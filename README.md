@@ -5,7 +5,7 @@ implements the discovery service APIs defined in
 
 ## Scope
 
-However, due to the variety of platforms out there, there is no single
+Due to the variety of platforms out there, there is no single
 control plane implementation that can satisfy everyone's needs.  Hence this
 code base does not attempt to be a full scale control plane for a fleet of
 Envoy proxies. Instead, it provides infrastructure that is shared by
