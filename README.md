@@ -6,7 +6,7 @@ implements the discovery service APIs defined in
 ## Scope
 
 Due to the variety of platforms out there, there is no single
-control plane implementation that can satisfy everyone's needs.  Hence this
+control plane implementation that can satisfy everyone's needs. Hence this
 code base does not attempt to be a full scale control plane for a fleet of
 Envoy proxies. Instead, it provides infrastructure that is shared by
 multiple different control plane implementations. The components provided
@@ -24,7 +24,7 @@ memory in an attempt to provide fast response to consumer Envoys. It is the
 responsibility of the consumer of this library to populate the cache as
 well as invalidate it when necessary. The cache will be keyed based on a
 pre-defined hash function whose keys are based on the
-[Node](https://github.com/envoyproxy/data-plane-api/blob/master/api/base.proto).
+[Node information](https://github.com/envoyproxy/data-plane-api/blob/master/api/base.proto#L25).
 
 At this moment, this repository will not tackle translating platform
 specific representation of resources (e.g., services, instances of
