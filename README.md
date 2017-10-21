@@ -24,7 +24,7 @@ memory in an attempt to provide fast response to consumer Envoys. It is the
 responsibility of the consumer of this library to populate the cache as
 well as invalidate it when necessary. The cache will be keyed based on a
 pre-defined hash function whose keys are based on the
-[Node information](https://github.com/envoyproxy/data-plane-api/blob/master/api/base.proto#L25).
+[Node information](https://github.com/envoyproxy/data-plane-api/blob/d4988844024d0bcff4bcd030552eabe3396203fa/api/base.proto#L26-L36).
 
 At this moment, this repository will not tackle translating platform
 specific representation of resources (e.g., services, instances of
