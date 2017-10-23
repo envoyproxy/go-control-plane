@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /go/src/github.com/envoyproxy/go-control-plane
     docker:
-      - image: rshriram/engoy-go-build:716c9eed
+      - image: rshriram/envoy-go-build:716c9eed
     steps:
       - checkout
       - run: make check
