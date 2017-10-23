@@ -41,7 +41,7 @@ compile: proto
 proto:
 	@go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
 	@mkdir -p proto
-	@/go/bin/protoc --go_out=plugins=grpc:proto/ vendor/github.com/envoyproxy/data-plane-api/api/*.proto \
+	@protoc --go_out=plugins=grpc:proto/ vendor/github.com/envoyproxy/data-plane-api/api/*.proto \
 					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
 					--proto_path=vendor/github.com/googleapis/googleapis/ \
 					--proto_path=vendor/github.com/google/protobuf/src/
