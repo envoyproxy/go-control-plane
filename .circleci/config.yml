@@ -7,5 +7,6 @@ jobs:
     steps:
       - checkout
       - run: make check
+      - run: make depend.install
       - run: make compile
       - run: make test
