@@ -1,0 +1,73 @@
+hash: 2f5e7adae8a174aebf478c2aac823837001c82d40f647fd9da15be270739057c
+updated: 2017-10-23T16:03:08.007589083-04:00
+imports:
+- name: github.com/envoyproxy/data-plane-api
+  version: 5b29f002b44f3f6e3921bd3b4535aeb91f89e84a
+- name: github.com/golang/protobuf
+  version: ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e
+  subpackages:
+  - jsonpb
+  - proto
+  - protoc-gen-go/descriptor
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/struct
+  - ptypes/timestamp
+  - ptypes/wrappers
+- name: github.com/google/protobuf
+  version: 78cb804063716767966cdcd86c66500df342ad33
+- name: github.com/googleapis/googleapis
+  version: 5c6df0cd18c6a429eab739fb711c27f6e1393366
+- name: golang.org/x/net
+  version: 5561cd9b4330353950f399814f427425c0a26fd2
+  subpackages:
+  - context
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - lex/httplex
+  - trace
+- name: golang.org/x/text
+  version: c01e4764d870b77f8abe5096ee19ad20d80e8075
+  subpackages:
+  - secure/bidirule
+  - transform
+  - unicode/bidi
+  - unicode/norm
+- name: google.golang.org/genproto
+  version: f676e0f3ac6395ff1a529ae59a6670878a8371a6
+  subpackages:
+  - googleapis/api/annotations
+  - googleapis/rpc/status
+- name: google.golang.org/grpc
+  version: 1687ce5770e998bcac6a136af6b52f079b9d902b
+  subpackages:
+  - codes
+  - connectivity
+  - credentials
+  - grpclb/grpc_lb_v1
+  - grpclog
+  - internal
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - stats
+  - status
+  - tap
+  - transport
+testImports:
+- name: github.com/golang/mock
+  version: 61503c535dc549c7ffc1ff07902345658a0f20a2
+  subpackages:
+  - gomock
+- name: github.com/onsi/gomega
+  version: 283ed655c6b8238afecd5bea6434bc9b03129f2f
+- name: github.com/stretchr/testify
+  version: 2aa2c176b9dab406a6970f6a55f513e8a8c8b18f
+  subpackages:
+  - assert
+- name: gopkg.in/yaml.v2
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
