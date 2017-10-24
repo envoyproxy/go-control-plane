@@ -23,7 +23,7 @@ for package in $PACKAGES; do
 done
 
 # Rewrite the local imports
-@gofmt -w -r '"api"->"github.com/envoyproxy/go-control-plane/api"' api/
+gofmt -w -r '"api"->"github.com/envoyproxy/go-control-plane/api"' api/
 
 
 
