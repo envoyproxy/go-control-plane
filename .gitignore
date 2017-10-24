@@ -2,7 +2,6 @@
 vendor
 bin
 build
-proto
 .idea*
 *.iml
 *.bak
