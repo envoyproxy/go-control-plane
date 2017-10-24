@@ -3,9 +3,10 @@ jobs:
   build:
     working_directory: /go/src/github.com/envoyproxy/go-control-plane
     docker:
-      - image: rshriram/envoy-go-build:956131ed
+      - image: circleci/golang:1.9
     steps:
       - checkout
+      - run: bin/install-deps.sh
       - run: make check
       - run: make depend.install
       - run: make build

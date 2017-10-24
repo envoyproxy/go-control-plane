@@ -1,31 +1,4 @@
-hash: d6fc1ffda5336bc94cc564496911ac0f6d812481c65b06e2a7833116cf3d127c
-updated: 2017-10-24T09:32:55.826752182-04:00
-imports:
-- name: github.com/envoyproxy/data-plane-api
-  version: 5b29f002b44f3f6e3921bd3b4535aeb91f89e84a
-- name: github.com/golang/protobuf
-  version: ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e
-  subpackages:
-  - jsonpb
-  - ptypes
-- name: github.com/google/protobuf
-  version: 78cb804063716767966cdcd86c66500df342ad33
-- name: github.com/googleapis/googleapis
-  version: 5c6df0cd18c6a429eab739fb711c27f6e1393366
-- name: golang.org/x/net
-  version: 4b14673ba32bee7f5ac0f990a48f033919fd418b
-  subpackages:
-  - context
-testImports:
-- name: github.com/golang/mock
-  version: 61503c535dc549c7ffc1ff07902345658a0f20a2
-  subpackages:
-  - gomock
-- name: github.com/onsi/gomega
-  version: 283ed655c6b8238afecd5bea6434bc9b03129f2f
-- name: github.com/stretchr/testify
-  version: 2aa2c176b9dab406a6970f6a55f513e8a8c8b18f
-  subpackages:
-  - assert
-- name: gopkg.in/yaml.v2
-  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
+hash: 4f4d2a5db31c584950d784580d75a34b37f48142f87fac5b80a6034ed1146f9c
+updated: 2017-10-24T13:42:00.208976733-04:00
+imports: []
+testImports: []

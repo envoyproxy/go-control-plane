@@ -6,10 +6,10 @@
 
 SHELL 		:= /bin/bash
 BINDIR		:= bin
-BUILDDIR    := build
+BUILDDIR	:= build
 DOCKERDIR	:= docker
 RELEASEDIR  := release
-OUTPUT_NAME := envoyctl
+OUTPUT_NAME := go-control-plane
 GOHOSTOS 	:= $(shell go env GOHOSTOS)
 
 ifndef GOOS
