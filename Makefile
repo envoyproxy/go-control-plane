@@ -40,8 +40,10 @@ compile:
 .PHONY: proto
 proto:
 	@go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
-	@mkdir -p services/xds/proto
-	@protoc --go_out=plugins=grpc:services/xds/proto/ vendor/github.com/envoyproxy/data-plane-api/api/*.proto \
+	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/*.proto \
+					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
+					--proto_path=vendor/github.com/googleapis/googleapis/
+	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/filter/*.proto \
 					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
 					--proto_path=vendor/github.com/googleapis/googleapis/
 
