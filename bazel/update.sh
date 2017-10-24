@@ -17,7 +17,13 @@ PACKAGES=`echo $GO_LIBRARIES | sed "s/[^ ]*\/\/\([^ ]*\):go_default_library/\1/g
 
 # Move generated API files to the sources
 for package in $PACKAGES; do
-  mkdir -p "pkg/$package"
-  rsync -a --include='*.pb.go' --exclude='*' \
-    "$BAZEL_BIN/external/$ENVOY_API/$package/go_default_library/$package/" "pkg/$package/"
+  mkdir -p "$package"
+  rsync -a --chmod=775 --include='*.pb.go' --exclude='*' \
+    "$BAZEL_BIN/external/$ENVOY_API/$package/go_default_library/$package/" "$package/"
 done
+
+# Rewrite the local imports
+@gofmt -w -r '"api"->"github.com/envoyproxy/go-control-plane/api"' api/
+
+
+
