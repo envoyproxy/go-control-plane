@@ -17,7 +17,7 @@ PACKAGES=`echo $GO_LIBRARIES | sed "s/[^ ]*\/\/\([^ ]*\):go_default_library/\1/g
 
 # Move generated API files to the sources
 for package in $PACKAGES; do
-  mkdir -p "vendor/$package"
+  mkdir -p "pkg/$package"
   rsync -a --include='*.pb.go' --exclude='*' \
-    "$BAZEL_BIN/external/$ENVOY_API/$package/go_default_library/$package/" "vendor/$package/"
+    "$BAZEL_BIN/external/$ENVOY_API/$package/go_default_library/$package/" "pkg/$package/"
 done
