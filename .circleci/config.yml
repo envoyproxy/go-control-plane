@@ -8,5 +8,5 @@ jobs:
       - checkout
       - run: make check
       - run: make depend.install
-      - run: make compile
+      - run: make build
       - run: make test

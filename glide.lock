@@ -1,5 +1,5 @@
-hash: 2f5e7adae8a174aebf478c2aac823837001c82d40f647fd9da15be270739057c
-updated: 2017-10-23T16:03:08.007589083-04:00
+hash: d6fc1ffda5336bc94cc564496911ac0f6d812481c65b06e2a7833116cf3d127c
+updated: 2017-10-24T09:32:55.826752182-04:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
   version: 5b29f002b44f3f6e3921bd3b4535aeb91f89e84a
@@ -7,57 +7,15 @@ imports:
   version: ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e
   subpackages:
   - jsonpb
-  - proto
-  - protoc-gen-go/descriptor
   - ptypes
-  - ptypes/any
-  - ptypes/duration
-  - ptypes/struct
-  - ptypes/timestamp
-  - ptypes/wrappers
 - name: github.com/google/protobuf
   version: 78cb804063716767966cdcd86c66500df342ad33
 - name: github.com/googleapis/googleapis
   version: 5c6df0cd18c6a429eab739fb711c27f6e1393366
 - name: golang.org/x/net
-  version: 5561cd9b4330353950f399814f427425c0a26fd2
+  version: 4b14673ba32bee7f5ac0f990a48f033919fd418b
   subpackages:
   - context
-  - http2
-  - http2/hpack
-  - idna
-  - internal/timeseries
-  - lex/httplex
-  - trace
-- name: golang.org/x/text
-  version: c01e4764d870b77f8abe5096ee19ad20d80e8075
-  subpackages:
-  - secure/bidirule
-  - transform
-  - unicode/bidi
-  - unicode/norm
-- name: google.golang.org/genproto
-  version: f676e0f3ac6395ff1a529ae59a6670878a8371a6
-  subpackages:
-  - googleapis/api/annotations
-  - googleapis/rpc/status
-- name: google.golang.org/grpc
-  version: 1687ce5770e998bcac6a136af6b52f079b9d902b
-  subpackages:
-  - codes
-  - connectivity
-  - credentials
-  - grpclb/grpc_lb_v1
-  - grpclog
-  - internal
-  - keepalive
-  - metadata
-  - naming
-  - peer
-  - stats
-  - status
-  - tap
-  - transport
 testImports:
 - name: github.com/golang/mock
   version: 61503c535dc549c7ffc1ff07902345658a0f20a2

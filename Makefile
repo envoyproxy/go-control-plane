@@ -1,4 +1,4 @@
-.DEFAULT_GOAL	:= compile
+.DEFAULT_GOAL	:= build
 
 #------------------------------------------------------------------------------
 # Variables
@@ -35,19 +35,20 @@ LDFLAGS		+= -X $(BUILD_SYM).buildUser=$(shell whoami || echo nobody)@$(shell hos
 LDFLAGS		+= -X $(BUILD_SYM).buildDate=$(shell date +%Y-%m-%dT%H:%M:%S%:z)
 LDFLAGS		+= -X $(BUILD_SYM).goVersion=$(word 3,$(shell go version))
 
-.PHONY: compile
-compile:
+.PHONY: build
+build:
 	@go build -ldflags '$(LDFLAGS)' -o $(BINDIR)/$(OUTPUT_NAME)
 
-.PHONY: proto
-proto:
-	@go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
-	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/*.proto \
-					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
-					--proto_path=vendor/github.com/googleapis/googleapis/
-	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/filter/*.proto \
-					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
-					--proto_path=vendor/github.com/googleapis/googleapis/
+# TODO: Set up this command to import envoy APIs into vendor/.../envoyproxy/data-plane-api/api/..
+# .PHONY: proto
+# proto:
+# 	@go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+# 	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/*.proto \
+# 					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
+# 					--proto_path=vendor/github.com/googleapis/googleapis/
+# 	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/filter/*.proto \
+# 					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
+# 					--proto_path=vendor/github.com/googleapis/googleapis/
 
 clean:
 	@echo "--> cleaning compiled objects and binaries"
@@ -101,20 +102,16 @@ depend.install:
 tools: tools.goimports tools.golint tools.govet
 
 tools.goimports:
-	@command -v goimports >/dev/null ; if [ $$? -ne 0 ]; then \
-		echo "--> installing goimports"; \
-		go get golang.org/x/tools/cmd/goimports; \
-    fi
+	@go get -u golang.org/x/tools/cmd/goimports
 
 tools.govet:
-	@go tool vet 2>/dev/null ; if [ $$? -eq 3 ]; then \
-		echo "--> installing govet"; \
-		go get golang.org/x/tools/cmd/vet; \
-	fi
+	@go get -u golang.org/x/tools/cmd/vet
 
 tools.golint:
-	@command -v golint >/dev/null ; if [ $$? -ne 0 ]; then \
-		echo "--> installing golint"; \
-		go get github.com/golang/lint/golint; \
-    fi
+	@go get -u github.com/golang/lint/golint
 
+tools.glide:
+	@command -v glide >/dev/null ; if [ $$? -ne 0 ]; then \
+		echo "--> installing glide"; \
+		curl https://glide.sh/get | sh; \
+    fi
