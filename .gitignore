@@ -15,6 +15,3 @@ coverage.out
 
 # auto-generated test files, e.g. mockgen
 *_gen_test.go
-
-# auto-generated build files
-*BUILD-e

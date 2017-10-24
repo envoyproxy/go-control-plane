@@ -20,9 +20,13 @@ ifndef GOARCH
 	GOARCH := $(shell go env GOHOSTARCH)
 endif
 
-GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*")
-GODIRS		= $(shell go list -f '{{.Dir}}' ./... | grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
-GOPKGS		= $(shell go list ./... | grep -vFf <(go list ./vendor/...))
+GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./api/*")
+GODIRS		= $(shell go list -f '{{.Dir}}' ./... \
+            | grep -vFf <(go list -f '{{.Dir}}' ./vendor/...) \
+            | grep -vFf <(go list -f '{{.Dir}}' ./api/...))
+GOPKGS		= $(shell go list ./... \
+            | grep -vFf <(go list ./vendor/...) \
+            | grep -vFf <(go list ./api/...))
 
 APP_VER		:= $(shell git describe --always 2> /dev/null || echo "unknown")
 
