@@ -39,17 +39,6 @@ LDFLAGS		+= -X $(BUILD_SYM).goVersion=$(word 3,$(shell go version))
 build:
 	@go build -ldflags '$(LDFLAGS)' -o $(BINDIR)/$(OUTPUT_NAME)
 
-# TODO: Set up this command to import envoy APIs into vendor/.../envoyproxy/data-plane-api/api/..
-# .PHONY: proto
-# proto:
-# 	@go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
-# 	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/*.proto \
-# 					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
-# 					--proto_path=vendor/github.com/googleapis/googleapis/
-# 	@protoc --go_out=plugins=grpc:pkg/ vendor/github.com/envoyproxy/data-plane-api/api/filter/*.proto \
-# 					--proto_path=vendor/github.com/envoyproxy/data-plane-api \
-# 					--proto_path=vendor/github.com/googleapis/googleapis/
-
 clean:
 	@echo "--> cleaning compiled objects and binaries"
 	@go clean -tags netgo -i $(GOPKGS)
@@ -86,11 +75,11 @@ lint: tools.golint
 #------------------
 .PHONY: depend.update depend.install
 
-depend.update:
+depend.update: tools.glide
 	@echo "--> updating dependencies from glide.yaml"
 	@glide update --strip-vendor
 
-depend.install:
+depend.install: tools.glide
 	@echo "--> installing dependencies from glide.lock "
 	@glide install --strip-vendor
 
