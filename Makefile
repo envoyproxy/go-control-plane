@@ -102,16 +102,25 @@ depend.install:
 tools: tools.goimports tools.golint tools.govet
 
 tools.goimports:
-	@go get -u golang.org/x/tools/cmd/goimports
+	@command -v goimports >/dev/null ; if [ $$? -ne 0 ]; then \
+		echo "--> installing goimports"; \
+		go get golang.org/x/tools/cmd/goimports; \
+	fi
 
 tools.govet:
-	@go get -u golang.org/x/tools/cmd/vet
+	@go tool vet 2>/dev/null ; if [ $$? -eq 3 ]; then \
+		echo "--> installing govet"; \
+		go get golang.org/x/tools/cmd/vet; \
+	fi
 
 tools.golint:
-	@go get -u github.com/golang/lint/golint
+	@command -v golint >/dev/null ; if [ $$? -ne 0 ]; then \
+		echo "--> installing golint"; \
+		go get github.com/golang/lint/golint; \
+	fi
 
 tools.glide:
 	@command -v glide >/dev/null ; if [ $$? -ne 0 ]; then \
 		echo "--> installing glide"; \
 		curl https://glide.sh/get | sh; \
-    fi
+	fi
