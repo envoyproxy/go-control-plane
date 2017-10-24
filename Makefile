@@ -24,6 +24,8 @@ GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GODIRS		= $(shell go list -f '{{.Dir}}' ./... | grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
 GOPKGS		= $(shell go list ./... | grep -vFf <(go list ./vendor/...))
 
+APP_VER		:= $(shell git describe --always 2> /dev/null || echo "unknown")
+
 # linker flags to set build info variables
 BUILD_SYM	:= github.com/envoyproxy/go-control-plane/pkg/version
 LDFLAGS		+= -X $(BUILD_SYM).version=$(APP_VER)
@@ -35,7 +37,7 @@ LDFLAGS		+= -X $(BUILD_SYM).goVersion=$(word 3,$(shell go version))
 
 .PHONY: compile
 compile:
-	@go build -o $(BINDIR)/$(OUTPUT_NAME)
+	@go build -ldflags '$(LDFLAGS)' -o $(BINDIR)/$(OUTPUT_NAME)
 
 .PHONY: proto
 proto:
