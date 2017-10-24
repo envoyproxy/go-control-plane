@@ -6,7 +6,7 @@ jobs:
       - image: circleci/golang:1.9
     steps:
       - checkout
-      - run: bin/install-deps.sh
+      - run: scripts/install-deps.sh
       - run: make check
       - run: make depend.install
       - run: make build
