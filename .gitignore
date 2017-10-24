@@ -1,5 +1,4 @@
 /bazel-*
-vendor
 bin
 build
 .idea*
