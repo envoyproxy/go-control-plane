@@ -1,4 +1,5 @@
 #!/bin/bash
+# Updates the API dependency SHA to master and uses bazel to generate code and copy it into the source tree
 
 set -o errexit
 set -o nounset
@@ -7,6 +8,17 @@ set -x
 
 BAZEL="bazel"
 ENVOY_API="envoy_api"
+
+# Update the SHA on API repo
+ENVOY_API_SHA=`git ls-remote https://github.com/envoyproxy/data-plane-api master | awk '{print $1}'`
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed_params=(-i "")
+else
+  sed_params=(-i)
+fi
+sed "${sed_params[@]}" \
+  -e "s|^ENVOY_API_SHA = .*$|ENVOY_API_SHA = \"$ENVOY_API_SHA\"|" \
+  bazel/repositories.bzl
 
 # Generate go sources
 GO_LIBRARIES=`$BAZEL query "attr(name, go_default_library, @${ENVOY_API}//...)" | tr '\n' ' '`
@@ -23,7 +35,9 @@ for package in $PACKAGES; do
 done
 
 # Rewrite the local imports
-gofmt -w -r '"api"->"github.com/envoyproxy/go-control-plane/api"' api/
+for package in $PACKAGES; do
+  gofmt -w -r "\"$package\"->\"github.com/envoyproxy/go-control-plane/$package\"" api/
+done
 
 
 

@@ -8,9 +8,9 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/struct"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf2 "github.com/golang/protobuf/ptypes/struct"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 import (
 	context "golang.org/x/net/context"
@@ -165,11 +165,11 @@ func (m *CircuitBreakers) GetThresholds() []*CircuitBreakers_Thresholds {
 }
 
 type CircuitBreakers_Thresholds struct {
-	Priority           RoutingPriority               `protobuf:"varint,1,opt,name=priority,enum=envoy.api.v2.RoutingPriority" json:"priority,omitempty"`
-	MaxConnections     *google_protobuf2.UInt32Value `protobuf:"bytes,2,opt,name=max_connections,json=maxConnections" json:"max_connections,omitempty"`
-	MaxPendingRequests *google_protobuf2.UInt32Value `protobuf:"bytes,3,opt,name=max_pending_requests,json=maxPendingRequests" json:"max_pending_requests,omitempty"`
-	MaxRequests        *google_protobuf2.UInt32Value `protobuf:"bytes,4,opt,name=max_requests,json=maxRequests" json:"max_requests,omitempty"`
-	MaxRetries         *google_protobuf2.UInt32Value `protobuf:"bytes,5,opt,name=max_retries,json=maxRetries" json:"max_retries,omitempty"`
+	Priority           RoutingPriority              `protobuf:"varint,1,opt,name=priority,enum=envoy.api.v2.RoutingPriority" json:"priority,omitempty"`
+	MaxConnections     *google_protobuf.UInt32Value `protobuf:"bytes,2,opt,name=max_connections,json=maxConnections" json:"max_connections,omitempty"`
+	MaxPendingRequests *google_protobuf.UInt32Value `protobuf:"bytes,3,opt,name=max_pending_requests,json=maxPendingRequests" json:"max_pending_requests,omitempty"`
+	MaxRequests        *google_protobuf.UInt32Value `protobuf:"bytes,4,opt,name=max_requests,json=maxRequests" json:"max_requests,omitempty"`
+	MaxRetries         *google_protobuf.UInt32Value `protobuf:"bytes,5,opt,name=max_retries,json=maxRetries" json:"max_retries,omitempty"`
 }
 
 func (m *CircuitBreakers_Thresholds) Reset()                    { *m = CircuitBreakers_Thresholds{} }
@@ -184,28 +184,28 @@ func (m *CircuitBreakers_Thresholds) GetPriority() RoutingPriority {
 	return RoutingPriority_DEFAULT
 }
 
-func (m *CircuitBreakers_Thresholds) GetMaxConnections() *google_protobuf2.UInt32Value {
+func (m *CircuitBreakers_Thresholds) GetMaxConnections() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.MaxConnections
 	}
 	return nil
 }
 
-func (m *CircuitBreakers_Thresholds) GetMaxPendingRequests() *google_protobuf2.UInt32Value {
+func (m *CircuitBreakers_Thresholds) GetMaxPendingRequests() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.MaxPendingRequests
 	}
 	return nil
 }
 
-func (m *CircuitBreakers_Thresholds) GetMaxRequests() *google_protobuf2.UInt32Value {
+func (m *CircuitBreakers_Thresholds) GetMaxRequests() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.MaxRequests
 	}
 	return nil
 }
 
-func (m *CircuitBreakers_Thresholds) GetMaxRetries() *google_protobuf2.UInt32Value {
+func (m *CircuitBreakers_Thresholds) GetMaxRetries() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.MaxRetries
 	}
@@ -213,30 +213,30 @@ func (m *CircuitBreakers_Thresholds) GetMaxRetries() *google_protobuf2.UInt32Val
 }
 
 type Cluster struct {
-	Name                          string                        `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Type                          Cluster_DiscoveryType         `protobuf:"varint,2,opt,name=type,enum=envoy.api.v2.Cluster_DiscoveryType" json:"type,omitempty"`
-	EdsClusterConfig              *Cluster_EdsClusterConfig     `protobuf:"bytes,3,opt,name=eds_cluster_config,json=edsClusterConfig" json:"eds_cluster_config,omitempty"`
-	ConnectTimeout                *google_protobuf.Duration     `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout" json:"connect_timeout,omitempty"`
-	PerConnectionBufferLimitBytes *google_protobuf2.UInt32Value `protobuf:"bytes,5,opt,name=per_connection_buffer_limit_bytes,json=perConnectionBufferLimitBytes" json:"per_connection_buffer_limit_bytes,omitempty"`
-	LbPolicy                      Cluster_LbPolicy              `protobuf:"varint,6,opt,name=lb_policy,json=lbPolicy,enum=envoy.api.v2.Cluster_LbPolicy" json:"lb_policy,omitempty"`
-	Hosts                         []*Address                    `protobuf:"bytes,7,rep,name=hosts" json:"hosts,omitempty"`
-	HealthChecks                  []*HealthCheck                `protobuf:"bytes,8,rep,name=health_checks,json=healthChecks" json:"health_checks,omitempty"`
-	MaxRequestsPerConnection      *google_protobuf2.UInt32Value `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection" json:"max_requests_per_connection,omitempty"`
-	CircuitBreakers               *CircuitBreakers              `protobuf:"bytes,10,opt,name=circuit_breakers,json=circuitBreakers" json:"circuit_breakers,omitempty"`
-	TlsContext                    *UpstreamTlsContext           `protobuf:"bytes,11,opt,name=tls_context,json=tlsContext" json:"tls_context,omitempty"`
+	Name                          string                       `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Type                          Cluster_DiscoveryType        `protobuf:"varint,2,opt,name=type,enum=envoy.api.v2.Cluster_DiscoveryType" json:"type,omitempty"`
+	EdsClusterConfig              *Cluster_EdsClusterConfig    `protobuf:"bytes,3,opt,name=eds_cluster_config,json=edsClusterConfig" json:"eds_cluster_config,omitempty"`
+	ConnectTimeout                *google_protobuf1.Duration   `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout" json:"connect_timeout,omitempty"`
+	PerConnectionBufferLimitBytes *google_protobuf.UInt32Value `protobuf:"bytes,5,opt,name=per_connection_buffer_limit_bytes,json=perConnectionBufferLimitBytes" json:"per_connection_buffer_limit_bytes,omitempty"`
+	LbPolicy                      Cluster_LbPolicy             `protobuf:"varint,6,opt,name=lb_policy,json=lbPolicy,enum=envoy.api.v2.Cluster_LbPolicy" json:"lb_policy,omitempty"`
+	Hosts                         []*Address                   `protobuf:"bytes,7,rep,name=hosts" json:"hosts,omitempty"`
+	HealthChecks                  []*HealthCheck               `protobuf:"bytes,8,rep,name=health_checks,json=healthChecks" json:"health_checks,omitempty"`
+	MaxRequestsPerConnection      *google_protobuf.UInt32Value `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection" json:"max_requests_per_connection,omitempty"`
+	CircuitBreakers               *CircuitBreakers             `protobuf:"bytes,10,opt,name=circuit_breakers,json=circuitBreakers" json:"circuit_breakers,omitempty"`
+	TlsContext                    *UpstreamTlsContext          `protobuf:"bytes,11,opt,name=tls_context,json=tlsContext" json:"tls_context,omitempty"`
 	// Types that are valid to be assigned to ProtocolOptions:
 	//	*Cluster_TcpProtocolOptions
 	//	*Cluster_HttpProtocolOptions
 	//	*Cluster_Http2ProtocolOptions
 	//	*Cluster_GrpcProtocolOptions
-	ProtocolOptions    isCluster_ProtocolOptions `protobuf_oneof:"protocol_options"`
-	DnsRefreshRate     *google_protobuf.Duration `protobuf:"bytes,16,opt,name=dns_refresh_rate,json=dnsRefreshRate" json:"dns_refresh_rate,omitempty"`
-	DnsLookupFamily    Cluster_DnsLookupFamily   `protobuf:"varint,17,opt,name=dns_lookup_family,json=dnsLookupFamily,enum=envoy.api.v2.Cluster_DnsLookupFamily" json:"dns_lookup_family,omitempty"`
-	DnsResolvers       []*Address                `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers" json:"dns_resolvers,omitempty"`
-	OutlierDetection   *Cluster_OutlierDetection `protobuf:"bytes,19,opt,name=outlier_detection,json=outlierDetection" json:"outlier_detection,omitempty"`
-	CleanupInterval    *google_protobuf.Duration `protobuf:"bytes,20,opt,name=cleanup_interval,json=cleanupInterval" json:"cleanup_interval,omitempty"`
-	UpstreamBindConfig *BindConfig               `protobuf:"bytes,21,opt,name=upstream_bind_config,json=upstreamBindConfig" json:"upstream_bind_config,omitempty"`
-	LbSubsetConfig     *Cluster_LbSubsetConfig   `protobuf:"bytes,22,opt,name=lb_subset_config,json=lbSubsetConfig" json:"lb_subset_config,omitempty"`
+	ProtocolOptions    isCluster_ProtocolOptions  `protobuf_oneof:"protocol_options"`
+	DnsRefreshRate     *google_protobuf1.Duration `protobuf:"bytes,16,opt,name=dns_refresh_rate,json=dnsRefreshRate" json:"dns_refresh_rate,omitempty"`
+	DnsLookupFamily    Cluster_DnsLookupFamily    `protobuf:"varint,17,opt,name=dns_lookup_family,json=dnsLookupFamily,enum=envoy.api.v2.Cluster_DnsLookupFamily" json:"dns_lookup_family,omitempty"`
+	DnsResolvers       []*Address                 `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers" json:"dns_resolvers,omitempty"`
+	OutlierDetection   *Cluster_OutlierDetection  `protobuf:"bytes,19,opt,name=outlier_detection,json=outlierDetection" json:"outlier_detection,omitempty"`
+	CleanupInterval    *google_protobuf1.Duration `protobuf:"bytes,20,opt,name=cleanup_interval,json=cleanupInterval" json:"cleanup_interval,omitempty"`
+	UpstreamBindConfig *BindConfig                `protobuf:"bytes,21,opt,name=upstream_bind_config,json=upstreamBindConfig" json:"upstream_bind_config,omitempty"`
+	LbSubsetConfig     *Cluster_LbSubsetConfig    `protobuf:"bytes,22,opt,name=lb_subset_config,json=lbSubsetConfig" json:"lb_subset_config,omitempty"`
 	// Types that are valid to be assigned to LbConfig:
 	//	*Cluster_RingHashLbConfig_
 	LbConfig isCluster_LbConfig `protobuf_oneof:"lb_config"`
@@ -310,14 +310,14 @@ func (m *Cluster) GetEdsClusterConfig() *Cluster_EdsClusterConfig {
 	return nil
 }
 
-func (m *Cluster) GetConnectTimeout() *google_protobuf.Duration {
+func (m *Cluster) GetConnectTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.ConnectTimeout
 	}
 	return nil
 }
 
-func (m *Cluster) GetPerConnectionBufferLimitBytes() *google_protobuf2.UInt32Value {
+func (m *Cluster) GetPerConnectionBufferLimitBytes() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.PerConnectionBufferLimitBytes
 	}
@@ -345,7 +345,7 @@ func (m *Cluster) GetHealthChecks() []*HealthCheck {
 	return nil
 }
 
-func (m *Cluster) GetMaxRequestsPerConnection() *google_protobuf2.UInt32Value {
+func (m *Cluster) GetMaxRequestsPerConnection() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.MaxRequestsPerConnection
 	}
@@ -394,7 +394,7 @@ func (m *Cluster) GetGrpcProtocolOptions() *GrpcProtocolOptions {
 	return nil
 }
 
-func (m *Cluster) GetDnsRefreshRate() *google_protobuf.Duration {
+func (m *Cluster) GetDnsRefreshRate() *google_protobuf1.Duration {
 	if m != nil {
 		return m.DnsRefreshRate
 	}
@@ -422,7 +422,7 @@ func (m *Cluster) GetOutlierDetection() *Cluster_OutlierDetection {
 	return nil
 }
 
-func (m *Cluster) GetCleanupInterval() *google_protobuf.Duration {
+func (m *Cluster) GetCleanupInterval() *google_protobuf1.Duration {
 	if m != nil {
 		return m.CleanupInterval
 	}
@@ -618,15 +618,15 @@ func (m *Cluster_EdsClusterConfig) GetServiceName() string {
 }
 
 type Cluster_OutlierDetection struct {
-	Consecutive_5Xx          *google_protobuf2.UInt32Value `protobuf:"bytes,1,opt,name=consecutive_5xx,json=consecutive5xx" json:"consecutive_5xx,omitempty"`
-	Interval                 *google_protobuf.Duration     `protobuf:"bytes,2,opt,name=interval" json:"interval,omitempty"`
-	BaseEjectionTime         *google_protobuf.Duration     `protobuf:"bytes,3,opt,name=base_ejection_time,json=baseEjectionTime" json:"base_ejection_time,omitempty"`
-	MaxEjectionPercent       *google_protobuf2.UInt32Value `protobuf:"bytes,4,opt,name=max_ejection_percent,json=maxEjectionPercent" json:"max_ejection_percent,omitempty"`
-	EnforcingConsecutive_5Xx *google_protobuf2.UInt32Value `protobuf:"bytes,5,opt,name=enforcing_consecutive_5xx,json=enforcingConsecutive5xx" json:"enforcing_consecutive_5xx,omitempty"`
-	EnforcingSuccessRate     *google_protobuf2.UInt32Value `protobuf:"bytes,6,opt,name=enforcing_success_rate,json=enforcingSuccessRate" json:"enforcing_success_rate,omitempty"`
-	SuccessRateMinimumHosts  *google_protobuf2.UInt32Value `protobuf:"bytes,7,opt,name=success_rate_minimum_hosts,json=successRateMinimumHosts" json:"success_rate_minimum_hosts,omitempty"`
-	SuccessRateRequestVolume *google_protobuf2.UInt32Value `protobuf:"bytes,8,opt,name=success_rate_request_volume,json=successRateRequestVolume" json:"success_rate_request_volume,omitempty"`
-	SuccessRateStdevFactor   *google_protobuf2.UInt32Value `protobuf:"bytes,9,opt,name=success_rate_stdev_factor,json=successRateStdevFactor" json:"success_rate_stdev_factor,omitempty"`
+	Consecutive_5Xx          *google_protobuf.UInt32Value `protobuf:"bytes,1,opt,name=consecutive_5xx,json=consecutive5xx" json:"consecutive_5xx,omitempty"`
+	Interval                 *google_protobuf1.Duration   `protobuf:"bytes,2,opt,name=interval" json:"interval,omitempty"`
+	BaseEjectionTime         *google_protobuf1.Duration   `protobuf:"bytes,3,opt,name=base_ejection_time,json=baseEjectionTime" json:"base_ejection_time,omitempty"`
+	MaxEjectionPercent       *google_protobuf.UInt32Value `protobuf:"bytes,4,opt,name=max_ejection_percent,json=maxEjectionPercent" json:"max_ejection_percent,omitempty"`
+	EnforcingConsecutive_5Xx *google_protobuf.UInt32Value `protobuf:"bytes,5,opt,name=enforcing_consecutive_5xx,json=enforcingConsecutive5xx" json:"enforcing_consecutive_5xx,omitempty"`
+	EnforcingSuccessRate     *google_protobuf.UInt32Value `protobuf:"bytes,6,opt,name=enforcing_success_rate,json=enforcingSuccessRate" json:"enforcing_success_rate,omitempty"`
+	SuccessRateMinimumHosts  *google_protobuf.UInt32Value `protobuf:"bytes,7,opt,name=success_rate_minimum_hosts,json=successRateMinimumHosts" json:"success_rate_minimum_hosts,omitempty"`
+	SuccessRateRequestVolume *google_protobuf.UInt32Value `protobuf:"bytes,8,opt,name=success_rate_request_volume,json=successRateRequestVolume" json:"success_rate_request_volume,omitempty"`
+	SuccessRateStdevFactor   *google_protobuf.UInt32Value `protobuf:"bytes,9,opt,name=success_rate_stdev_factor,json=successRateStdevFactor" json:"success_rate_stdev_factor,omitempty"`
 }
 
 func (m *Cluster_OutlierDetection) Reset()                    { *m = Cluster_OutlierDetection{} }
@@ -634,63 +634,63 @@ func (m *Cluster_OutlierDetection) String() string            { return proto.Com
 func (*Cluster_OutlierDetection) ProtoMessage()               {}
 func (*Cluster_OutlierDetection) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{2, 1} }
 
-func (m *Cluster_OutlierDetection) GetConsecutive_5Xx() *google_protobuf2.UInt32Value {
+func (m *Cluster_OutlierDetection) GetConsecutive_5Xx() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.Consecutive_5Xx
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetInterval() *google_protobuf.Duration {
+func (m *Cluster_OutlierDetection) GetInterval() *google_protobuf1.Duration {
 	if m != nil {
 		return m.Interval
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetBaseEjectionTime() *google_protobuf.Duration {
+func (m *Cluster_OutlierDetection) GetBaseEjectionTime() *google_protobuf1.Duration {
 	if m != nil {
 		return m.BaseEjectionTime
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetMaxEjectionPercent() *google_protobuf2.UInt32Value {
+func (m *Cluster_OutlierDetection) GetMaxEjectionPercent() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.MaxEjectionPercent
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetEnforcingConsecutive_5Xx() *google_protobuf2.UInt32Value {
+func (m *Cluster_OutlierDetection) GetEnforcingConsecutive_5Xx() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.EnforcingConsecutive_5Xx
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetEnforcingSuccessRate() *google_protobuf2.UInt32Value {
+func (m *Cluster_OutlierDetection) GetEnforcingSuccessRate() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.EnforcingSuccessRate
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetSuccessRateMinimumHosts() *google_protobuf2.UInt32Value {
+func (m *Cluster_OutlierDetection) GetSuccessRateMinimumHosts() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.SuccessRateMinimumHosts
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetSuccessRateRequestVolume() *google_protobuf2.UInt32Value {
+func (m *Cluster_OutlierDetection) GetSuccessRateRequestVolume() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.SuccessRateRequestVolume
 	}
 	return nil
 }
 
-func (m *Cluster_OutlierDetection) GetSuccessRateStdevFactor() *google_protobuf2.UInt32Value {
+func (m *Cluster_OutlierDetection) GetSuccessRateStdevFactor() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.SuccessRateStdevFactor
 	}
@@ -699,7 +699,7 @@ func (m *Cluster_OutlierDetection) GetSuccessRateStdevFactor() *google_protobuf2
 
 type Cluster_LbSubsetConfig struct {
 	FallbackPolicy  Cluster_LbSubsetConfig_LbSubsetFallbackPolicy `protobuf:"varint,1,opt,name=fallback_policy,json=fallbackPolicy,enum=envoy.api.v2.Cluster_LbSubsetConfig_LbSubsetFallbackPolicy" json:"fallback_policy,omitempty"`
-	DefaultSubset   *google_protobuf1.Struct                      `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset" json:"default_subset,omitempty"`
+	DefaultSubset   *google_protobuf2.Struct                      `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset" json:"default_subset,omitempty"`
 	SubsetSelectors []*Cluster_LbSubsetConfig_LbSubsetSelector    `protobuf:"bytes,3,rep,name=subset_selectors,json=subsetSelectors" json:"subset_selectors,omitempty"`
 }
 
@@ -715,7 +715,7 @@ func (m *Cluster_LbSubsetConfig) GetFallbackPolicy() Cluster_LbSubsetConfig_LbSu
 	return Cluster_LbSubsetConfig_NO_FALLBACK
 }
 
-func (m *Cluster_LbSubsetConfig) GetDefaultSubset() *google_protobuf1.Struct {
+func (m *Cluster_LbSubsetConfig) GetDefaultSubset() *google_protobuf2.Struct {
 	if m != nil {
 		return m.DefaultSubset
 	}
@@ -750,7 +750,7 @@ func (m *Cluster_LbSubsetConfig_LbSubsetSelector) GetKeys() []string {
 }
 
 type Cluster_RingHashLbConfig struct {
-	MinimumRingSize *google_protobuf2.UInt64Value          `protobuf:"bytes,1,opt,name=minimum_ring_size,json=minimumRingSize" json:"minimum_ring_size,omitempty"`
+	MinimumRingSize *google_protobuf.UInt64Value           `protobuf:"bytes,1,opt,name=minimum_ring_size,json=minimumRingSize" json:"minimum_ring_size,omitempty"`
 	DeprecatedV1    *Cluster_RingHashLbConfig_DeprecatedV1 `protobuf:"bytes,2,opt,name=deprecated_v1,json=deprecatedV1" json:"deprecated_v1,omitempty"`
 }
 
@@ -759,7 +759,7 @@ func (m *Cluster_RingHashLbConfig) String() string            { return proto.Com
 func (*Cluster_RingHashLbConfig) ProtoMessage()               {}
 func (*Cluster_RingHashLbConfig) Descriptor() ([]byte, []int) { return fileDescriptor4, []int{2, 3} }
 
-func (m *Cluster_RingHashLbConfig) GetMinimumRingSize() *google_protobuf2.UInt64Value {
+func (m *Cluster_RingHashLbConfig) GetMinimumRingSize() *google_protobuf.UInt64Value {
 	if m != nil {
 		return m.MinimumRingSize
 	}
@@ -774,7 +774,7 @@ func (m *Cluster_RingHashLbConfig) GetDeprecatedV1() *Cluster_RingHashLbConfig_D
 }
 
 type Cluster_RingHashLbConfig_DeprecatedV1 struct {
-	UseStdHash *google_protobuf2.BoolValue `protobuf:"bytes,1,opt,name=use_std_hash,json=useStdHash" json:"use_std_hash,omitempty"`
+	UseStdHash *google_protobuf.BoolValue `protobuf:"bytes,1,opt,name=use_std_hash,json=useStdHash" json:"use_std_hash,omitempty"`
 }
 
 func (m *Cluster_RingHashLbConfig_DeprecatedV1) Reset()         { *m = Cluster_RingHashLbConfig_DeprecatedV1{} }
@@ -784,7 +784,7 @@ func (*Cluster_RingHashLbConfig_DeprecatedV1) Descriptor() ([]byte, []int) {
 	return fileDescriptor4, []int{2, 3, 0}
 }
 
-func (m *Cluster_RingHashLbConfig_DeprecatedV1) GetUseStdHash() *google_protobuf2.BoolValue {
+func (m *Cluster_RingHashLbConfig_DeprecatedV1) GetUseStdHash() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.UseStdHash
 	}

@@ -3,8 +3,7 @@
 # https://github.com/google/protobuf/pull/3761.
 PROTOBUF_SHA = "c4f59dcc5c13debc572154c8f636b8a9361aacde"
 
-# ENVOY_API_SHA = "5b29f002b44f3f6e3921bd3b4535aeb91f89e84a" # Oct 23, 2018
-ENVOY_API_SHA = "488be171a42e142d2f8dbaa1b3e176a6ec70bdb4"
+ENVOY_API_SHA = "a039871337d82acb8aab868beb723b19e0ed196e"
 
 def protobuf_dependencies():
     native.http_archive(

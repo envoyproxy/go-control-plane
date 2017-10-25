@@ -8,7 +8,7 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
 
 import (
 	context "golang.org/x/net/context"
@@ -310,8 +310,8 @@ func (m *ClusterHealthCheck) GetEndpoints() []*LocalityEndpoints {
 }
 
 type HealthCheckSpecifier struct {
-	HealthCheck []*ClusterHealthCheck     `protobuf:"bytes,1,rep,name=health_check,json=healthCheck" json:"health_check,omitempty"`
-	Interval    *google_protobuf.Duration `protobuf:"bytes,2,opt,name=interval" json:"interval,omitempty"`
+	HealthCheck []*ClusterHealthCheck      `protobuf:"bytes,1,rep,name=health_check,json=healthCheck" json:"health_check,omitempty"`
+	Interval    *google_protobuf1.Duration `protobuf:"bytes,2,opt,name=interval" json:"interval,omitempty"`
 }
 
 func (m *HealthCheckSpecifier) Reset()                    { *m = HealthCheckSpecifier{} }
@@ -326,7 +326,7 @@ func (m *HealthCheckSpecifier) GetHealthCheck() []*ClusterHealthCheck {
 	return nil
 }
 
-func (m *HealthCheckSpecifier) GetInterval() *google_protobuf.Duration {
+func (m *HealthCheckSpecifier) GetInterval() *google_protobuf1.Duration {
 	if m != nil {
 		return m.Interval
 	}

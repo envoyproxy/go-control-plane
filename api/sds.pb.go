@@ -8,7 +8,7 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 import (
 	context "golang.org/x/net/context"
@@ -270,12 +270,12 @@ func (m *TlsSessionTicketKeys) GetKeys() []*DataSource {
 }
 
 type CertificateValidationContext struct {
-	TrustedCa                         *DataSource                 `protobuf:"bytes,1,opt,name=trusted_ca,json=trustedCa" json:"trusted_ca,omitempty"`
-	VerifyCertificateHash             []string                    `protobuf:"bytes,2,rep,name=verify_certificate_hash,json=verifyCertificateHash" json:"verify_certificate_hash,omitempty"`
-	VerifySpkiSha256                  []string                    `protobuf:"bytes,3,rep,name=verify_spki_sha256,json=verifySpkiSha256" json:"verify_spki_sha256,omitempty"`
-	VerifySubjectAltName              []string                    `protobuf:"bytes,4,rep,name=verify_subject_alt_name,json=verifySubjectAltName" json:"verify_subject_alt_name,omitempty"`
-	RequireOcspStaple                 *google_protobuf2.BoolValue `protobuf:"bytes,5,opt,name=require_ocsp_staple,json=requireOcspStaple" json:"require_ocsp_staple,omitempty"`
-	RequireSignedCertificateTimestamp *google_protobuf2.BoolValue `protobuf:"bytes,6,opt,name=require_signed_certificate_timestamp,json=requireSignedCertificateTimestamp" json:"require_signed_certificate_timestamp,omitempty"`
+	TrustedCa                         *DataSource                `protobuf:"bytes,1,opt,name=trusted_ca,json=trustedCa" json:"trusted_ca,omitempty"`
+	VerifyCertificateHash             []string                   `protobuf:"bytes,2,rep,name=verify_certificate_hash,json=verifyCertificateHash" json:"verify_certificate_hash,omitempty"`
+	VerifySpkiSha256                  []string                   `protobuf:"bytes,3,rep,name=verify_spki_sha256,json=verifySpkiSha256" json:"verify_spki_sha256,omitempty"`
+	VerifySubjectAltName              []string                   `protobuf:"bytes,4,rep,name=verify_subject_alt_name,json=verifySubjectAltName" json:"verify_subject_alt_name,omitempty"`
+	RequireOcspStaple                 *google_protobuf.BoolValue `protobuf:"bytes,5,opt,name=require_ocsp_staple,json=requireOcspStaple" json:"require_ocsp_staple,omitempty"`
+	RequireSignedCertificateTimestamp *google_protobuf.BoolValue `protobuf:"bytes,6,opt,name=require_signed_certificate_timestamp,json=requireSignedCertificateTimestamp" json:"require_signed_certificate_timestamp,omitempty"`
 }
 
 func (m *CertificateValidationContext) Reset()                    { *m = CertificateValidationContext{} }
@@ -311,14 +311,14 @@ func (m *CertificateValidationContext) GetVerifySubjectAltName() []string {
 	return nil
 }
 
-func (m *CertificateValidationContext) GetRequireOcspStaple() *google_protobuf2.BoolValue {
+func (m *CertificateValidationContext) GetRequireOcspStaple() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.RequireOcspStaple
 	}
 	return nil
 }
 
-func (m *CertificateValidationContext) GetRequireSignedCertificateTimestamp() *google_protobuf2.BoolValue {
+func (m *CertificateValidationContext) GetRequireSignedCertificateTimestamp() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.RequireSignedCertificateTimestamp
 	}
@@ -424,9 +424,9 @@ func (m *UpstreamTlsContext) GetSni() string {
 }
 
 type DownstreamTlsContext struct {
-	CommonTlsContext         *CommonTlsContext           `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext" json:"common_tls_context,omitempty"`
-	RequireClientCertificate *google_protobuf2.BoolValue `protobuf:"bytes,2,opt,name=require_client_certificate,json=requireClientCertificate" json:"require_client_certificate,omitempty"`
-	RequireSni               *google_protobuf2.BoolValue `protobuf:"bytes,3,opt,name=require_sni,json=requireSni" json:"require_sni,omitempty"`
+	CommonTlsContext         *CommonTlsContext          `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext" json:"common_tls_context,omitempty"`
+	RequireClientCertificate *google_protobuf.BoolValue `protobuf:"bytes,2,opt,name=require_client_certificate,json=requireClientCertificate" json:"require_client_certificate,omitempty"`
+	RequireSni               *google_protobuf.BoolValue `protobuf:"bytes,3,opt,name=require_sni,json=requireSni" json:"require_sni,omitempty"`
 	// Types that are valid to be assigned to SessionTicketKeysType:
 	//	*DownstreamTlsContext_SessionTicketKeys
 	//	*DownstreamTlsContext_SessionTicketKeysSdsSecretConfig
@@ -467,14 +467,14 @@ func (m *DownstreamTlsContext) GetCommonTlsContext() *CommonTlsContext {
 	return nil
 }
 
-func (m *DownstreamTlsContext) GetRequireClientCertificate() *google_protobuf2.BoolValue {
+func (m *DownstreamTlsContext) GetRequireClientCertificate() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.RequireClientCertificate
 	}
 	return nil
 }
 
-func (m *DownstreamTlsContext) GetRequireSni() *google_protobuf2.BoolValue {
+func (m *DownstreamTlsContext) GetRequireSni() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.RequireSni
 	}
