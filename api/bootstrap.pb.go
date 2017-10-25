@@ -7,9 +7,9 @@ package api
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/struct"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf2 "github.com/golang/protobuf/ptypes/struct"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -82,7 +82,7 @@ func (m *Tracing) GetHttp() *Tracing_Http {
 
 type Tracing_Http struct {
 	Name   string                   `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Config *google_protobuf1.Struct `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
+	Config *google_protobuf2.Struct `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
 }
 
 func (m *Tracing_Http) Reset()                    { *m = Tracing_Http{} }
@@ -97,7 +97,7 @@ func (m *Tracing_Http) GetName() string {
 	return ""
 }
 
-func (m *Tracing_Http) GetConfig() *google_protobuf1.Struct {
+func (m *Tracing_Http) GetConfig() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Config
 	}
@@ -313,7 +313,7 @@ func _StatsdSink_OneofSizer(msg proto.Message) (n int) {
 
 type StatsSink struct {
 	Name   string                   `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Config *google_protobuf1.Struct `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
+	Config *google_protobuf2.Struct `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
 }
 
 func (m *StatsSink) Reset()                    { *m = StatsSink{} }
@@ -328,7 +328,7 @@ func (m *StatsSink) GetName() string {
 	return ""
 }
 
-func (m *StatsSink) GetConfig() *google_protobuf1.Struct {
+func (m *StatsSink) GetConfig() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Config
 	}
@@ -360,8 +360,8 @@ func (m *TagSpecifier) GetRegex() string {
 }
 
 type StatsConfig struct {
-	StatsTags         []*TagSpecifier             `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags" json:"stats_tags,omitempty"`
-	UseAllDefaultTags *google_protobuf2.BoolValue `protobuf:"bytes,2,opt,name=use_all_default_tags,json=useAllDefaultTags" json:"use_all_default_tags,omitempty"`
+	StatsTags         []*TagSpecifier            `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags" json:"stats_tags,omitempty"`
+	UseAllDefaultTags *google_protobuf.BoolValue `protobuf:"bytes,2,opt,name=use_all_default_tags,json=useAllDefaultTags" json:"use_all_default_tags,omitempty"`
 }
 
 func (m *StatsConfig) Reset()                    { *m = StatsConfig{} }
@@ -376,7 +376,7 @@ func (m *StatsConfig) GetStatsTags() []*TagSpecifier {
 	return nil
 }
 
-func (m *StatsConfig) GetUseAllDefaultTags() *google_protobuf2.BoolValue {
+func (m *StatsConfig) GetUseAllDefaultTags() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.UseAllDefaultTags
 	}
@@ -384,10 +384,10 @@ func (m *StatsConfig) GetUseAllDefaultTags() *google_protobuf2.BoolValue {
 }
 
 type Watchdog struct {
-	MissTimeout      *google_protobuf.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout" json:"miss_timeout,omitempty"`
-	MegamissTimeout  *google_protobuf.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout" json:"megamiss_timeout,omitempty"`
-	KillTimeout      *google_protobuf.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout" json:"kill_timeout,omitempty"`
-	MultikillTimeout *google_protobuf.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout" json:"multikill_timeout,omitempty"`
+	MissTimeout      *google_protobuf1.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout" json:"miss_timeout,omitempty"`
+	MegamissTimeout  *google_protobuf1.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout" json:"megamiss_timeout,omitempty"`
+	KillTimeout      *google_protobuf1.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout" json:"kill_timeout,omitempty"`
+	MultikillTimeout *google_protobuf1.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout" json:"multikill_timeout,omitempty"`
 }
 
 func (m *Watchdog) Reset()                    { *m = Watchdog{} }
@@ -395,28 +395,28 @@ func (m *Watchdog) String() string            { return proto.CompactTextString(m
 func (*Watchdog) ProtoMessage()               {}
 func (*Watchdog) Descriptor() ([]byte, []int) { return fileDescriptor3, []int{9} }
 
-func (m *Watchdog) GetMissTimeout() *google_protobuf.Duration {
+func (m *Watchdog) GetMissTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.MissTimeout
 	}
 	return nil
 }
 
-func (m *Watchdog) GetMegamissTimeout() *google_protobuf.Duration {
+func (m *Watchdog) GetMegamissTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.MegamissTimeout
 	}
 	return nil
 }
 
-func (m *Watchdog) GetKillTimeout() *google_protobuf.Duration {
+func (m *Watchdog) GetKillTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.KillTimeout
 	}
 	return nil
 }
 
-func (m *Watchdog) GetMultikillTimeout() *google_protobuf.Duration {
+func (m *Watchdog) GetMultikillTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.MultikillTimeout
 	}
@@ -479,7 +479,7 @@ type Bootstrap struct {
 	FlagsPath          string                      `protobuf:"bytes,5,opt,name=flags_path,json=flagsPath" json:"flags_path,omitempty"`
 	StatsSinks         []*StatsSink                `protobuf:"bytes,6,rep,name=stats_sinks,json=statsSinks" json:"stats_sinks,omitempty"`
 	StatsConfig        *StatsConfig                `protobuf:"bytes,13,opt,name=stats_config,json=statsConfig" json:"stats_config,omitempty"`
-	StatsFlushInterval *google_protobuf.Duration   `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval" json:"stats_flush_interval,omitempty"`
+	StatsFlushInterval *google_protobuf1.Duration  `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval" json:"stats_flush_interval,omitempty"`
 	Watchdog           *Watchdog                   `protobuf:"bytes,8,opt,name=watchdog" json:"watchdog,omitempty"`
 	Tracing            *Tracing                    `protobuf:"bytes,9,opt,name=tracing" json:"tracing,omitempty"`
 	RateLimitService   *RateLimitServiceConfig     `protobuf:"bytes,10,opt,name=rate_limit_service,json=rateLimitService" json:"rate_limit_service,omitempty"`
@@ -541,7 +541,7 @@ func (m *Bootstrap) GetStatsConfig() *StatsConfig {
 	return nil
 }
 
-func (m *Bootstrap) GetStatsFlushInterval() *google_protobuf.Duration {
+func (m *Bootstrap) GetStatsFlushInterval() *google_protobuf1.Duration {
 	if m != nil {
 		return m.StatsFlushInterval
 	}

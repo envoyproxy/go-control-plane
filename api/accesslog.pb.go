@@ -27,6 +27,7 @@ It has these top-level messages:
 	SocketAddress
 	BindConfig
 	Address
+	CidrRange
 	Locality
 	Node
 	Endpoint
@@ -111,10 +112,10 @@ package api
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/struct"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf2 "github.com/golang/protobuf/ptypes/struct"
 import google_protobuf3 "github.com/golang/protobuf/ptypes/timestamp"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -245,28 +246,28 @@ type EnvoyAccessLog struct {
 	UpstreamHost            string                        `protobuf:"bytes,5,opt,name=upstream_host,json=upstreamHost" json:"upstream_host,omitempty"`
 	UpstreamCluster         string                        `protobuf:"bytes,6,opt,name=upstream_cluster,json=upstreamCluster" json:"upstream_cluster,omitempty"`
 	DestinationHost         string                        `protobuf:"bytes,7,opt,name=destination_host,json=destinationHost" json:"destination_host,omitempty"`
-	RequestBodyBytes        *google_protobuf2.UInt64Value `protobuf:"bytes,8,opt,name=request_body_bytes,json=requestBodyBytes" json:"request_body_bytes,omitempty"`
-	ResponseBodyBytes       *google_protobuf2.UInt64Value `protobuf:"bytes,9,opt,name=response_body_bytes,json=responseBodyBytes" json:"response_body_bytes,omitempty"`
-	RequestHeadersBytes     *google_protobuf2.UInt64Value `protobuf:"bytes,10,opt,name=request_headers_bytes,json=requestHeadersBytes" json:"request_headers_bytes,omitempty"`
-	ResponseHeadersBytes    *google_protobuf2.UInt64Value `protobuf:"bytes,11,opt,name=response_headers_bytes,json=responseHeadersBytes" json:"response_headers_bytes,omitempty"`
-	Secure                  *google_protobuf2.BoolValue   `protobuf:"bytes,12,opt,name=secure" json:"secure,omitempty"`
-	HealthCheck             *google_protobuf2.BoolValue   `protobuf:"bytes,13,opt,name=health_check,json=healthCheck" json:"health_check,omitempty"`
-	ResponseCode            *google_protobuf2.UInt32Value `protobuf:"bytes,14,opt,name=response_code,json=responseCode" json:"response_code,omitempty"`
+	RequestBodyBytes        *google_protobuf.UInt64Value  `protobuf:"bytes,8,opt,name=request_body_bytes,json=requestBodyBytes" json:"request_body_bytes,omitempty"`
+	ResponseBodyBytes       *google_protobuf.UInt64Value  `protobuf:"bytes,9,opt,name=response_body_bytes,json=responseBodyBytes" json:"response_body_bytes,omitempty"`
+	RequestHeadersBytes     *google_protobuf.UInt64Value  `protobuf:"bytes,10,opt,name=request_headers_bytes,json=requestHeadersBytes" json:"request_headers_bytes,omitempty"`
+	ResponseHeadersBytes    *google_protobuf.UInt64Value  `protobuf:"bytes,11,opt,name=response_headers_bytes,json=responseHeadersBytes" json:"response_headers_bytes,omitempty"`
+	Secure                  *google_protobuf.BoolValue    `protobuf:"bytes,12,opt,name=secure" json:"secure,omitempty"`
+	HealthCheck             *google_protobuf.BoolValue    `protobuf:"bytes,13,opt,name=health_check,json=healthCheck" json:"health_check,omitempty"`
+	ResponseCode            *google_protobuf.UInt32Value  `protobuf:"bytes,14,opt,name=response_code,json=responseCode" json:"response_code,omitempty"`
 	UserAgent               string                        `protobuf:"bytes,15,opt,name=user_agent,json=userAgent" json:"user_agent,omitempty"`
 	Path                    string                        `protobuf:"bytes,17,opt,name=path" json:"path,omitempty"`
 	Referer                 string                        `protobuf:"bytes,18,opt,name=referer" json:"referer,omitempty"`
 	ForwardedFor            string                        `protobuf:"bytes,19,opt,name=forwarded_for,json=forwardedFor" json:"forwarded_for,omitempty"`
 	RequestId               string                        `protobuf:"bytes,20,opt,name=request_id,json=requestId" json:"request_id,omitempty"`
 	Authority               string                        `protobuf:"bytes,21,opt,name=authority" json:"authority,omitempty"`
-	ResponseDuration        *google_protobuf.Duration     `protobuf:"bytes,22,opt,name=response_duration,json=responseDuration" json:"response_duration,omitempty"`
-	UpstreamServiceDuration *google_protobuf.Duration     `protobuf:"bytes,23,opt,name=upstream_service_duration,json=upstreamServiceDuration" json:"upstream_service_duration,omitempty"`
+	ResponseDuration        *google_protobuf1.Duration    `protobuf:"bytes,22,opt,name=response_duration,json=responseDuration" json:"response_duration,omitempty"`
+	UpstreamServiceDuration *google_protobuf1.Duration    `protobuf:"bytes,23,opt,name=upstream_service_duration,json=upstreamServiceDuration" json:"upstream_service_duration,omitempty"`
 	OriginalPath            string                        `protobuf:"bytes,24,opt,name=original_path,json=originalPath" json:"original_path,omitempty"`
-	Metadata                *google_protobuf1.Struct      `protobuf:"bytes,25,opt,name=metadata" json:"metadata,omitempty"`
+	Metadata                *google_protobuf2.Struct      `protobuf:"bytes,25,opt,name=metadata" json:"metadata,omitempty"`
 	RequestHeaders          []*HeaderValue                `protobuf:"bytes,26,rep,name=request_headers,json=requestHeaders" json:"request_headers,omitempty"`
 	ResponseHeaders         []*HeaderValue                `protobuf:"bytes,27,rep,name=response_headers,json=responseHeaders" json:"response_headers,omitempty"`
 	TlsSniHostname          string                        `protobuf:"bytes,28,opt,name=tls_sni_hostname,json=tlsSniHostname" json:"tls_sni_hostname,omitempty"`
 	TlsVersion              EnvoyAccessLog_TLSVersion     `protobuf:"varint,29,opt,name=tls_version,json=tlsVersion,enum=envoy.api.v2.EnvoyAccessLog_TLSVersion" json:"tls_version,omitempty"`
-	TlsCipherSuite          *google_protobuf2.UInt32Value `protobuf:"bytes,30,opt,name=tls_cipher_suite,json=tlsCipherSuite" json:"tls_cipher_suite,omitempty"`
+	TlsCipherSuite          *google_protobuf.UInt32Value  `protobuf:"bytes,30,opt,name=tls_cipher_suite,json=tlsCipherSuite" json:"tls_cipher_suite,omitempty"`
 }
 
 func (m *EnvoyAccessLog) Reset()                    { *m = EnvoyAccessLog{} }
@@ -323,49 +324,49 @@ func (m *EnvoyAccessLog) GetDestinationHost() string {
 	return ""
 }
 
-func (m *EnvoyAccessLog) GetRequestBodyBytes() *google_protobuf2.UInt64Value {
+func (m *EnvoyAccessLog) GetRequestBodyBytes() *google_protobuf.UInt64Value {
 	if m != nil {
 		return m.RequestBodyBytes
 	}
 	return nil
 }
 
-func (m *EnvoyAccessLog) GetResponseBodyBytes() *google_protobuf2.UInt64Value {
+func (m *EnvoyAccessLog) GetResponseBodyBytes() *google_protobuf.UInt64Value {
 	if m != nil {
 		return m.ResponseBodyBytes
 	}
 	return nil
 }
 
-func (m *EnvoyAccessLog) GetRequestHeadersBytes() *google_protobuf2.UInt64Value {
+func (m *EnvoyAccessLog) GetRequestHeadersBytes() *google_protobuf.UInt64Value {
 	if m != nil {
 		return m.RequestHeadersBytes
 	}
 	return nil
 }
 
-func (m *EnvoyAccessLog) GetResponseHeadersBytes() *google_protobuf2.UInt64Value {
+func (m *EnvoyAccessLog) GetResponseHeadersBytes() *google_protobuf.UInt64Value {
 	if m != nil {
 		return m.ResponseHeadersBytes
 	}
 	return nil
 }
 
-func (m *EnvoyAccessLog) GetSecure() *google_protobuf2.BoolValue {
+func (m *EnvoyAccessLog) GetSecure() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.Secure
 	}
 	return nil
 }
 
-func (m *EnvoyAccessLog) GetHealthCheck() *google_protobuf2.BoolValue {
+func (m *EnvoyAccessLog) GetHealthCheck() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.HealthCheck
 	}
 	return nil
 }
 
-func (m *EnvoyAccessLog) GetResponseCode() *google_protobuf2.UInt32Value {
+func (m *EnvoyAccessLog) GetResponseCode() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.ResponseCode
 	}
@@ -414,14 +415,14 @@ func (m *EnvoyAccessLog) GetAuthority() string {
 	return ""
 }
 
-func (m *EnvoyAccessLog) GetResponseDuration() *google_protobuf.Duration {
+func (m *EnvoyAccessLog) GetResponseDuration() *google_protobuf1.Duration {
 	if m != nil {
 		return m.ResponseDuration
 	}
 	return nil
 }
 
-func (m *EnvoyAccessLog) GetUpstreamServiceDuration() *google_protobuf.Duration {
+func (m *EnvoyAccessLog) GetUpstreamServiceDuration() *google_protobuf1.Duration {
 	if m != nil {
 		return m.UpstreamServiceDuration
 	}
@@ -435,7 +436,7 @@ func (m *EnvoyAccessLog) GetOriginalPath() string {
 	return ""
 }
 
-func (m *EnvoyAccessLog) GetMetadata() *google_protobuf1.Struct {
+func (m *EnvoyAccessLog) GetMetadata() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Metadata
 	}
@@ -470,7 +471,7 @@ func (m *EnvoyAccessLog) GetTlsVersion() EnvoyAccessLog_TLSVersion {
 	return EnvoyAccessLog_VERSION_UNSPECIFIED
 }
 
-func (m *EnvoyAccessLog) GetTlsCipherSuite() *google_protobuf2.UInt32Value {
+func (m *EnvoyAccessLog) GetTlsCipherSuite() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.TlsCipherSuite
 	}

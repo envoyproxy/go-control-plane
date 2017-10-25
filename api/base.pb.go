@@ -7,9 +7,9 @@ package api
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
-import google_protobuf1 "github.com/golang/protobuf/ptypes/struct"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf2 "github.com/golang/protobuf/ptypes/struct"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -138,7 +138,7 @@ func (m *Locality) GetSubZone() string {
 type Node struct {
 	Id           string                   `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 	Cluster      string                   `protobuf:"bytes,2,opt,name=cluster" json:"cluster,omitempty"`
-	Metadata     *google_protobuf1.Struct `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
+	Metadata     *google_protobuf2.Struct `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
 	Locality     *Locality                `protobuf:"bytes,4,opt,name=locality" json:"locality,omitempty"`
 	BuildVersion string                   `protobuf:"bytes,5,opt,name=build_version,json=buildVersion" json:"build_version,omitempty"`
 }
@@ -162,7 +162,7 @@ func (m *Node) GetCluster() string {
 	return ""
 }
 
-func (m *Node) GetMetadata() *google_protobuf1.Struct {
+func (m *Node) GetMetadata() *google_protobuf2.Struct {
 	if m != nil {
 		return m.Metadata
 	}
@@ -200,7 +200,7 @@ func (m *Endpoint) GetAddress() *Address {
 }
 
 type Metadata struct {
-	FilterMetadata map[string]*google_protobuf1.Struct `protobuf:"bytes,1,rep,name=filter_metadata,json=filterMetadata" json:"filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	FilterMetadata map[string]*google_protobuf2.Struct `protobuf:"bytes,1,rep,name=filter_metadata,json=filterMetadata" json:"filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 }
 
 func (m *Metadata) Reset()                    { *m = Metadata{} }
@@ -208,7 +208,7 @@ func (m *Metadata) String() string            { return proto.CompactTextString(m
 func (*Metadata) ProtoMessage()               {}
 func (*Metadata) Descriptor() ([]byte, []int) { return fileDescriptor2, []int{3} }
 
-func (m *Metadata) GetFilterMetadata() map[string]*google_protobuf1.Struct {
+func (m *Metadata) GetFilterMetadata() map[string]*google_protobuf2.Struct {
 	if m != nil {
 		return m.FilterMetadata
 	}
@@ -264,8 +264,8 @@ func (m *HeaderValue) GetValue() string {
 }
 
 type HeaderValueOption struct {
-	Header *HeaderValue                `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
-	Append *google_protobuf2.BoolValue `protobuf:"bytes,2,opt,name=append" json:"append,omitempty"`
+	Header *HeaderValue               `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
+	Append *google_protobuf.BoolValue `protobuf:"bytes,2,opt,name=append" json:"append,omitempty"`
 }
 
 func (m *HeaderValueOption) Reset()                    { *m = HeaderValueOption{} }
@@ -280,7 +280,7 @@ func (m *HeaderValueOption) GetHeader() *HeaderValue {
 	return nil
 }
 
-func (m *HeaderValueOption) GetAppend() *google_protobuf2.BoolValue {
+func (m *HeaderValueOption) GetAppend() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.Append
 	}
@@ -288,9 +288,9 @@ func (m *HeaderValueOption) GetAppend() *google_protobuf2.BoolValue {
 }
 
 type ApiConfigSource struct {
-	ApiType      ApiConfigSource_ApiType   `protobuf:"varint,1,opt,name=api_type,json=apiType,enum=envoy.api.v2.ApiConfigSource_ApiType" json:"api_type,omitempty"`
-	ClusterName  []string                  `protobuf:"bytes,2,rep,name=cluster_name,json=clusterName" json:"cluster_name,omitempty"`
-	RefreshDelay *google_protobuf.Duration `protobuf:"bytes,3,opt,name=refresh_delay,json=refreshDelay" json:"refresh_delay,omitempty"`
+	ApiType      ApiConfigSource_ApiType    `protobuf:"varint,1,opt,name=api_type,json=apiType,enum=envoy.api.v2.ApiConfigSource_ApiType" json:"api_type,omitempty"`
+	ClusterName  []string                   `protobuf:"bytes,2,rep,name=cluster_name,json=clusterName" json:"cluster_name,omitempty"`
+	RefreshDelay *google_protobuf1.Duration `protobuf:"bytes,3,opt,name=refresh_delay,json=refreshDelay" json:"refresh_delay,omitempty"`
 }
 
 func (m *ApiConfigSource) Reset()                    { *m = ApiConfigSource{} }
@@ -312,7 +312,7 @@ func (m *ApiConfigSource) GetClusterName() []string {
 	return nil
 }
 
-func (m *ApiConfigSource) GetRefreshDelay() *google_protobuf.Duration {
+func (m *ApiConfigSource) GetRefreshDelay() *google_protobuf1.Duration {
 	if m != nil {
 		return m.RefreshDelay
 	}

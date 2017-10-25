@@ -1,2 +1,18 @@
 package: github.com/envoyproxy/go-control-plane
-import: []
+import:
+- package: github.com/golang/protobuf
+  subpackages:
+  - proto
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/struct
+  - ptypes/timestamp
+  - ptypes/wrappers
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: google.golang.org/genproto
+  subpackages:
+  - googleapis/api/annotations
+- package: google.golang.org/grpc
+  version: ^1.7.0

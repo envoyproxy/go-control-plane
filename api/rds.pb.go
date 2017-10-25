@@ -8,8 +8,8 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 import (
 	context "golang.org/x/net/context"
@@ -72,9 +72,9 @@ func (m *WeightedCluster) GetRuntimeKeyPrefix() string {
 }
 
 type WeightedCluster_ClusterWeight struct {
-	Name          string                        `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Weight        *google_protobuf2.UInt32Value `protobuf:"bytes,2,opt,name=weight" json:"weight,omitempty"`
-	MetadataMatch *Metadata                     `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch" json:"metadata_match,omitempty"`
+	Name          string                       `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Weight        *google_protobuf.UInt32Value `protobuf:"bytes,2,opt,name=weight" json:"weight,omitempty"`
+	MetadataMatch *Metadata                    `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch" json:"metadata_match,omitempty"`
 }
 
 func (m *WeightedCluster_ClusterWeight) Reset()         { *m = WeightedCluster_ClusterWeight{} }
@@ -91,7 +91,7 @@ func (m *WeightedCluster_ClusterWeight) GetName() string {
 	return ""
 }
 
-func (m *WeightedCluster_ClusterWeight) GetWeight() *google_protobuf2.UInt32Value {
+func (m *WeightedCluster_ClusterWeight) GetWeight() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.Weight
 	}
@@ -110,10 +110,10 @@ type RouteMatch struct {
 	//	*RouteMatch_Prefix
 	//	*RouteMatch_Path
 	//	*RouteMatch_Regex
-	PathSpecifier isRouteMatch_PathSpecifier  `protobuf_oneof:"path_specifier"`
-	CaseSensitive *google_protobuf2.BoolValue `protobuf:"bytes,4,opt,name=case_sensitive,json=caseSensitive" json:"case_sensitive,omitempty"`
-	Runtime       *RuntimeUInt32              `protobuf:"bytes,5,opt,name=runtime" json:"runtime,omitempty"`
-	Headers       []*HeaderMatcher            `protobuf:"bytes,6,rep,name=headers" json:"headers,omitempty"`
+	PathSpecifier isRouteMatch_PathSpecifier `protobuf_oneof:"path_specifier"`
+	CaseSensitive *google_protobuf.BoolValue `protobuf:"bytes,4,opt,name=case_sensitive,json=caseSensitive" json:"case_sensitive,omitempty"`
+	Runtime       *RuntimeUInt32             `protobuf:"bytes,5,opt,name=runtime" json:"runtime,omitempty"`
+	Headers       []*HeaderMatcher           `protobuf:"bytes,6,rep,name=headers" json:"headers,omitempty"`
 }
 
 func (m *RouteMatch) Reset()                    { *m = RouteMatch{} }
@@ -167,7 +167,7 @@ func (m *RouteMatch) GetRegex() string {
 	return ""
 }
 
-func (m *RouteMatch) GetCaseSensitive() *google_protobuf2.BoolValue {
+func (m *RouteMatch) GetCaseSensitive() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.CaseSensitive
 	}
@@ -270,13 +270,13 @@ func _RouteMatch_OneofSizer(msg proto.Message) (n int) {
 }
 
 type CorsPolicy struct {
-	AllowOrigin      []string                    `protobuf:"bytes,1,rep,name=allow_origin,json=allowOrigin" json:"allow_origin,omitempty"`
-	AllowMethods     string                      `protobuf:"bytes,2,opt,name=allow_methods,json=allowMethods" json:"allow_methods,omitempty"`
-	AllowHeaders     string                      `protobuf:"bytes,3,opt,name=allow_headers,json=allowHeaders" json:"allow_headers,omitempty"`
-	ExposeHeaders    string                      `protobuf:"bytes,4,opt,name=expose_headers,json=exposeHeaders" json:"expose_headers,omitempty"`
-	MaxAge           string                      `protobuf:"bytes,5,opt,name=max_age,json=maxAge" json:"max_age,omitempty"`
-	AllowCredentials *google_protobuf2.BoolValue `protobuf:"bytes,6,opt,name=allow_credentials,json=allowCredentials" json:"allow_credentials,omitempty"`
-	Enabled          *google_protobuf2.BoolValue `protobuf:"bytes,7,opt,name=enabled" json:"enabled,omitempty"`
+	AllowOrigin      []string                   `protobuf:"bytes,1,rep,name=allow_origin,json=allowOrigin" json:"allow_origin,omitempty"`
+	AllowMethods     string                     `protobuf:"bytes,2,opt,name=allow_methods,json=allowMethods" json:"allow_methods,omitempty"`
+	AllowHeaders     string                     `protobuf:"bytes,3,opt,name=allow_headers,json=allowHeaders" json:"allow_headers,omitempty"`
+	ExposeHeaders    string                     `protobuf:"bytes,4,opt,name=expose_headers,json=exposeHeaders" json:"expose_headers,omitempty"`
+	MaxAge           string                     `protobuf:"bytes,5,opt,name=max_age,json=maxAge" json:"max_age,omitempty"`
+	AllowCredentials *google_protobuf.BoolValue `protobuf:"bytes,6,opt,name=allow_credentials,json=allowCredentials" json:"allow_credentials,omitempty"`
+	Enabled          *google_protobuf.BoolValue `protobuf:"bytes,7,opt,name=enabled" json:"enabled,omitempty"`
 }
 
 func (m *CorsPolicy) Reset()                    { *m = CorsPolicy{} }
@@ -319,14 +319,14 @@ func (m *CorsPolicy) GetMaxAge() string {
 	return ""
 }
 
-func (m *CorsPolicy) GetAllowCredentials() *google_protobuf2.BoolValue {
+func (m *CorsPolicy) GetAllowCredentials() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.AllowCredentials
 	}
 	return nil
 }
 
-func (m *CorsPolicy) GetEnabled() *google_protobuf2.BoolValue {
+func (m *CorsPolicy) GetEnabled() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.Enabled
 	}
@@ -345,15 +345,15 @@ type RouteAction struct {
 	//	*RouteAction_HostRewrite
 	//	*RouteAction_AutoHostRewrite
 	HostRewriteSpecifier isRouteAction_HostRewriteSpecifier `protobuf_oneof:"host_rewrite_specifier"`
-	Timeout              *google_protobuf.Duration          `protobuf:"bytes,8,opt,name=timeout" json:"timeout,omitempty"`
+	Timeout              *google_protobuf1.Duration         `protobuf:"bytes,8,opt,name=timeout" json:"timeout,omitempty"`
 	RetryPolicy          *RouteAction_RetryPolicy           `protobuf:"bytes,9,opt,name=retry_policy,json=retryPolicy" json:"retry_policy,omitempty"`
 	RequestMirrorPolicy  *RouteAction_RequestMirrorPolicy   `protobuf:"bytes,10,opt,name=request_mirror_policy,json=requestMirrorPolicy" json:"request_mirror_policy,omitempty"`
 	Priority             RoutingPriority                    `protobuf:"varint,11,opt,name=priority,enum=envoy.api.v2.RoutingPriority" json:"priority,omitempty"`
 	RequestHeadersToAdd  []*HeaderValueOption               `protobuf:"bytes,12,rep,name=request_headers_to_add,json=requestHeadersToAdd" json:"request_headers_to_add,omitempty"`
 	RateLimits           []*RateLimit                       `protobuf:"bytes,13,rep,name=rate_limits,json=rateLimits" json:"rate_limits,omitempty"`
-	IncludeVhRateLimits  *google_protobuf2.BoolValue        `protobuf:"bytes,14,opt,name=include_vh_rate_limits,json=includeVhRateLimits" json:"include_vh_rate_limits,omitempty"`
+	IncludeVhRateLimits  *google_protobuf.BoolValue         `protobuf:"bytes,14,opt,name=include_vh_rate_limits,json=includeVhRateLimits" json:"include_vh_rate_limits,omitempty"`
 	HashPolicy           []*RouteAction_HashPolicy          `protobuf:"bytes,15,rep,name=hash_policy,json=hashPolicy" json:"hash_policy,omitempty"`
-	UseWebsocket         *google_protobuf2.BoolValue        `protobuf:"bytes,16,opt,name=use_websocket,json=useWebsocket" json:"use_websocket,omitempty"`
+	UseWebsocket         *google_protobuf.BoolValue         `protobuf:"bytes,16,opt,name=use_websocket,json=useWebsocket" json:"use_websocket,omitempty"`
 	Cors                 *CorsPolicy                        `protobuf:"bytes,17,opt,name=cors" json:"cors,omitempty"`
 }
 
@@ -382,7 +382,7 @@ type RouteAction_HostRewrite struct {
 	HostRewrite string `protobuf:"bytes,6,opt,name=host_rewrite,json=hostRewrite,oneof"`
 }
 type RouteAction_AutoHostRewrite struct {
-	AutoHostRewrite *google_protobuf2.BoolValue `protobuf:"bytes,7,opt,name=auto_host_rewrite,json=autoHostRewrite,oneof"`
+	AutoHostRewrite *google_protobuf.BoolValue `protobuf:"bytes,7,opt,name=auto_host_rewrite,json=autoHostRewrite,oneof"`
 }
 
 func (*RouteAction_Cluster) isRouteAction_ClusterSpecifier()             {}
@@ -446,14 +446,14 @@ func (m *RouteAction) GetHostRewrite() string {
 	return ""
 }
 
-func (m *RouteAction) GetAutoHostRewrite() *google_protobuf2.BoolValue {
+func (m *RouteAction) GetAutoHostRewrite() *google_protobuf.BoolValue {
 	if x, ok := m.GetHostRewriteSpecifier().(*RouteAction_AutoHostRewrite); ok {
 		return x.AutoHostRewrite
 	}
 	return nil
 }
 
-func (m *RouteAction) GetTimeout() *google_protobuf.Duration {
+func (m *RouteAction) GetTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.Timeout
 	}
@@ -495,7 +495,7 @@ func (m *RouteAction) GetRateLimits() []*RateLimit {
 	return nil
 }
 
-func (m *RouteAction) GetIncludeVhRateLimits() *google_protobuf2.BoolValue {
+func (m *RouteAction) GetIncludeVhRateLimits() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.IncludeVhRateLimits
 	}
@@ -509,7 +509,7 @@ func (m *RouteAction) GetHashPolicy() []*RouteAction_HashPolicy {
 	return nil
 }
 
-func (m *RouteAction) GetUseWebsocket() *google_protobuf2.BoolValue {
+func (m *RouteAction) GetUseWebsocket() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.UseWebsocket
 	}
@@ -606,7 +606,7 @@ func _RouteAction_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Bu
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(google_protobuf2.BoolValue)
+		msg := new(google_protobuf.BoolValue)
 		err := b.DecodeMessage(msg)
 		m.HostRewriteSpecifier = &RouteAction_AutoHostRewrite{msg}
 		return true, err
@@ -655,9 +655,9 @@ func _RouteAction_OneofSizer(msg proto.Message) (n int) {
 }
 
 type RouteAction_RetryPolicy struct {
-	RetryOn       string                        `protobuf:"bytes,1,opt,name=retry_on,json=retryOn" json:"retry_on,omitempty"`
-	NumRetries    *google_protobuf2.UInt32Value `protobuf:"bytes,2,opt,name=num_retries,json=numRetries" json:"num_retries,omitempty"`
-	PerTryTimeout *google_protobuf.Duration     `protobuf:"bytes,3,opt,name=per_try_timeout,json=perTryTimeout" json:"per_try_timeout,omitempty"`
+	RetryOn       string                       `protobuf:"bytes,1,opt,name=retry_on,json=retryOn" json:"retry_on,omitempty"`
+	NumRetries    *google_protobuf.UInt32Value `protobuf:"bytes,2,opt,name=num_retries,json=numRetries" json:"num_retries,omitempty"`
+	PerTryTimeout *google_protobuf1.Duration   `protobuf:"bytes,3,opt,name=per_try_timeout,json=perTryTimeout" json:"per_try_timeout,omitempty"`
 }
 
 func (m *RouteAction_RetryPolicy) Reset()                    { *m = RouteAction_RetryPolicy{} }
@@ -672,14 +672,14 @@ func (m *RouteAction_RetryPolicy) GetRetryOn() string {
 	return ""
 }
 
-func (m *RouteAction_RetryPolicy) GetNumRetries() *google_protobuf2.UInt32Value {
+func (m *RouteAction_RetryPolicy) GetNumRetries() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.NumRetries
 	}
 	return nil
 }
 
-func (m *RouteAction_RetryPolicy) GetPerTryTimeout() *google_protobuf.Duration {
+func (m *RouteAction_RetryPolicy) GetPerTryTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.PerTryTimeout
 	}
@@ -883,8 +883,8 @@ func (m *RouteAction_HashPolicy_Header) GetHeaderName() string {
 }
 
 type RouteAction_HashPolicy_Cookie struct {
-	Name string                    `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Ttl  *google_protobuf.Duration `protobuf:"bytes,2,opt,name=ttl" json:"ttl,omitempty"`
+	Name string                     `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Ttl  *google_protobuf1.Duration `protobuf:"bytes,2,opt,name=ttl" json:"ttl,omitempty"`
 }
 
 func (m *RouteAction_HashPolicy_Cookie) Reset()         { *m = RouteAction_HashPolicy_Cookie{} }
@@ -901,7 +901,7 @@ func (m *RouteAction_HashPolicy_Cookie) GetName() string {
 	return ""
 }
 
-func (m *RouteAction_HashPolicy_Cookie) GetTtl() *google_protobuf.Duration {
+func (m *RouteAction_HashPolicy_Cookie) GetTtl() *google_protobuf1.Duration {
 	if m != nil {
 		return m.Ttl
 	}
@@ -1148,9 +1148,9 @@ func (m *VirtualCluster) GetMethod() RequestMethod {
 }
 
 type RateLimit struct {
-	Stage      *google_protobuf2.UInt32Value `protobuf:"bytes,1,opt,name=stage" json:"stage,omitempty"`
-	DisableKey string                        `protobuf:"bytes,2,opt,name=disable_key,json=disableKey" json:"disable_key,omitempty"`
-	Actions    []*RateLimit_Action           `protobuf:"bytes,3,rep,name=actions" json:"actions,omitempty"`
+	Stage      *google_protobuf.UInt32Value `protobuf:"bytes,1,opt,name=stage" json:"stage,omitempty"`
+	DisableKey string                       `protobuf:"bytes,2,opt,name=disable_key,json=disableKey" json:"disable_key,omitempty"`
+	Actions    []*RateLimit_Action          `protobuf:"bytes,3,rep,name=actions" json:"actions,omitempty"`
 }
 
 func (m *RateLimit) Reset()                    { *m = RateLimit{} }
@@ -1158,7 +1158,7 @@ func (m *RateLimit) String() string            { return proto.CompactTextString(
 func (*RateLimit) ProtoMessage()               {}
 func (*RateLimit) Descriptor() ([]byte, []int) { return fileDescriptor11, []int{8} }
 
-func (m *RateLimit) GetStage() *google_protobuf2.UInt32Value {
+func (m *RateLimit) GetStage() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.Stage
 	}
@@ -1499,9 +1499,9 @@ func (m *RateLimit_Action_GenericKey) GetDescriptorValue() string {
 }
 
 type RateLimit_Action_HeaderValueMatch struct {
-	DescriptorValue string                      `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue" json:"descriptor_value,omitempty"`
-	ExpectMatch     *google_protobuf2.BoolValue `protobuf:"bytes,2,opt,name=expect_match,json=expectMatch" json:"expect_match,omitempty"`
-	Headers         []*HeaderMatcher            `protobuf:"bytes,3,rep,name=headers" json:"headers,omitempty"`
+	DescriptorValue string                     `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue" json:"descriptor_value,omitempty"`
+	ExpectMatch     *google_protobuf.BoolValue `protobuf:"bytes,2,opt,name=expect_match,json=expectMatch" json:"expect_match,omitempty"`
+	Headers         []*HeaderMatcher           `protobuf:"bytes,3,rep,name=headers" json:"headers,omitempty"`
 }
 
 func (m *RateLimit_Action_HeaderValueMatch) Reset()         { *m = RateLimit_Action_HeaderValueMatch{} }
@@ -1518,7 +1518,7 @@ func (m *RateLimit_Action_HeaderValueMatch) GetDescriptorValue() string {
 	return ""
 }
 
-func (m *RateLimit_Action_HeaderValueMatch) GetExpectMatch() *google_protobuf2.BoolValue {
+func (m *RateLimit_Action_HeaderValueMatch) GetExpectMatch() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.ExpectMatch
 	}
@@ -1533,9 +1533,9 @@ func (m *RateLimit_Action_HeaderValueMatch) GetHeaders() []*HeaderMatcher {
 }
 
 type HeaderMatcher struct {
-	Name  string                      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Value string                      `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
-	Regex *google_protobuf2.BoolValue `protobuf:"bytes,3,opt,name=regex" json:"regex,omitempty"`
+	Name  string                     `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Value string                     `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
+	Regex *google_protobuf.BoolValue `protobuf:"bytes,3,opt,name=regex" json:"regex,omitempty"`
 }
 
 func (m *HeaderMatcher) Reset()                    { *m = HeaderMatcher{} }
@@ -1557,7 +1557,7 @@ func (m *HeaderMatcher) GetValue() string {
 	return ""
 }
 
-func (m *HeaderMatcher) GetRegex() *google_protobuf2.BoolValue {
+func (m *HeaderMatcher) GetRegex() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.Regex
 	}
@@ -1637,13 +1637,13 @@ func (m *VirtualHost) GetCors() *CorsPolicy {
 }
 
 type RouteConfiguration struct {
-	Name                    string                      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	VirtualHosts            []*VirtualHost              `protobuf:"bytes,2,rep,name=virtual_hosts,json=virtualHosts" json:"virtual_hosts,omitempty"`
-	InternalOnlyHeaders     []string                    `protobuf:"bytes,3,rep,name=internal_only_headers,json=internalOnlyHeaders" json:"internal_only_headers,omitempty"`
-	ResponseHeadersToAdd    []*HeaderValueOption        `protobuf:"bytes,4,rep,name=response_headers_to_add,json=responseHeadersToAdd" json:"response_headers_to_add,omitempty"`
-	ResponseHeadersToRemove []string                    `protobuf:"bytes,5,rep,name=response_headers_to_remove,json=responseHeadersToRemove" json:"response_headers_to_remove,omitempty"`
-	RequestHeadersToAdd     []*HeaderValueOption        `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd" json:"request_headers_to_add,omitempty"`
-	ValidateClusters        *google_protobuf2.BoolValue `protobuf:"bytes,7,opt,name=validate_clusters,json=validateClusters" json:"validate_clusters,omitempty"`
+	Name                    string                     `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	VirtualHosts            []*VirtualHost             `protobuf:"bytes,2,rep,name=virtual_hosts,json=virtualHosts" json:"virtual_hosts,omitempty"`
+	InternalOnlyHeaders     []string                   `protobuf:"bytes,3,rep,name=internal_only_headers,json=internalOnlyHeaders" json:"internal_only_headers,omitempty"`
+	ResponseHeadersToAdd    []*HeaderValueOption       `protobuf:"bytes,4,rep,name=response_headers_to_add,json=responseHeadersToAdd" json:"response_headers_to_add,omitempty"`
+	ResponseHeadersToRemove []string                   `protobuf:"bytes,5,rep,name=response_headers_to_remove,json=responseHeadersToRemove" json:"response_headers_to_remove,omitempty"`
+	RequestHeadersToAdd     []*HeaderValueOption       `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd" json:"request_headers_to_add,omitempty"`
+	ValidateClusters        *google_protobuf.BoolValue `protobuf:"bytes,7,opt,name=validate_clusters,json=validateClusters" json:"validate_clusters,omitempty"`
 }
 
 func (m *RouteConfiguration) Reset()                    { *m = RouteConfiguration{} }
@@ -1693,7 +1693,7 @@ func (m *RouteConfiguration) GetRequestHeadersToAdd() []*HeaderValueOption {
 	return nil
 }
 
-func (m *RouteConfiguration) GetValidateClusters() *google_protobuf2.BoolValue {
+func (m *RouteConfiguration) GetValidateClusters() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.ValidateClusters
 	}

@@ -8,8 +8,8 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 import (
 	context "golang.org/x/net/context"
@@ -22,10 +22,10 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 type LbEndpoint struct {
-	Endpoint            *Endpoint                     `protobuf:"bytes,1,opt,name=endpoint" json:"endpoint,omitempty"`
-	HealthStatus        HealthStatus                  `protobuf:"varint,2,opt,name=health_status,json=healthStatus,enum=envoy.api.v2.HealthStatus" json:"health_status,omitempty"`
-	Metadata            *Metadata                     `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
-	LoadBalancingWeight *google_protobuf2.UInt32Value `protobuf:"bytes,4,opt,name=load_balancing_weight,json=loadBalancingWeight" json:"load_balancing_weight,omitempty"`
+	Endpoint            *Endpoint                    `protobuf:"bytes,1,opt,name=endpoint" json:"endpoint,omitempty"`
+	HealthStatus        HealthStatus                 `protobuf:"varint,2,opt,name=health_status,json=healthStatus,enum=envoy.api.v2.HealthStatus" json:"health_status,omitempty"`
+	Metadata            *Metadata                    `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
+	LoadBalancingWeight *google_protobuf.UInt32Value `protobuf:"bytes,4,opt,name=load_balancing_weight,json=loadBalancingWeight" json:"load_balancing_weight,omitempty"`
 }
 
 func (m *LbEndpoint) Reset()                    { *m = LbEndpoint{} }
@@ -54,7 +54,7 @@ func (m *LbEndpoint) GetMetadata() *Metadata {
 	return nil
 }
 
-func (m *LbEndpoint) GetLoadBalancingWeight() *google_protobuf2.UInt32Value {
+func (m *LbEndpoint) GetLoadBalancingWeight() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.LoadBalancingWeight
 	}
@@ -62,9 +62,9 @@ func (m *LbEndpoint) GetLoadBalancingWeight() *google_protobuf2.UInt32Value {
 }
 
 type LocalityLbEndpoints struct {
-	Locality            *Locality                     `protobuf:"bytes,1,opt,name=locality" json:"locality,omitempty"`
-	LbEndpoints         []*LbEndpoint                 `protobuf:"bytes,2,rep,name=lb_endpoints,json=lbEndpoints" json:"lb_endpoints,omitempty"`
-	LoadBalancingWeight *google_protobuf2.UInt32Value `protobuf:"bytes,3,opt,name=load_balancing_weight,json=loadBalancingWeight" json:"load_balancing_weight,omitempty"`
+	Locality            *Locality                    `protobuf:"bytes,1,opt,name=locality" json:"locality,omitempty"`
+	LbEndpoints         []*LbEndpoint                `protobuf:"bytes,2,rep,name=lb_endpoints,json=lbEndpoints" json:"lb_endpoints,omitempty"`
+	LoadBalancingWeight *google_protobuf.UInt32Value `protobuf:"bytes,3,opt,name=load_balancing_weight,json=loadBalancingWeight" json:"load_balancing_weight,omitempty"`
 }
 
 func (m *LocalityLbEndpoints) Reset()                    { *m = LocalityLbEndpoints{} }
@@ -86,7 +86,7 @@ func (m *LocalityLbEndpoints) GetLbEndpoints() []*LbEndpoint {
 	return nil
 }
 
-func (m *LocalityLbEndpoints) GetLoadBalancingWeight() *google_protobuf2.UInt32Value {
+func (m *LocalityLbEndpoints) GetLoadBalancingWeight() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.LoadBalancingWeight
 	}
@@ -286,8 +286,8 @@ func (m *ClusterLoadAssignment_Policy) GetDropOverload() float64 {
 }
 
 type LoadStatsResponse struct {
-	Clusters              []string                  `protobuf:"bytes,1,rep,name=clusters" json:"clusters,omitempty"`
-	LoadReportingInterval *google_protobuf.Duration `protobuf:"bytes,2,opt,name=load_reporting_interval,json=loadReportingInterval" json:"load_reporting_interval,omitempty"`
+	Clusters              []string                   `protobuf:"bytes,1,rep,name=clusters" json:"clusters,omitempty"`
+	LoadReportingInterval *google_protobuf1.Duration `protobuf:"bytes,2,opt,name=load_reporting_interval,json=loadReportingInterval" json:"load_reporting_interval,omitempty"`
 }
 
 func (m *LoadStatsResponse) Reset()                    { *m = LoadStatsResponse{} }
@@ -302,7 +302,7 @@ func (m *LoadStatsResponse) GetClusters() []string {
 	return nil
 }
 
-func (m *LoadStatsResponse) GetLoadReportingInterval() *google_protobuf.Duration {
+func (m *LoadStatsResponse) GetLoadReportingInterval() *google_protobuf1.Duration {
 	if m != nil {
 		return m.LoadReportingInterval
 	}

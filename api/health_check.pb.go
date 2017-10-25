@@ -7,8 +7,8 @@ package api
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf "github.com/golang/protobuf/ptypes/duration"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf1 "github.com/golang/protobuf/ptypes/duration"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -46,13 +46,13 @@ func (x HealthStatus) String() string {
 func (HealthStatus) EnumDescriptor() ([]byte, []int) { return fileDescriptor8, []int{0} }
 
 type HealthCheck struct {
-	Timeout            *google_protobuf.Duration     `protobuf:"bytes,1,opt,name=timeout" json:"timeout,omitempty"`
-	Interval           *google_protobuf.Duration     `protobuf:"bytes,2,opt,name=interval" json:"interval,omitempty"`
-	IntervalJitter     *google_protobuf.Duration     `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter" json:"interval_jitter,omitempty"`
-	UnhealthyThreshold *google_protobuf2.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold" json:"unhealthy_threshold,omitempty"`
-	HealthyThreshold   *google_protobuf2.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold" json:"healthy_threshold,omitempty"`
-	AltPort            *google_protobuf2.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort" json:"alt_port,omitempty"`
-	ReuseConnection    *google_protobuf2.BoolValue   `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection" json:"reuse_connection,omitempty"`
+	Timeout            *google_protobuf1.Duration   `protobuf:"bytes,1,opt,name=timeout" json:"timeout,omitempty"`
+	Interval           *google_protobuf1.Duration   `protobuf:"bytes,2,opt,name=interval" json:"interval,omitempty"`
+	IntervalJitter     *google_protobuf1.Duration   `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter" json:"interval_jitter,omitempty"`
+	UnhealthyThreshold *google_protobuf.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold" json:"unhealthy_threshold,omitempty"`
+	HealthyThreshold   *google_protobuf.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold" json:"healthy_threshold,omitempty"`
+	AltPort            *google_protobuf.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort" json:"alt_port,omitempty"`
+	ReuseConnection    *google_protobuf.BoolValue   `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection" json:"reuse_connection,omitempty"`
 	// Types that are valid to be assigned to HealthChecker:
 	//	*HealthCheck_HttpHealthCheck_
 	//	*HealthCheck_TcpHealthCheck_
@@ -90,49 +90,49 @@ func (m *HealthCheck) GetHealthChecker() isHealthCheck_HealthChecker {
 	return nil
 }
 
-func (m *HealthCheck) GetTimeout() *google_protobuf.Duration {
+func (m *HealthCheck) GetTimeout() *google_protobuf1.Duration {
 	if m != nil {
 		return m.Timeout
 	}
 	return nil
 }
 
-func (m *HealthCheck) GetInterval() *google_protobuf.Duration {
+func (m *HealthCheck) GetInterval() *google_protobuf1.Duration {
 	if m != nil {
 		return m.Interval
 	}
 	return nil
 }
 
-func (m *HealthCheck) GetIntervalJitter() *google_protobuf.Duration {
+func (m *HealthCheck) GetIntervalJitter() *google_protobuf1.Duration {
 	if m != nil {
 		return m.IntervalJitter
 	}
 	return nil
 }
 
-func (m *HealthCheck) GetUnhealthyThreshold() *google_protobuf2.UInt32Value {
+func (m *HealthCheck) GetUnhealthyThreshold() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.UnhealthyThreshold
 	}
 	return nil
 }
 
-func (m *HealthCheck) GetHealthyThreshold() *google_protobuf2.UInt32Value {
+func (m *HealthCheck) GetHealthyThreshold() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.HealthyThreshold
 	}
 	return nil
 }
 
-func (m *HealthCheck) GetAltPort() *google_protobuf2.UInt32Value {
+func (m *HealthCheck) GetAltPort() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.AltPort
 	}
 	return nil
 }
 
-func (m *HealthCheck) GetReuseConnection() *google_protobuf2.BoolValue {
+func (m *HealthCheck) GetReuseConnection() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.ReuseConnection
 	}

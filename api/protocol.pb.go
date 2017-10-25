@@ -7,7 +7,7 @@ package api
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import google_protobuf2 "github.com/golang/protobuf/ptypes/wrappers"
+import google_protobuf "github.com/golang/protobuf/ptypes/wrappers"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -23,7 +23,7 @@ func (*TcpProtocolOptions) ProtoMessage()               {}
 func (*TcpProtocolOptions) Descriptor() ([]byte, []int) { return fileDescriptor10, []int{0} }
 
 type Http1ProtocolOptions struct {
-	AllowAbsoluteUrl *google_protobuf2.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl" json:"allow_absolute_url,omitempty"`
+	AllowAbsoluteUrl *google_protobuf.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl" json:"allow_absolute_url,omitempty"`
 }
 
 func (m *Http1ProtocolOptions) Reset()                    { *m = Http1ProtocolOptions{} }
@@ -31,7 +31,7 @@ func (m *Http1ProtocolOptions) String() string            { return proto.Compact
 func (*Http1ProtocolOptions) ProtoMessage()               {}
 func (*Http1ProtocolOptions) Descriptor() ([]byte, []int) { return fileDescriptor10, []int{1} }
 
-func (m *Http1ProtocolOptions) GetAllowAbsoluteUrl() *google_protobuf2.BoolValue {
+func (m *Http1ProtocolOptions) GetAllowAbsoluteUrl() *google_protobuf.BoolValue {
 	if m != nil {
 		return m.AllowAbsoluteUrl
 	}
@@ -39,10 +39,10 @@ func (m *Http1ProtocolOptions) GetAllowAbsoluteUrl() *google_protobuf2.BoolValue
 }
 
 type Http2ProtocolOptions struct {
-	HpackTableSize              *google_protobuf2.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize" json:"hpack_table_size,omitempty"`
-	MaxConcurrentStreams        *google_protobuf2.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams" json:"max_concurrent_streams,omitempty"`
-	InitialStreamWindowSize     *google_protobuf2.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize" json:"initial_stream_window_size,omitempty"`
-	InitialConnectionWindowSize *google_protobuf2.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize" json:"initial_connection_window_size,omitempty"`
+	HpackTableSize              *google_protobuf.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize" json:"hpack_table_size,omitempty"`
+	MaxConcurrentStreams        *google_protobuf.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams" json:"max_concurrent_streams,omitempty"`
+	InitialStreamWindowSize     *google_protobuf.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize" json:"initial_stream_window_size,omitempty"`
+	InitialConnectionWindowSize *google_protobuf.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize" json:"initial_connection_window_size,omitempty"`
 }
 
 func (m *Http2ProtocolOptions) Reset()                    { *m = Http2ProtocolOptions{} }
@@ -50,28 +50,28 @@ func (m *Http2ProtocolOptions) String() string            { return proto.Compact
 func (*Http2ProtocolOptions) ProtoMessage()               {}
 func (*Http2ProtocolOptions) Descriptor() ([]byte, []int) { return fileDescriptor10, []int{2} }
 
-func (m *Http2ProtocolOptions) GetHpackTableSize() *google_protobuf2.UInt32Value {
+func (m *Http2ProtocolOptions) GetHpackTableSize() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.HpackTableSize
 	}
 	return nil
 }
 
-func (m *Http2ProtocolOptions) GetMaxConcurrentStreams() *google_protobuf2.UInt32Value {
+func (m *Http2ProtocolOptions) GetMaxConcurrentStreams() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.MaxConcurrentStreams
 	}
 	return nil
 }
 
-func (m *Http2ProtocolOptions) GetInitialStreamWindowSize() *google_protobuf2.UInt32Value {
+func (m *Http2ProtocolOptions) GetInitialStreamWindowSize() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.InitialStreamWindowSize
 	}
 	return nil
 }
 
-func (m *Http2ProtocolOptions) GetInitialConnectionWindowSize() *google_protobuf2.UInt32Value {
+func (m *Http2ProtocolOptions) GetInitialConnectionWindowSize() *google_protobuf.UInt32Value {
 	if m != nil {
 		return m.InitialConnectionWindowSize
 	}
