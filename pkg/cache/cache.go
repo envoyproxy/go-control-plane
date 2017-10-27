@@ -20,8 +20,8 @@ import "github.com/envoyproxy/go-control-plane/api"
 // ConfigCache ...
 type ConfigCache interface {
 	// Listen requests a channel for receiving configuration resources for
-	// a given node, config resources, and last applied version identifier
-	Listen(*api.Node, ResourceSelector, string) chan api.DiscoveryResponse
+	// a given node, config resources, and last applied version identifier.
+	Listen(*api.Node, ResourceSelector, string) <-chan api.DiscoveryResponse
 }
 
 // ResourceSelector for selecting monitored configuration resources

@@ -16,7 +16,6 @@
 package server
 
 import (
-	"errors"
 	"strconv"
 	"sync/atomic"
 
@@ -24,16 +23,22 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// ManagementServer is a collection of handlers for streaming discovery requests
-type ManagementServer interface {
+// Server is a collection of handlers for streaming discovery requests
+type Server interface {
 	// Register the handlers in a gRPC server
 	Register(*grpc.Server)
 }
 
+func NewServer(config cache.ConfigCache) Server {
+	return &server{config: config}
+}
+
 type server struct {
-	cache cache.ConfigCache
+	config cache.ConfigCache
 }
 
 func (s *server) Register(srv *grpc.Server) {
@@ -66,8 +71,8 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 			reqCh <- req
 		}
 	}()
+	// prevents writing to a closed channel if send failed on blocked recv
 	defer func() {
-		// prevents writing to a closed channel if send failed on blocked recv
 		atomic.StoreInt32(&reqStop, 1)
 	}()
 
@@ -82,9 +87,9 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 
 	for {
 		// make a cache request
-		var configCh chan api.DiscoveryResponse
+		var configCh <-chan api.DiscoveryResponse
 		if node != nil {
-			configCh = s.cache.Listen(node, selector, version)
+			configCh = s.config.Listen(node, selector, version)
 		}
 
 		select {
@@ -96,22 +101,21 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 			}
 
 		case req, closed := <-reqCh:
-			// input stream ended or errored out
-			if closed {
+			switch {
+			case closed:
+				// input stream ended or errored out
 				return nil
-			}
-
-			// ignore stale non-empty nonces
-			if req.GetResponseNonce() != "" && req.GetResponseNonce() != strconv.FormatInt(nonce, 10) {
+			case req.GetResponseNonce() != "" && req.GetResponseNonce() != strconv.FormatInt(nonce, 10):
+				// ignore stale non-empty nonces
 				continue
-			}
-
-			// update cache request
-			node = req.GetNode()
-			version = req.GetVersionInfo()
-			selector.Names = req.GetResourceNames()
-			if req.TypeUrl != "" {
-				selector.Types = []string{req.TypeUrl}
+			default:
+				// update cache request
+				node = req.GetNode()
+				version = req.GetVersionInfo()
+				selector.Names = req.GetResourceNames()
+				if req.TypeUrl != "" {
+					selector.Types = []string{req.TypeUrl}
+				}
 			}
 		}
 	}
@@ -128,7 +132,7 @@ func (s *server) StreamEndpoints(stream api.EndpointDiscoveryService_StreamEndpo
 }
 
 func (s *server) StreamLoadStats(stream api.EndpointDiscoveryService_StreamLoadStatsServer) error {
-	return errors.New("not implemented")
+	return status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 func (s *server) StreamClusters(stream api.ClusterDiscoveryService_StreamClustersServer) error {
@@ -150,17 +154,17 @@ func (s *server) StreamListeners(stream api.ListenerDiscoveryService_StreamListe
 }
 
 func (s *server) FetchEndpoints(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
-	return nil, errors.New("not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 func (s *server) FetchClusters(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
-	return nil, errors.New("not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 func (s *server) FetchRoutes(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
-	return nil, errors.New("not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
 func (s *server) FetchListeners(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
-	return nil, errors.New("not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
