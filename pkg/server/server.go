@@ -101,7 +101,9 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 			node = req.GetNode()
 			version = req.GetVersionInfo()
 			selector.Names = req.GetResourceNames()
-			selector.Types = []string{req.TypeUrl}
+			if req.TypeUrl != "" {
+				selector.Types = []string{req.TypeUrl}
+			}
 		}
 	}
 }
