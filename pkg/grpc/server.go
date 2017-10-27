@@ -64,15 +64,15 @@ type stream interface {
 	Recv() (*api.DiscoveryRequest, error)
 }
 
-// promises for all xDS resource types
-type promises struct {
-	endpoints cache.Promise
-	clusters  cache.Promise
-	routes    cache.Promise
-	listeners cache.Promise
+// watches for all xDS resource types
+type watches struct {
+	endpoints cache.Watch
+	clusters  cache.Watch
+	routes    cache.Watch
+	listeners cache.Watch
 }
 
-func (values promises) Cancel() {
+func (values watches) Cancel() {
 	values.endpoints.Cancel()
 	values.clusters.Cancel()
 	values.routes.Cancel()
@@ -88,7 +88,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 		return stream.Send(resp)
 	}
 
-	var values promises
+	var values watches
 	defer func() {
 		values.Cancel()
 	}()
@@ -126,7 +126,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 				if req.TypeUrl != "" {
 					typeURL = req.TypeUrl
 				}
-				// cancel existing promises to (re-)request a newer version
+				// cancel existing watches to (re-)request a newer version
 				switch typeURL {
 				case EndpointType:
 					values.endpoints.Cancel()
