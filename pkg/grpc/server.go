@@ -27,18 +27,28 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Resource types in xDS v2
+const (
+	typePrefix   = "type.googleapis.com/envoy.api.v2."
+	EndpointType = typePrefix + "LbEndpoint"
+	ClusterType  = typePrefix + "Cluster"
+	RouteType    = typePrefix + "Route"
+	ListenerType = typePrefix + "Listener"
+)
+
 // Server is a collection of handlers for streaming discovery requests
 type Server interface {
 	// Register the handlers in a gRPC server
 	Register(*grpc.Server)
 }
 
-func NewServer(config cache.ConfigCache) Server {
+// NewServer creates handlers from a config watcher
+func NewServer(config cache.ConfigWatcher) Server {
 	return &server{config: config}
 }
 
 type server struct {
-	config cache.ConfigCache
+	config cache.ConfigWatcher
 }
 
 func (s *server) Register(srv *grpc.Server) {
@@ -54,7 +64,88 @@ type stream interface {
 	Recv() (*api.DiscoveryRequest, error)
 }
 
-func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
+// promises for all xDS resource types
+type promises struct {
+	endpoints cache.Promise
+	clusters  cache.Promise
+	routes    cache.Promise
+	listeners cache.Promise
+}
+
+func (values promises) Cancel() {
+	values.endpoints.Cancel()
+	values.clusters.Cancel()
+	values.routes.Cancel()
+	values.listeners.Cancel()
+}
+
+func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, implicitTypeURL string) error {
+	// unique nonce for req-resp pairs; the server ignores stale nonces
+	var nonce int64
+	send := func(resp *api.DiscoveryResponse) error {
+		resp.Nonce = strconv.FormatInt(nonce, 10)
+		nonce = nonce + 1
+		return stream.Send(resp)
+	}
+
+	var values promises
+	defer func() {
+		values.Cancel()
+	}()
+
+	for {
+		select {
+		case resp := <-values.endpoints.Value:
+			if err := send(&resp); err != nil {
+				return err
+			}
+		case resp := <-values.clusters.Value:
+			if err := send(&resp); err != nil {
+				return err
+			}
+		case resp := <-values.routes.Value:
+			if err := send(&resp); err != nil {
+				return err
+			}
+		case resp := <-values.listeners.Value:
+			if err := send(&resp); err != nil {
+				return err
+			}
+		case req, closed := <-reqCh:
+			switch {
+			case closed:
+				// input stream ended or errored out
+				return nil
+			case req.GetResponseNonce() != "" && req.GetResponseNonce() != strconv.FormatInt(nonce, 10):
+				// ignore stale non-empty nonces
+			default:
+				// proxy requests a new resource
+				// proxy can NACKs by sending an older version for the same resource type
+				typeURL := implicitTypeURL
+				if req.TypeUrl != "" {
+					typeURL = req.TypeUrl
+				}
+				// cancel existing promises to (re-)request a newer version
+				switch typeURL {
+				case EndpointType:
+					values.endpoints.Cancel()
+					values.endpoints = s.config.WatchEndpoints(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+				case ClusterType:
+					values.clusters.Cancel()
+					values.clusters = s.config.WatchClusters(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+				case RouteType:
+					values.routes.Cancel()
+					values.routes = s.config.WatchRoutes(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+				case ListenerType:
+					values.listeners.Cancel()
+					values.listeners = s.config.WatchListeners(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+				}
+			}
+		}
+	}
+}
+
+func (s *server) handler(stream stream, implicitTypeURL string) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *api.DiscoveryRequest, 0)
 	reqStop := int32(0)
@@ -71,74 +162,22 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 			reqCh <- req
 		}
 	}()
+
+	err := s.process(stream, reqCh, implicitTypeURL)
+
 	// prevents writing to a closed channel if send failed on blocked recv
-	defer func() {
-		atomic.StoreInt32(&reqStop, 1)
-	}()
+	// TODO(kuat) figure out how to unblock recv through gRPC API
+	atomic.StoreInt32(&reqStop, 1)
 
-	// the node issuing the last request (assumed to be constant for the session)
-	var node *api.Node
-
-	// unique nonce for req-resp pairs; the server ignores stale nonces
-	var nonce int64
-
-	// last successfully applied version as set in the requests
-	var version string
-
-	for {
-		config := cache.Promise{}
-		defer func() {
-			if config.Stop != nil {
-				config.Stop()
-			}
-		}()
-
-		// make a cache request
-		if node != nil {
-			config = s.config.Listen(node, selector, version)
-		}
-
-		select {
-		case resp := <-config.Value:
-			resp.Nonce = strconv.FormatInt(nonce, 10)
-			nonce = nonce + 1
-			if err := stream.Send(&resp); err != nil {
-				return err
-			}
-
-		case req, closed := <-reqCh:
-			switch {
-			case closed:
-				// input stream ended or errored out
-				return nil
-			case req.GetResponseNonce() != "" && req.GetResponseNonce() != strconv.FormatInt(nonce, 10):
-				// ignore stale non-empty nonces
-			default:
-				// update cache request
-				node = req.GetNode()
-				version = req.GetVersionInfo()
-				selector.Names = req.GetResourceNames()
-				if req.TypeUrl != "" {
-					selector.Types = []string{req.TypeUrl}
-				}
-			}
-		}
-
-		if config.Stop != nil {
-			config.Stop()
-			config.Stop = nil
-		}
-	}
+	return err
 }
 
 func (s *server) StreamAggregatedResources(stream api.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
-	return s.handler(stream, cache.ResourceSelector{})
+	return s.handler(stream, "")
 }
 
 func (s *server) StreamEndpoints(stream api.EndpointDiscoveryService_StreamEndpointsServer) error {
-	return s.handler(stream, cache.ResourceSelector{
-		Types: []string{cache.EndpointType},
-	})
+	return s.handler(stream, EndpointType)
 }
 
 func (s *server) StreamLoadStats(stream api.EndpointDiscoveryService_StreamLoadStatsServer) error {
@@ -146,21 +185,15 @@ func (s *server) StreamLoadStats(stream api.EndpointDiscoveryService_StreamLoadS
 }
 
 func (s *server) StreamClusters(stream api.ClusterDiscoveryService_StreamClustersServer) error {
-	return s.handler(stream, cache.ResourceSelector{
-		Types: []string{cache.ClusterType},
-	})
+	return s.handler(stream, ClusterType)
 }
 
 func (s *server) StreamRoutes(stream api.RouteDiscoveryService_StreamRoutesServer) error {
-	return s.handler(stream, cache.ResourceSelector{
-		Types: []string{cache.RouteType},
-	})
+	return s.handler(stream, RouteType)
 }
 
 func (s *server) StreamListeners(stream api.ListenerDiscoveryService_StreamListenersServer) error {
-	return s.handler(stream, cache.ResourceSelector{
-		Types: []string{cache.ListenerType},
-	})
+	return s.handler(stream, ListenerType)
 }
 
 func (s *server) FetchEndpoints(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {

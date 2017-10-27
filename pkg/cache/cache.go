@@ -17,37 +17,36 @@ package cache
 
 import "github.com/envoyproxy/go-control-plane/api"
 
-// ConfigCache ...
-type ConfigCache interface {
-	// Listen requests a promise for receiving configuration resources for
-	// a given node, config resources, and last applied version identifier.
-	// The promise returns a single response eventually to be used once,
-	// but can be terminated before completing.
-	Listen(*api.Node, ResourceSelector, string) Promise
+// ConfigWatcher requests promises for configuration resources by a node,
+// last applied version identifier and resource names hint.
+// The promise should send the response once it is ready or be cancelled
+// by the servier, in effect terminating the computation for the request.
+type ConfigWatcher interface {
+	// WatchEndpoints resources
+	WatchEndpoints(*api.Node, string, []string) Promise
+
+	// WatchClusters resources
+	WatchClusters(*api.Node, string, []string) Promise
+
+	// WatchRoutes resources
+	WatchRoutes(*api.Node, string, []string) Promise
+
+	// WatchListeners resources
+	WatchListeners(*api.Node, string, []string) Promise
 }
 
 // Promise is used once to complete a response asynchronously
 type Promise struct {
 	// Value is to be used once
 	Value <-chan api.DiscoveryResponse
+
 	// Stop terminates the promise computation
 	Stop func()
 }
 
-// ResourceSelector for selecting monitored configuration resources
-type ResourceSelector struct {
-	// Types of configuration resources to monitor (or all if empty)
-	Types []string
-
-	// Names of configuration resources (or all if empty)
-	Names []string
+// Cancel the promise computation
+func (promise Promise) Cancel() {
+	if promise.Stop != nil {
+		promise.Stop()
+	}
 }
-
-// Resource types in xDS v2
-const (
-	typePrefix   = "type.googleapis.com/envoy.api.v2."
-	EndpointType = typePrefix + "LbEndpoint"
-	ClusterType  = typePrefix + "Cluster"
-	RouteType    = typePrefix + "Route"
-	ListenerType = typePrefix + "Listener"
-)
