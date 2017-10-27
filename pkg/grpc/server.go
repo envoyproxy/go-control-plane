@@ -86,14 +86,20 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 	var version string
 
 	for {
+		config := cache.Promise{}
+		defer func() {
+			if config.Stop != nil {
+				config.Stop()
+			}
+		}()
+
 		// make a cache request
-		var configCh <-chan api.DiscoveryResponse
 		if node != nil {
-			configCh = s.config.Listen(node, selector, version)
+			config = s.config.Listen(node, selector, version)
 		}
 
 		select {
-		case resp := <-configCh:
+		case resp := <-config.Value:
 			resp.Nonce = strconv.FormatInt(nonce, 10)
 			nonce = nonce + 1
 			if err := stream.Send(&resp); err != nil {
@@ -107,7 +113,6 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 				return nil
 			case req.GetResponseNonce() != "" && req.GetResponseNonce() != strconv.FormatInt(nonce, 10):
 				// ignore stale non-empty nonces
-				continue
 			default:
 				// update cache request
 				node = req.GetNode()
@@ -117,6 +122,11 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 					selector.Types = []string{req.TypeUrl}
 				}
 			}
+		}
+
+		if config.Stop != nil {
+			config.Stop()
+			config.Stop = nil
 		}
 	}
 }

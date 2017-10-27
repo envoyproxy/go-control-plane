@@ -19,9 +19,19 @@ import "github.com/envoyproxy/go-control-plane/api"
 
 // ConfigCache ...
 type ConfigCache interface {
-	// Listen requests a channel for receiving configuration resources for
+	// Listen requests a promise for receiving configuration resources for
 	// a given node, config resources, and last applied version identifier.
-	Listen(*api.Node, ResourceSelector, string) <-chan api.DiscoveryResponse
+	// The promise returns a single response eventually to be used once,
+	// but can be terminated before completing.
+	Listen(*api.Node, ResourceSelector, string) Promise
+}
+
+// Promise is used once to complete a response asynchronously
+type Promise struct {
+	// Value is to be used once
+	Value <-chan api.DiscoveryResponse
+	// Stop terminates the promise computation
+	Stop func()
 }
 
 // ResourceSelector for selecting monitored configuration resources
