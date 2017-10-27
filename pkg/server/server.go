@@ -18,6 +18,7 @@ package server
 import (
 	"errors"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
@@ -51,9 +52,13 @@ type stream interface {
 func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *api.DiscoveryRequest, 0)
+	reqStop := int32(0)
 	go func() {
 		for {
 			req, err := stream.Recv()
+			if atomic.LoadInt32(&reqStop) != 0 {
+				return
+			}
 			if err != nil {
 				close(reqCh)
 				return
@@ -61,12 +66,16 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 			reqCh <- req
 		}
 	}()
+	defer func() {
+		// prevents writing to a closed channel if send failed on blocked recv
+		atomic.StoreInt32(&reqStop, 1)
+	}()
 
 	// the node issuing the last request (assumed to be constant for the session)
 	var node *api.Node
 
 	// unique nonce for req-resp pairs; the server ignores stale nonces
-	var nonce int
+	var nonce int64
 
 	// last successfully applied version as set in the requests
 	var version string
@@ -80,7 +89,7 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 
 		select {
 		case resp := <-configCh:
-			resp.Nonce = strconv.Itoa(nonce)
+			resp.Nonce = strconv.FormatInt(nonce, 10)
 			nonce = nonce + 1
 			if err := stream.Send(&resp); err != nil {
 				return err
@@ -93,7 +102,7 @@ func (s *server) handler(stream stream, selector cache.ResourceSelector) error {
 			}
 
 			// ignore stale non-empty nonces
-			if req.GetResponseNonce() != "" && req.GetResponseNonce() != strconv.Itoa(nonce) {
+			if req.GetResponseNonce() != "" && req.GetResponseNonce() != strconv.FormatInt(nonce, 10) {
 				continue
 			}
 
