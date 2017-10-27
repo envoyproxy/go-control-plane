@@ -17,10 +17,10 @@ package cache
 
 import "github.com/envoyproxy/go-control-plane/api"
 
-// ConfigWatcher requests promises for configuration resources by a node,
-// last applied version identifier and resource names hint.
-// The promise should send the response once it is ready or be cancelled
-// by the servier, in effect terminating the computation for the request.
+// ConfigWatcher requests promises for configuration resources by a node, last
+// applied version identifier and resource names hint.  The promise should send
+// the responss when they are ready.  The promise can be cancelled by the
+// consumer, in effect terminating the watch for the request.
 type ConfigWatcher interface {
 	// WatchEndpoints resources
 	WatchEndpoints(*api.Node, string, []string) Promise
@@ -35,18 +35,19 @@ type ConfigWatcher interface {
 	WatchListeners(*api.Node, string, []string) Promise
 }
 
-// Promise is used once to complete a response asynchronously
+// Promise is to complete a response asynchronously
 type Promise struct {
-	// Value is to be used once
+	// Value channel should send at least one response.
+	// The producer can eagerly send multiple values ahead of the consumer
+	// requesting a newer watch.
 	Value <-chan api.DiscoveryResponse
 
-	// Stop terminates the promise computation
-	Stop func()
+	stop func()
 }
 
-// Cancel the promise computation
+// Cancel the promise watch
 func (promise Promise) Cancel() {
-	if promise.Stop != nil {
-		promise.Stop()
+	if promise.stop != nil {
+		promise.stop()
 	}
 }
