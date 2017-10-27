@@ -95,6 +95,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 
 	for {
 		select {
+		// config watcher can send the requested resources types in any order
 		case resp := <-values.endpoints.Value:
 			if err := send(&resp); err != nil {
 				return err
