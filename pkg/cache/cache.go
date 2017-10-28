@@ -15,11 +15,14 @@
 // Package cache defines a configuration cache for the server
 package cache
 
-import "github.com/envoyproxy/go-control-plane/api"
+import (
+	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/golang/protobuf/proto"
+)
 
 // ConfigWatcher requests watches for configuration resources by a node, last
-// applied version identifier and resource names hint.  The watch should send
-// the responss when they are ready.  The watch can be cancelled by the
+// applied version identifier, and resource names hint.  The watch should send
+// the responses when they are ready.  The watch can be cancelled by the
 // consumer, in effect terminating the watch for the request.
 type ConfigWatcher interface {
 	// WatchEndpoints resources
@@ -35,14 +38,28 @@ type ConfigWatcher interface {
 	WatchListeners(*api.Node, string, []string) Watch
 }
 
-// Watch is to complete a response asynchronously
+// Watch is a dedicated stream of configuration resources
 type Watch struct {
-	// Value channel should send at least one response.
-	// The producer can eagerly send multiple values ahead of the consumer
-	// requesting a newer watch.
-	Value <-chan api.DiscoveryResponse
+	// Value channel should send at least one response.  The producer can eagerly
+	// send multiple values ahead of the consumer requesting a newer watch.  The
+	// producer can close the channel if an unrecoverable error occurs, in which
+	// case the consumer stream is terminated.
+	Value <-chan Response
 
 	stop func()
+}
+
+// Response is a pre-serialized response for an assumed type
+type Response struct {
+	// Version of the resources as tracked by the cache for the given type.
+	// Proxy responds with this version if the resources get applied remotely.
+	Version string
+
+	// Resources to be included in the response
+	Resources []proto.Message
+
+	// Canary bit to control Envoy config transition
+	Canary bool
 }
 
 // Cancel the watch watch
@@ -50,4 +67,9 @@ func (watch Watch) Cancel() {
 	if watch.stop != nil {
 		watch.stop()
 	}
+}
+
+// NodeGroup aggregates configuration resources by a hash of the node.
+type NodeGroup interface {
+	Hash(*api.Node) string
 }

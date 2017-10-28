@@ -21,6 +21,8 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/any"
 	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -72,7 +74,7 @@ type watches struct {
 	listeners cache.Watch
 }
 
-func (values watches) Cancel() {
+func (values watches) cancel() {
 	values.endpoints.Cancel()
 	values.clusters.Cancel()
 	values.routes.Cancel()
@@ -82,34 +84,67 @@ func (values watches) Cancel() {
 func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, implicitTypeURL string) error {
 	// unique nonce for req-resp pairs; the server ignores stale nonces
 	var nonce int64
-	send := func(resp *api.DiscoveryResponse) error {
-		resp.Nonce = strconv.FormatInt(nonce, 10)
+
+	// sends a response by serializing to protobuf Any
+	send := func(resp cache.Response, typeURL string) error {
+		resources := make([]*any.Any, len(resp.Resources))
+		for i := 0; i < len(resp.Resources); i++ {
+			data, err := proto.Marshal(resp.Resources[i])
+			if err != nil {
+				// TODO(kuat) logging
+				continue
+			}
+			resources[i] = &any.Any{
+				TypeUrl: typeURL,
+				Value:   data,
+			}
+		}
+
+		out := &api.DiscoveryResponse{
+			VersionInfo: resp.Version,
+			Resources:   resources,
+			Canary:      resp.Canary,
+			TypeUrl:     typeURL,
+			Nonce:       strconv.FormatInt(nonce, 10),
+		}
 		nonce = nonce + 1
-		return stream.Send(resp)
+		return stream.Send(out)
 	}
 
 	var values watches
 	defer func() {
-		values.Cancel()
+		values.cancel()
 	}()
 
 	for {
 		select {
 		// config watcher can send the requested resources types in any order
-		case resp := <-values.endpoints.Value:
-			if err := send(&resp); err != nil {
+		case resp, closed := <-values.endpoints.Value:
+			if closed {
+				return status.Errorf(codes.Unavailable, "endpoints watch failed")
+			}
+			if err := send(resp, EndpointType); err != nil {
 				return err
 			}
-		case resp := <-values.clusters.Value:
-			if err := send(&resp); err != nil {
+		case resp, closed := <-values.clusters.Value:
+			if closed {
+				return status.Errorf(codes.Unavailable, "clusters watch failed")
+			}
+			if err := send(resp, ClusterType); err != nil {
 				return err
 			}
-		case resp := <-values.routes.Value:
-			if err := send(&resp); err != nil {
+		case resp, closed := <-values.routes.Value:
+			if closed {
+				return status.Errorf(codes.Unavailable, "routes watch failed")
+			}
+			if err := send(resp, RouteType); err != nil {
 				return err
 			}
-		case resp := <-values.listeners.Value:
-			if err := send(&resp); err != nil {
+		case resp, closed := <-values.listeners.Value:
+			if closed {
+				return status.Errorf(codes.Unavailable, "listeners watch failed")
+			}
+			if err := send(resp, ListenerType); err != nil {
 				return err
 			}
 		case req, closed := <-reqCh:
