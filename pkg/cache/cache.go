@@ -62,7 +62,7 @@ type Response struct {
 	Canary bool
 }
 
-// Cancel the watch watch
+// Cancel the watch.
 func (watch Watch) Cancel() {
 	if watch.stop != nil {
 		watch.stop()
