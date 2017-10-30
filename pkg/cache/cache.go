@@ -64,6 +64,17 @@ type Response struct {
 	Canary bool
 }
 
+// ResponseType is an enumeration of cache response types.
+type ResponseType int
+
+// xDS response types
+const (
+	EndpointResponse ResponseType = iota
+	ClusterResponse
+	RouteResponse
+	ListenerResponse
+)
+
 // Cancel cancels the watch. Watch must be cancelled to release resources in the cache.
 // Cancel can be called multiple times.
 func (watch Watch) Cancel() {
@@ -73,8 +84,11 @@ func (watch Watch) Cancel() {
 	}
 }
 
+// CacheKey is the node group identifier
+type CacheKey string
+
 // NodeGroup aggregates configuration resources by a hash of the node.
 type NodeGroup interface {
 	// Hash returns a string identifier for the proxy nodes.
-	Hash(*api.Node) string
+	Hash(*api.Node) CacheKey
 }
