@@ -12,7 +12,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-// Package server provides an implementation of a streaming xDS server
+// Package server provides an implementation of a streaming xDS server.
 package server
 
 import (
@@ -29,7 +29,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Resource types in xDS v2
+// Resource types in xDS v2.
 const (
 	typePrefix   = "type.googleapis.com/envoy.api.v2."
 	EndpointType = typePrefix + "LbEndpoint"
@@ -38,13 +38,13 @@ const (
 	ListenerType = typePrefix + "Listener"
 )
 
-// Server is a collection of handlers for streaming discovery requests
+// Server is a collection of handlers for streaming discovery requests.
 type Server interface {
-	// Register the handlers in a gRPC server
+	// Register the handlers in a server.
 	Register(*grpc.Server)
 }
 
-// NewServer creates handlers from a config watcher
+// NewServer creates handlers from a config watcher.
 func NewServer(config cache.ConfigWatcher) Server {
 	return &server{config: config}
 }
@@ -74,6 +74,7 @@ type watches struct {
 	listeners cache.Watch
 }
 
+// cancel all watches
 func (values watches) cancel() {
 	values.endpoints.Cancel()
 	values.clusters.Cancel()
@@ -91,8 +92,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 		for i := 0; i < len(resp.Resources); i++ {
 			data, err := proto.Marshal(resp.Resources[i])
 			if err != nil {
-				// TODO(kuat) logging
-				continue
+				return err
 			}
 			resources[i] = &any.Any{
 				TypeUrl: typeURL,
