@@ -128,38 +128,42 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 			if closed {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
-			if nonce, err := send(resp, EndpointType); err != nil {
+			nonce, err := send(resp, EndpointType)
+			if err != nil {
 				return err
-			} else {
-				values.endpointNonce = nonce
 			}
+			values.endpointNonce = nonce
+
 		case resp, closed := <-values.clusters.Value:
 			if closed {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
-			if nonce, err := send(resp, ClusterType); err != nil {
+			nonce, err := send(resp, ClusterType)
+			if err != nil {
 				return err
-			} else {
-				values.clusterNonce = nonce
 			}
+			values.clusterNonce = nonce
+
 		case resp, closed := <-values.routes.Value:
 			if closed {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
-			if nonce, err := send(resp, RouteType); err != nil {
+			nonce, err := send(resp, RouteType)
+			if err != nil {
 				return err
-			} else {
-				values.routeNonce = nonce
 			}
+			values.routeNonce = nonce
+
 		case resp, closed := <-values.listeners.Value:
 			if closed {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
-			if nonce, err := send(resp, ListenerType); err != nil {
+			nonce, err := send(resp, ListenerType)
+			if err != nil {
 				return err
-			} else {
-				values.listenerNonce = nonce
 			}
+			values.listenerNonce = nonce
+
 		case req, closed := <-reqCh:
 			switch {
 			case closed:
