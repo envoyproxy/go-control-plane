@@ -90,9 +90,9 @@ depend.install: tools.glide
 #---------------
 #-- tools
 #---------------
-.PHONY: tools tools.goimports tools.golint tools.govet
+.PHONY: tools tools.glide tools.goimports tools.golint tools.govet
 
-tools: tools.goimports tools.golint tools.govet
+tools: tools.glide tools.goimports tools.golint tools.govet
 
 tools.goimports:
 	@command -v goimports >/dev/null ; if [ $$? -ne 0 ]; then \
