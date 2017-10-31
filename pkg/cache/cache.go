@@ -44,7 +44,7 @@ type Cache interface {
 	ConfigWatcher
 
 	// SetResource sets a response for a node group and a type.
-	SetResource(CacheKey, ResponseType, []proto.Message)
+	SetResource(Key, ResponseType, []proto.Message)
 }
 
 // Watch is a dedicated stream of configuration resources produced by the
@@ -93,12 +93,12 @@ const (
 	ListenerResponse
 )
 
-// CacheKey is the node group identifier
-type CacheKey string
+// Key is the node group identifier
+type Key string
 
 // NodeGroup aggregates configuration resources by a hash of the node.
 type NodeGroup interface {
 	// Hash returns a string identifier for the proxy nodes.
 	// Must be a thread-safe function.
-	Hash(*api.Node) CacheKey
+	Hash(*api.Node) Key
 }

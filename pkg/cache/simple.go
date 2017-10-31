@@ -26,16 +26,16 @@ import (
 // xDS response, node group tuple, with no canary updates.
 type SimpleCache struct {
 	// responses are cached resources
-	responses map[CacheKey]map[ResponseType][]proto.Message
+	responses map[Key]map[ResponseType][]proto.Message
 
 	// versions must have the same key set as responses
-	versions map[CacheKey]map[ResponseType]int
+	versions map[Key]map[ResponseType]int
 
 	// watches keeps track of open watches
-	watches map[CacheKey]map[ResponseType]map[int64]Watch
+	watches map[Key]map[ResponseType]map[int64]Watch
 
 	// callback requests missing responses
-	callback func(CacheKey, ResponseType)
+	callback func(Key, ResponseType)
 
 	// watchCount is the ID generator for watches
 	watchCount int64
@@ -49,18 +49,18 @@ type SimpleCache struct {
 // MakeSimpleCache initializes a simple cache.
 // callback function is called on every new cache key and response type if there is no response available.
 // callback is executed in a go-routine.
-func MakeSimpleCache(groups NodeGroup, callback func(CacheKey, ResponseType)) Cache {
+func MakeSimpleCache(groups NodeGroup, callback func(Key, ResponseType)) Cache {
 	return &SimpleCache{
-		responses:  make(map[CacheKey]map[ResponseType][]proto.Message),
-		versions:   make(map[CacheKey]map[ResponseType]int),
-		watches:    make(map[CacheKey]map[ResponseType]map[int64]Watch),
+		responses:  make(map[Key]map[ResponseType][]proto.Message),
+		versions:   make(map[Key]map[ResponseType]int),
+		watches:    make(map[Key]map[ResponseType]map[int64]Watch),
 		callback:   callback,
 		watchCount: 0,
 		groups:     groups,
 	}
 }
 
-func (cache *SimpleCache) SetResource(group CacheKey, typ ResponseType, resources []proto.Message) {
+func (cache *SimpleCache) SetResource(group Key, typ ResponseType, resources []proto.Message) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
