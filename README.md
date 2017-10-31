@@ -31,3 +31,27 @@ specific representation of resources (e.g., services, instances of
 services, etc.) into Envoy-style configuration. Based on usage and
 feedback, we might decided to revisit this aspect at a later point in time.
 
+
+## Quick start
+
+1. Setup tools and dependencies
+
+```sh
+make tools
+make depend.install
+```
+
+2. Edit the code in your favorite IDE
+
+3. Format, vet and lint the code
+
+```sh
+make check
+```
+
+3. Build and test
+
+```sh
+make build
+make test
+```
