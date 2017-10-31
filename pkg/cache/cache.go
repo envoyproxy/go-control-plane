@@ -24,6 +24,7 @@ import (
 // applied version identifier, and resource names hint. The watch should send
 // the responses when they are ready. The watch can be cancelled by the
 // consumer, in effect terminating the watch for the request.
+// ConfigWatcher implementation must be thread-safe.
 type ConfigWatcher interface {
 	// WatchEndpoints returns a watch for endpoints.
 	WatchEndpoints(*api.Node, string, []string) Watch
@@ -38,6 +39,14 @@ type ConfigWatcher interface {
 	WatchListeners(*api.Node, string, []string) Watch
 }
 
+// Cache is a generic config cache with a watcher.
+type Cache interface {
+	ConfigWatcher
+
+	// SetResource sets a response for a node group and a type.
+	SetResource(CacheKey, ResponseType, []proto.Message)
+}
+
 // Watch is a dedicated stream of configuration resources produced by the
 // configuration cache and consumed by the xDS server.
 type Watch struct {
@@ -46,9 +55,18 @@ type Watch struct {
 	// watch. If the channel is closed prior to cancellation of the watch, an
 	// unrecoverable error has occurred in the producer, and the consumer should
 	// close the corresponding stream.
-	Value <-chan Response
+	Value chan Response
 
 	stop func()
+}
+
+// Cancel cancels the watch. Watch must be cancelled to release resources in the cache.
+// Cancel can be called multiple times.
+func (watch Watch) Cancel() {
+	if watch.stop != nil {
+		watch.stop()
+		watch.stop = nil
+	}
 }
 
 // Response is a pre-serialized response for an assumed configuration type.
@@ -75,20 +93,12 @@ const (
 	ListenerResponse
 )
 
-// Cancel cancels the watch. Watch must be cancelled to release resources in the cache.
-// Cancel can be called multiple times.
-func (watch Watch) Cancel() {
-	if watch.stop != nil {
-		watch.stop()
-		watch.stop = nil
-	}
-}
-
 // CacheKey is the node group identifier
 type CacheKey string
 
 // NodeGroup aggregates configuration resources by a hash of the node.
 type NodeGroup interface {
 	// Hash returns a string identifier for the proxy nodes.
+	// Must be a thread-safe function.
 	Hash(*api.Node) CacheKey
 }

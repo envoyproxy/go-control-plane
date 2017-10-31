@@ -14,25 +14,151 @@
 
 package cache
 
-import "github.com/golang/protobuf/proto"
+import (
+	"fmt"
+	"sync"
+
+	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/golang/protobuf/proto"
+)
 
 // SimpleCache is a snapshot-based cache that maintains a single version per
-// xDS response, node group tuple.
+// xDS response, node group tuple, with no canary updates.
 type SimpleCache struct {
-	responses map[CacheKey][ResponseType]proto.Message
-	versions  map[CacheKey][ResponseType]int
+	// responses are cached resources
+	responses map[CacheKey]map[ResponseType][]proto.Message
+
+	// versions must have the same key set as responses
+	versions map[CacheKey]map[ResponseType]int
+
+	// watches keeps track of open watches
+	watches map[CacheKey]map[ResponseType]map[int64]Watch
+
+	// callback requests missing responses
+	callback func(CacheKey, ResponseType)
+
+	// watchCount is the ID generator for watches
+	watchCount int64
+
+	// groups is the hashing function for proxy nodes
+	groups NodeGroup
+
+	mu sync.Mutex
 }
 
-func (cache *SimpleCache) SetResource(key CacheKey, typ ResponseType) {
+// MakeSimpleCache initializes a simple cache.
+// callback function is called on every new cache key and response type if there is no response available.
+// callback is executed in a go-routine.
+func MakeSimpleCache(groups NodeGroup, callback func(CacheKey, ResponseType)) Cache {
+	return &SimpleCache{
+		responses:  make(map[CacheKey]map[ResponseType][]proto.Message),
+		versions:   make(map[CacheKey]map[ResponseType]int),
+		watches:    make(map[CacheKey]map[ResponseType]map[int64]Watch),
+		callback:   callback,
+		watchCount: 0,
+		groups:     groups,
+	}
+}
+
+func (cache *SimpleCache) SetResource(group CacheKey, typ ResponseType, resources []proto.Message) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
 	// update the existing entry
+	if _, ok := cache.responses[group]; !ok {
+		cache.responses[group] = make(map[ResponseType][]proto.Message)
+		cache.versions[group] = make(map[ResponseType]int)
+	}
+
+	cache.responses[group][typ] = resources
+
+	// increment version
+	cache.versions[group][typ]++
 
 	// trigger watches
+	if _, ok := cache.watches[group]; ok {
+		if _, ok := cache.watches[group][typ]; ok {
+			// signal the update (channels have buffer size 1)
+			for _, watch := range cache.watches[group][typ] {
+				watch.Value <- Response{
+					Version:   fmt.Sprintf("%d", cache.versions[group][typ]),
+					Resources: resources,
+				}
+				// remove clean-up as the watch is discarded immediately
+				watch.stop = nil
+			}
+			// discard all watches; the client must request a new watch to receive updates after ACK/NACK
+			cache.watches[group][typ] = make(map[int64]Watch)
+		}
+	}
 }
 
-type SimpleWatcher struct {
+func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string, names []string) Watch {
+	// do nothing case
+	if node == nil {
+		return Watch{}
+	}
+
+	group := cache.groups.Hash(node)
+
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	// if the requested version is up-to-date or missing a response, leave an open watch
+	versions, exists := cache.versions[group]
+	if !exists || version == fmt.Sprintf("%d", versions[typ]) {
+		// invoke callback in a go-routine
+		if !exists && cache.callback != nil {
+			go cache.callback(group, typ)
+		}
+
+		// make sure watches map exists
+		if _, ok := cache.watches[group]; !ok {
+			cache.watches[group] = make(map[ResponseType]map[int64]Watch)
+		}
+		if _, ok := cache.watches[group][typ]; !ok {
+			cache.watches[group][typ] = make(map[int64]Watch)
+		}
+
+		value := make(chan Response, 1)
+		cache.watchCount++
+		id := cache.watchCount
+		out := Watch{
+			Value: value,
+			stop: func() {
+				if _, ok := cache.watches[group]; ok {
+					if _, ok := cache.watches[group][typ]; ok {
+						delete(cache.watches[group][typ], id)
+					}
+				}
+			},
+		}
+		cache.watches[group][typ][id] = out
+		return out
+	}
+
+	// otherwise, respond with the latest version
+	// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
+	value := make(chan Response, 1)
+	value <- Response{
+		Version:   fmt.Sprintf("%d", cache.versions[group][typ]),
+		Resources: cache.responses[group][typ],
+	}
+	return Watch{Value: value}
 }
 
-func (watcher *SimpleWatcher) WatchEndpoints(*api.Node, string, []string) {
-	return watcher.Watch(EndpointType, node, version, 
+func (cache *SimpleCache) WatchEndpoints(node *api.Node, version string, names []string) Watch {
+	return cache.Watch(EndpointResponse, node, version, names)
 }
 
+func (cache *SimpleCache) WatchClusters(node *api.Node, version string, names []string) Watch {
+	return cache.Watch(ClusterResponse, node, version, names)
+}
+
+func (cache *SimpleCache) WatchRoutes(node *api.Node, version string, names []string) Watch {
+	return cache.Watch(RouteResponse, node, version, names)
+}
+
+func (cache *SimpleCache) WatchListeners(node *api.Node, version string, names []string) Watch {
+	return cache.Watch(ListenerResponse, node, version, names)
+}
