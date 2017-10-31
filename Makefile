@@ -6,7 +6,6 @@
 
 SHELL 		:= /bin/bash
 BINDIR		:= bin
-BUILDDIR	:= build
 DOCKERDIR	:= docker
 RELEASEDIR  := release
 OUTPUT_NAME := go-control-plane
@@ -47,7 +46,6 @@ clean:
 	@echo "--> cleaning compiled objects and binaries"
 	@go clean -tags netgo -i $(GOPKGS)
 	@rm -rf $(BINDIR)/*
-	@rm -rf $(BUILDDIR)/*
 	@rm -rf $(RELEASEDIR)/*
 
 .PHONY: test
@@ -90,9 +88,9 @@ depend.install: tools.glide
 #---------------
 #-- tools
 #---------------
-.PHONY: tools tools.goimports tools.golint tools.govet
+.PHONY: tools tools.glide tools.goimports tools.golint tools.govet
 
-tools: tools.goimports tools.golint tools.govet
+tools: tools.glide tools.goimports tools.golint tools.govet
 
 tools.goimports:
 	@command -v goimports >/dev/null ; if [ $$? -ne 0 ]; then \
