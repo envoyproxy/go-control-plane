@@ -110,7 +110,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 	if !exists || version == fmt.Sprintf("%d", versions[typ]) {
 		// invoke callback in a go-routine
 		if !exists && cache.callback != nil {
-			log.Printf("requesting resources for %v from %q at %q", typ, group, version)
+			log.Printf("requesting resources for %s from %q at %q", typ.String(), group, version)
 			go cache.callback(group, typ)
 		}
 
@@ -142,7 +142,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 
 	// otherwise, respond with the latest version
 	// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
-	log.Printf("respond for %v from %q at %q", typ, group, version)
+	log.Printf("respond for %s from %q at %q", typ.String(), group, version)
 	value := make(chan Response, 1)
 	value <- Response{
 		Version:   fmt.Sprintf("%d", cache.versions[group][typ]),

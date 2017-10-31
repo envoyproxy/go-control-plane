@@ -166,42 +166,40 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 			values.listenerNonce = nonce
 
 		case req, more := <-reqCh:
-			switch {
-			case !more:
+			// input stream ended or errored out
+			if !more {
 				log.Printf("stream closed")
-				// input stream ended or errored out
 				return nil
-			case req.GetResponseNonce() != values.endpointNonce &&
-				req.GetResponseNonce() != values.clusterNonce &&
-				req.GetResponseNonce() != values.routeNonce &&
-				req.GetResponseNonce() != values.listenerNonce:
-				// ignore stale non-empty nonces per xDS stream
-				log.Printf("stale nonce %q", req.GetResponseNonce())
+			}
+
+			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
+			nonce := req.GetResponseNonce()
+
+			// proxy requests a new resource
+			// proxy can NACKs by sending an older version for the same resource type
+			typeURL := implicitTypeURL
+			if req.TypeUrl != "" {
+				typeURL = req.TypeUrl
+			}
+
+			log.Printf("request %q with nonce %q", typeURL, nonce)
+
+			// cancel existing watches to (re-)request a newer version
+			switch {
+			case typeURL == EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
+				values.endpoints.Cancel()
+				values.endpoints = s.config.WatchEndpoints(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+			case typeURL == ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
+				values.clusters.Cancel()
+				values.clusters = s.config.WatchClusters(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+			case typeURL == RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
+				values.routes.Cancel()
+				values.routes = s.config.WatchRoutes(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+			case typeURL == ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
+				values.listeners.Cancel()
+				values.listeners = s.config.WatchListeners(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
 			default:
-				// proxy requests a new resource
-				// proxy can NACKs by sending an older version for the same resource type
-				typeURL := implicitTypeURL
-				if req.TypeUrl != "" {
-					typeURL = req.TypeUrl
-				}
-				log.Printf("request %q with nonce %q", typeURL, req.GetResponseNonce())
-				// cancel existing watches to (re-)request a newer version
-				switch typeURL {
-				case EndpointType:
-					values.endpoints.Cancel()
-					values.endpoints = s.config.WatchEndpoints(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-				case ClusterType:
-					values.clusters.Cancel()
-					values.clusters = s.config.WatchClusters(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-				case RouteType:
-					values.routes.Cancel()
-					values.routes = s.config.WatchRoutes(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-				case ListenerType:
-					values.listeners.Cancel()
-					values.listeners = s.config.WatchListeners(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-				default:
-					log.Printf("unexpected requested type %q", typeURL)
-				}
+				log.Printf("unexpected requested type %q or stale nonce %q", typeURL, nonce)
 			}
 		}
 	}

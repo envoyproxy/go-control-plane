@@ -20,6 +20,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/api/filter/http"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/golang/protobuf/ptypes/duration"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
 const (
@@ -74,6 +75,7 @@ func MakeRoute(route, cluster string) *api.RouteConfiguration {
 	return &api.RouteConfiguration{
 		Name: route,
 		VirtualHosts: []*api.VirtualHost{{
+			Name:    "all",
 			Domains: []string{"*"},
 			Routes: []*api.Route{{
 				Match: &api.RouteMatch{
@@ -109,6 +111,12 @@ func MakeListener(listener string, port uint32, route string) *api.Listener {
 		},
 		HttpFilters: []*http.HttpFilter{{
 			Name: router,
+			// TODO(kuat) surprising requirement to allow LDS retrieve this route
+			Config: &structpb.Struct{
+				Fields: map[string]*structpb.Value{
+					"deprecated_v1": {Kind: &structpb.Value_BoolValue{BoolValue: true}},
+				},
+			},
 		}},
 	}
 	pbst, err := cache.MessageToStruct(manager)

@@ -39,7 +39,7 @@ var (
 
 func init() {
 	flag.UintVar(&upstreamPort, "upstream", 18080, "Upstream HTTP/1.1 port")
-	flag.UintVar(&listenPort, "listen", 19000, "Listener port")
+	flag.UintVar(&listenPort, "listen", 9000, "Listener port")
 	flag.UintVar(&xdsPort, "xds", 18000, "xDS server port")
 }
 
