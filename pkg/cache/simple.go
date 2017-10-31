@@ -16,6 +16,7 @@ package cache
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/api"
@@ -46,10 +47,10 @@ type SimpleCache struct {
 	mu sync.Mutex
 }
 
-// MakeSimpleCache initializes a simple cache.
+// NewSimpleCache initializes a simple cache.
 // callback function is called on every new cache key and response type if there is no response available.
 // callback is executed in a go-routine.
-func MakeSimpleCache(groups NodeGroup, callback func(Key, ResponseType)) Cache {
+func NewSimpleCache(groups NodeGroup, callback func(Key, ResponseType)) Cache {
 	return &SimpleCache{
 		responses:  make(map[Key]map[ResponseType][]proto.Message),
 		versions:   make(map[Key]map[ResponseType]int),
@@ -109,6 +110,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 	if !exists || version == fmt.Sprintf("%d", versions[typ]) {
 		// invoke callback in a go-routine
 		if !exists && cache.callback != nil {
+			log.Printf("requesting resources for %v from %q at %q", typ, group, version)
 			go cache.callback(group, typ)
 		}
 
@@ -120,6 +122,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 			cache.watches[group][typ] = make(map[int64]Watch)
 		}
 
+		log.Printf("open watch for %s%v from key %q at version %q", typ.String(), names, group, version)
 		value := make(chan Response, 1)
 		cache.watchCount++
 		id := cache.watchCount
@@ -139,6 +142,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 
 	// otherwise, respond with the latest version
 	// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
+	log.Printf("respond for %v from %q at %q", typ, group, version)
 	value := make(chan Response, 1)
 	value <- Response{
 		Version:   fmt.Sprintf("%d", cache.versions[group][typ]),

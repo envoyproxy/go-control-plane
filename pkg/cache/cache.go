@@ -93,6 +93,21 @@ const (
 	ListenerResponse
 )
 
+func (typ ResponseType) String() string {
+	switch typ {
+	case EndpointResponse:
+		return "endpoints"
+	case ClusterResponse:
+		return "clusters"
+	case RouteResponse:
+		return "routes"
+	case ListenerResponse:
+		return "listeners"
+	default:
+		return "unknown"
+	}
+}
+
 // Key is the node group identifier
 type Key string
 
