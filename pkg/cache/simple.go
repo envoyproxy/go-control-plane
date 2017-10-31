@@ -81,8 +81,10 @@ func (cache *SimpleCache) SetResource(group Key, typ ResponseType, resources []p
 		if _, ok := cache.watches[group][typ]; ok {
 			// signal the update (channels have buffer size 1)
 			for _, watch := range cache.watches[group][typ] {
+				version := fmt.Sprintf("%d", cache.versions[group][typ])
+				log.Printf("respond for %s from %q at %q with %v", typ.String(), group, version, resources)
 				watch.Value <- Response{
-					Version:   fmt.Sprintf("%d", cache.versions[group][typ]),
+					Version:   version,
 					Resources: resources,
 				}
 				// remove clean-up as the watch is discarded immediately
@@ -122,7 +124,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 			cache.watches[group][typ] = make(map[int64]Watch)
 		}
 
-		log.Printf("open watch for %s%v from key %q at version %q", typ.String(), names, group, version)
+		log.Printf("open watch for %s%v from key %q from version %q", typ.String(), names, group, version)
 		value := make(chan Response, 1)
 		cache.watchCount++
 		id := cache.watchCount
@@ -142,11 +144,12 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 
 	// otherwise, respond with the latest version
 	// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
-	log.Printf("respond for %s from %q at %q", typ.String(), group, version)
 	value := make(chan Response, 1)
+	resources := cache.responses[group][typ]
+	log.Printf("respond for %s from %q at %q with %v", typ.String(), group, version, resources)
 	value <- Response{
 		Version:   fmt.Sprintf("%d", cache.versions[group][typ]),
-		Resources: cache.responses[group][typ],
+		Resources: resources,
 	}
 	return Watch{Value: value}
 }
