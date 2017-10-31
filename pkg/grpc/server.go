@@ -33,7 +33,7 @@ import (
 // Resource types in xDS v2.
 const (
 	typePrefix   = "type.googleapis.com/envoy.api.v2."
-	EndpointType = typePrefix + "LbEndpoint"
+	EndpointType = typePrefix + "ClusterLoadAssignment"
 	ClusterType  = typePrefix + "Cluster"
 	RouteType    = typePrefix + "RouteConfiguration"
 	ListenerType = typePrefix + "Listener"
