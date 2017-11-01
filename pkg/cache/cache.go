@@ -57,6 +57,11 @@ type Watch struct {
 	// close the corresponding stream.
 	Value chan Response
 
+	// Names for monitored resources. LDS/CDS expect empty list since they are
+	// discovered globally. RDS/EDS expect explicitly enumerated resource names
+	// as dictated by LDS/CDS.
+	Names []string
+
 	stop func()
 }
 

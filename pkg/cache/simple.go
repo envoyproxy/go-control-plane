@@ -130,6 +130,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 		id := cache.watchCount
 		out := Watch{
 			Value: value,
+			Names: names,
 			stop: func() {
 				if _, ok := cache.watches[group]; ok {
 					if _, ok := cache.watches[group][typ]; ok {
