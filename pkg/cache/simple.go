@@ -17,6 +17,7 @@ package cache
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/api"
@@ -106,6 +107,20 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
+
+	// WARNING WARNING WARNING this block causes Envoy to spin
+	// always respond with a new version for EDS
+	if typ == EndpointResponse {
+		value := make(chan Response, 1)
+		resources := cache.responses[group][typ]
+		version := rand.Intn(1000000)
+		log.Printf("immediately respond for %s from %q at %q with %v", typ.String(), group, version, resources)
+		value <- Response{
+			Version:   fmt.Sprintf("%d", version),
+			Resources: resources,
+		}
+		return Watch{Value: value}
+	}
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	versions, exists := cache.versions[group]

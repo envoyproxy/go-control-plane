@@ -182,7 +182,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 				typeURL = req.TypeUrl
 			}
 
-			log.Printf("request %s%v with nonce %q", typeURL, req.GetResourceNames(), nonce)
+			log.Printf("request %s%v with nonce %q from version %q", typeURL, req.GetResourceNames(), nonce, req.GetVersionInfo())
 
 			// cancel existing watches to (re-)request a newer version
 			switch {
