@@ -62,11 +62,14 @@ func main() {
 		for {
 			version := fmt.Sprintf("version%d", i)
 			clusterName := fmt.Sprintf("cluster%d", i)
+			routeName := fmt.Sprintf("route%d", i)
+			// listener name must be same since ports are shared and previous listener is drained
+			listenerName := "listener"
 
 			endpoint := test.MakeEndpoint(clusterName, uint32(upstreamPort))
 			cluster := test.MakeCluster(clusterName)
-			route := test.MakeRoute("route", clusterName)
-			listener := test.MakeListener("listener", uint32(listenPort), "route")
+			route := test.MakeRoute(routeName, clusterName)
+			listener := test.MakeListener(listenerName, uint32(listenPort), routeName)
 
 			log.Printf("updating cache with %d-labelled responses", i)
 			snapshot := cache.NewSnapshot(version,
