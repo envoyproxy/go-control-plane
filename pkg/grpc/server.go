@@ -16,6 +16,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"sync/atomic"
@@ -88,7 +89,7 @@ func (values watches) cancel() {
 	values.listeners.Cancel()
 }
 
-func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, implicitTypeURL string) error {
+func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defaultTypeURL string) error {
 	// unique nonce for req-resp pairs per xDS stream; the server ignores stale nonces.
 	// nonce is only modified within send() function.
 	var streamNonce int64
@@ -175,38 +176,34 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, impl
 			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
 			nonce := req.GetResponseNonce()
 
-			// proxy requests a new resource
-			// proxy can NACKs by sending an older version for the same resource type
-			typeURL := implicitTypeURL
-			if req.TypeUrl != "" {
-				typeURL = req.TypeUrl
+			// type URL must match expected type URL except for ADS
+			if defaultTypeURL != "" && defaultTypeURL != req.TypeUrl {
+				return fmt.Errorf("unexpected resource requested, want %q got %q", defaultTypeURL, req.TypeUrl)
 			}
 
-			log.Printf("request %s%v with nonce %q from version %q", typeURL, req.GetResourceNames(), nonce, req.GetVersionInfo())
+			log.Printf("request %s%v with nonce %q from version %q", req.TypeUrl, req.GetResourceNames(), nonce, req.GetVersionInfo())
 
 			// cancel existing watches to (re-)request a newer version
 			switch {
-			case typeURL == EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
+			case req.TypeUrl == EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
 				values.endpoints.Cancel()
 				values.endpoints = s.config.WatchEndpoints(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-			case typeURL == ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
+			case req.TypeUrl == ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
 				values.clusters.Cancel()
 				values.clusters = s.config.WatchClusters(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-			case typeURL == RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
+			case req.TypeUrl == RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
 				values.routes.Cancel()
 				values.routes = s.config.WatchRoutes(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-			case typeURL == ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
+			case req.TypeUrl == ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
 				values.listeners.Cancel()
 				values.listeners = s.config.WatchListeners(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-			default:
-				log.Printf("unexpected requested type %q or stale nonce %q", typeURL, nonce)
 			}
 		}
 	}
 }
 
-func (s *server) handler(stream stream, implicitTypeURL string) error {
-	log.Printf("handle stream for %q", implicitTypeURL)
+func (s *server) handler(stream stream, typeURL string) error {
+	log.Printf("handle stream for %q", typeURL)
 	// a channel for receiving incoming requests
 	reqCh := make(chan *api.DiscoveryRequest, 0)
 	reqStop := int32(0)
@@ -226,7 +223,7 @@ func (s *server) handler(stream stream, implicitTypeURL string) error {
 		}
 	}()
 
-	err := s.process(stream, reqCh, implicitTypeURL)
+	err := s.process(stream, reqCh, typeURL)
 
 	// prevents writing to a closed channel if send failed on blocked recv
 	// TODO(kuat) figure out how to unblock recv through gRPC API

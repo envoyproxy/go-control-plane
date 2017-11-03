@@ -43,8 +43,10 @@ type ConfigWatcher interface {
 type Cache interface {
 	ConfigWatcher
 
-	// SetResource sets a response for a node group and a type.
-	SetResource(Key, ResponseType, []proto.Message)
+	// SetSnapshot sets a response snapshot for a node group. The snapshots
+	// should have distinct versions and be internally consistent (e.g. all
+	// referenced resources must be included in the snapshot).
+	SetSnapshot(Key, Snapshot) error
 }
 
 // Watch is a dedicated stream of configuration resources produced by the
@@ -56,6 +58,9 @@ type Watch struct {
 	// unrecoverable error has occurred in the producer, and the consumer should
 	// close the corresponding stream.
 	Value chan Response
+
+	// Type is the response type.
+	Type ResponseType
 
 	// Names for monitored resources. LDS/CDS expect empty list since they are
 	// discovered globally. RDS/EDS expect explicitly enumerated resource names
@@ -87,32 +92,6 @@ type Response struct {
 	Canary bool
 }
 
-// ResponseType is an enumeration of cache response types.
-type ResponseType int
-
-// xDS response types
-const (
-	EndpointResponse ResponseType = iota
-	ClusterResponse
-	RouteResponse
-	ListenerResponse
-)
-
-func (typ ResponseType) String() string {
-	switch typ {
-	case EndpointResponse:
-		return "endpoints"
-	case ClusterResponse:
-		return "clusters"
-	case RouteResponse:
-		return "routes"
-	case ListenerResponse:
-		return "listeners"
-	default:
-		return "unknown"
-	}
-}
-
 // Key is the node group identifier
 type Key string
 
@@ -120,5 +99,5 @@ type Key string
 type NodeGroup interface {
 	// Hash returns a string identifier for the proxy nodes.
 	// Must be a thread-safe function.
-	Hash(*api.Node) Key
+	Hash(*api.Node) (Key, error)
 }

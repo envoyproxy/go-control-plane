@@ -37,6 +37,7 @@ var (
 	listenPort   uint
 	xdsPort      uint
 	interval     time.Duration
+	node         string
 )
 
 func init() {
@@ -44,6 +45,7 @@ func init() {
 	flag.UintVar(&listenPort, "listen", 9000, "Listener port")
 	flag.UintVar(&xdsPort, "xds", 18000, "xDS server port")
 	flag.DurationVar(&interval, "interval", 30*time.Second, "Interval between cache refresh")
+	flag.StringVar(&node, "node", "node", "Node group name")
 }
 
 func main() {
@@ -58,6 +60,7 @@ func main() {
 	go func() {
 		i := 0
 		for {
+			version := fmt.Sprintf("version%d", i)
 			clusterName := fmt.Sprintf("cluster%d", i)
 
 			endpoint := test.MakeEndpoint(clusterName, uint32(upstreamPort))
@@ -66,10 +69,12 @@ func main() {
 			listener := test.MakeListener("listener", uint32(listenPort), "route")
 
 			log.Printf("updating cache with %d-labelled responses", i)
-			config.SetResource("", cache.EndpointResponse, []proto.Message{endpoint})
-			config.SetResource("", cache.ClusterResponse, []proto.Message{cluster})
-			config.SetResource("", cache.RouteResponse, []proto.Message{route})
-			config.SetResource("", cache.ListenerResponse, []proto.Message{listener})
+			snapshot := cache.NewSnapshot(version,
+				[]proto.Message{endpoint},
+				[]proto.Message{cluster},
+				[]proto.Message{route},
+				[]proto.Message{listener})
+			config.SetSnapshot(cache.Key(node), snapshot)
 
 			time.Sleep(interval)
 			i++
@@ -93,8 +98,8 @@ func main() {
 type hasher struct {
 }
 
-func (hash hasher) Hash(*api.Node) cache.Key {
-	return ""
+func (hash hasher) Hash(*api.Node) (cache.Key, error) {
+	return cache.Key(node), nil
 }
 
 type handler struct {
