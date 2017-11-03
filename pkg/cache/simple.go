@@ -86,6 +86,7 @@ func NewSimpleCache(groups NodeGroup, callback func(Key)) Cache {
 	}
 }
 
+// SetSnapshot updates the simple cache with a snapshot for a node group.
 func (cache *SimpleCache) SetSnapshot(group Key, snapshot Snapshot) error {
 	// TODO(kuat) validate snapshot for types and internal consistency
 
@@ -144,6 +145,7 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 	}
 }
 
+// Watch returns a watch for an xDS request.
 func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string, names []string) Watch {
 	group, err := cache.groups.Hash(node)
 	// do nothing case
@@ -194,18 +196,22 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 	return out
 }
 
+// WatchEndpoints delegates to Watch function.
 func (cache *SimpleCache) WatchEndpoints(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(EndpointResponse, node, version, names)
 }
 
+// WatchClusters delegates to Watch function.
 func (cache *SimpleCache) WatchClusters(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(ClusterResponse, node, version, names)
 }
 
+// WatchRoutes delegates to Watch function.
 func (cache *SimpleCache) WatchRoutes(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(RouteResponse, node, version, names)
 }
 
+// WatchListeners delegates to Watch function.
 func (cache *SimpleCache) WatchListeners(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(ListenerResponse, node, version, names)
 }
