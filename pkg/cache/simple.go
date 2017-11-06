@@ -15,27 +15,30 @@
 package cache
 
 import (
-	"fmt"
+	"log"
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/golang/protobuf/proto"
 )
 
-// SimpleCache is a snapshot-based cache that maintains a single version per
-// xDS response, node group tuple, with no canary updates.
+// SimpleCache is a snapshot-based cache that maintains a single versioned
+// snapshot of responses per node group, with no canary updates.  SimpleCache
+// does not track status of remote nodes and consistently replies with the
+// latest snapshot. For the protocol to work correctly, EDS/RDS requests are
+// responded only when all resources in the snapshot xDS response are named as
+// part of the request. It is expected that the CDS response names all EDS
+// clusters, and the LDS response names all RDS routes in a snapshot, to ensure
+// that Envoy makes the request for all EDS clusters or RDS routes eventually.
 type SimpleCache struct {
-	// responses are cached resources
-	responses map[Key]map[ResponseType][]proto.Message
-
-	// versions must have the same key set as responses
-	versions map[Key]map[ResponseType]int
+	// snapshots are cached resources
+	snapshots map[Key]Snapshot
 
 	// watches keeps track of open watches
-	watches map[Key]map[ResponseType]map[int64]Watch
+	watches map[Key]map[int64]Watch
 
 	// callback requests missing responses
-	callback func(Key, ResponseType)
+	callback func(Key)
 
 	// watchCount is the ID generator for watches
 	watchCount int64
@@ -46,119 +49,169 @@ type SimpleCache struct {
 	mu sync.Mutex
 }
 
-// MakeSimpleCache initializes a simple cache.
+// Snapshot is an internally consistent snapshot of xDS resources.
+// Snapshots should have distinct versions per node group.
+type Snapshot struct {
+	version   string
+	resources map[ResponseType][]proto.Message
+}
+
+// NewSnapshot creates a snapshot from response types and a version.
+func NewSnapshot(version string,
+	endpoints []proto.Message,
+	clusters []proto.Message,
+	routes []proto.Message,
+	listeners []proto.Message) Snapshot {
+	return Snapshot{
+		version: version,
+		resources: map[ResponseType][]proto.Message{
+			EndpointResponse: endpoints,
+			ClusterResponse:  clusters,
+			RouteResponse:    routes,
+			ListenerResponse: listeners,
+		},
+	}
+}
+
+// NewSimpleCache initializes a simple cache.
 // callback function is called on every new cache key and response type if there is no response available.
-// callback is executed in a go-routine.
-func MakeSimpleCache(groups NodeGroup, callback func(Key, ResponseType)) Cache {
+// callback is executed in a go-routine and can be called multiple times prior to receiving a snapshot.
+func NewSimpleCache(groups NodeGroup, callback func(Key)) Cache {
 	return &SimpleCache{
-		responses:  make(map[Key]map[ResponseType][]proto.Message),
-		versions:   make(map[Key]map[ResponseType]int),
-		watches:    make(map[Key]map[ResponseType]map[int64]Watch),
+		snapshots:  make(map[Key]Snapshot),
+		watches:    make(map[Key]map[int64]Watch),
 		callback:   callback,
 		watchCount: 0,
 		groups:     groups,
 	}
 }
 
-func (cache *SimpleCache) SetResource(group Key, typ ResponseType, resources []proto.Message) {
+// SetSnapshot updates the simple cache with a snapshot for a node group.
+func (cache *SimpleCache) SetSnapshot(group Key, snapshot Snapshot) error {
+	// TODO(kuat) validate snapshot for types and internal consistency
+
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
 	// update the existing entry
-	if _, ok := cache.responses[group]; !ok {
-		cache.responses[group] = make(map[ResponseType][]proto.Message)
-		cache.versions[group] = make(map[ResponseType]int)
+	cache.snapshots[group] = snapshot
+
+	// trigger existing watches
+	if _, ok := cache.watches[group]; ok {
+		for _, watch := range cache.watches[group] {
+			respond(watch, snapshot, group)
+		}
+		// discard all watches; the client must request a new watch to receive updates and ACK/NACK
+		delete(cache.watches, group)
 	}
 
-	cache.responses[group][typ] = resources
+	return nil
+}
 
-	// increment version
-	cache.versions[group][typ]++
+// Respond to a watch with the snapshot value. The value channel should have capacity not to block.
+// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
+func respond(watch Watch, snapshot Snapshot, group Key) {
+	typ := watch.Type
+	resources := snapshot.resources[typ]
+	version := snapshot.version
 
-	// trigger watches
-	if _, ok := cache.watches[group]; ok {
-		if _, ok := cache.watches[group][typ]; ok {
-			// signal the update (channels have buffer size 1)
-			for _, watch := range cache.watches[group][typ] {
-				watch.Value <- Response{
-					Version:   fmt.Sprintf("%d", cache.versions[group][typ]),
-					Resources: resources,
-				}
-				// remove clean-up as the watch is discarded immediately
-				watch.stop = nil
-			}
-			// discard all watches; the client must request a new watch to receive updates after ACK/NACK
-			cache.watches[group][typ] = make(map[int64]Watch)
+	// remove clean-up as the watch is discarded immediately
+	watch.stop = nil
+
+	// the request names must match the snapshot names
+	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
+	if len(watch.Names) != 0 {
+		// convert to a set
+		names := make(map[string]bool)
+		for _, name := range watch.Names {
+			names[name] = true
 		}
+
+		// check that every snapshot resource name is present in the request
+		for _, resource := range resources {
+			resourceName := GetResourceName(resource)
+			if _, exists := names[resourceName]; !exists {
+				log.Printf("not responding for %s from %q at %q since %q not requested %v",
+					typ.String(), group, version, resourceName, watch.Names)
+				return
+			}
+		}
+	}
+
+	log.Printf("respond for %s from %q at %q with %v", typ.String(), group, version, resources)
+	watch.Value <- Response{
+		Version:   version,
+		Resources: resources,
 	}
 }
 
+// Watch returns a watch for an xDS request.
 func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string, names []string) Watch {
+	group, err := cache.groups.Hash(node)
 	// do nothing case
-	if node == nil {
+	if err != nil {
 		return Watch{}
 	}
-
-	group := cache.groups.Hash(node)
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
+	// allocate capacity 1 to allow one-time non-blocking use
+	value := make(chan Response, 1)
+	out := Watch{
+		Value: value,
+		Type:  typ,
+		Names: names,
+	}
+
 	// if the requested version is up-to-date or missing a response, leave an open watch
-	versions, exists := cache.versions[group]
-	if !exists || version == fmt.Sprintf("%d", versions[typ]) {
+	snapshot, exists := cache.snapshots[group]
+	if !exists || version == snapshot.version {
 		// invoke callback in a go-routine
 		if !exists && cache.callback != nil {
-			go cache.callback(group, typ)
+			log.Printf("callback %q at %q", group, version)
+			go cache.callback(group)
 		}
 
-		// make sure watches map exists
 		if _, ok := cache.watches[group]; !ok {
-			cache.watches[group] = make(map[ResponseType]map[int64]Watch)
-		}
-		if _, ok := cache.watches[group][typ]; !ok {
-			cache.watches[group][typ] = make(map[int64]Watch)
+			cache.watches[group] = make(map[int64]Watch)
 		}
 
-		value := make(chan Response, 1)
+		log.Printf("open watch for %s%v from key %q from version %q", typ.String(), names, group, version)
 		cache.watchCount++
 		id := cache.watchCount
-		out := Watch{
-			Value: value,
-			stop: func() {
-				if _, ok := cache.watches[group]; ok {
-					if _, ok := cache.watches[group][typ]; ok {
-						delete(cache.watches[group][typ], id)
-					}
-				}
-			},
+		cache.watches[group][id] = out
+		out.stop = func() {
+			cache.mu.Lock()
+			defer cache.mu.Unlock()
+			if _, ok := cache.watches[group]; ok {
+				delete(cache.watches[group], id)
+			}
 		}
-		cache.watches[group][typ][id] = out
 		return out
 	}
 
-	// otherwise, respond with the latest version
-	// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
-	value := make(chan Response, 1)
-	value <- Response{
-		Version:   fmt.Sprintf("%d", cache.versions[group][typ]),
-		Resources: cache.responses[group][typ],
-	}
-	return Watch{Value: value}
+	// otherwise, the watch may be responded immediately
+	respond(out, snapshot, group)
+	return out
 }
 
+// WatchEndpoints delegates to Watch function.
 func (cache *SimpleCache) WatchEndpoints(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(EndpointResponse, node, version, names)
 }
 
+// WatchClusters delegates to Watch function.
 func (cache *SimpleCache) WatchClusters(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(ClusterResponse, node, version, names)
 }
 
+// WatchRoutes delegates to Watch function.
 func (cache *SimpleCache) WatchRoutes(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(RouteResponse, node, version, names)
 }
 
+// WatchListeners delegates to Watch function.
 func (cache *SimpleCache) WatchListeners(node *api.Node, version string, names []string) Watch {
 	return cache.Watch(ListenerResponse, node, version, names)
 }
