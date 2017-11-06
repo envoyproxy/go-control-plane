@@ -62,9 +62,9 @@ type Watch struct {
 	// Type is the response type.
 	Type ResponseType
 
-	// Names for monitored resources. LDS/CDS expect empty list since they are
-	// discovered globally. RDS/EDS expect explicitly enumerated resource names
-	// as dictated by LDS/CDS.
+	// Names of requested resources (or empty to mean all resources). Resources
+	// that are not explicitly mentioned in this field are ignored by the proxy
+	// node.
 	Names []string
 
 	stop func()
