@@ -30,6 +30,11 @@ import (
 // part of the request. It is expected that the CDS response names all EDS
 // clusters, and the LDS response names all RDS routes in a snapshot, to ensure
 // that Envoy makes the request for all EDS clusters or RDS routes eventually.
+//
+// SimpleCache can also be used as a config cache for distinct xDS requests.
+// The snapshots are required to contain only the responses for the particular
+// type of the xDS service that the cache serves. Synchronization of multiple
+// caches for different response types is left to the configuration producer.
 type SimpleCache struct {
 	// snapshots are cached resources
 	snapshots map[Key]Snapshot
