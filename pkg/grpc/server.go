@@ -217,7 +217,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 // handler converts a blocking read call to channels and initiates stream processing
 func (s *server) handler(stream stream, typeURL string) error {
 	// a channel for receiving incoming requests
-	reqCh := make(chan *api.DiscoveryRequest, 0)
+	reqCh := make(chan *api.DiscoveryRequest)
 	reqStop := int32(0)
 	go func() {
 		for {
