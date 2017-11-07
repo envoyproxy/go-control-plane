@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"time"
@@ -28,6 +27,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	xds "github.com/envoyproxy/go-control-plane/pkg/grpc"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
+	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 )
@@ -71,7 +71,7 @@ func main() {
 			route := test.MakeRoute(routeName, clusterName)
 			listener := test.MakeListener(listenerName, uint32(listenPort), routeName)
 
-			log.Printf("updating cache with %d-labelled responses", i)
+			glog.Infof("updating cache with %d-labelled responses", i)
 			snapshot := cache.NewSnapshot(version,
 				[]proto.Message{endpoint},
 				[]proto.Message{cluster},
@@ -89,12 +89,12 @@ func main() {
 	grpcServer := grpc.NewServer()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", xdsPort))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		glog.Fatalf("failed to listen: %v", err)
 	}
 	server.Register(grpcServer)
-	log.Printf("xDS server listening on %d", xdsPort)
+	glog.Infof("xDS server listening on %d", xdsPort)
 	if err = grpcServer.Serve(lis); err != nil {
-		log.Println(err.Error())
+		glog.Error(err)
 	}
 }
 
@@ -109,18 +109,18 @@ type handler struct {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("received request from %q...", r.RemoteAddr)
+	glog.Infof("received request from %q...", r.RemoteAddr)
 	body := bytes.Buffer{}
 	w.Header().Set("Content-Type", "application/text")
 	if _, err := w.Write(body.Bytes()); err != nil {
-		log.Println(err.Error())
+		glog.Error(err)
 	}
 }
 
 func runHTTP() {
-	log.Printf("upstream listening HTTP1.1 on %d", upstreamPort)
+	glog.Infof("upstream listening HTTP1.1 on %d", upstreamPort)
 	h := handler{}
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", upstreamPort), h); err != nil {
-		log.Println(err.Error())
+		glog.Error(err)
 	}
 }
