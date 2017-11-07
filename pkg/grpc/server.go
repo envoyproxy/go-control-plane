@@ -95,7 +95,7 @@ func (values watches) cancel() {
 // process handles a bi-di stream request
 func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
-	streamId := atomic.AddInt64(&s.streamCount, 1)
+	streamID := atomic.AddInt64(&s.streamCount, 1)
 
 	// unique nonce generator for req-resp pairs per xDS stream; the server
 	// ignores stale nonces. nonce is only modified within send() function.
@@ -122,7 +122,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 			}
 		}
 		nonce := strconv.FormatInt(streamNonce, 10)
-		glog.V(10).Infof("[%d] respond %s with nonce %q version %q", streamId, typeURL, nonce, resp.Version)
+		glog.V(10).Infof("[%d] respond %s with nonce %q version %q", streamID, typeURL, nonce, resp.Version)
 		out := &api.DiscoveryResponse{
 			VersionInfo: resp.Version,
 			Resources:   resources,
@@ -133,7 +133,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 		return nonce, stream.Send(out)
 	}
 
-	glog.V(10).Infof("[%d] open stream for %q", streamId, defaultTypeURL)
+	glog.V(10).Infof("[%d] open stream for %q", streamID, defaultTypeURL)
 	for {
 		select {
 		// config watcher can send the requested resources types in any order
@@ -180,7 +180,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
-				glog.V(10).Infof("[%d] stream closed", streamId)
+				glog.V(10).Infof("[%d] stream closed", streamID)
 				return nil
 			}
 
@@ -192,7 +192,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 				return fmt.Errorf("unexpected resource requested, want %q got %q", defaultTypeURL, req.TypeUrl)
 			}
 
-			glog.V(10).Infof("[%d] request %s%v with nonce %q from version %q", streamId, req.TypeUrl,
+			glog.V(10).Infof("[%d] request %s%v with nonce %q from version %q", streamID, req.TypeUrl,
 				req.GetResourceNames(), nonce, req.GetVersionInfo())
 
 			// cancel existing watches to (re-)request a newer version
