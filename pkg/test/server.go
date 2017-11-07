@@ -92,6 +92,7 @@ func RunXDS(ctx context.Context, config cache.Cache, port uint) {
 // RunCacheUpdate executes a config update sequence every second.
 func RunCacheUpdate(ctx context.Context,
 	config cache.Cache,
+	ads bool,
 	interval time.Duration,
 	upstreamPort, listenPort uint) {
 	i := 0
@@ -103,9 +104,9 @@ func RunCacheUpdate(ctx context.Context,
 		listenerName := "listener"
 
 		endpoint := MakeEndpoint(clusterName, uint32(upstreamPort))
-		cluster := MakeCluster(clusterName)
+		cluster := MakeCluster(ads, clusterName)
 		route := MakeRoute(routeName, clusterName)
-		listener := MakeListener(listenerName, uint32(listenPort), routeName)
+		listener := MakeListener(ads, listenerName, uint32(listenPort), routeName)
 
 		glog.Infof("updating cache with %d-labelled responses", i)
 		snapshot := cache.NewSnapshot(version,

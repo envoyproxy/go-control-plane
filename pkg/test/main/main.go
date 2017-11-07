@@ -32,13 +32,15 @@ var (
 	listenPort   uint
 	xdsPort      uint
 	interval     time.Duration
+	ads          bool
 )
 
 func init() {
 	flag.UintVar(&upstreamPort, "upstream", 18080, "Upstream HTTP/1.1 port")
 	flag.UintVar(&listenPort, "listen", 9000, "Listener port")
 	flag.UintVar(&xdsPort, "xds", 18000, "xDS server port")
-	flag.DurationVar(&interval, "interval", 30*time.Second, "Interval between cache refresh")
+	flag.DurationVar(&interval, "interval", 10*time.Second, "Interval between cache refresh")
+	flag.BoolVar(&ads, "ads", true, "Use ADS instead of separate xDS services")
 }
 
 func main() {
@@ -52,16 +54,18 @@ func main() {
 	config := cache.NewSimpleCache(test.Hasher{}, nil)
 
 	// update the cache at a regular interval
-	go test.RunCacheUpdate(ctx, config, interval, upstreamPort, listenPort)
+	go test.RunCacheUpdate(ctx, config, ads, interval, upstreamPort, listenPort)
 
 	// start the xDS server
 	go test.RunXDS(ctx, config, xdsPort)
 
 	// start envoy
+	bootstrap := "server_xds.yaml"
+	if ads {
+		bootstrap = "server_ads.yaml"
+	}
 	envoy := exec.Command("envoy",
-		"-c", "pkg/test/main/server_ads.yaml",
-		"--service-cluster", "test",
-		"--service-node", "test",
+		"-c", "pkg/test/main/"+bootstrap,
 		"--drain-time-s", "1")
 	envoy.Stdout = os.Stdout
 	envoy.Stderr = os.Stderr
