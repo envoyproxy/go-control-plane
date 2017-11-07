@@ -16,7 +16,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"net"
@@ -109,10 +108,8 @@ type handler struct {
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	glog.Infof("received request from %q...", r.RemoteAddr)
-	body := bytes.Buffer{}
 	w.Header().Set("Content-Type", "application/text")
-	if _, err := w.Write(body.Bytes()); err != nil {
+	if _, err := w.Write([]byte("Hi, there!\n")); err != nil {
 		glog.Error(err)
 	}
 }
