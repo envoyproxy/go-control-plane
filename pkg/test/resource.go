@@ -27,6 +27,7 @@ const (
 	localhost  = "127.0.0.1"
 	router     = "envoy.router"
 	httpFilter = "envoy.http_connection_manager"
+	xdsCluster = "xds_cluster"
 )
 
 // MakeEndpoint creates a localhost endpoint.
@@ -54,17 +55,31 @@ func MakeEndpoint(cluster string, port uint32) *api.ClusterLoadAssignment {
 }
 
 // MakeCluster creates a cluster.
-func MakeCluster(cluster string) *api.Cluster {
+func MakeCluster(ads bool, cluster string) *api.Cluster {
+	var edsSource *api.ConfigSource
+	if ads {
+		edsSource = &api.ConfigSource{
+			ConfigSourceSpecifier: &api.ConfigSource_Ads{
+				Ads: &api.AggregatedConfigSource{},
+			},
+		}
+	} else {
+		edsSource = &api.ConfigSource{
+			ConfigSourceSpecifier: &api.ConfigSource_ApiConfigSource{
+				ApiConfigSource: &api.ApiConfigSource{
+					ApiType:     api.ApiConfigSource_GRPC,
+					ClusterName: []string{xdsCluster},
+				},
+			},
+		}
+	}
+
 	return &api.Cluster{
 		Name:           cluster,
 		ConnectTimeout: &duration.Duration{Seconds: 5},
 		Type:           api.Cluster_EDS,
 		EdsClusterConfig: &api.Cluster_EdsClusterConfig{
-			EdsConfig: &api.ConfigSource{
-				ConfigSourceSpecifier: &api.ConfigSource_Ads{
-					Ads: &api.AggregatedConfigSource{},
-				},
-			},
+			EdsConfig:   edsSource,
 			ServiceName: cluster,
 		},
 	}
@@ -96,16 +111,29 @@ func MakeRoute(route, cluster string) *api.RouteConfiguration {
 }
 
 // MakeListener creates a listener.
-func MakeListener(listener string, port uint32, route string) *api.Listener {
+func MakeListener(ads bool, listener string, port uint32, route string) *api.Listener {
+	var rdsSource *api.ConfigSource
+	if ads {
+		rdsSource = &api.ConfigSource{
+			ConfigSourceSpecifier: &api.ConfigSource_Ads{
+				Ads: &api.AggregatedConfigSource{},
+			},
+		}
+	} else {
+		rdsSource = &api.ConfigSource{
+			ConfigSourceSpecifier: &api.ConfigSource_ApiConfigSource{
+				ApiConfigSource: &api.ApiConfigSource{
+					ApiType:     api.ApiConfigSource_GRPC,
+					ClusterName: []string{xdsCluster},
+				},
+			},
+		}
+	}
 	manager := &http.HttpConnectionManager{
 		CodecType: http.HttpConnectionManager_AUTO,
 		RouteSpecifier: &http.HttpConnectionManager_Rds{
 			Rds: &http.Rds{
-				ConfigSource: &api.ConfigSource{
-					ConfigSourceSpecifier: &api.ConfigSource_Ads{
-						Ads: &api.AggregatedConfigSource{},
-					},
-				},
+				ConfigSource:    rdsSource,
 				RouteConfigName: route,
 			},
 		},

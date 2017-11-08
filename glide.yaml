@@ -16,3 +16,4 @@ import:
   - googleapis/api/annotations
 - package: google.golang.org/grpc
   version: ^1.7.0
+- package: github.com/golang/glog

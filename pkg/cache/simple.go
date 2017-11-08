@@ -15,10 +15,10 @@
 package cache
 
 import (
-	"log"
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -30,6 +30,11 @@ import (
 // part of the request. It is expected that the CDS response names all EDS
 // clusters, and the LDS response names all RDS routes in a snapshot, to ensure
 // that Envoy makes the request for all EDS clusters or RDS routes eventually.
+//
+// SimpleCache can also be used as a config cache for distinct xDS requests.
+// The snapshots are required to contain only the responses for the particular
+// type of the xDS service that the cache serves. Synchronization of multiple
+// caches for different response types is left to the configuration producer.
 type SimpleCache struct {
 	// snapshots are cached resources
 	snapshots map[Key]Snapshot
@@ -97,8 +102,8 @@ func (cache *SimpleCache) SetSnapshot(group Key, snapshot Snapshot) error {
 	cache.snapshots[group] = snapshot
 
 	// trigger existing watches
-	if _, ok := cache.watches[group]; ok {
-		for _, watch := range cache.watches[group] {
+	if watches, ok := cache.watches[group]; ok {
+		for _, watch := range watches {
 			respond(watch, snapshot, group)
 		}
 		// discard all watches; the client must request a new watch to receive updates and ACK/NACK
@@ -131,14 +136,13 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 		for _, resource := range resources {
 			resourceName := GetResourceName(resource)
 			if _, exists := names[resourceName]; !exists {
-				log.Printf("not responding for %s from %q at %q since %q not requested %v",
+				glog.V(10).Infof("not responding for %s from %q at %q since %q not requested %v",
 					typ.String(), group, version, resourceName, watch.Names)
 				return
 			}
 		}
 	}
 
-	log.Printf("respond for %s from %q at %q with %v", typ.String(), group, version, resources)
 	watch.Value <- Response{
 		Version:   version,
 		Resources: resources,
@@ -169,7 +173,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 	if !exists || version == snapshot.version {
 		// invoke callback in a go-routine
 		if !exists && cache.callback != nil {
-			log.Printf("callback %q at %q", group, version)
+			glog.V(10).Infof("callback %q at %q", group, version)
 			go cache.callback(group)
 		}
 
@@ -177,7 +181,7 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 			cache.watches[group] = make(map[int64]Watch)
 		}
 
-		log.Printf("open watch for %s%v from key %q from version %q", typ.String(), names, group, version)
+		glog.V(10).Infof("open watch for %s%v from key %q from version %q", typ.String(), names, group, version)
 		cache.watchCount++
 		id := cache.watchCount
 		cache.watches[group][id] = out

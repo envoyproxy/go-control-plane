@@ -16,16 +16,16 @@
 package server
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"strconv"
 	"sync/atomic"
 
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/any"
-	context "golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -53,6 +53,9 @@ func NewServer(config cache.ConfigWatcher) Server {
 
 type server struct {
 	config cache.ConfigWatcher
+
+	// streamCount for counting bi-di streams
+	streamCount int64
 }
 
 func (s *server) Register(srv *grpc.Server) {
@@ -89,10 +92,16 @@ func (values watches) cancel() {
 	values.listeners.Cancel()
 }
 
+// process handles a bi-di stream request
 func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defaultTypeURL string) error {
-	// unique nonce for req-resp pairs per xDS stream; the server ignores stale nonces.
-	// nonce is only modified within send() function.
+	// increment stream count
+	streamID := atomic.AddInt64(&s.streamCount, 1)
+
+	// unique nonce generator for req-resp pairs per xDS stream; the server
+	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
+
+	// a collection of watches per request type
 	var values watches
 	defer func() {
 		values.cancel()
@@ -113,6 +122,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 			}
 		}
 		nonce := strconv.FormatInt(streamNonce, 10)
+		glog.V(10).Infof("[%d] respond %s with nonce %q version %q", streamID, typeURL, nonce, resp.Version)
 		out := &api.DiscoveryResponse{
 			VersionInfo: resp.Version,
 			Resources:   resources,
@@ -123,6 +133,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 		return nonce, stream.Send(out)
 	}
 
+	glog.V(10).Infof("[%d] open stream for %q", streamID, defaultTypeURL)
 	for {
 		select {
 		// config watcher can send the requested resources types in any order
@@ -169,7 +180,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
-				log.Printf("stream closed")
+				glog.V(10).Infof("[%d] stream closed", streamID)
 				return nil
 			}
 
@@ -181,7 +192,8 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 				return fmt.Errorf("unexpected resource requested, want %q got %q", defaultTypeURL, req.TypeUrl)
 			}
 
-			log.Printf("request %s%v with nonce %q from version %q", req.TypeUrl, req.GetResourceNames(), nonce, req.GetVersionInfo())
+			glog.V(10).Infof("[%d] request %s%v with nonce %q from version %q", streamID, req.TypeUrl,
+				req.GetResourceNames(), nonce, req.GetVersionInfo())
 
 			// cancel existing watches to (re-)request a newer version
 			switch {
@@ -202,20 +214,18 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 	}
 }
 
+// handler converts a blocking read call to channels and initiates stream processing
 func (s *server) handler(stream stream, typeURL string) error {
-	log.Printf("handle stream for %q", typeURL)
 	// a channel for receiving incoming requests
-	reqCh := make(chan *api.DiscoveryRequest, 0)
+	reqCh := make(chan *api.DiscoveryRequest)
 	reqStop := int32(0)
 	go func() {
 		for {
 			req, err := stream.Recv()
 			if atomic.LoadInt32(&reqStop) != 0 {
-				log.Printf("reqStop termination")
 				return
 			}
 			if err != nil {
-				log.Printf("req error %v", err)
 				close(reqCh)
 				return
 			}

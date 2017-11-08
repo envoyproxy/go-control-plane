@@ -2,14 +2,17 @@ node:
   id: test-id
   cluster: test-cluster
 dynamic_resources:
-  lds_config: {ads: {}}
-  cds_config: {ads: {}}
-  ads_config:
-    api_type: GRPC
-    cluster_name: [ads_cluster]
+  lds_config:
+    api_config_source:
+      api_type: GRPC
+      cluster_name: [xds_cluster]
+  cds_config:
+    api_config_source:
+      api_type: GRPC
+      cluster_name: [xds_cluster]
 static_resources:
   clusters:
-  - name: ads_cluster
+  - name: xds_cluster
     connect_timeout: { seconds: 5 }
     type: STATIC
     hosts:

@@ -72,7 +72,7 @@ type Watch struct {
 
 // Cancel cancels the watch. Watch must be cancelled to release resources in the cache.
 // Cancel can be called multiple times.
-func (watch Watch) Cancel() {
+func (watch *Watch) Cancel() {
 	if watch.stop != nil {
 		watch.stop()
 		watch.stop = nil

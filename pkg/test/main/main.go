@@ -16,20 +16,15 @@
 package main
 
 import (
-	"bytes"
+	"context"
 	"flag"
-	"fmt"
-	"log"
-	"net"
-	"net/http"
+	"os"
+	"os/exec"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	xds "github.com/envoyproxy/go-control-plane/pkg/grpc"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
-	"github.com/golang/protobuf/proto"
-	"google.golang.org/grpc"
+	"github.com/golang/glog"
 )
 
 var (
@@ -37,90 +32,52 @@ var (
 	listenPort   uint
 	xdsPort      uint
 	interval     time.Duration
-	node         string
+	ads          bool
 )
 
 func init() {
 	flag.UintVar(&upstreamPort, "upstream", 18080, "Upstream HTTP/1.1 port")
 	flag.UintVar(&listenPort, "listen", 9000, "Listener port")
 	flag.UintVar(&xdsPort, "xds", 18000, "xDS server port")
-	flag.DurationVar(&interval, "interval", 30*time.Second, "Interval between cache refresh")
-	flag.StringVar(&node, "node", "node", "Node group name")
+	flag.DurationVar(&interval, "interval", 10*time.Second, "Interval between cache refresh")
+	flag.BoolVar(&ads, "ads", true, "Use ADS instead of separate xDS services")
 }
 
 func main() {
 	flag.Parse()
+	ctx := context.Background()
+
 	// start upstream
-	go runHTTP()
+	go test.RunHTTP(ctx, upstreamPort)
 
 	// create a cache
-	config := cache.NewSimpleCache(hasher{}, nil)
+	config := cache.NewSimpleCache(test.Hasher{}, nil)
 
 	// update the cache at a regular interval
-	go func() {
-		i := 0
-		for {
-			version := fmt.Sprintf("version%d", i)
-			clusterName := fmt.Sprintf("cluster%d", i)
-			routeName := fmt.Sprintf("route%d", i)
-			// listener name must be same since ports are shared and previous listener is drained
-			listenerName := "listener"
-
-			endpoint := test.MakeEndpoint(clusterName, uint32(upstreamPort))
-			cluster := test.MakeCluster(clusterName)
-			route := test.MakeRoute(routeName, clusterName)
-			listener := test.MakeListener(listenerName, uint32(listenPort), routeName)
-
-			log.Printf("updating cache with %d-labelled responses", i)
-			snapshot := cache.NewSnapshot(version,
-				[]proto.Message{endpoint},
-				[]proto.Message{cluster},
-				[]proto.Message{route},
-				[]proto.Message{listener})
-			config.SetSnapshot(cache.Key(node), snapshot)
-
-			time.Sleep(interval)
-			i++
-		}
-	}()
+	go test.RunCacheUpdate(ctx, config, ads, interval, upstreamPort, listenPort)
 
 	// start the xDS server
-	server := xds.NewServer(config)
-	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", xdsPort))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+	go test.RunXDS(ctx, config, xdsPort)
+
+	// start envoy
+	bootstrap := "server_xds.yaml"
+	if ads {
+		bootstrap = "server_ads.yaml"
 	}
-	server.Register(grpcServer)
-	log.Printf("xDS server listening on %d", xdsPort)
-	if err = grpcServer.Serve(lis); err != nil {
-		log.Println(err.Error())
-	}
-}
+	envoy := exec.Command("envoy",
+		"-c", "pkg/test/main/"+bootstrap,
+		"--drain-time-s", "1")
+	envoy.Stdout = os.Stdout
+	envoy.Stderr = os.Stderr
+	envoy.Start()
 
-type hasher struct {
-}
+	for {
+		if err := test.CheckResponse(listenPort); err != nil {
+			glog.Errorf("ERROR %v", err)
+		} else {
+			glog.Info("OK")
+		}
 
-func (hash hasher) Hash(*api.Node) (cache.Key, error) {
-	return cache.Key(node), nil
-}
-
-type handler struct {
-}
-
-func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("received request from %q...", r.RemoteAddr)
-	body := bytes.Buffer{}
-	w.Header().Set("Content-Type", "application/text")
-	if _, err := w.Write(body.Bytes()); err != nil {
-		log.Println(err.Error())
-	}
-}
-
-func runHTTP() {
-	log.Printf("upstream listening HTTP1.1 on %d", upstreamPort)
-	h := handler{}
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", upstreamPort), h); err != nil {
-		log.Println(err.Error())
+		time.Sleep(1 * time.Second)
 	}
 }
