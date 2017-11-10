@@ -1,5 +1,5 @@
-hash: a1c33016f72e58edd25e7e7b363104f5cf7922a4acb843a348abfd64932df3aa
-updated: 2017-11-06T16:44:42.564473884-08:00
+hash: 22b361e810bfa924562190bdf35dcdbfc22339bcfaca8cf30dd93826abb6c06c
+updated: 2017-11-10T10:59:51.01724288-08:00
 imports:
 - name: github.com/golang/glog
   version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
@@ -15,8 +15,12 @@ imports:
   - ptypes/struct
   - ptypes/timestamp
   - ptypes/wrappers
+- name: github.com/lyft/protoc-gen-validate
+  version: ef99a8ba19eb470c12238812747157bdbbc839eb
+  subpackages:
+  - validate
 - name: golang.org/x/net
-  version: 4b14673ba32bee7f5ac0f990a48f033919fd418b
+  version: a337091b0525af65de94df2eb7e98bd9962dcbe2
   subpackages:
   - context
   - http2
@@ -26,14 +30,14 @@ imports:
   - lex/httplex
   - trace
 - name: golang.org/x/text
-  version: 6eab0e8f74e86c598ec3b6fad4888e0c11482d48
+  version: 88f656faf3f37f690df1a32515b479415e1a6769
   subpackages:
   - secure/bidirule
   - transform
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/genproto
-  version: f676e0f3ac6395ff1a529ae59a6670878a8371a6
+  version: 11c7f9e547da6db876260ce49ea7536985904c9b
   subpackages:
   - googleapis/api/annotations
   - googleapis/rpc/status
