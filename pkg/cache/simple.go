@@ -199,23 +199,3 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 	respond(out, snapshot, group)
 	return out
 }
-
-// WatchEndpoints delegates to Watch function.
-func (cache *SimpleCache) WatchEndpoints(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(EndpointResponse, node, version, names)
-}
-
-// WatchClusters delegates to Watch function.
-func (cache *SimpleCache) WatchClusters(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(ClusterResponse, node, version, names)
-}
-
-// WatchRoutes delegates to Watch function.
-func (cache *SimpleCache) WatchRoutes(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(RouteResponse, node, version, names)
-}
-
-// WatchListeners delegates to Watch function.
-func (cache *SimpleCache) WatchListeners(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(ListenerResponse, node, version, names)
-}

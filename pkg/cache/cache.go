@@ -26,17 +26,8 @@ import (
 // consumer, in effect terminating the watch for the request.
 // ConfigWatcher implementation must be thread-safe.
 type ConfigWatcher interface {
-	// WatchEndpoints returns a watch for endpoints.
-	WatchEndpoints(*api.Node, string, []string) Watch
-
-	// WatchClusters returns a watch for clusters.
-	WatchClusters(*api.Node, string, []string) Watch
-
-	// WatchRoutes returns a watch for routes.
-	WatchRoutes(*api.Node, string, []string) Watch
-
-	// WatchListeners returns a watch for listeners.
-	WatchListeners(*api.Node, string, []string) Watch
+	// Watch returns a watch for a response type.
+	Watch(ResponseType, *api.Node, string, []string) Watch
 }
 
 // Cache is a generic config cache with a watcher.

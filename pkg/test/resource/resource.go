@@ -12,8 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-// Package test validates the xDS protocol implementation.
-package test
+// Package resource creates test xDS resources
+package resource
 
 import (
 	"github.com/envoyproxy/go-control-plane/api"
