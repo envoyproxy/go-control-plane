@@ -317,10 +317,12 @@ func TestAggregatedHandlers(t *testing.T) {
 		}
 	}()
 
+	count := 0
 	for {
 		select {
 		case <-resp.sent:
-			if resp.nonce >= 4 {
+			count++
+			if count >= 4 {
 				close(resp.recv)
 				if want := map[cache.ResponseType]int{
 					cache.EndpointResponse: 1,
@@ -335,7 +337,7 @@ func TestAggregatedHandlers(t *testing.T) {
 				return
 			}
 		case <-time.After(1 * time.Second):
-			t.Fatalf("got %d messages on the stream, not 4", resp.nonce)
+			t.Fatalf("got %d messages on the stream, not 4", count)
 		}
 	}
 }

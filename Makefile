@@ -47,7 +47,7 @@ test:
 .PHONY: cover
 cover:
 	@echo "--> running coverage tests"
-	@go test -cover $(GOPKGS)
+	@go test -race -cover $(GOPKGS)
 
 .PHONY: check
 check: format.check vet lint
