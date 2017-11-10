@@ -53,6 +53,11 @@ test:
 	@echo "--> running unit tests"
 	@go test -v $(GOPKGS)
 
+.PHONY: cover
+cover:
+	@echo "--> running coverage tests"
+	@go test -cover $(GOPKGS)
+
 .PHONY: check
 check: format.check vet lint
 

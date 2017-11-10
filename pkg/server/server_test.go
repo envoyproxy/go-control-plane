@@ -57,10 +57,11 @@ func makeMockConfigWatcher() *mockConfigWatcher {
 }
 
 type mockStream struct {
-	t     *testing.T
-	recv  chan *api.DiscoveryRequest
-	sent  chan *api.DiscoveryResponse
-	nonce int
+	t         *testing.T
+	recv      chan *api.DiscoveryRequest
+	sent      chan *api.DiscoveryResponse
+	nonce     int
+	sendError bool
 	grpc.ServerStream
 }
 
@@ -88,6 +89,9 @@ func (stream *mockStream) Send(resp *api.DiscoveryResponse) error {
 		}
 	}
 	stream.sent <- resp
+	if stream.sendError {
+		return errors.New("send error")
+	}
 	return nil
 }
 
@@ -203,6 +207,31 @@ func TestWatchClosed(t *testing.T) {
 			// check that response fails since watch gets closed
 			if err := s.StreamAggregatedResources(resp); err == nil {
 				t.Error("Stream() => got no error, want watch failed")
+			}
+
+			close(resp.recv)
+		})
+	}
+}
+
+func TestSendError(t *testing.T) {
+	for _, typ := range cache.ResponseTypes {
+		t.Run(typ.String(), func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.responses = makeResponses()
+			s := NewServer(config)
+
+			// make a request
+			resp := makeMockStream(t)
+			resp.sendError = true
+			resp.recv <- &api.DiscoveryRequest{
+				Node:    node,
+				TypeUrl: GetTypeURL(typ),
+			}
+
+			// check that response fails since watch gets closed
+			if err := s.StreamAggregatedResources(resp); err == nil {
+				t.Error("Stream() => got no error, want send error")
 			}
 
 			close(resp.recv)

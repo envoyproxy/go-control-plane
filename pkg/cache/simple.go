@@ -151,22 +151,22 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 
 // Watch returns a watch for an xDS request.
 func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string, names []string) Watch {
+	out := Watch{
+		Type:  typ,
+		Names: names,
+	}
 	group, err := cache.groups.Hash(node)
+
 	// do nothing case
 	if err != nil {
-		return Watch{}
+		return out
 	}
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
 	// allocate capacity 1 to allow one-time non-blocking use
-	value := make(chan Response, 1)
-	out := Watch{
-		Value: value,
-		Type:  typ,
-		Names: names,
-	}
+	out.Value = make(chan Response, 1)
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	snapshot, exists := cache.snapshots[group]

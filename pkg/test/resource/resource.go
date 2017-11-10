@@ -18,7 +18,7 @@ package resource
 import (
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/api/filter/http"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/pkg/util"
 	"github.com/golang/protobuf/ptypes/duration"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
@@ -147,7 +147,7 @@ func MakeListener(ads bool, listener string, port uint32, route string) *api.Lis
 			},
 		}},
 	}
-	pbst, err := cache.MessageToStruct(manager)
+	pbst, err := util.MessageToStruct(manager)
 	if err != nil {
 		panic(err)
 	}
