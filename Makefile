@@ -29,18 +29,9 @@ GOPKGS		= $(shell go list ./... \
 
 APP_VER		:= $(shell git describe --always 2> /dev/null || echo "unknown")
 
-# linker flags to set build info variables
-BUILD_SYM	:= github.com/envoyproxy/go-control-plane/pkg/version
-LDFLAGS		+= -X $(BUILD_SYM).version=$(APP_VER)
-LDFLAGS		+= -X $(BUILD_SYM).gitRevision=$(shell git rev-parse --short HEAD 2> /dev/null  || echo unknown)
-LDFLAGS		+= -X $(BUILD_SYM).branch=$(shell git rev-parse --abbrev-ref HEAD 2> /dev/null  || echo unknown)
-LDFLAGS		+= -X $(BUILD_SYM).buildUser=$(shell whoami || echo nobody)@$(shell hostname -f || echo builder)
-LDFLAGS		+= -X $(BUILD_SYM).buildDate=$(shell date +%Y-%m-%dT%H:%M:%S%:z)
-LDFLAGS		+= -X $(BUILD_SYM).goVersion=$(word 3,$(shell go version))
-
 .PHONY: build
 build:
-	@go build -ldflags '$(LDFLAGS)' -o $(BINDIR)/$(OUTPUT_NAME)
+	@go build ./...
 
 clean:
 	@echo "--> cleaning compiled objects and binaries"
