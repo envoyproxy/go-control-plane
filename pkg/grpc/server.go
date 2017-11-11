@@ -184,7 +184,6 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 				return nil
 			}
 
-			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
 			nonce := req.GetResponseNonce()
 
 			// type URL must match expected type URL except for ADS
@@ -195,6 +194,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 			glog.V(10).Infof("[%d] request %s%v with nonce %q from version %q", streamID, req.TypeUrl,
 				req.GetResourceNames(), nonce, req.GetVersionInfo())
 
+			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
 			// cancel existing watches to (re-)request a newer version
 			switch {
 			case req.TypeUrl == EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
