@@ -20,7 +20,7 @@ import (
 	"flag"
 	"os"
 	"os/exec"
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
@@ -52,7 +52,16 @@ func main() {
 	go test.RunHTTP(ctx, upstreamPort)
 
 	// create a status tracker
-	status := cache.NewStatusInfo(cache.DefaultID, func(a, b string) int { return strings.Compare(a, b) })
+	status := cache.NewStatusInfo(cache.DefaultID, func(a, b string) int {
+		ai, _ := strconv.Atoi(a)
+		bi, _ := strconv.Atoi(b)
+		if ai == bi {
+			return 0
+		} else if ai < bi {
+			return -1
+		}
+		return 1
+	})
 
 	// create a cache
 	config := cache.NewSimpleCache(test.Hasher{}, status, nil)
