@@ -20,7 +20,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/api/filter/http"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
 	"github.com/golang/protobuf/ptypes/duration"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
 const (
@@ -139,12 +138,6 @@ func MakeListener(ads bool, listener string, port uint32, route string) *api.Lis
 		},
 		HttpFilters: []*http.HttpFilter{{
 			Name: router,
-			// TODO(kuat) surprising requirement to allow LDS retrieve this route
-			Config: &structpb.Struct{
-				Fields: map[string]*structpb.Value{
-					"deprecated_v1": {Kind: &structpb.Value_BoolValue{BoolValue: true}},
-				},
-			},
 		}},
 	}
 	pbst, err := util.MessageToStruct(manager)
