@@ -151,22 +151,22 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 
 // Watch returns a watch for an xDS request.
 func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string, names []string) Watch {
+	out := Watch{
+		Type:  typ,
+		Names: names,
+	}
 	group, err := cache.groups.Hash(node)
+
 	// do nothing case
 	if err != nil {
-		return Watch{}
+		return out
 	}
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
 	// allocate capacity 1 to allow one-time non-blocking use
-	value := make(chan Response, 1)
-	out := Watch{
-		Value: value,
-		Type:  typ,
-		Names: names,
-	}
+	out.Value = make(chan Response, 1)
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	snapshot, exists := cache.snapshots[group]
@@ -198,24 +198,4 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 	// otherwise, the watch may be responded immediately
 	respond(out, snapshot, group)
 	return out
-}
-
-// WatchEndpoints delegates to Watch function.
-func (cache *SimpleCache) WatchEndpoints(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(EndpointResponse, node, version, names)
-}
-
-// WatchClusters delegates to Watch function.
-func (cache *SimpleCache) WatchClusters(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(ClusterResponse, node, version, names)
-}
-
-// WatchRoutes delegates to Watch function.
-func (cache *SimpleCache) WatchRoutes(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(RouteResponse, node, version, names)
-}
-
-// WatchListeners delegates to Watch function.
-func (cache *SimpleCache) WatchListeners(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(ListenerResponse, node, version, names)
 }

@@ -17,7 +17,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"sync/atomic"
 
@@ -26,7 +25,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/any"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -38,12 +36,31 @@ const (
 	ClusterType  = typePrefix + "Cluster"
 	RouteType    = typePrefix + "RouteConfiguration"
 	ListenerType = typePrefix + "Listener"
+	AnyType      = ""
 )
+
+// GetTypeURL retrieves type URL by response type.
+func GetTypeURL(typ cache.ResponseType) string {
+	switch typ {
+	case cache.EndpointResponse:
+		return EndpointType
+	case cache.ClusterResponse:
+		return ClusterType
+	case cache.RouteResponse:
+		return RouteType
+	case cache.ListenerResponse:
+		return ListenerType
+	}
+	return AnyType
+}
 
 // Server is a collection of handlers for streaming discovery requests.
 type Server interface {
-	// Register the handlers in a server.
-	Register(*grpc.Server)
+	api.AggregatedDiscoveryServiceServer
+	api.EndpointDiscoveryServiceServer
+	api.ClusterDiscoveryServiceServer
+	api.RouteDiscoveryServiceServer
+	api.ListenerDiscoveryServiceServer
 }
 
 // NewServer creates handlers from a config watcher.
@@ -56,14 +73,6 @@ type server struct {
 
 	// streamCount for counting bi-di streams
 	streamCount int64
-}
-
-func (s *server) Register(srv *grpc.Server) {
-	api.RegisterAggregatedDiscoveryServiceServer(srv, s)
-	api.RegisterEndpointDiscoveryServiceServer(srv, s)
-	api.RegisterClusterDiscoveryServiceServer(srv, s)
-	api.RegisterRouteDiscoveryServiceServer(srv, s)
-	api.RegisterListenerDiscoveryServiceServer(srv, s)
 }
 
 type stream interface {
@@ -187,28 +196,33 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
 			nonce := req.GetResponseNonce()
 
-			// type URL must match expected type URL except for ADS
-			if defaultTypeURL != "" && defaultTypeURL != req.TypeUrl {
-				return fmt.Errorf("unexpected resource requested, want %q got %q", defaultTypeURL, req.TypeUrl)
+			// type URL is required for ADS but is implicit for xDS
+			typeURL := req.TypeUrl
+			if defaultTypeURL == AnyType {
+				if typeURL == "" {
+					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
+				}
+			} else if typeURL == "" {
+				typeURL = defaultTypeURL
 			}
 
-			glog.V(10).Infof("[%d] request %s%v with nonce %q from version %q", streamID, req.TypeUrl,
+			glog.V(10).Infof("[%d] request %s%v with nonce %q from version %q", streamID, typeURL,
 				req.GetResourceNames(), nonce, req.GetVersionInfo())
 
 			// cancel existing watches to (re-)request a newer version
 			switch {
-			case req.TypeUrl == EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
+			case typeURL == EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
 				values.endpoints.Cancel()
-				values.endpoints = s.config.WatchEndpoints(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-			case req.TypeUrl == ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
+				values.endpoints = s.config.Watch(cache.EndpointResponse, req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+			case typeURL == ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
 				values.clusters.Cancel()
-				values.clusters = s.config.WatchClusters(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-			case req.TypeUrl == RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
+				values.clusters = s.config.Watch(cache.ClusterResponse, req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+			case typeURL == RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
 				values.routes.Cancel()
-				values.routes = s.config.WatchRoutes(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
-			case req.TypeUrl == ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
+				values.routes = s.config.Watch(cache.RouteResponse, req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+			case typeURL == ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
 				values.listeners.Cancel()
-				values.listeners = s.config.WatchListeners(req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
+				values.listeners = s.config.Watch(cache.ListenerResponse, req.GetNode(), req.GetVersionInfo(), req.GetResourceNames())
 			}
 		}
 	}
@@ -243,7 +257,7 @@ func (s *server) handler(stream stream, typeURL string) error {
 }
 
 func (s *server) StreamAggregatedResources(stream api.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
-	return s.handler(stream, "")
+	return s.handler(stream, AnyType)
 }
 
 func (s *server) StreamEndpoints(stream api.EndpointDiscoveryService_StreamEndpointsServer) error {
