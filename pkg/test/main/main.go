@@ -28,6 +28,11 @@ import (
 	"github.com/golang/glog"
 )
 
+const (
+	adsConfig = "server_ads.yaml"
+	xdsConfig = "server_xds.yaml"
+)
+
 var (
 	upstreamPort uint
 	listenPort   uint
@@ -73,9 +78,9 @@ func main() {
 	go test.RunXDS(ctx, config, xdsPort)
 
 	// start envoy
-	bootstrap := "server_xds.yaml"
+	bootstrap := xdsConfig
 	if ads {
-		bootstrap = "server_ads.yaml"
+		bootstrap = adsConfig
 	}
 	envoy := exec.Command("envoy",
 		"-c", "pkg/test/main/"+bootstrap,

@@ -161,10 +161,15 @@ func (cache *SimpleCache) respond(watch Watch, snapshot Snapshot, group Key) {
 
 // Watch returns a watch for an xDS request.
 func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string, names []string) Watch {
+	out := Watch{
+		Type:  typ,
+		Names: names,
+	}
 	group, err := cache.groups.Hash(node)
+
 	// do nothing case
 	if err != nil {
-		return Watch{}
+		return out
 	}
 
 	// report acknowledgement to the status tracker
@@ -213,24 +218,4 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string
 	// otherwise, the watch may be responded immediately
 	cache.respond(out, snapshot, group)
 	return out
-}
-
-// WatchEndpoints delegates to Watch function.
-func (cache *SimpleCache) WatchEndpoints(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(EndpointResponse, node, version, names)
-}
-
-// WatchClusters delegates to Watch function.
-func (cache *SimpleCache) WatchClusters(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(ClusterResponse, node, version, names)
-}
-
-// WatchRoutes delegates to Watch function.
-func (cache *SimpleCache) WatchRoutes(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(RouteResponse, node, version, names)
-}
-
-// WatchListeners delegates to Watch function.
-func (cache *SimpleCache) WatchListeners(node *api.Node, version string, names []string) Watch {
-	return cache.Watch(ListenerResponse, node, version, names)
 }

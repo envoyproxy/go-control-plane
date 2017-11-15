@@ -17,3 +17,4 @@ import:
 - package: google.golang.org/grpc
   version: ^1.7.0
 - package: github.com/golang/glog
+- package: github.com/lyft/protoc-gen-validate

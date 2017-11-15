@@ -14,27 +14,14 @@
 
 package cache
 
-import (
-	"bytes"
+import "testing"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	structpb "github.com/golang/protobuf/ptypes/struct"
-)
-
-// MessageToStruct encodes a protobuf Message into a Struct. Hilariously, it
-// uses JSON as the intermediary
-// author:glen@turbinelabs.io
-func MessageToStruct(msg proto.Message) (*structpb.Struct, error) {
-	buf := &bytes.Buffer{}
-	if err := (&jsonpb.Marshaler{}).Marshal(buf, msg); err != nil {
-		return nil, err
+func TestWatchCancel(t *testing.T) {
+	called := 0
+	w := Watch{stop: func() { called++ }}
+	w.Cancel()
+	w.Cancel()
+	if called != 1 {
+		t.Errorf("got count %d; stop function should be called once by Cancel()", called)
 	}
-
-	pbs := &structpb.Struct{}
-	if err := jsonpb.Unmarshal(buf, pbs); err != nil {
-		return nil, err
-	}
-
-	return pbs, nil
 }

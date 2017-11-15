@@ -25,7 +25,8 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	xds "github.com/envoyproxy/go-control-plane/pkg/grpc"
+	xds "github.com/envoyproxy/go-control-plane/pkg/server"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
@@ -78,7 +79,11 @@ func RunXDS(ctx context.Context, config cache.Cache, port uint) {
 	if err != nil {
 		glog.Fatalf("failed to listen: %v", err)
 	}
-	server.Register(grpcServer)
+	api.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
+	api.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	api.RegisterClusterDiscoveryServiceServer(grpcServer, server)
+	api.RegisterRouteDiscoveryServiceServer(grpcServer, server)
+	api.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 	glog.Infof("xDS server listening on %d", port)
 	go func() {
 		if err = grpcServer.Serve(lis); err != nil {
@@ -103,10 +108,10 @@ func RunCacheUpdate(ctx context.Context,
 		// listener name must be same since ports are shared and previous listener is drained
 		listenerName := "listener"
 
-		endpoint := MakeEndpoint(clusterName, uint32(upstreamPort))
-		cluster := MakeCluster(ads, clusterName)
-		route := MakeRoute(routeName, clusterName)
-		listener := MakeListener(ads, listenerName, uint32(listenPort), routeName)
+		endpoint := resource.MakeEndpoint(clusterName, uint32(upstreamPort))
+		cluster := resource.MakeCluster(ads, clusterName)
+		route := resource.MakeRoute(routeName, clusterName)
+		listener := resource.MakeListener(ads, listenerName, uint32(listenPort), routeName)
 
 		glog.Infof("updating cache with %d-labelled responses", i)
 		snapshot := cache.NewSnapshot(version,
