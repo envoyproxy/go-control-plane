@@ -16,10 +16,11 @@
 package resource
 
 import (
+	"time"
+
 	"github.com/envoyproxy/go-control-plane/api"
-	"github.com/envoyproxy/go-control-plane/api/filter/http"
+	"github.com/envoyproxy/go-control-plane/api/filter/network"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
-	"github.com/golang/protobuf/ptypes/duration"
 )
 
 const (
@@ -75,7 +76,7 @@ func MakeCluster(ads bool, cluster string) *api.Cluster {
 
 	return &api.Cluster{
 		Name:           cluster,
-		ConnectTimeout: &duration.Duration{Seconds: 5},
+		ConnectTimeout: 5 * time.Second,
 		Type:           api.Cluster_EDS,
 		EdsClusterConfig: &api.Cluster_EdsClusterConfig{
 			EdsConfig:   edsSource,
@@ -111,32 +112,29 @@ func MakeRoute(route, cluster string) *api.RouteConfiguration {
 
 // MakeListener creates a listener.
 func MakeListener(ads bool, listener string, port uint32, route string) *api.Listener {
-	var rdsSource *api.ConfigSource
+	rdsSource := api.ConfigSource{}
 	if ads {
-		rdsSource = &api.ConfigSource{
-			ConfigSourceSpecifier: &api.ConfigSource_Ads{
-				Ads: &api.AggregatedConfigSource{},
-			},
+		rdsSource.ConfigSourceSpecifier = &api.ConfigSource_Ads{
+			Ads: &api.AggregatedConfigSource{},
 		}
 	} else {
-		rdsSource = &api.ConfigSource{
-			ConfigSourceSpecifier: &api.ConfigSource_ApiConfigSource{
-				ApiConfigSource: &api.ApiConfigSource{
-					ApiType:     api.ApiConfigSource_GRPC,
-					ClusterName: []string{xdsCluster},
-				},
+		rdsSource.ConfigSourceSpecifier = &api.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &api.ApiConfigSource{
+				ApiType:     api.ApiConfigSource_GRPC,
+				ClusterName: []string{xdsCluster},
 			},
 		}
 	}
-	manager := &http.HttpConnectionManager{
-		CodecType: http.HttpConnectionManager_AUTO,
-		RouteSpecifier: &http.HttpConnectionManager_Rds{
-			Rds: &http.Rds{
+	manager := &network.HttpConnectionManager{
+		CodecType:  network.HttpConnectionManager_AUTO,
+		StatPrefix: "http",
+		RouteSpecifier: &network.HttpConnectionManager_Rds{
+			Rds: &network.Rds{
 				ConfigSource:    rdsSource,
 				RouteConfigName: route,
 			},
 		},
-		HttpFilters: []*http.HttpFilter{{
+		HttpFilters: []*network.HttpFilter{{
 			Name: router,
 		}},
 	}

@@ -18,8 +18,8 @@ import (
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/gogo/protobuf/proto"
 	"github.com/golang/glog"
-	"github.com/golang/protobuf/proto"
 )
 
 // SimpleCache is a snapshot-based cache that maintains a single versioned

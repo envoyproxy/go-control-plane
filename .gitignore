@@ -1,4 +1,3 @@
-/bazel-*
 vendor
 bin
 build

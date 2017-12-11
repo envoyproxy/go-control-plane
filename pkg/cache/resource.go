@@ -16,7 +16,7 @@ package cache
 
 import (
 	"github.com/envoyproxy/go-control-plane/api"
-	"github.com/golang/protobuf/proto"
+	"github.com/gogo/protobuf/proto"
 )
 
 // ResponseType is an enumeration of cache response types.

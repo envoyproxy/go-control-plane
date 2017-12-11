@@ -17,7 +17,7 @@ package cache
 
 import (
 	"github.com/envoyproxy/go-control-plane/api"
-	"github.com/golang/protobuf/proto"
+	"github.com/gogo/protobuf/proto"
 )
 
 // ConfigWatcher requests watches for configuration resources by a node, last

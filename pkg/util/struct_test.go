@@ -20,7 +20,7 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/gogo/protobuf/types"
 )
 
 func TestMessageToStruct(t *testing.T) {
@@ -32,11 +32,11 @@ func TestMessageToStruct(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error %v", err)
 	}
-	want := map[string]*structpb.Value{
-		"version_info": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: "test"}},
-		"node": &structpb.Value{Kind: &structpb.Value_StructValue{StructValue: &structpb.Struct{
-			Fields: map[string]*structpb.Value{
-				"id": &structpb.Value{Kind: &structpb.Value_StringValue{StringValue: "proxy"}},
+	want := map[string]*types.Value{
+		"version_info": &types.Value{Kind: &types.Value_StringValue{StringValue: "test"}},
+		"node": &types.Value{Kind: &types.Value_StructValue{StructValue: &types.Struct{
+			Fields: map[string]*types.Value{
+				"id": &types.Value{Kind: &types.Value_StringValue{StringValue: "proxy"}},
 			},
 		}}},
 	}

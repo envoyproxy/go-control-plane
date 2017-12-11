@@ -19,15 +19,15 @@ import (
 	"bytes"
 	"errors"
 
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/gogo/protobuf/jsonpb"
+	"github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/types"
 )
 
 // MessageToStruct encodes a protobuf Message into a Struct. Hilariously, it
 // uses JSON as the intermediary
 // author:glen@turbinelabs.io
-func MessageToStruct(msg proto.Message) (*structpb.Struct, error) {
+func MessageToStruct(msg proto.Message) (*types.Struct, error) {
 	if msg == nil {
 		return nil, errors.New("nil message")
 	}
@@ -37,7 +37,7 @@ func MessageToStruct(msg proto.Message) (*structpb.Struct, error) {
 		return nil, err
 	}
 
-	pbs := &structpb.Struct{}
+	pbs := &types.Struct{}
 	if err := jsonpb.Unmarshal(buf, pbs); err != nil {
 		return nil, err
 	}
