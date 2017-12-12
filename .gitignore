@@ -1,6 +1,5 @@
 vendor
 bin
-build
 .idea*
 *.iml
 *.bak

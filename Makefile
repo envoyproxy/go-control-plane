@@ -68,6 +68,11 @@ lint: tools.golint
 	@echo "--> checking code style with 'golint' tool"
 	@echo $(GODIRS) | xargs -n 1 golint
 
+generate: depend.install
+	@echo "--> generating pb.go files"
+	$(SHELL) generate_protos.sh > generate_protos.log 2>&1
+	@cat generate_protos.log
+
 #------------------
 #-- dependencies
 #------------------

@@ -10,9 +10,15 @@ protoc=$(which protoc)
 $protoc --version
 
 echo "Building gogo compiler ..."
-mkdir -p ${root}/build
-gogoplugin="${root}/build/gogofast"
-go build -o $gogoplugin vendor/github.com/gogo/protobuf/protoc-gen-gogofast/main.go
+mkdir -p ${root}/bin
+gogoplugin="gogofast"
+gogobinary="${root}/bin/gogofast"
+go build -o $gogobinary vendor/github.com/gogo/protobuf/protoc-gen-gogofast/main.go
+
+echo "Expecting to find sibling data-plane-api repository ..."
+pushd ../data-plane-api
+  git log -1
+popd
 
 paths=(
   "api"
@@ -63,10 +69,10 @@ done
 
 for path in "${paths[@]}"
 do
-  echo "Generating protos $path ..."
+  echo "Generating ${gogoplugin} protos $path ..."
   $protoc ${protocarg} ${root}/../data-plane-api/${path}/*.proto \
-    --plugin=protoc-gen-gogofast=${gogoplugin} --gogofast_out=${gogoarg}:.
+    --plugin=protoc-gen-${gogoplugin}=${gogobinary} --${gogoplugin}_out=${gogoarg}:.
 done
 
-echo "Removing metrics_service.pb.go due to incompatibility with gogo"
+echo "Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)"
 \rm ${root}/api/metrics_service.pb.go
