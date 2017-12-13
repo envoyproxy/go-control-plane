@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/api"
-	"github.com/golang/protobuf/proto"
+	"github.com/gogo/protobuf/proto"
 )
 
 type group struct{}

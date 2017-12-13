@@ -1,13 +1,7 @@
 package: github.com/envoyproxy/go-control-plane
 import:
-- package: github.com/golang/protobuf
-  subpackages:
-  - proto
-  - ptypes/any
-  - ptypes/duration
-  - ptypes/struct
-  - ptypes/timestamp
-  - ptypes/wrappers
+- package: github.com/gogo/protobuf
+  version: =0.5
 - package: golang.org/x/net
   subpackages:
   - context
@@ -18,3 +12,7 @@ import:
   version: ^1.7.0
 - package: github.com/golang/glog
 - package: github.com/lyft/protoc-gen-validate
+- package: github.com/prometheus/client_model
+  version: 6f3806018612930941127f2a7c6c453ba2c527d2 # Nov 02, 2017
+- package: github.com/googleapis/googleapis
+  version: 5c6df0cd18c6a429eab739fb711c27f6e1393366 # May 14, 2017

@@ -1,7 +1,5 @@
-/bazel-*
 vendor
 bin
-build
 .idea*
 *.iml
 *.bak

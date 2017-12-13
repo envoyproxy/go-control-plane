@@ -22,9 +22,9 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/api"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/gogo/protobuf/proto"
+	"github.com/gogo/protobuf/types"
 	"github.com/golang/glog"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes/any"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -118,14 +118,14 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 
 	// sends a response by serializing to protobuf Any
 	send := func(resp cache.Response, typeURL string) (string, error) {
-		resources := make([]*any.Any, len(resp.Resources))
+		resources := make([]*types.Any, len(resp.Resources))
 		streamNonce = streamNonce + 1
 		for i := 0; i < len(resp.Resources); i++ {
 			data, err := proto.Marshal(resp.Resources[i])
 			if err != nil {
 				return "", err
 			}
-			resources[i] = &any.Any{
+			resources[i] = &types.Any{
 				TypeUrl: typeURL,
 				Value:   data,
 			}

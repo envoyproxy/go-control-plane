@@ -1,24 +1,32 @@
-hash: 22b361e810bfa924562190bdf35dcdbfc22339bcfaca8cf30dd93826abb6c06c
-updated: 2017-11-10T10:59:51.01724288-08:00
+hash: eeafe4ccc338aa13668fb577a38f8765e9fe2fed9c057712a28d3d09b49d5698
+updated: 2017-12-11T14:11:11.765066779-08:00
 imports:
+- name: github.com/gogo/protobuf
+  version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
+  subpackages:
+  - jsonpb
+  - proto
+  - sortkeys
+  - types
 - name: github.com/golang/glog
   version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
   version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
   subpackages:
-  - jsonpb
   - proto
   - protoc-gen-go/descriptor
   - ptypes
   - ptypes/any
   - ptypes/duration
-  - ptypes/struct
   - ptypes/timestamp
-  - ptypes/wrappers
+- name: github.com/googleapis/googleapis
+  version: 5c6df0cd18c6a429eab739fb711c27f6e1393366
 - name: github.com/lyft/protoc-gen-validate
   version: ef99a8ba19eb470c12238812747157bdbbc839eb
   subpackages:
   - validate
+- name: github.com/prometheus/client_model
+  version: 6f3806018612930941127f2a7c6c453ba2c527d2
 - name: golang.org/x/net
   version: a337091b0525af65de94df2eb7e98bd9962dcbe2
   subpackages:
@@ -42,12 +50,14 @@ imports:
   - googleapis/api/annotations
   - googleapis/rpc/status
 - name: google.golang.org/grpc
-  version: 5ffe3083946d5603a0578721101dc8165b1d5b5f
+  version: be077907e29fdb945d351e4284eb5361e7f8924e
   subpackages:
   - balancer
+  - balancer/roundrobin
   - codes
   - connectivity
   - credentials
+  - encoding
   - grpclb/grpc_lb_v1/messages
   - grpclog
   - internal
@@ -56,6 +66,9 @@ imports:
   - naming
   - peer
   - resolver
+  - resolver/dns
+  - resolver/manual
+  - resolver/passthrough
   - stats
   - status
   - tap
