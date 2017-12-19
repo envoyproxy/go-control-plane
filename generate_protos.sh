@@ -22,6 +22,7 @@ popd
 
 paths=(
   "api"
+  "api/auth"
   "api/filter"
   "api/filter/accesslog"
   "api/filter/http"
@@ -55,6 +56,7 @@ mappings=(
   "api/base.proto=${import}"
   "api/protocol.proto=${import}"
   "api/rds.proto=${import}"
+  "api/sds.proto=${import}"
   "api/rls.proto=${import}"
   "api/filter/fault.proto=${import}/filter"
   "api/filter/accesslog/accesslog.proto=${import}/filter/accesslog"
@@ -76,3 +78,6 @@ done
 
 echo "Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)"
 \rm ${root}/api/metrics_service.pb.go
+
+echo "Removing external_auth.pb.go due to googleapis genproto incompatibility with gogo"
+\rm ${root}/api/auth/external_auth.pb.go

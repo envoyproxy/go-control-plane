@@ -8,7 +8,7 @@ import fmt "fmt"
 import math "math"
 import envoy_api_v21 "github.com/envoyproxy/go-control-plane/api"
 import envoy_api_v22 "github.com/envoyproxy/go-control-plane/api"
-import envoy_api_v26 "github.com/envoyproxy/go-control-plane/api"
+import envoy_api_v25 "github.com/envoyproxy/go-control-plane/api"
 import envoy_api_v2_filter_accesslog "github.com/envoyproxy/go-control-plane/api/filter/accesslog"
 import _ "github.com/gogo/protobuf/types"
 import google_protobuf4 "github.com/gogo/protobuf/types"
@@ -223,7 +223,7 @@ type HttpConnectionManager_Rds struct {
 	Rds *Rds `protobuf:"bytes,3,opt,name=rds,oneof"`
 }
 type HttpConnectionManager_RouteConfig struct {
-	RouteConfig *envoy_api_v26.RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,oneof"`
+	RouteConfig *envoy_api_v25.RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,oneof"`
 }
 
 func (*HttpConnectionManager_Rds) isHttpConnectionManager_RouteSpecifier()         {}
@@ -257,7 +257,7 @@ func (m *HttpConnectionManager) GetRds() *Rds {
 	return nil
 }
 
-func (m *HttpConnectionManager) GetRouteConfig() *envoy_api_v26.RouteConfiguration {
+func (m *HttpConnectionManager) GetRouteConfig() *envoy_api_v25.RouteConfiguration {
 	if x, ok := m.GetRouteSpecifier().(*HttpConnectionManager_RouteConfig); ok {
 		return x.RouteConfig
 	}
@@ -399,7 +399,7 @@ func _HttpConnectionManager_OneofUnmarshaler(msg proto.Message, tag, wire int, b
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(envoy_api_v26.RouteConfiguration)
+		msg := new(envoy_api_v25.RouteConfiguration)
 		err := b.DecodeMessage(msg)
 		m.RouteSpecifier = &HttpConnectionManager_RouteConfig{msg}
 		return true, err
@@ -1286,7 +1286,7 @@ func (m *HttpConnectionManager) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &envoy_api_v26.RouteConfiguration{}
+			v := &envoy_api_v25.RouteConfiguration{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

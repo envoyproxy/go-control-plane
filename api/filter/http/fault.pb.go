@@ -6,7 +6,7 @@ package envoy_api_v2_filter_http
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import envoy_api_v25 "github.com/envoyproxy/go-control-plane/api"
+import envoy_api_v24 "github.com/envoyproxy/go-control-plane/api"
 import envoy_api_v2_filter "github.com/envoyproxy/go-control-plane/api/filter"
 import _ "github.com/lyft/protoc-gen-validate/validate"
 
@@ -134,7 +134,7 @@ type HTTPFault struct {
 	// config. A match will happen if all the headers in the config are present in
 	// the request with the same values (or based on presence if the *value* field
 	// is not in the config).
-	Headers []*envoy_api_v25.HeaderMatcher `protobuf:"bytes,4,rep,name=headers" json:"headers,omitempty"`
+	Headers []*envoy_api_v24.HeaderMatcher `protobuf:"bytes,4,rep,name=headers" json:"headers,omitempty"`
 	// Faults are injected for the specified list of downstream hosts. If this
 	// setting is not set, faults are injected for all downstream nodes.
 	// Downstream node name is taken from :ref:`the HTTP
@@ -170,7 +170,7 @@ func (m *HTTPFault) GetUpstreamCluster() string {
 	return ""
 }
 
-func (m *HTTPFault) GetHeaders() []*envoy_api_v25.HeaderMatcher {
+func (m *HTTPFault) GetHeaders() []*envoy_api_v24.HeaderMatcher {
 	if m != nil {
 		return m.Headers
 	}
@@ -605,7 +605,7 @@ func (m *HTTPFault) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Headers = append(m.Headers, &envoy_api_v25.HeaderMatcher{})
+			m.Headers = append(m.Headers, &envoy_api_v24.HeaderMatcher{})
 			if err := m.Headers[len(m.Headers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

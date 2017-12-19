@@ -183,9 +183,11 @@ type Filter struct {
 	// filter. The built-in filters are:
 	//
 	// [#comment:TODO(mattklein123): Auto generate the following list]
+	// * :ref:`envoy.client_ssl_auth<config_network_filters_client_ssl_auth>`
 	// * :ref:`envoy.echo <config_network_filters_echo>`
 	// * :ref:`envoy.http_connection_manager <config_http_conn_man>`
 	// * :ref:`envoy.mongo_proxy <config_network_filters_mongo_proxy>`
+	// * :ref:`envoy.ratelimit <config_network_filters_rate_limit>`
 	// * :ref:`envoy.redis_proxy <config_network_filters_redis_proxy>`
 	// * :ref:`envoy.tcp_proxy <config_network_filters_tcp_proxy>`
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`

@@ -21,6 +21,7 @@
 		api/rls.proto
 		api/sds.proto
 		api/stats.proto
+		api/trace.proto
 
 	It has these top-level messages:
 		Pipe
@@ -41,9 +42,6 @@
 		ConfigSource
 		TransportSocket
 		Bootstrap
-		LightstepConfig
-		ZipkinConfig
-		Tracing
 		Admin
 		ClusterManager
 		Watchdog
@@ -112,6 +110,9 @@
 		TagSpecifier
 		StatsdSink
 		DogStatsdSink
+		Tracing
+		LightstepConfig
+		ZipkinConfig
 */
 package api
 

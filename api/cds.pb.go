@@ -229,6 +229,12 @@ type Cluster struct {
 	CircuitBreakers *CircuitBreakers `protobuf:"bytes,10,opt,name=circuit_breakers,json=circuitBreakers" json:"circuit_breakers,omitempty"`
 	// The TLS configuration for connections to the upstream cluster. If no TLS
 	// configuration is specified, TLS will not be used for new connections.
+	//
+	// .. attention::
+	//
+	//   Server certificate verification is not enabled by default. Configure
+	//   :ref:`trusted_ca<envoy_api_field_CertificateValidationContext.trusted_ca>` to enable
+	//   verification.
 	TlsContext *UpstreamTlsContext `protobuf:"bytes,11,opt,name=tls_context,json=tlsContext" json:"tls_context,omitempty"`
 	// Types that are valid to be assigned to ProtocolOptions:
 	//	*Cluster_TcpProtocolOptions
