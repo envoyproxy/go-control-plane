@@ -6,6 +6,7 @@
 
 	It is generated from these files:
 		api/address.proto
+		api/auth.proto
 		api/base.proto
 		api/bootstrap.proto
 		api/cds.proto
@@ -28,6 +29,7 @@
 		BindConfig
 		Address
 		CidrRange
+		AuthAction
 		Locality
 		Node
 		Endpoint
