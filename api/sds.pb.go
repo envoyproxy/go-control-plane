@@ -338,14 +338,18 @@ func (m *TlsSessionTicketKeys) GetKeys() []*DataSource {
 
 type CertificateValidationContext struct {
 	// TLS certificate data containing certificate authority certificates to use in verifying
-	// a presented client side certificate. If not specified and a client certificate is presented it
-	// will not be verified. By default, a client certificate is optional, unless one of the
-	// additional options (:ref:`require_client_certificate
+	// a presented peer certificate (e.g. server certificate for clusters or client certificate
+	// for listeners). If not specified and a peer certificate is presented it will not be
+	// verified. By default, a client certificate is optional, unless one of the additional
+	// options (:ref:`require_client_certificate
 	// <envoy_api_field_DownstreamTlsContext.require_client_certificate>`,
 	// :ref:`verify_certificate_hash
 	// <envoy_api_field_CertificateValidationContext.verify_certificate_hash>`, or
 	// :ref:`verify_subject_alt_name
 	// <envoy_api_field_CertificateValidationContext.verify_subject_alt_name>`) is also specified.
+	//
+	// See :ref:`the TLS overview <arch_overview_ssl_enabling_verification>` for a list of common
+	// system CA locations.
 	TrustedCa *DataSource `protobuf:"bytes,1,opt,name=trusted_ca,json=trustedCa" json:"trusted_ca,omitempty"`
 	// If specified, Envoy will verify (pin) the hex-encoded SHA-256 hash of
 	// the presented certificate.

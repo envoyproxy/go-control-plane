@@ -51,7 +51,7 @@ func (m *StatsSink) GetConfig() *google_protobuf4.Struct {
 	return nil
 }
 
-// Statistics :ref:`architecture overview <arch_overview_statistics>`.
+// Statistics configuration such as tagging.
 type StatsConfig struct {
 	// Each stat name is iteratively processed through these tag specifiers.
 	// When a tag is matched, the first capture group is removed from the name so

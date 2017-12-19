@@ -6,7 +6,7 @@ package network
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import envoy_api_v27 "github.com/envoyproxy/go-control-plane/api"
+import envoy_api_v26 "github.com/envoyproxy/go-control-plane/api"
 import google_protobuf2 "github.com/gogo/protobuf/types"
 import _ "github.com/lyft/protoc-gen-validate/validate"
 
@@ -23,7 +23,7 @@ type RateLimit struct {
 	// The rate limit domain to use in the rate limit service request.
 	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
 	// The rate limit descriptor list to use in the rate limit service request.
-	Descriptors []*envoy_api_v27.RateLimitDescriptor `protobuf:"bytes,3,rep,name=descriptors" json:"descriptors,omitempty"`
+	Descriptors []*envoy_api_v26.RateLimitDescriptor `protobuf:"bytes,3,rep,name=descriptors" json:"descriptors,omitempty"`
 	// The timeout in milliseconds for the rate limit service RPC. If not
 	// set, this defaults to 20ms.
 	Timeout *google_protobuf2.Duration `protobuf:"bytes,4,opt,name=timeout" json:"timeout,omitempty"`
@@ -48,7 +48,7 @@ func (m *RateLimit) GetDomain() string {
 	return ""
 }
 
-func (m *RateLimit) GetDescriptors() []*envoy_api_v27.RateLimitDescriptor {
+func (m *RateLimit) GetDescriptors() []*envoy_api_v26.RateLimitDescriptor {
 	if m != nil {
 		return m.Descriptors
 	}
@@ -276,7 +276,7 @@ func (m *RateLimit) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Descriptors = append(m.Descriptors, &envoy_api_v27.RateLimitDescriptor{})
+			m.Descriptors = append(m.Descriptors, &envoy_api_v26.RateLimitDescriptor{})
 			if err := m.Descriptors[len(m.Descriptors)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}

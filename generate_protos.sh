@@ -22,6 +22,7 @@ popd
 
 paths=(
   "api"
+  "api/auth"
   "api/filter"
   "api/filter/accesslog"
   "api/filter/http"
@@ -55,7 +56,9 @@ mappings=(
   "api/base.proto=${import}"
   "api/protocol.proto=${import}"
   "api/rds.proto=${import}"
+  "api/sds.proto=${import}"
   "api/rls.proto=${import}"
+  "api/auth/auth.proto=${import}/auth"
   "api/filter/fault.proto=${import}/filter"
   "api/filter/accesslog/accesslog.proto=${import}/filter/accesslog"
 )

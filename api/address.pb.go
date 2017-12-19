@@ -6,7 +6,6 @@
 
 	It is generated from these files:
 		api/address.proto
-		api/auth.proto
 		api/base.proto
 		api/bootstrap.proto
 		api/cds.proto
@@ -21,6 +20,7 @@
 		api/rls.proto
 		api/sds.proto
 		api/stats.proto
+		api/trace.proto
 
 	It has these top-level messages:
 		Pipe
@@ -28,7 +28,6 @@
 		BindConfig
 		Address
 		CidrRange
-		AuthAction
 		Locality
 		Node
 		Endpoint
@@ -41,9 +40,6 @@
 		ConfigSource
 		TransportSocket
 		Bootstrap
-		LightstepConfig
-		ZipkinConfig
-		Tracing
 		Admin
 		ClusterManager
 		Watchdog
@@ -112,6 +108,9 @@
 		TagSpecifier
 		StatsdSink
 		DogStatsdSink
+		Tracing
+		LightstepConfig
+		ZipkinConfig
 */
 package api
 
