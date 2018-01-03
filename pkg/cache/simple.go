@@ -138,7 +138,7 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 			if _, exists := names[resourceName]; !exists {
 				glog.V(10).Infof("not responding for %s from %q at %q since %q not requested %v",
 					typ.String(), group, version, resourceName, watch.Names)
-				return
+				continue
 			}
 		}
 	}
