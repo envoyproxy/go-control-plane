@@ -133,13 +133,18 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 		}
 
 		// check that every snapshot resource name is present in the request
+		found := false
 		for _, resource := range resources {
 			resourceName := GetResourceName(resource)
-			if _, exists := names[resourceName]; !exists {
-				glog.V(10).Infof("not responding for %s from %q at %q since %q not requested %v",
-					typ.String(), group, version, resourceName, watch.Names)
-				continue
+			if _, exists := names[resourceName]; exists {
+				found = true
+				break
 			}
+		}
+		if !found {
+			glog.V(10).Infof("not responding for %s from %q at %q since %v do not exist in resources",
+				typ.String(), group, version, watch.Names)
+			return
 		}
 	}
 
