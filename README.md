@@ -30,7 +30,9 @@ At this moment, this repository will not tackle translating platform
 specific representation of resources (e.g., services, instances of
 services, etc.) into Envoy-style configuration. Based on usage and
 feedback, we might decided to revisit this aspect at a later point in time.
+## Requirements
 
+1. Go 1.9.x
 
 ## Quick start
 
