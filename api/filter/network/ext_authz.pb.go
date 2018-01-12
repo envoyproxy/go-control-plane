@@ -6,7 +6,7 @@ package network
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import envoy_api_v22 "api"
+import envoy_api_v22 "github.com/envoyproxy/go-control-plane/api"
 import _ "github.com/lyft/protoc-gen-validate/validate"
 
 import io "io"
