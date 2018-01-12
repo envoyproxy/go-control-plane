@@ -6,6 +6,7 @@
 
 	It is generated from these files:
 		api/filter/http/buffer.proto
+		api/filter/http/ext_authz.proto
 		api/filter/http/fault.proto
 		api/filter/http/gzip.proto
 		api/filter/http/health_check.proto
@@ -13,10 +14,12 @@
 		api/filter/http/lua.proto
 		api/filter/http/rate_limit.proto
 		api/filter/http/router.proto
+		api/filter/http/squash.proto
 		api/filter/http/transcoder.proto
 
 	It has these top-level messages:
 		Buffer
+		ExtAuthz
 		FaultAbort
 		HTTPFault
 		Gzip
@@ -25,6 +28,7 @@
 		Lua
 		RateLimit
 		Router
+		Squash
 		GrpcJsonTranscoder
 */
 package envoy_api_v2_filter_http

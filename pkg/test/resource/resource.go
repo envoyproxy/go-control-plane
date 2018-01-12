@@ -67,8 +67,8 @@ func MakeCluster(ads bool, cluster string) *api.Cluster {
 		edsSource = &api.ConfigSource{
 			ConfigSourceSpecifier: &api.ConfigSource_ApiConfigSource{
 				ApiConfigSource: &api.ApiConfigSource{
-					ApiType:     api.ApiConfigSource_GRPC,
-					ClusterName: []string{xdsCluster},
+					ApiType:      api.ApiConfigSource_GRPC,
+					ClusterNames: []string{xdsCluster},
 				},
 			},
 		}
@@ -120,8 +120,8 @@ func MakeListener(ads bool, listener string, port uint32, route string) *api.Lis
 	} else {
 		rdsSource.ConfigSourceSpecifier = &api.ConfigSource_ApiConfigSource{
 			ApiConfigSource: &api.ApiConfigSource{
-				ApiType:     api.ApiConfigSource_GRPC,
-				ClusterName: []string{xdsCluster},
+				ApiType:      api.ApiConfigSource_GRPC,
+				ClusterNames: []string{xdsCluster},
 			},
 		}
 	}

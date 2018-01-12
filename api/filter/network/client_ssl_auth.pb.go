@@ -6,6 +6,7 @@
 
 	It is generated from these files:
 		api/filter/network/client_ssl_auth.proto
+		api/filter/network/ext_authz.proto
 		api/filter/network/http_connection_manager.proto
 		api/filter/network/mongo_proxy.proto
 		api/filter/network/rate_limit.proto
@@ -14,6 +15,7 @@
 
 	It has these top-level messages:
 		ClientSSLAuth
+		ExtAuthz
 		HttpConnectionManager
 		Rds
 		HttpFilter

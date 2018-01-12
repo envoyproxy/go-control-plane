@@ -10,8 +10,10 @@
 		api/base.proto
 		api/bootstrap.proto
 		api/cds.proto
+		api/config_source.proto
 		api/discovery.proto
 		api/eds.proto
+		api/grpc_service.proto
 		api/hds.proto
 		api/health_check.proto
 		api/lds.proto
@@ -37,9 +39,7 @@
 		RuntimeUInt32
 		HeaderValue
 		HeaderValueOption
-		ApiConfigSource
-		AggregatedConfigSource
-		ConfigSource
+		DataSource
 		TransportSocket
 		Bootstrap
 		Admin
@@ -50,6 +50,9 @@
 		Cluster
 		UpstreamBindConfig
 		CircuitBreakers
+		ApiConfigSource
+		AggregatedConfigSource
+		ConfigSource
 		DiscoveryRequest
 		DiscoveryResponse
 		LbEndpoint
@@ -60,6 +63,7 @@
 		LoadStatsRequest
 		ClusterLoadAssignment
 		LoadStatsResponse
+		GrpcService
 		Capability
 		HealthCheckRequest
 		EndpointHealth
@@ -88,14 +92,15 @@
 		CorsPolicy
 		RouteAction
 		RedirectAction
+		DirectResponseAction
 		Decorator
 		VirtualCluster
 		RateLimit
 		HeaderMatcher
+		QueryParameterMatcher
 		RateLimitRequest
 		RateLimitDescriptor
 		RateLimitResponse
-		DataSource
 		TlsParameters
 		TlsCertificate
 		TlsSessionTicketKeys
