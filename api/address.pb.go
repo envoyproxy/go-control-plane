@@ -33,6 +33,7 @@
 		CidrRange
 		AuthAction
 		Locality
+		Percent
 		Node
 		Endpoint
 		Metadata

@@ -1,20 +1,22 @@
 Expecting protoc version >= 3.5.0:
 libprotoc 3.5.0
+Make sure to run with 'make generate' to record the log
 Building gogo compiler ...
 Expecting to find sibling data-plane-api repository ...
 ~/go/src/github.com/envoyproxy/data-plane-api ~/go/src/github.com/envoyproxy/go-control-plane
-commit 9e967b37eed8f5a413072b94ce4ba95ec8875b6c
-Author: Kuat <kyessenov@users.noreply.github.com>
-Date:   Tue Dec 12 11:03:25 2017 -0800
+commit b4a303154703d19f49b63e5529877772ce5da617
+Author: Brian Pane <brianp+github@brianp.net>
+Date:   Tue Jan 16 13:30:08 2018 -0800
 
-    Add gogoproto annotations (#339)
+    Healthcheck filter: compute response based on upstream cluster health (#417)
     
-    Signed-off-by: Kuat Yessenov <kuat@google.com>
+    Signed-off-by: Brian Pane <bpane@pinterest.com>
 ~/go/src/github.com/envoyproxy/go-control-plane
 Generating gogofast protos api ...
-api/bootstrap.proto: warning: Import google/protobuf/wrappers.proto but not used.
+Generating gogofast protos api/auth ...
 Generating gogofast protos api/filter ...
 Generating gogofast protos api/filter/accesslog ...
 Generating gogofast protos api/filter/http ...
 Generating gogofast protos api/filter/network ...
+api/filter/network/http_connection_manager.proto: warning: Import api/base.proto but not used.
 Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)

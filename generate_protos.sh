@@ -9,6 +9,8 @@ echo "Expecting protoc version >= 3.5.0:"
 protoc=$(which protoc)
 $protoc --version
 
+echo "Make sure to run with 'make generate' to record the log"
+
 echo "Building gogo compiler ..."
 mkdir -p ${root}/bin
 gogoplugin="gogofast"
@@ -34,7 +36,7 @@ imports=(
   "${root}/vendor/github.com/lyft/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
   "${root}/vendor/github.com/prometheus/client_model"
-  "${root}/vendor/github.com/googleapis/googleapis"
+  "${root}/vendor/github.com/istio/gogo-genproto/googleapis"
 )
 
 protocarg=""
@@ -45,6 +47,11 @@ done
 
 import="github.com/envoyproxy/go-control-plane/api"
 mappings=(
+  "google/api/annotations.proto=github.com/istio/gogo-genproto/googleapis/google/api"
+  "google/api/http.proto=github.com/istio/gogo-genproto/googleapis/google/api"
+  "google/rpc/code.proto=github.com/istio/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/error_details.proto=github.com/istio/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/status.proto=github.com/istio/gogo-genproto/googleapis/google/rpc"
   "google/protobuf/any.proto=github.com/gogo/protobuf/types"
   "google/protobuf/duration.proto=github.com/gogo/protobuf/types"
   "google/protobuf/struct.proto=github.com/gogo/protobuf/types"
@@ -80,6 +87,3 @@ done
 
 echo "Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)"
 \rm ${root}/api/metrics_service.pb.go
-
-echo "Removing external_auth.pb.go due to googleapis genproto incompatibility with gogo"
-\rm ${root}/api/auth/external_auth.pb.go
