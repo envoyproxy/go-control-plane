@@ -9,6 +9,8 @@ echo "Expecting protoc version >= 3.5.0:"
 protoc=$(which protoc)
 $protoc --version
 
+echo "Make sure to run with 'make generate' to record the log"
+
 echo "Building gogo compiler ..."
 mkdir -p ${root}/bin
 gogoplugin="gogofast"
