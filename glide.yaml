@@ -14,5 +14,4 @@ import:
 - package: github.com/lyft/protoc-gen-validate
 - package: github.com/prometheus/client_model
   version: 6f3806018612930941127f2a7c6c453ba2c527d2 # Nov 02, 2017
-- package: github.com/googleapis/googleapis
-  version: 5c6df0cd18c6a429eab739fb711c27f6e1393366 # May 14, 2017
+- package: github.com/istio/gogo-genproto

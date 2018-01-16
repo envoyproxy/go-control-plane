@@ -20,11 +20,11 @@ var _ = math.Inf
 // Configuration for pluggable stats sinks.
 type StatsSink struct {
 	// The name of the stats sink to instantiate. The name must match a supported
-	// stats sink. *envoy.statsd* is a built-in sink suitable for emitting to
-	// `statsd <https://github.com/etsy/statsd>`_. Any other built-in stats sink
-	// can be found in `well_known_names.h
-	// <https://github.com/envoyproxy/envoy/blob/master/source/common/config/well_known_names.h>`_
-	// in the Envoy repository.
+	// stats sink. The built-in stats sinks are:
+	//
+	// * :ref:`envoy.statsd <envoy_api_msg_StatsdSink>`
+	// * :ref:`envoy.dog_statsd <envoy_api_msg_DogStatsdSink>`
+	// * :ref:`envoy.metrics_service <envoy_api_msg_MetricsServiceConfig>`
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Stats sink specific configuration which depends on the sink being
 	// instantiated. See :ref:`StatsdSink <envoy_api_msg_StatsdSink>` for an
@@ -95,78 +95,58 @@ func (m *StatsConfig) GetUseAllDefaultTags() *google_protobuf.BoolValue {
 	return nil
 }
 
-// Designates a tag to strip from the tag extracted name and provide as a named
-// tag value for all statistics. This will only occur if any part of the name
-// matches the regex provided with one or more capture groups.
+// Designates a tag name and value pair. The value may be either a fixed value
+// or a regex providing the value via capture groups. The specified tag will be
+// unconditionally set if a fixed value, otherwise it will only be set if one
+// or more capture groups in the regex match.
 type TagSpecifier struct {
 	// Attaches an identifier to the tag values to identify the tag being in the
 	// sink. Envoy has a set of default names and regexes to extract dynamic
 	// portions of existing stats, which can be found in `well_known_names.h
 	// <https://github.com/envoyproxy/envoy/blob/master/source/common/config/well_known_names.h>`_
 	// in the Envoy repository. If a :ref:`tag_name
-	// <envoy_api_field_TagSpecifier.tag_name>` is provided in the config with an
-	// empty regex, Envoy will attempt to find that name in its set of defaults
-	// and use the accompanying regex.
+	// <envoy_api_field_TagSpecifier.tag_name>` is provided in the config and neither
+	// :ref:`regex <envoy_api_field_TagSpecifier.regex>` or
+	// :ref:`fixed_value <envoy_api_field_TagSpecifier.fixed_value>` were specified,
+	// Envoy will attempt to find that name in its set of defaults and use the accompanying regex.
 	//
 	// .. note::
 	//
-	//   If any default tags are specified twice, the config will be considered
-	//   invalid.
+	//   It is invalid to specify the same tag name twice in a config.
 	TagName string `protobuf:"bytes,1,opt,name=tag_name,json=tagName,proto3" json:"tag_name,omitempty"`
-	// The first capture group identifies the portion of the name to remove. The
-	// second capture group (which will normally be nested inside the first) will
-	// designate the value of the tag for the statistic. If no second capture
-	// group is provided, the first will also be used to set the value of the tag.
-	// All other capture groups will be ignored.
-	//
-	// Take for example, with a stat name ``cluster.foo_cluster.upstream_rq_timeout``
-	// and
-	//
-	// .. code-block:: json
-	//
-	//   {
-	//     "tag_name": "envoy.cluster_name",
-	//     "regex": "^cluster\.((.+?)\.)"
-	//   }
-	//
-	// Note that the regex will remove ``foo_cluster.`` making the tag extracted
-	// name ``cluster.upstream_rq_timeout`` and the tag value for
-	// ``envoy.cluster_name`` will be ``foo_cluster`` (note: there will be no
-	// ``.`` character because of the second capture group).
-	//
-	// An example with two regexes and stat name
-	// ``http.connection_manager_1.user_agent.ios.downstream_cx_total``:
-	//
-	// .. code-block:: json
-	//
-	//   [
-	//     {
-	//       "tag_name": "envoy.http_user_agent",
-	//       "regex": "^http(?=\.).*?\.user_agent\.((.+?)\.)\w+?$"
-	//     },
-	//     {
-	//       "tag_name": "envoy.http_conn_manager_prefix",
-	//       "regex": "^http\.((.*?)\.)"
-	//     }
-	//   ]
-	//
-	// The first regex will remove ``ios.``, leaving the tag extracted name
-	// ``http.connection_manager_1.user_agent.downstream_cx_total``. The tag
-	// ``envoy.http_user_agent`` will be added with tag value ``ios``.
-	//
-	// The second regex will remove ``connection_manager_1.`` from the tag
-	// extracted name produced by the first regex
-	// ``http.connection_manager_1.user_agent.downstream_cx_total``, leaving
-	// ``http.user_agent.downstream_cx_total`` as the tag extracted name. The tag
-	// ``envoy.http_conn_manager_prefix`` will be added with the tag value
-	// ``connection_manager_1``.
-	Regex string `protobuf:"bytes,2,opt,name=regex,proto3" json:"regex,omitempty"`
+	// Types that are valid to be assigned to TagValue:
+	//	*TagSpecifier_Regex
+	//	*TagSpecifier_FixedValue
+	TagValue isTagSpecifier_TagValue `protobuf_oneof:"tag_value"`
 }
 
 func (m *TagSpecifier) Reset()                    { *m = TagSpecifier{} }
 func (m *TagSpecifier) String() string            { return proto.CompactTextString(m) }
 func (*TagSpecifier) ProtoMessage()               {}
 func (*TagSpecifier) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{2} }
+
+type isTagSpecifier_TagValue interface {
+	isTagSpecifier_TagValue()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type TagSpecifier_Regex struct {
+	Regex string `protobuf:"bytes,2,opt,name=regex,proto3,oneof"`
+}
+type TagSpecifier_FixedValue struct {
+	FixedValue string `protobuf:"bytes,3,opt,name=fixed_value,json=fixedValue,proto3,oneof"`
+}
+
+func (*TagSpecifier_Regex) isTagSpecifier_TagValue()      {}
+func (*TagSpecifier_FixedValue) isTagSpecifier_TagValue() {}
+
+func (m *TagSpecifier) GetTagValue() isTagSpecifier_TagValue {
+	if m != nil {
+		return m.TagValue
+	}
+	return nil
+}
 
 func (m *TagSpecifier) GetTagName() string {
 	if m != nil {
@@ -176,10 +156,83 @@ func (m *TagSpecifier) GetTagName() string {
 }
 
 func (m *TagSpecifier) GetRegex() string {
-	if m != nil {
-		return m.Regex
+	if x, ok := m.GetTagValue().(*TagSpecifier_Regex); ok {
+		return x.Regex
 	}
 	return ""
+}
+
+func (m *TagSpecifier) GetFixedValue() string {
+	if x, ok := m.GetTagValue().(*TagSpecifier_FixedValue); ok {
+		return x.FixedValue
+	}
+	return ""
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*TagSpecifier) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _TagSpecifier_OneofMarshaler, _TagSpecifier_OneofUnmarshaler, _TagSpecifier_OneofSizer, []interface{}{
+		(*TagSpecifier_Regex)(nil),
+		(*TagSpecifier_FixedValue)(nil),
+	}
+}
+
+func _TagSpecifier_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*TagSpecifier)
+	// tag_value
+	switch x := m.TagValue.(type) {
+	case *TagSpecifier_Regex:
+		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
+		_ = b.EncodeStringBytes(x.Regex)
+	case *TagSpecifier_FixedValue:
+		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
+		_ = b.EncodeStringBytes(x.FixedValue)
+	case nil:
+	default:
+		return fmt.Errorf("TagSpecifier.TagValue has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _TagSpecifier_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*TagSpecifier)
+	switch tag {
+	case 2: // tag_value.regex
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.TagValue = &TagSpecifier_Regex{x}
+		return true, err
+	case 3: // tag_value.fixed_value
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.TagValue = &TagSpecifier_FixedValue{x}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _TagSpecifier_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*TagSpecifier)
+	// tag_value
+	switch x := m.TagValue.(type) {
+	case *TagSpecifier_Regex:
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(len(x.Regex)))
+		n += len(x.Regex)
+	case *TagSpecifier_FixedValue:
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(len(x.FixedValue)))
+		n += len(x.FixedValue)
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
 }
 
 // Stats configuration proto schema for built-in *envoy.statsd* sink.
@@ -526,15 +579,32 @@ func (m *TagSpecifier) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintStats(dAtA, i, uint64(len(m.TagName)))
 		i += copy(dAtA[i:], m.TagName)
 	}
-	if len(m.Regex) > 0 {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintStats(dAtA, i, uint64(len(m.Regex)))
-		i += copy(dAtA[i:], m.Regex)
+	if m.TagValue != nil {
+		nn3, err := m.TagValue.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += nn3
 	}
 	return i, nil
 }
 
+func (m *TagSpecifier_Regex) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	dAtA[i] = 0x12
+	i++
+	i = encodeVarintStats(dAtA, i, uint64(len(m.Regex)))
+	i += copy(dAtA[i:], m.Regex)
+	return i, nil
+}
+func (m *TagSpecifier_FixedValue) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintStats(dAtA, i, uint64(len(m.FixedValue)))
+	i += copy(dAtA[i:], m.FixedValue)
+	return i, nil
+}
 func (m *StatsdSink) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -551,11 +621,11 @@ func (m *StatsdSink) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.StatsdSpecifier != nil {
-		nn3, err := m.StatsdSpecifier.MarshalTo(dAtA[i:])
+		nn4, err := m.StatsdSpecifier.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn3
+		i += nn4
 	}
 	return i, nil
 }
@@ -566,11 +636,11 @@ func (m *StatsdSink_Address) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintStats(dAtA, i, uint64(m.Address.Size()))
-		n4, err := m.Address.MarshalTo(dAtA[i:])
+		n5, err := m.Address.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n4
+		i += n5
 	}
 	return i, nil
 }
@@ -598,11 +668,11 @@ func (m *DogStatsdSink) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.DogStatsdSpecifier != nil {
-		nn5, err := m.DogStatsdSpecifier.MarshalTo(dAtA[i:])
+		nn6, err := m.DogStatsdSpecifier.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn5
+		i += nn6
 	}
 	return i, nil
 }
@@ -613,11 +683,11 @@ func (m *DogStatsdSink_Address) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintStats(dAtA, i, uint64(m.Address.Size()))
-		n6, err := m.Address.MarshalTo(dAtA[i:])
+		n7, err := m.Address.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i += n7
 	}
 	return i, nil
 }
@@ -675,13 +745,26 @@ func (m *TagSpecifier) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovStats(uint64(l))
 	}
-	l = len(m.Regex)
-	if l > 0 {
-		n += 1 + l + sovStats(uint64(l))
+	if m.TagValue != nil {
+		n += m.TagValue.Size()
 	}
 	return n
 }
 
+func (m *TagSpecifier_Regex) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Regex)
+	n += 1 + l + sovStats(uint64(l))
+	return n
+}
+func (m *TagSpecifier_FixedValue) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.FixedValue)
+	n += 1 + l + sovStats(uint64(l))
+	return n
+}
 func (m *StatsdSink) Size() (n int) {
 	var l int
 	_ = l
@@ -1057,7 +1140,36 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Regex = string(dAtA[iNdEx:postIndex])
+			m.TagValue = &TagSpecifier_Regex{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FixedValue", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowStats
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthStats
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TagValue = &TagSpecifier_FixedValue{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1410,32 +1522,33 @@ var (
 func init() { proto.RegisterFile("api/stats.proto", fileDescriptorStats) }
 
 var fileDescriptorStats = []byte{
-	// 418 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x91, 0xc1, 0x6e, 0x13, 0x31,
-	0x10, 0x86, 0x6b, 0x4a, 0x5b, 0x32, 0x09, 0xd0, 0x5a, 0x41, 0x4d, 0x23, 0x88, 0xa2, 0x3d, 0x45,
-	0x1c, 0xbc, 0x22, 0x9c, 0x38, 0xa1, 0xa6, 0x3d, 0x54, 0x42, 0x42, 0x68, 0xb7, 0xe2, 0xba, 0x9a,
-	0xec, 0x7a, 0xad, 0x15, 0x66, 0x6d, 0xd9, 0xde, 0x00, 0x2f, 0xc0, 0x8d, 0x23, 0xef, 0xc2, 0x91,
-	0x23, 0x47, 0x1e, 0x01, 0xe5, 0xc6, 0x5b, 0xa0, 0xb5, 0x77, 0x51, 0x00, 0x71, 0xed, 0xcd, 0xa3,
-	0x7f, 0x66, 0xfe, 0xef, 0xf7, 0xc0, 0x7d, 0xd4, 0x55, 0x6c, 0x1d, 0x3a, 0xcb, 0xb4, 0x51, 0x4e,
-	0xd1, 0x11, 0xaf, 0x37, 0xea, 0x03, 0x43, 0x5d, 0xb1, 0xcd, 0x72, 0x7a, 0xd2, 0xca, 0x58, 0x14,
-	0x86, 0xdb, 0xae, 0x61, 0xfa, 0x50, 0x28, 0x25, 0x24, 0x8f, 0x7d, 0xb5, 0x6e, 0xca, 0xd8, 0x3a,
-	0xd3, 0xe4, 0xae, 0x53, 0x67, 0x7f, 0xab, 0xef, 0x0c, 0x6a, 0xcd, 0x4d, 0x3f, 0x7d, 0xba, 0x41,
-	0x59, 0x15, 0xe8, 0x78, 0xdc, 0x3f, 0x82, 0x10, 0xbd, 0x82, 0x41, 0xda, 0x62, 0xa4, 0x55, 0xfd,
-	0x86, 0x52, 0xb8, 0x5d, 0xe3, 0x5b, 0x3e, 0x21, 0x73, 0xb2, 0x18, 0x24, 0xfe, 0x4d, 0x63, 0x38,
-	0xcc, 0x55, 0x5d, 0x56, 0x62, 0x72, 0x6b, 0x4e, 0x16, 0xc3, 0xe5, 0x29, 0x0b, 0x56, 0xac, 0xb7,
-	0x62, 0xa9, 0x07, 0x49, 0xba, 0xb6, 0xe8, 0x33, 0x81, 0xa1, 0x5f, 0x79, 0xe1, 0x6b, 0xfa, 0x0c,
-	0xc0, 0x07, 0xcd, 0x1c, 0x0a, 0x3b, 0x21, 0xf3, 0xfd, 0xc5, 0x70, 0x39, 0x65, 0xbb, 0x71, 0xd9,
-	0x35, 0x8a, 0x54, 0xf3, 0xbc, 0x2a, 0x2b, 0x6e, 0x92, 0x81, 0xef, 0xbe, 0x46, 0x61, 0xe9, 0x0b,
-	0x18, 0x37, 0x96, 0x67, 0x28, 0x65, 0x56, 0xf0, 0x12, 0x1b, 0xe9, 0xc2, 0x92, 0x40, 0x32, 0xfd,
-	0x87, 0x64, 0xa5, 0x94, 0x7c, 0x8d, 0xb2, 0xe1, 0xc9, 0x49, 0x63, 0xf9, 0xb9, 0x94, 0x97, 0x61,
-	0xaa, 0x5d, 0x16, 0x3d, 0x87, 0xd1, 0xae, 0x0f, 0x3d, 0x83, 0x3b, 0x0e, 0x45, 0xb6, 0x13, 0xf8,
-	0xc8, 0xa1, 0x78, 0xd9, 0x66, 0x1e, 0xc3, 0x81, 0xe1, 0x82, 0xbf, 0xf7, 0x46, 0x83, 0x24, 0x14,
-	0xd1, 0x47, 0x02, 0xe0, 0x83, 0x15, 0xfe, 0xb3, 0x9e, 0xc0, 0x51, 0x77, 0x21, 0x3f, 0x3e, 0x5c,
-	0x3e, 0xf8, 0x33, 0xd4, 0x79, 0x10, 0xaf, 0xf6, 0x92, 0xbe, 0x8f, 0x3e, 0x86, 0x63, 0x97, 0xeb,
-	0x2c, 0x97, 0x8d, 0x75, 0xdc, 0x04, 0x6b, 0x6f, 0x71, 0xb5, 0x97, 0xdc, 0x73, 0xb9, 0xbe, 0x08,
-	0x42, 0xcb, 0xb0, 0x3a, 0x83, 0x63, 0xff, 0x11, 0x45, 0x66, 0x7f, 0x23, 0x1f, 0x7c, 0xf9, 0xf9,
-	0x75, 0x9f, 0x44, 0x9f, 0x08, 0xdc, 0xbd, 0x54, 0xe2, 0xe6, 0x58, 0x1e, 0xc1, 0xb8, 0x50, 0x22,
-	0xfb, 0x0f, 0xcf, 0x6a, 0xf4, 0x6d, 0x3b, 0x23, 0xdf, 0xb7, 0x33, 0xf2, 0x63, 0x3b, 0x23, 0xeb,
-	0x43, 0x7f, 0x8e, 0xa7, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0x32, 0x73, 0x64, 0x76, 0xe3, 0x02,
-	0x00, 0x00,
+	// 441 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x91, 0xb1, 0x6e, 0xd4, 0x40,
+	0x10, 0x86, 0xb3, 0x1c, 0x49, 0xf0, 0xf8, 0x80, 0x64, 0x15, 0xc8, 0xe5, 0x04, 0xa7, 0xc3, 0xd5,
+	0x89, 0xc2, 0x16, 0x47, 0x45, 0x99, 0x4b, 0x8a, 0x48, 0x48, 0x08, 0xf9, 0x22, 0x5a, 0x6b, 0x63,
+	0x8f, 0x57, 0x16, 0xcb, 0xad, 0xd9, 0x5d, 0x1f, 0xe1, 0x05, 0xe8, 0x28, 0x79, 0x17, 0x4a, 0x4a,
+	0x4a, 0x1e, 0x01, 0x5d, 0xc7, 0x5b, 0x20, 0xcf, 0xda, 0xe8, 0x00, 0xd1, 0xd2, 0xed, 0xec, 0x3f,
+	0x3b, 0xff, 0xf7, 0xcf, 0xc2, 0x5d, 0x51, 0x57, 0x89, 0x75, 0xc2, 0xd9, 0xb8, 0x36, 0xda, 0x69,
+	0x3e, 0xc4, 0xd5, 0x5a, 0xbf, 0x8f, 0x45, 0x5d, 0xc5, 0xeb, 0xf9, 0xf8, 0xb0, 0x95, 0x45, 0x51,
+	0x18, 0xb4, 0x5d, 0xc3, 0xf8, 0x81, 0xd4, 0x5a, 0x2a, 0x4c, 0xa8, 0xba, 0x6a, 0xca, 0xc4, 0x3a,
+	0xd3, 0xe4, 0xae, 0x53, 0x27, 0x7f, 0xaa, 0xef, 0x8c, 0xa8, 0x6b, 0x34, 0xfd, 0xeb, 0xe3, 0xb5,
+	0x50, 0x55, 0x21, 0x1c, 0x26, 0xfd, 0xc1, 0x0b, 0xd1, 0x4b, 0x08, 0x96, 0x2d, 0xc6, 0xb2, 0x5a,
+	0xbd, 0xe6, 0x1c, 0x6e, 0xae, 0xc4, 0x1b, 0x1c, 0xb1, 0x29, 0x9b, 0x05, 0x29, 0x9d, 0x79, 0x02,
+	0x7b, 0xb9, 0x5e, 0x95, 0x95, 0x1c, 0xdd, 0x98, 0xb2, 0x59, 0x38, 0x3f, 0x8e, 0xbd, 0x55, 0xdc,
+	0x5b, 0xc5, 0x4b, 0x02, 0x49, 0xbb, 0xb6, 0xe8, 0x13, 0x83, 0x90, 0x46, 0x9e, 0x51, 0xcd, 0x9f,
+	0x01, 0x50, 0xd0, 0xcc, 0x09, 0x69, 0x47, 0x6c, 0x3a, 0x98, 0x85, 0xf3, 0x71, 0xbc, 0x1d, 0x37,
+	0xbe, 0x14, 0x72, 0x59, 0x63, 0x5e, 0x95, 0x15, 0x9a, 0x34, 0xa0, 0xee, 0x4b, 0x21, 0x2d, 0x7f,
+	0x0e, 0x47, 0x8d, 0xc5, 0x4c, 0x28, 0x95, 0x15, 0x58, 0x8a, 0x46, 0x39, 0x3f, 0xc4, 0x93, 0x8c,
+	0xff, 0x22, 0x59, 0x68, 0xad, 0x5e, 0x09, 0xd5, 0x60, 0x7a, 0xd8, 0x58, 0x3c, 0x55, 0xea, 0xdc,
+	0xbf, 0x6a, 0x87, 0x45, 0x6f, 0x61, 0xb8, 0xed, 0xc3, 0x4f, 0xe0, 0x96, 0x13, 0x32, 0xdb, 0x0a,
+	0xbc, 0xef, 0x84, 0x7c, 0xd1, 0x66, 0xbe, 0x0f, 0xbb, 0x06, 0x25, 0x5e, 0x93, 0x51, 0x70, 0xb1,
+	0x93, 0xfa, 0x92, 0x3f, 0x82, 0xb0, 0xac, 0xae, 0xb1, 0xc8, 0xd6, 0xad, 0xc9, 0x68, 0xd0, 0xa9,
+	0x40, 0x97, 0x64, 0xbc, 0x08, 0x21, 0x68, 0xa7, 0x52, 0x43, 0xf4, 0x81, 0x01, 0xd0, 0x2a, 0x0a,
+	0x5a, 0xef, 0x13, 0xd8, 0xef, 0xfe, 0x94, 0x0c, 0xc3, 0xf9, 0xbd, 0xdf, 0xd7, 0x70, 0xea, 0xc5,
+	0x8b, 0x9d, 0xb4, 0xef, 0xe3, 0x8f, 0xe1, 0xc0, 0xe5, 0x75, 0x96, 0xab, 0xc6, 0x3a, 0x34, 0x1e,
+	0xb6, 0x87, 0xba, 0xe3, 0xf2, 0xfa, 0xcc, 0x0b, 0x2d, 0xf5, 0xe2, 0x04, 0x0e, 0x68, 0x75, 0x45,
+	0x66, 0x7f, 0x85, 0xdc, 0xfd, 0xfc, 0xe3, 0xcb, 0x80, 0x45, 0x1f, 0x19, 0xdc, 0x3e, 0xd7, 0xf2,
+	0xff, 0xb1, 0x3c, 0x84, 0xa3, 0x42, 0xcb, 0xec, 0x1f, 0x3c, 0x8b, 0xe1, 0xd7, 0xcd, 0x84, 0x7d,
+	0xdb, 0x4c, 0xd8, 0xf7, 0xcd, 0x84, 0x5d, 0xed, 0xd1, 0x07, 0x3e, 0xfd, 0x19, 0x00, 0x00, 0xff,
+	0xff, 0x33, 0xe2, 0x5e, 0x6c, 0x15, 0x03, 0x00, 0x00,
 }
