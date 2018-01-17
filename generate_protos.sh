@@ -9,14 +9,6 @@ echo "Expecting protoc version >= 3.5.0:"
 protoc=$(which protoc)
 $protoc --version
 
-echo "Make sure to run with 'make generate' to record the log"
-
-echo "Building gogo compiler ..."
-mkdir -p ${root}/bin
-gogoplugin="gogofast"
-gogobinary="${root}/bin/gogofast"
-go build -o $gogobinary vendor/github.com/gogo/protobuf/protoc-gen-gogofast/main.go
-
 echo "Expecting to find sibling data-plane-api repository ..."
 pushd ../data-plane-api
   git log -1
@@ -80,9 +72,9 @@ done
 
 for path in "${paths[@]}"
 do
-  echo "Generating ${gogoplugin} protos $path ..."
+  echo "Generating protos $path ..."
   $protoc ${protocarg} ${root}/../data-plane-api/${path}/*.proto \
-    --plugin=protoc-gen-${gogoplugin}=${gogobinary} --${gogoplugin}_out=${gogoarg}:.
+    --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:.
 done
 
 echo "Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)"
