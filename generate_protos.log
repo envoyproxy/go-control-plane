@@ -1,7 +1,7 @@
 Expecting protoc version >= 3.5.0:
-libprotoc 3.5.0
+libprotoc 3.5.1
 Expecting to find sibling data-plane-api repository ...
-~/go/src/github.com/envoyproxy/data-plane-api ~/go/src/github.com/envoyproxy/go-control-plane
+~/Documents/research/repos/go/src/github.com/envoyproxy/data-plane-api ~/Documents/research/repos/go/src/github.com/envoyproxy/go-control-plane
 commit b4a303154703d19f49b63e5529877772ce5da617
 Author: Brian Pane <brianp+github@brianp.net>
 Date:   Tue Jan 16 13:30:08 2018 -0800
@@ -9,7 +9,7 @@ Date:   Tue Jan 16 13:30:08 2018 -0800
     Healthcheck filter: compute response based on upstream cluster health (#417)
     
     Signed-off-by: Brian Pane <bpane@pinterest.com>
-~/go/src/github.com/envoyproxy/go-control-plane
+~/Documents/research/repos/go/src/github.com/envoyproxy/go-control-plane
 Generating protos api ...
 Generating protos api/auth ...
 Generating protos api/filter ...

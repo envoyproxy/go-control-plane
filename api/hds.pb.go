@@ -6,7 +6,7 @@ package api
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import _ "github.com/istio/gogo-genproto/googleapis/google/api"
+import _ "istio.io/gogo-genproto/googleapis/google/api"
 import google_protobuf2 "github.com/gogo/protobuf/types"
 
 import (

@@ -1,39 +1,29 @@
-hash: d15a3f6d504c23e7b2f987aabd4ce37c86d1fa4e5d0d32dcccd159733e1070b9
-updated: 2018-01-16T14:38:34.003028-08:00
+hash: da4e4e73b4470c7d8df10f9ccaec58de1e54317a593cfe08021b9decc2a08dc5
+updated: 2018-01-22T12:59:48.22728-05:00
 imports:
 - name: github.com/gogo/protobuf
   version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
   subpackages:
-  - gogoproto
   - jsonpb
   - proto
-  - protoc-gen-gogo/descriptor
   - sortkeys
   - types
 - name: github.com/golang/glog
   version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
-  version: 1643683e1b54a9e88ad26d98f81400c8c9d9f4f9
+  version: ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e
   subpackages:
   - proto
-  - protoc-gen-go/descriptor
   - ptypes
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
-- name: github.com/istio/gogo-genproto
-  version: 67f8f8d47316e96703fa2fd09038285aecdb7535
-  subpackages:
-  - googleapis/google/api
-  - googleapis/google/rpc
 - name: github.com/lyft/protoc-gen-validate
-  version: ef99a8ba19eb470c12238812747157bdbbc839eb
-  subpackages:
-  - validate
+  version: 6cd364ac742e088e22c2d04e90358ce48e1e33e5
 - name: github.com/prometheus/client_model
   version: 6f3806018612930941127f2a7c6c453ba2c527d2
 - name: golang.org/x/net
-  version: a337091b0525af65de94df2eb7e98bd9962dcbe2
+  version: 5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec
   subpackages:
   - context
   - http2
@@ -43,19 +33,19 @@ imports:
   - lex/httplex
   - trace
 - name: golang.org/x/text
-  version: 88f656faf3f37f690df1a32515b479415e1a6769
+  version: e19ae1496984b1c655b8044a65c0300a3c878dd3
   subpackages:
   - secure/bidirule
   - transform
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/genproto
-  version: 11c7f9e547da6db876260ce49ea7536985904c9b
+  version: a8101f21cf983e773d0c1133ebc5424792003214
   subpackages:
   - googleapis/api/annotations
   - googleapis/rpc/status
 - name: google.golang.org/grpc
-  version: 7cea4cc846bcf00cbb27595b07da5de875ef7de9
+  version: 6b51017f791ae1cfbec89c52efdf444b13b550ef
   subpackages:
   - balancer
   - balancer/base
@@ -78,4 +68,6 @@ imports:
   - status
   - tap
   - transport
+- name: istio.io/gogo-genproto
+  version: 67f8f8d47316e96703fa2fd09038285aecdb7535
 testImports: []
