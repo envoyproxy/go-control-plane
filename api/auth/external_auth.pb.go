@@ -19,7 +19,7 @@ import fmt "fmt"
 import math "math"
 import envoy_api_v2 "github.com/envoyproxy/go-control-plane/api"
 import google_protobuf3 "github.com/gogo/protobuf/types"
-import google_rpc "github.com/istio/gogo-genproto/googleapis/google/rpc"
+import google_rpc "istio.io/gogo-genproto/googleapis/google/rpc"
 
 import (
 	context "golang.org/x/net/context"

@@ -4,10 +4,8 @@
 [[projects]]
   name = "github.com/gogo/protobuf"
   packages = [
-    "gogoproto",
     "jsonpb",
     "proto",
-    "protoc-gen-gogo/descriptor",
     "sortkeys",
     "types"
   ]
@@ -21,33 +19,19 @@
   revision = "23def4e6c14b4da8ac2ed8007337bc5eb5007998"
 
 [[projects]]
+  branch = "master"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
-    "protoc-gen-go/descriptor",
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
     "ptypes/timestamp"
   ]
-  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
+  revision = "1e59b77b52bf8e4b449a57e6f79f21226d571845"
 
 [[projects]]
   branch = "master"
-  name = "github.com/istio/gogo-genproto"
-  packages = [
-    "googleapis/google/api",
-    "googleapis/google/rpc"
-  ]
-  revision = "67f8f8d47316e96703fa2fd09038285aecdb7535"
-
-[[projects]]
-  name = "github.com/lyft/protoc-gen-validate"
-  packages = ["validate"]
-  revision = "ef99a8ba19eb470c12238812747157bdbbc839eb"
-  version = "v0.0.1"
-
-[[projects]]
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -58,9 +42,10 @@
     "lex/httplex",
     "trace"
   ]
-  revision = "a337091b0525af65de94df2eb7e98bd9962dcbe2"
+  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
 
 [[projects]]
+  branch = "master"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -78,12 +63,13 @@
     "unicode/norm",
     "unicode/rangetable"
   ]
-  revision = "88f656faf3f37f690df1a32515b479415e1a6769"
+  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
+  branch = "master"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
-  revision = "11c7f9e547da6db876260ce49ea7536985904c9b"
+  revision = "a8101f21cf983e773d0c1133ebc5424792003214"
 
 [[projects]]
   name = "google.golang.org/grpc"
@@ -111,12 +97,12 @@
     "tap",
     "transport"
   ]
-  revision = "7cea4cc846bcf00cbb27595b07da5de875ef7de9"
-  version = "v1.9.1"
+  revision = "6b51017f791ae1cfbec89c52efdf444b13b550ef"
+  version = "v1.9.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c2287020b0cd39c49f897c8fcbd58838b9d390b400d8d5c5172164c25cb55a0f"
+  inputs-digest = "ff102ef115a069e840f0f32deb1fffc69026560f8fd7c2cded5e62c44bc927b8"
   solver-name = "gps-cdcl"
   solver-version = 1

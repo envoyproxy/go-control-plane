@@ -30,7 +30,7 @@
 
 [[constraint]]
   branch = "master"
-  name = "github.com/istio/gogo-genproto"
+  name = "istio.io/gogo-genproto"
 
 [[constraint]]
   name = "github.com/lyft/protoc-gen-validate"

@@ -28,7 +28,7 @@ imports=(
   "${root}/vendor/github.com/lyft/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
   "${root}/vendor/github.com/prometheus/client_model"
-  "${root}/vendor/github.com/istio/gogo-genproto/googleapis"
+  "${root}/vendor/istio.io/gogo-genproto/googleapis"
 )
 
 protocarg=""
@@ -39,11 +39,11 @@ done
 
 import="github.com/envoyproxy/go-control-plane/api"
 mappings=(
-  "google/api/annotations.proto=github.com/istio/gogo-genproto/googleapis/google/api"
-  "google/api/http.proto=github.com/istio/gogo-genproto/googleapis/google/api"
-  "google/rpc/code.proto=github.com/istio/gogo-genproto/googleapis/google/rpc"
-  "google/rpc/error_details.proto=github.com/istio/gogo-genproto/googleapis/google/rpc"
-  "google/rpc/status.proto=github.com/istio/gogo-genproto/googleapis/google/rpc"
+  "google/api/annotations.proto=istio.io/gogo-genproto/googleapis/google/api"
+  "google/api/http.proto=istio.io/gogo-genproto/googleapis/google/api"
+  "google/rpc/code.proto=istio.io/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/error_details.proto=istio.io/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/status.proto=istio.io/gogo-genproto/googleapis/google/rpc"
   "google/protobuf/any.proto=github.com/gogo/protobuf/types"
   "google/protobuf/duration.proto=github.com/gogo/protobuf/types"
   "google/protobuf/struct.proto=github.com/gogo/protobuf/types"
