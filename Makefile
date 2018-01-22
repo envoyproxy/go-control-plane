@@ -4,71 +4,61 @@
 # Variables
 #------------------------------------------------------------------------------
 
-SHELL 		:= /bin/bash
-BINDIR		:= bin
-DOCKERDIR	:= docker
-RELEASEDIR  := release
-OUTPUT_NAME := go-control-plane
-GOHOSTOS 	:= $(shell go env GOHOSTOS)
+SHELL 	:= /bin/bash
+BINDIR	:= bin
 
-ifndef GOOS
-    GOOS := $(GOHOSTOS)
-endif
-
-ifndef GOARCH
-	GOARCH := $(shell go env GOHOSTARCH)
-endif
-
-GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./api/*")
+# Pure Go sources (not vendored and not generated)
+GOFILES		= $(shell find . -type f -name '*.go' \
+						-not -path "./vendor/*" \
+						-not -path "./api/*")
 GODIRS		= $(shell go list -f '{{.Dir}}' ./... \
-            | grep -vFf <(go list -f '{{.Dir}}' ./vendor/...) \
-            | grep -vFf <(go list -f '{{.Dir}}' ./api/...))
-GOPKGS		= $(shell go list ./... \
-            | grep -vFf <(go list ./vendor/...) \
-            | grep -vFf <(go list ./api/...))
-
-APP_VER		:= $(shell git describe --always 2> /dev/null || echo "unknown")
+						| grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
 
 .PHONY: build
-build:
+build: vendor
+	@echo "--> building"
 	@go build ./...
 
+.PHONY: clean
 clean:
 	@echo "--> cleaning compiled objects and binaries"
-	@go clean -tags netgo -i $(GOPKGS)
+	@go clean -tags netgo -i ./...
 	@rm -rf $(BINDIR)/*
-	@rm -rf $(RELEASEDIR)/*
 
 .PHONY: test
-test:
+test: vendor
 	@echo "--> running unit tests"
-	@go test -v $(GOPKGS)
+	@go test -v ./...
 
 .PHONY: cover
 cover:
 	@echo "--> running coverage tests"
-	@go test -race -cover $(GOPKGS)
+	@go test -race -cover ./...
 
 .PHONY: check
 check: format.check vet lint
 
+.PHONY: format
 format: tools.goimports
 	@echo "--> formatting code with 'goimports' tool"
 	@goimports -w -l $(GOFILES)
 
+.PHONY: format.check
 format.check: tools.goimports
 	@echo "--> checking code formatting with 'goimports' tool"
 	@goimports -l $(GOFILES) | sed -e "s/^/\?\t/" | tee >(test -z)
 
+.PHONY: vet
 vet: tools.govet
 	@echo "--> checking code correctness with 'go vet' tool"
-	@go vet $(GOPKGS)
+	@go vet ./...
 
+.PHONY: lint
 lint: tools.golint
 	@echo "--> checking code style with 'golint' tool"
 	@echo $(GODIRS) | xargs -n 1 golint
 
-generate: depend.install
+generate: $(BINDIR)/gogofast
 	@echo "--> generating pb.go files"
 	$(SHELL) generate_protos.sh > generate_protos.log 2>&1
 	@cat generate_protos.log
@@ -80,11 +70,18 @@ generate: depend.install
 
 depend.update: tools.glide
 	@echo "--> updating dependencies from glide.yaml"
-	@glide update --strip-vendor
+	@glide update
 
 depend.install: tools.glide
 	@echo "--> installing dependencies from glide.lock "
-	@glide install --strip-vendor
+	@glide install
+
+vendor:
+	@echo "--> installing dependencies from glide.lock "
+	@glide install
+
+$(BINDIR):
+	@mkdir -p $(BINDIR)
 
 #---------------
 #-- tools
@@ -116,3 +113,11 @@ tools.glide:
 		echo "--> installing glide"; \
 		curl https://glide.sh/get | sh; \
 	fi
+
+$(BINDIR)/gogofast: vendor
+	@echo "--> building $@"
+	@go build -o $@ vendor/github.com/gogo/protobuf/protoc-gen-gogofast/main.go
+
+$(BINDIR)/pgv: vendor
+	@echo "--> building $@"
+	@pushd vendor/github.com/lyft/protoc-gen-validate && go build -o ../../../../$@ . && popd

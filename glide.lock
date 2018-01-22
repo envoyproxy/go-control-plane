@@ -1,5 +1,5 @@
 hash: d15a3f6d504c23e7b2f987aabd4ce37c86d1fa4e5d0d32dcccd159733e1070b9
-updated: 2018-01-16T10:49:57.322044-08:00
+updated: 2018-01-16T14:38:34.003028-08:00
 imports:
 - name: github.com/gogo/protobuf
   version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
@@ -23,6 +23,9 @@ imports:
   - ptypes/timestamp
 - name: github.com/istio/gogo-genproto
   version: 67f8f8d47316e96703fa2fd09038285aecdb7535
+  subpackages:
+  - googleapis/google/api
+  - googleapis/google/rpc
 - name: github.com/lyft/protoc-gen-validate
   version: ef99a8ba19eb470c12238812747157bdbbc839eb
   subpackages:
