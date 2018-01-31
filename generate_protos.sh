@@ -2,33 +2,22 @@
 set -o errexit
 set -o nounset
 set -o pipefail
+shopt -s nullglob
 
 root="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+xds=${root}/vendor/github.com/envoyproxy/data-plane-api
 
 echo "Expecting protoc version >= 3.5.0:"
 protoc=$(which protoc)
 $protoc --version
 
-echo "Expecting to find sibling data-plane-api repository ..."
-pushd ../data-plane-api
-  git log -1
-popd
-
-paths=(
-  "api"
-  "api/auth"
-  "api/filter"
-  "api/filter/accesslog"
-  "api/filter/http"
-  "api/filter/network"
-)
-
 imports=(
-  "${root}/../data-plane-api"
+  ${xds}
   "${root}/vendor/github.com/lyft/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
   "${root}/vendor/github.com/prometheus/client_model"
   "${root}/vendor/istio.io/gogo-genproto/googleapis"
+  "${root}/vendor/istio.io/gogo-genproto/opencensus/proto/trace"
 )
 
 protocarg=""
@@ -37,7 +26,6 @@ do
   protocarg+="--proto_path=$i "
 done
 
-import="github.com/envoyproxy/go-control-plane/api"
 mappings=(
   "google/api/annotations.proto=istio.io/gogo-genproto/googleapis/google/api"
   "google/api/http.proto=istio.io/gogo-genproto/googleapis/google/api"
@@ -51,31 +39,41 @@ mappings=(
   "google/protobuf/wrappers.proto=github.com/gogo/protobuf/types"
   "metrics.proto=github.com/prometheus/client_model/go"
   "gogoproto/gogo.proto=github.com/gogo/protobuf/gogoproto"
-  "api/address.proto=${import}"
-  "api/base.proto=${import}"
-  "api/config_source.proto=${import}"
-  "api/grpc_service.proto=${import}"
-  "api/protocol.proto=${import}"
-  "api/rds.proto=${import}"
-  "api/sds.proto=${import}"
-  "api/rls.proto=${import}"
-  "api/filter/fault.proto=${import}/filter"
-  "api/filter/accesslog/accesslog.proto=${import}/filter/accesslog"
+  "trace.proto=istio.io/gogo-genproto/opencensus/proto/trace"
 )
 
 gogoarg="plugins=grpc"
 
+# assign importmap for canonical protos
 for mapping in "${mappings[@]}"
 do
   gogoarg+=",M$mapping"
 done
 
-for path in "${paths[@]}"
+# assign importmap for all referenced protos in data-plane-api
+for path in $(find ${xds}/envoy -type d)
 do
-  echo "Generating protos $path ..."
-  $protoc ${protocarg} ${root}/../data-plane-api/${path}/*.proto \
-    --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:.
+  path_protos=(${path}/*.proto)
+  if [[ ${#path_protos[@]} > 0 ]]
+  then
+    for path_proto in "${path_protos[@]}"
+    do
+      mapping=${path_proto##${xds}/}=github.com/envoyproxy/go-control-plane/${path##${xds}/}
+      gogoarg+=",M$mapping"
+    done
+  fi
 done
 
-echo "Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)"
-\rm ${root}/api/metrics_service.pb.go
+for path in $(find ${xds}/envoy -type d)
+do
+  path_protos=(${path}/*.proto)
+  if [[ ${#path_protos[@]} > 0 ]]
+  then
+    echo "Generating protos ${path} ..."
+    $protoc ${protocarg} ${path}/*.proto \
+      --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:.
+  fi
+done
+
+echo "TODO(kuat) Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)"
+\rm ${root}/envoy/service/metrics/v2/metrics_service.pb.go
