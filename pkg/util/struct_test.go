@@ -18,15 +18,16 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
 	"github.com/gogo/protobuf/types"
 )
 
 func TestMessageToStruct(t *testing.T) {
-	pb := &api.DiscoveryRequest{
+	pb := &v2.DiscoveryRequest{
 		VersionInfo: "test",
-		Node:        &api.Node{Id: "proxy"},
+		Node:        &core.Node{Id: "proxy"},
 	}
 	st, err := util.MessageToStruct(pb)
 	if err != nil {

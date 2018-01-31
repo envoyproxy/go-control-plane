@@ -60,8 +60,7 @@ lint: tools.golint
 
 generate: $(BINDIR)/gogofast
 	@echo "--> generating pb.go files"
-	$(SHELL) generate_protos.sh > generate_protos.log 2>&1
-	@cat generate_protos.log
+	$(SHELL) build/generate_protos.sh
 
 #------------------
 #-- dependencies

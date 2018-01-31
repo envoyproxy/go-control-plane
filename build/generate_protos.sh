@@ -4,7 +4,7 @@ set -o nounset
 set -o pipefail
 shopt -s nullglob
 
-root="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+root="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 xds=${root}/vendor/github.com/envoyproxy/data-plane-api
 
 echo "Expecting protoc version >= 3.5.0:"

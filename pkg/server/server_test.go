@@ -21,7 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 	"github.com/gogo/protobuf/proto"
@@ -34,7 +35,7 @@ type mockConfigWatcher struct {
 	closeWatch bool
 }
 
-func (config *mockConfigWatcher) Watch(typ cache.ResponseType, _ *api.Node, version string, names []string) cache.Watch {
+func (config *mockConfigWatcher) Watch(typ cache.ResponseType, _ *core.Node, version string, names []string) cache.Watch {
 	config.counts[typ] = config.counts[typ] + 1
 	out := make(chan cache.Response, 1)
 	if len(config.responses[typ]) > 0 {
@@ -58,14 +59,14 @@ func makeMockConfigWatcher() *mockConfigWatcher {
 
 type mockStream struct {
 	t         *testing.T
-	recv      chan *api.DiscoveryRequest
-	sent      chan *api.DiscoveryResponse
+	recv      chan *v2.DiscoveryRequest
+	sent      chan *v2.DiscoveryResponse
 	nonce     int
 	sendError bool
 	grpc.ServerStream
 }
 
-func (stream *mockStream) Send(resp *api.DiscoveryResponse) error {
+func (stream *mockStream) Send(resp *v2.DiscoveryResponse) error {
 	// check that nonce is monotonically incrementing
 	stream.nonce = stream.nonce + 1
 	if resp.Nonce != fmt.Sprintf("%d", stream.nonce) {
@@ -95,7 +96,7 @@ func (stream *mockStream) Send(resp *api.DiscoveryResponse) error {
 	return nil
 }
 
-func (stream *mockStream) Recv() (*api.DiscoveryRequest, error) {
+func (stream *mockStream) Recv() (*v2.DiscoveryRequest, error) {
 	req, more := <-stream.recv
 	if !more {
 		return nil, errors.New("empty")
@@ -106,8 +107,8 @@ func (stream *mockStream) Recv() (*api.DiscoveryRequest, error) {
 func makeMockStream(t *testing.T) *mockStream {
 	return &mockStream{
 		t:    t,
-		sent: make(chan *api.DiscoveryResponse, 10),
-		recv: make(chan *api.DiscoveryRequest, 10),
+		sent: make(chan *v2.DiscoveryResponse, 10),
+		recv: make(chan *v2.DiscoveryRequest, 10),
 	}
 }
 
@@ -118,7 +119,7 @@ const (
 )
 
 var (
-	node = &api.Node{
+	node = &core.Node{
 		Id:      "test-id",
 		Cluster: "test-cluster",
 	}
@@ -158,7 +159,7 @@ func TestResponseHandlers(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &api.DiscoveryRequest{Node: node}
+			resp.recv <- &v2.DiscoveryRequest{Node: node}
 			go func() {
 				var err error
 				switch typ {
@@ -199,7 +200,7 @@ func TestWatchClosed(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &api.DiscoveryRequest{
+			resp.recv <- &v2.DiscoveryRequest{
 				Node:    node,
 				TypeUrl: GetTypeURL(typ),
 			}
@@ -224,7 +225,7 @@ func TestSendError(t *testing.T) {
 			// make a request
 			resp := makeMockStream(t)
 			resp.sendError = true
-			resp.recv <- &api.DiscoveryRequest{
+			resp.recv <- &v2.DiscoveryRequest{
 				Node:    node,
 				TypeUrl: GetTypeURL(typ),
 			}
@@ -247,7 +248,7 @@ func TestStaleNonce(t *testing.T) {
 			s := NewServer(config)
 
 			resp := makeMockStream(t)
-			resp.recv <- &api.DiscoveryRequest{
+			resp.recv <- &v2.DiscoveryRequest{
 				Node:    node,
 				TypeUrl: GetTypeURL(typ),
 			}
@@ -265,13 +266,13 @@ func TestStaleNonce(t *testing.T) {
 			select {
 			case <-resp.sent:
 				// stale request
-				resp.recv <- &api.DiscoveryRequest{
+				resp.recv <- &v2.DiscoveryRequest{
 					Node:          node,
 					TypeUrl:       GetTypeURL(typ),
 					ResponseNonce: "xyz",
 				}
 				// fresh request
-				resp.recv <- &api.DiscoveryRequest{
+				resp.recv <- &v2.DiscoveryRequest{
 					VersionInfo:   "1",
 					Node:          node,
 					TypeUrl:       GetTypeURL(typ),
@@ -291,20 +292,20 @@ func TestAggregatedHandlers(t *testing.T) {
 	config.responses = makeResponses()
 	resp := makeMockStream(t)
 
-	resp.recv <- &api.DiscoveryRequest{
+	resp.recv <- &v2.DiscoveryRequest{
 		Node:    node,
 		TypeUrl: ListenerType,
 	}
-	resp.recv <- &api.DiscoveryRequest{
+	resp.recv <- &v2.DiscoveryRequest{
 		Node:    node,
 		TypeUrl: ClusterType,
 	}
-	resp.recv <- &api.DiscoveryRequest{
+	resp.recv <- &v2.DiscoveryRequest{
 		Node:          node,
 		TypeUrl:       EndpointType,
 		ResourceNames: []string{clusterName},
 	}
-	resp.recv <- &api.DiscoveryRequest{
+	resp.recv <- &v2.DiscoveryRequest{
 		Node:          node,
 		TypeUrl:       RouteType,
 		ResourceNames: []string{routeName},
@@ -346,7 +347,7 @@ func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
 	s := NewServer(config)
 	resp := makeMockStream(t)
-	resp.recv <- &api.DiscoveryRequest{Node: node}
+	resp.recv <- &v2.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
 		t.Error("StreamAggregatedResources() => got nil, want an error")
 	}
