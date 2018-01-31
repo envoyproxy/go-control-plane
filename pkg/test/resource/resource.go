@@ -35,9 +35,9 @@ const (
 )
 
 // MakeEndpoint creates a localhost endpoint.
-func MakeEndpoint(cluster string, port uint32) *v2.ClusterLoadAssignment {
+func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 	return &v2.ClusterLoadAssignment{
-		ClusterName: cluster,
+		ClusterName: clusterName,
 		Endpoints: []*endpoint.LocalityLbEndpoints{{
 			LbEndpoints: []*endpoint.LbEndpoint{{
 				Endpoint: &endpoint.Endpoint{
@@ -59,7 +59,7 @@ func MakeEndpoint(cluster string, port uint32) *v2.ClusterLoadAssignment {
 }
 
 // MakeCluster creates a cluster.
-func MakeCluster(ads bool, cluster string) *v2.Cluster {
+func MakeCluster(ads bool, clusterName string) *v2.Cluster {
 	var edsSource *core.ConfigSource
 	if ads {
 		edsSource = &core.ConfigSource{
@@ -79,18 +79,18 @@ func MakeCluster(ads bool, cluster string) *v2.Cluster {
 	}
 
 	return &v2.Cluster{
-		Name:           cluster,
+		Name:           clusterName,
 		ConnectTimeout: 5 * time.Second,
 		Type:           v2.Cluster_EDS,
 		EdsClusterConfig: &v2.Cluster_EdsClusterConfig{
 			EdsConfig:   edsSource,
-			ServiceName: cluster,
+			ServiceName: clusterName,
 		},
 	}
 }
 
 // MakeRoute creates an HTTP route.
-func MakeRoute(routeName, cluster string) *v2.RouteConfiguration {
+func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
 	return &v2.RouteConfiguration{
 		Name: routeName,
 		VirtualHosts: []*route.VirtualHost{{
@@ -105,7 +105,7 @@ func MakeRoute(routeName, cluster string) *v2.RouteConfiguration {
 				Action: &route.Route_Route{
 					Route: &route.RouteAction{
 						ClusterSpecifier: &route.RouteAction_Cluster{
-							Cluster: cluster,
+							Cluster: clusterName,
 						},
 					},
 				},
