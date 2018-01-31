@@ -6,10 +6,10 @@
 .vagrant
 
 # Eclipse artifacts
-.project
+/.project
 
 # codecov.io test coverage
-coverage.out
+/coverage.out
 
 # auto-generated test files, e.g. mockgen
 *_gen_test.go
