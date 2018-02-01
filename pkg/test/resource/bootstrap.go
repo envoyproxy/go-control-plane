@@ -23,20 +23,20 @@ import (
 )
 
 // MakeBootstrap creates a bootstrap envoy configuration
-func MakeBootstrap(ads bool, controlPort, adminPort uint32, clusterName string) *bootstrap.Bootstrap {
+func MakeBootstrap(ads bool, controlPort, adminPort uint32) *bootstrap.Bootstrap {
 	source := &core.ApiConfigSource{
 		ApiType:      core.ApiConfigSource_GRPC,
-		ClusterNames: []string{clusterName},
+		ClusterNames: []string{XdsCluster},
 	}
 
 	var dynamic *bootstrap.Bootstrap_DynamicResources
 	if ads {
 		dynamic = &bootstrap.Bootstrap_DynamicResources{
 			LdsConfig: &core.ConfigSource{
-				ConfigSourceSpecifier: &core.ConfigSource_Ads{},
+				ConfigSourceSpecifier: &core.ConfigSource_Ads{Ads: &core.AggregatedConfigSource{}},
 			},
 			CdsConfig: &core.ConfigSource{
-				ConfigSourceSpecifier: &core.ConfigSource_Ads{},
+				ConfigSourceSpecifier: &core.ConfigSource_Ads{Ads: &core.AggregatedConfigSource{}},
 			},
 			AdsConfig: source,
 		}
@@ -71,7 +71,7 @@ func MakeBootstrap(ads bool, controlPort, adminPort uint32, clusterName string) 
 		},
 		StaticResources: &bootstrap.Bootstrap_StaticResources{
 			Clusters: []*v2.Cluster{{
-				Name:           clusterName,
+				Name:           XdsCluster,
 				ConnectTimeout: 5 * time.Second,
 				Type:           v2.Cluster_STATIC,
 				Hosts: []*core.Address{{

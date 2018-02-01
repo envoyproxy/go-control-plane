@@ -16,28 +16,29 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"flag"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/gogo/protobuf/jsonpb"
 	"github.com/golang/glog"
 )
 
-const (
-	adsConfig = "server_ads.yaml"
-	xdsConfig = "server_xds.yaml"
-)
-
 var (
-	upstreamPort uint
-	listenPort   uint
-	xdsPort      uint
-	interval     time.Duration
-	ads          bool
+	upstreamPort  uint
+	listenPort    uint
+	xdsPort       uint
+	interval      time.Duration
+	ads           bool
+	bootstrapFile string
+	envoyBinary   string
 )
 
 func init() {
@@ -46,6 +47,8 @@ func init() {
 	flag.UintVar(&xdsPort, "xds", 18000, "xDS server port")
 	flag.DurationVar(&interval, "interval", 10*time.Second, "Interval between cache refresh")
 	flag.BoolVar(&ads, "ads", true, "Use ADS instead of separate xDS services")
+	flag.StringVar(&bootstrapFile, "bootstrap", "bootstrap.json", "Bootstrap file name")
+	flag.StringVar(&envoyBinary, "envoy", "envoy", "Envoy binary file")
 }
 
 func main() {
@@ -64,14 +67,18 @@ func main() {
 	// start the xDS server
 	go test.RunXDS(ctx, config, xdsPort)
 
-	// start envoy
-	bootstrap := xdsConfig
-	if ads {
-		bootstrap = adsConfig
+	// write bootstrap file
+	bootstrap := resource.MakeBootstrap(ads, uint32(xdsPort), 19000)
+	buf := &bytes.Buffer{}
+	if err := (&jsonpb.Marshaler{OrigName: true}).Marshal(buf, bootstrap); err != nil {
+		glog.Fatal(err)
 	}
-	envoy := exec.Command("envoy",
-		"-c", "pkg/test/main/"+bootstrap,
-		"--drain-time-s", "1")
+	if err := ioutil.WriteFile(bootstrapFile, buf.Bytes(), 0644); err != nil {
+		glog.Fatal(err)
+	}
+
+	// start envoy
+	envoy := exec.Command("envoy", "-c", bootstrapFile, "--drain-time-s", "1")
 	envoy.Stdout = os.Stdout
 	envoy.Stderr = os.Stderr
 	envoy.Start()

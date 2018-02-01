@@ -31,7 +31,9 @@ const (
 	localhost  = "127.0.0.1"
 	router     = "envoy.router"
 	httpFilter = "envoy.http_connection_manager"
-	xdsCluster = "xds_cluster"
+
+	// XdsCluster is the cluster name for control server (used by non-ADS set-up)
+	XdsCluster = "xds_cluster"
 )
 
 // MakeEndpoint creates a localhost endpoint.
@@ -72,7 +74,7 @@ func MakeCluster(ads bool, clusterName string) *v2.Cluster {
 			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
 				ApiConfigSource: &core.ApiConfigSource{
 					ApiType:      core.ApiConfigSource_GRPC,
-					ClusterNames: []string{xdsCluster},
+					ClusterNames: []string{XdsCluster},
 				},
 			},
 		}
@@ -125,7 +127,7 @@ func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.
 		rdsSource.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
 			ApiConfigSource: &core.ApiConfigSource{
 				ApiType:      core.ApiConfigSource_GRPC,
-				ClusterNames: []string{xdsCluster},
+				ClusterNames: []string{XdsCluster},
 			},
 		}
 	}
