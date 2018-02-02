@@ -15,7 +15,5 @@ import:
   version: ^1.7.2
 - package: github.com/golang/glog
 - package: github.com/lyft/protoc-gen-validate
-- package: github.com/prometheus/client_model
-  version: 6f3806018612930941127f2a7c6c453ba2c527d2
 - package: istio.io/gogo-genproto
 - package: github.com/envoyproxy/data-plane-api
