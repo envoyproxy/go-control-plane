@@ -18,5 +18,4 @@ import:
 - package: github.com/prometheus/client_model
   version: 6f3806018612930941127f2a7c6c453ba2c527d2
 - package: istio.io/gogo-genproto
-  version: 1a11627790185a3b76ac4a2842e9ec08a402773c
 - package: github.com/envoyproxy/data-plane-api

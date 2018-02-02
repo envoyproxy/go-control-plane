@@ -2,7 +2,7 @@ hash: a4b85550e25b2911df57ea9ec484ebde1a427943b47617ed0c21c7efe66aa414
 updated: 2018-01-30T22:48:57.165668207-08:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 3efeaf53c64c0f5edd2f4ea5d38ae91aba6ded5d
+  version: 4e533f22baced334c4aba68fb60c5fc439f0fe9c
 - name: github.com/gogo/protobuf
   version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
   subpackages:
@@ -11,8 +11,6 @@ imports:
   version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/lyft/protoc-gen-validate
   version: 6cd364ac742e088e22c2d04e90358ce48e1e33e5
-- name: github.com/prometheus/client_model
-  version: 6f3806018612930941127f2a7c6c453ba2c527d2
 - name: golang.org/x/net
   version: 5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec
   subpackages:
@@ -25,5 +23,5 @@ imports:
 - name: google.golang.org/grpc
   version: 6b51017f791ae1cfbec89c52efdf444b13b550ef
 - name: istio.io/gogo-genproto
-  version: 1a11627790185a3b76ac4a2842e9ec08a402773c
+  version: dd2b5b6a8f1400838165245e704a011a30154a44
 testImports: []

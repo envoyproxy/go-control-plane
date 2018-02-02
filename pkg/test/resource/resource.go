@@ -21,9 +21,9 @@ import (
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/filter/network"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/listener"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
 )
 
@@ -40,13 +40,13 @@ const (
 func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 	return &v2.ClusterLoadAssignment{
 		ClusterName: clusterName,
-		Endpoints: []*endpoint.LocalityLbEndpoints{{
-			LbEndpoints: []*endpoint.LbEndpoint{{
+		Endpoints: []endpoint.LocalityLbEndpoints{{
+			LbEndpoints: []endpoint.LbEndpoint{{
 				Endpoint: &endpoint.Endpoint{
 					Address: &core.Address{
 						Address: &core.Address_SocketAddress{
 							SocketAddress: &core.SocketAddress{
-								Protocol: core.SocketAddress_TCP,
+								Protocol: core.TCP,
 								Address:  localhost,
 								PortSpecifier: &core.SocketAddress_PortValue{
 									PortValue: port,
@@ -95,11 +95,11 @@ func MakeCluster(ads bool, clusterName string) *v2.Cluster {
 func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
 	return &v2.RouteConfiguration{
 		Name: routeName,
-		VirtualHosts: []*route.VirtualHost{{
+		VirtualHosts: []route.VirtualHost{{
 			Name:    "all",
 			Domains: []string{"*"},
-			Routes: []*route.Route{{
-				Match: &route.RouteMatch{
+			Routes: []route.Route{{
+				Match: route.RouteMatch{
 					PathSpecifier: &route.RouteMatch_Prefix{
 						Prefix: "/",
 					},
@@ -131,16 +131,16 @@ func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.
 			},
 		}
 	}
-	manager := &network.HttpConnectionManager{
-		CodecType:  network.HttpConnectionManager_AUTO,
+	manager := &hcm.HttpConnectionManager{
+		CodecType:  hcm.AUTO,
 		StatPrefix: "http",
-		RouteSpecifier: &network.HttpConnectionManager_Rds{
-			Rds: &network.Rds{
+		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
+			Rds: &hcm.Rds{
 				ConfigSource:    rdsSource,
 				RouteConfigName: route,
 			},
 		},
-		HttpFilters: []*network.HttpFilter{{
+		HttpFilters: []*hcm.HttpFilter{{
 			Name: router,
 		}},
 	}
@@ -151,10 +151,10 @@ func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.
 
 	return &v2.Listener{
 		Name: listenerName,
-		Address: &core.Address{
+		Address: core.Address{
 			Address: &core.Address_SocketAddress{
 				SocketAddress: &core.SocketAddress{
-					Protocol: core.SocketAddress_TCP,
+					Protocol: core.TCP,
 					Address:  localhost,
 					PortSpecifier: &core.SocketAddress_PortValue{
 						PortValue: port,
@@ -162,8 +162,8 @@ func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.
 				},
 			},
 		},
-		FilterChains: []*listener.FilterChain{{
-			Filters: []*listener.Filter{{
+		FilterChains: []listener.FilterChain{{
+			Filters: []listener.Filter{{
 				Name:   httpFilter,
 				Config: pbst,
 			}},

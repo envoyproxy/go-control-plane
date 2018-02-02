@@ -70,7 +70,7 @@ func MakeBootstrap(ads bool, controlPort, adminPort uint32) *bootstrap.Bootstrap
 			},
 		},
 		StaticResources: &bootstrap.Bootstrap_StaticResources{
-			Clusters: []*v2.Cluster{{
+			Clusters: []v2.Cluster{{
 				Name:           XdsCluster,
 				ConnectTimeout: 5 * time.Second,
 				Type:           v2.Cluster_STATIC,

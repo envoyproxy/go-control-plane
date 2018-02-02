@@ -15,7 +15,7 @@ imports=(
   ${xds}
   "${root}/vendor/github.com/lyft/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
-  "${root}/vendor/github.com/prometheus/client_model"
+  "${root}/vendor/istio.io/gogo-genproto/prometheus"
   "${root}/vendor/istio.io/gogo-genproto/googleapis"
   "${root}/vendor/istio.io/gogo-genproto/opencensus/proto/trace"
 )
@@ -37,9 +37,9 @@ mappings=(
   "google/protobuf/struct.proto=github.com/gogo/protobuf/types"
   "google/protobuf/timestamp.proto=github.com/gogo/protobuf/types"
   "google/protobuf/wrappers.proto=github.com/gogo/protobuf/types"
-  "metrics.proto=github.com/prometheus/client_model/go"
   "gogoproto/gogo.proto=github.com/gogo/protobuf/gogoproto"
   "trace.proto=istio.io/gogo-genproto/opencensus/proto/trace"
+  "metrics.proto=istio.io/gogo-genproto/prometheus"
 )
 
 gogoarg="plugins=grpc"
@@ -74,6 +74,3 @@ do
       --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:.
   fi
 done
-
-echo "TODO(kuat) Removing metrics_service.pb.go due to incompatibility with gogo (see https://github.com/prometheus/client_model/issues/15)"
-\rm ${root}/envoy/service/metrics/v2/metrics_service.pb.go

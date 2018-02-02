@@ -119,14 +119,14 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 
 	// sends a response by serializing to protobuf Any
 	send := func(resp cache.Response, typeURL string) (string, error) {
-		resources := make([]*types.Any, len(resp.Resources))
+		resources := make([]types.Any, len(resp.Resources))
 		streamNonce = streamNonce + 1
 		for i := 0; i < len(resp.Resources); i++ {
 			data, err := proto.Marshal(resp.Resources[i])
 			if err != nil {
 				return "", err
 			}
-			resources[i] = &types.Any{
+			resources[i] = types.Any{
 				TypeUrl: typeURL,
 				Value:   data,
 			}
