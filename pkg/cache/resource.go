@@ -15,7 +15,7 @@
 package cache
 
 import (
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/gogo/protobuf/proto"
 )
 
@@ -64,13 +64,13 @@ func (typ ResponseType) String() string {
 // GetResourceName returns the resource name for a valid xDS response type.
 func GetResourceName(xds proto.Message) string {
 	switch v := xds.(type) {
-	case *api.ClusterLoadAssignment:
+	case *v2.ClusterLoadAssignment:
 		return v.GetClusterName()
-	case *api.Cluster:
+	case *v2.Cluster:
 		return v.GetName()
-	case *api.RouteConfiguration:
+	case *v2.RouteConfiguration:
 		return v.GetName()
-	case *api.Listener:
+	case *v2.Listener:
 		return v.GetName()
 	default:
 		return ""

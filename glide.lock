@@ -1,11 +1,16 @@
-hash: da4e4e73b4470c7d8df10f9ccaec58de1e54317a593cfe08021b9decc2a08dc5
-updated: 2018-01-22T12:59:48.22728-05:00
+hash: 60ade9bb2a5c1c8c96924e8412b30ae58585d99689d564f4480f6d0e5d473256
+updated: 2018-02-02T15:48:19.480833522-08:00
 imports:
+- name: github.com/envoyproxy/data-plane-api
+  version: 4e533f22baced334c4aba68fb60c5fc439f0fe9c
 - name: github.com/gogo/protobuf
   version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
   subpackages:
+  - gogoproto
   - jsonpb
   - proto
+  - protoc-gen-gogo/descriptor
+  - protoc-gen-gogofast
   - sortkeys
   - types
 - name: github.com/golang/glog
@@ -14,14 +19,15 @@ imports:
   version: ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e
   subpackages:
   - proto
+  - protoc-gen-go/descriptor
   - ptypes
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
 - name: github.com/lyft/protoc-gen-validate
   version: 6cd364ac742e088e22c2d04e90358ce48e1e33e5
-- name: github.com/prometheus/client_model
-  version: 6f3806018612930941127f2a7c6c453ba2c527d2
+  subpackages:
+  - validate
 - name: golang.org/x/net
   version: 5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec
   subpackages:
@@ -42,8 +48,9 @@ imports:
 - name: google.golang.org/genproto
   version: a8101f21cf983e773d0c1133ebc5424792003214
   subpackages:
-  - googleapis/api/annotations
+  - googleapis
   - googleapis/rpc/status
+  - opencensus
 - name: google.golang.org/grpc
   version: 6b51017f791ae1cfbec89c52efdf444b13b550ef
   subpackages:
@@ -69,5 +76,10 @@ imports:
   - tap
   - transport
 - name: istio.io/gogo-genproto
-  version: 67f8f8d47316e96703fa2fd09038285aecdb7535
+  version: dd2b5b6a8f1400838165245e704a011a30154a44
+  subpackages:
+  - googleapis/google/api
+  - googleapis/google/rpc
+  - opencensus/proto/trace
+  - prometheus
 testImports: []

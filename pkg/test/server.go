@@ -23,7 +23,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
@@ -42,7 +44,7 @@ type Hasher struct {
 }
 
 // Hash function that always returns same value.
-func (h Hasher) Hash(*api.Node) (cache.Key, error) {
+func (h Hasher) Hash(*core.Node) (cache.Key, error) {
 	return cache.Key(node), nil
 }
 
@@ -79,11 +81,11 @@ func RunXDS(ctx context.Context, config cache.Cache, port uint) {
 	if err != nil {
 		glog.Fatalf("failed to listen: %v", err)
 	}
-	api.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
-	api.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
-	api.RegisterClusterDiscoveryServiceServer(grpcServer, server)
-	api.RegisterRouteDiscoveryServiceServer(grpcServer, server)
-	api.RegisterListenerDiscoveryServiceServer(grpcServer, server)
+	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
+	v2.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	v2.RegisterClusterDiscoveryServiceServer(grpcServer, server)
+	v2.RegisterRouteDiscoveryServiceServer(grpcServer, server)
+	v2.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 	glog.Infof("xDS server listening on %d", port)
 	go func() {
 		if err = grpcServer.Serve(lis); err != nil {

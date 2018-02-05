@@ -1,17 +1,19 @@
 package: github.com/envoyproxy/go-control-plane
 import:
 - package: github.com/gogo/protobuf
-  version: =0.5
+  subpackages:
+  - protoc-gen-gogofast
+  version: =0.5.0
 - package: golang.org/x/net
   subpackages:
   - context
 - package: google.golang.org/genproto
   subpackages:
-  - googleapis/api/annotations
+  - googleapis
+  - opencensus
 - package: google.golang.org/grpc
-  version: ^1.7.0
+  version: ^1.7.2
 - package: github.com/golang/glog
 - package: github.com/lyft/protoc-gen-validate
-- package: github.com/prometheus/client_model
-  version: 6f3806018612930941127f2a7c6c453ba2c527d2 # Nov 02, 2017
 - package: istio.io/gogo-genproto
+- package: github.com/envoyproxy/data-plane-api

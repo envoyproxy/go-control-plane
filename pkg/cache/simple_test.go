@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/gogo/protobuf/proto"
 )
 
@@ -30,7 +30,7 @@ const (
 	key Key = "node"
 )
 
-func (group) Hash(node *api.Node) (Key, error) {
+func (group) Hash(node *core.Node) (Key, error) {
 	if node == nil {
 		return "", errors.New("nil node")
 	}
@@ -60,7 +60,7 @@ func TestSimpleCache(t *testing.T) {
 
 	// try to get endpoints with incorrect list of names
 	// should not receive response
-	es := c.Watch(EndpointResponse, &api.Node{}, "", []string{"none"})
+	es := c.Watch(EndpointResponse, &core.Node{}, "", []string{"none"})
 	select {
 	case out := <-es.Value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -75,7 +75,7 @@ func TestSimpleCache(t *testing.T) {
 
 	for _, typ := range ResponseTypes {
 		t.Run(typ.String(), func(t *testing.T) {
-			w := c.Watch(typ, &api.Node{}, "", names[typ])
+			w := c.Watch(typ, &core.Node{}, "", names[typ])
 			if w.Type != typ {
 				t.Errorf("watch type => got %q, want %q", w.Type, typ)
 			}
@@ -101,7 +101,7 @@ func TestSimpleCacheWatch(t *testing.T) {
 	c := NewSimpleCache(group{}, nil)
 	watches := make(map[ResponseType]Watch)
 	for _, typ := range ResponseTypes {
-		watches[typ] = c.Watch(typ, &api.Node{}, "", names[typ])
+		watches[typ] = c.Watch(typ, &core.Node{}, "", names[typ])
 	}
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
@@ -126,7 +126,7 @@ func TestSimpleCacheWatch(t *testing.T) {
 func TestSimpleCacheWatchCancel(t *testing.T) {
 	c := NewSimpleCache(group{}, nil)
 	for _, typ := range ResponseTypes {
-		watch := c.Watch(typ, &api.Node{}, "", names[typ])
+		watch := c.Watch(typ, &core.Node{}, "", names[typ])
 		watch.Cancel()
 	}
 	for _, typ := range ResponseTypes {
@@ -140,7 +140,7 @@ func TestSimpleCacheCallback(t *testing.T) {
 	var called Key
 	stop := make(chan struct{})
 	c := NewSimpleCache(group{}, func(key Key) { called = key; close(stop) })
-	c.Watch(ListenerResponse, &api.Node{}, "", nil)
+	c.Watch(ListenerResponse, &core.Node{}, "", nil)
 	select {
 	case <-stop:
 	case <-time.After(time.Second):

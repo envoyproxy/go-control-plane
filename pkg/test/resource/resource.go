@@ -18,8 +18,12 @@ package resource
 import (
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/api"
-	"github.com/envoyproxy/go-control-plane/api/filter/network"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/listener"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
 )
 
@@ -27,22 +31,24 @@ const (
 	localhost  = "127.0.0.1"
 	router     = "envoy.router"
 	httpFilter = "envoy.http_connection_manager"
-	xdsCluster = "xds_cluster"
+
+	// XdsCluster is the cluster name for control server (used by non-ADS set-up)
+	XdsCluster = "xds_cluster"
 )
 
 // MakeEndpoint creates a localhost endpoint.
-func MakeEndpoint(cluster string, port uint32) *api.ClusterLoadAssignment {
-	return &api.ClusterLoadAssignment{
-		ClusterName: cluster,
-		Endpoints: []*api.LocalityLbEndpoints{{
-			LbEndpoints: []*api.LbEndpoint{{
-				Endpoint: &api.Endpoint{
-					Address: &api.Address{
-						Address: &api.Address_SocketAddress{
-							SocketAddress: &api.SocketAddress{
-								Protocol: api.SocketAddress_TCP,
+func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
+	return &v2.ClusterLoadAssignment{
+		ClusterName: clusterName,
+		Endpoints: []endpoint.LocalityLbEndpoints{{
+			LbEndpoints: []endpoint.LbEndpoint{{
+				Endpoint: &endpoint.Endpoint{
+					Address: &core.Address{
+						Address: &core.Address_SocketAddress{
+							SocketAddress: &core.SocketAddress{
+								Protocol: core.TCP,
 								Address:  localhost,
-								PortSpecifier: &api.SocketAddress_PortValue{
+								PortSpecifier: &core.SocketAddress_PortValue{
 									PortValue: port,
 								},
 							},
@@ -55,53 +61,53 @@ func MakeEndpoint(cluster string, port uint32) *api.ClusterLoadAssignment {
 }
 
 // MakeCluster creates a cluster.
-func MakeCluster(ads bool, cluster string) *api.Cluster {
-	var edsSource *api.ConfigSource
+func MakeCluster(ads bool, clusterName string) *v2.Cluster {
+	var edsSource *core.ConfigSource
 	if ads {
-		edsSource = &api.ConfigSource{
-			ConfigSourceSpecifier: &api.ConfigSource_Ads{
-				Ads: &api.AggregatedConfigSource{},
+		edsSource = &core.ConfigSource{
+			ConfigSourceSpecifier: &core.ConfigSource_Ads{
+				Ads: &core.AggregatedConfigSource{},
 			},
 		}
 	} else {
-		edsSource = &api.ConfigSource{
-			ConfigSourceSpecifier: &api.ConfigSource_ApiConfigSource{
-				ApiConfigSource: &api.ApiConfigSource{
-					ApiType:      api.ApiConfigSource_GRPC,
-					ClusterNames: []string{xdsCluster},
+		edsSource = &core.ConfigSource{
+			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
+				ApiConfigSource: &core.ApiConfigSource{
+					ApiType:      core.ApiConfigSource_GRPC,
+					ClusterNames: []string{XdsCluster},
 				},
 			},
 		}
 	}
 
-	return &api.Cluster{
-		Name:           cluster,
+	return &v2.Cluster{
+		Name:           clusterName,
 		ConnectTimeout: 5 * time.Second,
-		Type:           api.Cluster_EDS,
-		EdsClusterConfig: &api.Cluster_EdsClusterConfig{
+		Type:           v2.Cluster_EDS,
+		EdsClusterConfig: &v2.Cluster_EdsClusterConfig{
 			EdsConfig:   edsSource,
-			ServiceName: cluster,
+			ServiceName: clusterName,
 		},
 	}
 }
 
 // MakeRoute creates an HTTP route.
-func MakeRoute(route, cluster string) *api.RouteConfiguration {
-	return &api.RouteConfiguration{
-		Name: route,
-		VirtualHosts: []*api.VirtualHost{{
+func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
+	return &v2.RouteConfiguration{
+		Name: routeName,
+		VirtualHosts: []route.VirtualHost{{
 			Name:    "all",
 			Domains: []string{"*"},
-			Routes: []*api.Route{{
-				Match: &api.RouteMatch{
-					PathSpecifier: &api.RouteMatch_Prefix{
+			Routes: []route.Route{{
+				Match: route.RouteMatch{
+					PathSpecifier: &route.RouteMatch_Prefix{
 						Prefix: "/",
 					},
 				},
-				Action: &api.Route_Route{
-					Route: &api.RouteAction{
-						ClusterSpecifier: &api.RouteAction_Cluster{
-							Cluster: cluster,
+				Action: &route.Route_Route{
+					Route: &route.RouteAction{
+						ClusterSpecifier: &route.RouteAction_Cluster{
+							Cluster: clusterName,
 						},
 					},
 				},
@@ -111,30 +117,30 @@ func MakeRoute(route, cluster string) *api.RouteConfiguration {
 }
 
 // MakeListener creates a listener.
-func MakeListener(ads bool, listener string, port uint32, route string) *api.Listener {
-	rdsSource := api.ConfigSource{}
+func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.Listener {
+	rdsSource := core.ConfigSource{}
 	if ads {
-		rdsSource.ConfigSourceSpecifier = &api.ConfigSource_Ads{
-			Ads: &api.AggregatedConfigSource{},
+		rdsSource.ConfigSourceSpecifier = &core.ConfigSource_Ads{
+			Ads: &core.AggregatedConfigSource{},
 		}
 	} else {
-		rdsSource.ConfigSourceSpecifier = &api.ConfigSource_ApiConfigSource{
-			ApiConfigSource: &api.ApiConfigSource{
-				ApiType:      api.ApiConfigSource_GRPC,
-				ClusterNames: []string{xdsCluster},
+		rdsSource.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &core.ApiConfigSource{
+				ApiType:      core.ApiConfigSource_GRPC,
+				ClusterNames: []string{XdsCluster},
 			},
 		}
 	}
-	manager := &network.HttpConnectionManager{
-		CodecType:  network.HttpConnectionManager_AUTO,
+	manager := &hcm.HttpConnectionManager{
+		CodecType:  hcm.AUTO,
 		StatPrefix: "http",
-		RouteSpecifier: &network.HttpConnectionManager_Rds{
-			Rds: &network.Rds{
+		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
+			Rds: &hcm.Rds{
 				ConfigSource:    rdsSource,
 				RouteConfigName: route,
 			},
 		},
-		HttpFilters: []*network.HttpFilter{{
+		HttpFilters: []*hcm.HttpFilter{{
 			Name: router,
 		}},
 	}
@@ -143,21 +149,21 @@ func MakeListener(ads bool, listener string, port uint32, route string) *api.Lis
 		panic(err)
 	}
 
-	return &api.Listener{
-		Name: listener,
-		Address: &api.Address{
-			Address: &api.Address_SocketAddress{
-				SocketAddress: &api.SocketAddress{
-					Protocol: api.SocketAddress_TCP,
+	return &v2.Listener{
+		Name: listenerName,
+		Address: core.Address{
+			Address: &core.Address_SocketAddress{
+				SocketAddress: &core.SocketAddress{
+					Protocol: core.TCP,
 					Address:  localhost,
-					PortSpecifier: &api.SocketAddress_PortValue{
+					PortSpecifier: &core.SocketAddress_PortValue{
 						PortValue: port,
 					},
 				},
 			},
 		},
-		FilterChains: []*api.FilterChain{{
-			Filters: []*api.Filter{{
+		FilterChains: []listener.FilterChain{{
+			Filters: []listener.Filter{{
 				Name:   httpFilter,
 				Config: pbst,
 			}},

@@ -20,7 +20,8 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
@@ -56,11 +57,11 @@ func GetTypeURL(typ cache.ResponseType) string {
 
 // Server is a collection of handlers for streaming discovery requests.
 type Server interface {
-	api.AggregatedDiscoveryServiceServer
-	api.EndpointDiscoveryServiceServer
-	api.ClusterDiscoveryServiceServer
-	api.RouteDiscoveryServiceServer
-	api.ListenerDiscoveryServiceServer
+	v2.EndpointDiscoveryServiceServer
+	v2.ClusterDiscoveryServiceServer
+	v2.RouteDiscoveryServiceServer
+	v2.ListenerDiscoveryServiceServer
+	discovery.AggregatedDiscoveryServiceServer
 }
 
 // NewServer creates handlers from a config watcher.
@@ -76,8 +77,8 @@ type server struct {
 }
 
 type stream interface {
-	Send(*api.DiscoveryResponse) error
-	Recv() (*api.DiscoveryRequest, error)
+	Send(*v2.DiscoveryResponse) error
+	Recv() (*v2.DiscoveryRequest, error)
 }
 
 // watches for all xDS resource types
@@ -102,7 +103,7 @@ func (values watches) cancel() {
 }
 
 // process handles a bi-di stream request
-func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defaultTypeURL string) error {
+func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
@@ -118,21 +119,21 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 
 	// sends a response by serializing to protobuf Any
 	send := func(resp cache.Response, typeURL string) (string, error) {
-		resources := make([]*types.Any, len(resp.Resources))
+		resources := make([]types.Any, len(resp.Resources))
 		streamNonce = streamNonce + 1
 		for i := 0; i < len(resp.Resources); i++ {
 			data, err := proto.Marshal(resp.Resources[i])
 			if err != nil {
 				return "", err
 			}
-			resources[i] = &types.Any{
+			resources[i] = types.Any{
 				TypeUrl: typeURL,
 				Value:   data,
 			}
 		}
 		nonce := strconv.FormatInt(streamNonce, 10)
 		glog.V(10).Infof("[%d] respond %s with nonce %q version %q", streamID, typeURL, nonce, resp.Version)
-		out := &api.DiscoveryResponse{
+		out := &v2.DiscoveryResponse{
 			VersionInfo: resp.Version,
 			Resources:   resources,
 			Canary:      resp.Canary,
@@ -231,7 +232,7 @@ func (s *server) process(stream stream, reqCh <-chan *api.DiscoveryRequest, defa
 // handler converts a blocking read call to channels and initiates stream processing
 func (s *server) handler(stream stream, typeURL string) error {
 	// a channel for receiving incoming requests
-	reqCh := make(chan *api.DiscoveryRequest)
+	reqCh := make(chan *v2.DiscoveryRequest)
 	reqStop := int32(0)
 	go func() {
 		for {
@@ -256,42 +257,38 @@ func (s *server) handler(stream stream, typeURL string) error {
 	return err
 }
 
-func (s *server) StreamAggregatedResources(stream api.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
+func (s *server) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
 	return s.handler(stream, AnyType)
 }
 
-func (s *server) StreamEndpoints(stream api.EndpointDiscoveryService_StreamEndpointsServer) error {
+func (s *server) StreamEndpoints(stream v2.EndpointDiscoveryService_StreamEndpointsServer) error {
 	return s.handler(stream, EndpointType)
 }
 
-func (s *server) StreamLoadStats(stream api.EndpointDiscoveryService_StreamLoadStatsServer) error {
-	return status.Errorf(codes.Unimplemented, "not implemented")
-}
-
-func (s *server) StreamClusters(stream api.ClusterDiscoveryService_StreamClustersServer) error {
+func (s *server) StreamClusters(stream v2.ClusterDiscoveryService_StreamClustersServer) error {
 	return s.handler(stream, ClusterType)
 }
 
-func (s *server) StreamRoutes(stream api.RouteDiscoveryService_StreamRoutesServer) error {
+func (s *server) StreamRoutes(stream v2.RouteDiscoveryService_StreamRoutesServer) error {
 	return s.handler(stream, RouteType)
 }
 
-func (s *server) StreamListeners(stream api.ListenerDiscoveryService_StreamListenersServer) error {
+func (s *server) StreamListeners(stream v2.ListenerDiscoveryService_StreamListenersServer) error {
 	return s.handler(stream, ListenerType)
 }
 
-func (s *server) FetchEndpoints(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
+func (s *server) FetchEndpoints(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (s *server) FetchClusters(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
+func (s *server) FetchClusters(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (s *server) FetchRoutes(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
+func (s *server) FetchRoutes(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }
 
-func (s *server) FetchListeners(ctx context.Context, req *api.DiscoveryRequest) (*api.DiscoveryResponse, error) {
+func (s *server) FetchListeners(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "not implemented")
 }

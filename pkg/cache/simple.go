@@ -17,7 +17,7 @@ package cache
 import (
 	"sync"
 
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/glog"
 )
@@ -150,7 +150,7 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 }
 
 // Watch returns a watch for an xDS request.
-func (cache *SimpleCache) Watch(typ ResponseType, node *api.Node, version string, names []string) Watch {
+func (cache *SimpleCache) Watch(typ ResponseType, node *core.Node, version string, names []string) Watch {
 	out := Watch{
 		Type:  typ,
 		Names: names,

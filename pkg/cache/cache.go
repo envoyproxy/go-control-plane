@@ -16,7 +16,7 @@
 package cache
 
 import (
-	"github.com/envoyproxy/go-control-plane/api"
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/gogo/protobuf/proto"
 )
 
@@ -27,7 +27,7 @@ import (
 // ConfigWatcher implementation must be thread-safe.
 type ConfigWatcher interface {
 	// Watch returns a watch for a response type.
-	Watch(ResponseType, *api.Node, string, []string) Watch
+	Watch(ResponseType, *core.Node, string, []string) Watch
 }
 
 // Cache is a generic config cache with a watcher.
@@ -90,5 +90,5 @@ type Key string
 type NodeGroup interface {
 	// Hash returns a string identifier for the proxy nodes.
 	// Must be a thread-safe function.
-	Hash(*api.Node) (Key, error)
+	Hash(*core.Node) (Key, error)
 }
