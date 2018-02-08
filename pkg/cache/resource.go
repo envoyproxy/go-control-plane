@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -15,55 +15,51 @@
 package cache
 
 import (
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/gogo/protobuf/proto"
+
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/util"
 )
 
-// ResponseType is an enumeration of cache response types.
-type ResponseType int
+// Resource is the base interface for the xDS payload.
+type Resource interface {
+	proto.Message
+	Equal(interface{}) bool
+}
 
+// Common names for Envoy filters.
 const (
-	// EndpointResponse for EDS.
-	EndpointResponse ResponseType = iota
+	Router                = "envoy.router"
+	HTTPConnectionManager = "envoy.http_connection_manager"
+	TCPProxy              = "envoy.tcp_proxy"
+)
 
-	// ClusterResponse for CDS.
-	ClusterResponse
+// Resource types in xDS v2.
+const (
+	typePrefix   = "type.googleapis.com/envoy.api.v2."
+	EndpointType = typePrefix + "ClusterLoadAssignment"
+	ClusterType  = typePrefix + "Cluster"
+	RouteType    = typePrefix + "RouteConfiguration"
+	ListenerType = typePrefix + "Listener"
 
-	// RouteResponse for RDS.
-	RouteResponse
-
-	// ListenerResponse for LDS.
-	ListenerResponse
+	// AnyType is used only by ADS
+	AnyType = ""
 )
 
 var (
 	// ResponseTypes are supported response types.
-	ResponseTypes = []ResponseType{
-		EndpointResponse,
-		ClusterResponse,
-		RouteResponse,
-		ListenerResponse,
+	ResponseTypes = []string{
+		EndpointType,
+		ClusterType,
+		RouteType,
+		ListenerType,
 	}
 )
 
-func (typ ResponseType) String() string {
-	switch typ {
-	case EndpointResponse:
-		return "endpoints"
-	case ClusterResponse:
-		return "clusters"
-	case RouteResponse:
-		return "routes"
-	case ListenerResponse:
-		return "listeners"
-	default:
-		return "unknown"
-	}
-}
-
 // GetResourceName returns the resource name for a valid xDS response type.
-func GetResourceName(xds proto.Message) string {
-	switch v := xds.(type) {
+func GetResourceName(res Resource) string {
+	switch v := res.(type) {
 	case *v2.ClusterLoadAssignment:
 		return v.GetClusterName()
 	case *v2.Cluster:
@@ -75,4 +71,46 @@ func GetResourceName(xds proto.Message) string {
 	default:
 		return ""
 	}
+}
+
+// GetResourceReferences returns the names for dependent resources (EDS cluster
+// names for CDS, RDS routes names for LDS).
+func GetResourceReferences(resources ...Resource) map[string]bool {
+	out := make(map[string]bool)
+	for _, res := range resources {
+		if res != nil {
+			switch v := res.(type) {
+			case *v2.ClusterLoadAssignment:
+				// no dependencies
+			case *v2.Cluster:
+				// for EDS type, use cluster name or ServiceName override
+				if v.Type == v2.Cluster_EDS {
+					if v.EdsClusterConfig != nil && v.EdsClusterConfig.ServiceName != "" {
+						out[v.EdsClusterConfig.ServiceName] = true
+					} else {
+						out[v.Name] = true
+					}
+				}
+			case *v2.RouteConfiguration:
+				// no dependencies
+			case *v2.Listener:
+				// extract route configuration names from HTTP connection manager
+				for _, chain := range v.FilterChains {
+					for _, filter := range chain.Filters {
+						if filter.Name == HTTPConnectionManager {
+							config := &hcm.HttpConnectionManager{}
+							if util.StructToMessage(filter.Config, config) == nil {
+								if config != nil {
+									if rds, ok := config.RouteSpecifier.(*hcm.HttpConnectionManager_Rds); ok && rds != nil && rds.Rds != nil {
+										out[rds.Rds.RouteConfigName] = true
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return out
 }

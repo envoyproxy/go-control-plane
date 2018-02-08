@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -12,83 +12,84 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-package cache
+package cache_test
 
 import (
-	"errors"
+	"context"
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/gogo/protobuf/proto"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
 
 type group struct{}
 
 const (
-	key Key = "node"
+	key = "node"
 )
 
-func (group) Hash(node *core.Node) (Key, error) {
-	if node == nil {
-		return "", errors.New("nil node")
+func (group) ID(node *core.Node) string {
+	if node != nil {
+		return node.Id
 	}
-	return key, nil
+	return key
 }
 
 var (
 	version  = "x"
-	snapshot = NewSnapshot(version,
-		[]proto.Message{endpoint},
-		[]proto.Message{cluster},
-		[]proto.Message{route},
-		[]proto.Message{listener})
-	names = map[ResponseType][]string{
-		EndpointResponse: []string{clusterName},
-		ClusterResponse:  nil,
-		RouteResponse:    []string{routeName},
-		ListenerResponse: nil,
+	version2 = "y"
+
+	snapshot = cache.NewSnapshot(version,
+		[]cache.Resource{endpoint},
+		[]cache.Resource{cluster},
+		[]cache.Resource{route},
+		[]cache.Resource{listener})
+
+	names = map[string][]string{
+		cache.EndpointType: []string{clusterName},
+		cache.ClusterType:  nil,
+		cache.RouteType:    []string{routeName},
+		cache.ListenerType: nil,
 	}
 )
 
-func TestSimpleCache(t *testing.T) {
-	c := NewSimpleCache(group{}, nil)
+type logger struct {
+	t *testing.T
+}
+
+func (log logger) Infof(format string, args ...interface{}) {
+	log.t.Logf(format, args...)
+}
+
+func TestSnapshotCache(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
 	// try to get endpoints with incorrect list of names
 	// should not receive response
-	es := c.Watch(EndpointResponse, &core.Node{}, "", []string{"none"})
+	value, _ := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: cache.EndpointType, ResourceNames: []string{"none"}})
 	select {
-	case out := <-es.Value:
+	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
 	case <-time.After(time.Second / 4):
 	}
 
-	// try to get from nil node
-	nilNode := c.Watch(ListenerResponse, nil, "", nil)
-	if nilNode.Value != nil {
-		t.Errorf("watch for nil node => got value %v, want none", nilNode.Value)
-	}
-
-	for _, typ := range ResponseTypes {
-		t.Run(typ.String(), func(t *testing.T) {
-			w := c.Watch(typ, &core.Node{}, "", names[typ])
-			if w.Type != typ {
-				t.Errorf("watch type => got %q, want %q", w.Type, typ)
-			}
-			if !reflect.DeepEqual(w.Names, names[typ]) {
-				t.Errorf("watch names => got %q, want %q", w.Names, names[typ])
-			}
+	for _, typ := range cache.ResponseTypes {
+		t.Run(typ, func(t *testing.T) {
+			value, _ := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 			select {
-			case out := <-w.Value:
+			case out := <-value:
 				if out.Version != version {
 					t.Errorf("got version %q, want %q", out.Version, version)
 				}
-				if !reflect.DeepEqual(out.Resources, snapshot.resources[typ]) {
-					t.Errorf("get resources %v, want %v", out.Resources, snapshot.resources[typ])
+				if !reflect.DeepEqual(out.Resources, snapshot.GetResources(typ)) {
+					t.Errorf("get resources %v, want %v", out.Resources, snapshot.GetResources(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -97,56 +98,111 @@ func TestSimpleCache(t *testing.T) {
 	}
 }
 
-func TestSimpleCacheWatch(t *testing.T) {
-	c := NewSimpleCache(group{}, nil)
-	watches := make(map[ResponseType]Watch)
-	for _, typ := range ResponseTypes {
-		watches[typ] = c.Watch(typ, &core.Node{}, "", names[typ])
+func TestSnapshotCacheFetch(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, typ := range cache.ResponseTypes {
+		t.Run(typ, func(t *testing.T) {
+			resp, err := c.Fetch(context.Background(), v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+			if err != nil || resp == nil {
+				t.Fatal("unexpected error or null response")
+			}
+			if resp.Version != version {
+				t.Errorf("got version %q, want %q", resp.Version, version)
+			}
+		})
+	}
+
+	// no response for missing snapshot
+	if resp, err := c.Fetch(context.Background(),
+		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
+		t.Errorf("missing snapshot: response is not nil %q", resp)
+	}
+
+	// no response for latest version
+	if resp, err := c.Fetch(context.Background(),
+		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, VersionInfo: version}); resp != nil || err == nil {
+		t.Errorf("latest version: response is not nil %q", resp)
+	}
+
+}
+
+func TestSnapshotCacheWatch(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	watches := make(map[string]chan cache.Response)
+	for _, typ := range cache.ResponseTypes {
+		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 	}
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
-	for _, typ := range ResponseTypes {
-		t.Run(typ.String(), func(t *testing.T) {
+	for _, typ := range cache.ResponseTypes {
+		t.Run(typ, func(t *testing.T) {
 			select {
-			case out := <-watches[typ].Value:
+			case out := <-watches[typ]:
 				if out.Version != version {
 					t.Errorf("got version %q, want %q", out.Version, version)
 				}
-				if !reflect.DeepEqual(out.Resources, snapshot.resources[typ]) {
-					t.Errorf("get resources %v, want %v", out.Resources, snapshot.resources[typ])
+				if !reflect.DeepEqual(out.Resources, snapshot.GetResources(typ)) {
+					t.Errorf("get resources %v, want %v", out.Resources, snapshot.GetResources(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}
 		})
 	}
+
+	// open new watches with the latest version
+	for _, typ := range cache.ResponseTypes {
+		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
+	}
+	if count := len(c.GetStatusInfo(key).ResponseWatches); count != len(cache.ResponseTypes) {
+		t.Errorf("watches should be created for the latest version: %d", count)
+	}
+
+	// set partially-versioned snapshot
+	snapshot2 := snapshot
+	snapshot2.Endpoints = cache.Resources{
+		Version: version2,
+		Items:   []cache.Resource{resource.MakeEndpoint(clusterName, 9090)},
+	}
+	if err := c.SetSnapshot(key, snapshot2); err != nil {
+		t.Fatal(err)
+	}
+	if count := len(c.GetStatusInfo(key).ResponseWatches); count != len(cache.ResponseTypes)-1 {
+		t.Errorf("watches should be preserved for all but one: %d", count)
+	}
+
+	// validate response for endpoints
+	select {
+	case out := <-watches[cache.EndpointType]:
+		if out.Version != version2 {
+			t.Errorf("got version %q, want %q", out.Version, version2)
+		}
+		if !reflect.DeepEqual(out.Resources, snapshot2.Endpoints.Items) {
+			t.Errorf("get resources %v, want %v", out.Resources, snapshot2.Endpoints.Items)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("failed to receive snapshot response")
+	}
 }
 
-func TestSimpleCacheWatchCancel(t *testing.T) {
-	c := NewSimpleCache(group{}, nil)
-	for _, typ := range ResponseTypes {
-		watch := c.Watch(typ, &core.Node{}, "", names[typ])
-		watch.Cancel()
+func TestSnapshotCacheWatchCancel(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	for _, typ := range cache.ResponseTypes {
+		_, cancel := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+		cancel()
 	}
-	for _, typ := range ResponseTypes {
-		if count := len(c.(*SimpleCache).watches[key]); count > 0 {
+	for _, typ := range cache.ResponseTypes {
+		if count := len(c.GetStatusInfo(key).ResponseWatches); count > 0 {
 			t.Errorf("watches should be released for %s", typ)
 		}
 	}
-}
 
-func TestSimpleCacheCallback(t *testing.T) {
-	var called Key
-	stop := make(chan struct{})
-	c := NewSimpleCache(group{}, func(key Key) { called = key; close(stop) })
-	c.Watch(ListenerResponse, &core.Node{}, "", nil)
-	select {
-	case <-stop:
-	case <-time.After(time.Second):
-		t.Fatal("callback not called")
-	}
-	if called != key {
-		t.Errorf("got %q, callback not called for watch with missing node group", called)
+	if empty := c.GetStatusInfo("missing"); empty != nil {
+		t.Errorf("missing node key")
 	}
 }
