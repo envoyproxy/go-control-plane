@@ -64,13 +64,15 @@ do
   fi
 done
 
-for path in $(find ${xds}/envoy -type d)
+# for path in $(find ${xds}/envoy -type d)
+for path in "${xds}/envoy/api/v2/core"
 do
   path_protos=(${path}/*.proto)
   if [[ ${#path_protos[@]} > 0 ]]
   then
     echo "Generating protos ${path} ..."
     $protoc ${protocarg} ${path}/*.proto \
-      --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:.
+      --plugin=protoc-gen-validate=${root}/bin/gen-validate --validate_out="lang=gogo:."
+      # --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:. \
   fi
 done

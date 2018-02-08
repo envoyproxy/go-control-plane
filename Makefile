@@ -10,7 +10,7 @@ BINDIR	:= bin
 # Pure Go sources (not vendored and not generated)
 GOFILES		= $(shell find . -type f -name '*.go' \
 						-not -path "./vendor/*" \
-						-not -path "./api/*")
+						-not -path "./envoy/*")
 GODIRS		= $(shell go list -f '{{.Dir}}' ./... \
 						| grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
 
@@ -58,7 +58,7 @@ lint: tools.golint
 	@echo "--> checking code style with 'golint' tool"
 	@echo $(GODIRS) | xargs -n 1 golint
 
-generate: $(BINDIR)/gogofast
+generate: $(BINDIR)/gogofast $(BINDIR)/gen-validate
 	@echo "--> generating pb.go files"
 	$(SHELL) build/generate_protos.sh
 
@@ -115,8 +115,10 @@ tools.glide:
 
 $(BINDIR)/gogofast: vendor
 	@echo "--> building $@"
-	@go build -o $@ vendor/github.com/gogo/protobuf/protoc-gen-gogofast/main.go
+	@go build -o $@ ./vendor/github.com/gogo/protobuf/protoc-gen-gogofast/
 
-$(BINDIR)/pgv: vendor
+$(BINDIR)/gen-validate: vendor
 	@echo "--> building $@"
-	@pushd vendor/github.com/lyft/protoc-gen-validate && go build -o ../../../../$@ . && popd
+	@go build -o $@ ./vendor/github.com/lyft/protoc-gen-validate/
+
+.PHONY: $(BINDIR)/gen-validate
