@@ -1,8 +1,8 @@
-hash: 60ade9bb2a5c1c8c96924e8412b30ae58585d99689d564f4480f6d0e5d473256
-updated: 2018-02-02T15:48:19.480833522-08:00
+hash: 58fe8ff6c4d3121053c9ae505613a12bd7a116c4af4871063317aa3e264d8bf1
+updated: 2018-02-12T10:11:06.7585678-08:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 4e533f22baced334c4aba68fb60c5fc439f0fe9c
+  version: 258bfddfddaad4d6a1da7b4476c98b060d57bcc1
 - name: github.com/gogo/protobuf
   version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
   subpackages:

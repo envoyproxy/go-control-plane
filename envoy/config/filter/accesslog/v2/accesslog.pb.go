@@ -148,7 +148,6 @@ func (ComparisonFilter_Op) EnumDescriptor() ([]byte, []int) {
 }
 
 // Defines fields that are shared by all Envoy access logs.
-// [#proto-status: draft]
 // [#not-implemented-hide:] Not configuration. TBD how to doc proto APIs.
 type AccessLogCommon struct {
 	// This field indicates the rate at which this log entry was sampled.
@@ -340,7 +339,6 @@ func (m *AccessLogCommon) GetMetadata() *envoy_api_v2_core1.Metadata {
 	return nil
 }
 
-// [#proto-status: draft]
 // [#not-implemented-hide:] Not configuration. TBD how to doc proto APIs.
 // Flags indicating occurences during request/response processing.
 type ResponseFlags struct {
@@ -459,7 +457,6 @@ func (m *ResponseFlags) GetRateLimited() bool {
 	return false
 }
 
-// [#proto-status: draft]
 // [#not-implemented-hide:] Not configuration. TBD how to doc proto APIs.
 // Properties of a negotiated TLS connection.
 type TLSProperties struct {
@@ -501,7 +498,6 @@ func (m *TLSProperties) GetTlsSniHostname() string {
 	return ""
 }
 
-// [#proto-status: draft]
 // [#not-implemented-hide:] Not configuration. TBD how to doc proto APIs.
 type TCPAccessLogEntry struct {
 	// Common properties shared by all Envoy access logs.
@@ -520,7 +516,6 @@ func (m *TCPAccessLogEntry) GetCommonProperties() *AccessLogCommon {
 	return nil
 }
 
-// [#proto-status: draft]
 // [#not-implemented-hide:] Not configuration. TBD how to doc proto APIs.
 type HTTPRequestProperties struct {
 	// The request method (RFC 7231/2616).
@@ -660,7 +655,6 @@ func (m *HTTPRequestProperties) GetRequestHeaders() map[string]string {
 	return nil
 }
 
-// [#proto-status: draft]
 // [#not-implemented-hide:] Not configuration. TBD how to doc proto APIs.
 type HTTPResponseProperties struct {
 	// The HTTP response code returned by Envoy.
@@ -712,7 +706,6 @@ func (m *HTTPResponseProperties) GetResponseHeaders() map[string]string {
 	return nil
 }
 
-// [#proto-status: draft]
 // [#not-implemented-hide:] Not configuration. TBD how to doc proto APIs.
 type HTTPAccessLogEntry struct {
 	// Common properties shared by all Envoy access logs.

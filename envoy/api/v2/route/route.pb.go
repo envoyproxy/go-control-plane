@@ -1655,7 +1655,7 @@ type RedirectAction struct {
 	// The HTTP status code to use in the redirect response. The default response
 	// code is MOVED_PERMANENTLY (301).
 	ResponseCode RedirectAction_RedirectResponseCode `protobuf:"varint,3,opt,name=response_code,json=responseCode,proto3,enum=envoy.api.v2.route.RedirectAction_RedirectResponseCode" json:"response_code,omitempty"`
-	// [#not-implemented-hide:] The scheme portion of the URL will be swapped with "https".
+	// The scheme portion of the URL will be swapped with "https".
 	HttpsRedirect bool `protobuf:"varint,4,opt,name=https_redirect,json=httpsRedirect,proto3" json:"https_redirect,omitempty"`
 }
 

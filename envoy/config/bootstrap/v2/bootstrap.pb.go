@@ -244,7 +244,7 @@ type Bootstrap_DynamicResources struct {
 	// the :ref:`ads <envoy_api_field_core.ConfigSource.ads>` field set will be
 	// streamed on the ADS channel.
 	AdsConfig *envoy_api_v2_core3.ApiConfigSource `protobuf:"bytes,3,opt,name=ads_config,json=adsConfig" json:"ads_config,omitempty"`
-	// [#not-implemented-hide:]
+	// [#not-implemented-hide:] Hide from docs.
 	DeprecatedV1 *Bootstrap_DynamicResources_DeprecatedV1 `protobuf:"bytes,4,opt,name=deprecated_v1,json=deprecatedV1" json:"deprecated_v1,omitempty"`
 }
 
@@ -283,6 +283,7 @@ func (m *Bootstrap_DynamicResources) GetDeprecatedV1() *Bootstrap_DynamicResourc
 	return nil
 }
 
+// [#not-implemented-hide:] Hide from docs.
 type Bootstrap_DynamicResources_DeprecatedV1 struct {
 	// This is the global :ref:`SDS <arch_overview_dynamic_config_sds>` config
 	// when using v1 REST for :ref:`CDS
