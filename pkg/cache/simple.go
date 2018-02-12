@@ -24,12 +24,12 @@ import (
 
 // SimpleCache is a snapshot-based cache that maintains a single versioned
 // snapshot of responses per node group, with no canary updates.  SimpleCache
-// does not track status of remote nodes and consistently replies with the
-// latest snapshot. For the protocol to work correctly, EDS/RDS requests are
-// responded only when all resources in the snapshot xDS response are named as
-// part of the request. It is expected that the CDS response names all EDS
-// clusters, and the LDS response names all RDS routes in a snapshot, to ensure
-// that Envoy makes the request for all EDS clusters or RDS routes eventually.
+// consistently replies with the latest snapshot. For the protocol to work
+// correctly, EDS/RDS requests are responded only when all resources in the
+// snapshot xDS response are named as part of the request. It is expected that
+// the CDS response names all EDS clusters, and the LDS response names all RDS
+// routes in a snapshot, to ensure that Envoy makes the request for all EDS
+// clusters or RDS routes eventually.
 //
 // SimpleCache can also be used as a config cache for distinct xDS requests.
 // The snapshots are required to contain only the responses for the particular
@@ -38,6 +38,9 @@ import (
 type SimpleCache struct {
 	// snapshots are cached resources
 	snapshots map[Key]Snapshot
+
+	// status tracking
+	status *StatusInfo
 
 	// watches keeps track of open watches
 	watches map[Key]map[int64]Watch
@@ -81,9 +84,10 @@ func NewSnapshot(version string,
 // NewSimpleCache initializes a simple cache.
 // callback function is called on every new cache key and response type if there is no response available.
 // callback is executed in a go-routine and can be called multiple times prior to receiving a snapshot.
-func NewSimpleCache(groups NodeGroup, callback func(Key)) Cache {
+func NewSimpleCache(groups NodeGroup, status *StatusInfo, callback func(Key)) Cache {
 	return &SimpleCache{
 		snapshots:  make(map[Key]Snapshot),
+		status:     status,
 		watches:    make(map[Key]map[int64]Watch),
 		callback:   callback,
 		watchCount: 0,
@@ -104,7 +108,7 @@ func (cache *SimpleCache) SetSnapshot(group Key, snapshot Snapshot) error {
 	// trigger existing watches
 	if watches, ok := cache.watches[group]; ok {
 		for _, watch := range watches {
-			respond(watch, snapshot, group)
+			cache.respond(watch, snapshot, group)
 		}
 		// discard all watches; the client must request a new watch to receive updates and ACK/NACK
 		delete(cache.watches, group)
@@ -114,8 +118,7 @@ func (cache *SimpleCache) SetSnapshot(group Key, snapshot Snapshot) error {
 }
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
-// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
-func respond(watch Watch, snapshot Snapshot, group Key) {
+func (cache *SimpleCache) respond(watch Watch, snapshot Snapshot, group Key) {
 	typ := watch.Type
 	resources := snapshot.resources[typ]
 	version := snapshot.version
@@ -143,6 +146,13 @@ func respond(watch Watch, snapshot Snapshot, group Key) {
 		}
 	}
 
+	// do not respond unless permitted; preventing a response may require a new watch for the node
+	// this check must be immediately prior to sending the response
+	if !cache.status.AllowResponse(typ, watch.Node, version) {
+		glog.V(10).Infof("not responding for %s from %q at %q: status disallowed", typ.String(), group, version)
+		return
+	}
+
 	watch.Value <- Response{
 		Version:   version,
 		Resources: resources,
@@ -162,11 +172,21 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *core.Node, version strin
 		return out
 	}
 
+	// report acknowledgement to the status tracker
+	// note that stale watch request may arrive after a newer version over a different stream
+	cache.status.Ack(typ, node, version)
+
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
 	// allocate capacity 1 to allow one-time non-blocking use
-	out.Value = make(chan Response, 1)
+	value := make(chan Response, 1)
+	out := Watch{
+		Value: value,
+		Node:  node,
+		Type:  typ,
+		Names: names,
+	}
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	snapshot, exists := cache.snapshots[group]
@@ -196,6 +216,6 @@ func (cache *SimpleCache) Watch(typ ResponseType, node *core.Node, version strin
 	}
 
 	// otherwise, the watch may be responded immediately
-	respond(out, snapshot, group)
+	cache.respond(out, snapshot, group)
 	return out
 }

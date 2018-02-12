@@ -104,7 +104,7 @@ func RunCacheUpdate(ctx context.Context,
 	upstreamPort, listenPort uint) {
 	i := 0
 	for {
-		version := fmt.Sprintf("version%d", i)
+		version := fmt.Sprintf("%d", i)
 		clusterName := fmt.Sprintf("cluster%d", i)
 		routeName := fmt.Sprintf("route%d", i)
 		// listener name must be same since ports are shared and previous listener is drained

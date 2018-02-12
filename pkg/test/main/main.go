@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
@@ -45,7 +46,7 @@ func init() {
 	flag.UintVar(&upstreamPort, "upstream", 18080, "Upstream HTTP/1.1 port")
 	flag.UintVar(&listenPort, "listen", 9000, "Listener port")
 	flag.UintVar(&xdsPort, "xds", 18000, "xDS server port")
-	flag.DurationVar(&interval, "interval", 10*time.Second, "Interval between cache refresh")
+	flag.DurationVar(&interval, "interval", 5*time.Second, "Interval between cache refresh")
 	flag.BoolVar(&ads, "ads", true, "Use ADS instead of separate xDS services")
 	flag.StringVar(&bootstrapFile, "bootstrap", "bootstrap.json", "Bootstrap file name")
 	flag.StringVar(&envoyBinary, "envoy", "envoy", "Envoy binary file")
@@ -58,8 +59,20 @@ func main() {
 	// start upstream
 	go test.RunHTTP(ctx, upstreamPort)
 
+	// create a status tracker
+	status := cache.NewStatusInfo(cache.DefaultID, func(a, b string) int {
+		ai, _ := strconv.Atoi(a)
+		bi, _ := strconv.Atoi(b)
+		if ai == bi {
+			return 0
+		} else if ai < bi {
+			return -1
+		}
+		return 1
+	})
+
 	// create a cache
-	config := cache.NewSimpleCache(test.Hasher{}, nil)
+	config := cache.NewSimpleCache(test.Hasher{}, status, nil)
 
 	// update the cache at a regular interval
 	go test.RunCacheUpdate(ctx, config, ads, interval, upstreamPort, listenPort)
@@ -89,6 +102,7 @@ func main() {
 		} else {
 			glog.Info("OK")
 		}
+		glog.Info(status.Dump())
 
 		time.Sleep(1 * time.Second)
 	}

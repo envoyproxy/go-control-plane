@@ -24,6 +24,8 @@ import (
 // applied version identifier, and resource names hint. The watch should send
 // the responses when they are ready. The watch can be cancelled by the
 // consumer, in effect terminating the watch for the request.
+// Request for a watch includes the latest accepted version of the config,
+// providing a feedback mechanism for the proxy to indicate its status.
 // ConfigWatcher implementation must be thread-safe.
 type ConfigWatcher interface {
 	// Watch returns a watch for a response type.
@@ -49,6 +51,9 @@ type Watch struct {
 	// unrecoverable error has occurred in the producer, and the consumer should
 	// close the corresponding stream.
 	Value chan Response
+
+	// Node making the watch request
+	Node *api.Node
 
 	// Type is the response type.
 	Type ResponseType
@@ -83,7 +88,7 @@ type Response struct {
 	Canary bool
 }
 
-// Key is the node group identifier
+// Key is the node group identifier.
 type Key string
 
 // NodeGroup aggregates configuration resources by a hash of the node.
