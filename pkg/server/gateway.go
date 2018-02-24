@@ -24,11 +24,15 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
 
 // HTTPGateway is a custom implementation of [gRPC gateway](https://github.com/grpc-ecosystem/grpc-gateway)
 // specialized to Envoy xDS API.
 type HTTPGateway struct {
+	// Log is an optional log for errors in response write
+	Log log.Logger
+
 	// Server is the underlying gRPC server
 	Server Server
 }
@@ -85,6 +89,8 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		http.Error(resp, "marshal error: "+err.Error(), http.StatusInternalServerError)
 	}
 
-	// TODO: error handling
-	_, _ = resp.Write(buf.Bytes())
+	_, err = resp.Write(buf.Bytes())
+	if h.Log != nil {
+		h.Log.Infof("gateway error: %v", err)
+	}
 }

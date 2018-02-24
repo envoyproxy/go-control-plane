@@ -26,6 +26,14 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 )
 
+type logger struct {
+	t *testing.T
+}
+
+func (log logger) Infof(format string, args ...interface{}) {
+	log.t.Logf(format, args...)
+}
+
 func TestGateway(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.responses = map[string][]cache.Response{
@@ -42,7 +50,7 @@ func TestGateway(t *testing.T) {
 			Resources: []cache.Resource{listener},
 		}},
 	}
-	gtw := server.HTTPGateway{Server: server.NewServer(config, nil)}
+	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(config, nil)}
 
 	failCases := []struct {
 		path   string
