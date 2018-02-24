@@ -206,3 +206,14 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 		t.Errorf("missing node key")
 	}
 }
+
+func TestSnapshotClear(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		t.Fatal(err)
+	}
+	c.ClearSnapshot(key)
+	if empty := c.GetStatusInfo(key); empty != nil {
+		t.Errorf("cache should be cleared")
+	}
+}
