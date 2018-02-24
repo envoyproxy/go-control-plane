@@ -16,6 +16,7 @@ package cache_test
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -127,7 +128,6 @@ func TestSnapshotCacheFetch(t *testing.T) {
 		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, VersionInfo: version}); resp != nil || err == nil {
 		t.Errorf("latest version: response is not nil %q", resp)
 	}
-
 }
 
 func TestSnapshotCacheWatch(t *testing.T) {
@@ -187,6 +187,27 @@ func TestSnapshotCacheWatch(t *testing.T) {
 		}
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
+	}
+}
+
+func TestConcurrentSetWatch(t *testing.T) {
+	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	for i := 0; i < 50; i++ {
+		func(i int) {
+			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
+				t.Parallel()
+				if i < 25 {
+					c.SetSnapshot(key, cache.Snapshot{
+						Endpoints: cache.Resources{
+							Version: fmt.Sprintf("v%d", i),
+							Items:   []cache.Resource{resource.MakeEndpoint(clusterName, uint32(i))},
+						},
+					})
+				} else {
+					_, _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: cache.EndpointType})
+				}
+			})
+		}(i)
 	}
 }
 

@@ -64,7 +64,7 @@ lint: tools.golint
 
 $(BINDIR)/test: vendor
 	@echo "--> building test binary"
-	@go build -o $@ pkg/test/main/main.go
+	@go build -race -o $@ pkg/test/main/main.go
 
 docker: $(BINDIR)/test
 	@echo "--> building test docker image"

@@ -26,13 +26,15 @@ import (
 
 // SnapshotCache is a snapshot-based cache that maintains a single versioned
 // snapshot of responses per node. SnapshotCache consistently replies with the
-// latest snapshot. For the protocol to work correctly, EDS/RDS requests are
-// responded only when all resources in the snapshot xDS response are named as
-// part of the request. It is expected that the CDS response names all EDS
-// clusters, and the LDS response names all RDS routes in a snapshot, to ensure
-// that Envoy makes the request for all EDS clusters or RDS routes eventually.
+// latest snapshot. For the protocol to work correctly in ADS mode, EDS/RDS
+// requests are responded only when all resources in the snapshot xDS response
+// are named as part of the request. It is expected that the CDS response names
+// all EDS clusters, and the LDS response names all RDS routes in a snapshot,
+// to ensure that Envoy makes the request for all EDS clusters or RDS routes
+// eventually.
 //
-// SnapshotCache can operate as an ADS or REST backend.
+// SnapshotCache can operate as a REST or regular xDS backend. The snapshot
+// can be partial, e.g. only include RDS or EDS resources.
 type SnapshotCache struct {
 	log log.Logger
 
@@ -233,6 +235,7 @@ func createResponse(request Request, resources []Resource, version string) Respo
 }
 
 // Fetch implements the cache fetch function.
+// Fetch is called on multiple streams, so responding to individual names with the same version works.
 func (cache *SnapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
 	nodeID := cache.hash.ID(request.Node)
 

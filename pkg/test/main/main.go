@@ -65,9 +65,9 @@ func init() {
 	flag.IntVar(&requests, "r", 5, "Number of requests between snapshot updates")
 	flag.IntVar(&updates, "u", 3, "Number of snapshot updates")
 	flag.StringVar(&mode, "xds", resource.Ads, "Management server type (ads, xds, rest)")
-	flag.IntVar(&clusters, "clusters", 2, "Number of clusters")
-	flag.IntVar(&httpListeners, "http", 1, "Number of HTTP listeners (and RDS configs)")
-	flag.IntVar(&tcpListeners, "tcp", 1, "Number of TCP pass-through listeners")
+	flag.IntVar(&clusters, "clusters", 4, "Number of clusters")
+	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
+	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
 	flag.StringVar(&nodeID, "nodeID", "test-id", "Node ID")
 }
 
@@ -146,7 +146,7 @@ func main() {
 		als.Dump(func(s string) { log.Debug(s) })
 	}
 
-	log.Info("Test passed!")
+	log.Infof("Test for %s passed!", mode)
 }
 
 // callEcho calls upstream echo service on all listener ports and returns an error
