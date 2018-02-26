@@ -46,7 +46,7 @@ type SnapshotCache struct {
 	snapshots map[string]Snapshot
 
 	// status information for all nodes indexed by node IDs
-	status map[string]StatusInfo
+	status map[string]*StatusInfo
 
 	// hash is the hashing function for Envoy nodes
 	hash NodeHash
@@ -73,7 +73,7 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *SnapshotCache
 		log:       logger,
 		ads:       ads,
 		snapshots: make(map[string]Snapshot),
-		status:    make(map[string]StatusInfo),
+		status:    make(map[string]*StatusInfo),
 		hash:      hash,
 	}
 }
@@ -275,10 +275,7 @@ func (cache *SnapshotCache) GetStatusInfo(node string) *StatusInfo {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 
-	if info, ok := cache.status[node]; ok {
-		return &info
-	}
-	return nil
+	return cache.status[node]
 }
 
 // GetStatusKeys retrieves all node IDs in the status map.

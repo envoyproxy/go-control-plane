@@ -62,9 +62,8 @@ type logger struct {
 	t *testing.T
 }
 
-func (log logger) Infof(format string, args ...interface{}) {
-	log.t.Logf(format, args...)
-}
+func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
+func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
 func TestSnapshotCache(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
@@ -229,6 +228,11 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 		_, cancel := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 		cancel()
 	}
+	// should be status info for the node
+	if keys := c.GetStatusKeys(); len(keys) == 0 {
+		t.Error("got 0, want status info for the node")
+	}
+
 	for _, typ := range cache.ResponseTypes {
 		if count := c.GetStatusInfo(key).GetNumWatches(); count > 0 {
 			t.Errorf("watches should be released for %s", typ)
@@ -248,5 +252,8 @@ func TestSnapshotClear(t *testing.T) {
 	c.ClearSnapshot(key)
 	if empty := c.GetStatusInfo(key); empty != nil {
 		t.Errorf("cache should be cleared")
+	}
+	if keys := c.GetStatusKeys(); len(keys) != 0 {
+		t.Errorf("keys should be empty")
 	}
 }

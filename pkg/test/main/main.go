@@ -199,6 +199,9 @@ type logger struct{}
 func (logger logger) Infof(format string, args ...interface{}) {
 	log.Debugf(format, args...)
 }
+func (logger logger) Errorf(format string, args ...interface{}) {
+	log.Errorf(format, args...)
+}
 
 type callbacks struct {
 	signal chan struct{}

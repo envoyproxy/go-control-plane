@@ -91,6 +91,6 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 	_, err = resp.Write(buf.Bytes())
 	if h.Log != nil {
-		h.Log.Infof("gateway error: %v", err)
+		h.Log.Errorf("gateway error: %v", err)
 	}
 }

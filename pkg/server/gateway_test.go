@@ -30,9 +30,8 @@ type logger struct {
 	t *testing.T
 }
 
-func (log logger) Infof(format string, args ...interface{}) {
-	log.t.Logf(format, args...)
-}
+func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
+func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
 func TestGateway(t *testing.T) {
 	config := makeMockConfigWatcher()

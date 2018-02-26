@@ -54,15 +54,15 @@ type ResponseWatch struct {
 }
 
 // NewStatusInfo initializes a status info data structure.
-func NewStatusInfo(node *core.Node) StatusInfo {
+func NewStatusInfo(node *core.Node) *StatusInfo {
 	out := StatusInfo{
 		node:    node,
 		watches: make(map[int64]ResponseWatch),
 	}
-	return out
+	return &out
 }
 
-// GetInfo returns the node metadata.
+// GetNode returns the node metadata.
 func (info *StatusInfo) GetNode() *core.Node {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
@@ -76,6 +76,7 @@ func (info *StatusInfo) GetNumWatches() int {
 	return len(info.watches)
 }
 
+// GetLastWatchRequestTime returns the timestamp of the last discovery watch request.
 func (info *StatusInfo) GetLastWatchRequestTime() time.Time {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
