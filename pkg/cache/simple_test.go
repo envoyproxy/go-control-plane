@@ -68,6 +68,10 @@ func (log logger) Infof(format string, args ...interface{}) {
 
 func TestSnapshotCache(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+
+	// check type safety
+	var _ cache.Cache = c
+
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
@@ -159,7 +163,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	for _, typ := range cache.ResponseTypes {
 		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
 	}
-	if count := len(c.GetStatusInfo(key).ResponseWatches); count != len(cache.ResponseTypes) {
+	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(cache.ResponseTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
 	}
 
@@ -172,7 +176,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	if err := c.SetSnapshot(key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
-	if count := len(c.GetStatusInfo(key).ResponseWatches); count != len(cache.ResponseTypes)-1 {
+	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(cache.ResponseTypes)-1 {
 		t.Errorf("watches should be preserved for all but one: %d", count)
 	}
 
@@ -196,15 +200,23 @@ func TestConcurrentSetWatch(t *testing.T) {
 		func(i int) {
 			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
 				t.Parallel()
+				id := fmt.Sprintf("%d", i%2)
+				var cancel func()
 				if i < 25 {
-					c.SetSnapshot(key, cache.Snapshot{
+					c.SetSnapshot(id, cache.Snapshot{
 						Endpoints: cache.Resources{
 							Version: fmt.Sprintf("v%d", i),
 							Items:   []cache.Resource{resource.MakeEndpoint(clusterName, uint32(i))},
 						},
 					})
 				} else {
-					_, _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: cache.EndpointType})
+					if cancel != nil {
+						cancel()
+					}
+					_, cancel = c.CreateWatch(v2.DiscoveryRequest{
+						Node:    &core.Node{Id: id},
+						TypeUrl: cache.EndpointType,
+					})
 				}
 			})
 		}(i)
@@ -218,7 +230,7 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 		cancel()
 	}
 	for _, typ := range cache.ResponseTypes {
-		if count := len(c.GetStatusInfo(key).ResponseWatches); count > 0 {
+		if count := c.GetStatusInfo(key).GetNumWatches(); count > 0 {
 			t.Errorf("watches should be released for %s", typ)
 		}
 	}

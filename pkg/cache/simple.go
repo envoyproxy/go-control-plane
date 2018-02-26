@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
@@ -92,7 +93,8 @@ func (cache *SnapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 	// trigger existing watches for which version changed
 	if info, ok := cache.status[node]; ok {
-		for id, watch := range info.ResponseWatches {
+		info.mu.Lock()
+		for id, watch := range info.watches {
 			version := snapshot.GetVersion(watch.Request.TypeUrl)
 			if version != watch.Request.VersionInfo {
 				if cache.log != nil {
@@ -101,9 +103,10 @@ func (cache *SnapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 				cache.respond(watch.Request, watch.Response, snapshot.GetResources(watch.Request.TypeUrl), version)
 
 				// discard the watch
-				delete(info.ResponseWatches, id)
+				delete(info.watches, id)
 			}
 		}
+		info.mu.Unlock()
 	}
 
 	return nil
@@ -145,6 +148,17 @@ func (cache *SnapshotCache) CreateWatch(request Request) (chan Response, func())
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
+	info, ok := cache.status[nodeID]
+	if !ok {
+		info = NewStatusInfo(request.Node)
+		cache.status[nodeID] = info
+	}
+
+	// update last watch request time
+	info.mu.Lock()
+	info.lastWatchRequestTime = time.Now()
+	info.mu.Unlock()
+
 	// allocate capacity 1 to allow one-time non-blocking use
 	value := make(chan Response, 1)
 
@@ -153,18 +167,14 @@ func (cache *SnapshotCache) CreateWatch(request Request) (chan Response, func())
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	if !exists || request.VersionInfo == version {
-		info, ok := cache.status[nodeID]
-		if !ok {
-			info = NewStatusInfo(request.Node)
-			cache.status[nodeID] = info
-		}
-
 		watchID := cache.freshWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open watch %d for %s%v from nodeID %q, version %q", watchID,
 				request.TypeUrl, request.ResourceNames, nodeID, request.VersionInfo)
 		}
-		info.ResponseWatches[watchID] = ResponseWatch{Request: request, Response: value}
+		info.mu.Lock()
+		info.watches[watchID] = ResponseWatch{Request: request, Response: value}
+		info.mu.Unlock()
 		return value, cache.cancelWatch(nodeID, watchID)
 	}
 
@@ -184,8 +194,10 @@ func (cache *SnapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 		// uses the cache mutex
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
-		if _, ok := cache.status[nodeID]; ok {
-			delete(cache.status[nodeID].ResponseWatches, watchID)
+		if info, ok := cache.status[nodeID]; ok {
+			info.mu.Lock()
+			delete(info.watches, watchID)
+			info.mu.Unlock()
 		}
 	}
 }
@@ -267,4 +279,17 @@ func (cache *SnapshotCache) GetStatusInfo(node string) *StatusInfo {
 		return &info
 	}
 	return nil
+}
+
+// GetStatusKeys retrieves all node IDs in the status map.
+func (cache *SnapshotCache) GetStatusKeys() []string {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+
+	out := make([]string, len(cache.status))
+	for id := range cache.status {
+		out = append(out, id)
+	}
+
+	return out
 }

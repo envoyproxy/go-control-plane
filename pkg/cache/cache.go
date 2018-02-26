@@ -48,6 +48,12 @@ type Cache interface {
 
 	// Fetch implements the polling method of the config cache using a non-empty request.
 	Fetch(context.Context, Request) (*Response, error)
+
+	// GetStatusInfo retrieves status information for a node ID.
+	GetStatusInfo(string) *StatusInfo
+
+	// GetStatusKeys retrieves node IDs for all statuses.
+	GetStatusKeys() []string
 }
 
 // Response is a pre-serialized xDS response.

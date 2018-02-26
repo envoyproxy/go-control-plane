@@ -58,6 +58,9 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req v2.DiscoveryRequ
 	return nil, errors.New("missing")
 }
 
+func (config *mockConfigWatcher) GetStatusInfo(string) *cache.StatusInfo { return nil }
+func (config *mockConfigWatcher) GetStatusKeys() []string                { return nil }
+
 func makeMockConfigWatcher() *mockConfigWatcher {
 	return &mockConfigWatcher{
 		counts: make(map[string]int),

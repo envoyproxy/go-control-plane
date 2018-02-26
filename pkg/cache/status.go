@@ -15,6 +15,9 @@
 package cache
 
 import (
+	"sync"
+	"time"
+
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 )
 
@@ -27,11 +30,18 @@ type NodeHash interface {
 // StatusInfo tracks the server state for the remote Envoy node.
 // Not all fields are used by all cache implementations.
 type StatusInfo struct {
-	// Node is the constant Envoy node metadata.
-	Node *core.Node
+	// node is the constant Envoy node metadata.
+	node *core.Node
 
-	// ResponseWatches are indexed channels for the response watches and the original requests.
-	ResponseWatches map[int64]ResponseWatch
+	// watches are indexed channels for the response watches and the original requests.
+	watches map[int64]ResponseWatch
+
+	// the timestamp of the last watch request
+	lastWatchRequestTime time.Time
+
+	// mutex to protect the status fields.
+	// should not acquire mutex of the parent cache after acquiring this mutex.
+	mu sync.RWMutex
 }
 
 // ResponseWatch is a watch record keeping both the request and an open channel for the response.
@@ -46,8 +56,28 @@ type ResponseWatch struct {
 // NewStatusInfo initializes a status info data structure.
 func NewStatusInfo(node *core.Node) StatusInfo {
 	out := StatusInfo{
-		Node:            node,
-		ResponseWatches: make(map[int64]ResponseWatch),
+		node:    node,
+		watches: make(map[int64]ResponseWatch),
 	}
 	return out
+}
+
+// GetInfo returns the node metadata.
+func (info *StatusInfo) GetNode() *core.Node {
+	info.mu.RLock()
+	defer info.mu.RUnlock()
+	return info.node
+}
+
+// GetNumWatches returns the number of open watches.
+func (info *StatusInfo) GetNumWatches() int {
+	info.mu.RLock()
+	defer info.mu.RUnlock()
+	return len(info.watches)
+}
+
+func (info *StatusInfo) GetLastWatchRequestTime() time.Time {
+	info.mu.RLock()
+	defer info.mu.RUnlock()
+	return info.lastWatchRequestTime
 }
