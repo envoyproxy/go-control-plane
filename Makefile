@@ -60,7 +60,7 @@ lint: tools.golint
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test docker integration integration.ads integration.xds integration.rest integration.docker
+.PHONY: $(BINDIR)/test $(BINDIR)/test-linux docker integration integration.ads integration.xds integration.rest integration.docker
 
 $(BINDIR)/test: vendor
 	@echo "--> building test binary"
