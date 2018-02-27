@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -12,16 +12,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-package cache
+// Package log provides a logging interface for use in this library.
+package log
 
-import "testing"
+// Logger interface for reporting informational and warning messages.
+type Logger interface {
+	// Infof logs a formatted informational message.
+	Infof(format string, args ...interface{})
 
-func TestWatchCancel(t *testing.T) {
-	called := 0
-	w := Watch{stop: func() { called++ }}
-	w.Cancel()
-	w.Cancel()
-	if called != 1 {
-		t.Errorf("got count %d; stop function should be called once by Cancel()", called)
-	}
+	// Errorf logs a formatted error message.
+	Errorf(format string, args ...interface{})
 }

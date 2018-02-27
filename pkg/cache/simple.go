@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -15,187 +15,278 @@
 package cache
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"sync"
+	"sync/atomic"
+	"time"
 
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/gogo/protobuf/proto"
-	"github.com/golang/glog"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
 
-// SimpleCache is a snapshot-based cache that maintains a single versioned
-// snapshot of responses per node group, with no canary updates.  SimpleCache
-// does not track status of remote nodes and consistently replies with the
-// latest snapshot. For the protocol to work correctly, EDS/RDS requests are
-// responded only when all resources in the snapshot xDS response are named as
-// part of the request. It is expected that the CDS response names all EDS
-// clusters, and the LDS response names all RDS routes in a snapshot, to ensure
-// that Envoy makes the request for all EDS clusters or RDS routes eventually.
+// SnapshotCache is a snapshot-based cache that maintains a single versioned
+// snapshot of responses per node. SnapshotCache consistently replies with the
+// latest snapshot. For the protocol to work correctly in ADS mode, EDS/RDS
+// requests are responded only when all resources in the snapshot xDS response
+// are named as part of the request. It is expected that the CDS response names
+// all EDS clusters, and the LDS response names all RDS routes in a snapshot,
+// to ensure that Envoy makes the request for all EDS clusters or RDS routes
+// eventually.
 //
-// SimpleCache can also be used as a config cache for distinct xDS requests.
-// The snapshots are required to contain only the responses for the particular
-// type of the xDS service that the cache serves. Synchronization of multiple
-// caches for different response types is left to the configuration producer.
-type SimpleCache struct {
-	// snapshots are cached resources
-	snapshots map[Key]Snapshot
+// SnapshotCache can operate as a REST or regular xDS backend. The snapshot
+// can be partial, e.g. only include RDS or EDS resources.
+type SnapshotCache struct {
+	log log.Logger
 
-	// watches keeps track of open watches
-	watches map[Key]map[int64]Watch
+	// ads flag to hold responses until all resources are named
+	ads bool
 
-	// callback requests missing responses
-	callback func(Key)
+	// snapshots are cached resources indexed by node IDs
+	snapshots map[string]Snapshot
 
-	// watchCount is the ID generator for watches
+	// status information for all nodes indexed by node IDs
+	status map[string]*StatusInfo
+
+	// hash is the hashing function for Envoy nodes
+	hash NodeHash
+
+	// watchCount is an atomic counter incremented for each watch
 	watchCount int64
 
-	// groups is the hashing function for proxy nodes
-	groups NodeGroup
-
-	mu sync.Mutex
+	mu sync.RWMutex
 }
 
-// Snapshot is an internally consistent snapshot of xDS resources.
-// Snapshots should have distinct versions per node group.
-type Snapshot struct {
-	version   string
-	resources map[ResponseType][]proto.Message
-}
-
-// NewSnapshot creates a snapshot from response types and a version.
-func NewSnapshot(version string,
-	endpoints []proto.Message,
-	clusters []proto.Message,
-	routes []proto.Message,
-	listeners []proto.Message) Snapshot {
-	return Snapshot{
-		version: version,
-		resources: map[ResponseType][]proto.Message{
-			EndpointResponse: endpoints,
-			ClusterResponse:  clusters,
-			RouteResponse:    routes,
-			ListenerResponse: listeners,
-		},
+// NewSnapshotCache initializes a simple cache.
+//
+// ADS flag forces a delay in responding to streaming requests until all
+// resources are explicitly named in the request. This avoids the problem of a
+// partial request over a single stream for a subset of resources which would
+// require generating a fresh version for acknowledgement. ADS flag requires
+// snapshot consistency. For non-ADS case (and fetch), mutliple partial
+// requests are sent across multiple streams and re-using the snapshot version
+// is OK.
+//
+// Logger is optional.
+func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *SnapshotCache {
+	return &SnapshotCache{
+		log:       logger,
+		ads:       ads,
+		snapshots: make(map[string]Snapshot),
+		status:    make(map[string]*StatusInfo),
+		hash:      hash,
 	}
 }
 
-// NewSimpleCache initializes a simple cache.
-// callback function is called on every new cache key and response type if there is no response available.
-// callback is executed in a go-routine and can be called multiple times prior to receiving a snapshot.
-func NewSimpleCache(groups NodeGroup, callback func(Key)) Cache {
-	return &SimpleCache{
-		snapshots:  make(map[Key]Snapshot),
-		watches:    make(map[Key]map[int64]Watch),
-		callback:   callback,
-		watchCount: 0,
-		groups:     groups,
-	}
-}
-
-// SetSnapshot updates the simple cache with a snapshot for a node group.
-func (cache *SimpleCache) SetSnapshot(group Key, snapshot Snapshot) error {
-	// TODO(kuat) validate snapshot for types and internal consistency
-
+// SetSnapshot sets a response snapshot for a node. For ADS, the snapshots
+// should have distinct versions and be internally consistent (e.g. all
+// referenced resources must be included in the snapshot).
+//
+// This method will cause the server to respond to all open watches, for which
+// the version differs from the snapshot version.
+func (cache *SnapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
 	// update the existing entry
-	cache.snapshots[group] = snapshot
+	cache.snapshots[node] = snapshot
 
-	// trigger existing watches
-	if watches, ok := cache.watches[group]; ok {
-		for _, watch := range watches {
-			respond(watch, snapshot, group)
+	// trigger existing watches for which version changed
+	if info, ok := cache.status[node]; ok {
+		info.mu.Lock()
+		for id, watch := range info.watches {
+			version := snapshot.GetVersion(watch.Request.TypeUrl)
+			if version != watch.Request.VersionInfo {
+				if cache.log != nil {
+					cache.log.Infof("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
+				}
+				cache.respond(watch.Request, watch.Response, snapshot.GetResources(watch.Request.TypeUrl), version)
+
+				// discard the watch
+				delete(info.watches, id)
+			}
 		}
-		// discard all watches; the client must request a new watch to receive updates and ACK/NACK
-		delete(cache.watches, group)
+		info.mu.Unlock()
 	}
 
 	return nil
 }
 
-// Respond to a watch with the snapshot value. The value channel should have capacity not to block.
-// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
-func respond(watch Watch, snapshot Snapshot, group Key) {
-	typ := watch.Type
-	resources := snapshot.resources[typ]
-	version := snapshot.version
+// ClearSnapshot removes all status and snapshot information associated with a node.
+func (cache *SnapshotCache) ClearSnapshot(node string) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
 
-	// remove clean-up as the watch is discarded immediately
-	watch.stop = nil
-
-	// the request names must match the snapshot names
-	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
-	if len(watch.Names) != 0 {
-		// convert to a set
-		names := make(map[string]bool)
-		for _, name := range watch.Names {
-			names[name] = true
-		}
-
-		// check that every snapshot resource name is present in the request
-		for _, resource := range resources {
-			resourceName := GetResourceName(resource)
-			if _, exists := names[resourceName]; !exists {
-				glog.V(10).Infof("not responding for %s from %q at %q since %q not requested %v",
-					typ.String(), group, version, resourceName, watch.Names)
-				return
-			}
-		}
-	}
-
-	watch.Value <- Response{
-		Version:   version,
-		Resources: resources,
-	}
+	delete(cache.snapshots, node)
+	delete(cache.status, node)
 }
 
-// Watch returns a watch for an xDS request.
-func (cache *SimpleCache) Watch(typ ResponseType, node *core.Node, version string, names []string) Watch {
-	out := Watch{
-		Type:  typ,
-		Names: names,
+// nameSet creates a map from a string slice to value true.
+func nameSet(names []string) map[string]bool {
+	set := make(map[string]bool)
+	for _, name := range names {
+		set[name] = true
 	}
-	group, err := cache.groups.Hash(node)
+	return set
+}
 
-	// do nothing case
-	if err != nil {
-		return out
+// superset checks that all resources are listed in the names set.
+func superset(names map[string]bool, resources []Resource) error {
+	for _, resource := range resources {
+		resourceName := GetResourceName(resource)
+		if _, exists := names[resourceName]; !exists {
+			return fmt.Errorf("%q not listed", resourceName)
+		}
 	}
+	return nil
+}
+
+// CreateWatch returns a watch for an xDS request.
+func (cache *SnapshotCache) CreateWatch(request Request) (chan Response, func()) {
+	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
+	info, ok := cache.status[nodeID]
+	if !ok {
+		info = NewStatusInfo(request.Node)
+		cache.status[nodeID] = info
+	}
+
+	// update last watch request time
+	info.mu.Lock()
+	info.lastWatchRequestTime = time.Now()
+	info.mu.Unlock()
+
 	// allocate capacity 1 to allow one-time non-blocking use
-	out.Value = make(chan Response, 1)
+	value := make(chan Response, 1)
+
+	snapshot, exists := cache.snapshots[nodeID]
+	version := snapshot.GetVersion(request.TypeUrl)
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
-	snapshot, exists := cache.snapshots[group]
-	if !exists || version == snapshot.version {
-		// invoke callback in a go-routine
-		if !exists && cache.callback != nil {
-			glog.V(10).Infof("callback %q at %q", group, version)
-			go cache.callback(group)
+	if !exists || request.VersionInfo == version {
+		watchID := cache.freshWatchID()
+		if cache.log != nil {
+			cache.log.Infof("open watch %d for %s%v from nodeID %q, version %q", watchID,
+				request.TypeUrl, request.ResourceNames, nodeID, request.VersionInfo)
 		}
-
-		if _, ok := cache.watches[group]; !ok {
-			cache.watches[group] = make(map[int64]Watch)
-		}
-
-		glog.V(10).Infof("open watch for %s%v from key %q from version %q", typ.String(), names, group, version)
-		cache.watchCount++
-		id := cache.watchCount
-		cache.watches[group][id] = out
-		out.stop = func() {
-			cache.mu.Lock()
-			defer cache.mu.Unlock()
-			if _, ok := cache.watches[group]; ok {
-				delete(cache.watches[group], id)
-			}
-		}
-		return out
+		info.mu.Lock()
+		info.watches[watchID] = ResponseWatch{Request: request, Response: value}
+		info.mu.Unlock()
+		return value, cache.cancelWatch(nodeID, watchID)
 	}
 
 	// otherwise, the watch may be responded immediately
-	respond(out, snapshot, group)
+	cache.respond(request, value, snapshot.GetResources(request.TypeUrl), version)
+
+	return value, nil
+}
+
+func (cache *SnapshotCache) freshWatchID() int64 {
+	return atomic.AddInt64(&cache.watchCount, 1)
+}
+
+// cancellation function for cleaning stale watches
+func (cache *SnapshotCache) cancelWatch(nodeID string, watchID int64) func() {
+	return func() {
+		// uses the cache mutex
+		cache.mu.Lock()
+		defer cache.mu.Unlock()
+		if info, ok := cache.status[nodeID]; ok {
+			info.mu.Lock()
+			delete(info.watches, watchID)
+			info.mu.Unlock()
+		}
+	}
+}
+
+// Respond to a watch with the snapshot value. The value channel should have capacity not to block.
+// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
+func (cache *SnapshotCache) respond(request Request, value chan Response, resources []Resource, version string) {
+	// for ADS, the request names must match the snapshot names
+	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
+	if len(request.ResourceNames) != 0 && cache.ads {
+		if err := superset(nameSet(request.ResourceNames), resources); err != nil {
+			if cache.log != nil {
+				cache.log.Infof("ADS mode: not responding to request: %v", err)
+			}
+			return
+		}
+	}
+	if cache.log != nil {
+		cache.log.Infof("respond %s%v version %q with version %q",
+			request.TypeUrl, request.ResourceNames, request.VersionInfo, version)
+	}
+
+	value <- createResponse(request, resources, version)
+}
+
+func createResponse(request Request, resources []Resource, version string) Response {
+	filtered := resources
+
+	// Reply only with the requested resources. Envoy may ask each resource
+	// individually in a separate stream. It is ok to reply with the same version
+	// on separate streams since requests do not share their response versions.
+	if len(request.ResourceNames) != 0 {
+		filtered = make([]Resource, 0, len(resources))
+		set := nameSet(request.ResourceNames)
+		for _, resource := range resources {
+			if set[GetResourceName(resource)] {
+				filtered = append(filtered, resource)
+			}
+		}
+	}
+
+	return Response{
+		Request:   request,
+		Version:   version,
+		Resources: filtered,
+	}
+}
+
+// Fetch implements the cache fetch function.
+// Fetch is called on multiple streams, so responding to individual names with the same version works.
+func (cache *SnapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
+	nodeID := cache.hash.ID(request.Node)
+
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+
+	if snapshot, exists := cache.snapshots[nodeID]; exists {
+		// Respond only if the request version is distinct from the current snapshot state.
+		// It might be beneficial to hold the request since Envoy will re-attempt the refresh.
+		version := snapshot.GetVersion(request.TypeUrl)
+		if request.VersionInfo == version {
+			return nil, errors.New("skip fetch: version up to date")
+		}
+
+		resources := snapshot.GetResources(request.TypeUrl)
+		out := createResponse(request, resources, version)
+		return &out, nil
+	}
+
+	return nil, fmt.Errorf("missing snapshot for %q", nodeID)
+}
+
+// GetStatusInfo retrieves the status info for the node.
+func (cache *SnapshotCache) GetStatusInfo(node string) *StatusInfo {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+
+	return cache.status[node]
+}
+
+// GetStatusKeys retrieves all node IDs in the status map.
+func (cache *SnapshotCache) GetStatusKeys() []string {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+
+	out := make([]string, len(cache.status))
+	for id := range cache.status {
+		out = append(out, id)
+	}
+
 	return out
 }

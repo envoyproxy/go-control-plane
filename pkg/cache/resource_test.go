@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -12,11 +12,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-package cache
+package cache_test
 
 import (
+	"reflect"
 	"testing"
 
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
 
@@ -28,25 +31,63 @@ const (
 
 var (
 	endpoint = resource.MakeEndpoint(clusterName, 8080)
-	cluster  = resource.MakeCluster(true, clusterName)
+	cluster  = resource.MakeCluster(resource.Ads, clusterName)
 	route    = resource.MakeRoute(routeName, clusterName)
-	listener = resource.MakeListener(true, listenerName, 80, routeName)
+	listener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
 )
 
 func TestGetResourceName(t *testing.T) {
-	if name := GetResourceName(endpoint); name != clusterName {
+	if name := cache.GetResourceName(endpoint); name != clusterName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", endpoint, name, clusterName)
 	}
-	if name := GetResourceName(cluster); name != clusterName {
+	if name := cache.GetResourceName(cluster); name != clusterName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", cluster, name, clusterName)
 	}
-	if name := GetResourceName(route); name != routeName {
+	if name := cache.GetResourceName(route); name != routeName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", route, name, routeName)
 	}
-	if name := GetResourceName(listener); name != listenerName {
+	if name := cache.GetResourceName(listener); name != listenerName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", listener, name, listenerName)
 	}
-	if name := GetResourceName(nil); name != "" {
+	if name := cache.GetResourceName(nil); name != "" {
 		t.Errorf("GetResourceName(nil) => got %q, want none", name)
+	}
+}
+
+func TestGetResourceReferences(t *testing.T) {
+	cases := []struct {
+		in  cache.Resource
+		out map[string]bool
+	}{
+		{
+			in:  cluster,
+			out: map[string]bool{clusterName: true},
+		},
+		{
+			in:  &v2.Cluster{Name: clusterName, Type: v2.Cluster_EDS, EdsClusterConfig: &v2.Cluster_EdsClusterConfig{ServiceName: "test"}},
+			out: map[string]bool{"test": true},
+		},
+		{
+			in:  listener,
+			out: map[string]bool{routeName: true},
+		},
+		{
+			in:  route,
+			out: map[string]bool{},
+		},
+		{
+			in:  endpoint,
+			out: map[string]bool{},
+		},
+		{
+			in:  resource.MakeTCPListener(listenerName, 80, clusterName),
+			out: map[string]bool{},
+		},
+	}
+	for _, cs := range cases {
+		names := cache.GetResourceReferences(cs.in)
+		if !reflect.DeepEqual(names, cs.out) {
+			t.Errorf("GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
+		}
 	}
 }

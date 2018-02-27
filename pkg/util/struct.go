@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -43,4 +43,18 @@ func MessageToStruct(msg proto.Message) (*types.Struct, error) {
 	}
 
 	return pbs, nil
+}
+
+// StructToMessage decodes a protobuf Message from a Struct.
+func StructToMessage(pbst *types.Struct, out proto.Message) error {
+	if pbst == nil {
+		return errors.New("nil struct")
+	}
+
+	buf := &bytes.Buffer{}
+	if err := (&jsonpb.Marshaler{OrigName: true}).Marshal(buf, pbst); err != nil {
+		return err
+	}
+
+	return jsonpb.Unmarshal(buf, out)
 }

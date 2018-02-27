@@ -6,11 +6,10 @@
 
 SHELL 	:= /bin/bash
 BINDIR	:= bin
+PKG 		:= github.com/envoyproxy/go-control-plane
 
 # Pure Go sources (not vendored and not generated)
-GOFILES		= $(shell find . -type f -name '*.go' \
-						-not -path "./vendor/*" \
-						-not -path "./api/*")
+GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GODIRS		= $(shell go list -f '{{.Dir}}' ./... \
 						| grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
 
@@ -28,12 +27,12 @@ clean:
 .PHONY: test
 test: vendor
 	@echo "--> running unit tests"
-	@go test -v ./...
+	@go test ./pkg/...
 
 .PHONY: cover
 cover:
 	@echo "--> running coverage tests"
-	@go test -race -cover ./...
+	@build/coverage.sh
 
 .PHONY: check
 check: format.check vet lint
@@ -41,12 +40,12 @@ check: format.check vet lint
 .PHONY: format
 format: tools.goimports
 	@echo "--> formatting code with 'goimports' tool"
-	@goimports -w -l $(GOFILES)
+	@goimports -local $(PKG) -w -l $(GOFILES)
 
 .PHONY: format.check
 format.check: tools.goimports
 	@echo "--> checking code formatting with 'goimports' tool"
-	@goimports -l $(GOFILES) | sed -e "s/^/\?\t/" | tee >(test -z)
+	@goimports -local $(PKG) -l $(GOFILES) | sed -e "s/^/\?\t/" | tee >(test -z)
 
 .PHONY: vet
 vet: tools.govet
@@ -57,6 +56,43 @@ vet: tools.govet
 lint: tools.golint
 	@echo "--> checking code style with 'golint' tool"
 	@echo $(GODIRS) | xargs -n 1 golint
+
+#-----------------
+#-- integration
+#-----------------
+.PHONY: $(BINDIR)/test $(BINDIR)/test-linux docker integration integration.ads integration.xds integration.rest integration.docker
+
+$(BINDIR)/test: vendor
+	@echo "--> building test binary"
+	@go build -race -o $@ pkg/test/main/main.go
+
+$(BINDIR)/test-linux: vendor
+	@echo "--> building Linux test binary"
+	@env GOOS=linux GOARCH=amd64 go build -race -o $@ pkg/test/main/main.go
+
+docker: $(BINDIR)/test-linux
+	@echo "--> building test docker image"
+	@docker build -t test .
+
+integration: integration.ads integration.xds integration.rest
+
+integration.ads: $(BINDIR)/test
+	env XDS=ads build/integration.sh
+
+integration.xds: $(BINDIR)/test
+	env XDS=xds build/integration.sh
+
+integration.rest: $(BINDIR)/test
+	env XDS=rest build/integration.sh
+
+integration.docker: docker
+	docker run -it -e "XDS=ads" test -debug
+	docker run -it -e "XDS=xds" test -debug
+	docker run -it -e "XDS=rest" test -debug
+
+#-----------------
+#-- code generaion
+#-----------------
 
 generate: $(BINDIR)/gogofast
 	@echo "--> generating pb.go files"
@@ -116,7 +152,3 @@ tools.glide:
 $(BINDIR)/gogofast: vendor
 	@echo "--> building $@"
 	@go build -o $@ vendor/github.com/gogo/protobuf/protoc-gen-gogofast/main.go
-
-$(BINDIR)/pgv: vendor
-	@echo "--> building $@"
-	@pushd vendor/github.com/lyft/protoc-gen-validate && go build -o ../../../../$@ . && popd
