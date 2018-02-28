@@ -31,9 +31,9 @@ const (
 
 var (
 	endpoint = resource.MakeEndpoint(clusterName, 8080)
-	cluster  = resource.MakeCluster(resource.Ads, clusterName)
+	cluster  = resource.MakeCluster(true, clusterName)
 	route    = resource.MakeRoute(routeName, clusterName)
-	listener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	listener = resource.MakeListener(true, listenerName, 80, routeName)
 )
 
 func TestGetResourceName(t *testing.T) {
@@ -77,10 +77,6 @@ func TestGetResourceReferences(t *testing.T) {
 		},
 		{
 			in:  endpoint,
-			out: map[string]bool{},
-		},
-		{
-			in:  resource.MakeTCPListener(listenerName, 80, clusterName),
 			out: map[string]bool{},
 		},
 	}

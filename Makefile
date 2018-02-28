@@ -28,7 +28,7 @@ clean:
 .PHONY: test
 test: vendor
 	@echo "--> running unit tests"
-	@go test -v ./...
+	@go test ./pkg/...
 
 .PHONY: cover
 cover:
