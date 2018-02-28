@@ -68,9 +68,6 @@ func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format
 func TestSnapshotCache(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 
-	// check type safety
-	var _ cache.Cache = c
-
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}

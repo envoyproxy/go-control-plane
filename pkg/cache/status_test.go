@@ -12,19 +12,18 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-package cache_test
+package cache
 
 import (
 	"reflect"
 	"testing"
 
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
 )
 
 func TestNewStatusInfo(t *testing.T) {
 	node := &core.Node{Id: "test"}
-	info := cache.NewStatusInfo(node)
+	info := newStatusInfo(node)
 
 	if got := info.GetNode(); !reflect.DeepEqual(got, node) {
 		t.Errorf("GetNode() => got %#v, want %#v", got, node)

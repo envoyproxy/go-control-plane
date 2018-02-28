@@ -97,7 +97,7 @@ func RunXDS(ctx context.Context, config cache.Cache, port uint) {
 
 // RunCacheUpdate executes a config update sequence every second.
 func RunCacheUpdate(ctx context.Context,
-	config *cache.SnapshotCache,
+	config cache.SnapshotCache,
 	ads bool,
 	interval time.Duration,
 	upstreamPort, listenPort uint) {

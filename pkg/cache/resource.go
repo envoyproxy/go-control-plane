@@ -78,34 +78,35 @@ func GetResourceName(res Resource) string {
 func GetResourceReferences(resources ...Resource) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
-		if res != nil {
-			switch v := res.(type) {
-			case *v2.ClusterLoadAssignment:
-				// no dependencies
-			case *v2.Cluster:
-				// for EDS type, use cluster name or ServiceName override
-				if v.Type == v2.Cluster_EDS {
-					if v.EdsClusterConfig != nil && v.EdsClusterConfig.ServiceName != "" {
-						out[v.EdsClusterConfig.ServiceName] = true
-					} else {
-						out[v.Name] = true
-					}
+		if res == nil {
+			continue
+		}
+		switch v := res.(type) {
+		case *v2.ClusterLoadAssignment:
+			// no dependencies
+		case *v2.Cluster:
+			// for EDS type, use cluster name or ServiceName override
+			if v.Type == v2.Cluster_EDS {
+				if v.EdsClusterConfig != nil && v.EdsClusterConfig.ServiceName != "" {
+					out[v.EdsClusterConfig.ServiceName] = true
+				} else {
+					out[v.Name] = true
 				}
-			case *v2.RouteConfiguration:
-				// no dependencies
-			case *v2.Listener:
-				// extract route configuration names from HTTP connection manager
-				for _, chain := range v.FilterChains {
-					for _, filter := range chain.Filters {
-						if filter.Name == HTTPConnectionManager {
-							config := &hcm.HttpConnectionManager{}
-							if util.StructToMessage(filter.Config, config) == nil {
-								if config != nil {
-									if rds, ok := config.RouteSpecifier.(*hcm.HttpConnectionManager_Rds); ok && rds != nil && rds.Rds != nil {
-										out[rds.Rds.RouteConfigName] = true
-									}
-								}
-							}
+			}
+		case *v2.RouteConfiguration:
+			// no dependencies
+		case *v2.Listener:
+			// extract route configuration names from HTTP connection manager
+			for _, chain := range v.FilterChains {
+				for _, filter := range chain.Filters {
+					if filter.Name != HTTPConnectionManager {
+						continue
+					}
+
+					config := &hcm.HttpConnectionManager{}
+					if util.StructToMessage(filter.Config, config) == nil && config != nil {
+						if rds, ok := config.RouteSpecifier.(*hcm.HttpConnectionManager_Rds); ok && rds != nil && rds.Rds != nil {
+							out[rds.Rds.RouteConfigName] = true
 						}
 					}
 				}

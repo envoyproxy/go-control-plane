@@ -36,7 +36,22 @@ import (
 //
 // SnapshotCache can operate as a REST or regular xDS backend. The snapshot
 // can be partial, e.g. only include RDS or EDS resources.
-type SnapshotCache struct {
+type SnapshotCache interface {
+	Cache
+
+	// SetSnapshot sets a response snapshot for a node. For ADS, the snapshots
+	// should have distinct versions and be internally consistent (e.g. all
+	// referenced resources must be included in the snapshot).
+	//
+	// This method will cause the server to respond to all open watches, for which
+	// the version differs from the snapshot version.
+	SetSnapshot(node string, snapshot Snapshot) error
+
+	// ClearSnapshot removes all status and snapshot information associated with a node.
+	ClearSnapshot(node string)
+}
+
+type snapshotCache struct {
 	log log.Logger
 
 	// ads flag to hold responses until all resources are named
@@ -46,7 +61,7 @@ type SnapshotCache struct {
 	snapshots map[string]Snapshot
 
 	// status information for all nodes indexed by node IDs
-	status map[string]*StatusInfo
+	status map[string]*statusInfo
 
 	// hash is the hashing function for Envoy nodes
 	hash NodeHash
@@ -68,23 +83,18 @@ type SnapshotCache struct {
 // is OK.
 //
 // Logger is optional.
-func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *SnapshotCache {
-	return &SnapshotCache{
+func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache {
+	return &snapshotCache{
 		log:       logger,
 		ads:       ads,
 		snapshots: make(map[string]Snapshot),
-		status:    make(map[string]*StatusInfo),
+		status:    make(map[string]*statusInfo),
 		hash:      hash,
 	}
 }
 
-// SetSnapshot sets a response snapshot for a node. For ADS, the snapshots
-// should have distinct versions and be internally consistent (e.g. all
-// referenced resources must be included in the snapshot).
-//
-// This method will cause the server to respond to all open watches, for which
-// the version differs from the snapshot version.
-func (cache *SnapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
+// SetSnapshotCache updates a snapshot for a node.
+func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -112,8 +122,8 @@ func (cache *SnapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	return nil
 }
 
-// ClearSnapshot removes all status and snapshot information associated with a node.
-func (cache *SnapshotCache) ClearSnapshot(node string) {
+// ClearSnapshot clears snapshot and info for a node.
+func (cache *snapshotCache) ClearSnapshot(node string) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -142,7 +152,7 @@ func superset(names map[string]bool, resources []Resource) error {
 }
 
 // CreateWatch returns a watch for an xDS request.
-func (cache *SnapshotCache) CreateWatch(request Request) (chan Response, func()) {
+func (cache *snapshotCache) CreateWatch(request Request) (chan Response, func()) {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.Lock()
@@ -150,7 +160,7 @@ func (cache *SnapshotCache) CreateWatch(request Request) (chan Response, func())
 
 	info, ok := cache.status[nodeID]
 	if !ok {
-		info = NewStatusInfo(request.Node)
+		info = newStatusInfo(request.Node)
 		cache.status[nodeID] = info
 	}
 
@@ -167,7 +177,7 @@ func (cache *SnapshotCache) CreateWatch(request Request) (chan Response, func())
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	if !exists || request.VersionInfo == version {
-		watchID := cache.freshWatchID()
+		watchID := cache.nextWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open watch %d for %s%v from nodeID %q, version %q", watchID,
 				request.TypeUrl, request.ResourceNames, nodeID, request.VersionInfo)
@@ -184,12 +194,12 @@ func (cache *SnapshotCache) CreateWatch(request Request) (chan Response, func())
 	return value, nil
 }
 
-func (cache *SnapshotCache) freshWatchID() int64 {
+func (cache *snapshotCache) nextWatchID() int64 {
 	return atomic.AddInt64(&cache.watchCount, 1)
 }
 
 // cancellation function for cleaning stale watches
-func (cache *SnapshotCache) cancelWatch(nodeID string, watchID int64) func() {
+func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 	return func() {
 		// uses the cache mutex
 		cache.mu.Lock()
@@ -203,8 +213,8 @@ func (cache *SnapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 }
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
-// TODO(kuat) this responds immediately and can cause the remote node to spin if it consistently fails to ACK the update
-func (cache *SnapshotCache) respond(request Request, value chan Response, resources []Resource, version string) {
+// TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
+func (cache *snapshotCache) respond(request Request, value chan Response, resources []Resource, version string) {
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
@@ -248,7 +258,7 @@ func createResponse(request Request, resources []Resource, version string) Respo
 
 // Fetch implements the cache fetch function.
 // Fetch is called on multiple streams, so responding to individual names with the same version works.
-func (cache *SnapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
+func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.RLock()
@@ -271,7 +281,7 @@ func (cache *SnapshotCache) Fetch(ctx context.Context, request Request) (*Respon
 }
 
 // GetStatusInfo retrieves the status info for the node.
-func (cache *SnapshotCache) GetStatusInfo(node string) *StatusInfo {
+func (cache *snapshotCache) GetStatusInfo(node string) StatusInfo {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 
@@ -279,7 +289,7 @@ func (cache *SnapshotCache) GetStatusInfo(node string) *StatusInfo {
 }
 
 // GetStatusKeys retrieves all node IDs in the status map.
-func (cache *SnapshotCache) GetStatusKeys() []string {
+func (cache *snapshotCache) GetStatusKeys() []string {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 

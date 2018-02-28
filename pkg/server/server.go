@@ -44,6 +44,7 @@ type Server interface {
 }
 
 // Callbacks is a collection of callbacks inserted into the server operation.
+// The callbacks are invoked synchronously.
 type Callbacks interface {
 	// OnStreamOpen is called once an xDS stream is open with a stream ID and the type URL (or "" for ADS).
 	OnStreamOpen(int64, string)
@@ -61,11 +62,11 @@ type Callbacks interface {
 
 // NewServer creates handlers from a config watcher and an optional logger.
 func NewServer(config cache.Cache, callbacks Callbacks) Server {
-	return &server{config: config, callbacks: callbacks}
+	return &server{cache: config, callbacks: callbacks}
 }
 
 type server struct {
-	config    cache.Cache
+	cache     cache.Cache
 	callbacks Callbacks
 
 	// streamCount for counting bi-di streams
@@ -246,22 +247,22 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 				if values.endpointCancel != nil {
 					values.endpointCancel()
 				}
-				values.endpoints, values.endpointCancel = s.config.CreateWatch(*req)
+				values.endpoints, values.endpointCancel = s.cache.CreateWatch(*req)
 			case req.TypeUrl == cache.ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
 				if values.clusterCancel != nil {
 					values.clusterCancel()
 				}
-				values.clusters, values.clusterCancel = s.config.CreateWatch(*req)
+				values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
 			case req.TypeUrl == cache.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
 				if values.routeCancel != nil {
 					values.routeCancel()
 				}
-				values.routes, values.routeCancel = s.config.CreateWatch(*req)
+				values.routes, values.routeCancel = s.cache.CreateWatch(*req)
 			case req.TypeUrl == cache.ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
 				if values.listenerCancel != nil {
 					values.listenerCancel()
 				}
-				values.listeners, values.listenerCancel = s.config.CreateWatch(*req)
+				values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
 			}
 		}
 	}
@@ -320,7 +321,7 @@ func (s *server) Fetch(ctx context.Context, req *v2.DiscoveryRequest) (*v2.Disco
 	if s.callbacks != nil {
 		s.callbacks.OnFetchRequest(req)
 	}
-	resp, err := s.config.Fetch(ctx, *req)
+	resp, err := s.cache.Fetch(ctx, *req)
 	if err != nil {
 		return nil, err
 	}

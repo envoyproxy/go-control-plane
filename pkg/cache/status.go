@@ -29,7 +29,18 @@ type NodeHash interface {
 
 // StatusInfo tracks the server state for the remote Envoy node.
 // Not all fields are used by all cache implementations.
-type StatusInfo struct {
+type StatusInfo interface {
+	// GetNode returns the node metadata.
+	GetNode() *core.Node
+
+	// GetNumWatches returns the number of open watches.
+	GetNumWatches() int
+
+	// GetLastWatchRequestTime returns the timestamp of the last discovery watch request.
+	GetLastWatchRequestTime() time.Time
+}
+
+type statusInfo struct {
 	// node is the constant Envoy node metadata.
 	node *core.Node
 
@@ -53,31 +64,28 @@ type ResponseWatch struct {
 	Response chan Response
 }
 
-// NewStatusInfo initializes a status info data structure.
-func NewStatusInfo(node *core.Node) *StatusInfo {
-	out := StatusInfo{
+// newStatusInfo initializes a status info data structure.
+func newStatusInfo(node *core.Node) *statusInfo {
+	out := statusInfo{
 		node:    node,
 		watches: make(map[int64]ResponseWatch),
 	}
 	return &out
 }
 
-// GetNode returns the node metadata.
-func (info *StatusInfo) GetNode() *core.Node {
+func (info *statusInfo) GetNode() *core.Node {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.node
 }
 
-// GetNumWatches returns the number of open watches.
-func (info *StatusInfo) GetNumWatches() int {
+func (info *statusInfo) GetNumWatches() int {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return len(info.watches)
 }
 
-// GetLastWatchRequestTime returns the timestamp of the last discovery watch request.
-func (info *StatusInfo) GetLastWatchRequestTime() time.Time {
+func (info *statusInfo) GetLastWatchRequestTime() time.Time {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.lastWatchRequestTime
