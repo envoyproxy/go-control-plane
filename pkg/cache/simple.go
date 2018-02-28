@@ -285,7 +285,12 @@ func (cache *snapshotCache) GetStatusInfo(node string) StatusInfo {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 
-	return cache.status[node]
+	info, exists := cache.status[node]
+	if !exists {
+		return nil
+	}
+
+	return info
 }
 
 // GetStatusKeys retrieves all node IDs in the status map.

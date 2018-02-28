@@ -237,7 +237,7 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 	}
 
 	if empty := c.GetStatusInfo("missing"); empty != nil {
-		t.Errorf("missing node key")
+		t.Errorf("should not return a status for unknown key: got %#v", empty)
 	}
 }
 
