@@ -94,7 +94,9 @@ func GetResourceReferences(resources ...Resource) map[string]bool {
 				}
 			}
 		case *v2.RouteConfiguration:
-			// no dependencies
+			// References to clusters in both routes (and listeners) are not included
+			// in the result, because the clusters are retrieved in bulk currently,
+			// and not by name.
 		case *v2.Listener:
 			// extract route configuration names from HTTP connection manager
 			for _, chain := range v.FilterChains {
