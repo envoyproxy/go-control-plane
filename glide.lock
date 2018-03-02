@@ -1,5 +1,5 @@
-hash: 677f8498b3d6077ba65eaf07fae763cf4f99a7d1167febb83099b9ef62f795d1
-updated: 2018-03-01T15:24:20.382473738-08:00
+hash: dafd8adaf8ad55d5537863c19511a8864af94bfd9e18678a21dc8e68c6b1a35c
+updated: 2018-03-02T14:25:28.445801704-08:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
   version: 6defada5735de6998aa0fdcfb4d3aaa5e48972bd
