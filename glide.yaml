@@ -15,7 +15,8 @@ import:
   version: ^1.7.2
 - package: github.com/lyft/protoc-gen-validate
 - package: istio.io/gogo-genproto
+- package: github.com/gogo/googleapis
 - package: github.com/envoyproxy/data-plane-api
-  version: 258bfddfddaad4d6a1da7b4476c98b060d57bcc1
+  version: 6defada5735de6998aa0fdcfb4d3aaa5e48972bd
 - package: github.com/sirupsen/logrus
   version: ^1.0.4

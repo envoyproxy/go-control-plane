@@ -1,8 +1,13 @@
-hash: 16ca24c9ca23481e6abf23a1162d9ccb732afa08fd3d7925829cfcfef5cdb292
-updated: 2018-02-15T16:54:08.001278355-08:00
+hash: 677f8498b3d6077ba65eaf07fae763cf4f99a7d1167febb83099b9ef62f795d1
+updated: 2018-03-01T15:24:20.382473738-08:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 258bfddfddaad4d6a1da7b4476c98b060d57bcc1
+  version: 6defada5735de6998aa0fdcfb4d3aaa5e48972bd
+- name: github.com/gogo/googleapis
+  version: 0cd9801be74a10d5ac39d69626eac8255ffcd502
+  subpackages:
+  - google/api
+  - google/rpc
 - name: github.com/gogo/protobuf
   version: 342cbe0a04158f6dcb03ca0079991a51a4248c02
   subpackages:
@@ -88,8 +93,6 @@ imports:
 - name: istio.io/gogo-genproto
   version: dd2b5b6a8f1400838165245e704a011a30154a44
   subpackages:
-  - googleapis/google/api
-  - googleapis/google/rpc
   - opencensus/proto/trace
   - prometheus
 testImports: []
