@@ -150,9 +150,9 @@ var (
 		Cluster: "test-cluster",
 	}
 	endpoint = resource.MakeEndpoint(clusterName, 8080)
-	cluster  = resource.MakeCluster(true, clusterName)
+	cluster  = resource.MakeCluster(resource.Ads, clusterName)
 	route    = resource.MakeRoute(routeName, clusterName)
-	listener = resource.MakeListener(true, listenerName, 80, routeName)
+	listener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
 )
 
 func makeResponses() map[string][]cache.Response {

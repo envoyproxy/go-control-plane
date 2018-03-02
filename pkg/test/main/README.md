@@ -9,8 +9,8 @@ exercising the pushed configuration.
 
 ## Requirements
 
-* Envoy binary `envoy` available: set `ENVOY` environment vaiable to the
-  location of the binary, or use default `/usr/local/bin/envoy`
+* Envoy binary `envoy` available: set `ENVOY` environment variable to the
+  location of the binary, or use the default value `/usr/local/bin/envoy`
 * `go-control-plane` builds successfully
 
 ## Steps
