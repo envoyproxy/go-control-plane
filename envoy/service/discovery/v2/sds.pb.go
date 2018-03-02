@@ -7,7 +7,7 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import envoy_api_v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-import _ "istio.io/gogo-genproto/googleapis/google/api"
+import _ "github.com/gogo/googleapis/google/api"
 
 import (
 	context "golang.org/x/net/context"

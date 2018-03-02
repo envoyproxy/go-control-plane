@@ -19,7 +19,6 @@
 		Address
 		CidrRange
 		Locality
-		Percent
 		Node
 		Metadata
 		RuntimeUInt32
