@@ -1,5 +1,5 @@
-hash: 58fe8ff6c4d3121053c9ae505613a12bd7a116c4af4871063317aa3e264d8bf1
-updated: 2018-02-12T10:11:06.7585678-08:00
+hash: 16ca24c9ca23481e6abf23a1162d9ccb732afa08fd3d7925829cfcfef5cdb292
+updated: 2018-02-15T16:54:08.001278355-08:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
   version: 258bfddfddaad4d6a1da7b4476c98b060d57bcc1
@@ -13,8 +13,6 @@ imports:
   - protoc-gen-gogofast
   - sortkeys
   - types
-- name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
 - name: github.com/golang/protobuf
   version: ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e
   subpackages:
@@ -28,6 +26,12 @@ imports:
   version: 6cd364ac742e088e22c2d04e90358ce48e1e33e5
   subpackages:
   - validate
+- name: github.com/sirupsen/logrus
+  version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
+- name: golang.org/x/crypto
+  version: 5119cf507ed5294cc409c092980c7497ee5d6fd2
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/net
   version: 5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec
   subpackages:
@@ -38,6 +42,11 @@ imports:
   - internal/timeseries
   - lex/httplex
   - trace
+- name: golang.org/x/sys
+  version: 37707fdb30a5b38865cfb95e5aab41707daec7fd
+  subpackages:
+  - unix
+  - windows
 - name: golang.org/x/text
   version: e19ae1496984b1c655b8044a65c0300a3c878dd3
   subpackages:
@@ -52,7 +61,7 @@ imports:
   - googleapis/rpc/status
   - opencensus
 - name: google.golang.org/grpc
-  version: 6b51017f791ae1cfbec89c52efdf444b13b550ef
+  version: 8e4536a86ab602859c20df5ebfd0bd4228d08655
   subpackages:
   - balancer
   - balancer/base
@@ -61,6 +70,7 @@ imports:
   - connectivity
   - credentials
   - encoding
+  - encoding/proto
   - grpclb/grpc_lb_v1/messages
   - grpclog
   - internal

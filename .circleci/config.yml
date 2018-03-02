@@ -10,3 +10,8 @@ jobs:
       - run: make depend.install
       - run: make build
       - run: make test
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: make integration.docker
+      - run: make cover
+      - run: curl -s https://codecov.io/bash | bash
