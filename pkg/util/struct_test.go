@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/gogo/protobuf/types"
+
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
-	"github.com/gogo/protobuf/types"
 )
 
-func TestMessageToStruct(t *testing.T) {
+func TestConversion(t *testing.T) {
 	pb := &v2.DiscoveryRequest{
 		VersionInfo: "test",
 		Node:        &core.Node{Id: "proxy"},
@@ -33,7 +34,7 @@ func TestMessageToStruct(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error %v", err)
 	}
-	want := map[string]*types.Value{
+	pbst := map[string]*types.Value{
 		"version_info": &types.Value{Kind: &types.Value_StringValue{StringValue: "test"}},
 		"node": &types.Value{Kind: &types.Value_StructValue{StructValue: &types.Struct{
 			Fields: map[string]*types.Value{
@@ -41,11 +42,24 @@ func TestMessageToStruct(t *testing.T) {
 			},
 		}}},
 	}
-	if !reflect.DeepEqual(st.Fields, want) {
-		t.Errorf("MessageToStruct(%v) => got %v, want %v", pb, st.Fields, want)
+	if !reflect.DeepEqual(st.Fields, pbst) {
+		t.Errorf("MessageToStruct(%v) => got %v, want %v", pb, st.Fields, pbst)
+	}
+
+	out := &v2.DiscoveryRequest{}
+	err = util.StructToMessage(st, out)
+	if err != nil {
+		t.Fatalf("unexpected error %v", err)
+	}
+	if !reflect.DeepEqual(pb, out) {
+		t.Errorf("StructToMessage(%v) => got %v, want %v", st, out, pb)
 	}
 
 	if _, err = util.MessageToStruct(nil); err == nil {
 		t.Error("MessageToStruct(nil) => got no error")
+	}
+
+	if err = util.StructToMessage(nil, &v2.DiscoveryRequest{}); err == nil {
+		t.Error("StructToMessage(nil) => got no error")
 	}
 }

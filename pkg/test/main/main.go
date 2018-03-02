@@ -59,7 +59,7 @@ func main() {
 	go test.RunHTTP(ctx, upstreamPort)
 
 	// create a cache
-	config := cache.NewSimpleCache(test.Hasher{}, nil)
+	config := cache.NewSnapshotCache(true, test.Hasher{}, nil)
 
 	// update the cache at a regular interval
 	go test.RunCacheUpdate(ctx, config, ads, interval, upstreamPort, listenPort)

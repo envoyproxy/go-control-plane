@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -14,14 +14,27 @@
 
 package cache
 
-import "testing"
+import (
+	"reflect"
+	"testing"
 
-func TestWatchCancel(t *testing.T) {
-	called := 0
-	w := Watch{stop: func() { called++ }}
-	w.Cancel()
-	w.Cancel()
-	if called != 1 {
-		t.Errorf("got count %d; stop function should be called once by Cancel()", called)
+	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+)
+
+func TestNewStatusInfo(t *testing.T) {
+	node := &core.Node{Id: "test"}
+	info := newStatusInfo(node)
+
+	if got := info.GetNode(); !reflect.DeepEqual(got, node) {
+		t.Errorf("GetNode() => got %#v, want %#v", got, node)
 	}
+
+	if got := info.GetNumWatches(); got != 0 {
+		t.Errorf("GetNumWatches() => got %d, want 0", got)
+	}
+
+	if got := info.GetLastWatchRequestTime(); !got.IsZero() {
+		t.Errorf("GetLastWatchRequestTime() => got %v, want zero time", got)
+	}
+
 }

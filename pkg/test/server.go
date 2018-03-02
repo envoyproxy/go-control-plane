@@ -29,7 +29,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
-	"github.com/gogo/protobuf/proto"
 	"github.com/golang/glog"
 	"google.golang.org/grpc"
 )
@@ -43,9 +42,9 @@ const (
 type Hasher struct {
 }
 
-// Hash function that always returns same value.
-func (h Hasher) Hash(*core.Node) (cache.Key, error) {
-	return cache.Key(node), nil
+// ID function that always returns the same value.
+func (h Hasher) ID(*core.Node) string {
+	return node
 }
 
 type handler struct {
@@ -75,7 +74,7 @@ func RunHTTP(ctx context.Context, upstreamPort uint) {
 
 // RunXDS starts an xDS server at the given port.
 func RunXDS(ctx context.Context, config cache.Cache, port uint) {
-	server := xds.NewServer(config)
+	server := xds.NewServer(config, nil)
 	grpcServer := grpc.NewServer()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
@@ -98,7 +97,7 @@ func RunXDS(ctx context.Context, config cache.Cache, port uint) {
 
 // RunCacheUpdate executes a config update sequence every second.
 func RunCacheUpdate(ctx context.Context,
-	config cache.Cache,
+	config cache.SnapshotCache,
 	ads bool,
 	interval time.Duration,
 	upstreamPort, listenPort uint) {
@@ -117,11 +116,11 @@ func RunCacheUpdate(ctx context.Context,
 
 		glog.Infof("updating cache with %d-labelled responses", i)
 		snapshot := cache.NewSnapshot(version,
-			[]proto.Message{endpoint},
-			[]proto.Message{cluster},
-			[]proto.Message{route},
-			[]proto.Message{listener})
-		config.SetSnapshot(cache.Key(node), snapshot)
+			[]cache.Resource{endpoint},
+			[]cache.Resource{cluster},
+			[]cache.Resource{route},
+			[]cache.Resource{listener})
+		config.SetSnapshot(node, snapshot)
 
 		select {
 		case <-time.After(interval):
