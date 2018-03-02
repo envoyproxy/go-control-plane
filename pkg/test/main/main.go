@@ -22,6 +22,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -84,8 +85,9 @@ func main() {
 
 	// create a cache
 	signal := make(chan struct{})
+	cb := &callbacks{signal: signal}
 	config := cache.NewSnapshotCache(mode == resource.Ads, test.Hasher{}, logger{})
-	srv := server.NewServer(config, &callbacks{signal: signal})
+	srv := server.NewServer(config, cb)
 	als := &test.AccessLogService{}
 
 	// create a test snapshot
@@ -138,12 +140,13 @@ func main() {
 			}
 		}
 
+		als.Dump(func(s string) { log.Debug(s) })
+		cb.Report()
+
 		if !pass {
 			log.Errorf("failed all requests in a run %d", i)
 			os.Exit(1)
 		}
-
-		als.Dump(func(s string) { log.Debug(s) })
 	}
 
 	log.Infof("Test for %s passed!", mode)
@@ -204,9 +207,17 @@ func (logger logger) Errorf(format string, args ...interface{}) {
 }
 
 type callbacks struct {
-	signal chan struct{}
+	signal   chan struct{}
+	fetches  int
+	requests int
+	mu       sync.Mutex
 }
 
+func (cb *callbacks) Report() {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	log.WithFields(log.Fields{"fetches": cb.fetches, "requests": cb.requests}).Info("server callbacks")
+}
 func (cb *callbacks) OnStreamOpen(id int64, typ string) {
 	log.Debugf("stream %d open for %s", id, typ)
 }
@@ -214,6 +225,9 @@ func (cb *callbacks) OnStreamClosed(id int64) {
 	log.Debugf("stream %d closed", id)
 }
 func (cb *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.requests++
 	if cb.signal != nil {
 		close(cb.signal)
 		cb.signal = nil
@@ -221,7 +235,9 @@ func (cb *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) {
 }
 func (cb *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
 func (cb *callbacks) OnFetchRequest(req *v2.DiscoveryRequest) {
-	log.Debugf("fetch version %q names %v type %s", req.VersionInfo, req.ResourceNames, req.TypeUrl)
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.fetches++
 	if cb.signal != nil {
 		close(cb.signal)
 		cb.signal = nil
