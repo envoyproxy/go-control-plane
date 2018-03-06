@@ -15,6 +15,7 @@ imports=(
   ${xds}
   "${root}/vendor/github.com/lyft/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
+  "${root}/vendor/github.com/gogo/protobuf/protobuf"
   "${root}/vendor/istio.io/gogo-genproto/prometheus"
   "${root}/vendor/istio.io/gogo-genproto/googleapis"
   "${root}/vendor/istio.io/gogo-genproto/opencensus/proto/trace"
