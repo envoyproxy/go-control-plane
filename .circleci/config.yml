@@ -6,7 +6,7 @@ jobs:
       - image: circleci/golang:1.10
     steps:
       - checkout
-      - run: make check
       - run: make depend.install
+      - run: make check
       - run: make build
       - run: make test
