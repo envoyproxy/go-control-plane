@@ -3,10 +3,10 @@ jobs:
   build:
     working_directory: /go/src/github.com/envoyproxy/go-control-plane
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.10
     steps:
       - checkout
-      - run: make check
       - run: make depend.install
+      - run: make check
       - run: make build
       - run: make test
