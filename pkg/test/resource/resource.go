@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package resource
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
@@ -23,20 +24,37 @@ import (
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/listener"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	als "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v2"
+	alf "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
+	tcp "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/util"
 )
 
 const (
-	localhost  = "127.0.0.1"
-	router     = "envoy.router"
-	httpFilter = "envoy.http_connection_manager"
+	localhost     = "127.0.0.1"
+	httpAccessLog = "envoy.http_grpc_access_log"
 
-	// XdsCluster is the cluster name for control server (used by non-ADS set-up)
+	// XdsCluster is the cluster name for the control server (used by non-ADS set-up)
 	XdsCluster = "xds_cluster"
+
+	// Ads mode for resources: one aggregated xDS service
+	Ads = "ads"
+
+	// Xds mode for resources: individual xDS services
+	Xds = "xds"
+
+	// Rest mode for resources: polling using Fetch
+	Rest = "rest"
 )
 
-// MakeEndpoint creates a localhost endpoint.
+var (
+	// RefreshDelay for the polling config source
+	RefreshDelay = 500 * time.Millisecond
+)
+
+// MakeEndpoint creates a localhost endpoint on a given port.
 func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 	return &v2.ClusterLoadAssignment{
 		ClusterName: clusterName,
@@ -60,21 +78,32 @@ func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 	}
 }
 
-// MakeCluster creates a cluster.
-func MakeCluster(ads bool, clusterName string) *v2.Cluster {
+// MakeCluster creates a cluster using either ADS or EDS.
+func MakeCluster(mode string, clusterName string) *v2.Cluster {
 	var edsSource *core.ConfigSource
-	if ads {
+	switch mode {
+	case Ads:
 		edsSource = &core.ConfigSource{
 			ConfigSourceSpecifier: &core.ConfigSource_Ads{
 				Ads: &core.AggregatedConfigSource{},
 			},
 		}
-	} else {
+	case Xds:
 		edsSource = &core.ConfigSource{
 			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
 				ApiConfigSource: &core.ApiConfigSource{
 					ApiType:      core.ApiConfigSource_GRPC,
 					ClusterNames: []string{XdsCluster},
+				},
+			},
+		}
+	case Rest:
+		edsSource = &core.ConfigSource{
+			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
+				ApiConfigSource: &core.ApiConfigSource{
+					ApiType:      core.ApiConfigSource_REST,
+					ClusterNames: []string{XdsCluster},
+					RefreshDelay: &RefreshDelay,
 				},
 			},
 		}
@@ -85,18 +114,17 @@ func MakeCluster(ads bool, clusterName string) *v2.Cluster {
 		ConnectTimeout: 5 * time.Second,
 		Type:           v2.Cluster_EDS,
 		EdsClusterConfig: &v2.Cluster_EdsClusterConfig{
-			EdsConfig:   edsSource,
-			ServiceName: clusterName,
+			EdsConfig: edsSource,
 		},
 	}
 }
 
-// MakeRoute creates an HTTP route.
+// MakeRoute creates an HTTP route that routes to a given cluster.
 func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
 	return &v2.RouteConfiguration{
 		Name: routeName,
 		VirtualHosts: []route.VirtualHost{{
-			Name:    "all",
+			Name:    routeName,
 			Domains: []string{"*"},
 			Routes: []route.Route{{
 				Match: route.RouteMatch{
@@ -116,21 +144,51 @@ func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
 	}
 }
 
-// MakeListener creates a listener.
-func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.Listener {
+// MakeHTTPListener creates a listener using either ADS or RDS for the route.
+func MakeHTTPListener(mode string, listenerName string, port uint32, route string) *v2.Listener {
+	// data source configuration
 	rdsSource := core.ConfigSource{}
-	if ads {
+	switch mode {
+	case Ads:
 		rdsSource.ConfigSourceSpecifier = &core.ConfigSource_Ads{
 			Ads: &core.AggregatedConfigSource{},
 		}
-	} else {
+	case Xds:
 		rdsSource.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
 			ApiConfigSource: &core.ApiConfigSource{
 				ApiType:      core.ApiConfigSource_GRPC,
 				ClusterNames: []string{XdsCluster},
 			},
 		}
+	case Rest:
+		rdsSource.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &core.ApiConfigSource{
+				ApiType:      core.ApiConfigSource_REST,
+				ClusterNames: []string{XdsCluster},
+				RefreshDelay: &RefreshDelay,
+			},
+		}
 	}
+
+	// access log service configuration
+	alsConfig := &als.HttpGrpcAccessLogConfig{
+		CommonConfig: &als.CommonGrpcAccessLogConfig{
+			LogName: "echo",
+			GrpcService: &core.GrpcService{
+				TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+					EnvoyGrpc: &core.GrpcService_EnvoyGrpc{
+						ClusterName: XdsCluster,
+					},
+				},
+			},
+		},
+	}
+	alsConfigPbst, err := util.MessageToStruct(alsConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	// HTTP filter configuration
 	manager := &hcm.HttpConnectionManager{
 		CodecType:  hcm.AUTO,
 		StatPrefix: "http",
@@ -141,7 +199,11 @@ func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.
 			},
 		},
 		HttpFilters: []*hcm.HttpFilter{{
-			Name: router,
+			Name: cache.Router,
+		}},
+		AccessLog: []*alf.AccessLog{{
+			Name:   httpAccessLog,
+			Config: alsConfigPbst,
 		}},
 	}
 	pbst, err := util.MessageToStruct(manager)
@@ -164,9 +226,93 @@ func MakeListener(ads bool, listenerName string, port uint32, route string) *v2.
 		},
 		FilterChains: []listener.FilterChain{{
 			Filters: []listener.Filter{{
-				Name:   httpFilter,
+				Name:   cache.HTTPConnectionManager,
 				Config: pbst,
 			}},
 		}},
 	}
+}
+
+// MakeTCPListener creates a TCP listener for a cluster.
+func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.Listener {
+	// TCP filter configuration
+	config := &tcp.TcpProxy{
+		StatPrefix: "tcp",
+		Cluster:    clusterName,
+	}
+	pbst, err := util.MessageToStruct(config)
+	if err != nil {
+		panic(err)
+	}
+	return &v2.Listener{
+		Name: listenerName,
+		Address: core.Address{
+			Address: &core.Address_SocketAddress{
+				SocketAddress: &core.SocketAddress{
+					Protocol: core.TCP,
+					Address:  localhost,
+					PortSpecifier: &core.SocketAddress_PortValue{
+						PortValue: port,
+					},
+				},
+			},
+		},
+		FilterChains: []listener.FilterChain{{
+			Filters: []listener.Filter{{
+				Name:   cache.TCPProxy,
+				Config: pbst,
+			}},
+		}},
+	}
+}
+
+// TestSnapshot holds parameters for a synthetic snapshot.
+type TestSnapshot struct {
+	// Xds indicates snapshot mode: ads, xds, or rest
+	Xds string
+	// Version for the snapshot.
+	Version string
+	// UpstreamPort for the single endpoint on the localhost.
+	UpstreamPort uint32
+	// BasePort is the initial port for the listeners.
+	BasePort uint32
+	// NumClusters is the total number of clusters to generate.
+	NumClusters int
+	// NumHTTPListeners is the total number of HTTP listeners to generate.
+	NumHTTPListeners int
+	// NumTCPListeners is the total number of TCP listeners to generate.
+	// Listeners are assigned clusters in a round-robin fashion.
+	NumTCPListeners int
+}
+
+// Generate produces a snapshot from the parameters.
+func (ts TestSnapshot) Generate() cache.Snapshot {
+	clusters := make([]cache.Resource, ts.NumClusters)
+	endpoints := make([]cache.Resource, ts.NumClusters)
+	for i := 0; i < ts.NumClusters; i++ {
+		name := fmt.Sprintf("cluster-%s-%d", ts.Version, i)
+		clusters[i] = MakeCluster(ts.Xds, name)
+		endpoints[i] = MakeEndpoint(name, ts.UpstreamPort)
+	}
+
+	routes := make([]cache.Resource, ts.NumHTTPListeners)
+	for i := 0; i < ts.NumHTTPListeners; i++ {
+		name := fmt.Sprintf("route-%s-%d", ts.Version, i)
+		routes[i] = MakeRoute(name, cache.GetResourceName(clusters[i%ts.NumClusters]))
+	}
+
+	total := ts.NumHTTPListeners + ts.NumTCPListeners
+	listeners := make([]cache.Resource, total)
+	for i := 0; i < total; i++ {
+		port := ts.BasePort + uint32(i)
+		// listener name must be same since ports are shared and previous listener is drained
+		name := fmt.Sprintf("listener-%d", port)
+		if i < ts.NumHTTPListeners {
+			listeners[i] = MakeHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]))
+		} else {
+			listeners[i] = MakeTCPListener(name, port, cache.GetResourceName(clusters[i%ts.NumClusters]))
+		}
+	}
+
+	return cache.NewSnapshot(ts.Version, endpoints, clusters, routes, listeners)
 }

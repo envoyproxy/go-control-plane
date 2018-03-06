@@ -1,4 +1,4 @@
-// Copyright 2017 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -18,136 +18,116 @@ package test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
-	"time"
+
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	accesslog "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
-	"github.com/golang/glog"
-	"google.golang.org/grpc"
 )
 
 const (
-	node  = "service-node"
-	hello = "Hi, there!\n"
+	// Hello is the echo message
+	Hello = "Hi, there!\n"
 )
 
-// Hasher is a single cache key hash.
+// Hasher returns node ID as an ID
 type Hasher struct {
 }
 
-// ID function that always returns the same value.
-func (h Hasher) ID(*core.Node) string {
-	return node
+// ID function
+func (h Hasher) ID(node *core.Node) string {
+	if node == nil {
+		return "unknown"
+	}
+	return node.Id
 }
 
-type handler struct {
-}
+type echo struct{}
 
-func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h echo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/text")
-	if _, err := w.Write([]byte(hello)); err != nil {
-		glog.Error(err)
+	if _, err := w.Write([]byte(Hello)); err != nil {
+		log.Error(err)
 	}
 }
 
 // RunHTTP opens a simple listener on the port.
 func RunHTTP(ctx context.Context, upstreamPort uint) {
-	glog.Infof("upstream listening HTTP1.1 on %d", upstreamPort)
-	h := handler{}
-	server := &http.Server{Addr: fmt.Sprintf(":%d", upstreamPort), Handler: h}
+	log.WithFields(log.Fields{"port": upstreamPort}).Info("upstream listening HTTP/1.1")
+	server := &http.Server{Addr: fmt.Sprintf(":%d", upstreamPort), Handler: echo{}}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}()
 	if err := server.Shutdown(ctx); err != nil {
-		glog.Error(err)
+		log.Error(err)
 	}
 }
 
-// RunXDS starts an xDS server at the given port.
-func RunXDS(ctx context.Context, config cache.Cache, port uint) {
-	server := xds.NewServer(config, nil)
+// RunAccessLogServer starts an accesslog service.
+func RunAccessLogServer(ctx context.Context, als *AccessLogService, port uint) {
 	grpcServer := grpc.NewServer()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		glog.Fatalf("failed to listen: %v", err)
+		log.WithError(err).Fatal("failed to listen")
 	}
+
+	accesslog.RegisterAccessLogServiceServer(grpcServer, als)
+	log.WithFields(log.Fields{"port": port}).Info("access log server listening")
+
+	go func() {
+		if err = grpcServer.Serve(lis); err != nil {
+			log.Error(err)
+		}
+	}()
+	<-ctx.Done()
+
+	grpcServer.GracefulStop()
+}
+
+// RunManagementServer starts an xDS server at the given port.
+func RunManagementServer(ctx context.Context, server xds.Server, port uint) {
+	grpcServer := grpc.NewServer()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		log.WithError(err).Fatal("failed to listen")
+	}
+
+	// register services
 	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
 	v2.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
 	v2.RegisterClusterDiscoveryServiceServer(grpcServer, server)
 	v2.RegisterRouteDiscoveryServiceServer(grpcServer, server)
 	v2.RegisterListenerDiscoveryServiceServer(grpcServer, server)
-	glog.Infof("xDS server listening on %d", port)
+
+	log.WithFields(log.Fields{"port": port}).Info("management server listening")
 	go func() {
 		if err = grpcServer.Serve(lis); err != nil {
-			glog.Error(err)
+			log.Error(err)
 		}
 	}()
 	<-ctx.Done()
+
 	grpcServer.GracefulStop()
 }
 
-// RunCacheUpdate executes a config update sequence every second.
-func RunCacheUpdate(ctx context.Context,
-	config cache.SnapshotCache,
-	ads bool,
-	interval time.Duration,
-	upstreamPort, listenPort uint) {
-	i := 0
-	for {
-		version := fmt.Sprintf("version%d", i)
-		clusterName := fmt.Sprintf("cluster%d", i)
-		routeName := fmt.Sprintf("route%d", i)
-		// listener name must be same since ports are shared and previous listener is drained
-		listenerName := "listener"
-
-		endpoint := resource.MakeEndpoint(clusterName, uint32(upstreamPort))
-		cluster := resource.MakeCluster(ads, clusterName)
-		route := resource.MakeRoute(routeName, clusterName)
-		listener := resource.MakeListener(ads, listenerName, uint32(listenPort), routeName)
-
-		glog.Infof("updating cache with %d-labelled responses", i)
-		snapshot := cache.NewSnapshot(version,
-			[]cache.Resource{endpoint},
-			[]cache.Resource{cluster},
-			[]cache.Resource{route},
-			[]cache.Resource{listener})
-		config.SetSnapshot(node, snapshot)
-
-		select {
-		case <-time.After(interval):
-		case <-ctx.Done():
-			return
+// RunManagementGateway starts an HTTP gateway to an xDS server.
+func RunManagementGateway(ctx context.Context, srv xds.Server, port uint) {
+	log.WithFields(log.Fields{"port": port}).Info("gateway listening HTTP/1.1")
+	server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &xds.HTTPGateway{Server: srv}}
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			log.Error(err)
 		}
-		i++
+	}()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Error(err)
 	}
-}
-
-// CheckResponse makes a request to localhost at the given port and checks that the response body matches.
-func CheckResponse(port uint) error {
-	glog.Infof("making a request to :%d", port)
-	client := http.Client{
-		Timeout: 1 * time.Second,
-	}
-	req, err := client.Get(fmt.Sprintf("http://localhost:%d", port))
-	if err != nil {
-		return err
-	}
-	defer req.Body.Close()
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return err
-	}
-	if string(body) != hello {
-		return fmt.Errorf("unexpected return %q", string(body))
-	}
-	return nil
 }

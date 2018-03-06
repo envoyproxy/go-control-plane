@@ -9,18 +9,62 @@ exercising the pushed configuration.
 
 ## Requirements
 
-* Envoy binary `envoy` available on the path
+* Envoy binary `envoy` available: set `ENVOY` environment variable to the
+  location of the binary, or use the default value `/usr/local/bin/envoy`
 * `go-control-plane` builds successfully
 
 ## Steps
 
 To run the script with a single ADS server:
 
-    go run pkg/test/main/main.go --logtostderr -v 10 --ads=true
+    make integration.ads
 
-To run the script with EDS, CDS, RDS, and LDS servers:
+To run the script with a single server configured as different xDS servers:
 
-    go run pkg/test/main/main.go --logtostderr -v 10 --ads=false
+    make integration.xds
 
-You should see configuration push events logged as well as individual requests
-reports (`OK` or `ERROR` depending whether the proxy is ready or not to accept requests).
+To run the script with a single server configured to use `Fetch` through HTTP:
+
+    make integration.rest
+
+You should see runs of configuration push events and request batch reports. The
+test executes batches of requests to exercise multiple listeners, routes, and
+clusters, and records the number of successful and failed requests. The test is
+successful if at least one batch passes through all requests (e.g. Envoy
+eventually converges to use the latest pushed configuration) for each run.
+
+## Customizing the test driver
+
+The test driver has the following options: 
+
+```
+Usage of bin/test:
+  -als uint
+    	Accesslog server port (default 18090)
+  -base uint
+    	Listener port (default 9000)
+  -clusters int
+    	Number of clusters (default 2)
+  -debug
+    	Use debug logging
+  -delay duration
+    	Interval between request batch retries (default 500ms)
+  -gateway uint
+    	Management server port for HTTP gateway (default 18001)
+  -http int
+    	Number of HTTP listeners (and RDS configs) (default 1)
+  -nodeID string
+    	Node ID (default "test-id")
+  -port uint
+    	Management server port (default 18000)
+  -r int
+    	Number of requests between snapshot updates (default 5)
+  -tcp int
+    	Number of TCP pass-through listeners (default 1)
+  -u int
+    	Number of snapshot updates (default 3)
+  -upstream uint
+    	Upstream HTTP/1.1 port (default 18080)
+  -xds string
+    	Management server type (ads, xds, rest) (default "ads")
+```
