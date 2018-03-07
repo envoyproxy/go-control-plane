@@ -75,7 +75,7 @@ func GetResourceName(res Resource) string {
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources ...Resource) map[string]bool {
+func GetResourceReferences(resources map[string]Resource) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
 		if res == nil {

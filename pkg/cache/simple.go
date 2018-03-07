@@ -141,9 +141,8 @@ func nameSet(names []string) map[string]bool {
 }
 
 // superset checks that all resources are listed in the names set.
-func superset(names map[string]bool, resources []Resource) error {
-	for _, resource := range resources {
-		resourceName := GetResourceName(resource)
+func superset(names map[string]bool, resources map[string]Resource) error {
+	for resourceName := range resources {
 		if _, exists := names[resourceName]; !exists {
 			return fmt.Errorf("%q not listed", resourceName)
 		}
@@ -214,7 +213,7 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
 // TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
-func (cache *snapshotCache) respond(request Request, value chan Response, resources []Resource, version string) {
+func (cache *snapshotCache) respond(request Request, value chan Response, resources map[string]Resource, version string) {
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
@@ -233,19 +232,22 @@ func (cache *snapshotCache) respond(request Request, value chan Response, resour
 	value <- createResponse(request, resources, version)
 }
 
-func createResponse(request Request, resources []Resource, version string) Response {
-	filtered := resources
+func createResponse(request Request, resources map[string]Resource, version string) Response {
+	filtered := make([]Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
 	// on separate streams since requests do not share their response versions.
 	if len(request.ResourceNames) != 0 {
-		filtered = make([]Resource, 0, len(resources))
 		set := nameSet(request.ResourceNames)
-		for _, resource := range resources {
-			if set[GetResourceName(resource)] {
+		for name, resource := range resources {
+			if set[name] {
 				filtered = append(filtered, resource)
 			}
+		}
+	} else {
+		for _, resource := range resources {
+			filtered = append(filtered, resource)
 		}
 	}
 
