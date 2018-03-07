@@ -100,10 +100,7 @@ func (s *Snapshot) Consistent() error {
 	if len(routes) != len(s.Routes.Items) {
 		return fmt.Errorf("mismatched route reference and resource lengths: %v != %d", routes, len(s.Routes.Items))
 	}
-	if err := superset(routes, s.Routes.Items); err != nil {
-		return err
-	}
-	return nil
+	return superset(routes, s.Routes.Items)
 }
 
 // GetResources selects snapshot resources by type.
