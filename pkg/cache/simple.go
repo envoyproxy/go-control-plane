@@ -167,6 +167,7 @@ func (cache *snapshotCache) CreateWatch(request Request) (chan Response, func())
 	// update last watch request time
 	info.mu.Lock()
 	info.lastWatchRequestTime = time.Now()
+	info.setWatchVersion(request.TypeUrl, request.VersionInfo)
 	info.mu.Unlock()
 
 	// allocate capacity 1 to allow one-time non-blocking use
