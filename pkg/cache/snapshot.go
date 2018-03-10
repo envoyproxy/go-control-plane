@@ -43,6 +43,9 @@ type Snapshot struct {
 
 	// Listeners are items in the LDS response payload.
 	Listeners Resources
+
+	// Secrets are items in the SDS response payload.
+	Secrets Resources
 }
 
 // NewSnapshot creates a snapshot from response types and a version.
@@ -103,6 +106,8 @@ func (s *Snapshot) GetResources(typ string) []Resource {
 		return s.Routes.Items
 	case ListenerType:
 		return s.Listeners.Items
+	case SecretType:
+		return s.Secrets.Items
 	}
 	return nil
 }
@@ -121,6 +126,8 @@ func (s *Snapshot) GetVersion(typ string) string {
 		return s.Routes.Version
 	case ListenerType:
 		return s.Listeners.Version
+	case SecretType:
+		return s.Secrets.Version
 	}
 	return ""
 }

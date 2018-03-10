@@ -38,6 +38,7 @@ type Server interface {
 	v2.RouteDiscoveryServiceServer
 	v2.ListenerDiscoveryServiceServer
 	discovery.AggregatedDiscoveryServiceServer
+	discovery.SecretDiscoveryServiceServer
 
 	// Fetch is the universal fetch method.
 	Fetch(context.Context, *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error)
@@ -84,16 +85,19 @@ type watches struct {
 	clusters  chan cache.Response
 	routes    chan cache.Response
 	listeners chan cache.Response
+	secrets   chan cache.Response
 
 	endpointCancel func()
 	clusterCancel  func()
 	routeCancel    func()
 	listenerCancel func()
+	secretCancel   func()
 
 	endpointNonce string
 	clusterNonce  string
 	routeNonce    string
 	listenerNonce string
+	secretNonce   string
 }
 
 // Cancel all watches
@@ -109,6 +113,9 @@ func (values watches) Cancel() {
 	}
 	if values.listenerCancel != nil {
 		values.listenerCancel()
+	}
+	if values.secretCancel != nil {
+		values.secretCancel()
 	}
 }
 
@@ -216,6 +223,16 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			}
 			values.listenerNonce = nonce
 
+		case resp, more := <-values.secrets:
+			if !more {
+				return status.Errorf(codes.Unavailable, "secrets watch failed")
+			}
+			nonce, err := send(resp, cache.SecretType)
+			if err != nil {
+				return err
+			}
+			values.secretNonce = nonce
+
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -263,6 +280,11 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 					values.listenerCancel()
 				}
 				values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
+			case req.TypeUrl == cache.SecretType && (values.secretNonce == "" || values.secretNonce == nonce):
+				if values.secretCancel != nil {
+					values.secretCancel()
+				}
+				values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
 			}
 		}
 	}
@@ -316,6 +338,10 @@ func (s *server) StreamListeners(stream v2.ListenerDiscoveryService_StreamListen
 	return s.handler(stream, cache.ListenerType)
 }
 
+func (s *server) StreamSecrets(stream discovery.SecretDiscoveryService_StreamSecretsServer) error {
+	return s.handler(stream, cache.SecretType)
+}
+
 // Fetch is the universal fetch method.
 func (s *server) Fetch(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
 	if s.callbacks != nil {
@@ -361,5 +387,13 @@ func (s *server) FetchListeners(ctx context.Context, req *v2.DiscoveryRequest) (
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
 	req.TypeUrl = cache.ListenerType
+	return s.Fetch(ctx, req)
+}
+
+func (s *server) FetchSecrets(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.Unavailable, "empty request")
+	}
+	req.TypeUrl = cache.SecretType
 	return s.Fetch(ctx, req)
 }
