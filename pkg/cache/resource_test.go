@@ -60,6 +60,10 @@ func TestGetResourceReferences(t *testing.T) {
 		out map[string]bool
 	}{
 		{
+			in:  nil,
+			out: map[string]bool{},
+		},
+		{
 			in:  cluster,
 			out: map[string]bool{clusterName: true},
 		},
@@ -68,8 +72,12 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[string]bool{"test": true},
 		},
 		{
-			in:  listener,
+			in:  resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName),
 			out: map[string]bool{routeName: true},
+		},
+		{
+			in:  resource.MakeTCPListener(listenerName, 80, clusterName),
+			out: map[string]bool{},
 		},
 		{
 			in:  route,
@@ -81,7 +89,7 @@ func TestGetResourceReferences(t *testing.T) {
 		},
 	}
 	for _, cs := range cases {
-		names := cache.GetResourceReferences(cs.in)
+		names := cache.GetResourceReferences(cache.IndexResourcesByName([]cache.Resource{cs.in}))
 		if !reflect.DeepEqual(names, cs.out) {
 			t.Errorf("GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
 		}
