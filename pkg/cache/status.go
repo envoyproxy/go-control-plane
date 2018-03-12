@@ -38,6 +38,11 @@ type StatusInfo interface {
 
 	// GetLastWatchRequestTime returns the timestamp of the last discovery watch request.
 	GetLastWatchRequestTime() time.Time
+
+	// GetLastWatchVersion returns the version info from the last watch request
+	// per type URL. Note that this is mostly useful in the ADS mode, since the
+	// server only responds once for the entire set of resource names.
+	GetLastWatchVersion(string) string
 }
 
 type statusInfo struct {
@@ -49,6 +54,12 @@ type statusInfo struct {
 
 	// the timestamp of the last watch request
 	lastWatchRequestTime time.Time
+
+	// the version from the last watch request per discovery type
+	lastWatchEndpointsVersion string
+	lastWatchClustersVersion  string
+	lastWatchRoutesVersion    string
+	lastWatchListenersVersion string
 
 	// mutex to protect the status fields.
 	// should not acquire mutex of the parent cache after acquiring this mutex.
@@ -73,6 +84,20 @@ func newStatusInfo(node *core.Node) *statusInfo {
 	return &out
 }
 
+// setWatchVersion updates the last known accepted version from the watch request.
+func (info *statusInfo) setWatchVersion(typeURL string, version string) {
+	switch typeURL {
+	case EndpointType:
+		info.lastWatchEndpointsVersion = version
+	case ClusterType:
+		info.lastWatchClustersVersion = version
+	case RouteType:
+		info.lastWatchRoutesVersion = version
+	case ListenerType:
+		info.lastWatchListenersVersion = version
+	}
+}
+
 func (info *statusInfo) GetNode() *core.Node {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
@@ -89,4 +114,18 @@ func (info *statusInfo) GetLastWatchRequestTime() time.Time {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.lastWatchRequestTime
+}
+
+func (info *statusInfo) GetLastWatchVersion(typeURL string) string {
+	switch typeURL {
+	case EndpointType:
+		return info.lastWatchEndpointsVersion
+	case ClusterType:
+		return info.lastWatchClustersVersion
+	case RouteType:
+		return info.lastWatchRoutesVersion
+	case ListenerType:
+		return info.lastWatchListenersVersion
+	}
+	return ""
 }

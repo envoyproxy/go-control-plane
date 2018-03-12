@@ -149,6 +149,9 @@ func TestSnapshotCacheWatch(t *testing.T) {
 				if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot.GetResources(typ)) {
 					t.Errorf("get resources %v, want %v", out.Resources, snapshot.GetResources(typ))
 				}
+				if got := c.GetStatusInfo(key).GetLastWatchVersion(typ); got != "" {
+					t.Errorf("got %q for last watch version for %q, want empty", got, typ)
+				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}
@@ -158,6 +161,9 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	// open new watches with the latest version
 	for _, typ := range cache.ResponseTypes {
 		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
+		if got := c.GetStatusInfo(key).GetLastWatchVersion(typ); got != version {
+			t.Errorf("got %q for last watch version for %q, want %q", got, typ, version)
+		}
 	}
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(cache.ResponseTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)

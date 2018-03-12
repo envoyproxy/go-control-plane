@@ -37,4 +37,13 @@ func TestNewStatusInfo(t *testing.T) {
 		t.Errorf("GetLastWatchRequestTime() => got %v, want zero time", got)
 	}
 
+	// initial versions should be all set to ""
+	for _, typeURL := range ResponseTypes {
+		if got := info.GetLastWatchVersion(typeURL); got != "" {
+			t.Errorf("GetLastWatchVersion(%q) => got %q, want empty", typeURL, got)
+		}
+	}
+	if got := info.GetLastWatchVersion(""); got != "" {
+		t.Errorf("GetLastWatchVersion(\"\") => got %q, want empty", got)
+	}
 }
