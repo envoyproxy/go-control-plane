@@ -199,7 +199,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 			},
 		},
 		HttpFilters: []*hcm.HttpFilter{{
-			Name: cache.Router,
+			Name: util.Router,
 		}},
 		AccessLog: []*alf.AccessLog{{
 			Name:   httpAccessLog,
@@ -226,7 +226,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		},
 		FilterChains: []listener.FilterChain{{
 			Filters: []listener.Filter{{
-				Name:   cache.HTTPConnectionManager,
+				Name:   util.HTTPConnectionManager,
 				Config: pbst,
 			}},
 		}},
@@ -259,7 +259,7 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 		},
 		FilterChains: []listener.FilterChain{{
 			Filters: []listener.Filter{{
-				Name:   cache.TCPProxy,
+				Name:   util.TCPProxy,
 				Config: pbst,
 			}},
 		}},
