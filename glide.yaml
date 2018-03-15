@@ -17,6 +17,6 @@ import:
 - package: istio.io/gogo-genproto
 - package: github.com/gogo/googleapis
 - package: github.com/envoyproxy/data-plane-api
-  version: 6defada5735de6998aa0fdcfb4d3aaa5e48972bd
+  version: 47e11810c1af88fdd3cb5fe1aeee139cc67497e0
 - package: github.com/sirupsen/logrus
   version: ^1.0.4
