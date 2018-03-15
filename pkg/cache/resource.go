@@ -30,6 +30,7 @@ type Resource interface {
 
 // Common names for Envoy filters.
 const (
+	CORS                  = "envoy.cors"
 	Router                = "envoy.router"
 	HTTPConnectionManager = "envoy.http_connection_manager"
 	TCPProxy              = "envoy.tcp_proxy"
