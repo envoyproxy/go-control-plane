@@ -195,7 +195,7 @@ type VirtualHost struct {
 	// <config_http_conn_man_headers_custom_request_headers>`.
 	ResponseHeadersToAdd []*envoy_api_v2_core.HeaderValueOption `protobuf:"bytes,10,rep,name=response_headers_to_add,json=responseHeadersToAdd" json:"response_headers_to_add,omitempty"`
 	// Specifies a list of HTTP headers that should be removed from each response
-	// handle by this virtual host.
+	// handled by this virtual host.
 	ResponseHeadersToRemove []string `protobuf:"bytes,11,rep,name=response_headers_to_remove,json=responseHeadersToRemove" json:"response_headers_to_remove,omitempty"`
 	// Indicates that the virtual host has a CORS policy.
 	Cors *CorsPolicy `protobuf:"bytes,8,opt,name=cors" json:"cors,omitempty"`
@@ -551,27 +551,24 @@ type WeightedCluster_ClusterWeight struct {
 	// cluster with metadata matching that set in metadata_match will be
 	// considered. The filter name should be specified as *envoy.lb*.
 	MetadataMatch *envoy_api_v2_core.Metadata `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch" json:"metadata_match,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies a list of headers to be added to requests when this cluster is selected
 	// through the enclosing :ref:`envoy_api_msg_route.RouteAction`.
 	// Headers specified at this level are applied before headers from the enclosing
 	// :ref:`envoy_api_msg_route.RouteAction`,
 	// :ref:`envoy_api_msg_route.VirtualHost`, and
-	// :ref:`envoy_api_msg_route.RouteConfiguration`. For more information, including details on
+	// :ref:`envoy_api_msg_RouteConfiguration`. For more information, including details on
 	// header value syntax, see the documentation on :ref:`custom request headers
 	// <config_http_conn_man_headers_custom_request_headers>`.
 	RequestHeadersToAdd []*envoy_api_v2_core.HeaderValueOption `protobuf:"bytes,4,rep,name=request_headers_to_add,json=requestHeadersToAdd" json:"request_headers_to_add,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies a list of headers to be added to responses when this cluster is selected
 	// through the enclosing :ref:`envoy_api_msg_route.RouteAction`.
 	// Headers specified at this level are applied before headers from the enclosing
 	// :ref:`envoy_api_msg_route.RouteAction`,
 	// :ref:`envoy_api_msg_route.VirtualHost`, and
-	// :ref:`envoy_api_msg_route.RouteConfiguration`. For more information, including details on
+	// :ref:`envoy_api_msg_RouteConfiguration`. For more information, including details on
 	// header value syntax, see the documentation on :ref:`custom request headers
 	// <config_http_conn_man_headers_custom_request_headers>`.
 	ResponseHeadersToAdd []*envoy_api_v2_core.HeaderValueOption `protobuf:"bytes,5,rep,name=response_headers_to_add,json=responseHeadersToAdd" json:"response_headers_to_add,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies a list of headers to be removed from responses when this cluster is selected
 	// through the enclosing :ref:`envoy_api_msg_route.RouteAction`.
 	ResponseHeadersToRemove []string `protobuf:"bytes,6,rep,name=response_headers_to_remove,json=responseHeadersToRemove" json:"response_headers_to_remove,omitempty"`
@@ -1660,7 +1657,7 @@ type RedirectAction struct {
 	ResponseCode RedirectAction_RedirectResponseCode `protobuf:"varint,3,opt,name=response_code,json=responseCode,proto3,enum=envoy.api.v2.route.RedirectAction_RedirectResponseCode" json:"response_code,omitempty"`
 	// The scheme portion of the URL will be swapped with "https".
 	HttpsRedirect bool `protobuf:"varint,4,opt,name=https_redirect,json=httpsRedirect,proto3" json:"https_redirect,omitempty"`
-	// [#not-implemented-hide:] Indicates that during redirection, the query portion of the URL will
+	// Indicates that during redirection, the query portion of the URL will
 	// be removed. Default value is false.
 	StripQuery bool `protobuf:"varint,6,opt,name=strip_query,json=stripQuery,proto3" json:"strip_query,omitempty"`
 }

@@ -573,8 +573,9 @@ type HttpConnectionManager_SetCurrentClientCertDetails struct {
 	Subject *google_protobuf1.BoolValue `protobuf:"bytes,1,opt,name=subject" json:"subject,omitempty"`
 	// Whether to forward the SAN of the client cert. Defaults to false.
 	San *google_protobuf1.BoolValue `protobuf:"bytes,2,opt,name=san" json:"san,omitempty"`
-	// [#not-implemented-hide:]
-	// Whether to forward the entire client cert in base64 encoded format. Defaults to false.
+	// Whether to forward the entire client cert in URL encoded PEM format. This will appear in the
+	// XFCC header comma separated from other values with the value Cert="PEM".
+	// Defaults to false.
 	Cert bool `protobuf:"varint,3,opt,name=cert,proto3" json:"cert,omitempty"`
 }
 

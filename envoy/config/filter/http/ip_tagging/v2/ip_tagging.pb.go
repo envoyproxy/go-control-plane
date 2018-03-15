@@ -70,7 +70,8 @@ func (IPTagging_RequestType) EnumDescriptor() ([]byte, []int) {
 type IPTagging struct {
 	// The type of request the filter should apply to.
 	RequestType IPTagging_RequestType `protobuf:"varint,1,opt,name=request_type,json=requestType,proto3,enum=envoy.config.filter.http.ip_tagging.v2.IPTagging_RequestType" json:"request_type,omitempty"`
-	// [#comment:TODO(ccaraman): Extend functionality to load IP tags from file system.]
+	// [#comment:TODO(ccaraman): Extend functionality to load IP tags from file system.
+	// Tracked by issue https://github.com/envoyproxy/envoy/issues/2695]
 	// The set of IP tags for the filter.
 	IpTags []*IPTagging_IPTag `protobuf:"bytes,4,rep,name=ip_tags,json=ipTags" json:"ip_tags,omitempty"`
 }
