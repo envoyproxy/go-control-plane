@@ -14,7 +14,7 @@
 
 package util
 
-// Common names for Envoy filters.
+// HTTP filter names
 const (
 	// Buffer HTTP filter
 	Buffer = "envoy.buffer"
@@ -46,7 +46,12 @@ const (
 	Squash = "envoy.squash"
 	// HTTPExternalAuthorization HTTP filter
 	HTTPExternalAuthorization = "envoy.ext_authz"
+)
 
+// Network filter names
+const (
+	// ClientSSLAuth network filter
+	ClientSSLAuth = "envoy.client_ssl_auth"
 	// Echo network filter
 	Echo = "envoy.echo"
 	// HTTPConnectionManager network filter
@@ -61,4 +66,40 @@ const (
 	RedisProxy = "envoy.redis_proxy"
 	// ExternalAuthorization network filter
 	ExternalAuthorization = "envoy.ext_authz"
+)
+
+// Listener filter names
+const (
+	// OriginalDestination listener filter
+	OriginalDestination = "envoy.listener.original_dst"
+	// ProxyProtocol listener filter
+	ProxyProtocol = "envoy.listener.proxy_protocol"
+)
+
+// Tracing provider names
+const (
+	// Lightstep tracer name
+	Lightstep = "envoy.lightstep"
+	// Zipkin tracer name
+	Zipkin = "envoy.zipkin"
+	// DynamicOT tracer name
+	DynamicOT = "envoy.dynamic.ot"
+)
+
+// Stats sink names
+const (
+	// Statsd sink
+	Statsd = "envoy.statsd"
+	// DogStatsD compatible stastsd sink
+	DogStatsd = "envoy.dog_statsd"
+	// MetricsService sink
+	MetricsService = "envoy.metrics_service"
+)
+
+// Access log sink names
+const (
+	// FileAccessLog sink name
+	FileAccessLog = "envoy.file_access_log"
+	// HTTPGRPCAccessLog sink for the HTTP gRPC access log service
+	HTTPGRPCAccessLog = "envoy.http_grpc_access_log"
 )
