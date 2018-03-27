@@ -72,6 +72,7 @@ do
   then
     echo "Generating protos ${path} ..."
     $protoc ${protocarg} ${path}/*.proto \
-      --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:.
+      --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:. \
+      --validate_out=lang=gogo:.
   fi
 done
