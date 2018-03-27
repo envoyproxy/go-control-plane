@@ -26,6 +26,8 @@ type StatsSink struct {
 	// * :ref:`envoy.statsd <envoy_api_msg_config.metrics.v2.StatsdSink>`
 	// * :ref:`envoy.dog_statsd <envoy_api_msg_config.metrics.v2.DogStatsdSink>`
 	// * :ref:`envoy.metrics_service <envoy_api_msg_config.metrics.v2.MetricsServiceConfig>`
+	//
+	// Sinks optionally support tagged/multiple dimensional metrics.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Stats sink specific configuration which depends on the sink being
 	// instantiated. See :ref:`StatsdSink <envoy_api_msg_config.metrics.v2.StatsdSink>` for an
@@ -236,7 +238,8 @@ func _TagSpecifier_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-// Stats configuration proto schema for built-in *envoy.statsd* sink.
+// Stats configuration proto schema for built-in *envoy.statsd* sink. This sink does not support
+// tagged metrics.
 type StatsdSink struct {
 	// Types that are valid to be assigned to StatsdSpecifier:
 	//	*StatsdSink_Address
