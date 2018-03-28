@@ -175,7 +175,15 @@ func (m *BindConfig) Validate() error {
 		}
 	}
 
-	// no validation rules for Freebind
+	if v, ok := interface{}(m.GetFreebind()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BindConfigValidationError{
+				Field:  "Freebind",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
 
 	return nil
 }
