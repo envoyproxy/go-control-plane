@@ -2417,7 +2417,6 @@ type HeaderMatcher struct {
 	// * The regex *\d{3}* does not match the value *1234*
 	// * The regex *\d{3}* does not match the value *123.456*
 	Regex *google_protobuf1.BoolValue `protobuf:"bytes,3,opt,name=regex" json:"regex,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies how the header match will be performed to route the request.
 	// If header_match_specifier is absent, a request that has the
 	// :ref:`envoy_api_msg_route.HeaderMatcher.name` header will match, regardless of the header's

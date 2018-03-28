@@ -1,8 +1,8 @@
-hash: a952717853c3a38033a035acd2e5b089d33bd759d6464abb53b78a03c848deff
-updated: 2018-03-15T10:55:09.93521862-07:00
+hash: 2b24134f468a3e0ddb72640328224a3fded06fa4eee6b62991979ae2fadc25c9
+updated: 2018-03-27T19:44:21.991981981-07:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 47e11810c1af88fdd3cb5fe1aeee139cc67497e0
+  version: ec157d3d8b359a1bd65c22116ba4387a459cc53a
 - name: github.com/gogo/googleapis
   version: 0cd9801be74a10d5ac39d69626eac8255ffcd502
   subpackages:
@@ -28,7 +28,7 @@ imports:
   - ptypes/duration
   - ptypes/timestamp
 - name: github.com/lyft/protoc-gen-validate
-  version: 6cd364ac742e088e22c2d04e90358ce48e1e33e5
+  version: cae364899cd8c08b83bfdcabf4ce4dd4a68ca6da
   subpackages:
   - validate
 - name: github.com/sirupsen/logrus
@@ -66,7 +66,7 @@ imports:
   - googleapis/rpc/status
   - opencensus
 - name: google.golang.org/grpc
-  version: 8e4536a86ab602859c20df5ebfd0bd4228d08655
+  version: afc05b9e1d36f289ea16ba294894486a3e458246
   subpackages:
   - balancer
   - balancer/base

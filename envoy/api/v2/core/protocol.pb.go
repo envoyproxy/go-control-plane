@@ -33,7 +33,6 @@ func (*TcpProtocolOptions) ProtoMessage()               {}
 func (*TcpProtocolOptions) Descriptor() ([]byte, []int) { return fileDescriptorProtocol, []int{0} }
 
 type HttpProtocolOptions struct {
-	// [#not-implemented-hide:]
 	// The idle timeout for upstream connection pool connections. The idle timeout is defined as the
 	// period in which there are no active requests. If not set, there is no idle timeout. When the
 	// idle timeout is reached the connection will be closed. Note that request based timeouts mean
@@ -59,13 +58,11 @@ type Http1ProtocolOptions struct {
 	// envoy as their HTTP proxy. In Unix, for example, this is typically done by setting the
 	// *http_proxy* environment variable.
 	AllowAbsoluteUrl *google_protobuf.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl" json:"allow_absolute_url,omitempty"`
-	// [#not-implemented-hide:]
 	// Handle incoming HTTP/1.0 and HTTP 0.9 requests.
 	// This is off by default, and not fully standards compliant. There is support for pre-HTTP/1.1
 	// style connect logic, dechunking, and handling lack of client host iff
 	// *default_host_for_http_10* is configured.
 	AcceptHttp_10 bool `protobuf:"varint,2,opt,name=accept_http_10,json=acceptHttp10,proto3" json:"accept_http_10,omitempty"`
-	// [#not-implemented-hide:]
 	// A default host for HTTP/1.0 requests. This is highly suggested if *accept_http_10* is true as
 	// Envoy does not otherwise support HTTP/1.0 without a Host header.
 	// This is a no-op if *accept_http_10* is not true.

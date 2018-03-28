@@ -36,6 +36,21 @@ var (
 	listener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
 )
 
+func TestValidate(t *testing.T) {
+	if err := endpoint.Validate(); err != nil {
+		t.Error(err)
+	}
+	if err := cluster.Validate(); err != nil {
+		t.Error(err)
+	}
+	if err := route.Validate(); err != nil {
+		t.Error(err)
+	}
+	if err := listener.Validate(); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestGetResourceName(t *testing.T) {
 	if name := cache.GetResourceName(endpoint); name != clusterName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", endpoint, name, clusterName)
