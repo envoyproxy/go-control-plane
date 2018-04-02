@@ -1,8 +1,8 @@
-hash: 2b24134f468a3e0ddb72640328224a3fded06fa4eee6b62991979ae2fadc25c9
-updated: 2018-03-27T19:44:21.991981981-07:00
+hash: 6ccb41c88aa5a24d1777594b0e281788b3fb2663d01e9fef28da5be346ce8d33
+updated: 2018-04-02T13:26:29.659866858-07:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: ec157d3d8b359a1bd65c22116ba4387a459cc53a
+  version: 22d98ce77228bde6984dfee38a285f501e748343
 - name: github.com/gogo/googleapis
   version: 0cd9801be74a10d5ac39d69626eac8255ffcd502
   subpackages:
@@ -66,7 +66,7 @@ imports:
   - googleapis/rpc/status
   - opencensus
 - name: google.golang.org/grpc
-  version: afc05b9e1d36f289ea16ba294894486a3e458246
+  version: 1e2570b1b19ade82d8dbb31bba4e65e9f9ef5b34
   subpackages:
   - balancer
   - balancer/base

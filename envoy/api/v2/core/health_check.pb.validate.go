@@ -311,6 +311,21 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 
 	// no validation rules for ServiceName
 
+	for idx, item := range m.GetRequestHeadersToAdd() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HealthCheck_HttpHealthCheckValidationError{
+					Field:  fmt.Sprintf("RequestHeadersToAdd[%v]", idx),
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
