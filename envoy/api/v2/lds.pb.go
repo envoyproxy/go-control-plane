@@ -110,7 +110,6 @@ type Listener struct {
 	// filters are processed sequentially right after a socket has been accepted by the listener, and
 	// before a connection is created.
 	ListenerFilters []envoy_api_v2_listener.ListenerFilter `protobuf:"bytes,9,rep,name=listener_filters,json=listenerFilters" json:"listener_filters"`
-	// [#not-implemented-hide:]
 	// Whether the listener should be set as a transparent socket.
 	// When this flag is set to true, connections can be redirected to the listener using an
 	// *iptables* *TPROXY* target, in which case the original source and destination addresses and
@@ -126,12 +125,12 @@ type Listener struct {
 	// When this flag is not set (default), the socket is not modified, i.e. the transparent option
 	// is neither set nor reset.
 	Transparent *google_protobuf.BoolValue `protobuf:"bytes,10,opt,name=transparent" json:"transparent,omitempty"`
-	// [#not-implemented-hide:] Whether the listener should set the *IP_FREEBIND*
-	// socket option. When this flag is set to true, listeners can be bound to an
-	// IP address that is not configured on the system running Envoy. When this
-	// flag is set to false, the option *IP_FREEBIND* is disabled on the socket.
-	// When this flag is not set (default), the socket is not modified, i.e. the
-	// option is neither enabled nor disabled.
+	// Whether the listener should set the *IP_FREEBIND* socket option. When this
+	// flag is set to true, listeners can be bound to an IP address that is not
+	// configured on the system running Envoy. When this flag is set to false, the
+	// option *IP_FREEBIND* is disabled on the socket. When this flag is not set
+	// (default), the socket is not modified, i.e. the option is neither enabled
+	// nor disabled.
 	Freebind *google_protobuf.BoolValue `protobuf:"bytes,11,opt,name=freebind" json:"freebind,omitempty"`
 }
 
