@@ -272,6 +272,7 @@ type ListenerFilter struct {
 	//
 	// [#comment:TODO(mattklein123): Auto generate the following list]
 	// * :ref:`envoy.listener.original_dst <config_listener_filters_original_dst>`
+	// * :ref:`envoy.listener.tls_inspector <config_listener_filters_tls_inspector>`
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.
