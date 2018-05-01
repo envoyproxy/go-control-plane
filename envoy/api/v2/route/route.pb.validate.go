@@ -143,16 +143,6 @@ func (m *VirtualHost) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAuth()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return VirtualHostValidationError{
-				Field:  "Auth",
-				Reason: "embedded message failed validation",
-				Cause:  err,
-			}
-		}
-	}
-
 	// no validation rules for PerFilterConfig
 
 	return nil
@@ -220,16 +210,6 @@ func (m *Route) Validate() error {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Decorator",
-				Reason: "embedded message failed validation",
-				Cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetAuth()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RouteValidationError{
-				Field:  "Auth",
 				Reason: "embedded message failed validation",
 				Cause:  err,
 			}
