@@ -53,7 +53,6 @@ type HealthCheck struct {
 	// names and the minimum percentage of servers in each of those clusters that
 	// must be healthy in order for the filter to return a 200.
 	ClusterMinHealthyPercentages map[string]*envoy_type1.Percent `protobuf:"bytes,4,rep,name=cluster_min_healthy_percentages,json=clusterMinHealthyPercentages" json:"cluster_min_healthy_percentages,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
-	// [#not-implemented-hide:]
 	// Specifies a set of health check request headers to match on. The health check filter will
 	// check a request’s headers against all the specified headers. To specify the health check
 	// endpoint, set the ``:path`` header to match on. Note that if the

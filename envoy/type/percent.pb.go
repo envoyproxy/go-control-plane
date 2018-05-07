@@ -7,11 +7,13 @@
 	It is generated from these files:
 		envoy/type/percent.proto
 		envoy/type/range.proto
+		envoy/type/string_match.proto
 
 	It has these top-level messages:
 		Percent
 		FractionalPercent
 		Int64Range
+		StringMatch
 */
 package envoy_type
 
