@@ -461,7 +461,12 @@ func (m *UpstreamTlsContext) Validate() error {
 		}
 	}
 
-	// no validation rules for Sni
+	if len(m.GetSni()) > 255 {
+		return UpstreamTlsContextValidationError{
+			Field:  "Sni",
+			Reason: "value length must be at most 255 bytes",
+		}
+	}
 
 	return nil
 }

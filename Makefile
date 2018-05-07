@@ -140,9 +140,7 @@ tools.govet:
 tools.golint:
 	@command -v golint >/dev/null ; if [ $$? -ne 0 ]; then \
 		echo "--> installing golint"; \
-		mkdir -p $$GOPATH/src/golang.org/x \
-		  && git clone https://github.com/golang/lint.git $$GOPATH/src/golang.org/x/lint \
-		  && go get -u golang.org/x/lint/golint; \
+		go get -u golang.org/x/lint/golint; \
 	fi
 
 tools.glide:
