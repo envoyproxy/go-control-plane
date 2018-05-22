@@ -8,7 +8,7 @@ import fmt "fmt"
 import math "math"
 import google_protobuf2 "github.com/gogo/protobuf/types"
 import google_protobuf4 "github.com/gogo/protobuf/types"
-import google_protobuf5 "google/protobuf"
+import google_protobuf5 "github.com/gogo/protobuf/types"
 import _ "github.com/lyft/protoc-gen-validate/validate"
 import _ "github.com/gogo/protobuf/gogoproto"
 
