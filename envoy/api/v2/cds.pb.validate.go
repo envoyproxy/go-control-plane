@@ -312,6 +312,8 @@ func (m *Cluster) Validate() error {
 
 	// no validation rules for CloseConnectionsOnHostHealthFailure
 
+	// no validation rules for DrainConnectionsOnHostRemoval
+
 	switch m.LbConfig.(type) {
 
 	case *Cluster_RingHashLbConfig_:

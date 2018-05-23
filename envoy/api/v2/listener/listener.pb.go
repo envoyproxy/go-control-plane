@@ -105,8 +105,11 @@ func (m *Filter_DeprecatedV1) GetType() string {
 // Specifies the match criteria for selecting a specific filter chain for a
 // listener.
 type FilterChainMatch struct {
-	// If non-empty, the SNI domains to consider. May contain a wildcard prefix,
-	// e.g. ``*.example.com``.
+	// If non-empty, the SNI domain names to consider. May contain a wildcard prefix for
+	// the bottom-level domain of a domain name, e.g. ``*.example.com``. Note that
+	// ``foo.example.com`` will be matched by ``foo.example.com`` and ``*.example.com``
+	// SNI domain names, but **not** by ``*foo.example.com``, ``*oo.example.com``,
+	// ``*example.com``, ``*.com`` or ``*``.
 	//
 	// .. attention::
 	//

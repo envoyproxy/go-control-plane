@@ -525,8 +525,8 @@ func _HealthCheck_Payload_OneofSizer(msg proto.Message) (n int) {
 
 type HealthCheck_HttpHealthCheck struct {
 	// The value of the host header in the HTTP health check request. If
-	// left empty (default value), the IP on behalf of which this health check is performed will be
-	// used.
+	// left empty (default value), the name of the cluster this health check is associated
+	// with will be used.
 	Host string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
 	// Specifies the HTTP path that will be requested during health checking. For example
 	// */healthcheck*.
