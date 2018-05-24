@@ -508,10 +508,7 @@ func init() {
 }
 func (this *Pipe) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Pipe)
@@ -524,10 +521,7 @@ func (this *Pipe) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -538,10 +532,7 @@ func (this *Pipe) Equal(that interface{}) bool {
 }
 func (this *SocketAddress) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*SocketAddress)
@@ -554,10 +545,7 @@ func (this *SocketAddress) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -586,10 +574,7 @@ func (this *SocketAddress) Equal(that interface{}) bool {
 }
 func (this *SocketAddress_PortValue) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*SocketAddress_PortValue)
@@ -602,10 +587,7 @@ func (this *SocketAddress_PortValue) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -616,10 +598,7 @@ func (this *SocketAddress_PortValue) Equal(that interface{}) bool {
 }
 func (this *SocketAddress_NamedPort) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*SocketAddress_NamedPort)
@@ -632,10 +611,7 @@ func (this *SocketAddress_NamedPort) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -646,10 +622,7 @@ func (this *SocketAddress_NamedPort) Equal(that interface{}) bool {
 }
 func (this *TcpKeepalive) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*TcpKeepalive)
@@ -662,10 +635,7 @@ func (this *TcpKeepalive) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -682,10 +652,7 @@ func (this *TcpKeepalive) Equal(that interface{}) bool {
 }
 func (this *BindConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*BindConfig)
@@ -698,10 +665,7 @@ func (this *BindConfig) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -715,10 +679,7 @@ func (this *BindConfig) Equal(that interface{}) bool {
 }
 func (this *Address) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Address)
@@ -731,10 +692,7 @@ func (this *Address) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -751,10 +709,7 @@ func (this *Address) Equal(that interface{}) bool {
 }
 func (this *Address_SocketAddress) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Address_SocketAddress)
@@ -767,10 +722,7 @@ func (this *Address_SocketAddress) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -781,10 +733,7 @@ func (this *Address_SocketAddress) Equal(that interface{}) bool {
 }
 func (this *Address_Pipe) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Address_Pipe)
@@ -797,10 +746,7 @@ func (this *Address_Pipe) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -811,10 +757,7 @@ func (this *Address_Pipe) Equal(that interface{}) bool {
 }
 func (this *CidrRange) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*CidrRange)
@@ -827,10 +770,7 @@ func (this *CidrRange) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

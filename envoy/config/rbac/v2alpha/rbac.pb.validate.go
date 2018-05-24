@@ -164,162 +164,6 @@ func (e PolicyValidationError) Error() string {
 
 var _ error = PolicyValidationError{}
 
-// Validate checks the field values on MapEntryMatch with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *MapEntryMatch) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Key
-
-	for idx, item := range m.GetValues() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return MapEntryMatchValidationError{
-					Field:  fmt.Sprintf("Values[%v]", idx),
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// MapEntryMatchValidationError is the validation error returned by
-// MapEntryMatch.Validate if the designated constraints aren't met.
-type MapEntryMatchValidationError struct {
-	Field  string
-	Reason string
-	Cause  error
-	Key    bool
-}
-
-// Error satisfies the builtin error interface
-func (e MapEntryMatchValidationError) Error() string {
-	cause := ""
-	if e.Cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
-	}
-
-	key := ""
-	if e.Key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sMapEntryMatch.%s: %s%s",
-		key,
-		e.Field,
-		e.Reason,
-		cause)
-}
-
-var _ error = MapEntryMatchValidationError{}
-
-// Validate checks the field values on IpMatch with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *IpMatch) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	for idx, item := range m.GetCidrs() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return IpMatchValidationError{
-					Field:  fmt.Sprintf("Cidrs[%v]", idx),
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// IpMatchValidationError is the validation error returned by IpMatch.Validate
-// if the designated constraints aren't met.
-type IpMatchValidationError struct {
-	Field  string
-	Reason string
-	Cause  error
-	Key    bool
-}
-
-// Error satisfies the builtin error interface
-func (e IpMatchValidationError) Error() string {
-	cause := ""
-	if e.Cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
-	}
-
-	key := ""
-	if e.Key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sIpMatch.%s: %s%s",
-		key,
-		e.Field,
-		e.Reason,
-		cause)
-}
-
-var _ error = IpMatchValidationError{}
-
-// Validate checks the field values on PortMatch with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *PortMatch) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	return nil
-}
-
-// PortMatchValidationError is the validation error returned by
-// PortMatch.Validate if the designated constraints aren't met.
-type PortMatchValidationError struct {
-	Field  string
-	Reason string
-	Cause  error
-	Key    bool
-}
-
-// Error satisfies the builtin error interface
-func (e PortMatchValidationError) Error() string {
-	cause := ""
-	if e.Cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
-	}
-
-	key := ""
-	if e.Key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPortMatch.%s: %s%s",
-		key,
-		e.Field,
-		e.Reason,
-		cause)
-}
-
-var _ error = PortMatchValidationError{}
-
 // Validate checks the field values on Permission with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Permission) Validate() error {
@@ -327,32 +171,78 @@ func (m *Permission) Validate() error {
 		return nil
 	}
 
-	for idx, item := range m.GetPaths() {
-		_, _ = idx, item
+	switch m.Rule.(type) {
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+	case *Permission_AndRules:
+
+		if v, ok := interface{}(m.GetAndRules()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return PermissionValidationError{
-					Field:  fmt.Sprintf("Paths[%v]", idx),
+					Field:  "AndRules",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
 			}
 		}
 
-	}
+	case *Permission_OrRules:
 
-	for idx, item := range m.GetConditions() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetOrRules()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return PermissionValidationError{
-					Field:  fmt.Sprintf("Conditions[%v]", idx),
+					Field:  "OrRules",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
 			}
+		}
+
+	case *Permission_Any:
+
+		if m.GetAny() != true {
+			return PermissionValidationError{
+				Field:  "Any",
+				Reason: "value must equal true",
+			}
+		}
+
+	case *Permission_Header:
+
+		if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PermissionValidationError{
+					Field:  "Header",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *Permission_DestinationIp:
+
+		if v, ok := interface{}(m.GetDestinationIp()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PermissionValidationError{
+					Field:  "DestinationIp",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *Permission_DestinationPort:
+
+		if m.GetDestinationPort() > 65535 {
+			return PermissionValidationError{
+				Field:  "DestinationPort",
+				Reason: "value must be less than or equal to 65535",
+			}
+		}
+
+	default:
+		return PermissionValidationError{
+			Field:  "Rule",
+			Reason: "value is required",
 		}
 
 	}
@@ -398,27 +288,81 @@ func (m *Principal) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetAuthenticated()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return PrincipalValidationError{
-				Field:  "Authenticated",
-				Reason: "embedded message failed validation",
-				Cause:  err,
-			}
-		}
-	}
+	switch m.Identifier.(type) {
 
-	for idx, item := range m.GetAttributes() {
-		_, _ = idx, item
+	case *Principal_AndIds:
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetAndIds()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return PrincipalValidationError{
-					Field:  fmt.Sprintf("Attributes[%v]", idx),
+					Field:  "AndIds",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
 			}
+		}
+
+	case *Principal_OrIds:
+
+		if v, ok := interface{}(m.GetOrIds()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PrincipalValidationError{
+					Field:  "OrIds",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *Principal_Any:
+
+		if m.GetAny() != true {
+			return PrincipalValidationError{
+				Field:  "Any",
+				Reason: "value must equal true",
+			}
+		}
+
+	case *Principal_Authenticated_:
+
+		if v, ok := interface{}(m.GetAuthenticated()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PrincipalValidationError{
+					Field:  "Authenticated",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *Principal_SourceIp:
+
+		if v, ok := interface{}(m.GetSourceIp()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PrincipalValidationError{
+					Field:  "SourceIp",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *Principal_Header:
+
+		if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PrincipalValidationError{
+					Field:  "Header",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	default:
+		return PrincipalValidationError{
+			Field:  "Identifier",
+			Reason: "value is required",
 		}
 
 	}
@@ -457,46 +401,28 @@ func (e PrincipalValidationError) Error() string {
 
 var _ error = PrincipalValidationError{}
 
-// Validate checks the field values on Permission_Condition with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *Permission_Condition) Validate() error {
+// Validate checks the field values on Permission_Set with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *Permission_Set) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	switch m.ConditionSpec.(type) {
-
-	case *Permission_Condition_Header:
-
-		if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return Permission_ConditionValidationError{
-					Field:  "Header",
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
+	if len(m.GetRules()) < 1 {
+		return Permission_SetValidationError{
+			Field:  "Rules",
+			Reason: "value must contain at least 1 item(s)",
 		}
+	}
 
-	case *Permission_Condition_DestinationIps:
+	for idx, item := range m.GetRules() {
+		_, _ = idx, item
 
-		if v, ok := interface{}(m.GetDestinationIps()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return Permission_ConditionValidationError{
-					Field:  "DestinationIps",
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	case *Permission_Condition_DestinationPorts:
-
-		if v, ok := interface{}(m.GetDestinationPorts()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return Permission_ConditionValidationError{
-					Field:  "DestinationPorts",
+				return Permission_SetValidationError{
+					Field:  fmt.Sprintf("Rules[%v]", idx),
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
@@ -508,9 +434,9 @@ func (m *Permission_Condition) Validate() error {
 	return nil
 }
 
-// Permission_ConditionValidationError is the validation error returned by
-// Permission_Condition.Validate if the designated constraints aren't met.
-type Permission_ConditionValidationError struct {
+// Permission_SetValidationError is the validation error returned by
+// Permission_Set.Validate if the designated constraints aren't met.
+type Permission_SetValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -518,7 +444,7 @@ type Permission_ConditionValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e Permission_ConditionValidationError) Error() string {
+func (e Permission_SetValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -530,14 +456,78 @@ func (e Permission_ConditionValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sPermission_Condition.%s: %s%s",
+		"invalid %sPermission_Set.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = Permission_ConditionValidationError{}
+var _ error = Permission_SetValidationError{}
+
+// Validate checks the field values on Principal_Set with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *Principal_Set) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetIds()) < 1 {
+		return Principal_SetValidationError{
+			Field:  "Ids",
+			Reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetIds() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return Principal_SetValidationError{
+					Field:  fmt.Sprintf("Ids[%v]", idx),
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// Principal_SetValidationError is the validation error returned by
+// Principal_Set.Validate if the designated constraints aren't met.
+type Principal_SetValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e Principal_SetValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPrincipal_Set.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = Principal_SetValidationError{}
 
 // Validate checks the field values on Principal_Authenticated with the rules
 // defined in the proto definition for this message. If any rules are
@@ -582,76 +572,3 @@ func (e Principal_AuthenticatedValidationError) Error() string {
 }
 
 var _ error = Principal_AuthenticatedValidationError{}
-
-// Validate checks the field values on Principal_Attribute with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *Principal_Attribute) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	switch m.AttributeSpec.(type) {
-
-	case *Principal_Attribute_Service:
-		// no validation rules for Service
-
-	case *Principal_Attribute_SourceIps:
-
-		if v, ok := interface{}(m.GetSourceIps()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return Principal_AttributeValidationError{
-					Field:  "SourceIps",
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	case *Principal_Attribute_Header:
-
-		if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return Principal_AttributeValidationError{
-					Field:  "Header",
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// Principal_AttributeValidationError is the validation error returned by
-// Principal_Attribute.Validate if the designated constraints aren't met.
-type Principal_AttributeValidationError struct {
-	Field  string
-	Reason string
-	Cause  error
-	Key    bool
-}
-
-// Error satisfies the builtin error interface
-func (e Principal_AttributeValidationError) Error() string {
-	cause := ""
-	if e.Cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
-	}
-
-	key := ""
-	if e.Key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sPrincipal_Attribute.%s: %s%s",
-		key,
-		e.Field,
-		e.Reason,
-		cause)
-}
-
-var _ error = Principal_AttributeValidationError{}

@@ -46,8 +46,8 @@ import _ "github.com/gogo/protobuf/gogoproto"
 
 import time "time"
 
-import encoding_binary "encoding/binary"
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import binary "encoding/binary"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -1429,7 +1429,7 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.SampleRate != 0 {
 		dAtA[i] = 0x9
 		i++
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.SampleRate))))
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.SampleRate))))
 		i += 8
 	}
 	if m.DownstreamRemoteAddress != nil {
@@ -1465,8 +1465,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.StartTime != nil {
 		dAtA[i] = 0x2a
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartTime)))
-		n4, err := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartTime, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdTime(*m.StartTime)))
+		n4, err := types.StdTimeMarshalTo(*m.StartTime, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1475,8 +1475,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.TimeToLastRxByte != nil {
 		dAtA[i] = 0x32
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastRxByte)))
-		n5, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.TimeToLastRxByte, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdDuration(*m.TimeToLastRxByte)))
+		n5, err := types.StdDurationMarshalTo(*m.TimeToLastRxByte, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1485,8 +1485,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.TimeToFirstUpstreamTxByte != nil {
 		dAtA[i] = 0x3a
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToFirstUpstreamTxByte)))
-		n6, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.TimeToFirstUpstreamTxByte, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdDuration(*m.TimeToFirstUpstreamTxByte)))
+		n6, err := types.StdDurationMarshalTo(*m.TimeToFirstUpstreamTxByte, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1495,8 +1495,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.TimeToLastUpstreamTxByte != nil {
 		dAtA[i] = 0x42
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastUpstreamTxByte)))
-		n7, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.TimeToLastUpstreamTxByte, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdDuration(*m.TimeToLastUpstreamTxByte)))
+		n7, err := types.StdDurationMarshalTo(*m.TimeToLastUpstreamTxByte, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1505,8 +1505,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.TimeToFirstUpstreamRxByte != nil {
 		dAtA[i] = 0x4a
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToFirstUpstreamRxByte)))
-		n8, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.TimeToFirstUpstreamRxByte, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdDuration(*m.TimeToFirstUpstreamRxByte)))
+		n8, err := types.StdDurationMarshalTo(*m.TimeToFirstUpstreamRxByte, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1515,8 +1515,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.TimeToLastUpstreamRxByte != nil {
 		dAtA[i] = 0x52
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastUpstreamRxByte)))
-		n9, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.TimeToLastUpstreamRxByte, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdDuration(*m.TimeToLastUpstreamRxByte)))
+		n9, err := types.StdDurationMarshalTo(*m.TimeToLastUpstreamRxByte, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1525,8 +1525,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.TimeToFirstDownstreamTxByte != nil {
 		dAtA[i] = 0x5a
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToFirstDownstreamTxByte)))
-		n10, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.TimeToFirstDownstreamTxByte, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdDuration(*m.TimeToFirstDownstreamTxByte)))
+		n10, err := types.StdDurationMarshalTo(*m.TimeToFirstDownstreamTxByte, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1535,8 +1535,8 @@ func (m *AccessLogCommon) MarshalTo(dAtA []byte) (int, error) {
 	if m.TimeToLastDownstreamTxByte != nil {
 		dAtA[i] = 0x62
 		i++
-		i = encodeVarintAccesslog(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastDownstreamTxByte)))
-		n11, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.TimeToLastDownstreamTxByte, dAtA[i:])
+		i = encodeVarintAccesslog(dAtA, i, uint64(types.SizeOfStdDuration(*m.TimeToLastDownstreamTxByte)))
+		n11, err := types.StdDurationMarshalTo(*m.TimeToLastDownstreamTxByte, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -2562,35 +2562,35 @@ func (m *AccessLogCommon) Size() (n int) {
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.StartTime != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartTime)
+		l = types.SizeOfStdTime(*m.StartTime)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.TimeToLastRxByte != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastRxByte)
+		l = types.SizeOfStdDuration(*m.TimeToLastRxByte)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.TimeToFirstUpstreamTxByte != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToFirstUpstreamTxByte)
+		l = types.SizeOfStdDuration(*m.TimeToFirstUpstreamTxByte)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.TimeToLastUpstreamTxByte != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastUpstreamTxByte)
+		l = types.SizeOfStdDuration(*m.TimeToLastUpstreamTxByte)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.TimeToFirstUpstreamRxByte != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToFirstUpstreamRxByte)
+		l = types.SizeOfStdDuration(*m.TimeToFirstUpstreamRxByte)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.TimeToLastUpstreamRxByte != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastUpstreamRxByte)
+		l = types.SizeOfStdDuration(*m.TimeToLastUpstreamRxByte)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.TimeToFirstDownstreamTxByte != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToFirstDownstreamTxByte)
+		l = types.SizeOfStdDuration(*m.TimeToFirstDownstreamTxByte)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.TimeToLastDownstreamTxByte != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.TimeToLastDownstreamTxByte)
+		l = types.SizeOfStdDuration(*m.TimeToLastDownstreamTxByte)
 		n += 1 + l + sovAccesslog(uint64(l))
 	}
 	if m.UpstreamRemoteAddress != nil {
@@ -3069,7 +3069,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 8) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.SampleRate = float64(math.Float64frombits(v))
 		case 2:
@@ -3200,7 +3200,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.StartTime == nil {
 				m.StartTime = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdTimeUnmarshal(m.StartTime, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3233,7 +3233,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.TimeToLastRxByte == nil {
 				m.TimeToLastRxByte = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.TimeToLastRxByte, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.TimeToLastRxByte, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3266,7 +3266,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.TimeToFirstUpstreamTxByte == nil {
 				m.TimeToFirstUpstreamTxByte = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.TimeToFirstUpstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.TimeToFirstUpstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3299,7 +3299,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.TimeToLastUpstreamTxByte == nil {
 				m.TimeToLastUpstreamTxByte = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.TimeToLastUpstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.TimeToLastUpstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3332,7 +3332,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.TimeToFirstUpstreamRxByte == nil {
 				m.TimeToFirstUpstreamRxByte = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.TimeToFirstUpstreamRxByte, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.TimeToFirstUpstreamRxByte, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3365,7 +3365,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.TimeToLastUpstreamRxByte == nil {
 				m.TimeToLastUpstreamRxByte = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.TimeToLastUpstreamRxByte, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.TimeToLastUpstreamRxByte, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3398,7 +3398,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.TimeToFirstDownstreamTxByte == nil {
 				m.TimeToFirstDownstreamTxByte = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.TimeToFirstDownstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.TimeToFirstDownstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3431,7 +3431,7 @@ func (m *AccessLogCommon) Unmarshal(dAtA []byte) error {
 			if m.TimeToLastDownstreamTxByte == nil {
 				m.TimeToLastDownstreamTxByte = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.TimeToLastDownstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.TimeToLastDownstreamTxByte, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
