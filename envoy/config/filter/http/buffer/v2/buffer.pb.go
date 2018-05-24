@@ -23,7 +23,7 @@ import _ "github.com/gogo/protobuf/gogoproto"
 
 import time "time"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -221,8 +221,8 @@ func (m *Buffer) MarshalTo(dAtA []byte) (int, error) {
 	if m.MaxRequestTime != nil {
 		dAtA[i] = 0x12
 		i++
-		i = encodeVarintBuffer(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.MaxRequestTime)))
-		n2, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.MaxRequestTime, dAtA[i:])
+		i = encodeVarintBuffer(dAtA, i, uint64(types.SizeOfStdDuration(*m.MaxRequestTime)))
+		n2, err := types.StdDurationMarshalTo(*m.MaxRequestTime, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -299,7 +299,7 @@ func (m *Buffer) Size() (n int) {
 		n += 1 + l + sovBuffer(uint64(l))
 	}
 	if m.MaxRequestTime != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.MaxRequestTime)
+		l = types.SizeOfStdDuration(*m.MaxRequestTime)
 		n += 1 + l + sovBuffer(uint64(l))
 	}
 	return n
@@ -434,7 +434,7 @@ func (m *Buffer) Unmarshal(dAtA []byte) error {
 			if m.MaxRequestTime == nil {
 				m.MaxRequestTime = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.MaxRequestTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.MaxRequestTime, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

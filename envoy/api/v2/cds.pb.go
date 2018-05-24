@@ -44,12 +44,10 @@ import _ "github.com/gogo/protobuf/gogoproto"
 
 import time "time"
 
-import (
-	context "golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
-)
+import context "golang.org/x/net/context"
+import grpc "google.golang.org/grpc"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -1129,10 +1127,7 @@ func init() {
 }
 func (this *Cluster) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster)
@@ -1145,10 +1140,7 @@ func (this *Cluster) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1279,10 +1271,7 @@ func (this *Cluster) Equal(that interface{}) bool {
 }
 func (this *Cluster_RingHashLbConfig_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_RingHashLbConfig_)
@@ -1295,10 +1284,7 @@ func (this *Cluster_RingHashLbConfig_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1309,10 +1295,7 @@ func (this *Cluster_RingHashLbConfig_) Equal(that interface{}) bool {
 }
 func (this *Cluster_EdsClusterConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_EdsClusterConfig)
@@ -1325,10 +1308,7 @@ func (this *Cluster_EdsClusterConfig) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1342,10 +1322,7 @@ func (this *Cluster_EdsClusterConfig) Equal(that interface{}) bool {
 }
 func (this *Cluster_LbSubsetConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_LbSubsetConfig)
@@ -1358,10 +1335,7 @@ func (this *Cluster_LbSubsetConfig) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1383,10 +1357,7 @@ func (this *Cluster_LbSubsetConfig) Equal(that interface{}) bool {
 }
 func (this *Cluster_LbSubsetConfig_LbSubsetSelector) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_LbSubsetConfig_LbSubsetSelector)
@@ -1399,10 +1370,7 @@ func (this *Cluster_LbSubsetConfig_LbSubsetSelector) Equal(that interface{}) boo
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1418,10 +1386,7 @@ func (this *Cluster_LbSubsetConfig_LbSubsetSelector) Equal(that interface{}) boo
 }
 func (this *Cluster_RingHashLbConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_RingHashLbConfig)
@@ -1434,10 +1399,7 @@ func (this *Cluster_RingHashLbConfig) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1451,10 +1413,7 @@ func (this *Cluster_RingHashLbConfig) Equal(that interface{}) bool {
 }
 func (this *Cluster_RingHashLbConfig_DeprecatedV1) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_RingHashLbConfig_DeprecatedV1)
@@ -1467,10 +1426,7 @@ func (this *Cluster_RingHashLbConfig_DeprecatedV1) Equal(that interface{}) bool 
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1481,10 +1437,7 @@ func (this *Cluster_RingHashLbConfig_DeprecatedV1) Equal(that interface{}) bool 
 }
 func (this *Cluster_CommonLbConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_CommonLbConfig)
@@ -1497,10 +1450,7 @@ func (this *Cluster_CommonLbConfig) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1520,10 +1470,7 @@ func (this *Cluster_CommonLbConfig) Equal(that interface{}) bool {
 }
 func (this *Cluster_CommonLbConfig_ZoneAwareLbConfig_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_CommonLbConfig_ZoneAwareLbConfig_)
@@ -1536,10 +1483,7 @@ func (this *Cluster_CommonLbConfig_ZoneAwareLbConfig_) Equal(that interface{}) b
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1550,10 +1494,7 @@ func (this *Cluster_CommonLbConfig_ZoneAwareLbConfig_) Equal(that interface{}) b
 }
 func (this *Cluster_CommonLbConfig_LocalityWeightedLbConfig_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_CommonLbConfig_LocalityWeightedLbConfig_)
@@ -1566,10 +1507,7 @@ func (this *Cluster_CommonLbConfig_LocalityWeightedLbConfig_) Equal(that interfa
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1580,10 +1518,7 @@ func (this *Cluster_CommonLbConfig_LocalityWeightedLbConfig_) Equal(that interfa
 }
 func (this *Cluster_CommonLbConfig_ZoneAwareLbConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_CommonLbConfig_ZoneAwareLbConfig)
@@ -1596,10 +1531,7 @@ func (this *Cluster_CommonLbConfig_ZoneAwareLbConfig) Equal(that interface{}) bo
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1613,10 +1545,7 @@ func (this *Cluster_CommonLbConfig_ZoneAwareLbConfig) Equal(that interface{}) bo
 }
 func (this *Cluster_CommonLbConfig_LocalityWeightedLbConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Cluster_CommonLbConfig_LocalityWeightedLbConfig)
@@ -1629,10 +1558,7 @@ func (this *Cluster_CommonLbConfig_LocalityWeightedLbConfig) Equal(that interfac
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1640,10 +1566,7 @@ func (this *Cluster_CommonLbConfig_LocalityWeightedLbConfig) Equal(that interfac
 }
 func (this *UpstreamBindConfig) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpstreamBindConfig)
@@ -1656,10 +1579,7 @@ func (this *UpstreamBindConfig) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1670,10 +1590,7 @@ func (this *UpstreamBindConfig) Equal(that interface{}) bool {
 }
 func (this *UpstreamConnectionOptions) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*UpstreamConnectionOptions)
@@ -1686,10 +1603,7 @@ func (this *UpstreamConnectionOptions) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1875,8 +1789,8 @@ func (m *Cluster) MarshalTo(dAtA []byte) (int, error) {
 	}
 	dAtA[i] = 0x22
 	i++
-	i = encodeVarintCds(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(m.ConnectTimeout)))
-	n2, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.ConnectTimeout, dAtA[i:])
+	i = encodeVarintCds(dAtA, i, uint64(types.SizeOfStdDuration(m.ConnectTimeout)))
+	n2, err := types.StdDurationMarshalTo(m.ConnectTimeout, dAtA[i:])
 	if err != nil {
 		return 0, err
 	}
@@ -1975,8 +1889,8 @@ func (m *Cluster) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		dAtA[i] = 0x1
 		i++
-		i = encodeVarintCds(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DnsRefreshRate)))
-		n9, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.DnsRefreshRate, dAtA[i:])
+		i = encodeVarintCds(dAtA, i, uint64(types.SizeOfStdDuration(*m.DnsRefreshRate)))
+		n9, err := types.StdDurationMarshalTo(*m.DnsRefreshRate, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -2020,8 +1934,8 @@ func (m *Cluster) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		dAtA[i] = 0x1
 		i++
-		i = encodeVarintCds(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.CleanupInterval)))
-		n11, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.CleanupInterval, dAtA[i:])
+		i = encodeVarintCds(dAtA, i, uint64(types.SizeOfStdDuration(*m.CleanupInterval)))
+		n11, err := types.StdDurationMarshalTo(*m.CleanupInterval, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -2552,7 +2466,7 @@ func (m *Cluster) Size() (n int) {
 		l = m.EdsClusterConfig.Size()
 		n += 1 + l + sovCds(uint64(l))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdDuration(m.ConnectTimeout)
+	l = types.SizeOfStdDuration(m.ConnectTimeout)
 	n += 1 + l + sovCds(uint64(l))
 	if m.PerConnectionBufferLimitBytes != nil {
 		l = m.PerConnectionBufferLimitBytes.Size()
@@ -2594,7 +2508,7 @@ func (m *Cluster) Size() (n int) {
 		n += 1 + l + sovCds(uint64(l))
 	}
 	if m.DnsRefreshRate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.DnsRefreshRate)
+		l = types.SizeOfStdDuration(*m.DnsRefreshRate)
 		n += 2 + l + sovCds(uint64(l))
 	}
 	if m.DnsLookupFamily != 0 {
@@ -2611,7 +2525,7 @@ func (m *Cluster) Size() (n int) {
 		n += 2 + l + sovCds(uint64(l))
 	}
 	if m.CleanupInterval != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.CleanupInterval)
+		l = types.SizeOfStdDuration(*m.CleanupInterval)
 		n += 2 + l + sovCds(uint64(l))
 	}
 	if m.UpstreamBindConfig != nil {
@@ -2959,7 +2873,7 @@ func (m *Cluster) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(&m.ConnectTimeout, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(&m.ConnectTimeout, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3271,7 +3185,7 @@ func (m *Cluster) Unmarshal(dAtA []byte) error {
 			if m.DnsRefreshRate == nil {
 				m.DnsRefreshRate = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.DnsRefreshRate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.DnsRefreshRate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -3387,7 +3301,7 @@ func (m *Cluster) Unmarshal(dAtA []byte) error {
 			if m.CleanupInterval == nil {
 				m.CleanupInterval = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.CleanupInterval, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.CleanupInterval, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

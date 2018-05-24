@@ -788,10 +788,7 @@ func init() {
 }
 func (this *GrpcService) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService)
@@ -804,10 +801,7 @@ func (this *GrpcService) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -835,10 +829,7 @@ func (this *GrpcService) Equal(that interface{}) bool {
 }
 func (this *GrpcService_EnvoyGrpc_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_EnvoyGrpc_)
@@ -851,10 +842,7 @@ func (this *GrpcService_EnvoyGrpc_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -865,10 +853,7 @@ func (this *GrpcService_EnvoyGrpc_) Equal(that interface{}) bool {
 }
 func (this *GrpcService_GoogleGrpc_) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_)
@@ -881,10 +866,7 @@ func (this *GrpcService_GoogleGrpc_) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -895,10 +877,7 @@ func (this *GrpcService_GoogleGrpc_) Equal(that interface{}) bool {
 }
 func (this *GrpcService_EnvoyGrpc) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_EnvoyGrpc)
@@ -911,10 +890,7 @@ func (this *GrpcService_EnvoyGrpc) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -925,10 +901,7 @@ func (this *GrpcService_EnvoyGrpc) Equal(that interface{}) bool {
 }
 func (this *GrpcService_GoogleGrpc) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc)
@@ -941,10 +914,7 @@ func (this *GrpcService_GoogleGrpc) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -975,10 +945,7 @@ func (this *GrpcService_GoogleGrpc) Equal(that interface{}) bool {
 }
 func (this *GrpcService_GoogleGrpc_SslCredentials) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_SslCredentials)
@@ -991,10 +958,7 @@ func (this *GrpcService_GoogleGrpc_SslCredentials) Equal(that interface{}) bool 
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1011,10 +975,7 @@ func (this *GrpcService_GoogleGrpc_SslCredentials) Equal(that interface{}) bool 
 }
 func (this *GrpcService_GoogleGrpc_ChannelCredentials) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_ChannelCredentials)
@@ -1027,10 +988,7 @@ func (this *GrpcService_GoogleGrpc_ChannelCredentials) Equal(that interface{}) b
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1047,10 +1005,7 @@ func (this *GrpcService_GoogleGrpc_ChannelCredentials) Equal(that interface{}) b
 }
 func (this *GrpcService_GoogleGrpc_ChannelCredentials_SslCredentials) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_ChannelCredentials_SslCredentials)
@@ -1063,10 +1018,7 @@ func (this *GrpcService_GoogleGrpc_ChannelCredentials_SslCredentials) Equal(that
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1077,10 +1029,7 @@ func (this *GrpcService_GoogleGrpc_ChannelCredentials_SslCredentials) Equal(that
 }
 func (this *GrpcService_GoogleGrpc_ChannelCredentials_GoogleDefault) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_ChannelCredentials_GoogleDefault)
@@ -1093,10 +1042,7 @@ func (this *GrpcService_GoogleGrpc_ChannelCredentials_GoogleDefault) Equal(that 
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1107,10 +1053,7 @@ func (this *GrpcService_GoogleGrpc_ChannelCredentials_GoogleDefault) Equal(that 
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials)
@@ -1123,10 +1066,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials) Equal(that interface{}) bool
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1143,10 +1083,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials) Equal(that interface{}) bool
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_AccessToken) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_AccessToken)
@@ -1159,10 +1096,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_AccessToken) Equal(that inter
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1173,10 +1107,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_AccessToken) Equal(that inter
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleComputeEngine) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_GoogleComputeEngine)
@@ -1189,10 +1120,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleComputeEngine) Equal(th
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1203,10 +1131,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleComputeEngine) Equal(th
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleRefreshToken) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_GoogleRefreshToken)
@@ -1219,10 +1144,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleRefreshToken) Equal(tha
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1233,10 +1155,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleRefreshToken) Equal(tha
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJwtAccess) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJwtAccess)
@@ -1249,10 +1168,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJwtAccess) Equa
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1263,10 +1179,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJwtAccess) Equa
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleIam) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_GoogleIam)
@@ -1279,10 +1192,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleIam) Equal(that interfa
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1293,10 +1203,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleIam) Equal(that interfa
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_FromPlugin) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_FromPlugin)
@@ -1309,10 +1216,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_FromPlugin) Equal(that interf
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1323,10 +1227,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_FromPlugin) Equal(that interf
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCredentials) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCredentials)
@@ -1339,10 +1240,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCreden
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1356,10 +1254,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCreden
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials)
@@ -1372,10 +1267,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials) Equal(t
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1389,10 +1281,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials) Equal(t
 }
 func (this *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin)
@@ -1405,10 +1294,7 @@ func (this *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}

@@ -24,7 +24,7 @@ import _ "github.com/gogo/protobuf/gogoproto"
 
 import time "time"
 
-import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 
 import io "io"
 
@@ -138,8 +138,8 @@ func (m *HealthCheck) MarshalTo(dAtA []byte) (int, error) {
 	if m.CacheTime != nil {
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintHealthCheck(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.CacheTime)))
-		n2, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.CacheTime, dAtA[i:])
+		i = encodeVarintHealthCheck(dAtA, i, uint64(types.SizeOfStdDuration(*m.CacheTime)))
+		n2, err := types.StdDurationMarshalTo(*m.CacheTime, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -209,7 +209,7 @@ func (m *HealthCheck) Size() (n int) {
 		n += 1 + l + sovHealthCheck(uint64(l))
 	}
 	if m.CacheTime != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.CacheTime)
+		l = types.SizeOfStdDuration(*m.CacheTime)
 		n += 1 + l + sovHealthCheck(uint64(l))
 	}
 	if len(m.ClusterMinHealthyPercentages) > 0 {
@@ -367,7 +367,7 @@ func (m *HealthCheck) Unmarshal(dAtA []byte) error {
 			if m.CacheTime == nil {
 				m.CacheTime = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.CacheTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.CacheTime, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

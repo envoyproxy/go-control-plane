@@ -269,6 +269,18 @@ func (m *CertificateValidationContext) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetVerifyCertificateHash() {
+		_, _ = idx, item
+
+		if l := len(item); l < 64 || l > 95 {
+			return CertificateValidationContextValidationError{
+				Field:  fmt.Sprintf("VerifyCertificateHash[%v]", idx),
+				Reason: "value length must be between 64 and 95 bytes, inclusive",
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetRequireOcspStaple()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CertificateValidationContextValidationError{
