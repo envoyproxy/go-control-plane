@@ -61,6 +61,7 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	body, err := ioutil.ReadAll(req.Body)
+	defer req.Body.Close()
 	if err != nil {
 		http.Error(resp, "cannot read body", http.StatusBadRequest)
 		return
