@@ -323,6 +323,8 @@ func (m *CertificateValidationContext) Validate() error {
 		}
 	}
 
+	// no validation rules for AllowExpiredCertificate
+
 	return nil
 }
 

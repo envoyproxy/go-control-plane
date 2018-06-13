@@ -2548,7 +2548,7 @@ type HeaderMatcher struct {
 	//	*HeaderMatcher_PrefixMatch
 	//	*HeaderMatcher_SuffixMatch
 	HeaderMatchSpecifier isHeaderMatcher_HeaderMatchSpecifier `protobuf_oneof:"header_match_specifier"`
-	// If specified, the match result will be inverted before before checking. Defaults to false.
+	// If specified, the match result will be inverted before checking. Defaults to false.
 	//
 	// Examples:
 	//
