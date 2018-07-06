@@ -14,7 +14,7 @@ import:
 - package: google.golang.org/grpc
   version: =1.11.1
 - package: github.com/lyft/protoc-gen-validate
-  version: cae364899cd8c08b83bfdcabf4ce4dd4a68ca6da
+  version: f9d2b11e44149635b23a002693b76512b01ae515
 - package: istio.io/gogo-genproto
 - package: github.com/gogo/googleapis
 - package: github.com/envoyproxy/data-plane-api

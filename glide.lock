@@ -1,5 +1,5 @@
-hash: f2a1e2d33966a47b620b04aadfa1cbc87525f93b88701e7bf642310dfce6c4ba
-updated: 2018-07-03T16:55:43.481956726-07:00
+hash: cdc4c19aae1352d73c2502f514b7a44822d5afcf77acaef0bcfb4c143c41aec5
+updated: 2018-07-06T11:44:46.987142209-07:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
   version: 5d0d8a33fe313b196d65a9726c1f26f3833b6069
@@ -28,7 +28,7 @@ imports:
   - ptypes/duration
   - ptypes/timestamp
 - name: github.com/lyft/protoc-gen-validate
-  version: cae364899cd8c08b83bfdcabf4ce4dd4a68ca6da
+  version: f9d2b11e44149635b23a002693b76512b01ae515
   subpackages:
   - validate
 - name: github.com/sirupsen/logrus

@@ -817,3 +817,19 @@ func (e ResponseFlagFilterValidationError) Error() string {
 }
 
 var _ error = ResponseFlagFilterValidationError{}
+
+var _ResponseFlagFilter_Flags_InLookup = map[string]struct{}{
+	"LH":   {},
+	"UH":   {},
+	"UT":   {},
+	"LR":   {},
+	"UR":   {},
+	"UF":   {},
+	"UC":   {},
+	"UO":   {},
+	"NR":   {},
+	"DI":   {},
+	"FI":   {},
+	"RL":   {},
+	"UAEX": {},
+}
