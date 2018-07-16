@@ -259,9 +259,8 @@ type HttpConnectionManager struct {
 	// :ref:`http_connection_manager.represent_ipv4_remote_address_as_ipv4_mapped_ipv6
 	// <config_http_conn_man_runtime_represent_ipv4_remote_address_as_ipv4_mapped_ipv6>` for runtime
 	// control.
-	RepresentIpv4RemoteAddressAsIpv4MappedIpv6 bool `protobuf:"varint,20,opt,name=represent_ipv4_remote_address_as_ipv4_mapped_ipv6,json=representIpv4RemoteAddressAsIpv4MappedIpv6,proto3" json:"represent_ipv4_remote_address_as_ipv4_mapped_ipv6,omitempty"`
-	// [#not-implemented-hide:]
-	UpgradeConfigs []*HttpConnectionManager_UpgradeConfig `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs" json:"upgrade_configs,omitempty"`
+	RepresentIpv4RemoteAddressAsIpv4MappedIpv6 bool                                   `protobuf:"varint,20,opt,name=represent_ipv4_remote_address_as_ipv4_mapped_ipv6,json=representIpv4RemoteAddressAsIpv4MappedIpv6,proto3" json:"represent_ipv4_remote_address_as_ipv4_mapped_ipv6,omitempty"`
+	UpgradeConfigs                             []*HttpConnectionManager_UpgradeConfig `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs" json:"upgrade_configs,omitempty"`
 }
 
 func (m *HttpConnectionManager) Reset()         { *m = HttpConnectionManager{} }
@@ -656,7 +655,6 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) GetUri() bool {
 	return false
 }
 
-// [#not-implemented-hide:]
 // The configuration for HTTP upgrades.
 // For each upgrade type desired, an UpgradeConfig must be added.
 //
@@ -665,6 +663,10 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) GetUri() bool {
 //    The current implementation of upgrade headers does not handle
 //    multi-valued upgrade headers. Support for multi-valued headers may be
 //    added in the future if needed.
+//
+// .. warning::
+//    The current implementation of upgrade headers does not work with HTTP/2
+//    upstreams.
 type HttpConnectionManager_UpgradeConfig struct {
 	// The case-insensitive name of this upgrade, e.g. "websocket".
 	// For each upgrade type present in upgrade_configs, requests with

@@ -94,6 +94,8 @@ func (m *HealthCheck) Validate() error {
 		}
 	}
 
+	// no validation rules for IntervalJitterPercent
+
 	if v, ok := interface{}(m.GetUnhealthyThreshold()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HealthCheckValidationError{
@@ -173,6 +175,8 @@ func (m *HealthCheck) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for EventLogPath
 
 	switch m.HealthChecker.(type) {
 
