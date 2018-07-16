@@ -1,15 +1,15 @@
-hash: cdc4c19aae1352d73c2502f514b7a44822d5afcf77acaef0bcfb4c143c41aec5
-updated: 2018-07-06T11:44:46.987142209-07:00
+hash: 5823c5838b331ee466d8fafac738627550549199f5a9b352e7ea135f84f52c92
+updated: 2018-07-15T21:03:00.647328-04:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 5d0d8a33fe313b196d65a9726c1f26f3833b6069
+  version: 56f0268e5d906fc7b3e0887c873613247d0eef54
 - name: github.com/gogo/googleapis
   version: 0cd9801be74a10d5ac39d69626eac8255ffcd502
   subpackages:
   - google/api
   - google/rpc
 - name: github.com/gogo/protobuf
-  version: 1adfc126b41513cc696b209667c8656ea7aac67c
+  version: 7d68e886eac4f7e34d0d82241a6273d6c304c5cf
   subpackages:
   - gogoproto
   - jsonpb

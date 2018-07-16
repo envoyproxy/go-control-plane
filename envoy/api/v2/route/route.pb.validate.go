@@ -1125,18 +1125,6 @@ func (m *HeaderMatcher) Validate() error {
 		}
 	}
 
-	// no validation rules for Value
-
-	if v, ok := interface{}(m.GetRegex()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HeaderMatcherValidationError{
-				Field:  "Regex",
-				Reason: "embedded message failed validation",
-				Cause:  err,
-			}
-		}
-	}
-
 	// no validation rules for InvertMatch
 
 	switch m.HeaderMatchSpecifier.(type) {
