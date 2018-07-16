@@ -6,17 +6,15 @@ package v2
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
+import envoy_api_v2_endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
 import _ "github.com/gogo/googleapis/google/api"
-import _ "github.com/gogo/protobuf/gogoproto"
 import _ "github.com/lyft/protoc-gen-validate/validate"
+import _ "github.com/gogo/protobuf/gogoproto"
 
-import bytes "bytes"
+import context "golang.org/x/net/context"
+import grpc "google.golang.org/grpc"
 
-import golang_org_x_net_context "golang.org/x/net/context"
-import google_golang_org_grpc "google.golang.org/grpc"
-
-import encoding_binary "encoding/binary"
+import binary "encoding/binary"
 
 import io "io"
 
@@ -24,12 +22,6 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Each route from RDS will map to a single cluster or traffic split across
 // clusters using weights expressed in the RDS WeightedCluster.
@@ -46,46 +38,15 @@ type ClusterLoadAssignment struct {
 	// <envoy_api_msg_Cluster.EdsClusterConfig>`.
 	ClusterName string `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
 	// List of endpoints to load balance to.
-	Endpoints []endpoint.LocalityLbEndpoints `protobuf:"bytes,2,rep,name=endpoints" json:"endpoints"`
+	Endpoints []envoy_api_v2_endpoint.LocalityLbEndpoints `protobuf:"bytes,2,rep,name=endpoints" json:"endpoints"`
 	// Load balancing policy settings.
-	Policy               *ClusterLoadAssignment_Policy `protobuf:"bytes,4,opt,name=policy" json:"policy,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
-	XXX_unrecognized     []byte                        `json:"-"`
-	XXX_sizecache        int32                         `json:"-"`
+	Policy *ClusterLoadAssignment_Policy `protobuf:"bytes,4,opt,name=policy" json:"policy,omitempty"`
 }
 
-func (m *ClusterLoadAssignment) Reset()         { *m = ClusterLoadAssignment{} }
-func (m *ClusterLoadAssignment) String() string { return proto.CompactTextString(m) }
-func (*ClusterLoadAssignment) ProtoMessage()    {}
-func (*ClusterLoadAssignment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_eds_22bfb8484ad10615, []int{0}
-}
-func (m *ClusterLoadAssignment) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ClusterLoadAssignment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClusterLoadAssignment.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *ClusterLoadAssignment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClusterLoadAssignment.Merge(dst, src)
-}
-func (m *ClusterLoadAssignment) XXX_Size() int {
-	return m.Size()
-}
-func (m *ClusterLoadAssignment) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClusterLoadAssignment.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClusterLoadAssignment proto.InternalMessageInfo
+func (m *ClusterLoadAssignment) Reset()                    { *m = ClusterLoadAssignment{} }
+func (m *ClusterLoadAssignment) String() string            { return proto.CompactTextString(m) }
+func (*ClusterLoadAssignment) ProtoMessage()               {}
+func (*ClusterLoadAssignment) Descriptor() ([]byte, []int) { return fileDescriptorEds, []int{0} }
 
 func (m *ClusterLoadAssignment) GetClusterName() string {
 	if m != nil {
@@ -94,7 +55,7 @@ func (m *ClusterLoadAssignment) GetClusterName() string {
 	return ""
 }
 
-func (m *ClusterLoadAssignment) GetEndpoints() []endpoint.LocalityLbEndpoints {
+func (m *ClusterLoadAssignment) GetEndpoints() []envoy_api_v2_endpoint.LocalityLbEndpoints {
 	if m != nil {
 		return m.Endpoints
 	}
@@ -115,44 +76,15 @@ type ClusterLoadAssignment_Policy struct {
 	// recover from an outage or should they be unable to autoscale and hence
 	// overall incoming traffic volume need to be trimmed to protect them.
 	// [#v2-api-diff: This is known as maintenance mode in v1.]
-	DropOverload         float64  `protobuf:"fixed64,1,opt,name=drop_overload,json=dropOverload,proto3" json:"drop_overload,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	DropOverload float64 `protobuf:"fixed64,1,opt,name=drop_overload,json=dropOverload,proto3" json:"drop_overload,omitempty"`
 }
 
 func (m *ClusterLoadAssignment_Policy) Reset()         { *m = ClusterLoadAssignment_Policy{} }
 func (m *ClusterLoadAssignment_Policy) String() string { return proto.CompactTextString(m) }
 func (*ClusterLoadAssignment_Policy) ProtoMessage()    {}
 func (*ClusterLoadAssignment_Policy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_eds_22bfb8484ad10615, []int{0, 0}
+	return fileDescriptorEds, []int{0, 0}
 }
-func (m *ClusterLoadAssignment_Policy) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ClusterLoadAssignment_Policy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClusterLoadAssignment_Policy.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *ClusterLoadAssignment_Policy) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClusterLoadAssignment_Policy.Merge(dst, src)
-}
-func (m *ClusterLoadAssignment_Policy) XXX_Size() int {
-	return m.Size()
-}
-func (m *ClusterLoadAssignment_Policy) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClusterLoadAssignment_Policy.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClusterLoadAssignment_Policy proto.InternalMessageInfo
 
 func (m *ClusterLoadAssignment_Policy) GetDropOverload() float64 {
 	if m != nil {
@@ -198,9 +130,6 @@ func (this *ClusterLoadAssignment) Equal(that interface{}) bool {
 	if !this.Policy.Equal(that1.Policy) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 func (this *ClusterLoadAssignment_Policy) Equal(that interface{}) bool {
@@ -223,9 +152,6 @@ func (this *ClusterLoadAssignment_Policy) Equal(that interface{}) bool {
 		return false
 	}
 	if this.DropOverload != that1.DropOverload {
-		return false
-	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -257,7 +183,7 @@ func NewEndpointDiscoveryServiceClient(cc *grpc.ClientConn) EndpointDiscoverySer
 }
 
 func (c *endpointDiscoveryServiceClient) StreamEndpoints(ctx context.Context, opts ...grpc.CallOption) (EndpointDiscoveryService_StreamEndpointsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_EndpointDiscoveryService_serviceDesc.Streams[0], "/envoy.api.v2.EndpointDiscoveryService/StreamEndpoints", opts...)
+	stream, err := grpc.NewClientStream(ctx, &_EndpointDiscoveryService_serviceDesc.Streams[0], c.cc, "/envoy.api.v2.EndpointDiscoveryService/StreamEndpoints", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -289,7 +215,7 @@ func (x *endpointDiscoveryServiceStreamEndpointsClient) Recv() (*DiscoveryRespon
 
 func (c *endpointDiscoveryServiceClient) FetchEndpoints(ctx context.Context, in *DiscoveryRequest, opts ...grpc.CallOption) (*DiscoveryResponse, error) {
 	out := new(DiscoveryResponse)
-	err := c.cc.Invoke(ctx, "/envoy.api.v2.EndpointDiscoveryService/FetchEndpoints", in, out, opts...)
+	err := grpc.Invoke(ctx, "/envoy.api.v2.EndpointDiscoveryService/FetchEndpoints", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -416,9 +342,6 @@ func (m *ClusterLoadAssignment) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n1
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -440,11 +363,8 @@ func (m *ClusterLoadAssignment_Policy) MarshalTo(dAtA []byte) (int, error) {
 	if m.DropOverload != 0 {
 		dAtA[i] = 0x9
 		i++
-		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.DropOverload))))
+		binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.DropOverload))))
 		i += 8
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -475,9 +395,6 @@ func (m *ClusterLoadAssignment) Size() (n int) {
 		l = m.Policy.Size()
 		n += 1 + l + sovEds(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -486,9 +403,6 @@ func (m *ClusterLoadAssignment_Policy) Size() (n int) {
 	_ = l
 	if m.DropOverload != 0 {
 		n += 9
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -590,7 +504,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Endpoints = append(m.Endpoints, endpoint.LocalityLbEndpoints{})
+			m.Endpoints = append(m.Endpoints, envoy_api_v2_endpoint.LocalityLbEndpoints{})
 			if err := m.Endpoints[len(m.Endpoints)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -640,7 +554,6 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -687,7 +600,7 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 			if (iNdEx + 8) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
 			iNdEx += 8
 			m.DropOverload = float64(math.Float64frombits(v))
 		default:
@@ -702,7 +615,6 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -817,9 +729,9 @@ var (
 	ErrIntOverflowEds   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("envoy/api/v2/eds.proto", fileDescriptor_eds_22bfb8484ad10615) }
+func init() { proto.RegisterFile("envoy/api/v2/eds.proto", fileDescriptorEds) }
 
-var fileDescriptor_eds_22bfb8484ad10615 = []byte{
+var fileDescriptorEds = []byte{
 	// 426 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x52, 0x3d, 0x8b, 0xd4, 0x40,
 	0x18, 0xde, 0xd9, 0x5b, 0x16, 0x76, 0x6e, 0x55, 0x18, 0x4f, 0x6f, 0x2f, 0x2c, 0xb9, 0x25, 0x58,
