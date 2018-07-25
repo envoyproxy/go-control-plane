@@ -1,5 +1,5 @@
-hash: 5b3bc2da2eb17b91baeda0ab743a36b0278743d3e340c53b0f6f5b58ae98058f
-updated: 2018-07-16T09:09:39.674852928-07:00
+hash: 3d67b891b9ecd451da8dde0519caaf981ac3cf396b67636bf5ddbfd5f8a9da81
+updated: 2018-07-18T14:30:54.345022556-07:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
   version: 56f0268e5d906fc7b3e0887c873613247d0eef54
@@ -9,7 +9,7 @@ imports:
   - google/api
   - google/rpc
 - name: github.com/gogo/protobuf
-  version: 1adfc126b41513cc696b209667c8656ea7aac67c
+  version: 636bf0302bc95575d69441b25a2603156ffdddf1
   subpackages:
   - gogoproto
   - jsonpb
@@ -66,7 +66,7 @@ imports:
   - googleapis/rpc/status
   - opencensus
 - name: google.golang.org/grpc
-  version: 1e2570b1b19ade82d8dbb31bba4e65e9f9ef5b34
+  version: 168a6198bcb0ef175f7dacec0b8691fc141dc9b8
   subpackages:
   - balancer
   - balancer/base
@@ -76,9 +76,11 @@ imports:
   - credentials
   - encoding
   - encoding/proto
-  - grpclb/grpc_lb_v1/messages
   - grpclog
   - internal
+  - internal/backoff
+  - internal/channelz
+  - internal/grpcrand
   - keepalive
   - metadata
   - naming
