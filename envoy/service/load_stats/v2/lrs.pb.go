@@ -43,7 +43,7 @@ func (m *LoadStatsRequest) Reset()         { *m = LoadStatsRequest{} }
 func (m *LoadStatsRequest) String() string { return proto.CompactTextString(m) }
 func (*LoadStatsRequest) ProtoMessage()    {}
 func (*LoadStatsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lrs_20349fafdc78f607, []int{0}
+	return fileDescriptor_lrs_d838e6a6287bfc4a, []int{0}
 }
 func (m *LoadStatsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -92,7 +92,13 @@ func (m *LoadStatsRequest) GetClusterStats() []*endpoint.ClusterStats {
 type LoadStatsResponse struct {
 	// Clusters to report stats for.
 	Clusters []string `protobuf:"bytes,1,rep,name=clusters" json:"clusters,omitempty"`
-	// The interval of time to collect stats. The default is 10 seconds.
+	// The minimum interval of time to collect stats over. This is only a minimum for two reasons:
+	// 1. There may be some delay from when the timer fires until stats sampling occurs.
+	// 2. For clusters that were already feature in the previous *LoadStatsResponse*, any traffic
+	//    that is observed in between the corresponding previous *LoadStatsRequest* and this
+	//    *LoadStatsResponse* will also be accumulated and billed to the cluster. This avoids a period
+	//    of inobservability that might otherwise exists between the messages. New clusters are not
+	//    subject to this consideration.
 	LoadReportingInterval *types.Duration `protobuf:"bytes,2,opt,name=load_reporting_interval,json=loadReportingInterval" json:"load_reporting_interval,omitempty"`
 	XXX_NoUnkeyedLiteral  struct{}        `json:"-"`
 	XXX_unrecognized      []byte          `json:"-"`
@@ -103,7 +109,7 @@ func (m *LoadStatsResponse) Reset()         { *m = LoadStatsResponse{} }
 func (m *LoadStatsResponse) String() string { return proto.CompactTextString(m) }
 func (*LoadStatsResponse) ProtoMessage()    {}
 func (*LoadStatsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lrs_20349fafdc78f607, []int{1}
+	return fileDescriptor_lrs_d838e6a6287bfc4a, []int{1}
 }
 func (m *LoadStatsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -794,10 +800,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/service/load_stats/v2/lrs.proto", fileDescriptor_lrs_20349fafdc78f607)
+	proto.RegisterFile("envoy/service/load_stats/v2/lrs.proto", fileDescriptor_lrs_d838e6a6287bfc4a)
 }
 
-var fileDescriptor_lrs_20349fafdc78f607 = []byte{
+var fileDescriptor_lrs_d838e6a6287bfc4a = []byte{
 	// 391 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0xc1, 0x6e, 0xd3, 0x30,
 	0x1c, 0xc6, 0x71, 0x0a, 0xa8, 0xb8, 0x20, 0x20, 0x80, 0x1a, 0x0a, 0x8a, 0xaa, 0x22, 0x20, 0x12,
