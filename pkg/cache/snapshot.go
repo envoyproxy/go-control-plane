@@ -25,7 +25,24 @@ type Resources struct {
 	Version string
 
 	// Items in the group.
-	Items []Resource
+	Items map[string]Resource
+}
+
+// IndexResourcesByName creates a map from the resource name to the resource.
+func IndexResourcesByName(items []Resource) map[string]Resource {
+	indexed := make(map[string]Resource, len(items))
+	for _, item := range items {
+		indexed[GetResourceName(item)] = item
+	}
+	return indexed
+}
+
+// NewResources creates a new resource group.
+func NewResources(version string, items []Resource) Resources {
+	return Resources{
+		Version: version,
+		Items:   IndexResourcesByName(items),
+	}
 }
 
 // Snapshot is an internally consistent snapshot of xDS resources.
@@ -55,10 +72,10 @@ func NewSnapshot(version string,
 	routes []Resource,
 	listeners []Resource) Snapshot {
 	return Snapshot{
-		Endpoints: Resources{Version: version, Items: endpoints},
-		Clusters:  Resources{Version: version, Items: clusters},
-		Routes:    Resources{Version: version, Items: routes},
-		Listeners: Resources{Version: version, Items: listeners},
+		Endpoints: NewResources(version, endpoints),
+		Clusters:  NewResources(version, clusters),
+		Routes:    NewResources(version, routes),
+		Listeners: NewResources(version, listeners),
 	}
 }
 
@@ -74,7 +91,7 @@ func (s *Snapshot) Consistent() error {
 	if s == nil {
 		return errors.New("nil snapshot")
 	}
-	endpoints := GetResourceReferences(s.Clusters.Items...)
+	endpoints := GetResourceReferences(s.Clusters.Items)
 	if len(endpoints) != len(s.Endpoints.Items) {
 		return fmt.Errorf("mismatched endpoint reference and resource lengths: %v != %d", endpoints, len(s.Endpoints.Items))
 	}
@@ -82,18 +99,15 @@ func (s *Snapshot) Consistent() error {
 		return err
 	}
 
-	routes := GetResourceReferences(s.Listeners.Items...)
+	routes := GetResourceReferences(s.Listeners.Items)
 	if len(routes) != len(s.Routes.Items) {
 		return fmt.Errorf("mismatched route reference and resource lengths: %v != %d", routes, len(s.Routes.Items))
 	}
-	if err := superset(routes, s.Routes.Items); err != nil {
-		return err
-	}
-	return nil
+	return superset(routes, s.Routes.Items)
 }
 
 // GetResources selects snapshot resources by type.
-func (s *Snapshot) GetResources(typ string) []Resource {
+func (s *Snapshot) GetResources(typ string) map[string]Resource {
 	if s == nil {
 		return nil
 	}

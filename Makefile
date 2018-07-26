@@ -94,7 +94,7 @@ integration.docker: docker
 #-- code generaion
 #-----------------
 
-generate: $(BINDIR)/gogofast
+generate: $(BINDIR)/gogofast $(BINDIR)/validate
 	@echo "--> generating pb.go files"
 	$(SHELL) build/generate_protos.sh
 
@@ -140,7 +140,7 @@ tools.govet:
 tools.golint:
 	@command -v golint >/dev/null ; if [ $$? -ne 0 ]; then \
 		echo "--> installing golint"; \
-		go get github.com/golang/lint/golint; \
+		go get -u golang.org/x/lint/golint; \
 	fi
 
 tools.glide:
@@ -152,3 +152,7 @@ tools.glide:
 $(BINDIR)/gogofast: vendor
 	@echo "--> building $@"
 	@go build -o $@ vendor/github.com/gogo/protobuf/protoc-gen-gogofast/main.go
+
+$(BINDIR)/validate: vendor
+	@echo "--> building $@"
+	@go build -o $@ vendor/github.com/lyft/protoc-gen-validate/main.go

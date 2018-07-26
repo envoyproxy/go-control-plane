@@ -33,8 +33,7 @@ import (
 )
 
 const (
-	localhost     = "127.0.0.1"
-	httpAccessLog = "envoy.http_grpc_access_log"
+	localhost = "127.0.0.1"
 
 	// XdsCluster is the cluster name for the control server (used by non-ADS set-up)
 	XdsCluster = "xds_cluster"
@@ -92,8 +91,12 @@ func MakeCluster(mode string, clusterName string) *v2.Cluster {
 		edsSource = &core.ConfigSource{
 			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
 				ApiConfigSource: &core.ApiConfigSource{
-					ApiType:      core.ApiConfigSource_GRPC,
-					ClusterNames: []string{XdsCluster},
+					ApiType: core.ApiConfigSource_GRPC,
+					GrpcServices: []*core.GrpcService{{
+						TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+							EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
+						},
+					}},
 				},
 			},
 		}
@@ -156,8 +159,12 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 	case Xds:
 		rdsSource.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
 			ApiConfigSource: &core.ApiConfigSource{
-				ApiType:      core.ApiConfigSource_GRPC,
-				ClusterNames: []string{XdsCluster},
+				ApiType: core.ApiConfigSource_GRPC,
+				GrpcServices: []*core.GrpcService{{
+					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+						EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
+					},
+				}},
 			},
 		}
 	case Rest:
@@ -199,10 +206,10 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 			},
 		},
 		HttpFilters: []*hcm.HttpFilter{{
-			Name: cache.Router,
+			Name: util.Router,
 		}},
 		AccessLog: []*alf.AccessLog{{
-			Name:   httpAccessLog,
+			Name:   util.HTTPGRPCAccessLog,
 			Config: alsConfigPbst,
 		}},
 	}
@@ -226,7 +233,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		},
 		FilterChains: []listener.FilterChain{{
 			Filters: []listener.Filter{{
-				Name:   cache.HTTPConnectionManager,
+				Name:   util.HTTPConnectionManager,
 				Config: pbst,
 			}},
 		}},
@@ -259,7 +266,7 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 		},
 		FilterChains: []listener.FilterChain{{
 			Filters: []listener.Filter{{
-				Name:   cache.TCPProxy,
+				Name:   util.TCPProxy,
 				Config: pbst,
 			}},
 		}},

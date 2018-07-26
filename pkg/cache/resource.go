@@ -29,13 +29,6 @@ type Resource interface {
 	Equal(interface{}) bool
 }
 
-// Common names for Envoy filters.
-const (
-	Router                = "envoy.router"
-	HTTPConnectionManager = "envoy.http_connection_manager"
-	TCPProxy              = "envoy.tcp_proxy"
-)
-
 // Resource types in xDS v2.
 const (
 	typePrefix   = "type.googleapis.com/envoy.api.v2."
@@ -80,7 +73,7 @@ func GetResourceName(res Resource) string {
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources ...Resource) map[string]bool {
+func GetResourceReferences(resources map[string]Resource) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
 		if res == nil {
@@ -106,7 +99,7 @@ func GetResourceReferences(resources ...Resource) map[string]bool {
 			// extract route configuration names from HTTP connection manager
 			for _, chain := range v.FilterChains {
 				for _, filter := range chain.Filters {
-					if filter.Name != HTTPConnectionManager {
+					if filter.Name != util.HTTPConnectionManager {
 						continue
 					}
 
