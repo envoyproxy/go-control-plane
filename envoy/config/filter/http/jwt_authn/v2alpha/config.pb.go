@@ -36,13 +36,13 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 //     issuer: https://example.com
 //     audiences:
 //     - bookstore_android.apps.googleusercontent.com
-//       bookstore_web.apps.googleusercontent.com
+//     - bookstore_web.apps.googleusercontent.com
 //     remote_jwks:
-//     - http_uri:
-//       - uri: https://example.com/.well-known/jwks.json
+//       http_uri:
+//         uri: https://example.com/.well-known/jwks.json
 //         cluster: example_jwks_cluster
 //       cache_duration:
-//       - seconds: 300
+//         seconds: 300
 //
 // [#not-implemented-hide:]
 type JwtProvider struct {
@@ -63,7 +63,7 @@ type JwtProvider struct {
 	//
 	//     audiences:
 	//     - bookstore_android.apps.googleusercontent.com
-	//       bookstore_web.apps.googleusercontent.com
+	//     - bookstore_web.apps.googleusercontent.com
 	//
 	Audiences []string `protobuf:"bytes,2,rep,name=audiences" json:"audiences,omitempty"`
 	// `JSON Web Key Set <https://tools.ietf.org/html/rfc7517#appendix-A>`_ is needed. to validate
@@ -122,7 +122,7 @@ func (m *JwtProvider) Reset()         { *m = JwtProvider{} }
 func (m *JwtProvider) String() string { return proto.CompactTextString(m) }
 func (*JwtProvider) ProtoMessage()    {}
 func (*JwtProvider) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{0}
+	return fileDescriptor_config_db699e1e0c06383d, []int{0}
 }
 func (m *JwtProvider) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -311,7 +311,7 @@ type RemoteJwks struct {
 	// .. code-block:: yaml
 	//
 	//    http_uri:
-	//    - uri: https://www.googleapis.com/oauth2/v1/certs
+	//      uri: https://www.googleapis.com/oauth2/v1/certs
 	//      cluster: jwt.www.googleapis.com|443
 	//
 	HttpUri *core.HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri" json:"http_uri,omitempty"`
@@ -327,7 +327,7 @@ func (m *RemoteJwks) Reset()         { *m = RemoteJwks{} }
 func (m *RemoteJwks) String() string { return proto.CompactTextString(m) }
 func (*RemoteJwks) ProtoMessage()    {}
 func (*RemoteJwks) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{1}
+	return fileDescriptor_config_db699e1e0c06383d, []int{1}
 }
 func (m *RemoteJwks) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -387,7 +387,7 @@ func (m *JwtHeader) Reset()         { *m = JwtHeader{} }
 func (m *JwtHeader) String() string { return proto.CompactTextString(m) }
 func (*JwtHeader) ProtoMessage()    {}
 func (*JwtHeader) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{2}
+	return fileDescriptor_config_db699e1e0c06383d, []int{2}
 }
 func (m *JwtHeader) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -445,7 +445,7 @@ func (m *ProviderWithAudiences) Reset()         { *m = ProviderWithAudiences{} }
 func (m *ProviderWithAudiences) String() string { return proto.CompactTextString(m) }
 func (*ProviderWithAudiences) ProtoMessage()    {}
 func (*ProviderWithAudiences) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{3}
+	return fileDescriptor_config_db699e1e0c06383d, []int{3}
 }
 func (m *ProviderWithAudiences) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -545,7 +545,7 @@ func (m *JwtRequirement) Reset()         { *m = JwtRequirement{} }
 func (m *JwtRequirement) String() string { return proto.CompactTextString(m) }
 func (*JwtRequirement) ProtoMessage()    {}
 func (*JwtRequirement) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{4}
+	return fileDescriptor_config_db699e1e0c06383d, []int{4}
 }
 func (m *JwtRequirement) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -785,7 +785,7 @@ func (m *JwtRequirementOrList) Reset()         { *m = JwtRequirementOrList{} }
 func (m *JwtRequirementOrList) String() string { return proto.CompactTextString(m) }
 func (*JwtRequirementOrList) ProtoMessage()    {}
 func (*JwtRequirementOrList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{5}
+	return fileDescriptor_config_db699e1e0c06383d, []int{5}
 }
 func (m *JwtRequirementOrList) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -835,7 +835,7 @@ func (m *JwtRequirementAndList) Reset()         { *m = JwtRequirementAndList{} }
 func (m *JwtRequirementAndList) String() string { return proto.CompactTextString(m) }
 func (*JwtRequirementAndList) ProtoMessage()    {}
 func (*JwtRequirementAndList) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{6}
+	return fileDescriptor_config_db699e1e0c06383d, []int{6}
 }
 func (m *JwtRequirementAndList) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -915,7 +915,7 @@ func (m *RequirementRule) Reset()         { *m = RequirementRule{} }
 func (m *RequirementRule) String() string { return proto.CompactTextString(m) }
 func (*RequirementRule) ProtoMessage()    {}
 func (*RequirementRule) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{7}
+	return fileDescriptor_config_db699e1e0c06383d, []int{7}
 }
 func (m *RequirementRule) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1056,7 +1056,7 @@ func (m *JwtAuthentication) Reset()         { *m = JwtAuthentication{} }
 func (m *JwtAuthentication) String() string { return proto.CompactTextString(m) }
 func (*JwtAuthentication) ProtoMessage()    {}
 func (*JwtAuthentication) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_8c20fe700233ea2a, []int{8}
+	return fileDescriptor_config_db699e1e0c06383d, []int{8}
 }
 func (m *JwtAuthentication) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3288,10 +3288,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/http/jwt_authn/v2alpha/config.proto", fileDescriptor_config_8c20fe700233ea2a)
+	proto.RegisterFile("envoy/config/filter/http/jwt_authn/v2alpha/config.proto", fileDescriptor_config_db699e1e0c06383d)
 }
 
-var fileDescriptor_config_8c20fe700233ea2a = []byte{
+var fileDescriptor_config_db699e1e0c06383d = []byte{
 	// 947 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x55, 0x4f, 0x6f, 0x1b, 0xc5,
 	0x1b, 0xf6, 0xda, 0x71, 0x62, 0xbf, 0x76, 0xd2, 0xfe, 0x46, 0x49, 0xbb, 0xbf, 0xa8, 0x35, 0xae,

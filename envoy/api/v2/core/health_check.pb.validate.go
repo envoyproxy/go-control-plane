@@ -204,18 +204,6 @@ func (m *HealthCheck) Validate() error {
 			}
 		}
 
-	case *HealthCheck_RedisHealthCheck_:
-
-		if v, ok := interface{}(m.GetRedisHealthCheck()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return HealthCheckValidationError{
-					Field:  "RedisHealthCheck",
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
 	case *HealthCheck_GrpcHealthCheck_:
 
 		if v, ok := interface{}(m.GetGrpcHealthCheck()).(interface{ Validate() error }); ok {
