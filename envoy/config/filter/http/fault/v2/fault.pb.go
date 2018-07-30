@@ -39,7 +39,7 @@ func (m *FaultAbort) Reset()         { *m = FaultAbort{} }
 func (m *FaultAbort) String() string { return proto.CompactTextString(m) }
 func (*FaultAbort) ProtoMessage()    {}
 func (*FaultAbort) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fault_7dd490e472a38ef8, []int{0}
+	return fileDescriptor_fault_51fe2e769f9ff448, []int{0}
 }
 func (m *FaultAbort) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -188,7 +188,7 @@ func (m *HTTPFault) Reset()         { *m = HTTPFault{} }
 func (m *HTTPFault) String() string { return proto.CompactTextString(m) }
 func (*HTTPFault) ProtoMessage()    {}
 func (*HTTPFault) Descriptor() ([]byte, []int) {
-	return fileDescriptor_fault_7dd490e472a38ef8, []int{1}
+	return fileDescriptor_fault_51fe2e769f9ff448, []int{1}
 }
 func (m *HTTPFault) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -848,10 +848,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/http/fault/v2/fault.proto", fileDescriptor_fault_7dd490e472a38ef8)
+	proto.RegisterFile("envoy/config/filter/http/fault/v2/fault.proto", fileDescriptor_fault_51fe2e769f9ff448)
 }
 
-var fileDescriptor_fault_7dd490e472a38ef8 = []byte{
+var fileDescriptor_fault_51fe2e769f9ff448 = []byte{
 	// 397 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x91, 0x31, 0x8b, 0xdb, 0x30,
 	0x1c, 0xc5, 0x2b, 0x3b, 0x4e, 0x1a, 0x99, 0xd0, 0xa0, 0x0e, 0x35, 0x19, 0x8c, 0x93, 0x2e, 0x6e,

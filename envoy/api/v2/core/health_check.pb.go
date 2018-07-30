@@ -70,7 +70,7 @@ func (x HealthStatus) String() string {
 	return proto.EnumName(HealthStatus_name, int32(x))
 }
 func (HealthStatus) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0}
 }
 
 type HealthCheck struct {
@@ -147,7 +147,7 @@ func (m *HealthCheck) Reset()         { *m = HealthCheck{} }
 func (m *HealthCheck) String() string { return proto.CompactTextString(m) }
 func (*HealthCheck) ProtoMessage()    {}
 func (*HealthCheck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0}
 }
 func (m *HealthCheck) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -454,7 +454,7 @@ func (m *HealthCheck_Payload) Reset()         { *m = HealthCheck_Payload{} }
 func (m *HealthCheck_Payload) String() string { return proto.CompactTextString(m) }
 func (*HealthCheck_Payload) ProtoMessage()    {}
 func (*HealthCheck_Payload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0, 0}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0, 0}
 }
 func (m *HealthCheck_Payload) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -604,7 +604,9 @@ type HealthCheck_HttpHealthCheck struct {
 	// <arch_overview_health_checking_identity>` for more information.
 	ServiceName string `protobuf:"bytes,5,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each request that is sent to the
-	// health checked cluster.
+	// health checked cluster. For more information, including details on header value syntax, see
+	// the documentation on :ref:`custom request headers
+	// <config_http_conn_man_headers_custom_request_headers>`.
 	RequestHeadersToAdd []*HeaderValueOption `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd" json:"request_headers_to_add,omitempty"`
 	// If set, health checks will be made using http/2.
 	UseHttp2             bool     `protobuf:"varint,7,opt,name=use_http2,json=useHttp2,proto3" json:"use_http2,omitempty"`
@@ -617,7 +619,7 @@ func (m *HealthCheck_HttpHealthCheck) Reset()         { *m = HealthCheck_HttpHea
 func (m *HealthCheck_HttpHealthCheck) String() string { return proto.CompactTextString(m) }
 func (*HealthCheck_HttpHealthCheck) ProtoMessage()    {}
 func (*HealthCheck_HttpHealthCheck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0, 1}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0, 1}
 }
 func (m *HealthCheck_HttpHealthCheck) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -711,7 +713,7 @@ func (m *HealthCheck_TcpHealthCheck) Reset()         { *m = HealthCheck_TcpHealt
 func (m *HealthCheck_TcpHealthCheck) String() string { return proto.CompactTextString(m) }
 func (*HealthCheck_TcpHealthCheck) ProtoMessage()    {}
 func (*HealthCheck_TcpHealthCheck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0, 2}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0, 2}
 }
 func (m *HealthCheck_TcpHealthCheck) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -769,7 +771,7 @@ func (m *HealthCheck_RedisHealthCheck) Reset()         { *m = HealthCheck_RedisH
 func (m *HealthCheck_RedisHealthCheck) String() string { return proto.CompactTextString(m) }
 func (*HealthCheck_RedisHealthCheck) ProtoMessage()    {}
 func (*HealthCheck_RedisHealthCheck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0, 3}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0, 3}
 }
 func (m *HealthCheck_RedisHealthCheck) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -825,7 +827,7 @@ func (m *HealthCheck_GrpcHealthCheck) Reset()         { *m = HealthCheck_GrpcHea
 func (m *HealthCheck_GrpcHealthCheck) String() string { return proto.CompactTextString(m) }
 func (*HealthCheck_GrpcHealthCheck) ProtoMessage()    {}
 func (*HealthCheck_GrpcHealthCheck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0, 4}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0, 4}
 }
 func (m *HealthCheck_GrpcHealthCheck) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -877,7 +879,7 @@ func (m *HealthCheck_CustomHealthCheck) Reset()         { *m = HealthCheck_Custo
 func (m *HealthCheck_CustomHealthCheck) String() string { return proto.CompactTextString(m) }
 func (*HealthCheck_CustomHealthCheck) ProtoMessage()    {}
 func (*HealthCheck_CustomHealthCheck) Descriptor() ([]byte, []int) {
-	return fileDescriptor_health_check_701eedd895b34526, []int{0, 5}
+	return fileDescriptor_health_check_ccd217d94c083297, []int{0, 5}
 }
 func (m *HealthCheck_CustomHealthCheck) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3530,10 +3532,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/api/v2/core/health_check.proto", fileDescriptor_health_check_701eedd895b34526)
+	proto.RegisterFile("envoy/api/v2/core/health_check.proto", fileDescriptor_health_check_ccd217d94c083297)
 }
 
-var fileDescriptor_health_check_701eedd895b34526 = []byte{
+var fileDescriptor_health_check_ccd217d94c083297 = []byte{
 	// 990 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x96, 0xd1, 0x6e, 0xe3, 0x44,
 	0x14, 0x86, 0xeb, 0x24, 0xdb, 0x24, 0x27, 0x69, 0xe2, 0x4c, 0x29, 0x35, 0xa1, 0x74, 0x0b, 0xaa,

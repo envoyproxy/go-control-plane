@@ -64,7 +64,7 @@ func (x HttpConnectionManager_CodecType) String() string {
 	return proto.EnumName(HttpConnectionManager_CodecType_name, int32(x))
 }
 func (HttpConnectionManager_CodecType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{0, 0}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{0, 0}
 }
 
 // How to handle the :ref:`config_http_conn_man_headers_x-forwarded-client-cert` (XFCC) HTTP
@@ -107,7 +107,7 @@ func (x HttpConnectionManager_ForwardClientCertDetails) String() string {
 	return proto.EnumName(HttpConnectionManager_ForwardClientCertDetails_name, int32(x))
 }
 func (HttpConnectionManager_ForwardClientCertDetails) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{0, 1}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{0, 1}
 }
 
 type HttpConnectionManager_Tracing_OperationName int32
@@ -132,7 +132,7 @@ func (x HttpConnectionManager_Tracing_OperationName) String() string {
 	return proto.EnumName(HttpConnectionManager_Tracing_OperationName_name, int32(x))
 }
 func (HttpConnectionManager_Tracing_OperationName) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{0, 0, 0}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{0, 0, 0}
 }
 
 // [#comment:next free field: 25]
@@ -282,7 +282,7 @@ func (m *HttpConnectionManager) Reset()         { *m = HttpConnectionManager{} }
 func (m *HttpConnectionManager) String() string { return proto.CompactTextString(m) }
 func (*HttpConnectionManager) ProtoMessage()    {}
 func (*HttpConnectionManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{0}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{0}
 }
 func (m *HttpConnectionManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -614,7 +614,7 @@ func (m *HttpConnectionManager_Tracing) Reset()         { *m = HttpConnectionMan
 func (m *HttpConnectionManager_Tracing) String() string { return proto.CompactTextString(m) }
 func (*HttpConnectionManager_Tracing) ProtoMessage()    {}
 func (*HttpConnectionManager_Tracing) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{0, 0}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{0, 0}
 }
 func (m *HttpConnectionManager_Tracing) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -704,7 +704,7 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) String() string {
 }
 func (*HttpConnectionManager_SetCurrentClientCertDetails) ProtoMessage() {}
 func (*HttpConnectionManager_SetCurrentClientCertDetails) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{0, 1}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{0, 1}
 }
 func (m *HttpConnectionManager_SetCurrentClientCertDetails) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -792,7 +792,7 @@ func (m *HttpConnectionManager_UpgradeConfig) Reset()         { *m = HttpConnect
 func (m *HttpConnectionManager_UpgradeConfig) String() string { return proto.CompactTextString(m) }
 func (*HttpConnectionManager_UpgradeConfig) ProtoMessage()    {}
 func (*HttpConnectionManager_UpgradeConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{0, 2}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{0, 2}
 }
 func (m *HttpConnectionManager_UpgradeConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -852,7 +852,7 @@ func (m *Rds) Reset()         { *m = Rds{} }
 func (m *Rds) String() string { return proto.CompactTextString(m) }
 func (*Rds) ProtoMessage()    {}
 func (*Rds) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{1}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{1}
 }
 func (m *Rds) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -931,7 +931,7 @@ func (m *HttpFilter) Reset()         { *m = HttpFilter{} }
 func (m *HttpFilter) String() string { return proto.CompactTextString(m) }
 func (*HttpFilter) ProtoMessage()    {}
 func (*HttpFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{2}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{2}
 }
 func (m *HttpFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -995,7 +995,7 @@ func (m *HttpFilter_DeprecatedV1) Reset()         { *m = HttpFilter_DeprecatedV1
 func (m *HttpFilter_DeprecatedV1) String() string { return proto.CompactTextString(m) }
 func (*HttpFilter_DeprecatedV1) ProtoMessage()    {}
 func (*HttpFilter_DeprecatedV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_d4cc14bb5eb16d23, []int{2, 0}
+	return fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7, []int{2, 0}
 }
 func (m *HttpFilter_DeprecatedV1) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3493,10 +3493,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto", fileDescriptor_http_connection_manager_d4cc14bb5eb16d23)
+	proto.RegisterFile("envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto", fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7)
 }
 
-var fileDescriptor_http_connection_manager_d4cc14bb5eb16d23 = []byte{
+var fileDescriptor_http_connection_manager_5c85b4f0eeee8fe7 = []byte{
 	// 1537 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x57, 0x4f, 0x6f, 0x23, 0x49,
 	0x15, 0x4f, 0xdb, 0xce, 0xc4, 0x7e, 0xfe, 0x93, 0x4e, 0x65, 0x66, 0xd2, 0x78, 0x20, 0x31, 0x91,

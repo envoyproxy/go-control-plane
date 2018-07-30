@@ -40,7 +40,7 @@ func (m *Tracing) Reset()         { *m = Tracing{} }
 func (m *Tracing) String() string { return proto.CompactTextString(m) }
 func (*Tracing) ProtoMessage()    {}
 func (*Tracing) Descriptor() ([]byte, []int) {
-	return fileDescriptor_trace_5fdd28a387ec90f3, []int{0}
+	return fileDescriptor_trace_7e0acba3d4740834, []int{0}
 }
 func (m *Tracing) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -96,7 +96,7 @@ func (m *Tracing_Http) Reset()         { *m = Tracing_Http{} }
 func (m *Tracing_Http) String() string { return proto.CompactTextString(m) }
 func (*Tracing_Http) ProtoMessage()    {}
 func (*Tracing_Http) Descriptor() ([]byte, []int) {
-	return fileDescriptor_trace_5fdd28a387ec90f3, []int{0, 0}
+	return fileDescriptor_trace_7e0acba3d4740834, []int{0, 0}
 }
 func (m *Tracing_Http) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -155,7 +155,7 @@ func (m *LightstepConfig) Reset()         { *m = LightstepConfig{} }
 func (m *LightstepConfig) String() string { return proto.CompactTextString(m) }
 func (*LightstepConfig) ProtoMessage()    {}
 func (*LightstepConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_trace_5fdd28a387ec90f3, []int{1}
+	return fileDescriptor_trace_7e0acba3d4740834, []int{1}
 }
 func (m *LightstepConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -219,7 +219,7 @@ func (m *ZipkinConfig) Reset()         { *m = ZipkinConfig{} }
 func (m *ZipkinConfig) String() string { return proto.CompactTextString(m) }
 func (*ZipkinConfig) ProtoMessage()    {}
 func (*ZipkinConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_trace_5fdd28a387ec90f3, []int{2}
+	return fileDescriptor_trace_7e0acba3d4740834, []int{2}
 }
 func (m *ZipkinConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -288,7 +288,7 @@ func (m *DynamicOtConfig) Reset()         { *m = DynamicOtConfig{} }
 func (m *DynamicOtConfig) String() string { return proto.CompactTextString(m) }
 func (*DynamicOtConfig) ProtoMessage()    {}
 func (*DynamicOtConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_trace_5fdd28a387ec90f3, []int{3}
+	return fileDescriptor_trace_7e0acba3d4740834, []int{3}
 }
 func (m *DynamicOtConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -344,7 +344,7 @@ func (m *TraceServiceConfig) Reset()         { *m = TraceServiceConfig{} }
 func (m *TraceServiceConfig) String() string { return proto.CompactTextString(m) }
 func (*TraceServiceConfig) ProtoMessage()    {}
 func (*TraceServiceConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_trace_5fdd28a387ec90f3, []int{4}
+	return fileDescriptor_trace_7e0acba3d4740834, []int{4}
 }
 func (m *TraceServiceConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1457,10 +1457,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/trace/v2/trace.proto", fileDescriptor_trace_5fdd28a387ec90f3)
+	proto.RegisterFile("envoy/config/trace/v2/trace.proto", fileDescriptor_trace_7e0acba3d4740834)
 }
 
-var fileDescriptor_trace_5fdd28a387ec90f3 = []byte{
+var fileDescriptor_trace_7e0acba3d4740834 = []byte{
 	// 460 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x92, 0xcd, 0x6e, 0x13, 0x31,
 	0x14, 0x85, 0xe5, 0x34, 0xb4, 0xf4, 0xb6, 0x28, 0xa9, 0x25, 0xd4, 0x28, 0x82, 0x28, 0xa4, 0x08,

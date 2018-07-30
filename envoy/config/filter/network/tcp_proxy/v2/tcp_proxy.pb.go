@@ -90,7 +90,7 @@ func (m *TcpProxy) Reset()         { *m = TcpProxy{} }
 func (m *TcpProxy) String() string { return proto.CompactTextString(m) }
 func (*TcpProxy) ProtoMessage()    {}
 func (*TcpProxy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tcp_proxy_9d6d58e69700b657, []int{0}
+	return fileDescriptor_tcp_proxy_a4de2eb36d680bd4, []int{0}
 }
 func (m *TcpProxy) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -199,7 +199,7 @@ func (m *TcpProxy_DeprecatedV1) Reset()         { *m = TcpProxy_DeprecatedV1{} }
 func (m *TcpProxy_DeprecatedV1) String() string { return proto.CompactTextString(m) }
 func (*TcpProxy_DeprecatedV1) ProtoMessage()    {}
 func (*TcpProxy_DeprecatedV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tcp_proxy_9d6d58e69700b657, []int{0, 0}
+	return fileDescriptor_tcp_proxy_a4de2eb36d680bd4, []int{0, 0}
 }
 func (m *TcpProxy_DeprecatedV1) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -284,7 +284,7 @@ func (m *TcpProxy_DeprecatedV1_TCPRoute) Reset()         { *m = TcpProxy_Depreca
 func (m *TcpProxy_DeprecatedV1_TCPRoute) String() string { return proto.CompactTextString(m) }
 func (*TcpProxy_DeprecatedV1_TCPRoute) ProtoMessage()    {}
 func (*TcpProxy_DeprecatedV1_TCPRoute) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tcp_proxy_9d6d58e69700b657, []int{0, 0, 0}
+	return fileDescriptor_tcp_proxy_a4de2eb36d680bd4, []int{0, 0, 0}
 }
 func (m *TcpProxy_DeprecatedV1_TCPRoute) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1397,10 +1397,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/network/tcp_proxy/v2/tcp_proxy.proto", fileDescriptor_tcp_proxy_9d6d58e69700b657)
+	proto.RegisterFile("envoy/config/filter/network/tcp_proxy/v2/tcp_proxy.proto", fileDescriptor_tcp_proxy_a4de2eb36d680bd4)
 }
 
-var fileDescriptor_tcp_proxy_9d6d58e69700b657 = []byte{
+var fileDescriptor_tcp_proxy_a4de2eb36d680bd4 = []byte{
 	// 683 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x53, 0xcd, 0x6e, 0xd3, 0x4a,
 	0x14, 0xbe, 0xe3, 0xf4, 0x27, 0x99, 0xa4, 0x55, 0xaf, 0xdb, 0xaa, 0xbe, 0xb9, 0x55, 0x1a, 0x60,

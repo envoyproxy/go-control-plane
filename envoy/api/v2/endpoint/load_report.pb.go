@@ -77,7 +77,7 @@ func (m *UpstreamLocalityStats) Reset()         { *m = UpstreamLocalityStats{} }
 func (m *UpstreamLocalityStats) String() string { return proto.CompactTextString(m) }
 func (*UpstreamLocalityStats) ProtoMessage()    {}
 func (*UpstreamLocalityStats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_load_report_f5264946a657a709, []int{0}
+	return fileDescriptor_load_report_c63c9d1f6761c0a0, []int{0}
 }
 func (m *UpstreamLocalityStats) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -166,7 +166,7 @@ func (m *EndpointLoadMetricStats) Reset()         { *m = EndpointLoadMetricStats
 func (m *EndpointLoadMetricStats) String() string { return proto.CompactTextString(m) }
 func (*EndpointLoadMetricStats) ProtoMessage()    {}
 func (*EndpointLoadMetricStats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_load_report_f5264946a657a709, []int{1}
+	return fileDescriptor_load_report_c63c9d1f6761c0a0, []int{1}
 }
 func (m *EndpointLoadMetricStats) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -254,7 +254,7 @@ func (m *ClusterStats) Reset()         { *m = ClusterStats{} }
 func (m *ClusterStats) String() string { return proto.CompactTextString(m) }
 func (*ClusterStats) ProtoMessage()    {}
 func (*ClusterStats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_load_report_f5264946a657a709, []int{2}
+	return fileDescriptor_load_report_c63c9d1f6761c0a0, []int{2}
 }
 func (m *ClusterStats) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -332,7 +332,7 @@ func (m *ClusterStats_DroppedRequests) Reset()         { *m = ClusterStats_Dropp
 func (m *ClusterStats_DroppedRequests) String() string { return proto.CompactTextString(m) }
 func (*ClusterStats_DroppedRequests) ProtoMessage()    {}
 func (*ClusterStats_DroppedRequests) Descriptor() ([]byte, []int) {
-	return fileDescriptor_load_report_f5264946a657a709, []int{2, 0}
+	return fileDescriptor_load_report_c63c9d1f6761c0a0, []int{2, 0}
 }
 func (m *ClusterStats_DroppedRequests) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1400,10 +1400,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/api/v2/endpoint/load_report.proto", fileDescriptor_load_report_f5264946a657a709)
+	proto.RegisterFile("envoy/api/v2/endpoint/load_report.proto", fileDescriptor_load_report_c63c9d1f6761c0a0)
 }
 
-var fileDescriptor_load_report_f5264946a657a709 = []byte{
+var fileDescriptor_load_report_c63c9d1f6761c0a0 = []byte{
 	// 630 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x53, 0xcb, 0x6e, 0x13, 0x31,
 	0x14, 0x95, 0x93, 0xb6, 0x4a, 0x9d, 0x54, 0x2d, 0x56, 0x4b, 0xd2, 0x00, 0x21, 0x14, 0x21, 0xb2,
