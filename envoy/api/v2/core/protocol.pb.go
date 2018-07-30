@@ -41,7 +41,7 @@ func (m *TcpProtocolOptions) Reset()         { *m = TcpProtocolOptions{} }
 func (m *TcpProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*TcpProtocolOptions) ProtoMessage()    {}
 func (*TcpProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_79e290bd8707018a, []int{0}
+	return fileDescriptor_protocol_421b79c49b67d717, []int{0}
 }
 func (m *TcpProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -85,7 +85,7 @@ func (m *HttpProtocolOptions) Reset()         { *m = HttpProtocolOptions{} }
 func (m *HttpProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*HttpProtocolOptions) ProtoMessage()    {}
 func (*HttpProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_79e290bd8707018a, []int{1}
+	return fileDescriptor_protocol_421b79c49b67d717, []int{1}
 }
 func (m *HttpProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -145,7 +145,7 @@ func (m *Http1ProtocolOptions) Reset()         { *m = Http1ProtocolOptions{} }
 func (m *Http1ProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*Http1ProtocolOptions) ProtoMessage()    {}
 func (*Http1ProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_79e290bd8707018a, []int{2}
+	return fileDescriptor_protocol_421b79c49b67d717, []int{2}
 }
 func (m *Http1ProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -221,7 +221,7 @@ func (m *Http2ProtocolOptions) Reset()         { *m = Http2ProtocolOptions{} }
 func (m *Http2ProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*Http2ProtocolOptions) ProtoMessage()    {}
 func (*Http2ProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_79e290bd8707018a, []int{3}
+	return fileDescriptor_protocol_421b79c49b67d717, []int{3}
 }
 func (m *Http2ProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -290,7 +290,7 @@ func (m *GrpcProtocolOptions) Reset()         { *m = GrpcProtocolOptions{} }
 func (m *GrpcProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*GrpcProtocolOptions) ProtoMessage()    {}
 func (*GrpcProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_79e290bd8707018a, []int{4}
+	return fileDescriptor_protocol_421b79c49b67d717, []int{4}
 }
 func (m *GrpcProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1420,10 +1420,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/api/v2/core/protocol.proto", fileDescriptor_protocol_79e290bd8707018a)
+	proto.RegisterFile("envoy/api/v2/core/protocol.proto", fileDescriptor_protocol_421b79c49b67d717)
 }
 
-var fileDescriptor_protocol_79e290bd8707018a = []byte{
+var fileDescriptor_protocol_421b79c49b67d717 = []byte{
 	// 540 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0xc1, 0x6e, 0xd3, 0x40,
 	0x10, 0x86, 0x65, 0x52, 0x41, 0xd9, 0x46, 0x25, 0x75, 0xad, 0x36, 0x04, 0x64, 0xa2, 0x08, 0x89,

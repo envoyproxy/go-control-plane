@@ -48,7 +48,7 @@ func (m *GrpcService) Reset()         { *m = GrpcService{} }
 func (m *GrpcService) String() string { return proto.CompactTextString(m) }
 func (*GrpcService) ProtoMessage()    {}
 func (*GrpcService) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0}
 }
 func (m *GrpcService) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -217,7 +217,7 @@ func (m *GrpcService_EnvoyGrpc) Reset()         { *m = GrpcService_EnvoyGrpc{} }
 func (m *GrpcService_EnvoyGrpc) String() string { return proto.CompactTextString(m) }
 func (*GrpcService_EnvoyGrpc) ProtoMessage()    {}
 func (*GrpcService_EnvoyGrpc) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 0}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 0}
 }
 func (m *GrpcService_EnvoyGrpc) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -289,7 +289,7 @@ func (m *GrpcService_GoogleGrpc) Reset()         { *m = GrpcService_GoogleGrpc{}
 func (m *GrpcService_GoogleGrpc) String() string { return proto.CompactTextString(m) }
 func (*GrpcService_GoogleGrpc) ProtoMessage()    {}
 func (*GrpcService_GoogleGrpc) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 1}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 1}
 }
 func (m *GrpcService_GoogleGrpc) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -377,7 +377,7 @@ func (m *GrpcService_GoogleGrpc_SslCredentials) Reset()         { *m = GrpcServi
 func (m *GrpcService_GoogleGrpc_SslCredentials) String() string { return proto.CompactTextString(m) }
 func (*GrpcService_GoogleGrpc_SslCredentials) ProtoMessage()    {}
 func (*GrpcService_GoogleGrpc_SslCredentials) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 1, 0}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 1, 0}
 }
 func (m *GrpcService_GoogleGrpc_SslCredentials) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -445,7 +445,7 @@ func (m *GrpcService_GoogleGrpc_ChannelCredentials) Reset() {
 func (m *GrpcService_GoogleGrpc_ChannelCredentials) String() string { return proto.CompactTextString(m) }
 func (*GrpcService_GoogleGrpc_ChannelCredentials) ProtoMessage()    {}
 func (*GrpcService_GoogleGrpc_ChannelCredentials) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 1, 1}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 1, 1}
 }
 func (m *GrpcService_GoogleGrpc_ChannelCredentials) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -608,7 +608,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials) Reset() {
 func (m *GrpcService_GoogleGrpc_CallCredentials) String() string { return proto.CompactTextString(m) }
 func (*GrpcService_GoogleGrpc_CallCredentials) ProtoMessage()    {}
 func (*GrpcService_GoogleGrpc_CallCredentials) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 1, 2}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 1, 2}
 }
 func (m *GrpcService_GoogleGrpc_CallCredentials) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -883,7 +883,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCredentia
 }
 func (*GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCredentials) ProtoMessage() {}
 func (*GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCredentials) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 1, 2, 0}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 1, 2, 0}
 }
 func (m *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJWTAccessCredentials) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -942,7 +942,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials) String() s
 }
 func (*GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials) ProtoMessage() {}
 func (*GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 1, 2, 1}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 1, 2, 1}
 }
 func (m *GrpcService_GoogleGrpc_CallCredentials_GoogleIAMCredentials) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1001,7 +1001,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) S
 }
 func (*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) ProtoMessage() {}
 func (*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) Descriptor() ([]byte, []int) {
-	return fileDescriptor_grpc_service_e73d2f02b779f904, []int{0, 1, 2, 2}
+	return fileDescriptor_grpc_service_a6d9d8caad0b010f, []int{0, 1, 2, 2}
 }
 func (m *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3783,10 +3783,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/api/v2/core/grpc_service.proto", fileDescriptor_grpc_service_e73d2f02b779f904)
+	proto.RegisterFile("envoy/api/v2/core/grpc_service.proto", fileDescriptor_grpc_service_a6d9d8caad0b010f)
 }
 
-var fileDescriptor_grpc_service_e73d2f02b779f904 = []byte{
+var fileDescriptor_grpc_service_a6d9d8caad0b010f = []byte{
 	// 984 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0xcb, 0x6e, 0x1b, 0x37,
 	0x14, 0xf5, 0x58, 0xb2, 0x1d, 0xdd, 0x49, 0xfd, 0xa0, 0x5d, 0x5b, 0x9e, 0xc6, 0x82, 0x91, 0x76,

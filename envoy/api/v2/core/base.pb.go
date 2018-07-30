@@ -52,7 +52,7 @@ func (x RoutingPriority) String() string {
 	return proto.EnumName(RoutingPriority_name, int32(x))
 }
 func (RoutingPriority) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{0}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{0}
 }
 
 // HTTP request method.
@@ -97,7 +97,7 @@ func (x RequestMethod) String() string {
 	return proto.EnumName(RequestMethod_name, int32(x))
 }
 func (RequestMethod) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{1}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{1}
 }
 
 type SocketOption_SocketState int32
@@ -126,7 +126,7 @@ func (x SocketOption_SocketState) String() string {
 	return proto.EnumName(SocketOption_SocketState_name, int32(x))
 }
 func (SocketOption_SocketState) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{8, 0}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{8, 0}
 }
 
 // Identifies location of where either Envoy runs or where upstream hosts run.
@@ -155,7 +155,7 @@ func (m *Locality) Reset()         { *m = Locality{} }
 func (m *Locality) String() string { return proto.CompactTextString(m) }
 func (*Locality) ProtoMessage()    {}
 func (*Locality) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{0}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{0}
 }
 func (m *Locality) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -245,7 +245,7 @@ func (m *Node) Reset()         { *m = Node{} }
 func (m *Node) String() string { return proto.CompactTextString(m) }
 func (*Node) ProtoMessage()    {}
 func (*Node) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{1}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{1}
 }
 func (m *Node) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -340,7 +340,7 @@ func (m *Metadata) Reset()         { *m = Metadata{} }
 func (m *Metadata) String() string { return proto.CompactTextString(m) }
 func (*Metadata) ProtoMessage()    {}
 func (*Metadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{2}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{2}
 }
 func (m *Metadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -391,7 +391,7 @@ func (m *RuntimeUInt32) Reset()         { *m = RuntimeUInt32{} }
 func (m *RuntimeUInt32) String() string { return proto.CompactTextString(m) }
 func (*RuntimeUInt32) ProtoMessage()    {}
 func (*RuntimeUInt32) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{3}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{3}
 }
 func (m *RuntimeUInt32) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -453,7 +453,7 @@ func (m *HeaderValue) Reset()         { *m = HeaderValue{} }
 func (m *HeaderValue) String() string { return proto.CompactTextString(m) }
 func (*HeaderValue) ProtoMessage()    {}
 func (*HeaderValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{4}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{4}
 }
 func (m *HeaderValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -512,7 +512,7 @@ func (m *HeaderValueOption) Reset()         { *m = HeaderValueOption{} }
 func (m *HeaderValueOption) String() string { return proto.CompactTextString(m) }
 func (*HeaderValueOption) ProtoMessage()    {}
 func (*HeaderValueOption) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{5}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{5}
 }
 func (m *HeaderValueOption) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -571,7 +571,7 @@ func (m *DataSource) Reset()         { *m = DataSource{} }
 func (m *DataSource) String() string { return proto.CompactTextString(m) }
 func (*DataSource) ProtoMessage()    {}
 func (*DataSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{6}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{6}
 }
 func (m *DataSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -750,7 +750,7 @@ func (m *TransportSocket) Reset()         { *m = TransportSocket{} }
 func (m *TransportSocket) String() string { return proto.CompactTextString(m) }
 func (*TransportSocket) ProtoMessage()    {}
 func (*TransportSocket) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{7}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{7}
 }
 func (m *TransportSocket) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -819,7 +819,7 @@ func (m *SocketOption) Reset()         { *m = SocketOption{} }
 func (m *SocketOption) String() string { return proto.CompactTextString(m) }
 func (*SocketOption) ProtoMessage()    {}
 func (*SocketOption) Descriptor() ([]byte, []int) {
-	return fileDescriptor_base_87b76f8c5a7066cb, []int{8}
+	return fileDescriptor_base_56e1a3946b1570d0, []int{8}
 }
 func (m *SocketOption) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3448,9 +3448,9 @@ var (
 	ErrIntOverflowBase   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("envoy/api/v2/core/base.proto", fileDescriptor_base_87b76f8c5a7066cb) }
+func init() { proto.RegisterFile("envoy/api/v2/core/base.proto", fileDescriptor_base_56e1a3946b1570d0) }
 
-var fileDescriptor_base_87b76f8c5a7066cb = []byte{
+var fileDescriptor_base_56e1a3946b1570d0 = []byte{
 	// 970 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0xcf, 0x6e, 0xeb, 0xc4,
 	0x17, 0xee, 0xe4, 0x5f, 0x93, 0x93, 0xa4, 0x75, 0xe7, 0x56, 0xbd, 0xfd, 0xf5, 0xde, 0x46, 0x95,

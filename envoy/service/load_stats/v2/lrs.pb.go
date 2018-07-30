@@ -43,7 +43,7 @@ func (m *LoadStatsRequest) Reset()         { *m = LoadStatsRequest{} }
 func (m *LoadStatsRequest) String() string { return proto.CompactTextString(m) }
 func (*LoadStatsRequest) ProtoMessage()    {}
 func (*LoadStatsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lrs_d838e6a6287bfc4a, []int{0}
+	return fileDescriptor_lrs_7926936dce4e8a94, []int{0}
 }
 func (m *LoadStatsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -109,7 +109,7 @@ func (m *LoadStatsResponse) Reset()         { *m = LoadStatsResponse{} }
 func (m *LoadStatsResponse) String() string { return proto.CompactTextString(m) }
 func (*LoadStatsResponse) ProtoMessage()    {}
 func (*LoadStatsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_lrs_d838e6a6287bfc4a, []int{1}
+	return fileDescriptor_lrs_7926936dce4e8a94, []int{1}
 }
 func (m *LoadStatsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -800,10 +800,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/service/load_stats/v2/lrs.proto", fileDescriptor_lrs_d838e6a6287bfc4a)
+	proto.RegisterFile("envoy/service/load_stats/v2/lrs.proto", fileDescriptor_lrs_7926936dce4e8a94)
 }
 
-var fileDescriptor_lrs_d838e6a6287bfc4a = []byte{
+var fileDescriptor_lrs_7926936dce4e8a94 = []byte{
 	// 391 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0xc1, 0x6e, 0xd3, 0x30,
 	0x1c, 0xc6, 0x71, 0x0a, 0xa8, 0xb8, 0x20, 0x20, 0x80, 0x1a, 0x0a, 0x8a, 0xaa, 0x22, 0x20, 0x12,

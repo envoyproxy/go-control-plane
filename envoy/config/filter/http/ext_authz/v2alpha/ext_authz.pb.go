@@ -48,7 +48,7 @@ func (m *ExtAuthz) Reset()         { *m = ExtAuthz{} }
 func (m *ExtAuthz) String() string { return proto.CompactTextString(m) }
 func (*ExtAuthz) ProtoMessage()    {}
 func (*ExtAuthz) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_1802f525b528f1e1, []int{0}
+	return fileDescriptor_ext_authz_636d420332df1e72, []int{0}
 }
 func (m *ExtAuthz) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -227,7 +227,7 @@ func (m *HttpService) Reset()         { *m = HttpService{} }
 func (m *HttpService) String() string { return proto.CompactTextString(m) }
 func (*HttpService) ProtoMessage()    {}
 func (*HttpService) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_1802f525b528f1e1, []int{1}
+	return fileDescriptor_ext_authz_636d420332df1e72, []int{1}
 }
 func (m *HttpService) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -860,10 +860,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/http/ext_authz/v2alpha/ext_authz.proto", fileDescriptor_ext_authz_1802f525b528f1e1)
+	proto.RegisterFile("envoy/config/filter/http/ext_authz/v2alpha/ext_authz.proto", fileDescriptor_ext_authz_636d420332df1e72)
 }
 
-var fileDescriptor_ext_authz_1802f525b528f1e1 = []byte{
+var fileDescriptor_ext_authz_636d420332df1e72 = []byte{
 	// 376 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0x41, 0x6b, 0xdb, 0x30,
 	0x14, 0xc7, 0xa7, 0x05, 0xb6, 0x44, 0xce, 0x61, 0x08, 0xc6, 0x82, 0x0f, 0x5e, 0x08, 0x3b, 0x84,

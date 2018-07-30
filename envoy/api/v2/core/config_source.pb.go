@@ -59,7 +59,7 @@ func (x ApiConfigSource_ApiType) String() string {
 	return proto.EnumName(ApiConfigSource_ApiType_name, int32(x))
 }
 func (ApiConfigSource_ApiType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_config_source_79c81e7035821e08, []int{0, 0}
+	return fileDescriptor_config_source_2a5e14545410bc7b, []int{0, 0}
 }
 
 // API configuration source. This identifies the API type and cluster that Envoy
@@ -89,7 +89,7 @@ func (m *ApiConfigSource) Reset()         { *m = ApiConfigSource{} }
 func (m *ApiConfigSource) String() string { return proto.CompactTextString(m) }
 func (*ApiConfigSource) ProtoMessage()    {}
 func (*ApiConfigSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_source_79c81e7035821e08, []int{0}
+	return fileDescriptor_config_source_2a5e14545410bc7b, []int{0}
 }
 func (m *ApiConfigSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -159,7 +159,7 @@ func (m *AggregatedConfigSource) Reset()         { *m = AggregatedConfigSource{}
 func (m *AggregatedConfigSource) String() string { return proto.CompactTextString(m) }
 func (*AggregatedConfigSource) ProtoMessage()    {}
 func (*AggregatedConfigSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_source_79c81e7035821e08, []int{1}
+	return fileDescriptor_config_source_2a5e14545410bc7b, []int{1}
 }
 func (m *AggregatedConfigSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -209,7 +209,7 @@ func (m *ConfigSource) Reset()         { *m = ConfigSource{} }
 func (m *ConfigSource) String() string { return proto.CompactTextString(m) }
 func (*ConfigSource) ProtoMessage()    {}
 func (*ConfigSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_source_79c81e7035821e08, []int{2}
+	return fileDescriptor_config_source_2a5e14545410bc7b, []int{2}
 }
 func (m *ConfigSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1272,10 +1272,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/api/v2/core/config_source.proto", fileDescriptor_config_source_79c81e7035821e08)
+	proto.RegisterFile("envoy/api/v2/core/config_source.proto", fileDescriptor_config_source_2a5e14545410bc7b)
 }
 
-var fileDescriptor_config_source_79c81e7035821e08 = []byte{
+var fileDescriptor_config_source_2a5e14545410bc7b = []byte{
 	// 469 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0x3f, 0x6f, 0xd3, 0x40,
 	0x1c, 0xcd, 0xc5, 0x29, 0x6d, 0x2f, 0x09, 0x71, 0xad, 0x8a, 0x9a, 0x0e, 0xc6, 0x32, 0x20, 0x05,
