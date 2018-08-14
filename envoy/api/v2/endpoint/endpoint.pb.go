@@ -13,6 +13,7 @@
 		LbEndpoint
 		LocalityLbEndpoints
 		UpstreamLocalityStats
+		UpstreamEndpointStats
 		EndpointLoadMetricStats
 		ClusterStats
 */
