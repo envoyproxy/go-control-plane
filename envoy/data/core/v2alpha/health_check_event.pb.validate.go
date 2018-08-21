@@ -66,16 +66,6 @@ func (m *HealthCheckEvent) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HealthCheckEventValidationError{
-				Field:  "Timestamp",
-				Reason: "embedded message failed validation",
-				Cause:  err,
-			}
-		}
-	}
-
 	switch m.Event.(type) {
 
 	case *HealthCheckEvent_EjectUnhealthyEvent:

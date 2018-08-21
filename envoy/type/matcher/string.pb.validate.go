@@ -66,13 +66,7 @@ func (m *StringMatcher) Validate() error {
 		}
 
 	case *StringMatcher_Regex:
-
-		if len(m.GetRegex()) > 1024 {
-			return StringMatcherValidationError{
-				Field:  "Regex",
-				Reason: "value length must be at most 1024 bytes",
-			}
-		}
+		// no validation rules for Regex
 
 	default:
 		return StringMatcherValidationError{

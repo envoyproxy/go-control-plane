@@ -41,20 +41,7 @@ func (m *ConfigDump) Validate() error {
 		return nil
 	}
 
-	for idx, item := range m.GetConfigs() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ConfigDumpValidationError{
-					Field:  fmt.Sprintf("Configs[%v]", idx),
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	}
+	// no validation rules for Configs
 
 	return nil
 }

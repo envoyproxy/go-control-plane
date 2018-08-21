@@ -471,13 +471,7 @@ func (m *RouteMatch) Validate() error {
 		// no validation rules for Path
 
 	case *RouteMatch_Regex:
-
-		if len(m.GetRegex()) > 1024 {
-			return RouteMatchValidationError{
-				Field:  "Regex",
-				Reason: "value length must be at most 1024 bytes",
-			}
-		}
+		// no validation rules for Regex
 
 	default:
 		return RouteMatchValidationError{
@@ -1034,10 +1028,10 @@ func (m *VirtualCluster) Validate() error {
 		return nil
 	}
 
-	if l := len(m.GetPattern()); l < 1 || l > 1024 {
+	if len(m.GetPattern()) < 1 {
 		return VirtualClusterValidationError{
 			Field:  "Pattern",
-			Reason: "value length must be between 1 and 1024 bytes, inclusive",
+			Reason: "value length must be at least 1 bytes",
 		}
 	}
 
@@ -1183,13 +1177,7 @@ func (m *HeaderMatcher) Validate() error {
 		// no validation rules for ExactMatch
 
 	case *HeaderMatcher_RegexMatch:
-
-		if len(m.GetRegexMatch()) > 1024 {
-			return HeaderMatcherValidationError{
-				Field:  "RegexMatch",
-				Reason: "value length must be at most 1024 bytes",
-			}
-		}
+		// no validation rules for RegexMatch
 
 	case *HeaderMatcher_RangeMatch:
 
@@ -1268,10 +1256,10 @@ func (m *QueryParameterMatcher) Validate() error {
 		return nil
 	}
 
-	if l := len(m.GetName()); l < 1 || l > 1024 {
+	if len(m.GetName()) < 1 {
 		return QueryParameterMatcherValidationError{
 			Field:  "Name",
-			Reason: "value length must be between 1 and 1024 bytes, inclusive",
+			Reason: "value length must be at least 1 bytes",
 		}
 	}
 
