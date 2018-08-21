@@ -161,7 +161,23 @@ func (m *RouteMatch) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Method
+	// no validation rules for Invert
+
+	switch m.MatchSpecifier.(type) {
+
+	case *RouteMatch_MethodName:
+		// no validation rules for MethodName
+
+	case *RouteMatch_ServiceName:
+		// no validation rules for ServiceName
+
+	default:
+		return RouteMatchValidationError{
+			Field:  "MatchSpecifier",
+			Reason: "value is required",
+		}
+
+	}
 
 	return nil
 }

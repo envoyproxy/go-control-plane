@@ -167,7 +167,13 @@ func (m *TagSpecifier) Validate() error {
 	switch m.TagValue.(type) {
 
 	case *TagSpecifier_Regex:
-		// no validation rules for Regex
+
+		if len(m.GetRegex()) > 1024 {
+			return TagSpecifierValidationError{
+				Field:  "Regex",
+				Reason: "value length must be at most 1024 bytes",
+			}
+		}
 
 	case *TagSpecifier_FixedValue:
 		// no validation rules for FixedValue
