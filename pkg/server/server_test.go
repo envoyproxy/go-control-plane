@@ -72,12 +72,15 @@ type callbacks struct {
 	fetchResp int
 }
 
-func (c *callbacks) OnStreamOpen(int64, string)                                          {}
+func (c *callbacks) OnStreamOpen(context.Context, int64, string) error {
+	return nil
+}
 func (c *callbacks) OnStreamClosed(int64)                                                {}
 func (c *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest)                         {}
 func (c *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
-func (c *callbacks) OnFetchRequest(*v2.DiscoveryRequest) {
+func (c *callbacks) OnFetchRequest(context.Context, *v2.DiscoveryRequest) error {
 	c.fetchReq++
+	return nil
 }
 func (c *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {
 	c.fetchResp++
@@ -85,11 +88,16 @@ func (c *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse)
 
 type mockStream struct {
 	t         *testing.T
+	ctx       context.Context
 	recv      chan *v2.DiscoveryRequest
 	sent      chan *v2.DiscoveryResponse
 	nonce     int
 	sendError bool
 	grpc.ServerStream
+}
+
+func (stream *mockStream) Context() context.Context {
+	return stream.ctx
 }
 
 func (stream *mockStream) Send(resp *v2.DiscoveryResponse) error {
@@ -133,6 +141,7 @@ func (stream *mockStream) Recv() (*v2.DiscoveryRequest, error) {
 func makeMockStream(t *testing.T) *mockStream {
 	return &mockStream{
 		t:    t,
+		ctx:  context.Background(),
 		sent: make(chan *v2.DiscoveryResponse, 10),
 		recv: make(chan *v2.DiscoveryRequest, 10),
 	}
