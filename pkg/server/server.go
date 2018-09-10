@@ -48,6 +48,7 @@ type Server interface {
 // The callbacks are invoked synchronously.
 type Callbacks interface {
 	// OnStreamOpen is called once an xDS stream is open with a stream ID and the type URL (or "" for ADS).
+	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnStreamOpen(context.Context, int64, string) error
 	// OnStreamClosed is called immediately prior to closing an xDS stream with a stream ID.
 	OnStreamClosed(int64)
@@ -55,7 +56,8 @@ type Callbacks interface {
 	OnStreamRequest(int64, *v2.DiscoveryRequest)
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse)
-	// OnFetchRequest is called for each Fetch request
+	// OnFetchRequest is called for each Fetch request. Returning an error will end processing of the
+	// request and respond with an error.
 	OnFetchRequest(context.Context, *v2.DiscoveryRequest) error
 	// OnFetchResponse is called immediately prior to sending a response.
 	OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse)
