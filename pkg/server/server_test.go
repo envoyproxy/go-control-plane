@@ -68,16 +68,26 @@ func makeMockConfigWatcher() *mockConfigWatcher {
 }
 
 type callbacks struct {
-	fetchReq  int
-	fetchResp int
+	fetchReq      int
+	fetchResp     int
+	callbackError bool
 }
 
-func (c *callbacks) OnStreamOpen(int64, string)                                          {}
+func (c *callbacks) OnStreamOpen(context.Context, int64, string) error {
+	if c.callbackError {
+		return errors.New("stream open error")
+	}
+	return nil
+}
 func (c *callbacks) OnStreamClosed(int64)                                                {}
 func (c *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest)                         {}
 func (c *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
-func (c *callbacks) OnFetchRequest(*v2.DiscoveryRequest) {
+func (c *callbacks) OnFetchRequest(context.Context, *v2.DiscoveryRequest) error {
+	if c.callbackError {
+		return errors.New("fetch request error")
+	}
 	c.fetchReq++
+	return nil
 }
 func (c *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {
 	c.fetchResp++
@@ -85,11 +95,16 @@ func (c *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse)
 
 type mockStream struct {
 	t         *testing.T
+	ctx       context.Context
 	recv      chan *v2.DiscoveryRequest
 	sent      chan *v2.DiscoveryResponse
 	nonce     int
 	sendError bool
 	grpc.ServerStream
+}
+
+func (stream *mockStream) Context() context.Context {
+	return stream.ctx
 }
 
 func (stream *mockStream) Send(resp *v2.DiscoveryResponse) error {
@@ -133,6 +148,7 @@ func (stream *mockStream) Recv() (*v2.DiscoveryRequest, error) {
 func makeMockStream(t *testing.T) *mockStream {
 	return &mockStream{
 		t:    t,
+		ctx:  context.Background(),
 		sent: make(chan *v2.DiscoveryResponse, 10),
 		recv: make(chan *v2.DiscoveryRequest, 10),
 	}
@@ -263,6 +279,21 @@ func TestFetch(t *testing.T) {
 		t.Errorf("expected empty on empty request: %v", err)
 	}
 
+	// send error from callback
+	cb.callbackError = true
+	if out, err := s.FetchEndpoints(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchClusters(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchRoutes(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchListeners(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+
 	// verify fetch callbacks
 	if want := 8; cb.fetchReq != want {
 		t.Errorf("unexpected number of fetch requests: got %d, want %d", cb.fetchReq, want)
@@ -311,7 +342,7 @@ func TestSendError(t *testing.T) {
 				TypeUrl: typ,
 			}
 
-			// check that response fails since watch gets closed
+			// check that response fails since send returns error
 			if err := s.StreamAggregatedResources(resp); err == nil {
 				t.Error("Stream() => got no error, want send error")
 			}
@@ -431,5 +462,29 @@ func TestAggregateRequestType(t *testing.T) {
 	resp.recv <- &v2.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
 		t.Error("StreamAggregatedResources() => got nil, want an error")
+	}
+}
+
+func TestCallbackError(t *testing.T) {
+	for _, typ := range cache.ResponseTypes {
+		t.Run(typ, func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.responses = makeResponses()
+			s := server.NewServer(config, &callbacks{callbackError: true})
+
+			// make a request
+			resp := makeMockStream(t)
+			resp.recv <- &v2.DiscoveryRequest{
+				Node:    node,
+				TypeUrl: typ,
+			}
+
+			// check that response fails since stream open returns error
+			if err := s.StreamAggregatedResources(resp); err == nil {
+				t.Error("Stream() => got no error, want error")
+			}
+
+			close(resp.recv)
+		})
 	}
 }
