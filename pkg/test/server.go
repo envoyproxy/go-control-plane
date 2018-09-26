@@ -66,10 +66,6 @@ func RunHTTP(ctx context.Context, upstreamPort uint) {
 			log.Error(err)
 		}
 	}()
-	<-ctx.Done()
-	if err := server.Shutdown(ctx); err != nil {
-		log.Error(err)
-	}
 }
 
 // RunAccessLogServer starts an accesslog service.
@@ -137,8 +133,4 @@ func RunManagementGateway(ctx context.Context, srv xds.Server, port uint) {
 			log.Error(err)
 		}
 	}()
-	<-ctx.Done()
-	if err := server.Shutdown(ctx); err != nil {
-		log.Error(err)
-	}
 }
