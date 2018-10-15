@@ -51,22 +51,29 @@ make tools
 make depend.install
 ```
 
-2. Edit the code in your favorite IDE
+2. Generate proto files (if you update the [data-plane-api](https://github.com/envoyproxy/data-plane-api)
+dependency)
 
-3. Format, vet and lint the code
+```sh
+make generate
+```
+
+3. Edit the code in your favorite IDE
+
+4. Format, vet and lint the code
 
 ```sh
 make check
 ```
 
-3. Build and test
+5. Build and test
 
 ```sh
 make build
 make test
 ```
 
-4. Run [integration test](pkg/test/main/README.md) against the latest Envoy
+6. Run [integration test](pkg/test/main/README.md) against the latest Envoy
    docker image:
 
 ```sh
