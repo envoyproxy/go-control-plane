@@ -210,7 +210,9 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		}},
 		AccessLog: []*alf.AccessLog{{
 			Name:   util.HTTPGRPCAccessLog,
-			Config: alsConfigPbst,
+			ConfigType: &alf.AccessLog_Config{
+				Config: alsConfigPbst,
+			},
 		}},
 	}
 	pbst, err := util.MessageToStruct(manager)
@@ -234,7 +236,9 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		FilterChains: []listener.FilterChain{{
 			Filters: []listener.Filter{{
 				Name:   util.HTTPConnectionManager,
-				Config: pbst,
+				ConfigType: &listener.Filter_Config{
+					Config: pbst,
+				},
 			}},
 		}},
 	}
@@ -269,7 +273,9 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 		FilterChains: []listener.FilterChain{{
 			Filters: []listener.Filter{{
 				Name:   util.TCPProxy,
+			ConfigType: &listener.Filter_Config{
 				Config: pbst,
+			},
 			}},
 		}},
 	}
