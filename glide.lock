@@ -1,8 +1,8 @@
-hash: b822b3a802107e4f825f218cd178bff9fd39a5d7e6fdf3f704cd2acd067ebee9
-updated: 2018-09-24T13:23:57.33690157-07:00
+hash: 66e8afcaa699100e0b186e3201cb8e1aee76a8b653706d4cc50803d096b54047
+updated: 2018-12-07T15:51:58.006861-05:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 911001cdca003337bdb93fab32740cde61bafee3
+  version: 31172b91f2bad512c3d03ab6a0bd07d1cfefd54b
 - name: github.com/gogo/googleapis
   version: 0cd9801be74a10d5ac39d69626eac8255ffcd502
   subpackages:
@@ -27,12 +27,14 @@ imports:
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
+- name: github.com/konsorten/go-windows-terminal-sequences
+  version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
 - name: github.com/lyft/protoc-gen-validate
   version: f9d2b11e44149635b23a002693b76512b01ae515
   subpackages:
   - validate
 - name: github.com/sirupsen/logrus
-  version: 3e01752db0189b9157070a0e1668a620f9a85da2
+  version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
 - name: golang.org/x/crypto
   version: 5119cf507ed5294cc409c092980c7497ee5d6fd2
   subpackages:
@@ -66,22 +68,27 @@ imports:
   - googleapis/rpc/status
   - opencensus
 - name: google.golang.org/grpc
-  version: 8dea3dc473e90c8179e519d91302d0597c0ca1d1
+  version: df014850f6dee74ba2fc94874043a9f3f75fbfd8
   subpackages:
   - balancer
   - balancer/base
   - balancer/roundrobin
+  - binarylog/grpc_binarylog_v1
   - codes
   - connectivity
   - credentials
+  - credentials/internal
   - encoding
   - encoding/proto
   - grpclog
   - internal
   - internal/backoff
+  - internal/binarylog
   - internal/channelz
   - internal/envconfig
   - internal/grpcrand
+  - internal/grpcsync
+  - internal/syscall
   - internal/transport
   - keepalive
   - metadata
