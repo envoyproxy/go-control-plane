@@ -51,7 +51,7 @@ func (x ComparisonFilter_Op) String() string {
 	return proto.EnumName(ComparisonFilter_Op_name, int32(x))
 }
 func (ComparisonFilter_Op) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{2, 0}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{2, 0}
 }
 
 type AccessLog struct {
@@ -84,7 +84,7 @@ func (m *AccessLog) Reset()         { *m = AccessLog{} }
 func (m *AccessLog) String() string { return proto.CompactTextString(m) }
 func (*AccessLog) ProtoMessage()    {}
 func (*AccessLog) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{0}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{0}
 }
 func (m *AccessLog) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -259,7 +259,7 @@ func (m *AccessLogFilter) Reset()         { *m = AccessLogFilter{} }
 func (m *AccessLogFilter) String() string { return proto.CompactTextString(m) }
 func (*AccessLogFilter) ProtoMessage()    {}
 func (*AccessLogFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{1}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{1}
 }
 func (m *AccessLogFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -624,7 +624,7 @@ func (m *ComparisonFilter) Reset()         { *m = ComparisonFilter{} }
 func (m *ComparisonFilter) String() string { return proto.CompactTextString(m) }
 func (*ComparisonFilter) ProtoMessage()    {}
 func (*ComparisonFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{2}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{2}
 }
 func (m *ComparisonFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -680,7 +680,7 @@ func (m *StatusCodeFilter) Reset()         { *m = StatusCodeFilter{} }
 func (m *StatusCodeFilter) String() string { return proto.CompactTextString(m) }
 func (*StatusCodeFilter) ProtoMessage()    {}
 func (*StatusCodeFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{3}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{3}
 }
 func (m *StatusCodeFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -729,7 +729,7 @@ func (m *DurationFilter) Reset()         { *m = DurationFilter{} }
 func (m *DurationFilter) String() string { return proto.CompactTextString(m) }
 func (*DurationFilter) ProtoMessage()    {}
 func (*DurationFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{4}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{4}
 }
 func (m *DurationFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -777,7 +777,7 @@ func (m *NotHealthCheckFilter) Reset()         { *m = NotHealthCheckFilter{} }
 func (m *NotHealthCheckFilter) String() string { return proto.CompactTextString(m) }
 func (*NotHealthCheckFilter) ProtoMessage()    {}
 func (*NotHealthCheckFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{5}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{5}
 }
 func (m *NotHealthCheckFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -818,7 +818,7 @@ func (m *TraceableFilter) Reset()         { *m = TraceableFilter{} }
 func (m *TraceableFilter) String() string { return proto.CompactTextString(m) }
 func (*TraceableFilter) ProtoMessage()    {}
 func (*TraceableFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{6}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{6}
 }
 func (m *TraceableFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -876,7 +876,7 @@ func (m *RuntimeFilter) Reset()         { *m = RuntimeFilter{} }
 func (m *RuntimeFilter) String() string { return proto.CompactTextString(m) }
 func (*RuntimeFilter) ProtoMessage()    {}
 func (*RuntimeFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{7}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{7}
 }
 func (m *RuntimeFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -940,7 +940,7 @@ func (m *AndFilter) Reset()         { *m = AndFilter{} }
 func (m *AndFilter) String() string { return proto.CompactTextString(m) }
 func (*AndFilter) ProtoMessage()    {}
 func (*AndFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{8}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{8}
 }
 func (m *AndFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -990,7 +990,7 @@ func (m *OrFilter) Reset()         { *m = OrFilter{} }
 func (m *OrFilter) String() string { return proto.CompactTextString(m) }
 func (*OrFilter) ProtoMessage()    {}
 func (*OrFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{9}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{9}
 }
 func (m *OrFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1040,7 +1040,7 @@ func (m *HeaderFilter) Reset()         { *m = HeaderFilter{} }
 func (m *HeaderFilter) String() string { return proto.CompactTextString(m) }
 func (*HeaderFilter) ProtoMessage()    {}
 func (*HeaderFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{10}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{10}
 }
 func (m *HeaderFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1093,7 +1093,7 @@ func (m *ResponseFlagFilter) Reset()         { *m = ResponseFlagFilter{} }
 func (m *ResponseFlagFilter) String() string { return proto.CompactTextString(m) }
 func (*ResponseFlagFilter) ProtoMessage()    {}
 func (*ResponseFlagFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_5e2dd701382acb48, []int{11}
+	return fileDescriptor_accesslog_fab579ab040dcc61, []int{11}
 }
 func (m *ResponseFlagFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -3437,10 +3437,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/accesslog/v2/accesslog.proto", fileDescriptor_accesslog_5e2dd701382acb48)
+	proto.RegisterFile("envoy/config/filter/accesslog/v2/accesslog.proto", fileDescriptor_accesslog_fab579ab040dcc61)
 }
 
-var fileDescriptor_accesslog_5e2dd701382acb48 = []byte{
+var fileDescriptor_accesslog_fab579ab040dcc61 = []byte{
 	// 970 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x96, 0x41, 0x6f, 0xdb, 0x36,
 	0x14, 0xc7, 0x23, 0xc6, 0x71, 0xe3, 0x97, 0x26, 0xd6, 0x88, 0x60, 0x71, 0x83, 0x2c, 0xf0, 0x74,
