@@ -35,10 +35,10 @@ type RateLimit struct {
 	// The rate limit domain to use in the rate limit service request.
 	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
 	// The rate limit descriptor list to use in the rate limit service request.
-	Descriptors []*ratelimit.RateLimitDescriptor `protobuf:"bytes,3,rep,name=descriptors" json:"descriptors,omitempty"`
+	Descriptors []*ratelimit.RateLimitDescriptor `protobuf:"bytes,3,rep,name=descriptors,proto3" json:"descriptors,omitempty"`
 	// The timeout in milliseconds for the rate limit service RPC. If not
 	// set, this defaults to 20ms.
-	Timeout *time.Duration `protobuf:"bytes,4,opt,name=timeout,stdduration" json:"timeout,omitempty"`
+	Timeout *time.Duration `protobuf:"bytes,4,opt,name=timeout,proto3,stdduration" json:"timeout,omitempty"`
 	// The filter's behaviour in case the rate limiting service does
 	// not respond back. When it is set to true, Envoy will not allow traffic in case of
 	// communication failure between rate limiting service and the proxy.
@@ -195,6 +195,9 @@ func encodeVarintRateLimit(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RateLimit) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.StatPrefix)

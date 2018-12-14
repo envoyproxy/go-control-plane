@@ -15,8 +15,10 @@ import _ "github.com/lyft/protoc-gen-validate/validate"
 
 import bytes "bytes"
 
-import context "golang.org/x/net/context"
-import grpc "google.golang.org/grpc"
+import (
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+)
 
 import io "io"
 
@@ -46,9 +48,9 @@ type ClusterLoadAssignment struct {
 	// <envoy_api_msg_Cluster.EdsClusterConfig>`.
 	ClusterName string `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
 	// List of endpoints to load balance to.
-	Endpoints []endpoint.LocalityLbEndpoints `protobuf:"bytes,2,rep,name=endpoints" json:"endpoints"`
+	Endpoints []endpoint.LocalityLbEndpoints `protobuf:"bytes,2,rep,name=endpoints,proto3" json:"endpoints"`
 	// Load balancing policy settings.
-	Policy               *ClusterLoadAssignment_Policy `protobuf:"bytes,4,opt,name=policy" json:"policy,omitempty"`
+	Policy               *ClusterLoadAssignment_Policy `protobuf:"bytes,4,opt,name=policy,proto3" json:"policy,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
 	XXX_unrecognized     []byte                        `json:"-"`
 	XXX_sizecache        int32                         `json:"-"`
@@ -129,7 +131,7 @@ type ClusterLoadAssignment_Policy struct {
 	//    "throttle"_drop = 60%
 	//    "lb"_drop = 20%  // 50% of the remaining 'actual' load, which is 40%.
 	//    actual_outgoing_load = 20% // remaining after applying all categories.
-	DropOverloads []*ClusterLoadAssignment_Policy_DropOverload `protobuf:"bytes,2,rep,name=drop_overloads,json=dropOverloads" json:"drop_overloads,omitempty"`
+	DropOverloads []*ClusterLoadAssignment_Policy_DropOverload `protobuf:"bytes,2,rep,name=drop_overloads,json=dropOverloads,proto3" json:"drop_overloads,omitempty"`
 	// Priority levels and localities are considered overprovisioned with this
 	// factor (in percentage). This means that we don't consider a priority
 	// level or locality unhealthy until the percentage of healthy hosts
@@ -139,7 +141,7 @@ type ClusterLoadAssignment_Policy struct {
 	// below 72%.
 	// Read more at :ref:`priority levels <arch_overview_load_balancing_priority_levels>` and
 	// :ref:`localities <arch_overview_load_balancing_locality_weighted_lb>`.
-	OverprovisioningFactor *types.UInt32Value `protobuf:"bytes,3,opt,name=overprovisioning_factor,json=overprovisioningFactor" json:"overprovisioning_factor,omitempty"`
+	OverprovisioningFactor *types.UInt32Value `protobuf:"bytes,3,opt,name=overprovisioning_factor,json=overprovisioningFactor,proto3" json:"overprovisioning_factor,omitempty"`
 	XXX_NoUnkeyedLiteral   struct{}           `json:"-"`
 	XXX_unrecognized       []byte             `json:"-"`
 	XXX_sizecache          int32              `json:"-"`
@@ -196,7 +198,7 @@ type ClusterLoadAssignment_Policy_DropOverload struct {
 	// Identifier for the policy specifying the drop.
 	Category string `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
 	// Percentage of traffic that should be dropped for the category.
-	DropPercentage       *_type.FractionalPercent `protobuf:"bytes,2,opt,name=drop_percentage,json=dropPercentage" json:"drop_percentage,omitempty"`
+	DropPercentage       *_type.FractionalPercent `protobuf:"bytes,2,opt,name=drop_percentage,json=dropPercentage,proto3" json:"drop_percentage,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_unrecognized     []byte                   `json:"-"`
 	XXX_sizecache        int32                    `json:"-"`
@@ -368,8 +370,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for EndpointDiscoveryService service
-
+// EndpointDiscoveryServiceClient is the client API for EndpointDiscoveryService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type EndpointDiscoveryServiceClient interface {
 	// The resource_names field in DiscoveryRequest specifies a list of clusters
 	// to subscribe to updates for.
@@ -425,8 +428,7 @@ func (c *endpointDiscoveryServiceClient) FetchEndpoints(ctx context.Context, in 
 	return out, nil
 }
 
-// Server API for EndpointDiscoveryService service
-
+// EndpointDiscoveryServiceServer is the server API for EndpointDiscoveryService service.
 type EndpointDiscoveryServiceServer interface {
 	// The resource_names field in DiscoveryRequest specifies a list of clusters
 	// to subscribe to updates for.
@@ -641,6 +643,9 @@ func encodeVarintEds(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ClusterLoadAssignment) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ClusterName)
@@ -664,6 +669,9 @@ func (m *ClusterLoadAssignment) Size() (n int) {
 }
 
 func (m *ClusterLoadAssignment_Policy) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.DropOverloads) > 0 {
@@ -683,6 +691,9 @@ func (m *ClusterLoadAssignment_Policy) Size() (n int) {
 }
 
 func (m *ClusterLoadAssignment_Policy_DropOverload) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Category)

@@ -31,11 +31,11 @@ type GrpcJsonTranscoder struct {
 	// the transcoder will translate. If the service name doesn't exist in ``proto_descriptor``,
 	// Envoy will fail at startup. The ``proto_descriptor`` may contain more services than
 	// the service names specified here, but they won't be translated.
-	Services []string `protobuf:"bytes,2,rep,name=services" json:"services,omitempty"`
+	Services []string `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty"`
 	// Control options for response JSON. These options are passed directly to
 	// `JsonPrintOptions <https://developers.google.com/protocol-buffers/docs/reference/cpp/
 	// google.protobuf.util.json_util#JsonPrintOptions>`_.
-	PrintOptions *GrpcJsonTranscoder_PrintOptions `protobuf:"bytes,3,opt,name=print_options,json=printOptions" json:"print_options,omitempty"`
+	PrintOptions *GrpcJsonTranscoder_PrintOptions `protobuf:"bytes,3,opt,name=print_options,json=printOptions,proto3" json:"print_options,omitempty"`
 	// Whether to keep the incoming request route after the outgoing headers have been transformed to
 	// the match the upstream gRPC service. Note: This means that routes for gRPC services that are
 	// not transcoded cannot be used in combination with *match_incoming_request_route*.
@@ -441,6 +441,9 @@ func encodeVarintTranscoder(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *GrpcJsonTranscoder) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DescriptorSet != nil {
@@ -466,6 +469,9 @@ func (m *GrpcJsonTranscoder) Size() (n int) {
 }
 
 func (m *GrpcJsonTranscoder_ProtoDescriptor) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ProtoDescriptor)
@@ -473,6 +479,9 @@ func (m *GrpcJsonTranscoder_ProtoDescriptor) Size() (n int) {
 	return n
 }
 func (m *GrpcJsonTranscoder_ProtoDescriptorBin) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ProtoDescriptorBin != nil {
@@ -482,6 +491,9 @@ func (m *GrpcJsonTranscoder_ProtoDescriptorBin) Size() (n int) {
 	return n
 }
 func (m *GrpcJsonTranscoder_PrintOptions) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.AddWhitespace {
