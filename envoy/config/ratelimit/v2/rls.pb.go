@@ -27,7 +27,7 @@ type RateLimitServiceConfig struct {
 	// Specifies the gRPC service that hosts the rate limit service. The client
 	// will connect to this cluster when it needs to make rate limit service
 	// requests.
-	GrpcService          *core.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
+	GrpcService          *core.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService" json:"grpc_service,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -37,7 +37,7 @@ func (m *RateLimitServiceConfig) Reset()         { *m = RateLimitServiceConfig{}
 func (m *RateLimitServiceConfig) String() string { return proto.CompactTextString(m) }
 func (*RateLimitServiceConfig) ProtoMessage()    {}
 func (*RateLimitServiceConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rls_da8e44cf2d50fc09, []int{0}
+	return fileDescriptor_rls_49ef7d0c0ed5079b, []int{0}
 }
 func (m *RateLimitServiceConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -117,9 +117,6 @@ func encodeVarintRls(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RateLimitServiceConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.GrpcService != nil {
@@ -335,10 +332,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/ratelimit/v2/rls.proto", fileDescriptor_rls_da8e44cf2d50fc09)
+	proto.RegisterFile("envoy/config/ratelimit/v2/rls.proto", fileDescriptor_rls_49ef7d0c0ed5079b)
 }
 
-var fileDescriptor_rls_da8e44cf2d50fc09 = []byte{
+var fileDescriptor_rls_49ef7d0c0ed5079b = []byte{
 	// 221 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x4e, 0xcd, 0x2b, 0xcb,
 	0xaf, 0xd4, 0x4f, 0xce, 0xcf, 0x4b, 0xcb, 0x4c, 0xd7, 0x2f, 0x4a, 0x2c, 0x49, 0xcd, 0xc9, 0xcc,

@@ -31,11 +31,11 @@ type GrpcJsonTranscoder struct {
 	// the transcoder will translate. If the service name doesn't exist in ``proto_descriptor``,
 	// Envoy will fail at startup. The ``proto_descriptor`` may contain more services than
 	// the service names specified here, but they won't be translated.
-	Services []string `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty"`
+	Services []string `protobuf:"bytes,2,rep,name=services" json:"services,omitempty"`
 	// Control options for response JSON. These options are passed directly to
 	// `JsonPrintOptions <https://developers.google.com/protocol-buffers/docs/reference/cpp/
 	// google.protobuf.util.json_util#JsonPrintOptions>`_.
-	PrintOptions *GrpcJsonTranscoder_PrintOptions `protobuf:"bytes,3,opt,name=print_options,json=printOptions,proto3" json:"print_options,omitempty"`
+	PrintOptions *GrpcJsonTranscoder_PrintOptions `protobuf:"bytes,3,opt,name=print_options,json=printOptions" json:"print_options,omitempty"`
 	// Whether to keep the incoming request route after the outgoing headers have been transformed to
 	// the match the upstream gRPC service. Note: This means that routes for gRPC services that are
 	// not transcoded cannot be used in combination with *match_incoming_request_route*.
@@ -49,7 +49,7 @@ func (m *GrpcJsonTranscoder) Reset()         { *m = GrpcJsonTranscoder{} }
 func (m *GrpcJsonTranscoder) String() string { return proto.CompactTextString(m) }
 func (*GrpcJsonTranscoder) ProtoMessage()    {}
 func (*GrpcJsonTranscoder) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transcoder_a3953bf08bea647e, []int{0}
+	return fileDescriptor_transcoder_c849d90d46201465, []int{0}
 }
 func (m *GrpcJsonTranscoder) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -228,7 +228,7 @@ func (m *GrpcJsonTranscoder_PrintOptions) Reset()         { *m = GrpcJsonTransco
 func (m *GrpcJsonTranscoder_PrintOptions) String() string { return proto.CompactTextString(m) }
 func (*GrpcJsonTranscoder_PrintOptions) ProtoMessage()    {}
 func (*GrpcJsonTranscoder_PrintOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transcoder_a3953bf08bea647e, []int{0, 0}
+	return fileDescriptor_transcoder_c849d90d46201465, []int{0, 0}
 }
 func (m *GrpcJsonTranscoder_PrintOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -441,9 +441,6 @@ func encodeVarintTranscoder(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *GrpcJsonTranscoder) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.DescriptorSet != nil {
@@ -469,9 +466,6 @@ func (m *GrpcJsonTranscoder) Size() (n int) {
 }
 
 func (m *GrpcJsonTranscoder_ProtoDescriptor) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.ProtoDescriptor)
@@ -479,9 +473,6 @@ func (m *GrpcJsonTranscoder_ProtoDescriptor) Size() (n int) {
 	return n
 }
 func (m *GrpcJsonTranscoder_ProtoDescriptorBin) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ProtoDescriptorBin != nil {
@@ -491,9 +482,6 @@ func (m *GrpcJsonTranscoder_ProtoDescriptorBin) Size() (n int) {
 	return n
 }
 func (m *GrpcJsonTranscoder_PrintOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.AddWhitespace {
@@ -956,10 +944,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/http/transcoder/v2/transcoder.proto", fileDescriptor_transcoder_a3953bf08bea647e)
+	proto.RegisterFile("envoy/config/filter/http/transcoder/v2/transcoder.proto", fileDescriptor_transcoder_c849d90d46201465)
 }
 
-var fileDescriptor_transcoder_a3953bf08bea647e = []byte{
+var fileDescriptor_transcoder_c849d90d46201465 = []byte{
 	// 468 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0x41, 0x6b, 0xd4, 0x40,
 	0x1c, 0xc5, 0x3b, 0xbb, 0x5d, 0x49, 0xc7, 0x6d, 0x2d, 0x83, 0xb8, 0x6b, 0xd0, 0x25, 0x08, 0x96,

@@ -57,7 +57,7 @@ func (x HTTPAccessLogEntry_HTTPVersion) String() string {
 	return proto.EnumName(HTTPAccessLogEntry_HTTPVersion_name, int32(x))
 }
 func (HTTPAccessLogEntry_HTTPVersion) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{1, 0}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{1, 0}
 }
 
 // Reasons why the request was unauthorized
@@ -82,7 +82,7 @@ func (x ResponseFlags_Unauthorized_Reason) String() string {
 	return proto.EnumName(ResponseFlags_Unauthorized_Reason_name, int32(x))
 }
 func (ResponseFlags_Unauthorized_Reason) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{3, 0, 0}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{3, 0, 0}
 }
 
 type TLSProperties_TLSVersion int32
@@ -114,13 +114,13 @@ func (x TLSProperties_TLSVersion) String() string {
 	return proto.EnumName(TLSProperties_TLSVersion_name, int32(x))
 }
 func (TLSProperties_TLSVersion) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{4, 0}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{4, 0}
 }
 
 // [#not-implemented-hide:]
 type TCPAccessLogEntry struct {
 	// Common properties shared by all Envoy access logs.
-	CommonProperties     *AccessLogCommon `protobuf:"bytes,1,opt,name=common_properties,json=commonProperties,proto3" json:"common_properties,omitempty"`
+	CommonProperties     *AccessLogCommon `protobuf:"bytes,1,opt,name=common_properties,json=commonProperties" json:"common_properties,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -130,7 +130,7 @@ func (m *TCPAccessLogEntry) Reset()         { *m = TCPAccessLogEntry{} }
 func (m *TCPAccessLogEntry) String() string { return proto.CompactTextString(m) }
 func (*TCPAccessLogEntry) ProtoMessage()    {}
 func (*TCPAccessLogEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{0}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{0}
 }
 func (m *TCPAccessLogEntry) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -168,12 +168,12 @@ func (m *TCPAccessLogEntry) GetCommonProperties() *AccessLogCommon {
 
 type HTTPAccessLogEntry struct {
 	// Common properties shared by all Envoy access logs.
-	CommonProperties *AccessLogCommon               `protobuf:"bytes,1,opt,name=common_properties,json=commonProperties,proto3" json:"common_properties,omitempty"`
+	CommonProperties *AccessLogCommon               `protobuf:"bytes,1,opt,name=common_properties,json=commonProperties" json:"common_properties,omitempty"`
 	ProtocolVersion  HTTPAccessLogEntry_HTTPVersion `protobuf:"varint,2,opt,name=protocol_version,json=protocolVersion,proto3,enum=envoy.data.accesslog.v2.HTTPAccessLogEntry_HTTPVersion" json:"protocol_version,omitempty"`
 	// Description of the incoming HTTP request.
-	Request *HTTPRequestProperties `protobuf:"bytes,3,opt,name=request,proto3" json:"request,omitempty"`
+	Request *HTTPRequestProperties `protobuf:"bytes,3,opt,name=request" json:"request,omitempty"`
 	// Description of the outgoing HTTP response.
-	Response             *HTTPResponseProperties `protobuf:"bytes,4,opt,name=response,proto3" json:"response,omitempty"`
+	Response             *HTTPResponseProperties `protobuf:"bytes,4,opt,name=response" json:"response,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
 	XXX_unrecognized     []byte                  `json:"-"`
 	XXX_sizecache        int32                   `json:"-"`
@@ -183,7 +183,7 @@ func (m *HTTPAccessLogEntry) Reset()         { *m = HTTPAccessLogEntry{} }
 func (m *HTTPAccessLogEntry) String() string { return proto.CompactTextString(m) }
 func (*HTTPAccessLogEntry) ProtoMessage()    {}
 func (*HTTPAccessLogEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{1}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{1}
 }
 func (m *HTTPAccessLogEntry) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -249,55 +249,55 @@ type AccessLogCommon struct {
 	// This field is the remote/origin address on which the request from the user was received.
 	// Note: This may not be the physical peer. E.g, if the remote address is inferred from for
 	// example the x-forwarder-for header, proxy protocol, etc.
-	DownstreamRemoteAddress *core.Address `protobuf:"bytes,2,opt,name=downstream_remote_address,json=downstreamRemoteAddress,proto3" json:"downstream_remote_address,omitempty"`
+	DownstreamRemoteAddress *core.Address `protobuf:"bytes,2,opt,name=downstream_remote_address,json=downstreamRemoteAddress" json:"downstream_remote_address,omitempty"`
 	// This field is the local/destination address on which the request from the user was received.
-	DownstreamLocalAddress *core.Address `protobuf:"bytes,3,opt,name=downstream_local_address,json=downstreamLocalAddress,proto3" json:"downstream_local_address,omitempty"`
+	DownstreamLocalAddress *core.Address `protobuf:"bytes,3,opt,name=downstream_local_address,json=downstreamLocalAddress" json:"downstream_local_address,omitempty"`
 	// [#not-implemented-hide:]
 	// If the connection is secure,S this field will contain TLS properties.
-	TlsProperties *TLSProperties `protobuf:"bytes,4,opt,name=tls_properties,json=tlsProperties,proto3" json:"tls_properties,omitempty"`
+	TlsProperties *TLSProperties `protobuf:"bytes,4,opt,name=tls_properties,json=tlsProperties" json:"tls_properties,omitempty"`
 	// The time that Envoy started servicing this request. This is effectively the time that the first
 	// downstream byte is received.
-	StartTime *time.Time `protobuf:"bytes,5,opt,name=start_time,json=startTime,proto3,stdtime" json:"start_time,omitempty"`
+	StartTime *time.Time `protobuf:"bytes,5,opt,name=start_time,json=startTime,stdtime" json:"start_time,omitempty"`
 	// Interval between the first downstream byte received and the last
 	// downstream byte received (i.e. time it takes to receive a request).
-	TimeToLastRxByte *time.Duration `protobuf:"bytes,6,opt,name=time_to_last_rx_byte,json=timeToLastRxByte,proto3,stdduration" json:"time_to_last_rx_byte,omitempty"`
+	TimeToLastRxByte *time.Duration `protobuf:"bytes,6,opt,name=time_to_last_rx_byte,json=timeToLastRxByte,stdduration" json:"time_to_last_rx_byte,omitempty"`
 	// Interval between the first downstream byte received and the first upstream byte sent. There may
 	// by considerable delta between *time_to_last_rx_byte* and this value due to filters.
 	// Additionally, the same caveats apply as documented in *time_to_last_downstream_tx_byte* about
 	// not accounting for kernel socket buffer time, etc.
-	TimeToFirstUpstreamTxByte *time.Duration `protobuf:"bytes,7,opt,name=time_to_first_upstream_tx_byte,json=timeToFirstUpstreamTxByte,proto3,stdduration" json:"time_to_first_upstream_tx_byte,omitempty"`
+	TimeToFirstUpstreamTxByte *time.Duration `protobuf:"bytes,7,opt,name=time_to_first_upstream_tx_byte,json=timeToFirstUpstreamTxByte,stdduration" json:"time_to_first_upstream_tx_byte,omitempty"`
 	// Interval between the first downstream byte received and the last upstream byte sent. There may
 	// by considerable delta between *time_to_last_rx_byte* and this value due to filters.
 	// Additionally, the same caveats apply as documented in *time_to_last_downstream_tx_byte* about
 	// not accounting for kernel socket buffer time, etc.
-	TimeToLastUpstreamTxByte *time.Duration `protobuf:"bytes,8,opt,name=time_to_last_upstream_tx_byte,json=timeToLastUpstreamTxByte,proto3,stdduration" json:"time_to_last_upstream_tx_byte,omitempty"`
+	TimeToLastUpstreamTxByte *time.Duration `protobuf:"bytes,8,opt,name=time_to_last_upstream_tx_byte,json=timeToLastUpstreamTxByte,stdduration" json:"time_to_last_upstream_tx_byte,omitempty"`
 	// Interval between the first downstream byte received and the first upstream
 	// byte received (i.e. time it takes to start receiving a response).
-	TimeToFirstUpstreamRxByte *time.Duration `protobuf:"bytes,9,opt,name=time_to_first_upstream_rx_byte,json=timeToFirstUpstreamRxByte,proto3,stdduration" json:"time_to_first_upstream_rx_byte,omitempty"`
+	TimeToFirstUpstreamRxByte *time.Duration `protobuf:"bytes,9,opt,name=time_to_first_upstream_rx_byte,json=timeToFirstUpstreamRxByte,stdduration" json:"time_to_first_upstream_rx_byte,omitempty"`
 	// Interval between the first downstream byte received and the last upstream
 	// byte received (i.e. time it takes to receive a complete response).
-	TimeToLastUpstreamRxByte *time.Duration `protobuf:"bytes,10,opt,name=time_to_last_upstream_rx_byte,json=timeToLastUpstreamRxByte,proto3,stdduration" json:"time_to_last_upstream_rx_byte,omitempty"`
+	TimeToLastUpstreamRxByte *time.Duration `protobuf:"bytes,10,opt,name=time_to_last_upstream_rx_byte,json=timeToLastUpstreamRxByte,stdduration" json:"time_to_last_upstream_rx_byte,omitempty"`
 	// Interval between the first downstream byte received and the first downstream byte sent.
 	// There may be a considerable delta between the *time_to_first_upstream_rx_byte* and this field
 	// due to filters. Additionally, the same caveats apply as documented in
 	// *time_to_last_downstream_tx_byte* about not accounting for kernel socket buffer time, etc.
-	TimeToFirstDownstreamTxByte *time.Duration `protobuf:"bytes,11,opt,name=time_to_first_downstream_tx_byte,json=timeToFirstDownstreamTxByte,proto3,stdduration" json:"time_to_first_downstream_tx_byte,omitempty"`
+	TimeToFirstDownstreamTxByte *time.Duration `protobuf:"bytes,11,opt,name=time_to_first_downstream_tx_byte,json=timeToFirstDownstreamTxByte,stdduration" json:"time_to_first_downstream_tx_byte,omitempty"`
 	// Interval between the first downstream byte received and the last downstream byte sent.
 	// Depending on protocol, buffering, windowing, filters, etc. there may be a considerable delta
 	// between *time_to_last_upstream_rx_byte* and this field. Note also that this is an approximate
 	// time. In the current implementation it does not include kernel socket buffer time. In the
 	// current implementation it also does not include send window buffering inside the HTTP/2 codec.
 	// In the future it is likely that work will be done to make this duration more accurate.
-	TimeToLastDownstreamTxByte *time.Duration `protobuf:"bytes,12,opt,name=time_to_last_downstream_tx_byte,json=timeToLastDownstreamTxByte,proto3,stdduration" json:"time_to_last_downstream_tx_byte,omitempty"`
+	TimeToLastDownstreamTxByte *time.Duration `protobuf:"bytes,12,opt,name=time_to_last_downstream_tx_byte,json=timeToLastDownstreamTxByte,stdduration" json:"time_to_last_downstream_tx_byte,omitempty"`
 	// The upstream remote/destination address that handles this exchange. This does not include
 	// retries.
-	UpstreamRemoteAddress *core.Address `protobuf:"bytes,13,opt,name=upstream_remote_address,json=upstreamRemoteAddress,proto3" json:"upstream_remote_address,omitempty"`
+	UpstreamRemoteAddress *core.Address `protobuf:"bytes,13,opt,name=upstream_remote_address,json=upstreamRemoteAddress" json:"upstream_remote_address,omitempty"`
 	// The upstream local/origin address that handles this exchange. This does not include retries.
-	UpstreamLocalAddress *core.Address `protobuf:"bytes,14,opt,name=upstream_local_address,json=upstreamLocalAddress,proto3" json:"upstream_local_address,omitempty"`
+	UpstreamLocalAddress *core.Address `protobuf:"bytes,14,opt,name=upstream_local_address,json=upstreamLocalAddress" json:"upstream_local_address,omitempty"`
 	// The upstream cluster that *upstream_remote_address* belongs to.
 	UpstreamCluster string `protobuf:"bytes,15,opt,name=upstream_cluster,json=upstreamCluster,proto3" json:"upstream_cluster,omitempty"`
 	// Flags indicating occurrences during request/response processing.
-	ResponseFlags *ResponseFlags `protobuf:"bytes,16,opt,name=response_flags,json=responseFlags,proto3" json:"response_flags,omitempty"`
+	ResponseFlags *ResponseFlags `protobuf:"bytes,16,opt,name=response_flags,json=responseFlags" json:"response_flags,omitempty"`
 	// All metadata encountered during request processing, including endpoint
 	// selection.
 	//
@@ -306,7 +306,7 @@ type AccessLogCommon struct {
 	// route created from a higher level forwarding rule with some ID can place
 	// that ID in this field and cross reference later. It can also be used to
 	// determine if a canary endpoint was used or not.
-	Metadata             *core.Metadata `protobuf:"bytes,17,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata             *core.Metadata `protobuf:"bytes,17,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
@@ -316,7 +316,7 @@ func (m *AccessLogCommon) Reset()         { *m = AccessLogCommon{} }
 func (m *AccessLogCommon) String() string { return proto.CompactTextString(m) }
 func (*AccessLogCommon) ProtoMessage()    {}
 func (*AccessLogCommon) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{2}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{2}
 }
 func (m *AccessLogCommon) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -491,7 +491,7 @@ type ResponseFlags struct {
 	// Indicates that the request was rate-limited locally.
 	RateLimited bool `protobuf:"varint,12,opt,name=rate_limited,json=rateLimited,proto3" json:"rate_limited,omitempty"`
 	// Indicates if the request was deemed unauthorized and the reason for it.
-	UnauthorizedDetails *ResponseFlags_Unauthorized `protobuf:"bytes,13,opt,name=unauthorized_details,json=unauthorizedDetails,proto3" json:"unauthorized_details,omitempty"`
+	UnauthorizedDetails *ResponseFlags_Unauthorized `protobuf:"bytes,13,opt,name=unauthorized_details,json=unauthorizedDetails" json:"unauthorized_details,omitempty"`
 	// [#not-implemented-hide:] Hide from docs.
 	// Indicates that the request was rejected because there was an error in rate limit service.
 	RateLimitServiceError bool `protobuf:"varint,14,opt,name=rate_limit_service_error,json=rateLimitServiceError,proto3" json:"rate_limit_service_error,omitempty"`
@@ -506,7 +506,7 @@ func (m *ResponseFlags) Reset()         { *m = ResponseFlags{} }
 func (m *ResponseFlags) String() string { return proto.CompactTextString(m) }
 func (*ResponseFlags) ProtoMessage()    {}
 func (*ResponseFlags) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{3}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{3}
 }
 func (m *ResponseFlags) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -651,7 +651,7 @@ func (m *ResponseFlags_Unauthorized) Reset()         { *m = ResponseFlags_Unauth
 func (m *ResponseFlags_Unauthorized) String() string { return proto.CompactTextString(m) }
 func (*ResponseFlags_Unauthorized) ProtoMessage()    {}
 func (*ResponseFlags_Unauthorized) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{3, 0}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{3, 0}
 }
 func (m *ResponseFlags_Unauthorized) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -697,7 +697,7 @@ type TLSProperties struct {
 	// (e.g. ``009C`` for ``TLS_RSA_WITH_AES_128_GCM_SHA256``).
 	//
 	// Here it is expressed as an integer.
-	TlsCipherSuite *types.UInt32Value `protobuf:"bytes,2,opt,name=tls_cipher_suite,json=tlsCipherSuite,proto3" json:"tls_cipher_suite,omitempty"`
+	TlsCipherSuite *types.UInt32Value `protobuf:"bytes,2,opt,name=tls_cipher_suite,json=tlsCipherSuite" json:"tls_cipher_suite,omitempty"`
 	// SNI hostname from handshake.
 	TlsSniHostname       string   `protobuf:"bytes,3,opt,name=tls_sni_hostname,json=tlsSniHostname,proto3" json:"tls_sni_hostname,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -709,7 +709,7 @@ func (m *TLSProperties) Reset()         { *m = TLSProperties{} }
 func (m *TLSProperties) String() string { return proto.CompactTextString(m) }
 func (*TLSProperties) ProtoMessage()    {}
 func (*TLSProperties) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{4}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{4}
 }
 func (m *TLSProperties) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -770,7 +770,7 @@ type HTTPRequestProperties struct {
 	Authority string `protobuf:"bytes,3,opt,name=authority,proto3" json:"authority,omitempty"`
 	// The port of the incoming request URI
 	// (unused currently, as port is composed onto authority).
-	Port *types.UInt32Value `protobuf:"bytes,4,opt,name=port,proto3" json:"port,omitempty"`
+	Port *types.UInt32Value `protobuf:"bytes,4,opt,name=port" json:"port,omitempty"`
 	// The path portion from the incoming request URI.
 	Path string `protobuf:"bytes,5,opt,name=path,proto3" json:"path,omitempty"`
 	// Value of the ``User-Agent`` request header.
@@ -798,7 +798,7 @@ type HTTPRequestProperties struct {
 	// include overhead from framing or encoding at other networking layers.
 	RequestBodyBytes uint64 `protobuf:"varint,12,opt,name=request_body_bytes,json=requestBodyBytes,proto3" json:"request_body_bytes,omitempty"`
 	// Map of additional headers that have been configured to be logged.
-	RequestHeaders       map[string]string `protobuf:"bytes,13,rep,name=request_headers,json=requestHeaders,proto3" json:"request_headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	RequestHeaders       map[string]string `protobuf:"bytes,13,rep,name=request_headers,json=requestHeaders" json:"request_headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -808,7 +808,7 @@ func (m *HTTPRequestProperties) Reset()         { *m = HTTPRequestProperties{} }
 func (m *HTTPRequestProperties) String() string { return proto.CompactTextString(m) }
 func (*HTTPRequestProperties) ProtoMessage()    {}
 func (*HTTPRequestProperties) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{5}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{5}
 }
 func (m *HTTPRequestProperties) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -930,7 +930,7 @@ func (m *HTTPRequestProperties) GetRequestHeaders() map[string]string {
 
 type HTTPResponseProperties struct {
 	// The HTTP response code returned by Envoy.
-	ResponseCode *types.UInt32Value `protobuf:"bytes,1,opt,name=response_code,json=responseCode,proto3" json:"response_code,omitempty"`
+	ResponseCode *types.UInt32Value `protobuf:"bytes,1,opt,name=response_code,json=responseCode" json:"response_code,omitempty"`
 	// Size of the HTTP response headers in bytes.
 	//
 	// This value is captured from the OSI layer 7 perspective, i.e. it does not
@@ -942,9 +942,9 @@ type HTTPResponseProperties struct {
 	// include overhead from framing or encoding at other networking layers.
 	ResponseBodyBytes uint64 `protobuf:"varint,3,opt,name=response_body_bytes,json=responseBodyBytes,proto3" json:"response_body_bytes,omitempty"`
 	// Map of additional headers configured to be logged.
-	ResponseHeaders map[string]string `protobuf:"bytes,4,rep,name=response_headers,json=responseHeaders,proto3" json:"response_headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ResponseHeaders map[string]string `protobuf:"bytes,4,rep,name=response_headers,json=responseHeaders" json:"response_headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Map of trailers configured to be logged.
-	ResponseTrailers     map[string]string `protobuf:"bytes,5,rep,name=response_trailers,json=responseTrailers,proto3" json:"response_trailers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ResponseTrailers     map[string]string `protobuf:"bytes,5,rep,name=response_trailers,json=responseTrailers" json:"response_trailers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -954,7 +954,7 @@ func (m *HTTPResponseProperties) Reset()         { *m = HTTPResponseProperties{}
 func (m *HTTPResponseProperties) String() string { return proto.CompactTextString(m) }
 func (*HTTPResponseProperties) ProtoMessage()    {}
 func (*HTTPResponseProperties) Descriptor() ([]byte, []int) {
-	return fileDescriptor_accesslog_8d6ac25ad9245082, []int{6}
+	return fileDescriptor_accesslog_dc70fcc103e37c98, []int{6}
 }
 func (m *HTTPResponseProperties) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1743,9 +1743,6 @@ func encodeVarintAccesslog(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *TCPAccessLogEntry) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.CommonProperties != nil {
@@ -1759,9 +1756,6 @@ func (m *TCPAccessLogEntry) Size() (n int) {
 }
 
 func (m *HTTPAccessLogEntry) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.CommonProperties != nil {
@@ -1786,9 +1780,6 @@ func (m *HTTPAccessLogEntry) Size() (n int) {
 }
 
 func (m *AccessLogCommon) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.SampleRate != 0 {
@@ -1865,9 +1856,6 @@ func (m *AccessLogCommon) Size() (n int) {
 }
 
 func (m *ResponseFlags) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.FailedLocalHealthcheck {
@@ -1923,9 +1911,6 @@ func (m *ResponseFlags) Size() (n int) {
 }
 
 func (m *ResponseFlags_Unauthorized) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Reason != 0 {
@@ -1938,9 +1923,6 @@ func (m *ResponseFlags_Unauthorized) Size() (n int) {
 }
 
 func (m *TLSProperties) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.TlsVersion != 0 {
@@ -1961,9 +1943,6 @@ func (m *TLSProperties) Size() (n int) {
 }
 
 func (m *HTTPRequestProperties) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.RequestMethod != 0 {
@@ -2026,9 +2005,6 @@ func (m *HTTPRequestProperties) Size() (n int) {
 }
 
 func (m *HTTPResponseProperties) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ResponseCode != nil {
@@ -4436,10 +4412,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/data/accesslog/v2/accesslog.proto", fileDescriptor_accesslog_8d6ac25ad9245082)
+	proto.RegisterFile("envoy/data/accesslog/v2/accesslog.proto", fileDescriptor_accesslog_dc70fcc103e37c98)
 }
 
-var fileDescriptor_accesslog_8d6ac25ad9245082 = []byte{
+var fileDescriptor_accesslog_dc70fcc103e37c98 = []byte{
 	// 1742 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0x4f, 0x53, 0x1b, 0xc9,
 	0x15, 0x5f, 0x81, 0xc0, 0xd2, 0x93, 0x80, 0xa1, 0x11, 0x30, 0x60, 0x1b, 0xb0, 0xf2, 0x8f, 0x54,

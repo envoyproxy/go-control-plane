@@ -41,7 +41,7 @@ func (m *TcpProtocolOptions) Reset()         { *m = TcpProtocolOptions{} }
 func (m *TcpProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*TcpProtocolOptions) ProtoMessage()    {}
 func (*TcpProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_1e4e68781f64b571, []int{0}
+	return fileDescriptor_protocol_821e02c837d354b2, []int{0}
 }
 func (m *TcpProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -75,7 +75,7 @@ type HttpProtocolOptions struct {
 	// period in which there are no active requests. If not set, there is no idle timeout. When the
 	// idle timeout is reached the connection will be closed. Note that request based timeouts mean
 	// that HTTP/2 PINGs will not keep the connection alive.
-	IdleTimeout          *time.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,proto3,stdduration" json:"idle_timeout,omitempty"`
+	IdleTimeout          *time.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,stdduration" json:"idle_timeout,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
@@ -85,7 +85,7 @@ func (m *HttpProtocolOptions) Reset()         { *m = HttpProtocolOptions{} }
 func (m *HttpProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*HttpProtocolOptions) ProtoMessage()    {}
 func (*HttpProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_1e4e68781f64b571, []int{1}
+	return fileDescriptor_protocol_821e02c837d354b2, []int{1}
 }
 func (m *HttpProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -126,7 +126,7 @@ type Http1ProtocolOptions struct {
 	// are generally sent by clients to forward/explicit proxies. This allows clients to configure
 	// envoy as their HTTP proxy. In Unix, for example, this is typically done by setting the
 	// *http_proxy* environment variable.
-	AllowAbsoluteUrl *types.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl,proto3" json:"allow_absolute_url,omitempty"`
+	AllowAbsoluteUrl *types.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl" json:"allow_absolute_url,omitempty"`
 	// Handle incoming HTTP/1.0 and HTTP 0.9 requests.
 	// This is off by default, and not fully standards compliant. There is support for pre-HTTP/1.1
 	// style connect logic, dechunking, and handling lack of client host iff
@@ -145,7 +145,7 @@ func (m *Http1ProtocolOptions) Reset()         { *m = Http1ProtocolOptions{} }
 func (m *Http1ProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*Http1ProtocolOptions) ProtoMessage()    {}
 func (*Http1ProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_1e4e68781f64b571, []int{2}
+	return fileDescriptor_protocol_821e02c837d354b2, []int{2}
 }
 func (m *Http1ProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -200,18 +200,18 @@ type Http2ProtocolOptions struct {
 	// (in octets) that the encoder is permitted to use for the dynamic HPACK table. Valid values
 	// range from 0 to 4294967295 (2^32 - 1) and defaults to 4096. 0 effectively disables header
 	// compression.
-	HpackTableSize *types.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize,proto3" json:"hpack_table_size,omitempty"`
+	HpackTableSize *types.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize" json:"hpack_table_size,omitempty"`
 	// `Maximum concurrent streams <http://httpwg.org/specs/rfc7540.html#rfc.section.5.1.2>`_
 	// allowed for peer on one HTTP/2 connection. Valid values range from 1 to 2147483647 (2^31 - 1)
 	// and defaults to 2147483647.
-	MaxConcurrentStreams *types.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
+	MaxConcurrentStreams *types.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams" json:"max_concurrent_streams,omitempty"`
 	// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
 	// HTTP/2 codec buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
 	// stop the flow of data to the codec buffers.
-	InitialStreamWindowSize *types.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
+	InitialStreamWindowSize *types.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize" json:"initial_stream_window_size,omitempty"`
 	// Similar to *initial_stream_window_size*, but for connection-level flow-control
 	// window. Currently, this has the same minimum/maximum/default as *initial_stream_window_size*.
-	InitialConnectionWindowSize *types.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
+	InitialConnectionWindowSize *types.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize" json:"initial_connection_window_size,omitempty"`
 	// Allows proxying Websocket and other upgrades over H2 connect.
 	AllowConnect bool `protobuf:"varint,5,opt,name=allow_connect,json=allowConnect,proto3" json:"allow_connect,omitempty"`
 	// [#not-implemented-hide:] Hiding until envoy has full metadata support.
@@ -230,7 +230,7 @@ func (m *Http2ProtocolOptions) Reset()         { *m = Http2ProtocolOptions{} }
 func (m *Http2ProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*Http2ProtocolOptions) ProtoMessage()    {}
 func (*Http2ProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_1e4e68781f64b571, []int{3}
+	return fileDescriptor_protocol_821e02c837d354b2, []int{3}
 }
 func (m *Http2ProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -303,7 +303,7 @@ func (m *Http2ProtocolOptions) GetAllowMetadata() bool {
 
 // [#not-implemented-hide:]
 type GrpcProtocolOptions struct {
-	Http2ProtocolOptions *Http2ProtocolOptions `protobuf:"bytes,1,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
+	Http2ProtocolOptions *Http2ProtocolOptions `protobuf:"bytes,1,opt,name=http2_protocol_options,json=http2ProtocolOptions" json:"http2_protocol_options,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -313,7 +313,7 @@ func (m *GrpcProtocolOptions) Reset()         { *m = GrpcProtocolOptions{} }
 func (m *GrpcProtocolOptions) String() string { return proto.CompactTextString(m) }
 func (*GrpcProtocolOptions) ProtoMessage()    {}
 func (*GrpcProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_protocol_1e4e68781f64b571, []int{4}
+	return fileDescriptor_protocol_821e02c837d354b2, []int{4}
 }
 func (m *GrpcProtocolOptions) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -736,9 +736,6 @@ func encodeVarintProtocol(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *TcpProtocolOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.XXX_unrecognized != nil {
@@ -748,9 +745,6 @@ func (m *TcpProtocolOptions) Size() (n int) {
 }
 
 func (m *HttpProtocolOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.IdleTimeout != nil {
@@ -764,9 +758,6 @@ func (m *HttpProtocolOptions) Size() (n int) {
 }
 
 func (m *Http1ProtocolOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.AllowAbsoluteUrl != nil {
@@ -787,9 +778,6 @@ func (m *Http1ProtocolOptions) Size() (n int) {
 }
 
 func (m *Http2ProtocolOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.HpackTableSize != nil {
@@ -821,9 +809,6 @@ func (m *Http2ProtocolOptions) Size() (n int) {
 }
 
 func (m *GrpcProtocolOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Http2ProtocolOptions != nil {
@@ -1530,10 +1515,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/api/v2/core/protocol.proto", fileDescriptor_protocol_1e4e68781f64b571)
+	proto.RegisterFile("envoy/api/v2/core/protocol.proto", fileDescriptor_protocol_821e02c837d354b2)
 }
 
-var fileDescriptor_protocol_1e4e68781f64b571 = []byte{
+var fileDescriptor_protocol_821e02c837d354b2 = []byte{
 	// 577 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x93, 0xc1, 0x6e, 0xd3, 0x4c,
 	0x10, 0xc7, 0xe5, 0x2f, 0xfd, 0x4a, 0xd9, 0x96, 0xd2, 0xba, 0x56, 0x6b, 0x02, 0x32, 0x51, 0x00,

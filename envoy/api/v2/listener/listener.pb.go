@@ -53,7 +53,7 @@ func (x FilterChainMatch_ConnectionSourceType) String() string {
 	return proto.EnumName(FilterChainMatch_ConnectionSourceType_name, int32(x))
 }
 func (FilterChainMatch_ConnectionSourceType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_listener_07b8c457c04a6406, []int{1, 0}
+	return fileDescriptor_listener_ef3b6967d70fb7bd, []int{1, 0}
 }
 
 type Filter struct {
@@ -85,7 +85,7 @@ func (m *Filter) Reset()         { *m = Filter{} }
 func (m *Filter) String() string { return proto.CompactTextString(m) }
 func (*Filter) ProtoMessage()    {}
 func (*Filter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_listener_07b8c457c04a6406, []int{0}
+	return fileDescriptor_listener_ef3b6967d70fb7bd, []int{0}
 }
 func (m *Filter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -122,10 +122,10 @@ type isFilter_ConfigType interface {
 }
 
 type Filter_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
+	Config *types.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
 }
 type Filter_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *types.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,oneof"`
 }
 
 func (*Filter_Config) isFilter_ConfigType()      {}
@@ -262,16 +262,16 @@ func _Filter_OneofSizer(msg proto.Message) (n int) {
 type FilterChainMatch struct {
 	// Optional destination port to consider when use_original_dst is set on the
 	// listener in determining a filter chain match.
-	DestinationPort *types.UInt32Value `protobuf:"bytes,8,opt,name=destination_port,json=destinationPort,proto3" json:"destination_port,omitempty"`
+	DestinationPort *types.UInt32Value `protobuf:"bytes,8,opt,name=destination_port,json=destinationPort" json:"destination_port,omitempty"`
 	// If non-empty, an IP address and prefix length to match addresses when the
 	// listener is bound to 0.0.0.0/:: or when use_original_dst is specified.
-	PrefixRanges []*core.CidrRange `protobuf:"bytes,3,rep,name=prefix_ranges,json=prefixRanges,proto3" json:"prefix_ranges,omitempty"`
+	PrefixRanges []*core.CidrRange `protobuf:"bytes,3,rep,name=prefix_ranges,json=prefixRanges" json:"prefix_ranges,omitempty"`
 	// If non-empty, an IP address and suffix length to match addresses when the
 	// listener is bound to 0.0.0.0/:: or when use_original_dst is specified.
 	// [#not-implemented-hide:]
 	AddressSuffix string `protobuf:"bytes,4,opt,name=address_suffix,json=addressSuffix,proto3" json:"address_suffix,omitempty"`
 	// [#not-implemented-hide:]
-	SuffixLen *types.UInt32Value `protobuf:"bytes,5,opt,name=suffix_len,json=suffixLen,proto3" json:"suffix_len,omitempty"`
+	SuffixLen *types.UInt32Value `protobuf:"bytes,5,opt,name=suffix_len,json=suffixLen" json:"suffix_len,omitempty"`
 	// Specifies the connection source IP match type. Can be any, local or external network.
 	SourceType FilterChainMatch_ConnectionSourceType `protobuf:"varint,12,opt,name=source_type,json=sourceType,proto3,enum=envoy.api.v2.listener.FilterChainMatch_ConnectionSourceType" json:"source_type,omitempty"`
 	// The criteria is satisfied if the source IP address of the downstream
@@ -279,12 +279,12 @@ type FilterChainMatch struct {
 	// parameter is not specified or the list is empty, the source IP address is
 	// ignored.
 	// [#not-implemented-hide:]
-	SourcePrefixRanges []*core.CidrRange `protobuf:"bytes,6,rep,name=source_prefix_ranges,json=sourcePrefixRanges,proto3" json:"source_prefix_ranges,omitempty"`
+	SourcePrefixRanges []*core.CidrRange `protobuf:"bytes,6,rep,name=source_prefix_ranges,json=sourcePrefixRanges" json:"source_prefix_ranges,omitempty"`
 	// The criteria is satisfied if the source port of the downstream connection
 	// is contained in at least one of the specified ports. If the parameter is
 	// not specified, the source port is ignored.
 	// [#not-implemented-hide:]
-	SourcePorts []*types.UInt32Value `protobuf:"bytes,7,rep,name=source_ports,json=sourcePorts,proto3" json:"source_ports,omitempty"`
+	SourcePorts []*types.UInt32Value `protobuf:"bytes,7,rep,name=source_ports,json=sourcePorts" json:"source_ports,omitempty"`
 	// If non-empty, a list of server names (e.g. SNI for TLS protocol) to consider when determining
 	// a filter chain match. Those values will be compared against the server names of a new
 	// connection, when detected by one of the listener filters.
@@ -298,7 +298,7 @@ type FilterChainMatch struct {
 	//
 	//   See the :ref:`FAQ entry <faq_how_to_setup_sni>` on how to configure SNI for more
 	//   information.
-	ServerNames []string `protobuf:"bytes,11,rep,name=server_names,json=serverNames,proto3" json:"server_names,omitempty"`
+	ServerNames []string `protobuf:"bytes,11,rep,name=server_names,json=serverNames" json:"server_names,omitempty"`
 	// If non-empty, a transport protocol to consider when determining a filter chain match.
 	// This value will be compared against the transport protocol of a new connection, when
 	// it's detected by one of the listener filters.
@@ -328,7 +328,7 @@ type FilterChainMatch struct {
 	//   However, the use of ALPN is pretty much limited to the HTTP/2 traffic on the Internet,
 	//   and matching on values other than ``h2`` is going to lead to a lot of false negatives,
 	//   unless all connecting clients are known to use ALPN.
-	ApplicationProtocols []string `protobuf:"bytes,10,rep,name=application_protocols,json=applicationProtocols,proto3" json:"application_protocols,omitempty"`
+	ApplicationProtocols []string `protobuf:"bytes,10,rep,name=application_protocols,json=applicationProtocols" json:"application_protocols,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -338,7 +338,7 @@ func (m *FilterChainMatch) Reset()         { *m = FilterChainMatch{} }
 func (m *FilterChainMatch) String() string { return proto.CompactTextString(m) }
 func (*FilterChainMatch) ProtoMessage()    {}
 func (*FilterChainMatch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_listener_07b8c457c04a6406, []int{1}
+	return fileDescriptor_listener_ef3b6967d70fb7bd, []int{1}
 }
 func (m *FilterChainMatch) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -441,25 +441,25 @@ func (m *FilterChainMatch) GetApplicationProtocols() []string {
 // various other parameters.
 type FilterChain struct {
 	// The criteria to use when matching a connection to this filter chain.
-	FilterChainMatch *FilterChainMatch `protobuf:"bytes,1,opt,name=filter_chain_match,json=filterChainMatch,proto3" json:"filter_chain_match,omitempty"`
+	FilterChainMatch *FilterChainMatch `protobuf:"bytes,1,opt,name=filter_chain_match,json=filterChainMatch" json:"filter_chain_match,omitempty"`
 	// The TLS context for this filter chain.
-	TlsContext *auth.DownstreamTlsContext `protobuf:"bytes,2,opt,name=tls_context,json=tlsContext,proto3" json:"tls_context,omitempty"`
+	TlsContext *auth.DownstreamTlsContext `protobuf:"bytes,2,opt,name=tls_context,json=tlsContext" json:"tls_context,omitempty"`
 	// A list of individual network filters that make up the filter chain for
 	// connections established with the listener. Order matters as the filters are
 	// processed sequentially as connection events happen. Note: If the filter
 	// list is empty, the connection will close by default.
-	Filters []Filter `protobuf:"bytes,3,rep,name=filters,proto3" json:"filters"`
+	Filters []Filter `protobuf:"bytes,3,rep,name=filters" json:"filters"`
 	// Whether the listener should expect a PROXY protocol V1 header on new
 	// connections. If this option is enabled, the listener will assume that that
 	// remote address of the connection is the one specified in the header. Some
 	// load balancers including the AWS ELB support this option. If the option is
 	// absent or set to false, Envoy will use the physical peer address of the
 	// connection as the remote address.
-	UseProxyProto *types.BoolValue `protobuf:"bytes,4,opt,name=use_proxy_proto,json=useProxyProto,proto3" json:"use_proxy_proto,omitempty"`
+	UseProxyProto *types.BoolValue `protobuf:"bytes,4,opt,name=use_proxy_proto,json=useProxyProto" json:"use_proxy_proto,omitempty"`
 	// [#not-implemented-hide:] filter chain metadata.
-	Metadata *core.Metadata `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata *core.Metadata `protobuf:"bytes,5,opt,name=metadata" json:"metadata,omitempty"`
 	// See :ref:`base.TransportSocket<envoy_api_msg_core.TransportSocket>` description.
-	TransportSocket      *core.TransportSocket `protobuf:"bytes,6,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
+	TransportSocket      *core.TransportSocket `protobuf:"bytes,6,opt,name=transport_socket,json=transportSocket" json:"transport_socket,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -469,7 +469,7 @@ func (m *FilterChain) Reset()         { *m = FilterChain{} }
 func (m *FilterChain) String() string { return proto.CompactTextString(m) }
 func (*FilterChain) ProtoMessage()    {}
 func (*FilterChain) Descriptor() ([]byte, []int) {
-	return fileDescriptor_listener_07b8c457c04a6406, []int{2}
+	return fileDescriptor_listener_ef3b6967d70fb7bd, []int{2}
 }
 func (m *FilterChain) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -564,7 +564,7 @@ func (m *ListenerFilter) Reset()         { *m = ListenerFilter{} }
 func (m *ListenerFilter) String() string { return proto.CompactTextString(m) }
 func (*ListenerFilter) ProtoMessage()    {}
 func (*ListenerFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_listener_07b8c457c04a6406, []int{3}
+	return fileDescriptor_listener_ef3b6967d70fb7bd, []int{3}
 }
 func (m *ListenerFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -601,10 +601,10 @@ type isListenerFilter_ConfigType interface {
 }
 
 type ListenerFilter_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
+	Config *types.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
 }
 type ListenerFilter_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,oneof"`
 }
 
 func (*ListenerFilter_Config) isListenerFilter_ConfigType()      {}
@@ -1354,9 +1354,6 @@ func encodeVarintListener(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *Filter) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -1373,9 +1370,6 @@ func (m *Filter) Size() (n int) {
 }
 
 func (m *Filter_Config) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -1385,9 +1379,6 @@ func (m *Filter_Config) Size() (n int) {
 	return n
 }
 func (m *Filter_TypedConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -1397,9 +1388,6 @@ func (m *Filter_TypedConfig) Size() (n int) {
 	return n
 }
 func (m *FilterChainMatch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if len(m.PrefixRanges) > 0 {
@@ -1458,9 +1446,6 @@ func (m *FilterChainMatch) Size() (n int) {
 }
 
 func (m *FilterChain) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.FilterChainMatch != nil {
@@ -1496,9 +1481,6 @@ func (m *FilterChain) Size() (n int) {
 }
 
 func (m *ListenerFilter) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -1515,9 +1497,6 @@ func (m *ListenerFilter) Size() (n int) {
 }
 
 func (m *ListenerFilter_Config) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -1527,9 +1506,6 @@ func (m *ListenerFilter_Config) Size() (n int) {
 	return n
 }
 func (m *ListenerFilter_TypedConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -2538,10 +2514,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/api/v2/listener/listener.proto", fileDescriptor_listener_07b8c457c04a6406)
+	proto.RegisterFile("envoy/api/v2/listener/listener.proto", fileDescriptor_listener_ef3b6967d70fb7bd)
 }
 
-var fileDescriptor_listener_07b8c457c04a6406 = []byte{
+var fileDescriptor_listener_ef3b6967d70fb7bd = []byte{
 	// 865 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0x41, 0x6f, 0xe3, 0x44,
 	0x14, 0xae, 0xe3, 0x34, 0x4d, 0x9e, 0xd3, 0xd6, 0x8c, 0xb2, 0xaa, 0x29, 0xdd, 0x6c, 0x88, 0x40,

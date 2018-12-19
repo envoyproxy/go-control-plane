@@ -47,7 +47,7 @@ type RateLimit struct {
 	RequestType string `protobuf:"bytes,3,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
 	// The timeout in milliseconds for the rate limit service RPC. If not
 	// set, this defaults to 20ms.
-	Timeout *time.Duration `protobuf:"bytes,4,opt,name=timeout,proto3,stdduration" json:"timeout,omitempty"`
+	Timeout *time.Duration `protobuf:"bytes,4,opt,name=timeout,stdduration" json:"timeout,omitempty"`
 	// The filter's behaviour in case the rate limiting service does
 	// not respond back. When it is set to true, Envoy will not allow traffic in case of
 	// communication failure between rate limiting service and the proxy.
@@ -66,7 +66,7 @@ func (m *RateLimit) Reset()         { *m = RateLimit{} }
 func (m *RateLimit) String() string { return proto.CompactTextString(m) }
 func (*RateLimit) ProtoMessage()    {}
 func (*RateLimit) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rate_limit_33baaf9ae3219e20, []int{0}
+	return fileDescriptor_rate_limit_d7f84ecb2e10bbd2, []int{0}
 }
 func (m *RateLimit) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -218,9 +218,6 @@ func encodeVarintRateLimit(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RateLimit) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Domain)
@@ -570,10 +567,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/http/rate_limit/v2/rate_limit.proto", fileDescriptor_rate_limit_33baaf9ae3219e20)
+	proto.RegisterFile("envoy/config/filter/http/rate_limit/v2/rate_limit.proto", fileDescriptor_rate_limit_d7f84ecb2e10bbd2)
 }
 
-var fileDescriptor_rate_limit_33baaf9ae3219e20 = []byte{
+var fileDescriptor_rate_limit_d7f84ecb2e10bbd2 = []byte{
 	// 367 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x4c, 0x90, 0xbd, 0x6e, 0xdb, 0x30,
 	0x14, 0x85, 0x41, 0xf9, 0xa7, 0x35, 0xdd, 0xa2, 0xad, 0x50, 0xa0, 0xaa, 0x07, 0x59, 0xf6, 0x50,

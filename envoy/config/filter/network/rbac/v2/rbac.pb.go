@@ -48,7 +48,7 @@ func (x RBAC_EnforcementType) String() string {
 	return proto.EnumName(RBAC_EnforcementType_name, int32(x))
 }
 func (RBAC_EnforcementType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_rbac_e037d279c7a4cb1f, []int{0, 0}
+	return fileDescriptor_rbac_4b235298fee4cc58, []int{0, 0}
 }
 
 // RBAC network filter config.
@@ -58,11 +58,11 @@ func (RBAC_EnforcementType) EnumDescriptor() ([]byte, []int) {
 type RBAC struct {
 	// Specify the RBAC rules to be applied globally.
 	// If absent, no enforcing RBAC policy will be applied.
-	Rules *v2alpha.RBAC `protobuf:"bytes,1,opt,name=rules,proto3" json:"rules,omitempty"`
+	Rules *v2alpha.RBAC `protobuf:"bytes,1,opt,name=rules" json:"rules,omitempty"`
 	// Shadow rules are not enforced by the filter but will emit stats and logs
 	// and can be used for rule testing.
 	// If absent, no shadow RBAC policy will be applied.
-	ShadowRules *v2alpha.RBAC `protobuf:"bytes,2,opt,name=shadow_rules,json=shadowRules,proto3" json:"shadow_rules,omitempty"`
+	ShadowRules *v2alpha.RBAC `protobuf:"bytes,2,opt,name=shadow_rules,json=shadowRules" json:"shadow_rules,omitempty"`
 	// The prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,3,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// RBAC enforcement strategy. By default RBAC will be enforced only once
@@ -80,7 +80,7 @@ func (m *RBAC) Reset()         { *m = RBAC{} }
 func (m *RBAC) String() string { return proto.CompactTextString(m) }
 func (*RBAC) ProtoMessage()    {}
 func (*RBAC) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rbac_e037d279c7a4cb1f, []int{0}
+	return fileDescriptor_rbac_4b235298fee4cc58, []int{0}
 }
 func (m *RBAC) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -203,9 +203,6 @@ func encodeVarintRbac(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RBAC) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Rules != nil {
@@ -513,10 +510,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/network/rbac/v2/rbac.proto", fileDescriptor_rbac_e037d279c7a4cb1f)
+	proto.RegisterFile("envoy/config/filter/network/rbac/v2/rbac.proto", fileDescriptor_rbac_4b235298fee4cc58)
 }
 
-var fileDescriptor_rbac_e037d279c7a4cb1f = []byte{
+var fileDescriptor_rbac_4b235298fee4cc58 = []byte{
 	// 347 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0x31, 0x4f, 0xfa, 0x40,
 	0x18, 0xc6, 0xff, 0x57, 0xf8, 0x9b, 0x70, 0x18, 0x68, 0x1a, 0xa3, 0x84, 0x01, 0x1b, 0x74, 0x20,

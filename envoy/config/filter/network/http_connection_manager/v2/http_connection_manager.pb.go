@@ -64,7 +64,7 @@ func (x HttpConnectionManager_CodecType) String() string {
 	return proto.EnumName(HttpConnectionManager_CodecType_name, int32(x))
 }
 func (HttpConnectionManager_CodecType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0, 0}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0, 0}
 }
 
 // How to handle the :ref:`config_http_conn_man_headers_x-forwarded-client-cert` (XFCC) HTTP
@@ -107,7 +107,7 @@ func (x HttpConnectionManager_ForwardClientCertDetails) String() string {
 	return proto.EnumName(HttpConnectionManager_ForwardClientCertDetails_name, int32(x))
 }
 func (HttpConnectionManager_ForwardClientCertDetails) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0, 1}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0, 1}
 }
 
 type HttpConnectionManager_Tracing_OperationName int32
@@ -132,7 +132,7 @@ func (x HttpConnectionManager_Tracing_OperationName) String() string {
 	return proto.EnumName(HttpConnectionManager_Tracing_OperationName_name, int32(x))
 }
 func (HttpConnectionManager_Tracing_OperationName) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0, 0, 0}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0, 0, 0}
 }
 
 // [#comment:next free field: 29]
@@ -150,19 +150,19 @@ type HttpConnectionManager struct {
 	// A list of individual HTTP filters that make up the filter chain for
 	// requests made to the connection manager. Order matters as the filters are
 	// processed sequentially as request events happen.
-	HttpFilters []*HttpFilter `protobuf:"bytes,5,rep,name=http_filters,json=httpFilters,proto3" json:"http_filters,omitempty"`
+	HttpFilters []*HttpFilter `protobuf:"bytes,5,rep,name=http_filters,json=httpFilters" json:"http_filters,omitempty"`
 	// Whether the connection manager manipulates the :ref:`config_http_conn_man_headers_user-agent`
 	// and :ref:`config_http_conn_man_headers_downstream-service-cluster` headers. See the linked
 	// documentation for more information. Defaults to false.
-	AddUserAgent *types.BoolValue `protobuf:"bytes,6,opt,name=add_user_agent,json=addUserAgent,proto3" json:"add_user_agent,omitempty"`
+	AddUserAgent *types.BoolValue `protobuf:"bytes,6,opt,name=add_user_agent,json=addUserAgent" json:"add_user_agent,omitempty"`
 	// Presence of the object defines whether the connection manager
 	// emits :ref:`tracing <arch_overview_tracing>` data to the :ref:`configured tracing provider
 	// <envoy_api_msg_config.trace.v2.Tracing>`.
-	Tracing *HttpConnectionManager_Tracing `protobuf:"bytes,7,opt,name=tracing,proto3" json:"tracing,omitempty"`
+	Tracing *HttpConnectionManager_Tracing `protobuf:"bytes,7,opt,name=tracing" json:"tracing,omitempty"`
 	// Additional HTTP/1 settings that are passed to the HTTP/1 codec.
-	HttpProtocolOptions *core.Http1ProtocolOptions `protobuf:"bytes,8,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
+	HttpProtocolOptions *core.Http1ProtocolOptions `protobuf:"bytes,8,opt,name=http_protocol_options,json=httpProtocolOptions" json:"http_protocol_options,omitempty"`
 	// Additional HTTP/2 settings that are passed directly to the HTTP/2 codec.
-	Http2ProtocolOptions *core.Http2ProtocolOptions `protobuf:"bytes,9,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
+	Http2ProtocolOptions *core.Http2ProtocolOptions `protobuf:"bytes,9,opt,name=http2_protocol_options,json=http2ProtocolOptions" json:"http2_protocol_options,omitempty"`
 	// An optional override that the connection manager will write to the server
 	// header in responses. If not set, the default is *envoy*.
 	ServerName string `protobuf:"bytes,10,opt,name=server_name,json=serverName,proto3" json:"server_name,omitempty"`
@@ -173,7 +173,7 @@ type HttpConnectionManager struct {
 	// connection a drain sequence will occur prior to closing the connection. See
 	// :ref:`drain_timeout
 	// <envoy_api_field_config.filter.network.http_connection_manager.v2.HttpConnectionManager.drain_timeout>`.
-	IdleTimeout *time.Duration `protobuf:"bytes,11,opt,name=idle_timeout,json=idleTimeout,proto3,stdduration" json:"idle_timeout,omitempty"`
+	IdleTimeout *time.Duration `protobuf:"bytes,11,opt,name=idle_timeout,json=idleTimeout,stdduration" json:"idle_timeout,omitempty"`
 	// The stream idle timeout for connections managed by the connection manager.
 	// If not specified, this defaults to 5 minutes. The default value was selected
 	// so as not to interfere with any smaller configured timeouts that may have
@@ -199,12 +199,12 @@ type HttpConnectionManager struct {
 	//
 	// A value of 0 will completely disable the connection manager stream idle
 	// timeout, although per-route idle timeout overrides will continue to apply.
-	StreamIdleTimeout *time.Duration `protobuf:"bytes,24,opt,name=stream_idle_timeout,json=streamIdleTimeout,proto3,stdduration" json:"stream_idle_timeout,omitempty"`
+	StreamIdleTimeout *time.Duration `protobuf:"bytes,24,opt,name=stream_idle_timeout,json=streamIdleTimeout,stdduration" json:"stream_idle_timeout,omitempty"`
 	// A timeout for idle requests managed by the connection manager.
 	// The timer is activated when the request is initiated, and is disarmed when the last byte of the
 	// request is sent upstream (i.e. all decoding filters have processed the request), OR when the
 	// response is initiated. If not specified or set to 0, this timeout is disabled.
-	RequestTimeout *time.Duration `protobuf:"bytes,28,opt,name=request_timeout,json=requestTimeout,proto3,stdduration" json:"request_timeout,omitempty"`
+	RequestTimeout *time.Duration `protobuf:"bytes,28,opt,name=request_timeout,json=requestTimeout,stdduration" json:"request_timeout,omitempty"`
 	// The time that Envoy will wait between sending an HTTP/2 “shutdown
 	// notification” (GOAWAY frame with max stream ID) and a final GOAWAY frame.
 	// This is used so that Envoy provides a grace period for new streams that
@@ -214,7 +214,7 @@ type HttpConnectionManager struct {
 	// both when a connection hits the idle timeout or during general server
 	// draining. The default grace period is 5000 milliseconds (5 seconds) if this
 	// option is not specified.
-	DrainTimeout *time.Duration `protobuf:"bytes,12,opt,name=drain_timeout,json=drainTimeout,proto3,stdduration" json:"drain_timeout,omitempty"`
+	DrainTimeout *time.Duration `protobuf:"bytes,12,opt,name=drain_timeout,json=drainTimeout,stdduration" json:"drain_timeout,omitempty"`
 	// The delayed close timeout is for downstream connections managed by the HTTP connection manager.
 	// It is defined as a grace period after connection close processing has been locally initiated
 	// during which Envoy will flush the write buffers for the connection and await the peer to close
@@ -232,10 +232,10 @@ type HttpConnectionManager struct {
 	//
 	// A value of 0 will completely disable delayed close processing, and the downstream connection's
 	// socket will be closed immediately after the write flush is completed.
-	DelayedCloseTimeout *time.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3,stdduration" json:"delayed_close_timeout,omitempty"`
+	DelayedCloseTimeout *time.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,stdduration" json:"delayed_close_timeout,omitempty"`
 	// Configuration for :ref:`HTTP access logs <arch_overview_access_logs>`
 	// emitted by the connection manager.
-	AccessLog []*v21.AccessLog `protobuf:"bytes,13,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	AccessLog []*v21.AccessLog `protobuf:"bytes,13,rep,name=access_log,json=accessLog" json:"access_log,omitempty"`
 	// If set to true, the connection manager will use the real remote address
 	// of the client connection when determining internal versus external origin and manipulating
 	// various headers. If set to false or absent, the connection manager will use the
@@ -243,7 +243,7 @@ type HttpConnectionManager struct {
 	// :ref:`config_http_conn_man_headers_x-forwarded-for`,
 	// :ref:`config_http_conn_man_headers_x-envoy-internal`, and
 	// :ref:`config_http_conn_man_headers_x-envoy-external-address` for more information.
-	UseRemoteAddress *types.BoolValue `protobuf:"bytes,14,opt,name=use_remote_address,json=useRemoteAddress,proto3" json:"use_remote_address,omitempty"`
+	UseRemoteAddress *types.BoolValue `protobuf:"bytes,14,opt,name=use_remote_address,json=useRemoteAddress" json:"use_remote_address,omitempty"`
 	// The number of additional ingress proxy hops from the right side of the
 	// :ref:`config_http_conn_man_headers_x-forwarded-for` HTTP header to trust when
 	// determining the origin client's IP address. The default is zero if this option
@@ -254,7 +254,7 @@ type HttpConnectionManager struct {
 	// purposes. If unspecified, only RFC1918 IP addresses will be considered internal.
 	// See the documentation for :ref:`config_http_conn_man_headers_x-envoy-internal` for more
 	// information about internal/external addresses.
-	InternalAddressConfig *HttpConnectionManager_InternalAddressConfig `protobuf:"bytes,25,opt,name=internal_address_config,json=internalAddressConfig,proto3" json:"internal_address_config,omitempty"`
+	InternalAddressConfig *HttpConnectionManager_InternalAddressConfig `protobuf:"bytes,25,opt,name=internal_address_config,json=internalAddressConfig" json:"internal_address_config,omitempty"`
 	// If set, Envoy will not append the remote address to the
 	// :ref:`config_http_conn_man_headers_x-forwarded-for` HTTP header. This may be used in
 	// conjunction with HTTP filters that explicitly manipulate XFF after the HTTP connection manager
@@ -271,7 +271,7 @@ type HttpConnectionManager struct {
 	// <config_http_conn_man_headers_x-request-id>` header if it does not exist. This defaults to
 	// true. Generating a random UUID4 is expensive so in high throughput scenarios where this feature
 	// is not desired it can be disabled.
-	GenerateRequestId *types.BoolValue `protobuf:"bytes,15,opt,name=generate_request_id,json=generateRequestId,proto3" json:"generate_request_id,omitempty"`
+	GenerateRequestId *types.BoolValue `protobuf:"bytes,15,opt,name=generate_request_id,json=generateRequestId" json:"generate_request_id,omitempty"`
 	// How to handle the :ref:`config_http_conn_man_headers_x-forwarded-client-cert` (XFCC) HTTP
 	// header.
 	ForwardClientCertDetails HttpConnectionManager_ForwardClientCertDetails `protobuf:"varint,16,opt,name=forward_client_cert_details,json=forwardClientCertDetails,proto3,enum=envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager_ForwardClientCertDetails" json:"forward_client_cert_details,omitempty"`
@@ -282,7 +282,7 @@ type HttpConnectionManager struct {
 	// :ref:`config_http_conn_man_headers_x-forwarded-client-cert` header, *Hash* is always set, and
 	// *By* is always set when the client certificate presents the URI type Subject Alternative Name
 	// value.
-	SetCurrentClientCertDetails *HttpConnectionManager_SetCurrentClientCertDetails `protobuf:"bytes,17,opt,name=set_current_client_cert_details,json=setCurrentClientCertDetails,proto3" json:"set_current_client_cert_details,omitempty"`
+	SetCurrentClientCertDetails *HttpConnectionManager_SetCurrentClientCertDetails `protobuf:"bytes,17,opt,name=set_current_client_cert_details,json=setCurrentClientCertDetails" json:"set_current_client_cert_details,omitempty"`
 	// If proxy_100_continue is true, Envoy will proxy incoming "Expect:
 	// 100-continue" headers upstream, and forward "100 Continue" responses
 	// downstream. If this is false or not set, Envoy will instead strip the
@@ -301,7 +301,7 @@ type HttpConnectionManager struct {
 	// <config_http_conn_man_runtime_represent_ipv4_remote_address_as_ipv4_mapped_ipv6>` for runtime
 	// control.
 	RepresentIpv4RemoteAddressAsIpv4MappedIpv6 bool                                   `protobuf:"varint,20,opt,name=represent_ipv4_remote_address_as_ipv4_mapped_ipv6,json=representIpv4RemoteAddressAsIpv4MappedIpv6,proto3" json:"represent_ipv4_remote_address_as_ipv4_mapped_ipv6,omitempty"`
-	UpgradeConfigs                             []*HttpConnectionManager_UpgradeConfig `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs,proto3" json:"upgrade_configs,omitempty"`
+	UpgradeConfigs                             []*HttpConnectionManager_UpgradeConfig `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs" json:"upgrade_configs,omitempty"`
 	// If true, the order of encoder filters will be reversed to that of filters
 	// configured in the HTTP filter chain. Otherwise, it will keep the existing
 	// order.
@@ -309,7 +309,7 @@ type HttpConnectionManager struct {
 	// order of encode filters to that of decode ones, (see
 	// https://github.com/envoyproxy/envoy/issues/4599 for details). When we remove this field, envoy
 	// will have the same behavior when it sets true.
-	BugfixReverseEncodeOrder *types.BoolValue `protobuf:"bytes,27,opt,name=bugfix_reverse_encode_order,json=bugfixReverseEncodeOrder,proto3" json:"bugfix_reverse_encode_order,omitempty"` // Deprecated: Do not use.
+	BugfixReverseEncodeOrder *types.BoolValue `protobuf:"bytes,27,opt,name=bugfix_reverse_encode_order,json=bugfixReverseEncodeOrder" json:"bugfix_reverse_encode_order,omitempty"` // Deprecated: Do not use.
 	XXX_NoUnkeyedLiteral     struct{}         `json:"-"`
 	XXX_unrecognized         []byte           `json:"-"`
 	XXX_sizecache            int32            `json:"-"`
@@ -319,7 +319,7 @@ func (m *HttpConnectionManager) Reset()         { *m = HttpConnectionManager{} }
 func (m *HttpConnectionManager) String() string { return proto.CompactTextString(m) }
 func (*HttpConnectionManager) ProtoMessage()    {}
 func (*HttpConnectionManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0}
 }
 func (m *HttpConnectionManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -355,10 +355,10 @@ type isHttpConnectionManager_RouteSpecifier interface {
 }
 
 type HttpConnectionManager_Rds struct {
-	Rds *Rds `protobuf:"bytes,3,opt,name=rds,proto3,oneof"`
+	Rds *Rds `protobuf:"bytes,3,opt,name=rds,oneof"`
 }
 type HttpConnectionManager_RouteConfig struct {
-	RouteConfig *v2.RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,proto3,oneof"`
+	RouteConfig *v2.RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,oneof"`
 }
 
 func (*HttpConnectionManager_Rds) isHttpConnectionManager_RouteSpecifier()         {}
@@ -648,20 +648,20 @@ type HttpConnectionManager_Tracing struct {
 	// A list of header names used to create tags for the active span. The header name is used to
 	// populate the tag name, and the header value is used to populate the tag value. The tag is
 	// created if the specified header name is present in the request's headers.
-	RequestHeadersForTags []string `protobuf:"bytes,2,rep,name=request_headers_for_tags,json=requestHeadersForTags,proto3" json:"request_headers_for_tags,omitempty"`
+	RequestHeadersForTags []string `protobuf:"bytes,2,rep,name=request_headers_for_tags,json=requestHeadersForTags" json:"request_headers_for_tags,omitempty"`
 	// Target percentage of requests managed by this HTTP connection manager that will be force
 	// traced if the :ref:`x-client-trace-id <config_http_conn_man_headers_x-client-trace-id>`
 	// header is set. This field is a direct analog for the runtime variable
 	// 'tracing.client_sampling' in the :ref:`HTTP Connection Manager
 	// <config_http_conn_man_runtime>`.
 	// Default: 100%
-	ClientSampling *_type.Percent `protobuf:"bytes,3,opt,name=client_sampling,json=clientSampling,proto3" json:"client_sampling,omitempty"`
+	ClientSampling *_type.Percent `protobuf:"bytes,3,opt,name=client_sampling,json=clientSampling" json:"client_sampling,omitempty"`
 	// Target percentage of requests managed by this HTTP connection manager that will be randomly
 	// selected for trace generation, if not requested by the client or not forced. This field is
 	// a direct analog for the runtime variable 'tracing.random_sampling' in the
 	// :ref:`HTTP Connection Manager <config_http_conn_man_runtime>`.
 	// Default: 100%
-	RandomSampling *_type.Percent `protobuf:"bytes,4,opt,name=random_sampling,json=randomSampling,proto3" json:"random_sampling,omitempty"`
+	RandomSampling *_type.Percent `protobuf:"bytes,4,opt,name=random_sampling,json=randomSampling" json:"random_sampling,omitempty"`
 	// Target percentage of requests managed by this HTTP connection manager that will be traced
 	// after all other sampling checks have been applied (client-directed, force tracing, random
 	// sampling). This field functions as an upper limit on the total configured sampling rate. For
@@ -670,7 +670,7 @@ type HttpConnectionManager_Tracing struct {
 	// analog for the runtime variable 'tracing.global_enabled' in the
 	// :ref:`HTTP Connection Manager <config_http_conn_man_runtime>`.
 	// Default: 100%
-	OverallSampling      *_type.Percent `protobuf:"bytes,5,opt,name=overall_sampling,json=overallSampling,proto3" json:"overall_sampling,omitempty"`
+	OverallSampling      *_type.Percent `protobuf:"bytes,5,opt,name=overall_sampling,json=overallSampling" json:"overall_sampling,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
@@ -680,7 +680,7 @@ func (m *HttpConnectionManager_Tracing) Reset()         { *m = HttpConnectionMan
 func (m *HttpConnectionManager_Tracing) String() string { return proto.CompactTextString(m) }
 func (*HttpConnectionManager_Tracing) ProtoMessage()    {}
 func (*HttpConnectionManager_Tracing) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0, 0}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0, 0}
 }
 func (m *HttpConnectionManager_Tracing) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -760,7 +760,7 @@ func (m *HttpConnectionManager_InternalAddressConfig) String() string {
 }
 func (*HttpConnectionManager_InternalAddressConfig) ProtoMessage() {}
 func (*HttpConnectionManager_InternalAddressConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0, 1}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0, 1}
 }
 func (m *HttpConnectionManager_InternalAddressConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -798,7 +798,7 @@ func (m *HttpConnectionManager_InternalAddressConfig) GetUnixSockets() bool {
 
 type HttpConnectionManager_SetCurrentClientCertDetails struct {
 	// Whether to forward the subject of the client cert. Defaults to false.
-	Subject *types.BoolValue `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
+	Subject *types.BoolValue `protobuf:"bytes,1,opt,name=subject" json:"subject,omitempty"`
 	// Whether to forward the entire client cert in URL encoded PEM format. This will appear in the
 	// XFCC header comma separated from other values with the value Cert="PEM".
 	// Defaults to false.
@@ -822,7 +822,7 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) String() string {
 }
 func (*HttpConnectionManager_SetCurrentClientCertDetails) ProtoMessage() {}
 func (*HttpConnectionManager_SetCurrentClientCertDetails) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0, 2}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0, 2}
 }
 func (m *HttpConnectionManager_SetCurrentClientCertDetails) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -900,12 +900,12 @@ type HttpConnectionManager_UpgradeConfig struct {
 	// If present, this represents the filter chain which will be created for
 	// this type of upgrade. If no filters are present, the filter chain for
 	// HTTP connections will be used for this upgrade type.
-	Filters []*HttpFilter `protobuf:"bytes,2,rep,name=filters,proto3" json:"filters,omitempty"`
+	Filters []*HttpFilter `protobuf:"bytes,2,rep,name=filters" json:"filters,omitempty"`
 	// Determines if upgrades are enabled or disabled by default. Defaults to true.
 	// This can be overriden on a per-route basis with :ref:`cluster
 	// <envoy_api_field_route.RouteAction.upgrade_configs>` as documented in the
 	// :ref:`upgrade documentation <arch_overview_websocket>`.
-	Enabled              *types.BoolValue `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Enabled              *types.BoolValue `protobuf:"bytes,3,opt,name=enabled" json:"enabled,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -915,7 +915,7 @@ func (m *HttpConnectionManager_UpgradeConfig) Reset()         { *m = HttpConnect
 func (m *HttpConnectionManager_UpgradeConfig) String() string { return proto.CompactTextString(m) }
 func (*HttpConnectionManager_UpgradeConfig) ProtoMessage()    {}
 func (*HttpConnectionManager_UpgradeConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{0, 3}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{0, 3}
 }
 func (m *HttpConnectionManager_UpgradeConfig) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -967,7 +967,7 @@ func (m *HttpConnectionManager_UpgradeConfig) GetEnabled() *types.BoolValue {
 
 type Rds struct {
 	// Configuration source specifier for RDS.
-	ConfigSource core.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source"`
+	ConfigSource core.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource" json:"config_source"`
 	// The name of the route configuration. This name will be passed to the RDS
 	// API. This allows an Envoy configuration with multiple HTTP listeners (and
 	// associated HTTP connection manager filters) to use different route
@@ -982,7 +982,7 @@ func (m *Rds) Reset()         { *m = Rds{} }
 func (m *Rds) String() string { return proto.CompactTextString(m) }
 func (*Rds) ProtoMessage()    {}
 func (*Rds) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{1}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{1}
 }
 func (m *Rds) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1062,7 +1062,7 @@ func (m *HttpFilter) Reset()         { *m = HttpFilter{} }
 func (m *HttpFilter) String() string { return proto.CompactTextString(m) }
 func (*HttpFilter) ProtoMessage()    {}
 func (*HttpFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_http_connection_manager_7cbc976203d94103, []int{2}
+	return fileDescriptor_http_connection_manager_5b6e0c870c48634b, []int{2}
 }
 func (m *HttpFilter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1098,10 +1098,10 @@ type isHttpFilter_ConfigType interface {
 }
 
 type HttpFilter_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
+	Config *types.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
 }
 type HttpFilter_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *types.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,oneof"`
 }
 
 func (*HttpFilter_Config) isHttpFilter_ConfigType()      {}
@@ -1861,9 +1861,6 @@ func encodeVarintHttpConnectionManager(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *HttpConnectionManager) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.CodecType != 0 {
@@ -1980,9 +1977,6 @@ func (m *HttpConnectionManager) Size() (n int) {
 }
 
 func (m *HttpConnectionManager_Rds) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Rds != nil {
@@ -1992,9 +1986,6 @@ func (m *HttpConnectionManager_Rds) Size() (n int) {
 	return n
 }
 func (m *HttpConnectionManager_RouteConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.RouteConfig != nil {
@@ -2004,9 +1995,6 @@ func (m *HttpConnectionManager_RouteConfig) Size() (n int) {
 	return n
 }
 func (m *HttpConnectionManager_Tracing) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.OperationName != 0 {
@@ -2037,9 +2025,6 @@ func (m *HttpConnectionManager_Tracing) Size() (n int) {
 }
 
 func (m *HttpConnectionManager_InternalAddressConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.UnixSockets {
@@ -2052,9 +2037,6 @@ func (m *HttpConnectionManager_InternalAddressConfig) Size() (n int) {
 }
 
 func (m *HttpConnectionManager_SetCurrentClientCertDetails) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Subject != nil {
@@ -2077,9 +2059,6 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) Size() (n int) {
 }
 
 func (m *HttpConnectionManager_UpgradeConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.UpgradeType)
@@ -2103,9 +2082,6 @@ func (m *HttpConnectionManager_UpgradeConfig) Size() (n int) {
 }
 
 func (m *Rds) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = m.ConfigSource.Size()
@@ -2121,9 +2097,6 @@ func (m *Rds) Size() (n int) {
 }
 
 func (m *HttpFilter) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -2140,9 +2113,6 @@ func (m *HttpFilter) Size() (n int) {
 }
 
 func (m *HttpFilter_Config) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -2152,9 +2122,6 @@ func (m *HttpFilter_Config) Size() (n int) {
 	return n
 }
 func (m *HttpFilter_TypedConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -3968,10 +3935,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto", fileDescriptor_http_connection_manager_7cbc976203d94103)
+	proto.RegisterFile("envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto", fileDescriptor_http_connection_manager_5b6e0c870c48634b)
 }
 
-var fileDescriptor_http_connection_manager_7cbc976203d94103 = []byte{
+var fileDescriptor_http_connection_manager_5b6e0c870c48634b = []byte{
 	// 1690 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x57, 0xcd, 0x6f, 0x23, 0x49,
 	0x15, 0x4f, 0xdb, 0x9e, 0x89, 0xf3, 0xec, 0x24, 0x9d, 0x4a, 0x32, 0xe9, 0x71, 0x96, 0xc4, 0x44,

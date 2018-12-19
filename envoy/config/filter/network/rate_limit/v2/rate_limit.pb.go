@@ -35,10 +35,10 @@ type RateLimit struct {
 	// The rate limit domain to use in the rate limit service request.
 	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
 	// The rate limit descriptor list to use in the rate limit service request.
-	Descriptors []*ratelimit.RateLimitDescriptor `protobuf:"bytes,3,rep,name=descriptors,proto3" json:"descriptors,omitempty"`
+	Descriptors []*ratelimit.RateLimitDescriptor `protobuf:"bytes,3,rep,name=descriptors" json:"descriptors,omitempty"`
 	// The timeout in milliseconds for the rate limit service RPC. If not
 	// set, this defaults to 20ms.
-	Timeout *time.Duration `protobuf:"bytes,4,opt,name=timeout,proto3,stdduration" json:"timeout,omitempty"`
+	Timeout *time.Duration `protobuf:"bytes,4,opt,name=timeout,stdduration" json:"timeout,omitempty"`
 	// The filter's behaviour in case the rate limiting service does
 	// not respond back. When it is set to true, Envoy will not allow traffic in case of
 	// communication failure between rate limiting service and the proxy.
@@ -53,7 +53,7 @@ func (m *RateLimit) Reset()         { *m = RateLimit{} }
 func (m *RateLimit) String() string { return proto.CompactTextString(m) }
 func (*RateLimit) ProtoMessage()    {}
 func (*RateLimit) Descriptor() ([]byte, []int) {
-	return fileDescriptor_rate_limit_d421d32cdead75ec, []int{0}
+	return fileDescriptor_rate_limit_26961ce65a907d33, []int{0}
 }
 func (m *RateLimit) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -195,9 +195,6 @@ func encodeVarintRateLimit(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RateLimit) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.StatPrefix)
@@ -539,10 +536,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/network/rate_limit/v2/rate_limit.proto", fileDescriptor_rate_limit_d421d32cdead75ec)
+	proto.RegisterFile("envoy/config/filter/network/rate_limit/v2/rate_limit.proto", fileDescriptor_rate_limit_26961ce65a907d33)
 }
 
-var fileDescriptor_rate_limit_d421d32cdead75ec = []byte{
+var fileDescriptor_rate_limit_26961ce65a907d33 = []byte{
 	// 366 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x90, 0xbd, 0x4e, 0xe3, 0x40,
 	0x14, 0x85, 0x35, 0xce, 0xcf, 0x26, 0xe3, 0x62, 0x77, 0xad, 0x95, 0xd6, 0x9b, 0xc2, 0xeb, 0xdd,

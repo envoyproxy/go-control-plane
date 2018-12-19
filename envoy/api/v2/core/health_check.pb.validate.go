@@ -600,6 +600,8 @@ func (m *HealthCheck_GrpcHealthCheck) Validate() error {
 
 	// no validation rules for ServiceName
 
+	// no validation rules for Authority
+
 	return nil
 }
 
