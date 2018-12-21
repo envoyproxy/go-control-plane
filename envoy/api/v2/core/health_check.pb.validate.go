@@ -222,6 +222,8 @@ func (m *HealthCheck) Validate() error {
 
 	// no validation rules for EventLogPath
 
+	// no validation rules for AlwaysLogHealthCheckFailures
+
 	switch m.HealthChecker.(type) {
 
 	case *HealthCheck_HttpHealthCheck_:

@@ -84,10 +84,10 @@ type isResourceMonitor_ConfigType interface {
 }
 
 type ResourceMonitor_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
+	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
 }
 type ResourceMonitor_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,oneof"`
+	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*ResourceMonitor_Config) isResourceMonitor_ConfigType()      {}
@@ -295,7 +295,7 @@ type isTrigger_TriggerOneof interface {
 }
 
 type Trigger_Threshold struct {
-	Threshold *ThresholdTrigger `protobuf:"bytes,2,opt,name=threshold,oneof"`
+	Threshold *ThresholdTrigger `protobuf:"bytes,2,opt,name=threshold,proto3,oneof"`
 }
 
 func (*Trigger_Threshold) isTrigger_TriggerOneof() {}
@@ -384,7 +384,7 @@ type OverloadAction struct {
 	// A set of triggers for this action. If any of these triggers fire the overload action
 	// is activated. Listeners are notified when the overload action transitions from
 	// inactivated to activated, or vice versa.
-	Triggers             []*Trigger `protobuf:"bytes,2,rep,name=triggers" json:"triggers,omitempty"`
+	Triggers             []*Trigger `protobuf:"bytes,2,rep,name=triggers,proto3" json:"triggers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
 	XXX_sizecache        int32      `json:"-"`
@@ -439,11 +439,11 @@ func (m *OverloadAction) GetTriggers() []*Trigger {
 
 type OverloadManager struct {
 	// The interval for refreshing resource usage.
-	RefreshInterval *types.Duration `protobuf:"bytes,1,opt,name=refresh_interval,json=refreshInterval" json:"refresh_interval,omitempty"`
+	RefreshInterval *types.Duration `protobuf:"bytes,1,opt,name=refresh_interval,json=refreshInterval,proto3" json:"refresh_interval,omitempty"`
 	// The set of resources to monitor.
-	ResourceMonitors []*ResourceMonitor `protobuf:"bytes,2,rep,name=resource_monitors,json=resourceMonitors" json:"resource_monitors,omitempty"`
+	ResourceMonitors []*ResourceMonitor `protobuf:"bytes,2,rep,name=resource_monitors,json=resourceMonitors,proto3" json:"resource_monitors,omitempty"`
 	// The set of overload actions.
-	Actions              []*OverloadAction `protobuf:"bytes,3,rep,name=actions" json:"actions,omitempty"`
+	Actions              []*OverloadAction `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -751,6 +751,9 @@ func encodeVarintOverload(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ResourceMonitor) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -767,6 +770,9 @@ func (m *ResourceMonitor) Size() (n int) {
 }
 
 func (m *ResourceMonitor_Config) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -776,6 +782,9 @@ func (m *ResourceMonitor_Config) Size() (n int) {
 	return n
 }
 func (m *ResourceMonitor_TypedConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -785,6 +794,9 @@ func (m *ResourceMonitor_TypedConfig) Size() (n int) {
 	return n
 }
 func (m *ThresholdTrigger) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Value != 0 {
@@ -797,6 +809,9 @@ func (m *ThresholdTrigger) Size() (n int) {
 }
 
 func (m *Trigger) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -813,6 +828,9 @@ func (m *Trigger) Size() (n int) {
 }
 
 func (m *Trigger_Threshold) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Threshold != nil {
@@ -822,6 +840,9 @@ func (m *Trigger_Threshold) Size() (n int) {
 	return n
 }
 func (m *OverloadAction) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -841,6 +862,9 @@ func (m *OverloadAction) Size() (n int) {
 }
 
 func (m *OverloadManager) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.RefreshInterval != nil {
