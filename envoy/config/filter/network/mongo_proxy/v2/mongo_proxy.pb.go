@@ -34,7 +34,7 @@ type MongoProxy struct {
 	// applied to the following MongoDB operations: Query, Insert, GetMore,
 	// and KillCursors. Once an active delay is in progress, all incoming
 	// data up until the timer event fires will be a part of the delay.
-	Delay *v2.FaultDelay `protobuf:"bytes,3,opt,name=delay,proto3" json:"delay,omitempty"`
+	Delay *v2.FaultDelay `protobuf:"bytes,3,opt,name=delay" json:"delay,omitempty"`
 	// Flag to specify whether :ref:`dynamic metadata
 	// <config_network_filters_mongo_proxy_dynamic_metadata>` should be emitted. Defaults to false.
 	EmitDynamicMetadata  bool     `protobuf:"varint,4,opt,name=emit_dynamic_metadata,json=emitDynamicMetadata,proto3" json:"emit_dynamic_metadata,omitempty"`
@@ -47,7 +47,7 @@ func (m *MongoProxy) Reset()         { *m = MongoProxy{} }
 func (m *MongoProxy) String() string { return proto.CompactTextString(m) }
 func (*MongoProxy) ProtoMessage()    {}
 func (*MongoProxy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_mongo_proxy_ddf168232691984a, []int{0}
+	return fileDescriptor_mongo_proxy_c181d629f222aba8, []int{0}
 }
 func (m *MongoProxy) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -170,9 +170,6 @@ func encodeVarintMongoProxy(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *MongoProxy) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.StatPrefix)
@@ -477,10 +474,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/filter/network/mongo_proxy/v2/mongo_proxy.proto", fileDescriptor_mongo_proxy_ddf168232691984a)
+	proto.RegisterFile("envoy/config/filter/network/mongo_proxy/v2/mongo_proxy.proto", fileDescriptor_mongo_proxy_c181d629f222aba8)
 }
 
-var fileDescriptor_mongo_proxy_ddf168232691984a = []byte{
+var fileDescriptor_mongo_proxy_c181d629f222aba8 = []byte{
 	// 292 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x8f, 0x31, 0x4b, 0xc4, 0x30,
 	0x18, 0x86, 0xc9, 0xdd, 0x29, 0x36, 0xb7, 0x48, 0x45, 0x2c, 0x07, 0x96, 0xe2, 0x54, 0x6e, 0x48,

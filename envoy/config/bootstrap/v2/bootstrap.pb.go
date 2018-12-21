@@ -39,44 +39,44 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 type Bootstrap struct {
 	// Node identity to present to the management server and for instance
 	// identification purposes (e.g. in generated headers).
-	Node *core.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
+	Node *core.Node `protobuf:"bytes,1,opt,name=node" json:"node,omitempty"`
 	// Statically specified resources.
-	StaticResources *Bootstrap_StaticResources `protobuf:"bytes,2,opt,name=static_resources,json=staticResources,proto3" json:"static_resources,omitempty"`
+	StaticResources *Bootstrap_StaticResources `protobuf:"bytes,2,opt,name=static_resources,json=staticResources" json:"static_resources,omitempty"`
 	// xDS configuration sources.
-	DynamicResources *Bootstrap_DynamicResources `protobuf:"bytes,3,opt,name=dynamic_resources,json=dynamicResources,proto3" json:"dynamic_resources,omitempty"`
+	DynamicResources *Bootstrap_DynamicResources `protobuf:"bytes,3,opt,name=dynamic_resources,json=dynamicResources" json:"dynamic_resources,omitempty"`
 	// Configuration for the cluster manager which owns all upstream clusters
 	// within the server.
-	ClusterManager *ClusterManager `protobuf:"bytes,4,opt,name=cluster_manager,json=clusterManager,proto3" json:"cluster_manager,omitempty"`
+	ClusterManager *ClusterManager `protobuf:"bytes,4,opt,name=cluster_manager,json=clusterManager" json:"cluster_manager,omitempty"`
 	// Health discovery service config option.
 	// (:ref:`core.ApiConfigSource <envoy_api_msg_core.ApiConfigSource>`)
-	HdsConfig *core.ApiConfigSource `protobuf:"bytes,14,opt,name=hds_config,json=hdsConfig,proto3" json:"hds_config,omitempty"`
+	HdsConfig *core.ApiConfigSource `protobuf:"bytes,14,opt,name=hds_config,json=hdsConfig" json:"hds_config,omitempty"`
 	// Optional file system path to search for startup flag files.
 	FlagsPath string `protobuf:"bytes,5,opt,name=flags_path,json=flagsPath,proto3" json:"flags_path,omitempty"`
 	// Optional set of stats sinks.
-	StatsSinks []*v2.StatsSink `protobuf:"bytes,6,rep,name=stats_sinks,json=statsSinks,proto3" json:"stats_sinks,omitempty"`
+	StatsSinks []*v2.StatsSink `protobuf:"bytes,6,rep,name=stats_sinks,json=statsSinks" json:"stats_sinks,omitempty"`
 	// Configuration for internal processing of stats.
-	StatsConfig *v2.StatsConfig `protobuf:"bytes,13,opt,name=stats_config,json=statsConfig,proto3" json:"stats_config,omitempty"`
+	StatsConfig *v2.StatsConfig `protobuf:"bytes,13,opt,name=stats_config,json=statsConfig" json:"stats_config,omitempty"`
 	// Optional duration between flushes to configured stats sinks. For
 	// performance reasons Envoy latches counters and only flushes counters and
 	// gauges at a periodic interval. If not specified the default is 5000ms (5
 	// seconds).
-	StatsFlushInterval *time.Duration `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval,proto3,stdduration" json:"stats_flush_interval,omitempty"`
+	StatsFlushInterval *time.Duration `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval,stdduration" json:"stats_flush_interval,omitempty"`
 	// Optional watchdog configuration.
-	Watchdog *Watchdog `protobuf:"bytes,8,opt,name=watchdog,proto3" json:"watchdog,omitempty"`
+	Watchdog *Watchdog `protobuf:"bytes,8,opt,name=watchdog" json:"watchdog,omitempty"`
 	// Configuration for an external tracing provider. If not specified, no
 	// tracing will be performed.
-	Tracing *v21.Tracing `protobuf:"bytes,9,opt,name=tracing,proto3" json:"tracing,omitempty"`
+	Tracing *v21.Tracing `protobuf:"bytes,9,opt,name=tracing" json:"tracing,omitempty"`
 	// Configuration for an external rate limit service provider. If not
 	// specified, any calls to the rate limit service will immediately return
 	// success.
-	RateLimitService *v22.RateLimitServiceConfig `protobuf:"bytes,10,opt,name=rate_limit_service,json=rateLimitService,proto3" json:"rate_limit_service,omitempty"`
+	RateLimitService *v22.RateLimitServiceConfig `protobuf:"bytes,10,opt,name=rate_limit_service,json=rateLimitService" json:"rate_limit_service,omitempty"`
 	// Configuration for the runtime configuration provider. If not specified, a
 	// “null” provider will be used which will result in all defaults being used.
-	Runtime *Runtime `protobuf:"bytes,11,opt,name=runtime,proto3" json:"runtime,omitempty"`
+	Runtime *Runtime `protobuf:"bytes,11,opt,name=runtime" json:"runtime,omitempty"`
 	// Configuration for the local administration HTTP server.
-	Admin *Admin `protobuf:"bytes,12,opt,name=admin,proto3" json:"admin,omitempty"`
+	Admin *Admin `protobuf:"bytes,12,opt,name=admin" json:"admin,omitempty"`
 	// Optional overload manager configuration.
-	OverloadManager      *v2alpha.OverloadManager `protobuf:"bytes,15,opt,name=overload_manager,json=overloadManager,proto3" json:"overload_manager,omitempty"`
+	OverloadManager      *v2alpha.OverloadManager `protobuf:"bytes,15,opt,name=overload_manager,json=overloadManager" json:"overload_manager,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_unrecognized     []byte                   `json:"-"`
 	XXX_sizecache        int32                    `json:"-"`
@@ -86,7 +86,7 @@ func (m *Bootstrap) Reset()         { *m = Bootstrap{} }
 func (m *Bootstrap) String() string { return proto.CompactTextString(m) }
 func (*Bootstrap) ProtoMessage()    {}
 func (*Bootstrap) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{0}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{0}
 }
 func (m *Bootstrap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -223,17 +223,17 @@ func (m *Bootstrap) GetOverloadManager() *v2alpha.OverloadManager {
 type Bootstrap_StaticResources struct {
 	// Static :ref:`Listeners <envoy_api_msg_Listener>`. These listeners are
 	// available regardless of LDS configuration.
-	Listeners []v23.Listener `protobuf:"bytes,1,rep,name=listeners,proto3" json:"listeners"`
+	Listeners []v23.Listener `protobuf:"bytes,1,rep,name=listeners" json:"listeners"`
 	// If a network based configuration source is specified for :ref:`cds_config
 	// <envoy_api_field_config.bootstrap.v2.Bootstrap.DynamicResources.cds_config>`, it's necessary
 	// to have some initial cluster definitions available to allow Envoy to know
 	// how to speak to the management server. These cluster definitions may not
 	// use :ref:`EDS <arch_overview_dynamic_config_eds>` (i.e. they should be static
 	// IP or DNS-based).
-	Clusters []v23.Cluster `protobuf:"bytes,2,rep,name=clusters,proto3" json:"clusters"`
+	Clusters []v23.Cluster `protobuf:"bytes,2,rep,name=clusters" json:"clusters"`
 	// These static secrets can be used by :ref:`SdsSecretConfig
 	// <envoy_api_msg_auth.SdsSecretConfig>`
-	Secrets              []auth.Secret `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets"`
+	Secrets              []auth.Secret `protobuf:"bytes,3,rep,name=secrets" json:"secrets"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -243,7 +243,7 @@ func (m *Bootstrap_StaticResources) Reset()         { *m = Bootstrap_StaticResou
 func (m *Bootstrap_StaticResources) String() string { return proto.CompactTextString(m) }
 func (*Bootstrap_StaticResources) ProtoMessage()    {}
 func (*Bootstrap_StaticResources) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{0, 0}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{0, 0}
 }
 func (m *Bootstrap_StaticResources) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -296,11 +296,11 @@ func (m *Bootstrap_StaticResources) GetSecrets() []auth.Secret {
 type Bootstrap_DynamicResources struct {
 	// All :ref:`Listeners <envoy_api_msg_Listener>` are provided by a single
 	// :ref:`LDS <arch_overview_dynamic_config_lds>` configuration source.
-	LdsConfig *core.ConfigSource `protobuf:"bytes,1,opt,name=lds_config,json=ldsConfig,proto3" json:"lds_config,omitempty"`
+	LdsConfig *core.ConfigSource `protobuf:"bytes,1,opt,name=lds_config,json=ldsConfig" json:"lds_config,omitempty"`
 	// All post-bootstrap :ref:`Cluster <envoy_api_msg_Cluster>` definitions are
 	// provided by a single :ref:`CDS <arch_overview_dynamic_config_cds>`
 	// configuration source.
-	CdsConfig *core.ConfigSource `protobuf:"bytes,2,opt,name=cds_config,json=cdsConfig,proto3" json:"cds_config,omitempty"`
+	CdsConfig *core.ConfigSource `protobuf:"bytes,2,opt,name=cds_config,json=cdsConfig" json:"cds_config,omitempty"`
 	// A single :ref:`ADS <config_overview_v2_ads>` source may be optionally
 	// specified. This must have :ref:`api_type
 	// <envoy_api_field_core.ApiConfigSource.api_type>` :ref:`GRPC
@@ -308,9 +308,9 @@ type Bootstrap_DynamicResources struct {
 	// :ref:`ConfigSources <envoy_api_msg_core.ConfigSource>` that have
 	// the :ref:`ads <envoy_api_field_core.ConfigSource.ads>` field set will be
 	// streamed on the ADS channel.
-	AdsConfig *core.ApiConfigSource `protobuf:"bytes,3,opt,name=ads_config,json=adsConfig,proto3" json:"ads_config,omitempty"`
+	AdsConfig *core.ApiConfigSource `protobuf:"bytes,3,opt,name=ads_config,json=adsConfig" json:"ads_config,omitempty"`
 	// [#not-implemented-hide:] Hide from docs.
-	DeprecatedV1         *Bootstrap_DynamicResources_DeprecatedV1 `protobuf:"bytes,4,opt,name=deprecated_v1,json=deprecatedV1,proto3" json:"deprecated_v1,omitempty"` // Deprecated: Do not use.
+	DeprecatedV1         *Bootstrap_DynamicResources_DeprecatedV1 `protobuf:"bytes,4,opt,name=deprecated_v1,json=deprecatedV1" json:"deprecated_v1,omitempty"` // Deprecated: Do not use.
 	XXX_NoUnkeyedLiteral struct{}                                 `json:"-"`
 	XXX_unrecognized     []byte                                   `json:"-"`
 	XXX_sizecache        int32                                    `json:"-"`
@@ -320,7 +320,7 @@ func (m *Bootstrap_DynamicResources) Reset()         { *m = Bootstrap_DynamicRes
 func (m *Bootstrap_DynamicResources) String() string { return proto.CompactTextString(m) }
 func (*Bootstrap_DynamicResources) ProtoMessage()    {}
 func (*Bootstrap_DynamicResources) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{0, 1}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{0, 1}
 }
 func (m *Bootstrap_DynamicResources) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -381,7 +381,7 @@ func (m *Bootstrap_DynamicResources) GetDeprecatedV1() *Bootstrap_DynamicResourc
 // [#not-implemented-hide:] Hide from docs.
 type Bootstrap_DynamicResources_DeprecatedV1 struct {
 	// Deprecated service discovery service config for when using API v1 REST.
-	SdsConfig            *core.ConfigSource `protobuf:"bytes,1,opt,name=sds_config,json=sdsConfig,proto3" json:"sds_config,omitempty"`
+	SdsConfig            *core.ConfigSource `protobuf:"bytes,1,opt,name=sds_config,json=sdsConfig" json:"sds_config,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -393,7 +393,7 @@ func (m *Bootstrap_DynamicResources_DeprecatedV1) Reset() {
 func (m *Bootstrap_DynamicResources_DeprecatedV1) String() string { return proto.CompactTextString(m) }
 func (*Bootstrap_DynamicResources_DeprecatedV1) ProtoMessage()    {}
 func (*Bootstrap_DynamicResources_DeprecatedV1) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{0, 1, 0}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{0, 1, 0}
 }
 func (m *Bootstrap_DynamicResources_DeprecatedV1) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -441,7 +441,7 @@ type Admin struct {
 	ProfilePath string `protobuf:"bytes,2,opt,name=profile_path,json=profilePath,proto3" json:"profile_path,omitempty"`
 	// The TCP address that the administration server will listen on.
 	// If not specified, Envoy will not start an administration server.
-	Address              *core.Address `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	Address              *core.Address `protobuf:"bytes,3,opt,name=address" json:"address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -451,7 +451,7 @@ func (m *Admin) Reset()         { *m = Admin{} }
 func (m *Admin) String() string { return proto.CompactTextString(m) }
 func (*Admin) ProtoMessage()    {}
 func (*Admin) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{1}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{1}
 }
 func (m *Admin) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -514,15 +514,15 @@ type ClusterManager struct {
 	// routing <https://github.com/envoyproxy/envoy/issues/774>`_.
 	LocalClusterName string `protobuf:"bytes,1,opt,name=local_cluster_name,json=localClusterName,proto3" json:"local_cluster_name,omitempty"`
 	// Optional global configuration for outlier detection.
-	OutlierDetection *ClusterManager_OutlierDetection `protobuf:"bytes,2,opt,name=outlier_detection,json=outlierDetection,proto3" json:"outlier_detection,omitempty"`
+	OutlierDetection *ClusterManager_OutlierDetection `protobuf:"bytes,2,opt,name=outlier_detection,json=outlierDetection" json:"outlier_detection,omitempty"`
 	// Optional configuration used to bind newly established upstream connections.
 	// This may be overridden on a per-cluster basis by upstream_bind_config in the cds_config.
-	UpstreamBindConfig *core.BindConfig `protobuf:"bytes,3,opt,name=upstream_bind_config,json=upstreamBindConfig,proto3" json:"upstream_bind_config,omitempty"`
+	UpstreamBindConfig *core.BindConfig `protobuf:"bytes,3,opt,name=upstream_bind_config,json=upstreamBindConfig" json:"upstream_bind_config,omitempty"`
 	// A management server endpoint to stream load stats to via
 	// *StreamLoadStats*. This must have :ref:`api_type
 	// <envoy_api_field_core.ApiConfigSource.api_type>` :ref:`GRPC
 	// <envoy_api_enum_value_core.ApiConfigSource.ApiType.GRPC>`.
-	LoadStatsConfig      *core.ApiConfigSource `protobuf:"bytes,4,opt,name=load_stats_config,json=loadStatsConfig,proto3" json:"load_stats_config,omitempty"`
+	LoadStatsConfig      *core.ApiConfigSource `protobuf:"bytes,4,opt,name=load_stats_config,json=loadStatsConfig" json:"load_stats_config,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -532,7 +532,7 @@ func (m *ClusterManager) Reset()         { *m = ClusterManager{} }
 func (m *ClusterManager) String() string { return proto.CompactTextString(m) }
 func (*ClusterManager) ProtoMessage()    {}
 func (*ClusterManager) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{2}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{2}
 }
 func (m *ClusterManager) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -601,7 +601,7 @@ func (m *ClusterManager_OutlierDetection) Reset()         { *m = ClusterManager_
 func (m *ClusterManager_OutlierDetection) String() string { return proto.CompactTextString(m) }
 func (*ClusterManager_OutlierDetection) ProtoMessage()    {}
 func (*ClusterManager_OutlierDetection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{2, 0}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{2, 0}
 }
 func (m *ClusterManager_OutlierDetection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -642,19 +642,19 @@ func (m *ClusterManager_OutlierDetection) GetEventLogPath() string {
 type Watchdog struct {
 	// The duration after which Envoy counts a nonresponsive thread in the
 	// *server.watchdog_miss* statistic. If not specified the default is 200ms.
-	MissTimeout *types.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout,proto3" json:"miss_timeout,omitempty"`
+	MissTimeout *types.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout" json:"miss_timeout,omitempty"`
 	// The duration after which Envoy counts a nonresponsive thread in the
 	// *server.watchdog_mega_miss* statistic. If not specified the default is
 	// 1000ms.
-	MegamissTimeout *types.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout,proto3" json:"megamiss_timeout,omitempty"`
+	MegamissTimeout *types.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout" json:"megamiss_timeout,omitempty"`
 	// If a watched thread has been nonresponsive for this duration, assume a
 	// programming error and kill the entire Envoy process. Set to 0 to disable
 	// kill behavior. If not specified the default is 0 (disabled).
-	KillTimeout *types.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout,proto3" json:"kill_timeout,omitempty"`
+	KillTimeout *types.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout" json:"kill_timeout,omitempty"`
 	// If at least two watched threads have been nonresponsive for at least this
 	// duration assume a true deadlock and kill the entire Envoy process. Set to 0
 	// to disable this behavior. If not specified the default is 0 (disabled).
-	MultikillTimeout     *types.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout,proto3" json:"multikill_timeout,omitempty"`
+	MultikillTimeout     *types.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout" json:"multikill_timeout,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -664,7 +664,7 @@ func (m *Watchdog) Reset()         { *m = Watchdog{} }
 func (m *Watchdog) String() string { return proto.CompactTextString(m) }
 func (*Watchdog) ProtoMessage()    {}
 func (*Watchdog) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{3}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{3}
 }
 func (m *Watchdog) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -749,7 +749,7 @@ func (m *Runtime) Reset()         { *m = Runtime{} }
 func (m *Runtime) String() string { return proto.CompactTextString(m) }
 func (*Runtime) ProtoMessage()    {}
 func (*Runtime) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bootstrap_9384baea86791112, []int{4}
+	return fileDescriptor_bootstrap_5630766791359e2a, []int{4}
 }
 func (m *Runtime) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1365,9 +1365,6 @@ func encodeVarintBootstrap(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *Bootstrap) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Node != nil {
@@ -1439,9 +1436,6 @@ func (m *Bootstrap) Size() (n int) {
 }
 
 func (m *Bootstrap_StaticResources) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if len(m.Listeners) > 0 {
@@ -1469,9 +1463,6 @@ func (m *Bootstrap_StaticResources) Size() (n int) {
 }
 
 func (m *Bootstrap_DynamicResources) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.LdsConfig != nil {
@@ -1497,9 +1488,6 @@ func (m *Bootstrap_DynamicResources) Size() (n int) {
 }
 
 func (m *Bootstrap_DynamicResources_DeprecatedV1) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.SdsConfig != nil {
@@ -1513,9 +1501,6 @@ func (m *Bootstrap_DynamicResources_DeprecatedV1) Size() (n int) {
 }
 
 func (m *Admin) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.AccessLogPath)
@@ -1537,9 +1522,6 @@ func (m *Admin) Size() (n int) {
 }
 
 func (m *ClusterManager) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.LocalClusterName)
@@ -1565,9 +1547,6 @@ func (m *ClusterManager) Size() (n int) {
 }
 
 func (m *ClusterManager_OutlierDetection) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.EventLogPath)
@@ -1581,9 +1560,6 @@ func (m *ClusterManager_OutlierDetection) Size() (n int) {
 }
 
 func (m *Watchdog) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.MissTimeout != nil {
@@ -1609,9 +1585,6 @@ func (m *Watchdog) Size() (n int) {
 }
 
 func (m *Runtime) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.SymlinkRoot)
@@ -3424,10 +3397,10 @@ var (
 )
 
 func init() {
-	proto.RegisterFile("envoy/config/bootstrap/v2/bootstrap.proto", fileDescriptor_bootstrap_9384baea86791112)
+	proto.RegisterFile("envoy/config/bootstrap/v2/bootstrap.proto", fileDescriptor_bootstrap_5630766791359e2a)
 }
 
-var fileDescriptor_bootstrap_9384baea86791112 = []byte{
+var fileDescriptor_bootstrap_5630766791359e2a = []byte{
 	// 1218 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x56, 0xcf, 0x6f, 0x1b, 0x45,
 	0x14, 0x66, 0x6d, 0xb7, 0x89, 0x9f, 0x9d, 0xd8, 0x19, 0xa5, 0xed, 0xd6, 0xa2, 0x49, 0xea, 0x16,

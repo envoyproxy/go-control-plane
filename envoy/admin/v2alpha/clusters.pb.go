@@ -26,7 +26,7 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // See :ref:`/clusters <operations_admin_interface_clusters>` for more information.
 type Clusters struct {
 	// Mapping from cluster name to each cluster's status.
-	ClusterStatuses      []*ClusterStatus `protobuf:"bytes,1,rep,name=cluster_statuses,json=clusterStatuses,proto3" json:"cluster_statuses,omitempty"`
+	ClusterStatuses      []*ClusterStatus `protobuf:"bytes,1,rep,name=cluster_statuses,json=clusterStatuses" json:"cluster_statuses,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -89,9 +89,9 @@ type ClusterStatus struct {
 	// 2. The threshold is computed to be < 0 because a negative value implies that there was no
 	//    threshold for that interval.
 	// 3. Outlier detection is not enabled for this cluster.
-	SuccessRateEjectionThreshold *_type.Percent `protobuf:"bytes,3,opt,name=success_rate_ejection_threshold,json=successRateEjectionThreshold,proto3" json:"success_rate_ejection_threshold,omitempty"`
+	SuccessRateEjectionThreshold *_type.Percent `protobuf:"bytes,3,opt,name=success_rate_ejection_threshold,json=successRateEjectionThreshold" json:"success_rate_ejection_threshold,omitempty"`
 	// Mapping from host address to the host's current status.
-	HostStatuses         []*HostStatus `protobuf:"bytes,4,rep,name=host_statuses,json=hostStatuses,proto3" json:"host_statuses,omitempty"`
+	HostStatuses         []*HostStatus `protobuf:"bytes,4,rep,name=host_statuses,json=hostStatuses" json:"host_statuses,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -161,17 +161,17 @@ func (m *ClusterStatus) GetHostStatuses() []*HostStatus {
 // Current state of a particular host.
 type HostStatus struct {
 	// Address of this host.
-	Address *core.Address `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Address *core.Address `protobuf:"bytes,1,opt,name=address" json:"address,omitempty"`
 	// List of stats specific to this host.
-	Stats []*SimpleMetric `protobuf:"bytes,2,rep,name=stats,proto3" json:"stats,omitempty"`
+	Stats []*SimpleMetric `protobuf:"bytes,2,rep,name=stats" json:"stats,omitempty"`
 	// The host's current health status.
-	HealthStatus *HostHealthStatus `protobuf:"bytes,3,opt,name=health_status,json=healthStatus,proto3" json:"health_status,omitempty"`
+	HealthStatus *HostHealthStatus `protobuf:"bytes,3,opt,name=health_status,json=healthStatus" json:"health_status,omitempty"`
 	// Request success rate for this host over the last calculated interval.
 	//
 	// Note: the message will not be present if host did not have enough request volume to calculate
 	// success rate or the cluster did not have enough hosts to run through success rate outlier
 	// ejection.
-	SuccessRate *_type.Percent `protobuf:"bytes,4,opt,name=success_rate,json=successRate,proto3" json:"success_rate,omitempty"`
+	SuccessRate *_type.Percent `protobuf:"bytes,4,opt,name=success_rate,json=successRate" json:"success_rate,omitempty"`
 	// The host's weight. If not configured, the value defaults to 1.
 	Weight               uint32   `protobuf:"varint,5,opt,name=weight,proto3" json:"weight,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -538,9 +538,6 @@ func encodeVarintClusters(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *Clusters) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if len(m.ClusterStatuses) > 0 {
@@ -556,9 +553,6 @@ func (m *Clusters) Size() (n int) {
 }
 
 func (m *ClusterStatus) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -585,9 +579,6 @@ func (m *ClusterStatus) Size() (n int) {
 }
 
 func (m *HostStatus) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Address != nil {
@@ -618,9 +609,6 @@ func (m *HostStatus) Size() (n int) {
 }
 
 func (m *HostHealthStatus) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.FailedActiveHealthCheck {
