@@ -80,6 +80,14 @@ make test
 make integration.docker
 ```
 
+## Version tagging
+
+**For project maintainers**: remember to add a version tag in format `v<version number>`, e.g. `v0.6.5` after each commit.
+The version number must be set according to [Semantic Versioning](https://semver.org).
+
+The version tags will allow users of go dependency management tools, such as [dep](https://golang.github.io/dep/),
+specify the dependency on `go-control-plane` using the [version property](https://golang.github.io/dep/).
+
 ## Usage
 
 Register services on the gRPC server as follows.
