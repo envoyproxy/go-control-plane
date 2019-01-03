@@ -30,7 +30,7 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 // in the future, but right now the HTTP tracer is the only one supported.
 type Tracing struct {
 	// Provides configuration for the HTTP tracer.
-	Http                 *Tracing_Http `protobuf:"bytes,1,opt,name=http" json:"http,omitempty"`
+	Http                 *Tracing_Http `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -142,10 +142,10 @@ type isTracing_Http_ConfigType interface {
 }
 
 type Tracing_Http_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
+	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
 }
 type Tracing_Http_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,oneof"`
+	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*Tracing_Http_Config) isTracing_Http_ConfigType()      {}
@@ -326,7 +326,7 @@ type ZipkinConfig struct {
 	TraceId_128Bit bool `protobuf:"varint,3,opt,name=trace_id_128bit,json=traceId128bit,proto3" json:"trace_id_128bit,omitempty"`
 	// Determines whether client and server spans will shared the same span id.
 	// The default value is true.
-	SharedSpanContext    *types.BoolValue `protobuf:"bytes,4,opt,name=shared_span_context,json=sharedSpanContext" json:"shared_span_context,omitempty"`
+	SharedSpanContext    *types.BoolValue `protobuf:"bytes,4,opt,name=shared_span_context,json=sharedSpanContext,proto3" json:"shared_span_context,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -402,7 +402,7 @@ type DynamicOtConfig struct {
 	Library string `protobuf:"bytes,1,opt,name=library,proto3" json:"library,omitempty"`
 	// The configuration to use when creating a tracer from the given dynamic
 	// library.
-	Config               *types.Struct `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
+	Config               *types.Struct `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -516,7 +516,7 @@ func (m *DatadogConfig) GetServiceName() string {
 // Configuration structure.
 type TraceServiceConfig struct {
 	// The upstream gRPC cluster that hosts the metrics service.
-	GrpcService          *core.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService" json:"grpc_service,omitempty"`
+	GrpcService          *core.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -861,6 +861,9 @@ func encodeVarintTrace(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *Tracing) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Http != nil {
@@ -874,6 +877,9 @@ func (m *Tracing) Size() (n int) {
 }
 
 func (m *Tracing_Http) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -890,6 +896,9 @@ func (m *Tracing_Http) Size() (n int) {
 }
 
 func (m *Tracing_Http_Config) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -899,6 +908,9 @@ func (m *Tracing_Http_Config) Size() (n int) {
 	return n
 }
 func (m *Tracing_Http_TypedConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -908,6 +920,9 @@ func (m *Tracing_Http_TypedConfig) Size() (n int) {
 	return n
 }
 func (m *LightstepConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.CollectorCluster)
@@ -925,6 +940,9 @@ func (m *LightstepConfig) Size() (n int) {
 }
 
 func (m *ZipkinConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.CollectorCluster)
@@ -949,6 +967,9 @@ func (m *ZipkinConfig) Size() (n int) {
 }
 
 func (m *DynamicOtConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Library)
@@ -966,6 +987,9 @@ func (m *DynamicOtConfig) Size() (n int) {
 }
 
 func (m *DatadogConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.CollectorCluster)
@@ -983,6 +1007,9 @@ func (m *DatadogConfig) Size() (n int) {
 }
 
 func (m *TraceServiceConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.GrpcService != nil {

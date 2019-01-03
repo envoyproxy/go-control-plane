@@ -393,6 +393,13 @@ func (m *CommonTlsContext) Validate() error {
 
 	}
 
+	if len(m.GetTlsCertificateSdsSecretConfigs()) > 1 {
+		return CommonTlsContextValidationError{
+			Field:  "TlsCertificateSdsSecretConfigs",
+			Reason: "value must contain no more than 1 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetTlsCertificateSdsSecretConfigs() {
 		_, _ = idx, item
 

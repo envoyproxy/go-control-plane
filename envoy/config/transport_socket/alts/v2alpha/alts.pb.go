@@ -29,7 +29,7 @@ type Alts struct {
 	HandshakerService string `protobuf:"bytes,1,opt,name=handshaker_service,json=handshakerService,proto3" json:"handshaker_service,omitempty"`
 	// The acceptable service accounts from peer, peers not in the list will be rejected in the
 	// handshake validation step. If empty, no validation will be performed.
-	PeerServiceAccounts  []string `protobuf:"bytes,2,rep,name=peer_service_accounts,json=peerServiceAccounts" json:"peer_service_accounts,omitempty"`
+	PeerServiceAccounts  []string `protobuf:"bytes,2,rep,name=peer_service_accounts,json=peerServiceAccounts,proto3" json:"peer_service_accounts,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -137,6 +137,9 @@ func encodeVarintAlts(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *Alts) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.HandshakerService)

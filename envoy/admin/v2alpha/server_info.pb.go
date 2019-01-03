@@ -114,11 +114,11 @@ type ServerInfo struct {
 	// State of the server.
 	State ServerInfo_State `protobuf:"varint,2,opt,name=state,proto3,enum=envoy.admin.v2alpha.ServerInfo_State" json:"state,omitempty"`
 	// Uptime since current epoch was started.
-	UptimeCurrentEpoch *types.Duration `protobuf:"bytes,3,opt,name=uptime_current_epoch,json=uptimeCurrentEpoch" json:"uptime_current_epoch,omitempty"`
+	UptimeCurrentEpoch *types.Duration `protobuf:"bytes,3,opt,name=uptime_current_epoch,json=uptimeCurrentEpoch,proto3" json:"uptime_current_epoch,omitempty"`
 	// Uptime since the start of the first epoch.
-	UptimeAllEpochs *types.Duration `protobuf:"bytes,4,opt,name=uptime_all_epochs,json=uptimeAllEpochs" json:"uptime_all_epochs,omitempty"`
+	UptimeAllEpochs *types.Duration `protobuf:"bytes,4,opt,name=uptime_all_epochs,json=uptimeAllEpochs,proto3" json:"uptime_all_epochs,omitempty"`
 	// Command line options the server is currently running with.
-	CommandLineOptions   *CommandLineOptions `protobuf:"bytes,6,opt,name=command_line_options,json=commandLineOptions" json:"command_line_options,omitempty"`
+	CommandLineOptions   *CommandLineOptions `protobuf:"bytes,6,opt,name=command_line_options,json=commandLineOptions,proto3" json:"command_line_options,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
@@ -224,11 +224,11 @@ type CommandLineOptions struct {
 	// See :option:`--service-zone` for details.
 	ServiceZone string `protobuf:"bytes,15,opt,name=service_zone,json=serviceZone,proto3" json:"service_zone,omitempty"`
 	// See :option:`--file-flush-interval-msec` for details.
-	FileFlushInterval *types.Duration `protobuf:"bytes,16,opt,name=file_flush_interval,json=fileFlushInterval" json:"file_flush_interval,omitempty"`
+	FileFlushInterval *types.Duration `protobuf:"bytes,16,opt,name=file_flush_interval,json=fileFlushInterval,proto3" json:"file_flush_interval,omitempty"`
 	// See :option:`--drain-time-s` for details.
-	DrainTime *types.Duration `protobuf:"bytes,17,opt,name=drain_time,json=drainTime" json:"drain_time,omitempty"`
+	DrainTime *types.Duration `protobuf:"bytes,17,opt,name=drain_time,json=drainTime,proto3" json:"drain_time,omitempty"`
 	// See :option:`--parent-shutdown-time-s` for details.
-	ParentShutdownTime *types.Duration `protobuf:"bytes,18,opt,name=parent_shutdown_time,json=parentShutdownTime" json:"parent_shutdown_time,omitempty"`
+	ParentShutdownTime *types.Duration `protobuf:"bytes,18,opt,name=parent_shutdown_time,json=parentShutdownTime,proto3" json:"parent_shutdown_time,omitempty"`
 	// See :option:`--mode` for details.
 	Mode CommandLineOptions_Mode `protobuf:"varint,19,opt,name=mode,proto3,enum=envoy.admin.v2alpha.CommandLineOptions_Mode" json:"mode,omitempty"`
 	// See :option:`--max-stats` for details.
@@ -730,6 +730,9 @@ func encodeVarintServerInfo(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ServerInfo) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Version)
@@ -758,6 +761,9 @@ func (m *ServerInfo) Size() (n int) {
 }
 
 func (m *CommandLineOptions) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.BaseId != 0 {

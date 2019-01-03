@@ -1663,6 +1663,16 @@ func (m *RouteAction_RequestMirrorPolicy) Validate() error {
 
 	// no validation rules for RuntimeKey
 
+	if v, ok := interface{}(m.GetRuntimeFraction()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_RequestMirrorPolicyValidationError{
+				Field:  "RuntimeFraction",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

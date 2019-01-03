@@ -85,10 +85,10 @@ type isExtAuthz_Services interface {
 }
 
 type ExtAuthz_GrpcService struct {
-	GrpcService *core.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,oneof"`
+	GrpcService *core.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,proto3,oneof"`
 }
 type ExtAuthz_HttpService struct {
-	HttpService *HttpService `protobuf:"bytes,3,opt,name=http_service,json=httpService,oneof"`
+	HttpService *HttpService `protobuf:"bytes,3,opt,name=http_service,json=httpService,proto3,oneof"`
 }
 
 func (*ExtAuthz_GrpcService) isExtAuthz_Services() {}
@@ -224,21 +224,21 @@ func _ExtAuthz_OneofSizer(msg proto.Message) (n int) {
 // <config_http_filters_ext_authz>`.
 type HttpService struct {
 	// Sets the HTTP server URI which the authorization requests must be sent to.
-	ServerUri *core.HttpUri `protobuf:"bytes,1,opt,name=server_uri,json=serverUri" json:"server_uri,omitempty"`
+	ServerUri *core.HttpUri `protobuf:"bytes,1,opt,name=server_uri,json=serverUri,proto3" json:"server_uri,omitempty"`
 	// Sets an optional prefix to the value of authorization request header *Path*.
 	PathPrefix string `protobuf:"bytes,2,opt,name=path_prefix,json=pathPrefix,proto3" json:"path_prefix,omitempty"`
 	// Sets a list of headers that can be sent from the authorization server to the upstream service,
 	// or to the downstream client when present in the authorization response. Note that a matched
 	// request header will have its value overridden by the ones sent from the authorization server.
-	AllowedAuthorizationHeaders []string `protobuf:"bytes,4,rep,name=allowed_authorization_headers,json=allowedAuthorizationHeaders" json:"allowed_authorization_headers,omitempty"`
+	AllowedAuthorizationHeaders []string `protobuf:"bytes,4,rep,name=allowed_authorization_headers,json=allowedAuthorizationHeaders,proto3" json:"allowed_authorization_headers,omitempty"`
 	// Sets a list of headers that should be sent *from the filter* to the authorization server
 	// when they are also present in the client request. Note that *Content-Length*, *Authority*,
 	// *Method* and *Path* are always dispatched to the authorization server by default. The message
 	// will not contain body data and the *Content-Length* will be set to zero.
-	AllowedRequestHeaders []string `protobuf:"bytes,5,rep,name=allowed_request_headers,json=allowedRequestHeaders" json:"allowed_request_headers,omitempty"`
+	AllowedRequestHeaders []string `protobuf:"bytes,5,rep,name=allowed_request_headers,json=allowedRequestHeaders,proto3" json:"allowed_request_headers,omitempty"`
 	// Sets a list of headers and their values that will be added to the request to external
 	// authorization server. Note that these will override the headers coming from the downstream.
-	AuthorizationHeadersToAdd []*core.HeaderValue `protobuf:"bytes,6,rep,name=authorization_headers_to_add,json=authorizationHeadersToAdd" json:"authorization_headers_to_add,omitempty"`
+	AuthorizationHeadersToAdd []*core.HeaderValue `protobuf:"bytes,6,rep,name=authorization_headers_to_add,json=authorizationHeadersToAdd,proto3" json:"authorization_headers_to_add,omitempty"`
 	XXX_NoUnkeyedLiteral      struct{}            `json:"-"`
 	XXX_unrecognized          []byte              `json:"-"`
 	XXX_sizecache             int32               `json:"-"`
@@ -366,7 +366,7 @@ type ExtAuthzPerRoute_Disabled struct {
 	Disabled bool `protobuf:"varint,1,opt,name=disabled,proto3,oneof"`
 }
 type ExtAuthzPerRoute_CheckSettings struct {
-	CheckSettings *CheckSettings `protobuf:"bytes,2,opt,name=check_settings,json=checkSettings,oneof"`
+	CheckSettings *CheckSettings `protobuf:"bytes,2,opt,name=check_settings,json=checkSettings,proto3,oneof"`
 }
 
 func (*ExtAuthzPerRoute_Disabled) isExtAuthzPerRoute_Override()      {}
@@ -482,7 +482,7 @@ type CheckSettings struct {
 	//
 	//   These settings are only applied to a filter configured with a
 	//   :ref:`grpc_service<envoy_api_field_config.filter.http.ext_authz.v2alpha.ExtAuthz.grpc_service>`.
-	ContextExtensions    map[string]string `protobuf:"bytes,1,rep,name=context_extensions,json=contextExtensions" json:"context_extensions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	ContextExtensions    map[string]string `protobuf:"bytes,1,rep,name=context_extensions,json=contextExtensions,proto3" json:"context_extensions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -782,6 +782,9 @@ func encodeVarintExtAuthz(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ExtAuthz) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Services != nil {
@@ -797,6 +800,9 @@ func (m *ExtAuthz) Size() (n int) {
 }
 
 func (m *ExtAuthz_GrpcService) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.GrpcService != nil {
@@ -806,6 +812,9 @@ func (m *ExtAuthz_GrpcService) Size() (n int) {
 	return n
 }
 func (m *ExtAuthz_HttpService) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.HttpService != nil {
@@ -815,6 +824,9 @@ func (m *ExtAuthz_HttpService) Size() (n int) {
 	return n
 }
 func (m *HttpService) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ServerUri != nil {
@@ -850,6 +862,9 @@ func (m *HttpService) Size() (n int) {
 }
 
 func (m *ExtAuthzPerRoute) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Override != nil {
@@ -862,12 +877,18 @@ func (m *ExtAuthzPerRoute) Size() (n int) {
 }
 
 func (m *ExtAuthzPerRoute_Disabled) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	n += 2
 	return n
 }
 func (m *ExtAuthzPerRoute_CheckSettings) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.CheckSettings != nil {
@@ -877,6 +898,9 @@ func (m *ExtAuthzPerRoute_CheckSettings) Size() (n int) {
 	return n
 }
 func (m *CheckSettings) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.ContextExtensions) > 0 {

@@ -58,11 +58,11 @@ func (RBAC_EnforcementType) EnumDescriptor() ([]byte, []int) {
 type RBAC struct {
 	// Specify the RBAC rules to be applied globally.
 	// If absent, no enforcing RBAC policy will be applied.
-	Rules *v2alpha.RBAC `protobuf:"bytes,1,opt,name=rules" json:"rules,omitempty"`
+	Rules *v2alpha.RBAC `protobuf:"bytes,1,opt,name=rules,proto3" json:"rules,omitempty"`
 	// Shadow rules are not enforced by the filter but will emit stats and logs
 	// and can be used for rule testing.
 	// If absent, no shadow RBAC policy will be applied.
-	ShadowRules *v2alpha.RBAC `protobuf:"bytes,2,opt,name=shadow_rules,json=shadowRules" json:"shadow_rules,omitempty"`
+	ShadowRules *v2alpha.RBAC `protobuf:"bytes,2,opt,name=shadow_rules,json=shadowRules,proto3" json:"shadow_rules,omitempty"`
 	// The prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,3,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// RBAC enforcement strategy. By default RBAC will be enforced only once
@@ -203,6 +203,9 @@ func encodeVarintRbac(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RBAC) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Rules != nil {

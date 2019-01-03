@@ -34,7 +34,7 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 type UpstreamLocalityStats struct {
 	// Name of zone, region and optionally endpoint group these metrics were
 	// collected from. Zone and region names could be empty if unknown.
-	Locality *core.Locality `protobuf:"bytes,1,opt,name=locality" json:"locality,omitempty"`
+	Locality *core.Locality `protobuf:"bytes,1,opt,name=locality,proto3" json:"locality,omitempty"`
 	// The total number of requests sent by this Envoy since the last report. This
 	// information is aggregated over all the upstream Endpoints. total_requests
 	// can be inferred from:
@@ -53,11 +53,11 @@ type UpstreamLocalityStats struct {
 	// aggregated over all endpoints in the locality.
 	TotalErrorRequests uint64 `protobuf:"varint,4,opt,name=total_error_requests,json=totalErrorRequests,proto3" json:"total_error_requests,omitempty"`
 	// Stats for multi-dimensional load balancing.
-	LoadMetricStats []*EndpointLoadMetricStats `protobuf:"bytes,5,rep,name=load_metric_stats,json=loadMetricStats" json:"load_metric_stats,omitempty"`
+	LoadMetricStats []*EndpointLoadMetricStats `protobuf:"bytes,5,rep,name=load_metric_stats,json=loadMetricStats,proto3" json:"load_metric_stats,omitempty"`
 	// Endpoint granularity stats information for this locality. This information
 	// is populated if the Server requests it by setting
 	// :ref:`LoadStatsResponse.report_endpoint_granularity<envoy_api_field_load_stats.LoadStatsResponse.report_endpoint_granularity>`.
-	UpstreamEndpointStats []*UpstreamEndpointStats `protobuf:"bytes,7,rep,name=upstream_endpoint_stats,json=upstreamEndpointStats" json:"upstream_endpoint_stats,omitempty"`
+	UpstreamEndpointStats []*UpstreamEndpointStats `protobuf:"bytes,7,rep,name=upstream_endpoint_stats,json=upstreamEndpointStats,proto3" json:"upstream_endpoint_stats,omitempty"`
 	// [#not-implemented-hide:] The priority of the endpoint group these metrics
 	// were collected from.
 	Priority             uint32   `protobuf:"varint,6,opt,name=priority,proto3" json:"priority,omitempty"`
@@ -150,10 +150,10 @@ func (m *UpstreamLocalityStats) GetPriority() uint32 {
 
 type UpstreamEndpointStats struct {
 	// Upstream host address.
-	Address *core.Address `protobuf:"bytes,1,opt,name=address" json:"address,omitempty"`
+	Address *core.Address `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	// Opaque and implementation dependent metadata of the
 	// endpoint. Envoy will pass this directly to the management server.
-	Metadata *types.Struct `protobuf:"bytes,6,opt,name=metadata" json:"metadata,omitempty"`
+	Metadata *types.Struct `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// The total number of requests successfully completed by the endpoint. A
 	// single HTTP or gRPC request or stream is counted as one request. A TCP
 	// connection is also treated as one request. There is no explicit
@@ -183,7 +183,7 @@ type UpstreamEndpointStats struct {
 	//   - DataLoss
 	TotalErrorRequests uint64 `protobuf:"varint,4,opt,name=total_error_requests,json=totalErrorRequests,proto3" json:"total_error_requests,omitempty"`
 	// Stats for multi-dimensional load balancing.
-	LoadMetricStats      []*EndpointLoadMetricStats `protobuf:"bytes,5,rep,name=load_metric_stats,json=loadMetricStats" json:"load_metric_stats,omitempty"`
+	LoadMetricStats      []*EndpointLoadMetricStats `protobuf:"bytes,5,rep,name=load_metric_stats,json=loadMetricStats,proto3" json:"load_metric_stats,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
 	XXX_unrecognized     []byte                     `json:"-"`
 	XXX_sizecache        int32                      `json:"-"`
@@ -339,7 +339,7 @@ type ClusterStats struct {
 	// The name of the cluster.
 	ClusterName string `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
 	// Need at least one.
-	UpstreamLocalityStats []*UpstreamLocalityStats `protobuf:"bytes,2,rep,name=upstream_locality_stats,json=upstreamLocalityStats" json:"upstream_locality_stats,omitempty"`
+	UpstreamLocalityStats []*UpstreamLocalityStats `protobuf:"bytes,2,rep,name=upstream_locality_stats,json=upstreamLocalityStats,proto3" json:"upstream_locality_stats,omitempty"`
 	// Cluster-level stats such as total_successful_requests may be computed by
 	// summing upstream_locality_stats. In addition, below there are additional
 	// cluster-wide stats. The following total_requests equality holds at the
@@ -355,12 +355,12 @@ type ClusterStats struct {
 	TotalDroppedRequests uint64 `protobuf:"varint,3,opt,name=total_dropped_requests,json=totalDroppedRequests,proto3" json:"total_dropped_requests,omitempty"`
 	// Information about deliberately dropped requests for each category specified
 	// in the DropOverload policy.
-	DroppedRequests []*ClusterStats_DroppedRequests `protobuf:"bytes,5,rep,name=dropped_requests,json=droppedRequests" json:"dropped_requests,omitempty"`
+	DroppedRequests []*ClusterStats_DroppedRequests `protobuf:"bytes,5,rep,name=dropped_requests,json=droppedRequests,proto3" json:"dropped_requests,omitempty"`
 	// Period over which the actual load report occurred. This will be guaranteed to include every
 	// request reported. Due to system load and delays between the *LoadStatsRequest* sent from Envoy
 	// and the *LoadStatsResponse* message sent from the management server, this may be longer than
 	// the requested load reporting interval in the *LoadStatsResponse*.
-	LoadReportInterval   *types.Duration `protobuf:"bytes,4,opt,name=load_report_interval,json=loadReportInterval" json:"load_report_interval,omitempty"`
+	LoadReportInterval   *types.Duration `protobuf:"bytes,4,opt,name=load_report_interval,json=loadReportInterval,proto3" json:"load_report_interval,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -787,6 +787,9 @@ func encodeVarintLoadReport(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *UpstreamLocalityStats) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Locality != nil {
@@ -824,6 +827,9 @@ func (m *UpstreamLocalityStats) Size() (n int) {
 }
 
 func (m *UpstreamEndpointStats) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Address != nil {
@@ -856,6 +862,9 @@ func (m *UpstreamEndpointStats) Size() (n int) {
 }
 
 func (m *EndpointLoadMetricStats) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.MetricName)
@@ -875,6 +884,9 @@ func (m *EndpointLoadMetricStats) Size() (n int) {
 }
 
 func (m *ClusterStats) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ClusterName)
@@ -907,6 +919,9 @@ func (m *ClusterStats) Size() (n int) {
 }
 
 func (m *ClusterStats_DroppedRequests) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Category)

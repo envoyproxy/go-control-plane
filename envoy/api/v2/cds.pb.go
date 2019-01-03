@@ -19,8 +19,10 @@ import time "time"
 
 import bytes "bytes"
 
-import context "golang.org/x/net/context"
-import grpc "google.golang.org/grpc"
+import (
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
+)
 
 import github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 
@@ -254,12 +256,12 @@ type Cluster struct {
 	// to use for resolving the cluster.
 	Type Cluster_DiscoveryType `protobuf:"varint,2,opt,name=type,proto3,enum=envoy.api.v2.Cluster_DiscoveryType" json:"type,omitempty"`
 	// Configuration to use for EDS updates for the Cluster.
-	EdsClusterConfig *Cluster_EdsClusterConfig `protobuf:"bytes,3,opt,name=eds_cluster_config,json=edsClusterConfig" json:"eds_cluster_config,omitempty"`
+	EdsClusterConfig *Cluster_EdsClusterConfig `protobuf:"bytes,3,opt,name=eds_cluster_config,json=edsClusterConfig,proto3" json:"eds_cluster_config,omitempty"`
 	// The timeout for new network connections to hosts in the cluster.
-	ConnectTimeout time.Duration `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout,stdduration" json:"connect_timeout"`
+	ConnectTimeout time.Duration `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout,proto3,stdduration" json:"connect_timeout"`
 	// Soft limit on size of the cluster’s connections read and write buffers. If
 	// unspecified, an implementation defined default is applied (1MiB).
-	PerConnectionBufferLimitBytes *types.UInt32Value `protobuf:"bytes,5,opt,name=per_connection_buffer_limit_bytes,json=perConnectionBufferLimitBytes" json:"per_connection_buffer_limit_bytes,omitempty"`
+	PerConnectionBufferLimitBytes *types.UInt32Value `protobuf:"bytes,5,opt,name=per_connection_buffer_limit_bytes,json=perConnectionBufferLimitBytes,proto3" json:"per_connection_buffer_limit_bytes,omitempty"`
 	// The :ref:`load balancer type <arch_overview_load_balancing_types>` to use
 	// when picking a host in the cluster.
 	LbPolicy Cluster_LbPolicy `protobuf:"varint,6,opt,name=lb_policy,json=lbPolicy,proto3,enum=envoy.api.v2.Cluster_LbPolicy" json:"lb_policy,omitempty"`
@@ -274,7 +276,7 @@ type Cluster struct {
 	//   **This field is deprecated**. Set the
 	//   :ref:`load_assignment<envoy_api_field_Cluster.load_assignment>` field instead.
 	//
-	Hosts []*core.Address `protobuf:"bytes,7,rep,name=hosts" json:"hosts,omitempty"` // Deprecated: Do not use.
+	Hosts []*core.Address `protobuf:"bytes,7,rep,name=hosts,proto3" json:"hosts,omitempty"` // Deprecated: Do not use.
 	// Setting this is required for specifying members of
 	// :ref:`STATIC<envoy_api_enum_value_Cluster.DiscoveryType.STATIC>`,
 	// :ref:`STRICT_DNS<envoy_api_enum_value_Cluster.DiscoveryType.STRICT_DNS>`
@@ -289,19 +291,19 @@ type Cluster struct {
 	//   :ref:`endpoint assignments<envoy_api_msg_ClusterLoadAssignment>`.
 	//   Setting this overrides :ref:`hosts<envoy_api_field_Cluster.hosts>` values.
 	//
-	LoadAssignment *ClusterLoadAssignment `protobuf:"bytes,33,opt,name=load_assignment,json=loadAssignment" json:"load_assignment,omitempty"`
+	LoadAssignment *ClusterLoadAssignment `protobuf:"bytes,33,opt,name=load_assignment,json=loadAssignment,proto3" json:"load_assignment,omitempty"`
 	// Optional :ref:`active health checking <arch_overview_health_checking>`
 	// configuration for the cluster. If no
 	// configuration is specified no health checking will be done and all cluster
 	// members will be considered healthy at all times.
-	HealthChecks []*core.HealthCheck `protobuf:"bytes,8,rep,name=health_checks,json=healthChecks" json:"health_checks,omitempty"`
+	HealthChecks []*core.HealthCheck `protobuf:"bytes,8,rep,name=health_checks,json=healthChecks,proto3" json:"health_checks,omitempty"`
 	// Optional maximum requests for a single upstream connection. This parameter
 	// is respected by both the HTTP/1.1 and HTTP/2 connection pool
 	// implementations. If not specified, there is no limit. Setting this
 	// parameter to 1 will effectively disable keep alive.
-	MaxRequestsPerConnection *types.UInt32Value `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection" json:"max_requests_per_connection,omitempty"`
+	MaxRequestsPerConnection *types.UInt32Value `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
 	// Optional :ref:`circuit breaking <arch_overview_circuit_break>` for the cluster.
-	CircuitBreakers *cluster.CircuitBreakers `protobuf:"bytes,10,opt,name=circuit_breakers,json=circuitBreakers" json:"circuit_breakers,omitempty"`
+	CircuitBreakers *cluster.CircuitBreakers `protobuf:"bytes,10,opt,name=circuit_breakers,json=circuitBreakers,proto3" json:"circuit_breakers,omitempty"`
 	// The TLS configuration for connections to the upstream cluster. If no TLS
 	// configuration is specified, TLS will not be used for new connections.
 	//
@@ -310,30 +312,30 @@ type Cluster struct {
 	//   Server certificate verification is not enabled by default. Configure
 	//   :ref:`trusted_ca<envoy_api_field_auth.CertificateValidationContext.trusted_ca>` to enable
 	//   verification.
-	TlsContext *auth.UpstreamTlsContext `protobuf:"bytes,11,opt,name=tls_context,json=tlsContext" json:"tls_context,omitempty"`
+	TlsContext *auth.UpstreamTlsContext `protobuf:"bytes,11,opt,name=tls_context,json=tlsContext,proto3" json:"tls_context,omitempty"`
 	// Additional options when handling HTTP requests. These options will be applicable to both
 	// HTTP1 and HTTP2 requests.
-	CommonHttpProtocolOptions *core.HttpProtocolOptions `protobuf:"bytes,29,opt,name=common_http_protocol_options,json=commonHttpProtocolOptions" json:"common_http_protocol_options,omitempty"`
+	CommonHttpProtocolOptions *core.HttpProtocolOptions `protobuf:"bytes,29,opt,name=common_http_protocol_options,json=commonHttpProtocolOptions,proto3" json:"common_http_protocol_options,omitempty"`
 	// Additional options when handling HTTP1 requests.
-	HttpProtocolOptions *core.Http1ProtocolOptions `protobuf:"bytes,13,opt,name=http_protocol_options,json=httpProtocolOptions" json:"http_protocol_options,omitempty"`
+	HttpProtocolOptions *core.Http1ProtocolOptions `protobuf:"bytes,13,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
 	// Even if default HTTP2 protocol options are desired, this field must be
 	// set so that Envoy will assume that the upstream supports HTTP/2 when
 	// making new HTTP connection pool connections. Currently, Envoy only
 	// supports prior knowledge for upstream connections. Even if TLS is used
 	// with ALPN, `http2_protocol_options` must be specified. As an aside this allows HTTP/2
 	// connections to happen over plain text.
-	Http2ProtocolOptions *core.Http2ProtocolOptions `protobuf:"bytes,14,opt,name=http2_protocol_options,json=http2ProtocolOptions" json:"http2_protocol_options,omitempty"`
+	Http2ProtocolOptions *core.Http2ProtocolOptions `protobuf:"bytes,14,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
 	// The extension_protocol_options field is used to provide extension-specific protocol options
 	// for upstream connections. The key should match the extension filter name, such as
 	// "envoy.filters.network.thrift_proxy". See the extension's documentation for details on
 	// specific options.
-	ExtensionProtocolOptions map[string]*types.Struct `protobuf:"bytes,35,rep,name=extension_protocol_options,json=extensionProtocolOptions" json:"extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	ExtensionProtocolOptions map[string]*types.Struct `protobuf:"bytes,35,rep,name=extension_protocol_options,json=extensionProtocolOptions,proto3" json:"extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// [#not-implemented-hide:]
 	// The extension_protocol_options field is used to provide extension-specific protocol options
 	// for upstream connections. The key should match the extension filter name, such as
 	// "envoy.filters.network.thrift_proxy". See the extension's documentation for details on
 	// specific options.
-	TypedExtensionProtocolOptions map[string]*types.Any `protobuf:"bytes,36,rep,name=typed_extension_protocol_options,json=typedExtensionProtocolOptions" json:"typed_extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	TypedExtensionProtocolOptions map[string]*types.Any `protobuf:"bytes,36,rep,name=typed_extension_protocol_options,json=typedExtensionProtocolOptions,proto3" json:"typed_extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// If the DNS refresh rate is specified and the cluster type is either
 	// :ref:`STRICT_DNS<envoy_api_enum_value_Cluster.DiscoveryType.STRICT_DNS>`,
 	// or :ref:`LOGICAL_DNS<envoy_api_enum_value_Cluster.DiscoveryType.LOGICAL_DNS>`,
@@ -343,7 +345,7 @@ type Cluster struct {
 	// :ref:`STRICT_DNS<envoy_api_enum_value_Cluster.DiscoveryType.STRICT_DNS>`
 	// and :ref:`LOGICAL_DNS<envoy_api_enum_value_Cluster.DiscoveryType.LOGICAL_DNS>`
 	// this setting is ignored.
-	DnsRefreshRate *time.Duration `protobuf:"bytes,16,opt,name=dns_refresh_rate,json=dnsRefreshRate,stdduration" json:"dns_refresh_rate,omitempty"`
+	DnsRefreshRate *time.Duration `protobuf:"bytes,16,opt,name=dns_refresh_rate,json=dnsRefreshRate,proto3,stdduration" json:"dns_refresh_rate,omitempty"`
 	// The DNS IP address resolution policy. If this setting is not specified, the
 	// value defaults to
 	// :ref:`AUTO<envoy_api_enum_value_Cluster.DnsLookupFamily.AUTO>`.
@@ -358,11 +360,11 @@ type Cluster struct {
 	// :ref:`STRICT_DNS<envoy_api_enum_value_Cluster.DiscoveryType.STRICT_DNS>`
 	// and :ref:`LOGICAL_DNS<envoy_api_enum_value_Cluster.DiscoveryType.LOGICAL_DNS>`
 	// this setting is ignored.
-	DnsResolvers []*core.Address `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers" json:"dns_resolvers,omitempty"`
+	DnsResolvers []*core.Address `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers,proto3" json:"dns_resolvers,omitempty"`
 	// If specified, outlier detection will be enabled for this upstream cluster.
 	// Each of the configuration values can be overridden via
 	// :ref:`runtime values <config_cluster_manager_cluster_runtime_outlier_detection>`.
-	OutlierDetection *cluster.OutlierDetection `protobuf:"bytes,19,opt,name=outlier_detection,json=outlierDetection" json:"outlier_detection,omitempty"`
+	OutlierDetection *cluster.OutlierDetection `protobuf:"bytes,19,opt,name=outlier_detection,json=outlierDetection,proto3" json:"outlier_detection,omitempty"`
 	// The interval for removing stale hosts from a cluster type
 	// :ref:`ORIGINAL_DST<envoy_api_enum_value_Cluster.DiscoveryType.ORIGINAL_DST>`.
 	// Hosts are considered stale if they have not been used
@@ -376,13 +378,13 @@ type Cluster struct {
 	// value defaults to 5000ms. For cluster types other than
 	// :ref:`ORIGINAL_DST<envoy_api_enum_value_Cluster.DiscoveryType.ORIGINAL_DST>`
 	// this setting is ignored.
-	CleanupInterval *time.Duration `protobuf:"bytes,20,opt,name=cleanup_interval,json=cleanupInterval,stdduration" json:"cleanup_interval,omitempty"`
+	CleanupInterval *time.Duration `protobuf:"bytes,20,opt,name=cleanup_interval,json=cleanupInterval,proto3,stdduration" json:"cleanup_interval,omitempty"`
 	// Optional configuration used to bind newly established upstream connections.
 	// This overrides any bind_config specified in the bootstrap proto.
 	// If the address and port are empty, no bind will be performed.
-	UpstreamBindConfig *core.BindConfig `protobuf:"bytes,21,opt,name=upstream_bind_config,json=upstreamBindConfig" json:"upstream_bind_config,omitempty"`
+	UpstreamBindConfig *core.BindConfig `protobuf:"bytes,21,opt,name=upstream_bind_config,json=upstreamBindConfig,proto3" json:"upstream_bind_config,omitempty"`
 	// Configuration for load balancing subsetting.
-	LbSubsetConfig *Cluster_LbSubsetConfig `protobuf:"bytes,22,opt,name=lb_subset_config,json=lbSubsetConfig" json:"lb_subset_config,omitempty"`
+	LbSubsetConfig *Cluster_LbSubsetConfig `protobuf:"bytes,22,opt,name=lb_subset_config,json=lbSubsetConfig,proto3" json:"lb_subset_config,omitempty"`
 	// Optional configuration for the load balancing algorithm selected by
 	// LbPolicy. Currently only
 	// :ref:`RING_HASH<envoy_api_enum_value_Cluster.LbPolicy.RING_HASH>` and
@@ -397,19 +399,19 @@ type Cluster struct {
 	//	*Cluster_LeastRequestLbConfig_
 	LbConfig isCluster_LbConfig `protobuf_oneof:"lb_config"`
 	// Common configuration for all load balancer implementations.
-	CommonLbConfig *Cluster_CommonLbConfig `protobuf:"bytes,27,opt,name=common_lb_config,json=commonLbConfig" json:"common_lb_config,omitempty"`
+	CommonLbConfig *Cluster_CommonLbConfig `protobuf:"bytes,27,opt,name=common_lb_config,json=commonLbConfig,proto3" json:"common_lb_config,omitempty"`
 	// Optional custom transport socket implementation to use for upstream connections.
-	TransportSocket *core.TransportSocket `protobuf:"bytes,24,opt,name=transport_socket,json=transportSocket" json:"transport_socket,omitempty"`
+	TransportSocket *core.TransportSocket `protobuf:"bytes,24,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
 	// The Metadata field can be used to provide additional information about the
 	// cluster. It can be used for stats, logging, and varying filter behavior.
 	// Fields should use reverse DNS notation to denote which entity within Envoy
 	// will need the information. For instance, if the metadata is intended for
 	// the Router filter, the filter name should be specified as *envoy.router*.
-	Metadata *core.Metadata `protobuf:"bytes,25,opt,name=metadata" json:"metadata,omitempty"`
+	Metadata *core.Metadata `protobuf:"bytes,25,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Determines how Envoy selects the protocol used to speak to upstream hosts.
 	ProtocolSelection Cluster_ClusterProtocolSelection `protobuf:"varint,26,opt,name=protocol_selection,json=protocolSelection,proto3,enum=envoy.api.v2.Cluster_ClusterProtocolSelection" json:"protocol_selection,omitempty"`
 	// Optional options for upstream connections.
-	UpstreamConnectionOptions *UpstreamConnectionOptions `protobuf:"bytes,30,opt,name=upstream_connection_options,json=upstreamConnectionOptions" json:"upstream_connection_options,omitempty"`
+	UpstreamConnectionOptions *UpstreamConnectionOptions `protobuf:"bytes,30,opt,name=upstream_connection_options,json=upstreamConnectionOptions,proto3" json:"upstream_connection_options,omitempty"`
 	// If an upstream host becomes unhealthy (as determined by the configured health checks
 	// or outlier detection), immediately close all connections to the failed host.
 	//
@@ -477,13 +479,13 @@ type isCluster_LbConfig interface {
 }
 
 type Cluster_RingHashLbConfig_ struct {
-	RingHashLbConfig *Cluster_RingHashLbConfig `protobuf:"bytes,23,opt,name=ring_hash_lb_config,json=ringHashLbConfig,oneof"`
+	RingHashLbConfig *Cluster_RingHashLbConfig `protobuf:"bytes,23,opt,name=ring_hash_lb_config,json=ringHashLbConfig,proto3,oneof"`
 }
 type Cluster_OriginalDstLbConfig_ struct {
-	OriginalDstLbConfig *Cluster_OriginalDstLbConfig `protobuf:"bytes,34,opt,name=original_dst_lb_config,json=originalDstLbConfig,oneof"`
+	OriginalDstLbConfig *Cluster_OriginalDstLbConfig `protobuf:"bytes,34,opt,name=original_dst_lb_config,json=originalDstLbConfig,proto3,oneof"`
 }
 type Cluster_LeastRequestLbConfig_ struct {
-	LeastRequestLbConfig *Cluster_LeastRequestLbConfig `protobuf:"bytes,37,opt,name=least_request_lb_config,json=leastRequestLbConfig,oneof"`
+	LeastRequestLbConfig *Cluster_LeastRequestLbConfig `protobuf:"bytes,37,opt,name=least_request_lb_config,json=leastRequestLbConfig,proto3,oneof"`
 }
 
 func (*Cluster_RingHashLbConfig_) isCluster_LbConfig()     {}
@@ -839,7 +841,7 @@ func _Cluster_OneofSizer(msg proto.Message) (n int) {
 // Only valid when discovery type is EDS.
 type Cluster_EdsClusterConfig struct {
 	// Configuration for the source of EDS updates for this Cluster.
-	EdsConfig *core.ConfigSource `protobuf:"bytes,1,opt,name=eds_config,json=edsConfig" json:"eds_config,omitempty"`
+	EdsConfig *core.ConfigSource `protobuf:"bytes,1,opt,name=eds_config,json=edsConfig,proto3" json:"eds_config,omitempty"`
 	// Optional alternative to cluster name to present to EDS. This does not
 	// have the same restrictions as cluster name, i.e. it may be arbitrary
 	// length.
@@ -911,7 +913,7 @@ type Cluster_LbSubsetConfig struct {
 	// namespace. It is valid for no hosts to match, in which case the behavior
 	// is the same as a fallback_policy of
 	// :ref:`NO_FALLBACK<envoy_api_enum_value_Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.NO_FALLBACK>`.
-	DefaultSubset *types.Struct `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset" json:"default_subset,omitempty"`
+	DefaultSubset *types.Struct `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset,proto3" json:"default_subset,omitempty"`
 	// For each entry, LbEndpoint.Metadata's
 	// *envoy.lb* namespace is traversed and a subset is created for each unique
 	// combination of key and value. For example:
@@ -926,7 +928,7 @@ type Cluster_LbSubsetConfig struct {
 	// A subset is matched when the metadata from the selected route and
 	// weighted cluster contains the same keys and values as the subset's
 	// metadata. The same host may appear in multiple subsets.
-	SubsetSelectors []*Cluster_LbSubsetConfig_LbSubsetSelector `protobuf:"bytes,3,rep,name=subset_selectors,json=subsetSelectors" json:"subset_selectors,omitempty"`
+	SubsetSelectors []*Cluster_LbSubsetConfig_LbSubsetSelector `protobuf:"bytes,3,rep,name=subset_selectors,json=subsetSelectors,proto3" json:"subset_selectors,omitempty"`
 	// If true, routing to subsets will take into account the localities and locality weights of the
 	// endpoints when making the routing decision.
 	//
@@ -1019,7 +1021,7 @@ func (m *Cluster_LbSubsetConfig) GetScaleLocalityWeight() bool {
 // Specifications for subsets.
 type Cluster_LbSubsetConfig_LbSubsetSelector struct {
 	// List of keys to match with the weighted cluster metadata.
-	Keys                 []string `protobuf:"bytes,1,rep,name=keys" json:"keys,omitempty"`
+	Keys                 []string `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1071,7 +1073,7 @@ func (m *Cluster_LbSubsetConfig_LbSubsetSelector) GetKeys() []string {
 type Cluster_LeastRequestLbConfig struct {
 	// The number of random healthy hosts from which the host with the fewest active requests will
 	// be chosen. Defaults to 2 so that we perform two-choice selection if the field is not set.
-	ChoiceCount          *types.UInt32Value `protobuf:"bytes,1,opt,name=choice_count,json=choiceCount" json:"choice_count,omitempty"`
+	ChoiceCount          *types.UInt32Value `protobuf:"bytes,1,opt,name=choice_count,json=choiceCount,proto3" json:"choice_count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -1126,10 +1128,10 @@ type Cluster_RingHashLbConfig struct {
 	// that total number of hosts is greater than the minimum, each host will
 	// be allocated a single virtual node. This field is limited to 8M to bound
 	// resource use.
-	MinimumRingSize *types.UInt64Value `protobuf:"bytes,1,opt,name=minimum_ring_size,json=minimumRingSize" json:"minimum_ring_size,omitempty"`
+	MinimumRingSize *types.UInt64Value `protobuf:"bytes,1,opt,name=minimum_ring_size,json=minimumRingSize,proto3" json:"minimum_ring_size,omitempty"`
 	// Deprecated settings from v1 config.
 	// [#not-implemented-hide:] Hide from docs.
-	DeprecatedV1         *Cluster_RingHashLbConfig_DeprecatedV1 `protobuf:"bytes,2,opt,name=deprecated_v1,json=deprecatedV1" json:"deprecated_v1,omitempty"` // Deprecated: Do not use.
+	DeprecatedV1         *Cluster_RingHashLbConfig_DeprecatedV1 `protobuf:"bytes,2,opt,name=deprecated_v1,json=deprecatedV1,proto3" json:"deprecated_v1,omitempty"` // Deprecated: Do not use.
 	XXX_NoUnkeyedLiteral struct{}                               `json:"-"`
 	XXX_unrecognized     []byte                                 `json:"-"`
 	XXX_sizecache        int32                                  `json:"-"`
@@ -1187,7 +1189,7 @@ func (m *Cluster_RingHashLbConfig) GetDeprecatedV1() *Cluster_RingHashLbConfig_D
 type Cluster_RingHashLbConfig_DeprecatedV1 struct {
 	// Defaults to false, meaning that `xxHash <https://github.com/Cyan4973/xxHash>`_
 	// is to hash hosts onto the ketama ring.
-	UseStdHash           *types.BoolValue `protobuf:"bytes,1,opt,name=use_std_hash,json=useStdHash" json:"use_std_hash,omitempty"`
+	UseStdHash           *types.BoolValue `protobuf:"bytes,1,opt,name=use_std_hash,json=useStdHash,proto3" json:"use_std_hash,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -1299,7 +1301,7 @@ type Cluster_CommonLbConfig struct {
 	//
 	// .. note::
 	//   The specified percent will be truncated to the nearest 1%.
-	HealthyPanicThreshold *_type.Percent `protobuf:"bytes,1,opt,name=healthy_panic_threshold,json=healthyPanicThreshold" json:"healthy_panic_threshold,omitempty"`
+	HealthyPanicThreshold *_type.Percent `protobuf:"bytes,1,opt,name=healthy_panic_threshold,json=healthyPanicThreshold,proto3" json:"healthy_panic_threshold,omitempty"`
 	// Types that are valid to be assigned to LocalityConfigSpecifier:
 	//	*Cluster_CommonLbConfig_ZoneAwareLbConfig_
 	//	*Cluster_CommonLbConfig_LocalityWeightedLbConfig_
@@ -1317,7 +1319,7 @@ type Cluster_CommonLbConfig struct {
 	// Note: merging does not apply to cluster membership changes (e.g.: adds/removes); this is
 	// because merging those updates isn't currently safe. See
 	// https://github.com/envoyproxy/envoy/pull/3941.
-	UpdateMergeWindow    *types.Duration `protobuf:"bytes,4,opt,name=update_merge_window,json=updateMergeWindow" json:"update_merge_window,omitempty"`
+	UpdateMergeWindow    *types.Duration `protobuf:"bytes,4,opt,name=update_merge_window,json=updateMergeWindow,proto3" json:"update_merge_window,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -1364,10 +1366,10 @@ type isCluster_CommonLbConfig_LocalityConfigSpecifier interface {
 }
 
 type Cluster_CommonLbConfig_ZoneAwareLbConfig_ struct {
-	ZoneAwareLbConfig *Cluster_CommonLbConfig_ZoneAwareLbConfig `protobuf:"bytes,2,opt,name=zone_aware_lb_config,json=zoneAwareLbConfig,oneof"`
+	ZoneAwareLbConfig *Cluster_CommonLbConfig_ZoneAwareLbConfig `protobuf:"bytes,2,opt,name=zone_aware_lb_config,json=zoneAwareLbConfig,proto3,oneof"`
 }
 type Cluster_CommonLbConfig_LocalityWeightedLbConfig_ struct {
-	LocalityWeightedLbConfig *Cluster_CommonLbConfig_LocalityWeightedLbConfig `protobuf:"bytes,3,opt,name=locality_weighted_lb_config,json=localityWeightedLbConfig,oneof"`
+	LocalityWeightedLbConfig *Cluster_CommonLbConfig_LocalityWeightedLbConfig `protobuf:"bytes,3,opt,name=locality_weighted_lb_config,json=localityWeightedLbConfig,proto3,oneof"`
 }
 
 func (*Cluster_CommonLbConfig_ZoneAwareLbConfig_) isCluster_CommonLbConfig_LocalityConfigSpecifier() {}
@@ -1490,13 +1492,13 @@ type Cluster_CommonLbConfig_ZoneAwareLbConfig struct {
 	// if zone aware routing is configured. If not specified, the default is 100%.
 	// * :ref:`runtime values <config_cluster_manager_cluster_runtime_zone_routing>`.
 	// * :ref:`Zone aware routing support <arch_overview_load_balancing_zone_aware_routing>`.
-	RoutingEnabled *_type.Percent `protobuf:"bytes,1,opt,name=routing_enabled,json=routingEnabled" json:"routing_enabled,omitempty"`
+	RoutingEnabled *_type.Percent `protobuf:"bytes,1,opt,name=routing_enabled,json=routingEnabled,proto3" json:"routing_enabled,omitempty"`
 	// Configures minimum upstream cluster size required for zone aware routing
 	// If upstream cluster size is less than specified, zone aware routing is not performed
 	// even if zone aware routing is configured. If not specified, the default is 6.
 	// * :ref:`runtime values <config_cluster_manager_cluster_runtime_zone_routing>`.
 	// * :ref:`Zone aware routing support <arch_overview_load_balancing_zone_aware_routing>`.
-	MinClusterSize       *types.UInt64Value `protobuf:"bytes,2,opt,name=min_cluster_size,json=minClusterSize" json:"min_cluster_size,omitempty"`
+	MinClusterSize       *types.UInt64Value `protobuf:"bytes,2,opt,name=min_cluster_size,json=minClusterSize,proto3" json:"min_cluster_size,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -1600,7 +1602,7 @@ var xxx_messageInfo_Cluster_CommonLbConfig_LocalityWeightedLbConfig proto.Intern
 // establishing upstream connections.
 type UpstreamBindConfig struct {
 	// The address Envoy should bind to when establishing upstream connections.
-	SourceAddress        *core.Address `protobuf:"bytes,1,opt,name=source_address,json=sourceAddress" json:"source_address,omitempty"`
+	SourceAddress        *core.Address `protobuf:"bytes,1,opt,name=source_address,json=sourceAddress,proto3" json:"source_address,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -1648,7 +1650,7 @@ func (m *UpstreamBindConfig) GetSourceAddress() *core.Address {
 
 type UpstreamConnectionOptions struct {
 	// If set then set SO_KEEPALIVE on the socket to enable TCP Keepalives.
-	TcpKeepalive         *core.TcpKeepalive `protobuf:"bytes,1,opt,name=tcp_keepalive,json=tcpKeepalive" json:"tcp_keepalive,omitempty"`
+	TcpKeepalive         *core.TcpKeepalive `protobuf:"bytes,1,opt,name=tcp_keepalive,json=tcpKeepalive,proto3" json:"tcp_keepalive,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -2375,8 +2377,9 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// Client API for ClusterDiscoveryService service
-
+// ClusterDiscoveryServiceClient is the client API for ClusterDiscoveryService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ClusterDiscoveryServiceClient interface {
 	StreamClusters(ctx context.Context, opts ...grpc.CallOption) (ClusterDiscoveryService_StreamClustersClient, error)
 	IncrementalClusters(ctx context.Context, opts ...grpc.CallOption) (ClusterDiscoveryService_IncrementalClustersClient, error)
@@ -2462,8 +2465,7 @@ func (c *clusterDiscoveryServiceClient) FetchClusters(ctx context.Context, in *D
 	return out, nil
 }
 
-// Server API for ClusterDiscoveryService service
-
+// ClusterDiscoveryServiceServer is the server API for ClusterDiscoveryService service.
 type ClusterDiscoveryServiceServer interface {
 	StreamClusters(ClusterDiscoveryService_StreamClustersServer) error
 	IncrementalClusters(ClusterDiscoveryService_IncrementalClustersServer) error
@@ -3501,6 +3503,9 @@ func encodeVarintCds(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *Cluster) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -3657,6 +3662,9 @@ func (m *Cluster) Size() (n int) {
 }
 
 func (m *Cluster_RingHashLbConfig_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.RingHashLbConfig != nil {
@@ -3666,6 +3674,9 @@ func (m *Cluster_RingHashLbConfig_) Size() (n int) {
 	return n
 }
 func (m *Cluster_OriginalDstLbConfig_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.OriginalDstLbConfig != nil {
@@ -3675,6 +3686,9 @@ func (m *Cluster_OriginalDstLbConfig_) Size() (n int) {
 	return n
 }
 func (m *Cluster_LeastRequestLbConfig_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.LeastRequestLbConfig != nil {
@@ -3684,6 +3698,9 @@ func (m *Cluster_LeastRequestLbConfig_) Size() (n int) {
 	return n
 }
 func (m *Cluster_EdsClusterConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.EdsConfig != nil {
@@ -3701,6 +3718,9 @@ func (m *Cluster_EdsClusterConfig) Size() (n int) {
 }
 
 func (m *Cluster_LbSubsetConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.FallbackPolicy != 0 {
@@ -3729,6 +3749,9 @@ func (m *Cluster_LbSubsetConfig) Size() (n int) {
 }
 
 func (m *Cluster_LbSubsetConfig_LbSubsetSelector) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Keys) > 0 {
@@ -3744,6 +3767,9 @@ func (m *Cluster_LbSubsetConfig_LbSubsetSelector) Size() (n int) {
 }
 
 func (m *Cluster_LeastRequestLbConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ChoiceCount != nil {
@@ -3757,6 +3783,9 @@ func (m *Cluster_LeastRequestLbConfig) Size() (n int) {
 }
 
 func (m *Cluster_RingHashLbConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.MinimumRingSize != nil {
@@ -3774,6 +3803,9 @@ func (m *Cluster_RingHashLbConfig) Size() (n int) {
 }
 
 func (m *Cluster_RingHashLbConfig_DeprecatedV1) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UseStdHash != nil {
@@ -3787,6 +3819,9 @@ func (m *Cluster_RingHashLbConfig_DeprecatedV1) Size() (n int) {
 }
 
 func (m *Cluster_OriginalDstLbConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.UseHttpHeader {
@@ -3799,6 +3834,9 @@ func (m *Cluster_OriginalDstLbConfig) Size() (n int) {
 }
 
 func (m *Cluster_CommonLbConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.HealthyPanicThreshold != nil {
@@ -3819,6 +3857,9 @@ func (m *Cluster_CommonLbConfig) Size() (n int) {
 }
 
 func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ZoneAwareLbConfig != nil {
@@ -3828,6 +3869,9 @@ func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig_) Size() (n int) {
 	return n
 }
 func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.LocalityWeightedLbConfig != nil {
@@ -3837,6 +3881,9 @@ func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig_) Size() (n int) {
 	return n
 }
 func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.RoutingEnabled != nil {
@@ -3854,6 +3901,9 @@ func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) Size() (n int) {
 }
 
 func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.XXX_unrecognized != nil {
@@ -3863,6 +3913,9 @@ func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) Size() (n int) {
 }
 
 func (m *UpstreamBindConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.SourceAddress != nil {
@@ -3876,6 +3929,9 @@ func (m *UpstreamBindConfig) Size() (n int) {
 }
 
 func (m *UpstreamConnectionOptions) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.TcpKeepalive != nil {
