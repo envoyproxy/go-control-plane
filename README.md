@@ -86,7 +86,7 @@ make integration.docker
 The version number must be set according to [Semantic Versioning](https://semver.org).
 
 The version tags will allow users of go dependency management tools, such as [dep](https://golang.github.io/dep/),
-specify the dependency on `go-control-plane` using the [version property](https://golang.github.io/dep/).
+specify dependencies on `go-control-plane` using the [version property](https://golang.github.io/dep/).
 
 ## Usage
 
