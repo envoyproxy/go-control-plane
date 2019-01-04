@@ -84,7 +84,7 @@ type FileAccessLog_Format struct {
 	Format string `protobuf:"bytes,2,opt,name=format,proto3,oneof"`
 }
 type FileAccessLog_JsonFormat struct {
-	JsonFormat *types.Struct `protobuf:"bytes,3,opt,name=json_format,json=jsonFormat,oneof"`
+	JsonFormat *types.Struct `protobuf:"bytes,3,opt,name=json_format,json=jsonFormat,proto3,oneof"`
 }
 
 func (*FileAccessLog_Format) isFileAccessLog_AccessLogFormat()     {}
@@ -257,6 +257,9 @@ func encodeVarintFile(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *FileAccessLog) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Path)
@@ -273,6 +276,9 @@ func (m *FileAccessLog) Size() (n int) {
 }
 
 func (m *FileAccessLog_Format) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Format)
@@ -280,6 +286,9 @@ func (m *FileAccessLog_Format) Size() (n int) {
 	return n
 }
 func (m *FileAccessLog_JsonFormat) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.JsonFormat != nil {

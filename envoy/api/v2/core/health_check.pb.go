@@ -76,12 +76,12 @@ func (HealthStatus) EnumDescriptor() ([]byte, []int) {
 type HealthCheck struct {
 	// The time to wait for a health check response. If the timeout is reached the
 	// health check attempt will be considered a failure.
-	Timeout *time.Duration `protobuf:"bytes,1,opt,name=timeout,stdduration" json:"timeout,omitempty"`
+	Timeout *time.Duration `protobuf:"bytes,1,opt,name=timeout,proto3,stdduration" json:"timeout,omitempty"`
 	// The interval between health checks.
-	Interval *time.Duration `protobuf:"bytes,2,opt,name=interval,stdduration" json:"interval,omitempty"`
+	Interval *time.Duration `protobuf:"bytes,2,opt,name=interval,proto3,stdduration" json:"interval,omitempty"`
 	// An optional jitter amount in millseconds. If specified, during every
 	// interval Envoy will add interval_jitter to the wait time.
-	IntervalJitter *types.Duration `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter" json:"interval_jitter,omitempty"`
+	IntervalJitter *types.Duration `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter,proto3" json:"interval_jitter,omitempty"`
 	// An optional jitter amount as a percentage of interval_ms. If specified,
 	// during every interval Envoy will add interval_ms *
 	// interval_jitter_percent / 100 to the wait time.
@@ -92,15 +92,15 @@ type HealthCheck struct {
 	// The number of unhealthy health checks required before a host is marked
 	// unhealthy. Note that for *http* health checking if a host responds with 503
 	// this threshold is ignored and the host is considered unhealthy immediately.
-	UnhealthyThreshold *types.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold" json:"unhealthy_threshold,omitempty"`
+	UnhealthyThreshold *types.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold,proto3" json:"unhealthy_threshold,omitempty"`
 	// The number of healthy health checks required before a host is marked
 	// healthy. Note that during startup, only a single successful health check is
 	// required to mark a host healthy.
-	HealthyThreshold *types.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold" json:"healthy_threshold,omitempty"`
+	HealthyThreshold *types.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold,proto3" json:"healthy_threshold,omitempty"`
 	// [#not-implemented-hide:] Non-serving port for health checking.
-	AltPort *types.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort" json:"alt_port,omitempty"`
+	AltPort *types.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort,proto3" json:"alt_port,omitempty"`
 	// Reuse health check connection between health checks. Default is true.
-	ReuseConnection *types.BoolValue `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection" json:"reuse_connection,omitempty"`
+	ReuseConnection *types.BoolValue `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection,proto3" json:"reuse_connection,omitempty"`
 	// Types that are valid to be assigned to HealthChecker:
 	//	*HealthCheck_HttpHealthCheck_
 	//	*HealthCheck_TcpHealthCheck_
@@ -115,26 +115,26 @@ type HealthCheck struct {
 	// any other.
 	//
 	// The default value for "no traffic interval" is 60 seconds.
-	NoTrafficInterval *types.Duration `protobuf:"bytes,12,opt,name=no_traffic_interval,json=noTrafficInterval" json:"no_traffic_interval,omitempty"`
+	NoTrafficInterval *types.Duration `protobuf:"bytes,12,opt,name=no_traffic_interval,json=noTrafficInterval,proto3" json:"no_traffic_interval,omitempty"`
 	// The "unhealthy interval" is a health check interval that is used for hosts that are marked as
 	// unhealthy. As soon as the host is marked as healthy, Envoy will shift back to using the
 	// standard health check interval that is defined.
 	//
 	// The default value for "unhealthy interval" is the same as "interval".
-	UnhealthyInterval *types.Duration `protobuf:"bytes,14,opt,name=unhealthy_interval,json=unhealthyInterval" json:"unhealthy_interval,omitempty"`
+	UnhealthyInterval *types.Duration `protobuf:"bytes,14,opt,name=unhealthy_interval,json=unhealthyInterval,proto3" json:"unhealthy_interval,omitempty"`
 	// The "unhealthy edge interval" is a special health check interval that is used for the first
 	// health check right after a host is marked as unhealthy. For subsequent health checks
 	// Envoy will shift back to using either "unhealthy interval" if present or the standard health
 	// check interval that is defined.
 	//
 	// The default value for "unhealthy edge interval" is the same as "unhealthy interval".
-	UnhealthyEdgeInterval *types.Duration `protobuf:"bytes,15,opt,name=unhealthy_edge_interval,json=unhealthyEdgeInterval" json:"unhealthy_edge_interval,omitempty"`
+	UnhealthyEdgeInterval *types.Duration `protobuf:"bytes,15,opt,name=unhealthy_edge_interval,json=unhealthyEdgeInterval,proto3" json:"unhealthy_edge_interval,omitempty"`
 	// The "healthy edge interval" is a special health check interval that is used for the first
 	// health check right after a host is marked as healthy. For subsequent health checks
 	// Envoy will shift back to using the standard health check interval that is defined.
 	//
 	// The default value for "healthy edge interval" is the same as the default interval.
-	HealthyEdgeInterval *types.Duration `protobuf:"bytes,16,opt,name=healthy_edge_interval,json=healthyEdgeInterval" json:"healthy_edge_interval,omitempty"`
+	HealthyEdgeInterval *types.Duration `protobuf:"bytes,16,opt,name=healthy_edge_interval,json=healthyEdgeInterval,proto3" json:"healthy_edge_interval,omitempty"`
 	// Specifies the path to the :ref:`health check event log <arch_overview_health_check_logging>`.
 	// If empty, no event log will be written.
 	EventLogPath string `protobuf:"bytes,17,opt,name=event_log_path,json=eventLogPath,proto3" json:"event_log_path,omitempty"`
@@ -188,16 +188,16 @@ type isHealthCheck_HealthChecker interface {
 }
 
 type HealthCheck_HttpHealthCheck_ struct {
-	HttpHealthCheck *HealthCheck_HttpHealthCheck `protobuf:"bytes,8,opt,name=http_health_check,json=httpHealthCheck,oneof"`
+	HttpHealthCheck *HealthCheck_HttpHealthCheck `protobuf:"bytes,8,opt,name=http_health_check,json=httpHealthCheck,proto3,oneof"`
 }
 type HealthCheck_TcpHealthCheck_ struct {
-	TcpHealthCheck *HealthCheck_TcpHealthCheck `protobuf:"bytes,9,opt,name=tcp_health_check,json=tcpHealthCheck,oneof"`
+	TcpHealthCheck *HealthCheck_TcpHealthCheck `protobuf:"bytes,9,opt,name=tcp_health_check,json=tcpHealthCheck,proto3,oneof"`
 }
 type HealthCheck_GrpcHealthCheck_ struct {
-	GrpcHealthCheck *HealthCheck_GrpcHealthCheck `protobuf:"bytes,11,opt,name=grpc_health_check,json=grpcHealthCheck,oneof"`
+	GrpcHealthCheck *HealthCheck_GrpcHealthCheck `protobuf:"bytes,11,opt,name=grpc_health_check,json=grpcHealthCheck,proto3,oneof"`
 }
 type HealthCheck_CustomHealthCheck_ struct {
-	CustomHealthCheck *HealthCheck_CustomHealthCheck `protobuf:"bytes,13,opt,name=custom_health_check,json=customHealthCheck,oneof"`
+	CustomHealthCheck *HealthCheck_CustomHealthCheck `protobuf:"bytes,13,opt,name=custom_health_check,json=customHealthCheck,proto3,oneof"`
 }
 
 func (*HealthCheck_HttpHealthCheck_) isHealthCheck_HealthChecker()   {}
@@ -608,9 +608,9 @@ type HealthCheck_HttpHealthCheck struct {
 	// */healthcheck*.
 	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
 	// [#not-implemented-hide:] HTTP specific payload.
-	Send *HealthCheck_Payload `protobuf:"bytes,3,opt,name=send" json:"send,omitempty"`
+	Send *HealthCheck_Payload `protobuf:"bytes,3,opt,name=send,proto3" json:"send,omitempty"`
 	// [#not-implemented-hide:] HTTP specific response.
-	Receive *HealthCheck_Payload `protobuf:"bytes,4,opt,name=receive" json:"receive,omitempty"`
+	Receive *HealthCheck_Payload `protobuf:"bytes,4,opt,name=receive,proto3" json:"receive,omitempty"`
 	// An optional service name parameter which is used to validate the identity of
 	// the health checked cluster. See the :ref:`architecture overview
 	// <arch_overview_health_checking_identity>` for more information.
@@ -619,10 +619,10 @@ type HealthCheck_HttpHealthCheck struct {
 	// health checked cluster. For more information, including details on header value syntax, see
 	// the documentation on :ref:`custom request headers
 	// <config_http_conn_man_headers_custom_request_headers>`.
-	RequestHeadersToAdd []*HeaderValueOption `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd" json:"request_headers_to_add,omitempty"`
+	RequestHeadersToAdd []*HeaderValueOption `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd,proto3" json:"request_headers_to_add,omitempty"`
 	// Specifies a list of HTTP headers that should be removed from each request that is sent to the
 	// health checked cluster.
-	RequestHeadersToRemove []string `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove" json:"request_headers_to_remove,omitempty"`
+	RequestHeadersToRemove []string `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove,proto3" json:"request_headers_to_remove,omitempty"`
 	// If set, health checks will be made using http/2.
 	UseHttp2             bool     `protobuf:"varint,7,opt,name=use_http2,json=useHttp2,proto3" json:"use_http2,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -721,11 +721,11 @@ func (m *HealthCheck_HttpHealthCheck) GetUseHttp2() bool {
 
 type HealthCheck_TcpHealthCheck struct {
 	// Empty payloads imply a connect-only health check.
-	Send *HealthCheck_Payload `protobuf:"bytes,1,opt,name=send" json:"send,omitempty"`
+	Send *HealthCheck_Payload `protobuf:"bytes,1,opt,name=send,proto3" json:"send,omitempty"`
 	// When checking the response, “fuzzy” matching is performed such that each
 	// binary block must be found, and in the order specified, but not
 	// necessarily contiguous.
-	Receive              []*HealthCheck_Payload `protobuf:"bytes,2,rep,name=receive" json:"receive,omitempty"`
+	Receive              []*HealthCheck_Payload `protobuf:"bytes,2,rep,name=receive,proto3" json:"receive,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
 	XXX_unrecognized     []byte                 `json:"-"`
 	XXX_sizecache        int32                  `json:"-"`
@@ -953,10 +953,10 @@ type isHealthCheck_CustomHealthCheck_ConfigType interface {
 }
 
 type HealthCheck_CustomHealthCheck_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
+	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
 }
 type HealthCheck_CustomHealthCheck_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,oneof"`
+	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*HealthCheck_CustomHealthCheck_Config) isHealthCheck_CustomHealthCheck_ConfigType()      {}
@@ -2112,6 +2112,9 @@ func encodeVarintHealthCheck(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *HealthCheck) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Timeout != nil {
@@ -2178,6 +2181,9 @@ func (m *HealthCheck) Size() (n int) {
 }
 
 func (m *HealthCheck_HttpHealthCheck_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.HttpHealthCheck != nil {
@@ -2187,6 +2193,9 @@ func (m *HealthCheck_HttpHealthCheck_) Size() (n int) {
 	return n
 }
 func (m *HealthCheck_TcpHealthCheck_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.TcpHealthCheck != nil {
@@ -2196,6 +2205,9 @@ func (m *HealthCheck_TcpHealthCheck_) Size() (n int) {
 	return n
 }
 func (m *HealthCheck_GrpcHealthCheck_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.GrpcHealthCheck != nil {
@@ -2205,6 +2217,9 @@ func (m *HealthCheck_GrpcHealthCheck_) Size() (n int) {
 	return n
 }
 func (m *HealthCheck_CustomHealthCheck_) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.CustomHealthCheck != nil {
@@ -2214,6 +2229,9 @@ func (m *HealthCheck_CustomHealthCheck_) Size() (n int) {
 	return n
 }
 func (m *HealthCheck_Payload) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Payload != nil {
@@ -2226,6 +2244,9 @@ func (m *HealthCheck_Payload) Size() (n int) {
 }
 
 func (m *HealthCheck_Payload_Text) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Text)
@@ -2233,6 +2254,9 @@ func (m *HealthCheck_Payload_Text) Size() (n int) {
 	return n
 }
 func (m *HealthCheck_Payload_Binary) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Binary != nil {
@@ -2242,6 +2266,9 @@ func (m *HealthCheck_Payload_Binary) Size() (n int) {
 	return n
 }
 func (m *HealthCheck_HttpHealthCheck) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Host)
@@ -2286,6 +2313,9 @@ func (m *HealthCheck_HttpHealthCheck) Size() (n int) {
 }
 
 func (m *HealthCheck_TcpHealthCheck) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Send != nil {
@@ -2305,6 +2335,9 @@ func (m *HealthCheck_TcpHealthCheck) Size() (n int) {
 }
 
 func (m *HealthCheck_RedisHealthCheck) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Key)
@@ -2318,6 +2351,9 @@ func (m *HealthCheck_RedisHealthCheck) Size() (n int) {
 }
 
 func (m *HealthCheck_GrpcHealthCheck) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.ServiceName)
@@ -2335,6 +2371,9 @@ func (m *HealthCheck_GrpcHealthCheck) Size() (n int) {
 }
 
 func (m *HealthCheck_CustomHealthCheck) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -2351,6 +2390,9 @@ func (m *HealthCheck_CustomHealthCheck) Size() (n int) {
 }
 
 func (m *HealthCheck_CustomHealthCheck_Config) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -2360,6 +2402,9 @@ func (m *HealthCheck_CustomHealthCheck_Config) Size() (n int) {
 	return n
 }
 func (m *HealthCheck_CustomHealthCheck_TypedConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {

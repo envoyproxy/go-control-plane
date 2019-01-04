@@ -62,7 +62,7 @@ type AccessLog struct {
 	// #. "envoy.http_grpc_access_log"
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Filter which is used to determine if the access log needs to be written.
-	Filter *AccessLogFilter `protobuf:"bytes,2,opt,name=filter" json:"filter,omitempty"`
+	Filter *AccessLogFilter `protobuf:"bytes,2,opt,name=filter,proto3" json:"filter,omitempty"`
 	// Custom configuration that depends on the access log being instantiated. Built-in
 	// configurations include:
 	//
@@ -120,10 +120,10 @@ type isAccessLog_ConfigType interface {
 }
 
 type AccessLog_Config struct {
-	Config *types.Struct `protobuf:"bytes,3,opt,name=config,oneof"`
+	Config *types.Struct `protobuf:"bytes,3,opt,name=config,proto3,oneof"`
 }
 type AccessLog_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,oneof"`
+	TypedConfig *types.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*AccessLog_Config) isAccessLog_ConfigType()      {}
@@ -295,31 +295,31 @@ type isAccessLogFilter_FilterSpecifier interface {
 }
 
 type AccessLogFilter_StatusCodeFilter struct {
-	StatusCodeFilter *StatusCodeFilter `protobuf:"bytes,1,opt,name=status_code_filter,json=statusCodeFilter,oneof"`
+	StatusCodeFilter *StatusCodeFilter `protobuf:"bytes,1,opt,name=status_code_filter,json=statusCodeFilter,proto3,oneof"`
 }
 type AccessLogFilter_DurationFilter struct {
-	DurationFilter *DurationFilter `protobuf:"bytes,2,opt,name=duration_filter,json=durationFilter,oneof"`
+	DurationFilter *DurationFilter `protobuf:"bytes,2,opt,name=duration_filter,json=durationFilter,proto3,oneof"`
 }
 type AccessLogFilter_NotHealthCheckFilter struct {
-	NotHealthCheckFilter *NotHealthCheckFilter `protobuf:"bytes,3,opt,name=not_health_check_filter,json=notHealthCheckFilter,oneof"`
+	NotHealthCheckFilter *NotHealthCheckFilter `protobuf:"bytes,3,opt,name=not_health_check_filter,json=notHealthCheckFilter,proto3,oneof"`
 }
 type AccessLogFilter_TraceableFilter struct {
-	TraceableFilter *TraceableFilter `protobuf:"bytes,4,opt,name=traceable_filter,json=traceableFilter,oneof"`
+	TraceableFilter *TraceableFilter `protobuf:"bytes,4,opt,name=traceable_filter,json=traceableFilter,proto3,oneof"`
 }
 type AccessLogFilter_RuntimeFilter struct {
-	RuntimeFilter *RuntimeFilter `protobuf:"bytes,5,opt,name=runtime_filter,json=runtimeFilter,oneof"`
+	RuntimeFilter *RuntimeFilter `protobuf:"bytes,5,opt,name=runtime_filter,json=runtimeFilter,proto3,oneof"`
 }
 type AccessLogFilter_AndFilter struct {
-	AndFilter *AndFilter `protobuf:"bytes,6,opt,name=and_filter,json=andFilter,oneof"`
+	AndFilter *AndFilter `protobuf:"bytes,6,opt,name=and_filter,json=andFilter,proto3,oneof"`
 }
 type AccessLogFilter_OrFilter struct {
-	OrFilter *OrFilter `protobuf:"bytes,7,opt,name=or_filter,json=orFilter,oneof"`
+	OrFilter *OrFilter `protobuf:"bytes,7,opt,name=or_filter,json=orFilter,proto3,oneof"`
 }
 type AccessLogFilter_HeaderFilter struct {
-	HeaderFilter *HeaderFilter `protobuf:"bytes,8,opt,name=header_filter,json=headerFilter,oneof"`
+	HeaderFilter *HeaderFilter `protobuf:"bytes,8,opt,name=header_filter,json=headerFilter,proto3,oneof"`
 }
 type AccessLogFilter_ResponseFlagFilter struct {
-	ResponseFlagFilter *ResponseFlagFilter `protobuf:"bytes,9,opt,name=response_flag_filter,json=responseFlagFilter,oneof"`
+	ResponseFlagFilter *ResponseFlagFilter `protobuf:"bytes,9,opt,name=response_flag_filter,json=responseFlagFilter,proto3,oneof"`
 }
 
 func (*AccessLogFilter_StatusCodeFilter) isAccessLogFilter_FilterSpecifier()     {}
@@ -614,7 +614,7 @@ type ComparisonFilter struct {
 	// Comparison operator.
 	Op ComparisonFilter_Op `protobuf:"varint,1,opt,name=op,proto3,enum=envoy.config.filter.accesslog.v2.ComparisonFilter_Op" json:"op,omitempty"`
 	// Value to compare against.
-	Value                *core.RuntimeUInt32 `protobuf:"bytes,2,opt,name=value" json:"value,omitempty"`
+	Value                *core.RuntimeUInt32 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
@@ -670,7 +670,7 @@ func (m *ComparisonFilter) GetValue() *core.RuntimeUInt32 {
 // Filters on HTTP response/status code.
 type StatusCodeFilter struct {
 	// Comparison.
-	Comparison           *ComparisonFilter `protobuf:"bytes,1,opt,name=comparison" json:"comparison,omitempty"`
+	Comparison           *ComparisonFilter `protobuf:"bytes,1,opt,name=comparison,proto3" json:"comparison,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -719,7 +719,7 @@ func (m *StatusCodeFilter) GetComparison() *ComparisonFilter {
 // Filters on total request duration in milliseconds.
 type DurationFilter struct {
 	// Comparison.
-	Comparison           *ComparisonFilter `protobuf:"bytes,1,opt,name=comparison" json:"comparison,omitempty"`
+	Comparison           *ComparisonFilter `protobuf:"bytes,1,opt,name=comparison,proto3" json:"comparison,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -853,7 +853,7 @@ type RuntimeFilter struct {
 	// If found in runtime, this value will replace the default numerator.
 	RuntimeKey string `protobuf:"bytes,1,opt,name=runtime_key,json=runtimeKey,proto3" json:"runtime_key,omitempty"`
 	// The default sampling percentage. If not specified, defaults to 0% with denominator of 100.
-	PercentSampled *_type.FractionalPercent `protobuf:"bytes,2,opt,name=percent_sampled,json=percentSampled" json:"percent_sampled,omitempty"`
+	PercentSampled *_type.FractionalPercent `protobuf:"bytes,2,opt,name=percent_sampled,json=percentSampled,proto3" json:"percent_sampled,omitempty"`
 	// By default, sampling pivots on the header
 	// :ref:`x-request-id<config_http_conn_man_headers_x-request-id>` being present. If
 	// :ref:`x-request-id<config_http_conn_man_headers_x-request-id>` is present, the filter will
@@ -930,7 +930,7 @@ func (m *RuntimeFilter) GetUseIndependentRandomness() bool {
 // Filters are evaluated sequentially and if one of them returns false, the
 // filter returns false immediately.
 type AndFilter struct {
-	Filters              []*AccessLogFilter `protobuf:"bytes,1,rep,name=filters" json:"filters,omitempty"`
+	Filters              []*AccessLogFilter `protobuf:"bytes,1,rep,name=filters,proto3" json:"filters,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -980,7 +980,7 @@ func (m *AndFilter) GetFilters() []*AccessLogFilter {
 // Filters are evaluated sequentially and if one of them returns true, the
 // filter returns true immediately.
 type OrFilter struct {
-	Filters              []*AccessLogFilter `protobuf:"bytes,2,rep,name=filters" json:"filters,omitempty"`
+	Filters              []*AccessLogFilter `protobuf:"bytes,2,rep,name=filters,proto3" json:"filters,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -1030,7 +1030,7 @@ func (m *OrFilter) GetFilters() []*AccessLogFilter {
 type HeaderFilter struct {
 	// Only requests with a header which matches the specified HeaderMatcher will pass the filter
 	// check.
-	Header               *route.HeaderMatcher `protobuf:"bytes,1,opt,name=header" json:"header,omitempty"`
+	Header               *route.HeaderMatcher `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -1083,7 +1083,7 @@ type ResponseFlagFilter struct {
 	// Only responses with the any of the flags listed in this field will be logged.
 	// This field is optional. If it is not specified, then any response flag will pass
 	// the filter check.
-	Flags                []string `protobuf:"bytes,1,rep,name=flags" json:"flags,omitempty"`
+	Flags                []string `protobuf:"bytes,1,rep,name=flags,proto3" json:"flags,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1700,6 +1700,9 @@ func encodeVarintAccesslog(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *AccessLog) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -1720,6 +1723,9 @@ func (m *AccessLog) Size() (n int) {
 }
 
 func (m *AccessLog_Config) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -1729,6 +1735,9 @@ func (m *AccessLog_Config) Size() (n int) {
 	return n
 }
 func (m *AccessLog_TypedConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -1738,6 +1747,9 @@ func (m *AccessLog_TypedConfig) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.FilterSpecifier != nil {
@@ -1750,6 +1762,9 @@ func (m *AccessLogFilter) Size() (n int) {
 }
 
 func (m *AccessLogFilter_StatusCodeFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.StatusCodeFilter != nil {
@@ -1759,6 +1774,9 @@ func (m *AccessLogFilter_StatusCodeFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_DurationFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.DurationFilter != nil {
@@ -1768,6 +1786,9 @@ func (m *AccessLogFilter_DurationFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_NotHealthCheckFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.NotHealthCheckFilter != nil {
@@ -1777,6 +1798,9 @@ func (m *AccessLogFilter_NotHealthCheckFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_TraceableFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.TraceableFilter != nil {
@@ -1786,6 +1810,9 @@ func (m *AccessLogFilter_TraceableFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_RuntimeFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.RuntimeFilter != nil {
@@ -1795,6 +1822,9 @@ func (m *AccessLogFilter_RuntimeFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_AndFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.AndFilter != nil {
@@ -1804,6 +1834,9 @@ func (m *AccessLogFilter_AndFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_OrFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.OrFilter != nil {
@@ -1813,6 +1846,9 @@ func (m *AccessLogFilter_OrFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_HeaderFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.HeaderFilter != nil {
@@ -1822,6 +1858,9 @@ func (m *AccessLogFilter_HeaderFilter) Size() (n int) {
 	return n
 }
 func (m *AccessLogFilter_ResponseFlagFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.ResponseFlagFilter != nil {
@@ -1831,6 +1870,9 @@ func (m *AccessLogFilter_ResponseFlagFilter) Size() (n int) {
 	return n
 }
 func (m *ComparisonFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Op != 0 {
@@ -1847,6 +1889,9 @@ func (m *ComparisonFilter) Size() (n int) {
 }
 
 func (m *StatusCodeFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Comparison != nil {
@@ -1860,6 +1905,9 @@ func (m *StatusCodeFilter) Size() (n int) {
 }
 
 func (m *DurationFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Comparison != nil {
@@ -1873,6 +1921,9 @@ func (m *DurationFilter) Size() (n int) {
 }
 
 func (m *NotHealthCheckFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.XXX_unrecognized != nil {
@@ -1882,6 +1933,9 @@ func (m *NotHealthCheckFilter) Size() (n int) {
 }
 
 func (m *TraceableFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.XXX_unrecognized != nil {
@@ -1891,6 +1945,9 @@ func (m *TraceableFilter) Size() (n int) {
 }
 
 func (m *RuntimeFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.RuntimeKey)
@@ -1911,6 +1968,9 @@ func (m *RuntimeFilter) Size() (n int) {
 }
 
 func (m *AndFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Filters) > 0 {
@@ -1926,6 +1986,9 @@ func (m *AndFilter) Size() (n int) {
 }
 
 func (m *OrFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Filters) > 0 {
@@ -1941,6 +2004,9 @@ func (m *OrFilter) Size() (n int) {
 }
 
 func (m *HeaderFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.Header != nil {
@@ -1954,6 +2020,9 @@ func (m *HeaderFilter) Size() (n int) {
 }
 
 func (m *ResponseFlagFilter) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if len(m.Flags) > 0 {

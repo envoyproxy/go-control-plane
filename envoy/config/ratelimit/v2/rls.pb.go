@@ -27,7 +27,7 @@ type RateLimitServiceConfig struct {
 	// Specifies the gRPC service that hosts the rate limit service. The client
 	// will connect to this cluster when it needs to make rate limit service
 	// requests.
-	GrpcService          *core.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService" json:"grpc_service,omitempty"`
+	GrpcService          *core.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
@@ -117,6 +117,9 @@ func encodeVarintRls(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RateLimitServiceConfig) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	if m.GrpcService != nil {

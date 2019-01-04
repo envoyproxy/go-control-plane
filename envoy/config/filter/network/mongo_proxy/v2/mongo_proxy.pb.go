@@ -34,7 +34,7 @@ type MongoProxy struct {
 	// applied to the following MongoDB operations: Query, Insert, GetMore,
 	// and KillCursors. Once an active delay is in progress, all incoming
 	// data up until the timer event fires will be a part of the delay.
-	Delay *v2.FaultDelay `protobuf:"bytes,3,opt,name=delay" json:"delay,omitempty"`
+	Delay *v2.FaultDelay `protobuf:"bytes,3,opt,name=delay,proto3" json:"delay,omitempty"`
 	// Flag to specify whether :ref:`dynamic metadata
 	// <config_network_filters_mongo_proxy_dynamic_metadata>` should be emitted. Defaults to false.
 	EmitDynamicMetadata  bool     `protobuf:"varint,4,opt,name=emit_dynamic_metadata,json=emitDynamicMetadata,proto3" json:"emit_dynamic_metadata,omitempty"`
@@ -170,6 +170,9 @@ func encodeVarintMongoProxy(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *MongoProxy) Size() (n int) {
+	if m == nil {
+		return 0
+	}
 	var l int
 	_ = l
 	l = len(m.StatPrefix)
