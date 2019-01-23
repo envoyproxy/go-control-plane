@@ -1,8 +1,12 @@
-hash: 848ee6cec6eb07c9f25f8ba7711d34f8690ebc74b673b001c2480ecaed889069
-updated: 2019-01-03T15:13:47.274325-06:00
+hash: d2685b51000b5981b2119001edc3fa436c69fc179ea889f10cf59c1cd0003cb7
+updated: 2019-01-23T21:36:30.591723-08:00
 imports:
+- name: github.com/census-instrumentation/opencensus-proto
+  version: 7f2434bc10da710debe5c4315ed6d4df454b4024
+  subpackages:
+  - opencensus
 - name: github.com/envoyproxy/data-plane-api
-  version: 6ad6c651384df9743caf5126c4878db646b767ac
+  version: 3e9f6bc13f42d94415126b6903356c7d9cf166f0
 - name: github.com/gogo/googleapis
   version: 8558fb44d2f1fc223118afc694129d2c2d2924d1
   subpackages:
@@ -19,7 +23,7 @@ imports:
   - sortkeys
   - types
 - name: github.com/golang/protobuf
-  version: d7fc20193620986259ffb1f9b9da752114ee14a4
+  version: 347cf4a86c1cb8d262994d8ef5924d4576c5b331
   subpackages:
   - proto
   - protoc-gen-go/descriptor
@@ -34,13 +38,13 @@ imports:
   subpackages:
   - validate
 - name: github.com/sirupsen/logrus
-  version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
+  version: e1e72e9de974bd926e5c56f83753fba2df402ce5
 - name: golang.org/x/crypto
-  version: 0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb
+  version: 057139ce5d2bdbe6fe73c53679e24e9cf007f637
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
-  version: 9b4f9f5ad5197c79fd623a3638e70d8b26cef344
+  version: ed066c81e75eba56dd9bd2139ade88125b855585
   subpackages:
   - context
   - http/httpguts
@@ -55,20 +59,19 @@ imports:
   - unix
   - windows
 - name: golang.org/x/text
-  version: 4d1c5fb19474adfe9562c9847ba425e7da817e81
+  version: e6919f6577db79269a6443b9dc46d18f2238fb5d
   subpackages:
   - secure/bidirule
   - transform
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/genproto
-  version: 94acd270e44e65579b9ee3cdab25034d33fed608
+  version: 8819c946db4494a2259bf100a377f51aa585d893
   subpackages:
   - googleapis
   - googleapis/rpc/status
-  - opencensus
 - name: google.golang.org/grpc
-  version: df014850f6dee74ba2fc94874043a9f3f75fbfd8
+  version: a02b0774206b209466313a0b525d2c738fe407eb
   subpackages:
   - balancer
   - balancer/base

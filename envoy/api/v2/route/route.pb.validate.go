@@ -602,14 +602,42 @@ func (m *CorsPolicy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetShadowEnabled()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CorsPolicyValidationError{
-				Field:  "Enabled",
+				Field:  "ShadowEnabled",
 				Reason: "embedded message failed validation",
 				Cause:  err,
 			}
 		}
+	}
+
+	switch m.EnabledSpecifier.(type) {
+
+	case *CorsPolicy_Enabled:
+
+		if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CorsPolicyValidationError{
+					Field:  "Enabled",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *CorsPolicy_FilterEnabled:
+
+		if v, ok := interface{}(m.GetFilterEnabled()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CorsPolicyValidationError{
+					Field:  "FilterEnabled",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

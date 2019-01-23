@@ -14,6 +14,9 @@ import:
 - package: google.golang.org/genproto
   subpackages:
   - googleapis
+- package: github.com/census-instrumentation/opencensus-proto
+  version: ^0.1.0
+  subpackages:
   - opencensus
 - package: google.golang.org/grpc
   version: ^1.12.0
@@ -22,6 +25,6 @@ import:
 - package: istio.io/gogo-genproto
 - package: github.com/gogo/googleapis
 - package: github.com/envoyproxy/data-plane-api
-  version: 6ad6c651384df9743caf5126c4878db646b767ac
+  version: 3e9f6bc13f42d94415126b6903356c7d9cf166f0
 - package: github.com/sirupsen/logrus
   version: ^1.0.4

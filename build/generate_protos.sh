@@ -18,7 +18,7 @@ imports=(
   "${root}/vendor/github.com/gogo/protobuf/protobuf"
   "${root}/vendor/istio.io/gogo-genproto/prometheus"
   "${root}/vendor/istio.io/gogo-genproto/googleapis"
-  "${root}/vendor/istio.io/gogo-genproto/opencensus/proto/trace"
+  "${root}/vendor/github.com/census-instrumentation/opencensus-proto/src/opencensus/proto/trace/v1"
 )
 
 protocarg=""
