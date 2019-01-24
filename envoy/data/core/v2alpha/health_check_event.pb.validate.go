@@ -66,6 +66,16 @@ func (m *HealthCheckEvent) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HealthCheckEventValidationError{
+				Field:  "Timestamp",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
 	switch m.Event.(type) {
 
 	case *HealthCheckEvent_EjectUnhealthyEvent:
@@ -86,6 +96,18 @@ func (m *HealthCheckEvent) Validate() error {
 			if err := v.Validate(); err != nil {
 				return HealthCheckEventValidationError{
 					Field:  "AddHealthyEvent",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *HealthCheckEvent_HealthCheckFailureEvent:
+
+		if v, ok := interface{}(m.GetHealthCheckFailureEvent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HealthCheckEventValidationError{
+					Field:  "HealthCheckFailureEvent",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
@@ -226,3 +248,54 @@ func (e HealthCheckAddHealthyValidationError) Error() string {
 }
 
 var _ error = HealthCheckAddHealthyValidationError{}
+
+// Validate checks the field values on HealthCheckFailure with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HealthCheckFailure) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if _, ok := HealthCheckFailureType_name[int32(m.GetFailureType())]; !ok {
+		return HealthCheckFailureValidationError{
+			Field:  "FailureType",
+			Reason: "value must be one of the defined enum values",
+		}
+	}
+
+	// no validation rules for FirstCheck
+
+	return nil
+}
+
+// HealthCheckFailureValidationError is the validation error returned by
+// HealthCheckFailure.Validate if the designated constraints aren't met.
+type HealthCheckFailureValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e HealthCheckFailureValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHealthCheckFailure.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = HealthCheckFailureValidationError{}

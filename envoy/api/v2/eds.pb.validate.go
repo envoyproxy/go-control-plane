@@ -131,6 +131,17 @@ func (m *ClusterLoadAssignment_Policy) Validate() error {
 
 	}
 
+	if wrapper := m.GetOverprovisioningFactor(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			return ClusterLoadAssignment_PolicyValidationError{
+				Field:  "OverprovisioningFactor",
+				Reason: "value must be greater than 0",
+			}
+		}
+
+	}
+
 	return nil
 }
 

@@ -7,6 +7,10 @@ import:
 - package: golang.org/x/net
   subpackages:
   - context
+- package: golang.org/x/sys
+  version: acbc56f
+  subpackages:
+  - unix
 - package: google.golang.org/genproto
   subpackages:
   - googleapis
@@ -18,6 +22,6 @@ import:
 - package: istio.io/gogo-genproto
 - package: github.com/gogo/googleapis
 - package: github.com/envoyproxy/data-plane-api
-  version: 55833ac4e2008f760631392dd0a446325e4b7fef
+  version: 6ad6c651384df9743caf5126c4878db646b767ac
 - package: github.com/sirupsen/logrus
   version: ^1.0.4

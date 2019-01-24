@@ -178,7 +178,20 @@ func (m *HostStatus) Validate() error {
 		}
 	}
 
-	// no validation rules for Stats
+	for idx, item := range m.GetStats() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HostStatusValidationError{
+					Field:  fmt.Sprintf("Stats[%v]", idx),
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if v, ok := interface{}(m.GetHealthStatus()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -199,6 +212,8 @@ func (m *HostStatus) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for Weight
 
 	return nil
 }
