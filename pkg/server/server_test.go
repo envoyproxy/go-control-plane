@@ -165,10 +165,16 @@ var (
 		Id:      "test-id",
 		Cluster: "test-cluster",
 	}
-	endpoint = resource.MakeEndpoint(clusterName, 8080)
-	cluster  = resource.MakeCluster(resource.Ads, clusterName)
-	route    = resource.MakeRoute(routeName, clusterName)
-	listener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	endpoint  = resource.MakeEndpoint(clusterName, 8080)
+	cluster   = resource.MakeCluster(resource.Ads, clusterName)
+	route     = resource.MakeRoute(routeName, clusterName)
+	listener  = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testTypes = []string{
+		cache.EndpointType,
+		cache.ClusterType,
+		cache.RouteType,
+		cache.ListenerType,
+	}
 )
 
 func makeResponses() map[string][]cache.Response {
@@ -193,7 +199,7 @@ func makeResponses() map[string][]cache.Response {
 }
 
 func TestResponseHandlers(t *testing.T) {
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
@@ -304,7 +310,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestWatchClosed(t *testing.T) {
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.closeWatch = true
@@ -328,7 +334,7 @@ func TestWatchClosed(t *testing.T) {
 }
 
 func TestSendError(t *testing.T) {
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
@@ -353,7 +359,7 @@ func TestSendError(t *testing.T) {
 }
 
 func TestStaleNonce(t *testing.T) {
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
@@ -466,7 +472,7 @@ func TestAggregateRequestType(t *testing.T) {
 }
 
 func TestCallbackError(t *testing.T) {
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
