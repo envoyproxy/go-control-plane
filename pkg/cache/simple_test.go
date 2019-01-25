@@ -56,6 +56,13 @@ var (
 		cache.RouteType:    []string{routeName},
 		cache.ListenerType: nil,
 	}
+
+	testTypes = []string{
+		cache.EndpointType,
+		cache.ClusterType,
+		cache.RouteType,
+		cache.ListenerType,
+	}
 )
 
 type logger struct {
@@ -81,7 +88,7 @@ func TestSnapshotCache(t *testing.T) {
 	case <-time.After(time.Second / 4):
 	}
 
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			value, _ := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 			select {
@@ -105,7 +112,7 @@ func TestSnapshotCacheFetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			resp, err := c.Fetch(context.Background(), v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 			if err != nil || resp == nil {
@@ -133,13 +140,13 @@ func TestSnapshotCacheFetch(t *testing.T) {
 func TestSnapshotCacheWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	watches := make(map[string]chan cache.Response)
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 	}
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
@@ -156,10 +163,10 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	}
 
 	// open new watches with the latest version
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
 	}
-	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(cache.ResponseTypes) {
+	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
 	}
 
@@ -169,7 +176,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	if err := c.SetSnapshot(key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
-	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(cache.ResponseTypes)-1 {
+	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes)-1 {
 		t.Errorf("watches should be preserved for all but one: %d", count)
 	}
 
@@ -215,7 +222,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 
 func TestSnapshotCacheWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		_, cancel := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 		cancel()
 	}
@@ -224,7 +231,7 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 		t.Error("got 0, want status info for the node")
 	}
 
-	for _, typ := range cache.ResponseTypes {
+	for _, typ := range testTypes {
 		if count := c.GetStatusInfo(key).GetNumWatches(); count > 0 {
 			t.Errorf("watches should be released for %s", typ)
 		}
