@@ -1,8 +1,8 @@
-hash: e84546e07298e70d632d9a327cb87af1239a8607eca3daed94901aec9e96641c
-updated: 2019-01-24T08:03:52.528311785-08:00
+hash: 8f083f78863603fa5523fbc6d6d86c8318a205d90c7e6d1c36fc96e7189acd7f
+updated: 2019-01-27T16:27:19.060951115-05:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 392777ff3b87412810bed2bc04da6cfb5a8edc9b
+  version: 0afc79c323bcc0044381e8edb1dbdb87d35d6948
 - name: github.com/gogo/googleapis
   version: 8558fb44d2f1fc223118afc694129d2c2d2924d1
   subpackages:
@@ -19,7 +19,7 @@ imports:
   - sortkeys
   - types
 - name: github.com/golang/protobuf
-  version: d7fc20193620986259ffb1f9b9da752114ee14a4
+  version: 347cf4a86c1cb8d262994d8ef5924d4576c5b331
   subpackages:
   - proto
   - protoc-gen-go/descriptor
@@ -36,11 +36,11 @@ imports:
 - name: github.com/sirupsen/logrus
   version: e1e72e9de974bd926e5c56f83753fba2df402ce5
 - name: golang.org/x/crypto
-  version: 0c41d7ab0a0ee717d4590a44bcb987dfd9e183eb
+  version: 057139ce5d2bdbe6fe73c53679e24e9cf007f637
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
-  version: 9b4f9f5ad5197c79fd623a3638e70d8b26cef344
+  version: d26f9f9a57f3fab6a695bec0d84433c2c50f8bbf
   subpackages:
   - context
   - http/httpguts
@@ -55,14 +55,14 @@ imports:
   - unix
   - windows
 - name: golang.org/x/text
-  version: 4d1c5fb19474adfe9562c9847ba425e7da817e81
+  version: e6919f6577db79269a6443b9dc46d18f2238fb5d
   subpackages:
   - secure/bidirule
   - transform
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/genproto
-  version: 94acd270e44e65579b9ee3cdab25034d33fed608
+  version: 7cdc0b958d7541690c155bb01fa9a219bbf35296
   subpackages:
   - googleapis
   - googleapis/rpc/status
@@ -103,6 +103,6 @@ imports:
 - name: istio.io/gogo-genproto
   version: 6d926a6e6feb2c0a1a72234b4aafa638dca29956
   subpackages:
-  - opencensus/proto/trace
+  - opencensus/proto/trace/v1
   - prometheus
 testImports: []
