@@ -80,7 +80,7 @@ func (c *callbacks) OnStreamOpen(context.Context, int64, string) error {
 	return nil
 }
 func (c *callbacks) OnStreamClosed(int64)                                                {}
-func (c *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest)                         {}
+func (c *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) error                   { return nil }
 func (c *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
 func (c *callbacks) OnFetchRequest(context.Context, *v2.DiscoveryRequest) error {
 	if c.callbackError {

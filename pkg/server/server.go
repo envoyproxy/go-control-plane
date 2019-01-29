@@ -54,7 +54,8 @@ type Callbacks interface {
 	// OnStreamClosed is called immediately prior to closing an xDS stream with a stream ID.
 	OnStreamClosed(int64)
 	// OnStreamRequest is called once a request is received on a stream.
-	OnStreamRequest(int64, *v2.DiscoveryRequest)
+	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
+	OnStreamRequest(int64, *v2.DiscoveryRequest) error
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse)
 	// OnFetchRequest is called for each Fetch request. Returning an error will end processing of the
@@ -262,7 +263,9 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			}
 
 			if s.callbacks != nil {
-				s.callbacks.OnStreamRequest(streamID, req)
+				if err := s.callbacks.OnStreamRequest(streamID, req); err != nil {
+					return err
+				}
 			}
 
 			// cancel existing watches to (re-)request a newer version
