@@ -3,13 +3,16 @@
 
 package v2
 
-import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-import types "github.com/gogo/protobuf/types"
+import (
+	fmt "fmt"
+	io "io"
+	math "math"
 
-import io "io"
+	proto "github.com/gogo/protobuf/proto"
+	types "github.com/gogo/protobuf/types"
+
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -40,7 +43,7 @@ func (m *Connection) Reset()         { *m = Connection{} }
 func (m *Connection) String() string { return proto.CompactTextString(m) }
 func (*Connection) ProtoMessage()    {}
 func (*Connection) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transport_e095f3b946d816d7, []int{0}
+	return fileDescriptor_03a9cebdb27ee552, []int{0}
 }
 func (m *Connection) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -57,8 +60,8 @@ func (m *Connection) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *Connection) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Connection.Merge(dst, src)
+func (m *Connection) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Connection.Merge(m, src)
 }
 func (m *Connection) XXX_Size() int {
 	return m.Size()
@@ -90,33 +93,33 @@ func (m *Connection) GetRemoteAddress() *core.Address {
 	return nil
 }
 
-// Event in a trace.
-type Event struct {
+// Event in a socket trace.
+type SocketEvent struct {
 	// Timestamp for event.
 	Timestamp *types.Timestamp `protobuf:"bytes,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// Read or write with content as bytes string.
 	//
 	// Types that are valid to be assigned to EventSelector:
-	//	*Event_Read_
-	//	*Event_Write_
-	EventSelector        isEvent_EventSelector `protobuf_oneof:"event_selector"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	//	*SocketEvent_Read_
+	//	*SocketEvent_Write_
+	EventSelector        isSocketEvent_EventSelector `protobuf_oneof:"event_selector"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
 }
 
-func (m *Event) Reset()         { *m = Event{} }
-func (m *Event) String() string { return proto.CompactTextString(m) }
-func (*Event) ProtoMessage()    {}
-func (*Event) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transport_e095f3b946d816d7, []int{1}
+func (m *SocketEvent) Reset()         { *m = SocketEvent{} }
+func (m *SocketEvent) String() string { return proto.CompactTextString(m) }
+func (*SocketEvent) ProtoMessage()    {}
+func (*SocketEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_03a9cebdb27ee552, []int{1}
 }
-func (m *Event) XXX_Unmarshal(b []byte) error {
+func (m *SocketEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Event) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SocketEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Event.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SocketEvent.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -126,125 +129,125 @@ func (m *Event) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *Event) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Event.Merge(dst, src)
+func (m *SocketEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SocketEvent.Merge(m, src)
 }
-func (m *Event) XXX_Size() int {
+func (m *SocketEvent) XXX_Size() int {
 	return m.Size()
 }
-func (m *Event) XXX_DiscardUnknown() {
-	xxx_messageInfo_Event.DiscardUnknown(m)
+func (m *SocketEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_SocketEvent.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Event proto.InternalMessageInfo
+var xxx_messageInfo_SocketEvent proto.InternalMessageInfo
 
-type isEvent_EventSelector interface {
-	isEvent_EventSelector()
+type isSocketEvent_EventSelector interface {
+	isSocketEvent_EventSelector()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type Event_Read_ struct {
-	Read *Event_Read `protobuf:"bytes,2,opt,name=read,proto3,oneof"`
+type SocketEvent_Read_ struct {
+	Read *SocketEvent_Read `protobuf:"bytes,2,opt,name=read,proto3,oneof"`
 }
-type Event_Write_ struct {
-	Write *Event_Write `protobuf:"bytes,3,opt,name=write,proto3,oneof"`
+type SocketEvent_Write_ struct {
+	Write *SocketEvent_Write `protobuf:"bytes,3,opt,name=write,proto3,oneof"`
 }
 
-func (*Event_Read_) isEvent_EventSelector()  {}
-func (*Event_Write_) isEvent_EventSelector() {}
+func (*SocketEvent_Read_) isSocketEvent_EventSelector()  {}
+func (*SocketEvent_Write_) isSocketEvent_EventSelector() {}
 
-func (m *Event) GetEventSelector() isEvent_EventSelector {
+func (m *SocketEvent) GetEventSelector() isSocketEvent_EventSelector {
 	if m != nil {
 		return m.EventSelector
 	}
 	return nil
 }
 
-func (m *Event) GetTimestamp() *types.Timestamp {
+func (m *SocketEvent) GetTimestamp() *types.Timestamp {
 	if m != nil {
 		return m.Timestamp
 	}
 	return nil
 }
 
-func (m *Event) GetRead() *Event_Read {
-	if x, ok := m.GetEventSelector().(*Event_Read_); ok {
+func (m *SocketEvent) GetRead() *SocketEvent_Read {
+	if x, ok := m.GetEventSelector().(*SocketEvent_Read_); ok {
 		return x.Read
 	}
 	return nil
 }
 
-func (m *Event) GetWrite() *Event_Write {
-	if x, ok := m.GetEventSelector().(*Event_Write_); ok {
+func (m *SocketEvent) GetWrite() *SocketEvent_Write {
+	if x, ok := m.GetEventSelector().(*SocketEvent_Write_); ok {
 		return x.Write
 	}
 	return nil
 }
 
 // XXX_OneofFuncs is for the internal use of the proto package.
-func (*Event) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Event_OneofMarshaler, _Event_OneofUnmarshaler, _Event_OneofSizer, []interface{}{
-		(*Event_Read_)(nil),
-		(*Event_Write_)(nil),
+func (*SocketEvent) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _SocketEvent_OneofMarshaler, _SocketEvent_OneofUnmarshaler, _SocketEvent_OneofSizer, []interface{}{
+		(*SocketEvent_Read_)(nil),
+		(*SocketEvent_Write_)(nil),
 	}
 }
 
-func _Event_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Event)
+func _SocketEvent_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*SocketEvent)
 	// event_selector
 	switch x := m.EventSelector.(type) {
-	case *Event_Read_:
+	case *SocketEvent_Read_:
 		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.Read); err != nil {
 			return err
 		}
-	case *Event_Write_:
+	case *SocketEvent_Write_:
 		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.Write); err != nil {
 			return err
 		}
 	case nil:
 	default:
-		return fmt.Errorf("Event.EventSelector has unexpected type %T", x)
+		return fmt.Errorf("SocketEvent.EventSelector has unexpected type %T", x)
 	}
 	return nil
 }
 
-func _Event_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Event)
+func _SocketEvent_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*SocketEvent)
 	switch tag {
 	case 2: // event_selector.read
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(Event_Read)
+		msg := new(SocketEvent_Read)
 		err := b.DecodeMessage(msg)
-		m.EventSelector = &Event_Read_{msg}
+		m.EventSelector = &SocketEvent_Read_{msg}
 		return true, err
 	case 3: // event_selector.write
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(Event_Write)
+		msg := new(SocketEvent_Write)
 		err := b.DecodeMessage(msg)
-		m.EventSelector = &Event_Write_{msg}
+		m.EventSelector = &SocketEvent_Write_{msg}
 		return true, err
 	default:
 		return false, nil
 	}
 }
 
-func _Event_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Event)
+func _SocketEvent_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*SocketEvent)
 	// event_selector
 	switch x := m.EventSelector.(type) {
-	case *Event_Read_:
+	case *SocketEvent_Read_:
 		s := proto.Size(x.Read)
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
-	case *Event_Write_:
+	case *SocketEvent_Write_:
 		s := proto.Size(x.Write)
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
@@ -257,26 +260,26 @@ func _Event_OneofSizer(msg proto.Message) (n int) {
 }
 
 // Data read by Envoy from the transport socket.
-type Event_Read struct {
+type SocketEvent_Read struct {
 	// Binary data read.
-	Data                 []byte   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Data                 *Body    `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Event_Read) Reset()         { *m = Event_Read{} }
-func (m *Event_Read) String() string { return proto.CompactTextString(m) }
-func (*Event_Read) ProtoMessage()    {}
-func (*Event_Read) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transport_e095f3b946d816d7, []int{1, 0}
+func (m *SocketEvent_Read) Reset()         { *m = SocketEvent_Read{} }
+func (m *SocketEvent_Read) String() string { return proto.CompactTextString(m) }
+func (*SocketEvent_Read) ProtoMessage()    {}
+func (*SocketEvent_Read) Descriptor() ([]byte, []int) {
+	return fileDescriptor_03a9cebdb27ee552, []int{1, 0}
 }
-func (m *Event_Read) XXX_Unmarshal(b []byte) error {
+func (m *SocketEvent_Read) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Event_Read) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SocketEvent_Read) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Event_Read.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SocketEvent_Read.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -286,19 +289,19 @@ func (m *Event_Read) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *Event_Read) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Event_Read.Merge(dst, src)
+func (m *SocketEvent_Read) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SocketEvent_Read.Merge(m, src)
 }
-func (m *Event_Read) XXX_Size() int {
+func (m *SocketEvent_Read) XXX_Size() int {
 	return m.Size()
 }
-func (m *Event_Read) XXX_DiscardUnknown() {
-	xxx_messageInfo_Event_Read.DiscardUnknown(m)
+func (m *SocketEvent_Read) XXX_DiscardUnknown() {
+	xxx_messageInfo_SocketEvent_Read.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Event_Read proto.InternalMessageInfo
+var xxx_messageInfo_SocketEvent_Read proto.InternalMessageInfo
 
-func (m *Event_Read) GetData() []byte {
+func (m *SocketEvent_Read) GetData() *Body {
 	if m != nil {
 		return m.Data
 	}
@@ -306,9 +309,9 @@ func (m *Event_Read) GetData() []byte {
 }
 
 // Data written by Envoy to the transport socket.
-type Event_Write struct {
+type SocketEvent_Write struct {
 	// Binary data written.
-	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Data *Body `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	// Stream was half closed after this write.
 	EndStream            bool     `protobuf:"varint,2,opt,name=end_stream,json=endStream,proto3" json:"end_stream,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -316,18 +319,18 @@ type Event_Write struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Event_Write) Reset()         { *m = Event_Write{} }
-func (m *Event_Write) String() string { return proto.CompactTextString(m) }
-func (*Event_Write) ProtoMessage()    {}
-func (*Event_Write) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transport_e095f3b946d816d7, []int{1, 1}
+func (m *SocketEvent_Write) Reset()         { *m = SocketEvent_Write{} }
+func (m *SocketEvent_Write) String() string { return proto.CompactTextString(m) }
+func (*SocketEvent_Write) ProtoMessage()    {}
+func (*SocketEvent_Write) Descriptor() ([]byte, []int) {
+	return fileDescriptor_03a9cebdb27ee552, []int{1, 1}
 }
-func (m *Event_Write) XXX_Unmarshal(b []byte) error {
+func (m *SocketEvent_Write) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Event_Write) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SocketEvent_Write) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Event_Write.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SocketEvent_Write.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -337,26 +340,26 @@ func (m *Event_Write) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (dst *Event_Write) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Event_Write.Merge(dst, src)
+func (m *SocketEvent_Write) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SocketEvent_Write.Merge(m, src)
 }
-func (m *Event_Write) XXX_Size() int {
+func (m *SocketEvent_Write) XXX_Size() int {
 	return m.Size()
 }
-func (m *Event_Write) XXX_DiscardUnknown() {
-	xxx_messageInfo_Event_Write.DiscardUnknown(m)
+func (m *SocketEvent_Write) XXX_DiscardUnknown() {
+	xxx_messageInfo_SocketEvent_Write.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Event_Write proto.InternalMessageInfo
+var xxx_messageInfo_SocketEvent_Write proto.InternalMessageInfo
 
-func (m *Event_Write) GetData() []byte {
+func (m *SocketEvent_Write) GetData() *Body {
 	if m != nil {
 		return m.Data
 	}
 	return nil
 }
 
-func (m *Event_Write) GetEndStream() bool {
+func (m *SocketEvent_Write) GetEndStream() bool {
 	if m != nil {
 		return m.EndStream
 	}
@@ -366,28 +369,34 @@ func (m *Event_Write) GetEndStream() bool {
 // Sequence of read/write events that constitute a trace on a socket.
 // Multiple Trace messages might be emitted for a given connection ID, with the
 // sink (e.g. file set, network) responsible for later reassembly.
-type Trace struct {
+type SocketTrace struct {
 	// Connection properties.
 	Connection *Connection `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	// Sequence of observed events.
-	Events               []*Event `protobuf:"bytes,2,rep,name=events,proto3" json:"events,omitempty"`
+	Events []*SocketEvent `protobuf:"bytes,2,rep,name=events,proto3" json:"events,omitempty"`
+	// Set to true if read events were truncated due to the :ref:`max_buffered_rx_bytes
+	// <envoy_api_field_service.tap.v2alpha.OutputConfig.max_buffered_rx_bytes>` setting.
+	ReadTruncated bool `protobuf:"varint,3,opt,name=read_truncated,json=readTruncated,proto3" json:"read_truncated,omitempty"`
+	// Set to true if write events were truncated due to the :ref:`max_buffered_tx_bytes
+	// <envoy_api_field_service.tap.v2alpha.OutputConfig.max_buffered_tx_bytes>` setting.
+	WriteTruncated       bool     `protobuf:"varint,4,opt,name=write_truncated,json=writeTruncated,proto3" json:"write_truncated,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Trace) Reset()         { *m = Trace{} }
-func (m *Trace) String() string { return proto.CompactTextString(m) }
-func (*Trace) ProtoMessage()    {}
-func (*Trace) Descriptor() ([]byte, []int) {
-	return fileDescriptor_transport_e095f3b946d816d7, []int{2}
+func (m *SocketTrace) Reset()         { *m = SocketTrace{} }
+func (m *SocketTrace) String() string { return proto.CompactTextString(m) }
+func (*SocketTrace) ProtoMessage()    {}
+func (*SocketTrace) Descriptor() ([]byte, []int) {
+	return fileDescriptor_03a9cebdb27ee552, []int{2}
 }
-func (m *Trace) XXX_Unmarshal(b []byte) error {
+func (m *SocketTrace) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *Trace) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *SocketTrace) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_Trace.Marshal(b, m, deterministic)
+		return xxx_messageInfo_SocketTrace.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalTo(b)
@@ -397,39 +406,94 @@ func (m *Trace) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *Trace) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Trace.Merge(dst, src)
+func (m *SocketTrace) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SocketTrace.Merge(m, src)
 }
-func (m *Trace) XXX_Size() int {
+func (m *SocketTrace) XXX_Size() int {
 	return m.Size()
 }
-func (m *Trace) XXX_DiscardUnknown() {
-	xxx_messageInfo_Trace.DiscardUnknown(m)
+func (m *SocketTrace) XXX_DiscardUnknown() {
+	xxx_messageInfo_SocketTrace.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Trace proto.InternalMessageInfo
+var xxx_messageInfo_SocketTrace proto.InternalMessageInfo
 
-func (m *Trace) GetConnection() *Connection {
+func (m *SocketTrace) GetConnection() *Connection {
 	if m != nil {
 		return m.Connection
 	}
 	return nil
 }
 
-func (m *Trace) GetEvents() []*Event {
+func (m *SocketTrace) GetEvents() []*SocketEvent {
 	if m != nil {
 		return m.Events
 	}
 	return nil
 }
 
+func (m *SocketTrace) GetReadTruncated() bool {
+	if m != nil {
+		return m.ReadTruncated
+	}
+	return false
+}
+
+func (m *SocketTrace) GetWriteTruncated() bool {
+	if m != nil {
+		return m.WriteTruncated
+	}
+	return false
+}
+
 func init() {
 	proto.RegisterType((*Connection)(nil), "envoy.data.tap.v2alpha.Connection")
-	proto.RegisterType((*Event)(nil), "envoy.data.tap.v2alpha.Event")
-	proto.RegisterType((*Event_Read)(nil), "envoy.data.tap.v2alpha.Event.Read")
-	proto.RegisterType((*Event_Write)(nil), "envoy.data.tap.v2alpha.Event.Write")
-	proto.RegisterType((*Trace)(nil), "envoy.data.tap.v2alpha.Trace")
+	proto.RegisterType((*SocketEvent)(nil), "envoy.data.tap.v2alpha.SocketEvent")
+	proto.RegisterType((*SocketEvent_Read)(nil), "envoy.data.tap.v2alpha.SocketEvent.Read")
+	proto.RegisterType((*SocketEvent_Write)(nil), "envoy.data.tap.v2alpha.SocketEvent.Write")
+	proto.RegisterType((*SocketTrace)(nil), "envoy.data.tap.v2alpha.SocketTrace")
 }
+
+func init() {
+	proto.RegisterFile("envoy/data/tap/v2alpha/transport.proto", fileDescriptor_03a9cebdb27ee552)
+}
+
+var fileDescriptor_03a9cebdb27ee552 = []byte{
+	// 497 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0xdd, 0x6a, 0xd4, 0x40,
+	0x18, 0x6d, 0xb6, 0x69, 0x69, 0xbf, 0xda, 0x28, 0x73, 0x21, 0x25, 0xe8, 0xb6, 0x6c, 0xfd, 0x59,
+	0x6f, 0x26, 0x12, 0x6f, 0x0a, 0x82, 0xb2, 0x11, 0x61, 0x2f, 0xcb, 0x74, 0x41, 0xf1, 0x66, 0x99,
+	0x66, 0x3e, 0x6b, 0x30, 0x99, 0x09, 0x93, 0x69, 0x74, 0xdf, 0xc6, 0xc7, 0xf1, 0xd2, 0x27, 0x10,
+	0xd9, 0x27, 0xf0, 0x11, 0x64, 0x26, 0x93, 0xed, 0x5e, 0xb8, 0x58, 0x2f, 0xe7, 0xe3, 0x9c, 0xf3,
+	0x9d, 0xf3, 0xe5, 0x04, 0x9e, 0xa0, 0x6c, 0xd5, 0x22, 0x11, 0xdc, 0xf0, 0xc4, 0xf0, 0x3a, 0x69,
+	0x53, 0x5e, 0xd6, 0x9f, 0x78, 0x62, 0x34, 0x97, 0x4d, 0xad, 0xb4, 0xa1, 0xb5, 0x56, 0x46, 0x91,
+	0xfb, 0x0e, 0x47, 0x2d, 0x8e, 0x1a, 0x5e, 0x53, 0x8f, 0x8b, 0x8f, 0x3b, 0x3e, 0xaf, 0x8b, 0xa4,
+	0x4d, 0x93, 0x5c, 0x69, 0x4c, 0xb8, 0x10, 0x1a, 0x9b, 0xa6, 0x23, 0xc6, 0xa7, 0x1b, 0x16, 0xe4,
+	0xaa, 0xaa, 0x94, 0xf4, 0xa0, 0xe3, 0x2b, 0xa5, 0xae, 0x4a, 0x4c, 0xdc, 0xeb, 0xf2, 0xfa, 0x63,
+	0x62, 0x8a, 0x0a, 0x1b, 0xc3, 0xab, 0xba, 0x03, 0x8c, 0xbe, 0x05, 0x00, 0x6f, 0x94, 0x94, 0x98,
+	0x9b, 0x42, 0x49, 0x12, 0xc1, 0xa0, 0x10, 0x47, 0xc1, 0x49, 0x30, 0x0e, 0xd9, 0xa0, 0x10, 0xe4,
+	0x35, 0x1c, 0x96, 0x2a, 0xe7, 0xe5, 0xdc, 0xef, 0x3e, 0x1a, 0x9c, 0x04, 0xe3, 0x83, 0x34, 0xa6,
+	0x9d, 0x6b, 0x5e, 0x17, 0xb4, 0x4d, 0xa9, 0x75, 0x47, 0x27, 0x1d, 0x82, 0xdd, 0x71, 0x04, 0xff,
+	0x22, 0x13, 0x88, 0x34, 0x56, 0xca, 0xe0, 0x4a, 0x61, 0xfb, 0x9f, 0x0a, 0x87, 0x1d, 0xc3, 0x3f,
+	0x47, 0xbf, 0x07, 0x70, 0x70, 0xa1, 0xf2, 0xcf, 0x68, 0xde, 0xb6, 0x28, 0x0d, 0x39, 0x83, 0xfd,
+	0x55, 0x0a, 0x67, 0xd5, 0xaa, 0x75, 0x39, 0x69, 0x9f, 0x93, 0xce, 0x7a, 0x04, 0xbb, 0x01, 0x93,
+	0x57, 0x10, 0x6a, 0xe4, 0xc2, 0x87, 0x18, 0xd3, 0xbf, 0x9f, 0x9e, 0xae, 0x2d, 0xa3, 0x0c, 0xb9,
+	0x98, 0x6e, 0x31, 0xc7, 0x23, 0x13, 0xd8, 0xf9, 0xa2, 0x0b, 0x83, 0x3e, 0xc3, 0xb3, 0xdb, 0x08,
+	0xbc, 0xb3, 0x84, 0xe9, 0x16, 0xeb, 0x98, 0xf1, 0x19, 0x84, 0x56, 0x92, 0x3c, 0x87, 0xd0, 0xd2,
+	0xbc, 0xff, 0x07, 0x9b, 0x94, 0x32, 0x25, 0x16, 0xcc, 0x21, 0xe3, 0xf7, 0xb0, 0xe3, 0xb4, 0xfe,
+	0x9f, 0x4a, 0x1e, 0x02, 0xa0, 0x14, 0xf3, 0xc6, 0x68, 0xe4, 0x95, 0x4b, 0xbf, 0xc7, 0xf6, 0x51,
+	0x8a, 0x0b, 0x37, 0xc8, 0xee, 0x41, 0x84, 0xd6, 0xeb, 0xbc, 0xc1, 0x12, 0x73, 0xa3, 0xf4, 0xe8,
+	0x67, 0xd0, 0x9f, 0x7c, 0xa6, 0x79, 0x8e, 0x24, 0x03, 0xc8, 0x57, 0x25, 0xf1, 0x8b, 0x47, 0x9b,
+	0x16, 0xdf, 0xd4, 0x89, 0xad, 0xb1, 0xc8, 0x4b, 0xd8, 0x75, 0x5b, 0x6c, 0x87, 0xb6, 0xc7, 0x07,
+	0xe9, 0xe9, 0x2d, 0xae, 0xc7, 0x3c, 0x85, 0x3c, 0xb6, 0x35, 0xe2, 0x62, 0x6e, 0xf4, 0xb5, 0xcc,
+	0xb9, 0x41, 0xe1, 0x3e, 0xc1, 0x9e, 0xad, 0x0a, 0x17, 0xb3, 0x7e, 0x48, 0x9e, 0xc2, 0x5d, 0x77,
+	0xe6, 0x35, 0x5c, 0xe8, 0x70, 0x91, 0x1b, 0xaf, 0x80, 0xd9, 0xf4, 0xfb, 0x72, 0x18, 0xfc, 0x58,
+	0x0e, 0x83, 0x5f, 0xcb, 0x61, 0x00, 0x8f, 0x0a, 0xd5, 0x99, 0xa9, 0xb5, 0xfa, 0xba, 0xd8, 0xe0,
+	0x2b, 0x8b, 0x66, 0xfd, 0xaf, 0x7b, 0x6e, 0x5b, 0x76, 0x1e, 0x7c, 0x18, 0xb4, 0xe9, 0xe5, 0xae,
+	0xab, 0xdc, 0x8b, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x7e, 0xac, 0xec, 0xf0, 0x03, 0x00,
+	0x00,
+}
+
 func (m *Connection) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -476,7 +540,7 @@ func (m *Connection) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *Event) Marshal() (dAtA []byte, err error) {
+func (m *SocketEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -486,7 +550,7 @@ func (m *Event) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Event) MarshalTo(dAtA []byte) (int, error) {
+func (m *SocketEvent) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -514,7 +578,7 @@ func (m *Event) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *Event_Read_) MarshalTo(dAtA []byte) (int, error) {
+func (m *SocketEvent_Read_) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	if m.Read != nil {
 		dAtA[i] = 0x12
@@ -528,7 +592,7 @@ func (m *Event_Read_) MarshalTo(dAtA []byte) (int, error) {
 	}
 	return i, nil
 }
-func (m *Event_Write_) MarshalTo(dAtA []byte) (int, error) {
+func (m *SocketEvent_Write_) MarshalTo(dAtA []byte) (int, error) {
 	i := 0
 	if m.Write != nil {
 		dAtA[i] = 0x1a
@@ -542,7 +606,7 @@ func (m *Event_Write_) MarshalTo(dAtA []byte) (int, error) {
 	}
 	return i, nil
 }
-func (m *Event_Read) Marshal() (dAtA []byte, err error) {
+func (m *SocketEvent_Read) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -552,16 +616,20 @@ func (m *Event_Read) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Event_Read) MarshalTo(dAtA []byte) (int, error) {
+func (m *SocketEvent_Read) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Data) > 0 {
+	if m.Data != nil {
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintTransport(dAtA, i, uint64(len(m.Data)))
-		i += copy(dAtA[i:], m.Data)
+		i = encodeVarintTransport(dAtA, i, uint64(m.Data.Size()))
+		n7, err := m.Data.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -569,7 +637,7 @@ func (m *Event_Read) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *Event_Write) Marshal() (dAtA []byte, err error) {
+func (m *SocketEvent_Write) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -579,16 +647,20 @@ func (m *Event_Write) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Event_Write) MarshalTo(dAtA []byte) (int, error) {
+func (m *SocketEvent_Write) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if len(m.Data) > 0 {
+	if m.Data != nil {
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintTransport(dAtA, i, uint64(len(m.Data)))
-		i += copy(dAtA[i:], m.Data)
+		i = encodeVarintTransport(dAtA, i, uint64(m.Data.Size()))
+		n8, err := m.Data.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n8
 	}
 	if m.EndStream {
 		dAtA[i] = 0x10
@@ -606,7 +678,7 @@ func (m *Event_Write) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *Trace) Marshal() (dAtA []byte, err error) {
+func (m *SocketTrace) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -616,7 +688,7 @@ func (m *Trace) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *Trace) MarshalTo(dAtA []byte) (int, error) {
+func (m *SocketTrace) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -625,11 +697,11 @@ func (m *Trace) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintTransport(dAtA, i, uint64(m.Connection.Size()))
-		n7, err := m.Connection.MarshalTo(dAtA[i:])
+		n9, err := m.Connection.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n7
+		i += n9
 	}
 	if len(m.Events) > 0 {
 		for _, msg := range m.Events {
@@ -642,6 +714,26 @@ func (m *Trace) MarshalTo(dAtA []byte) (int, error) {
 			}
 			i += n
 		}
+	}
+	if m.ReadTruncated {
+		dAtA[i] = 0x18
+		i++
+		if m.ReadTruncated {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.WriteTruncated {
+		dAtA[i] = 0x20
+		i++
+		if m.WriteTruncated {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -681,7 +773,7 @@ func (m *Connection) Size() (n int) {
 	return n
 }
 
-func (m *Event) Size() (n int) {
+func (m *SocketEvent) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -700,7 +792,7 @@ func (m *Event) Size() (n int) {
 	return n
 }
 
-func (m *Event_Read_) Size() (n int) {
+func (m *SocketEvent_Read_) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -712,7 +804,7 @@ func (m *Event_Read_) Size() (n int) {
 	}
 	return n
 }
-func (m *Event_Write_) Size() (n int) {
+func (m *SocketEvent_Write_) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -724,14 +816,14 @@ func (m *Event_Write_) Size() (n int) {
 	}
 	return n
 }
-func (m *Event_Read) Size() (n int) {
+func (m *SocketEvent_Read) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Data)
-	if l > 0 {
+	if m.Data != nil {
+		l = m.Data.Size()
 		n += 1 + l + sovTransport(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -740,14 +832,14 @@ func (m *Event_Read) Size() (n int) {
 	return n
 }
 
-func (m *Event_Write) Size() (n int) {
+func (m *SocketEvent_Write) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.Data)
-	if l > 0 {
+	if m.Data != nil {
+		l = m.Data.Size()
 		n += 1 + l + sovTransport(uint64(l))
 	}
 	if m.EndStream {
@@ -759,7 +851,7 @@ func (m *Event_Write) Size() (n int) {
 	return n
 }
 
-func (m *Trace) Size() (n int) {
+func (m *SocketTrace) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -774,6 +866,12 @@ func (m *Trace) Size() (n int) {
 			l = e.Size()
 			n += 1 + l + sovTransport(uint64(l))
 		}
+	}
+	if m.ReadTruncated {
+		n += 2
+	}
+	if m.WriteTruncated {
+		n += 2
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -809,7 +907,7 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -837,7 +935,7 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= (uint64(b) & 0x7F) << shift
+				m.Id |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -856,7 +954,7 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -865,6 +963,9 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTransport
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -889,7 +990,7 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -898,6 +999,9 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTransport
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -917,6 +1021,9 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthTransport
 			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -930,7 +1037,7 @@ func (m *Connection) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Event) Unmarshal(dAtA []byte) error {
+func (m *SocketEvent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -945,7 +1052,7 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -953,10 +1060,10 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Event: wiretype end group for non-group")
+			return fmt.Errorf("proto: SocketEvent: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Event: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SocketEvent: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -973,7 +1080,7 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -982,6 +1089,9 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTransport
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1006,7 +1116,7 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1015,14 +1125,17 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTransport
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &Event_Read{}
+			v := &SocketEvent_Read{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.EventSelector = &Event_Read_{v}
+			m.EventSelector = &SocketEvent_Read_{v}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -1038,7 +1151,7 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1047,14 +1160,17 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTransport
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &Event_Write{}
+			v := &SocketEvent_Write{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.EventSelector = &Event_Write_{v}
+			m.EventSelector = &SocketEvent_Write_{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1063,6 +1179,9 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTransport
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTransport
 			}
 			if (iNdEx + skippy) > l {
@@ -1078,7 +1197,7 @@ func (m *Event) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Event_Read) Unmarshal(dAtA []byte) error {
+func (m *SocketEvent_Read) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1093,7 +1212,7 @@ func (m *Event_Read) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1111,7 +1230,7 @@ func (m *Event_Read) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
 			}
-			var byteLen int
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTransport
@@ -1121,21 +1240,26 @@ func (m *Event_Read) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTransport
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
 			if m.Data == nil {
-				m.Data = []byte{}
+				m.Data = &Body{}
+			}
+			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		default:
@@ -1145,6 +1269,9 @@ func (m *Event_Read) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTransport
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTransport
 			}
 			if (iNdEx + skippy) > l {
@@ -1160,7 +1287,7 @@ func (m *Event_Read) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Event_Write) Unmarshal(dAtA []byte) error {
+func (m *SocketEvent_Write) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1175,7 +1302,7 @@ func (m *Event_Write) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1193,7 +1320,7 @@ func (m *Event_Write) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
 			}
-			var byteLen int
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTransport
@@ -1203,21 +1330,26 @@ func (m *Event_Write) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTransport
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Data = append(m.Data[:0], dAtA[iNdEx:postIndex]...)
 			if m.Data == nil {
-				m.Data = []byte{}
+				m.Data = &Body{}
+			}
+			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		case 2:
@@ -1234,7 +1366,7 @@ func (m *Event_Write) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= (int(b) & 0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1247,6 +1379,9 @@ func (m *Event_Write) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTransport
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTransport
 			}
 			if (iNdEx + skippy) > l {
@@ -1262,7 +1397,7 @@ func (m *Event_Write) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *Trace) Unmarshal(dAtA []byte) error {
+func (m *SocketTrace) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1277,7 +1412,7 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1285,10 +1420,10 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Trace: wiretype end group for non-group")
+			return fmt.Errorf("proto: SocketTrace: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Trace: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: SocketTrace: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1305,7 +1440,7 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1314,6 +1449,9 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTransport
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1338,7 +1476,7 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1347,14 +1485,57 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTransport
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTransport
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Events = append(m.Events, &Event{})
+			m.Events = append(m.Events, &SocketEvent{})
 			if err := m.Events[len(m.Events)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ReadTruncated", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTransport
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ReadTruncated = bool(v != 0)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WriteTruncated", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTransport
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.WriteTruncated = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTransport(dAtA[iNdEx:])
@@ -1362,6 +1543,9 @@ func (m *Trace) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTransport
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTransport
 			}
 			if (iNdEx + skippy) > l {
@@ -1431,8 +1615,11 @@ func skipTransport(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthTransport
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthTransport
 			}
 			return iNdEx, nil
@@ -1463,6 +1650,9 @@ func skipTransport(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthTransport
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1481,38 +1671,3 @@ var (
 	ErrInvalidLengthTransport = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowTransport   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() {
-	proto.RegisterFile("envoy/data/tap/v2alpha/transport.proto", fileDescriptor_transport_e095f3b946d816d7)
-}
-
-var fileDescriptor_transport_e095f3b946d816d7 = []byte{
-	// 425 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x91, 0xcf, 0x6a, 0x14, 0x41,
-	0x10, 0xc6, 0x33, 0x93, 0xdd, 0x60, 0x2a, 0xc9, 0x22, 0x7d, 0x90, 0x30, 0x90, 0x4d, 0x58, 0x45,
-	0xf6, 0xd4, 0x0d, 0x23, 0x4a, 0xd0, 0x83, 0x64, 0x45, 0xc8, 0xb9, 0x0d, 0x08, 0x5e, 0x96, 0xca,
-	0x74, 0x19, 0x07, 0x66, 0xa6, 0x9b, 0x9e, 0x76, 0x34, 0x57, 0x9f, 0x44, 0x7c, 0x1a, 0x8f, 0x3e,
-	0x82, 0xec, 0x93, 0x48, 0xff, 0xc9, 0xc6, 0x43, 0xb2, 0xb9, 0x4d, 0x4d, 0x7f, 0xbf, 0xaf, 0xbe,
-	0xaa, 0x82, 0xe7, 0xd4, 0x0d, 0xfa, 0x5a, 0x28, 0x74, 0x28, 0x1c, 0x1a, 0x31, 0x94, 0xd8, 0x98,
-	0x2f, 0x28, 0x9c, 0xc5, 0xae, 0x37, 0xda, 0x3a, 0x6e, 0xac, 0x76, 0x9a, 0x3d, 0x09, 0x3a, 0xee,
-	0x75, 0xdc, 0xa1, 0xe1, 0x49, 0x57, 0x1c, 0x47, 0x1e, 0x4d, 0x2d, 0x86, 0x52, 0x54, 0xda, 0x92,
-	0x40, 0xa5, 0x2c, 0xf5, 0x7d, 0x04, 0x8b, 0xe3, 0x2b, 0xad, 0xaf, 0x1a, 0x12, 0xa1, 0xba, 0xfc,
-	0xfa, 0x59, 0xb8, 0xba, 0xa5, 0xde, 0x61, 0x6b, 0xa2, 0x60, 0xf6, 0x33, 0x03, 0x78, 0xa7, 0xbb,
-	0x8e, 0x2a, 0x57, 0xeb, 0x8e, 0x4d, 0x20, 0xaf, 0xd5, 0x61, 0x76, 0x92, 0xcd, 0x47, 0x32, 0xaf,
-	0x15, 0x7b, 0x0b, 0x07, 0x8d, 0xae, 0xb0, 0x59, 0x26, 0xdb, 0xc3, 0xfc, 0x24, 0x9b, 0xef, 0x95,
-	0x05, 0x8f, 0x81, 0xd0, 0xd4, 0x7c, 0x28, 0xb9, 0x6f, 0xcc, 0xcf, 0xa2, 0x42, 0xee, 0x07, 0x20,
-	0x55, 0xec, 0x0c, 0x26, 0x96, 0x5a, 0xed, 0x68, 0xed, 0xb0, 0xfd, 0xa0, 0xc3, 0x41, 0x24, 0x52,
-	0x39, 0xfb, 0x95, 0xc3, 0xf8, 0xfd, 0x40, 0x9d, 0x63, 0xa7, 0xb0, 0xbb, 0xce, 0x1f, 0x42, 0x7a,
-	0x9f, 0x38, 0x21, 0xbf, 0x99, 0x90, 0x5f, 0xdc, 0x28, 0xe4, 0xad, 0x98, 0x9d, 0xc2, 0xc8, 0x12,
-	0xaa, 0x14, 0x7f, 0xc6, 0xef, 0xde, 0x27, 0x0f, 0x6d, 0xb8, 0x24, 0x54, 0xe7, 0x5b, 0x32, 0x10,
-	0xec, 0x0d, 0x8c, 0xbf, 0xd9, 0xda, 0x51, 0xca, 0xfd, 0x74, 0x33, 0xfa, 0xd1, 0x4b, 0xcf, 0xb7,
-	0x64, 0x64, 0x8a, 0x02, 0x46, 0xde, 0x8c, 0x31, 0x18, 0x79, 0x20, 0x64, 0xde, 0x97, 0xe1, 0xbb,
-	0x78, 0x0d, 0xe3, 0xa0, 0xbe, 0xeb, 0x91, 0x1d, 0x01, 0x50, 0xa7, 0x96, 0xbd, 0xb3, 0x84, 0x6d,
-	0x48, 0xfd, 0x48, 0xee, 0x52, 0xa7, 0x3e, 0x84, 0x1f, 0x8b, 0xc7, 0x30, 0x21, 0xdf, 0x6f, 0xd9,
-	0x53, 0x43, 0x95, 0xd3, 0x76, 0xf6, 0x23, 0x83, 0xf1, 0x85, 0xc5, 0x8a, 0xd8, 0x02, 0xa0, 0x5a,
-	0x1f, 0x34, 0x6d, 0xe9, 0xde, 0x81, 0x6f, 0x4f, 0x2f, 0xff, 0xa3, 0xd8, 0x4b, 0xd8, 0x09, 0xfe,
-	0xfe, 0xde, 0xdb, 0xf3, 0xbd, 0xf2, 0x68, 0xe3, 0xd4, 0x32, 0x89, 0x17, 0xaf, 0x7e, 0xaf, 0xa6,
-	0xd9, 0x9f, 0xd5, 0x34, 0xfb, 0xbb, 0x9a, 0x66, 0xf0, 0xac, 0xd6, 0x11, 0x33, 0x56, 0x7f, 0xbf,
-	0xbe, 0xc7, 0xe1, 0x53, 0x3e, 0x94, 0x97, 0x3b, 0xe1, 0x78, 0x2f, 0xfe, 0x05, 0x00, 0x00, 0xff,
-	0xff, 0xed, 0x51, 0x4a, 0x1f, 0x0f, 0x03, 0x00, 0x00,
-}

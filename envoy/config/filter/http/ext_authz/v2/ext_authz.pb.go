@@ -3,14 +3,17 @@
 
 package v2
 
-import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-import matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
-import _ "github.com/lyft/protoc-gen-validate/validate"
+import (
+	fmt "fmt"
+	io "io"
+	math "math"
 
-import io "io"
+	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/lyft/protoc-gen-validate/validate"
+
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -44,7 +47,12 @@ type ExtAuthz struct {
 	//
 	// Note that errors can be *always* tracked in the :ref:`stats
 	// <config_http_filters_ext_authz_stats>`.
-	FailureModeAllow     bool     `protobuf:"varint,2,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
+	FailureModeAllow bool `protobuf:"varint,2,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
+	// Sets the package version the gRPC service should use. This is particularly
+	// useful when transitioning from alpha to release versions assuming that both definitions are
+	// semantically compatible. Deprecation note: This field is deprecated and should only be used for
+	// version upgrade. See release notes for more details.
+	UseAlpha             bool     `protobuf:"varint,4,opt,name=use_alpha,json=useAlpha,proto3" json:"use_alpha,omitempty"` // Deprecated: Do not use.
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -54,7 +62,7 @@ func (m *ExtAuthz) Reset()         { *m = ExtAuthz{} }
 func (m *ExtAuthz) String() string { return proto.CompactTextString(m) }
 func (*ExtAuthz) ProtoMessage()    {}
 func (*ExtAuthz) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_76c7f0235b9df92f, []int{0}
+	return fileDescriptor_861cd76675296973, []int{0}
 }
 func (m *ExtAuthz) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -71,8 +79,8 @@ func (m *ExtAuthz) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *ExtAuthz) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ExtAuthz.Merge(dst, src)
+func (m *ExtAuthz) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExtAuthz.Merge(m, src)
 }
 func (m *ExtAuthz) XXX_Size() int {
 	return m.Size()
@@ -123,6 +131,14 @@ func (m *ExtAuthz) GetHttpService() *HttpService {
 func (m *ExtAuthz) GetFailureModeAllow() bool {
 	if m != nil {
 		return m.FailureModeAllow
+	}
+	return false
+}
+
+// Deprecated: Do not use.
+func (m *ExtAuthz) GetUseAlpha() bool {
+	if m != nil {
+		return m.UseAlpha
 	}
 	return false
 }
@@ -201,16 +217,16 @@ func _ExtAuthz_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-// HttpService is used for raw HTTP comunication between the filter and the authorization service.
+// HttpService is used for raw HTTP communication between the filter and the authorization service.
 // When configured, the filter will parse the client request and use these attributes to call the
 // authorization server. Depending on the response, the filter may reject or accept the client
-// request. Note that in any of these events, metadata can be added, removed or overriden by the
+// request. Note that in any of these events, metadata can be added, removed or overridden by the
 // filter:
 //
 // *On authorization request*, a list of allowed request headers may be supplied. See
 // :ref:`allowed_headers
 // <envoy_api_field_config.filter.http.ext_authz.v2.AuthorizationRequest.allowed_headers>`
-// for details. Additional headers metadata may be added to the authorization resquest. See
+// for details. Additional headers metadata may be added to the authorization request. See
 // :ref:`headers_to_add
 // <envoy_api_field_config.filter.http.ext_authz.v2.AuthorizationRequest.headers_to_add>` for
 // details.
@@ -243,7 +259,7 @@ func (m *HttpService) Reset()         { *m = HttpService{} }
 func (m *HttpService) String() string { return proto.CompactTextString(m) }
 func (*HttpService) ProtoMessage()    {}
 func (*HttpService) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_76c7f0235b9df92f, []int{1}
+	return fileDescriptor_861cd76675296973, []int{1}
 }
 func (m *HttpService) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -260,8 +276,8 @@ func (m *HttpService) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-func (dst *HttpService) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HttpService.Merge(dst, src)
+func (m *HttpService) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HttpService.Merge(m, src)
 }
 func (m *HttpService) XXX_Size() int {
 	return m.Size()
@@ -312,7 +328,7 @@ type AuthorizationRequest struct {
 	//
 	AllowedHeaders *matcher.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
 	// Sets a list of headers that will be included to the request to authorization service. Note that
-	// client request of the same key will be overriden.
+	// client request of the same key will be overridden.
 	HeadersToAdd         []*core.HeaderValue `protobuf:"bytes,2,rep,name=headers_to_add,json=headersToAdd,proto3" json:"headers_to_add,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
@@ -323,7 +339,7 @@ func (m *AuthorizationRequest) Reset()         { *m = AuthorizationRequest{} }
 func (m *AuthorizationRequest) String() string { return proto.CompactTextString(m) }
 func (*AuthorizationRequest) ProtoMessage()    {}
 func (*AuthorizationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_76c7f0235b9df92f, []int{2}
+	return fileDescriptor_861cd76675296973, []int{2}
 }
 func (m *AuthorizationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -340,8 +356,8 @@ func (m *AuthorizationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (dst *AuthorizationRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AuthorizationRequest.Merge(dst, src)
+func (m *AuthorizationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AuthorizationRequest.Merge(m, src)
 }
 func (m *AuthorizationRequest) XXX_Size() int {
 	return m.Size()
@@ -369,7 +385,7 @@ func (m *AuthorizationRequest) GetHeadersToAdd() []*core.HeaderValue {
 type AuthorizationResponse struct {
 	// When this :ref:`list <envoy_api_msg_type.matcher.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the original client request.
-	// Note that coexistent headers will be overriden.
+	// Note that coexistent headers will be overridden.
 	AllowedUpstreamHeaders *matcher.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_upstream_headers,json=allowedUpstreamHeaders,proto3" json:"allowed_upstream_headers,omitempty"`
 	// When this :ref:`list <envoy_api_msg_type.matcher.ListStringMatcher>`. is set, authorization
 	// response headers that have a correspondent match will be added to the client's response. Note
@@ -386,7 +402,7 @@ func (m *AuthorizationResponse) Reset()         { *m = AuthorizationResponse{} }
 func (m *AuthorizationResponse) String() string { return proto.CompactTextString(m) }
 func (*AuthorizationResponse) ProtoMessage()    {}
 func (*AuthorizationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_76c7f0235b9df92f, []int{3}
+	return fileDescriptor_861cd76675296973, []int{3}
 }
 func (m *AuthorizationResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -403,8 +419,8 @@ func (m *AuthorizationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (dst *AuthorizationResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AuthorizationResponse.Merge(dst, src)
+func (m *AuthorizationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AuthorizationResponse.Merge(m, src)
 }
 func (m *AuthorizationResponse) XXX_Size() int {
 	return m.Size()
@@ -429,7 +445,7 @@ func (m *AuthorizationResponse) GetAllowedClientHeaders() *matcher.ListStringMat
 	return nil
 }
 
-// Extra settings on a per virtualhost/route/weighter-cluster level.
+// Extra settings on a per virtualhost/route/weighted-cluster level.
 type ExtAuthzPerRoute struct {
 	// Types that are valid to be assigned to Override:
 	//	*ExtAuthzPerRoute_Disabled
@@ -444,7 +460,7 @@ func (m *ExtAuthzPerRoute) Reset()         { *m = ExtAuthzPerRoute{} }
 func (m *ExtAuthzPerRoute) String() string { return proto.CompactTextString(m) }
 func (*ExtAuthzPerRoute) ProtoMessage()    {}
 func (*ExtAuthzPerRoute) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_76c7f0235b9df92f, []int{4}
+	return fileDescriptor_861cd76675296973, []int{4}
 }
 func (m *ExtAuthzPerRoute) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -461,8 +477,8 @@ func (m *ExtAuthzPerRoute) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (dst *ExtAuthzPerRoute) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ExtAuthzPerRoute.Merge(dst, src)
+func (m *ExtAuthzPerRoute) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExtAuthzPerRoute.Merge(m, src)
 }
 func (m *ExtAuthzPerRoute) XXX_Size() int {
 	return m.Size()
@@ -587,7 +603,7 @@ func _ExtAuthzPerRoute_OneofSizer(msg proto.Message) (n int) {
 // external authorization server on specific virtual hosts \ routes. For example, adding a context
 // extension on the virtual host level can give the ext-authz server information on what virtual
 // host is used without needing to parse the host header. If CheckSettings is specified in multiple
-// per-filter-configs, they will be merged in order, and the result will be be used.
+// per-filter-configs, they will be merged in order, and the result will be used.
 type CheckSettings struct {
 	// Context extensions to set on the CheckRequest's
 	// :ref:`AttributeContext.context_extensions<envoy_api_field_service.auth.v2.AttributeContext.context_extensions>`
@@ -608,7 +624,7 @@ func (m *CheckSettings) Reset()         { *m = CheckSettings{} }
 func (m *CheckSettings) String() string { return proto.CompactTextString(m) }
 func (*CheckSettings) ProtoMessage()    {}
 func (*CheckSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ext_authz_76c7f0235b9df92f, []int{5}
+	return fileDescriptor_861cd76675296973, []int{5}
 }
 func (m *CheckSettings) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -625,8 +641,8 @@ func (m *CheckSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (dst *CheckSettings) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CheckSettings.Merge(dst, src)
+func (m *CheckSettings) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CheckSettings.Merge(m, src)
 }
 func (m *CheckSettings) XXX_Size() int {
 	return m.Size()
@@ -653,6 +669,65 @@ func init() {
 	proto.RegisterType((*CheckSettings)(nil), "envoy.config.filter.http.ext_authz.v2.CheckSettings")
 	proto.RegisterMapType((map[string]string)(nil), "envoy.config.filter.http.ext_authz.v2.CheckSettings.ContextExtensionsEntry")
 }
+
+func init() {
+	proto.RegisterFile("envoy/config/filter/http/ext_authz/v2/ext_authz.proto", fileDescriptor_861cd76675296973)
+}
+
+var fileDescriptor_861cd76675296973 = []byte{
+	// 797 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x54, 0x4f, 0x6f, 0xe3, 0x44,
+	0x14, 0xdf, 0x71, 0x92, 0xae, 0xf3, 0xfa, 0x87, 0xec, 0xa8, 0x2d, 0x51, 0x85, 0xda, 0x2a, 0x62,
+	0xc5, 0x1e, 0x90, 0x2d, 0x65, 0x41, 0xe2, 0xdf, 0x25, 0xe9, 0x56, 0x54, 0x85, 0x45, 0x95, 0x4b,
+	0x17, 0x09, 0x0e, 0xd6, 0xd4, 0x7e, 0x4d, 0x86, 0x4d, 0x3d, 0x66, 0x66, 0x6c, 0x92, 0x5e, 0xb9,
+	0xf1, 0x59, 0xf8, 0x00, 0xc0, 0x69, 0x8f, 0x1c, 0xe1, 0xc0, 0x1d, 0xf5, 0xc4, 0x7e, 0x0b, 0x34,
+	0x9e, 0x71, 0xdb, 0xdd, 0x06, 0x29, 0xdb, 0x9b, 0xe7, 0xbd, 0xf7, 0xfb, 0xf3, 0xde, 0x3c, 0x0f,
+	0x7c, 0x88, 0x59, 0x29, 0x66, 0x61, 0x22, 0xb2, 0x33, 0x3e, 0x0a, 0xcf, 0xf8, 0x44, 0xa3, 0x0c,
+	0xc7, 0x5a, 0xe7, 0x21, 0x4e, 0x75, 0xcc, 0x0a, 0x3d, 0xbe, 0x08, 0xcb, 0xfe, 0xf5, 0x21, 0xc8,
+	0xa5, 0xd0, 0x82, 0x3e, 0xac, 0x60, 0x81, 0x85, 0x05, 0x16, 0x16, 0x18, 0x58, 0x70, 0x5d, 0x59,
+	0xf6, 0xb7, 0xde, 0xb1, 0xec, 0x2c, 0xe7, 0x86, 0x24, 0x11, 0x12, 0xc3, 0x53, 0xa6, 0xd0, 0x92,
+	0x6c, 0xbd, 0x7b, 0x3b, 0x3b, 0x92, 0x79, 0x12, 0x2b, 0x94, 0x25, 0x4f, 0xea, 0xaa, 0xdd, 0xdb,
+	0x55, 0x46, 0x28, 0x2e, 0x24, 0x77, 0x15, 0x3b, 0xb6, 0x42, 0xcf, 0x72, 0x0c, 0xcf, 0x99, 0x4e,
+	0xc6, 0x28, 0x43, 0xa5, 0x25, 0xcf, 0x46, 0xae, 0xe0, 0xed, 0x92, 0x4d, 0x78, 0xca, 0x34, 0x86,
+	0xf5, 0x87, 0x4d, 0xf4, 0x7e, 0xf2, 0xc0, 0xdf, 0x9f, 0xea, 0x81, 0xf1, 0x4b, 0xf7, 0x60, 0xe5,
+	0xa6, 0x7c, 0x97, 0xec, 0x92, 0x47, 0xcb, 0xfd, 0xed, 0xc0, 0xb6, 0xca, 0x72, 0x1e, 0x94, 0xfd,
+	0xc0, 0xe8, 0x07, 0x9f, 0xcb, 0x3c, 0x39, 0xb6, 0x55, 0x07, 0xf7, 0xa2, 0xe5, 0xd1, 0xf5, 0x91,
+	0x7e, 0x03, 0x2b, 0x95, 0xbb, 0x9a, 0xa4, 0x51, 0x91, 0xf4, 0x83, 0x85, 0xe6, 0x15, 0x1c, 0x68,
+	0x9d, 0xdf, 0x20, 0x1e, 0x5f, 0x1f, 0xe9, 0xfb, 0x40, 0xcf, 0x18, 0x9f, 0x14, 0x12, 0xe3, 0x73,
+	0x91, 0x62, 0xcc, 0x26, 0x13, 0xf1, 0x63, 0xd7, 0xdb, 0x25, 0x8f, 0xfc, 0xa8, 0xe3, 0x32, 0x4f,
+	0x45, 0x8a, 0x03, 0x13, 0xa7, 0x3b, 0xd0, 0x2e, 0x94, 0x29, 0xca, 0xc7, 0xac, 0xdb, 0x34, 0x45,
+	0x43, 0xaf, 0x4b, 0x22, 0xbf, 0x50, 0x38, 0x30, 0xb1, 0x21, 0x80, 0xef, 0x2c, 0xaa, 0xde, 0xbf,
+	0x1e, 0x2c, 0xdf, 0x50, 0xa6, 0x1f, 0x03, 0x98, 0x1c, 0x4a, 0x33, 0x63, 0x37, 0x86, 0xad, 0x39,
+	0x63, 0x30, 0x98, 0x13, 0xc9, 0xa3, 0xb6, 0xad, 0x3e, 0x91, 0x9c, 0xee, 0xc0, 0x72, 0xce, 0xf4,
+	0x38, 0xce, 0x25, 0x9e, 0xf1, 0x69, 0x65, 0xaf, 0x1d, 0x81, 0x09, 0x1d, 0x55, 0x11, 0x9a, 0xc3,
+	0x86, 0xe9, 0x56, 0x48, 0x7e, 0xc1, 0x34, 0x17, 0x59, 0x2c, 0xf1, 0x87, 0x02, 0x95, 0xee, 0xde,
+	0xaf, 0x64, 0x3e, 0x5d, 0x70, 0x50, 0x83, 0x9b, 0x1c, 0x91, 0xa5, 0x88, 0xd6, 0xd9, 0x9c, 0x28,
+	0x55, 0xb0, 0xf9, 0xba, 0xa2, 0xca, 0x45, 0xa6, 0xb0, 0xeb, 0x57, 0x92, 0x9f, 0xdd, 0x4d, 0xd2,
+	0x72, 0x44, 0x1b, 0x6c, 0x5e, 0xf8, 0xb0, 0xe9, 0x37, 0x3a, 0xcd, 0xc3, 0xa6, 0xdf, 0xec, 0xb4,
+	0x0e, 0x9b, 0x7e, 0xab, 0xb3, 0x74, 0xd8, 0xf4, 0x97, 0x3a, 0xf7, 0x7b, 0xbf, 0x10, 0x58, 0x9f,
+	0xe7, 0x9d, 0x7e, 0x05, 0x6f, 0x55, 0x37, 0x8a, 0x69, 0x3c, 0x46, 0x96, 0xa2, 0x54, 0x6e, 0xf0,
+	0x0f, 0x9d, 0x3d, 0xb3, 0xdd, 0x81, 0xdb, 0xee, 0xe0, 0x4b, 0xae, 0xf4, 0x71, 0xb5, 0xe1, 0x4f,
+	0x6d, 0x24, 0x5a, 0x73, 0xe8, 0x03, 0x0b, 0xa6, 0x4f, 0x60, 0xcd, 0xf1, 0xc4, 0x5a, 0xc4, 0x2c,
+	0x4d, 0xbb, 0xde, 0x6e, 0xe3, 0x7f, 0xd6, 0xd9, 0x62, 0x9e, 0xb1, 0x49, 0x81, 0xd1, 0x8a, 0x43,
+	0x7d, 0x2d, 0x06, 0x69, 0xda, 0xfb, 0x9b, 0xc0, 0xc6, 0xdc, 0xbe, 0x69, 0x0c, 0xdd, 0xda, 0x6f,
+	0x91, 0x2b, 0x2d, 0x91, 0x9d, 0xdf, 0xcd, 0xf8, 0xa6, 0xa3, 0x39, 0x71, 0x2c, 0x75, 0x03, 0xdf,
+	0x41, 0x9d, 0x89, 0x93, 0x09, 0xc7, 0x4c, 0x5f, 0xd1, 0x7b, 0x6f, 0x42, 0xbf, 0xee, 0x48, 0xf6,
+	0x2a, 0x0e, 0x47, 0xde, 0xfb, 0x8d, 0x40, 0xa7, 0xfe, 0xef, 0x8f, 0x50, 0x46, 0xa2, 0xd0, 0x48,
+	0xdf, 0x03, 0x3f, 0xe5, 0x8a, 0x9d, 0x4e, 0x30, 0xad, 0x5a, 0xf0, 0x87, 0xed, 0xdf, 0x5f, 0xbe,
+	0x68, 0x34, 0xbf, 0xf7, 0x7c, 0x72, 0x70, 0x2f, 0xba, 0x4a, 0x52, 0x0e, 0x6b, 0xc9, 0x18, 0x93,
+	0xe7, 0xb1, 0x42, 0xad, 0x79, 0x36, 0xaa, 0x2d, 0x7d, 0xb0, 0xe0, 0x26, 0xed, 0x19, 0xf0, 0xb1,
+	0xc3, 0x0e, 0xc1, 0x88, 0xb4, 0x7e, 0x26, 0x5e, 0xc7, 0xa8, 0xac, 0x26, 0xaf, 0x24, 0x1f, 0x80,
+	0x2f, 0x4a, 0x94, 0x92, 0xa7, 0x48, 0x5b, 0xbf, 0xbe, 0x7c, 0xd1, 0x20, 0xbd, 0xbf, 0x08, 0xac,
+	0xbe, 0xc2, 0x40, 0x2f, 0x80, 0x26, 0x22, 0xd3, 0x46, 0x03, 0xa7, 0x1a, 0x33, 0xc5, 0x45, 0x66,
+	0x6e, 0xc1, 0xdc, 0xf7, 0x17, 0x77, 0xf1, 0x14, 0xec, 0x59, 0xba, 0xfd, 0x2b, 0xb6, 0xfd, 0x4c,
+	0xcb, 0x59, 0xf4, 0x20, 0x79, 0x3d, 0xbe, 0xf5, 0x04, 0x36, 0xe7, 0x17, 0xd3, 0x0e, 0x34, 0x9e,
+	0xe3, 0xac, 0x9a, 0x64, 0x3b, 0x32, 0x9f, 0x74, 0x1d, 0x5a, 0xa5, 0x59, 0x32, 0xf7, 0x2c, 0xd8,
+	0xc3, 0x27, 0xde, 0x47, 0x64, 0xf8, 0xec, 0x8f, 0xcb, 0x6d, 0xf2, 0xe7, 0xe5, 0x36, 0xf9, 0xe7,
+	0x72, 0x9b, 0xc0, 0x63, 0x2e, 0xac, 0xeb, 0x5c, 0x8a, 0xe9, 0x6c, 0xb1, 0x06, 0x86, 0xab, 0x57,
+	0xf7, 0x69, 0x5e, 0xf6, 0x23, 0xf2, 0xad, 0x57, 0xf6, 0x4f, 0x97, 0xaa, 0x67, 0xfe, 0xf1, 0x7f,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0x2c, 0xf1, 0xee, 0x9b, 0xe6, 0x06, 0x00, 0x00,
+}
+
 func (m *ExtAuthz) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -679,6 +754,16 @@ func (m *ExtAuthz) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x10
 		i++
 		if m.FailureModeAllow {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
+	}
+	if m.UseAlpha {
+		dAtA[i] = 0x20
+		i++
+		if m.UseAlpha {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -973,6 +1058,9 @@ func (m *ExtAuthz) Size() (n int) {
 	if m.FailureModeAllow {
 		n += 2
 	}
+	if m.UseAlpha {
+		n += 2
+	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
 	}
@@ -1157,7 +1245,7 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1185,7 +1273,7 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1194,6 +1282,9 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1217,7 +1308,7 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= (int(b) & 0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1237,7 +1328,7 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1246,6 +1337,9 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1255,6 +1349,26 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 			}
 			m.Services = &ExtAuthz_HttpService{v}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UseAlpha", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowExtAuthz
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.UseAlpha = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipExtAuthz(dAtA[iNdEx:])
@@ -1262,6 +1376,9 @@ func (m *ExtAuthz) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthExtAuthz
 			}
 			if (iNdEx + skippy) > l {
@@ -1292,7 +1409,7 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1320,7 +1437,7 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1329,6 +1446,9 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1353,7 +1473,7 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1363,6 +1483,9 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1382,7 +1505,7 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1391,6 +1514,9 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1415,7 +1541,7 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1424,6 +1550,9 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1441,6 +1570,9 @@ func (m *HttpService) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthExtAuthz
 			}
 			if (iNdEx + skippy) > l {
@@ -1471,7 +1603,7 @@ func (m *AuthorizationRequest) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1499,7 +1631,7 @@ func (m *AuthorizationRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1508,6 +1640,9 @@ func (m *AuthorizationRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1532,7 +1667,7 @@ func (m *AuthorizationRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1541,6 +1676,9 @@ func (m *AuthorizationRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1556,6 +1694,9 @@ func (m *AuthorizationRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthExtAuthz
 			}
 			if (iNdEx + skippy) > l {
@@ -1586,7 +1727,7 @@ func (m *AuthorizationResponse) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1614,7 +1755,7 @@ func (m *AuthorizationResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1623,6 +1764,9 @@ func (m *AuthorizationResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1647,7 +1791,7 @@ func (m *AuthorizationResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1656,6 +1800,9 @@ func (m *AuthorizationResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1673,6 +1820,9 @@ func (m *AuthorizationResponse) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthExtAuthz
 			}
 			if (iNdEx + skippy) > l {
@@ -1703,7 +1853,7 @@ func (m *ExtAuthzPerRoute) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1731,7 +1881,7 @@ func (m *ExtAuthzPerRoute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= (int(b) & 0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1752,7 +1902,7 @@ func (m *ExtAuthzPerRoute) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1761,6 +1911,9 @@ func (m *ExtAuthzPerRoute) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1777,6 +1930,9 @@ func (m *ExtAuthzPerRoute) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthExtAuthz
 			}
 			if (iNdEx + skippy) > l {
@@ -1807,7 +1963,7 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1835,7 +1991,7 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1844,6 +2000,9 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthExtAuthz
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1864,7 +2023,7 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
+					wire |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -1881,7 +2040,7 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						stringLenmapkey |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1891,6 +2050,9 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthExtAuthz
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthExtAuthz
+					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1907,7 +2069,7 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						stringLenmapvalue |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1917,6 +2079,9 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthExtAuthz
 					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthExtAuthz
+					}
 					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1946,6 +2111,9 @@ func (m *CheckSettings) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthExtAuthz
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthExtAuthz
 			}
 			if (iNdEx + skippy) > l {
@@ -2015,8 +2183,11 @@ func skipExtAuthz(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthExtAuthz
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthExtAuthz
 			}
 			return iNdEx, nil
@@ -2047,6 +2218,9 @@ func skipExtAuthz(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthExtAuthz
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -2065,59 +2239,3 @@ var (
 	ErrInvalidLengthExtAuthz = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowExtAuthz   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() {
-	proto.RegisterFile("envoy/config/filter/http/ext_authz/v2/ext_authz.proto", fileDescriptor_ext_authz_76c7f0235b9df92f)
-}
-
-var fileDescriptor_ext_authz_76c7f0235b9df92f = []byte{
-	// 766 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x54, 0x4f, 0x8f, 0xdb, 0x44,
-	0x14, 0xef, 0x38, 0xc9, 0xd6, 0x99, 0x6c, 0x17, 0x77, 0x94, 0x5d, 0xa2, 0x08, 0xa5, 0x51, 0x44,
-	0x45, 0x0f, 0xc8, 0x96, 0x52, 0x90, 0xf8, 0x77, 0x49, 0xd2, 0x55, 0xa3, 0x40, 0xd1, 0xca, 0xcb,
-	0x82, 0x04, 0x07, 0x6b, 0xd6, 0x7e, 0x49, 0x86, 0x7a, 0x3d, 0x66, 0x3c, 0x31, 0xc9, 0x7e, 0x04,
-	0x3e, 0x0b, 0x1f, 0x00, 0x38, 0xf5, 0xc8, 0x11, 0x0e, 0xdc, 0x51, 0x4e, 0xf4, 0x5b, 0xa0, 0xf1,
-	0x8c, 0x37, 0x69, 0x1b, 0xa4, 0xb0, 0x37, 0xcf, 0x7b, 0xef, 0xf7, 0x6f, 0xfc, 0x6c, 0xfc, 0x21,
-	0x24, 0x39, 0x5f, 0x79, 0x21, 0x4f, 0xa6, 0x6c, 0xe6, 0x4d, 0x59, 0x2c, 0x41, 0x78, 0x73, 0x29,
-	0x53, 0x0f, 0x96, 0x32, 0xa0, 0x0b, 0x39, 0xbf, 0xf6, 0xf2, 0xfe, 0xe6, 0xe0, 0xa6, 0x82, 0x4b,
-	0x4e, 0x1e, 0x16, 0x30, 0x57, 0xc3, 0x5c, 0x0d, 0x73, 0x15, 0xcc, 0xdd, 0x4c, 0xe6, 0xfd, 0xf6,
-	0x3b, 0x9a, 0x9d, 0xa6, 0x4c, 0x91, 0x84, 0x5c, 0x80, 0x77, 0x49, 0x33, 0xd0, 0x24, 0xed, 0x77,
-	0xdf, 0xec, 0xce, 0x44, 0x1a, 0x06, 0x19, 0x88, 0x9c, 0x85, 0xe5, 0x54, 0xf7, 0xcd, 0x29, 0x25,
-	0x14, 0x2c, 0x04, 0x33, 0x13, 0x0f, 0xf4, 0x84, 0x5c, 0xa5, 0xe0, 0x5d, 0x51, 0x19, 0xce, 0x41,
-	0x78, 0x99, 0x14, 0x2c, 0x99, 0x99, 0x81, 0xb7, 0x73, 0x1a, 0xb3, 0x88, 0x4a, 0xf0, 0xca, 0x07,
-	0xdd, 0xe8, 0xad, 0x11, 0xb6, 0x4f, 0x97, 0x72, 0xa0, 0xfc, 0x92, 0x11, 0x3e, 0xdc, 0x96, 0x6f,
-	0xa1, 0x2e, 0x7a, 0xd4, 0xe8, 0x77, 0x5c, 0x1d, 0x95, 0xa6, 0xcc, 0xcd, 0xfb, 0xae, 0xd2, 0x77,
-	0x9f, 0x8a, 0x34, 0x3c, 0xd7, 0x53, 0xe3, 0x3b, 0x7e, 0x63, 0xb6, 0x39, 0x92, 0xf7, 0x31, 0x99,
-	0x52, 0x16, 0x2f, 0x04, 0x04, 0x57, 0x3c, 0x82, 0x80, 0xc6, 0x31, 0xff, 0xb1, 0x65, 0x75, 0xd1,
-	0x23, 0xdb, 0x77, 0x4c, 0xe7, 0x19, 0x8f, 0x60, 0xa0, 0xea, 0xe4, 0x1b, 0x7c, 0x58, 0x64, 0x29,
-	0x25, 0x2b, 0x85, 0x64, 0xdf, 0xdd, 0xeb, 0x76, 0xdd, 0xb1, 0x94, 0xe9, 0x96, 0x8d, 0xf9, 0xe6,
-	0x38, 0xc4, 0xd8, 0x36, 0x9c, 0x59, 0xef, 0x1f, 0x0b, 0x37, 0xb6, 0x46, 0xc9, 0xc7, 0x18, 0xab,
-	0x1e, 0x08, 0x75, 0x85, 0x26, 0x65, 0x7b, 0x47, 0x4a, 0x85, 0xb9, 0x10, 0xcc, 0xaf, 0xeb, 0xe9,
-	0x0b, 0xc1, 0xc8, 0x03, 0xdc, 0x48, 0xa9, 0x9c, 0x07, 0xa9, 0x80, 0x29, 0x5b, 0x16, 0xb1, 0xea,
-	0x3e, 0x56, 0xa5, 0xb3, 0xa2, 0x42, 0x52, 0x7c, 0xac, 0xec, 0x71, 0xc1, 0xae, 0xa9, 0x64, 0x3c,
-	0x09, 0x04, 0xfc, 0xb0, 0x80, 0x4c, 0xb6, 0xee, 0x16, 0x32, 0x9f, 0xee, 0x99, 0x6c, 0xb0, 0xcd,
-	0xe1, 0x6b, 0x0a, 0xbf, 0x49, 0x77, 0x54, 0x49, 0x86, 0x4f, 0x5e, 0x57, 0xcc, 0x52, 0x9e, 0x64,
-	0xd0, 0xb2, 0x0b, 0xc9, 0xcf, 0x6e, 0x27, 0xa9, 0x39, 0xfc, 0x63, 0xba, 0xab, 0x3c, 0xa9, 0xda,
-	0x15, 0xa7, 0x3a, 0xa9, 0xda, 0x55, 0xa7, 0x36, 0xa9, 0xda, 0x35, 0xe7, 0x60, 0x52, 0xb5, 0x0f,
-	0x9c, 0xbb, 0xbd, 0x9f, 0x11, 0x6e, 0xee, 0xf2, 0x4e, 0xbe, 0xc4, 0x6f, 0x15, 0x9b, 0x00, 0x51,
-	0x30, 0x07, 0x1a, 0x81, 0xc8, 0xcc, 0xc5, 0x3f, 0x34, 0xf6, 0xd4, 0xf2, 0xba, 0x66, 0x79, 0xdd,
-	0x2f, 0x58, 0x26, 0xcf, 0x8b, 0x05, 0x7e, 0xa6, 0x2b, 0xfe, 0x91, 0x41, 0x8f, 0x35, 0x98, 0x3c,
-	0xc1, 0x47, 0x86, 0x27, 0x90, 0x3c, 0xa0, 0x51, 0xd4, 0xb2, 0xba, 0x95, 0xff, 0xd8, 0x56, 0x8d,
-	0xf9, 0x9a, 0xc6, 0x0b, 0xf0, 0x0f, 0x0d, 0xea, 0x2b, 0x3e, 0x88, 0xa2, 0xde, 0x5f, 0x08, 0x1f,
-	0xef, 0xcc, 0x4d, 0x02, 0xdc, 0x2a, 0xfd, 0x2e, 0xd2, 0x4c, 0x0a, 0xa0, 0x57, 0xb7, 0x33, 0x7e,
-	0x62, 0x68, 0x2e, 0x0c, 0x4b, 0x19, 0xe0, 0x3b, 0x5c, 0x76, 0x82, 0x30, 0x66, 0x90, 0xc8, 0x1b,
-	0x7a, 0xeb, 0xff, 0xd0, 0x37, 0x0d, 0xc9, 0xa8, 0xe0, 0x30, 0xe4, 0xbd, 0x5f, 0x11, 0x76, 0xca,
-	0xcf, 0xfa, 0x0c, 0x84, 0xcf, 0x17, 0x12, 0xc8, 0x7b, 0xd8, 0x8e, 0x58, 0x46, 0x2f, 0x63, 0x88,
-	0x8a, 0x08, 0xf6, 0xb0, 0xfe, 0xdb, 0xcb, 0x17, 0x95, 0xea, 0xf7, 0x96, 0x8d, 0xc6, 0x77, 0xfc,
-	0x9b, 0x26, 0x61, 0xf8, 0x28, 0x9c, 0x43, 0xf8, 0x3c, 0xc8, 0x40, 0x4a, 0x96, 0xcc, 0x4a, 0x4b,
-	0x1f, 0xec, 0xb9, 0x49, 0x23, 0x05, 0x3e, 0x37, 0xd8, 0x21, 0x56, 0x22, 0xb5, 0x9f, 0x90, 0xe5,
-	0x28, 0x95, 0x7b, 0xe1, 0x2b, 0xcd, 0xfb, 0xd8, 0xe6, 0x39, 0x08, 0xc1, 0x22, 0x20, 0xb5, 0x5f,
-	0x5e, 0xbe, 0xa8, 0xa0, 0xde, 0x9f, 0x08, 0xdf, 0x7b, 0x85, 0x81, 0x5c, 0x63, 0x12, 0xf2, 0x44,
-	0x2a, 0x0d, 0x58, 0x4a, 0x48, 0x32, 0xc6, 0x13, 0xf5, 0x16, 0xd4, 0xfb, 0xfe, 0xfc, 0x36, 0x9e,
-	0xdc, 0x91, 0xa6, 0x3b, 0xbd, 0x61, 0x3b, 0x4d, 0xa4, 0x58, 0xf9, 0xf7, 0xc3, 0xd7, 0xeb, 0xed,
-	0x27, 0xf8, 0x64, 0xf7, 0x30, 0x71, 0x70, 0xe5, 0x39, 0xac, 0x8a, 0x9b, 0xac, 0xfb, 0xea, 0x91,
-	0x34, 0x71, 0x2d, 0x57, 0x4b, 0x66, 0x7e, 0x0b, 0xfa, 0xf0, 0x89, 0xf5, 0x11, 0x1a, 0x3e, 0xfd,
-	0x7d, 0xdd, 0x41, 0x7f, 0xac, 0x3b, 0xe8, 0xef, 0x75, 0x07, 0xe1, 0xc7, 0x8c, 0x6b, 0xd7, 0xa9,
-	0xe0, 0xcb, 0xd5, 0x7e, 0x01, 0xce, 0xd0, 0xb7, 0x56, 0xde, 0xbf, 0x3c, 0x28, 0x7e, 0xdb, 0x8f,
-	0xff, 0x0d, 0x00, 0x00, 0xff, 0xff, 0xfc, 0xd9, 0x0d, 0xc0, 0xb6, 0x06, 0x00, 0x00,
-}

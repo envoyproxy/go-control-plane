@@ -728,6 +728,17 @@ func (m *Cluster_RingHashLbConfig) Validate() error {
 		}
 	}
 
+	if wrapper := m.GetMaximumRingSize(); wrapper != nil {
+
+		if wrapper.GetValue() > 8388608 {
+			return Cluster_RingHashLbConfigValidationError{
+				Field:  "MaximumRingSize",
+				Reason: "value must be less than or equal to 8388608",
+			}
+		}
+
+	}
+
 	return nil
 }
 

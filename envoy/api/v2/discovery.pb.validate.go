@@ -133,6 +133,16 @@ func (m *DiscoveryResponse) Validate() error {
 
 	// no validation rules for Nonce
 
+	if v, ok := interface{}(m.GetControlPlane()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DiscoveryResponseValidationError{
+				Field:  "ControlPlane",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
