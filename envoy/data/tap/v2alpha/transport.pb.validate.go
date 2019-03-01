@@ -97,16 +97,17 @@ func (e ConnectionValidationError) Error() string {
 
 var _ error = ConnectionValidationError{}
 
-// Validate checks the field values on Event with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *Event) Validate() error {
+// Validate checks the field values on SocketEvent with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *SocketEvent) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return EventValidationError{
+			return SocketEventValidationError{
 				Field:  "Timestamp",
 				Reason: "embedded message failed validation",
 				Cause:  err,
@@ -116,11 +117,11 @@ func (m *Event) Validate() error {
 
 	switch m.EventSelector.(type) {
 
-	case *Event_Read_:
+	case *SocketEvent_Read_:
 
 		if v, ok := interface{}(m.GetRead()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return EventValidationError{
+				return SocketEventValidationError{
 					Field:  "Read",
 					Reason: "embedded message failed validation",
 					Cause:  err,
@@ -128,11 +129,11 @@ func (m *Event) Validate() error {
 			}
 		}
 
-	case *Event_Write_:
+	case *SocketEvent_Write_:
 
 		if v, ok := interface{}(m.GetWrite()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return EventValidationError{
+				return SocketEventValidationError{
 					Field:  "Write",
 					Reason: "embedded message failed validation",
 					Cause:  err,
@@ -145,9 +146,9 @@ func (m *Event) Validate() error {
 	return nil
 }
 
-// EventValidationError is the validation error returned by Event.Validate if
-// the designated constraints aren't met.
-type EventValidationError struct {
+// SocketEventValidationError is the validation error returned by
+// SocketEvent.Validate if the designated constraints aren't met.
+type SocketEventValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -155,7 +156,7 @@ type EventValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e EventValidationError) Error() string {
+func (e SocketEventValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -167,25 +168,26 @@ func (e EventValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sEvent.%s: %s%s",
+		"invalid %sSocketEvent.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = EventValidationError{}
+var _ error = SocketEventValidationError{}
 
-// Validate checks the field values on Trace with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *Trace) Validate() error {
+// Validate checks the field values on SocketTrace with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *SocketTrace) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if v, ok := interface{}(m.GetConnection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return TraceValidationError{
+			return SocketTraceValidationError{
 				Field:  "Connection",
 				Reason: "embedded message failed validation",
 				Cause:  err,
@@ -198,7 +200,7 @@ func (m *Trace) Validate() error {
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return TraceValidationError{
+				return SocketTraceValidationError{
 					Field:  fmt.Sprintf("Events[%v]", idx),
 					Reason: "embedded message failed validation",
 					Cause:  err,
@@ -208,12 +210,16 @@ func (m *Trace) Validate() error {
 
 	}
 
+	// no validation rules for ReadTruncated
+
+	// no validation rules for WriteTruncated
+
 	return nil
 }
 
-// TraceValidationError is the validation error returned by Trace.Validate if
-// the designated constraints aren't met.
-type TraceValidationError struct {
+// SocketTraceValidationError is the validation error returned by
+// SocketTrace.Validate if the designated constraints aren't met.
+type SocketTraceValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -221,7 +227,7 @@ type TraceValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e TraceValidationError) Error() string {
+func (e SocketTraceValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -233,30 +239,39 @@ func (e TraceValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sTrace.%s: %s%s",
+		"invalid %sSocketTrace.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = TraceValidationError{}
+var _ error = SocketTraceValidationError{}
 
-// Validate checks the field values on Event_Read with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *Event_Read) Validate() error {
+// Validate checks the field values on SocketEvent_Read with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *SocketEvent_Read) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	// no validation rules for Data
+	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SocketEvent_ReadValidationError{
+				Field:  "Data",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
 
 	return nil
 }
 
-// Event_ReadValidationError is the validation error returned by
-// Event_Read.Validate if the designated constraints aren't met.
-type Event_ReadValidationError struct {
+// SocketEvent_ReadValidationError is the validation error returned by
+// SocketEvent_Read.Validate if the designated constraints aren't met.
+type SocketEvent_ReadValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -264,7 +279,7 @@ type Event_ReadValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e Event_ReadValidationError) Error() string {
+func (e SocketEvent_ReadValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -276,33 +291,41 @@ func (e Event_ReadValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sEvent_Read.%s: %s%s",
+		"invalid %sSocketEvent_Read.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = Event_ReadValidationError{}
+var _ error = SocketEvent_ReadValidationError{}
 
-// Validate checks the field values on Event_Write with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *Event_Write) Validate() error {
+// Validate checks the field values on SocketEvent_Write with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *SocketEvent_Write) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	// no validation rules for Data
+	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SocketEvent_WriteValidationError{
+				Field:  "Data",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
 
 	// no validation rules for EndStream
 
 	return nil
 }
 
-// Event_WriteValidationError is the validation error returned by
-// Event_Write.Validate if the designated constraints aren't met.
-type Event_WriteValidationError struct {
+// SocketEvent_WriteValidationError is the validation error returned by
+// SocketEvent_Write.Validate if the designated constraints aren't met.
+type SocketEvent_WriteValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -310,7 +333,7 @@ type Event_WriteValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e Event_WriteValidationError) Error() string {
+func (e SocketEvent_WriteValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -322,11 +345,11 @@ func (e Event_WriteValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sEvent_Write.%s: %s%s",
+		"invalid %sSocketEvent_Write.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = Event_WriteValidationError{}
+var _ error = SocketEvent_WriteValidationError{}

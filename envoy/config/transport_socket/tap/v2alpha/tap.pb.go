@@ -3,12 +3,17 @@
 
 package v2
 
-import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+import (
+	fmt "fmt"
+	io "io"
+	math "math"
 
-import io "io"
+	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/lyft/protoc-gen-validate/validate"
+
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	v2alpha "github.com/envoyproxy/go-control-plane/envoy/config/common/tap/v2alpha"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -21,105 +26,11 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-// File format.
-type FileSink_Format int32
-
-const (
-	// Binary proto format as per :ref:`Trace
-	// <envoy_api_msg_data.tap.v2alpha.Trace>`.
-	FileSink_PROTO_BINARY FileSink_Format = 0
-	// Text proto format as per :ref:`Trace
-	// <envoy_api_msg_data.tap.v2alpha.Trace>`.
-	FileSink_PROTO_TEXT FileSink_Format = 1
-)
-
-var FileSink_Format_name = map[int32]string{
-	0: "PROTO_BINARY",
-	1: "PROTO_TEXT",
-}
-var FileSink_Format_value = map[string]int32{
-	"PROTO_BINARY": 0,
-	"PROTO_TEXT":   1,
-}
-
-func (x FileSink_Format) String() string {
-	return proto.EnumName(FileSink_Format_name, int32(x))
-}
-func (FileSink_Format) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_tap_8fe1cdbf1545a110, []int{0, 0}
-}
-
-// File sink.
-//
-// .. warning::
-//
-//   The current file sink implementation buffers the entire trace in memory
-//   prior to writing. This will OOM for long lived sockets and/or where there
-//   is a large amount of traffic on the socket.
-type FileSink struct {
-	// Path prefix. The output file will be of the form <path_prefix>_<id>.pb, where <id> is an
-	// identifier distinguishing the recorded trace for individual socket instances (the Envoy
-	// connection ID).
-	PathPrefix           string          `protobuf:"bytes,1,opt,name=path_prefix,json=pathPrefix,proto3" json:"path_prefix,omitempty"`
-	Format               FileSink_Format `protobuf:"varint,2,opt,name=format,proto3,enum=envoy.config.transport_socket.tap.v2alpha.FileSink_Format" json:"format,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
-}
-
-func (m *FileSink) Reset()         { *m = FileSink{} }
-func (m *FileSink) String() string { return proto.CompactTextString(m) }
-func (*FileSink) ProtoMessage()    {}
-func (*FileSink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tap_8fe1cdbf1545a110, []int{0}
-}
-func (m *FileSink) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *FileSink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_FileSink.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *FileSink) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FileSink.Merge(dst, src)
-}
-func (m *FileSink) XXX_Size() int {
-	return m.Size()
-}
-func (m *FileSink) XXX_DiscardUnknown() {
-	xxx_messageInfo_FileSink.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_FileSink proto.InternalMessageInfo
-
-func (m *FileSink) GetPathPrefix() string {
-	if m != nil {
-		return m.PathPrefix
-	}
-	return ""
-}
-
-func (m *FileSink) GetFormat() FileSink_Format {
-	if m != nil {
-		return m.Format
-	}
-	return FileSink_PROTO_BINARY
-}
-
 // Configuration for tap transport socket. This wraps another transport socket, providing the
 // ability to interpose and record in plain text any traffic that is surfaced to Envoy.
 type Tap struct {
-	// Types that are valid to be assigned to SinkSelector:
-	//	*Tap_FileSink
-	SinkSelector isTap_SinkSelector `protobuf_oneof:"sink_selector"`
+	// Common configuration for the tap transport socket.
+	CommonConfig *v2alpha.CommonExtensionConfig `protobuf:"bytes,1,opt,name=common_config,json=commonConfig,proto3" json:"common_config,omitempty"`
 	// The underlying transport socket being wrapped.
 	TransportSocket      *core.TransportSocket `protobuf:"bytes,2,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
@@ -131,7 +42,7 @@ func (m *Tap) Reset()         { *m = Tap{} }
 func (m *Tap) String() string { return proto.CompactTextString(m) }
 func (*Tap) ProtoMessage()    {}
 func (*Tap) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tap_8fe1cdbf1545a110, []int{1}
+	return fileDescriptor_07cb8c0b42756e40, []int{0}
 }
 func (m *Tap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -148,8 +59,8 @@ func (m *Tap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *Tap) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Tap.Merge(dst, src)
+func (m *Tap) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Tap.Merge(m, src)
 }
 func (m *Tap) XXX_Size() int {
 	return m.Size()
@@ -160,28 +71,9 @@ func (m *Tap) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Tap proto.InternalMessageInfo
 
-type isTap_SinkSelector interface {
-	isTap_SinkSelector()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type Tap_FileSink struct {
-	FileSink *FileSink `protobuf:"bytes,1,opt,name=file_sink,json=fileSink,proto3,oneof"`
-}
-
-func (*Tap_FileSink) isTap_SinkSelector() {}
-
-func (m *Tap) GetSinkSelector() isTap_SinkSelector {
+func (m *Tap) GetCommonConfig() *v2alpha.CommonExtensionConfig {
 	if m != nil {
-		return m.SinkSelector
-	}
-	return nil
-}
-
-func (m *Tap) GetFileSink() *FileSink {
-	if x, ok := m.GetSinkSelector().(*Tap_FileSink); ok {
-		return x.FileSink
+		return m.CommonConfig
 	}
 	return nil
 }
@@ -193,96 +85,35 @@ func (m *Tap) GetTransportSocket() *core.TransportSocket {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Tap) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Tap_OneofMarshaler, _Tap_OneofUnmarshaler, _Tap_OneofSizer, []interface{}{
-		(*Tap_FileSink)(nil),
-	}
-}
-
-func _Tap_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Tap)
-	// sink_selector
-	switch x := m.SinkSelector.(type) {
-	case *Tap_FileSink:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.FileSink); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Tap.SinkSelector has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Tap_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Tap)
-	switch tag {
-	case 1: // sink_selector.file_sink
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(FileSink)
-		err := b.DecodeMessage(msg)
-		m.SinkSelector = &Tap_FileSink{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Tap_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Tap)
-	// sink_selector
-	switch x := m.SinkSelector.(type) {
-	case *Tap_FileSink:
-		s := proto.Size(x.FileSink)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
+func init() {
+	proto.RegisterType((*Tap)(nil), "envoy.config.transport_socket.tap.v2alpha.Tap")
 }
 
 func init() {
-	proto.RegisterType((*FileSink)(nil), "envoy.config.transport_socket.tap.v2alpha.FileSink")
-	proto.RegisterType((*Tap)(nil), "envoy.config.transport_socket.tap.v2alpha.Tap")
-	proto.RegisterEnum("envoy.config.transport_socket.tap.v2alpha.FileSink_Format", FileSink_Format_name, FileSink_Format_value)
-}
-func (m *FileSink) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
+	proto.RegisterFile("envoy/config/transport_socket/tap/v2alpha/tap.proto", fileDescriptor_07cb8c0b42756e40)
 }
 
-func (m *FileSink) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.PathPrefix) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintTap(dAtA, i, uint64(len(m.PathPrefix)))
-		i += copy(dAtA[i:], m.PathPrefix)
-	}
-	if m.Format != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintTap(dAtA, i, uint64(m.Format))
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
+var fileDescriptor_07cb8c0b42756e40 = []byte{
+	// 290 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x50, 0xbd, 0x4a, 0x03, 0x41,
+	0x10, 0x66, 0x13, 0x14, 0x59, 0x15, 0xc3, 0x35, 0x86, 0x20, 0x87, 0xa4, 0x52, 0x90, 0x5d, 0xb8,
+	0x80, 0xf6, 0x09, 0xf6, 0x41, 0xcf, 0x42, 0x9b, 0x30, 0x39, 0xd7, 0xb8, 0x98, 0xec, 0x2c, 0x77,
+	0xcb, 0x92, 0xbc, 0x82, 0x8f, 0x64, 0x65, 0xa9, 0x9d, 0x8f, 0x20, 0xd7, 0xf9, 0x16, 0x72, 0x3b,
+	0x17, 0xf0, 0xae, 0xb2, 0x1b, 0xe6, 0xfb, 0x9b, 0xf9, 0xf8, 0x48, 0x19, 0x8f, 0x1b, 0x99, 0xa1,
+	0x79, 0xd2, 0x0b, 0xe9, 0x72, 0x30, 0x85, 0xc5, 0xdc, 0xcd, 0x0a, 0xcc, 0x5e, 0x94, 0x93, 0x0e,
+	0xac, 0xf4, 0x09, 0x2c, 0xed, 0x33, 0x54, 0xb3, 0xb0, 0x39, 0x3a, 0x8c, 0xce, 0x83, 0x48, 0x90,
+	0x48, 0xb4, 0x45, 0xa2, 0x22, 0xd6, 0xa2, 0xc1, 0x45, 0xc3, 0x3f, 0xc3, 0xd5, 0x0a, 0x4d, 0xc3,
+	0x95, 0x56, 0x64, 0x3c, 0x38, 0x21, 0x36, 0x58, 0x2d, 0x7d, 0x22, 0x33, 0xcc, 0x95, 0x9c, 0x43,
+	0xa1, 0x6a, 0xf4, 0xd8, 0xc3, 0x52, 0x3f, 0x82, 0x53, 0x72, 0x3b, 0x10, 0x30, 0xfc, 0x64, 0xbc,
+	0x9b, 0x82, 0x8d, 0x16, 0xfc, 0x90, 0xec, 0x66, 0x94, 0xd7, 0x67, 0xa7, 0xec, 0x6c, 0x3f, 0xb9,
+	0x14, 0x8d, 0x7b, 0xeb, 0xc4, 0x3f, 0x57, 0x8a, 0x49, 0x58, 0x5d, 0xaf, 0x9d, 0x32, 0x85, 0x46,
+	0x33, 0x09, 0xc4, 0x31, 0x7f, 0xfb, 0x79, 0xef, 0xee, 0xbc, 0xb2, 0x4e, 0x8f, 0xdd, 0x1c, 0x90,
+	0x8a, 0x90, 0xe8, 0x9e, 0xf7, 0xda, 0x5f, 0xf7, 0x3b, 0x21, 0x6b, 0x58, 0x67, 0x81, 0xd5, 0xc2,
+	0x27, 0xa2, 0x7a, 0x41, 0xa4, 0x5b, 0xea, 0x6d, 0x60, 0x36, 0x7c, 0x8f, 0x5c, 0x0b, 0xbc, 0xfb,
+	0x28, 0x63, 0xf6, 0x55, 0xc6, 0xec, 0xbb, 0x8c, 0x19, 0xbf, 0xd2, 0x48, 0x86, 0x36, 0xc7, 0xf5,
+	0x46, 0xfc, 0xbb, 0xf7, 0xf1, 0x5e, 0x0a, 0x76, 0x5a, 0x95, 0x33, 0x65, 0x0f, 0x1d, 0x9f, 0xcc,
+	0x77, 0x43, 0x53, 0xa3, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0x76, 0x4a, 0xf2, 0xf0, 0x01,
+	0x00, 0x00,
 }
 
 func (m *Tap) Marshal() (dAtA []byte, err error) {
@@ -300,12 +131,15 @@ func (m *Tap) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.SinkSelector != nil {
-		nn1, err := m.SinkSelector.MarshalTo(dAtA[i:])
+	if m.CommonConfig != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintTap(dAtA, i, uint64(m.CommonConfig.Size()))
+		n1, err := m.CommonConfig.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn1
+		i += n1
 	}
 	if m.TransportSocket != nil {
 		dAtA[i] = 0x12
@@ -323,20 +157,6 @@ func (m *Tap) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *Tap_FileSink) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	if m.FileSink != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintTap(dAtA, i, uint64(m.FileSink.Size()))
-		n3, err := m.FileSink.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	return i, nil
-}
 func encodeVarintTap(dAtA []byte, offset int, v uint64) int {
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -346,33 +166,15 @@ func encodeVarintTap(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func (m *FileSink) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.PathPrefix)
-	if l > 0 {
-		n += 1 + l + sovTap(uint64(l))
-	}
-	if m.Format != 0 {
-		n += 1 + sovTap(uint64(m.Format))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
 func (m *Tap) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.SinkSelector != nil {
-		n += m.SinkSelector.Size()
+	if m.CommonConfig != nil {
+		l = m.CommonConfig.Size()
+		n += 1 + l + sovTap(uint64(l))
 	}
 	if m.TransportSocket != nil {
 		l = m.TransportSocket.Size()
@@ -380,19 +182,6 @@ func (m *Tap) Size() (n int) {
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Tap_FileSink) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.FileSink != nil {
-		l = m.FileSink.Size()
-		n += 1 + l + sovTap(uint64(l))
 	}
 	return n
 }
@@ -410,105 +199,6 @@ func sovTap(x uint64) (n int) {
 func sozTap(x uint64) (n int) {
 	return sovTap(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *FileSink) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTap
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: FileSink: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: FileSink: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PathPrefix", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTap
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTap
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PathPrefix = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Format", wireType)
-			}
-			m.Format = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTap
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Format |= (FileSink_Format(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTap(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthTap
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *Tap) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -524,7 +214,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -540,7 +230,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FileSink", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CommonConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -552,7 +242,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -561,14 +251,18 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTap
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTap
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &FileSink{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if m.CommonConfig == nil {
+				m.CommonConfig = &v2alpha.CommonExtensionConfig{}
+			}
+			if err := m.CommonConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.SinkSelector = &Tap_FileSink{v}
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -584,7 +278,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -593,6 +287,9 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTap
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTap
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -610,6 +307,9 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthTap
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTap
 			}
 			if (iNdEx + skippy) > l {
@@ -679,8 +379,11 @@ func skipTap(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthTap
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthTap
 			}
 			return iNdEx, nil
@@ -711,6 +414,9 @@ func skipTap(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthTap
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -729,32 +435,3 @@ var (
 	ErrInvalidLengthTap = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowTap   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() {
-	proto.RegisterFile("envoy/config/transport_socket/tap/v2alpha/tap.proto", fileDescriptor_tap_8fe1cdbf1545a110)
-}
-
-var fileDescriptor_tap_8fe1cdbf1545a110 = []byte{
-	// 335 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x91, 0xc1, 0x6a, 0x2a, 0x31,
-	0x14, 0x86, 0x8d, 0x17, 0x44, 0x8f, 0xf7, 0xea, 0x30, 0x2b, 0xb9, 0x14, 0x2b, 0xb3, 0xb2, 0x5d,
-	0x24, 0x10, 0x17, 0x85, 0xee, 0x2a, 0x54, 0xea, 0xa2, 0x55, 0xe2, 0x2c, 0xda, 0x6e, 0x86, 0x38,
-	0x64, 0x6a, 0x70, 0x3a, 0x09, 0x99, 0x30, 0xe8, 0x33, 0xf5, 0x09, 0xfa, 0x06, 0x5d, 0xf6, 0x11,
-	0x8a, 0x4f, 0x52, 0x26, 0xa3, 0x8b, 0xba, 0x92, 0xee, 0xc2, 0xcf, 0xf9, 0xbf, 0x7c, 0x27, 0x81,
-	0x91, 0xc8, 0x0a, 0xb5, 0x25, 0xb1, 0xca, 0x12, 0xf9, 0x42, 0xac, 0xe1, 0x59, 0xae, 0x95, 0xb1,
-	0x51, 0xae, 0xe2, 0xb5, 0xb0, 0xc4, 0x72, 0x4d, 0x0a, 0xca, 0x53, 0xbd, 0xe2, 0xe5, 0x19, 0x6b,
-	0xa3, 0xac, 0xf2, 0x2f, 0x5c, 0x09, 0x57, 0x25, 0x7c, 0x5c, 0xc2, 0xe5, 0xe0, 0xbe, 0xf4, 0xff,
-	0xac, 0xe2, 0x73, 0x2d, 0x49, 0x41, 0x49, 0xac, 0x8c, 0x20, 0x4b, 0x9e, 0x8b, 0x0a, 0x14, 0xbc,
-	0x21, 0x68, 0x4e, 0x64, 0x2a, 0x16, 0x32, 0x5b, 0xfb, 0xe7, 0xd0, 0xd6, 0xdc, 0xae, 0x22, 0x6d,
-	0x44, 0x22, 0x37, 0x3d, 0x34, 0x40, 0xc3, 0x16, 0x83, 0x32, 0x9a, 0xbb, 0xc4, 0x67, 0xd0, 0x48,
-	0x94, 0x79, 0xe5, 0xb6, 0x57, 0x1f, 0xa0, 0x61, 0x87, 0x5e, 0xe3, 0x93, 0x3d, 0xf0, 0xe1, 0x16,
-	0x3c, 0x71, 0x04, 0xb6, 0x27, 0x05, 0x97, 0xd0, 0xa8, 0x12, 0xdf, 0x83, 0xbf, 0x73, 0x36, 0x0b,
-	0x67, 0xd1, 0x78, 0xfa, 0x70, 0xc3, 0x9e, 0xbc, 0x9a, 0xdf, 0x01, 0xa8, 0x92, 0xf0, 0xf6, 0x31,
-	0xf4, 0x50, 0xf0, 0x8e, 0xe0, 0x4f, 0xc8, 0xb5, 0xcf, 0xa0, 0x95, 0xc8, 0x54, 0x44, 0xb9, 0xcc,
-	0xd6, 0x4e, 0xb3, 0x4d, 0x47, 0xbf, 0x50, 0xb9, 0xab, 0xb1, 0x66, 0x72, 0x58, 0xfe, 0x1e, 0xbc,
-	0xe3, 0x92, 0xdb, 0xb2, 0x4d, 0x83, 0x3d, 0x9a, 0x6b, 0x89, 0x0b, 0x8a, 0xcb, 0x27, 0xc4, 0xe1,
-	0x61, 0x74, 0xe1, 0x26, 0x59, 0xd7, 0xfe, 0x0c, 0xc6, 0x5d, 0xf8, 0x57, 0xda, 0x45, 0xb9, 0x48,
-	0x45, 0x6c, 0x95, 0x19, 0x4f, 0x3f, 0x76, 0x7d, 0xf4, 0xb9, 0xeb, 0xa3, 0xaf, 0x5d, 0x1f, 0xc1,
-	0x95, 0x54, 0x15, 0x55, 0x1b, 0xb5, 0xd9, 0x9e, 0xee, 0xfe, 0x5c, 0x2f, 0xe8, 0xb2, 0xe1, 0xfe,
-	0x6e, 0xf4, 0x1d, 0x00, 0x00, 0xff, 0xff, 0xae, 0x0a, 0x0b, 0x3a, 0x3b, 0x02, 0x00, 0x00,
-}

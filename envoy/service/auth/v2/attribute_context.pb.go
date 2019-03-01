@@ -3,13 +3,16 @@
 
 package v2
 
-import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-import types "github.com/gogo/protobuf/types"
+import (
+	fmt "fmt"
+	io "io"
+	math "math"
 
-import io "io"
+	proto "github.com/gogo/protobuf/proto"
+	types "github.com/gogo/protobuf/types"
+
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -53,7 +56,7 @@ func (m *AttributeContext) Reset()         { *m = AttributeContext{} }
 func (m *AttributeContext) String() string { return proto.CompactTextString(m) }
 func (*AttributeContext) ProtoMessage()    {}
 func (*AttributeContext) Descriptor() ([]byte, []int) {
-	return fileDescriptor_attribute_context_149886b9675786bf, []int{0}
+	return fileDescriptor_a6030c9468e3591b, []int{0}
 }
 func (m *AttributeContext) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -70,8 +73,8 @@ func (m *AttributeContext) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (dst *AttributeContext) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttributeContext.Merge(dst, src)
+func (m *AttributeContext) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AttributeContext.Merge(m, src)
 }
 func (m *AttributeContext) XXX_Size() int {
 	return m.Size()
@@ -147,7 +150,7 @@ func (m *AttributeContext_Peer) Reset()         { *m = AttributeContext_Peer{} }
 func (m *AttributeContext_Peer) String() string { return proto.CompactTextString(m) }
 func (*AttributeContext_Peer) ProtoMessage()    {}
 func (*AttributeContext_Peer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_attribute_context_149886b9675786bf, []int{0, 0}
+	return fileDescriptor_a6030c9468e3591b, []int{0, 0}
 }
 func (m *AttributeContext_Peer) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -164,8 +167,8 @@ func (m *AttributeContext_Peer) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (dst *AttributeContext_Peer) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttributeContext_Peer.Merge(dst, src)
+func (m *AttributeContext_Peer) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AttributeContext_Peer.Merge(m, src)
 }
 func (m *AttributeContext_Peer) XXX_Size() int {
 	return m.Size()
@@ -219,7 +222,7 @@ func (m *AttributeContext_Request) Reset()         { *m = AttributeContext_Reque
 func (m *AttributeContext_Request) String() string { return proto.CompactTextString(m) }
 func (*AttributeContext_Request) ProtoMessage()    {}
 func (*AttributeContext_Request) Descriptor() ([]byte, []int) {
-	return fileDescriptor_attribute_context_149886b9675786bf, []int{0, 1}
+	return fileDescriptor_a6030c9468e3591b, []int{0, 1}
 }
 func (m *AttributeContext_Request) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -236,8 +239,8 @@ func (m *AttributeContext_Request) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (dst *AttributeContext_Request) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttributeContext_Request.Merge(dst, src)
+func (m *AttributeContext_Request) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AttributeContext_Request.Merge(m, src)
 }
 func (m *AttributeContext_Request) XXX_Size() int {
 	return m.Size()
@@ -301,7 +304,7 @@ func (m *AttributeContext_HttpRequest) Reset()         { *m = AttributeContext_H
 func (m *AttributeContext_HttpRequest) String() string { return proto.CompactTextString(m) }
 func (*AttributeContext_HttpRequest) ProtoMessage()    {}
 func (*AttributeContext_HttpRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_attribute_context_149886b9675786bf, []int{0, 2}
+	return fileDescriptor_a6030c9468e3591b, []int{0, 2}
 }
 func (m *AttributeContext_HttpRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -318,8 +321,8 @@ func (m *AttributeContext_HttpRequest) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-func (dst *AttributeContext_HttpRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AttributeContext_HttpRequest.Merge(dst, src)
+func (m *AttributeContext_HttpRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AttributeContext_HttpRequest.Merge(m, src)
 }
 func (m *AttributeContext_HttpRequest) XXX_Size() int {
 	return m.Size()
@@ -409,6 +412,53 @@ func init() {
 	proto.RegisterType((*AttributeContext_HttpRequest)(nil), "envoy.service.auth.v2.AttributeContext.HttpRequest")
 	proto.RegisterMapType((map[string]string)(nil), "envoy.service.auth.v2.AttributeContext.HttpRequest.HeadersEntry")
 }
+
+func init() {
+	proto.RegisterFile("envoy/service/auth/v2/attribute_context.proto", fileDescriptor_a6030c9468e3591b)
+}
+
+var fileDescriptor_a6030c9468e3591b = []byte{
+	// 600 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0x96, 0x93, 0x34, 0x69, 0x26, 0x08, 0x95, 0x15, 0xad, 0x56, 0x16, 0x6a, 0x2b, 0xb8, 0xf4,
+	0x00, 0x6b, 0x29, 0xe5, 0x50, 0x7a, 0x40, 0xb4, 0xb4, 0xa2, 0x20, 0x84, 0x22, 0x8b, 0x13, 0x97,
+	0x6a, 0x63, 0x4f, 0xeb, 0x15, 0x89, 0xd7, 0xdd, 0x5d, 0x47, 0x0d, 0x37, 0x78, 0x15, 0x5e, 0x86,
+	0x23, 0x8f, 0x80, 0xfa, 0x02, 0xbc, 0x02, 0xda, 0x1f, 0x97, 0xa8, 0xea, 0xa1, 0xe9, 0x29, 0x3b,
+	0x93, 0x6f, 0xbe, 0xf9, 0xe6, 0x9b, 0x31, 0xbc, 0xc0, 0x72, 0x26, 0xe7, 0x89, 0x46, 0x35, 0x13,
+	0x19, 0x26, 0xbc, 0x36, 0x45, 0x32, 0x1b, 0x26, 0xdc, 0x18, 0x25, 0xc6, 0xb5, 0xc1, 0xd3, 0x4c,
+	0x96, 0x06, 0x2f, 0x0d, 0xab, 0x94, 0x34, 0x92, 0xac, 0x3b, 0x38, 0x0b, 0x70, 0x66, 0xe1, 0x6c,
+	0x36, 0x8c, 0xb7, 0x3c, 0x0b, 0xaf, 0x84, 0x2d, 0xce, 0xa4, 0xc2, 0x84, 0xe7, 0xb9, 0x42, 0xad,
+	0x7d, 0x5d, 0xbc, 0x75, 0x2e, 0xe5, 0xf9, 0x04, 0x13, 0x17, 0x8d, 0xeb, 0xb3, 0xc4, 0x88, 0x29,
+	0x6a, 0xc3, 0xa7, 0x95, 0x07, 0x3c, 0xfd, 0xd9, 0x87, 0xb5, 0x83, 0xa6, 0xe9, 0x5b, 0xdf, 0x93,
+	0x1c, 0x41, 0x57, 0xcb, 0x5a, 0x65, 0x48, 0xa3, 0xed, 0x68, 0x67, 0x30, 0x7c, 0xce, 0x6e, 0x6d,
+	0xcf, 0x6e, 0x16, 0xb2, 0x11, 0xa2, 0x4a, 0x43, 0x2d, 0xf9, 0x04, 0x83, 0x1c, 0xb5, 0x11, 0x25,
+	0x37, 0x42, 0x96, 0xb4, 0x75, 0x0f, 0xaa, 0x45, 0x02, 0xf2, 0x1e, 0x7a, 0x0a, 0x2f, 0x6a, 0xd4,
+	0x86, 0x76, 0x1c, 0x57, 0x72, 0x57, 0xae, 0xd4, 0x97, 0xa5, 0x4d, 0x3d, 0x99, 0x02, 0x09, 0xfe,
+	0x9e, 0xe2, 0xa5, 0xc1, 0x52, 0x0b, 0x59, 0x6a, 0x0a, 0xdb, 0xed, 0x9d, 0xc1, 0xf0, 0xf5, 0x5d,
+	0x59, 0xc3, 0xef, 0xf1, 0x35, 0xc1, 0x71, 0x69, 0xd4, 0x3c, 0x7d, 0x94, 0xdd, 0xcc, 0xc7, 0xdf,
+	0x5b, 0xd0, 0xb1, 0xf3, 0x90, 0x97, 0xd0, 0x0b, 0xfb, 0x09, 0xce, 0xc6, 0xa1, 0x19, 0xaf, 0x84,
+	0xed, 0x61, 0x37, 0xc8, 0x0e, 0x3c, 0x22, 0x6d, 0xa0, 0x84, 0x42, 0x2f, 0x88, 0x71, 0x26, 0xf6,
+	0xd3, 0x26, 0x24, 0x23, 0xe8, 0x4e, 0xf8, 0x18, 0x27, 0x9a, 0xb6, 0x9d, 0xf6, 0xbd, 0x65, 0xdc,
+	0x65, 0x1f, 0x5d, 0xa9, 0x57, 0x1d, 0x78, 0xc8, 0x13, 0xe8, 0x57, 0x4a, 0x94, 0x99, 0xa8, 0xf8,
+	0xc4, 0xd9, 0xdc, 0x4f, 0xff, 0x27, 0xe2, 0x57, 0x30, 0x58, 0x28, 0x22, 0x6b, 0xd0, 0xfe, 0x8a,
+	0x73, 0x37, 0x4a, 0x3f, 0xb5, 0x4f, 0xf2, 0x18, 0x56, 0x66, 0x7c, 0x52, 0x37, 0x42, 0x7d, 0xb0,
+	0xdf, 0xda, 0x8b, 0xe2, 0x1f, 0x11, 0xf4, 0xc2, 0x1e, 0x08, 0x83, 0x8e, 0xbd, 0xc3, 0x6b, 0x0f,
+	0xfc, 0x91, 0xb2, 0xe6, 0x48, 0xd9, 0xe7, 0xe6, 0x48, 0x53, 0x87, 0x23, 0xef, 0xa0, 0x53, 0x18,
+	0x53, 0x85, 0x13, 0xda, 0xbd, 0xeb, 0x90, 0x27, 0xc6, 0x54, 0xcd, 0xea, 0x1d, 0x41, 0xfc, 0xb7,
+	0x05, 0x83, 0x85, 0x2c, 0x79, 0x08, 0x2d, 0x91, 0x07, 0xfd, 0x2d, 0x91, 0x93, 0x0d, 0xe8, 0x4e,
+	0xd1, 0x14, 0x32, 0x0f, 0xfa, 0x43, 0x44, 0xbe, 0x40, 0xaf, 0x40, 0x9e, 0xa3, 0x6a, 0x8c, 0x7e,
+	0x73, 0x0f, 0x0d, 0xec, 0xc4, 0x53, 0x78, 0xc3, 0x1b, 0x42, 0x42, 0xa0, 0x53, 0x71, 0x53, 0x04,
+	0xb3, 0xdd, 0xdb, 0xe6, 0x0a, 0xa9, 0x0d, 0x5d, 0xf1, 0x39, 0xfb, 0xb6, 0xda, 0x74, 0x56, 0xe0,
+	0x14, 0x69, 0xd7, 0x6b, 0xf3, 0x91, 0xb5, 0xfc, 0xa2, 0x46, 0x35, 0xa7, 0x3d, 0x6f, 0xb9, 0x0b,
+	0x48, 0x0c, 0xab, 0x67, 0x8a, 0x9f, 0x4f, 0xb1, 0x34, 0x74, 0xd5, 0xfd, 0x71, 0x1d, 0x5b, 0x76,
+	0x2d, 0xbe, 0x21, 0xed, 0x6f, 0x47, 0x3b, 0xed, 0xd4, 0xbd, 0x2d, 0xde, 0xd9, 0x9f, 0xc9, 0x09,
+	0x05, 0x8f, 0x6f, 0xe2, 0x78, 0x1f, 0x1e, 0x2c, 0x4a, 0x5f, 0x6a, 0xed, 0x47, 0xb0, 0x71, 0xfb,
+	0x77, 0xb2, 0x0c, 0xcb, 0xe1, 0x87, 0x5f, 0x57, 0x9b, 0xd1, 0xef, 0xab, 0xcd, 0xe8, 0xcf, 0xd5,
+	0x66, 0x04, 0xcf, 0x84, 0xf4, 0xf6, 0x57, 0x4a, 0x5e, 0xce, 0x6f, 0xdf, 0xc4, 0xe1, 0xfa, 0xcd,
+	0x55, 0x8c, 0xec, 0x38, 0xa3, 0x68, 0xdc, 0x75, 0x73, 0xed, 0xfe, 0x0b, 0x00, 0x00, 0xff, 0xff,
+	0x08, 0xa2, 0x2a, 0x34, 0x82, 0x05, 0x00, 0x00,
+}
+
 func (m *AttributeContext) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -845,7 +895,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -873,7 +923,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -882,6 +932,9 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -906,7 +959,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -915,6 +968,9 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -939,7 +995,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -948,6 +1004,9 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -972,7 +1031,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -981,6 +1040,9 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1001,7 +1063,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
+					wire |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -1018,7 +1080,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						stringLenmapkey |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1028,6 +1090,9 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthAttributeContext
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthAttributeContext
+					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1044,7 +1109,7 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						stringLenmapvalue |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1054,6 +1119,9 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthAttributeContext
 					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthAttributeContext
+					}
 					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1085,6 +1153,9 @@ func (m *AttributeContext) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthAttributeContext
 			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1113,7 +1184,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1141,7 +1212,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1150,6 +1221,9 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1174,7 +1248,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1184,6 +1258,9 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1203,7 +1280,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1212,6 +1289,9 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1232,7 +1312,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
+					wire |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -1249,7 +1329,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						stringLenmapkey |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1259,6 +1339,9 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthAttributeContext
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthAttributeContext
+					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1275,7 +1358,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						stringLenmapvalue |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1285,6 +1368,9 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthAttributeContext
 					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthAttributeContext
+					}
 					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1321,7 +1407,7 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1331,6 +1417,9 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1343,6 +1432,9 @@ func (m *AttributeContext_Peer) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthAttributeContext
 			}
 			if (iNdEx + skippy) > l {
@@ -1373,7 +1465,7 @@ func (m *AttributeContext_Request) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1401,7 +1493,7 @@ func (m *AttributeContext_Request) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1410,6 +1502,9 @@ func (m *AttributeContext_Request) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1434,7 +1529,7 @@ func (m *AttributeContext_Request) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1443,6 +1538,9 @@ func (m *AttributeContext_Request) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1460,6 +1558,9 @@ func (m *AttributeContext_Request) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthAttributeContext
 			}
 			if (iNdEx + skippy) > l {
@@ -1490,7 +1591,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1518,7 +1619,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1528,6 +1629,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1547,7 +1651,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1557,6 +1661,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1576,7 +1683,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1585,6 +1692,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1605,7 +1715,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= (uint64(b) & 0x7F) << shift
+					wire |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -1622,7 +1732,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= (uint64(b) & 0x7F) << shift
+						stringLenmapkey |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1632,6 +1742,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthAttributeContext
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthAttributeContext
+					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1648,7 +1761,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+						stringLenmapvalue |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1658,6 +1771,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthAttributeContext
 					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthAttributeContext
+					}
 					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1694,7 +1810,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1704,6 +1820,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1723,7 +1842,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1733,6 +1852,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1752,7 +1874,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1762,6 +1884,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1781,7 +1906,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1791,6 +1916,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1810,7 +1938,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1820,6 +1948,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1839,7 +1970,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Size_ |= (int64(b) & 0x7F) << shift
+				m.Size_ |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1858,7 +1989,7 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1868,6 +1999,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthAttributeContext
 			}
 			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1880,6 +2014,9 @@ func (m *AttributeContext_HttpRequest) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			if skippy < 0 {
+				return ErrInvalidLengthAttributeContext
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthAttributeContext
 			}
 			if (iNdEx + skippy) > l {
@@ -1949,8 +2086,11 @@ func skipAttributeContext(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthAttributeContext
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthAttributeContext
 			}
 			return iNdEx, nil
@@ -1981,6 +2121,9 @@ func skipAttributeContext(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthAttributeContext
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1999,48 +2142,3 @@ var (
 	ErrInvalidLengthAttributeContext = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowAttributeContext   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() {
-	proto.RegisterFile("envoy/service/auth/v2/attribute_context.proto", fileDescriptor_attribute_context_149886b9675786bf)
-}
-
-var fileDescriptor_attribute_context_149886b9675786bf = []byte{
-	// 591 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0x96, 0x93, 0x34, 0x69, 0x26, 0x08, 0x95, 0x15, 0x54, 0x2b, 0x0b, 0xb5, 0x15, 0x5c, 0x7a,
-	0x80, 0xb5, 0x48, 0x39, 0x94, 0x1e, 0x10, 0x85, 0x56, 0x14, 0x09, 0xa1, 0xca, 0xe2, 0xc4, 0xa5,
-	0xda, 0xd8, 0xd3, 0x7a, 0x45, 0xec, 0x75, 0x77, 0xd7, 0x51, 0xc3, 0x0d, 0x5e, 0x85, 0x97, 0xe1,
-	0xc8, 0x23, 0xa0, 0xbe, 0x00, 0xaf, 0x80, 0xf6, 0xc7, 0x25, 0xaa, 0x7a, 0x68, 0x7a, 0xca, 0xcc,
-	0xe4, 0x9b, 0x6f, 0xbe, 0xfd, 0x66, 0x0c, 0xcf, 0xb1, 0x9a, 0xc9, 0x79, 0xa2, 0x51, 0xcd, 0x44,
-	0x86, 0x09, 0x6f, 0x4c, 0x91, 0xcc, 0xc6, 0x09, 0x37, 0x46, 0x89, 0x49, 0x63, 0xf0, 0x24, 0x93,
-	0x95, 0xc1, 0x0b, 0xc3, 0x6a, 0x25, 0x8d, 0x24, 0x8f, 0x1c, 0x9c, 0x05, 0x38, 0xb3, 0x70, 0x36,
-	0x1b, 0xc7, 0x9b, 0x9e, 0x85, 0xd7, 0xc2, 0x36, 0x67, 0x52, 0x61, 0xc2, 0xf3, 0x5c, 0xa1, 0xd6,
-	0xbe, 0x2f, 0xde, 0x3c, 0x93, 0xf2, 0x6c, 0x8a, 0x89, 0xcb, 0x26, 0xcd, 0x69, 0x62, 0x44, 0x89,
-	0xda, 0xf0, 0xb2, 0xf6, 0x80, 0x27, 0x3f, 0x87, 0xb0, 0xb6, 0xdf, 0x0e, 0x7d, 0xe7, 0x67, 0x92,
-	0x03, 0xe8, 0x6b, 0xd9, 0xa8, 0x0c, 0x69, 0xb4, 0x15, 0x6d, 0x8f, 0xc6, 0xcf, 0xd8, 0x8d, 0xe3,
-	0xd9, 0xf5, 0x46, 0x76, 0x8c, 0xa8, 0xd2, 0xd0, 0x4b, 0x3e, 0xc1, 0x28, 0x47, 0x6d, 0x44, 0xc5,
-	0x8d, 0x90, 0x15, 0xed, 0xdc, 0x81, 0x6a, 0x91, 0x80, 0x7c, 0x80, 0x81, 0xc2, 0xf3, 0x06, 0xb5,
-	0xa1, 0x3d, 0xc7, 0x95, 0xdc, 0x96, 0x2b, 0xf5, 0x6d, 0x69, 0xdb, 0x4f, 0x4a, 0x20, 0xc1, 0xdf,
-	0x13, 0xbc, 0x30, 0x58, 0x69, 0x21, 0x2b, 0x4d, 0x61, 0xab, 0xbb, 0x3d, 0x1a, 0xbf, 0xbe, 0x2d,
-	0x6b, 0xf8, 0x3d, 0xbc, 0x22, 0x38, 0xac, 0x8c, 0x9a, 0xa7, 0x0f, 0xb2, 0xeb, 0xf5, 0xf8, 0x7b,
-	0x07, 0x7a, 0xf6, 0x3d, 0xe4, 0x25, 0x0c, 0xc2, 0x7e, 0x82, 0xb3, 0x71, 0x18, 0xc6, 0x6b, 0x61,
-	0x67, 0xd8, 0x0d, 0xb2, 0x7d, 0x8f, 0x48, 0x5b, 0x28, 0xa1, 0x30, 0x08, 0x62, 0x9c, 0x89, 0xc3,
-	0xb4, 0x4d, 0xc9, 0x31, 0xf4, 0xa7, 0x7c, 0x82, 0x53, 0x4d, 0xbb, 0x4e, 0xfb, 0xee, 0x32, 0xee,
-	0xb2, 0x8f, 0xae, 0xd5, 0xab, 0x0e, 0x3c, 0xe4, 0x31, 0x0c, 0x6b, 0x25, 0xaa, 0x4c, 0xd4, 0x7c,
-	0xea, 0x6c, 0x1e, 0xa6, 0xff, 0x0b, 0xf1, 0x2b, 0x18, 0x2d, 0x34, 0x91, 0x35, 0xe8, 0x7e, 0xc5,
-	0xb9, 0x7b, 0xca, 0x30, 0xb5, 0x21, 0x79, 0x08, 0x2b, 0x33, 0x3e, 0x6d, 0x5a, 0xa1, 0x3e, 0xd9,
-	0xeb, 0xec, 0x46, 0xf1, 0x8f, 0x08, 0x06, 0x61, 0x0f, 0x84, 0x41, 0xcf, 0xde, 0xe1, 0x95, 0x07,
-	0xfe, 0x48, 0x59, 0x7b, 0xa4, 0xec, 0x73, 0x7b, 0xa4, 0xa9, 0xc3, 0x91, 0xf7, 0xd0, 0x2b, 0x8c,
-	0xa9, 0xc3, 0x09, 0xed, 0xdc, 0xf6, 0x91, 0x47, 0xc6, 0xd4, 0xed, 0xea, 0x1d, 0x41, 0xfc, 0xb7,
-	0x03, 0xa3, 0x85, 0x2a, 0xb9, 0x0f, 0x1d, 0x91, 0x07, 0xfd, 0x1d, 0x91, 0x93, 0x75, 0xe8, 0x97,
-	0x68, 0x0a, 0x99, 0x07, 0xfd, 0x21, 0x23, 0x5f, 0x60, 0x50, 0x20, 0xcf, 0x51, 0xb5, 0x46, 0xbf,
-	0xb9, 0x83, 0x06, 0x76, 0xe4, 0x29, 0xbc, 0xe1, 0x2d, 0x21, 0x21, 0xd0, 0xab, 0xb9, 0x29, 0x82,
-	0xd9, 0x2e, 0xb6, 0xb5, 0x42, 0x6a, 0x43, 0x57, 0x7c, 0xcd, 0xc6, 0x56, 0x9b, 0xce, 0x0a, 0x2c,
-	0x91, 0xf6, 0xbd, 0x36, 0x9f, 0x59, 0xcb, 0xcf, 0x1b, 0x54, 0x73, 0x3a, 0xf0, 0x96, 0xbb, 0x84,
-	0xc4, 0xb0, 0x7a, 0xaa, 0xf8, 0x59, 0x89, 0x95, 0xa1, 0xab, 0xee, 0x8f, 0xab, 0xdc, 0xb2, 0x6b,
-	0xf1, 0x0d, 0xe9, 0x70, 0x2b, 0xda, 0xee, 0xa6, 0x2e, 0xb6, 0x78, 0x67, 0x7f, 0x26, 0xa7, 0x14,
-	0x3c, 0xbe, 0xcd, 0xe3, 0x3d, 0xb8, 0xb7, 0x28, 0x7d, 0xa9, 0xb5, 0x1f, 0xc0, 0xfa, 0xcd, 0xdf,
-	0xc9, 0x32, 0x2c, 0x6f, 0x5f, 0xfc, 0xba, 0xdc, 0x88, 0x7e, 0x5f, 0x6e, 0x44, 0x7f, 0x2e, 0x37,
-	0x22, 0x78, 0x2a, 0xa4, 0xb7, 0xbf, 0x56, 0xf2, 0x62, 0x7e, 0xf3, 0x26, 0x26, 0x7d, 0x27, 0x7f,
-	0xe7, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x71, 0xb8, 0xcb, 0xc2, 0x69, 0x05, 0x00, 0x00,
-}

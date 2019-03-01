@@ -56,6 +56,18 @@ func (m *BufferedTraceWrapper) Validate() error {
 			}
 		}
 
+	case *BufferedTraceWrapper_SocketBufferedTrace:
+
+		if v, ok := interface{}(m.GetSocketBufferedTrace()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BufferedTraceWrapperValidationError{
+					Field:  "SocketBufferedTrace",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
 	default:
 		return BufferedTraceWrapperValidationError{
 			Field:  "Trace",

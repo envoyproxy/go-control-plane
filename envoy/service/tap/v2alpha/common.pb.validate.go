@@ -164,24 +164,48 @@ func (m *MatchPredicate) Validate() error {
 			}
 		}
 
-	case *MatchPredicate_HttpRequestMatch:
+	case *MatchPredicate_HttpRequestHeadersMatch:
 
-		if v, ok := interface{}(m.GetHttpRequestMatch()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHttpRequestHeadersMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
-					Field:  "HttpRequestMatch",
+					Field:  "HttpRequestHeadersMatch",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
 			}
 		}
 
-	case *MatchPredicate_HttpResponseMatch:
+	case *MatchPredicate_HttpRequestTrailersMatch:
 
-		if v, ok := interface{}(m.GetHttpResponseMatch()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHttpRequestTrailersMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
-					Field:  "HttpResponseMatch",
+					Field:  "HttpRequestTrailersMatch",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *MatchPredicate_HttpResponseHeadersMatch:
+
+		if v, ok := interface{}(m.GetHttpResponseHeadersMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MatchPredicateValidationError{
+					Field:  "HttpResponseHeadersMatch",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *MatchPredicate_HttpResponseTrailersMatch:
+
+		if v, ok := interface{}(m.GetHttpResponseTrailersMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MatchPredicateValidationError{
+					Field:  "HttpResponseTrailersMatch",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
@@ -230,10 +254,10 @@ func (e MatchPredicateValidationError) Error() string {
 
 var _ error = MatchPredicateValidationError{}
 
-// Validate checks the field values on HttpRequestMatch with the rules defined
+// Validate checks the field values on HttpHeadersMatch with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
-func (m *HttpRequestMatch) Validate() error {
+func (m *HttpHeadersMatch) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -243,7 +267,7 @@ func (m *HttpRequestMatch) Validate() error {
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return HttpRequestMatchValidationError{
+				return HttpHeadersMatchValidationError{
 					Field:  fmt.Sprintf("Headers[%v]", idx),
 					Reason: "embedded message failed validation",
 					Cause:  err,
@@ -256,9 +280,9 @@ func (m *HttpRequestMatch) Validate() error {
 	return nil
 }
 
-// HttpRequestMatchValidationError is the validation error returned by
-// HttpRequestMatch.Validate if the designated constraints aren't met.
-type HttpRequestMatchValidationError struct {
+// HttpHeadersMatchValidationError is the validation error returned by
+// HttpHeadersMatch.Validate if the designated constraints aren't met.
+type HttpHeadersMatchValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -266,7 +290,7 @@ type HttpRequestMatchValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e HttpRequestMatchValidationError) Error() string {
+func (e HttpHeadersMatchValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -278,71 +302,14 @@ func (e HttpRequestMatchValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sHttpRequestMatch.%s: %s%s",
+		"invalid %sHttpHeadersMatch.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = HttpRequestMatchValidationError{}
-
-// Validate checks the field values on HttpResponseMatch with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
-func (m *HttpResponseMatch) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	for idx, item := range m.GetHeaders() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return HttpResponseMatchValidationError{
-					Field:  fmt.Sprintf("Headers[%v]", idx),
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// HttpResponseMatchValidationError is the validation error returned by
-// HttpResponseMatch.Validate if the designated constraints aren't met.
-type HttpResponseMatchValidationError struct {
-	Field  string
-	Reason string
-	Cause  error
-	Key    bool
-}
-
-// Error satisfies the builtin error interface
-func (e HttpResponseMatchValidationError) Error() string {
-	cause := ""
-	if e.Cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
-	}
-
-	key := ""
-	if e.Key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sHttpResponseMatch.%s: %s%s",
-		key,
-		e.Field,
-		e.Reason,
-		cause)
-}
-
-var _ error = HttpResponseMatchValidationError{}
+var _ error = HttpHeadersMatchValidationError{}
 
 // Validate checks the field values on OutputConfig with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -372,6 +339,26 @@ func (m *OutputConfig) Validate() error {
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetMaxBufferedRxBytes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OutputConfigValidationError{
+				Field:  "MaxBufferedRxBytes",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMaxBufferedTxBytes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OutputConfigValidationError{
+				Field:  "MaxBufferedTxBytes",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
 	}
 
 	return nil
@@ -415,6 +402,13 @@ func (m *OutputSink) Validate() error {
 		return nil
 	}
 
+	if _, ok := OutputSink_Format_name[int32(m.GetFormat())]; !ok {
+		return OutputSinkValidationError{
+			Field:  "Format",
+			Reason: "value must be one of the defined enum values",
+		}
+	}
+
 	switch m.OutputSinkType.(type) {
 
 	case *OutputSink_StreamingAdmin:
@@ -423,6 +417,18 @@ func (m *OutputSink) Validate() error {
 			if err := v.Validate(); err != nil {
 				return OutputSinkValidationError{
 					Field:  "StreamingAdmin",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *OutputSink_FilePerTap:
+
+		if v, ok := interface{}(m.GetFilePerTap()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return OutputSinkValidationError{
+					Field:  "FilePerTap",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
@@ -512,6 +518,55 @@ func (e StreamingAdminSinkValidationError) Error() string {
 }
 
 var _ error = StreamingAdminSinkValidationError{}
+
+// Validate checks the field values on FilePerTapSink with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *FilePerTapSink) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetPathPrefix()) < 1 {
+		return FilePerTapSinkValidationError{
+			Field:  "PathPrefix",
+			Reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	return nil
+}
+
+// FilePerTapSinkValidationError is the validation error returned by
+// FilePerTapSink.Validate if the designated constraints aren't met.
+type FilePerTapSinkValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e FilePerTapSinkValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFilePerTapSink.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = FilePerTapSinkValidationError{}
 
 // Validate checks the field values on MatchPredicate_MatchSet with the rules
 // defined in the proto definition for this message. If any rules are

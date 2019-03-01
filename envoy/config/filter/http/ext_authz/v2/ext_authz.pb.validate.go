@@ -43,6 +43,8 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for FailureModeAllow
 
+	// no validation rules for UseAlpha
+
 	switch m.Services.(type) {
 
 	case *ExtAuthz_GrpcService:

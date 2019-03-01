@@ -653,3 +653,47 @@ func (e RuntimeFractionalPercentValidationError) Error() string {
 }
 
 var _ error = RuntimeFractionalPercentValidationError{}
+
+// Validate checks the field values on ControlPlane with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ControlPlane) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Identifier
+
+	return nil
+}
+
+// ControlPlaneValidationError is the validation error returned by
+// ControlPlane.Validate if the designated constraints aren't met.
+type ControlPlaneValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e ControlPlaneValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sControlPlane.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = ControlPlaneValidationError{}

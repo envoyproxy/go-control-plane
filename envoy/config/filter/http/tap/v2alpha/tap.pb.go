@@ -3,13 +3,16 @@
 
 package envoy_config_filter_http_tap_v2alpha
 
-import proto "github.com/gogo/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import _ "github.com/envoyproxy/go-control-plane/envoy/service/tap/v2alpha"
-import _ "github.com/lyft/protoc-gen-validate/validate"
+import (
+	fmt "fmt"
+	io "io"
+	math "math"
 
-import io "io"
+	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/lyft/protoc-gen-validate/validate"
+
+	v2alpha "github.com/envoyproxy/go-control-plane/envoy/config/common/tap/v2alpha"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -24,19 +27,18 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Top level configuration for the tap filter.
 type Tap struct {
-	// Types that are valid to be assigned to ConfigType:
-	//	*Tap_AdminConfig
-	ConfigType           isTap_ConfigType `protobuf_oneof:"config_type"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	// Common configuration for the HTTP tap filter.
+	CommonConfig         *v2alpha.CommonExtensionConfig `protobuf:"bytes,1,opt,name=common_config,json=commonConfig,proto3" json:"common_config,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
+	XXX_unrecognized     []byte                         `json:"-"`
+	XXX_sizecache        int32                          `json:"-"`
 }
 
 func (m *Tap) Reset()         { *m = Tap{} }
 func (m *Tap) String() string { return proto.CompactTextString(m) }
 func (*Tap) ProtoMessage()    {}
 func (*Tap) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tap_1f587736898ecf31, []int{0}
+	return fileDescriptor_ee77d938a401b876, []int{0}
 }
 func (m *Tap) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -53,8 +55,8 @@ func (m *Tap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (dst *Tap) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Tap.Merge(dst, src)
+func (m *Tap) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Tap.Merge(m, src)
 }
 func (m *Tap) XXX_Size() int {
 	return m.Size()
@@ -65,142 +67,40 @@ func (m *Tap) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Tap proto.InternalMessageInfo
 
-type isTap_ConfigType interface {
-	isTap_ConfigType()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type Tap_AdminConfig struct {
-	AdminConfig *AdminConfig `protobuf:"bytes,1,opt,name=admin_config,json=adminConfig,proto3,oneof"`
-}
-
-func (*Tap_AdminConfig) isTap_ConfigType() {}
-
-func (m *Tap) GetConfigType() isTap_ConfigType {
+func (m *Tap) GetCommonConfig() *v2alpha.CommonExtensionConfig {
 	if m != nil {
-		return m.ConfigType
+		return m.CommonConfig
 	}
 	return nil
-}
-
-func (m *Tap) GetAdminConfig() *AdminConfig {
-	if x, ok := m.GetConfigType().(*Tap_AdminConfig); ok {
-		return x.AdminConfig
-	}
-	return nil
-}
-
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Tap) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Tap_OneofMarshaler, _Tap_OneofUnmarshaler, _Tap_OneofSizer, []interface{}{
-		(*Tap_AdminConfig)(nil),
-	}
-}
-
-func _Tap_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Tap)
-	// config_type
-	switch x := m.ConfigType.(type) {
-	case *Tap_AdminConfig:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.AdminConfig); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("Tap.ConfigType has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Tap_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Tap)
-	switch tag {
-	case 1: // config_type.admin_config
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(AdminConfig)
-		err := b.DecodeMessage(msg)
-		m.ConfigType = &Tap_AdminConfig{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Tap_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Tap)
-	// config_type
-	switch x := m.ConfigType.(type) {
-	case *Tap_AdminConfig:
-		s := proto.Size(x.AdminConfig)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
-}
-
-// Configuration for the admin handler. See :ref:`here <config_http_filters_tap_admin_handler>` for
-// more information.
-type AdminConfig struct {
-	// Opaque configuration ID. When requests are made to the admin handler, the passed opaque ID is
-	// matched to the configured filter opaque ID to determine which filter to configure.
-	ConfigId             string   `protobuf:"bytes,1,opt,name=config_id,json=configId,proto3" json:"config_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *AdminConfig) Reset()         { *m = AdminConfig{} }
-func (m *AdminConfig) String() string { return proto.CompactTextString(m) }
-func (*AdminConfig) ProtoMessage()    {}
-func (*AdminConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_tap_1f587736898ecf31, []int{1}
-}
-func (m *AdminConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AdminConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AdminConfig.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (dst *AdminConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AdminConfig.Merge(dst, src)
-}
-func (m *AdminConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *AdminConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_AdminConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AdminConfig proto.InternalMessageInfo
-
-func (m *AdminConfig) GetConfigId() string {
-	if m != nil {
-		return m.ConfigId
-	}
-	return ""
 }
 
 func init() {
 	proto.RegisterType((*Tap)(nil), "envoy.config.filter.http.tap.v2alpha.Tap")
-	proto.RegisterType((*AdminConfig)(nil), "envoy.config.filter.http.tap.v2alpha.AdminConfig")
 }
+
+func init() {
+	proto.RegisterFile("envoy/config/filter/http/tap/v2alpha/tap.proto", fileDescriptor_ee77d938a401b876)
+}
+
+var fileDescriptor_ee77d938a401b876 = []byte{
+	// 229 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xd2, 0x4b, 0xcd, 0x2b, 0xcb,
+	0xaf, 0xd4, 0x4f, 0xce, 0xcf, 0x4b, 0xcb, 0x4c, 0xd7, 0x4f, 0xcb, 0xcc, 0x29, 0x49, 0x2d, 0xd2,
+	0xcf, 0x28, 0x29, 0x29, 0xd0, 0x2f, 0x49, 0x2c, 0xd0, 0x2f, 0x33, 0x4a, 0xcc, 0x29, 0xc8, 0x48,
+	0x04, 0xb1, 0xf5, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x85, 0x54, 0xc0, 0xea, 0xf5, 0x20, 0xea, 0xf5,
+	0x20, 0xea, 0xf5, 0x40, 0xea, 0xf5, 0x40, 0x6a, 0xa0, 0xea, 0xa5, 0x74, 0x50, 0x4c, 0x4d, 0xce,
+	0xcf, 0xcd, 0xcd, 0xcf, 0x43, 0x31, 0x10, 0x22, 0x04, 0x31, 0x53, 0x4a, 0xbc, 0x2c, 0x31, 0x27,
+	0x33, 0x25, 0xb1, 0x24, 0x55, 0x1f, 0xc6, 0x80, 0x48, 0x28, 0xe5, 0x71, 0x31, 0x87, 0x24, 0x16,
+	0x08, 0xa5, 0x73, 0xf1, 0x42, 0xd4, 0xc7, 0x43, 0x0c, 0x94, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x36,
+	0x32, 0xd3, 0x43, 0x71, 0x0b, 0xd4, 0x48, 0x24, 0x67, 0xe8, 0x39, 0x83, 0x85, 0x5c, 0x2b, 0x4a,
+	0x52, 0xf3, 0x8a, 0x33, 0xf3, 0xf3, 0x9c, 0xc1, 0x0a, 0x9d, 0xb8, 0x76, 0xbd, 0x3c, 0xc0, 0xcc,
+	0xda, 0xc5, 0xc8, 0x24, 0xc0, 0x18, 0xc4, 0x03, 0xd1, 0x05, 0x95, 0xf1, 0x39, 0xf1, 0x48, 0x8e,
+	0xf1, 0xc2, 0x23, 0x39, 0xc6, 0x07, 0x8f, 0xe4, 0x18, 0xb9, 0x8c, 0x32, 0xf3, 0x21, 0x36, 0x14,
+	0x14, 0xe5, 0x57, 0x54, 0xea, 0x11, 0xe3, 0x71, 0x27, 0x8e, 0x90, 0xc4, 0x82, 0x00, 0x90, 0xdb,
+	0x03, 0x18, 0x93, 0xd8, 0xc0, 0x9e, 0x30, 0x06, 0x04, 0x00, 0x00, 0xff, 0xff, 0xb6, 0xc6, 0x2c,
+	0x49, 0x63, 0x01, 0x00, 0x00,
+}
+
 func (m *Tap) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -216,53 +116,15 @@ func (m *Tap) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.ConfigType != nil {
-		nn1, err := m.ConfigType.MarshalTo(dAtA[i:])
+	if m.CommonConfig != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintTap(dAtA, i, uint64(m.CommonConfig.Size()))
+		n1, err := m.CommonConfig.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn1
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *Tap_AdminConfig) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	if m.AdminConfig != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintTap(dAtA, i, uint64(m.AdminConfig.Size()))
-		n2, err := m.AdminConfig.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	return i, nil
-}
-func (m *AdminConfig) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AdminConfig) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.ConfigId) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintTap(dAtA, i, uint64(len(m.ConfigId)))
-		i += copy(dAtA[i:], m.ConfigId)
+		i += n1
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -285,35 +147,8 @@ func (m *Tap) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ConfigType != nil {
-		n += m.ConfigType.Size()
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *Tap_AdminConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AdminConfig != nil {
-		l = m.AdminConfig.Size()
-		n += 1 + l + sovTap(uint64(l))
-	}
-	return n
-}
-func (m *AdminConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.ConfigId)
-	if l > 0 {
+	if m.CommonConfig != nil {
+		l = m.CommonConfig.Size()
 		n += 1 + l + sovTap(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -350,7 +185,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
+			wire |= uint64(b&0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -366,7 +201,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AdminConfig", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CommonConfig", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -378,7 +213,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -387,14 +222,18 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthTap
 			}
 			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTap
+			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &AdminConfig{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if m.CommonConfig == nil {
+				m.CommonConfig = &v2alpha.CommonExtensionConfig{}
+			}
+			if err := m.CommonConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
-			m.ConfigType = &Tap_AdminConfig{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -405,84 +244,7 @@ func (m *Tap) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthTap
 			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AdminConfig) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTap
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AdminConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AdminConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ConfigId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTap
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTap
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ConfigId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTap(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTap
 			}
 			if (iNdEx + skippy) > l {
@@ -552,8 +314,11 @@ func skipTap(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			iNdEx += length
 			if length < 0 {
+				return 0, ErrInvalidLengthTap
+			}
+			iNdEx += length
+			if iNdEx < 0 {
 				return 0, ErrInvalidLengthTap
 			}
 			return iNdEx, nil
@@ -584,6 +349,9 @@ func skipTap(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
+				if iNdEx < 0 {
+					return 0, ErrInvalidLengthTap
+				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -602,27 +370,3 @@ var (
 	ErrInvalidLengthTap = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowTap   = fmt.Errorf("proto: integer overflow")
 )
-
-func init() {
-	proto.RegisterFile("envoy/config/filter/http/tap/v2alpha/tap.proto", fileDescriptor_tap_1f587736898ecf31)
-}
-
-var fileDescriptor_tap_1f587736898ecf31 = []byte{
-	// 255 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xd2, 0x4b, 0xcd, 0x2b, 0xcb,
-	0xaf, 0xd4, 0x4f, 0xce, 0xcf, 0x4b, 0xcb, 0x4c, 0xd7, 0x4f, 0xcb, 0xcc, 0x29, 0x49, 0x2d, 0xd2,
-	0xcf, 0x28, 0x29, 0x29, 0xd0, 0x2f, 0x49, 0x2c, 0xd0, 0x2f, 0x33, 0x4a, 0xcc, 0x29, 0xc8, 0x48,
-	0x04, 0xb1, 0xf5, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2, 0x85, 0x54, 0xc0, 0xea, 0xf5, 0x20, 0xea, 0xf5,
-	0x20, 0xea, 0xf5, 0x40, 0xea, 0xf5, 0x40, 0x6a, 0xa0, 0xea, 0xa5, 0xd4, 0x20, 0xa6, 0x16, 0xa7,
-	0x16, 0x95, 0x65, 0x26, 0xa7, 0xa2, 0x18, 0x95, 0x9c, 0x9f, 0x9b, 0x9b, 0x9f, 0x07, 0x31, 0x4d,
-	0x4a, 0xbc, 0x2c, 0x31, 0x27, 0x33, 0x25, 0xb1, 0x24, 0x55, 0x1f, 0xc6, 0x80, 0x48, 0x28, 0x15,
-	0x73, 0x31, 0x87, 0x24, 0x16, 0x08, 0x85, 0x71, 0xf1, 0x24, 0xa6, 0xe4, 0x66, 0xe6, 0xc5, 0x43,
-	0xec, 0x93, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x36, 0x32, 0xd4, 0x23, 0xc6, 0x11, 0x7a, 0x8e, 0x20,
-	0x9d, 0xce, 0x60, 0x35, 0x1e, 0x0c, 0x41, 0xdc, 0x89, 0x08, 0xae, 0x93, 0x08, 0x17, 0x37, 0x44,
-	0x73, 0x7c, 0x49, 0x65, 0x41, 0xaa, 0x10, 0xeb, 0x8e, 0x97, 0x07, 0x98, 0x19, 0x95, 0x4c, 0xb9,
-	0xb8, 0x91, 0xf4, 0x08, 0xa9, 0x71, 0x71, 0x42, 0x15, 0x65, 0xa6, 0x80, 0x6d, 0xe6, 0x74, 0xe2,
-	0xdc, 0xf5, 0xf2, 0x00, 0x33, 0x4b, 0x11, 0x93, 0x02, 0x63, 0x10, 0x07, 0x44, 0xce, 0x33, 0xc5,
-	0xc9, 0xe1, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0xe4, 0x32,
-	0xca, 0xcc, 0x87, 0x38, 0xaf, 0xa0, 0x28, 0xbf, 0xa2, 0x92, 0x28, 0x97, 0x26, 0xb1, 0x81, 0x3d,
-	0x6d, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x30, 0x16, 0x0e, 0x36, 0x8d, 0x01, 0x00, 0x00,
-}
