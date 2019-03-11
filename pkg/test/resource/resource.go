@@ -118,9 +118,9 @@ func MakeCluster(mode string, clusterName string) *v2.Cluster {
 	}
 
 	return &v2.Cluster{
-		Name:           clusterName,
-		ConnectTimeout: 5 * time.Second,
-		Type:           v2.Cluster_EDS,
+		Name:                 clusterName,
+		ConnectTimeout:       5 * time.Second,
+		ClusterDiscoveryType: &v2.Cluster_Type{Type: v2.Cluster_EDS},
 		EdsClusterConfig: &v2.Cluster_EdsClusterConfig{
 			EdsConfig: edsSource,
 		},
