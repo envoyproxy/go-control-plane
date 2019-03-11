@@ -5,10 +5,9 @@ package envoy_admin_v2alpha
 
 import (
 	fmt "fmt"
+	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
-
-	proto "github.com/gogo/protobuf/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -24,7 +23,7 @@ const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Proto representation of the internal memory consumption of an Envoy instance. These represent
 // values extracted from an internal TCMalloc instance. For more information, see the section of the
-// docs entitled ["Generic Tcmalloc Status"](http://gperftools.github.io/gperftools/tcmalloc.html).
+// docs entitled ["Generic Tcmalloc Status"](https://gperftools.github.io/gperftools/tcmalloc.html).
 type Memory struct {
 	// The number of bytes allocated by the heap for Envoy. This is an alias for
 	// `generic.current_allocated_bytes`.

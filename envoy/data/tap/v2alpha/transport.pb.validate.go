@@ -41,8 +41,6 @@ func (m *Connection) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Id
-
 	if v, ok := interface{}(m.GetLocalAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ConnectionValidationError{
@@ -141,6 +139,18 @@ func (m *SocketEvent) Validate() error {
 			}
 		}
 
+	case *SocketEvent_Closed_:
+
+		if v, ok := interface{}(m.GetClosed()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SocketEventValidationError{
+					Field:  "Closed",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -177,17 +187,19 @@ func (e SocketEventValidationError) Error() string {
 
 var _ error = SocketEventValidationError{}
 
-// Validate checks the field values on SocketTrace with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *SocketTrace) Validate() error {
+// Validate checks the field values on SocketBufferedTrace with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SocketBufferedTrace) Validate() error {
 	if m == nil {
 		return nil
 	}
 
+	// no validation rules for TraceId
+
 	if v, ok := interface{}(m.GetConnection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return SocketTraceValidationError{
+			return SocketBufferedTraceValidationError{
 				Field:  "Connection",
 				Reason: "embedded message failed validation",
 				Cause:  err,
@@ -200,7 +212,7 @@ func (m *SocketTrace) Validate() error {
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return SocketTraceValidationError{
+				return SocketBufferedTraceValidationError{
 					Field:  fmt.Sprintf("Events[%v]", idx),
 					Reason: "embedded message failed validation",
 					Cause:  err,
@@ -217,9 +229,9 @@ func (m *SocketTrace) Validate() error {
 	return nil
 }
 
-// SocketTraceValidationError is the validation error returned by
-// SocketTrace.Validate if the designated constraints aren't met.
-type SocketTraceValidationError struct {
+// SocketBufferedTraceValidationError is the validation error returned by
+// SocketBufferedTrace.Validate if the designated constraints aren't met.
+type SocketBufferedTraceValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -227,7 +239,7 @@ type SocketTraceValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e SocketTraceValidationError) Error() string {
+func (e SocketBufferedTraceValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -239,14 +251,86 @@ func (e SocketTraceValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sSocketTrace.%s: %s%s",
+		"invalid %sSocketBufferedTrace.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = SocketTraceValidationError{}
+var _ error = SocketBufferedTraceValidationError{}
+
+// Validate checks the field values on SocketStreamedTraceSegment with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SocketStreamedTraceSegment) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for TraceId
+
+	switch m.MessagePiece.(type) {
+
+	case *SocketStreamedTraceSegment_Connection:
+
+		if v, ok := interface{}(m.GetConnection()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SocketStreamedTraceSegmentValidationError{
+					Field:  "Connection",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *SocketStreamedTraceSegment_Event:
+
+		if v, ok := interface{}(m.GetEvent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SocketStreamedTraceSegmentValidationError{
+					Field:  "Event",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// SocketStreamedTraceSegmentValidationError is the validation error returned
+// by SocketStreamedTraceSegment.Validate if the designated constraints aren't met.
+type SocketStreamedTraceSegmentValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e SocketStreamedTraceSegmentValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSocketStreamedTraceSegment.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = SocketStreamedTraceSegmentValidationError{}
 
 // Validate checks the field values on SocketEvent_Read with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -353,3 +437,45 @@ func (e SocketEvent_WriteValidationError) Error() string {
 }
 
 var _ error = SocketEvent_WriteValidationError{}
+
+// Validate checks the field values on SocketEvent_Closed with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SocketEvent_Closed) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// SocketEvent_ClosedValidationError is the validation error returned by
+// SocketEvent_Closed.Validate if the designated constraints aren't met.
+type SocketEvent_ClosedValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e SocketEvent_ClosedValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSocketEvent_Closed.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = SocketEvent_ClosedValidationError{}

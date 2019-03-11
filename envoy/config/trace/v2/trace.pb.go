@@ -5,14 +5,12 @@ package v2
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
-
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -262,7 +260,7 @@ type LightstepConfig struct {
 	// The cluster manager cluster that hosts the LightStep collectors.
 	CollectorCluster string `protobuf:"bytes,1,opt,name=collector_cluster,json=collectorCluster,proto3" json:"collector_cluster,omitempty"`
 	// File containing the access token to the `LightStep
-	// <http://lightstep.com/>`_ API.
+	// <https://lightstep.com/>`_ API.
 	AccessTokenFile      string   `protobuf:"bytes,2,opt,name=access_token_file,json=accessTokenFile,proto3" json:"access_token_file,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

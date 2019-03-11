@@ -327,6 +327,8 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
+	// no validation rules for UpstreamTransportFailureReason
+
 	return nil
 }
 

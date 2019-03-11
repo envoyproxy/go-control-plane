@@ -115,10 +115,10 @@ func (m *HttpConnectionManager) Validate() error {
 
 	if wrapper := m.GetMaxRequestHeadersKb(); wrapper != nil {
 
-		if wrapper.GetValue() > 64 {
+		if wrapper.GetValue() > 96 {
 			return HttpConnectionManagerValidationError{
 				Field:  "MaxRequestHeadersKb",
-				Reason: "value must be less than or equal to 64",
+				Reason: "value must be less than or equal to 96",
 			}
 		}
 
@@ -507,6 +507,8 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for Verbose
 
 	return nil
 }

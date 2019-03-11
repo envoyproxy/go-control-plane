@@ -5,18 +5,16 @@ package v2
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-	time "time"
-
+	ratelimit "github.com/envoyproxy/go-control-plane/envoy/api/v2/ratelimit"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/config/ratelimit/v2"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	_ "github.com/gogo/protobuf/types"
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
-
-	ratelimit "github.com/envoyproxy/go-control-plane/envoy/api/v2/ratelimit"
-	v2 "github.com/envoyproxy/go-control-plane/envoy/config/ratelimit/v2"
+	io "io"
+	math "math"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

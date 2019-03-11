@@ -5,13 +5,11 @@ package v2
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	v2 "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
-
-	v2 "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

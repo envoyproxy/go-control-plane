@@ -6,15 +6,14 @@ package v2
 import (
 	bytes "bytes"
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	rpc "github.com/gogo/googleapis/google/rpc"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 	types "github.com/gogo/protobuf/types"
-
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -78,16 +77,12 @@ func (m *DiscoveryRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *DiscoveryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_DiscoveryRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *DiscoveryRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DiscoveryRequest.Merge(m, src)
@@ -194,16 +189,12 @@ func (m *DiscoveryResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *DiscoveryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_DiscoveryResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *DiscoveryResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DiscoveryResponse.Merge(m, src)
@@ -259,33 +250,32 @@ func (m *DiscoveryResponse) GetControlPlane() *core.ControlPlane {
 	return nil
 }
 
-// IncrementalDiscoveryRequest and IncrementalDiscoveryResponse are used in a
-// new gRPC endpoint for Incremental xDS. The feature is not supported for REST
-// management servers.
+// DeltaDiscoveryRequest and DeltaDiscoveryResponse are used in a new gRPC
+// endpoint for Delta xDS.
 //
-// With Incremental xDS, the IncrementalDiscoveryResponses do not need to
-// include a full snapshot of the tracked resources. Instead
-// IncrementalDiscoveryResponses are a diff to the state of a xDS client.
-// In Incremental XDS there are per resource versions which allows to track
-// state at the resource granularity.
-// An xDS Incremental session is always in the context of a gRPC bidirectional
+// With Delta xDS, the DeltaDiscoveryResponses do not need to include a full
+// snapshot of the tracked resources. Instead, DeltaDiscoveryResponses are a
+// diff to the state of a xDS client.
+// In Delta XDS there are per resource versions, which allow tracking state at
+// the resource granularity.
+// An xDS Delta session is always in the context of a gRPC bidirectional
 // stream. This allows the xDS server to keep track of the state of xDS clients
 // connected to it.
 //
-// In Incremental xDS the nonce field is required and used to pair
-// IncrementalDiscoveryResponse to a IncrementalDiscoveryRequest ACK or NACK.
+// In Delta xDS the nonce field is required and used to pair
+// DeltaDiscoveryResponse to a DeltaDiscoveryRequest ACK or NACK.
 // Optionally, a response message level system_version_info is present for
 // debugging purposes only.
 //
-// IncrementalDiscoveryRequest can be sent in 3 situations:
+// DeltaDiscoveryRequest can be sent in 3 situations:
 //   1. Initial message in a xDS bidirectional gRPC stream.
-//   2. As a ACK or NACK response to a previous IncrementalDiscoveryResponse.
+//   2. As a ACK or NACK response to a previous DeltaDiscoveryResponse.
 //      In this case the response_nonce is set to the nonce value in the Response.
 //      ACK or NACK is determined by the absence or presence of error_detail.
-//   3. Spontaneous IncrementalDiscoveryRequest from the client.
+//   3. Spontaneous DeltaDiscoveryRequest from the client.
 //      This can be done to dynamically add or remove elements from the tracked
 //      resource_names set. In this case response_nonce must be omitted.
-type IncrementalDiscoveryRequest struct {
+type DeltaDiscoveryRequest struct {
 	// The node making the request.
 	Node *core.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
 	// Type of the resource that is being requested, e.g.
@@ -293,32 +283,34 @@ type IncrementalDiscoveryRequest struct {
 	// in requests made via singleton xDS APIs such as CDS, LDS, etc. but is
 	// required for ADS.
 	TypeUrl string `protobuf:"bytes,2,opt,name=type_url,json=typeUrl,proto3" json:"type_url,omitempty"`
-	// IncrementalDiscoveryRequests allow the client to add or remove individual
+	// DeltaDiscoveryRequests allow the client to add or remove individual
 	// resources to the set of tracked resources in the context of a stream.
 	// All resource names in the resource_names_subscribe list are added to the
 	// set of tracked resources and all resource names in the resource_names_unsubscribe
 	// list are removed from the set of tracked resources.
-	// Unlike in non incremental xDS, an empty resource_names_subscribe or
+	// Unlike in state-of-the-world xDS, an empty resource_names_subscribe or
 	// resource_names_unsubscribe list simply means that no resources are to be
 	// added or removed to the resource list.
 	// The xDS server must send updates for all tracked resources but can also
 	// send updates for resources the client has not subscribed to. This behavior
-	// is similar to non incremental xDS.
-	// These two fields can be set for all types of IncrementalDiscoveryRequests
+	// is similar to state-of-the-world xDS.
+	// These two fields can be set for all types of DeltaDiscoveryRequests
 	// (initial, ACK/NACK or spontaneous).
 	//
 	// A list of Resource names to add to the list of tracked resources.
 	ResourceNamesSubscribe []string `protobuf:"bytes,3,rep,name=resource_names_subscribe,json=resourceNamesSubscribe,proto3" json:"resource_names_subscribe,omitempty"`
 	// A list of Resource names to remove from the list of tracked resources.
 	ResourceNamesUnsubscribe []string `protobuf:"bytes,4,rep,name=resource_names_unsubscribe,json=resourceNamesUnsubscribe,proto3" json:"resource_names_unsubscribe,omitempty"`
-	// This map must be populated when the IncrementalDiscoveryRequest is the
-	// first in a stream. The keys are the resources names of the xDS resources
+	// This map must be populated when the DeltaDiscoveryRequest is the
+	// first in a stream (assuming there are any resources - this field's purpose is to enable
+	// a session to continue in a reconnected gRPC stream, and so will not be used in the very
+	// first stream of a session). The keys are the resources names of the xDS resources
 	// known to the xDS client. The values in the map are the associated resource
 	// level version info.
 	InitialResourceVersions map[string]string `protobuf:"bytes,5,rep,name=initial_resource_versions,json=initialResourceVersions,proto3" json:"initial_resource_versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// When the IncrementalDiscoveryRequest is a ACK or NACK message in response
-	// to a previous IncrementalDiscoveryResponse, the response_nonce must be the
-	// nonce in the IncrementalDiscoveryResponse.
+	// When the DeltaDiscoveryRequest is a ACK or NACK message in response
+	// to a previous DeltaDiscoveryResponse, the response_nonce must be the
+	// nonce in the DeltaDiscoveryResponse.
 	// Otherwise response_nonce must be omitted.
 	ResponseNonce string `protobuf:"bytes,6,opt,name=response_nonce,json=responseNonce,proto3" json:"response_nonce,omitempty"`
 	// This is populated when the previous :ref:`DiscoveryResponse <envoy_api_msg_DiscoveryResponse>`
@@ -330,160 +322,152 @@ type IncrementalDiscoveryRequest struct {
 	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *IncrementalDiscoveryRequest) Reset()         { *m = IncrementalDiscoveryRequest{} }
-func (m *IncrementalDiscoveryRequest) String() string { return proto.CompactTextString(m) }
-func (*IncrementalDiscoveryRequest) ProtoMessage()    {}
-func (*IncrementalDiscoveryRequest) Descriptor() ([]byte, []int) {
+func (m *DeltaDiscoveryRequest) Reset()         { *m = DeltaDiscoveryRequest{} }
+func (m *DeltaDiscoveryRequest) String() string { return proto.CompactTextString(m) }
+func (*DeltaDiscoveryRequest) ProtoMessage()    {}
+func (*DeltaDiscoveryRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2c7365e287e5c035, []int{2}
 }
-func (m *IncrementalDiscoveryRequest) XXX_Unmarshal(b []byte) error {
+func (m *DeltaDiscoveryRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *IncrementalDiscoveryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_IncrementalDiscoveryRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+func (m *DeltaDiscoveryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
-func (m *IncrementalDiscoveryRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_IncrementalDiscoveryRequest.Merge(m, src)
+func (m *DeltaDiscoveryRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeltaDiscoveryRequest.Merge(m, src)
 }
-func (m *IncrementalDiscoveryRequest) XXX_Size() int {
+func (m *DeltaDiscoveryRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *IncrementalDiscoveryRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_IncrementalDiscoveryRequest.DiscardUnknown(m)
+func (m *DeltaDiscoveryRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeltaDiscoveryRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_IncrementalDiscoveryRequest proto.InternalMessageInfo
+var xxx_messageInfo_DeltaDiscoveryRequest proto.InternalMessageInfo
 
-func (m *IncrementalDiscoveryRequest) GetNode() *core.Node {
+func (m *DeltaDiscoveryRequest) GetNode() *core.Node {
 	if m != nil {
 		return m.Node
 	}
 	return nil
 }
 
-func (m *IncrementalDiscoveryRequest) GetTypeUrl() string {
+func (m *DeltaDiscoveryRequest) GetTypeUrl() string {
 	if m != nil {
 		return m.TypeUrl
 	}
 	return ""
 }
 
-func (m *IncrementalDiscoveryRequest) GetResourceNamesSubscribe() []string {
+func (m *DeltaDiscoveryRequest) GetResourceNamesSubscribe() []string {
 	if m != nil {
 		return m.ResourceNamesSubscribe
 	}
 	return nil
 }
 
-func (m *IncrementalDiscoveryRequest) GetResourceNamesUnsubscribe() []string {
+func (m *DeltaDiscoveryRequest) GetResourceNamesUnsubscribe() []string {
 	if m != nil {
 		return m.ResourceNamesUnsubscribe
 	}
 	return nil
 }
 
-func (m *IncrementalDiscoveryRequest) GetInitialResourceVersions() map[string]string {
+func (m *DeltaDiscoveryRequest) GetInitialResourceVersions() map[string]string {
 	if m != nil {
 		return m.InitialResourceVersions
 	}
 	return nil
 }
 
-func (m *IncrementalDiscoveryRequest) GetResponseNonce() string {
+func (m *DeltaDiscoveryRequest) GetResponseNonce() string {
 	if m != nil {
 		return m.ResponseNonce
 	}
 	return ""
 }
 
-func (m *IncrementalDiscoveryRequest) GetErrorDetail() *rpc.Status {
+func (m *DeltaDiscoveryRequest) GetErrorDetail() *rpc.Status {
 	if m != nil {
 		return m.ErrorDetail
 	}
 	return nil
 }
 
-type IncrementalDiscoveryResponse struct {
+type DeltaDiscoveryResponse struct {
 	// The version of the response data (used for debugging).
 	SystemVersionInfo string `protobuf:"bytes,1,opt,name=system_version_info,json=systemVersionInfo,proto3" json:"system_version_info,omitempty"`
 	// The response resources. These are typed resources that match the type url
-	// in the IncrementalDiscoveryRequest.
+	// in the DeltaDiscoveryRequest.
 	Resources []Resource `protobuf:"bytes,2,rep,name=resources,proto3" json:"resources"`
 	// Resources names of resources that have be deleted and to be removed from the xDS Client.
 	// Removed resources for missing resources can be ignored.
 	RemovedResources []string `protobuf:"bytes,6,rep,name=removed_resources,json=removedResources,proto3" json:"removed_resources,omitempty"`
-	// The nonce provides a way for IncrementalDiscoveryRequests to uniquely
-	// reference a IncrementalDiscoveryResponse. The nonce is required.
+	// The nonce provides a way for DeltaDiscoveryRequests to uniquely
+	// reference a DeltaDiscoveryResponse. The nonce is required.
 	Nonce                string   `protobuf:"bytes,5,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *IncrementalDiscoveryResponse) Reset()         { *m = IncrementalDiscoveryResponse{} }
-func (m *IncrementalDiscoveryResponse) String() string { return proto.CompactTextString(m) }
-func (*IncrementalDiscoveryResponse) ProtoMessage()    {}
-func (*IncrementalDiscoveryResponse) Descriptor() ([]byte, []int) {
+func (m *DeltaDiscoveryResponse) Reset()         { *m = DeltaDiscoveryResponse{} }
+func (m *DeltaDiscoveryResponse) String() string { return proto.CompactTextString(m) }
+func (*DeltaDiscoveryResponse) ProtoMessage()    {}
+func (*DeltaDiscoveryResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_2c7365e287e5c035, []int{3}
 }
-func (m *IncrementalDiscoveryResponse) XXX_Unmarshal(b []byte) error {
+func (m *DeltaDiscoveryResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *IncrementalDiscoveryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_IncrementalDiscoveryResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+func (m *DeltaDiscoveryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
-func (m *IncrementalDiscoveryResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_IncrementalDiscoveryResponse.Merge(m, src)
+func (m *DeltaDiscoveryResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeltaDiscoveryResponse.Merge(m, src)
 }
-func (m *IncrementalDiscoveryResponse) XXX_Size() int {
+func (m *DeltaDiscoveryResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *IncrementalDiscoveryResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_IncrementalDiscoveryResponse.DiscardUnknown(m)
+func (m *DeltaDiscoveryResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeltaDiscoveryResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_IncrementalDiscoveryResponse proto.InternalMessageInfo
+var xxx_messageInfo_DeltaDiscoveryResponse proto.InternalMessageInfo
 
-func (m *IncrementalDiscoveryResponse) GetSystemVersionInfo() string {
+func (m *DeltaDiscoveryResponse) GetSystemVersionInfo() string {
 	if m != nil {
 		return m.SystemVersionInfo
 	}
 	return ""
 }
 
-func (m *IncrementalDiscoveryResponse) GetResources() []Resource {
+func (m *DeltaDiscoveryResponse) GetResources() []Resource {
 	if m != nil {
 		return m.Resources
 	}
 	return nil
 }
 
-func (m *IncrementalDiscoveryResponse) GetRemovedResources() []string {
+func (m *DeltaDiscoveryResponse) GetRemovedResources() []string {
 	if m != nil {
 		return m.RemovedResources
 	}
 	return nil
 }
 
-func (m *IncrementalDiscoveryResponse) GetNonce() string {
+func (m *DeltaDiscoveryResponse) GetNonce() string {
 	if m != nil {
 		return m.Nonce
 	}
@@ -491,6 +475,8 @@ func (m *IncrementalDiscoveryResponse) GetNonce() string {
 }
 
 type Resource struct {
+	// The resource's name, to distinguish it from others of the same type of resource.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// The resource level version. It allows xDS to track the state of individual
 	// resources.
 	Version string `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
@@ -511,16 +497,12 @@ func (m *Resource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *Resource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Resource.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *Resource) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Resource.Merge(m, src)
@@ -533,6 +515,13 @@ func (m *Resource) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_Resource proto.InternalMessageInfo
+
+func (m *Resource) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
 
 func (m *Resource) GetVersion() string {
 	if m != nil {
@@ -551,59 +540,60 @@ func (m *Resource) GetResource() *types.Any {
 func init() {
 	proto.RegisterType((*DiscoveryRequest)(nil), "envoy.api.v2.DiscoveryRequest")
 	proto.RegisterType((*DiscoveryResponse)(nil), "envoy.api.v2.DiscoveryResponse")
-	proto.RegisterType((*IncrementalDiscoveryRequest)(nil), "envoy.api.v2.IncrementalDiscoveryRequest")
-	proto.RegisterMapType((map[string]string)(nil), "envoy.api.v2.IncrementalDiscoveryRequest.InitialResourceVersionsEntry")
-	proto.RegisterType((*IncrementalDiscoveryResponse)(nil), "envoy.api.v2.IncrementalDiscoveryResponse")
+	proto.RegisterType((*DeltaDiscoveryRequest)(nil), "envoy.api.v2.DeltaDiscoveryRequest")
+	proto.RegisterMapType((map[string]string)(nil), "envoy.api.v2.DeltaDiscoveryRequest.InitialResourceVersionsEntry")
+	proto.RegisterType((*DeltaDiscoveryResponse)(nil), "envoy.api.v2.DeltaDiscoveryResponse")
 	proto.RegisterType((*Resource)(nil), "envoy.api.v2.Resource")
 }
 
 func init() { proto.RegisterFile("envoy/api/v2/discovery.proto", fileDescriptor_2c7365e287e5c035) }
 
 var fileDescriptor_2c7365e287e5c035 = []byte{
-	// 680 bytes of a gzipped FileDescriptorProto
+	// 690 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xcf, 0x6a, 0xdb, 0x4e,
-	0x10, 0xfe, 0xad, 0xed, 0x38, 0xce, 0xda, 0x09, 0xc9, 0xfe, 0x42, 0xa2, 0xb8, 0xc1, 0x71, 0x0d,
-	0x05, 0x43, 0x40, 0x2a, 0x2e, 0x85, 0x10, 0x7a, 0xa9, 0x9b, 0x16, 0xd2, 0x43, 0x08, 0x0a, 0xc9,
-	0xa1, 0x17, 0xb1, 0x96, 0x27, 0x46, 0x54, 0xde, 0x55, 0x77, 0x25, 0x51, 0x5d, 0x73, 0xee, 0x83,
-	0xf4, 0x51, 0x72, 0x29, 0xf4, 0x09, 0x4a, 0xf1, 0x8b, 0xb4, 0x68, 0xb5, 0xb2, 0xad, 0x46, 0x18,
-	0xdf, 0x34, 0x33, 0xdf, 0x7c, 0x3b, 0x7f, 0xbe, 0x11, 0x3e, 0x06, 0x16, 0xf3, 0xc4, 0xa2, 0x81,
-	0x67, 0xc5, 0x03, 0x6b, 0xec, 0x49, 0x97, 0xc7, 0x20, 0x12, 0x33, 0x10, 0x3c, 0xe4, 0xa4, 0xa5,
-	0xa2, 0x26, 0x0d, 0x3c, 0x33, 0x1e, 0xb4, 0x8b, 0x58, 0x97, 0x0b, 0xb0, 0x46, 0x54, 0x42, 0x86,
-	0x6d, 0x1f, 0x4d, 0x38, 0x9f, 0xf8, 0x60, 0x29, 0x6b, 0x14, 0xdd, 0x5b, 0x94, 0x69, 0x9a, 0xf6,
-	0xa1, 0x0e, 0x89, 0xc0, 0xb5, 0x64, 0x48, 0xc3, 0x48, 0xea, 0xc0, 0xfe, 0x84, 0x4f, 0xb8, 0xfa,
-	0xb4, 0xd2, 0xaf, 0xcc, 0xdb, 0x7b, 0xa8, 0xe0, 0xdd, 0x8b, 0xbc, 0x12, 0x1b, 0xbe, 0x44, 0x20,
-	0x43, 0xf2, 0x1c, 0xb7, 0x62, 0x10, 0xd2, 0xe3, 0xcc, 0xf1, 0xd8, 0x3d, 0x37, 0x50, 0x17, 0xf5,
-	0xb7, 0xec, 0xa6, 0xf6, 0x5d, 0xb2, 0x7b, 0x4e, 0x4e, 0x71, 0x8d, 0xf1, 0x31, 0x18, 0x95, 0x2e,
-	0xea, 0x37, 0x07, 0x87, 0xe6, 0x72, 0xf1, 0x66, 0x5a, 0xae, 0x79, 0xc5, 0xc7, 0x60, 0x2b, 0x10,
-	0x79, 0x81, 0x77, 0x04, 0x48, 0x1e, 0x09, 0x17, 0x1c, 0x46, 0xa7, 0x20, 0x8d, 0x6a, 0xb7, 0xda,
-	0xdf, 0xb2, 0xb7, 0x73, 0xef, 0x55, 0xea, 0x24, 0x47, 0xb8, 0x11, 0x26, 0x01, 0x38, 0x91, 0xf0,
-	0x8d, 0x9a, 0x7a, 0x72, 0x33, 0xb5, 0x6f, 0x85, 0xaf, 0x19, 0x02, 0xce, 0x24, 0x38, 0x8c, 0x33,
-	0x17, 0x8c, 0x0d, 0x05, 0xd8, 0xce, 0xbd, 0x57, 0xa9, 0x93, 0xbc, 0xc6, 0x2d, 0x10, 0x82, 0x0b,
-	0x67, 0x0c, 0x21, 0xf5, 0x7c, 0xa3, 0xae, 0xaa, 0x23, 0x66, 0x36, 0x13, 0x53, 0x04, 0xae, 0x79,
-	0xa3, 0x66, 0x62, 0x37, 0x15, 0xee, 0x42, 0xc1, 0x7a, 0x7f, 0x10, 0xde, 0x5b, 0x1a, 0x42, 0xc6,
-	0xb8, 0xce, 0x14, 0xce, 0xf0, 0x56, 0xde, 0x82, 0x34, 0x2a, 0xdd, 0x6a, 0xbf, 0x39, 0xd8, 0xcf,
-	0x1f, 0xcb, 0x77, 0x63, 0xbe, 0x65, 0xc9, 0xb0, 0xf6, 0xf8, 0xeb, 0xe4, 0x3f, 0x7b, 0x01, 0x26,
-	0x07, 0xb8, 0xee, 0x52, 0x46, 0x45, 0x62, 0x54, 0xbb, 0xa8, 0xdf, 0xb0, 0xb5, 0xb5, 0x6a, 0x06,
-	0xfb, 0x78, 0x63, 0xb9, 0xf5, 0xcc, 0x20, 0x17, 0x78, 0xdb, 0xe5, 0x2c, 0x14, 0xdc, 0x77, 0x02,
-	0x9f, 0x32, 0xd0, 0x3d, 0x9f, 0x94, 0x6c, 0xe4, 0x5d, 0x86, 0xbb, 0x4e, 0x61, 0x76, 0xcb, 0x5d,
-	0xb2, 0x7a, 0xdf, 0x6a, 0xf8, 0xd9, 0x25, 0x73, 0x05, 0x4c, 0x81, 0x85, 0xd4, 0x7f, 0xa2, 0x88,
-	0x7c, 0xdd, 0x68, 0x9d, 0x75, 0x2f, 0xf7, 0x50, 0x29, 0xf6, 0x70, 0x86, 0x8d, 0xa2, 0x12, 0x1c,
-	0x19, 0x8d, 0xa4, 0x2b, 0xbc, 0x11, 0x68, 0x4d, 0x1c, 0x14, 0x34, 0x71, 0x93, 0x47, 0xc9, 0x1b,
-	0xdc, 0xfe, 0x27, 0x33, 0x62, 0x8b, 0xdc, 0x9a, 0xca, 0x35, 0x0a, 0xb9, 0xb7, 0x8b, 0x38, 0x79,
-	0x40, 0xf8, 0xc8, 0x63, 0x5e, 0xe8, 0x51, 0xdf, 0x99, 0xd3, 0xe8, 0x4d, 0x4a, 0x63, 0x43, 0x6d,
-	0xee, 0x43, 0xb1, 0xab, 0x15, 0xe3, 0x30, 0x2f, 0x33, 0x2a, 0x5b, 0x33, 0xdd, 0x69, 0xa2, 0xf7,
-	0x2c, 0x14, 0x89, 0x7d, 0xe8, 0x95, 0x47, 0x4b, 0x44, 0x5c, 0x5f, 0x47, 0xc4, 0x9b, 0x6b, 0x89,
-	0xb8, 0xfd, 0x11, 0x1f, 0xaf, 0x2a, 0x8b, 0xec, 0xe2, 0xea, 0x67, 0x48, 0xb4, 0x8a, 0xd3, 0xcf,
-	0x54, 0x50, 0x31, 0xf5, 0x23, 0xd0, 0x4b, 0xca, 0x8c, 0xf3, 0xca, 0x19, 0xea, 0xfd, 0x40, 0x29,
-	0x59, 0x59, 0xff, 0xfa, 0x36, 0x4c, 0xfc, 0xbf, 0x4c, 0x64, 0x08, 0x53, 0xa7, 0xe4, 0x44, 0xf6,
-	0xb2, 0xd0, 0xdd, 0xd2, 0xa1, 0x9c, 0x3f, 0x3d, 0x94, 0x83, 0xe2, 0xb8, 0xf3, 0xa2, 0x9f, 0x9e,
-	0xca, 0x29, 0xde, 0x13, 0x30, 0xe5, 0x31, 0x8c, 0x9d, 0x05, 0x47, 0x5d, 0x2d, 0x7c, 0x57, 0x07,
-	0xec, 0x39, 0xb8, 0xf4, 0x48, 0x7a, 0x77, 0xb8, 0x91, 0x43, 0x88, 0x81, 0x37, 0x75, 0xcd, 0xba,
-	0xdc, 0xdc, 0x24, 0x2f, 0x71, 0x23, 0x7f, 0x40, 0xff, 0xd7, 0x4a, 0x8f, 0xd9, 0x9e, 0xa3, 0x86,
-	0xc3, 0xef, 0xb3, 0x0e, 0x7a, 0x9c, 0x75, 0xd0, 0xcf, 0x59, 0x07, 0xfd, 0x9e, 0x75, 0x10, 0x6e,
-	0x7b, 0x3c, 0xeb, 0x2b, 0x10, 0xfc, 0x6b, 0x52, 0x68, 0x71, 0xb8, 0x33, 0x9f, 0xe3, 0x75, 0x4a,
-	0x77, 0x8d, 0x3e, 0x55, 0xe2, 0xc1, 0xa8, 0xae, 0xb8, 0x5f, 0xfd, 0x0d, 0x00, 0x00, 0xff, 0xff,
-	0x62, 0xba, 0xde, 0xbb, 0x1e, 0x06, 0x00, 0x00,
+	0x10, 0xfe, 0xad, 0xed, 0x38, 0xf6, 0xda, 0x09, 0xc9, 0xfe, 0x52, 0x47, 0x31, 0xc1, 0x71, 0x0d,
+	0x05, 0x43, 0x40, 0x2a, 0x2e, 0x85, 0x10, 0x7a, 0x68, 0x53, 0xb7, 0x90, 0x1e, 0x42, 0x50, 0x48,
+	0x0e, 0xbd, 0x88, 0xb5, 0x3c, 0x31, 0x6a, 0x95, 0x5d, 0x75, 0x57, 0x12, 0x15, 0xf4, 0xd4, 0xa7,
+	0xe9, 0x9b, 0x34, 0xc7, 0x1e, 0x7b, 0x2a, 0xc5, 0x2f, 0x92, 0xa2, 0xd5, 0xca, 0xb6, 0x12, 0x13,
+	0x7c, 0xdb, 0x99, 0xf9, 0xe6, 0xd3, 0xfc, 0xf9, 0x46, 0x78, 0x1f, 0x58, 0xcc, 0x13, 0x8b, 0x06,
+	0x9e, 0x15, 0x0f, 0xac, 0xb1, 0x27, 0x5d, 0x1e, 0x83, 0x48, 0xcc, 0x40, 0xf0, 0x90, 0x93, 0xa6,
+	0x8a, 0x9a, 0x34, 0xf0, 0xcc, 0x78, 0xd0, 0x2e, 0x62, 0x5d, 0x2e, 0xc0, 0x1a, 0x51, 0x09, 0x19,
+	0xb6, 0xbd, 0x37, 0xe1, 0x7c, 0xe2, 0x83, 0xa5, 0xac, 0x51, 0x74, 0x6d, 0x51, 0xa6, 0x69, 0xda,
+	0xbb, 0x3a, 0x24, 0x02, 0xd7, 0x92, 0x21, 0x0d, 0x23, 0xa9, 0x03, 0x3b, 0x13, 0x3e, 0xe1, 0xea,
+	0x69, 0xa5, 0xaf, 0xcc, 0xdb, 0xfb, 0x5e, 0xc2, 0x5b, 0xc3, 0xbc, 0x12, 0x1b, 0xbe, 0x44, 0x20,
+	0x43, 0xf2, 0x14, 0x37, 0x63, 0x10, 0xd2, 0xe3, 0xcc, 0xf1, 0xd8, 0x35, 0x37, 0x50, 0x17, 0xf5,
+	0xeb, 0x76, 0x43, 0xfb, 0x4e, 0xd9, 0x35, 0x27, 0x87, 0xb8, 0xc2, 0xf8, 0x18, 0x8c, 0x52, 0x17,
+	0xf5, 0x1b, 0x83, 0x5d, 0x73, 0xb1, 0x78, 0x33, 0x2d, 0xd7, 0x3c, 0xe3, 0x63, 0xb0, 0x15, 0x88,
+	0x3c, 0xc3, 0x9b, 0x02, 0x24, 0x8f, 0x84, 0x0b, 0x0e, 0xa3, 0x37, 0x20, 0x8d, 0x72, 0xb7, 0xdc,
+	0xaf, 0xdb, 0x1b, 0xb9, 0xf7, 0x2c, 0x75, 0x92, 0x3d, 0x5c, 0x0b, 0x93, 0x00, 0x9c, 0x48, 0xf8,
+	0x46, 0x45, 0x7d, 0x72, 0x3d, 0xb5, 0x2f, 0x85, 0xaf, 0x19, 0x02, 0xce, 0x24, 0x38, 0x8c, 0x33,
+	0x17, 0x8c, 0x35, 0x05, 0xd8, 0xc8, 0xbd, 0x67, 0xa9, 0x93, 0xbc, 0xc4, 0x4d, 0x10, 0x82, 0x0b,
+	0x67, 0x0c, 0x21, 0xf5, 0x7c, 0xa3, 0xaa, 0xaa, 0x23, 0x66, 0x36, 0x13, 0x53, 0x04, 0xae, 0x79,
+	0xa1, 0x66, 0x62, 0x37, 0x14, 0x6e, 0xa8, 0x60, 0xbd, 0x3b, 0x84, 0xb7, 0x17, 0x86, 0x90, 0x31,
+	0xae, 0x32, 0x85, 0x23, 0x5c, 0xcf, 0x5b, 0x90, 0x46, 0xa9, 0x5b, 0xee, 0x37, 0x06, 0x3b, 0xf9,
+	0xc7, 0xf2, 0xdd, 0x98, 0x6f, 0x58, 0x72, 0x52, 0xb9, 0xfd, 0x73, 0xf0, 0x9f, 0x3d, 0x07, 0x93,
+	0x16, 0xae, 0xba, 0x94, 0x51, 0x91, 0x18, 0xe5, 0x2e, 0xea, 0xd7, 0x6c, 0x6d, 0x3d, 0x36, 0x83,
+	0x1d, 0xbc, 0xb6, 0xd8, 0x7a, 0x66, 0x90, 0x21, 0xde, 0x70, 0x39, 0x0b, 0x05, 0xf7, 0x9d, 0xc0,
+	0xa7, 0x0c, 0x74, 0xcf, 0x07, 0x4b, 0x36, 0xf2, 0x36, 0xc3, 0x9d, 0xa7, 0x30, 0xbb, 0xe9, 0x2e,
+	0x58, 0xbd, 0xbb, 0x32, 0x7e, 0x32, 0x04, 0x3f, 0xa4, 0x0f, 0xb4, 0x90, 0x2f, 0x1a, 0xad, 0xb2,
+	0xe8, 0xc5, 0xea, 0x4b, 0xc5, 0xea, 0x8f, 0xb0, 0x51, 0xd4, 0x80, 0x23, 0xa3, 0x91, 0x74, 0x85,
+	0x37, 0x02, 0xad, 0x86, 0x56, 0x41, 0x0d, 0x17, 0x79, 0x94, 0xbc, 0xc2, 0xed, 0x7b, 0x99, 0x11,
+	0x9b, 0xe7, 0x56, 0x54, 0xae, 0x51, 0xc8, 0xbd, 0x9c, 0xc7, 0xc9, 0x37, 0xbc, 0xe7, 0x31, 0x2f,
+	0xf4, 0xa8, 0xef, 0xcc, 0x58, 0xf4, 0x0a, 0xa5, 0xb1, 0xa6, 0x56, 0xf6, 0xba, 0xd8, 0xd4, 0xd2,
+	0x39, 0x98, 0xa7, 0x19, 0x89, 0xad, 0x39, 0xae, 0x34, 0xc5, 0x3b, 0x16, 0x8a, 0xc4, 0xde, 0xf5,
+	0x96, 0x47, 0x97, 0xe8, 0xb6, 0xba, 0x8a, 0x6e, 0xd7, 0x57, 0xd2, 0x6d, 0xfb, 0x03, 0xde, 0x7f,
+	0xac, 0x2c, 0xb2, 0x85, 0xcb, 0x9f, 0x21, 0xd1, 0xc2, 0x4d, 0x9f, 0xa9, 0x86, 0x62, 0xea, 0x47,
+	0xa0, 0xb7, 0x93, 0x19, 0xc7, 0xa5, 0x23, 0xd4, 0xfb, 0x89, 0x70, 0xeb, 0x7e, 0xe7, 0xfa, 0x10,
+	0x4c, 0xfc, 0xbf, 0x4c, 0x64, 0x08, 0x37, 0xce, 0x92, 0x7b, 0xd8, 0xce, 0x42, 0x57, 0x0b, 0x57,
+	0x71, 0xfc, 0xf0, 0x2a, 0x5a, 0xc5, 0x11, 0xe7, 0xe5, 0x3e, 0xbc, 0x8b, 0x43, 0xbc, 0x2d, 0xe0,
+	0x86, 0xc7, 0x30, 0x76, 0xe6, 0x1c, 0x55, 0xb5, 0xe3, 0x2d, 0x1d, 0xb0, 0x67, 0xe0, 0xa5, 0x17,
+	0xd1, 0xfb, 0x84, 0x6b, 0x39, 0x84, 0x10, 0x5c, 0x49, 0x25, 0xa3, 0x8e, 0xac, 0x6e, 0xab, 0x37,
+	0x31, 0xf0, 0xba, 0xee, 0x43, 0xb7, 0x90, 0x9b, 0xe4, 0x39, 0xae, 0xe5, 0x1f, 0xd5, 0x3f, 0xb6,
+	0xa5, 0xd7, 0x6c, 0xcf, 0x50, 0x27, 0xef, 0x7f, 0x4c, 0x3b, 0xe8, 0x76, 0xda, 0x41, 0xbf, 0xa6,
+	0x1d, 0xf4, 0x7b, 0xda, 0x41, 0x7f, 0xa7, 0x1d, 0x84, 0xdb, 0x1e, 0xcf, 0xfa, 0x0d, 0x04, 0xff,
+	0x9a, 0x14, 0x5a, 0x3f, 0xd9, 0x9c, 0xcd, 0xf7, 0x3c, 0xa5, 0x3c, 0x47, 0x1f, 0x4b, 0xf1, 0x60,
+	0x54, 0x55, 0xfc, 0x2f, 0xfe, 0x05, 0x00, 0x00, 0xff, 0xff, 0x6e, 0x65, 0x85, 0x5e, 0x23, 0x06,
+	0x00, 0x00,
 }
 
 func (this *DiscoveryRequest) Equal(that interface{}) bool {
@@ -700,14 +690,14 @@ func (this *DiscoveryResponse) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *IncrementalDiscoveryRequest) Equal(that interface{}) bool {
+func (this *DeltaDiscoveryRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*IncrementalDiscoveryRequest)
+	that1, ok := that.(*DeltaDiscoveryRequest)
 	if !ok {
-		that2, ok := that.(IncrementalDiscoveryRequest)
+		that2, ok := that.(DeltaDiscoveryRequest)
 		if ok {
 			that1 = &that2
 		} else {
@@ -760,14 +750,14 @@ func (this *IncrementalDiscoveryRequest) Equal(that interface{}) bool {
 	}
 	return true
 }
-func (this *IncrementalDiscoveryResponse) Equal(that interface{}) bool {
+func (this *DeltaDiscoveryResponse) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
 	}
 
-	that1, ok := that.(*IncrementalDiscoveryResponse)
+	that1, ok := that.(*DeltaDiscoveryResponse)
 	if !ok {
-		that2, ok := that.(IncrementalDiscoveryResponse)
+		that2, ok := that.(DeltaDiscoveryResponse)
 		if ok {
 			that1 = &that2
 		} else {
@@ -823,6 +813,9 @@ func (this *Resource) Equal(that interface{}) bool {
 	if that1 == nil {
 		return this == nil
 	} else if this == nil {
+		return false
+	}
+	if this.Name != that1.Name {
 		return false
 	}
 	if this.Version != that1.Version {
@@ -981,7 +974,7 @@ func (m *DiscoveryResponse) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *IncrementalDiscoveryRequest) Marshal() (dAtA []byte, err error) {
+func (m *DeltaDiscoveryRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -991,7 +984,7 @@ func (m *IncrementalDiscoveryRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *IncrementalDiscoveryRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *DeltaDiscoveryRequest) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -1043,10 +1036,15 @@ func (m *IncrementalDiscoveryRequest) MarshalTo(dAtA []byte) (int, error) {
 		}
 	}
 	if len(m.InitialResourceVersions) > 0 {
+		keysForInitialResourceVersions := make([]string, 0, len(m.InitialResourceVersions))
 		for k, _ := range m.InitialResourceVersions {
+			keysForInitialResourceVersions = append(keysForInitialResourceVersions, string(k))
+		}
+		github_com_gogo_protobuf_sortkeys.Strings(keysForInitialResourceVersions)
+		for _, k := range keysForInitialResourceVersions {
 			dAtA[i] = 0x2a
 			i++
-			v := m.InitialResourceVersions[k]
+			v := m.InitialResourceVersions[string(k)]
 			mapSize := 1 + len(k) + sovDiscovery(uint64(len(k))) + 1 + len(v) + sovDiscovery(uint64(len(v)))
 			i = encodeVarintDiscovery(dAtA, i, uint64(mapSize))
 			dAtA[i] = 0xa
@@ -1081,7 +1079,7 @@ func (m *IncrementalDiscoveryRequest) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
-func (m *IncrementalDiscoveryResponse) Marshal() (dAtA []byte, err error) {
+func (m *DeltaDiscoveryResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -1091,7 +1089,7 @@ func (m *IncrementalDiscoveryResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *IncrementalDiscoveryResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *DeltaDiscoveryResponse) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -1171,6 +1169,12 @@ func (m *Resource) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n6
+	}
+	if len(m.Name) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintDiscovery(dAtA, i, uint64(len(m.Name)))
+		i += copy(dAtA[i:], m.Name)
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -1262,7 +1266,7 @@ func (m *DiscoveryResponse) Size() (n int) {
 	return n
 }
 
-func (m *IncrementalDiscoveryRequest) Size() (n int) {
+func (m *DeltaDiscoveryRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1310,7 +1314,7 @@ func (m *IncrementalDiscoveryRequest) Size() (n int) {
 	return n
 }
 
-func (m *IncrementalDiscoveryResponse) Size() (n int) {
+func (m *DeltaDiscoveryResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1354,6 +1358,10 @@ func (m *Resource) Size() (n int) {
 	}
 	if m.Resource != nil {
 		l = m.Resource.Size()
+		n += 1 + l + sovDiscovery(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
 		n += 1 + l + sovDiscovery(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -1869,7 +1877,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *IncrementalDiscoveryRequest) Unmarshal(dAtA []byte) error {
+func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1892,10 +1900,10 @@ func (m *IncrementalDiscoveryRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: IncrementalDiscoveryRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: DeltaDiscoveryRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: IncrementalDiscoveryRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DeltaDiscoveryRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2250,7 +2258,7 @@ func (m *IncrementalDiscoveryRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *IncrementalDiscoveryResponse) Unmarshal(dAtA []byte) error {
+func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2273,10 +2281,10 @@ func (m *IncrementalDiscoveryResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: IncrementalDiscoveryResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: DeltaDiscoveryResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: IncrementalDiscoveryResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: DeltaDiscoveryResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2530,6 +2538,38 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 			if err := m.Resource.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDiscovery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDiscovery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDiscovery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
