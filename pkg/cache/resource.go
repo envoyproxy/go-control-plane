@@ -85,11 +85,14 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 			// no dependencies
 		case *v2.Cluster:
 			// for EDS type, use cluster name or ServiceName override
-			if v.Type == v2.Cluster_EDS {
-				if v.EdsClusterConfig != nil && v.EdsClusterConfig.ServiceName != "" {
-					out[v.EdsClusterConfig.ServiceName] = true
-				} else {
-					out[v.Name] = true
+			switch typ := v.ClusterDiscoveryType.(type) {
+			case *v2.Cluster_Type:
+				if typ.Type == v2.Cluster_EDS {
+					if v.EdsClusterConfig != nil && v.EdsClusterConfig.ServiceName != "" {
+						out[v.EdsClusterConfig.ServiceName] = true
+					} else {
+						out[v.Name] = true
+					}
 				}
 			}
 		case *v2.RouteConfiguration:
