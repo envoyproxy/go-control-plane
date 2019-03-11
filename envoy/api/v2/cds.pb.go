@@ -7,10 +7,10 @@ import (
 	bytes "bytes"
 	context "context"
 	fmt "fmt"
-	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
-	cluster "github.com/envoyproxy/go-control-plane/envoy/api/v2/cluster"
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	io "io"
+	math "math"
+	time "time"
+
 	_ "github.com/gogo/googleapis/google/api"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
@@ -19,9 +19,11 @@ import (
 	types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
 	grpc "google.golang.org/grpc"
-	io "io"
-	math "math"
-	time "time"
+
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	cluster "github.com/envoyproxy/go-control-plane/envoy/api/v2/cluster"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

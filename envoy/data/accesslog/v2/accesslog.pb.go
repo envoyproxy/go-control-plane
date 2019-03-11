@@ -6,16 +6,18 @@ package envoy_data_accesslog_v2
 import (
 	encoding_binary "encoding/binary"
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	io "io"
+	math "math"
+	time "time"
+
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
-	io "io"
-	math "math"
-	time "time"
+
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

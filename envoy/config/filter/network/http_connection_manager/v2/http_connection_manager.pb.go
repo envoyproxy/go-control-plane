@@ -5,18 +5,20 @@ package v2
 
 import (
 	fmt "fmt"
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	v21 "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
-	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	io "io"
+	math "math"
+	time "time"
+
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
-	io "io"
-	math "math"
-	time "time"
+
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	v21 "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
