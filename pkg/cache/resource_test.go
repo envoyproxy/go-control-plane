@@ -83,7 +83,8 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[string]bool{clusterName: true},
 		},
 		{
-			in:  &v2.Cluster{Name: clusterName, Type: v2.Cluster_EDS, EdsClusterConfig: &v2.Cluster_EdsClusterConfig{ServiceName: "test"}},
+			in: &v2.Cluster{Name: clusterName, ClusterDiscoveryType: &v2.Cluster_Type{Type: v2.Cluster_EDS},
+				EdsClusterConfig: &v2.Cluster_EdsClusterConfig{ServiceName: "test"}},
 			out: map[string]bool{"test": true},
 		},
 		{
