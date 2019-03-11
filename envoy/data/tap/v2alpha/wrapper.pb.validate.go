@@ -34,21 +34,21 @@ var (
 	_ = types.DynamicAny{}
 )
 
-// Validate checks the field values on BufferedTraceWrapper with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *BufferedTraceWrapper) Validate() error {
+// Validate checks the field values on TraceWrapper with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *TraceWrapper) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	switch m.Trace.(type) {
 
-	case *BufferedTraceWrapper_HttpBufferedTrace:
+	case *TraceWrapper_HttpBufferedTrace:
 
 		if v, ok := interface{}(m.GetHttpBufferedTrace()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return BufferedTraceWrapperValidationError{
+				return TraceWrapperValidationError{
 					Field:  "HttpBufferedTrace",
 					Reason: "embedded message failed validation",
 					Cause:  err,
@@ -56,11 +56,23 @@ func (m *BufferedTraceWrapper) Validate() error {
 			}
 		}
 
-	case *BufferedTraceWrapper_SocketBufferedTrace:
+	case *TraceWrapper_HttpStreamedTraceSegment:
+
+		if v, ok := interface{}(m.GetHttpStreamedTraceSegment()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TraceWrapperValidationError{
+					Field:  "HttpStreamedTraceSegment",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *TraceWrapper_SocketBufferedTrace:
 
 		if v, ok := interface{}(m.GetSocketBufferedTrace()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return BufferedTraceWrapperValidationError{
+				return TraceWrapperValidationError{
 					Field:  "SocketBufferedTrace",
 					Reason: "embedded message failed validation",
 					Cause:  err,
@@ -68,8 +80,20 @@ func (m *BufferedTraceWrapper) Validate() error {
 			}
 		}
 
+	case *TraceWrapper_SocketStreamedTraceSegment:
+
+		if v, ok := interface{}(m.GetSocketStreamedTraceSegment()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TraceWrapperValidationError{
+					Field:  "SocketStreamedTraceSegment",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
 	default:
-		return BufferedTraceWrapperValidationError{
+		return TraceWrapperValidationError{
 			Field:  "Trace",
 			Reason: "value is required",
 		}
@@ -79,9 +103,9 @@ func (m *BufferedTraceWrapper) Validate() error {
 	return nil
 }
 
-// BufferedTraceWrapperValidationError is the validation error returned by
-// BufferedTraceWrapper.Validate if the designated constraints aren't met.
-type BufferedTraceWrapperValidationError struct {
+// TraceWrapperValidationError is the validation error returned by
+// TraceWrapper.Validate if the designated constraints aren't met.
+type TraceWrapperValidationError struct {
 	Field  string
 	Reason string
 	Cause  error
@@ -89,7 +113,7 @@ type BufferedTraceWrapperValidationError struct {
 }
 
 // Error satisfies the builtin error interface
-func (e BufferedTraceWrapperValidationError) Error() string {
+func (e TraceWrapperValidationError) Error() string {
 	cause := ""
 	if e.Cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
@@ -101,11 +125,11 @@ func (e BufferedTraceWrapperValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sBufferedTraceWrapper.%s: %s%s",
+		"invalid %sTraceWrapper.%s: %s%s",
 		key,
 		e.Field,
 		e.Reason,
 		cause)
 }
 
-var _ error = BufferedTraceWrapperValidationError{}
+var _ error = TraceWrapperValidationError{}

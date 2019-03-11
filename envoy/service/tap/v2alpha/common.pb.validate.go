@@ -361,6 +361,8 @@ func (m *OutputConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for Streaming
+
 	return nil
 }
 

@@ -262,7 +262,7 @@ type LightstepConfig struct {
 	// The cluster manager cluster that hosts the LightStep collectors.
 	CollectorCluster string `protobuf:"bytes,1,opt,name=collector_cluster,json=collectorCluster,proto3" json:"collector_cluster,omitempty"`
 	// File containing the access token to the `LightStep
-	// <http://lightstep.com/>`_ API.
+	// <https://lightstep.com/>`_ API.
 	AccessTokenFile      string   `protobuf:"bytes,2,opt,name=access_token_file,json=accessTokenFile,proto3" json:"access_token_file,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

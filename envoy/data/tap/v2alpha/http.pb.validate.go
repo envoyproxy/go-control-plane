@@ -96,6 +96,126 @@ func (e HttpBufferedTraceValidationError) Error() string {
 
 var _ error = HttpBufferedTraceValidationError{}
 
+// Validate checks the field values on HttpStreamedTraceSegment with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HttpStreamedTraceSegment) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for TraceId
+
+	switch m.MessagePiece.(type) {
+
+	case *HttpStreamedTraceSegment_RequestHeaders:
+
+		if v, ok := interface{}(m.GetRequestHeaders()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpStreamedTraceSegmentValidationError{
+					Field:  "RequestHeaders",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *HttpStreamedTraceSegment_RequestBodyChunk:
+
+		if v, ok := interface{}(m.GetRequestBodyChunk()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpStreamedTraceSegmentValidationError{
+					Field:  "RequestBodyChunk",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *HttpStreamedTraceSegment_RequestTrailers:
+
+		if v, ok := interface{}(m.GetRequestTrailers()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpStreamedTraceSegmentValidationError{
+					Field:  "RequestTrailers",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *HttpStreamedTraceSegment_ResponseHeaders:
+
+		if v, ok := interface{}(m.GetResponseHeaders()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpStreamedTraceSegmentValidationError{
+					Field:  "ResponseHeaders",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *HttpStreamedTraceSegment_ResponseBodyChunk:
+
+		if v, ok := interface{}(m.GetResponseBodyChunk()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpStreamedTraceSegmentValidationError{
+					Field:  "ResponseBodyChunk",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *HttpStreamedTraceSegment_ResponseTrailers:
+
+		if v, ok := interface{}(m.GetResponseTrailers()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpStreamedTraceSegmentValidationError{
+					Field:  "ResponseTrailers",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// HttpStreamedTraceSegmentValidationError is the validation error returned by
+// HttpStreamedTraceSegment.Validate if the designated constraints aren't met.
+type HttpStreamedTraceSegmentValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e HttpStreamedTraceSegmentValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpStreamedTraceSegment.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = HttpStreamedTraceSegmentValidationError{}
+
 // Validate checks the field values on HttpBufferedTrace_Message with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

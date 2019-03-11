@@ -24,7 +24,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // HTTP response codes supported in Envoy.
-// For more details: http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+// For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 type StatusCode int32
 
 const (
