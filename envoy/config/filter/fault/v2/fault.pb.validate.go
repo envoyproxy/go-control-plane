@@ -117,3 +117,126 @@ func (e FaultDelayValidationError) Error() string {
 }
 
 var _ error = FaultDelayValidationError{}
+
+// Validate checks the field values on FaultRateLimit with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *FaultRateLimit) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FaultRateLimitValidationError{
+				Field:  "Percentage",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
+	switch m.LimitType.(type) {
+
+	case *FaultRateLimit_FixedLimit_:
+
+		if v, ok := interface{}(m.GetFixedLimit()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FaultRateLimitValidationError{
+					Field:  "FixedLimit",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	default:
+		return FaultRateLimitValidationError{
+			Field:  "LimitType",
+			Reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// FaultRateLimitValidationError is the validation error returned by
+// FaultRateLimit.Validate if the designated constraints aren't met.
+type FaultRateLimitValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e FaultRateLimitValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFaultRateLimit.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = FaultRateLimitValidationError{}
+
+// Validate checks the field values on FaultRateLimit_FixedLimit with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *FaultRateLimit_FixedLimit) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetLimitKbps() < 1 {
+		return FaultRateLimit_FixedLimitValidationError{
+			Field:  "LimitKbps",
+			Reason: "value must be greater than or equal to 1",
+		}
+	}
+
+	return nil
+}
+
+// FaultRateLimit_FixedLimitValidationError is the validation error returned by
+// FaultRateLimit_FixedLimit.Validate if the designated constraints aren't met.
+type FaultRateLimit_FixedLimitValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e FaultRateLimit_FixedLimitValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFaultRateLimit_FixedLimit.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = FaultRateLimit_FixedLimitValidationError{}

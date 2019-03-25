@@ -7,9 +7,8 @@ import (
 	bytes "bytes"
 	context "context"
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	_ "github.com/gogo/googleapis/google/api"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
@@ -17,9 +16,8 @@ import (
 	types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
 	grpc "google.golang.org/grpc"
-
-	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
-	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

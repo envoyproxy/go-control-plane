@@ -5,13 +5,11 @@ package envoy_config_filter_http_tap_v2alpha
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	v2alpha "github.com/envoyproxy/go-control-plane/envoy/config/common/tap/v2alpha"
 	proto "github.com/gogo/protobuf/proto"
 	_ "github.com/lyft/protoc-gen-validate/validate"
-
-	v2alpha "github.com/envoyproxy/go-control-plane/envoy/config/common/tap/v2alpha"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

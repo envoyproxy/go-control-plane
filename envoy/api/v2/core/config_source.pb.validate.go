@@ -245,6 +245,16 @@ func (m *ConfigSource) Validate() error {
 		return nil
 	}
 
+	if v, ok := interface{}(m.GetInitialFetchTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConfigSourceValidationError{
+				Field:  "InitialFetchTimeout",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
 	switch m.ConfigSourceSpecifier.(type) {
 
 	case *ConfigSource_Path:

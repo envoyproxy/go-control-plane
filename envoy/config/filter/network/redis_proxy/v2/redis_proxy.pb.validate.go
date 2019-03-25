@@ -72,6 +72,8 @@ func (m *RedisProxy) Validate() error {
 		}
 	}
 
+	// no validation rules for LatencyInMicros
+
 	return nil
 }
 

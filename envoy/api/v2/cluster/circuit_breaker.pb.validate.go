@@ -141,6 +141,8 @@ func (m *CircuitBreakers_Thresholds) Validate() error {
 		}
 	}
 
+	// no validation rules for TrackRemaining
+
 	return nil
 }
 

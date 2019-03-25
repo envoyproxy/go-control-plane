@@ -71,6 +71,13 @@ func (m *RateLimit) Validate() error {
 
 	// no validation rules for RateLimitedAsResourceExhausted
 
+	if m.GetRateLimitService() == nil {
+		return RateLimitValidationError{
+			Field:  "RateLimitService",
+			Reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{

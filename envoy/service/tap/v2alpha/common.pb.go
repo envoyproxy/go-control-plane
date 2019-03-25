@@ -5,14 +5,12 @@ package envoy_service_tap_v2alpha
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
-
-	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

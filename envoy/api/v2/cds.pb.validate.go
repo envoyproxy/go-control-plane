@@ -790,16 +790,6 @@ func (m *Cluster_RingHashLbConfig) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetDeprecatedV1()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Cluster_RingHashLbConfigValidationError{
-				Field:  "DeprecatedV1",
-				Reason: "embedded message failed validation",
-				Cause:  err,
-			}
-		}
-	}
-
 	if _, ok := Cluster_RingHashLbConfig_HashFunction_name[int32(m.GetHashFunction())]; !ok {
 		return Cluster_RingHashLbConfigValidationError{
 			Field:  "HashFunction",
@@ -1029,59 +1019,6 @@ func (e Cluster_LbSubsetConfig_LbSubsetSelectorValidationError) Error() string {
 }
 
 var _ error = Cluster_LbSubsetConfig_LbSubsetSelectorValidationError{}
-
-// Validate checks the field values on Cluster_RingHashLbConfig_DeprecatedV1
-// with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
-func (m *Cluster_RingHashLbConfig_DeprecatedV1) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if v, ok := interface{}(m.GetUseStdHash()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Cluster_RingHashLbConfig_DeprecatedV1ValidationError{
-				Field:  "UseStdHash",
-				Reason: "embedded message failed validation",
-				Cause:  err,
-			}
-		}
-	}
-
-	return nil
-}
-
-// Cluster_RingHashLbConfig_DeprecatedV1ValidationError is the validation error
-// returned by Cluster_RingHashLbConfig_DeprecatedV1.Validate if the
-// designated constraints aren't met.
-type Cluster_RingHashLbConfig_DeprecatedV1ValidationError struct {
-	Field  string
-	Reason string
-	Cause  error
-	Key    bool
-}
-
-// Error satisfies the builtin error interface
-func (e Cluster_RingHashLbConfig_DeprecatedV1ValidationError) Error() string {
-	cause := ""
-	if e.Cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
-	}
-
-	key := ""
-	if e.Key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sCluster_RingHashLbConfig_DeprecatedV1.%s: %s%s",
-		key,
-		e.Field,
-		e.Reason,
-		cause)
-}
-
-var _ error = Cluster_RingHashLbConfig_DeprecatedV1ValidationError{}
 
 // Validate checks the field values on Cluster_CommonLbConfig_ZoneAwareLbConfig
 // with the rules defined in the proto definition for this message. If any

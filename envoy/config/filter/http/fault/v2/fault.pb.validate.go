@@ -158,6 +158,16 @@ func (m *HTTPFault) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetResponseRateLimit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HTTPFaultValidationError{
+				Field:  "ResponseRateLimit",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
