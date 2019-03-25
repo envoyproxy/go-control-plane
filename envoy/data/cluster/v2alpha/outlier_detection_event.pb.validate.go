@@ -49,7 +49,9 @@ func (m *OutlierDetectionEvent) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimestamp()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return OutlierDetectionEventValidationError{
 				Field:  "Timestamp",
@@ -59,7 +61,9 @@ func (m *OutlierDetectionEvent) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetSecsSinceLastAction()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetSecsSinceLastAction()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return OutlierDetectionEventValidationError{
 				Field:  "SecsSinceLastAction",
@@ -98,7 +102,9 @@ func (m *OutlierDetectionEvent) Validate() error {
 
 	case *OutlierDetectionEvent_EjectSuccessRateEvent:
 
-		if v, ok := interface{}(m.GetEjectSuccessRateEvent()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetEjectSuccessRateEvent()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return OutlierDetectionEventValidationError{
 					Field:  "EjectSuccessRateEvent",
@@ -110,7 +116,9 @@ func (m *OutlierDetectionEvent) Validate() error {
 
 	case *OutlierDetectionEvent_EjectConsecutiveEvent:
 
-		if v, ok := interface{}(m.GetEjectConsecutiveEvent()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetEjectConsecutiveEvent()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return OutlierDetectionEventValidationError{
 					Field:  "EjectConsecutiveEvent",

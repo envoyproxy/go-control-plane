@@ -5,10 +5,11 @@ package v2alpha1
 
 import (
 	fmt "fmt"
-	proto "github.com/gogo/protobuf/proto"
-	_ "github.com/lyft/protoc-gen-validate/validate"
 	io "io"
 	math "math"
+
+	proto "github.com/gogo/protobuf/proto"
+	_ "github.com/lyft/protoc-gen-validate/validate"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

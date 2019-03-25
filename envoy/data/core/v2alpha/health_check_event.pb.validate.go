@@ -49,7 +49,9 @@ func (m *HealthCheckEvent) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetHost()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHost()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HealthCheckEventValidationError{
 				Field:  "Host",
@@ -66,7 +68,9 @@ func (m *HealthCheckEvent) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimestamp()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HealthCheckEventValidationError{
 				Field:  "Timestamp",
@@ -80,7 +84,9 @@ func (m *HealthCheckEvent) Validate() error {
 
 	case *HealthCheckEvent_EjectUnhealthyEvent:
 
-		if v, ok := interface{}(m.GetEjectUnhealthyEvent()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetEjectUnhealthyEvent()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HealthCheckEventValidationError{
 					Field:  "EjectUnhealthyEvent",
@@ -92,7 +98,9 @@ func (m *HealthCheckEvent) Validate() error {
 
 	case *HealthCheckEvent_AddHealthyEvent:
 
-		if v, ok := interface{}(m.GetAddHealthyEvent()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetAddHealthyEvent()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HealthCheckEventValidationError{
 					Field:  "AddHealthyEvent",
@@ -104,7 +112,9 @@ func (m *HealthCheckEvent) Validate() error {
 
 	case *HealthCheckEvent_HealthCheckFailureEvent:
 
-		if v, ok := interface{}(m.GetHealthCheckFailureEvent()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHealthCheckFailureEvent()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HealthCheckEventValidationError{
 					Field:  "HealthCheckFailureEvent",
@@ -116,7 +126,9 @@ func (m *HealthCheckEvent) Validate() error {
 
 	case *HealthCheckEvent_DegradedHealthyHost:
 
-		if v, ok := interface{}(m.GetDegradedHealthyHost()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetDegradedHealthyHost()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HealthCheckEventValidationError{
 					Field:  "DegradedHealthyHost",
@@ -128,7 +140,9 @@ func (m *HealthCheckEvent) Validate() error {
 
 	case *HealthCheckEvent_NoLongerDegradedHost:
 
-		if v, ok := interface{}(m.GetNoLongerDegradedHost()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetNoLongerDegradedHost()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HealthCheckEventValidationError{
 					Field:  "NoLongerDegradedHost",

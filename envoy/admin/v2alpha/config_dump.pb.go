@@ -5,13 +5,15 @@ package envoy_admin_v2alpha
 
 import (
 	fmt "fmt"
-	v21 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	v2 "github.com/envoyproxy/go-control-plane/envoy/config/bootstrap/v2"
+	io "io"
+	math "math"
+
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
-	io "io"
-	math "math"
+
+	v21 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/config/bootstrap/v2"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

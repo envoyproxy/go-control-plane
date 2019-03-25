@@ -6,14 +6,15 @@ package core
 import (
 	bytes "bytes"
 	fmt "fmt"
+	io "io"
+	math "math"
+	time "time"
+
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	types "github.com/gogo/protobuf/types"
 	_ "github.com/lyft/protoc-gen-validate/validate"
-	io "io"
-	math "math"
-	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -59,9 +60,9 @@ var ApiConfigSource_ApiType_name = map[int32]string{
 
 var ApiConfigSource_ApiType_value = map[string]int32{
 	"UNSUPPORTED_REST_LEGACY": 0,
-	"REST":                    1,
-	"GRPC":                    2,
-	"DELTA_GRPC":              3,
+	"REST":       1,
+	"GRPC":       2,
+	"DELTA_GRPC": 3,
 }
 
 func (x ApiConfigSource_ApiType) String() string {

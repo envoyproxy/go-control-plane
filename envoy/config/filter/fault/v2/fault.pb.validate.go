@@ -48,7 +48,9 @@ func (m *FaultDelay) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPercentage()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FaultDelayValidationError{
 				Field:  "Percentage",
@@ -126,7 +128,9 @@ func (m *FaultRateLimit) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPercentage()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FaultRateLimitValidationError{
 				Field:  "Percentage",
@@ -140,7 +144,9 @@ func (m *FaultRateLimit) Validate() error {
 
 	case *FaultRateLimit_FixedLimit_:
 
-		if v, ok := interface{}(m.GetFixedLimit()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetFixedLimit()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FaultRateLimitValidationError{
 					Field:  "FixedLimit",

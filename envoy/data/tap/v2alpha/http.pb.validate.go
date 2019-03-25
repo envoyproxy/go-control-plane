@@ -42,7 +42,9 @@ func (m *HttpBufferedTrace) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRequest()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HttpBufferedTraceValidationError{
 				Field:  "Request",
@@ -52,7 +54,9 @@ func (m *HttpBufferedTrace) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetResponse()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetResponse()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HttpBufferedTraceValidationError{
 				Field:  "Response",
@@ -110,7 +114,9 @@ func (m *HttpStreamedTraceSegment) Validate() error {
 
 	case *HttpStreamedTraceSegment_RequestHeaders:
 
-		if v, ok := interface{}(m.GetRequestHeaders()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRequestHeaders()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpStreamedTraceSegmentValidationError{
 					Field:  "RequestHeaders",
@@ -122,7 +128,9 @@ func (m *HttpStreamedTraceSegment) Validate() error {
 
 	case *HttpStreamedTraceSegment_RequestBodyChunk:
 
-		if v, ok := interface{}(m.GetRequestBodyChunk()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRequestBodyChunk()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpStreamedTraceSegmentValidationError{
 					Field:  "RequestBodyChunk",
@@ -134,7 +142,9 @@ func (m *HttpStreamedTraceSegment) Validate() error {
 
 	case *HttpStreamedTraceSegment_RequestTrailers:
 
-		if v, ok := interface{}(m.GetRequestTrailers()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRequestTrailers()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpStreamedTraceSegmentValidationError{
 					Field:  "RequestTrailers",
@@ -146,7 +156,9 @@ func (m *HttpStreamedTraceSegment) Validate() error {
 
 	case *HttpStreamedTraceSegment_ResponseHeaders:
 
-		if v, ok := interface{}(m.GetResponseHeaders()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetResponseHeaders()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpStreamedTraceSegmentValidationError{
 					Field:  "ResponseHeaders",
@@ -158,7 +170,9 @@ func (m *HttpStreamedTraceSegment) Validate() error {
 
 	case *HttpStreamedTraceSegment_ResponseBodyChunk:
 
-		if v, ok := interface{}(m.GetResponseBodyChunk()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetResponseBodyChunk()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpStreamedTraceSegmentValidationError{
 					Field:  "ResponseBodyChunk",
@@ -170,7 +184,9 @@ func (m *HttpStreamedTraceSegment) Validate() error {
 
 	case *HttpStreamedTraceSegment_ResponseTrailers:
 
-		if v, ok := interface{}(m.GetResponseTrailers()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetResponseTrailers()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpStreamedTraceSegmentValidationError{
 					Field:  "ResponseTrailers",
@@ -227,7 +243,9 @@ func (m *HttpBufferedTrace_Message) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpBufferedTrace_MessageValidationError{
 					Field:  fmt.Sprintf("Headers[%v]", idx),
@@ -239,7 +257,9 @@ func (m *HttpBufferedTrace_Message) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetBody()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetBody()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HttpBufferedTrace_MessageValidationError{
 				Field:  "Body",
@@ -252,7 +272,9 @@ func (m *HttpBufferedTrace_Message) Validate() error {
 	for idx, item := range m.GetTrailers() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HttpBufferedTrace_MessageValidationError{
 					Field:  fmt.Sprintf("Trailers[%v]", idx),
