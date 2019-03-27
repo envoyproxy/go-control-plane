@@ -60,9 +60,9 @@ var ApiConfigSource_ApiType_name = map[int32]string{
 
 var ApiConfigSource_ApiType_value = map[string]int32{
 	"UNSUPPORTED_REST_LEGACY": 0,
-	"REST":       1,
-	"GRPC":       2,
-	"DELTA_GRPC": 3,
+	"REST":                    1,
+	"GRPC":                    2,
+	"DELTA_GRPC":              3,
 }
 
 func (x ApiConfigSource_ApiType) String() string {
