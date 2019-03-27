@@ -47,7 +47,9 @@ func (m *RouteConfiguration) Validate() error {
 	for idx, item := range m.GetVirtualHosts() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteConfigurationValidationError{
 					Field:  fmt.Sprintf("VirtualHosts[%v]", idx),
@@ -69,7 +71,9 @@ func (m *RouteConfiguration) Validate() error {
 	for idx, item := range m.GetResponseHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteConfigurationValidationError{
 					Field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
@@ -91,7 +95,9 @@ func (m *RouteConfiguration) Validate() error {
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteConfigurationValidationError{
 					Field:  fmt.Sprintf("RequestHeadersToAdd[%v]", idx),
@@ -103,7 +109,9 @@ func (m *RouteConfiguration) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetValidateClusters()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetValidateClusters()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteConfigurationValidationError{
 				Field:  "ValidateClusters",

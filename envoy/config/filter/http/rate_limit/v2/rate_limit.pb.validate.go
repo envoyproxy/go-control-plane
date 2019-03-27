@@ -57,7 +57,9 @@ func (m *RateLimit) Validate() error {
 
 	// no validation rules for RequestType
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeout()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				Field:  "Timeout",
@@ -71,7 +73,16 @@ func (m *RateLimit) Validate() error {
 
 	// no validation rules for RateLimitedAsResourceExhausted
 
-	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
+	if m.GetRateLimitService() == nil {
+		return RateLimitValidationError{
+			Field:  "RateLimitService",
+			Reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetRateLimitService()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				Field:  "RateLimitService",

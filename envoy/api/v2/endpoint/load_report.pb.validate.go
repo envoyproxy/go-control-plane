@@ -42,7 +42,9 @@ func (m *UpstreamLocalityStats) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetLocality()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLocality()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return UpstreamLocalityStatsValidationError{
 				Field:  "Locality",
@@ -61,7 +63,9 @@ func (m *UpstreamLocalityStats) Validate() error {
 	for idx, item := range m.GetLoadMetricStats() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return UpstreamLocalityStatsValidationError{
 					Field:  fmt.Sprintf("LoadMetricStats[%v]", idx),
@@ -76,7 +80,9 @@ func (m *UpstreamLocalityStats) Validate() error {
 	for idx, item := range m.GetUpstreamEndpointStats() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return UpstreamLocalityStatsValidationError{
 					Field:  fmt.Sprintf("UpstreamEndpointStats[%v]", idx),
@@ -132,7 +138,9 @@ func (m *UpstreamEndpointStats) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetAddress()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return UpstreamEndpointStatsValidationError{
 				Field:  "Address",
@@ -142,7 +150,9 @@ func (m *UpstreamEndpointStats) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadata()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return UpstreamEndpointStatsValidationError{
 				Field:  "Metadata",
@@ -161,7 +171,9 @@ func (m *UpstreamEndpointStats) Validate() error {
 	for idx, item := range m.GetLoadMetricStats() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return UpstreamEndpointStatsValidationError{
 					Field:  fmt.Sprintf("LoadMetricStats[%v]", idx),
@@ -282,7 +294,9 @@ func (m *ClusterStats) Validate() error {
 	for idx, item := range m.GetUpstreamLocalityStats() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterStatsValidationError{
 					Field:  fmt.Sprintf("UpstreamLocalityStats[%v]", idx),
@@ -299,7 +313,9 @@ func (m *ClusterStats) Validate() error {
 	for idx, item := range m.GetDroppedRequests() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterStatsValidationError{
 					Field:  fmt.Sprintf("DroppedRequests[%v]", idx),
@@ -311,7 +327,9 @@ func (m *ClusterStats) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetLoadReportInterval()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLoadReportInterval()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterStatsValidationError{
 				Field:  "LoadReportInterval",

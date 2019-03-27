@@ -65,7 +65,9 @@ func (m *RateLimit) Validate() error {
 	for idx, item := range m.GetDescriptors() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitValidationError{
 					Field:  fmt.Sprintf("Descriptors[%v]", idx),
@@ -77,7 +79,9 @@ func (m *RateLimit) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeout()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				Field:  "Timeout",
@@ -89,7 +93,16 @@ func (m *RateLimit) Validate() error {
 
 	// no validation rules for FailureModeDeny
 
-	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
+	if m.GetRateLimitService() == nil {
+		return RateLimitValidationError{
+			Field:  "RateLimitService",
+			Reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetRateLimitService()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				Field:  "RateLimitService",

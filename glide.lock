@@ -2,7 +2,7 @@ hash: 6c16e13ca41a4f49e11f9e8dc9731be609557d51a68b001c8e17923af4e2a0ae
 updated: 2019-03-11T13:32:13.140956548-07:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 4f4ee118c54b7a52393c7d45b94f6bd5040a7118
+  version: 4af3ed0740ce913c62afbe7f74d10f0b3738ec3d
 - name: github.com/gogo/googleapis
   version: 8558fb44d2f1fc223118afc694129d2c2d2924d1
   subpackages:

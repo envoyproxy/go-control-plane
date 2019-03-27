@@ -65,7 +65,9 @@ func (m *DubboProxy) Validate() error {
 	for idx, item := range m.GetRouteConfig() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return DubboProxyValidationError{
 					Field:  fmt.Sprintf("RouteConfig[%v]", idx),
@@ -80,7 +82,9 @@ func (m *DubboProxy) Validate() error {
 	for idx, item := range m.GetDubboFilters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return DubboProxyValidationError{
 					Field:  fmt.Sprintf("DubboFilters[%v]", idx),
@@ -141,7 +145,9 @@ func (m *DubboFilter) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetConfig()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return DubboFilterValidationError{
 				Field:  "Config",

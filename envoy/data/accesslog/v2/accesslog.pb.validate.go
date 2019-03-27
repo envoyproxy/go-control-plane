@@ -42,7 +42,9 @@ func (m *TCPAccessLogEntry) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetCommonProperties()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCommonProperties()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return TCPAccessLogEntryValidationError{
 				Field:  "CommonProperties",
@@ -94,7 +96,9 @@ func (m *HTTPAccessLogEntry) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetCommonProperties()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCommonProperties()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HTTPAccessLogEntryValidationError{
 				Field:  "CommonProperties",
@@ -106,7 +110,9 @@ func (m *HTTPAccessLogEntry) Validate() error {
 
 	// no validation rules for ProtocolVersion
 
-	if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRequest()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HTTPAccessLogEntryValidationError{
 				Field:  "Request",
@@ -116,7 +122,9 @@ func (m *HTTPAccessLogEntry) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetResponse()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetResponse()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HTTPAccessLogEntryValidationError{
 				Field:  "Response",
@@ -175,7 +183,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDownstreamRemoteAddress()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetDownstreamRemoteAddress()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "DownstreamRemoteAddress",
@@ -185,7 +195,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDownstreamLocalAddress()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetDownstreamLocalAddress()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "DownstreamLocalAddress",
@@ -195,7 +207,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTlsProperties()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTlsProperties()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TlsProperties",
@@ -205,7 +219,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetStartTime()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetStartTime()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "StartTime",
@@ -215,7 +231,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeToLastRxByte()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeToLastRxByte()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TimeToLastRxByte",
@@ -225,7 +243,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeToFirstUpstreamTxByte()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeToFirstUpstreamTxByte()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TimeToFirstUpstreamTxByte",
@@ -235,7 +255,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeToLastUpstreamTxByte()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeToLastUpstreamTxByte()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TimeToLastUpstreamTxByte",
@@ -245,7 +267,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeToFirstUpstreamRxByte()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeToFirstUpstreamRxByte()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TimeToFirstUpstreamRxByte",
@@ -255,7 +279,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeToLastUpstreamRxByte()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeToLastUpstreamRxByte()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TimeToLastUpstreamRxByte",
@@ -265,7 +291,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeToFirstDownstreamTxByte()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeToFirstDownstreamTxByte()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TimeToFirstDownstreamTxByte",
@@ -275,7 +303,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeToLastDownstreamTxByte()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeToLastDownstreamTxByte()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "TimeToLastDownstreamTxByte",
@@ -285,7 +315,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetUpstreamRemoteAddress()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetUpstreamRemoteAddress()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "UpstreamRemoteAddress",
@@ -295,7 +327,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetUpstreamLocalAddress()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetUpstreamLocalAddress()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "UpstreamLocalAddress",
@@ -307,7 +341,9 @@ func (m *AccessLogCommon) Validate() error {
 
 	// no validation rules for UpstreamCluster
 
-	if v, ok := interface{}(m.GetResponseFlags()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetResponseFlags()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "ResponseFlags",
@@ -317,7 +353,9 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadata()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return AccessLogCommonValidationError{
 				Field:  "Metadata",
@@ -395,7 +433,9 @@ func (m *ResponseFlags) Validate() error {
 
 	// no validation rules for RateLimited
 
-	if v, ok := interface{}(m.GetUnauthorizedDetails()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetUnauthorizedDetails()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ResponseFlagsValidationError{
 				Field:  "UnauthorizedDetails",
@@ -457,7 +497,9 @@ func (m *TLSProperties) Validate() error {
 
 	// no validation rules for TlsVersion
 
-	if v, ok := interface{}(m.GetTlsCipherSuite()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTlsCipherSuite()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return TLSPropertiesValidationError{
 				Field:  "TlsCipherSuite",
@@ -468,6 +510,30 @@ func (m *TLSProperties) Validate() error {
 	}
 
 	// no validation rules for TlsSniHostname
+
+	if v, ok := interface{}(m.GetLocalCertificateProperties()).(interface {
+		Validate() error
+	}); ok {
+		if err := v.Validate(); err != nil {
+			return TLSPropertiesValidationError{
+				Field:  "LocalCertificateProperties",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetPeerCertificateProperties()).(interface {
+		Validate() error
+	}); ok {
+		if err := v.Validate(); err != nil {
+			return TLSPropertiesValidationError{
+				Field:  "PeerCertificateProperties",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
 
 	return nil
 }
@@ -517,7 +583,9 @@ func (m *HTTPRequestProperties) Validate() error {
 
 	// no validation rules for Authority
 
-	if v, ok := interface{}(m.GetPort()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPort()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HTTPRequestPropertiesValidationError{
 				Field:  "Port",
@@ -587,7 +655,9 @@ func (m *HTTPResponseProperties) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetResponseCode()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetResponseCode()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HTTPResponsePropertiesValidationError{
 				Field:  "ResponseCode",
@@ -682,3 +752,120 @@ func (e ResponseFlags_UnauthorizedValidationError) Error() string {
 }
 
 var _ error = ResponseFlags_UnauthorizedValidationError{}
+
+// Validate checks the field values on TLSProperties_CertificateProperties with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *TLSProperties_CertificateProperties) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetSubjectAltName() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
+			if err := v.Validate(); err != nil {
+				return TLSProperties_CertificatePropertiesValidationError{
+					Field:  fmt.Sprintf("SubjectAltName[%v]", idx),
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Subject
+
+	return nil
+}
+
+// TLSProperties_CertificatePropertiesValidationError is the validation error
+// returned by TLSProperties_CertificateProperties.Validate if the designated
+// constraints aren't met.
+type TLSProperties_CertificatePropertiesValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e TLSProperties_CertificatePropertiesValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTLSProperties_CertificateProperties.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = TLSProperties_CertificatePropertiesValidationError{}
+
+// Validate checks the field values on
+// TLSProperties_CertificateProperties_SubjectAltName with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *TLSProperties_CertificateProperties_SubjectAltName) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.San.(type) {
+
+	case *TLSProperties_CertificateProperties_SubjectAltName_Uri:
+		// no validation rules for Uri
+
+	case *TLSProperties_CertificateProperties_SubjectAltName_Dns:
+		// no validation rules for Dns
+
+	}
+
+	return nil
+}
+
+// TLSProperties_CertificateProperties_SubjectAltNameValidationError is the
+// validation error returned by
+// TLSProperties_CertificateProperties_SubjectAltName.Validate if the
+// designated constraints aren't met.
+type TLSProperties_CertificateProperties_SubjectAltNameValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e TLSProperties_CertificateProperties_SubjectAltNameValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTLSProperties_CertificateProperties_SubjectAltName.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = TLSProperties_CertificateProperties_SubjectAltNameValidationError{}

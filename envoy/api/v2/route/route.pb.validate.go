@@ -59,7 +59,9 @@ func (m *VirtualHost) Validate() error {
 	for idx, item := range m.GetRoutes() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return VirtualHostValidationError{
 					Field:  fmt.Sprintf("Routes[%v]", idx),
@@ -76,7 +78,9 @@ func (m *VirtualHost) Validate() error {
 	for idx, item := range m.GetVirtualClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return VirtualHostValidationError{
 					Field:  fmt.Sprintf("VirtualClusters[%v]", idx),
@@ -91,7 +95,9 @@ func (m *VirtualHost) Validate() error {
 	for idx, item := range m.GetRateLimits() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return VirtualHostValidationError{
 					Field:  fmt.Sprintf("RateLimits[%v]", idx),
@@ -113,7 +119,9 @@ func (m *VirtualHost) Validate() error {
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return VirtualHostValidationError{
 					Field:  fmt.Sprintf("RequestHeadersToAdd[%v]", idx),
@@ -135,7 +143,9 @@ func (m *VirtualHost) Validate() error {
 	for idx, item := range m.GetResponseHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return VirtualHostValidationError{
 					Field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
@@ -147,7 +157,9 @@ func (m *VirtualHost) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetCors()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCors()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return VirtualHostValidationError{
 				Field:  "Cors",
@@ -163,7 +175,9 @@ func (m *VirtualHost) Validate() error {
 
 	// no validation rules for IncludeRequestAttemptCount
 
-	if v, ok := interface{}(m.GetRetryPolicy()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRetryPolicy()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return VirtualHostValidationError{
 				Field:  "RetryPolicy",
@@ -173,7 +187,9 @@ func (m *VirtualHost) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetHedgePolicy()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHedgePolicy()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return VirtualHostValidationError{
 				Field:  "HedgePolicy",
@@ -224,7 +240,9 @@ func (m *Route) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Match",
@@ -234,7 +252,9 @@ func (m *Route) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadata()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Metadata",
@@ -244,7 +264,9 @@ func (m *Route) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDecorator()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetDecorator()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Decorator",
@@ -268,7 +290,9 @@ func (m *Route) Validate() error {
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteValidationError{
 					Field:  fmt.Sprintf("RequestHeadersToAdd[%v]", idx),
@@ -290,7 +314,9 @@ func (m *Route) Validate() error {
 	for idx, item := range m.GetResponseHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteValidationError{
 					Field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
@@ -306,7 +332,9 @@ func (m *Route) Validate() error {
 
 	case *Route_Route:
 
-		if v, ok := interface{}(m.GetRoute()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRoute()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteValidationError{
 					Field:  "Route",
@@ -318,7 +346,9 @@ func (m *Route) Validate() error {
 
 	case *Route_Redirect:
 
-		if v, ok := interface{}(m.GetRedirect()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRedirect()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteValidationError{
 					Field:  "Redirect",
@@ -330,7 +360,9 @@ func (m *Route) Validate() error {
 
 	case *Route_DirectResponse:
 
-		if v, ok := interface{}(m.GetDirectResponse()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetDirectResponse()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteValidationError{
 					Field:  "DirectResponse",
@@ -400,7 +432,9 @@ func (m *WeightedCluster) Validate() error {
 	for idx, item := range m.GetClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return WeightedClusterValidationError{
 					Field:  fmt.Sprintf("Clusters[%v]", idx),
@@ -466,7 +500,9 @@ func (m *RouteMatch) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetCaseSensitive()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCaseSensitive()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteMatchValidationError{
 				Field:  "CaseSensitive",
@@ -476,7 +512,9 @@ func (m *RouteMatch) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRuntimeFraction()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRuntimeFraction()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteMatchValidationError{
 				Field:  "RuntimeFraction",
@@ -489,7 +527,9 @@ func (m *RouteMatch) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteMatchValidationError{
 					Field:  fmt.Sprintf("Headers[%v]", idx),
@@ -504,7 +544,9 @@ func (m *RouteMatch) Validate() error {
 	for idx, item := range m.GetQueryParameters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteMatchValidationError{
 					Field:  fmt.Sprintf("QueryParameters[%v]", idx),
@@ -516,7 +558,9 @@ func (m *RouteMatch) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetGrpc()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetGrpc()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteMatchValidationError{
 				Field:  "Grpc",
@@ -612,7 +656,9 @@ func (m *CorsPolicy) Validate() error {
 
 	// no validation rules for MaxAge
 
-	if v, ok := interface{}(m.GetAllowCredentials()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetAllowCredentials()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return CorsPolicyValidationError{
 				Field:  "AllowCredentials",
@@ -622,7 +668,9 @@ func (m *CorsPolicy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetShadowEnabled()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetShadowEnabled()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return CorsPolicyValidationError{
 				Field:  "ShadowEnabled",
@@ -636,7 +684,9 @@ func (m *CorsPolicy) Validate() error {
 
 	case *CorsPolicy_Enabled:
 
-		if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetEnabled()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return CorsPolicyValidationError{
 					Field:  "Enabled",
@@ -648,7 +698,9 @@ func (m *CorsPolicy) Validate() error {
 
 	case *CorsPolicy_FilterEnabled:
 
-		if v, ok := interface{}(m.GetFilterEnabled()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetFilterEnabled()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return CorsPolicyValidationError{
 					Field:  "FilterEnabled",
@@ -709,7 +761,9 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadataMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "MetadataMatch",
@@ -721,7 +775,9 @@ func (m *RouteAction) Validate() error {
 
 	// no validation rules for PrefixRewrite
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeout()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "Timeout",
@@ -745,7 +801,9 @@ func (m *RouteAction) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetRetryPolicy()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRetryPolicy()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "RetryPolicy",
@@ -755,7 +813,9 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRequestMirrorPolicy()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRequestMirrorPolicy()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "RequestMirrorPolicy",
@@ -770,7 +830,9 @@ func (m *RouteAction) Validate() error {
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  fmt.Sprintf("RequestHeadersToAdd[%v]", idx),
@@ -785,7 +847,9 @@ func (m *RouteAction) Validate() error {
 	for idx, item := range m.GetResponseHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
@@ -800,7 +864,9 @@ func (m *RouteAction) Validate() error {
 	for idx, item := range m.GetRateLimits() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  fmt.Sprintf("RateLimits[%v]", idx),
@@ -812,7 +878,9 @@ func (m *RouteAction) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetIncludeVhRateLimits()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetIncludeVhRateLimits()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "IncludeVhRateLimits",
@@ -825,7 +893,9 @@ func (m *RouteAction) Validate() error {
 	for idx, item := range m.GetHashPolicy() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  fmt.Sprintf("HashPolicy[%v]", idx),
@@ -837,7 +907,9 @@ func (m *RouteAction) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetCors()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCors()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "Cors",
@@ -847,7 +919,9 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMaxGrpcTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMaxGrpcTimeout()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "MaxGrpcTimeout",
@@ -860,7 +934,9 @@ func (m *RouteAction) Validate() error {
 	for idx, item := range m.GetUpgradeConfigs() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  fmt.Sprintf("UpgradeConfigs[%v]", idx),
@@ -874,7 +950,9 @@ func (m *RouteAction) Validate() error {
 
 	// no validation rules for InternalRedirectAction
 
-	if v, ok := interface{}(m.GetHedgePolicy()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHedgePolicy()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "HedgePolicy",
@@ -906,7 +984,9 @@ func (m *RouteAction) Validate() error {
 
 	case *RouteAction_WeightedClusters:
 
-		if v, ok := interface{}(m.GetWeightedClusters()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetWeightedClusters()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  "WeightedClusters",
@@ -931,7 +1011,9 @@ func (m *RouteAction) Validate() error {
 
 	case *RouteAction_AutoHostRewrite:
 
-		if v, ok := interface{}(m.GetAutoHostRewrite()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetAutoHostRewrite()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  "AutoHostRewrite",
@@ -987,7 +1069,9 @@ func (m *RetryPolicy) Validate() error {
 
 	// no validation rules for RetryOn
 
-	if v, ok := interface{}(m.GetNumRetries()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetNumRetries()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RetryPolicyValidationError{
 				Field:  "NumRetries",
@@ -997,7 +1081,9 @@ func (m *RetryPolicy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetPerTryTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPerTryTimeout()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RetryPolicyValidationError{
 				Field:  "PerTryTimeout",
@@ -1007,7 +1093,9 @@ func (m *RetryPolicy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRetryPriority()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRetryPriority()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RetryPolicyValidationError{
 				Field:  "RetryPriority",
@@ -1020,7 +1108,9 @@ func (m *RetryPolicy) Validate() error {
 	for idx, item := range m.GetRetryHostPredicate() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RetryPolicyValidationError{
 					Field:  fmt.Sprintf("RetryHostPredicate[%v]", idx),
@@ -1087,7 +1177,9 @@ func (m *HedgePolicy) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetAdditionalRequestChance()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetAdditionalRequestChance()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return HedgePolicyValidationError{
 				Field:  "AdditionalRequestChance",
@@ -1223,7 +1315,9 @@ func (m *DirectResponseAction) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetBody()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetBody()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return DirectResponseActionValidationError{
 				Field:  "Body",
@@ -1403,7 +1497,9 @@ func (m *RateLimit) Validate() error {
 	for idx, item := range m.GetActions() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitValidationError{
 					Field:  fmt.Sprintf("Actions[%v]", idx),
@@ -1482,7 +1578,9 @@ func (m *HeaderMatcher) Validate() error {
 
 	case *HeaderMatcher_RangeMatch:
 
-		if v, ok := interface{}(m.GetRangeMatch()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRangeMatch()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return HeaderMatcherValidationError{
 					Field:  "RangeMatch",
@@ -1566,7 +1664,9 @@ func (m *QueryParameterMatcher) Validate() error {
 
 	// no validation rules for Value
 
-	if v, ok := interface{}(m.GetRegex()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRegex()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return QueryParameterMatcherValidationError{
 				Field:  "Regex",
@@ -1625,7 +1725,9 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetWeight()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetWeight()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return WeightedCluster_ClusterWeightValidationError{
 				Field:  "Weight",
@@ -1635,7 +1737,9 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadataMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return WeightedCluster_ClusterWeightValidationError{
 				Field:  "MetadataMatch",
@@ -1655,7 +1759,9 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return WeightedCluster_ClusterWeightValidationError{
 					Field:  fmt.Sprintf("RequestHeadersToAdd[%v]", idx),
@@ -1677,7 +1783,9 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 	for idx, item := range m.GetResponseHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return WeightedCluster_ClusterWeightValidationError{
 					Field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
@@ -1788,7 +1896,9 @@ func (m *RouteAction_RequestMirrorPolicy) Validate() error {
 
 	// no validation rules for RuntimeKey
 
-	if v, ok := interface{}(m.GetRuntimeFraction()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRuntimeFraction()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteAction_RequestMirrorPolicyValidationError{
 				Field:  "RuntimeFraction",
@@ -1847,7 +1957,9 @@ func (m *RouteAction_HashPolicy) Validate() error {
 
 	case *RouteAction_HashPolicy_Header_:
 
-		if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHeader()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteAction_HashPolicyValidationError{
 					Field:  "Header",
@@ -1859,7 +1971,9 @@ func (m *RouteAction_HashPolicy) Validate() error {
 
 	case *RouteAction_HashPolicy_Cookie_:
 
-		if v, ok := interface{}(m.GetCookie()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetCookie()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteAction_HashPolicyValidationError{
 					Field:  "Cookie",
@@ -1871,7 +1985,9 @@ func (m *RouteAction_HashPolicy) Validate() error {
 
 	case *RouteAction_HashPolicy_ConnectionProperties_:
 
-		if v, ok := interface{}(m.GetConnectionProperties()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetConnectionProperties()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteAction_HashPolicyValidationError{
 					Field:  "ConnectionProperties",
@@ -1933,7 +2049,9 @@ func (m *RouteAction_UpgradeConfig) Validate() error {
 
 	// no validation rules for UpgradeType
 
-	if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetEnabled()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteAction_UpgradeConfigValidationError{
 				Field:  "Enabled",
@@ -2042,7 +2160,9 @@ func (m *RouteAction_HashPolicy_Cookie) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTtl()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTtl()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteAction_HashPolicy_CookieValidationError{
 				Field:  "Ttl",
@@ -2153,7 +2273,9 @@ func (m *RetryPolicy_RetryPriority) Validate() error {
 
 	case *RetryPolicy_RetryPriority_Config:
 
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RetryPolicy_RetryPriorityValidationError{
 					Field:  "Config",
@@ -2165,7 +2287,9 @@ func (m *RetryPolicy_RetryPriority) Validate() error {
 
 	case *RetryPolicy_RetryPriority_TypedConfig:
 
-		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetTypedConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RetryPolicy_RetryPriorityValidationError{
 					Field:  "TypedConfig",
@@ -2230,7 +2354,9 @@ func (m *RetryPolicy_RetryHostPredicate) Validate() error {
 
 	case *RetryPolicy_RetryHostPredicate_Config:
 
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RetryPolicy_RetryHostPredicateValidationError{
 					Field:  "Config",
@@ -2242,7 +2368,9 @@ func (m *RetryPolicy_RetryHostPredicate) Validate() error {
 
 	case *RetryPolicy_RetryHostPredicate_TypedConfig:
 
-		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetTypedConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RetryPolicy_RetryHostPredicateValidationError{
 					Field:  "TypedConfig",
@@ -2301,7 +2429,9 @@ func (m *RateLimit_Action) Validate() error {
 
 	case *RateLimit_Action_SourceCluster_:
 
-		if v, ok := interface{}(m.GetSourceCluster()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetSourceCluster()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimit_ActionValidationError{
 					Field:  "SourceCluster",
@@ -2313,7 +2443,9 @@ func (m *RateLimit_Action) Validate() error {
 
 	case *RateLimit_Action_DestinationCluster_:
 
-		if v, ok := interface{}(m.GetDestinationCluster()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetDestinationCluster()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimit_ActionValidationError{
 					Field:  "DestinationCluster",
@@ -2325,7 +2457,9 @@ func (m *RateLimit_Action) Validate() error {
 
 	case *RateLimit_Action_RequestHeaders_:
 
-		if v, ok := interface{}(m.GetRequestHeaders()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRequestHeaders()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimit_ActionValidationError{
 					Field:  "RequestHeaders",
@@ -2337,7 +2471,9 @@ func (m *RateLimit_Action) Validate() error {
 
 	case *RateLimit_Action_RemoteAddress_:
 
-		if v, ok := interface{}(m.GetRemoteAddress()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetRemoteAddress()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimit_ActionValidationError{
 					Field:  "RemoteAddress",
@@ -2349,7 +2485,9 @@ func (m *RateLimit_Action) Validate() error {
 
 	case *RateLimit_Action_GenericKey_:
 
-		if v, ok := interface{}(m.GetGenericKey()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetGenericKey()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimit_ActionValidationError{
 					Field:  "GenericKey",
@@ -2361,7 +2499,9 @@ func (m *RateLimit_Action) Validate() error {
 
 	case *RateLimit_Action_HeaderValueMatch_:
 
-		if v, ok := interface{}(m.GetHeaderValueMatch()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHeaderValueMatch()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimit_ActionValidationError{
 					Field:  "HeaderValueMatch",
@@ -2664,7 +2804,9 @@ func (m *RateLimit_Action_HeaderValueMatch) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetExpectMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetExpectMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimit_Action_HeaderValueMatchValidationError{
 				Field:  "ExpectMatch",
@@ -2684,7 +2826,9 @@ func (m *RateLimit_Action_HeaderValueMatch) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimit_Action_HeaderValueMatchValidationError{
 					Field:  fmt.Sprintf("Headers[%v]", idx),

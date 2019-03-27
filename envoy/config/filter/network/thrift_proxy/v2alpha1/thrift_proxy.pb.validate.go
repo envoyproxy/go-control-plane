@@ -63,7 +63,9 @@ func (m *ThriftProxy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRouteConfig()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRouteConfig()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ThriftProxyValidationError{
 				Field:  "RouteConfig",
@@ -76,7 +78,9 @@ func (m *ThriftProxy) Validate() error {
 	for idx, item := range m.GetThriftFilters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ThriftProxyValidationError{
 					Field:  fmt.Sprintf("ThriftFilters[%v]", idx),
@@ -141,7 +145,9 @@ func (m *ThriftFilter) Validate() error {
 
 	case *ThriftFilter_Config:
 
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ThriftFilterValidationError{
 					Field:  "Config",
@@ -153,7 +159,9 @@ func (m *ThriftFilter) Validate() error {
 
 	case *ThriftFilter_TypedConfig:
 
-		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetTypedConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ThriftFilterValidationError{
 					Field:  "TypedConfig",

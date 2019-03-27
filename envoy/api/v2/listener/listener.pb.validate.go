@@ -52,7 +52,9 @@ func (m *Filter) Validate() error {
 
 	case *Filter_Config:
 
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FilterValidationError{
 					Field:  "Config",
@@ -64,7 +66,9 @@ func (m *Filter) Validate() error {
 
 	case *Filter_TypedConfig:
 
-		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetTypedConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FilterValidationError{
 					Field:  "TypedConfig",
@@ -132,7 +136,9 @@ func (m *FilterChainMatch) Validate() error {
 	for idx, item := range m.GetPrefixRanges() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FilterChainMatchValidationError{
 					Field:  fmt.Sprintf("PrefixRanges[%v]", idx),
@@ -146,7 +152,9 @@ func (m *FilterChainMatch) Validate() error {
 
 	// no validation rules for AddressSuffix
 
-	if v, ok := interface{}(m.GetSuffixLen()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetSuffixLen()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainMatchValidationError{
 				Field:  "SuffixLen",
@@ -166,7 +174,9 @@ func (m *FilterChainMatch) Validate() error {
 	for idx, item := range m.GetSourcePrefixRanges() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FilterChainMatchValidationError{
 					Field:  fmt.Sprintf("SourcePrefixRanges[%v]", idx),
@@ -181,7 +191,9 @@ func (m *FilterChainMatch) Validate() error {
 	for idx, item := range m.GetSourcePorts() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FilterChainMatchValidationError{
 					Field:  fmt.Sprintf("SourcePorts[%v]", idx),
@@ -237,7 +249,9 @@ func (m *FilterChain) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetFilterChainMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetFilterChainMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainValidationError{
 				Field:  "FilterChainMatch",
@@ -247,7 +261,9 @@ func (m *FilterChain) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTlsContext()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTlsContext()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainValidationError{
 				Field:  "TlsContext",
@@ -260,7 +276,9 @@ func (m *FilterChain) Validate() error {
 	for idx, item := range m.GetFilters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FilterChainValidationError{
 					Field:  fmt.Sprintf("Filters[%v]", idx),
@@ -272,7 +290,9 @@ func (m *FilterChain) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetUseProxyProto()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetUseProxyProto()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainValidationError{
 				Field:  "UseProxyProto",
@@ -282,7 +302,9 @@ func (m *FilterChain) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadata()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainValidationError{
 				Field:  "Metadata",
@@ -292,7 +314,9 @@ func (m *FilterChain) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTransportSocket()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTransportSocket()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainValidationError{
 				Field:  "TransportSocket",
@@ -355,7 +379,9 @@ func (m *ListenerFilter) Validate() error {
 
 	case *ListenerFilter_Config:
 
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ListenerFilterValidationError{
 					Field:  "Config",
@@ -367,7 +393,9 @@ func (m *ListenerFilter) Validate() error {
 
 	case *ListenerFilter_TypedConfig:
 
-		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetTypedConfig()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ListenerFilterValidationError{
 					Field:  "TypedConfig",
