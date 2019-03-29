@@ -112,6 +112,14 @@ func TestSnapshotCacheFetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	snap, err := c.GetSnapshot(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(snap, snapshot) {
+		t.Errorf("expect snapshot: %v, got: %v", snapshot, snap)
+	}
+
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			resp, err := c.Fetch(context.Background(), v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
