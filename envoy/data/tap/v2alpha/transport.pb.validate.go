@@ -41,9 +41,7 @@ func (m *Connection) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetLocalAddress()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetLocalAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ConnectionValidationError{
 				Field:  "LocalAddress",
@@ -53,9 +51,7 @@ func (m *Connection) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRemoteAddress()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetRemoteAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ConnectionValidationError{
 				Field:  "RemoteAddress",
@@ -107,9 +103,7 @@ func (m *SocketEvent) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTimestamp()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SocketEventValidationError{
 				Field:  "Timestamp",
@@ -123,9 +117,7 @@ func (m *SocketEvent) Validate() error {
 
 	case *SocketEvent_Read_:
 
-		if v, ok := interface{}(m.GetRead()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetRead()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return SocketEventValidationError{
 					Field:  "Read",
@@ -137,9 +129,7 @@ func (m *SocketEvent) Validate() error {
 
 	case *SocketEvent_Write_:
 
-		if v, ok := interface{}(m.GetWrite()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetWrite()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return SocketEventValidationError{
 					Field:  "Write",
@@ -151,9 +141,7 @@ func (m *SocketEvent) Validate() error {
 
 	case *SocketEvent_Closed_:
 
-		if v, ok := interface{}(m.GetClosed()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetClosed()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return SocketEventValidationError{
 					Field:  "Closed",
@@ -209,9 +197,7 @@ func (m *SocketBufferedTrace) Validate() error {
 
 	// no validation rules for TraceId
 
-	if v, ok := interface{}(m.GetConnection()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetConnection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SocketBufferedTraceValidationError{
 				Field:  "Connection",
@@ -224,9 +210,7 @@ func (m *SocketBufferedTrace) Validate() error {
 	for idx, item := range m.GetEvents() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return SocketBufferedTraceValidationError{
 					Field:  fmt.Sprintf("Events[%v]", idx),
@@ -290,9 +274,7 @@ func (m *SocketStreamedTraceSegment) Validate() error {
 
 	case *SocketStreamedTraceSegment_Connection:
 
-		if v, ok := interface{}(m.GetConnection()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetConnection()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return SocketStreamedTraceSegmentValidationError{
 					Field:  "Connection",
@@ -304,9 +286,7 @@ func (m *SocketStreamedTraceSegment) Validate() error {
 
 	case *SocketStreamedTraceSegment_Event:
 
-		if v, ok := interface{}(m.GetEvent()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetEvent()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return SocketStreamedTraceSegmentValidationError{
 					Field:  "Event",
@@ -360,9 +340,7 @@ func (m *SocketEvent_Read) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetData()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SocketEvent_ReadValidationError{
 				Field:  "Data",
@@ -414,9 +392,7 @@ func (m *SocketEvent_Write) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetData()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SocketEvent_WriteValidationError{
 				Field:  "Data",

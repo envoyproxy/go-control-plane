@@ -41,16 +41,9 @@ func (m *FaultDelay) Validate() error {
 		return nil
 	}
 
-	if _, ok := FaultDelay_FaultDelayType_name[int32(m.GetType())]; !ok {
-		return FaultDelayValidationError{
-			Field:  "Type",
-			Reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for Type
 
-	if v, ok := interface{}(m.GetPercentage()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return FaultDelayValidationError{
 				Field:  "Percentage",
@@ -76,6 +69,18 @@ func (m *FaultDelay) Validate() error {
 				}
 			}
 
+		}
+
+	case *FaultDelay_HeaderDelay_:
+
+		if v, ok := interface{}(m.GetHeaderDelay()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FaultDelayValidationError{
+					Field:  "HeaderDelay",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
 		}
 
 	default:
@@ -128,9 +133,7 @@ func (m *FaultRateLimit) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetPercentage()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return FaultRateLimitValidationError{
 				Field:  "Percentage",
@@ -144,12 +147,22 @@ func (m *FaultRateLimit) Validate() error {
 
 	case *FaultRateLimit_FixedLimit_:
 
-		if v, ok := interface{}(m.GetFixedLimit()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetFixedLimit()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return FaultRateLimitValidationError{
 					Field:  "FixedLimit",
+					Reason: "embedded message failed validation",
+					Cause:  err,
+				}
+			}
+		}
+
+	case *FaultRateLimit_HeaderLimit_:
+
+		if v, ok := interface{}(m.GetHeaderLimit()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FaultRateLimitValidationError{
+					Field:  "HeaderLimit",
 					Reason: "embedded message failed validation",
 					Cause:  err,
 				}
@@ -197,6 +210,48 @@ func (e FaultRateLimitValidationError) Error() string {
 }
 
 var _ error = FaultRateLimitValidationError{}
+
+// Validate checks the field values on FaultDelay_HeaderDelay with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *FaultDelay_HeaderDelay) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// FaultDelay_HeaderDelayValidationError is the validation error returned by
+// FaultDelay_HeaderDelay.Validate if the designated constraints aren't met.
+type FaultDelay_HeaderDelayValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e FaultDelay_HeaderDelayValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFaultDelay_HeaderDelay.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = FaultDelay_HeaderDelayValidationError{}
 
 // Validate checks the field values on FaultRateLimit_FixedLimit with the rules
 // defined in the proto definition for this message. If any rules are
@@ -246,3 +301,45 @@ func (e FaultRateLimit_FixedLimitValidationError) Error() string {
 }
 
 var _ error = FaultRateLimit_FixedLimitValidationError{}
+
+// Validate checks the field values on FaultRateLimit_HeaderLimit with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *FaultRateLimit_HeaderLimit) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// FaultRateLimit_HeaderLimitValidationError is the validation error returned
+// by FaultRateLimit_HeaderLimit.Validate if the designated constraints aren't met.
+type FaultRateLimit_HeaderLimitValidationError struct {
+	Field  string
+	Reason string
+	Cause  error
+	Key    bool
+}
+
+// Error satisfies the builtin error interface
+func (e FaultRateLimit_HeaderLimitValidationError) Error() string {
+	cause := ""
+	if e.Cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.Cause)
+	}
+
+	key := ""
+	if e.Key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFaultRateLimit_HeaderLimit.%s: %s%s",
+		key,
+		e.Field,
+		e.Reason,
+		cause)
+}
+
+var _ error = FaultRateLimit_HeaderLimitValidationError{}

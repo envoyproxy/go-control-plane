@@ -53,9 +53,7 @@ func (m *RouteConfiguration) Validate() error {
 	for idx, item := range m.GetRoutes() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RouteConfigurationValidationError{
 					Field:  fmt.Sprintf("Routes[%v]", idx),
@@ -108,9 +106,7 @@ func (m *Route) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMatch()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Match",
@@ -120,9 +116,7 @@ func (m *Route) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRoute()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetRoute()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Route",
@@ -174,9 +168,7 @@ func (m *MethodMatch) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetName()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return MethodMatchValidationError{
 				Field:  "Name",
@@ -229,9 +221,7 @@ func (m *RouteMatch) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMethod()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMethod()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteMatchValidationError{
 				Field:  "Method",
@@ -244,9 +234,7 @@ func (m *RouteMatch) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RouteMatchValidationError{
 					Field:  fmt.Sprintf("Headers[%v]", idx),
@@ -307,9 +295,7 @@ func (m *RouteAction) Validate() error {
 
 	case *RouteAction_WeightedClusters:
 
-		if v, ok := interface{}(m.GetWeightedClusters()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetWeightedClusters()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  "WeightedClusters",
@@ -376,9 +362,7 @@ func (m *MethodMatch_ParameterMatchSpecifier) Validate() error {
 
 	case *MethodMatch_ParameterMatchSpecifier_RangeMatch:
 
-		if v, ok := interface{}(m.GetRangeMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetRangeMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MethodMatch_ParameterMatchSpecifierValidationError{
 					Field:  "RangeMatch",

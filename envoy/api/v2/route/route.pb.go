@@ -169,17 +169,21 @@ type VirtualHost struct {
 	// statistics but is not relevant for routing.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A list of domains (host/authority header) that will be matched to this
-	// virtual host. Wildcard hosts are supported in the form of ``*.foo.com`` or
-	// ``*-bar.foo.com``.
+	// virtual host. Wildcard hosts are supported in the suffix or prefix form.
+	//
+	// Domain search order:
+	//  1. Exact domain names: ``www.foo.com``.
+	//  2. Suffix domain wildcards: ``*.foo.com`` or ``*-bar.foo.com``.
+	//  3. Prefix domain wildcards: ``foo.*`` or ``foo-*``.
+	//  4. Special wildcard ``*`` matching any domain.
 	//
 	// .. note::
 	//
 	//   The wildcard will not match the empty string.
 	//   e.g. ``*-bar.foo.com`` will match ``baz-bar.foo.com`` but not ``-bar.foo.com``.
-	//   Additionally, a special entry ``*`` is allowed which will match any
-	//   host/authority header. Only a single virtual host in the entire route
-	//   configuration can match on ``*``. A domain must be unique across all virtual
-	//   hosts or the config will fail to load.
+	//   The longest wildcards match first.
+	//   Only a single virtual host in the entire route configuration can match on ``*``. A domain
+	//   must be unique across all virtual hosts or the config will fail to load.
 	Domains []string `protobuf:"bytes,2,rep,name=domains,proto3" json:"domains,omitempty"`
 	// The list of routes that will be matched, in order, for incoming requests.
 	// The first route that matches will be used.
