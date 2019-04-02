@@ -197,7 +197,9 @@ type HTTPFault struct {
 	//   limit. It's possible for the number of active faults to rise slightly above the configured
 	//   amount due to the implementation details.
 	MaxActiveFaults *types.UInt32Value `protobuf:"bytes,6,opt,name=max_active_faults,json=maxActiveFaults,proto3" json:"max_active_faults,omitempty"`
-	// The response rate limit to be applied to the response body of the stream.
+	// The response rate limit to be applied to the response body of the stream. When configured,
+	// the percentage can be overridden by the :ref:`fault.http.rate_limit.response_percent
+	// <config_http_filters_fault_injection_runtime>` runtime key.
 	//
 	// .. attention::
 	//  This is a per-stream limit versus a connection level limit. This means that concurrent streams

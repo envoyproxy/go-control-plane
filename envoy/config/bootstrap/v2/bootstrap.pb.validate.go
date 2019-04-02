@@ -41,9 +41,7 @@ func (m *Bootstrap) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetNode()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "Node",
@@ -53,9 +51,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetStaticResources()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetStaticResources()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "StaticResources",
@@ -65,9 +61,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDynamicResources()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetDynamicResources()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "DynamicResources",
@@ -77,9 +71,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetClusterManager()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetClusterManager()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "ClusterManager",
@@ -89,9 +81,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetHdsConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetHdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "HdsConfig",
@@ -106,9 +96,7 @@ func (m *Bootstrap) Validate() error {
 	for idx, item := range m.GetStatsSinks() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return BootstrapValidationError{
 					Field:  fmt.Sprintf("StatsSinks[%v]", idx),
@@ -120,9 +108,7 @@ func (m *Bootstrap) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetStatsConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetStatsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "StatsConfig",
@@ -132,9 +118,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetStatsFlushInterval()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetStatsFlushInterval()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "StatsFlushInterval",
@@ -144,9 +128,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetWatchdog()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetWatchdog()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "Watchdog",
@@ -156,9 +138,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTracing()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetTracing()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "Tracing",
@@ -168,9 +148,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRuntime()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetRuntime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "Runtime",
@@ -180,9 +158,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAdmin()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAdmin()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "Admin",
@@ -192,9 +168,7 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetOverloadManager()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetOverloadManager()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
 				Field:  "OverloadManager",
@@ -249,9 +223,7 @@ func (m *Admin) Validate() error {
 
 	// no validation rules for ProfilePath
 
-	if v, ok := interface{}(m.GetAddress()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AdminValidationError{
 				Field:  "Address",
@@ -305,9 +277,7 @@ func (m *ClusterManager) Validate() error {
 
 	// no validation rules for LocalClusterName
 
-	if v, ok := interface{}(m.GetOutlierDetection()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetOutlierDetection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterManagerValidationError{
 				Field:  "OutlierDetection",
@@ -317,9 +287,7 @@ func (m *ClusterManager) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetUpstreamBindConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetUpstreamBindConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterManagerValidationError{
 				Field:  "UpstreamBindConfig",
@@ -329,9 +297,7 @@ func (m *ClusterManager) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLoadStatsConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetLoadStatsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterManagerValidationError{
 				Field:  "LoadStatsConfig",
@@ -382,9 +348,7 @@ func (m *Watchdog) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMissTimeout()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMissTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WatchdogValidationError{
 				Field:  "MissTimeout",
@@ -394,9 +358,7 @@ func (m *Watchdog) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMegamissTimeout()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMegamissTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WatchdogValidationError{
 				Field:  "MegamissTimeout",
@@ -406,9 +368,7 @@ func (m *Watchdog) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetKillTimeout()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetKillTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WatchdogValidationError{
 				Field:  "KillTimeout",
@@ -418,9 +378,7 @@ func (m *Watchdog) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMultikillTimeout()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMultikillTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WatchdogValidationError{
 				Field:  "MultikillTimeout",
@@ -527,9 +485,7 @@ func (m *Bootstrap_StaticResources) Validate() error {
 	for idx, item := range m.GetListeners() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return Bootstrap_StaticResourcesValidationError{
 					Field:  fmt.Sprintf("Listeners[%v]", idx),
@@ -544,9 +500,7 @@ func (m *Bootstrap_StaticResources) Validate() error {
 	for idx, item := range m.GetClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return Bootstrap_StaticResourcesValidationError{
 					Field:  fmt.Sprintf("Clusters[%v]", idx),
@@ -561,9 +515,7 @@ func (m *Bootstrap_StaticResources) Validate() error {
 	for idx, item := range m.GetSecrets() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return Bootstrap_StaticResourcesValidationError{
 					Field:  fmt.Sprintf("Secrets[%v]", idx),
@@ -617,9 +569,7 @@ func (m *Bootstrap_DynamicResources) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetLdsConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetLdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Bootstrap_DynamicResourcesValidationError{
 				Field:  "LdsConfig",
@@ -629,9 +579,7 @@ func (m *Bootstrap_DynamicResources) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCdsConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetCdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Bootstrap_DynamicResourcesValidationError{
 				Field:  "CdsConfig",
@@ -641,9 +589,7 @@ func (m *Bootstrap_DynamicResources) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAdsConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Bootstrap_DynamicResourcesValidationError{
 				Field:  "AdsConfig",

@@ -134,9 +134,7 @@ func (m *ListStringMatcher) Validate() error {
 	for idx, item := range m.GetPatterns() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ListStringMatcherValidationError{
 					Field:  fmt.Sprintf("Patterns[%v]", idx),

@@ -46,9 +46,7 @@ func (m *CommonExtensionConfig) Validate() error {
 
 	case *CommonExtensionConfig_AdminConfig:
 
-		if v, ok := interface{}(m.GetAdminConfig()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetAdminConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CommonExtensionConfigValidationError{
 					Field:  "AdminConfig",
@@ -60,9 +58,7 @@ func (m *CommonExtensionConfig) Validate() error {
 
 	case *CommonExtensionConfig_StaticConfig:
 
-		if v, ok := interface{}(m.GetStaticConfig()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetStaticConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CommonExtensionConfigValidationError{
 					Field:  "StaticConfig",

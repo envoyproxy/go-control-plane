@@ -50,9 +50,7 @@ func (m *Cluster) Validate() error {
 
 	// no validation rules for AltStatName
 
-	if v, ok := interface{}(m.GetEdsClusterConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetEdsClusterConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "EdsClusterConfig",
@@ -76,9 +74,7 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetPerConnectionBufferLimitBytes()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetPerConnectionBufferLimitBytes()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "PerConnectionBufferLimitBytes",
@@ -98,9 +94,7 @@ func (m *Cluster) Validate() error {
 	for idx, item := range m.GetHosts() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
 					Field:  fmt.Sprintf("Hosts[%v]", idx),
@@ -112,9 +106,7 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetLoadAssignment()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetLoadAssignment()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "LoadAssignment",
@@ -127,9 +119,7 @@ func (m *Cluster) Validate() error {
 	for idx, item := range m.GetHealthChecks() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
 					Field:  fmt.Sprintf("HealthChecks[%v]", idx),
@@ -141,9 +131,7 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetMaxRequestsPerConnection()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "MaxRequestsPerConnection",
@@ -153,9 +141,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCircuitBreakers()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetCircuitBreakers()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "CircuitBreakers",
@@ -165,9 +151,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTlsContext()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetTlsContext()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "TlsContext",
@@ -177,9 +161,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCommonHttpProtocolOptions()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetCommonHttpProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "CommonHttpProtocolOptions",
@@ -189,9 +171,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetHttpProtocolOptions()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetHttpProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "HttpProtocolOptions",
@@ -201,9 +181,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetHttp2ProtocolOptions()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetHttp2ProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "Http2ProtocolOptions",
@@ -241,9 +219,7 @@ func (m *Cluster) Validate() error {
 	for idx, item := range m.GetDnsResolvers() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
 					Field:  fmt.Sprintf("DnsResolvers[%v]", idx),
@@ -255,9 +231,7 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetOutlierDetection()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetOutlierDetection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "OutlierDetection",
@@ -281,9 +255,7 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetUpstreamBindConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetUpstreamBindConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "UpstreamBindConfig",
@@ -293,9 +265,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLbSubsetConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetLbSubsetConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "LbSubsetConfig",
@@ -305,9 +275,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCommonLbConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetCommonLbConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "CommonLbConfig",
@@ -317,9 +285,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTransportSocket()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetTransportSocket()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "TransportSocket",
@@ -329,9 +295,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMetadata()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "Metadata",
@@ -343,9 +307,7 @@ func (m *Cluster) Validate() error {
 
 	// no validation rules for ProtocolSelection
 
-	if v, ok := interface{}(m.GetUpstreamConnectionOptions()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetUpstreamConnectionOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				Field:  "UpstreamConnectionOptions",
@@ -372,9 +334,7 @@ func (m *Cluster) Validate() error {
 
 	case *Cluster_ClusterType:
 
-		if v, ok := interface{}(m.GetClusterType()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetClusterType()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
 					Field:  "ClusterType",
@@ -390,9 +350,7 @@ func (m *Cluster) Validate() error {
 
 	case *Cluster_RingHashLbConfig_:
 
-		if v, ok := interface{}(m.GetRingHashLbConfig()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetRingHashLbConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
 					Field:  "RingHashLbConfig",
@@ -404,9 +362,7 @@ func (m *Cluster) Validate() error {
 
 	case *Cluster_OriginalDstLbConfig_:
 
-		if v, ok := interface{}(m.GetOriginalDstLbConfig()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetOriginalDstLbConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
 					Field:  "OriginalDstLbConfig",
@@ -418,9 +374,7 @@ func (m *Cluster) Validate() error {
 
 	case *Cluster_LeastRequestLbConfig_:
 
-		if v, ok := interface{}(m.GetLeastRequestLbConfig()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetLeastRequestLbConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
 					Field:  "LeastRequestLbConfig",
@@ -474,9 +428,7 @@ func (m *UpstreamBindConfig) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetSourceAddress()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetSourceAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return UpstreamBindConfigValidationError{
 				Field:  "SourceAddress",
@@ -528,9 +480,7 @@ func (m *UpstreamConnectionOptions) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTcpKeepalive()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetTcpKeepalive()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return UpstreamConnectionOptionsValidationError{
 				Field:  "TcpKeepalive",
@@ -589,9 +539,7 @@ func (m *Cluster_CustomClusterType) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTypedConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Cluster_CustomClusterTypeValidationError{
 				Field:  "TypedConfig",
@@ -643,9 +591,7 @@ func (m *Cluster_EdsClusterConfig) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetEdsConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetEdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Cluster_EdsClusterConfigValidationError{
 				Field:  "EdsConfig",
@@ -706,9 +652,7 @@ func (m *Cluster_LbSubsetConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDefaultSubset()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetDefaultSubset()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Cluster_LbSubsetConfigValidationError{
 				Field:  "DefaultSubset",
@@ -721,9 +665,7 @@ func (m *Cluster_LbSubsetConfig) Validate() error {
 	for idx, item := range m.GetSubsetSelectors() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return Cluster_LbSubsetConfigValidationError{
 					Field:  fmt.Sprintf("SubsetSelectors[%v]", idx),
@@ -953,9 +895,7 @@ func (m *Cluster_CommonLbConfig) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetHealthyPanicThreshold()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetHealthyPanicThreshold()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Cluster_CommonLbConfigValidationError{
 				Field:  "HealthyPanicThreshold",
@@ -965,9 +905,7 @@ func (m *Cluster_CommonLbConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetUpdateMergeWindow()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetUpdateMergeWindow()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Cluster_CommonLbConfigValidationError{
 				Field:  "UpdateMergeWindow",
@@ -981,9 +919,7 @@ func (m *Cluster_CommonLbConfig) Validate() error {
 
 	case *Cluster_CommonLbConfig_ZoneAwareLbConfig_:
 
-		if v, ok := interface{}(m.GetZoneAwareLbConfig()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetZoneAwareLbConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return Cluster_CommonLbConfigValidationError{
 					Field:  "ZoneAwareLbConfig",
@@ -995,9 +931,7 @@ func (m *Cluster_CommonLbConfig) Validate() error {
 
 	case *Cluster_CommonLbConfig_LocalityWeightedLbConfig_:
 
-		if v, ok := interface{}(m.GetLocalityWeightedLbConfig()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetLocalityWeightedLbConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return Cluster_CommonLbConfigValidationError{
 					Field:  "LocalityWeightedLbConfig",
@@ -1094,9 +1028,7 @@ func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetRoutingEnabled()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetRoutingEnabled()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Cluster_CommonLbConfig_ZoneAwareLbConfigValidationError{
 				Field:  "RoutingEnabled",
@@ -1106,9 +1038,7 @@ func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMinClusterSize()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMinClusterSize()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Cluster_CommonLbConfig_ZoneAwareLbConfigValidationError{
 				Field:  "MinClusterSize",

@@ -45,9 +45,7 @@ func (m *ServerInfo) Validate() error {
 
 	// no validation rules for State
 
-	if v, ok := interface{}(m.GetUptimeCurrentEpoch()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetUptimeCurrentEpoch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ServerInfoValidationError{
 				Field:  "UptimeCurrentEpoch",
@@ -57,9 +55,7 @@ func (m *ServerInfo) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetUptimeAllEpochs()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetUptimeAllEpochs()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ServerInfoValidationError{
 				Field:  "UptimeAllEpochs",
@@ -69,9 +65,7 @@ func (m *ServerInfo) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCommandLineOptions()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetCommandLineOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ServerInfoValidationError{
 				Field:  "CommandLineOptions",
@@ -153,9 +147,7 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for ServiceZone
 
-	if v, ok := interface{}(m.GetFileFlushInterval()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetFileFlushInterval()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommandLineOptionsValidationError{
 				Field:  "FileFlushInterval",
@@ -165,9 +157,7 @@ func (m *CommandLineOptions) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDrainTime()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetDrainTime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommandLineOptionsValidationError{
 				Field:  "DrainTime",
@@ -177,9 +167,7 @@ func (m *CommandLineOptions) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetParentShutdownTime()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetParentShutdownTime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommandLineOptionsValidationError{
 				Field:  "ParentShutdownTime",
