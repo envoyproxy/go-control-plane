@@ -47,7 +47,9 @@ func (m *RouteConfiguration) Validate() error {
 	for idx, item := range m.GetRoutes() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteConfigurationValidationError{
 					Field:  fmt.Sprintf("Routes[%v]", idx),
@@ -100,7 +102,9 @@ func (m *Route) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Match",
@@ -110,7 +114,9 @@ func (m *Route) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRoute()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRoute()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				Field:  "Route",
@@ -166,7 +172,9 @@ func (m *RouteMatch) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteMatchValidationError{
 					Field:  fmt.Sprintf("Headers[%v]", idx),
@@ -236,7 +244,9 @@ func (m *RouteAction) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadataMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				Field:  "MetadataMatch",
@@ -249,7 +259,9 @@ func (m *RouteAction) Validate() error {
 	for idx, item := range m.GetRateLimits() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  fmt.Sprintf("RateLimits[%v]", idx),
@@ -274,7 +286,9 @@ func (m *RouteAction) Validate() error {
 
 	case *RouteAction_WeightedClusters:
 
-		if v, ok := interface{}(m.GetWeightedClusters()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetWeightedClusters()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RouteActionValidationError{
 					Field:  "WeightedClusters",
@@ -344,7 +358,9 @@ func (m *WeightedCluster) Validate() error {
 	for idx, item := range m.GetClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return WeightedClusterValidationError{
 					Field:  fmt.Sprintf("Clusters[%v]", idx),
@@ -416,7 +432,9 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMetadataMatch()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return WeightedCluster_ClusterWeightValidationError{
 				Field:  "MetadataMatch",

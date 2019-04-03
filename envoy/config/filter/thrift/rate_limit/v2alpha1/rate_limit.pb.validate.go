@@ -55,7 +55,9 @@ func (m *RateLimit) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTimeout()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				Field:  "Timeout",
@@ -74,7 +76,9 @@ func (m *RateLimit) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRateLimitService()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				Field:  "RateLimitService",

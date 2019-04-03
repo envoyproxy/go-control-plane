@@ -51,7 +51,9 @@ func (m *ZooKeeperProxy) Validate() error {
 
 	// no validation rules for AccessLog
 
-	if v, ok := interface{}(m.GetMaxPacketBytes()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetMaxPacketBytes()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ZooKeeperProxyValidationError{
 				Field:  "MaxPacketBytes",

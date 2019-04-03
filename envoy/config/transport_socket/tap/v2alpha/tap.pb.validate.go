@@ -48,7 +48,9 @@ func (m *Tap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCommonConfig()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return TapValidationError{
 				Field:  "CommonConfig",
@@ -65,7 +67,9 @@ func (m *Tap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTransportSocket()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTransportSocket()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return TapValidationError{
 				Field:  "TransportSocket",

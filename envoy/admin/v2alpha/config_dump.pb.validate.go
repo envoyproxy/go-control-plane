@@ -44,7 +44,9 @@ func (m *ConfigDump) Validate() error {
 	for idx, item := range m.GetConfigs() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ConfigDumpValidationError{
 					Field:  fmt.Sprintf("Configs[%v]", idx),
@@ -98,7 +100,9 @@ func (m *BootstrapConfigDump) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetBootstrap()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetBootstrap()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapConfigDumpValidationError{
 				Field:  "Bootstrap",
@@ -108,7 +112,9 @@ func (m *BootstrapConfigDump) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLastUpdated()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapConfigDumpValidationError{
 				Field:  "LastUpdated",
@@ -165,7 +171,9 @@ func (m *ListenersConfigDump) Validate() error {
 	for idx, item := range m.GetStaticListeners() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ListenersConfigDumpValidationError{
 					Field:  fmt.Sprintf("StaticListeners[%v]", idx),
@@ -180,7 +188,9 @@ func (m *ListenersConfigDump) Validate() error {
 	for idx, item := range m.GetDynamicActiveListeners() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ListenersConfigDumpValidationError{
 					Field:  fmt.Sprintf("DynamicActiveListeners[%v]", idx),
@@ -195,7 +205,9 @@ func (m *ListenersConfigDump) Validate() error {
 	for idx, item := range m.GetDynamicWarmingListeners() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ListenersConfigDumpValidationError{
 					Field:  fmt.Sprintf("DynamicWarmingListeners[%v]", idx),
@@ -210,7 +222,9 @@ func (m *ListenersConfigDump) Validate() error {
 	for idx, item := range m.GetDynamicDrainingListeners() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ListenersConfigDumpValidationError{
 					Field:  fmt.Sprintf("DynamicDrainingListeners[%v]", idx),
@@ -269,7 +283,9 @@ func (m *ClustersConfigDump) Validate() error {
 	for idx, item := range m.GetStaticClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ClustersConfigDumpValidationError{
 					Field:  fmt.Sprintf("StaticClusters[%v]", idx),
@@ -284,7 +300,9 @@ func (m *ClustersConfigDump) Validate() error {
 	for idx, item := range m.GetDynamicActiveClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ClustersConfigDumpValidationError{
 					Field:  fmt.Sprintf("DynamicActiveClusters[%v]", idx),
@@ -299,7 +317,9 @@ func (m *ClustersConfigDump) Validate() error {
 	for idx, item := range m.GetDynamicWarmingClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ClustersConfigDumpValidationError{
 					Field:  fmt.Sprintf("DynamicWarmingClusters[%v]", idx),
@@ -356,7 +376,9 @@ func (m *RoutesConfigDump) Validate() error {
 	for idx, item := range m.GetStaticRouteConfigs() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RoutesConfigDumpValidationError{
 					Field:  fmt.Sprintf("StaticRouteConfigs[%v]", idx),
@@ -371,7 +393,9 @@ func (m *RoutesConfigDump) Validate() error {
 	for idx, item := range m.GetDynamicRouteConfigs() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return RoutesConfigDumpValidationError{
 					Field:  fmt.Sprintf("DynamicRouteConfigs[%v]", idx),
@@ -425,7 +449,9 @@ func (m *ListenersConfigDump_StaticListener) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetListener()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetListener()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ListenersConfigDump_StaticListenerValidationError{
 				Field:  "Listener",
@@ -435,7 +461,9 @@ func (m *ListenersConfigDump_StaticListener) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLastUpdated()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ListenersConfigDump_StaticListenerValidationError{
 				Field:  "LastUpdated",
@@ -490,7 +518,9 @@ func (m *ListenersConfigDump_DynamicListener) Validate() error {
 
 	// no validation rules for VersionInfo
 
-	if v, ok := interface{}(m.GetListener()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetListener()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ListenersConfigDump_DynamicListenerValidationError{
 				Field:  "Listener",
@@ -500,7 +530,9 @@ func (m *ListenersConfigDump_DynamicListener) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLastUpdated()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ListenersConfigDump_DynamicListenerValidationError{
 				Field:  "LastUpdated",
@@ -553,7 +585,9 @@ func (m *ClustersConfigDump_StaticCluster) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetCluster()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCluster()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ClustersConfigDump_StaticClusterValidationError{
 				Field:  "Cluster",
@@ -563,7 +597,9 @@ func (m *ClustersConfigDump_StaticCluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLastUpdated()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ClustersConfigDump_StaticClusterValidationError{
 				Field:  "LastUpdated",
@@ -618,7 +654,9 @@ func (m *ClustersConfigDump_DynamicCluster) Validate() error {
 
 	// no validation rules for VersionInfo
 
-	if v, ok := interface{}(m.GetCluster()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetCluster()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ClustersConfigDump_DynamicClusterValidationError{
 				Field:  "Cluster",
@@ -628,7 +666,9 @@ func (m *ClustersConfigDump_DynamicCluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLastUpdated()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ClustersConfigDump_DynamicClusterValidationError{
 				Field:  "LastUpdated",
@@ -681,7 +721,9 @@ func (m *RoutesConfigDump_StaticRouteConfig) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetRouteConfig()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRouteConfig()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RoutesConfigDump_StaticRouteConfigValidationError{
 				Field:  "RouteConfig",
@@ -691,7 +733,9 @@ func (m *RoutesConfigDump_StaticRouteConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLastUpdated()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RoutesConfigDump_StaticRouteConfigValidationError{
 				Field:  "LastUpdated",
@@ -746,7 +790,9 @@ func (m *RoutesConfigDump_DynamicRouteConfig) Validate() error {
 
 	// no validation rules for VersionInfo
 
-	if v, ok := interface{}(m.GetRouteConfig()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetRouteConfig()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RoutesConfigDump_DynamicRouteConfigValidationError{
 				Field:  "RouteConfig",
@@ -756,7 +802,9 @@ func (m *RoutesConfigDump_DynamicRouteConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLastUpdated()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return RoutesConfigDump_DynamicRouteConfigValidationError{
 				Field:  "LastUpdated",

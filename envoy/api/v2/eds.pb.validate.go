@@ -52,7 +52,9 @@ func (m *ClusterLoadAssignment) Validate() error {
 	for idx, item := range m.GetEndpoints() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterLoadAssignmentValidationError{
 					Field:  fmt.Sprintf("Endpoints[%v]", idx),
@@ -66,7 +68,9 @@ func (m *ClusterLoadAssignment) Validate() error {
 
 	// no validation rules for NamedEndpoints
 
-	if v, ok := interface{}(m.GetPolicy()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPolicy()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterLoadAssignmentValidationError{
 				Field:  "Policy",
@@ -121,7 +125,9 @@ func (m *ClusterLoadAssignment_Policy) Validate() error {
 	for idx, item := range m.GetDropOverloads() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(item).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterLoadAssignment_PolicyValidationError{
 					Field:  fmt.Sprintf("DropOverloads[%v]", idx),
@@ -194,7 +200,9 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDropPercentage()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetDropPercentage()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterLoadAssignment_Policy_DropOverloadValidationError{
 				Field:  "DropPercentage",

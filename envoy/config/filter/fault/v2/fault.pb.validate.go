@@ -43,7 +43,9 @@ func (m *FaultDelay) Validate() error {
 
 	// no validation rules for Type
 
-	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPercentage()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FaultDelayValidationError{
 				Field:  "Percentage",
@@ -73,7 +75,9 @@ func (m *FaultDelay) Validate() error {
 
 	case *FaultDelay_HeaderDelay_:
 
-		if v, ok := interface{}(m.GetHeaderDelay()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHeaderDelay()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FaultDelayValidationError{
 					Field:  "HeaderDelay",
@@ -133,7 +137,9 @@ func (m *FaultRateLimit) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPercentage()).(interface {
+		Validate() error
+	}); ok {
 		if err := v.Validate(); err != nil {
 			return FaultRateLimitValidationError{
 				Field:  "Percentage",
@@ -147,7 +153,9 @@ func (m *FaultRateLimit) Validate() error {
 
 	case *FaultRateLimit_FixedLimit_:
 
-		if v, ok := interface{}(m.GetFixedLimit()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetFixedLimit()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FaultRateLimitValidationError{
 					Field:  "FixedLimit",
@@ -159,7 +167,9 @@ func (m *FaultRateLimit) Validate() error {
 
 	case *FaultRateLimit_HeaderLimit_:
 
-		if v, ok := interface{}(m.GetHeaderLimit()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHeaderLimit()).(interface {
+			Validate() error
+		}); ok {
 			if err := v.Validate(); err != nil {
 				return FaultRateLimitValidationError{
 					Field:  "HeaderLimit",
