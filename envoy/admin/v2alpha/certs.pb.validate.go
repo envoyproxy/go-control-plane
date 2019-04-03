@@ -45,9 +45,7 @@ func (m *Certificates) Validate() error {
 	for idx, item := range m.GetCertificates() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CertificatesValidationError{
 					Field:  fmt.Sprintf("Certificates[%v]", idx),
@@ -104,9 +102,7 @@ func (m *Certificate) Validate() error {
 	for idx, item := range m.GetCaCert() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CertificateValidationError{
 					Field:  fmt.Sprintf("CaCert[%v]", idx),
@@ -121,9 +117,7 @@ func (m *Certificate) Validate() error {
 	for idx, item := range m.GetCertChain() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CertificateValidationError{
 					Field:  fmt.Sprintf("CertChain[%v]", idx),
@@ -184,9 +178,7 @@ func (m *CertificateDetails) Validate() error {
 	for idx, item := range m.GetSubjectAltNames() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CertificateDetailsValidationError{
 					Field:  fmt.Sprintf("SubjectAltNames[%v]", idx),
@@ -200,9 +192,7 @@ func (m *CertificateDetails) Validate() error {
 
 	// no validation rules for DaysUntilExpiration
 
-	if v, ok := interface{}(m.GetValidFrom()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetValidFrom()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CertificateDetailsValidationError{
 				Field:  "ValidFrom",
@@ -212,9 +202,7 @@ func (m *CertificateDetails) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetExpirationTime()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetExpirationTime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CertificateDetailsValidationError{
 				Field:  "ExpirationTime",

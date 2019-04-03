@@ -44,9 +44,7 @@ func (m *DiscoveryRequest) Validate() error {
 
 	// no validation rules for VersionInfo
 
-	if v, ok := interface{}(m.GetNode()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DiscoveryRequestValidationError{
 				Field:  "Node",
@@ -60,9 +58,7 @@ func (m *DiscoveryRequest) Validate() error {
 
 	// no validation rules for ResponseNonce
 
-	if v, ok := interface{}(m.GetErrorDetail()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetErrorDetail()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DiscoveryRequestValidationError{
 				Field:  "ErrorDetail",
@@ -119,9 +115,7 @@ func (m *DiscoveryResponse) Validate() error {
 	for idx, item := range m.GetResources() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return DiscoveryResponseValidationError{
 					Field:  fmt.Sprintf("Resources[%v]", idx),
@@ -139,9 +133,7 @@ func (m *DiscoveryResponse) Validate() error {
 
 	// no validation rules for Nonce
 
-	if v, ok := interface{}(m.GetControlPlane()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetControlPlane()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DiscoveryResponseValidationError{
 				Field:  "ControlPlane",
@@ -193,9 +185,7 @@ func (m *DeltaDiscoveryRequest) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetNode()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DeltaDiscoveryRequestValidationError{
 				Field:  "Node",
@@ -211,9 +201,7 @@ func (m *DeltaDiscoveryRequest) Validate() error {
 
 	// no validation rules for ResponseNonce
 
-	if v, ok := interface{}(m.GetErrorDetail()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetErrorDetail()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DeltaDiscoveryRequestValidationError{
 				Field:  "ErrorDetail",
@@ -270,9 +258,7 @@ func (m *DeltaDiscoveryResponse) Validate() error {
 	for idx, item := range m.GetResources() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return DeltaDiscoveryResponseValidationError{
 					Field:  fmt.Sprintf("Resources[%v]", idx),
@@ -331,9 +317,7 @@ func (m *Resource) Validate() error {
 
 	// no validation rules for Version
 
-	if v, ok := interface{}(m.GetResource()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetResource()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ResourceValidationError{
 				Field:  "Resource",

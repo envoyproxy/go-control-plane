@@ -48,9 +48,7 @@ func (m *TapConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMatchConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMatchConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TapConfigValidationError{
 				Field:  "MatchConfig",
@@ -67,9 +65,7 @@ func (m *TapConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetOutputConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetOutputConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TapConfigValidationError{
 				Field:  "OutputConfig",
@@ -125,9 +121,7 @@ func (m *MatchPredicate) Validate() error {
 
 	case *MatchPredicate_OrMatch:
 
-		if v, ok := interface{}(m.GetOrMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetOrMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
 					Field:  "OrMatch",
@@ -139,9 +133,7 @@ func (m *MatchPredicate) Validate() error {
 
 	case *MatchPredicate_AndMatch:
 
-		if v, ok := interface{}(m.GetAndMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetAndMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
 					Field:  "AndMatch",
@@ -153,9 +145,7 @@ func (m *MatchPredicate) Validate() error {
 
 	case *MatchPredicate_NotMatch:
 
-		if v, ok := interface{}(m.GetNotMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetNotMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
 					Field:  "NotMatch",
@@ -176,9 +166,7 @@ func (m *MatchPredicate) Validate() error {
 
 	case *MatchPredicate_HttpRequestHeadersMatch:
 
-		if v, ok := interface{}(m.GetHttpRequestHeadersMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetHttpRequestHeadersMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
 					Field:  "HttpRequestHeadersMatch",
@@ -190,9 +178,7 @@ func (m *MatchPredicate) Validate() error {
 
 	case *MatchPredicate_HttpRequestTrailersMatch:
 
-		if v, ok := interface{}(m.GetHttpRequestTrailersMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetHttpRequestTrailersMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
 					Field:  "HttpRequestTrailersMatch",
@@ -204,9 +190,7 @@ func (m *MatchPredicate) Validate() error {
 
 	case *MatchPredicate_HttpResponseHeadersMatch:
 
-		if v, ok := interface{}(m.GetHttpResponseHeadersMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetHttpResponseHeadersMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
 					Field:  "HttpResponseHeadersMatch",
@@ -218,9 +202,7 @@ func (m *MatchPredicate) Validate() error {
 
 	case *MatchPredicate_HttpResponseTrailersMatch:
 
-		if v, ok := interface{}(m.GetHttpResponseTrailersMatch()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetHttpResponseTrailersMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicateValidationError{
 					Field:  "HttpResponseTrailersMatch",
@@ -283,9 +265,7 @@ func (m *HttpHeadersMatch) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return HttpHeadersMatchValidationError{
 					Field:  fmt.Sprintf("Headers[%v]", idx),
@@ -349,9 +329,7 @@ func (m *OutputConfig) Validate() error {
 	for idx, item := range m.GetSinks() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return OutputConfigValidationError{
 					Field:  fmt.Sprintf("Sinks[%v]", idx),
@@ -363,9 +341,7 @@ func (m *OutputConfig) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetMaxBufferedRxBytes()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMaxBufferedRxBytes()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return OutputConfigValidationError{
 				Field:  "MaxBufferedRxBytes",
@@ -375,9 +351,7 @@ func (m *OutputConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMaxBufferedTxBytes()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetMaxBufferedTxBytes()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return OutputConfigValidationError{
 				Field:  "MaxBufferedTxBytes",
@@ -441,9 +415,7 @@ func (m *OutputSink) Validate() error {
 
 	case *OutputSink_StreamingAdmin:
 
-		if v, ok := interface{}(m.GetStreamingAdmin()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetStreamingAdmin()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return OutputSinkValidationError{
 					Field:  "StreamingAdmin",
@@ -455,9 +427,7 @@ func (m *OutputSink) Validate() error {
 
 	case *OutputSink_FilePerTap:
 
-		if v, ok := interface{}(m.GetFilePerTap()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetFilePerTap()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return OutputSinkValidationError{
 					Field:  "FilePerTap",
@@ -618,9 +588,7 @@ func (m *MatchPredicate_MatchSet) Validate() error {
 	for idx, item := range m.GetRules() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchPredicate_MatchSetValidationError{
 					Field:  fmt.Sprintf("Rules[%v]", idx),

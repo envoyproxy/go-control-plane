@@ -45,9 +45,7 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for UseAlpha
 
-	if v, ok := interface{}(m.GetWithRequestBody()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetWithRequestBody()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtAuthzValidationError{
 				Field:  "WithRequestBody",
@@ -61,9 +59,7 @@ func (m *ExtAuthz) Validate() error {
 
 	case *ExtAuthz_GrpcService:
 
-		if v, ok := interface{}(m.GetGrpcService()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ExtAuthzValidationError{
 					Field:  "GrpcService",
@@ -75,9 +71,7 @@ func (m *ExtAuthz) Validate() error {
 
 	case *ExtAuthz_HttpService:
 
-		if v, ok := interface{}(m.GetHttpService()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetHttpService()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ExtAuthzValidationError{
 					Field:  "HttpService",
@@ -182,9 +176,7 @@ func (m *HttpService) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetServerUri()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetServerUri()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpServiceValidationError{
 				Field:  "ServerUri",
@@ -196,9 +188,7 @@ func (m *HttpService) Validate() error {
 
 	// no validation rules for PathPrefix
 
-	if v, ok := interface{}(m.GetAuthorizationRequest()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAuthorizationRequest()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpServiceValidationError{
 				Field:  "AuthorizationRequest",
@@ -208,9 +198,7 @@ func (m *HttpService) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAuthorizationResponse()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAuthorizationResponse()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpServiceValidationError{
 				Field:  "AuthorizationResponse",
@@ -262,9 +250,7 @@ func (m *AuthorizationRequest) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetAllowedHeaders()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAllowedHeaders()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AuthorizationRequestValidationError{
 				Field:  "AllowedHeaders",
@@ -277,9 +263,7 @@ func (m *AuthorizationRequest) Validate() error {
 	for idx, item := range m.GetHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return AuthorizationRequestValidationError{
 					Field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
@@ -333,9 +317,7 @@ func (m *AuthorizationResponse) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetAllowedUpstreamHeaders()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAllowedUpstreamHeaders()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AuthorizationResponseValidationError{
 				Field:  "AllowedUpstreamHeaders",
@@ -345,9 +327,7 @@ func (m *AuthorizationResponse) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAllowedClientHeaders()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetAllowedClientHeaders()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AuthorizationResponseValidationError{
 				Field:  "AllowedClientHeaders",
@@ -419,9 +399,7 @@ func (m *ExtAuthzPerRoute) Validate() error {
 			}
 		}
 
-		if v, ok := interface{}(m.GetCheckSettings()).(interface {
-			Validate() error
-		}); ok {
+		if v, ok := interface{}(m.GetCheckSettings()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ExtAuthzPerRouteValidationError{
 					Field:  "CheckSettings",

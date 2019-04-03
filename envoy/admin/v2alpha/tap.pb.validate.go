@@ -55,9 +55,7 @@ func (m *TapRequest) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTapConfig()).(interface {
-		Validate() error
-	}); ok {
+	if v, ok := interface{}(m.GetTapConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TapRequestValidationError{
 				Field:  "TapConfig",
