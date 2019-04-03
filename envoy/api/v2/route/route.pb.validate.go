@@ -767,36 +767,6 @@ func (m *RouteAction) Validate() error {
 
 	// no validation rules for Priority
 
-	for idx, item := range m.GetRequestHeadersToAdd() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RouteActionValidationError{
-					Field:  fmt.Sprintf("RequestHeadersToAdd[%v]", idx),
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	}
-
-	for idx, item := range m.GetResponseHeadersToAdd() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RouteActionValidationError{
-					Field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
-					Reason: "embedded message failed validation",
-					Cause:  err,
-				}
-			}
-		}
-
-	}
-
 	for idx, item := range m.GetRateLimits() {
 		_, _ = idx, item
 
