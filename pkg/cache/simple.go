@@ -127,8 +127,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 // GetSnapshots gets the snapshot for a node, and returns an error if not found.
 func (cache *snapshotCache) GetSnapshot(node string) (Snapshot, error) {
-	cache.mu.Lock()
-	defer cache.mu.Unlock()
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
 
 	snap, ok := cache.snapshots[node]
 	if !ok {
