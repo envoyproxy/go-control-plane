@@ -75,8 +75,20 @@ func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format
 func TestSnapshotCache(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 
+	if _, err := c.GetSnapshot(key); err == nil {
+		t.Errorf("unexpected snapshot found for key %q", key)
+	}
+
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
+	}
+
+	snap, err := c.GetSnapshot(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(snap, snapshot) {
+		t.Errorf("expect snapshot: %v, got: %v", snapshot, snap)
 	}
 
 	// try to get endpoints with incorrect list of names
