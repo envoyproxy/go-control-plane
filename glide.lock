@@ -1,10 +1,10 @@
-hash: 2c344aeeaf387ccfe918d82c8539b493a41542f853005c96085dc3fa572966c0
-updated: 2019-04-03T12:45:36.230143033-04:00
+hash: e2131de84f2479e8f3f0564a9af234352482c7086c5041e6458abdb73a59870b
+updated: 2019-04-05T13:25:17.583869122-04:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 897f5b09bbe3823853c20f610120228ca54ec7a0
+  version: 6b978acde7fbb42bf11d4e0e9160044608088588
 - name: github.com/gogo/googleapis
-  version: 8558fb44d2f1fc223118afc694129d2c2d2924d1
+  version: 0cd9801be74a10d5ac39d69626eac8255ffcd502
   subpackages:
   - google/api
   - google/rpc
@@ -34,18 +34,18 @@ imports:
 - name: github.com/sirupsen/logrus
   version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
 - name: golang.org/x/crypto
-  version: 49796115aa4b964c318aad4f3084fdb41e9aa067
+  version: 91a49db82a88618983a78a06c1cbd4e00ab749ab
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
-  version: 1c05540f6879653db88113bc4a2b70aec4bd491f
+  version: eb5bcb51f2a31c7d5141d810b70815c05d9c9146
   subpackages:
   - context
+  - http/httpguts
   - http2
   - http2/hpack
   - idna
   - internal/timeseries
-  - lex/httplex
   - trace
 - name: golang.org/x/sys
   version: acbc56fc7007d2a01796d5bde54f39e3b3e95945
@@ -53,14 +53,14 @@ imports:
   - unix
   - windows
 - name: golang.org/x/text
-  version: b19bf474d317b857955b12035d2c5acb57ce8b01
+  version: 27420a1a391f5504f73155051cd274311bf70883
   subpackages:
   - secure/bidirule
   - transform
   - unicode/bidi
   - unicode/norm
 - name: google.golang.org/genproto
-  version: 09f6ed296fc66555a25fe4ce95173148778dfa85
+  version: 2d9486acae19cf9bd0c093d7dc236a323726a9e4
   subpackages:
   - googleapis
   - googleapis/rpc/status

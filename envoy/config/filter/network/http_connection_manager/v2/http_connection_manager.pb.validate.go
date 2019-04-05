@@ -261,6 +261,16 @@ func (m *HttpConnectionManager) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetNormalizePath()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				Field:  "NormalizePath",
+				Reason: "embedded message failed validation",
+				Cause:  err,
+			}
+		}
+	}
+
 	switch m.RouteSpecifier.(type) {
 
 	case *HttpConnectionManager_Rds:
