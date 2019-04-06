@@ -87,7 +87,7 @@ type CircuitBreakers_Thresholds struct {
 	// The :ref:`RoutingPriority<envoy_api_enum_core.RoutingPriority>`
 	// the specified CircuitBreaker settings apply to.
 	// [#comment:TODO(htuch): add (validate.rules).enum.defined_only = true once
-	// https://github.com/lyft/protoc-gen-validate/issues/42 is resolved.]
+	// https://github.com/envoyproxy/protoc-gen-validate/issues/42 is resolved.]
 	Priority core.RoutingPriority `protobuf:"varint,1,opt,name=priority,proto3,enum=envoy.api.v2.core.RoutingPriority" json:"priority,omitempty"`
 	// The maximum number of connections that Envoy will make to the upstream
 	// cluster. If not specified, the default is 1024.

@@ -27,7 +27,7 @@ imports:
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
-- name: github.com/lyft/protoc-gen-validate
+- name: github.com/envoyproxy/protoc-gen-validate
   version: f9d2b11e44149635b23a002693b76512b01ae515
   subpackages:
   - validate
