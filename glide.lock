@@ -1,8 +1,12 @@
-hash: e2131de84f2479e8f3f0564a9af234352482c7086c5041e6458abdb73a59870b
-updated: 2019-04-05T13:25:17.583869122-04:00
+hash: e0f843a95167ce5ee9c8329a280b9f10f31bf8a532c3bd22d458a12940a796dd
+updated: 2019-04-05T16:19:23.104424383-07:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 6b978acde7fbb42bf11d4e0e9160044608088588
+  version: 897f5b09bbe3823853c20f610120228ca54ec7a0
+- name: github.com/envoyproxy/protoc-gen-validate
+  version: d6164de4910977d3c3c8dbd9299b5064ea9e7c2b
+  subpackages:
+  - validate
 - name: github.com/gogo/googleapis
   version: 0cd9801be74a10d5ac39d69626eac8255ffcd502
   subpackages:
@@ -27,10 +31,6 @@ imports:
   - ptypes/any
   - ptypes/duration
   - ptypes/timestamp
-- name: github.com/lyft/protoc-gen-validate
-  version: f9d2b11e44149635b23a002693b76512b01ae515
-  subpackages:
-  - validate
 - name: github.com/sirupsen/logrus
   version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
 - name: golang.org/x/crypto

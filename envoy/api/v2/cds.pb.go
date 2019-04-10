@@ -11,13 +11,13 @@ import (
 	math "math"
 	time "time"
 
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "github.com/gogo/googleapis/google/api"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
 	types "github.com/gogo/protobuf/types"
-	_ "github.com/lyft/protoc-gen-validate/validate"
 	grpc "google.golang.org/grpc"
 
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
