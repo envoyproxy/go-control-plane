@@ -340,12 +340,17 @@ func (m *HttpConnectionManager) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetNormalizePath()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HttpConnectionManagerValidationError{
-				Field:  "NormalizePath",
-				Reason: "embedded message failed validation",
-				Cause:  err,
+	{
+		tmp := m.GetNormalizePath()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return HttpConnectionManagerValidationError{
+					field:  "NormalizePath",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

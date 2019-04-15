@@ -152,6 +152,8 @@ func (m *RedisProxy_ConnPoolSettings) Validate() error {
 
 	// no validation rules for EnableHashtagging
 
+	// no validation rules for EnableRedirection
+
 	return nil
 }
 

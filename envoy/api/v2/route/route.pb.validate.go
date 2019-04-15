@@ -991,18 +991,19 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	if d := m.GetIdleTimeout(); d != nil {
-		dur := *d
+	{
+		tmp := m.GetIdleTimeout()
 
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
 
-		if dur <= gt {
-			return RouteActionValidationError{
-				field:  "IdleTimeout",
-				reason: "value must be greater than 0s",
+			if err := v.Validate(); err != nil {
+				return RouteActionValidationError{
+					field:  "IdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
-
 	}
 
 	{
