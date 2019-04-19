@@ -59,6 +59,8 @@ func (m *ExtAuthz) Validate() error {
 		}
 	}
 
+	// no validation rules for ClearRouteCache
+
 	switch m.Services.(type) {
 
 	case *ExtAuthz_GrpcService:
