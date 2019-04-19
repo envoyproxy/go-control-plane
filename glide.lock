@@ -1,8 +1,8 @@
-hash: e0f843a95167ce5ee9c8329a280b9f10f31bf8a532c3bd22d458a12940a796dd
-updated: 2019-04-05T16:19:23.104424383-07:00
+hash: 776b712f59e46e70aee5340a40597363191025942217242047bb111e2cfa4412
+updated: 2019-04-19T21:01:59.327763767Z
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 897f5b09bbe3823853c20f610120228ca54ec7a0
+  version: 758fe69d11f5dba13f8297e4cd615ef4be0cbc4c
 - name: github.com/envoyproxy/protoc-gen-validate
   version: d6164de4910977d3c3c8dbd9299b5064ea9e7c2b
   subpackages:
@@ -66,7 +66,7 @@ imports:
   - googleapis/rpc/status
   - opencensus
 - name: google.golang.org/grpc
-  version: 3507fb8e1a5ad030303c106fef3a47c9fdad16ad
+  version: 25c4f928eaa6d96443009bd842389fb4fa48664e
   subpackages:
   - balancer
   - balancer/base
@@ -81,6 +81,7 @@ imports:
   - grpclog
   - internal
   - internal/backoff
+  - internal/balancerload
   - internal/binarylog
   - internal/channelz
   - internal/envconfig

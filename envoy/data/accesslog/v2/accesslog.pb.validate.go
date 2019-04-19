@@ -897,6 +897,8 @@ func (m *HTTPResponseProperties) Validate() error {
 
 	// no validation rules for ResponseTrailers
 
+	// no validation rules for ResponseCodeDetails
+
 	return nil
 }
 

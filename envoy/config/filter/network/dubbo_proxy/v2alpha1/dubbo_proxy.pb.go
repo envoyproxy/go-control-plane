@@ -25,6 +25,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
+// Dubbo Protocol types supported by Envoy.
 type ProtocolType int32
 
 const (
@@ -47,6 +48,7 @@ func (ProtocolType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_8ee9c82d7d1be64c, []int{0}
 }
 
+// Dubbo Serialization types supported by Envoy.
 type SerializationType int32
 
 const (
@@ -69,8 +71,7 @@ func (SerializationType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_8ee9c82d7d1be64c, []int{1}
 }
 
-// [#protodoc-title: Dubbo Proxy]
-// Dubbo Proxy filter configuration.
+// [#comment:next free field: 6]
 type DubboProxy struct {
 	// The human readable prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
