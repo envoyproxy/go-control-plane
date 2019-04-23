@@ -1,8 +1,8 @@
-hash: 776b712f59e46e70aee5340a40597363191025942217242047bb111e2cfa4412
-updated: 2019-04-19T21:01:59.327763767Z
+hash: 0407e74d972c5cf9671f37b75c49bd9ea60989f111d735b177655a0f2f3a5fbc
+updated: 2019-04-23T16:12:25.385403-07:00
 imports:
 - name: github.com/envoyproxy/data-plane-api
-  version: 758fe69d11f5dba13f8297e4cd615ef4be0cbc4c
+  version: da8a43117df30a8439d6290a34e9e82e19006d1e
 - name: github.com/envoyproxy/protoc-gen-validate
   version: d6164de4910977d3c3c8dbd9299b5064ea9e7c2b
   subpackages:
