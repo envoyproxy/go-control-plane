@@ -1081,6 +1081,7 @@ type HttpFilter struct {
 	// * :ref:`envoy.cors <config_http_filters_cors>`
 	// * :ref:`envoy.ext_authz <config_http_filters_ext_authz>`
 	// * :ref:`envoy.fault <config_http_filters_fault_injection>`
+	// * :ref:`envoy.filters.http.csrf <config_http_filters_csrf>`
 	// * :ref:`envoy.filters.http.header_to_metadata <config_http_filters_header_to_metadata>`
 	// * :ref:`envoy.filters.http.grpc_http1_reverse_bridge \
 	//   <config_http_filters_grpc_http1_reverse_bridge>`

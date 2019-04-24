@@ -1123,6 +1123,21 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
+	{
+		tmp := m.GetGrpcTimeoutOffset()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return RouteActionValidationError{
+					field:  "GrpcTimeoutOffset",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+	}
+
 	for idx, item := range m.GetUpgradeConfigs() {
 		_, _ = idx, item
 
