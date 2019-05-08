@@ -13,6 +13,7 @@ GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GODIRS		= $(shell go list -f '{{.Dir}}' ./... \
 						| grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
 
+.PHONY: vendor
 vendor:
 	@go mod vendor
 

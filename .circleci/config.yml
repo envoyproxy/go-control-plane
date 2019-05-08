@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-    working_directory: /go/src/github.com/envoyproxy/go-control-plane
+    working_directory: /go-control-plane
     docker:
       - image: circleci/golang:1.12
     steps:
