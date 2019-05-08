@@ -13,6 +13,9 @@ GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 GODIRS		= $(shell go list -f '{{.Dir}}' ./... \
 						| grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
 
+vendor:
+	@go mod vendor
+
 .PHONY: build
 build: vendor
 	@echo "--> building"
@@ -101,32 +104,15 @@ generate: $(BINDIR)/gogofast $(BINDIR)/validate
 	@echo "--> generating pb.go files"
 	$(SHELL) build/generate_protos.sh
 
-#------------------
-#-- dependencies
-#------------------
-.PHONY: depend.update depend.install
-
-depend.update: tools.glide
-	@echo "--> updating dependencies from glide.yaml"
-	@glide update
-
-depend.install: tools.glide
-	@echo "--> installing dependencies from glide.lock "
-	@glide install
-
-vendor:
-	@echo "--> installing dependencies from glide.lock "
-	@glide install
-
 $(BINDIR):
 	@mkdir -p $(BINDIR)
 
 #---------------
 #-- tools
 #---------------
-.PHONY: tools tools.glide tools.goimports tools.golint tools.govet
+.PHONY: tools tools.goimports tools.golint tools.govet
 
-tools: tools.glide tools.goimports tools.golint tools.govet
+tools: tools.goimports tools.golint tools.govet
 
 tools.goimports:
 	@command -v goimports >/dev/null ; if [ $$? -ne 0 ]; then \
@@ -144,12 +130,6 @@ tools.golint:
 	@command -v golint >/dev/null ; if [ $$? -ne 0 ]; then \
 		echo "--> installing golint"; \
 		go get -u golang.org/x/lint/golint; \
-	fi
-
-tools.glide:
-	@command -v glide >/dev/null ; if [ $$? -ne 0 ]; then \
-		echo "--> installing glide"; \
-		curl https://glide.sh/get | sh; \
 	fi
 
 $(BINDIR)/gogofast: vendor
