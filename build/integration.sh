@@ -11,7 +11,7 @@ set -o pipefail
 # Management server type. Valid values are "ads", "xds", "rest"
 XDS=${XDS:-ads}
 
-(bin/test --xds=${XDS} "$@")&
+(bin/test --xds=${XDS} -debug "$@")&
 SERVER_PID=$!
 
 # Envoy start-up command
