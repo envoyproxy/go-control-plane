@@ -42,21 +42,13 @@ format:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test $(BINDIR)/test-linux docker integration integration.ads integration.xds integration.rest integration.docker
+.PHONY: $(BINDIR)/test integration integration.ads integration.xds integration.rest integration.ads.tls
 
 $(BINDIR)/test:
 	@echo "--> building test binary"
 	@go build -race -o $@ pkg/test/main/main.go
 
-$(BINDIR)/test-linux:
-	@echo "--> building Linux test binary"
-	@env GOOS=linux GOARCH=amd64 go build -race -o $@ pkg/test/main/main.go
-
-docker:
-	@echo "--> building test docker image"
-	@docker build -t test .
-
-integration: integration.ads integration.xds integration.rest
+integration: integration.ads integration.xds integration.rest integration.ads.tls
 
 integration.ads: $(BINDIR)/test
 	env XDS=ads build/integration.sh
@@ -67,13 +59,8 @@ integration.xds: $(BINDIR)/test
 integration.rest: $(BINDIR)/test
 	env XDS=rest build/integration.sh
 
-integration.docker: docker
-	docker run -it -e "XDS=ads" test -debug
-	docker run -it -e "XDS=xds" test -debug
-	docker run -it -e "XDS=rest" test -debug
-	docker run -it -e "XDS=ads" test -debug -tls
-	docker run -it -e "XDS=xds" test -debug -tls
-	docker run -it -e "XDS=rest" test -debug -tls
+integration.ads.tls: $(BINDIR)/test
+	env XDS=ads build/integration.sh -tls
 
 #-----------------
 #-- code generaion
