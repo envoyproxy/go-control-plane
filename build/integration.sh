@@ -25,6 +25,7 @@ ENVOY_PID=$!
 function cleanup() {
   kill ${ENVOY_PID}
   echo Envoy log: ${ENVOY_LOG}
+  cat ${ENVOY_LOG}
 }
 trap cleanup EXIT
 
