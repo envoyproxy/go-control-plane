@@ -3,10 +3,9 @@ jobs:
   build:
     working_directory: /go-control-plane
     docker:
-      - image: circleci/golang:1.12
+      - image: gcr.io/istio-testing/go-control-plane-ci:05-09-2019
     steps:
       - checkout
-      - run: make check
       - run: make build
       - run: make test
       - setup_remote_docker:
