@@ -48,7 +48,7 @@ $(BINDIR)/test:
 	@echo "--> building test binary"
 	@go build -race -o $@ pkg/test/main/main.go
 
-integration: integration.ads integration.xds integration.rest integration.ads.tls
+integration: integration.xds integration.ads integration.rest integration.ads.tls
 
 integration.ads: $(BINDIR)/test
 	env XDS=ads build/integration.sh
