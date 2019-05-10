@@ -40,15 +40,15 @@ feedback, we might decided to revisit this aspect at a later point in time.
 
 ## Requirements
 
-1. Go 1.9+
+1. Go 1.12+
 
 ## Quick start
 
-1. Setup tools and dependencies
+1. Setup existing build:
 
 ```sh
-make tools
-make depend.install
+make build
+make test
 ```
 
 2. Generate proto files (if you update the [data-plane-api](https://github.com/envoyproxy/data-plane-api)
@@ -58,27 +58,28 @@ dependency)
 make generate
 ```
 
-3. Edit the code in your favorite IDE
+You should use the included build image to produce a consistent set of generated file, e.g.
 
-4. Format, vet and lint the code
+```sh
+docker run -v $(pwd):/go-control-plane gcr.io/istio-testing/go-control-plane-ci:05-09-2019 make generate
+```
+
+Format the code:
 
 ```sh
 make format
-make check
 ```
 
-5. Build and test
+__NOTE__: you may need to apply a small patch to correct imports in the generate files:
 
 ```sh
-make build
-make test
+make generate-patch
 ```
 
-6. Run [integration test](pkg/test/main/README.md) against the latest Envoy
-   docker image:
+3. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
 
 ```sh
-make integration.docker
+make integration
 ```
 
 ## Usage

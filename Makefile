@@ -8,15 +8,10 @@ SHELL 	:= /bin/bash
 BINDIR	:= bin
 PKG 		:= github.com/envoyproxy/go-control-plane
 
-# Pure Go sources (not vendored and not generated)
-GOFILES		= $(shell find . -type f -name '*.go' -not -path "./vendor/*")
-GODIRS		= $(shell go list -f '{{.Dir}}' ./... \
-						| grep -vFf <(go list -f '{{.Dir}}' ./vendor/...))
-
 .PHONY: build
 build:
 	@echo "--> building"
-	@go build ./...
+	@go build ./pkg/... ./envoy/...
 
 .PHONY: clean
 clean:
@@ -37,7 +32,7 @@ cover:
 .PHONY: format
 format:
 	@echo "--> formatting code with 'goimports' tool"
-	@goimports -local $(PKG) -w -l $(GOFILES)
+	@goimports -local $(PKG) -w -l pkg envoy
 
 #-----------------
 #-- integration
@@ -67,8 +62,16 @@ integration.ads.tls: $(BINDIR)/test
 #-----------------
 
 generate:
+	@echo "--> vendoring protobufs"
+	@go mod vendor
 	@echo "--> generating pb.go files"
 	$(SHELL) build/generate_protos.sh
 
 $(BINDIR):
 	@mkdir -p $(BINDIR)
+
+.PHONY: generate-patch
+generate-patch:
+	@echo "--> patching generated code due to issue with protoc-gen-validate"
+	find envoy -type f -print0 |\
+		xargs -0 sed -i 's#"envoy/api/v2/core"#"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"#g'
