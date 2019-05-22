@@ -33,11 +33,18 @@ const (
 	key = "node"
 )
 
-func (group) ID(node *core.Node) string {
+func (group) SnapshotID(node *core.Node) cache.SnapshotID {
 	if node != nil {
-		return node.Id
+		return cache.SnapshotID(node.Id)
 	}
-	return key
+	return cache.SnapshotID(key)
+}
+
+func (group) NodeID(node *core.Node) cache.NodeID {
+	if node != nil {
+		return cache.NodeID(node.Id)
+	}
+	return cache.NodeID(key)
 }
 
 var (
@@ -215,7 +222,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 				id := fmt.Sprintf("%d", i%2)
 				var cancel func()
 				if i < 25 {
-					c.SetSnapshot(id, cache.Snapshot{
+					c.SetSnapshot(cache.SnapshotID(id), cache.Snapshot{
 						Endpoints: cache.NewResources(fmt.Sprintf("v%d", i), []cache.Resource{resource.MakeEndpoint(clusterName, uint32(i))}),
 					})
 				} else {

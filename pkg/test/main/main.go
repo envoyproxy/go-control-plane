@@ -119,7 +119,7 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshot)
 		}
 
-		err := config.SetSnapshot(nodeID, snapshot)
+		err := config.SetSnapshot(cache.SnapshotID(nodeID), snapshot)
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshot)
 			os.Exit(1)

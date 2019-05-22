@@ -45,13 +45,13 @@ type SnapshotCache interface {
 	//
 	// This method will cause the server to respond to all open watches, for which
 	// the version differs from the snapshot version.
-	SetSnapshot(node string, snapshot Snapshot) error
+	SetSnapshot(snapshotID SnapshotID, snapshot Snapshot) error
 
 	// GetSnapshots gets the snapshot for a node.
-	GetSnapshot(node string) (Snapshot, error)
+	GetSnapshot(snapshotID SnapshotID) (Snapshot, error)
 
 	// ClearSnapshot removes all status and snapshot information associated with a node.
-	ClearSnapshot(node string)
+	ClearSnapshot(snapshotID SnapshotID)
 }
 
 type snapshotCache struct {
@@ -61,10 +61,13 @@ type snapshotCache struct {
 	ads bool
 
 	// snapshots are cached resources indexed by node IDs
-	snapshots map[string]Snapshot
+	snapshots map[SnapshotID]Snapshot
+
+	// nodes for snapshot
+	nodes map[SnapshotID]map[NodeID]bool
 
 	// status information for all nodes indexed by node IDs
-	status map[string]*statusInfo
+	status map[NodeID]*statusInfo
 
 	// hash is the hashing function for Envoy nodes
 	hash NodeHash
@@ -90,60 +93,66 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache 
 	return &snapshotCache{
 		log:       logger,
 		ads:       ads,
-		snapshots: make(map[string]Snapshot),
-		status:    make(map[string]*statusInfo),
+		snapshots: make(map[SnapshotID]Snapshot),
+		nodes:     make(map[SnapshotID]map[NodeID]bool),
+		status:    make(map[NodeID]*statusInfo),
 		hash:      hash,
 	}
 }
 
 // SetSnapshotCache updates a snapshot for a node.
-func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
+func (cache *snapshotCache) SetSnapshot(snapshotID SnapshotID, snapshot Snapshot) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
 	// update the existing entry
-	cache.snapshots[node] = snapshot
+	cache.snapshots[snapshotID] = snapshot
 
 	// trigger existing watches for which version changed
-	if info, ok := cache.status[node]; ok {
-		info.mu.Lock()
-		for id, watch := range info.watches {
-			version := snapshot.GetVersion(watch.Request.TypeUrl)
-			if version != watch.Request.VersionInfo {
-				if cache.log != nil {
-					cache.log.Infof("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
-				}
-				cache.respond(watch.Request, watch.Response, snapshot.GetResources(watch.Request.TypeUrl), version)
+	for nodeId := range cache.nodes[snapshotID] {
+		if info, ok := cache.status[nodeId]; ok {
+			info.mu.Lock()
+			for id, watch := range info.watches {
+				version := snapshot.GetVersion(watch.Request.TypeUrl)
+				if version != watch.Request.VersionInfo {
+					if cache.log != nil {
+						cache.log.Infof("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
+					}
+					cache.respond(watch.Request, watch.Response, snapshot.GetResources(watch.Request.TypeUrl), version)
 
-				// discard the watch
-				delete(info.watches, id)
+					// discard the watch
+					delete(info.watches, id)
+				}
 			}
+			info.mu.Unlock()
 		}
-		info.mu.Unlock()
 	}
 
 	return nil
 }
 
 // GetSnapshots gets the snapshot for a node, and returns an error if not found.
-func (cache *snapshotCache) GetSnapshot(node string) (Snapshot, error) {
+func (cache *snapshotCache) GetSnapshot(snapshotID SnapshotID) (Snapshot, error) {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 
-	snap, ok := cache.snapshots[node]
+	snap, ok := cache.snapshots[snapshotID]
 	if !ok {
-		return Snapshot{}, fmt.Errorf("no snapshot found for node %s", node)
+		return Snapshot{}, fmt.Errorf("no snapshot found: %s", snapshotID)
 	}
 	return snap, nil
 }
 
 // ClearSnapshot clears snapshot and info for a node.
-func (cache *snapshotCache) ClearSnapshot(node string) {
+func (cache *snapshotCache) ClearSnapshot(snapshotID SnapshotID) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	delete(cache.snapshots, node)
-	delete(cache.status, node)
+	delete(cache.snapshots, snapshotID)
+	for nodeId := range cache.nodes[snapshotID] {
+		delete(cache.status, nodeId)
+	}
+	delete(cache.nodes, snapshotID)
 }
 
 // nameSet creates a map from a string slice to value true.
@@ -167,7 +176,8 @@ func superset(names map[string]bool, resources map[string]Resource) error {
 
 // CreateWatch returns a watch for an xDS request.
 func (cache *snapshotCache) CreateWatch(request Request) (chan Response, func()) {
-	nodeID := cache.hash.ID(request.Node)
+	snapshotID := cache.hash.SnapshotID(request.Node)
+	nodeID := cache.hash.NodeID(request.Node)
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -178,6 +188,12 @@ func (cache *snapshotCache) CreateWatch(request Request) (chan Response, func())
 		cache.status[nodeID] = info
 	}
 
+	// Attach node watch to specific snapshot
+	if _, exists := cache.nodes[snapshotID]; !exists {
+		cache.nodes[snapshotID] = map[NodeID]bool{}
+	}
+	cache.nodes[snapshotID][nodeID] = true
+
 	// update last watch request time
 	info.mu.Lock()
 	info.lastWatchRequestTime = time.Now()
@@ -186,7 +202,7 @@ func (cache *snapshotCache) CreateWatch(request Request) (chan Response, func())
 	// allocate capacity 1 to allow one-time non-blocking use
 	value := make(chan Response, 1)
 
-	snapshot, exists := cache.snapshots[nodeID]
+	snapshot, exists := cache.snapshots[snapshotID]
 	version := snapshot.GetVersion(request.TypeUrl)
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
@@ -213,7 +229,7 @@ func (cache *snapshotCache) nextWatchID() int64 {
 }
 
 // cancellation function for cleaning stale watches
-func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
+func (cache *snapshotCache) cancelWatch(nodeID NodeID, watchID int64) func() {
 	return func() {
 		// uses the cache mutex
 		cache.mu.Lock()
@@ -276,12 +292,12 @@ func createResponse(request Request, resources map[string]Resource, version stri
 // Fetch implements the cache fetch function.
 // Fetch is called on multiple streams, so responding to individual names with the same version works.
 func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
-	nodeID := cache.hash.ID(request.Node)
+	snapshotID := cache.hash.SnapshotID(request.Node)
 
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 
-	if snapshot, exists := cache.snapshots[nodeID]; exists {
+	if snapshot, exists := cache.snapshots[snapshotID]; exists {
 		// Respond only if the request version is distinct from the current snapshot state.
 		// It might be beneficial to hold the request since Envoy will re-attempt the refresh.
 		version := snapshot.GetVersion(request.TypeUrl)
@@ -294,11 +310,11 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Respon
 		return &out, nil
 	}
 
-	return nil, fmt.Errorf("missing snapshot for %q", nodeID)
+	return nil, fmt.Errorf("missing snapshot for %q", cache.hash.NodeID(request.Node))
 }
 
 // GetStatusInfo retrieves the status info for the node.
-func (cache *snapshotCache) GetStatusInfo(node string) StatusInfo {
+func (cache *snapshotCache) GetStatusInfo(node NodeID) StatusInfo {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 
@@ -311,11 +327,11 @@ func (cache *snapshotCache) GetStatusInfo(node string) StatusInfo {
 }
 
 // GetStatusKeys retrieves all node IDs in the status map.
-func (cache *snapshotCache) GetStatusKeys() []string {
+func (cache *snapshotCache) GetStatusKeys() []NodeID {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 
-	out := make([]string, 0, len(cache.status))
+	out := make([]NodeID, 0, len(cache.status))
 	for id := range cache.status {
 		out = append(out, id)
 	}

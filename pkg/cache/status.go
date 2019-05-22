@@ -21,10 +21,14 @@ import (
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 )
 
+type NodeID string
+type SnapshotID string
+
 // NodeHash computes string identifiers for Envoy nodes.
 type NodeHash interface {
 	// ID function defines a unique string identifier for the remote Envoy node.
-	ID(node *core.Node) string
+	SnapshotID(node *core.Node) SnapshotID
+	NodeID(node *core.Node) NodeID
 }
 
 // StatusInfo tracks the server state for the remote Envoy node.

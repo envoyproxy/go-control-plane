@@ -18,6 +18,7 @@ package test
 import (
 	"context"
 	"fmt"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"log"
 	"net"
 	"net/http"
@@ -41,11 +42,18 @@ type Hasher struct {
 }
 
 // ID function
-func (h Hasher) ID(node *core.Node) string {
+func (h Hasher) SnapshotID(node *core.Node) cache.SnapshotID {
 	if node == nil {
-		return "unknown"
+		return cache.SnapshotID("unknown")
 	}
-	return node.Id
+	return cache.SnapshotID(node.Id)
+}
+
+func (h Hasher) NodeID(node *core.Node) cache.NodeID {
+	if node == nil {
+		return cache.NodeID("unknown")
+	}
+	return cache.NodeID(node.Id)
 }
 
 type echo struct{}
