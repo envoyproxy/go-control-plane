@@ -15,4 +15,3 @@
 *_gen_test.go
 
 /envoy.log
-/data-plane-api

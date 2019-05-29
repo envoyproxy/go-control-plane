@@ -5,22 +5,18 @@ set -o pipefail
 shopt -s nullglob
 
 root="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-xds=${root}/vendor/github.com/envoyproxy/data-plane-api
-
-echo "Expecting protoc version >= 3.5.0:"
-protoc=$(which protoc)
-$protoc --version
+xds="${root}/data-plane-api"
 
 imports=(
   ${xds}
   "${root}/vendor/github.com/envoyproxy/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
-  "${root}/vendor/github.com/gogo/protobuf/protobuf"
+  "${root}/vendor/github.com/gogo/googleapis"
   "${root}/vendor/istio.io/gogo-genproto/prometheus"
-  "${root}/vendor/istio.io/gogo-genproto/googleapis"
   "${root}/vendor/istio.io/gogo-genproto/opencensus/proto/trace/v1"
 )
 
+protoc="protoc"
 protocarg=""
 for i in "${imports[@]}"
 do
@@ -42,6 +38,7 @@ mappings=(
   "gogoproto/gogo.proto=github.com/gogo/protobuf/gogoproto"
   "trace.proto=istio.io/gogo-genproto/opencensus/proto/trace/v1"
   "metrics.proto=istio.io/gogo-genproto/prometheus"
+  "validate/validate.proto=github.com/envoyproxy/protoc-gen-validate/validate"
 )
 
 gogoarg="plugins=grpc"
