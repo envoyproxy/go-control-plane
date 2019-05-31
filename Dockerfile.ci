@@ -22,5 +22,4 @@ RUN rm go.mod
 RUN rm go.sum
 
 # add envoy
-# Due to https://github.com/envoyproxy/envoy/issues/6237, we have to pin envoy temporarily
-COPY --from=envoyproxy/envoy:0634e7bcbfea7317eaf805a657d048ffa27f519a /usr/local/bin/envoy /usr/local/bin/envoy
+COPY --from=envoyproxy/envoy:latest /usr/local/bin/envoy /usr/local/bin/envoy
