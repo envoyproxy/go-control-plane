@@ -88,6 +88,21 @@ func (m *RedisProxy) Validate() error {
 		}
 	}
 
+	{
+		tmp := m.GetDownstreamAuthPassword()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return RedisProxyValidationError{
+					field:  "DownstreamAuthPassword",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -144,6 +159,88 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RedisProxyValidationError{}
+
+// Validate checks the field values on RedisProtocolOptions with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RedisProtocolOptions) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	{
+		tmp := m.GetAuthPassword()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return RedisProtocolOptionsValidationError{
+					field:  "AuthPassword",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// RedisProtocolOptionsValidationError is the validation error returned by
+// RedisProtocolOptions.Validate if the designated constraints aren't met.
+type RedisProtocolOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RedisProtocolOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RedisProtocolOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RedisProtocolOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RedisProtocolOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RedisProtocolOptionsValidationError) ErrorName() string {
+	return "RedisProtocolOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RedisProtocolOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRedisProtocolOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RedisProtocolOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RedisProtocolOptionsValidationError{}
 
 // Validate checks the field values on RedisProxy_ConnPoolSettings with the
 // rules defined in the proto definition for this message. If any rules are
