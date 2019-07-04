@@ -8,6 +8,7 @@ jobs:
       - checkout
       - run: make build
       - run: make test
+      - run: git submodule update --init && make generate
       - run: make integration
       - run: make cover
       - run: curl -s https://codecov.io/bash | bash
