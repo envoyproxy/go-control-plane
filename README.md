@@ -3,7 +3,6 @@
 [![CircleCI](https://circleci.com/gh/envoyproxy/go-control-plane.svg?style=svg)](https://circleci.com/gh/envoyproxy/go-control-plane)
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
 [![GoDoc](https://godoc.org/github.com/envoyproxy/go-control-plane?status.svg)](https://godoc.org/github.com/envoyproxy/go-control-plane)
-[![codecov](https://codecov.io/gh/envoyproxy/go-control-plane/branch/master/graph/badge.svg)](https://codecov.io/gh/envoyproxy/go-control-plane)
 
 
 This repository contains a Go-based implementation of an API server that
