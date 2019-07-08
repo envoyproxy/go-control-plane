@@ -75,3 +75,5 @@ generate-patch:
 	@echo "--> patching generated code due to issue with protoc-gen-validate"
 	find envoy -type f -print0 |\
 		xargs -0 sed -i 's#"envoy/api/v2/core"#"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"#g'
+	find envoy -type f -print0 |\
+		xargs -0 sed -i 's#"envoy/api/v2"#"github.com/envoyproxy/go-control-plane/envoy/api/v2"#g'
