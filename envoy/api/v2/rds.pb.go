@@ -3,34 +3,26 @@
 
 package v2
 
-import (
-	bytes "bytes"
-	context "context"
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import envoy_api_v2_core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+import envoy_api_v2_core3 "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+import envoy_api_v2_route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+import _ "github.com/gogo/googleapis/google/api"
+import google_protobuf2 "github.com/gogo/protobuf/types"
+import _ "github.com/envoyproxy/protoc-gen-validate/validate"
+import _ "github.com/gogo/protobuf/gogoproto"
 
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "github.com/gogo/googleapis/google/api"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	types "github.com/gogo/protobuf/types"
-	grpc "google.golang.org/grpc"
+import context "golang.org/x/net/context"
+import grpc "google.golang.org/grpc"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
-)
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // [#comment:next free field: 10]
 type RouteConfiguration struct {
@@ -40,7 +32,7 @@ type RouteConfiguration struct {
 	// :ref:`envoy_api_msg_config.filter.network.http_connection_manager.v2.Rds`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// An array of virtual hosts that make up the route table.
-	VirtualHosts []route.VirtualHost `protobuf:"bytes,2,rep,name=virtual_hosts,json=virtualHosts,proto3" json:"virtual_hosts"`
+	VirtualHosts []envoy_api_v2_route.VirtualHost `protobuf:"bytes,2,rep,name=virtual_hosts,json=virtualHosts" json:"virtual_hosts"`
 	// An array of virtual hosts will be dynamically loaded via the VHDS API.
 	// Both *virtual_hosts* and *vhds* fields will be used when present. *virtual_hosts* can be used
 	// for a base routing table or for infrequently changing virtual hosts. *vhds* is used for
@@ -48,32 +40,32 @@ type RouteConfiguration struct {
 	// generate a routing table for a given RouteConfiguration, with *vhds* derived configuration
 	// taking precedence.
 	// [#not-implemented-hide:]
-	Vhds *Vhds `protobuf:"bytes,9,opt,name=vhds,proto3" json:"vhds,omitempty"`
+	Vhds *Vhds `protobuf:"bytes,9,opt,name=vhds" json:"vhds,omitempty"`
 	// Optionally specifies a list of HTTP headers that the connection manager
 	// will consider to be internal only. If they are found on external requests they will be cleaned
 	// prior to filter invocation. See :ref:`config_http_conn_man_headers_x-envoy-internal` for more
 	// information.
-	InternalOnlyHeaders []string `protobuf:"bytes,3,rep,name=internal_only_headers,json=internalOnlyHeaders,proto3" json:"internal_only_headers,omitempty"`
+	InternalOnlyHeaders []string `protobuf:"bytes,3,rep,name=internal_only_headers,json=internalOnlyHeaders" json:"internal_only_headers,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each response that
 	// the connection manager encodes. Headers specified at this level are applied
 	// after headers from any enclosed :ref:`envoy_api_msg_route.VirtualHost` or
 	// :ref:`envoy_api_msg_route.RouteAction`. For more information, including details on
 	// header value syntax, see the documentation on :ref:`custom request headers
 	// <config_http_conn_man_headers_custom_request_headers>`.
-	ResponseHeadersToAdd []*core.HeaderValueOption `protobuf:"bytes,4,rep,name=response_headers_to_add,json=responseHeadersToAdd,proto3" json:"response_headers_to_add,omitempty"`
+	ResponseHeadersToAdd []*envoy_api_v2_core.HeaderValueOption `protobuf:"bytes,4,rep,name=response_headers_to_add,json=responseHeadersToAdd" json:"response_headers_to_add,omitempty"`
 	// Specifies a list of HTTP headers that should be removed from each response
 	// that the connection manager encodes.
-	ResponseHeadersToRemove []string `protobuf:"bytes,5,rep,name=response_headers_to_remove,json=responseHeadersToRemove,proto3" json:"response_headers_to_remove,omitempty"`
+	ResponseHeadersToRemove []string `protobuf:"bytes,5,rep,name=response_headers_to_remove,json=responseHeadersToRemove" json:"response_headers_to_remove,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each request
 	// routed by the HTTP connection manager. Headers specified at this level are
 	// applied after headers from any enclosed :ref:`envoy_api_msg_route.VirtualHost` or
 	// :ref:`envoy_api_msg_route.RouteAction`. For more information, including details on
 	// header value syntax, see the documentation on :ref:`custom request headers
 	// <config_http_conn_man_headers_custom_request_headers>`.
-	RequestHeadersToAdd []*core.HeaderValueOption `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd,proto3" json:"request_headers_to_add,omitempty"`
+	RequestHeadersToAdd []*envoy_api_v2_core.HeaderValueOption `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd" json:"request_headers_to_add,omitempty"`
 	// Specifies a list of HTTP headers that should be removed from each request
 	// routed by the HTTP connection manager.
-	RequestHeadersToRemove []string `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove,proto3" json:"request_headers_to_remove,omitempty"`
+	RequestHeadersToRemove []string `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove" json:"request_headers_to_remove,omitempty"`
 	// An optional boolean that specifies whether the clusters that the route
 	// table refers to will be validated by the cluster manager. If set to true
 	// and a route refers to a non-existent cluster, the route table will not
@@ -87,44 +79,13 @@ type RouteConfiguration struct {
 	// <envoy_api_field_config.filter.network.http_connection_manager.v2.HttpConnectionManager.rds>`
 	// option. Users may wish to override the default behavior in certain cases (for example when
 	// using CDS with a static route table).
-	ValidateClusters     *types.BoolValue `protobuf:"bytes,7,opt,name=validate_clusters,json=validateClusters,proto3" json:"validate_clusters,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	ValidateClusters *google_protobuf2.BoolValue `protobuf:"bytes,7,opt,name=validate_clusters,json=validateClusters" json:"validate_clusters,omitempty"`
 }
 
-func (m *RouteConfiguration) Reset()         { *m = RouteConfiguration{} }
-func (m *RouteConfiguration) String() string { return proto.CompactTextString(m) }
-func (*RouteConfiguration) ProtoMessage()    {}
-func (*RouteConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_78812f46dcff924a, []int{0}
-}
-func (m *RouteConfiguration) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RouteConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RouteConfiguration.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RouteConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteConfiguration.Merge(m, src)
-}
-func (m *RouteConfiguration) XXX_Size() int {
-	return m.Size()
-}
-func (m *RouteConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteConfiguration.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteConfiguration proto.InternalMessageInfo
+func (m *RouteConfiguration) Reset()                    { *m = RouteConfiguration{} }
+func (m *RouteConfiguration) String() string            { return proto.CompactTextString(m) }
+func (*RouteConfiguration) ProtoMessage()               {}
+func (*RouteConfiguration) Descriptor() ([]byte, []int) { return fileDescriptorRds, []int{0} }
 
 func (m *RouteConfiguration) GetName() string {
 	if m != nil {
@@ -133,7 +94,7 @@ func (m *RouteConfiguration) GetName() string {
 	return ""
 }
 
-func (m *RouteConfiguration) GetVirtualHosts() []route.VirtualHost {
+func (m *RouteConfiguration) GetVirtualHosts() []envoy_api_v2_route.VirtualHost {
 	if m != nil {
 		return m.VirtualHosts
 	}
@@ -154,7 +115,7 @@ func (m *RouteConfiguration) GetInternalOnlyHeaders() []string {
 	return nil
 }
 
-func (m *RouteConfiguration) GetResponseHeadersToAdd() []*core.HeaderValueOption {
+func (m *RouteConfiguration) GetResponseHeadersToAdd() []*envoy_api_v2_core.HeaderValueOption {
 	if m != nil {
 		return m.ResponseHeadersToAdd
 	}
@@ -168,7 +129,7 @@ func (m *RouteConfiguration) GetResponseHeadersToRemove() []string {
 	return nil
 }
 
-func (m *RouteConfiguration) GetRequestHeadersToAdd() []*core.HeaderValueOption {
+func (m *RouteConfiguration) GetRequestHeadersToAdd() []*envoy_api_v2_core.HeaderValueOption {
 	if m != nil {
 		return m.RequestHeadersToAdd
 	}
@@ -182,7 +143,7 @@ func (m *RouteConfiguration) GetRequestHeadersToRemove() []string {
 	return nil
 }
 
-func (m *RouteConfiguration) GetValidateClusters() *types.BoolValue {
+func (m *RouteConfiguration) GetValidateClusters() *google_protobuf2.BoolValue {
 	if m != nil {
 		return m.ValidateClusters
 	}
@@ -192,106 +153,25 @@ func (m *RouteConfiguration) GetValidateClusters() *types.BoolValue {
 // [#not-implemented-hide:]
 type Vhds struct {
 	// Configuration source specifier for VHDS.
-	ConfigSource         core.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	ConfigSource envoy_api_v2_core3.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource" json:"config_source"`
 }
 
-func (m *Vhds) Reset()         { *m = Vhds{} }
-func (m *Vhds) String() string { return proto.CompactTextString(m) }
-func (*Vhds) ProtoMessage()    {}
-func (*Vhds) Descriptor() ([]byte, []int) {
-	return fileDescriptor_78812f46dcff924a, []int{1}
-}
-func (m *Vhds) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Vhds) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Vhds.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Vhds) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Vhds.Merge(m, src)
-}
-func (m *Vhds) XXX_Size() int {
-	return m.Size()
-}
-func (m *Vhds) XXX_DiscardUnknown() {
-	xxx_messageInfo_Vhds.DiscardUnknown(m)
-}
+func (m *Vhds) Reset()                    { *m = Vhds{} }
+func (m *Vhds) String() string            { return proto.CompactTextString(m) }
+func (*Vhds) ProtoMessage()               {}
+func (*Vhds) Descriptor() ([]byte, []int) { return fileDescriptorRds, []int{1} }
 
-var xxx_messageInfo_Vhds proto.InternalMessageInfo
-
-func (m *Vhds) GetConfigSource() core.ConfigSource {
+func (m *Vhds) GetConfigSource() envoy_api_v2_core3.ConfigSource {
 	if m != nil {
 		return m.ConfigSource
 	}
-	return core.ConfigSource{}
+	return envoy_api_v2_core3.ConfigSource{}
 }
 
 func init() {
 	proto.RegisterType((*RouteConfiguration)(nil), "envoy.api.v2.RouteConfiguration")
 	proto.RegisterType((*Vhds)(nil), "envoy.api.v2.Vhds")
 }
-
-func init() { proto.RegisterFile("envoy/api/v2/rds.proto", fileDescriptor_78812f46dcff924a) }
-
-var fileDescriptor_78812f46dcff924a = []byte{
-	// 673 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xbf, 0x6f, 0xd3, 0x40,
-	0x18, 0xed, 0x25, 0xe9, 0xaf, 0x4b, 0x8a, 0xda, 0xeb, 0xaf, 0x34, 0xa0, 0x24, 0x0a, 0x05, 0x45,
-	0x0c, 0x36, 0x32, 0x13, 0xed, 0x44, 0x5a, 0x41, 0xc5, 0xd2, 0xca, 0x2d, 0x99, 0x10, 0xd6, 0xd5,
-	0xbe, 0xc6, 0x96, 0x5c, 0x7f, 0xe6, 0xee, 0x6c, 0xc8, 0x0a, 0x0b, 0x62, 0x84, 0x7f, 0x82, 0xbf,
-	0x81, 0x05, 0xc6, 0x8e, 0x48, 0xec, 0x08, 0x05, 0x06, 0xf8, 0x2f, 0x90, 0xcf, 0x36, 0xc4, 0x4d,
-	0x61, 0x40, 0x5d, 0xa2, 0xcb, 0xbd, 0xf7, 0xbe, 0xef, 0x7d, 0x77, 0xef, 0x8c, 0xd7, 0x58, 0x10,
-	0xc3, 0x50, 0xa7, 0xa1, 0xa7, 0xc7, 0x86, 0xce, 0x1d, 0xa1, 0x85, 0x1c, 0x24, 0x90, 0x9a, 0xda,
-	0xd7, 0x68, 0xe8, 0x69, 0xb1, 0xd1, 0xb8, 0x56, 0x60, 0xd9, 0xc0, 0x99, 0x7e, 0x4c, 0x05, 0x4b,
-	0xb9, 0x8d, 0x1b, 0x93, 0xa8, 0x0d, 0xc1, 0x89, 0x37, 0xb0, 0x04, 0x44, 0xdc, 0xce, 0x69, 0xc5,
-	0x22, 0x8e, 0x27, 0x6c, 0x88, 0x19, 0x1f, 0x66, 0x68, 0xb3, 0x68, 0x04, 0x22, 0xc9, 0xd2, 0xdf,
-	0x5c, 0x3d, 0x00, 0x18, 0xf8, 0x4c, 0x11, 0x68, 0x10, 0x80, 0xa4, 0xd2, 0x83, 0x40, 0xe4, 0xea,
-	0x0c, 0x55, 0xff, 0x8e, 0xa3, 0x13, 0xfd, 0x19, 0xa7, 0x61, 0xc8, 0x78, 0x8e, 0xaf, 0xc7, 0xd4,
-	0xf7, 0x1c, 0x2a, 0x99, 0x9e, 0x2f, 0x32, 0x60, 0x65, 0x00, 0x03, 0x50, 0x4b, 0x3d, 0x59, 0xa5,
-	0xbb, 0x9d, 0x6f, 0x15, 0x4c, 0xcc, 0xa4, 0xf9, 0x8e, 0x9a, 0x23, 0xe2, 0xaa, 0x19, 0x21, 0xb8,
-	0x12, 0xd0, 0x53, 0x56, 0x47, 0x6d, 0xd4, 0x9d, 0x37, 0xd5, 0x9a, 0x3c, 0xc4, 0x0b, 0xb1, 0xc7,
-	0x65, 0x44, 0x7d, 0xcb, 0x05, 0x21, 0x45, 0xbd, 0xd4, 0x2e, 0x77, 0xab, 0x46, 0x4b, 0x1b, 0x3f,
-	0x40, 0x2d, 0x9d, 0xa4, 0x9f, 0x12, 0xf7, 0x40, 0xc8, 0x5e, 0xe5, 0xec, 0x4b, 0x6b, 0xca, 0xac,
-	0xc5, 0x7f, 0xb6, 0x04, 0xb9, 0x89, 0x2b, 0xb1, 0xeb, 0x88, 0xfa, 0x7c, 0x1b, 0x75, 0xab, 0x06,
-	0x29, 0x96, 0xe8, 0xbb, 0x8e, 0x30, 0x15, 0x4e, 0x0c, 0xbc, 0xea, 0x05, 0x92, 0xf1, 0x80, 0xfa,
-	0x16, 0x04, 0xfe, 0xd0, 0x72, 0x19, 0x75, 0x18, 0x17, 0xf5, 0x72, 0xbb, 0xdc, 0x9d, 0x37, 0x97,
-	0x73, 0x70, 0x3f, 0xf0, 0x87, 0x7b, 0x29, 0x44, 0x5c, 0xbc, 0xce, 0x99, 0x08, 0x21, 0x10, 0x2c,
-	0xa7, 0x5b, 0x12, 0x2c, 0xea, 0x38, 0xf5, 0x8a, 0x72, 0xbc, 0x59, 0x6c, 0x97, 0x5c, 0xa3, 0x96,
-	0x8a, 0xfb, 0xd4, 0x8f, 0xd8, 0x7e, 0x98, 0x1c, 0x41, 0xaf, 0xfa, 0xfe, 0xe7, 0xc7, 0xf2, 0xcc,
-	0x1b, 0x54, 0x5e, 0xfc, 0x31, 0x6b, 0xae, 0xe4, 0x15, 0xb3, 0x26, 0x47, 0x70, 0xcf, 0x71, 0xc8,
-	0x36, 0x6e, 0x5c, 0xd4, 0x89, 0xb3, 0x53, 0x88, 0x59, 0x7d, 0x5a, 0x59, 0x5c, 0x9f, 0x50, 0x9a,
-	0x0a, 0x26, 0x27, 0x78, 0x8d, 0xb3, 0xa7, 0x11, 0x13, 0xf2, 0xbc, 0xcb, 0x99, 0xff, 0x75, 0xb9,
-	0x9c, 0x15, 0x2c, 0x98, 0xbc, 0x8b, 0x37, 0x2e, 0xe8, 0x93, 0x79, 0x9c, 0x53, 0x1e, 0xd7, 0xce,
-	0xeb, 0x32, 0x8b, 0x0f, 0xf0, 0x52, 0x1e, 0x22, 0xcb, 0xf6, 0x23, 0x21, 0x93, 0x93, 0x9f, 0x55,
-	0x57, 0xd6, 0xd0, 0xd2, 0x1c, 0x6a, 0x79, 0x0e, 0xb5, 0x1e, 0x80, 0xaf, 0x9c, 0x99, 0x8b, 0xb9,
-	0x68, 0x27, 0xd3, 0x74, 0x1e, 0xe3, 0x4a, 0x72, 0xa9, 0xe4, 0x08, 0x2f, 0x14, 0xde, 0x8b, 0xca,
-	0xd7, 0x44, 0x84, 0xd4, 0xa8, 0x69, 0x1e, 0x0f, 0x15, 0xad, 0x77, 0x25, 0x89, 0x50, 0x32, 0xe9,
-	0xf4, 0x6b, 0x54, 0x5a, 0x44, 0x66, 0xcd, 0x1e, 0x43, 0x8d, 0x0f, 0x25, 0xbc, 0xaa, 0x32, 0xbc,
-	0x9b, 0xbf, 0xb4, 0x43, 0xc6, 0x63, 0xcf, 0x66, 0xe4, 0x11, 0xae, 0x1d, 0x4a, 0xce, 0xe8, 0xa9,
-	0x82, 0x05, 0x69, 0x16, 0x1b, 0xfd, 0xe6, 0x9b, 0xe9, 0xfc, 0x8d, 0xd6, 0x5f, 0xf1, 0xf4, 0x0e,
-	0x3b, 0x53, 0x5d, 0x74, 0x1b, 0x91, 0x27, 0xb8, 0xba, 0xcb, 0x7c, 0x49, 0xb3, 0xaa, 0xd7, 0xcf,
-	0xa9, 0x12, 0x68, 0xa2, 0xf4, 0xe6, 0xbf, 0x49, 0x85, 0xfa, 0x80, 0xab, 0xf7, 0x99, 0xb4, 0xdd,
-	0xcb, 0x72, 0xdd, 0x7a, 0xf1, 0xf9, 0xfb, 0xdb, 0xd2, 0x46, 0x67, 0xa5, 0xf0, 0x39, 0xda, 0x52,
-	0x4f, 0x55, 0x6c, 0xa1, 0x5b, 0xc6, 0x4b, 0x84, 0xaf, 0x8e, 0x3d, 0xd9, 0x89, 0x73, 0x74, 0xf0,
-	0x92, 0x32, 0xdc, 0x1f, 0x7f, 0xc3, 0x97, 0x3d, 0x76, 0x6f, 0xfb, 0xdd, 0xa8, 0x89, 0xce, 0x46,
-	0x4d, 0xf4, 0x69, 0xd4, 0x44, 0x5f, 0x47, 0x4d, 0x84, 0x1b, 0x1e, 0xa4, 0xfa, 0x90, 0xc3, 0xf3,
-	0x61, 0xa1, 0x54, 0x6f, 0xce, 0x74, 0xc4, 0x41, 0x12, 0xbe, 0x03, 0xf4, 0x0a, 0xa1, 0xe3, 0x19,
-	0x15, 0xc4, 0x3b, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0xfa, 0x13, 0x2b, 0xc3, 0xe7, 0x05, 0x00,
-	0x00,
-}
-
 func (this *RouteConfiguration) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -368,9 +248,6 @@ func (this *RouteConfiguration) Equal(that interface{}) bool {
 	if !this.ValidateClusters.Equal(that1.ValidateClusters) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 func (this *Vhds) Equal(that interface{}) bool {
@@ -395,9 +272,6 @@ func (this *Vhds) Equal(that interface{}) bool {
 	if !this.ConfigSource.Equal(&that1.ConfigSource) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 
@@ -409,9 +283,8 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// RouteDiscoveryServiceClient is the client API for RouteDiscoveryService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+// Client API for RouteDiscoveryService service
+
 type RouteDiscoveryServiceClient interface {
 	StreamRoutes(ctx context.Context, opts ...grpc.CallOption) (RouteDiscoveryService_StreamRoutesClient, error)
 	DeltaRoutes(ctx context.Context, opts ...grpc.CallOption) (RouteDiscoveryService_DeltaRoutesClient, error)
@@ -427,7 +300,7 @@ func NewRouteDiscoveryServiceClient(cc *grpc.ClientConn) RouteDiscoveryServiceCl
 }
 
 func (c *routeDiscoveryServiceClient) StreamRoutes(ctx context.Context, opts ...grpc.CallOption) (RouteDiscoveryService_StreamRoutesClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_RouteDiscoveryService_serviceDesc.Streams[0], "/envoy.api.v2.RouteDiscoveryService/StreamRoutes", opts...)
+	stream, err := grpc.NewClientStream(ctx, &_RouteDiscoveryService_serviceDesc.Streams[0], c.cc, "/envoy.api.v2.RouteDiscoveryService/StreamRoutes", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -458,7 +331,7 @@ func (x *routeDiscoveryServiceStreamRoutesClient) Recv() (*DiscoveryResponse, er
 }
 
 func (c *routeDiscoveryServiceClient) DeltaRoutes(ctx context.Context, opts ...grpc.CallOption) (RouteDiscoveryService_DeltaRoutesClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_RouteDiscoveryService_serviceDesc.Streams[1], "/envoy.api.v2.RouteDiscoveryService/DeltaRoutes", opts...)
+	stream, err := grpc.NewClientStream(ctx, &_RouteDiscoveryService_serviceDesc.Streams[1], c.cc, "/envoy.api.v2.RouteDiscoveryService/DeltaRoutes", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -490,14 +363,15 @@ func (x *routeDiscoveryServiceDeltaRoutesClient) Recv() (*DeltaDiscoveryResponse
 
 func (c *routeDiscoveryServiceClient) FetchRoutes(ctx context.Context, in *DiscoveryRequest, opts ...grpc.CallOption) (*DiscoveryResponse, error) {
 	out := new(DiscoveryResponse)
-	err := c.cc.Invoke(ctx, "/envoy.api.v2.RouteDiscoveryService/FetchRoutes", in, out, opts...)
+	err := grpc.Invoke(ctx, "/envoy.api.v2.RouteDiscoveryService/FetchRoutes", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RouteDiscoveryServiceServer is the server API for RouteDiscoveryService service.
+// Server API for RouteDiscoveryService service
+
 type RouteDiscoveryServiceServer interface {
 	StreamRoutes(RouteDiscoveryService_StreamRoutesServer) error
 	DeltaRoutes(RouteDiscoveryService_DeltaRoutesServer) error
@@ -604,9 +478,8 @@ var _RouteDiscoveryService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "envoy/api/v2/rds.proto",
 }
 
-// VirtualHostDiscoveryServiceClient is the client API for VirtualHostDiscoveryService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+// Client API for VirtualHostDiscoveryService service
+
 type VirtualHostDiscoveryServiceClient interface {
 	DeltaVirtualHosts(ctx context.Context, opts ...grpc.CallOption) (VirtualHostDiscoveryService_DeltaVirtualHostsClient, error)
 }
@@ -620,7 +493,7 @@ func NewVirtualHostDiscoveryServiceClient(cc *grpc.ClientConn) VirtualHostDiscov
 }
 
 func (c *virtualHostDiscoveryServiceClient) DeltaVirtualHosts(ctx context.Context, opts ...grpc.CallOption) (VirtualHostDiscoveryService_DeltaVirtualHostsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_VirtualHostDiscoveryService_serviceDesc.Streams[0], "/envoy.api.v2.VirtualHostDiscoveryService/DeltaVirtualHosts", opts...)
+	stream, err := grpc.NewClientStream(ctx, &_VirtualHostDiscoveryService_serviceDesc.Streams[0], c.cc, "/envoy.api.v2.VirtualHostDiscoveryService/DeltaVirtualHosts", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -650,7 +523,8 @@ func (x *virtualHostDiscoveryServiceDeltaVirtualHostsClient) Recv() (*DeltaDisco
 	return m, nil
 }
 
-// VirtualHostDiscoveryServiceServer is the server API for VirtualHostDiscoveryService service.
+// Server API for VirtualHostDiscoveryService service
+
 type VirtualHostDiscoveryServiceServer interface {
 	DeltaVirtualHosts(VirtualHostDiscoveryService_DeltaVirtualHostsServer) error
 }
@@ -822,9 +696,6 @@ func (m *RouteConfiguration) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n2
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -851,9 +722,6 @@ func (m *Vhds) MarshalTo(dAtA []byte) (int, error) {
 		return 0, err
 	}
 	i += n3
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -867,9 +735,6 @@ func encodeVarintRds(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RouteConfiguration) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -920,23 +785,14 @@ func (m *RouteConfiguration) Size() (n int) {
 		l = m.Vhds.Size()
 		n += 1 + l + sovRds(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *Vhds) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = m.ConfigSource.Size()
 	n += 1 + l + sovRds(uint64(l))
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -968,7 +824,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -996,7 +852,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1006,9 +862,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1028,7 +881,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1037,13 +890,10 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.VirtualHosts = append(m.VirtualHosts, route.VirtualHost{})
+			m.VirtualHosts = append(m.VirtualHosts, envoy_api_v2_route.VirtualHost{})
 			if err := m.VirtualHosts[len(m.VirtualHosts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1062,7 +912,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1072,9 +922,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1094,7 +941,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1103,13 +950,10 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ResponseHeadersToAdd = append(m.ResponseHeadersToAdd, &core.HeaderValueOption{})
+			m.ResponseHeadersToAdd = append(m.ResponseHeadersToAdd, &envoy_api_v2_core.HeaderValueOption{})
 			if err := m.ResponseHeadersToAdd[len(m.ResponseHeadersToAdd)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1128,7 +972,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1138,9 +982,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1160,7 +1001,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1169,13 +1010,10 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RequestHeadersToAdd = append(m.RequestHeadersToAdd, &core.HeaderValueOption{})
+			m.RequestHeadersToAdd = append(m.RequestHeadersToAdd, &envoy_api_v2_core.HeaderValueOption{})
 			if err := m.RequestHeadersToAdd[len(m.RequestHeadersToAdd)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1194,7 +1032,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1203,14 +1041,11 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ValidateClusters == nil {
-				m.ValidateClusters = &types.BoolValue{}
+				m.ValidateClusters = &google_protobuf2.BoolValue{}
 			}
 			if err := m.ValidateClusters.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1230,7 +1065,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1240,9 +1075,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1262,7 +1094,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1271,9 +1103,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1293,13 +1122,9 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRds
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRds
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1324,7 +1149,7 @@ func (m *Vhds) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1352,7 +1177,7 @@ func (m *Vhds) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1361,9 +1186,6 @@ func (m *Vhds) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1380,13 +1202,9 @@ func (m *Vhds) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRds
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRds
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1450,11 +1268,8 @@ func skipRds(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthRds
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthRds
 			}
 			return iNdEx, nil
@@ -1485,9 +1300,6 @@ func skipRds(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthRds
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1506,3 +1318,51 @@ var (
 	ErrInvalidLengthRds = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowRds   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("envoy/api/v2/rds.proto", fileDescriptorRds) }
+
+var fileDescriptorRds = []byte{
+	// 672 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x3d, 0x6f, 0xd3, 0x40,
+	0x18, 0xee, 0x25, 0xe9, 0xd7, 0x25, 0x45, 0xed, 0xf5, 0x2b, 0x0d, 0x28, 0x89, 0x42, 0x41, 0x11,
+	0x83, 0x8d, 0xcc, 0x44, 0x3b, 0x91, 0x56, 0x50, 0xb1, 0xb4, 0x72, 0x4b, 0x26, 0x84, 0x75, 0xb5,
+	0xaf, 0xb1, 0x25, 0xd7, 0xaf, 0xb9, 0x3b, 0x1b, 0xb2, 0xc2, 0x82, 0x18, 0xe1, 0x4f, 0xf0, 0x1b,
+	0x58, 0x60, 0xec, 0x88, 0xc4, 0x8e, 0x50, 0x60, 0x80, 0x7f, 0x81, 0x7c, 0xb6, 0x21, 0x6e, 0x0a,
+	0x03, 0xea, 0x12, 0x9d, 0xef, 0x79, 0x3f, 0x9e, 0xe7, 0xbd, 0xe7, 0x0d, 0x5e, 0x63, 0x41, 0x0c,
+	0x43, 0x9d, 0x86, 0x9e, 0x1e, 0x1b, 0x3a, 0x77, 0x84, 0x16, 0x72, 0x90, 0x40, 0x6a, 0xea, 0x5e,
+	0xa3, 0xa1, 0xa7, 0xc5, 0x46, 0xe3, 0x5a, 0x21, 0xca, 0x06, 0xce, 0xf4, 0x63, 0x2a, 0x58, 0x1a,
+	0xdb, 0xb8, 0x31, 0x89, 0xda, 0x10, 0x9c, 0x78, 0x03, 0x4b, 0x40, 0xc4, 0xed, 0x3c, 0xac, 0x58,
+	0xc4, 0xf1, 0x84, 0x0d, 0x31, 0xe3, 0xc3, 0x0c, 0x6d, 0x16, 0x89, 0x40, 0x24, 0x59, 0xfa, 0x9b,
+	0x67, 0x0f, 0x00, 0x06, 0x3e, 0x53, 0x01, 0x34, 0x08, 0x40, 0x52, 0xe9, 0x41, 0x20, 0xf2, 0xec,
+	0x0c, 0x55, 0x5f, 0xc7, 0xd1, 0x89, 0xfe, 0x8c, 0xd3, 0x30, 0x64, 0x3c, 0xc7, 0xd7, 0x63, 0xea,
+	0x7b, 0x0e, 0x95, 0x4c, 0xcf, 0x0f, 0x19, 0xb0, 0x32, 0x80, 0x01, 0xa8, 0xa3, 0x9e, 0x9c, 0xd2,
+	0xdb, 0xce, 0xb7, 0x0a, 0x26, 0x66, 0xd2, 0x7c, 0x47, 0xe9, 0x88, 0xb8, 0x6a, 0x46, 0x08, 0xae,
+	0x04, 0xf4, 0x94, 0xd5, 0x51, 0x1b, 0x75, 0xe7, 0x4d, 0x75, 0x26, 0x0f, 0xf1, 0x42, 0xec, 0x71,
+	0x19, 0x51, 0xdf, 0x72, 0x41, 0x48, 0x51, 0x2f, 0xb5, 0xcb, 0xdd, 0xaa, 0xd1, 0xd2, 0xc6, 0x07,
+	0xa8, 0xa5, 0x4a, 0xfa, 0x69, 0xe0, 0x1e, 0x08, 0xd9, 0xab, 0x9c, 0x7d, 0x69, 0x4d, 0x99, 0xb5,
+	0xf8, 0xcf, 0x95, 0x20, 0x06, 0x5e, 0xf5, 0x02, 0xc9, 0x78, 0x40, 0x7d, 0x0b, 0x02, 0x7f, 0x68,
+	0xb9, 0x8c, 0x3a, 0x8c, 0x8b, 0x7a, 0xb9, 0x5d, 0xee, 0xce, 0x9b, 0xcb, 0x39, 0xb8, 0x1f, 0xf8,
+	0xc3, 0xbd, 0x14, 0x22, 0x2e, 0x5e, 0xe7, 0x4c, 0x84, 0x10, 0x08, 0x96, 0x87, 0x5b, 0x12, 0x2c,
+	0xea, 0x38, 0xf5, 0x8a, 0x62, 0xb2, 0x59, 0x64, 0x92, 0x3c, 0x8f, 0x96, 0x26, 0xf7, 0xa9, 0x1f,
+	0xb1, 0xfd, 0x30, 0x91, 0xd6, 0xab, 0xbe, 0xff, 0xf9, 0xb1, 0x3c, 0xf3, 0x06, 0x95, 0x17, 0x7f,
+	0xcc, 0x9a, 0x2b, 0x79, 0xc5, 0xac, 0xc9, 0x11, 0xdc, 0x73, 0x1c, 0xb2, 0x8d, 0x1b, 0x17, 0x75,
+	0xe2, 0xec, 0x14, 0x62, 0x56, 0x9f, 0x56, 0x14, 0xd7, 0x27, 0x32, 0x4d, 0x05, 0x93, 0x13, 0xbc,
+	0xc6, 0xd9, 0xd3, 0x88, 0x09, 0x79, 0x9e, 0xe5, 0xcc, 0xff, 0xb2, 0x5c, 0xce, 0x0a, 0x16, 0x48,
+	0x3e, 0xc0, 0x4b, 0xf9, 0x0b, 0x5b, 0xb6, 0x1f, 0x09, 0x99, 0x8c, 0x6f, 0xb6, 0x8d, 0xba, 0x55,
+	0xa3, 0xa1, 0xa5, 0x26, 0xd1, 0x72, 0x93, 0x68, 0x3d, 0x00, 0x5f, 0x95, 0x37, 0x17, 0xf3, 0xa4,
+	0x9d, 0x2c, 0x87, 0xdc, 0xc5, 0x1b, 0x17, 0x10, 0xce, 0xc4, 0xce, 0x29, 0xb1, 0x6b, 0xe7, 0x09,
+	0x64, 0x5a, 0x6f, 0xe2, 0x4a, 0xec, 0x3a, 0xa2, 0x3e, 0xaf, 0xda, 0x92, 0xa2, 0xb2, 0xbe, 0xeb,
+	0x08, 0x53, 0xe1, 0x9d, 0xc7, 0xb8, 0x92, 0x7c, 0x91, 0x23, 0xbc, 0x50, 0xd8, 0x17, 0xe5, 0xaf,
+	0x09, 0x0b, 0xa9, 0x91, 0xa4, 0x7e, 0x3c, 0x54, 0x61, 0xbd, 0x2b, 0x89, 0x85, 0x92, 0x89, 0x4c,
+	0xbf, 0x46, 0xa5, 0x45, 0x64, 0xd6, 0xec, 0x31, 0xd4, 0xf8, 0x50, 0xc2, 0xab, 0xca, 0xc3, 0xbb,
+	0xf9, 0xa6, 0x1d, 0x32, 0x1e, 0x7b, 0x36, 0x23, 0x8f, 0x70, 0xed, 0x50, 0x72, 0x46, 0x4f, 0x15,
+	0x2c, 0x48, 0xb3, 0xd8, 0xe8, 0x77, 0xbc, 0x99, 0xca, 0x6b, 0xb4, 0xfe, 0x8a, 0xa7, 0x6f, 0xdd,
+	0x99, 0xea, 0xa2, 0xdb, 0x88, 0x3c, 0xc1, 0xd5, 0x5d, 0xe6, 0x4b, 0x9a, 0x55, 0xbd, 0x7e, 0x2e,
+	0x2b, 0x81, 0x26, 0x4a, 0x6f, 0xfe, 0x3b, 0xa8, 0x50, 0x1f, 0x70, 0xf5, 0x3e, 0x93, 0xb6, 0x7b,
+	0x59, 0xac, 0x5b, 0x2f, 0x3e, 0x7f, 0x7f, 0x5b, 0xda, 0xe8, 0xac, 0x14, 0xfe, 0x8e, 0xb6, 0xd4,
+	0xaa, 0x8a, 0x2d, 0x74, 0xcb, 0x78, 0x89, 0xf0, 0xd5, 0xb1, 0x95, 0x9d, 0x98, 0xa3, 0x83, 0x97,
+	0x14, 0xe1, 0xfe, 0xf8, 0x0e, 0x5f, 0xb6, 0xec, 0xde, 0xf6, 0xbb, 0x51, 0x13, 0x9d, 0x8d, 0x9a,
+	0xe8, 0xd3, 0xa8, 0x89, 0xbe, 0x8e, 0x9a, 0x08, 0x37, 0x3c, 0x48, 0xf3, 0x43, 0x0e, 0xcf, 0x87,
+	0x85, 0x52, 0xbd, 0x39, 0xd3, 0x11, 0x07, 0x89, 0xbf, 0x0f, 0xd0, 0x2b, 0x84, 0x8e, 0x67, 0x94,
+	0xd7, 0xef, 0xfc, 0x0a, 0x00, 0x00, 0xff, 0xff, 0x8b, 0x8a, 0xf1, 0x9f, 0xe7, 0x05, 0x00, 0x00,
+}

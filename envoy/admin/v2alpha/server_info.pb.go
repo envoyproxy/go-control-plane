@@ -3,25 +3,17 @@
 
 package envoy_admin_v2alpha
 
-import (
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import google_protobuf5 "github.com/gogo/protobuf/types"
 
-	proto "github.com/gogo/protobuf/proto"
-	types "github.com/gogo/protobuf/types"
-)
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 type ServerInfo_State int32
 
@@ -42,7 +34,6 @@ var ServerInfo_State_name = map[int32]string{
 	2: "PRE_INITIALIZING",
 	3: "INITIALIZING",
 }
-
 var ServerInfo_State_value = map[string]int32{
 	"LIVE":             0,
 	"DRAINING":         1,
@@ -53,10 +44,7 @@ var ServerInfo_State_value = map[string]int32{
 func (x ServerInfo_State) String() string {
 	return proto.EnumName(ServerInfo_State_name, int32(x))
 }
-
-func (ServerInfo_State) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_ed0f406f9d75bf97, []int{0, 0}
-}
+func (ServerInfo_State) EnumDescriptor() ([]byte, []int) { return fileDescriptorServerInfo, []int{0, 0} }
 
 type CommandLineOptions_IpVersion int32
 
@@ -69,7 +57,6 @@ var CommandLineOptions_IpVersion_name = map[int32]string{
 	0: "v4",
 	1: "v6",
 }
-
 var CommandLineOptions_IpVersion_value = map[string]int32{
 	"v4": 0,
 	"v6": 1,
@@ -78,9 +65,8 @@ var CommandLineOptions_IpVersion_value = map[string]int32{
 func (x CommandLineOptions_IpVersion) String() string {
 	return proto.EnumName(CommandLineOptions_IpVersion_name, int32(x))
 }
-
 func (CommandLineOptions_IpVersion) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_ed0f406f9d75bf97, []int{1, 0}
+	return fileDescriptorServerInfo, []int{1, 0}
 }
 
 type CommandLineOptions_Mode int32
@@ -99,7 +85,6 @@ var CommandLineOptions_Mode_name = map[int32]string{
 	1: "Validate",
 	2: "InitOnly",
 }
-
 var CommandLineOptions_Mode_value = map[string]int32{
 	"Serve":    0,
 	"Validate": 1,
@@ -109,9 +94,8 @@ var CommandLineOptions_Mode_value = map[string]int32{
 func (x CommandLineOptions_Mode) String() string {
 	return proto.EnumName(CommandLineOptions_Mode_name, int32(x))
 }
-
 func (CommandLineOptions_Mode) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_ed0f406f9d75bf97, []int{1, 1}
+	return fileDescriptorServerInfo, []int{1, 1}
 }
 
 // Proto representation of the value returned by /server_info, containing
@@ -122,48 +106,17 @@ type ServerInfo struct {
 	// State of the server.
 	State ServerInfo_State `protobuf:"varint,2,opt,name=state,proto3,enum=envoy.admin.v2alpha.ServerInfo_State" json:"state,omitempty"`
 	// Uptime since current epoch was started.
-	UptimeCurrentEpoch *types.Duration `protobuf:"bytes,3,opt,name=uptime_current_epoch,json=uptimeCurrentEpoch,proto3" json:"uptime_current_epoch,omitempty"`
+	UptimeCurrentEpoch *google_protobuf5.Duration `protobuf:"bytes,3,opt,name=uptime_current_epoch,json=uptimeCurrentEpoch" json:"uptime_current_epoch,omitempty"`
 	// Uptime since the start of the first epoch.
-	UptimeAllEpochs *types.Duration `protobuf:"bytes,4,opt,name=uptime_all_epochs,json=uptimeAllEpochs,proto3" json:"uptime_all_epochs,omitempty"`
+	UptimeAllEpochs *google_protobuf5.Duration `protobuf:"bytes,4,opt,name=uptime_all_epochs,json=uptimeAllEpochs" json:"uptime_all_epochs,omitempty"`
 	// Command line options the server is currently running with.
-	CommandLineOptions   *CommandLineOptions `protobuf:"bytes,6,opt,name=command_line_options,json=commandLineOptions,proto3" json:"command_line_options,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+	CommandLineOptions *CommandLineOptions `protobuf:"bytes,6,opt,name=command_line_options,json=commandLineOptions" json:"command_line_options,omitempty"`
 }
 
-func (m *ServerInfo) Reset()         { *m = ServerInfo{} }
-func (m *ServerInfo) String() string { return proto.CompactTextString(m) }
-func (*ServerInfo) ProtoMessage()    {}
-func (*ServerInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed0f406f9d75bf97, []int{0}
-}
-func (m *ServerInfo) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ServerInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ServerInfo.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ServerInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ServerInfo.Merge(m, src)
-}
-func (m *ServerInfo) XXX_Size() int {
-	return m.Size()
-}
-func (m *ServerInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_ServerInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ServerInfo proto.InternalMessageInfo
+func (m *ServerInfo) Reset()                    { *m = ServerInfo{} }
+func (m *ServerInfo) String() string            { return proto.CompactTextString(m) }
+func (*ServerInfo) ProtoMessage()               {}
+func (*ServerInfo) Descriptor() ([]byte, []int) { return fileDescriptorServerInfo, []int{0} }
 
 func (m *ServerInfo) GetVersion() string {
 	if m != nil {
@@ -179,14 +132,14 @@ func (m *ServerInfo) GetState() ServerInfo_State {
 	return ServerInfo_LIVE
 }
 
-func (m *ServerInfo) GetUptimeCurrentEpoch() *types.Duration {
+func (m *ServerInfo) GetUptimeCurrentEpoch() *google_protobuf5.Duration {
 	if m != nil {
 		return m.UptimeCurrentEpoch
 	}
 	return nil
 }
 
-func (m *ServerInfo) GetUptimeAllEpochs() *types.Duration {
+func (m *ServerInfo) GetUptimeAllEpochs() *google_protobuf5.Duration {
 	if m != nil {
 		return m.UptimeAllEpochs
 	}
@@ -232,16 +185,16 @@ type CommandLineOptions struct {
 	// See :option:`--service-zone` for details.
 	ServiceZone string `protobuf:"bytes,15,opt,name=service_zone,json=serviceZone,proto3" json:"service_zone,omitempty"`
 	// See :option:`--file-flush-interval-msec` for details.
-	FileFlushInterval *types.Duration `protobuf:"bytes,16,opt,name=file_flush_interval,json=fileFlushInterval,proto3" json:"file_flush_interval,omitempty"`
+	FileFlushInterval *google_protobuf5.Duration `protobuf:"bytes,16,opt,name=file_flush_interval,json=fileFlushInterval" json:"file_flush_interval,omitempty"`
 	// See :option:`--drain-time-s` for details.
-	DrainTime *types.Duration `protobuf:"bytes,17,opt,name=drain_time,json=drainTime,proto3" json:"drain_time,omitempty"`
+	DrainTime *google_protobuf5.Duration `protobuf:"bytes,17,opt,name=drain_time,json=drainTime" json:"drain_time,omitempty"`
 	// See :option:`--parent-shutdown-time-s` for details.
-	ParentShutdownTime *types.Duration `protobuf:"bytes,18,opt,name=parent_shutdown_time,json=parentShutdownTime,proto3" json:"parent_shutdown_time,omitempty"`
+	ParentShutdownTime *google_protobuf5.Duration `protobuf:"bytes,18,opt,name=parent_shutdown_time,json=parentShutdownTime" json:"parent_shutdown_time,omitempty"`
 	// See :option:`--mode` for details.
 	Mode CommandLineOptions_Mode `protobuf:"varint,19,opt,name=mode,proto3,enum=envoy.admin.v2alpha.CommandLineOptions_Mode" json:"mode,omitempty"`
 	// max_stats and max_obj_name_len are now unused and have no effect.
-	MaxStats      uint64 `protobuf:"varint,20,opt,name=max_stats,json=maxStats,proto3" json:"max_stats,omitempty"`                    // Deprecated: Do not use.
-	MaxObjNameLen uint64 `protobuf:"varint,21,opt,name=max_obj_name_len,json=maxObjNameLen,proto3" json:"max_obj_name_len,omitempty"` // Deprecated: Do not use.
+	MaxStats      uint64 `protobuf:"varint,20,opt,name=max_stats,json=maxStats,proto3" json:"max_stats,omitempty"`
+	MaxObjNameLen uint64 `protobuf:"varint,21,opt,name=max_obj_name_len,json=maxObjNameLen,proto3" json:"max_obj_name_len,omitempty"`
 	// See :option:`--disable-hot-restart` for details.
 	DisableHotRestart bool `protobuf:"varint,22,opt,name=disable_hot_restart,json=disableHotRestart,proto3" json:"disable_hot_restart,omitempty"`
 	// See :option:`--enable-mutex-tracing` for details.
@@ -249,44 +202,13 @@ type CommandLineOptions struct {
 	// See :option:`--restart-epoch` for details.
 	RestartEpoch uint32 `protobuf:"varint,24,opt,name=restart_epoch,json=restartEpoch,proto3" json:"restart_epoch,omitempty"`
 	// See :option:`--cpuset-threads` for details.
-	CpusetThreads        bool     `protobuf:"varint,25,opt,name=cpuset_threads,json=cpusetThreads,proto3" json:"cpuset_threads,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	CpusetThreads bool `protobuf:"varint,25,opt,name=cpuset_threads,json=cpusetThreads,proto3" json:"cpuset_threads,omitempty"`
 }
 
-func (m *CommandLineOptions) Reset()         { *m = CommandLineOptions{} }
-func (m *CommandLineOptions) String() string { return proto.CompactTextString(m) }
-func (*CommandLineOptions) ProtoMessage()    {}
-func (*CommandLineOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ed0f406f9d75bf97, []int{1}
-}
-func (m *CommandLineOptions) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *CommandLineOptions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_CommandLineOptions.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *CommandLineOptions) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CommandLineOptions.Merge(m, src)
-}
-func (m *CommandLineOptions) XXX_Size() int {
-	return m.Size()
-}
-func (m *CommandLineOptions) XXX_DiscardUnknown() {
-	xxx_messageInfo_CommandLineOptions.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CommandLineOptions proto.InternalMessageInfo
+func (m *CommandLineOptions) Reset()                    { *m = CommandLineOptions{} }
+func (m *CommandLineOptions) String() string            { return proto.CompactTextString(m) }
+func (*CommandLineOptions) ProtoMessage()               {}
+func (*CommandLineOptions) Descriptor() ([]byte, []int) { return fileDescriptorServerInfo, []int{1} }
 
 func (m *CommandLineOptions) GetBaseId() uint64 {
 	if m != nil {
@@ -393,21 +315,21 @@ func (m *CommandLineOptions) GetServiceZone() string {
 	return ""
 }
 
-func (m *CommandLineOptions) GetFileFlushInterval() *types.Duration {
+func (m *CommandLineOptions) GetFileFlushInterval() *google_protobuf5.Duration {
 	if m != nil {
 		return m.FileFlushInterval
 	}
 	return nil
 }
 
-func (m *CommandLineOptions) GetDrainTime() *types.Duration {
+func (m *CommandLineOptions) GetDrainTime() *google_protobuf5.Duration {
 	if m != nil {
 		return m.DrainTime
 	}
 	return nil
 }
 
-func (m *CommandLineOptions) GetParentShutdownTime() *types.Duration {
+func (m *CommandLineOptions) GetParentShutdownTime() *google_protobuf5.Duration {
 	if m != nil {
 		return m.ParentShutdownTime
 	}
@@ -421,7 +343,6 @@ func (m *CommandLineOptions) GetMode() CommandLineOptions_Mode {
 	return CommandLineOptions_Serve
 }
 
-// Deprecated: Do not use.
 func (m *CommandLineOptions) GetMaxStats() uint64 {
 	if m != nil {
 		return m.MaxStats
@@ -429,7 +350,6 @@ func (m *CommandLineOptions) GetMaxStats() uint64 {
 	return 0
 }
 
-// Deprecated: Do not use.
 func (m *CommandLineOptions) GetMaxObjNameLen() uint64 {
 	if m != nil {
 		return m.MaxObjNameLen
@@ -466,80 +386,12 @@ func (m *CommandLineOptions) GetCpusetThreads() bool {
 }
 
 func init() {
+	proto.RegisterType((*ServerInfo)(nil), "envoy.admin.v2alpha.ServerInfo")
+	proto.RegisterType((*CommandLineOptions)(nil), "envoy.admin.v2alpha.CommandLineOptions")
 	proto.RegisterEnum("envoy.admin.v2alpha.ServerInfo_State", ServerInfo_State_name, ServerInfo_State_value)
 	proto.RegisterEnum("envoy.admin.v2alpha.CommandLineOptions_IpVersion", CommandLineOptions_IpVersion_name, CommandLineOptions_IpVersion_value)
 	proto.RegisterEnum("envoy.admin.v2alpha.CommandLineOptions_Mode", CommandLineOptions_Mode_name, CommandLineOptions_Mode_value)
-	proto.RegisterType((*ServerInfo)(nil), "envoy.admin.v2alpha.ServerInfo")
-	proto.RegisterType((*CommandLineOptions)(nil), "envoy.admin.v2alpha.CommandLineOptions")
 }
-
-func init() {
-	proto.RegisterFile("envoy/admin/v2alpha/server_info.proto", fileDescriptor_ed0f406f9d75bf97)
-}
-
-var fileDescriptor_ed0f406f9d75bf97 = []byte{
-	// 936 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x55, 0xdd, 0x6e, 0xdb, 0x36,
-	0x18, 0xad, 0xf2, 0x6b, 0x7f, 0xf9, 0x53, 0x68, 0x77, 0x65, 0x56, 0x2c, 0x75, 0x3d, 0x04, 0x0d,
-	0xb0, 0x4e, 0xde, 0xb2, 0x61, 0x18, 0xb0, 0x9b, 0x25, 0x69, 0xd2, 0x09, 0x73, 0x9d, 0x40, 0xc9,
-	0x02, 0xb4, 0x37, 0x04, 0x2d, 0xd1, 0x36, 0x33, 0x8a, 0x14, 0x24, 0xca, 0xb5, 0xf7, 0x2a, 0x7b,
-	0xa1, 0x5d, 0xee, 0x0d, 0x36, 0xe4, 0x49, 0x0a, 0x92, 0xb2, 0x93, 0xa2, 0x01, 0xd2, 0x2b, 0x43,
-	0xe7, 0x3b, 0xe7, 0x90, 0xfc, 0xfe, 0x0c, 0x7b, 0x4c, 0x8e, 0xd5, 0xb4, 0x43, 0x93, 0x94, 0xcb,
-	0xce, 0xf8, 0x80, 0x8a, 0x6c, 0x44, 0x3b, 0x05, 0xcb, 0xc7, 0x2c, 0x27, 0x5c, 0x0e, 0x54, 0x90,
-	0xe5, 0x4a, 0x2b, 0xd4, 0xb0, 0xb4, 0xc0, 0xd2, 0x82, 0x8a, 0xf6, 0xe5, 0xee, 0x50, 0xa9, 0xa1,
-	0x60, 0x1d, 0x4b, 0xe9, 0x97, 0x83, 0x4e, 0x52, 0xe6, 0x54, 0x73, 0x25, 0x9d, 0xa8, 0xfd, 0xf7,
-	0x22, 0xc0, 0x85, 0xb5, 0x0a, 0xe5, 0x40, 0x21, 0x0c, 0xab, 0x63, 0x96, 0x17, 0x5c, 0x49, 0xec,
-	0xb5, 0xbc, 0xfd, 0x7a, 0x34, 0xfb, 0x44, 0xbf, 0xc0, 0x72, 0xa1, 0xa9, 0x66, 0x78, 0xa1, 0xe5,
-	0xed, 0x6f, 0x1e, 0xec, 0x05, 0xf7, 0x9c, 0x16, 0xdc, 0x3a, 0x05, 0x17, 0x86, 0x1c, 0x39, 0x0d,
-	0xfa, 0x1d, 0x9a, 0x65, 0xa6, 0x79, 0xca, 0x48, 0x5c, 0xe6, 0x39, 0x93, 0x9a, 0xb0, 0x4c, 0xc5,
-	0x23, 0xbc, 0xd8, 0xf2, 0xf6, 0xd7, 0x0e, 0x76, 0x02, 0x77, 0xc9, 0x60, 0x76, 0xc9, 0xe0, 0x55,
-	0x75, 0xc9, 0x08, 0x39, 0xd9, 0xb1, 0x53, 0x9d, 0x18, 0x11, 0x3a, 0x81, 0xed, 0xca, 0x8c, 0x0a,
-	0xe1, 0x8c, 0x0a, 0xbc, 0xf4, 0x90, 0xd3, 0x96, 0xd3, 0x1c, 0x0a, 0x61, 0x5d, 0x0a, 0xf4, 0x16,
-	0x9a, 0xb1, 0x4a, 0x53, 0x2a, 0x13, 0x22, 0xb8, 0x64, 0x44, 0x65, 0x86, 0x57, 0xe0, 0x15, 0xeb,
-	0xf4, 0xe2, 0xde, 0xf7, 0x1d, 0x3b, 0x41, 0x97, 0x4b, 0x76, 0xe6, 0xe8, 0x11, 0x8a, 0x3f, 0xc1,
-	0xda, 0xaf, 0x61, 0xd9, 0x3e, 0x1f, 0xd5, 0x60, 0xa9, 0x1b, 0x5e, 0x9d, 0xf8, 0x8f, 0xd0, 0x3a,
-	0xd4, 0x5e, 0x45, 0x87, 0x61, 0x2f, 0xec, 0xbd, 0xf6, 0x3d, 0xd4, 0x04, 0xff, 0x3c, 0x3a, 0x21,
-	0x61, 0x2f, 0xbc, 0x0c, 0x0f, 0xbb, 0xe1, 0x3b, 0x83, 0x2e, 0x20, 0x1f, 0xd6, 0x3f, 0x42, 0x16,
-	0xdb, 0xff, 0xd5, 0x01, 0x7d, 0x7a, 0x26, 0x7a, 0x02, 0xab, 0x7d, 0x5a, 0x30, 0xc2, 0x13, 0x5b,
-	0xa5, 0xa5, 0x68, 0xc5, 0x7c, 0x86, 0x09, 0x6a, 0xc1, 0x5a, 0xac, 0xa4, 0xcb, 0x71, 0x3c, 0xb5,
-	0xa5, 0xda, 0x88, 0xee, 0x42, 0xe8, 0x99, 0x65, 0x0c, 0xf8, 0x90, 0x64, 0x54, 0xbb, 0x02, 0xd4,
-	0x23, 0x70, 0xd0, 0x39, 0xd5, 0xa3, 0x3b, 0x84, 0x29, 0x4d, 0x85, 0xcd, 0xeb, 0x9c, 0xf0, 0x96,
-	0xa6, 0x02, 0x7d, 0x07, 0x4d, 0x2a, 0x84, 0x7a, 0x4f, 0x4a, 0xf9, 0xa7, 0x54, 0xef, 0x25, 0x19,
-	0x70, 0x26, 0x92, 0x02, 0x2f, 0xb7, 0xbc, 0xfd, 0x5a, 0x84, 0x6c, 0xec, 0x0f, 0x17, 0x3a, 0xb5,
-	0x11, 0xf4, 0x12, 0x90, 0x4d, 0x23, 0xa1, 0x49, 0x92, 0xb3, 0xa2, 0x70, 0x47, 0xaf, 0x58, 0x67,
-	0xdf, 0x46, 0x0e, 0x5d, 0xc0, 0x5e, 0xe0, 0x1a, 0xb0, 0x50, 0x31, 0x15, 0x73, 0x36, 0xcf, 0xc8,
-	0xac, 0x27, 0x57, 0x6d, 0xef, 0x7d, 0xff, 0x99, 0xb5, 0x09, 0xc2, 0xec, 0xca, 0x09, 0xa3, 0xc7,
-	0xd6, 0xb2, 0x3a, 0x66, 0x0e, 0xa3, 0xa7, 0x50, 0x17, 0x6a, 0x48, 0x04, 0x1b, 0x33, 0x81, 0x6b,
-	0xf6, 0x42, 0x35, 0xa1, 0x86, 0x5d, 0xf3, 0x8d, 0x02, 0x68, 0xc4, 0x2a, 0xcd, 0x94, 0x34, 0xfd,
-	0x7a, 0x4b, 0xab, 0x5b, 0xda, 0xf6, 0x3c, 0xd4, 0x9d, 0xf1, 0xbf, 0x02, 0x30, 0xac, 0x81, 0xca,
-	0x53, 0xaa, 0x31, 0x58, 0x9a, 0xb1, 0x3f, 0xb5, 0x00, 0xda, 0x01, 0x63, 0xed, 0xde, 0xbe, 0xe6,
-	0x66, 0x4b, 0x28, 0x97, 0xf3, 0x00, 0x1a, 0x23, 0xa5, 0x49, 0xce, 0x0a, 0x4d, 0x73, 0x3d, 0x7f,
-	0xed, 0xba, 0xcd, 0xe8, 0xf6, 0x48, 0xe9, 0xc8, 0x45, 0x66, 0xd7, 0x7e, 0x01, 0x5b, 0x66, 0xfc,
-	0x79, 0xcc, 0x48, 0x2c, 0xca, 0x42, 0xb3, 0x1c, 0x6f, 0x58, 0xc7, 0xcd, 0x0a, 0x3e, 0x76, 0x28,
-	0x7a, 0x0e, 0xeb, 0x33, 0xa2, 0x54, 0x09, 0xc3, 0x9b, 0x96, 0xb5, 0x56, 0x61, 0x3d, 0x95, 0xb0,
-	0xbb, 0x94, 0xbf, 0x94, 0x64, 0x78, 0xeb, 0x23, 0xca, 0x3b, 0x25, 0x19, 0x0a, 0xa1, 0x31, 0xe0,
-	0x82, 0x91, 0x81, 0x28, 0x8b, 0x11, 0xe1, 0x52, 0xb3, 0x7c, 0x4c, 0x05, 0xf6, 0x1f, 0x1a, 0xb9,
-	0x6d, 0xa3, 0x3a, 0x35, 0xa2, 0xb0, 0xd2, 0xa0, 0x9f, 0x01, 0x92, 0x9c, 0x72, 0x49, 0xcc, 0x2c,
-	0xe2, 0xed, 0x87, 0x1c, 0xea, 0x96, 0x7c, 0xc9, 0x53, 0xbb, 0x42, 0x32, 0x6a, 0x57, 0x47, 0x31,
-	0x2a, 0x75, 0x62, 0x1a, 0xcf, 0x7a, 0xa0, 0x07, 0x57, 0x88, 0x93, 0x5d, 0x54, 0x2a, 0x6b, 0xf6,
-	0x2b, 0x2c, 0xa5, 0x26, 0x1f, 0x0d, 0xdb, 0x4f, 0x2f, 0x3f, 0xb7, 0x9f, 0xde, 0xa8, 0x84, 0x45,
-	0x56, 0x89, 0x9e, 0x41, 0x3d, 0xa5, 0x13, 0x62, 0xd6, 0x5b, 0x81, 0x9b, 0x66, 0x08, 0x8f, 0x16,
-	0xb0, 0x17, 0xd5, 0x52, 0x3a, 0x31, 0xa3, 0x5f, 0xa0, 0x6f, 0xc0, 0x37, 0x04, 0xd5, 0xbf, 0x26,
-	0x92, 0xa6, 0x8c, 0x08, 0x26, 0xf1, 0xe3, 0x39, 0x6f, 0x23, 0xa5, 0x93, 0xb3, 0xfe, 0x75, 0x8f,
-	0xa6, 0xac, 0xcb, 0xa4, 0x69, 0x80, 0x84, 0x17, 0xb4, 0x2f, 0x18, 0xb9, 0xd3, 0x08, 0xf8, 0x0b,
-	0xd7, 0x00, 0x55, 0xe8, 0xb7, 0x79, 0x1f, 0x98, 0x19, 0x64, 0xd2, 0xd2, 0xd3, 0x52, 0xb3, 0x09,
-	0xd1, 0x39, 0x8d, 0xb9, 0x1c, 0xe2, 0x27, 0x6e, 0x06, 0x5d, 0xec, 0x8d, 0x09, 0x5d, 0xba, 0x08,
-	0xfa, 0x1a, 0x36, 0x66, 0xed, 0xe5, 0x56, 0x2f, 0xb6, 0xbb, 0x61, 0xbd, 0x02, 0xdd, 0x66, 0xdd,
-	0x83, 0xcd, 0x38, 0x2b, 0x0b, 0xa6, 0x89, 0x1e, 0xe5, 0x8c, 0x26, 0x05, 0xde, 0xb1, 0x86, 0x1b,
-	0x0e, 0xbd, 0x74, 0x60, 0xfb, 0x29, 0xd4, 0x6f, 0x47, 0x68, 0x05, 0x16, 0xc6, 0x3f, 0xfa, 0x8f,
-	0xec, 0xef, 0x4f, 0xbe, 0xd7, 0xfe, 0x16, 0x96, 0x4c, 0x9a, 0x50, 0x1d, 0x96, 0xed, 0xbf, 0x81,
-	0xdb, 0x7d, 0x57, 0x54, 0xf0, 0x84, 0x6a, 0xe6, 0x7b, 0xe6, 0x2b, 0x94, 0x5c, 0x9f, 0x49, 0x31,
-	0xf5, 0x17, 0x8e, 0x8e, 0xfe, 0xb9, 0xd9, 0xf5, 0xfe, 0xbd, 0xd9, 0xf5, 0xfe, 0xbf, 0xd9, 0xf5,
-	0xe0, 0x39, 0x57, 0xae, 0x16, 0x59, 0xae, 0x26, 0xd3, 0xfb, 0xca, 0x72, 0xb4, 0x75, 0xfb, 0x1f,
-	0x73, 0x6e, 0x6a, 0x7d, 0xee, 0xf5, 0x57, 0x6c, 0xd1, 0x7f, 0xf8, 0x10, 0x00, 0x00, 0xff, 0xff,
-	0xba, 0xcf, 0x16, 0xe6, 0x28, 0x07, 0x00, 0x00,
-}
-
 func (m *ServerInfo) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -595,9 +447,6 @@ func (m *ServerInfo) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n3
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -812,9 +661,6 @@ func (m *CommandLineOptions) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i++
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -828,9 +674,6 @@ func encodeVarintServerInfo(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ServerInfo) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Version)
@@ -852,16 +695,10 @@ func (m *ServerInfo) Size() (n int) {
 		l = m.CommandLineOptions.Size()
 		n += 1 + l + sovServerInfo(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *CommandLineOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.BaseId != 0 {
@@ -952,9 +789,6 @@ func (m *CommandLineOptions) Size() (n int) {
 	if m.CpusetThreads {
 		n += 3
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
@@ -986,7 +820,7 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1014,7 +848,7 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1024,9 +858,6 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1046,7 +877,7 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.State |= ServerInfo_State(b&0x7F) << shift
+				m.State |= (ServerInfo_State(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1065,7 +896,7 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1074,14 +905,11 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.UptimeCurrentEpoch == nil {
-				m.UptimeCurrentEpoch = &types.Duration{}
+				m.UptimeCurrentEpoch = &google_protobuf5.Duration{}
 			}
 			if err := m.UptimeCurrentEpoch.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1101,7 +929,7 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1110,14 +938,11 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.UptimeAllEpochs == nil {
-				m.UptimeAllEpochs = &types.Duration{}
+				m.UptimeAllEpochs = &google_protobuf5.Duration{}
 			}
 			if err := m.UptimeAllEpochs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1137,7 +962,7 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1146,9 +971,6 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1168,13 +990,9 @@ func (m *ServerInfo) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthServerInfo
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1199,7 +1017,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1227,7 +1045,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.BaseId |= uint64(b&0x7F) << shift
+				m.BaseId |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1246,7 +1064,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Concurrency |= uint32(b&0x7F) << shift
+				m.Concurrency |= (uint32(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1265,7 +1083,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1275,9 +1093,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1297,7 +1112,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1307,9 +1122,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1329,7 +1141,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1349,7 +1161,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1359,9 +1171,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1381,7 +1190,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.LocalAddressIpVersion |= CommandLineOptions_IpVersion(b&0x7F) << shift
+				m.LocalAddressIpVersion |= (CommandLineOptions_IpVersion(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1400,7 +1209,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1410,9 +1219,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1432,7 +1238,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1442,9 +1248,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1464,7 +1267,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1474,9 +1277,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1496,7 +1296,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1506,9 +1306,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1528,7 +1325,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1548,7 +1345,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1558,9 +1355,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1580,7 +1374,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1590,9 +1384,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1612,7 +1403,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1622,9 +1413,6 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1644,7 +1432,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1653,14 +1441,11 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.FileFlushInterval == nil {
-				m.FileFlushInterval = &types.Duration{}
+				m.FileFlushInterval = &google_protobuf5.Duration{}
 			}
 			if err := m.FileFlushInterval.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1680,7 +1465,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1689,14 +1474,11 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.DrainTime == nil {
-				m.DrainTime = &types.Duration{}
+				m.DrainTime = &google_protobuf5.Duration{}
 			}
 			if err := m.DrainTime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1716,7 +1498,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1725,14 +1507,11 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthServerInfo
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ParentShutdownTime == nil {
-				m.ParentShutdownTime = &types.Duration{}
+				m.ParentShutdownTime = &google_protobuf5.Duration{}
 			}
 			if err := m.ParentShutdownTime.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1752,7 +1531,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Mode |= CommandLineOptions_Mode(b&0x7F) << shift
+				m.Mode |= (CommandLineOptions_Mode(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1771,7 +1550,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MaxStats |= uint64(b&0x7F) << shift
+				m.MaxStats |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1790,7 +1569,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MaxObjNameLen |= uint64(b&0x7F) << shift
+				m.MaxObjNameLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1809,7 +1588,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1829,7 +1608,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1849,7 +1628,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.RestartEpoch |= uint32(b&0x7F) << shift
+				m.RestartEpoch |= (uint32(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1868,7 +1647,7 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1883,13 +1662,9 @@ func (m *CommandLineOptions) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthServerInfo
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthServerInfo
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1953,11 +1728,8 @@ func skipServerInfo(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthServerInfo
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthServerInfo
 			}
 			return iNdEx, nil
@@ -1988,9 +1760,6 @@ func skipServerInfo(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthServerInfo
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -2009,3 +1778,68 @@ var (
 	ErrInvalidLengthServerInfo = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowServerInfo   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("envoy/admin/v2alpha/server_info.proto", fileDescriptorServerInfo) }
+
+var fileDescriptorServerInfo = []byte{
+	// 936 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x55, 0xdd, 0x6e, 0xdb, 0x36,
+	0x18, 0xad, 0xf2, 0x6b, 0x7f, 0xf9, 0x53, 0x68, 0x77, 0x65, 0x56, 0x2c, 0x75, 0x3d, 0x04, 0x0d,
+	0xb0, 0x4e, 0xde, 0xb2, 0x61, 0x18, 0xb0, 0x9b, 0x25, 0x69, 0xd2, 0x09, 0x73, 0x9d, 0x40, 0xc9,
+	0x02, 0xb4, 0x37, 0x04, 0x2d, 0xd1, 0x36, 0x33, 0x8a, 0x14, 0x24, 0xca, 0xb5, 0xf7, 0x2a, 0x7b,
+	0xa1, 0x5d, 0xee, 0x0d, 0x36, 0xe4, 0x49, 0x0a, 0x92, 0xb2, 0x93, 0xa2, 0x01, 0xd2, 0x2b, 0x43,
+	0xe7, 0x3b, 0xe7, 0x90, 0xfc, 0xfe, 0x0c, 0x7b, 0x4c, 0x8e, 0xd5, 0xb4, 0x43, 0x93, 0x94, 0xcb,
+	0xce, 0xf8, 0x80, 0x8a, 0x6c, 0x44, 0x3b, 0x05, 0xcb, 0xc7, 0x2c, 0x27, 0x5c, 0x0e, 0x54, 0x90,
+	0xe5, 0x4a, 0x2b, 0xd4, 0xb0, 0xb4, 0xc0, 0xd2, 0x82, 0x8a, 0xf6, 0xe5, 0xee, 0x50, 0xa9, 0xa1,
+	0x60, 0x1d, 0x4b, 0xe9, 0x97, 0x83, 0x4e, 0x52, 0xe6, 0x54, 0x73, 0x25, 0x9d, 0xa8, 0xfd, 0xf7,
+	0x22, 0xc0, 0x85, 0xb5, 0x0a, 0xe5, 0x40, 0x21, 0x0c, 0xab, 0x63, 0x96, 0x17, 0x5c, 0x49, 0xec,
+	0xb5, 0xbc, 0xfd, 0x7a, 0x34, 0xfb, 0x44, 0xbf, 0xc0, 0x72, 0xa1, 0xa9, 0x66, 0x78, 0xa1, 0xe5,
+	0xed, 0x6f, 0x1e, 0xec, 0x05, 0xf7, 0x9c, 0x16, 0xdc, 0x3a, 0x05, 0x17, 0x86, 0x1c, 0x39, 0x0d,
+	0xfa, 0x1d, 0x9a, 0x65, 0xa6, 0x79, 0xca, 0x48, 0x5c, 0xe6, 0x39, 0x93, 0x9a, 0xb0, 0x4c, 0xc5,
+	0x23, 0xbc, 0xd8, 0xf2, 0xf6, 0xd7, 0x0e, 0x76, 0x02, 0x77, 0xc9, 0x60, 0x76, 0xc9, 0xe0, 0x55,
+	0x75, 0xc9, 0x08, 0x39, 0xd9, 0xb1, 0x53, 0x9d, 0x18, 0x11, 0x3a, 0x81, 0xed, 0xca, 0x8c, 0x0a,
+	0xe1, 0x8c, 0x0a, 0xbc, 0xf4, 0x90, 0xd3, 0x96, 0xd3, 0x1c, 0x0a, 0x61, 0x5d, 0x0a, 0xf4, 0x16,
+	0x9a, 0xb1, 0x4a, 0x53, 0x2a, 0x13, 0x22, 0xb8, 0x64, 0x44, 0x65, 0x86, 0x57, 0xe0, 0x15, 0xeb,
+	0xf4, 0xe2, 0xde, 0xf7, 0x1d, 0x3b, 0x41, 0x97, 0x4b, 0x76, 0xe6, 0xe8, 0x11, 0x8a, 0x3f, 0xc1,
+	0xda, 0xaf, 0x61, 0xd9, 0x3e, 0x1f, 0xd5, 0x60, 0xa9, 0x1b, 0x5e, 0x9d, 0xf8, 0x8f, 0xd0, 0x3a,
+	0xd4, 0x5e, 0x45, 0x87, 0x61, 0x2f, 0xec, 0xbd, 0xf6, 0x3d, 0xd4, 0x04, 0xff, 0x3c, 0x3a, 0x21,
+	0x61, 0x2f, 0xbc, 0x0c, 0x0f, 0xbb, 0xe1, 0x3b, 0x83, 0x2e, 0x20, 0x1f, 0xd6, 0x3f, 0x42, 0x16,
+	0xdb, 0xff, 0xd5, 0x01, 0x7d, 0x7a, 0x26, 0x7a, 0x02, 0xab, 0x7d, 0x5a, 0x30, 0xc2, 0x13, 0x5b,
+	0xa5, 0xa5, 0x68, 0xc5, 0x7c, 0x86, 0x09, 0x6a, 0xc1, 0x5a, 0xac, 0xa4, 0xcb, 0x71, 0x3c, 0xb5,
+	0xa5, 0xda, 0x88, 0xee, 0x42, 0xe8, 0x99, 0x65, 0x0c, 0xf8, 0x90, 0x64, 0x54, 0xbb, 0x02, 0xd4,
+	0x23, 0x70, 0xd0, 0x39, 0xd5, 0xa3, 0x3b, 0x84, 0x29, 0x4d, 0x85, 0xcd, 0xeb, 0x9c, 0xf0, 0x96,
+	0xa6, 0x02, 0x7d, 0x07, 0x4d, 0x2a, 0x84, 0x7a, 0x4f, 0x4a, 0xf9, 0xa7, 0x54, 0xef, 0x25, 0x19,
+	0x70, 0x26, 0x92, 0x02, 0x2f, 0xb7, 0xbc, 0xfd, 0x5a, 0x84, 0x6c, 0xec, 0x0f, 0x17, 0x3a, 0xb5,
+	0x11, 0xf4, 0x12, 0x90, 0x4d, 0x23, 0xa1, 0x49, 0x92, 0xb3, 0xa2, 0x70, 0x47, 0xaf, 0x58, 0x67,
+	0xdf, 0x46, 0x0e, 0x5d, 0xc0, 0x5e, 0xe0, 0x1a, 0xb0, 0x50, 0x31, 0x15, 0x73, 0x36, 0xcf, 0xc8,
+	0xac, 0x27, 0x57, 0x6d, 0xef, 0x7d, 0xff, 0x99, 0xb5, 0x09, 0xc2, 0xec, 0xca, 0x09, 0xa3, 0xc7,
+	0xd6, 0xb2, 0x3a, 0x66, 0x0e, 0xa3, 0xa7, 0x50, 0x17, 0x6a, 0x48, 0x04, 0x1b, 0x33, 0x81, 0x6b,
+	0xf6, 0x42, 0x35, 0xa1, 0x86, 0x5d, 0xf3, 0x8d, 0x02, 0x68, 0xc4, 0x2a, 0xcd, 0x94, 0x34, 0xfd,
+	0x7a, 0x4b, 0xab, 0x5b, 0xda, 0xf6, 0x3c, 0xd4, 0x9d, 0xf1, 0xbf, 0x02, 0x30, 0xac, 0x81, 0xca,
+	0x53, 0xaa, 0x31, 0x58, 0x9a, 0xb1, 0x3f, 0xb5, 0x00, 0xda, 0x01, 0x63, 0xed, 0xde, 0xbe, 0xe6,
+	0x66, 0x4b, 0x28, 0x97, 0xf3, 0x00, 0x1a, 0x23, 0xa5, 0x49, 0xce, 0x0a, 0x4d, 0x73, 0x3d, 0x7f,
+	0xed, 0xba, 0xcd, 0xe8, 0xf6, 0x48, 0xe9, 0xc8, 0x45, 0x66, 0xd7, 0x7e, 0x01, 0x5b, 0x66, 0xfc,
+	0x79, 0xcc, 0x48, 0x2c, 0xca, 0x42, 0xb3, 0x1c, 0x6f, 0x58, 0xc7, 0xcd, 0x0a, 0x3e, 0x76, 0x28,
+	0x7a, 0x0e, 0xeb, 0x33, 0xa2, 0x54, 0x09, 0xc3, 0x9b, 0x96, 0xb5, 0x56, 0x61, 0x3d, 0x95, 0xb0,
+	0xbb, 0x94, 0xbf, 0x94, 0x64, 0x78, 0xeb, 0x23, 0xca, 0x3b, 0x25, 0x19, 0x0a, 0xa1, 0x31, 0xe0,
+	0x82, 0x91, 0x81, 0x28, 0x8b, 0x11, 0xe1, 0x52, 0xb3, 0x7c, 0x4c, 0x05, 0xf6, 0x1f, 0x1a, 0xb9,
+	0x6d, 0xa3, 0x3a, 0x35, 0xa2, 0xb0, 0xd2, 0xa0, 0x9f, 0x01, 0x92, 0x9c, 0x72, 0x49, 0xcc, 0x2c,
+	0xe2, 0xed, 0x87, 0x1c, 0xea, 0x96, 0x7c, 0xc9, 0x53, 0xbb, 0x42, 0x32, 0x6a, 0x57, 0x47, 0x31,
+	0x2a, 0x75, 0x62, 0x1a, 0xcf, 0x7a, 0xa0, 0x07, 0x57, 0x88, 0x93, 0x5d, 0x54, 0x2a, 0x6b, 0xf6,
+	0x2b, 0x2c, 0xa5, 0x26, 0x1f, 0x0d, 0xdb, 0x4f, 0x2f, 0x3f, 0xb7, 0x9f, 0xde, 0xa8, 0x84, 0x45,
+	0x56, 0x89, 0x9e, 0x41, 0x3d, 0xa5, 0x13, 0x62, 0xd6, 0x5b, 0x81, 0x9b, 0x66, 0x08, 0x8f, 0x16,
+	0xb0, 0x17, 0xd5, 0x52, 0x3a, 0x31, 0xa3, 0x5f, 0xa0, 0x6f, 0xc0, 0x37, 0x04, 0xd5, 0xbf, 0x26,
+	0x92, 0xa6, 0x8c, 0x08, 0x26, 0xf1, 0xe3, 0x39, 0x6f, 0x23, 0xa5, 0x93, 0xb3, 0xfe, 0x75, 0x8f,
+	0xa6, 0xac, 0xcb, 0xa4, 0x69, 0x80, 0x84, 0x17, 0xb4, 0x2f, 0x18, 0xb9, 0xd3, 0x08, 0xf8, 0x0b,
+	0xd7, 0x00, 0x55, 0xe8, 0xb7, 0x79, 0x1f, 0x98, 0x19, 0x64, 0xd2, 0xd2, 0xd3, 0x52, 0xb3, 0x09,
+	0xd1, 0x39, 0x8d, 0xb9, 0x1c, 0xe2, 0x27, 0x6e, 0x06, 0x5d, 0xec, 0x8d, 0x09, 0x5d, 0xba, 0x08,
+	0xfa, 0x1a, 0x36, 0x66, 0xed, 0xe5, 0x56, 0x2f, 0xb6, 0xbb, 0x61, 0xbd, 0x02, 0xdd, 0x66, 0xdd,
+	0x83, 0xcd, 0x38, 0x2b, 0x0b, 0xa6, 0x89, 0x1e, 0xe5, 0x8c, 0x26, 0x05, 0xde, 0xb1, 0x86, 0x1b,
+	0x0e, 0xbd, 0x74, 0x60, 0xfb, 0x29, 0xd4, 0x6f, 0x47, 0x68, 0x05, 0x16, 0xc6, 0x3f, 0xfa, 0x8f,
+	0xec, 0xef, 0x4f, 0xbe, 0xd7, 0xfe, 0x16, 0x96, 0x4c, 0x9a, 0x50, 0x1d, 0x96, 0xed, 0xbf, 0x81,
+	0xdb, 0x7d, 0x57, 0x54, 0xf0, 0x84, 0x6a, 0xe6, 0x7b, 0xe6, 0x2b, 0x94, 0x5c, 0x9f, 0x49, 0x31,
+	0xf5, 0x17, 0x8e, 0x8e, 0xfe, 0xb9, 0xd9, 0xf5, 0xfe, 0xbd, 0xd9, 0xf5, 0xfe, 0xbf, 0xd9, 0xf5,
+	0xe0, 0x39, 0x57, 0xae, 0x16, 0x59, 0xae, 0x26, 0xd3, 0xfb, 0xca, 0x72, 0xb4, 0x75, 0xfb, 0x1f,
+	0x73, 0x6e, 0x6a, 0x7d, 0xee, 0xf5, 0x57, 0x6c, 0xd1, 0x7f, 0xf8, 0x10, 0x00, 0x00, 0xff, 0xff,
+	0xba, 0xcf, 0x16, 0xe6, 0x28, 0x07, 0x00, 0x00,
+}

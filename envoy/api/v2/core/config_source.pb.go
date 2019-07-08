@@ -3,19 +3,19 @@
 
 package core
 
-import (
-	bytes "bytes"
-	fmt "fmt"
-	io "io"
-	math "math"
-	time "time"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import google_protobuf4 "github.com/gogo/protobuf/types"
+import google_protobuf2 "github.com/gogo/protobuf/types"
+import _ "github.com/envoyproxy/protoc-gen-validate/validate"
+import _ "github.com/gogo/protobuf/gogoproto"
 
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
-	types "github.com/gogo/protobuf/types"
-)
+import time "time"
+
+import types "github.com/gogo/protobuf/types"
+
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -23,19 +23,13 @@ var _ = fmt.Errorf
 var _ = math.Inf
 var _ = time.Kitchen
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
-
 // APIs may be fetched via either REST or gRPC.
 type ApiConfigSource_ApiType int32
 
 const (
 	// Ideally this would be 'reserved 0' but one can't reserve the default
 	// value. Instead we throw an exception if this is ever used.
-	ApiConfigSource_UNSUPPORTED_REST_LEGACY ApiConfigSource_ApiType = 0 // Deprecated: Do not use.
+	ApiConfigSource_UNSUPPORTED_REST_LEGACY ApiConfigSource_ApiType = 0
 	// REST-JSON v2 API. The `canonical JSON encoding
 	// <https://developers.google.com/protocol-buffers/docs/proto3#json>`_ for
 	// the v2 protos is used.
@@ -57,7 +51,6 @@ var ApiConfigSource_ApiType_name = map[int32]string{
 	2: "GRPC",
 	3: "DELTA_GRPC",
 }
-
 var ApiConfigSource_ApiType_value = map[string]int32{
 	"UNSUPPORTED_REST_LEGACY": 0,
 	"REST":                    1,
@@ -68,9 +61,8 @@ var ApiConfigSource_ApiType_value = map[string]int32{
 func (x ApiConfigSource_ApiType) String() string {
 	return proto.EnumName(ApiConfigSource_ApiType_name, int32(x))
 }
-
 func (ApiConfigSource_ApiType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_1ffcc55cf4c30535, []int{0, 0}
+	return fileDescriptorConfigSource, []int{0, 0}
 }
 
 // API configuration source. This identifies the API type and cluster that Envoy
@@ -85,54 +77,23 @@ type ApiConfigSource struct {
 	//
 	//  The cluster with name ``cluster_name`` must be statically defined and its
 	//  type must not be ``EDS``.
-	ClusterNames []string `protobuf:"bytes,2,rep,name=cluster_names,json=clusterNames,proto3" json:"cluster_names,omitempty"`
+	ClusterNames []string `protobuf:"bytes,2,rep,name=cluster_names,json=clusterNames" json:"cluster_names,omitempty"`
 	// Multiple gRPC services be provided for GRPC. If > 1 cluster is defined,
 	// services will be cycled through if any kind of failure occurs.
-	GrpcServices []*GrpcService `protobuf:"bytes,4,rep,name=grpc_services,json=grpcServices,proto3" json:"grpc_services,omitempty"`
+	GrpcServices []*GrpcService `protobuf:"bytes,4,rep,name=grpc_services,json=grpcServices" json:"grpc_services,omitempty"`
 	// For REST APIs, the delay between successive polls.
-	RefreshDelay *time.Duration `protobuf:"bytes,3,opt,name=refresh_delay,json=refreshDelay,proto3,stdduration" json:"refresh_delay,omitempty"`
+	RefreshDelay *time.Duration `protobuf:"bytes,3,opt,name=refresh_delay,json=refreshDelay,stdduration" json:"refresh_delay,omitempty"`
 	// For REST APIs, the request timeout. If not set, a default value of 1s will be used.
-	RequestTimeout *time.Duration `protobuf:"bytes,5,opt,name=request_timeout,json=requestTimeout,proto3,stdduration" json:"request_timeout,omitempty"`
+	RequestTimeout *time.Duration `protobuf:"bytes,5,opt,name=request_timeout,json=requestTimeout,stdduration" json:"request_timeout,omitempty"`
 	// For GRPC APIs, the rate limit settings. If present, discovery requests made by Envoy will be
 	// rate limited.
-	RateLimitSettings    *RateLimitSettings `protobuf:"bytes,6,opt,name=rate_limit_settings,json=rateLimitSettings,proto3" json:"rate_limit_settings,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	RateLimitSettings *RateLimitSettings `protobuf:"bytes,6,opt,name=rate_limit_settings,json=rateLimitSettings" json:"rate_limit_settings,omitempty"`
 }
 
-func (m *ApiConfigSource) Reset()         { *m = ApiConfigSource{} }
-func (m *ApiConfigSource) String() string { return proto.CompactTextString(m) }
-func (*ApiConfigSource) ProtoMessage()    {}
-func (*ApiConfigSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1ffcc55cf4c30535, []int{0}
-}
-func (m *ApiConfigSource) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ApiConfigSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ApiConfigSource.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ApiConfigSource) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ApiConfigSource.Merge(m, src)
-}
-func (m *ApiConfigSource) XXX_Size() int {
-	return m.Size()
-}
-func (m *ApiConfigSource) XXX_DiscardUnknown() {
-	xxx_messageInfo_ApiConfigSource.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ApiConfigSource proto.InternalMessageInfo
+func (m *ApiConfigSource) Reset()                    { *m = ApiConfigSource{} }
+func (m *ApiConfigSource) String() string            { return proto.CompactTextString(m) }
+func (*ApiConfigSource) ProtoMessage()               {}
+func (*ApiConfigSource) Descriptor() ([]byte, []int) { return fileDescriptorConfigSource, []int{0} }
 
 func (m *ApiConfigSource) GetApiType() ApiConfigSource_ApiType {
 	if m != nil {
@@ -180,98 +141,38 @@ func (m *ApiConfigSource) GetRateLimitSettings() *RateLimitSettings {
 // set in :ref:`ConfigSource <envoy_api_msg_core.ConfigSource>` can be used to
 // specify that ADS is to be used.
 type AggregatedConfigSource struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *AggregatedConfigSource) Reset()         { *m = AggregatedConfigSource{} }
 func (m *AggregatedConfigSource) String() string { return proto.CompactTextString(m) }
 func (*AggregatedConfigSource) ProtoMessage()    {}
 func (*AggregatedConfigSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1ffcc55cf4c30535, []int{1}
+	return fileDescriptorConfigSource, []int{1}
 }
-func (m *AggregatedConfigSource) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AggregatedConfigSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AggregatedConfigSource.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AggregatedConfigSource) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AggregatedConfigSource.Merge(m, src)
-}
-func (m *AggregatedConfigSource) XXX_Size() int {
-	return m.Size()
-}
-func (m *AggregatedConfigSource) XXX_DiscardUnknown() {
-	xxx_messageInfo_AggregatedConfigSource.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AggregatedConfigSource proto.InternalMessageInfo
 
 // Rate Limit settings to be applied for discovery requests made by Envoy.
 type RateLimitSettings struct {
 	// Maximum number of tokens to be used for rate limiting discovery request calls. If not set, a
 	// default value of 100 will be used.
-	MaxTokens *types.UInt32Value `protobuf:"bytes,1,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	MaxTokens *google_protobuf2.UInt32Value `protobuf:"bytes,1,opt,name=max_tokens,json=maxTokens" json:"max_tokens,omitempty"`
 	// Rate at which tokens will be filled per second. If not set, a default fill rate of 10 tokens
 	// per second will be used.
-	FillRate             *types.DoubleValue `protobuf:"bytes,2,opt,name=fill_rate,json=fillRate,proto3" json:"fill_rate,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	FillRate *google_protobuf2.DoubleValue `protobuf:"bytes,2,opt,name=fill_rate,json=fillRate" json:"fill_rate,omitempty"`
 }
 
-func (m *RateLimitSettings) Reset()         { *m = RateLimitSettings{} }
-func (m *RateLimitSettings) String() string { return proto.CompactTextString(m) }
-func (*RateLimitSettings) ProtoMessage()    {}
-func (*RateLimitSettings) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1ffcc55cf4c30535, []int{2}
-}
-func (m *RateLimitSettings) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RateLimitSettings) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RateLimitSettings.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RateLimitSettings) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RateLimitSettings.Merge(m, src)
-}
-func (m *RateLimitSettings) XXX_Size() int {
-	return m.Size()
-}
-func (m *RateLimitSettings) XXX_DiscardUnknown() {
-	xxx_messageInfo_RateLimitSettings.DiscardUnknown(m)
-}
+func (m *RateLimitSettings) Reset()                    { *m = RateLimitSettings{} }
+func (m *RateLimitSettings) String() string            { return proto.CompactTextString(m) }
+func (*RateLimitSettings) ProtoMessage()               {}
+func (*RateLimitSettings) Descriptor() ([]byte, []int) { return fileDescriptorConfigSource, []int{2} }
 
-var xxx_messageInfo_RateLimitSettings proto.InternalMessageInfo
-
-func (m *RateLimitSettings) GetMaxTokens() *types.UInt32Value {
+func (m *RateLimitSettings) GetMaxTokens() *google_protobuf2.UInt32Value {
 	if m != nil {
 		return m.MaxTokens
 	}
 	return nil
 }
 
-func (m *RateLimitSettings) GetFillRate() *types.DoubleValue {
+func (m *RateLimitSettings) GetFillRate() *google_protobuf2.DoubleValue {
 	if m != nil {
 		return m.FillRate
 	}
@@ -298,44 +199,13 @@ type ConfigSource struct {
 	// when the xDS API subscription starts, and is disarmed on first config update or on error. 0
 	// means no timeout - Envoy will wait indefinitely for the first xDS config (unless another
 	// timeout applies). Default 0.
-	InitialFetchTimeout  *types.Duration `protobuf:"bytes,4,opt,name=initial_fetch_timeout,json=initialFetchTimeout,proto3" json:"initial_fetch_timeout,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	InitialFetchTimeout *google_protobuf4.Duration `protobuf:"bytes,4,opt,name=initial_fetch_timeout,json=initialFetchTimeout" json:"initial_fetch_timeout,omitempty"`
 }
 
-func (m *ConfigSource) Reset()         { *m = ConfigSource{} }
-func (m *ConfigSource) String() string { return proto.CompactTextString(m) }
-func (*ConfigSource) ProtoMessage()    {}
-func (*ConfigSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1ffcc55cf4c30535, []int{3}
-}
-func (m *ConfigSource) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ConfigSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ConfigSource.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ConfigSource) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ConfigSource.Merge(m, src)
-}
-func (m *ConfigSource) XXX_Size() int {
-	return m.Size()
-}
-func (m *ConfigSource) XXX_DiscardUnknown() {
-	xxx_messageInfo_ConfigSource.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ConfigSource proto.InternalMessageInfo
+func (m *ConfigSource) Reset()                    { *m = ConfigSource{} }
+func (m *ConfigSource) String() string            { return proto.CompactTextString(m) }
+func (*ConfigSource) ProtoMessage()               {}
+func (*ConfigSource) Descriptor() ([]byte, []int) { return fileDescriptorConfigSource, []int{3} }
 
 type isConfigSource_ConfigSourceSpecifier interface {
 	isConfigSource_ConfigSourceSpecifier()
@@ -348,10 +218,10 @@ type ConfigSource_Path struct {
 	Path string `protobuf:"bytes,1,opt,name=path,proto3,oneof"`
 }
 type ConfigSource_ApiConfigSource struct {
-	ApiConfigSource *ApiConfigSource `protobuf:"bytes,2,opt,name=api_config_source,json=apiConfigSource,proto3,oneof"`
+	ApiConfigSource *ApiConfigSource `protobuf:"bytes,2,opt,name=api_config_source,json=apiConfigSource,oneof"`
 }
 type ConfigSource_Ads struct {
-	Ads *AggregatedConfigSource `protobuf:"bytes,3,opt,name=ads,proto3,oneof"`
+	Ads *AggregatedConfigSource `protobuf:"bytes,3,opt,name=ads,oneof"`
 }
 
 func (*ConfigSource_Path) isConfigSource_ConfigSourceSpecifier()            {}
@@ -386,7 +256,7 @@ func (m *ConfigSource) GetAds() *AggregatedConfigSource {
 	return nil
 }
 
-func (m *ConfigSource) GetInitialFetchTimeout() *types.Duration {
+func (m *ConfigSource) GetInitialFetchTimeout() *google_protobuf4.Duration {
 	if m != nil {
 		return m.InitialFetchTimeout
 	}
@@ -462,17 +332,17 @@ func _ConfigSource_OneofSizer(msg proto.Message) (n int) {
 	// config_source_specifier
 	switch x := m.ConfigSourceSpecifier.(type) {
 	case *ConfigSource_Path:
-		n += 1 // tag and wire
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.Path)))
 		n += len(x.Path)
 	case *ConfigSource_ApiConfigSource:
 		s := proto.Size(x.ApiConfigSource)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case *ConfigSource_Ads:
 		s := proto.Size(x.Ads)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -483,66 +353,12 @@ func _ConfigSource_OneofSizer(msg proto.Message) (n int) {
 }
 
 func init() {
-	proto.RegisterEnum("envoy.api.v2.core.ApiConfigSource_ApiType", ApiConfigSource_ApiType_name, ApiConfigSource_ApiType_value)
 	proto.RegisterType((*ApiConfigSource)(nil), "envoy.api.v2.core.ApiConfigSource")
 	proto.RegisterType((*AggregatedConfigSource)(nil), "envoy.api.v2.core.AggregatedConfigSource")
 	proto.RegisterType((*RateLimitSettings)(nil), "envoy.api.v2.core.RateLimitSettings")
 	proto.RegisterType((*ConfigSource)(nil), "envoy.api.v2.core.ConfigSource")
+	proto.RegisterEnum("envoy.api.v2.core.ApiConfigSource_ApiType", ApiConfigSource_ApiType_name, ApiConfigSource_ApiType_value)
 }
-
-func init() {
-	proto.RegisterFile("envoy/api/v2/core/config_source.proto", fileDescriptor_1ffcc55cf4c30535)
-}
-
-var fileDescriptor_1ffcc55cf4c30535 = []byte{
-	// 707 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0x4f, 0x4f, 0xdb, 0x48,
-	0x14, 0xcf, 0x24, 0x01, 0x92, 0x49, 0x80, 0x64, 0x60, 0x17, 0x2f, 0x5a, 0x85, 0x6c, 0x96, 0x95,
-	0xb2, 0x1c, 0x6c, 0x29, 0x1c, 0x57, 0x7b, 0xc8, 0x3f, 0x60, 0xb5, 0x94, 0xa6, 0x13, 0x53, 0xa9,
-	0xa7, 0xd1, 0xe0, 0x4c, 0xcc, 0xa8, 0x8e, 0xc7, 0x1d, 0x8f, 0x53, 0x72, 0xed, 0x27, 0xe8, 0xb1,
-	0x97, 0x5e, 0xab, 0xaa, 0x9f, 0xa0, 0xea, 0x89, 0x63, 0x8f, 0xfd, 0x06, 0xad, 0x72, 0xe3, 0x5b,
-	0x54, 0xe3, 0x98, 0x16, 0x48, 0x10, 0x3e, 0xbd, 0xf7, 0xe6, 0xfd, 0xde, 0xbc, 0xdf, 0xcf, 0xbf,
-	0x81, 0x7f, 0x31, 0x7f, 0x2c, 0x26, 0x16, 0x0d, 0xb8, 0x35, 0x6e, 0x58, 0x8e, 0x90, 0xcc, 0x72,
-	0x84, 0x3f, 0xe4, 0x2e, 0x09, 0x45, 0x24, 0x1d, 0x66, 0x06, 0x52, 0x28, 0x81, 0xca, 0x71, 0x9b,
-	0x49, 0x03, 0x6e, 0x8e, 0x1b, 0xa6, 0x6e, 0xdb, 0xde, 0x9d, 0x47, 0xba, 0x32, 0x70, 0x48, 0xc8,
-	0xe4, 0x98, 0x5f, 0x03, 0xb7, 0x2b, 0xae, 0x10, 0xae, 0xc7, 0xac, 0x38, 0x3b, 0x8b, 0x86, 0xd6,
-	0x20, 0x92, 0x54, 0x71, 0xe1, 0xdf, 0x77, 0xfe, 0x52, 0xd2, 0x20, 0x60, 0x32, 0x4c, 0xce, 0xb7,
-	0xc6, 0xd4, 0xe3, 0x03, 0xaa, 0x98, 0x75, 0x1d, 0x24, 0x07, 0x9b, 0xae, 0x70, 0x45, 0x1c, 0x5a,
-	0x3a, 0x9a, 0x55, 0x6b, 0xaf, 0xb3, 0x70, 0xbd, 0x19, 0xf0, 0x76, 0x4c, 0xa1, 0x1f, 0x33, 0x40,
-	0x4f, 0x60, 0x8e, 0x06, 0x9c, 0xa8, 0x49, 0xc0, 0x0c, 0x50, 0x05, 0xf5, 0xb5, 0xc6, 0x9e, 0x39,
-	0x47, 0xc7, 0xbc, 0x83, 0xd2, 0xb9, 0x3d, 0x09, 0x58, 0x0b, 0x7e, 0xba, 0xba, 0xcc, 0x2c, 0xbd,
-	0x02, 0xe9, 0x12, 0xc0, 0x2b, 0x74, 0x56, 0x44, 0x7f, 0xc2, 0x55, 0xc7, 0x8b, 0x42, 0xc5, 0x24,
-	0xf1, 0xe9, 0x88, 0x85, 0x46, 0xba, 0x9a, 0xa9, 0xe7, 0x71, 0x31, 0x29, 0x9e, 0xe8, 0x1a, 0x6a,
-	0xc3, 0xd5, 0x9b, 0x82, 0x84, 0x46, 0xb6, 0x9a, 0xa9, 0x17, 0x1a, 0x95, 0x05, 0x97, 0x1f, 0xca,
-	0xc0, 0xe9, 0xcf, 0xda, 0x70, 0xd1, 0xfd, 0x99, 0x84, 0xa8, 0x03, 0x57, 0x25, 0x1b, 0x4a, 0x16,
-	0x9e, 0x93, 0x01, 0xf3, 0xe8, 0xc4, 0xc8, 0x54, 0x41, 0xbd, 0xd0, 0xf8, 0xcd, 0x9c, 0xe9, 0x66,
-	0x5e, 0xeb, 0x66, 0x76, 0x12, 0x5d, 0x5b, 0xd9, 0x37, 0x5f, 0x77, 0x00, 0x2e, 0x26, 0xa8, 0x8e,
-	0x06, 0x21, 0x1b, 0xae, 0x4b, 0xf6, 0x22, 0x62, 0xa1, 0x22, 0x8a, 0x8f, 0x98, 0x88, 0x94, 0xb1,
-	0xf4, 0xd0, 0x9c, 0x92, 0x9e, 0xa3, 0xc9, 0xaf, 0x7c, 0x00, 0xd9, 0xbd, 0x74, 0x2e, 0x85, 0xd7,
-	0x92, 0x19, 0xf6, 0x6c, 0x04, 0xb2, 0xe1, 0x86, 0xa4, 0x8a, 0x11, 0x8f, 0x8f, 0xb8, 0x22, 0x21,
-	0x53, 0x8a, 0xfb, 0x6e, 0x68, 0x2c, 0xc7, 0x93, 0x77, 0x17, 0xd0, 0xc4, 0x54, 0xb1, 0x63, 0xdd,
-	0xdc, 0x4f, 0x7a, 0x71, 0x59, 0xde, 0x2d, 0xd5, 0x4e, 0xe0, 0x4a, 0xa2, 0x3d, 0xda, 0x81, 0x5b,
-	0xa7, 0x27, 0xfd, 0xd3, 0x5e, 0xef, 0x31, 0xb6, 0xbb, 0x1d, 0x82, 0xbb, 0x7d, 0x9b, 0x1c, 0x77,
-	0x0f, 0x9b, 0xed, 0x67, 0xa5, 0xd4, 0x76, 0x3a, 0x07, 0x50, 0x0e, 0x66, 0x75, 0xb1, 0x14, 0x47,
-	0x87, 0xb8, 0xd7, 0x2e, 0xa5, 0xd1, 0x1a, 0x84, 0x9d, 0xee, 0xb1, 0xdd, 0x24, 0x71, 0x9e, 0xa9,
-	0x19, 0xf0, 0xd7, 0xa6, 0xeb, 0x4a, 0xe6, 0x52, 0xc5, 0x06, 0x37, 0x7f, 0x71, 0xed, 0x2d, 0x80,
-	0xe5, 0xb9, 0x95, 0xd0, 0x3f, 0x10, 0x8e, 0xe8, 0x05, 0x51, 0xe2, 0x39, 0xf3, 0xc3, 0xd8, 0x30,
-	0x85, 0xc6, 0xef, 0x73, 0x32, 0x9d, 0xfe, 0xe7, 0xab, 0xfd, 0xc6, 0x53, 0xea, 0x45, 0x0c, 0xe7,
-	0x47, 0xf4, 0xc2, 0x8e, 0xdb, 0xd1, 0xff, 0x30, 0x3f, 0xe4, 0x9e, 0x47, 0x34, 0x2d, 0x23, 0x7d,
-	0x0f, 0xb6, 0x23, 0xa2, 0x33, 0x8f, 0xc5, 0xd8, 0x56, 0x49, 0x2b, 0x5c, 0x40, 0xf9, 0x3f, 0x52,
-	0xc9, 0x87, 0x73, 0x7a, 0x80, 0x5e, 0xab, 0xf6, 0x2e, 0x0d, 0x8b, 0xb7, 0x9c, 0xbc, 0x09, 0xb3,
-	0x01, 0x55, 0xe7, 0xf1, 0x52, 0xf9, 0xa3, 0x14, 0x8e, 0x33, 0xd4, 0x83, 0x65, 0xed, 0xef, 0x5b,
-	0xcf, 0x36, 0xb9, 0xbb, 0xf6, 0xb0, 0xd1, 0x8f, 0x52, 0x78, 0x9d, 0xde, 0x79, 0x31, 0xff, 0xc2,
-	0x0c, 0x1d, 0x84, 0x89, 0xd5, 0xfe, 0x5e, 0x34, 0x63, 0xa1, 0xa0, 0x47, 0x29, 0xac, 0x71, 0xe8,
-	0x11, 0xfc, 0x85, 0xfb, 0x5c, 0x71, 0xea, 0x91, 0x21, 0x53, 0xce, 0xf9, 0x0f, 0xcf, 0x65, 0x1f,
-	0xf0, 0x1c, 0xde, 0x48, 0x70, 0x07, 0x1a, 0x96, 0xd8, 0xac, 0x55, 0x85, 0x5b, 0xb7, 0xb8, 0x91,
-	0x30, 0x60, 0x0e, 0x1f, 0x72, 0x26, 0xd1, 0xd2, 0xc7, 0xab, 0xcb, 0x0c, 0x68, 0x1d, 0xbc, 0x9f,
-	0x56, 0xc0, 0xe7, 0x69, 0x05, 0x7c, 0x99, 0x56, 0xc0, 0xb7, 0x69, 0x05, 0xc0, 0x1d, 0x2e, 0x66,
-	0x6b, 0x07, 0x52, 0x5c, 0x4c, 0xe6, 0x19, 0xb4, 0xca, 0x37, 0x17, 0xef, 0xe9, 0x45, 0x7a, 0xe0,
-	0x6c, 0x39, 0xde, 0x68, 0xff, 0x7b, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa4, 0x59, 0x6b, 0x4c, 0x15,
-	0x05, 0x00, 0x00,
-}
-
 func (this *ApiConfigSource) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -602,9 +418,6 @@ func (this *ApiConfigSource) Equal(that interface{}) bool {
 	if !this.RateLimitSettings.Equal(that1.RateLimitSettings) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 func (this *AggregatedConfigSource) Equal(that interface{}) bool {
@@ -624,9 +437,6 @@ func (this *AggregatedConfigSource) Equal(that interface{}) bool {
 	if that1 == nil {
 		return this == nil
 	} else if this == nil {
-		return false
-	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -654,9 +464,6 @@ func (this *RateLimitSettings) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.FillRate.Equal(that1.FillRate) {
-		return false
-	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -690,9 +497,6 @@ func (this *ConfigSource) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.InitialFetchTimeout.Equal(that1.InitialFetchTimeout) {
-		return false
-	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -807,8 +611,8 @@ func (m *ApiConfigSource) MarshalTo(dAtA []byte) (int, error) {
 	if m.RefreshDelay != nil {
 		dAtA[i] = 0x1a
 		i++
-		i = encodeVarintConfigSource(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.RefreshDelay)))
-		n1, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.RefreshDelay, dAtA[i:])
+		i = encodeVarintConfigSource(dAtA, i, uint64(types.SizeOfStdDuration(*m.RefreshDelay)))
+		n1, err := types.StdDurationMarshalTo(*m.RefreshDelay, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -829,8 +633,8 @@ func (m *ApiConfigSource) MarshalTo(dAtA []byte) (int, error) {
 	if m.RequestTimeout != nil {
 		dAtA[i] = 0x2a
 		i++
-		i = encodeVarintConfigSource(dAtA, i, uint64(github_com_gogo_protobuf_types.SizeOfStdDuration(*m.RequestTimeout)))
-		n2, err := github_com_gogo_protobuf_types.StdDurationMarshalTo(*m.RequestTimeout, dAtA[i:])
+		i = encodeVarintConfigSource(dAtA, i, uint64(types.SizeOfStdDuration(*m.RequestTimeout)))
+		n2, err := types.StdDurationMarshalTo(*m.RequestTimeout, dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -845,9 +649,6 @@ func (m *ApiConfigSource) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n3
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -867,9 +668,6 @@ func (m *AggregatedConfigSource) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -908,9 +706,6 @@ func (m *RateLimitSettings) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n5
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -945,9 +740,6 @@ func (m *ConfigSource) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n7
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -998,9 +790,6 @@ func encodeVarintConfigSource(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ApiConfigSource) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ApiType != 0 {
@@ -1013,7 +802,7 @@ func (m *ApiConfigSource) Size() (n int) {
 		}
 	}
 	if m.RefreshDelay != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.RefreshDelay)
+		l = types.SizeOfStdDuration(*m.RefreshDelay)
 		n += 1 + l + sovConfigSource(uint64(l))
 	}
 	if len(m.GrpcServices) > 0 {
@@ -1023,35 +812,23 @@ func (m *ApiConfigSource) Size() (n int) {
 		}
 	}
 	if m.RequestTimeout != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdDuration(*m.RequestTimeout)
+		l = types.SizeOfStdDuration(*m.RequestTimeout)
 		n += 1 + l + sovConfigSource(uint64(l))
 	}
 	if m.RateLimitSettings != nil {
 		l = m.RateLimitSettings.Size()
 		n += 1 + l + sovConfigSource(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *AggregatedConfigSource) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *RateLimitSettings) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.MaxTokens != nil {
@@ -1062,16 +839,10 @@ func (m *RateLimitSettings) Size() (n int) {
 		l = m.FillRate.Size()
 		n += 1 + l + sovConfigSource(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *ConfigSource) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ConfigSourceSpecifier != nil {
@@ -1081,16 +852,10 @@ func (m *ConfigSource) Size() (n int) {
 		l = m.InitialFetchTimeout.Size()
 		n += 1 + l + sovConfigSource(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *ConfigSource_Path) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Path)
@@ -1098,9 +863,6 @@ func (m *ConfigSource_Path) Size() (n int) {
 	return n
 }
 func (m *ConfigSource_ApiConfigSource) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ApiConfigSource != nil {
@@ -1110,9 +872,6 @@ func (m *ConfigSource_ApiConfigSource) Size() (n int) {
 	return n
 }
 func (m *ConfigSource_Ads) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Ads != nil {
@@ -1150,7 +909,7 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1178,7 +937,7 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.ApiType |= ApiConfigSource_ApiType(b&0x7F) << shift
+				m.ApiType |= (ApiConfigSource_ApiType(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1197,7 +956,7 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1207,9 +966,6 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1229,7 +985,7 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1238,16 +994,13 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.RefreshDelay == nil {
 				m.RefreshDelay = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.RefreshDelay, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.RefreshDelay, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1265,7 +1018,7 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1274,9 +1027,6 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1299,7 +1049,7 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1308,16 +1058,13 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.RequestTimeout == nil {
 				m.RequestTimeout = new(time.Duration)
 			}
-			if err := github_com_gogo_protobuf_types.StdDurationUnmarshal(m.RequestTimeout, dAtA[iNdEx:postIndex]); err != nil {
+			if err := types.StdDurationUnmarshal(m.RequestTimeout, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1335,7 +1082,7 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1344,9 +1091,6 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1366,13 +1110,9 @@ func (m *ApiConfigSource) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthConfigSource
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1397,7 +1137,7 @@ func (m *AggregatedConfigSource) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1420,13 +1160,9 @@ func (m *AggregatedConfigSource) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthConfigSource
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1451,7 +1187,7 @@ func (m *RateLimitSettings) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1479,7 +1215,7 @@ func (m *RateLimitSettings) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1488,14 +1224,11 @@ func (m *RateLimitSettings) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.MaxTokens == nil {
-				m.MaxTokens = &types.UInt32Value{}
+				m.MaxTokens = &google_protobuf2.UInt32Value{}
 			}
 			if err := m.MaxTokens.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1515,7 +1248,7 @@ func (m *RateLimitSettings) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1524,14 +1257,11 @@ func (m *RateLimitSettings) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.FillRate == nil {
-				m.FillRate = &types.DoubleValue{}
+				m.FillRate = &google_protobuf2.DoubleValue{}
 			}
 			if err := m.FillRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1546,13 +1276,9 @@ func (m *RateLimitSettings) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthConfigSource
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1577,7 +1303,7 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1605,7 +1331,7 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1615,9 +1341,6 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1637,7 +1360,7 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1646,9 +1369,6 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1672,7 +1392,7 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1681,9 +1401,6 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1707,7 +1424,7 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1716,14 +1433,11 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthConfigSource
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.InitialFetchTimeout == nil {
-				m.InitialFetchTimeout = &types.Duration{}
+				m.InitialFetchTimeout = &google_protobuf4.Duration{}
 			}
 			if err := m.InitialFetchTimeout.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1738,13 +1452,9 @@ func (m *ConfigSource) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthConfigSource
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthConfigSource
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1808,11 +1518,8 @@ func skipConfigSource(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthConfigSource
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthConfigSource
 			}
 			return iNdEx, nil
@@ -1843,9 +1550,6 @@ func skipConfigSource(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthConfigSource
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1864,3 +1568,53 @@ var (
 	ErrInvalidLengthConfigSource = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowConfigSource   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("envoy/api/v2/core/config_source.proto", fileDescriptorConfigSource) }
+
+var fileDescriptorConfigSource = []byte{
+	// 704 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0x4d, 0x4f, 0xdb, 0x48,
+	0x18, 0xce, 0x24, 0x01, 0x92, 0x49, 0x80, 0x64, 0x60, 0x17, 0x2f, 0x5a, 0x85, 0x6c, 0x96, 0x95,
+	0xb2, 0x1c, 0x6c, 0x29, 0x1c, 0x57, 0x7b, 0xc8, 0x17, 0xb0, 0x5a, 0x4a, 0xd3, 0x89, 0xa9, 0xd4,
+	0xd3, 0x68, 0x70, 0x26, 0x66, 0x54, 0xc7, 0xe3, 0x8e, 0xc7, 0x29, 0xb9, 0xf6, 0x17, 0xf4, 0xd8,
+	0x4b, 0xaf, 0x55, 0xd5, 0x5f, 0x50, 0xf5, 0xc4, 0xb1, 0xc7, 0xfe, 0x83, 0x56, 0xb9, 0xf1, 0x2f,
+	0xaa, 0x71, 0x4c, 0x0b, 0x24, 0x88, 0x9c, 0xde, 0xaf, 0xe7, 0xcd, 0xf3, 0xbc, 0x7e, 0x06, 0xfe,
+	0xc5, 0xfc, 0xb1, 0x98, 0x58, 0x34, 0xe0, 0xd6, 0xb8, 0x61, 0x39, 0x42, 0x32, 0xcb, 0x11, 0xfe,
+	0x90, 0xbb, 0x24, 0x14, 0x91, 0x74, 0x98, 0x19, 0x48, 0xa1, 0x04, 0x2a, 0xc7, 0x63, 0x26, 0x0d,
+	0xb8, 0x39, 0x6e, 0x98, 0x7a, 0x6c, 0x7b, 0x77, 0x1e, 0xe9, 0xca, 0xc0, 0x21, 0x21, 0x93, 0x63,
+	0x7e, 0x0d, 0xdc, 0xae, 0xb8, 0x42, 0xb8, 0x1e, 0xb3, 0xe2, 0xec, 0x2c, 0x1a, 0x5a, 0x83, 0x48,
+	0x52, 0xc5, 0x85, 0x7f, 0x5f, 0xff, 0xa5, 0xa4, 0x41, 0xc0, 0x64, 0x98, 0xf4, 0xb7, 0xc6, 0xd4,
+	0xe3, 0x03, 0xaa, 0x98, 0x75, 0x1d, 0x24, 0x8d, 0x4d, 0x57, 0xb8, 0x22, 0x0e, 0x2d, 0x1d, 0xcd,
+	0xaa, 0xb5, 0xd7, 0x59, 0xb8, 0xde, 0x0c, 0x78, 0x3b, 0x96, 0xd0, 0x8f, 0x15, 0xa0, 0x27, 0x30,
+	0x47, 0x03, 0x4e, 0xd4, 0x24, 0x60, 0x06, 0xa8, 0x82, 0xfa, 0x5a, 0x63, 0xcf, 0x9c, 0x93, 0x63,
+	0xde, 0x41, 0xe9, 0xdc, 0x9e, 0x04, 0xac, 0x05, 0x3f, 0x5d, 0x5d, 0x66, 0x96, 0x5e, 0x81, 0x74,
+	0x09, 0xe0, 0x15, 0x3a, 0x2b, 0xa2, 0x3f, 0xe1, 0xaa, 0xe3, 0x45, 0xa1, 0x62, 0x92, 0xf8, 0x74,
+	0xc4, 0x42, 0x23, 0x5d, 0xcd, 0xd4, 0xf3, 0xb8, 0x98, 0x14, 0x4f, 0x74, 0x0d, 0x75, 0xe0, 0xaa,
+	0x64, 0x43, 0xc9, 0xc2, 0x73, 0x32, 0x60, 0x1e, 0x9d, 0x18, 0x99, 0x2a, 0xa8, 0x17, 0x1a, 0xbf,
+	0x99, 0x33, 0xc9, 0xe6, 0xb5, 0x64, 0xb3, 0x93, 0x9c, 0xa4, 0x95, 0x7d, 0xf3, 0x75, 0x07, 0xe0,
+	0x62, 0x82, 0xea, 0x68, 0x10, 0x6a, 0xc3, 0xd5, 0x9b, 0x67, 0x0d, 0x8d, 0x6c, 0x35, 0x53, 0x2f,
+	0x34, 0x2a, 0x0b, 0x24, 0x1c, 0xca, 0xc0, 0xe9, 0xcf, 0xc6, 0x70, 0xd1, 0xfd, 0x99, 0x84, 0xc8,
+	0x86, 0xeb, 0x92, 0xbd, 0x88, 0x58, 0xa8, 0x88, 0xe2, 0x23, 0x26, 0x22, 0x65, 0x2c, 0x3d, 0x44,
+	0xa6, 0xa4, 0xc9, 0x68, 0xf1, 0x2b, 0x1f, 0x40, 0x76, 0x2f, 0x9d, 0x4b, 0xe1, 0xb5, 0x64, 0x87,
+	0x3d, 0x5b, 0x81, 0x6c, 0xb8, 0x21, 0xa9, 0x62, 0xc4, 0xe3, 0x23, 0xae, 0x48, 0xc8, 0x94, 0xe2,
+	0xbe, 0x1b, 0x1a, 0xcb, 0xf1, 0xe6, 0xdd, 0x05, 0x04, 0x31, 0x55, 0xec, 0x58, 0x0f, 0xf7, 0x93,
+	0x59, 0x5c, 0x96, 0x77, 0x4b, 0xb5, 0x13, 0xb8, 0x92, 0xdc, 0x1e, 0xed, 0xc0, 0xad, 0xd3, 0x93,
+	0xfe, 0x69, 0xaf, 0xf7, 0x18, 0xdb, 0xdd, 0x0e, 0xc1, 0xdd, 0xbe, 0x4d, 0x8e, 0xbb, 0x87, 0xcd,
+	0xf6, 0xb3, 0x52, 0x6a, 0x3b, 0x9d, 0x03, 0x28, 0x07, 0xb3, 0xba, 0x58, 0x8a, 0xa3, 0x43, 0xdc,
+	0x6b, 0x97, 0xd2, 0x68, 0x0d, 0xc2, 0x4e, 0xf7, 0xd8, 0x6e, 0x92, 0x38, 0xcf, 0xd4, 0x0c, 0xf8,
+	0x6b, 0xd3, 0x75, 0x25, 0x73, 0xa9, 0x62, 0x83, 0x9b, 0x9f, 0xb8, 0xf6, 0x16, 0xc0, 0xf2, 0x1c,
+	0x25, 0xf4, 0x0f, 0x84, 0x23, 0x7a, 0x41, 0x94, 0x78, 0xce, 0xfc, 0x30, 0x36, 0x4c, 0xa1, 0xf1,
+	0xfb, 0xdc, 0x99, 0x4e, 0xff, 0xf3, 0xd5, 0x7e, 0xe3, 0x29, 0xf5, 0x22, 0x86, 0xf3, 0x23, 0x7a,
+	0x61, 0xc7, 0xe3, 0xe8, 0x7f, 0x98, 0x1f, 0x72, 0xcf, 0x23, 0x5a, 0x96, 0x91, 0xbe, 0x07, 0xdb,
+	0x11, 0xd1, 0x99, 0xc7, 0x62, 0x6c, 0xab, 0xa4, 0x2f, 0x5c, 0x40, 0xf9, 0x3f, 0x52, 0xc9, 0x0f,
+	0xe7, 0xf4, 0x02, 0x4d, 0xab, 0xf6, 0x2e, 0x0d, 0x8b, 0xb7, 0x9c, 0xbc, 0x09, 0xb3, 0x01, 0x55,
+	0xe7, 0x31, 0xa9, 0xfc, 0x51, 0x0a, 0xc7, 0x19, 0xea, 0xc1, 0xb2, 0xf6, 0xf7, 0xad, 0x67, 0x9b,
+	0xfc, 0x77, 0xed, 0x61, 0xa3, 0x1f, 0xa5, 0xf0, 0x3a, 0xbd, 0xf3, 0x62, 0xfe, 0x85, 0x19, 0x3a,
+	0x08, 0x13, 0xbf, 0xfe, 0xbd, 0x68, 0xc7, 0xc2, 0x83, 0x1e, 0xa5, 0xb0, 0xc6, 0xa1, 0x47, 0xf0,
+	0x17, 0xee, 0x73, 0xc5, 0xa9, 0x47, 0x86, 0x4c, 0x39, 0xe7, 0x3f, 0x3c, 0x97, 0x7d, 0xc0, 0x73,
+	0x78, 0x23, 0xc1, 0x1d, 0x68, 0x58, 0x62, 0xb3, 0x56, 0x15, 0x6e, 0xdd, 0xd2, 0x46, 0xc2, 0x80,
+	0x39, 0x7c, 0xc8, 0x99, 0x44, 0x4b, 0x1f, 0xaf, 0x2e, 0x33, 0xa0, 0x75, 0xf0, 0x7e, 0x5a, 0x01,
+	0x9f, 0xa7, 0x15, 0xf0, 0x65, 0x5a, 0x01, 0xdf, 0xa6, 0x15, 0x00, 0x77, 0xb8, 0x98, 0xd1, 0x0e,
+	0xa4, 0xb8, 0x98, 0xcc, 0x2b, 0x68, 0x95, 0x6f, 0x12, 0xef, 0x69, 0x22, 0x3d, 0x70, 0xb6, 0x1c,
+	0x33, 0xda, 0xff, 0x1e, 0x00, 0x00, 0xff, 0xff, 0xb7, 0xa1, 0xbf, 0x64, 0x15, 0x05, 0x00, 0x00,
+}

@@ -3,70 +3,31 @@
 
 package envoy_admin_v2alpha
 
-import (
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import envoy_api_v2_core1 "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+import envoy_api_v2_core2 "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+import envoy_type "github.com/envoyproxy/go-control-plane/envoy/type"
 
-	proto "github.com/gogo/protobuf/proto"
-
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	_type "github.com/envoyproxy/go-control-plane/envoy/type"
-)
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
-
 // Admin endpoint uses this wrapper for `/clusters` to display cluster status information.
 // See :ref:`/clusters <operations_admin_interface_clusters>` for more information.
 type Clusters struct {
 	// Mapping from cluster name to each cluster's status.
-	ClusterStatuses      []*ClusterStatus `protobuf:"bytes,1,rep,name=cluster_statuses,json=clusterStatuses,proto3" json:"cluster_statuses,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	ClusterStatuses []*ClusterStatus `protobuf:"bytes,1,rep,name=cluster_statuses,json=clusterStatuses" json:"cluster_statuses,omitempty"`
 }
 
-func (m *Clusters) Reset()         { *m = Clusters{} }
-func (m *Clusters) String() string { return proto.CompactTextString(m) }
-func (*Clusters) ProtoMessage()    {}
-func (*Clusters) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c6251a3a957f478b, []int{0}
-}
-func (m *Clusters) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Clusters) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Clusters.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Clusters) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Clusters.Merge(m, src)
-}
-func (m *Clusters) XXX_Size() int {
-	return m.Size()
-}
-func (m *Clusters) XXX_DiscardUnknown() {
-	xxx_messageInfo_Clusters.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Clusters proto.InternalMessageInfo
+func (m *Clusters) Reset()                    { *m = Clusters{} }
+func (m *Clusters) String() string            { return proto.CompactTextString(m) }
+func (*Clusters) ProtoMessage()               {}
+func (*Clusters) Descriptor() ([]byte, []int) { return fileDescriptorClusters, []int{0} }
 
 func (m *Clusters) GetClusterStatuses() []*ClusterStatus {
 	if m != nil {
@@ -81,9 +42,15 @@ type ClusterStatus struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Denotes whether this cluster was added via API or configured statically.
 	AddedViaApi bool `protobuf:"varint,2,opt,name=added_via_api,json=addedViaApi,proto3" json:"added_via_api,omitempty"`
-	// The success rate threshold used in the last interval. The threshold is used to eject hosts
-	// based on their success rate. See
-	// :ref:`Cluster outlier detection <arch_overview_outlier_detection>` statistics
+	// The success rate threshold used in the last interval.
+	// If
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_cluster.OutlierDetection.split_external_local_origin_errors>`
+	// is *false*, all errors: externally and locally generated were used to calculate the threshold.
+	// If
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_cluster.OutlierDetection.split_external_local_origin_errors>`
+	// is *true*, only externally generated errors were used to calculate the threshold.
+	// The threshold is used to eject hosts based on their success rate. See
+	// :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for details.
 	//
 	// Note: this field may be omitted in any of the three following cases:
 	//
@@ -92,46 +59,31 @@ type ClusterStatus struct {
 	// 2. The threshold is computed to be < 0 because a negative value implies that there was no
 	//    threshold for that interval.
 	// 3. Outlier detection is not enabled for this cluster.
-	SuccessRateEjectionThreshold *_type.Percent `protobuf:"bytes,3,opt,name=success_rate_ejection_threshold,json=successRateEjectionThreshold,proto3" json:"success_rate_ejection_threshold,omitempty"`
+	SuccessRateEjectionThreshold *envoy_type.Percent `protobuf:"bytes,3,opt,name=success_rate_ejection_threshold,json=successRateEjectionThreshold" json:"success_rate_ejection_threshold,omitempty"`
 	// Mapping from host address to the host's current status.
-	HostStatuses         []*HostStatus `protobuf:"bytes,4,rep,name=host_statuses,json=hostStatuses,proto3" json:"host_statuses,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	HostStatuses []*HostStatus `protobuf:"bytes,4,rep,name=host_statuses,json=hostStatuses" json:"host_statuses,omitempty"`
+	// The success rate threshold used in the last interval when only locally originated failures were
+	// taken into account and externally originated errors were treated as success.
+	// This field should be interpretted only when
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_cluster.OutlierDetection.split_external_local_origin_errors>`
+	// is *true*. The threshold is used to eject hosts based on their success rate.
+	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
+	// details.
+	//
+	// Note: this field may be omitted in any of the three following cases:
+	//
+	// 1. There were not enough hosts with enough request volume to proceed with success rate based
+	//    outlier ejection.
+	// 2. The threshold is computed to be < 0 because a negative value implies that there was no
+	//    threshold for that interval.
+	// 3. Outlier detection is not enabled for this cluster.
+	LocalOriginSuccessRateEjectionThreshold *envoy_type.Percent `protobuf:"bytes,5,opt,name=local_origin_success_rate_ejection_threshold,json=localOriginSuccessRateEjectionThreshold" json:"local_origin_success_rate_ejection_threshold,omitempty"`
 }
 
-func (m *ClusterStatus) Reset()         { *m = ClusterStatus{} }
-func (m *ClusterStatus) String() string { return proto.CompactTextString(m) }
-func (*ClusterStatus) ProtoMessage()    {}
-func (*ClusterStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c6251a3a957f478b, []int{1}
-}
-func (m *ClusterStatus) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ClusterStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ClusterStatus.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ClusterStatus) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClusterStatus.Merge(m, src)
-}
-func (m *ClusterStatus) XXX_Size() int {
-	return m.Size()
-}
-func (m *ClusterStatus) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClusterStatus.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClusterStatus proto.InternalMessageInfo
+func (m *ClusterStatus) Reset()                    { *m = ClusterStatus{} }
+func (m *ClusterStatus) String() string            { return proto.CompactTextString(m) }
+func (*ClusterStatus) ProtoMessage()               {}
+func (*ClusterStatus) Descriptor() ([]byte, []int) { return fileDescriptorClusters, []int{1} }
 
 func (m *ClusterStatus) GetName() string {
 	if m != nil {
@@ -147,7 +99,7 @@ func (m *ClusterStatus) GetAddedViaApi() bool {
 	return false
 }
 
-func (m *ClusterStatus) GetSuccessRateEjectionThreshold() *_type.Percent {
+func (m *ClusterStatus) GetSuccessRateEjectionThreshold() *envoy_type.Percent {
 	if m != nil {
 		return m.SuccessRateEjectionThreshold
 	}
@@ -161,61 +113,62 @@ func (m *ClusterStatus) GetHostStatuses() []*HostStatus {
 	return nil
 }
 
+func (m *ClusterStatus) GetLocalOriginSuccessRateEjectionThreshold() *envoy_type.Percent {
+	if m != nil {
+		return m.LocalOriginSuccessRateEjectionThreshold
+	}
+	return nil
+}
+
 // Current state of a particular host.
 type HostStatus struct {
 	// Address of this host.
-	Address *core.Address `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Address *envoy_api_v2_core1.Address `protobuf:"bytes,1,opt,name=address" json:"address,omitempty"`
 	// List of stats specific to this host.
-	Stats []*SimpleMetric `protobuf:"bytes,2,rep,name=stats,proto3" json:"stats,omitempty"`
+	Stats []*SimpleMetric `protobuf:"bytes,2,rep,name=stats" json:"stats,omitempty"`
 	// The host's current health status.
-	HealthStatus *HostHealthStatus `protobuf:"bytes,3,opt,name=health_status,json=healthStatus,proto3" json:"health_status,omitempty"`
+	HealthStatus *HostHealthStatus `protobuf:"bytes,3,opt,name=health_status,json=healthStatus" json:"health_status,omitempty"`
 	// Request success rate for this host over the last calculated interval.
+	// If
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_cluster.OutlierDetection.split_external_local_origin_errors>`
+	// is *false*, all errors: externally and locally generated were used in success rate
+	// calculation. If
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_cluster.OutlierDetection.split_external_local_origin_errors>`
+	// is *true*, only externally generated errors were used in success rate calculation.
+	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
+	// details.
 	//
 	// Note: the message will not be present if host did not have enough request volume to calculate
 	// success rate or the cluster did not have enough hosts to run through success rate outlier
 	// ejection.
-	SuccessRate *_type.Percent `protobuf:"bytes,4,opt,name=success_rate,json=successRate,proto3" json:"success_rate,omitempty"`
+	SuccessRate *envoy_type.Percent `protobuf:"bytes,4,opt,name=success_rate,json=successRate" json:"success_rate,omitempty"`
 	// The host's weight. If not configured, the value defaults to 1.
-	Weight               uint32   `protobuf:"varint,5,opt,name=weight,proto3" json:"weight,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Weight uint32 `protobuf:"varint,5,opt,name=weight,proto3" json:"weight,omitempty"`
+	// The hostname of the host, if applicable.
+	Hostname string `protobuf:"bytes,6,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	// The host's priority. If not configured, the value defaults to 0 (highest priority).
+	Priority uint32 `protobuf:"varint,7,opt,name=priority,proto3" json:"priority,omitempty"`
+	// Request success rate for this host over the last calculated
+	// interval when only locally originated errors are taken into account and externally originated
+	// errors were treated as success.
+	// This field should be interpretted only when
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_cluster.OutlierDetection.split_external_local_origin_errors>`
+	// is *true*.
+	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
+	// details.
+	//
+	// Note: the message will not be present if host did not have enough request volume to calculate
+	// success rate or the cluster did not have enough hosts to run through success rate outlier
+	// ejection.
+	LocalOriginSuccessRate *envoy_type.Percent `protobuf:"bytes,8,opt,name=local_origin_success_rate,json=localOriginSuccessRate" json:"local_origin_success_rate,omitempty"`
 }
 
-func (m *HostStatus) Reset()         { *m = HostStatus{} }
-func (m *HostStatus) String() string { return proto.CompactTextString(m) }
-func (*HostStatus) ProtoMessage()    {}
-func (*HostStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c6251a3a957f478b, []int{2}
-}
-func (m *HostStatus) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *HostStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_HostStatus.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *HostStatus) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HostStatus.Merge(m, src)
-}
-func (m *HostStatus) XXX_Size() int {
-	return m.Size()
-}
-func (m *HostStatus) XXX_DiscardUnknown() {
-	xxx_messageInfo_HostStatus.DiscardUnknown(m)
-}
+func (m *HostStatus) Reset()                    { *m = HostStatus{} }
+func (m *HostStatus) String() string            { return proto.CompactTextString(m) }
+func (*HostStatus) ProtoMessage()               {}
+func (*HostStatus) Descriptor() ([]byte, []int) { return fileDescriptorClusters, []int{2} }
 
-var xxx_messageInfo_HostStatus proto.InternalMessageInfo
-
-func (m *HostStatus) GetAddress() *core.Address {
+func (m *HostStatus) GetAddress() *envoy_api_v2_core1.Address {
 	if m != nil {
 		return m.Address
 	}
@@ -236,7 +189,7 @@ func (m *HostStatus) GetHealthStatus() *HostHealthStatus {
 	return nil
 }
 
-func (m *HostStatus) GetSuccessRate() *_type.Percent {
+func (m *HostStatus) GetSuccessRate() *envoy_type.Percent {
 	if m != nil {
 		return m.SuccessRate
 	}
@@ -248,6 +201,27 @@ func (m *HostStatus) GetWeight() uint32 {
 		return m.Weight
 	}
 	return 0
+}
+
+func (m *HostStatus) GetHostname() string {
+	if m != nil {
+		return m.Hostname
+	}
+	return ""
+}
+
+func (m *HostStatus) GetPriority() uint32 {
+	if m != nil {
+		return m.Priority
+	}
+	return 0
+}
+
+func (m *HostStatus) GetLocalOriginSuccessRate() *envoy_type.Percent {
+	if m != nil {
+		return m.LocalOriginSuccessRate
+	}
+	return nil
 }
 
 // Health status for a host.
@@ -266,44 +240,13 @@ type HostHealthStatus struct {
 	// Health status as reported by EDS. Note: only HEALTHY and UNHEALTHY are currently supported
 	// here.
 	// TODO(mrice32): pipe through remaining EDS health status possibilities.
-	EdsHealthStatus      core.HealthStatus `protobuf:"varint,3,opt,name=eds_health_status,json=edsHealthStatus,proto3,enum=envoy.api.v2.core.HealthStatus" json:"eds_health_status,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	EdsHealthStatus envoy_api_v2_core2.HealthStatus `protobuf:"varint,3,opt,name=eds_health_status,json=edsHealthStatus,proto3,enum=envoy.api.v2.core.HealthStatus" json:"eds_health_status,omitempty"`
 }
 
-func (m *HostHealthStatus) Reset()         { *m = HostHealthStatus{} }
-func (m *HostHealthStatus) String() string { return proto.CompactTextString(m) }
-func (*HostHealthStatus) ProtoMessage()    {}
-func (*HostHealthStatus) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c6251a3a957f478b, []int{3}
-}
-func (m *HostHealthStatus) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *HostHealthStatus) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_HostHealthStatus.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *HostHealthStatus) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HostHealthStatus.Merge(m, src)
-}
-func (m *HostHealthStatus) XXX_Size() int {
-	return m.Size()
-}
-func (m *HostHealthStatus) XXX_DiscardUnknown() {
-	xxx_messageInfo_HostHealthStatus.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_HostHealthStatus proto.InternalMessageInfo
+func (m *HostHealthStatus) Reset()                    { *m = HostHealthStatus{} }
+func (m *HostHealthStatus) String() string            { return proto.CompactTextString(m) }
+func (*HostHealthStatus) ProtoMessage()               {}
+func (*HostHealthStatus) Descriptor() ([]byte, []int) { return fileDescriptorClusters, []int{3} }
 
 func (m *HostHealthStatus) GetFailedActiveHealthCheck() bool {
 	if m != nil {
@@ -340,11 +283,11 @@ func (m *HostHealthStatus) GetPendingActiveHc() bool {
 	return false
 }
 
-func (m *HostHealthStatus) GetEdsHealthStatus() core.HealthStatus {
+func (m *HostHealthStatus) GetEdsHealthStatus() envoy_api_v2_core2.HealthStatus {
 	if m != nil {
 		return m.EdsHealthStatus
 	}
-	return core.HealthStatus_UNKNOWN
+	return envoy_api_v2_core2.HealthStatus_UNKNOWN
 }
 
 func init() {
@@ -353,52 +296,6 @@ func init() {
 	proto.RegisterType((*HostStatus)(nil), "envoy.admin.v2alpha.HostStatus")
 	proto.RegisterType((*HostHealthStatus)(nil), "envoy.admin.v2alpha.HostHealthStatus")
 }
-
-func init() { proto.RegisterFile("envoy/admin/v2alpha/clusters.proto", fileDescriptor_c6251a3a957f478b) }
-
-var fileDescriptor_c6251a3a957f478b = []byte{
-	// 617 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x94, 0xcf, 0x6e, 0xd4, 0x3c,
-	0x14, 0xc5, 0x95, 0xe9, 0xb4, 0xdf, 0x7c, 0x9e, 0x0e, 0x6d, 0x5d, 0xa0, 0x61, 0x54, 0xb5, 0xd3,
-	0x08, 0xa4, 0x11, 0x8b, 0x04, 0x0d, 0xa8, 0x2c, 0x58, 0x40, 0xff, 0x20, 0x55, 0xa0, 0x8a, 0x2a,
-	0x45, 0x48, 0xb0, 0xb1, 0x8c, 0x7d, 0x69, 0x0c, 0x99, 0x38, 0xb2, 0x3d, 0x81, 0x79, 0x12, 0x5e,
-	0x89, 0x25, 0x8f, 0x80, 0xba, 0x63, 0xcd, 0x0b, 0xa0, 0xb1, 0x9d, 0x36, 0xa5, 0xd3, 0x5d, 0x9c,
-	0xf3, 0x3b, 0xf6, 0x3d, 0xbe, 0x37, 0x41, 0x11, 0x14, 0x95, 0x9c, 0x26, 0x94, 0x8f, 0x45, 0x91,
-	0x54, 0x23, 0x9a, 0x97, 0x19, 0x4d, 0x58, 0x3e, 0xd1, 0x06, 0x94, 0x8e, 0x4b, 0x25, 0x8d, 0xc4,
-	0xeb, 0x96, 0x89, 0x2d, 0x13, 0x7b, 0xa6, 0xbf, 0x33, 0xcf, 0x38, 0x06, 0xa3, 0x04, 0xf3, 0xbe,
-	0xfe, 0xb6, 0x47, 0x4a, 0x91, 0x54, 0xa3, 0x84, 0x49, 0x05, 0x09, 0xe5, 0x5c, 0x81, 0xae, 0x81,
-	0xfb, 0xd7, 0x81, 0x0c, 0x68, 0x6e, 0x32, 0xc2, 0x32, 0x60, 0x5f, 0x3c, 0x15, 0x3a, 0xca, 0x4c,
-	0x4b, 0x48, 0x4a, 0x50, 0x0c, 0x0a, 0xe3, 0x94, 0xe8, 0x3d, 0xea, 0x1c, 0xf8, 0x52, 0xf1, 0x31,
-	0x5a, 0xf5, 0x65, 0x13, 0x6d, 0xa8, 0x99, 0x68, 0xd0, 0x61, 0x30, 0x58, 0x18, 0x76, 0x47, 0x51,
-	0x3c, 0xa7, 0xfe, 0xd8, 0x1b, 0x4f, 0x2d, 0x9b, 0xae, 0xb0, 0xe6, 0x12, 0x74, 0xf4, 0x3b, 0x40,
-	0xbd, 0x2b, 0x08, 0xc6, 0xa8, 0x5d, 0xd0, 0x31, 0x84, 0xc1, 0x20, 0x18, 0xfe, 0x9f, 0xda, 0x67,
-	0x1c, 0xa1, 0x1e, 0xe5, 0x1c, 0x38, 0xa9, 0x04, 0x25, 0xb4, 0x14, 0x61, 0x6b, 0x10, 0x0c, 0x3b,
-	0x69, 0xd7, 0xbe, 0x7c, 0x27, 0xe8, 0x5e, 0x29, 0xf0, 0x07, 0xb4, 0xad, 0x27, 0x8c, 0x81, 0xd6,
-	0x44, 0x51, 0x03, 0x04, 0x3e, 0x03, 0x33, 0x42, 0x16, 0xc4, 0x64, 0x0a, 0x74, 0x26, 0x73, 0x1e,
-	0x2e, 0x0c, 0x82, 0x61, 0x77, 0xb4, 0xee, 0xeb, 0x9c, 0x05, 0x8d, 0x4f, 0x5c, 0xd0, 0x74, 0xd3,
-	0x7b, 0x53, 0x6a, 0xe0, 0xa5, 0x77, 0xbe, 0xad, 0x8d, 0xf8, 0x10, 0xf5, 0x32, 0xa9, 0xcd, 0x65,
-	0xe2, 0xb6, 0x4d, 0xbc, 0x3d, 0x37, 0xf1, 0x91, 0xd4, 0xc6, 0xc7, 0x5d, 0xce, 0x2e, 0x9e, 0x41,
-	0x47, 0xdf, 0x5b, 0x08, 0x5d, 0x8a, 0xf8, 0x09, 0xfa, 0xcf, 0xb7, 0xc9, 0x66, 0xed, 0x8e, 0xfa,
-	0xf5, 0x76, 0xa5, 0x88, 0xab, 0x51, 0x3c, 0xeb, 0x53, 0xbc, 0xe7, 0x88, 0xb4, 0x46, 0xf1, 0x53,
-	0xb4, 0x38, 0xab, 0x42, 0x87, 0x2d, 0x5b, 0xc2, 0xce, 0xdc, 0x12, 0x4e, 0xc5, 0xb8, 0xcc, 0xe1,
-	0xd8, 0x4e, 0x49, 0xea, 0x78, 0xfc, 0x0a, 0xf5, 0x7c, 0xd3, 0x5d, 0x0a, 0x7f, 0x1b, 0x0f, 0x6e,
-	0xcc, 0x70, 0x64, 0xe9, 0x8b, 0x24, 0x8d, 0x15, 0xde, 0x45, 0xcb, 0xcd, 0xbb, 0x0e, 0xdb, 0x37,
-	0x5f, 0x6c, 0xb7, 0x71, 0xb1, 0xf8, 0x2e, 0x5a, 0xfa, 0x0a, 0xe2, 0x2c, 0x33, 0xe1, 0xe2, 0x20,
-	0x18, 0xf6, 0x52, 0xbf, 0x8a, 0xfe, 0xb4, 0xd0, 0xea, 0xbf, 0x47, 0xe2, 0x67, 0xa8, 0xff, 0x89,
-	0x8a, 0x1c, 0x38, 0xa1, 0xcc, 0x88, 0x0a, 0x48, 0x73, 0x66, 0xed, 0x95, 0x75, 0xd2, 0x0d, 0x47,
-	0xec, 0x59, 0xc0, 0xb9, 0x0f, 0x66, 0x32, 0x7e, 0x84, 0x6e, 0x7b, 0xb3, 0x9c, 0x98, 0x5c, 0x80,
-	0xf2, 0x36, 0x37, 0x38, 0xd8, 0x69, 0x6f, 0x9c, 0xe4, 0x1c, 0xcf, 0xd1, 0xe6, 0xd5, 0xe3, 0x38,
-	0x9c, 0x29, 0x3a, 0x1b, 0x3a, 0xe7, 0x6c, 0x5b, 0xe7, 0xbd, 0xe6, 0x81, 0x87, 0x9e, 0x70, 0x1b,
-	0xec, 0xa2, 0x8d, 0x12, 0x0a, 0x2e, 0x8a, 0x33, 0xc2, 0xa7, 0x05, 0x1d, 0x0b, 0x46, 0x14, 0x8c,
-	0x65, 0x45, 0x73, 0x9b, 0xb6, 0x93, 0xde, 0xf1, 0xf2, 0xa1, 0x53, 0x53, 0x27, 0xe2, 0x87, 0x68,
-	0xad, 0xf6, 0xd5, 0x41, 0x59, 0xb8, 0x64, 0x1d, 0x2b, 0x5e, 0xf0, 0xf9, 0x18, 0x7e, 0x8d, 0xd6,
-	0x80, 0x6b, 0x72, 0xbd, 0x91, 0xb7, 0x2e, 0x87, 0xb1, 0x31, 0x3d, 0x57, 0x5a, 0xb8, 0x02, 0x5c,
-	0x37, 0x5f, 0xec, 0xbf, 0xf8, 0x71, 0xbe, 0x15, 0xfc, 0x3c, 0xdf, 0x0a, 0x7e, 0x9d, 0x6f, 0x05,
-	0x68, 0x47, 0x48, 0xb7, 0x43, 0xa9, 0xe4, 0xb7, 0xe9, 0xbc, 0xa9, 0xd8, 0xaf, 0xbf, 0x54, 0x7d,
-	0x32, 0xfb, 0x2d, 0x9c, 0x04, 0x1f, 0x97, 0xec, 0xff, 0xe1, 0xf1, 0xdf, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0x82, 0x53, 0x95, 0xa3, 0xde, 0x04, 0x00, 0x00,
-}
-
 func (m *Clusters) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -425,9 +322,6 @@ func (m *Clusters) MarshalTo(dAtA []byte) (int, error) {
 			}
 			i += n
 		}
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -485,8 +379,15 @@ func (m *ClusterStatus) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if m.LocalOriginSuccessRateEjectionThreshold != nil {
+		dAtA[i] = 0x2a
+		i++
+		i = encodeVarintClusters(dAtA, i, uint64(m.LocalOriginSuccessRateEjectionThreshold.Size()))
+		n2, err := m.LocalOriginSuccessRateEjectionThreshold.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
 	}
 	return i, nil
 }
@@ -510,11 +411,11 @@ func (m *HostStatus) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintClusters(dAtA, i, uint64(m.Address.Size()))
-		n2, err := m.Address.MarshalTo(dAtA[i:])
+		n3, err := m.Address.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n2
+		i += n3
 	}
 	if len(m.Stats) > 0 {
 		for _, msg := range m.Stats {
@@ -532,29 +433,47 @@ func (m *HostStatus) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintClusters(dAtA, i, uint64(m.HealthStatus.Size()))
-		n3, err := m.HealthStatus.MarshalTo(dAtA[i:])
+		n4, err := m.HealthStatus.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n3
+		i += n4
 	}
 	if m.SuccessRate != nil {
 		dAtA[i] = 0x22
 		i++
 		i = encodeVarintClusters(dAtA, i, uint64(m.SuccessRate.Size()))
-		n4, err := m.SuccessRate.MarshalTo(dAtA[i:])
+		n5, err := m.SuccessRate.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n4
+		i += n5
 	}
 	if m.Weight != 0 {
 		dAtA[i] = 0x28
 		i++
 		i = encodeVarintClusters(dAtA, i, uint64(m.Weight))
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
+	if len(m.Hostname) > 0 {
+		dAtA[i] = 0x32
+		i++
+		i = encodeVarintClusters(dAtA, i, uint64(len(m.Hostname)))
+		i += copy(dAtA[i:], m.Hostname)
+	}
+	if m.Priority != 0 {
+		dAtA[i] = 0x38
+		i++
+		i = encodeVarintClusters(dAtA, i, uint64(m.Priority))
+	}
+	if m.LocalOriginSuccessRate != nil {
+		dAtA[i] = 0x42
+		i++
+		i = encodeVarintClusters(dAtA, i, uint64(m.LocalOriginSuccessRate.Size()))
+		n6, err := m.LocalOriginSuccessRate.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
 	}
 	return i, nil
 }
@@ -629,9 +548,6 @@ func (m *HostHealthStatus) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i++
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -645,9 +561,6 @@ func encodeVarintClusters(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *Clusters) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if len(m.ClusterStatuses) > 0 {
@@ -656,16 +569,10 @@ func (m *Clusters) Size() (n int) {
 			n += 1 + l + sovClusters(uint64(l))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *ClusterStatus) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -685,16 +592,14 @@ func (m *ClusterStatus) Size() (n int) {
 			n += 1 + l + sovClusters(uint64(l))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
+	if m.LocalOriginSuccessRateEjectionThreshold != nil {
+		l = m.LocalOriginSuccessRateEjectionThreshold.Size()
+		n += 1 + l + sovClusters(uint64(l))
 	}
 	return n
 }
 
 func (m *HostStatus) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Address != nil {
@@ -718,16 +623,21 @@ func (m *HostStatus) Size() (n int) {
 	if m.Weight != 0 {
 		n += 1 + sovClusters(uint64(m.Weight))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
+	l = len(m.Hostname)
+	if l > 0 {
+		n += 1 + l + sovClusters(uint64(l))
+	}
+	if m.Priority != 0 {
+		n += 1 + sovClusters(uint64(m.Priority))
+	}
+	if m.LocalOriginSuccessRate != nil {
+		l = m.LocalOriginSuccessRate.Size()
+		n += 1 + l + sovClusters(uint64(l))
 	}
 	return n
 }
 
 func (m *HostHealthStatus) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.FailedActiveHealthCheck {
@@ -747,9 +657,6 @@ func (m *HostHealthStatus) Size() (n int) {
 	}
 	if m.PendingActiveHc {
 		n += 2
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -782,7 +689,7 @@ func (m *Clusters) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -810,7 +717,7 @@ func (m *Clusters) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -819,9 +726,6 @@ func (m *Clusters) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -839,13 +743,9 @@ func (m *Clusters) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthClusters
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -870,7 +770,7 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -898,7 +798,7 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -908,9 +808,6 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -930,7 +827,7 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -950,7 +847,7 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -959,14 +856,11 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.SuccessRateEjectionThreshold == nil {
-				m.SuccessRateEjectionThreshold = &_type.Percent{}
+				m.SuccessRateEjectionThreshold = &envoy_type.Percent{}
 			}
 			if err := m.SuccessRateEjectionThreshold.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -986,7 +880,7 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -995,14 +889,44 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			m.HostStatuses = append(m.HostStatuses, &HostStatus{})
 			if err := m.HostStatuses[len(m.HostStatuses)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LocalOriginSuccessRateEjectionThreshold", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClusters
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthClusters
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LocalOriginSuccessRateEjectionThreshold == nil {
+				m.LocalOriginSuccessRateEjectionThreshold = &envoy_type.Percent{}
+			}
+			if err := m.LocalOriginSuccessRateEjectionThreshold.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1015,13 +939,9 @@ func (m *ClusterStatus) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthClusters
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1046,7 +966,7 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1074,7 +994,7 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1083,14 +1003,11 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Address == nil {
-				m.Address = &core.Address{}
+				m.Address = &envoy_api_v2_core1.Address{}
 			}
 			if err := m.Address.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1110,7 +1027,7 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1119,9 +1036,6 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1144,7 +1058,7 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1153,9 +1067,6 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1180,7 +1091,7 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1189,14 +1100,11 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthClusters
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.SuccessRate == nil {
-				m.SuccessRate = &_type.Percent{}
+				m.SuccessRate = &envoy_type.Percent{}
 			}
 			if err := m.SuccessRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1216,11 +1124,92 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Weight |= uint32(b&0x7F) << shift
+				m.Weight |= (uint32(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Hostname", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClusters
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthClusters
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Hostname = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Priority", wireType)
+			}
+			m.Priority = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClusters
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Priority |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LocalOriginSuccessRate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowClusters
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthClusters
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.LocalOriginSuccessRate == nil {
+				m.LocalOriginSuccessRate = &envoy_type.Percent{}
+			}
+			if err := m.LocalOriginSuccessRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipClusters(dAtA[iNdEx:])
@@ -1230,13 +1219,9 @@ func (m *HostStatus) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthClusters
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1261,7 +1246,7 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1289,7 +1274,7 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1309,7 +1294,7 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1329,7 +1314,7 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.EdsHealthStatus |= core.HealthStatus(b&0x7F) << shift
+				m.EdsHealthStatus |= (envoy_api_v2_core2.HealthStatus(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1348,7 +1333,7 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1368,7 +1353,7 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1388,7 +1373,7 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1403,13 +1388,9 @@ func (m *HostHealthStatus) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthClusters
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthClusters
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1473,11 +1454,8 @@ func skipClusters(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthClusters
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthClusters
 			}
 			return iNdEx, nil
@@ -1508,9 +1486,6 @@ func skipClusters(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthClusters
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1529,3 +1504,52 @@ var (
 	ErrInvalidLengthClusters = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowClusters   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("envoy/admin/v2alpha/clusters.proto", fileDescriptorClusters) }
+
+var fileDescriptorClusters = []byte{
+	// 685 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0x5d, 0x6e, 0x13, 0x3d,
+	0x14, 0xd5, 0xa4, 0x69, 0x9b, 0xcf, 0x69, 0xbe, 0xb6, 0xee, 0xf7, 0xb5, 0xd3, 0xa8, 0x6a, 0xd3,
+	0x08, 0x44, 0x84, 0xd0, 0x04, 0x05, 0x54, 0x1e, 0x78, 0x80, 0xfe, 0x20, 0x55, 0xa0, 0xd2, 0x6a,
+	0x8a, 0x90, 0xe0, 0xc5, 0x32, 0x9e, 0x4b, 0xc6, 0x30, 0x19, 0x8f, 0x6c, 0x27, 0x90, 0xd5, 0xb0,
+	0x1d, 0x1e, 0xd9, 0x00, 0x12, 0xea, 0x16, 0xd8, 0x00, 0x1a, 0xdb, 0x93, 0x4e, 0x68, 0x02, 0x6f,
+	0x73, 0xe7, 0x9e, 0x63, 0x9d, 0x73, 0xcf, 0xb5, 0x51, 0x1b, 0xd2, 0x91, 0x18, 0x77, 0x69, 0x34,
+	0xe0, 0x69, 0x77, 0xd4, 0xa3, 0x49, 0x16, 0xd3, 0x2e, 0x4b, 0x86, 0x4a, 0x83, 0x54, 0x41, 0x26,
+	0x85, 0x16, 0x78, 0xc3, 0x60, 0x02, 0x83, 0x09, 0x1c, 0xa6, 0xb9, 0x3f, 0x8b, 0x38, 0x00, 0x2d,
+	0x39, 0x73, 0xbc, 0xe6, 0x9e, 0x83, 0x64, 0xbc, 0x3b, 0xea, 0x75, 0x99, 0x90, 0xd0, 0xa5, 0x51,
+	0x24, 0x41, 0x15, 0x80, 0x5b, 0x37, 0x01, 0x31, 0xd0, 0x44, 0xc7, 0x84, 0xc5, 0xc0, 0x3e, 0x3a,
+	0x94, 0x6f, 0x51, 0x7a, 0x9c, 0x41, 0x37, 0x03, 0xc9, 0x20, 0xd5, 0xb6, 0xd3, 0x7e, 0x83, 0x6a,
+	0xc7, 0x4e, 0x2a, 0x3e, 0x43, 0x6b, 0x4e, 0x36, 0x51, 0x9a, 0xea, 0xa1, 0x02, 0xe5, 0x7b, 0xad,
+	0x85, 0x4e, 0xbd, 0xd7, 0x0e, 0x66, 0xe8, 0x0f, 0x1c, 0xf1, 0xd2, 0x60, 0xc3, 0x55, 0x56, 0x2e,
+	0x41, 0xb5, 0xbf, 0x57, 0x50, 0x63, 0x0a, 0x82, 0x31, 0xaa, 0xa6, 0x74, 0x00, 0xbe, 0xd7, 0xf2,
+	0x3a, 0xff, 0x84, 0xe6, 0x1b, 0xb7, 0x51, 0x83, 0x46, 0x11, 0x44, 0x64, 0xc4, 0x29, 0xa1, 0x19,
+	0xf7, 0x2b, 0x2d, 0xaf, 0x53, 0x0b, 0xeb, 0xe6, 0xe7, 0x6b, 0x4e, 0x0f, 0x33, 0x8e, 0xdf, 0xa2,
+	0x3d, 0x35, 0x64, 0x0c, 0x94, 0x22, 0x92, 0x6a, 0x20, 0xf0, 0x01, 0x98, 0xe6, 0x22, 0x25, 0x3a,
+	0x96, 0xa0, 0x62, 0x91, 0x44, 0xfe, 0x42, 0xcb, 0xeb, 0xd4, 0x7b, 0x1b, 0x4e, 0x67, 0x6e, 0x34,
+	0xb8, 0xb0, 0x46, 0xc3, 0x1d, 0xc7, 0x0d, 0xa9, 0x86, 0x67, 0x8e, 0xf9, 0xaa, 0x20, 0xe2, 0x13,
+	0xd4, 0x88, 0x85, 0xd2, 0xd7, 0x8e, 0xab, 0xc6, 0xf1, 0xde, 0x4c, 0xc7, 0xa7, 0x42, 0x69, 0x67,
+	0x77, 0x25, 0x9e, 0x7c, 0x83, 0xc2, 0x12, 0xdd, 0x4b, 0x04, 0xa3, 0x09, 0x11, 0x92, 0xf7, 0x79,
+	0x4a, 0xfe, 0x26, 0x77, 0x71, 0xbe, 0xdc, 0x3b, 0xe6, 0xa0, 0x73, 0x73, 0xce, 0xe5, 0x1f, 0x94,
+	0xb7, 0xbf, 0x2c, 0x20, 0x74, 0x2d, 0x08, 0x3f, 0x44, 0xcb, 0x6e, 0x35, 0xcc, 0x7c, 0xeb, 0xbd,
+	0x66, 0x61, 0x21, 0xe3, 0xc1, 0xa8, 0x17, 0xe4, 0xbb, 0x11, 0x1c, 0x5a, 0x44, 0x58, 0x40, 0xf1,
+	0x23, 0xb4, 0x98, 0x3b, 0x57, 0x7e, 0xc5, 0xd8, 0xde, 0x9f, 0x69, 0xfb, 0x92, 0x0f, 0xb2, 0x04,
+	0xce, 0xcc, 0x66, 0x86, 0x16, 0x8f, 0x9f, 0xa3, 0x86, 0x5b, 0x34, 0x3b, 0x39, 0x97, 0xc0, 0xed,
+	0xb9, 0x73, 0x3b, 0x35, 0xe8, 0xc9, 0xf4, 0x4a, 0x15, 0x3e, 0x40, 0x2b, 0xe5, 0x81, 0xf9, 0xd5,
+	0xf9, 0xd3, 0xa9, 0x97, 0xc2, 0xc4, 0x9b, 0x68, 0xe9, 0x13, 0xf0, 0x7e, 0xac, 0xcd, 0x3c, 0x1b,
+	0xa1, 0xab, 0x70, 0x13, 0xd5, 0xf2, 0x74, 0xcc, 0xae, 0x2d, 0x99, 0x5d, 0x9b, 0xd4, 0x79, 0x2f,
+	0x93, 0x5c, 0x48, 0xae, 0xc7, 0xfe, 0xb2, 0x61, 0x4d, 0x6a, 0xfc, 0x12, 0x6d, 0xcf, 0x4d, 0xd1,
+	0xaf, 0xcd, 0x17, 0xb5, 0x39, 0x3b, 0xb2, 0xf6, 0xcf, 0x0a, 0x5a, 0xfb, 0xdd, 0x3a, 0x7e, 0x8c,
+	0x9a, 0xef, 0x29, 0x4f, 0x20, 0x22, 0x94, 0x69, 0x3e, 0x02, 0x52, 0xbe, 0xaf, 0x26, 0xba, 0x5a,
+	0xb8, 0x65, 0x11, 0x87, 0x06, 0x60, 0xd9, 0xc7, 0x79, 0x1b, 0xdf, 0x47, 0xff, 0x39, 0xb2, 0x18,
+	0xea, 0x84, 0x83, 0x74, 0x34, 0x7b, 0x69, 0xb0, 0xed, 0x9d, 0xdb, 0x96, 0x65, 0xbc, 0x40, 0xeb,
+	0x10, 0x29, 0x72, 0x33, 0xab, 0x7f, 0xaf, 0x77, 0xbc, 0xb4, 0x20, 0x53, 0x29, 0xad, 0x42, 0xa4,
+	0xa6, 0xb4, 0x3f, 0x41, 0x3b, 0xd3, 0xda, 0x23, 0xe8, 0x4b, 0x9a, 0xdf, 0x5e, 0x2b, 0xa3, 0x6a,
+	0x64, 0x6c, 0x97, 0xd5, 0x9f, 0x38, 0x84, 0x55, 0x73, 0x80, 0xb6, 0x32, 0x48, 0x23, 0x9e, 0xf6,
+	0x49, 0x34, 0x4e, 0xe9, 0x80, 0x33, 0x22, 0x61, 0x20, 0x46, 0x34, 0x31, 0x11, 0xd6, 0xc2, 0xff,
+	0x5d, 0xfb, 0xc4, 0x76, 0x43, 0xdb, 0xc4, 0x77, 0xd1, 0x7a, 0xc1, 0x2b, 0xa6, 0xc6, 0x4c, 0xb4,
+	0xb5, 0x70, 0xd5, 0x35, 0xdc, 0xb0, 0xd8, 0xd1, 0xd3, 0xaf, 0x57, 0xbb, 0xde, 0xb7, 0xab, 0x5d,
+	0xef, 0xc7, 0xd5, 0xae, 0x87, 0xf6, 0xb9, 0xb0, 0x36, 0x33, 0x29, 0x3e, 0x8f, 0x67, 0x6d, 0xe7,
+	0x51, 0xf1, 0x4a, 0xa9, 0x8b, 0xfc, 0x49, 0xbc, 0xf0, 0xde, 0x2d, 0x99, 0xb7, 0xf1, 0xc1, 0xaf,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x10, 0x48, 0xb4, 0x9d, 0xda, 0x05, 0x00, 0x00,
+}

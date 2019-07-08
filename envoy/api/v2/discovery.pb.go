@@ -3,31 +3,22 @@
 
 package v2
 
-import (
-	bytes "bytes"
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import envoy_api_v2_core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+import google_protobuf "github.com/gogo/protobuf/types"
+import google_rpc "github.com/gogo/googleapis/google/rpc"
+import _ "github.com/gogo/protobuf/gogoproto"
 
-	rpc "github.com/gogo/googleapis/google/rpc"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
-	types "github.com/gogo/protobuf/types"
+import sortkeys "github.com/gogo/protobuf/sortkeys"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-)
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // A DiscoveryRequest requests a set of versioned resources of the same type for
 // a given Envoy node on some API.
@@ -41,14 +32,14 @@ type DiscoveryRequest struct {
 	// (see below) has an independent version associated with it.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The node making the request.
-	Node *core.Node `protobuf:"bytes,2,opt,name=node,proto3" json:"node,omitempty"`
+	Node *envoy_api_v2_core.Node `protobuf:"bytes,2,opt,name=node" json:"node,omitempty"`
 	// List of resources to subscribe to, e.g. list of cluster names or a route
 	// configuration name. If this is empty, all resources for the API are
 	// returned. LDS/CDS expect empty resource_names, since this is global
 	// discovery for the Envoy instance. The LDS and CDS responses will then imply
 	// a number of resources that need to be fetched via EDS/RDS, which will be
 	// explicitly enumerated in resource_names.
-	ResourceNames []string `protobuf:"bytes,3,rep,name=resource_names,json=resourceNames,proto3" json:"resource_names,omitempty"`
+	ResourceNames []string `protobuf:"bytes,3,rep,name=resource_names,json=resourceNames" json:"resource_names,omitempty"`
 	// Type of the resource that is being requested, e.g.
 	// "type.googleapis.com/envoy.api.v2.ClusterLoadAssignment". This is implicit
 	// in requests made via singleton xDS APIs such as CDS, LDS, etc. but is
@@ -63,40 +54,13 @@ type DiscoveryRequest struct {
 	// failed to update configuration. The *message* field in *error_details* provides the Envoy
 	// internal exception related to the failure. It is only intended for consumption during manual
 	// debugging, the string provided is not guaranteed to be stable across Envoy versions.
-	ErrorDetail          *rpc.Status `protobuf:"bytes,6,opt,name=error_detail,json=errorDetail,proto3" json:"error_detail,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+	ErrorDetail *google_rpc.Status `protobuf:"bytes,6,opt,name=error_detail,json=errorDetail" json:"error_detail,omitempty"`
 }
 
-func (m *DiscoveryRequest) Reset()         { *m = DiscoveryRequest{} }
-func (m *DiscoveryRequest) String() string { return proto.CompactTextString(m) }
-func (*DiscoveryRequest) ProtoMessage()    {}
-func (*DiscoveryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2c7365e287e5c035, []int{0}
-}
-func (m *DiscoveryRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DiscoveryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *DiscoveryRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DiscoveryRequest.Merge(m, src)
-}
-func (m *DiscoveryRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *DiscoveryRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DiscoveryRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DiscoveryRequest proto.InternalMessageInfo
+func (m *DiscoveryRequest) Reset()                    { *m = DiscoveryRequest{} }
+func (m *DiscoveryRequest) String() string            { return proto.CompactTextString(m) }
+func (*DiscoveryRequest) ProtoMessage()               {}
+func (*DiscoveryRequest) Descriptor() ([]byte, []int) { return fileDescriptorDiscovery, []int{0} }
 
 func (m *DiscoveryRequest) GetVersionInfo() string {
 	if m != nil {
@@ -105,7 +69,7 @@ func (m *DiscoveryRequest) GetVersionInfo() string {
 	return ""
 }
 
-func (m *DiscoveryRequest) GetNode() *core.Node {
+func (m *DiscoveryRequest) GetNode() *envoy_api_v2_core.Node {
 	if m != nil {
 		return m.Node
 	}
@@ -133,7 +97,7 @@ func (m *DiscoveryRequest) GetResponseNonce() string {
 	return ""
 }
 
-func (m *DiscoveryRequest) GetErrorDetail() *rpc.Status {
+func (m *DiscoveryRequest) GetErrorDetail() *google_rpc.Status {
 	if m != nil {
 		return m.ErrorDetail
 	}
@@ -144,7 +108,7 @@ type DiscoveryResponse struct {
 	// The version of the response data.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The response resources. These resources are typed and depend on the API being called.
-	Resources []types.Any `protobuf:"bytes,2,rep,name=resources,proto3" json:"resources"`
+	Resources []google_protobuf.Any `protobuf:"bytes,2,rep,name=resources" json:"resources"`
 	// [#not-implemented-hide:]
 	// Canary is used to support two Envoy command line flags:
 	//
@@ -174,40 +138,13 @@ type DiscoveryResponse struct {
 	Nonce string `protobuf:"bytes,5,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	// [#not-implemented-hide:]
 	// The control plane instance that sent the response.
-	ControlPlane         *core.ControlPlane `protobuf:"bytes,6,opt,name=control_plane,json=controlPlane,proto3" json:"control_plane,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	ControlPlane *envoy_api_v2_core.ControlPlane `protobuf:"bytes,6,opt,name=control_plane,json=controlPlane" json:"control_plane,omitempty"`
 }
 
-func (m *DiscoveryResponse) Reset()         { *m = DiscoveryResponse{} }
-func (m *DiscoveryResponse) String() string { return proto.CompactTextString(m) }
-func (*DiscoveryResponse) ProtoMessage()    {}
-func (*DiscoveryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2c7365e287e5c035, []int{1}
-}
-func (m *DiscoveryResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DiscoveryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *DiscoveryResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DiscoveryResponse.Merge(m, src)
-}
-func (m *DiscoveryResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *DiscoveryResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DiscoveryResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DiscoveryResponse proto.InternalMessageInfo
+func (m *DiscoveryResponse) Reset()                    { *m = DiscoveryResponse{} }
+func (m *DiscoveryResponse) String() string            { return proto.CompactTextString(m) }
+func (*DiscoveryResponse) ProtoMessage()               {}
+func (*DiscoveryResponse) Descriptor() ([]byte, []int) { return fileDescriptorDiscovery, []int{1} }
 
 func (m *DiscoveryResponse) GetVersionInfo() string {
 	if m != nil {
@@ -216,7 +153,7 @@ func (m *DiscoveryResponse) GetVersionInfo() string {
 	return ""
 }
 
-func (m *DiscoveryResponse) GetResources() []types.Any {
+func (m *DiscoveryResponse) GetResources() []google_protobuf.Any {
 	if m != nil {
 		return m.Resources
 	}
@@ -244,7 +181,7 @@ func (m *DiscoveryResponse) GetNonce() string {
 	return ""
 }
 
-func (m *DiscoveryResponse) GetControlPlane() *core.ControlPlane {
+func (m *DiscoveryResponse) GetControlPlane() *envoy_api_v2_core.ControlPlane {
 	if m != nil {
 		return m.ControlPlane
 	}
@@ -285,7 +222,7 @@ func (m *DiscoveryResponse) GetControlPlane() *core.ControlPlane {
 // initial_resource_versions.
 type DeltaDiscoveryRequest struct {
 	// The node making the request.
-	Node *core.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
+	Node *envoy_api_v2_core.Node `protobuf:"bytes,1,opt,name=node" json:"node,omitempty"`
 	// Type of the resource that is being requested, e.g.
 	// "type.googleapis.com/envoy.api.v2.ClusterLoadAssignment".
 	TypeUrl string `protobuf:"bytes,2,opt,name=type_url,json=typeUrl,proto3" json:"type_url,omitempty"`
@@ -310,9 +247,9 @@ type DeltaDiscoveryRequest struct {
 	// and initial_resource_versions.
 	//
 	// A list of Resource names to add to the list of tracked resources.
-	ResourceNamesSubscribe []string `protobuf:"bytes,3,rep,name=resource_names_subscribe,json=resourceNamesSubscribe,proto3" json:"resource_names_subscribe,omitempty"`
+	ResourceNamesSubscribe []string `protobuf:"bytes,3,rep,name=resource_names_subscribe,json=resourceNamesSubscribe" json:"resource_names_subscribe,omitempty"`
 	// A list of Resource names to remove from the list of tracked resources.
-	ResourceNamesUnsubscribe []string `protobuf:"bytes,4,rep,name=resource_names_unsubscribe,json=resourceNamesUnsubscribe,proto3" json:"resource_names_unsubscribe,omitempty"`
+	ResourceNamesUnsubscribe []string `protobuf:"bytes,4,rep,name=resource_names_unsubscribe,json=resourceNamesUnsubscribe" json:"resource_names_unsubscribe,omitempty"`
 	// Informs the server of the versions of the resources the xDS client knows of, to enable the
 	// client to continue the same logical xDS session even in the face of gRPC stream reconnection.
 	// It will not be populated: [1] in the very first stream of a session, since the client will
@@ -321,7 +258,7 @@ type DeltaDiscoveryRequest struct {
 	// (In ADS, the first message *of each type_url* of a reconnected stream populates this map.)
 	// The map's keys are names of xDS resources known to the xDS client.
 	// The map's values are opaque resource versions.
-	InitialResourceVersions map[string]string `protobuf:"bytes,5,rep,name=initial_resource_versions,json=initialResourceVersions,proto3" json:"initial_resource_versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	InitialResourceVersions map[string]string `protobuf:"bytes,5,rep,name=initial_resource_versions,json=initialResourceVersions" json:"initial_resource_versions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// When the DeltaDiscoveryRequest is a ACK or NACK message in response
 	// to a previous DeltaDiscoveryResponse, the response_nonce must be the
 	// nonce in the DeltaDiscoveryResponse.
@@ -330,42 +267,15 @@ type DeltaDiscoveryRequest struct {
 	// This is populated when the previous :ref:`DiscoveryResponse <envoy_api_msg_DiscoveryResponse>`
 	// failed to update configuration. The *message* field in *error_details*
 	// provides the Envoy internal exception related to the failure.
-	ErrorDetail          *rpc.Status `protobuf:"bytes,7,opt,name=error_detail,json=errorDetail,proto3" json:"error_detail,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+	ErrorDetail *google_rpc.Status `protobuf:"bytes,7,opt,name=error_detail,json=errorDetail" json:"error_detail,omitempty"`
 }
 
-func (m *DeltaDiscoveryRequest) Reset()         { *m = DeltaDiscoveryRequest{} }
-func (m *DeltaDiscoveryRequest) String() string { return proto.CompactTextString(m) }
-func (*DeltaDiscoveryRequest) ProtoMessage()    {}
-func (*DeltaDiscoveryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2c7365e287e5c035, []int{2}
-}
-func (m *DeltaDiscoveryRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DeltaDiscoveryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *DeltaDiscoveryRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeltaDiscoveryRequest.Merge(m, src)
-}
-func (m *DeltaDiscoveryRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *DeltaDiscoveryRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeltaDiscoveryRequest.DiscardUnknown(m)
-}
+func (m *DeltaDiscoveryRequest) Reset()                    { *m = DeltaDiscoveryRequest{} }
+func (m *DeltaDiscoveryRequest) String() string            { return proto.CompactTextString(m) }
+func (*DeltaDiscoveryRequest) ProtoMessage()               {}
+func (*DeltaDiscoveryRequest) Descriptor() ([]byte, []int) { return fileDescriptorDiscovery, []int{2} }
 
-var xxx_messageInfo_DeltaDiscoveryRequest proto.InternalMessageInfo
-
-func (m *DeltaDiscoveryRequest) GetNode() *core.Node {
+func (m *DeltaDiscoveryRequest) GetNode() *envoy_api_v2_core.Node {
 	if m != nil {
 		return m.Node
 	}
@@ -407,7 +317,7 @@ func (m *DeltaDiscoveryRequest) GetResponseNonce() string {
 	return ""
 }
 
-func (m *DeltaDiscoveryRequest) GetErrorDetail() *rpc.Status {
+func (m *DeltaDiscoveryRequest) GetErrorDetail() *google_rpc.Status {
 	if m != nil {
 		return m.ErrorDetail
 	}
@@ -419,49 +329,22 @@ type DeltaDiscoveryResponse struct {
 	SystemVersionInfo string `protobuf:"bytes,1,opt,name=system_version_info,json=systemVersionInfo,proto3" json:"system_version_info,omitempty"`
 	// The response resources. These are typed resources, whose types must match
 	// the type_url field.
-	Resources []Resource `protobuf:"bytes,2,rep,name=resources,proto3" json:"resources"`
+	Resources []Resource `protobuf:"bytes,2,rep,name=resources" json:"resources"`
 	// Type URL for resources. Identifies the xDS API when muxing over ADS.
 	// Must be consistent with the type_url in the Any within 'resources' if 'resources' is non-empty.
 	TypeUrl string `protobuf:"bytes,4,opt,name=type_url,json=typeUrl,proto3" json:"type_url,omitempty"`
 	// Resources names of resources that have be deleted and to be removed from the xDS Client.
 	// Removed resources for missing resources can be ignored.
-	RemovedResources []string `protobuf:"bytes,6,rep,name=removed_resources,json=removedResources,proto3" json:"removed_resources,omitempty"`
+	RemovedResources []string `protobuf:"bytes,6,rep,name=removed_resources,json=removedResources" json:"removed_resources,omitempty"`
 	// The nonce provides a way for DeltaDiscoveryRequests to uniquely
 	// reference a DeltaDiscoveryResponse when (N)ACKing. The nonce is required.
-	Nonce                string   `protobuf:"bytes,5,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Nonce string `protobuf:"bytes,5,opt,name=nonce,proto3" json:"nonce,omitempty"`
 }
 
-func (m *DeltaDiscoveryResponse) Reset()         { *m = DeltaDiscoveryResponse{} }
-func (m *DeltaDiscoveryResponse) String() string { return proto.CompactTextString(m) }
-func (*DeltaDiscoveryResponse) ProtoMessage()    {}
-func (*DeltaDiscoveryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2c7365e287e5c035, []int{3}
-}
-func (m *DeltaDiscoveryResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DeltaDiscoveryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *DeltaDiscoveryResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeltaDiscoveryResponse.Merge(m, src)
-}
-func (m *DeltaDiscoveryResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *DeltaDiscoveryResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeltaDiscoveryResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeltaDiscoveryResponse proto.InternalMessageInfo
+func (m *DeltaDiscoveryResponse) Reset()                    { *m = DeltaDiscoveryResponse{} }
+func (m *DeltaDiscoveryResponse) String() string            { return proto.CompactTextString(m) }
+func (*DeltaDiscoveryResponse) ProtoMessage()               {}
+func (*DeltaDiscoveryResponse) Descriptor() ([]byte, []int) { return fileDescriptorDiscovery, []int{3} }
 
 func (m *DeltaDiscoveryResponse) GetSystemVersionInfo() string {
 	if m != nil {
@@ -503,45 +386,18 @@ type Resource struct {
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// [#not-implemented-hide:]
 	// The aliases are a list of other names that this resource can go by.
-	Aliases []string `protobuf:"bytes,4,rep,name=aliases,proto3" json:"aliases,omitempty"`
+	Aliases []string `protobuf:"bytes,4,rep,name=aliases" json:"aliases,omitempty"`
 	// The resource level version. It allows xDS to track the state of individual
 	// resources.
 	Version string `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
 	// The resource being tracked.
-	Resource             *types.Any `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_unrecognized     []byte     `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+	Resource *google_protobuf.Any `protobuf:"bytes,2,opt,name=resource" json:"resource,omitempty"`
 }
 
-func (m *Resource) Reset()         { *m = Resource{} }
-func (m *Resource) String() string { return proto.CompactTextString(m) }
-func (*Resource) ProtoMessage()    {}
-func (*Resource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2c7365e287e5c035, []int{4}
-}
-func (m *Resource) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Resource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Resource) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Resource.Merge(m, src)
-}
-func (m *Resource) XXX_Size() int {
-	return m.Size()
-}
-func (m *Resource) XXX_DiscardUnknown() {
-	xxx_messageInfo_Resource.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Resource proto.InternalMessageInfo
+func (m *Resource) Reset()                    { *m = Resource{} }
+func (m *Resource) String() string            { return proto.CompactTextString(m) }
+func (*Resource) ProtoMessage()               {}
+func (*Resource) Descriptor() ([]byte, []int) { return fileDescriptorDiscovery, []int{4} }
 
 func (m *Resource) GetName() string {
 	if m != nil {
@@ -564,7 +420,7 @@ func (m *Resource) GetVersion() string {
 	return ""
 }
 
-func (m *Resource) GetResource() *types.Any {
+func (m *Resource) GetResource() *google_protobuf.Any {
 	if m != nil {
 		return m.Resource
 	}
@@ -575,61 +431,9 @@ func init() {
 	proto.RegisterType((*DiscoveryRequest)(nil), "envoy.api.v2.DiscoveryRequest")
 	proto.RegisterType((*DiscoveryResponse)(nil), "envoy.api.v2.DiscoveryResponse")
 	proto.RegisterType((*DeltaDiscoveryRequest)(nil), "envoy.api.v2.DeltaDiscoveryRequest")
-	proto.RegisterMapType((map[string]string)(nil), "envoy.api.v2.DeltaDiscoveryRequest.InitialResourceVersionsEntry")
 	proto.RegisterType((*DeltaDiscoveryResponse)(nil), "envoy.api.v2.DeltaDiscoveryResponse")
 	proto.RegisterType((*Resource)(nil), "envoy.api.v2.Resource")
 }
-
-func init() { proto.RegisterFile("envoy/api/v2/discovery.proto", fileDescriptor_2c7365e287e5c035) }
-
-var fileDescriptor_2c7365e287e5c035 = []byte{
-	// 702 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x54, 0xcd, 0x6a, 0xdb, 0x40,
-	0x10, 0xee, 0xda, 0x8e, 0x63, 0xaf, 0x9d, 0x90, 0x6c, 0x53, 0x47, 0x31, 0xc1, 0x71, 0x0d, 0x05,
-	0x43, 0x40, 0x2a, 0x2e, 0x85, 0x10, 0x7a, 0x68, 0x53, 0xb7, 0x90, 0x1e, 0x42, 0x50, 0x48, 0x0e,
-	0xbd, 0x88, 0xb5, 0x3c, 0x31, 0xa2, 0xca, 0xae, 0xba, 0x2b, 0x89, 0x0a, 0x7a, 0x2a, 0x7d, 0x98,
-	0x3e, 0x4a, 0x8e, 0x3d, 0xf6, 0x54, 0x8a, 0x5f, 0x24, 0x45, 0xab, 0x95, 0x6d, 0x25, 0x26, 0xf8,
-	0xb6, 0x33, 0xf3, 0xcd, 0xa7, 0xf9, 0xf9, 0x46, 0x78, 0x1f, 0x58, 0xcc, 0x13, 0x8b, 0x06, 0x9e,
-	0x15, 0x0f, 0xac, 0xb1, 0x27, 0x5d, 0x1e, 0x83, 0x48, 0xcc, 0x40, 0xf0, 0x90, 0x93, 0xa6, 0x8a,
-	0x9a, 0x34, 0xf0, 0xcc, 0x78, 0xd0, 0x2e, 0x62, 0x5d, 0x2e, 0xc0, 0x1a, 0x51, 0x09, 0x19, 0xb6,
-	0xbd, 0x37, 0xe1, 0x7c, 0xe2, 0x83, 0xa5, 0xac, 0x51, 0x74, 0x6d, 0x51, 0xa6, 0x69, 0xda, 0xbb,
-	0x3a, 0x24, 0x02, 0xd7, 0x92, 0x21, 0x0d, 0x23, 0xa9, 0x03, 0x3b, 0x13, 0x3e, 0xe1, 0xea, 0x69,
-	0xa5, 0xaf, 0xcc, 0xdb, 0xfb, 0x51, 0xc2, 0x5b, 0xc3, 0xbc, 0x12, 0x1b, 0xbe, 0x46, 0x20, 0x43,
-	0xf2, 0x1c, 0x37, 0x63, 0x10, 0xd2, 0xe3, 0xcc, 0xf1, 0xd8, 0x35, 0x37, 0x50, 0x17, 0xf5, 0xeb,
-	0x76, 0x43, 0xfb, 0x4e, 0xd9, 0x35, 0x27, 0x87, 0xb8, 0xc2, 0xf8, 0x18, 0x8c, 0x52, 0x17, 0xf5,
-	0x1b, 0x83, 0x5d, 0x73, 0xb1, 0x78, 0x33, 0x2d, 0xd7, 0x3c, 0xe3, 0x63, 0xb0, 0x15, 0x88, 0xbc,
-	0xc0, 0x9b, 0x02, 0x24, 0x8f, 0x84, 0x0b, 0x0e, 0xa3, 0x37, 0x20, 0x8d, 0x72, 0xb7, 0xdc, 0xaf,
-	0xdb, 0x1b, 0xb9, 0xf7, 0x2c, 0x75, 0x92, 0x3d, 0x5c, 0x0b, 0x93, 0x00, 0x9c, 0x48, 0xf8, 0x46,
-	0x45, 0x7d, 0x72, 0x3d, 0xb5, 0x2f, 0x85, 0xaf, 0x19, 0x02, 0xce, 0x24, 0x38, 0x8c, 0x33, 0x17,
-	0x8c, 0x35, 0x05, 0xd8, 0xc8, 0xbd, 0x67, 0xa9, 0x93, 0xbc, 0xc6, 0x4d, 0x10, 0x82, 0x0b, 0x67,
-	0x0c, 0x21, 0xf5, 0x7c, 0xa3, 0xaa, 0xaa, 0x23, 0x66, 0x36, 0x13, 0x53, 0x04, 0xae, 0x79, 0xa1,
-	0x66, 0x62, 0x37, 0x14, 0x6e, 0xa8, 0x60, 0xbd, 0x3b, 0x84, 0xb7, 0x17, 0x86, 0x90, 0x31, 0xae,
-	0x32, 0x85, 0x23, 0x5c, 0xcf, 0x5b, 0x90, 0x46, 0xa9, 0x5b, 0xee, 0x37, 0x06, 0x3b, 0xf9, 0xc7,
-	0xf2, 0xdd, 0x98, 0xef, 0x58, 0x72, 0x52, 0xb9, 0xfd, 0x7b, 0xf0, 0xc4, 0x9e, 0x83, 0x49, 0x0b,
-	0x57, 0x5d, 0xca, 0xa8, 0x48, 0x8c, 0x72, 0x17, 0xf5, 0x6b, 0xb6, 0xb6, 0x1e, 0x9b, 0xc1, 0x0e,
-	0x5e, 0x5b, 0x6c, 0x3d, 0x33, 0xc8, 0x10, 0x6f, 0xb8, 0x9c, 0x85, 0x82, 0xfb, 0x4e, 0xe0, 0x53,
-	0x06, 0xba, 0xe7, 0x83, 0x25, 0x1b, 0x79, 0x9f, 0xe1, 0xce, 0x53, 0x98, 0xdd, 0x74, 0x17, 0xac,
-	0xde, 0x5d, 0x19, 0x3f, 0x1b, 0x82, 0x1f, 0xd2, 0x07, 0x5a, 0xc8, 0x17, 0x8d, 0x56, 0x59, 0xf4,
-	0x62, 0xf5, 0xa5, 0x62, 0xf5, 0x47, 0xd8, 0x28, 0x6a, 0xc0, 0x91, 0xd1, 0x48, 0xba, 0xc2, 0x1b,
-	0x81, 0x56, 0x43, 0xab, 0xa0, 0x86, 0x8b, 0x3c, 0x4a, 0xde, 0xe0, 0xf6, 0xbd, 0xcc, 0x88, 0xcd,
-	0x73, 0x2b, 0x2a, 0xd7, 0x28, 0xe4, 0x5e, 0xce, 0xe3, 0xe4, 0x3b, 0xde, 0xf3, 0x98, 0x17, 0x7a,
-	0xd4, 0x77, 0x66, 0x2c, 0x7a, 0x85, 0xd2, 0x58, 0x53, 0x2b, 0x7b, 0x5b, 0x6c, 0x6a, 0xe9, 0x1c,
-	0xcc, 0xd3, 0x8c, 0xc4, 0xd6, 0x1c, 0x57, 0x9a, 0xe2, 0x03, 0x0b, 0x45, 0x62, 0xef, 0x7a, 0xcb,
-	0xa3, 0x4b, 0x74, 0x5b, 0x5d, 0x45, 0xb7, 0xeb, 0x2b, 0xe9, 0xb6, 0xfd, 0x09, 0xef, 0x3f, 0x56,
-	0x16, 0xd9, 0xc2, 0xe5, 0x2f, 0x90, 0x68, 0xe1, 0xa6, 0xcf, 0x54, 0x43, 0x31, 0xf5, 0x23, 0xd0,
-	0xdb, 0xc9, 0x8c, 0xe3, 0xd2, 0x11, 0xea, 0x4d, 0x11, 0x6e, 0xdd, 0xef, 0x5c, 0x1f, 0x82, 0x89,
-	0x9f, 0xca, 0x44, 0x86, 0x70, 0xe3, 0x2c, 0xb9, 0x87, 0xed, 0x2c, 0x74, 0xb5, 0x70, 0x15, 0xc7,
-	0x0f, 0xaf, 0xa2, 0x55, 0x1c, 0x71, 0x5e, 0xee, 0xc3, 0xbb, 0x78, 0x44, 0xff, 0x87, 0x78, 0x5b,
-	0xc0, 0x0d, 0x8f, 0x61, 0xec, 0xcc, 0xe9, 0xab, 0x6a, 0xfd, 0x5b, 0x3a, 0x60, 0xcf, 0x78, 0x96,
-	0x1e, 0x4b, 0xef, 0x27, 0xc2, 0xb5, 0x1c, 0x43, 0x08, 0xae, 0xa4, 0x72, 0x52, 0x07, 0x58, 0xb7,
-	0xd5, 0x9b, 0x18, 0x78, 0x9d, 0xfa, 0x1e, 0x95, 0x20, 0xb5, 0xb0, 0x72, 0x33, 0x8d, 0xe8, 0xee,
-	0x75, 0xe3, 0xb9, 0x49, 0x5e, 0xe2, 0x5a, 0x5e, 0x8f, 0xfe, 0x1d, 0x2e, 0xfd, 0x07, 0xd8, 0x33,
-	0xd4, 0xc9, 0xc7, 0x5f, 0xd3, 0x0e, 0xba, 0x9d, 0x76, 0xd0, 0xef, 0x69, 0x07, 0xfd, 0x99, 0x76,
-	0xd0, 0xbf, 0x69, 0x07, 0xe1, 0xb6, 0xc7, 0xb3, 0x29, 0x05, 0x82, 0x7f, 0x4b, 0x0a, 0x03, 0x3b,
-	0xd9, 0x9c, 0x6d, 0xe5, 0x3c, 0xa5, 0x3c, 0x47, 0x9f, 0x4b, 0xf1, 0x60, 0x54, 0x55, 0xfc, 0xaf,
-	0xfe, 0x07, 0x00, 0x00, 0xff, 0xff, 0xf4, 0xcd, 0x22, 0x18, 0x59, 0x06, 0x00, 0x00,
-}
-
 func (this *DiscoveryRequest) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -670,9 +474,6 @@ func (this *DiscoveryRequest) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.ErrorDetail.Equal(that1.ErrorDetail) {
-		return false
-	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -717,9 +518,6 @@ func (this *DiscoveryResponse) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.ControlPlane.Equal(that1.ControlPlane) {
-		return false
-	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -779,9 +577,6 @@ func (this *DeltaDiscoveryRequest) Equal(that interface{}) bool {
 	if !this.ErrorDetail.Equal(that1.ErrorDetail) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 func (this *DeltaDiscoveryResponse) Equal(that interface{}) bool {
@@ -828,9 +623,6 @@ func (this *DeltaDiscoveryResponse) Equal(that interface{}) bool {
 	if this.Nonce != that1.Nonce {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 func (this *Resource) Equal(that interface{}) bool {
@@ -867,9 +659,6 @@ func (this *Resource) Equal(that interface{}) bool {
 		return false
 	}
 	if !this.Resource.Equal(that1.Resource) {
-		return false
-	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
 		return false
 	}
 	return true
@@ -942,9 +731,6 @@ func (m *DiscoveryRequest) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n2
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -1012,9 +798,6 @@ func (m *DiscoveryResponse) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n3
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -1085,7 +868,7 @@ func (m *DeltaDiscoveryRequest) MarshalTo(dAtA []byte) (int, error) {
 		for k, _ := range m.InitialResourceVersions {
 			keysForInitialResourceVersions = append(keysForInitialResourceVersions, string(k))
 		}
-		github_com_gogo_protobuf_sortkeys.Strings(keysForInitialResourceVersions)
+		sortkeys.Strings(keysForInitialResourceVersions)
 		for _, k := range keysForInitialResourceVersions {
 			dAtA[i] = 0x2a
 			i++
@@ -1117,9 +900,6 @@ func (m *DeltaDiscoveryRequest) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += n5
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -1184,9 +964,6 @@ func (m *DeltaDiscoveryResponse) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], s)
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -1242,9 +1019,6 @@ func (m *Resource) MarshalTo(dAtA []byte) (int, error) {
 			i += copy(dAtA[i:], s)
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -1258,9 +1032,6 @@ func encodeVarintDiscovery(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *DiscoveryRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.VersionInfo)
@@ -1289,16 +1060,10 @@ func (m *DiscoveryRequest) Size() (n int) {
 		l = m.ErrorDetail.Size()
 		n += 1 + l + sovDiscovery(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *DiscoveryResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.VersionInfo)
@@ -1326,16 +1091,10 @@ func (m *DiscoveryResponse) Size() (n int) {
 		l = m.ControlPlane.Size()
 		n += 1 + l + sovDiscovery(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *DeltaDiscoveryRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Node != nil {
@@ -1374,16 +1133,10 @@ func (m *DeltaDiscoveryRequest) Size() (n int) {
 		l = m.ErrorDetail.Size()
 		n += 1 + l + sovDiscovery(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *DeltaDiscoveryResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.SystemVersionInfo)
@@ -1410,16 +1163,10 @@ func (m *DeltaDiscoveryResponse) Size() (n int) {
 			n += 1 + l + sovDiscovery(uint64(l))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *Resource) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Version)
@@ -1439,9 +1186,6 @@ func (m *Resource) Size() (n int) {
 			l = len(s)
 			n += 1 + l + sovDiscovery(uint64(l))
 		}
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -1474,7 +1218,7 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1502,7 +1246,7 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1512,9 +1256,6 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1534,7 +1275,7 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1543,14 +1284,11 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Node == nil {
-				m.Node = &core.Node{}
+				m.Node = &envoy_api_v2_core.Node{}
 			}
 			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1570,7 +1308,7 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1580,9 +1318,6 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1602,7 +1337,7 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1612,9 +1347,6 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1634,7 +1366,7 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1644,9 +1376,6 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1666,7 +1395,7 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1675,14 +1404,11 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ErrorDetail == nil {
-				m.ErrorDetail = &rpc.Status{}
+				m.ErrorDetail = &google_rpc.Status{}
 			}
 			if err := m.ErrorDetail.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1697,13 +1423,9 @@ func (m *DiscoveryRequest) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthDiscovery
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1728,7 +1450,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1756,7 +1478,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1766,9 +1488,6 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1788,7 +1507,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1797,13 +1516,10 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Resources = append(m.Resources, types.Any{})
+			m.Resources = append(m.Resources, google_protobuf.Any{})
 			if err := m.Resources[len(m.Resources)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1822,7 +1538,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1842,7 +1558,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1852,9 +1568,6 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1874,7 +1587,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1884,9 +1597,6 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1906,7 +1616,7 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1915,14 +1625,11 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ControlPlane == nil {
-				m.ControlPlane = &core.ControlPlane{}
+				m.ControlPlane = &envoy_api_v2_core.ControlPlane{}
 			}
 			if err := m.ControlPlane.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1937,13 +1644,9 @@ func (m *DiscoveryResponse) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthDiscovery
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1968,7 +1671,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1996,7 +1699,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2005,14 +1708,11 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Node == nil {
-				m.Node = &core.Node{}
+				m.Node = &envoy_api_v2_core.Node{}
 			}
 			if err := m.Node.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2032,7 +1732,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2042,9 +1742,6 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2064,7 +1761,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2074,9 +1771,6 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2096,7 +1790,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2106,9 +1800,6 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2128,7 +1819,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2137,9 +1828,6 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2160,7 +1848,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= uint64(b&0x7F) << shift
+					wire |= (uint64(b) & 0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -2177,7 +1865,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -2187,9 +1875,6 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthDiscovery
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthDiscovery
-					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -2206,7 +1891,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
+						stringLenmapvalue |= (uint64(b) & 0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -2216,9 +1901,6 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthDiscovery
 					}
 					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthDiscovery
-					}
 					if postStringIndexmapvalue > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -2255,7 +1937,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2265,9 +1947,6 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2287,7 +1966,7 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2296,14 +1975,11 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.ErrorDetail == nil {
-				m.ErrorDetail = &rpc.Status{}
+				m.ErrorDetail = &google_rpc.Status{}
 			}
 			if err := m.ErrorDetail.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2318,13 +1994,9 @@ func (m *DeltaDiscoveryRequest) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthDiscovery
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2349,7 +2021,7 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -2377,7 +2049,7 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2387,9 +2059,6 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2409,7 +2078,7 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2418,9 +2087,6 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2443,7 +2109,7 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2453,9 +2119,6 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2475,7 +2138,7 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2485,9 +2148,6 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2507,7 +2167,7 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2517,9 +2177,6 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2534,13 +2191,9 @@ func (m *DeltaDiscoveryResponse) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthDiscovery
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2565,7 +2218,7 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -2593,7 +2246,7 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2603,9 +2256,6 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2625,7 +2275,7 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2634,14 +2284,11 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Resource == nil {
-				m.Resource = &types.Any{}
+				m.Resource = &google_protobuf.Any{}
 			}
 			if err := m.Resource.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2661,7 +2308,7 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2671,9 +2318,6 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2693,7 +2337,7 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2703,9 +2347,6 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthDiscovery
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2720,13 +2361,9 @@ func (m *Resource) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthDiscovery
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthDiscovery
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2790,11 +2427,8 @@ func skipDiscovery(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthDiscovery
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthDiscovery
 			}
 			return iNdEx, nil
@@ -2825,9 +2459,6 @@ func skipDiscovery(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthDiscovery
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -2846,3 +2477,53 @@ var (
 	ErrInvalidLengthDiscovery = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowDiscovery   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("envoy/api/v2/discovery.proto", fileDescriptorDiscovery) }
+
+var fileDescriptorDiscovery = []byte{
+	// 702 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xc1, 0x6a, 0xdb, 0x4c,
+	0x10, 0xfe, 0xd7, 0x76, 0x1c, 0x7b, 0xed, 0x84, 0x64, 0xff, 0xd4, 0x51, 0x4c, 0x70, 0x5c, 0x43,
+	0xc1, 0x10, 0x90, 0x8a, 0x4b, 0x21, 0x84, 0x1e, 0xda, 0xd4, 0x2d, 0xa4, 0x87, 0x10, 0x14, 0x92,
+	0x43, 0x2f, 0x62, 0x2d, 0x4f, 0x8c, 0xa8, 0xb2, 0xab, 0xee, 0x4a, 0xa2, 0x82, 0x9e, 0x4a, 0x1f,
+	0xa6, 0x8f, 0x92, 0x63, 0x8f, 0x3d, 0x95, 0xe2, 0x17, 0x49, 0xd1, 0x6a, 0x15, 0x5b, 0xb1, 0x09,
+	0xee, 0x6d, 0x67, 0xe6, 0xdb, 0xd9, 0x6f, 0x66, 0xbe, 0x59, 0xbc, 0x0f, 0x2c, 0xe6, 0x89, 0x45,
+	0x03, 0xcf, 0x8a, 0x07, 0xd6, 0xd8, 0x93, 0x2e, 0x8f, 0x41, 0x24, 0x66, 0x20, 0x78, 0xc8, 0x49,
+	0x53, 0x45, 0x4d, 0x1a, 0x78, 0x66, 0x3c, 0x68, 0x17, 0xb1, 0x2e, 0x17, 0x60, 0x8d, 0xa8, 0x84,
+	0x0c, 0xdb, 0xde, 0x9b, 0x70, 0x3e, 0xf1, 0xc1, 0x52, 0xd6, 0x28, 0xba, 0xb6, 0x28, 0xd3, 0x69,
+	0xda, 0xbb, 0x3a, 0x24, 0x02, 0xd7, 0x92, 0x21, 0x0d, 0x23, 0xa9, 0x03, 0x3b, 0x13, 0x3e, 0xe1,
+	0xea, 0x68, 0xa5, 0xa7, 0xcc, 0xdb, 0xfb, 0x56, 0xc2, 0x5b, 0xc3, 0x9c, 0x89, 0x0d, 0x9f, 0x23,
+	0x90, 0x21, 0x79, 0x8a, 0x9b, 0x31, 0x08, 0xe9, 0x71, 0xe6, 0x78, 0xec, 0x9a, 0x1b, 0xa8, 0x8b,
+	0xfa, 0x75, 0xbb, 0xa1, 0x7d, 0xa7, 0xec, 0x9a, 0x93, 0x43, 0x5c, 0x61, 0x7c, 0x0c, 0x46, 0xa9,
+	0x8b, 0xfa, 0x8d, 0xc1, 0xae, 0x39, 0x4f, 0xde, 0x4c, 0xe9, 0x9a, 0x67, 0x7c, 0x0c, 0xb6, 0x02,
+	0x91, 0x67, 0x78, 0x53, 0x80, 0xe4, 0x91, 0x70, 0xc1, 0x61, 0xf4, 0x06, 0xa4, 0x51, 0xee, 0x96,
+	0xfb, 0x75, 0x7b, 0x23, 0xf7, 0x9e, 0xa5, 0x4e, 0xb2, 0x87, 0x6b, 0x61, 0x12, 0x80, 0x13, 0x09,
+	0xdf, 0xa8, 0xa8, 0x27, 0xd7, 0x53, 0xfb, 0x52, 0xf8, 0x3a, 0x43, 0xc0, 0x99, 0x04, 0x87, 0x71,
+	0xe6, 0x82, 0xb1, 0xa6, 0x00, 0x1b, 0xb9, 0xf7, 0x2c, 0x75, 0x92, 0x97, 0xb8, 0x09, 0x42, 0x70,
+	0xe1, 0x8c, 0x21, 0xa4, 0x9e, 0x6f, 0x54, 0x15, 0x3b, 0x62, 0x66, 0x3d, 0x31, 0x45, 0xe0, 0x9a,
+	0x17, 0xaa, 0x27, 0x76, 0x43, 0xe1, 0x86, 0x0a, 0xd6, 0xbb, 0x43, 0x78, 0x7b, 0xae, 0x09, 0x59,
+	0xc6, 0x55, 0xba, 0x70, 0x84, 0xeb, 0x79, 0x09, 0xd2, 0x28, 0x75, 0xcb, 0xfd, 0xc6, 0x60, 0x27,
+	0x7f, 0x2c, 0x9f, 0x8d, 0xf9, 0x86, 0x25, 0x27, 0x95, 0xdb, 0xdf, 0x07, 0xff, 0xd9, 0x33, 0x30,
+	0x69, 0xe1, 0xaa, 0x4b, 0x19, 0x15, 0x89, 0x51, 0xee, 0xa2, 0x7e, 0xcd, 0xd6, 0xd6, 0x63, 0x3d,
+	0xd8, 0xc1, 0x6b, 0xf3, 0xa5, 0x67, 0x06, 0x19, 0xe2, 0x0d, 0x97, 0xb3, 0x50, 0x70, 0xdf, 0x09,
+	0x7c, 0xca, 0x40, 0xd7, 0x7c, 0xb0, 0x64, 0x22, 0x6f, 0x33, 0xdc, 0x79, 0x0a, 0xb3, 0x9b, 0xee,
+	0x9c, 0xd5, 0xbb, 0x2b, 0xe3, 0x27, 0x43, 0xf0, 0x43, 0xba, 0xa0, 0x85, 0x7c, 0xd0, 0x68, 0x95,
+	0x41, 0xcf, 0xb3, 0x2f, 0x15, 0xd9, 0x1f, 0x61, 0xa3, 0xa8, 0x01, 0x47, 0x46, 0x23, 0xe9, 0x0a,
+	0x6f, 0x04, 0x5a, 0x0d, 0xad, 0x82, 0x1a, 0x2e, 0xf2, 0x28, 0x79, 0x85, 0xdb, 0x0f, 0x6e, 0x46,
+	0x6c, 0x76, 0xb7, 0xa2, 0xee, 0x1a, 0x85, 0xbb, 0x97, 0xb3, 0x38, 0xf9, 0x8a, 0xf7, 0x3c, 0xe6,
+	0x85, 0x1e, 0xf5, 0x9d, 0xfb, 0x2c, 0x7a, 0x84, 0xd2, 0x58, 0x53, 0x23, 0x7b, 0x5d, 0x2c, 0x6a,
+	0x69, 0x1f, 0xcc, 0xd3, 0x2c, 0x89, 0xad, 0x73, 0x5c, 0xe9, 0x14, 0xef, 0x58, 0x28, 0x12, 0x7b,
+	0xd7, 0x5b, 0x1e, 0x5d, 0xa2, 0xdb, 0xea, 0x2a, 0xba, 0x5d, 0x5f, 0x49, 0xb7, 0xed, 0x0f, 0x78,
+	0xff, 0x31, 0x5a, 0x64, 0x0b, 0x97, 0x3f, 0x41, 0xa2, 0x85, 0x9b, 0x1e, 0x53, 0x0d, 0xc5, 0xd4,
+	0x8f, 0x40, 0x4f, 0x27, 0x33, 0x8e, 0x4b, 0x47, 0xa8, 0x37, 0x45, 0xb8, 0xf5, 0xb0, 0x72, 0xbd,
+	0x08, 0x26, 0xfe, 0x5f, 0x26, 0x32, 0x84, 0x1b, 0x67, 0xc9, 0x3e, 0x6c, 0x67, 0xa1, 0xab, 0xb9,
+	0xad, 0x38, 0x5e, 0xdc, 0x8a, 0x56, 0xb1, 0xc5, 0x39, 0xdd, 0xc5, 0xbd, 0xf8, 0x67, 0xfd, 0x1f,
+	0xe2, 0x6d, 0x01, 0x37, 0x3c, 0x86, 0xb1, 0x33, 0x7b, 0xb4, 0xaa, 0x44, 0xb1, 0xa5, 0x03, 0xf9,
+	0x6b, 0xb2, 0xf7, 0x1d, 0xe1, 0x5a, 0x6e, 0x11, 0x03, 0xaf, 0xeb, 0x7a, 0x74, 0x29, 0xb9, 0x49,
+	0x9e, 0xe3, 0x5a, 0x9e, 0x4b, 0x7f, 0x70, 0x4b, 0xb7, 0xda, 0xbe, 0x47, 0x11, 0x82, 0x2b, 0xa9,
+	0x34, 0xd5, 0x32, 0xd7, 0x6d, 0x75, 0x4e, 0xf3, 0x53, 0xdf, 0xa3, 0x12, 0xa4, 0x16, 0x69, 0x6e,
+	0x9e, 0xbc, 0xff, 0x31, 0xed, 0xa0, 0xdb, 0x69, 0x07, 0xfd, 0x9c, 0x76, 0xd0, 0xaf, 0x69, 0x07,
+	0xfd, 0x99, 0x76, 0x10, 0x6e, 0x7b, 0x3c, 0xeb, 0x52, 0x20, 0xf8, 0x97, 0xa4, 0xd0, 0xb0, 0x93,
+	0xcd, 0xfb, 0xa9, 0x9c, 0xa7, 0x04, 0xce, 0xd1, 0xc7, 0x52, 0x3c, 0x18, 0x55, 0x15, 0x9b, 0x17,
+	0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0xe6, 0x51, 0xcc, 0x87, 0x59, 0x06, 0x00, 0x00,
+}

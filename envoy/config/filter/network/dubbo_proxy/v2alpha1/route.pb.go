@@ -3,32 +3,24 @@
 
 package v2
 
-import (
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import envoy_api_v2_route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+import envoy_type_matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
+import envoy_type1 "github.com/envoyproxy/go-control-plane/envoy/type"
+import _ "github.com/gogo/protobuf/types"
+import _ "github.com/envoyproxy/protoc-gen-validate/validate"
+import _ "github.com/gogo/protobuf/gogoproto"
 
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
-	_ "github.com/gogo/protobuf/types"
+import sortkeys "github.com/gogo/protobuf/sortkeys"
 
-	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
-	_type "github.com/envoyproxy/go-control-plane/envoy/type"
-	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
-)
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // [#comment:next free field: 6]
 type RouteConfiguration struct {
@@ -42,40 +34,13 @@ type RouteConfiguration struct {
 	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	// The list of routes that will be matched, in order, against incoming requests. The first route
 	// that matches will be used.
-	Routes               []Route  `protobuf:"bytes,5,rep,name=routes,proto3" json:"routes"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Routes []Route `protobuf:"bytes,5,rep,name=routes" json:"routes"`
 }
 
-func (m *RouteConfiguration) Reset()         { *m = RouteConfiguration{} }
-func (m *RouteConfiguration) String() string { return proto.CompactTextString(m) }
-func (*RouteConfiguration) ProtoMessage()    {}
-func (*RouteConfiguration) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{0}
-}
-func (m *RouteConfiguration) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RouteConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *RouteConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteConfiguration.Merge(m, src)
-}
-func (m *RouteConfiguration) XXX_Size() int {
-	return m.Size()
-}
-func (m *RouteConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteConfiguration.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteConfiguration proto.InternalMessageInfo
+func (m *RouteConfiguration) Reset()                    { *m = RouteConfiguration{} }
+func (m *RouteConfiguration) String() string            { return proto.CompactTextString(m) }
+func (*RouteConfiguration) ProtoMessage()               {}
+func (*RouteConfiguration) Descriptor() ([]byte, []int) { return fileDescriptorRoute, []int{0} }
 
 func (m *RouteConfiguration) GetName() string {
 	if m != nil {
@@ -115,42 +80,15 @@ func (m *RouteConfiguration) GetRoutes() []Route {
 // [#comment:next free field: 3]
 type Route struct {
 	// Route matching parameters.
-	Match RouteMatch `protobuf:"bytes,1,opt,name=match,proto3" json:"match"`
+	Match RouteMatch `protobuf:"bytes,1,opt,name=match" json:"match"`
 	// Route request to some upstream cluster.
-	Route                RouteAction `protobuf:"bytes,2,opt,name=route,proto3" json:"route"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+	Route RouteAction `protobuf:"bytes,2,opt,name=route" json:"route"`
 }
 
-func (m *Route) Reset()         { *m = Route{} }
-func (m *Route) String() string { return proto.CompactTextString(m) }
-func (*Route) ProtoMessage()    {}
-func (*Route) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{1}
-}
-func (m *Route) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Route) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *Route) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Route.Merge(m, src)
-}
-func (m *Route) XXX_Size() int {
-	return m.Size()
-}
-func (m *Route) XXX_DiscardUnknown() {
-	xxx_messageInfo_Route.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Route proto.InternalMessageInfo
+func (m *Route) Reset()                    { *m = Route{} }
+func (m *Route) String() string            { return proto.CompactTextString(m) }
+func (*Route) ProtoMessage()               {}
+func (*Route) Descriptor() ([]byte, []int) { return fileDescriptorRoute, []int{1} }
 
 func (m *Route) GetMatch() RouteMatch {
 	if m != nil {
@@ -169,45 +107,18 @@ func (m *Route) GetRoute() RouteAction {
 // [#comment:next free field: 3]
 type RouteMatch struct {
 	// Method level routing matching.
-	Method *MethodMatch `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
+	Method *MethodMatch `protobuf:"bytes,1,opt,name=method" json:"method,omitempty"`
 	// Specifies a set of headers that the route should match on. The router will check the request’s
 	// headers against all the specified headers in the route config. A match will happen if all the
 	// headers in the route are present in the request with the same values (or based on presence if
 	// the value field is not in the config).
-	Headers              []*route.HeaderMatcher `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
+	Headers []*envoy_api_v2_route.HeaderMatcher `protobuf:"bytes,2,rep,name=headers" json:"headers,omitempty"`
 }
 
-func (m *RouteMatch) Reset()         { *m = RouteMatch{} }
-func (m *RouteMatch) String() string { return proto.CompactTextString(m) }
-func (*RouteMatch) ProtoMessage()    {}
-func (*RouteMatch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{2}
-}
-func (m *RouteMatch) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RouteMatch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *RouteMatch) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteMatch.Merge(m, src)
-}
-func (m *RouteMatch) XXX_Size() int {
-	return m.Size()
-}
-func (m *RouteMatch) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteMatch.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteMatch proto.InternalMessageInfo
+func (m *RouteMatch) Reset()                    { *m = RouteMatch{} }
+func (m *RouteMatch) String() string            { return proto.CompactTextString(m) }
+func (*RouteMatch) ProtoMessage()               {}
+func (*RouteMatch) Descriptor() ([]byte, []int) { return fileDescriptorRoute, []int{2} }
 
 func (m *RouteMatch) GetMethod() *MethodMatch {
 	if m != nil {
@@ -216,7 +127,7 @@ func (m *RouteMatch) GetMethod() *MethodMatch {
 	return nil
 }
 
-func (m *RouteMatch) GetHeaders() []*route.HeaderMatcher {
+func (m *RouteMatch) GetHeaders() []*envoy_api_v2_route.HeaderMatcher {
 	if m != nil {
 		return m.Headers
 	}
@@ -228,40 +139,13 @@ type RouteAction struct {
 	// Types that are valid to be assigned to ClusterSpecifier:
 	//	*RouteAction_Cluster
 	//	*RouteAction_WeightedClusters
-	ClusterSpecifier     isRouteAction_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
-	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
-	XXX_unrecognized     []byte                         `json:"-"`
-	XXX_sizecache        int32                          `json:"-"`
+	ClusterSpecifier isRouteAction_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
 }
 
-func (m *RouteAction) Reset()         { *m = RouteAction{} }
-func (m *RouteAction) String() string { return proto.CompactTextString(m) }
-func (*RouteAction) ProtoMessage()    {}
-func (*RouteAction) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{3}
-}
-func (m *RouteAction) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RouteAction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *RouteAction) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteAction.Merge(m, src)
-}
-func (m *RouteAction) XXX_Size() int {
-	return m.Size()
-}
-func (m *RouteAction) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteAction.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteAction proto.InternalMessageInfo
+func (m *RouteAction) Reset()                    { *m = RouteAction{} }
+func (m *RouteAction) String() string            { return proto.CompactTextString(m) }
+func (*RouteAction) ProtoMessage()               {}
+func (*RouteAction) Descriptor() ([]byte, []int) { return fileDescriptorRoute, []int{3} }
 
 type isRouteAction_ClusterSpecifier interface {
 	isRouteAction_ClusterSpecifier()
@@ -273,7 +157,7 @@ type RouteAction_Cluster struct {
 	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3,oneof"`
 }
 type RouteAction_WeightedClusters struct {
-	WeightedClusters *route.WeightedCluster `protobuf:"bytes,2,opt,name=weighted_clusters,json=weightedClusters,proto3,oneof"`
+	WeightedClusters *envoy_api_v2_route.WeightedCluster `protobuf:"bytes,2,opt,name=weighted_clusters,json=weightedClusters,oneof"`
 }
 
 func (*RouteAction_Cluster) isRouteAction_ClusterSpecifier()          {}
@@ -293,7 +177,7 @@ func (m *RouteAction) GetCluster() string {
 	return ""
 }
 
-func (m *RouteAction) GetWeightedClusters() *route.WeightedCluster {
+func (m *RouteAction) GetWeightedClusters() *envoy_api_v2_route.WeightedCluster {
 	if x, ok := m.GetClusterSpecifier().(*RouteAction_WeightedClusters); ok {
 		return x.WeightedClusters
 	}
@@ -341,7 +225,7 @@ func _RouteAction_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Bu
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(route.WeightedCluster)
+		msg := new(envoy_api_v2_route.WeightedCluster)
 		err := b.DecodeMessage(msg)
 		m.ClusterSpecifier = &RouteAction_WeightedClusters{msg}
 		return true, err
@@ -355,12 +239,12 @@ func _RouteAction_OneofSizer(msg proto.Message) (n int) {
 	// cluster_specifier
 	switch x := m.ClusterSpecifier.(type) {
 	case *RouteAction_Cluster:
-		n += 1 // tag and wire
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.Cluster)))
 		n += len(x.Cluster)
 	case *RouteAction_WeightedClusters:
 		s := proto.Size(x.WeightedClusters)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -373,46 +257,19 @@ func _RouteAction_OneofSizer(msg proto.Message) (n int) {
 // [#comment:next free field: 5]
 type MethodMatch struct {
 	// The name of the method.
-	Name *matcher.StringMatcher `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Name *envoy_type_matcher.StringMatcher `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	// Method parameter definition.
 	// The key is the parameter index, starting from 0.
 	// The value is the parameter matching type.
-	ParamsMatch          map[uint32]*MethodMatch_ParameterMatchSpecifier `protobuf:"bytes,2,rep,name=params_match,json=paramsMatch,proto3" json:"params_match,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	XXX_NoUnkeyedLiteral struct{}                                        `json:"-"`
-	XXX_unrecognized     []byte                                          `json:"-"`
-	XXX_sizecache        int32                                           `json:"-"`
+	ParamsMatch map[uint32]*MethodMatch_ParameterMatchSpecifier `protobuf:"bytes,2,rep,name=params_match,json=paramsMatch" json:"params_match,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
 }
 
-func (m *MethodMatch) Reset()         { *m = MethodMatch{} }
-func (m *MethodMatch) String() string { return proto.CompactTextString(m) }
-func (*MethodMatch) ProtoMessage()    {}
-func (*MethodMatch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{4}
-}
-func (m *MethodMatch) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MethodMatch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *MethodMatch) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MethodMatch.Merge(m, src)
-}
-func (m *MethodMatch) XXX_Size() int {
-	return m.Size()
-}
-func (m *MethodMatch) XXX_DiscardUnknown() {
-	xxx_messageInfo_MethodMatch.DiscardUnknown(m)
-}
+func (m *MethodMatch) Reset()                    { *m = MethodMatch{} }
+func (m *MethodMatch) String() string            { return proto.CompactTextString(m) }
+func (*MethodMatch) ProtoMessage()               {}
+func (*MethodMatch) Descriptor() ([]byte, []int) { return fileDescriptorRoute, []int{4} }
 
-var xxx_messageInfo_MethodMatch proto.InternalMessageInfo
-
-func (m *MethodMatch) GetName() *matcher.StringMatcher {
+func (m *MethodMatch) GetName() *envoy_type_matcher.StringMatcher {
 	if m != nil {
 		return m.Name
 	}
@@ -432,39 +289,14 @@ type MethodMatch_ParameterMatchSpecifier struct {
 	//	*MethodMatch_ParameterMatchSpecifier_ExactMatch
 	//	*MethodMatch_ParameterMatchSpecifier_RangeMatch
 	ParameterMatchSpecifier isMethodMatch_ParameterMatchSpecifier_ParameterMatchSpecifier `protobuf_oneof:"parameter_match_specifier"`
-	XXX_NoUnkeyedLiteral    struct{}                                                      `json:"-"`
-	XXX_unrecognized        []byte                                                        `json:"-"`
-	XXX_sizecache           int32                                                         `json:"-"`
 }
 
 func (m *MethodMatch_ParameterMatchSpecifier) Reset()         { *m = MethodMatch_ParameterMatchSpecifier{} }
 func (m *MethodMatch_ParameterMatchSpecifier) String() string { return proto.CompactTextString(m) }
 func (*MethodMatch_ParameterMatchSpecifier) ProtoMessage()    {}
 func (*MethodMatch_ParameterMatchSpecifier) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{4, 0}
+	return fileDescriptorRoute, []int{4, 0}
 }
-func (m *MethodMatch_ParameterMatchSpecifier) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MethodMatch_ParameterMatchSpecifier) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *MethodMatch_ParameterMatchSpecifier) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MethodMatch_ParameterMatchSpecifier.Merge(m, src)
-}
-func (m *MethodMatch_ParameterMatchSpecifier) XXX_Size() int {
-	return m.Size()
-}
-func (m *MethodMatch_ParameterMatchSpecifier) XXX_DiscardUnknown() {
-	xxx_messageInfo_MethodMatch_ParameterMatchSpecifier.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MethodMatch_ParameterMatchSpecifier proto.InternalMessageInfo
 
 type isMethodMatch_ParameterMatchSpecifier_ParameterMatchSpecifier interface {
 	isMethodMatch_ParameterMatchSpecifier_ParameterMatchSpecifier()
@@ -476,7 +308,7 @@ type MethodMatch_ParameterMatchSpecifier_ExactMatch struct {
 	ExactMatch string `protobuf:"bytes,3,opt,name=exact_match,json=exactMatch,proto3,oneof"`
 }
 type MethodMatch_ParameterMatchSpecifier_RangeMatch struct {
-	RangeMatch *_type.Int64Range `protobuf:"bytes,4,opt,name=range_match,json=rangeMatch,proto3,oneof"`
+	RangeMatch *envoy_type1.Int64Range `protobuf:"bytes,4,opt,name=range_match,json=rangeMatch,oneof"`
 }
 
 func (*MethodMatch_ParameterMatchSpecifier_ExactMatch) isMethodMatch_ParameterMatchSpecifier_ParameterMatchSpecifier() {
@@ -498,7 +330,7 @@ func (m *MethodMatch_ParameterMatchSpecifier) GetExactMatch() string {
 	return ""
 }
 
-func (m *MethodMatch_ParameterMatchSpecifier) GetRangeMatch() *_type.Int64Range {
+func (m *MethodMatch_ParameterMatchSpecifier) GetRangeMatch() *envoy_type1.Int64Range {
 	if x, ok := m.GetParameterMatchSpecifier().(*MethodMatch_ParameterMatchSpecifier_RangeMatch); ok {
 		return x.RangeMatch
 	}
@@ -546,7 +378,7 @@ func _MethodMatch_ParameterMatchSpecifier_OneofUnmarshaler(msg proto.Message, ta
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(_type.Int64Range)
+		msg := new(envoy_type1.Int64Range)
 		err := b.DecodeMessage(msg)
 		m.ParameterMatchSpecifier = &MethodMatch_ParameterMatchSpecifier_RangeMatch{msg}
 		return true, err
@@ -560,12 +392,12 @@ func _MethodMatch_ParameterMatchSpecifier_OneofSizer(msg proto.Message) (n int) 
 	// parameter_match_specifier
 	switch x := m.ParameterMatchSpecifier.(type) {
 	case *MethodMatch_ParameterMatchSpecifier_ExactMatch:
-		n += 1 // tag and wire
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.ExactMatch)))
 		n += len(x.ExactMatch)
 	case *MethodMatch_ParameterMatchSpecifier_RangeMatch:
 		s := proto.Size(x.RangeMatch)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(4<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -581,63 +413,8 @@ func init() {
 	proto.RegisterType((*RouteMatch)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.RouteMatch")
 	proto.RegisterType((*RouteAction)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.RouteAction")
 	proto.RegisterType((*MethodMatch)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.MethodMatch")
-	proto.RegisterMapType((map[uint32]*MethodMatch_ParameterMatchSpecifier)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.MethodMatch.ParamsMatchEntry")
 	proto.RegisterType((*MethodMatch_ParameterMatchSpecifier)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.MethodMatch.ParameterMatchSpecifier")
 }
-
-func init() {
-	proto.RegisterFile("envoy/config/filter/network/dubbo_proxy/v2alpha1/route.proto", fileDescriptor_74a572433a3292e0)
-}
-
-var fileDescriptor_74a572433a3292e0 = []byte{
-	// 707 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcf, 0x6f, 0xd3, 0x4a,
-	0x10, 0xee, 0x26, 0x71, 0xab, 0x8e, 0xdf, 0x7b, 0x4a, 0x57, 0x55, 0x9b, 0x17, 0x50, 0xda, 0x86,
-	0x4b, 0x4f, 0x36, 0x84, 0xdf, 0x50, 0x90, 0x48, 0x85, 0x54, 0x0e, 0x45, 0x95, 0xab, 0x0a, 0x89,
-	0x4b, 0xb4, 0x71, 0x36, 0x8e, 0xd5, 0xc4, 0x6b, 0xd6, 0x1b, 0xa7, 0xf9, 0x17, 0x38, 0xc3, 0x81,
-	0x1b, 0x7f, 0x06, 0xe2, 0xd4, 0x63, 0x2f, 0x48, 0x3d, 0x72, 0x42, 0x28, 0x07, 0xa4, 0xfe, 0x17,
-	0xc8, 0xb3, 0x6b, 0x12, 0x28, 0x97, 0x16, 0x6e, 0xe3, 0xd9, 0xf9, 0xbe, 0x99, 0xef, 0xf3, 0xec,
-	0xc2, 0x16, 0x8f, 0x52, 0x31, 0x76, 0x7d, 0x11, 0x75, 0xc3, 0xc0, 0xed, 0x86, 0x7d, 0xc5, 0xa5,
-	0x1b, 0x71, 0x35, 0x12, 0xf2, 0xd0, 0xed, 0x0c, 0xdb, 0x6d, 0xd1, 0x8a, 0xa5, 0x38, 0x1a, 0xbb,
-	0x69, 0x83, 0xf5, 0xe3, 0x1e, 0xbb, 0xe1, 0x4a, 0x31, 0x54, 0xdc, 0x89, 0xa5, 0x50, 0x82, 0x5e,
-	0x47, 0xb4, 0xa3, 0xd1, 0x8e, 0x46, 0x3b, 0x06, 0xed, 0xcc, 0xa0, 0x9d, 0x1c, 0x5d, 0xad, 0xe9,
-	0x7e, 0x2c, 0x0e, 0xdd, 0xb4, 0xa1, 0xb9, 0x66, 0x19, 0xab, 0x6b, 0xfa, 0x5c, 0x8d, 0x63, 0xee,
-	0x0e, 0x98, 0xf2, 0x7b, 0x5c, 0xba, 0x89, 0x92, 0x61, 0x14, 0x98, 0x82, 0x95, 0x99, 0x02, 0xc9,
-	0xa2, 0x20, 0x07, 0xd6, 0x02, 0x21, 0x82, 0x3e, 0x77, 0xf1, 0xab, 0x3d, 0xec, 0xba, 0x23, 0xc9,
-	0xe2, 0x98, 0xcb, 0xc4, 0x9c, 0xaf, 0xa6, 0xac, 0x1f, 0x76, 0x98, 0xe2, 0x6e, 0x1e, 0x98, 0x83,
-	0xe5, 0x40, 0x04, 0x02, 0x43, 0x37, 0x8b, 0x74, 0xb6, 0xfe, 0x89, 0x00, 0xf5, 0xb2, 0xb9, 0xb6,
-	0x51, 0xdb, 0x50, 0x32, 0x15, 0x8a, 0x88, 0x52, 0x28, 0x45, 0x6c, 0xc0, 0x2b, 0x64, 0x9d, 0x6c,
-	0x2e, 0x7a, 0x18, 0xd3, 0xab, 0xb0, 0x18, 0x46, 0x8a, 0xcb, 0x2e, 0xf3, 0x79, 0xa5, 0x80, 0x07,
-	0xd3, 0x04, 0x5d, 0x06, 0x2b, 0x90, 0x62, 0x18, 0x57, 0x8a, 0x78, 0xa2, 0x3f, 0x68, 0x05, 0x16,
-	0x52, 0x2e, 0x93, 0x50, 0x44, 0x95, 0x12, 0xe6, 0xf3, 0x4f, 0x7a, 0x00, 0xf3, 0xe8, 0x47, 0x52,
-	0xb1, 0xd6, 0x8b, 0x9b, 0x76, 0xe3, 0xae, 0x73, 0x51, 0x8f, 0x1d, 0x9c, 0xbb, 0x59, 0x3a, 0xf9,
-	0xb2, 0x36, 0xe7, 0x19, 0xb2, 0xfa, 0x29, 0x01, 0x0b, 0xf3, 0xb4, 0x0d, 0x16, 0x1a, 0x8b, 0x1a,
-	0xec, 0xc6, 0xd6, 0x25, 0xf9, 0x77, 0x33, 0x8e, 0xe6, 0x7f, 0x59, 0x93, 0x8f, 0x67, 0xc7, 0x45,
-	0xeb, 0x35, 0x29, 0x94, 0x89, 0xa7, 0xa9, 0xa9, 0x0f, 0x16, 0xf6, 0x45, 0x3b, 0xec, 0xc6, 0xa3,
-	0x4b, 0xf6, 0x78, 0xe2, 0x67, 0xa6, 0x9f, 0x6f, 0x82, 0xdc, 0xf5, 0xf7, 0x04, 0x60, 0x3a, 0x4a,
-	0x66, 0xdc, 0x80, 0xab, 0x9e, 0xe8, 0x18, 0x61, 0x97, 0x68, 0xba, 0x8b, 0x78, 0xa4, 0xf3, 0x0c,
-	0x19, 0x7d, 0x08, 0x0b, 0x3d, 0xce, 0x3a, 0x5c, 0x26, 0x95, 0x02, 0xfe, 0x90, 0x0d, 0xc3, 0xcb,
-	0xe2, 0xd0, 0x49, 0x1b, 0x8e, 0x5e, 0xde, 0x1d, 0x2c, 0xd9, 0xd5, 0x0b, 0xeb, 0xe5, 0x88, 0xfa,
-	0x3b, 0x02, 0xf6, 0x8c, 0x12, 0x5a, 0x85, 0x05, 0xbf, 0x3f, 0x4c, 0x14, 0x97, 0x7a, 0x83, 0x76,
-	0xe6, 0xbc, 0x3c, 0x41, 0x3d, 0x58, 0x1a, 0xf1, 0x30, 0xe8, 0x29, 0xde, 0x69, 0x99, 0x5c, 0x62,
-	0xfc, 0xbb, 0xf6, 0xbb, 0x96, 0x2f, 0x4c, 0xf1, 0xb6, 0xae, 0xdd, 0x99, 0xf3, 0xca, 0xa3, 0x9f,
-	0x53, 0x49, 0xb3, 0x0a, 0x4b, 0x86, 0xaa, 0x95, 0xc4, 0xdc, 0x0f, 0xbb, 0x21, 0x97, 0xd4, 0xfa,
-	0x70, 0x76, 0x5c, 0x24, 0xf5, 0x6f, 0x45, 0xb0, 0x67, 0x04, 0xd3, 0xdb, 0x33, 0xab, 0x3d, 0x55,
-	0x99, 0xdd, 0x33, 0xc7, 0x5c, 0x44, 0x67, 0x1f, 0x2f, 0x62, 0xae, 0x52, 0x6f, 0xff, 0x2b, 0xf8,
-	0x27, 0x66, 0x92, 0x0d, 0x92, 0x96, 0xde, 0x2a, 0x6d, 0xd2, 0xf3, 0x3f, 0x32, 0xdf, 0xd9, 0x43,
-	0x46, 0x8c, 0x9f, 0x46, 0x4a, 0x8e, 0x3d, 0x3b, 0x9e, 0x66, 0xaa, 0x6f, 0x08, 0xac, 0x62, 0x05,
-	0x57, 0xc6, 0xf3, 0xfd, 0x1f, 0xe2, 0x36, 0xc0, 0xe6, 0x47, 0xcc, 0x57, 0x66, 0x9a, 0xa2, 0x71,
-	0x19, 0x30, 0xa9, 0x85, 0xde, 0x07, 0x1b, 0x1f, 0x0e, 0x53, 0x52, 0x42, 0xbd, 0x2b, 0xb3, 0x7a,
-	0x9f, 0x45, 0xea, 0xce, 0x2d, 0x2f, 0xab, 0xc9, 0xa0, 0x58, 0xac, 0xd7, 0xfd, 0x0a, 0xfc, 0x1f,
-	0xe7, 0x8d, 0x35, 0x7c, 0xea, 0x6b, 0xf5, 0x2d, 0x81, 0xf2, 0xaf, 0x83, 0xd3, 0x32, 0x14, 0x0f,
-	0xf9, 0x18, 0x4d, 0xfd, 0xd7, 0xcb, 0x42, 0x7a, 0x08, 0x56, 0xca, 0xfa, 0xc3, 0xfc, 0x6e, 0x1c,
-	0xfc, 0x05, 0xa7, 0xce, 0xfb, 0xe0, 0xe9, 0x1e, 0x0f, 0x0a, 0xf7, 0x48, 0xb3, 0x7d, 0x32, 0xa9,
-	0x91, 0xd3, 0x49, 0x8d, 0x7c, 0x9e, 0xd4, 0xc8, 0xd7, 0x49, 0x8d, 0xc0, 0xe3, 0x50, 0xe8, 0xae,
-	0x9a, 0xf8, 0xa2, 0x03, 0x34, 0xf5, 0xb5, 0xdb, 0xcb, 0x1e, 0xca, 0x3d, 0xf2, 0xb2, 0x90, 0x36,
-	0xda, 0xf3, 0xf8, 0x6a, 0xde, 0xfc, 0x1e, 0x00, 0x00, 0xff, 0xff, 0xeb, 0x63, 0x9d, 0x7c, 0x4f,
-	0x06, 0x00, 0x00,
-}
-
 func (m *RouteConfiguration) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -689,9 +466,6 @@ func (m *RouteConfiguration) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -726,9 +500,6 @@ func (m *Route) MarshalTo(dAtA []byte) (int, error) {
 		return 0, err
 	}
 	i += n2
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -769,9 +540,6 @@ func (m *RouteMatch) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -796,9 +564,6 @@ func (m *RouteAction) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += nn4
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -855,7 +620,7 @@ func (m *MethodMatch) MarshalTo(dAtA []byte) (int, error) {
 		for k, _ := range m.ParamsMatch {
 			keysForParamsMatch = append(keysForParamsMatch, uint32(k))
 		}
-		github_com_gogo_protobuf_sortkeys.Uint32s(keysForParamsMatch)
+		sortkeys.Uint32s(keysForParamsMatch)
 		for _, k := range keysForParamsMatch {
 			dAtA[i] = 0x12
 			i++
@@ -882,9 +647,6 @@ func (m *MethodMatch) MarshalTo(dAtA []byte) (int, error) {
 			}
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -909,9 +671,6 @@ func (m *MethodMatch_ParameterMatchSpecifier) MarshalTo(dAtA []byte) (int, error
 			return 0, err
 		}
 		i += nn8
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -948,9 +707,6 @@ func encodeVarintRoute(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *RouteConfiguration) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -975,32 +731,20 @@ func (m *RouteConfiguration) Size() (n int) {
 			n += 1 + l + sovRoute(uint64(l))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *Route) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = m.Match.Size()
 	n += 1 + l + sovRoute(uint64(l))
 	l = m.Route.Size()
 	n += 1 + l + sovRoute(uint64(l))
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *RouteMatch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Method != nil {
@@ -1013,31 +757,19 @@ func (m *RouteMatch) Size() (n int) {
 			n += 1 + l + sovRoute(uint64(l))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *RouteAction) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ClusterSpecifier != nil {
 		n += m.ClusterSpecifier.Size()
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *RouteAction_Cluster) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Cluster)
@@ -1045,9 +777,6 @@ func (m *RouteAction_Cluster) Size() (n int) {
 	return n
 }
 func (m *RouteAction_WeightedClusters) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.WeightedClusters != nil {
@@ -1057,9 +786,6 @@ func (m *RouteAction_WeightedClusters) Size() (n int) {
 	return n
 }
 func (m *MethodMatch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Name != nil {
@@ -1079,31 +805,19 @@ func (m *MethodMatch) Size() (n int) {
 			n += mapEntrySize + 1 + sovRoute(uint64(mapEntrySize))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *MethodMatch_ParameterMatchSpecifier) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ParameterMatchSpecifier != nil {
 		n += m.ParameterMatchSpecifier.Size()
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *MethodMatch_ParameterMatchSpecifier_ExactMatch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.ExactMatch)
@@ -1111,9 +825,6 @@ func (m *MethodMatch_ParameterMatchSpecifier_ExactMatch) Size() (n int) {
 	return n
 }
 func (m *MethodMatch_ParameterMatchSpecifier_RangeMatch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.RangeMatch != nil {
@@ -1151,7 +862,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1179,7 +890,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1189,9 +900,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1211,7 +919,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1221,9 +929,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1243,7 +948,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1253,9 +958,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1275,7 +977,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1285,9 +987,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1307,7 +1006,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1316,9 +1015,6 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1336,13 +1032,9 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRoute
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1367,7 +1059,7 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1395,7 +1087,7 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1404,9 +1096,6 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1428,7 +1117,7 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1437,9 +1126,6 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1456,13 +1142,9 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRoute
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1487,7 +1169,7 @@ func (m *RouteMatch) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1515,7 +1197,7 @@ func (m *RouteMatch) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1524,9 +1206,6 @@ func (m *RouteMatch) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1551,7 +1230,7 @@ func (m *RouteMatch) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1560,13 +1239,10 @@ func (m *RouteMatch) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Headers = append(m.Headers, &route.HeaderMatcher{})
+			m.Headers = append(m.Headers, &envoy_api_v2_route.HeaderMatcher{})
 			if err := m.Headers[len(m.Headers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1580,13 +1256,9 @@ func (m *RouteMatch) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRoute
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1611,7 +1283,7 @@ func (m *RouteAction) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1639,7 +1311,7 @@ func (m *RouteAction) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1649,9 +1321,6 @@ func (m *RouteAction) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1671,7 +1340,7 @@ func (m *RouteAction) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1680,13 +1349,10 @@ func (m *RouteAction) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &route.WeightedCluster{}
+			v := &envoy_api_v2_route.WeightedCluster{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1701,13 +1367,9 @@ func (m *RouteAction) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRoute
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1732,7 +1394,7 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1760,7 +1422,7 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1769,14 +1431,11 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Name == nil {
-				m.Name = &matcher.StringMatcher{}
+				m.Name = &envoy_type_matcher.StringMatcher{}
 			}
 			if err := m.Name.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1796,7 +1455,7 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1805,9 +1464,6 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1828,7 +1484,7 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= uint64(b&0x7F) << shift
+					wire |= (uint64(b) & 0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -1844,7 +1500,7 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						mapkey |= uint32(b&0x7F) << shift
+						mapkey |= (uint32(b) & 0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1860,7 +1516,7 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						mapmsglen |= int(b&0x7F) << shift
+						mapmsglen |= (int(b) & 0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1869,7 +1525,7 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthRoute
 					}
 					postmsgIndex := iNdEx + mapmsglen
-					if postmsgIndex < 0 {
+					if mapmsglen < 0 {
 						return ErrInvalidLengthRoute
 					}
 					if postmsgIndex > l {
@@ -1906,13 +1562,9 @@ func (m *MethodMatch) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRoute
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1937,7 +1589,7 @@ func (m *MethodMatch_ParameterMatchSpecifier) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1965,7 +1617,7 @@ func (m *MethodMatch_ParameterMatchSpecifier) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1975,9 +1627,6 @@ func (m *MethodMatch_ParameterMatchSpecifier) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1997,7 +1646,7 @@ func (m *MethodMatch_ParameterMatchSpecifier) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2006,13 +1655,10 @@ func (m *MethodMatch_ParameterMatchSpecifier) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthRoute
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &_type.Int64Range{}
+			v := &envoy_type1.Int64Range{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2027,13 +1673,9 @@ func (m *MethodMatch_ParameterMatchSpecifier) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthRoute
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2097,11 +1739,8 @@ func skipRoute(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthRoute
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthRoute
 			}
 			return iNdEx, nil
@@ -2132,9 +1771,6 @@ func skipRoute(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthRoute
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -2153,3 +1789,56 @@ var (
 	ErrInvalidLengthRoute = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowRoute   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() {
+	proto.RegisterFile("envoy/config/filter/network/dubbo_proxy/v2alpha1/route.proto", fileDescriptorRoute)
+}
+
+var fileDescriptorRoute = []byte{
+	// 707 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcf, 0x6f, 0xd3, 0x4a,
+	0x10, 0xee, 0x26, 0x71, 0xab, 0x8e, 0xdf, 0x7b, 0x4a, 0x57, 0x55, 0x9b, 0x17, 0x50, 0xda, 0x86,
+	0x4b, 0x4f, 0x36, 0x84, 0xdf, 0x50, 0x90, 0x48, 0x85, 0x54, 0x0e, 0x45, 0x95, 0xab, 0x0a, 0x89,
+	0x4b, 0xb4, 0x71, 0x36, 0x8e, 0xd5, 0xc4, 0x6b, 0xd6, 0x1b, 0xa7, 0xf9, 0x17, 0x38, 0xc3, 0x81,
+	0x1b, 0x7f, 0x06, 0xe2, 0xd4, 0x63, 0x2f, 0x48, 0x3d, 0x72, 0x42, 0x28, 0x07, 0xa4, 0xfe, 0x17,
+	0xc8, 0xb3, 0x6b, 0x12, 0x28, 0x97, 0x16, 0x6e, 0xe3, 0xd9, 0xf9, 0xbe, 0x99, 0xef, 0xf3, 0xec,
+	0xc2, 0x16, 0x8f, 0x52, 0x31, 0x76, 0x7d, 0x11, 0x75, 0xc3, 0xc0, 0xed, 0x86, 0x7d, 0xc5, 0xa5,
+	0x1b, 0x71, 0x35, 0x12, 0xf2, 0xd0, 0xed, 0x0c, 0xdb, 0x6d, 0xd1, 0x8a, 0xa5, 0x38, 0x1a, 0xbb,
+	0x69, 0x83, 0xf5, 0xe3, 0x1e, 0xbb, 0xe1, 0x4a, 0x31, 0x54, 0xdc, 0x89, 0xa5, 0x50, 0x82, 0x5e,
+	0x47, 0xb4, 0xa3, 0xd1, 0x8e, 0x46, 0x3b, 0x06, 0xed, 0xcc, 0xa0, 0x9d, 0x1c, 0x5d, 0xad, 0xe9,
+	0x7e, 0x2c, 0x0e, 0xdd, 0xb4, 0xa1, 0xb9, 0x66, 0x19, 0xab, 0x6b, 0xfa, 0x5c, 0x8d, 0x63, 0xee,
+	0x0e, 0x98, 0xf2, 0x7b, 0x5c, 0xba, 0x89, 0x92, 0x61, 0x14, 0x98, 0x82, 0x95, 0x99, 0x02, 0xc9,
+	0xa2, 0x20, 0x07, 0xd6, 0x02, 0x21, 0x82, 0x3e, 0x77, 0xf1, 0xab, 0x3d, 0xec, 0xba, 0x23, 0xc9,
+	0xe2, 0x98, 0xcb, 0xc4, 0x9c, 0xaf, 0xa6, 0xac, 0x1f, 0x76, 0x98, 0xe2, 0x6e, 0x1e, 0x98, 0x83,
+	0xe5, 0x40, 0x04, 0x02, 0x43, 0x37, 0x8b, 0x74, 0xb6, 0xfe, 0x89, 0x00, 0xf5, 0xb2, 0xb9, 0xb6,
+	0x51, 0xdb, 0x50, 0x32, 0x15, 0x8a, 0x88, 0x52, 0x28, 0x45, 0x6c, 0xc0, 0x2b, 0x64, 0x9d, 0x6c,
+	0x2e, 0x7a, 0x18, 0xd3, 0xab, 0xb0, 0x18, 0x46, 0x8a, 0xcb, 0x2e, 0xf3, 0x79, 0xa5, 0x80, 0x07,
+	0xd3, 0x04, 0x5d, 0x06, 0x2b, 0x90, 0x62, 0x18, 0x57, 0x8a, 0x78, 0xa2, 0x3f, 0x68, 0x05, 0x16,
+	0x52, 0x2e, 0x93, 0x50, 0x44, 0x95, 0x12, 0xe6, 0xf3, 0x4f, 0x7a, 0x00, 0xf3, 0xe8, 0x47, 0x52,
+	0xb1, 0xd6, 0x8b, 0x9b, 0x76, 0xe3, 0xae, 0x73, 0x51, 0x8f, 0x1d, 0x9c, 0xbb, 0x59, 0x3a, 0xf9,
+	0xb2, 0x36, 0xe7, 0x19, 0xb2, 0xfa, 0x29, 0x01, 0x0b, 0xf3, 0xb4, 0x0d, 0x16, 0x1a, 0x8b, 0x1a,
+	0xec, 0xc6, 0xd6, 0x25, 0xf9, 0x77, 0x33, 0x8e, 0xe6, 0x7f, 0x59, 0x93, 0x8f, 0x67, 0xc7, 0x45,
+	0xeb, 0x35, 0x29, 0x94, 0x89, 0xa7, 0xa9, 0xa9, 0x0f, 0x16, 0xf6, 0x45, 0x3b, 0xec, 0xc6, 0xa3,
+	0x4b, 0xf6, 0x78, 0xe2, 0x67, 0xa6, 0x9f, 0x6f, 0x82, 0xdc, 0xf5, 0xf7, 0x04, 0x60, 0x3a, 0x4a,
+	0x66, 0xdc, 0x80, 0xab, 0x9e, 0xe8, 0x18, 0x61, 0x97, 0x68, 0xba, 0x8b, 0x78, 0xa4, 0xf3, 0x0c,
+	0x19, 0x7d, 0x08, 0x0b, 0x3d, 0xce, 0x3a, 0x5c, 0x26, 0x95, 0x02, 0xfe, 0x90, 0x0d, 0xc3, 0xcb,
+	0xe2, 0xd0, 0x49, 0x1b, 0x8e, 0x5e, 0xde, 0x1d, 0x2c, 0xd9, 0xd5, 0x0b, 0xeb, 0xe5, 0x88, 0xfa,
+	0x3b, 0x02, 0xf6, 0x8c, 0x12, 0x5a, 0x85, 0x05, 0xbf, 0x3f, 0x4c, 0x14, 0x97, 0x7a, 0x83, 0x76,
+	0xe6, 0xbc, 0x3c, 0x41, 0x3d, 0x58, 0x1a, 0xf1, 0x30, 0xe8, 0x29, 0xde, 0x69, 0x99, 0x5c, 0x62,
+	0xfc, 0xbb, 0xf6, 0xbb, 0x96, 0x2f, 0x4c, 0xf1, 0xb6, 0xae, 0xdd, 0x99, 0xf3, 0xca, 0xa3, 0x9f,
+	0x53, 0x49, 0xb3, 0x0a, 0x4b, 0x86, 0xaa, 0x95, 0xc4, 0xdc, 0x0f, 0xbb, 0x21, 0x97, 0xd4, 0xfa,
+	0x70, 0x76, 0x5c, 0x24, 0xf5, 0x6f, 0x45, 0xb0, 0x67, 0x04, 0xd3, 0xdb, 0x33, 0xab, 0x3d, 0x55,
+	0x99, 0xdd, 0x33, 0xc7, 0x5c, 0x44, 0x67, 0x1f, 0x2f, 0x62, 0xae, 0x52, 0x6f, 0xff, 0x2b, 0xf8,
+	0x27, 0x66, 0x92, 0x0d, 0x92, 0x96, 0xde, 0x2a, 0x6d, 0xd2, 0xf3, 0x3f, 0x32, 0xdf, 0xd9, 0x43,
+	0x46, 0x8c, 0x9f, 0x46, 0x4a, 0x8e, 0x3d, 0x3b, 0x9e, 0x66, 0xaa, 0x6f, 0x08, 0xac, 0x62, 0x05,
+	0x57, 0xc6, 0xf3, 0xfd, 0x1f, 0xe2, 0x36, 0xc0, 0xe6, 0x47, 0xcc, 0x57, 0x66, 0x9a, 0xa2, 0x71,
+	0x19, 0x30, 0xa9, 0x85, 0xde, 0x07, 0x1b, 0x1f, 0x0e, 0x53, 0x52, 0x42, 0xbd, 0x2b, 0xb3, 0x7a,
+	0x9f, 0x45, 0xea, 0xce, 0x2d, 0x2f, 0xab, 0xc9, 0xa0, 0x58, 0xac, 0xd7, 0xfd, 0x0a, 0xfc, 0x1f,
+	0xe7, 0x8d, 0x35, 0x7c, 0xea, 0x6b, 0xf5, 0x2d, 0x81, 0xf2, 0xaf, 0x83, 0xd3, 0x32, 0x14, 0x0f,
+	0xf9, 0x18, 0x4d, 0xfd, 0xd7, 0xcb, 0x42, 0x7a, 0x08, 0x56, 0xca, 0xfa, 0xc3, 0xfc, 0x6e, 0x1c,
+	0xfc, 0x05, 0xa7, 0xce, 0xfb, 0xe0, 0xe9, 0x1e, 0x0f, 0x0a, 0xf7, 0x48, 0xb3, 0x7d, 0x32, 0xa9,
+	0x91, 0xd3, 0x49, 0x8d, 0x7c, 0x9e, 0xd4, 0xc8, 0xd7, 0x49, 0x8d, 0xc0, 0xe3, 0x50, 0xe8, 0xae,
+	0x9a, 0xf8, 0xa2, 0x03, 0x34, 0xf5, 0xb5, 0xdb, 0xcb, 0x1e, 0xca, 0x3d, 0xf2, 0xb2, 0x90, 0x36,
+	0xda, 0xf3, 0xf8, 0x6a, 0xde, 0xfc, 0x1e, 0x00, 0x00, 0xff, 0xff, 0xeb, 0x63, 0x9d, 0x7c, 0x4f,
+	0x06, 0x00, 0x00,
+}

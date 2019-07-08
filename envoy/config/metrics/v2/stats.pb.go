@@ -3,29 +3,22 @@
 
 package v2
 
-import (
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import envoy_api_v2_core2 "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+import envoy_type_matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
+import google_protobuf "github.com/gogo/protobuf/types"
+import google_protobuf1 "github.com/gogo/protobuf/types"
+import google_protobuf2 "github.com/gogo/protobuf/types"
+import _ "github.com/envoyproxy/protoc-gen-validate/validate"
 
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	proto "github.com/gogo/protobuf/proto"
-	types "github.com/gogo/protobuf/types"
-
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
-)
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Configuration for pluggable stats sinks.
 type StatsSink struct {
@@ -45,44 +38,13 @@ type StatsSink struct {
 	// Types that are valid to be assigned to ConfigType:
 	//	*StatsSink_Config
 	//	*StatsSink_TypedConfig
-	ConfigType           isStatsSink_ConfigType `protobuf_oneof:"config_type"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
+	ConfigType isStatsSink_ConfigType `protobuf_oneof:"config_type"`
 }
 
-func (m *StatsSink) Reset()         { *m = StatsSink{} }
-func (m *StatsSink) String() string { return proto.CompactTextString(m) }
-func (*StatsSink) ProtoMessage()    {}
-func (*StatsSink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_51e6d6532209c486, []int{0}
-}
-func (m *StatsSink) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *StatsSink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_StatsSink.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *StatsSink) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StatsSink.Merge(m, src)
-}
-func (m *StatsSink) XXX_Size() int {
-	return m.Size()
-}
-func (m *StatsSink) XXX_DiscardUnknown() {
-	xxx_messageInfo_StatsSink.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_StatsSink proto.InternalMessageInfo
+func (m *StatsSink) Reset()                    { *m = StatsSink{} }
+func (m *StatsSink) String() string            { return proto.CompactTextString(m) }
+func (*StatsSink) ProtoMessage()               {}
+func (*StatsSink) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{0} }
 
 type isStatsSink_ConfigType interface {
 	isStatsSink_ConfigType()
@@ -91,10 +53,10 @@ type isStatsSink_ConfigType interface {
 }
 
 type StatsSink_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
+	Config *google_protobuf1.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
 }
 type StatsSink_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *google_protobuf.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,oneof"`
 }
 
 func (*StatsSink_Config) isStatsSink_ConfigType()      {}
@@ -114,14 +76,14 @@ func (m *StatsSink) GetName() string {
 	return ""
 }
 
-func (m *StatsSink) GetConfig() *types.Struct {
+func (m *StatsSink) GetConfig() *google_protobuf1.Struct {
 	if x, ok := m.GetConfigType().(*StatsSink_Config); ok {
 		return x.Config
 	}
 	return nil
 }
 
-func (m *StatsSink) GetTypedConfig() *types.Any {
+func (m *StatsSink) GetTypedConfig() *google_protobuf.Any {
 	if x, ok := m.GetConfigType().(*StatsSink_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -164,7 +126,7 @@ func _StatsSink_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buff
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(types.Struct)
+		msg := new(google_protobuf1.Struct)
 		err := b.DecodeMessage(msg)
 		m.ConfigType = &StatsSink_Config{msg}
 		return true, err
@@ -172,7 +134,7 @@ func _StatsSink_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buff
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(types.Any)
+		msg := new(google_protobuf.Any)
 		err := b.DecodeMessage(msg)
 		m.ConfigType = &StatsSink_TypedConfig{msg}
 		return true, err
@@ -187,12 +149,12 @@ func _StatsSink_OneofSizer(msg proto.Message) (n int) {
 	switch x := m.ConfigType.(type) {
 	case *StatsSink_Config:
 		s := proto.Size(x.Config)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case *StatsSink_TypedConfig:
 		s := proto.Size(x.TypedConfig)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -208,7 +170,7 @@ type StatsConfig struct {
 	// When a tag is matched, the first capture group is removed from the name so
 	// later :ref:`TagSpecifiers <envoy_api_msg_config.metrics.v2.TagSpecifier>` cannot match that
 	// same portion of the match.
-	StatsTags []*TagSpecifier `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags,proto3" json:"stats_tags,omitempty"`
+	StatsTags []*TagSpecifier `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags" json:"stats_tags,omitempty"`
 	// Use all default tag regexes specified in Envoy. These can be combined with
 	// custom tags specified in :ref:`stats_tags
 	// <envoy_api_field_config.metrics.v2.StatsConfig.stats_tags>`. They will be processed before
@@ -223,48 +185,17 @@ type StatsConfig struct {
 	// default tags in Envoy.
 	//
 	// If not provided, the value is assumed to be true.
-	UseAllDefaultTags *types.BoolValue `protobuf:"bytes,2,opt,name=use_all_default_tags,json=useAllDefaultTags,proto3" json:"use_all_default_tags,omitempty"`
+	UseAllDefaultTags *google_protobuf2.BoolValue `protobuf:"bytes,2,opt,name=use_all_default_tags,json=useAllDefaultTags" json:"use_all_default_tags,omitempty"`
 	// Inclusion/exclusion matcher for stat name creation. If not provided, all stats are instantiated
 	// as normal. Preventing the instantiation of certain families of stats can improve memory
 	// performance for Envoys running especially large configs.
-	StatsMatcher         *StatsMatcher `protobuf:"bytes,3,opt,name=stats_matcher,json=statsMatcher,proto3" json:"stats_matcher,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	StatsMatcher *StatsMatcher `protobuf:"bytes,3,opt,name=stats_matcher,json=statsMatcher" json:"stats_matcher,omitempty"`
 }
 
-func (m *StatsConfig) Reset()         { *m = StatsConfig{} }
-func (m *StatsConfig) String() string { return proto.CompactTextString(m) }
-func (*StatsConfig) ProtoMessage()    {}
-func (*StatsConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_51e6d6532209c486, []int{1}
-}
-func (m *StatsConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *StatsConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_StatsConfig.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *StatsConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StatsConfig.Merge(m, src)
-}
-func (m *StatsConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *StatsConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_StatsConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_StatsConfig proto.InternalMessageInfo
+func (m *StatsConfig) Reset()                    { *m = StatsConfig{} }
+func (m *StatsConfig) String() string            { return proto.CompactTextString(m) }
+func (*StatsConfig) ProtoMessage()               {}
+func (*StatsConfig) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{1} }
 
 func (m *StatsConfig) GetStatsTags() []*TagSpecifier {
 	if m != nil {
@@ -273,7 +204,7 @@ func (m *StatsConfig) GetStatsTags() []*TagSpecifier {
 	return nil
 }
 
-func (m *StatsConfig) GetUseAllDefaultTags() *types.BoolValue {
+func (m *StatsConfig) GetUseAllDefaultTags() *google_protobuf2.BoolValue {
 	if m != nil {
 		return m.UseAllDefaultTags
 	}
@@ -293,44 +224,13 @@ type StatsMatcher struct {
 	//	*StatsMatcher_RejectAll
 	//	*StatsMatcher_ExclusionList
 	//	*StatsMatcher_InclusionList
-	StatsMatcher         isStatsMatcher_StatsMatcher `protobuf_oneof:"stats_matcher"`
-	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
-	XXX_unrecognized     []byte                      `json:"-"`
-	XXX_sizecache        int32                       `json:"-"`
+	StatsMatcher isStatsMatcher_StatsMatcher `protobuf_oneof:"stats_matcher"`
 }
 
-func (m *StatsMatcher) Reset()         { *m = StatsMatcher{} }
-func (m *StatsMatcher) String() string { return proto.CompactTextString(m) }
-func (*StatsMatcher) ProtoMessage()    {}
-func (*StatsMatcher) Descriptor() ([]byte, []int) {
-	return fileDescriptor_51e6d6532209c486, []int{2}
-}
-func (m *StatsMatcher) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *StatsMatcher) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_StatsMatcher.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *StatsMatcher) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StatsMatcher.Merge(m, src)
-}
-func (m *StatsMatcher) XXX_Size() int {
-	return m.Size()
-}
-func (m *StatsMatcher) XXX_DiscardUnknown() {
-	xxx_messageInfo_StatsMatcher.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_StatsMatcher proto.InternalMessageInfo
+func (m *StatsMatcher) Reset()                    { *m = StatsMatcher{} }
+func (m *StatsMatcher) String() string            { return proto.CompactTextString(m) }
+func (*StatsMatcher) ProtoMessage()               {}
+func (*StatsMatcher) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{2} }
 
 type isStatsMatcher_StatsMatcher interface {
 	isStatsMatcher_StatsMatcher()
@@ -342,10 +242,10 @@ type StatsMatcher_RejectAll struct {
 	RejectAll bool `protobuf:"varint,1,opt,name=reject_all,json=rejectAll,proto3,oneof"`
 }
 type StatsMatcher_ExclusionList struct {
-	ExclusionList *matcher.ListStringMatcher `protobuf:"bytes,2,opt,name=exclusion_list,json=exclusionList,proto3,oneof"`
+	ExclusionList *envoy_type_matcher.ListStringMatcher `protobuf:"bytes,2,opt,name=exclusion_list,json=exclusionList,oneof"`
 }
 type StatsMatcher_InclusionList struct {
-	InclusionList *matcher.ListStringMatcher `protobuf:"bytes,3,opt,name=inclusion_list,json=inclusionList,proto3,oneof"`
+	InclusionList *envoy_type_matcher.ListStringMatcher `protobuf:"bytes,3,opt,name=inclusion_list,json=inclusionList,oneof"`
 }
 
 func (*StatsMatcher_RejectAll) isStatsMatcher_StatsMatcher()     {}
@@ -366,14 +266,14 @@ func (m *StatsMatcher) GetRejectAll() bool {
 	return false
 }
 
-func (m *StatsMatcher) GetExclusionList() *matcher.ListStringMatcher {
+func (m *StatsMatcher) GetExclusionList() *envoy_type_matcher.ListStringMatcher {
 	if x, ok := m.GetStatsMatcher().(*StatsMatcher_ExclusionList); ok {
 		return x.ExclusionList
 	}
 	return nil
 }
 
-func (m *StatsMatcher) GetInclusionList() *matcher.ListStringMatcher {
+func (m *StatsMatcher) GetInclusionList() *envoy_type_matcher.ListStringMatcher {
 	if x, ok := m.GetStatsMatcher().(*StatsMatcher_InclusionList); ok {
 		return x.InclusionList
 	}
@@ -431,7 +331,7 @@ func _StatsMatcher_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.B
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(matcher.ListStringMatcher)
+		msg := new(envoy_type_matcher.ListStringMatcher)
 		err := b.DecodeMessage(msg)
 		m.StatsMatcher = &StatsMatcher_ExclusionList{msg}
 		return true, err
@@ -439,7 +339,7 @@ func _StatsMatcher_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.B
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(matcher.ListStringMatcher)
+		msg := new(envoy_type_matcher.ListStringMatcher)
 		err := b.DecodeMessage(msg)
 		m.StatsMatcher = &StatsMatcher_InclusionList{msg}
 		return true, err
@@ -453,16 +353,16 @@ func _StatsMatcher_OneofSizer(msg proto.Message) (n int) {
 	// stats_matcher
 	switch x := m.StatsMatcher.(type) {
 	case *StatsMatcher_RejectAll:
-		n += 1 // tag and wire
+		n += proto.SizeVarint(1<<3 | proto.WireVarint)
 		n += 1
 	case *StatsMatcher_ExclusionList:
 		s := proto.Size(x.ExclusionList)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case *StatsMatcher_InclusionList:
 		s := proto.Size(x.InclusionList)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -493,44 +393,13 @@ type TagSpecifier struct {
 	// Types that are valid to be assigned to TagValue:
 	//	*TagSpecifier_Regex
 	//	*TagSpecifier_FixedValue
-	TagValue             isTagSpecifier_TagValue `protobuf_oneof:"tag_value"`
-	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
-	XXX_unrecognized     []byte                  `json:"-"`
-	XXX_sizecache        int32                   `json:"-"`
+	TagValue isTagSpecifier_TagValue `protobuf_oneof:"tag_value"`
 }
 
-func (m *TagSpecifier) Reset()         { *m = TagSpecifier{} }
-func (m *TagSpecifier) String() string { return proto.CompactTextString(m) }
-func (*TagSpecifier) ProtoMessage()    {}
-func (*TagSpecifier) Descriptor() ([]byte, []int) {
-	return fileDescriptor_51e6d6532209c486, []int{3}
-}
-func (m *TagSpecifier) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *TagSpecifier) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_TagSpecifier.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *TagSpecifier) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TagSpecifier.Merge(m, src)
-}
-func (m *TagSpecifier) XXX_Size() int {
-	return m.Size()
-}
-func (m *TagSpecifier) XXX_DiscardUnknown() {
-	xxx_messageInfo_TagSpecifier.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TagSpecifier proto.InternalMessageInfo
+func (m *TagSpecifier) Reset()                    { *m = TagSpecifier{} }
+func (m *TagSpecifier) String() string            { return proto.CompactTextString(m) }
+func (*TagSpecifier) ProtoMessage()               {}
+func (*TagSpecifier) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{3} }
 
 type isTagSpecifier_TagValue interface {
 	isTagSpecifier_TagValue()
@@ -628,11 +497,11 @@ func _TagSpecifier_OneofSizer(msg proto.Message) (n int) {
 	// tag_value
 	switch x := m.TagValue.(type) {
 	case *TagSpecifier_Regex:
-		n += 1 // tag and wire
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.Regex)))
 		n += len(x.Regex)
 	case *TagSpecifier_FixedValue:
-		n += 1 // tag and wire
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.FixedValue)))
 		n += len(x.FixedValue)
 	case nil:
@@ -675,44 +544,13 @@ type StatsdSink struct {
 	//
 	//   envoy.test_counter:1|c
 	//   envoy.test_timer:5|ms
-	Prefix               string   `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Prefix string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
 }
 
-func (m *StatsdSink) Reset()         { *m = StatsdSink{} }
-func (m *StatsdSink) String() string { return proto.CompactTextString(m) }
-func (*StatsdSink) ProtoMessage()    {}
-func (*StatsdSink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_51e6d6532209c486, []int{4}
-}
-func (m *StatsdSink) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *StatsdSink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_StatsdSink.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *StatsdSink) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StatsdSink.Merge(m, src)
-}
-func (m *StatsdSink) XXX_Size() int {
-	return m.Size()
-}
-func (m *StatsdSink) XXX_DiscardUnknown() {
-	xxx_messageInfo_StatsdSink.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_StatsdSink proto.InternalMessageInfo
+func (m *StatsdSink) Reset()                    { *m = StatsdSink{} }
+func (m *StatsdSink) String() string            { return proto.CompactTextString(m) }
+func (*StatsdSink) ProtoMessage()               {}
+func (*StatsdSink) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{4} }
 
 type isStatsdSink_StatsdSpecifier interface {
 	isStatsdSink_StatsdSpecifier()
@@ -721,7 +559,7 @@ type isStatsdSink_StatsdSpecifier interface {
 }
 
 type StatsdSink_Address struct {
-	Address *core.Address `protobuf:"bytes,1,opt,name=address,proto3,oneof"`
+	Address *envoy_api_v2_core2.Address `protobuf:"bytes,1,opt,name=address,oneof"`
 }
 type StatsdSink_TcpClusterName struct {
 	TcpClusterName string `protobuf:"bytes,2,opt,name=tcp_cluster_name,json=tcpClusterName,proto3,oneof"`
@@ -737,7 +575,7 @@ func (m *StatsdSink) GetStatsdSpecifier() isStatsdSink_StatsdSpecifier {
 	return nil
 }
 
-func (m *StatsdSink) GetAddress() *core.Address {
+func (m *StatsdSink) GetAddress() *envoy_api_v2_core2.Address {
 	if x, ok := m.GetStatsdSpecifier().(*StatsdSink_Address); ok {
 		return x.Address
 	}
@@ -792,7 +630,7 @@ func _StatsdSink_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buf
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(core.Address)
+		msg := new(envoy_api_v2_core2.Address)
 		err := b.DecodeMessage(msg)
 		m.StatsdSpecifier = &StatsdSink_Address{msg}
 		return true, err
@@ -814,11 +652,11 @@ func _StatsdSink_OneofSizer(msg proto.Message) (n int) {
 	switch x := m.StatsdSpecifier.(type) {
 	case *StatsdSink_Address:
 		s := proto.Size(x.Address)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case *StatsdSink_TcpClusterName:
-		n += 1 // tag and wire
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(len(x.TcpClusterName)))
 		n += len(x.TcpClusterName)
 	case nil:
@@ -839,44 +677,13 @@ type DogStatsdSink struct {
 	DogStatsdSpecifier isDogStatsdSink_DogStatsdSpecifier `protobuf_oneof:"dog_statsd_specifier"`
 	// Optional custom metric name prefix. See :ref:`StatsdSink's prefix field
 	// <envoy_api_field_config.metrics.v2.StatsdSink.prefix>` for more details.
-	Prefix               string   `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Prefix string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
 }
 
-func (m *DogStatsdSink) Reset()         { *m = DogStatsdSink{} }
-func (m *DogStatsdSink) String() string { return proto.CompactTextString(m) }
-func (*DogStatsdSink) ProtoMessage()    {}
-func (*DogStatsdSink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_51e6d6532209c486, []int{5}
-}
-func (m *DogStatsdSink) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *DogStatsdSink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_DogStatsdSink.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *DogStatsdSink) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DogStatsdSink.Merge(m, src)
-}
-func (m *DogStatsdSink) XXX_Size() int {
-	return m.Size()
-}
-func (m *DogStatsdSink) XXX_DiscardUnknown() {
-	xxx_messageInfo_DogStatsdSink.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DogStatsdSink proto.InternalMessageInfo
+func (m *DogStatsdSink) Reset()                    { *m = DogStatsdSink{} }
+func (m *DogStatsdSink) String() string            { return proto.CompactTextString(m) }
+func (*DogStatsdSink) ProtoMessage()               {}
+func (*DogStatsdSink) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{5} }
 
 type isDogStatsdSink_DogStatsdSpecifier interface {
 	isDogStatsdSink_DogStatsdSpecifier()
@@ -885,7 +692,7 @@ type isDogStatsdSink_DogStatsdSpecifier interface {
 }
 
 type DogStatsdSink_Address struct {
-	Address *core.Address `protobuf:"bytes,1,opt,name=address,proto3,oneof"`
+	Address *envoy_api_v2_core2.Address `protobuf:"bytes,1,opt,name=address,oneof"`
 }
 
 func (*DogStatsdSink_Address) isDogStatsdSink_DogStatsdSpecifier() {}
@@ -897,7 +704,7 @@ func (m *DogStatsdSink) GetDogStatsdSpecifier() isDogStatsdSink_DogStatsdSpecifi
 	return nil
 }
 
-func (m *DogStatsdSink) GetAddress() *core.Address {
+func (m *DogStatsdSink) GetAddress() *envoy_api_v2_core2.Address {
 	if x, ok := m.GetDogStatsdSpecifier().(*DogStatsdSink_Address); ok {
 		return x.Address
 	}
@@ -941,7 +748,7 @@ func _DogStatsdSink_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(core.Address)
+		msg := new(envoy_api_v2_core2.Address)
 		err := b.DecodeMessage(msg)
 		m.DogStatsdSpecifier = &DogStatsdSink_Address{msg}
 		return true, err
@@ -956,7 +763,7 @@ func _DogStatsdSink_OneofSizer(msg proto.Message) (n int) {
 	switch x := m.DogStatsdSpecifier.(type) {
 	case *DogStatsdSink_Address:
 		s := proto.Size(x.Address)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -987,44 +794,13 @@ type HystrixSink struct {
 	//
 	// More detailed explanation can be found in `Hystrix wiki
 	// <https://github.com/Netflix/Hystrix/wiki/Metrics-and-Monitoring#hystrixrollingnumber>`_.
-	NumBuckets           int64    `protobuf:"varint,1,opt,name=num_buckets,json=numBuckets,proto3" json:"num_buckets,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	NumBuckets int64 `protobuf:"varint,1,opt,name=num_buckets,json=numBuckets,proto3" json:"num_buckets,omitempty"`
 }
 
-func (m *HystrixSink) Reset()         { *m = HystrixSink{} }
-func (m *HystrixSink) String() string { return proto.CompactTextString(m) }
-func (*HystrixSink) ProtoMessage()    {}
-func (*HystrixSink) Descriptor() ([]byte, []int) {
-	return fileDescriptor_51e6d6532209c486, []int{6}
-}
-func (m *HystrixSink) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *HystrixSink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_HystrixSink.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *HystrixSink) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HystrixSink.Merge(m, src)
-}
-func (m *HystrixSink) XXX_Size() int {
-	return m.Size()
-}
-func (m *HystrixSink) XXX_DiscardUnknown() {
-	xxx_messageInfo_HystrixSink.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_HystrixSink proto.InternalMessageInfo
+func (m *HystrixSink) Reset()                    { *m = HystrixSink{} }
+func (m *HystrixSink) String() string            { return proto.CompactTextString(m) }
+func (*HystrixSink) ProtoMessage()               {}
+func (*HystrixSink) Descriptor() ([]byte, []int) { return fileDescriptorStats, []int{6} }
 
 func (m *HystrixSink) GetNumBuckets() int64 {
 	if m != nil {
@@ -1042,61 +818,6 @@ func init() {
 	proto.RegisterType((*DogStatsdSink)(nil), "envoy.config.metrics.v2.DogStatsdSink")
 	proto.RegisterType((*HystrixSink)(nil), "envoy.config.metrics.v2.HystrixSink")
 }
-
-func init() {
-	proto.RegisterFile("envoy/config/metrics/v2/stats.proto", fileDescriptor_51e6d6532209c486)
-}
-
-var fileDescriptor_51e6d6532209c486 = []byte{
-	// 721 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x6b, 0xdb, 0x4a,
-	0x14, 0xb5, 0xac, 0x7c, 0xf9, 0xca, 0x0e, 0x79, 0x22, 0xe4, 0x8b, 0xf7, 0x9c, 0x3c, 0x3f, 0x02,
-	0xe6, 0x2d, 0x24, 0xea, 0x42, 0xa1, 0x4b, 0x2b, 0x29, 0x88, 0xb4, 0x0d, 0x41, 0x0e, 0x5d, 0x74,
-	0x23, 0x26, 0xd2, 0x58, 0x9d, 0x46, 0xd6, 0x88, 0x99, 0x91, 0x6b, 0x2f, 0x0a, 0x5d, 0xf4, 0x67,
-	0x74, 0xd7, 0x3f, 0x51, 0xba, 0xca, 0xb2, 0xcb, 0xfe, 0x84, 0x92, 0x4d, 0x09, 0xf4, 0x47, 0x94,
-	0xf9, 0x70, 0x70, 0x13, 0xbc, 0x28, 0x74, 0x67, 0xcd, 0x39, 0xe7, 0xde, 0x73, 0xee, 0x9d, 0x31,
-	0xfc, 0x87, 0x8b, 0x31, 0x9d, 0xfa, 0x09, 0x2d, 0x86, 0x24, 0xf3, 0x47, 0x58, 0x30, 0x92, 0x70,
-	0x7f, 0xdc, 0xf3, 0xb9, 0x40, 0x82, 0x7b, 0x25, 0xa3, 0x82, 0xba, 0xdb, 0x8a, 0xe4, 0x69, 0x92,
-	0x67, 0x48, 0xde, 0xb8, 0xb7, 0xb7, 0xaf, 0xd5, 0xa8, 0x24, 0x52, 0x92, 0x50, 0x86, 0x7d, 0x94,
-	0xa6, 0x0c, 0x73, 0xa3, 0x9c, 0x11, 0xc4, 0xb4, 0xc4, 0xfe, 0x08, 0x89, 0xe4, 0x15, 0x66, 0x3e,
-	0x17, 0x8c, 0x14, 0x99, 0x21, 0xec, 0x66, 0x94, 0x66, 0x39, 0xf6, 0xd5, 0xd7, 0x45, 0x35, 0xf4,
-	0x51, 0x31, 0x35, 0xd0, 0xdf, 0x77, 0x21, 0x2e, 0x58, 0x95, 0x08, 0x83, 0xb6, 0xef, 0xa2, 0x6f,
-	0x18, 0x2a, 0x4b, 0xcc, 0x66, 0x9d, 0xb7, 0xc7, 0x28, 0x27, 0x29, 0x12, 0xd8, 0x9f, 0xfd, 0xd0,
-	0x40, 0xe7, 0x83, 0x05, 0x8d, 0x81, 0x0c, 0x37, 0x20, 0xc5, 0xa5, 0xeb, 0xc2, 0x52, 0x81, 0x46,
-	0x78, 0xc7, 0x3a, 0xb0, 0xba, 0x8d, 0x48, 0xfd, 0x76, 0x1f, 0xc0, 0x8a, 0x8e, 0xba, 0x53, 0x3f,
-	0xb0, 0xba, 0x4e, 0x6f, 0xdb, 0xd3, 0xbd, 0xbc, 0x59, 0x2f, 0x6f, 0xa0, 0x9c, 0x84, 0xb5, 0xc8,
-	0x10, 0xdd, 0xc7, 0xd0, 0x94, 0x19, 0xd3, 0xd8, 0x08, 0x6d, 0x25, 0xdc, 0xbc, 0x27, 0xec, 0x17,
-	0xd3, 0xb0, 0x16, 0x39, 0x8a, 0x7b, 0xa4, 0xa8, 0x41, 0x0b, 0x1c, 0x2d, 0x8a, 0xe5, 0x69, 0xe7,
-	0x87, 0x05, 0x8e, 0xb2, 0xa7, 0x61, 0xf7, 0x18, 0x40, 0xad, 0x22, 0x16, 0x28, 0xe3, 0x3b, 0xd6,
-	0x81, 0xdd, 0x75, 0x7a, 0x87, 0xde, 0x82, 0x85, 0x78, 0xe7, 0x28, 0x1b, 0x94, 0x38, 0x21, 0x43,
-	0x82, 0x59, 0xd4, 0x50, 0xc2, 0x73, 0x94, 0x71, 0xf7, 0x29, 0x6c, 0x56, 0x1c, 0xc7, 0x28, 0xcf,
-	0xe3, 0x14, 0x0f, 0x51, 0x95, 0x0b, 0x5d, 0x4f, 0x07, 0xdc, 0xbb, 0xe7, 0x33, 0xa0, 0x34, 0x7f,
-	0x81, 0xf2, 0x0a, 0x47, 0x7f, 0x55, 0x1c, 0xf7, 0xf3, 0xfc, 0x58, 0xab, 0x54, 0xb1, 0x13, 0x68,
-	0x69, 0x4b, 0x66, 0xa3, 0x26, 0xed, 0x62, 0x57, 0x2a, 0xcf, 0x73, 0x4d, 0x8e, 0x9a, 0x7c, 0xee,
-	0xab, 0xf3, 0xdd, 0x82, 0xe6, 0x3c, 0xec, 0xee, 0x03, 0x30, 0xfc, 0x1a, 0x27, 0x42, 0x9a, 0x55,
-	0x6b, 0x59, 0x0b, 0x6b, 0x51, 0x43, 0x9f, 0xf5, 0xf3, 0xdc, 0x3d, 0x85, 0x75, 0x3c, 0x49, 0xf2,
-	0x8a, 0x13, 0x5a, 0xc4, 0x39, 0xe1, 0xc2, 0x84, 0x98, 0xb5, 0x97, 0x53, 0xf4, 0x8c, 0x33, 0xef,
-	0x19, 0xe1, 0x62, 0xa0, 0xee, 0x9b, 0xa9, 0x1f, 0xd6, 0xa2, 0xd6, 0xad, 0x5c, 0xa2, 0xb2, 0x1e,
-	0x29, 0x7e, 0xa9, 0x67, 0xff, 0x66, 0xbd, 0x5b, 0xb9, 0x44, 0x83, 0xad, 0x3b, 0xd3, 0x71, 0x97,
-	0x3f, 0xdd, 0x5c, 0xd9, 0x56, 0xe7, 0x2d, 0x34, 0xe7, 0xb7, 0xe3, 0xee, 0xc2, 0x9a, 0x40, 0x59,
-	0x3c, 0x77, 0xfb, 0x56, 0x05, 0xca, 0x4e, 0xe5, 0x05, 0xec, 0xc0, 0x32, 0xc3, 0x19, 0x9e, 0xa8,
-	0x64, 0x8d, 0x00, 0x3e, 0xdf, 0x5c, 0xd9, 0xcb, 0xcc, 0xee, 0xbe, 0x93, 0xa3, 0xd0, 0x90, 0xfb,
-	0x2f, 0x38, 0x43, 0x32, 0xc1, 0x69, 0x3c, 0x96, 0x6b, 0x52, 0x9e, 0x1b, 0x61, 0x2d, 0x02, 0x75,
-	0xa8, 0x56, 0x17, 0x38, 0xd0, 0x90, 0x1d, 0x14, 0xa1, 0xf3, 0xd1, 0x02, 0x50, 0x83, 0x4e, 0xd5,
-	0xbd, 0x7f, 0x04, 0xab, 0xe6, 0xa5, 0xaa, 0xe6, 0xf2, 0x0e, 0xe8, 0xb8, 0xa8, 0x24, 0x72, 0x65,
-	0xf2, 0x2d, 0x7b, 0x7d, 0xcd, 0x08, 0x6b, 0xd1, 0x8c, 0xec, 0xfe, 0x0f, 0x1b, 0x22, 0x29, 0x63,
-	0x19, 0x58, 0x60, 0xa6, 0xdd, 0xd7, 0x4d, 0xef, 0x75, 0x91, 0x94, 0x47, 0x1a, 0x50, 0x31, 0xb6,
-	0x60, 0xa5, 0x64, 0x78, 0x48, 0x26, 0xda, 0x5d, 0x64, 0xbe, 0x82, 0x5d, 0xd8, 0x50, 0x13, 0x4a,
-	0x63, 0x7e, 0x3b, 0x0d, 0x33, 0xa4, 0xf7, 0x16, 0xb4, 0x8e, 0x69, 0xf6, 0x07, 0x8c, 0x2e, 0x6a,
-	0xfe, 0x0f, 0x6c, 0xa6, 0x34, 0x8b, 0x17, 0x18, 0x38, 0x59, 0x5a, 0xab, 0x6f, 0xd8, 0x1d, 0x0f,
-	0x9c, 0x70, 0x2a, 0xff, 0xa7, 0x26, 0xca, 0xc3, 0x3e, 0x38, 0x45, 0x35, 0x8a, 0x2f, 0xaa, 0xe4,
-	0x12, 0x0b, 0xed, 0xc3, 0x8e, 0xa0, 0xa8, 0x46, 0x81, 0x3e, 0x09, 0x9e, 0x7c, 0xb9, 0x6e, 0x5b,
-	0x5f, 0xaf, 0xdb, 0xd6, 0xb7, 0xeb, 0xb6, 0x05, 0x87, 0x84, 0x6a, 0x8f, 0x25, 0xa3, 0x93, 0xe9,
-	0xa2, 0x57, 0x11, 0xe8, 0x75, 0x9c, 0xc9, 0x27, 0x77, 0x66, 0xbd, 0xac, 0x8f, 0x7b, 0x17, 0x2b,
-	0xea, 0xfd, 0x3d, 0xfc, 0x19, 0x00, 0x00, 0xff, 0xff, 0xc5, 0x81, 0xb0, 0x36, 0x95, 0x05, 0x00,
-	0x00,
-}
-
 func (m *StatsSink) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -1124,9 +845,6 @@ func (m *StatsSink) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += nn1
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -1206,9 +924,6 @@ func (m *StatsConfig) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n5
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -1233,9 +948,6 @@ func (m *StatsMatcher) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += nn6
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -1308,9 +1020,6 @@ func (m *TagSpecifier) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += nn9
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -1357,9 +1066,6 @@ func (m *StatsdSink) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintStats(dAtA, i, uint64(len(m.Prefix)))
 		i += copy(dAtA[i:], m.Prefix)
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -1414,9 +1120,6 @@ func (m *DogStatsdSink) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintStats(dAtA, i, uint64(len(m.Prefix)))
 		i += copy(dAtA[i:], m.Prefix)
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -1454,9 +1157,6 @@ func (m *HystrixSink) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintStats(dAtA, i, uint64(m.NumBuckets))
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -1470,9 +1170,6 @@ func encodeVarintStats(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *StatsSink) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -1482,16 +1179,10 @@ func (m *StatsSink) Size() (n int) {
 	if m.ConfigType != nil {
 		n += m.ConfigType.Size()
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *StatsSink_Config) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -1501,9 +1192,6 @@ func (m *StatsSink_Config) Size() (n int) {
 	return n
 }
 func (m *StatsSink_TypedConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -1513,9 +1201,6 @@ func (m *StatsSink_TypedConfig) Size() (n int) {
 	return n
 }
 func (m *StatsConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if len(m.StatsTags) > 0 {
@@ -1532,40 +1217,25 @@ func (m *StatsConfig) Size() (n int) {
 		l = m.StatsMatcher.Size()
 		n += 1 + l + sovStats(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *StatsMatcher) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.StatsMatcher != nil {
 		n += m.StatsMatcher.Size()
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *StatsMatcher_RejectAll) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	n += 2
 	return n
 }
 func (m *StatsMatcher_ExclusionList) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.ExclusionList != nil {
@@ -1575,9 +1245,6 @@ func (m *StatsMatcher_ExclusionList) Size() (n int) {
 	return n
 }
 func (m *StatsMatcher_InclusionList) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.InclusionList != nil {
@@ -1587,9 +1254,6 @@ func (m *StatsMatcher_InclusionList) Size() (n int) {
 	return n
 }
 func (m *TagSpecifier) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.TagName)
@@ -1599,16 +1263,10 @@ func (m *TagSpecifier) Size() (n int) {
 	if m.TagValue != nil {
 		n += m.TagValue.Size()
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *TagSpecifier_Regex) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Regex)
@@ -1616,9 +1274,6 @@ func (m *TagSpecifier_Regex) Size() (n int) {
 	return n
 }
 func (m *TagSpecifier_FixedValue) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.FixedValue)
@@ -1626,9 +1281,6 @@ func (m *TagSpecifier_FixedValue) Size() (n int) {
 	return n
 }
 func (m *StatsdSink) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.StatsdSpecifier != nil {
@@ -1638,16 +1290,10 @@ func (m *StatsdSink) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovStats(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *StatsdSink_Address) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Address != nil {
@@ -1657,9 +1303,6 @@ func (m *StatsdSink_Address) Size() (n int) {
 	return n
 }
 func (m *StatsdSink_TcpClusterName) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.TcpClusterName)
@@ -1667,9 +1310,6 @@ func (m *StatsdSink_TcpClusterName) Size() (n int) {
 	return n
 }
 func (m *DogStatsdSink) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.DogStatsdSpecifier != nil {
@@ -1679,16 +1319,10 @@ func (m *DogStatsdSink) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovStats(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *DogStatsdSink_Address) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Address != nil {
@@ -1698,16 +1332,10 @@ func (m *DogStatsdSink_Address) Size() (n int) {
 	return n
 }
 func (m *HystrixSink) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.NumBuckets != 0 {
 		n += 1 + sovStats(uint64(m.NumBuckets))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -1740,7 +1368,7 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1768,7 +1396,7 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1778,9 +1406,6 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1800,7 +1425,7 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1809,13 +1434,10 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &types.Struct{}
+			v := &google_protobuf1.Struct{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1835,7 +1457,7 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1844,13 +1466,10 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &types.Any{}
+			v := &google_protobuf.Any{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1865,13 +1484,9 @@ func (m *StatsSink) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthStats
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthStats
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1896,7 +1511,7 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1924,7 +1539,7 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1933,9 +1548,6 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1958,7 +1570,7 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1967,14 +1579,11 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.UseAllDefaultTags == nil {
-				m.UseAllDefaultTags = &types.BoolValue{}
+				m.UseAllDefaultTags = &google_protobuf2.BoolValue{}
 			}
 			if err := m.UseAllDefaultTags.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1994,7 +1603,7 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2003,9 +1612,6 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2025,13 +1631,9 @@ func (m *StatsConfig) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthStats
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthStats
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2056,7 +1658,7 @@ func (m *StatsMatcher) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -2084,7 +1686,7 @@ func (m *StatsMatcher) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				v |= int(b&0x7F) << shift
+				v |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2105,7 +1707,7 @@ func (m *StatsMatcher) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2114,13 +1716,10 @@ func (m *StatsMatcher) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &matcher.ListStringMatcher{}
+			v := &envoy_type_matcher.ListStringMatcher{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2140,7 +1739,7 @@ func (m *StatsMatcher) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2149,13 +1748,10 @@ func (m *StatsMatcher) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &matcher.ListStringMatcher{}
+			v := &envoy_type_matcher.ListStringMatcher{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2170,13 +1766,9 @@ func (m *StatsMatcher) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthStats
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthStats
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2201,7 +1793,7 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -2229,7 +1821,7 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2239,9 +1831,6 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2261,7 +1850,7 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2271,9 +1860,6 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2293,7 +1879,7 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2303,9 +1889,6 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2320,13 +1903,9 @@ func (m *TagSpecifier) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthStats
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthStats
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2351,7 +1930,7 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -2379,7 +1958,7 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2388,13 +1967,10 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &core.Address{}
+			v := &envoy_api_v2_core2.Address{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2414,7 +1990,7 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2424,9 +2000,6 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2446,7 +2019,7 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2456,9 +2029,6 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2473,13 +2043,9 @@ func (m *StatsdSink) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthStats
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthStats
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2504,7 +2070,7 @@ func (m *DogStatsdSink) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -2532,7 +2098,7 @@ func (m *DogStatsdSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2541,13 +2107,10 @@ func (m *DogStatsdSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &core.Address{}
+			v := &envoy_api_v2_core2.Address{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -2567,7 +2130,7 @@ func (m *DogStatsdSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2577,9 +2140,6 @@ func (m *DogStatsdSink) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthStats
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthStats
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -2594,13 +2154,9 @@ func (m *DogStatsdSink) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthStats
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthStats
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2625,7 +2181,7 @@ func (m *HystrixSink) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -2653,7 +2209,7 @@ func (m *HystrixSink) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.NumBuckets |= int64(b&0x7F) << shift
+				m.NumBuckets |= (int64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -2667,13 +2223,9 @@ func (m *HystrixSink) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthStats
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthStats
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -2737,11 +2289,8 @@ func skipStats(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthStats
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthStats
 			}
 			return iNdEx, nil
@@ -2772,9 +2321,6 @@ func skipStats(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthStats
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -2793,3 +2339,55 @@ var (
 	ErrInvalidLengthStats = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowStats   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("envoy/config/metrics/v2/stats.proto", fileDescriptorStats) }
+
+var fileDescriptorStats = []byte{
+	// 721 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x6b, 0xdb, 0x4a,
+	0x14, 0xb5, 0xac, 0x7c, 0xf9, 0xca, 0x0e, 0x79, 0x22, 0xe4, 0x8b, 0xf7, 0x9c, 0x3c, 0x3f, 0x02,
+	0xe6, 0x2d, 0x24, 0xea, 0x42, 0xa1, 0x4b, 0x2b, 0x29, 0x88, 0xb4, 0x0d, 0x41, 0x0e, 0x5d, 0x74,
+	0x23, 0x26, 0xd2, 0x58, 0x9d, 0x46, 0xd6, 0x88, 0x99, 0x91, 0x6b, 0x2f, 0x0a, 0x5d, 0xf4, 0x67,
+	0x74, 0xd7, 0x3f, 0x51, 0xba, 0xca, 0xb2, 0xcb, 0xfe, 0x84, 0x92, 0x4d, 0x09, 0xf4, 0x47, 0x94,
+	0xf9, 0x70, 0x70, 0x13, 0xbc, 0x28, 0x74, 0x67, 0xcd, 0x39, 0xe7, 0xde, 0x73, 0xee, 0x9d, 0x31,
+	0xfc, 0x87, 0x8b, 0x31, 0x9d, 0xfa, 0x09, 0x2d, 0x86, 0x24, 0xf3, 0x47, 0x58, 0x30, 0x92, 0x70,
+	0x7f, 0xdc, 0xf3, 0xb9, 0x40, 0x82, 0x7b, 0x25, 0xa3, 0x82, 0xba, 0xdb, 0x8a, 0xe4, 0x69, 0x92,
+	0x67, 0x48, 0xde, 0xb8, 0xb7, 0xb7, 0xaf, 0xd5, 0xa8, 0x24, 0x52, 0x92, 0x50, 0x86, 0x7d, 0x94,
+	0xa6, 0x0c, 0x73, 0xa3, 0x9c, 0x11, 0xc4, 0xb4, 0xc4, 0xfe, 0x08, 0x89, 0xe4, 0x15, 0x66, 0x3e,
+	0x17, 0x8c, 0x14, 0x99, 0x21, 0xec, 0x66, 0x94, 0x66, 0x39, 0xf6, 0xd5, 0xd7, 0x45, 0x35, 0xf4,
+	0x51, 0x31, 0x35, 0xd0, 0xdf, 0x77, 0x21, 0x2e, 0x58, 0x95, 0x08, 0x83, 0xb6, 0xef, 0xa2, 0x6f,
+	0x18, 0x2a, 0x4b, 0xcc, 0x66, 0x9d, 0xb7, 0xc7, 0x28, 0x27, 0x29, 0x12, 0xd8, 0x9f, 0xfd, 0xd0,
+	0x40, 0xe7, 0x83, 0x05, 0x8d, 0x81, 0x0c, 0x37, 0x20, 0xc5, 0xa5, 0xeb, 0xc2, 0x52, 0x81, 0x46,
+	0x78, 0xc7, 0x3a, 0xb0, 0xba, 0x8d, 0x48, 0xfd, 0x76, 0x1f, 0xc0, 0x8a, 0x8e, 0xba, 0x53, 0x3f,
+	0xb0, 0xba, 0x4e, 0x6f, 0xdb, 0xd3, 0xbd, 0xbc, 0x59, 0x2f, 0x6f, 0xa0, 0x9c, 0x84, 0xb5, 0xc8,
+	0x10, 0xdd, 0xc7, 0xd0, 0x94, 0x19, 0xd3, 0xd8, 0x08, 0x6d, 0x25, 0xdc, 0xbc, 0x27, 0xec, 0x17,
+	0xd3, 0xb0, 0x16, 0x39, 0x8a, 0x7b, 0xa4, 0xa8, 0x41, 0x0b, 0x1c, 0x2d, 0x8a, 0xe5, 0x69, 0xe7,
+	0x87, 0x05, 0x8e, 0xb2, 0xa7, 0x61, 0xf7, 0x18, 0x40, 0xad, 0x22, 0x16, 0x28, 0xe3, 0x3b, 0xd6,
+	0x81, 0xdd, 0x75, 0x7a, 0x87, 0xde, 0x82, 0x85, 0x78, 0xe7, 0x28, 0x1b, 0x94, 0x38, 0x21, 0x43,
+	0x82, 0x59, 0xd4, 0x50, 0xc2, 0x73, 0x94, 0x71, 0xf7, 0x29, 0x6c, 0x56, 0x1c, 0xc7, 0x28, 0xcf,
+	0xe3, 0x14, 0x0f, 0x51, 0x95, 0x0b, 0x5d, 0x4f, 0x07, 0xdc, 0xbb, 0xe7, 0x33, 0xa0, 0x34, 0x7f,
+	0x81, 0xf2, 0x0a, 0x47, 0x7f, 0x55, 0x1c, 0xf7, 0xf3, 0xfc, 0x58, 0xab, 0x54, 0xb1, 0x13, 0x68,
+	0x69, 0x4b, 0x66, 0xa3, 0x26, 0xed, 0x62, 0x57, 0x2a, 0xcf, 0x73, 0x4d, 0x8e, 0x9a, 0x7c, 0xee,
+	0xab, 0xf3, 0xdd, 0x82, 0xe6, 0x3c, 0xec, 0xee, 0x03, 0x30, 0xfc, 0x1a, 0x27, 0x42, 0x9a, 0x55,
+	0x6b, 0x59, 0x0b, 0x6b, 0x51, 0x43, 0x9f, 0xf5, 0xf3, 0xdc, 0x3d, 0x85, 0x75, 0x3c, 0x49, 0xf2,
+	0x8a, 0x13, 0x5a, 0xc4, 0x39, 0xe1, 0xc2, 0x84, 0x98, 0xb5, 0x97, 0x53, 0xf4, 0x8c, 0x33, 0xef,
+	0x19, 0xe1, 0x62, 0xa0, 0xee, 0x9b, 0xa9, 0x1f, 0xd6, 0xa2, 0xd6, 0xad, 0x5c, 0xa2, 0xb2, 0x1e,
+	0x29, 0x7e, 0xa9, 0x67, 0xff, 0x66, 0xbd, 0x5b, 0xb9, 0x44, 0x83, 0xad, 0x3b, 0xd3, 0x71, 0x97,
+	0x3f, 0xdd, 0x5c, 0xd9, 0x56, 0xe7, 0x2d, 0x34, 0xe7, 0xb7, 0xe3, 0xee, 0xc2, 0x9a, 0x40, 0x59,
+	0x3c, 0x77, 0xfb, 0x56, 0x05, 0xca, 0x4e, 0xe5, 0x05, 0xec, 0xc0, 0x32, 0xc3, 0x19, 0x9e, 0xa8,
+	0x64, 0x8d, 0x00, 0x3e, 0xdf, 0x5c, 0xd9, 0xcb, 0xcc, 0xee, 0xbe, 0x93, 0xa3, 0xd0, 0x90, 0xfb,
+	0x2f, 0x38, 0x43, 0x32, 0xc1, 0x69, 0x3c, 0x96, 0x6b, 0x52, 0x9e, 0x1b, 0x61, 0x2d, 0x02, 0x75,
+	0xa8, 0x56, 0x17, 0x38, 0xd0, 0x90, 0x1d, 0x14, 0xa1, 0xf3, 0xd1, 0x02, 0x50, 0x83, 0x4e, 0xd5,
+	0xbd, 0x7f, 0x04, 0xab, 0xe6, 0xa5, 0xaa, 0xe6, 0xf2, 0x0e, 0xe8, 0xb8, 0xa8, 0x24, 0x72, 0x65,
+	0xf2, 0x2d, 0x7b, 0x7d, 0xcd, 0x08, 0x6b, 0xd1, 0x8c, 0xec, 0xfe, 0x0f, 0x1b, 0x22, 0x29, 0x63,
+	0x19, 0x58, 0x60, 0xa6, 0xdd, 0xd7, 0x4d, 0xef, 0x75, 0x91, 0x94, 0x47, 0x1a, 0x50, 0x31, 0xb6,
+	0x60, 0xa5, 0x64, 0x78, 0x48, 0x26, 0xda, 0x5d, 0x64, 0xbe, 0x82, 0x5d, 0xd8, 0x50, 0x13, 0x4a,
+	0x63, 0x7e, 0x3b, 0x0d, 0x33, 0xa4, 0xf7, 0x16, 0xb4, 0x8e, 0x69, 0xf6, 0x07, 0x8c, 0x2e, 0x6a,
+	0xfe, 0x0f, 0x6c, 0xa6, 0x34, 0x8b, 0x17, 0x18, 0x38, 0x59, 0x5a, 0xab, 0x6f, 0xd8, 0x1d, 0x0f,
+	0x9c, 0x70, 0x2a, 0xff, 0xa7, 0x26, 0xca, 0xc3, 0x3e, 0x38, 0x45, 0x35, 0x8a, 0x2f, 0xaa, 0xe4,
+	0x12, 0x0b, 0xed, 0xc3, 0x8e, 0xa0, 0xa8, 0x46, 0x81, 0x3e, 0x09, 0x9e, 0x7c, 0xb9, 0x6e, 0x5b,
+	0x5f, 0xaf, 0xdb, 0xd6, 0xb7, 0xeb, 0xb6, 0x05, 0x87, 0x84, 0x6a, 0x8f, 0x25, 0xa3, 0x93, 0xe9,
+	0xa2, 0x57, 0x11, 0xe8, 0x75, 0x9c, 0xc9, 0x27, 0x77, 0x66, 0xbd, 0xac, 0x8f, 0x7b, 0x17, 0x2b,
+	0xea, 0xfd, 0x3d, 0xfc, 0x19, 0x00, 0x00, 0xff, 0xff, 0xc5, 0x81, 0xb0, 0x36, 0x95, 0x05, 0x00,
+	0x00,
+}

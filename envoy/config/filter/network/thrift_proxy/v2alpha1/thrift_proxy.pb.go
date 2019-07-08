@@ -3,27 +3,20 @@
 
 package v2
 
-import (
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import google_protobuf "github.com/gogo/protobuf/types"
+import google_protobuf1 "github.com/gogo/protobuf/types"
+import _ "github.com/envoyproxy/protoc-gen-validate/validate"
+import _ "github.com/gogo/protobuf/gogoproto"
 
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	types "github.com/gogo/protobuf/types"
-)
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Thrift transport types supported by Envoy.
 type TransportType int32
@@ -47,7 +40,6 @@ var TransportType_name = map[int32]string{
 	2: "UNFRAMED",
 	3: "HEADER",
 }
-
 var TransportType_value = map[string]int32{
 	"AUTO_TRANSPORT": 0,
 	"FRAMED":         1,
@@ -58,10 +50,7 @@ var TransportType_value = map[string]int32{
 func (x TransportType) String() string {
 	return proto.EnumName(TransportType_name, int32(x))
 }
-
-func (TransportType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_e8fab7646d88fc90, []int{0}
-}
+func (TransportType) EnumDescriptor() ([]byte, []int) { return fileDescriptorThriftProxy, []int{0} }
 
 // Thrift Protocol types supported by Envoy.
 type ProtocolType int32
@@ -89,7 +78,6 @@ var ProtocolType_name = map[int32]string{
 	3: "COMPACT",
 	4: "TWITTER",
 }
-
 var ProtocolType_value = map[string]int32{
 	"AUTO_PROTOCOL": 0,
 	"BINARY":        1,
@@ -101,10 +89,7 @@ var ProtocolType_value = map[string]int32{
 func (x ProtocolType) String() string {
 	return proto.EnumName(ProtocolType_name, int32(x))
 }
-
-func (ProtocolType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_e8fab7646d88fc90, []int{1}
-}
+func (ProtocolType) EnumDescriptor() ([]byte, []int) { return fileDescriptorThriftProxy, []int{1} }
 
 // [#comment:next free field: 6]
 type ThriftProxy struct {
@@ -117,49 +102,18 @@ type ThriftProxy struct {
 	// The human readable prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// The route table for the connection manager is static and is specified in this property.
-	RouteConfig *RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
+	RouteConfig *RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig" json:"route_config,omitempty"`
 	// A list of individual Thrift filters that make up the filter chain for requests made to the
 	// Thrift proxy. Order matters as the filters are processed sequentially. For backwards
 	// compatibility, if no thrift_filters are specified, a default Thrift router filter
 	// (`envoy.filters.thrift.router`) is used.
-	ThriftFilters        []*ThriftFilter `protobuf:"bytes,5,rep,name=thrift_filters,json=thriftFilters,proto3" json:"thrift_filters,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	ThriftFilters []*ThriftFilter `protobuf:"bytes,5,rep,name=thrift_filters,json=thriftFilters" json:"thrift_filters,omitempty"`
 }
 
-func (m *ThriftProxy) Reset()         { *m = ThriftProxy{} }
-func (m *ThriftProxy) String() string { return proto.CompactTextString(m) }
-func (*ThriftProxy) ProtoMessage()    {}
-func (*ThriftProxy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e8fab7646d88fc90, []int{0}
-}
-func (m *ThriftProxy) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ThriftProxy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ThriftProxy.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ThriftProxy) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ThriftProxy.Merge(m, src)
-}
-func (m *ThriftProxy) XXX_Size() int {
-	return m.Size()
-}
-func (m *ThriftProxy) XXX_DiscardUnknown() {
-	xxx_messageInfo_ThriftProxy.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ThriftProxy proto.InternalMessageInfo
+func (m *ThriftProxy) Reset()                    { *m = ThriftProxy{} }
+func (m *ThriftProxy) String() string            { return proto.CompactTextString(m) }
+func (*ThriftProxy) ProtoMessage()               {}
+func (*ThriftProxy) Descriptor() ([]byte, []int) { return fileDescriptorThriftProxy, []int{0} }
 
 func (m *ThriftProxy) GetTransport() TransportType {
 	if m != nil {
@@ -212,44 +166,13 @@ type ThriftFilter struct {
 	// Types that are valid to be assigned to ConfigType:
 	//	*ThriftFilter_Config
 	//	*ThriftFilter_TypedConfig
-	ConfigType           isThriftFilter_ConfigType `protobuf_oneof:"config_type"`
-	XXX_NoUnkeyedLiteral struct{}                  `json:"-"`
-	XXX_unrecognized     []byte                    `json:"-"`
-	XXX_sizecache        int32                     `json:"-"`
+	ConfigType isThriftFilter_ConfigType `protobuf_oneof:"config_type"`
 }
 
-func (m *ThriftFilter) Reset()         { *m = ThriftFilter{} }
-func (m *ThriftFilter) String() string { return proto.CompactTextString(m) }
-func (*ThriftFilter) ProtoMessage()    {}
-func (*ThriftFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e8fab7646d88fc90, []int{1}
-}
-func (m *ThriftFilter) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ThriftFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ThriftFilter.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ThriftFilter) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ThriftFilter.Merge(m, src)
-}
-func (m *ThriftFilter) XXX_Size() int {
-	return m.Size()
-}
-func (m *ThriftFilter) XXX_DiscardUnknown() {
-	xxx_messageInfo_ThriftFilter.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ThriftFilter proto.InternalMessageInfo
+func (m *ThriftFilter) Reset()                    { *m = ThriftFilter{} }
+func (m *ThriftFilter) String() string            { return proto.CompactTextString(m) }
+func (*ThriftFilter) ProtoMessage()               {}
+func (*ThriftFilter) Descriptor() ([]byte, []int) { return fileDescriptorThriftProxy, []int{1} }
 
 type isThriftFilter_ConfigType interface {
 	isThriftFilter_ConfigType()
@@ -258,10 +181,10 @@ type isThriftFilter_ConfigType interface {
 }
 
 type ThriftFilter_Config struct {
-	Config *types.Struct `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
+	Config *google_protobuf1.Struct `protobuf:"bytes,2,opt,name=config,oneof"`
 }
 type ThriftFilter_TypedConfig struct {
-	TypedConfig *types.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *google_protobuf.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,oneof"`
 }
 
 func (*ThriftFilter_Config) isThriftFilter_ConfigType()      {}
@@ -281,14 +204,14 @@ func (m *ThriftFilter) GetName() string {
 	return ""
 }
 
-func (m *ThriftFilter) GetConfig() *types.Struct {
+func (m *ThriftFilter) GetConfig() *google_protobuf1.Struct {
 	if x, ok := m.GetConfigType().(*ThriftFilter_Config); ok {
 		return x.Config
 	}
 	return nil
 }
 
-func (m *ThriftFilter) GetTypedConfig() *types.Any {
+func (m *ThriftFilter) GetTypedConfig() *google_protobuf.Any {
 	if x, ok := m.GetConfigType().(*ThriftFilter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -331,7 +254,7 @@ func _ThriftFilter_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.B
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(types.Struct)
+		msg := new(google_protobuf1.Struct)
 		err := b.DecodeMessage(msg)
 		m.ConfigType = &ThriftFilter_Config{msg}
 		return true, err
@@ -339,7 +262,7 @@ func _ThriftFilter_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.B
 		if wire != proto.WireBytes {
 			return true, proto.ErrInternalBadWireType
 		}
-		msg := new(types.Any)
+		msg := new(google_protobuf.Any)
 		err := b.DecodeMessage(msg)
 		m.ConfigType = &ThriftFilter_TypedConfig{msg}
 		return true, err
@@ -354,12 +277,12 @@ func _ThriftFilter_OneofSizer(msg proto.Message) (n int) {
 	switch x := m.ConfigType.(type) {
 	case *ThriftFilter_Config:
 		s := proto.Size(x.Config)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case *ThriftFilter_TypedConfig:
 		s := proto.Size(x.TypedConfig)
-		n += 1 // tag and wire
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
 		n += proto.SizeVarint(uint64(s))
 		n += s
 	case nil:
@@ -383,44 +306,13 @@ type ThriftProtocolOptions struct {
 	// Selecting
 	// :ref:`AUTO_PROTOCOL<envoy_api_enum_value_config.filter.network.thrift_proxy.v2alpha1.ProtocolType.AUTO_PROTOCOL>`,
 	// which is the default, causes the proxy to use the same protocol as the downstream connection.
-	Protocol             ProtocolType `protobuf:"varint,2,opt,name=protocol,proto3,enum=envoy.config.filter.network.thrift_proxy.v2alpha1.ProtocolType" json:"protocol,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+	Protocol ProtocolType `protobuf:"varint,2,opt,name=protocol,proto3,enum=envoy.config.filter.network.thrift_proxy.v2alpha1.ProtocolType" json:"protocol,omitempty"`
 }
 
-func (m *ThriftProtocolOptions) Reset()         { *m = ThriftProtocolOptions{} }
-func (m *ThriftProtocolOptions) String() string { return proto.CompactTextString(m) }
-func (*ThriftProtocolOptions) ProtoMessage()    {}
-func (*ThriftProtocolOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e8fab7646d88fc90, []int{2}
-}
-func (m *ThriftProtocolOptions) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ThriftProtocolOptions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ThriftProtocolOptions.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *ThriftProtocolOptions) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ThriftProtocolOptions.Merge(m, src)
-}
-func (m *ThriftProtocolOptions) XXX_Size() int {
-	return m.Size()
-}
-func (m *ThriftProtocolOptions) XXX_DiscardUnknown() {
-	xxx_messageInfo_ThriftProtocolOptions.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ThriftProtocolOptions proto.InternalMessageInfo
+func (m *ThriftProtocolOptions) Reset()                    { *m = ThriftProtocolOptions{} }
+func (m *ThriftProtocolOptions) String() string            { return proto.CompactTextString(m) }
+func (*ThriftProtocolOptions) ProtoMessage()               {}
+func (*ThriftProtocolOptions) Descriptor() ([]byte, []int) { return fileDescriptorThriftProxy, []int{2} }
 
 func (m *ThriftProtocolOptions) GetTransport() TransportType {
 	if m != nil {
@@ -437,60 +329,12 @@ func (m *ThriftProtocolOptions) GetProtocol() ProtocolType {
 }
 
 func init() {
-	proto.RegisterEnum("envoy.config.filter.network.thrift_proxy.v2alpha1.TransportType", TransportType_name, TransportType_value)
-	proto.RegisterEnum("envoy.config.filter.network.thrift_proxy.v2alpha1.ProtocolType", ProtocolType_name, ProtocolType_value)
 	proto.RegisterType((*ThriftProxy)(nil), "envoy.config.filter.network.thrift_proxy.v2alpha1.ThriftProxy")
 	proto.RegisterType((*ThriftFilter)(nil), "envoy.config.filter.network.thrift_proxy.v2alpha1.ThriftFilter")
 	proto.RegisterType((*ThriftProtocolOptions)(nil), "envoy.config.filter.network.thrift_proxy.v2alpha1.ThriftProtocolOptions")
+	proto.RegisterEnum("envoy.config.filter.network.thrift_proxy.v2alpha1.TransportType", TransportType_name, TransportType_value)
+	proto.RegisterEnum("envoy.config.filter.network.thrift_proxy.v2alpha1.ProtocolType", ProtocolType_name, ProtocolType_value)
 }
-
-func init() {
-	proto.RegisterFile("envoy/config/filter/network/thrift_proxy/v2alpha1/thrift_proxy.proto", fileDescriptor_e8fab7646d88fc90)
-}
-
-var fileDescriptor_e8fab7646d88fc90 = []byte{
-	// 609 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0xcd, 0x6e, 0xd3, 0x4c,
-	0x14, 0xcd, 0xd8, 0x69, 0xbf, 0xf6, 0x3a, 0x89, 0xfc, 0x8d, 0x8a, 0x1a, 0x22, 0x88, 0xa2, 0xae,
-	0xa2, 0x2e, 0x6c, 0x35, 0xac, 0x58, 0xa0, 0x62, 0xa7, 0xa9, 0x5a, 0xa9, 0xad, 0xad, 0xa9, 0x2b,
-	0x7e, 0x24, 0x14, 0xb9, 0xad, 0xed, 0x1a, 0x82, 0xc7, 0x1a, 0x4f, 0x42, 0xb3, 0x65, 0xc5, 0x7b,
-	0xb0, 0xe3, 0x11, 0x58, 0xb1, 0x64, 0xc9, 0x23, 0x54, 0xdd, 0x21, 0xf1, 0x10, 0xc8, 0x33, 0x4e,
-	0x9b, 0x90, 0x55, 0x22, 0xc1, 0xce, 0xf7, 0xef, 0xdc, 0x73, 0xcf, 0x1c, 0x19, 0xf6, 0x82, 0x64,
-	0x44, 0xc7, 0xe6, 0x05, 0x4d, 0xc2, 0x38, 0x32, 0xc3, 0x78, 0xc0, 0x03, 0x66, 0x26, 0x01, 0xff,
-	0x40, 0xd9, 0x3b, 0x93, 0x5f, 0xb1, 0x38, 0xe4, 0xfd, 0x94, 0xd1, 0xeb, 0xb1, 0x39, 0xea, 0xf8,
-	0x83, 0xf4, 0xca, 0xdf, 0x99, 0xc9, 0x1a, 0x29, 0xa3, 0x9c, 0xe2, 0x1d, 0x81, 0x62, 0x48, 0x14,
-	0x43, 0xa2, 0x18, 0x05, 0x8a, 0x31, 0xd3, 0x3f, 0x41, 0x69, 0x3c, 0x5b, 0x7c, 0x31, 0xa3, 0x43,
-	0x1e, 0xc8, 0x8d, 0x8d, 0x87, 0x11, 0xa5, 0xd1, 0x20, 0x30, 0x45, 0x74, 0x3e, 0x0c, 0x4d, 0x3f,
-	0x29, 0xc8, 0x34, 0x1e, 0xfd, 0x59, 0xca, 0x38, 0x1b, 0x5e, 0xf0, 0xa2, 0xba, 0x39, 0xf2, 0x07,
-	0xf1, 0xa5, 0xcf, 0x03, 0x73, 0xf2, 0x51, 0x14, 0x36, 0x22, 0x1a, 0x51, 0xf1, 0x69, 0xe6, 0x5f,
-	0x32, 0xbb, 0x75, 0xa3, 0x82, 0xe6, 0x09, 0x36, 0x6e, 0x4e, 0x06, 0xbf, 0x85, 0x75, 0xce, 0xfc,
-	0x24, 0x4b, 0x29, 0xe3, 0x75, 0xa5, 0x85, 0xda, 0xb5, 0xce, 0x73, 0x63, 0xe1, 0xeb, 0x0d, 0x6f,
-	0x82, 0xe1, 0x8d, 0xd3, 0xc0, 0x86, 0xaf, 0x3f, 0xbf, 0xa9, 0x2b, 0x1f, 0x91, 0xa2, 0x23, 0x72,
-	0x0f, 0x8f, 0x23, 0x58, 0x13, 0x24, 0x2e, 0xe8, 0xa0, 0xae, 0x8a, 0x55, 0xbb, 0x4b, 0xac, 0x72,
-	0x0b, 0x88, 0xb9, 0x4d, 0x77, 0xe0, 0x78, 0x1b, 0xb4, 0x8c, 0xfb, 0xf9, 0x64, 0x10, 0xc6, 0xd7,
-	0x75, 0xd4, 0x42, 0xed, 0x75, 0x7b, 0x3d, 0x6f, 0x2d, 0x33, 0xa5, 0x85, 0x08, 0xe4, 0x55, 0x57,
-	0x14, 0xf1, 0x15, 0x54, 0xc4, 0x3b, 0xf4, 0x25, 0x87, 0x7a, 0xb9, 0x85, 0xda, 0x5a, 0xa7, 0xb7,
-	0x04, 0x31, 0x92, 0xc3, 0x74, 0xc5, 0xc0, 0x90, 0xf9, 0x3c, 0xa6, 0x09, 0xd1, 0xd8, 0x7d, 0x0e,
-	0x87, 0x50, 0x2b, 0x06, 0x25, 0x5c, 0x56, 0x5f, 0x69, 0xa9, 0x6d, 0x6d, 0x29, 0x11, 0xe4, 0x13,
-	0xee, 0x8b, 0x56, 0x52, 0xe5, 0x53, 0x51, 0xb6, 0xf5, 0x05, 0x41, 0x65, 0xba, 0x8e, 0x1f, 0x43,
-	0x39, 0xf1, 0xdf, 0x07, 0xf3, 0x3a, 0x88, 0x34, 0xde, 0x81, 0xd5, 0xe2, 0x76, 0x45, 0xdc, 0xbe,
-	0x69, 0x48, 0xc3, 0x19, 0x13, 0xc3, 0x19, 0xa7, 0xc2, 0x70, 0x07, 0x25, 0x52, 0x34, 0xe2, 0xa7,
-	0x50, 0xe1, 0xe3, 0x34, 0xb8, 0x9c, 0x88, 0xa6, 0x8a, 0xc1, 0x8d, 0xb9, 0x41, 0x2b, 0x19, 0x1f,
-	0x94, 0x88, 0x26, 0x7a, 0xa5, 0x0a, 0x76, 0x15, 0x34, 0x39, 0xd4, 0xcf, 0xb3, 0x5b, 0xbf, 0x10,
-	0x3c, 0xb8, 0xf3, 0xa3, 0x78, 0x3d, 0x27, 0xcd, 0xa5, 0xcb, 0x66, 0x9d, 0x89, 0xfe, 0x9d, 0x33,
-	0x95, 0xbf, 0xe8, 0xcc, 0x6d, 0x07, 0xaa, 0x33, 0x84, 0x30, 0x86, 0x9a, 0x75, 0xe6, 0x39, 0x7d,
-	0x8f, 0x58, 0x27, 0xa7, 0xae, 0x43, 0x3c, 0xbd, 0x84, 0x01, 0x56, 0xf7, 0x89, 0x75, 0xdc, 0xdb,
-	0xd3, 0x11, 0xae, 0xc0, 0xda, 0xd9, 0x49, 0x11, 0x29, 0x79, 0xe5, 0xa0, 0x67, 0xed, 0xf5, 0x88,
-	0xae, 0x36, 0xca, 0x9f, 0x3e, 0x37, 0x4b, 0xdb, 0x6f, 0xa0, 0x32, 0xbd, 0x16, 0xff, 0x0f, 0x55,
-	0x81, 0xe7, 0x12, 0xc7, 0x73, 0xba, 0xce, 0x91, 0x84, 0xb3, 0x0f, 0x4f, 0x2c, 0xf2, 0x4a, 0x47,
-	0xb8, 0x06, 0x70, 0x64, 0xbd, 0xec, 0x17, 0xb1, 0x82, 0x35, 0xf8, 0xaf, 0xeb, 0x1c, 0xbb, 0x56,
-	0xd7, 0xd3, 0xd5, 0x3c, 0xf0, 0x5e, 0x1c, 0x7a, 0x5e, 0x8f, 0xe8, 0x65, 0x09, 0x6f, 0x07, 0xdf,
-	0x6f, 0x9b, 0xe8, 0xc7, 0x6d, 0x13, 0xdd, 0xdc, 0x36, 0x11, 0xec, 0xc6, 0x54, 0xca, 0x22, 0x0f,
-	0x5f, 0x58, 0x21, 0x5b, 0x9f, 0xfa, 0xf5, 0x08, 0xda, 0x2e, 0x7a, 0xad, 0x8c, 0x3a, 0xe7, 0xab,
-	0x42, 0xa0, 0x27, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0xc6, 0xdb, 0x43, 0x17, 0xbe, 0x05, 0x00,
-	0x00,
-}
-
 func (m *ThriftProxy) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -544,9 +388,6 @@ func (m *ThriftProxy) MarshalTo(dAtA []byte) (int, error) {
 			i += n
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -577,9 +418,6 @@ func (m *ThriftFilter) MarshalTo(dAtA []byte) (int, error) {
 			return 0, err
 		}
 		i += nn2
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -637,9 +475,6 @@ func (m *ThriftProtocolOptions) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintThriftProxy(dAtA, i, uint64(m.Protocol))
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -653,9 +488,6 @@ func encodeVarintThriftProxy(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ThriftProxy) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.StatPrefix)
@@ -678,16 +510,10 @@ func (m *ThriftProxy) Size() (n int) {
 			n += 1 + l + sovThriftProxy(uint64(l))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *ThriftFilter) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -697,16 +523,10 @@ func (m *ThriftFilter) Size() (n int) {
 	if m.ConfigType != nil {
 		n += m.ConfigType.Size()
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *ThriftFilter_Config) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Config != nil {
@@ -716,9 +536,6 @@ func (m *ThriftFilter_Config) Size() (n int) {
 	return n
 }
 func (m *ThriftFilter_TypedConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.TypedConfig != nil {
@@ -728,9 +545,6 @@ func (m *ThriftFilter_TypedConfig) Size() (n int) {
 	return n
 }
 func (m *ThriftProtocolOptions) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if m.Transport != 0 {
@@ -738,9 +552,6 @@ func (m *ThriftProtocolOptions) Size() (n int) {
 	}
 	if m.Protocol != 0 {
 		n += 1 + sovThriftProxy(uint64(m.Protocol))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -773,7 +584,7 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -801,7 +612,7 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -811,9 +622,6 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthThriftProxy
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -833,7 +641,7 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Transport |= TransportType(b&0x7F) << shift
+				m.Transport |= (TransportType(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -852,7 +660,7 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Protocol |= ProtocolType(b&0x7F) << shift
+				m.Protocol |= (ProtocolType(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -871,7 +679,7 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -880,9 +688,6 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthThriftProxy
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -907,7 +712,7 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -916,9 +721,6 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthThriftProxy
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -936,13 +738,9 @@ func (m *ThriftProxy) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthThriftProxy
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -967,7 +765,7 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -995,7 +793,7 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1005,9 +803,6 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthThriftProxy
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1027,7 +822,7 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1036,13 +831,10 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthThriftProxy
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &types.Struct{}
+			v := &google_protobuf1.Struct{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1062,7 +854,7 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1071,13 +863,10 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthThriftProxy
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			v := &types.Any{}
+			v := &google_protobuf.Any{}
 			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1092,13 +881,9 @@ func (m *ThriftFilter) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthThriftProxy
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1123,7 +908,7 @@ func (m *ThriftProtocolOptions) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1151,7 +936,7 @@ func (m *ThriftProtocolOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Transport |= TransportType(b&0x7F) << shift
+				m.Transport |= (TransportType(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1170,7 +955,7 @@ func (m *ThriftProtocolOptions) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Protocol |= ProtocolType(b&0x7F) << shift
+				m.Protocol |= (ProtocolType(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1184,13 +969,9 @@ func (m *ThriftProtocolOptions) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthThriftProxy
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthThriftProxy
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1254,11 +1035,8 @@ func skipThriftProxy(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthThriftProxy
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthThriftProxy
 			}
 			return iNdEx, nil
@@ -1289,9 +1067,6 @@ func skipThriftProxy(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthThriftProxy
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1310,3 +1085,50 @@ var (
 	ErrInvalidLengthThriftProxy = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowThriftProxy   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() {
+	proto.RegisterFile("envoy/config/filter/network/thrift_proxy/v2alpha1/thrift_proxy.proto", fileDescriptorThriftProxy)
+}
+
+var fileDescriptorThriftProxy = []byte{
+	// 610 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x94, 0xcf, 0x6e, 0xd3, 0x4e,
+	0x10, 0xc7, 0xb3, 0x76, 0xda, 0x5f, 0x3b, 0x4e, 0x22, 0xff, 0x56, 0x45, 0x0d, 0x11, 0x44, 0x51,
+	0x4f, 0x51, 0x0f, 0xb6, 0x1a, 0x4e, 0x1c, 0x50, 0xb1, 0xd3, 0x54, 0xad, 0xd4, 0xd6, 0xd6, 0xd6,
+	0x15, 0x7f, 0x24, 0x14, 0xb9, 0xad, 0xed, 0x1a, 0x82, 0xd7, 0x5a, 0x6f, 0x42, 0x73, 0xe5, 0xc4,
+	0x7b, 0x70, 0xe3, 0x11, 0x38, 0x71, 0xe4, 0xc8, 0x23, 0x54, 0xbd, 0x21, 0xf1, 0x10, 0xc8, 0xbb,
+	0x4e, 0x9b, 0x90, 0x53, 0x22, 0xc1, 0xcd, 0x33, 0xb3, 0xf3, 0xf9, 0xce, 0x3f, 0x19, 0xf6, 0x82,
+	0x64, 0x44, 0xc7, 0xe6, 0x05, 0x4d, 0xc2, 0x38, 0x32, 0xc3, 0x78, 0xc0, 0x03, 0x66, 0x26, 0x01,
+	0xff, 0x40, 0xd9, 0x3b, 0x93, 0x5f, 0xb1, 0x38, 0xe4, 0xfd, 0x94, 0xd1, 0xeb, 0xb1, 0x39, 0xea,
+	0xf8, 0x83, 0xf4, 0xca, 0xdf, 0x99, 0xf1, 0x1a, 0x29, 0xa3, 0x9c, 0xe2, 0x1d, 0x41, 0x31, 0x24,
+	0xc5, 0x90, 0x14, 0xa3, 0xa0, 0x18, 0x33, 0xef, 0x27, 0x94, 0xc6, 0xb3, 0xc5, 0x85, 0x19, 0x1d,
+	0xf2, 0x40, 0x2a, 0x36, 0x1e, 0x46, 0x94, 0x46, 0x83, 0xc0, 0x14, 0xd6, 0xf9, 0x30, 0x34, 0xfd,
+	0xa4, 0x28, 0xa6, 0xf1, 0xe8, 0xcf, 0x50, 0xc6, 0xd9, 0xf0, 0x82, 0x17, 0xd1, 0xcd, 0x91, 0x3f,
+	0x88, 0x2f, 0x7d, 0x1e, 0x98, 0x93, 0x8f, 0x22, 0xb0, 0x11, 0xd1, 0x88, 0x8a, 0x4f, 0x33, 0xff,
+	0x92, 0xde, 0xad, 0x1b, 0x15, 0x34, 0x4f, 0x54, 0xe3, 0xe6, 0xc5, 0xe0, 0x6d, 0xd0, 0x32, 0xee,
+	0xe7, 0xa5, 0x05, 0x61, 0x7c, 0x5d, 0x47, 0x2d, 0xd4, 0x5e, 0xb7, 0xd7, 0xbf, 0xfe, 0xfc, 0xa6,
+	0x96, 0x99, 0xd2, 0x42, 0x04, 0xf2, 0xa8, 0x2b, 0x82, 0xf8, 0x2d, 0xac, 0x73, 0xe6, 0x27, 0x59,
+	0x4a, 0x19, 0xaf, 0x2b, 0x2d, 0xd4, 0xae, 0x75, 0x9e, 0x1b, 0x0b, 0x4f, 0xca, 0xf0, 0x26, 0x0c,
+	0x6f, 0x9c, 0x06, 0x36, 0xe4, 0x5a, 0x2b, 0x1f, 0x91, 0xa2, 0x23, 0x72, 0x8f, 0xc7, 0x11, 0xac,
+	0x89, 0x82, 0x2f, 0xe8, 0xa0, 0xae, 0x0a, 0xa9, 0xdd, 0x25, 0xa4, 0xdc, 0x02, 0x31, 0xa7, 0x74,
+	0x07, 0xc7, 0x57, 0x50, 0x11, 0x7b, 0xe8, 0x4b, 0x6e, 0xbd, 0xdc, 0x42, 0x6d, 0xad, 0xd3, 0x5b,
+	0x42, 0x8c, 0xe4, 0x98, 0xae, 0x48, 0x18, 0x32, 0x9f, 0xc7, 0x34, 0x21, 0x1a, 0xbb, 0xf7, 0xe1,
+	0x10, 0x6a, 0x45, 0xa2, 0xc4, 0x65, 0xf5, 0x95, 0x96, 0xda, 0xd6, 0x96, 0x6a, 0x4c, 0xae, 0x70,
+	0x5f, 0x3c, 0x25, 0x55, 0x3e, 0x65, 0x65, 0x5b, 0x5f, 0x10, 0x54, 0xa6, 0xe3, 0xf8, 0x31, 0x94,
+	0x13, 0xff, 0x7d, 0x30, 0xbf, 0x5c, 0xe1, 0xc6, 0x3b, 0xb0, 0x5a, 0xf4, 0xae, 0x88, 0xde, 0x37,
+	0x0d, 0x79, 0x70, 0xc6, 0xe4, 0xe0, 0x8c, 0x53, 0x71, 0x70, 0x07, 0x25, 0x52, 0x3c, 0xc4, 0x4f,
+	0xa1, 0xc2, 0xc7, 0x69, 0x70, 0x39, 0x19, 0x9a, 0x2a, 0x12, 0x37, 0xe6, 0x12, 0xad, 0x64, 0x7c,
+	0x50, 0x22, 0x9a, 0x78, 0x2b, 0xa7, 0x60, 0x57, 0x41, 0x93, 0x49, 0xfd, 0xdc, 0xbb, 0xf5, 0x0b,
+	0xc1, 0x83, 0xbb, 0x7b, 0x14, 0x1b, 0x71, 0xd2, 0x7c, 0x74, 0xd9, 0xec, 0xb5, 0xa1, 0x7f, 0x77,
+	0x6d, 0xca, 0x5f, 0xbc, 0xb6, 0x6d, 0x07, 0xaa, 0x33, 0x05, 0x61, 0x0c, 0x35, 0xeb, 0xcc, 0x73,
+	0xfa, 0x1e, 0xb1, 0x4e, 0x4e, 0x5d, 0x87, 0x78, 0x7a, 0x09, 0x03, 0xac, 0xee, 0x13, 0xeb, 0xb8,
+	0xb7, 0xa7, 0x23, 0x5c, 0x81, 0xb5, 0xb3, 0x93, 0xc2, 0x52, 0xf2, 0xc8, 0x41, 0xcf, 0xda, 0xeb,
+	0x11, 0x5d, 0x6d, 0x94, 0x3f, 0x7d, 0x6e, 0x96, 0xb6, 0xdf, 0x40, 0x65, 0x5a, 0x16, 0xff, 0x0f,
+	0x55, 0xc1, 0x73, 0x89, 0xe3, 0x39, 0x5d, 0xe7, 0x48, 0xe2, 0xec, 0xc3, 0x13, 0x8b, 0xbc, 0xd2,
+	0x11, 0xae, 0x01, 0x1c, 0x59, 0x2f, 0xfb, 0x85, 0xad, 0x60, 0x0d, 0xfe, 0xeb, 0x3a, 0xc7, 0xae,
+	0xd5, 0xf5, 0x74, 0x35, 0x37, 0xbc, 0x17, 0x87, 0x9e, 0xd7, 0x23, 0x7a, 0x59, 0xe2, 0xed, 0xe0,
+	0xfb, 0x6d, 0x13, 0xfd, 0xb8, 0x6d, 0xa2, 0x9b, 0xdb, 0x26, 0x82, 0xdd, 0x98, 0xca, 0xb1, 0xc8,
+	0xc6, 0x17, 0x9e, 0x90, 0xad, 0x4f, 0xfd, 0x7a, 0x44, 0xd9, 0x2e, 0x7a, 0xad, 0x8c, 0x3a, 0xe7,
+	0xab, 0x62, 0x40, 0x4f, 0x7e, 0x07, 0x00, 0x00, 0xff, 0xff, 0x62, 0x61, 0x0f, 0x87, 0xbe, 0x05,
+	0x00, 0x00,
+}

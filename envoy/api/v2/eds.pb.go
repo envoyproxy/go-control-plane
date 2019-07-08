@@ -3,35 +3,28 @@
 
 package v2
 
-import (
-	bytes "bytes"
-	context "context"
-	fmt "fmt"
-	io "io"
-	math "math"
+import proto "github.com/gogo/protobuf/proto"
+import fmt "fmt"
+import math "math"
+import envoy_api_v2_endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
+import envoy_type "github.com/envoyproxy/go-control-plane/envoy/type"
+import _ "github.com/gogo/googleapis/google/api"
+import _ "github.com/envoyproxy/protoc-gen-validate/validate"
+import _ "github.com/gogo/protobuf/gogoproto"
+import google_protobuf2 "github.com/gogo/protobuf/types"
+import google_protobuf4 "github.com/gogo/protobuf/types"
 
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "github.com/gogo/googleapis/google/api"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
-	types "github.com/gogo/protobuf/types"
-	grpc "google.golang.org/grpc"
+import context "golang.org/x/net/context"
+import grpc "google.golang.org/grpc"
 
-	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
-	_type "github.com/envoyproxy/go-control-plane/envoy/type"
-)
+import sortkeys "github.com/gogo/protobuf/sortkeys"
+
+import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Each route from RDS will map to a single cluster or traffic split across
 // clusters using weights expressed in the RDS WeightedCluster.
@@ -49,44 +42,17 @@ type ClusterLoadAssignment struct {
 	// <envoy_api_msg_Cluster.EdsClusterConfig>`.
 	ClusterName string `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
 	// List of endpoints to load balance to.
-	Endpoints []endpoint.LocalityLbEndpoints `protobuf:"bytes,2,rep,name=endpoints,proto3" json:"endpoints"`
+	Endpoints []envoy_api_v2_endpoint.LocalityLbEndpoints `protobuf:"bytes,2,rep,name=endpoints" json:"endpoints"`
 	// Map of named endpoints that can be referenced in LocalityLbEndpoints.
-	NamedEndpoints map[string]*endpoint.Endpoint `protobuf:"bytes,5,rep,name=named_endpoints,json=namedEndpoints,proto3" json:"named_endpoints,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	NamedEndpoints map[string]*envoy_api_v2_endpoint.Endpoint `protobuf:"bytes,5,rep,name=named_endpoints,json=namedEndpoints" json:"named_endpoints,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
 	// Load balancing policy settings.
-	Policy               *ClusterLoadAssignment_Policy `protobuf:"bytes,4,opt,name=policy,proto3" json:"policy,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
-	XXX_unrecognized     []byte                        `json:"-"`
-	XXX_sizecache        int32                         `json:"-"`
+	Policy *ClusterLoadAssignment_Policy `protobuf:"bytes,4,opt,name=policy" json:"policy,omitempty"`
 }
 
-func (m *ClusterLoadAssignment) Reset()         { *m = ClusterLoadAssignment{} }
-func (m *ClusterLoadAssignment) String() string { return proto.CompactTextString(m) }
-func (*ClusterLoadAssignment) ProtoMessage()    {}
-func (*ClusterLoadAssignment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3c8760f38742c17f, []int{0}
-}
-func (m *ClusterLoadAssignment) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ClusterLoadAssignment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *ClusterLoadAssignment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClusterLoadAssignment.Merge(m, src)
-}
-func (m *ClusterLoadAssignment) XXX_Size() int {
-	return m.Size()
-}
-func (m *ClusterLoadAssignment) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClusterLoadAssignment.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClusterLoadAssignment proto.InternalMessageInfo
+func (m *ClusterLoadAssignment) Reset()                    { *m = ClusterLoadAssignment{} }
+func (m *ClusterLoadAssignment) String() string            { return proto.CompactTextString(m) }
+func (*ClusterLoadAssignment) ProtoMessage()               {}
+func (*ClusterLoadAssignment) Descriptor() ([]byte, []int) { return fileDescriptorEds, []int{0} }
 
 func (m *ClusterLoadAssignment) GetClusterName() string {
 	if m != nil {
@@ -95,14 +61,14 @@ func (m *ClusterLoadAssignment) GetClusterName() string {
 	return ""
 }
 
-func (m *ClusterLoadAssignment) GetEndpoints() []endpoint.LocalityLbEndpoints {
+func (m *ClusterLoadAssignment) GetEndpoints() []envoy_api_v2_endpoint.LocalityLbEndpoints {
 	if m != nil {
 		return m.Endpoints
 	}
 	return nil
 }
 
-func (m *ClusterLoadAssignment) GetNamedEndpoints() map[string]*endpoint.Endpoint {
+func (m *ClusterLoadAssignment) GetNamedEndpoints() map[string]*envoy_api_v2_endpoint.Endpoint {
 	if m != nil {
 		return m.NamedEndpoints
 	}
@@ -137,7 +103,7 @@ type ClusterLoadAssignment_Policy struct {
 	//    "throttle"_drop = 60%
 	//    "lb"_drop = 20%  // 50% of the remaining 'actual' load, which is 40%.
 	//    actual_outgoing_load = 20% // remaining after applying all categories.
-	DropOverloads []*ClusterLoadAssignment_Policy_DropOverload `protobuf:"bytes,2,rep,name=drop_overloads,json=dropOverloads,proto3" json:"drop_overloads,omitempty"`
+	DropOverloads []*ClusterLoadAssignment_Policy_DropOverload `protobuf:"bytes,2,rep,name=drop_overloads,json=dropOverloads" json:"drop_overloads,omitempty"`
 	// Priority levels and localities are considered overprovisioned with this
 	// factor (in percentage). This means that we don't consider a priority
 	// level or locality unhealthy until the percentage of healthy hosts
@@ -152,45 +118,20 @@ type ClusterLoadAssignment_Policy struct {
 	//
 	// Read more at :ref:`priority levels <arch_overview_load_balancing_priority_levels>` and
 	// :ref:`localities <arch_overview_load_balancing_locality_weighted_lb>`.
-	OverprovisioningFactor *types.UInt32Value `protobuf:"bytes,3,opt,name=overprovisioning_factor,json=overprovisioningFactor,proto3" json:"overprovisioning_factor,omitempty"`
+	OverprovisioningFactor *google_protobuf2.UInt32Value `protobuf:"bytes,3,opt,name=overprovisioning_factor,json=overprovisioningFactor" json:"overprovisioning_factor,omitempty"`
 	// The max time until which the endpoints from this assignment can be used.
 	// If no new assignments are received before this time expires the endpoints
 	// are considered stale and should be marked unhealthy.
 	// Defaults to 0 which means endpoints never go stale.
-	EndpointStaleAfter   *types.Duration `protobuf:"bytes,4,opt,name=endpoint_stale_after,json=endpointStaleAfter,proto3" json:"endpoint_stale_after,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	EndpointStaleAfter *google_protobuf4.Duration `protobuf:"bytes,4,opt,name=endpoint_stale_after,json=endpointStaleAfter" json:"endpoint_stale_after,omitempty"`
 }
 
 func (m *ClusterLoadAssignment_Policy) Reset()         { *m = ClusterLoadAssignment_Policy{} }
 func (m *ClusterLoadAssignment_Policy) String() string { return proto.CompactTextString(m) }
 func (*ClusterLoadAssignment_Policy) ProtoMessage()    {}
 func (*ClusterLoadAssignment_Policy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3c8760f38742c17f, []int{0, 1}
+	return fileDescriptorEds, []int{0, 1}
 }
-func (m *ClusterLoadAssignment_Policy) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ClusterLoadAssignment_Policy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *ClusterLoadAssignment_Policy) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClusterLoadAssignment_Policy.Merge(m, src)
-}
-func (m *ClusterLoadAssignment_Policy) XXX_Size() int {
-	return m.Size()
-}
-func (m *ClusterLoadAssignment_Policy) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClusterLoadAssignment_Policy.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClusterLoadAssignment_Policy proto.InternalMessageInfo
 
 func (m *ClusterLoadAssignment_Policy) GetDropOverloads() []*ClusterLoadAssignment_Policy_DropOverload {
 	if m != nil {
@@ -199,14 +140,14 @@ func (m *ClusterLoadAssignment_Policy) GetDropOverloads() []*ClusterLoadAssignme
 	return nil
 }
 
-func (m *ClusterLoadAssignment_Policy) GetOverprovisioningFactor() *types.UInt32Value {
+func (m *ClusterLoadAssignment_Policy) GetOverprovisioningFactor() *google_protobuf2.UInt32Value {
 	if m != nil {
 		return m.OverprovisioningFactor
 	}
 	return nil
 }
 
-func (m *ClusterLoadAssignment_Policy) GetEndpointStaleAfter() *types.Duration {
+func (m *ClusterLoadAssignment_Policy) GetEndpointStaleAfter() *google_protobuf4.Duration {
 	if m != nil {
 		return m.EndpointStaleAfter
 	}
@@ -217,10 +158,7 @@ type ClusterLoadAssignment_Policy_DropOverload struct {
 	// Identifier for the policy specifying the drop.
 	Category string `protobuf:"bytes,1,opt,name=category,proto3" json:"category,omitempty"`
 	// Percentage of traffic that should be dropped for the category.
-	DropPercentage       *_type.FractionalPercent `protobuf:"bytes,2,opt,name=drop_percentage,json=dropPercentage,proto3" json:"drop_percentage,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
+	DropPercentage *envoy_type.FractionalPercent `protobuf:"bytes,2,opt,name=drop_percentage,json=dropPercentage" json:"drop_percentage,omitempty"`
 }
 
 func (m *ClusterLoadAssignment_Policy_DropOverload) Reset() {
@@ -229,30 +167,8 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Reset() {
 func (m *ClusterLoadAssignment_Policy_DropOverload) String() string { return proto.CompactTextString(m) }
 func (*ClusterLoadAssignment_Policy_DropOverload) ProtoMessage()    {}
 func (*ClusterLoadAssignment_Policy_DropOverload) Descriptor() ([]byte, []int) {
-	return fileDescriptor_3c8760f38742c17f, []int{0, 1, 0}
+	return fileDescriptorEds, []int{0, 1, 0}
 }
-func (m *ClusterLoadAssignment_Policy_DropOverload) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *ClusterLoadAssignment_Policy_DropOverload) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	b = b[:cap(b)]
-	n, err := m.MarshalTo(b)
-	if err != nil {
-		return nil, err
-	}
-	return b[:n], nil
-}
-func (m *ClusterLoadAssignment_Policy_DropOverload) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClusterLoadAssignment_Policy_DropOverload.Merge(m, src)
-}
-func (m *ClusterLoadAssignment_Policy_DropOverload) XXX_Size() int {
-	return m.Size()
-}
-func (m *ClusterLoadAssignment_Policy_DropOverload) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClusterLoadAssignment_Policy_DropOverload.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClusterLoadAssignment_Policy_DropOverload proto.InternalMessageInfo
 
 func (m *ClusterLoadAssignment_Policy_DropOverload) GetCategory() string {
 	if m != nil {
@@ -261,7 +177,7 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) GetCategory() string {
 	return ""
 }
 
-func (m *ClusterLoadAssignment_Policy_DropOverload) GetDropPercentage() *_type.FractionalPercent {
+func (m *ClusterLoadAssignment_Policy_DropOverload) GetDropPercentage() *envoy_type.FractionalPercent {
 	if m != nil {
 		return m.DropPercentage
 	}
@@ -270,63 +186,9 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) GetDropPercentage() *_type.F
 
 func init() {
 	proto.RegisterType((*ClusterLoadAssignment)(nil), "envoy.api.v2.ClusterLoadAssignment")
-	proto.RegisterMapType((map[string]*endpoint.Endpoint)(nil), "envoy.api.v2.ClusterLoadAssignment.NamedEndpointsEntry")
 	proto.RegisterType((*ClusterLoadAssignment_Policy)(nil), "envoy.api.v2.ClusterLoadAssignment.Policy")
 	proto.RegisterType((*ClusterLoadAssignment_Policy_DropOverload)(nil), "envoy.api.v2.ClusterLoadAssignment.Policy.DropOverload")
 }
-
-func init() { proto.RegisterFile("envoy/api/v2/eds.proto", fileDescriptor_3c8760f38742c17f) }
-
-var fileDescriptor_3c8760f38742c17f = []byte{
-	// 726 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0xc7, 0xb3, 0x4e, 0x1a, 0xd2, 0x6d, 0x48, 0x2b, 0x53, 0xda, 0x60, 0x85, 0x34, 0x0a, 0x45,
-	0xaa, 0x22, 0x64, 0xa3, 0x54, 0xa8, 0xa8, 0x17, 0xd4, 0x90, 0x46, 0x02, 0x55, 0x25, 0x72, 0x05,
-	0x82, 0x0b, 0x61, 0x63, 0x6f, 0x8d, 0x85, 0xb3, 0x6b, 0xd6, 0x1b, 0x83, 0x0f, 0x5c, 0x38, 0x71,
-	0xe7, 0x25, 0x50, 0x1f, 0x81, 0x13, 0xc7, 0x1e, 0x10, 0x42, 0xe2, 0xc2, 0x09, 0xa1, 0x88, 0x0b,
-	0x6f, 0x81, 0xd6, 0x5f, 0xa9, 0x9b, 0x16, 0x71, 0xe0, 0x36, 0xde, 0x99, 0xf9, 0xcd, 0x78, 0xe6,
-	0xbf, 0x0b, 0x57, 0x30, 0xf1, 0x69, 0xa0, 0x21, 0xd7, 0xd6, 0xfc, 0xb6, 0x86, 0x4d, 0x4f, 0x75,
-	0x19, 0xe5, 0x54, 0x2e, 0x87, 0xe7, 0x2a, 0x72, 0x6d, 0xd5, 0x6f, 0x2b, 0xb5, 0x4c, 0x94, 0x69,
-	0x7b, 0x06, 0xf5, 0x31, 0x0b, 0xa2, 0x58, 0x65, 0x3d, 0xcb, 0x20, 0xa6, 0x4b, 0x6d, 0xc2, 0x53,
-	0x23, 0x8e, 0xaa, 0x46, 0x51, 0x3c, 0x70, 0xb1, 0xe6, 0x62, 0x66, 0xe0, 0xd4, 0x53, 0xb3, 0x28,
-	0xb5, 0x1c, 0x1c, 0x02, 0x10, 0x21, 0x94, 0x23, 0x6e, 0x53, 0x12, 0x77, 0xa2, 0xac, 0xfa, 0xc8,
-	0xb1, 0x4d, 0xc4, 0xb1, 0x96, 0x18, 0xb1, 0x63, 0xd9, 0xa2, 0x16, 0x0d, 0x4d, 0x4d, 0x58, 0xf1,
-	0x69, 0x3d, 0x86, 0x85, 0x5f, 0xc3, 0xf1, 0xa1, 0xf6, 0x8a, 0x21, 0xd7, 0xc5, 0xcc, 0x3b, 0xcf,
-	0x6f, 0x8e, 0x59, 0x58, 0x2f, 0xf2, 0x37, 0x3f, 0x17, 0xe1, 0xe5, 0xbb, 0xce, 0xd8, 0xe3, 0x98,
-	0xed, 0x51, 0x64, 0xee, 0x78, 0x9e, 0x6d, 0x91, 0x11, 0x26, 0x5c, 0xbe, 0x01, 0xcb, 0x46, 0xe4,
-	0x18, 0x10, 0x34, 0xc2, 0x55, 0xd0, 0x00, 0x1b, 0xf3, 0x9d, 0xf9, 0x8f, 0xbf, 0x3f, 0xe5, 0x0b,
-	0x4c, 0x6a, 0x00, 0x7d, 0x21, 0x76, 0xef, 0xa3, 0x11, 0x96, 0xf7, 0xe1, 0x7c, 0x32, 0x00, 0xaf,
-	0x2a, 0x35, 0xf2, 0x1b, 0x0b, 0xed, 0x96, 0x7a, 0x72, 0xa8, 0x6a, 0x3a, 0x9f, 0x3d, 0x6a, 0x20,
-	0xc7, 0xe6, 0xc1, 0xde, 0x70, 0x37, 0xc9, 0xe8, 0x14, 0x8e, 0x7f, 0xac, 0xe5, 0xf4, 0x29, 0x42,
-	0x7e, 0x06, 0x17, 0x45, 0x55, 0x73, 0x30, 0xa5, 0xce, 0x85, 0xd4, 0xad, 0x2c, 0xf5, 0xcc, 0xde,
-	0x55, 0xd1, 0x92, 0x99, 0xd2, 0x77, 0x09, 0x67, 0x81, 0x5e, 0x21, 0x99, 0x43, 0xb9, 0x03, 0x8b,
-	0x2e, 0x75, 0x6c, 0x23, 0xa8, 0x16, 0x1a, 0x60, 0xb6, 0xdd, 0xb3, 0xc1, 0xfd, 0x30, 0x43, 0x8f,
-	0x33, 0x95, 0x21, 0xbc, 0x74, 0x46, 0x29, 0x79, 0x09, 0xe6, 0x5f, 0xe0, 0x20, 0x9a, 0x98, 0x2e,
-	0x4c, 0xf9, 0x16, 0x9c, 0xf3, 0x91, 0x33, 0xc6, 0x55, 0x29, 0xac, 0xb5, 0x76, 0xce, 0x68, 0x12,
-	0x8e, 0x1e, 0x45, 0x6f, 0x4b, 0xb7, 0x81, 0x72, 0x94, 0x87, 0xc5, 0xa8, 0xac, 0xfc, 0x14, 0x56,
-	0x4c, 0x46, 0xdd, 0x81, 0x50, 0xa3, 0x43, 0x91, 0x99, 0x4c, 0x7a, 0xeb, 0xdf, 0x5b, 0x57, 0xbb,
-	0x8c, 0xba, 0x0f, 0xe2, 0x7c, 0xfd, 0xa2, 0x79, 0xe2, 0x4b, 0x0c, 0x7d, 0x55, 0xa0, 0x5d, 0x46,
-	0x7d, 0xdb, 0xb3, 0x29, 0xb1, 0x89, 0x35, 0x38, 0x44, 0x06, 0xa7, 0xac, 0x9a, 0x0f, 0xfb, 0xae,
-	0xa9, 0x91, 0x9c, 0xd4, 0x44, 0x4e, 0xea, 0xc3, 0x7b, 0x84, 0x6f, 0xb6, 0x1f, 0x89, 0x6e, 0x63,
-	0x6d, 0xb4, 0xa4, 0x46, 0x4e, 0x5f, 0x39, 0xcd, 0xe9, 0x85, 0x18, 0xf9, 0x09, 0x5c, 0x4e, 0x7e,
-	0x76, 0xe0, 0x71, 0xe4, 0xe0, 0x01, 0x3a, 0xe4, 0x98, 0xc5, 0x2b, 0xb8, 0x32, 0x83, 0xef, 0xc6,
-	0x6a, 0xed, 0x94, 0x05, 0xfb, 0xc2, 0x11, 0x28, 0xb4, 0xa4, 0x52, 0x4e, 0x97, 0x13, 0xc8, 0x81,
-	0x60, 0xec, 0x08, 0x84, 0xf2, 0x06, 0x96, 0x4f, 0xfe, 0x9b, 0x7c, 0x1d, 0x96, 0x0c, 0xc4, 0xb1,
-	0x45, 0x59, 0x30, 0xab, 0xdd, 0xd4, 0x25, 0xf7, 0xe0, 0x62, 0x38, 0xd3, 0xf8, 0x8e, 0x22, 0x2b,
-	0xd9, 0xd1, 0xd5, 0x78, 0xa8, 0xe2, 0x06, 0xab, 0x3d, 0x86, 0x0c, 0xd1, 0x07, 0x72, 0xfa, 0x51,
-	0x9c, 0x1e, 0x6e, 0xa2, 0x9f, 0x26, 0xdd, 0x2f, 0x94, 0xc0, 0x92, 0xd4, 0xfe, 0x22, 0xc1, 0x6a,
-	0xb2, 0xc4, 0x6e, 0xf2, 0x6e, 0x1c, 0x60, 0xe6, 0xdb, 0x06, 0x96, 0x1f, 0xc3, 0xc5, 0x03, 0xce,
-	0x30, 0x1a, 0x4d, 0x45, 0x58, 0xcf, 0x6e, 0x2e, 0x4d, 0xd1, 0xf1, 0xcb, 0x31, 0xf6, 0xb8, 0xb2,
-	0x76, 0xae, 0xdf, 0x73, 0x29, 0xf1, 0x70, 0x33, 0xb7, 0x01, 0x6e, 0x02, 0x19, 0xc1, 0x4a, 0x17,
-	0x3b, 0x1c, 0x4d, 0xc1, 0xd7, 0x4e, 0x25, 0x0a, 0xef, 0x0c, 0x7d, 0xfd, 0xef, 0x41, 0x99, 0x12,
-	0x63, 0x58, 0xe9, 0x61, 0x6e, 0x3c, 0xff, 0x8f, 0xbd, 0x37, 0xdf, 0x7e, 0xfb, 0xf5, 0x5e, 0xaa,
-	0x35, 0x57, 0x33, 0xaf, 0xec, 0x76, 0x7a, 0xe3, 0xb7, 0x41, 0xab, 0x73, 0xe7, 0xc3, 0xa4, 0x0e,
-	0x8e, 0x27, 0x75, 0xf0, 0x75, 0x52, 0x07, 0xdf, 0x27, 0x75, 0xf0, 0x73, 0x52, 0x07, 0x50, 0xb1,
-	0x69, 0x04, 0x77, 0x19, 0x7d, 0x1d, 0x64, 0xea, 0x74, 0x4a, 0xbb, 0xa6, 0xd7, 0x17, 0xfa, 0xe9,
-	0x83, 0x77, 0x00, 0x0c, 0x8b, 0xa1, 0x96, 0x36, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xa1, 0xc3,
-	0x41, 0x52, 0xfa, 0x05, 0x00, 0x00,
-}
-
 func (this *ClusterLoadAssignment) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -368,9 +230,6 @@ func (this *ClusterLoadAssignment) Equal(that interface{}) bool {
 	if !this.Policy.Equal(that1.Policy) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 func (this *ClusterLoadAssignment_Policy) Equal(that interface{}) bool {
@@ -406,9 +265,6 @@ func (this *ClusterLoadAssignment_Policy) Equal(that interface{}) bool {
 	if !this.EndpointStaleAfter.Equal(that1.EndpointStaleAfter) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 func (this *ClusterLoadAssignment_Policy_DropOverload) Equal(that interface{}) bool {
@@ -436,9 +292,6 @@ func (this *ClusterLoadAssignment_Policy_DropOverload) Equal(that interface{}) b
 	if !this.DropPercentage.Equal(that1.DropPercentage) {
 		return false
 	}
-	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
-		return false
-	}
 	return true
 }
 
@@ -450,9 +303,8 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// EndpointDiscoveryServiceClient is the client API for EndpointDiscoveryService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+// Client API for EndpointDiscoveryService service
+
 type EndpointDiscoveryServiceClient interface {
 	// The resource_names field in DiscoveryRequest specifies a list of clusters
 	// to subscribe to updates for.
@@ -470,7 +322,7 @@ func NewEndpointDiscoveryServiceClient(cc *grpc.ClientConn) EndpointDiscoverySer
 }
 
 func (c *endpointDiscoveryServiceClient) StreamEndpoints(ctx context.Context, opts ...grpc.CallOption) (EndpointDiscoveryService_StreamEndpointsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_EndpointDiscoveryService_serviceDesc.Streams[0], "/envoy.api.v2.EndpointDiscoveryService/StreamEndpoints", opts...)
+	stream, err := grpc.NewClientStream(ctx, &_EndpointDiscoveryService_serviceDesc.Streams[0], c.cc, "/envoy.api.v2.EndpointDiscoveryService/StreamEndpoints", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -501,7 +353,7 @@ func (x *endpointDiscoveryServiceStreamEndpointsClient) Recv() (*DiscoveryRespon
 }
 
 func (c *endpointDiscoveryServiceClient) DeltaEndpoints(ctx context.Context, opts ...grpc.CallOption) (EndpointDiscoveryService_DeltaEndpointsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_EndpointDiscoveryService_serviceDesc.Streams[1], "/envoy.api.v2.EndpointDiscoveryService/DeltaEndpoints", opts...)
+	stream, err := grpc.NewClientStream(ctx, &_EndpointDiscoveryService_serviceDesc.Streams[1], c.cc, "/envoy.api.v2.EndpointDiscoveryService/DeltaEndpoints", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -533,14 +385,15 @@ func (x *endpointDiscoveryServiceDeltaEndpointsClient) Recv() (*DeltaDiscoveryRe
 
 func (c *endpointDiscoveryServiceClient) FetchEndpoints(ctx context.Context, in *DiscoveryRequest, opts ...grpc.CallOption) (*DiscoveryResponse, error) {
 	out := new(DiscoveryResponse)
-	err := c.cc.Invoke(ctx, "/envoy.api.v2.EndpointDiscoveryService/FetchEndpoints", in, out, opts...)
+	err := grpc.Invoke(ctx, "/envoy.api.v2.EndpointDiscoveryService/FetchEndpoints", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// EndpointDiscoveryServiceServer is the server API for EndpointDiscoveryService service.
+// Server API for EndpointDiscoveryService service
+
 type EndpointDiscoveryServiceServer interface {
 	// The resource_names field in DiscoveryRequest specifies a list of clusters
 	// to subscribe to updates for.
@@ -697,7 +550,7 @@ func (m *ClusterLoadAssignment) MarshalTo(dAtA []byte) (int, error) {
 		for k, _ := range m.NamedEndpoints {
 			keysForNamedEndpoints = append(keysForNamedEndpoints, string(k))
 		}
-		github_com_gogo_protobuf_sortkeys.Strings(keysForNamedEndpoints)
+		sortkeys.Strings(keysForNamedEndpoints)
 		for _, k := range keysForNamedEndpoints {
 			dAtA[i] = 0x2a
 			i++
@@ -724,9 +577,6 @@ func (m *ClusterLoadAssignment) MarshalTo(dAtA []byte) (int, error) {
 				i += n2
 			}
 		}
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
@@ -778,9 +628,6 @@ func (m *ClusterLoadAssignment_Policy) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n4
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -815,9 +662,6 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) MarshalTo(dAtA []byte) (int,
 		}
 		i += n5
 	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
 	return i, nil
 }
 
@@ -831,9 +675,6 @@ func encodeVarintEds(dAtA []byte, offset int, v uint64) int {
 	return offset + 1
 }
 func (m *ClusterLoadAssignment) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.ClusterName)
@@ -863,16 +704,10 @@ func (m *ClusterLoadAssignment) Size() (n int) {
 			n += mapEntrySize + 1 + sovEds(uint64(mapEntrySize))
 		}
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *ClusterLoadAssignment_Policy) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	if len(m.DropOverloads) > 0 {
@@ -889,16 +724,10 @@ func (m *ClusterLoadAssignment_Policy) Size() (n int) {
 		l = m.EndpointStaleAfter.Size()
 		n += 1 + l + sovEds(uint64(l))
 	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
 	return n
 }
 
 func (m *ClusterLoadAssignment_Policy_DropOverload) Size() (n int) {
-	if m == nil {
-		return 0
-	}
 	var l int
 	_ = l
 	l = len(m.Category)
@@ -908,9 +737,6 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Size() (n int) {
 	if m.DropPercentage != nil {
 		l = m.DropPercentage.Size()
 		n += 1 + l + sovEds(uint64(l))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -943,7 +769,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -971,7 +797,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -981,9 +807,6 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1003,7 +826,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1012,13 +835,10 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Endpoints = append(m.Endpoints, endpoint.LocalityLbEndpoints{})
+			m.Endpoints = append(m.Endpoints, envoy_api_v2_endpoint.LocalityLbEndpoints{})
 			if err := m.Endpoints[len(m.Endpoints)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1037,7 +857,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1046,9 +866,6 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1073,7 +890,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1082,17 +899,14 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.NamedEndpoints == nil {
-				m.NamedEndpoints = make(map[string]*endpoint.Endpoint)
+				m.NamedEndpoints = make(map[string]*envoy_api_v2_endpoint.Endpoint)
 			}
 			var mapkey string
-			var mapvalue *endpoint.Endpoint
+			var mapvalue *envoy_api_v2_endpoint.Endpoint
 			for iNdEx < postIndex {
 				entryPreIndex := iNdEx
 				var wire uint64
@@ -1105,7 +919,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= uint64(b&0x7F) << shift
+					wire |= (uint64(b) & 0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -1122,7 +936,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
+						stringLenmapkey |= (uint64(b) & 0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1132,9 +946,6 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthEds
 					}
 					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthEds
-					}
 					if postStringIndexmapkey > l {
 						return io.ErrUnexpectedEOF
 					}
@@ -1151,7 +962,7 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						mapmsglen |= int(b&0x7F) << shift
+						mapmsglen |= (int(b) & 0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -1160,13 +971,13 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 						return ErrInvalidLengthEds
 					}
 					postmsgIndex := iNdEx + mapmsglen
-					if postmsgIndex < 0 {
+					if mapmsglen < 0 {
 						return ErrInvalidLengthEds
 					}
 					if postmsgIndex > l {
 						return io.ErrUnexpectedEOF
 					}
-					mapvalue = &endpoint.Endpoint{}
+					mapvalue = &envoy_api_v2_endpoint.Endpoint{}
 					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
 						return err
 					}
@@ -1197,13 +1008,9 @@ func (m *ClusterLoadAssignment) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthEds
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthEds
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1228,7 +1035,7 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1256,7 +1063,7 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1265,9 +1072,6 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1290,7 +1094,7 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1299,14 +1103,11 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.OverprovisioningFactor == nil {
-				m.OverprovisioningFactor = &types.UInt32Value{}
+				m.OverprovisioningFactor = &google_protobuf2.UInt32Value{}
 			}
 			if err := m.OverprovisioningFactor.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1326,7 +1127,7 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1335,14 +1136,11 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.EndpointStaleAfter == nil {
-				m.EndpointStaleAfter = &types.Duration{}
+				m.EndpointStaleAfter = &google_protobuf4.Duration{}
 			}
 			if err := m.EndpointStaleAfter.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1357,13 +1155,9 @@ func (m *ClusterLoadAssignment_Policy) Unmarshal(dAtA []byte) error {
 			if skippy < 0 {
 				return ErrInvalidLengthEds
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthEds
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1388,7 +1182,7 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Unmarshal(dAtA []byte) error
 			}
 			b := dAtA[iNdEx]
 			iNdEx++
-			wire |= uint64(b&0x7F) << shift
+			wire |= (uint64(b) & 0x7F) << shift
 			if b < 0x80 {
 				break
 			}
@@ -1416,7 +1210,7 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Unmarshal(dAtA []byte) error
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1426,9 +1220,6 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Unmarshal(dAtA []byte) error
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
@@ -1448,7 +1239,7 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Unmarshal(dAtA []byte) error
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -1457,14 +1248,11 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Unmarshal(dAtA []byte) error
 				return ErrInvalidLengthEds
 			}
 			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthEds
-			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
 			if m.DropPercentage == nil {
-				m.DropPercentage = &_type.FractionalPercent{}
+				m.DropPercentage = &envoy_type.FractionalPercent{}
 			}
 			if err := m.DropPercentage.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -1479,13 +1267,9 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Unmarshal(dAtA []byte) error
 			if skippy < 0 {
 				return ErrInvalidLengthEds
 			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthEds
-			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1549,11 +1333,8 @@ func skipEds(dAtA []byte) (n int, err error) {
 					break
 				}
 			}
-			if length < 0 {
-				return 0, ErrInvalidLengthEds
-			}
 			iNdEx += length
-			if iNdEx < 0 {
+			if length < 0 {
 				return 0, ErrInvalidLengthEds
 			}
 			return iNdEx, nil
@@ -1584,9 +1365,6 @@ func skipEds(dAtA []byte) (n int, err error) {
 					return 0, err
 				}
 				iNdEx = start + next
-				if iNdEx < 0 {
-					return 0, ErrInvalidLengthEds
-				}
 			}
 			return iNdEx, nil
 		case 4:
@@ -1605,3 +1383,55 @@ var (
 	ErrInvalidLengthEds = fmt.Errorf("proto: negative length found during unmarshaling")
 	ErrIntOverflowEds   = fmt.Errorf("proto: integer overflow")
 )
+
+func init() { proto.RegisterFile("envoy/api/v2/eds.proto", fileDescriptorEds) }
+
+var fileDescriptorEds = []byte{
+	// 727 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xcf, 0x6b, 0x13, 0x41,
+	0x14, 0xc7, 0x33, 0x9b, 0x34, 0xa6, 0xd3, 0x98, 0x96, 0xb1, 0xb6, 0x71, 0x89, 0x69, 0x88, 0x15,
+	0x4a, 0x90, 0x8d, 0xa4, 0x48, 0xa5, 0x17, 0x69, 0x4c, 0x03, 0x4a, 0xa9, 0x61, 0x8b, 0xa2, 0x17,
+	0xd3, 0xc9, 0xee, 0x74, 0x5d, 0xdc, 0xcc, 0xac, 0xb3, 0x93, 0xd5, 0x3d, 0x78, 0xf1, 0xe4, 0xdd,
+	0x7f, 0x42, 0xfa, 0x27, 0x78, 0xf2, 0xd8, 0x83, 0x88, 0xe0, 0xc5, 0x93, 0x48, 0xf0, 0xe2, 0x7f,
+	0x21, 0xb3, 0xbf, 0xda, 0x34, 0xad, 0xf4, 0xe0, 0xed, 0xed, 0xbc, 0xf7, 0x3e, 0xf3, 0x7d, 0x3f,
+	0x66, 0xe1, 0x12, 0xa1, 0x3e, 0x0b, 0x9a, 0xd8, 0xb5, 0x9b, 0x7e, 0xab, 0x49, 0x4c, 0x4f, 0x73,
+	0x39, 0x13, 0x0c, 0x15, 0xc3, 0x73, 0x0d, 0xbb, 0xb6, 0xe6, 0xb7, 0xd4, 0xca, 0x44, 0x94, 0x69,
+	0x7b, 0x06, 0xf3, 0x09, 0x0f, 0xa2, 0x58, 0x75, 0x75, 0x92, 0x41, 0x4d, 0x97, 0xd9, 0x54, 0xa4,
+	0x46, 0x1c, 0x55, 0x8e, 0xa2, 0x44, 0xe0, 0x92, 0xa6, 0x4b, 0xb8, 0x41, 0x52, 0x4f, 0xc5, 0x62,
+	0xcc, 0x72, 0x48, 0x08, 0xc0, 0x94, 0x32, 0x81, 0x85, 0xcd, 0x68, 0xac, 0x44, 0x5d, 0xf6, 0xb1,
+	0x63, 0x9b, 0x58, 0x90, 0x66, 0x62, 0xc4, 0x8e, 0x45, 0x8b, 0x59, 0x2c, 0x34, 0x9b, 0xd2, 0x8a,
+	0x4f, 0xab, 0x31, 0x2c, 0xfc, 0x1a, 0x8c, 0x0e, 0x9a, 0xaf, 0x39, 0x76, 0x5d, 0xc2, 0xbd, 0xf3,
+	0xfc, 0xe6, 0x88, 0x87, 0xf7, 0x45, 0xfe, 0xfa, 0x97, 0x3c, 0xbc, 0x7a, 0xdf, 0x19, 0x79, 0x82,
+	0xf0, 0x1d, 0x86, 0xcd, 0x2d, 0xcf, 0xb3, 0x2d, 0x3a, 0x24, 0x54, 0xa0, 0x5b, 0xb0, 0x68, 0x44,
+	0x8e, 0x3e, 0xc5, 0x43, 0x52, 0x06, 0x35, 0xb0, 0x36, 0xdb, 0x9e, 0xfd, 0xf4, 0xe7, 0x73, 0x36,
+	0xc7, 0x95, 0x1a, 0xd0, 0xe7, 0x62, 0xf7, 0x2e, 0x1e, 0x12, 0xb4, 0x0b, 0x67, 0x93, 0x06, 0x78,
+	0x65, 0xa5, 0x96, 0x5d, 0x9b, 0x6b, 0x35, 0xb4, 0x93, 0x4d, 0xd5, 0xd2, 0xfe, 0xec, 0x30, 0x03,
+	0x3b, 0xb6, 0x08, 0x76, 0x06, 0xdb, 0x49, 0x46, 0x3b, 0x77, 0xf4, 0x73, 0x25, 0xa3, 0x1f, 0x23,
+	0x50, 0x1b, 0xe6, 0x5d, 0xe6, 0xd8, 0x46, 0x50, 0xce, 0xd5, 0xc0, 0x34, 0xec, 0x4c, 0xc9, 0x5a,
+	0x2f, 0xcc, 0xd0, 0xe3, 0x4c, 0xb4, 0x0f, 0xe7, 0xa5, 0x72, 0xb3, 0x7f, 0xac, 0x6c, 0x26, 0x54,
+	0xb6, 0x71, 0x11, 0x98, 0x2c, 0xcb, 0x4c, 0x15, 0x6e, 0x53, 0xc1, 0x03, 0xbd, 0x44, 0x27, 0x0e,
+	0xd5, 0x01, 0xbc, 0x72, 0x46, 0x18, 0x5a, 0x80, 0xd9, 0x97, 0x24, 0x88, 0x3a, 0xa6, 0x4b, 0x13,
+	0xdd, 0x81, 0x33, 0x3e, 0x76, 0x46, 0xa4, 0xac, 0x84, 0xd5, 0xac, 0x9c, 0xd3, 0x9a, 0x84, 0xa3,
+	0x47, 0xd1, 0x9b, 0xca, 0x5d, 0xa0, 0x1e, 0x66, 0x61, 0x3e, 0x2a, 0x0c, 0x3d, 0x87, 0x25, 0x93,
+	0x33, 0xb7, 0x2f, 0xb7, 0xd1, 0x61, 0xd8, 0x4c, 0x3a, 0xbd, 0x71, 0xf1, 0xe6, 0x68, 0x1d, 0xce,
+	0xdc, 0x47, 0x71, 0xbe, 0x7e, 0xd9, 0x3c, 0xf1, 0xe5, 0xa1, 0x7d, 0xb8, 0x2c, 0xd1, 0x2e, 0x67,
+	0xbe, 0xed, 0xd9, 0x8c, 0xda, 0xd4, 0xea, 0x1f, 0x60, 0x43, 0x30, 0x5e, 0xce, 0x86, 0xba, 0x2b,
+	0x5a, 0xb4, 0x4e, 0x5a, 0xb2, 0x4e, 0xda, 0xe3, 0x07, 0x54, 0xac, 0xb7, 0x9e, 0x48, 0xb5, 0xf1,
+	0x6e, 0x34, 0x94, 0x5a, 0x46, 0x5f, 0x3a, 0xcd, 0xe9, 0x86, 0x18, 0xf4, 0x0c, 0x2e, 0x26, 0xc5,
+	0xf6, 0x3d, 0x81, 0x1d, 0xd2, 0xc7, 0x07, 0x82, 0xf0, 0x78, 0xc8, 0xd7, 0xa6, 0xf0, 0x9d, 0x78,
+	0x5b, 0xdb, 0x45, 0xc9, 0xbe, 0x74, 0x08, 0x72, 0x0d, 0xa5, 0x90, 0xd1, 0x51, 0x02, 0xd9, 0x93,
+	0x8c, 0x2d, 0x89, 0x50, 0xdf, 0xc2, 0xe2, 0xc9, 0xda, 0xd0, 0x4d, 0x58, 0x30, 0xb0, 0x20, 0x16,
+	0xe3, 0xc1, 0xf4, 0xee, 0xa6, 0x2e, 0xd4, 0x85, 0xf3, 0x61, 0x4f, 0xe3, 0x37, 0x8a, 0xad, 0x64,
+	0x46, 0xd7, 0xe3, 0xa6, 0xca, 0x17, 0xac, 0x75, 0x39, 0x36, 0xa4, 0x0e, 0xec, 0xf4, 0xa2, 0x38,
+	0x3d, 0x9c, 0x44, 0x2f, 0x4d, 0x7a, 0x98, 0x2b, 0x80, 0x05, 0xa5, 0xf5, 0x55, 0x81, 0xe5, 0x64,
+	0x88, 0x9d, 0xe4, 0xbf, 0xb1, 0x47, 0xb8, 0x6f, 0x1b, 0x04, 0x3d, 0x85, 0xf3, 0x7b, 0x82, 0x13,
+	0x3c, 0x4c, 0xd7, 0x05, 0x55, 0x27, 0x27, 0x97, 0xa6, 0xe8, 0xe4, 0xd5, 0x88, 0x78, 0x42, 0x5d,
+	0x39, 0xd7, 0xef, 0xb9, 0x8c, 0x7a, 0xa4, 0x9e, 0x59, 0x03, 0xb7, 0x01, 0xc2, 0xb0, 0xd4, 0x21,
+	0x8e, 0xc0, 0xc7, 0xe0, 0x1b, 0xa7, 0x12, 0xa5, 0x77, 0x8a, 0xbe, 0xfa, 0xef, 0xa0, 0x89, 0x2b,
+	0x46, 0xb0, 0xd4, 0x25, 0xc2, 0x78, 0xf1, 0x1f, 0xb5, 0xd7, 0xdf, 0x7d, 0xff, 0xfd, 0x41, 0xa9,
+	0xd4, 0x97, 0x27, 0xfe, 0xb2, 0x9b, 0xe9, 0x6b, 0xdd, 0x04, 0x8d, 0xf6, 0xbd, 0x8f, 0xe3, 0x2a,
+	0x38, 0x1a, 0x57, 0xc1, 0xb7, 0x71, 0x15, 0xfc, 0x18, 0x57, 0xc1, 0xaf, 0x71, 0x15, 0x40, 0xd5,
+	0x66, 0x11, 0xdc, 0xe5, 0xec, 0x4d, 0x30, 0x71, 0x4f, 0xbb, 0xb0, 0x6d, 0x7a, 0x3d, 0xb9, 0x3f,
+	0x3d, 0xf0, 0x1e, 0x80, 0x41, 0x3e, 0xdc, 0xa5, 0xf5, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x4c,
+	0x41, 0x14, 0xac, 0xfa, 0x05, 0x00, 0x00,
+}
