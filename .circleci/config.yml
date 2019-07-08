@@ -9,5 +9,3 @@ jobs:
       - run: make build
       - run: make test
       - run: make integration
-      - run: make cover
-      - run: curl -s https://codecov.io/bash | bash
