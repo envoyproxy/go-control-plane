@@ -61,7 +61,7 @@ make generate
 You should use the included [build image](Dockerfile.ci) to produce a consistent set of generated files, e.g.
 
 ```sh
-docker run -v $(pwd):/go-control-plane gcr.io/istio-testing/go-control-plane-ci:05-09-2019 make generate
+docker run -v $(pwd):/go-control-plane gcr.io/istio-testing/go-control-plane-ci:latest make generate
 ```
 
 Format the code:
