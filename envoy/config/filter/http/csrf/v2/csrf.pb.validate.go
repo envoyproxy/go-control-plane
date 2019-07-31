@@ -47,32 +47,22 @@ func (m *CsrfPolicy) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetFilterEnabled()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return CsrfPolicyValidationError{
-					field:  "FilterEnabled",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetFilterEnabled()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CsrfPolicyValidationError{
+				field:  "FilterEnabled",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetShadowEnabled()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return CsrfPolicyValidationError{
-					field:  "ShadowEnabled",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetShadowEnabled()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CsrfPolicyValidationError{
+				field:  "ShadowEnabled",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -80,17 +70,12 @@ func (m *CsrfPolicy) Validate() error {
 	for idx, item := range m.GetAdditionalOrigins() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CsrfPolicyValidationError{
-						field:  fmt.Sprintf("AdditionalOrigins[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CsrfPolicyValidationError{
+					field:  fmt.Sprintf("AdditionalOrigins[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}

@@ -47,17 +47,12 @@ func (m *Tap) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetCommonConfig()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return TapValidationError{
-					field:  "CommonConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TapValidationError{
+				field:  "CommonConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -69,17 +64,12 @@ func (m *Tap) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetTransportSocket()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return TapValidationError{
-					field:  "TransportSocket",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTransportSocket()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TapValidationError{
+				field:  "TransportSocket",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}

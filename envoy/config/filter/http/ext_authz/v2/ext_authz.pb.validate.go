@@ -44,34 +44,24 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for UseAlpha
 
-	{
-		tmp := m.GetWithRequestBody()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return ExtAuthzValidationError{
-					field:  "WithRequestBody",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetWithRequestBody()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtAuthzValidationError{
+				field:  "WithRequestBody",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
 	// no validation rules for ClearRouteCache
 
-	{
-		tmp := m.GetStatusOnError()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return ExtAuthzValidationError{
-					field:  "StatusOnError",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetStatusOnError()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtAuthzValidationError{
+				field:  "StatusOnError",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -80,34 +70,24 @@ func (m *ExtAuthz) Validate() error {
 
 	case *ExtAuthz_GrpcService:
 
-		{
-			tmp := m.GetGrpcService()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return ExtAuthzValidationError{
-						field:  "GrpcService",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExtAuthzValidationError{
+					field:  "GrpcService",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
 
 	case *ExtAuthz_HttpService:
 
-		{
-			tmp := m.GetHttpService()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return ExtAuthzValidationError{
-						field:  "HttpService",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetHttpService()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExtAuthzValidationError{
+					field:  "HttpService",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -253,49 +233,34 @@ func (m *HttpService) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetServerUri()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HttpServiceValidationError{
-					field:  "ServerUri",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetServerUri()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpServiceValidationError{
+				field:  "ServerUri",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
 	// no validation rules for PathPrefix
 
-	{
-		tmp := m.GetAuthorizationRequest()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HttpServiceValidationError{
-					field:  "AuthorizationRequest",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetAuthorizationRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpServiceValidationError{
+				field:  "AuthorizationRequest",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetAuthorizationResponse()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HttpServiceValidationError{
-					field:  "AuthorizationResponse",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetAuthorizationResponse()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpServiceValidationError{
+				field:  "AuthorizationResponse",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -365,17 +330,12 @@ func (m *AuthorizationRequest) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetAllowedHeaders()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AuthorizationRequestValidationError{
-					field:  "AllowedHeaders",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetAllowedHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AuthorizationRequestValidationError{
+				field:  "AllowedHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -383,17 +343,12 @@ func (m *AuthorizationRequest) Validate() error {
 	for idx, item := range m.GetHeadersToAdd() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return AuthorizationRequestValidationError{
-						field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AuthorizationRequestValidationError{
+					field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -467,32 +422,22 @@ func (m *AuthorizationResponse) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetAllowedUpstreamHeaders()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AuthorizationResponseValidationError{
-					field:  "AllowedUpstreamHeaders",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetAllowedUpstreamHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AuthorizationResponseValidationError{
+				field:  "AllowedUpstreamHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetAllowedClientHeaders()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AuthorizationResponseValidationError{
-					field:  "AllowedClientHeaders",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetAllowedClientHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AuthorizationResponseValidationError{
+				field:  "AllowedClientHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -584,17 +529,12 @@ func (m *ExtAuthzPerRoute) Validate() error {
 			}
 		}
 
-		{
-			tmp := m.GetCheckSettings()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return ExtAuthzPerRouteValidationError{
-						field:  "CheckSettings",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetCheckSettings()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExtAuthzPerRouteValidationError{
+					field:  "CheckSettings",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}

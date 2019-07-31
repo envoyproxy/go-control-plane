@@ -108,17 +108,12 @@ func (m *StreamMetricsMessage) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetIdentifier()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return StreamMetricsMessageValidationError{
-					field:  "Identifier",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetIdentifier()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamMetricsMessageValidationError{
+				field:  "Identifier",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -126,17 +121,12 @@ func (m *StreamMetricsMessage) Validate() error {
 	for idx, item := range m.GetEnvoyMetrics() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return StreamMetricsMessageValidationError{
-						field:  fmt.Sprintf("EnvoyMetrics[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StreamMetricsMessageValidationError{
+					field:  fmt.Sprintf("EnvoyMetrics[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -217,17 +207,12 @@ func (m *StreamMetricsMessage_Identifier) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetNode()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return StreamMetricsMessage_IdentifierValidationError{
-					field:  "Node",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamMetricsMessage_IdentifierValidationError{
+				field:  "Node",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}

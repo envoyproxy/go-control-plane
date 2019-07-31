@@ -41,17 +41,12 @@ func (m *CheckRequest) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetAttributes()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return CheckRequestValidationError{
-					field:  "Attributes",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetAttributes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CheckRequestValidationError{
+				field:  "Attributes",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -128,17 +123,12 @@ func (m *DeniedHttpResponse) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetStatus()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return DeniedHttpResponseValidationError{
-					field:  "Status",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetStatus()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeniedHttpResponseValidationError{
+				field:  "Status",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -146,17 +136,12 @@ func (m *DeniedHttpResponse) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return DeniedHttpResponseValidationError{
-						field:  fmt.Sprintf("Headers[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DeniedHttpResponseValidationError{
+					field:  fmt.Sprintf("Headers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -235,17 +220,12 @@ func (m *OkHttpResponse) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return OkHttpResponseValidationError{
-						field:  fmt.Sprintf("Headers[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return OkHttpResponseValidationError{
+					field:  fmt.Sprintf("Headers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -317,17 +297,12 @@ func (m *CheckResponse) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetStatus()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return CheckResponseValidationError{
-					field:  "Status",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetStatus()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CheckResponseValidationError{
+				field:  "Status",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -336,34 +311,24 @@ func (m *CheckResponse) Validate() error {
 
 	case *CheckResponse_DeniedResponse:
 
-		{
-			tmp := m.GetDeniedResponse()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CheckResponseValidationError{
-						field:  "DeniedResponse",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetDeniedResponse()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CheckResponseValidationError{
+					field:  "DeniedResponse",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
 
 	case *CheckResponse_OkResponse:
 
-		{
-			tmp := m.GetOkResponse()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CheckResponseValidationError{
-						field:  "OkResponse",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetOkResponse()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CheckResponseValidationError{
+					field:  "OkResponse",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}

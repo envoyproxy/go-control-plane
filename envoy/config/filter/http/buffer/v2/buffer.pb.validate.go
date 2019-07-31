@@ -136,17 +136,12 @@ func (m *BufferPerRoute) Validate() error {
 			}
 		}
 
-		{
-			tmp := m.GetBuffer()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return BufferPerRouteValidationError{
-						field:  "Buffer",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetBuffer()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BufferPerRouteValidationError{
+					field:  "Buffer",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}

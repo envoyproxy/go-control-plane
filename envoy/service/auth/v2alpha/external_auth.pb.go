@@ -6,12 +6,10 @@ package v2alpha
 import (
 	context "context"
 	fmt "fmt"
-	math "math"
-
+	v2 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
-
-	v2 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
