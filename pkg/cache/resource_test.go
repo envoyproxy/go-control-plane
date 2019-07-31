@@ -53,7 +53,7 @@ func TestValidate(t *testing.T) {
 
 	invalidRoute := &v2.RouteConfiguration{
 		Name: "test",
-		VirtualHosts: []v2route.VirtualHost{{
+		VirtualHosts: []*v2route.VirtualHost{{
 			Name:    "test",
 			Domains: []string{},
 		}},
