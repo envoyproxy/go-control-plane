@@ -46,17 +46,12 @@ func (m *RateLimitRequest) Validate() error {
 	for idx, item := range m.GetDescriptors() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return RateLimitRequestValidationError{
-						field:  fmt.Sprintf("Descriptors[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitRequestValidationError{
+					field:  fmt.Sprintf("Descriptors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -135,17 +130,12 @@ func (m *RateLimitResponse) Validate() error {
 	for idx, item := range m.GetStatuses() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return RateLimitResponseValidationError{
-						field:  fmt.Sprintf("Statuses[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitResponseValidationError{
+					field:  fmt.Sprintf("Statuses[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -155,17 +145,12 @@ func (m *RateLimitResponse) Validate() error {
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return RateLimitResponseValidationError{
-						field:  fmt.Sprintf("Headers[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitResponseValidationError{
+					field:  fmt.Sprintf("Headers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -313,17 +298,12 @@ func (m *RateLimitResponse_DescriptorStatus) Validate() error {
 
 	// no validation rules for Code
 
-	{
-		tmp := m.GetCurrentLimit()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return RateLimitResponse_DescriptorStatusValidationError{
-					field:  "CurrentLimit",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetCurrentLimit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitResponse_DescriptorStatusValidationError{
+				field:  "CurrentLimit",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}

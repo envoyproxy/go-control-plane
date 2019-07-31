@@ -6,6 +6,7 @@ github.com/envoyproxy/data-plane-api v0.0.0-20190531200741-dc1cbfa9f777 h1:3Ipkz
 github.com/envoyproxy/data-plane-api v0.0.0-20190614154036-f0e799971158 h1:+Dp0acoRmfzDSdr48XdSLNr3aeEBI0wljn0FB/WUa+0=
 github.com/envoyproxy/data-plane-api v0.0.0-20190627184114-829b48c237a2 h1:MKMym1FZ38m7s6Xb3/JHi67wXjectpeE1yWVzbztsT8=
 github.com/envoyproxy/data-plane-api v0.0.0-20190702203801-965c278c10fa h1:o9vB8o8/eJOBsAd+vGPTSAJ3mVBQkUdUG3+CIW/jS5Q=
+github.com/envoyproxy/data-plane-api v0.0.0-20190728194620-fbae81c94119 h1:FW8bxZ0b8JH4fbzT+d//hp1BASbduvYMZSeANUoBDSM=
 github.com/envoyproxy/protoc-gen-validate v0.0.0-20190405222122-d6164de49109 h1:FNgqGzbOm637YKRbYGKb9cqGo8i50++w/LWvMau7jrw=
 github.com/envoyproxy/protoc-gen-validate v0.0.0-20190405222122-d6164de49109/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/envoyproxy/protoc-gen-validate v0.0.14 h1:YBW6/cKy9prEGRYLnaGa4IDhzxZhRCtKsax8srGKDnM=

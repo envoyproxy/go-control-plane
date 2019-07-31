@@ -48,17 +48,12 @@ func (m *GrpcJsonTranscoder) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetPrintOptions()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return GrpcJsonTranscoderValidationError{
-					field:  "PrintOptions",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetPrintOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GrpcJsonTranscoderValidationError{
+				field:  "PrintOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -66,6 +61,8 @@ func (m *GrpcJsonTranscoder) Validate() error {
 	// no validation rules for MatchIncomingRequestRoute
 
 	// no validation rules for AutoMapping
+
+	// no validation rules for IgnoreUnknownQueryParameters
 
 	switch m.DescriptorSet.(type) {
 

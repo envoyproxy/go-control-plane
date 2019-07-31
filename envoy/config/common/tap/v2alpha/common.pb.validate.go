@@ -45,51 +45,36 @@ func (m *CommonExtensionConfig) Validate() error {
 
 	case *CommonExtensionConfig_AdminConfig:
 
-		{
-			tmp := m.GetAdminConfig()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CommonExtensionConfigValidationError{
-						field:  "AdminConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetAdminConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommonExtensionConfigValidationError{
+					field:  "AdminConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
 
 	case *CommonExtensionConfig_StaticConfig:
 
-		{
-			tmp := m.GetStaticConfig()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CommonExtensionConfigValidationError{
-						field:  "StaticConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetStaticConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommonExtensionConfigValidationError{
+					field:  "StaticConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
 
 	case *CommonExtensionConfig_TapdsConfig:
 
-		{
-			tmp := m.GetTapdsConfig()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CommonExtensionConfigValidationError{
-						field:  "TapdsConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetTapdsConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommonExtensionConfigValidationError{
+					field:  "TapdsConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -241,17 +226,19 @@ func (m *CommonExtensionConfig_TapDSConfig) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetConfigSource()
+	if m.GetConfigSource() == nil {
+		return CommonExtensionConfig_TapDSConfigValidationError{
+			field:  "ConfigSource",
+			reason: "value is required",
+		}
+	}
 
-		if v, ok := interface{}(&tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return CommonExtensionConfig_TapDSConfigValidationError{
-					field:  "ConfigSource",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetConfigSource()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonExtensionConfig_TapDSConfigValidationError{
+				field:  "ConfigSource",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}

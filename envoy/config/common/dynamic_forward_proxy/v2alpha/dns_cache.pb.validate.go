@@ -17,7 +17,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	v2 "envoy/api/v2"
 )
 
 // ensure the imports are used

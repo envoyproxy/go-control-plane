@@ -17,7 +17,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	core "envoy/api/v2/core"
 )
 
 // ensure the imports are used
@@ -45,17 +45,12 @@ func (m *TCPAccessLogEntry) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetCommonProperties()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return TCPAccessLogEntryValidationError{
-					field:  "CommonProperties",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetCommonProperties()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TCPAccessLogEntryValidationError{
+				field:  "CommonProperties",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -127,49 +122,34 @@ func (m *HTTPAccessLogEntry) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetCommonProperties()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HTTPAccessLogEntryValidationError{
-					field:  "CommonProperties",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetCommonProperties()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HTTPAccessLogEntryValidationError{
+				field:  "CommonProperties",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
 	// no validation rules for ProtocolVersion
 
-	{
-		tmp := m.GetRequest()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HTTPAccessLogEntryValidationError{
-					field:  "Request",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HTTPAccessLogEntryValidationError{
+				field:  "Request",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetResponse()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HTTPAccessLogEntryValidationError{
-					field:  "Response",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetResponse()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HTTPAccessLogEntryValidationError{
+				field:  "Response",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -248,229 +228,154 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetDownstreamRemoteAddress()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "DownstreamRemoteAddress",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetDownstreamRemoteAddress()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "DownstreamRemoteAddress",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetDownstreamLocalAddress()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "DownstreamLocalAddress",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetDownstreamLocalAddress()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "DownstreamLocalAddress",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTlsProperties()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TlsProperties",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTlsProperties()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TlsProperties",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetStartTime()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "StartTime",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetStartTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "StartTime",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTimeToLastRxByte()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TimeToLastRxByte",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTimeToLastRxByte()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TimeToLastRxByte",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTimeToFirstUpstreamTxByte()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TimeToFirstUpstreamTxByte",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTimeToFirstUpstreamTxByte()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TimeToFirstUpstreamTxByte",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTimeToLastUpstreamTxByte()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TimeToLastUpstreamTxByte",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTimeToLastUpstreamTxByte()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TimeToLastUpstreamTxByte",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTimeToFirstUpstreamRxByte()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TimeToFirstUpstreamRxByte",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTimeToFirstUpstreamRxByte()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TimeToFirstUpstreamRxByte",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTimeToLastUpstreamRxByte()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TimeToLastUpstreamRxByte",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTimeToLastUpstreamRxByte()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TimeToLastUpstreamRxByte",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTimeToFirstDownstreamTxByte()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TimeToFirstDownstreamTxByte",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTimeToFirstDownstreamTxByte()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TimeToFirstDownstreamTxByte",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetTimeToLastDownstreamTxByte()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "TimeToLastDownstreamTxByte",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTimeToLastDownstreamTxByte()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "TimeToLastDownstreamTxByte",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetUpstreamRemoteAddress()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "UpstreamRemoteAddress",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetUpstreamRemoteAddress()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "UpstreamRemoteAddress",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetUpstreamLocalAddress()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "UpstreamLocalAddress",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetUpstreamLocalAddress()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "UpstreamLocalAddress",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
 	// no validation rules for UpstreamCluster
 
-	{
-		tmp := m.GetResponseFlags()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "ResponseFlags",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetResponseFlags()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "ResponseFlags",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetMetadata()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return AccessLogCommonValidationError{
-					field:  "Metadata",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -568,17 +473,12 @@ func (m *ResponseFlags) Validate() error {
 
 	// no validation rules for RateLimited
 
-	{
-		tmp := m.GetUnauthorizedDetails()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return ResponseFlagsValidationError{
-					field:  "UnauthorizedDetails",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetUnauthorizedDetails()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResponseFlagsValidationError{
+				field:  "UnauthorizedDetails",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -660,49 +560,34 @@ func (m *TLSProperties) Validate() error {
 
 	// no validation rules for TlsVersion
 
-	{
-		tmp := m.GetTlsCipherSuite()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return TLSPropertiesValidationError{
-					field:  "TlsCipherSuite",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTlsCipherSuite()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TLSPropertiesValidationError{
+				field:  "TlsCipherSuite",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
 	// no validation rules for TlsSniHostname
 
-	{
-		tmp := m.GetLocalCertificateProperties()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return TLSPropertiesValidationError{
-					field:  "LocalCertificateProperties",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetLocalCertificateProperties()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TLSPropertiesValidationError{
+				field:  "LocalCertificateProperties",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
-	{
-		tmp := m.GetPeerCertificateProperties()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return TLSPropertiesValidationError{
-					field:  "PeerCertificateProperties",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetPeerCertificateProperties()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TLSPropertiesValidationError{
+				field:  "PeerCertificateProperties",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -780,17 +665,12 @@ func (m *HTTPRequestProperties) Validate() error {
 
 	// no validation rules for Authority
 
-	{
-		tmp := m.GetPort()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HTTPRequestPropertiesValidationError{
-					field:  "Port",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetPort()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HTTPRequestPropertiesValidationError{
+				field:  "Port",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -880,17 +760,12 @@ func (m *HTTPResponseProperties) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetResponseCode()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return HTTPResponsePropertiesValidationError{
-					field:  "ResponseCode",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetResponseCode()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HTTPResponsePropertiesValidationError{
+				field:  "ResponseCode",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -1044,17 +919,12 @@ func (m *TLSProperties_CertificateProperties) Validate() error {
 	for idx, item := range m.GetSubjectAltName() {
 		_, _ = idx, item
 
-		{
-			tmp := item
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return TLSProperties_CertificatePropertiesValidationError{
-						field:  fmt.Sprintf("SubjectAltName[%v]", idx),
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TLSProperties_CertificatePropertiesValidationError{
+					field:  fmt.Sprintf("SubjectAltName[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
