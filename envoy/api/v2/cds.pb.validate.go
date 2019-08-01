@@ -40,12 +40,7 @@ func (m *Cluster) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return ClusterValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
 	// no validation rules for AltStatName
 
@@ -59,18 +54,14 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if d := m.GetConnectTimeout(); d != nil {
-		dur := *d
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
+	if v, ok := interface{}(m.GetConnectTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				field:  "ConnectTimeout",
-				reason: "value must be greater than 0s",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	if v, ok := interface{}(m.GetPerConnectionBufferLimitBytes()).(interface{ Validate() error }); ok {
@@ -83,12 +74,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if _, ok := Cluster_LbPolicy_name[int32(m.GetLbPolicy())]; !ok {
-		return ClusterValidationError{
-			field:  "LbPolicy",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for LbPolicy
 
 	for idx, item := range m.GetHosts() {
 		_, _ = idx, item
@@ -194,28 +180,19 @@ func (m *Cluster) Validate() error {
 
 	// no validation rules for TypedExtensionProtocolOptions
 
-	if d := m.GetDnsRefreshRate(); d != nil {
-		dur := *d
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
+	if v, ok := interface{}(m.GetDnsRefreshRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				field:  "DnsRefreshRate",
-				reason: "value must be greater than 0s",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	// no validation rules for RespectDnsTtl
 
-	if _, ok := Cluster_DnsLookupFamily_name[int32(m.GetDnsLookupFamily())]; !ok {
-		return ClusterValidationError{
-			field:  "DnsLookupFamily",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for DnsLookupFamily
 
 	for idx, item := range m.GetDnsResolvers() {
 		_, _ = idx, item
@@ -242,18 +219,14 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if d := m.GetCleanupInterval(); d != nil {
-		dur := *d
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
+	if v, ok := interface{}(m.GetCleanupInterval()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				field:  "CleanupInterval",
-				reason: "value must be greater than 0s",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	if v, ok := interface{}(m.GetUpstreamBindConfig()).(interface{ Validate() error }); ok {
@@ -340,13 +313,7 @@ func (m *Cluster) Validate() error {
 	switch m.ClusterDiscoveryType.(type) {
 
 	case *Cluster_Type:
-
-		if _, ok := Cluster_DiscoveryType_name[int32(m.GetType())]; !ok {
-			return ClusterValidationError{
-				field:  "Type",
-				reason: "value must be one of the defined enum values",
-			}
-		}
+		// no validation rules for Type
 
 	case *Cluster_ClusterType:
 
@@ -621,12 +588,7 @@ func (m *Cluster_CustomClusterType) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return Cluster_CustomClusterTypeValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
 	if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -784,12 +746,7 @@ func (m *Cluster_LbSubsetConfig) Validate() error {
 		return nil
 	}
 
-	if _, ok := Cluster_LbSubsetConfig_LbSubsetFallbackPolicy_name[int32(m.GetFallbackPolicy())]; !ok {
-		return Cluster_LbSubsetConfigValidationError{
-			field:  "FallbackPolicy",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for FallbackPolicy
 
 	if v, ok := interface{}(m.GetDefaultSubset()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -891,15 +848,14 @@ func (m *Cluster_LeastRequestLbConfig) Validate() error {
 		return nil
 	}
 
-	if wrapper := m.GetChoiceCount(); wrapper != nil {
-
-		if wrapper.GetValue() < 2 {
+	if v, ok := interface{}(m.GetChoiceCount()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return Cluster_LeastRequestLbConfigValidationError{
 				field:  "ChoiceCount",
-				reason: "value must be greater than or equal to 2",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	return nil
@@ -970,33 +926,26 @@ func (m *Cluster_RingHashLbConfig) Validate() error {
 		return nil
 	}
 
-	if wrapper := m.GetMinimumRingSize(); wrapper != nil {
-
-		if wrapper.GetValue() > 8388608 {
+	if v, ok := interface{}(m.GetMinimumRingSize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return Cluster_RingHashLbConfigValidationError{
 				field:  "MinimumRingSize",
-				reason: "value must be less than or equal to 8388608",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if _, ok := Cluster_RingHashLbConfig_HashFunction_name[int32(m.GetHashFunction())]; !ok {
-		return Cluster_RingHashLbConfigValidationError{
-			field:  "HashFunction",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for HashFunction
 
-	if wrapper := m.GetMaximumRingSize(); wrapper != nil {
-
-		if wrapper.GetValue() > 8388608 {
+	if v, ok := interface{}(m.GetMaximumRingSize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return Cluster_RingHashLbConfigValidationError{
 				field:  "MaximumRingSize",
-				reason: "value must be less than or equal to 8388608",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	return nil
@@ -1253,12 +1202,7 @@ func (m *Cluster_LbSubsetConfig_LbSubsetSelector) Validate() error {
 		return nil
 	}
 
-	if _, ok := Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy_name[int32(m.GetFallbackPolicy())]; !ok {
-		return Cluster_LbSubsetConfig_LbSubsetSelectorValidationError{
-			field:  "FallbackPolicy",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for FallbackPolicy
 
 	return nil
 }

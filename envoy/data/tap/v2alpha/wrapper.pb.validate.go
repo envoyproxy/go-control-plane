@@ -91,12 +91,6 @@ func (m *TraceWrapper) Validate() error {
 			}
 		}
 
-	default:
-		return TraceWrapperValidationError{
-			field:  "Trace",
-			reason: "value is required",
-		}
-
 	}
 
 	return nil

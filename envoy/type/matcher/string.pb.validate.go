@@ -47,37 +47,13 @@ func (m *StringMatcher) Validate() error {
 		// no validation rules for Exact
 
 	case *StringMatcher_Prefix:
-
-		if len(m.GetPrefix()) < 1 {
-			return StringMatcherValidationError{
-				field:  "Prefix",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
+		// no validation rules for Prefix
 
 	case *StringMatcher_Suffix:
-
-		if len(m.GetSuffix()) < 1 {
-			return StringMatcherValidationError{
-				field:  "Suffix",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
+		// no validation rules for Suffix
 
 	case *StringMatcher_Regex:
-
-		if len(m.GetRegex()) > 1024 {
-			return StringMatcherValidationError{
-				field:  "Regex",
-				reason: "value length must be at most 1024 bytes",
-			}
-		}
-
-	default:
-		return StringMatcherValidationError{
-			field:  "MatchPattern",
-			reason: "value is required",
-		}
+		// no validation rules for Regex
 
 	}
 
@@ -144,13 +120,6 @@ var _ interface {
 func (m *ListStringMatcher) Validate() error {
 	if m == nil {
 		return nil
-	}
-
-	if len(m.GetPatterns()) < 1 {
-		return ListStringMatcherValidationError{
-			field:  "Patterns",
-			reason: "value must contain at least 1 item(s)",
-		}
 	}
 
 	for idx, item := range m.GetPatterns() {

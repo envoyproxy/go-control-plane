@@ -40,12 +40,7 @@ func (m *ExtAuthz) Validate() error {
 		return nil
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
-		return ExtAuthzValidationError{
-			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for StatPrefix
 
 	if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

@@ -40,13 +40,6 @@ func (m *TapConfig) Validate() error {
 		return nil
 	}
 
-	if m.GetMatchConfig() == nil {
-		return TapConfigValidationError{
-			field:  "MatchConfig",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetMatchConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TapConfigValidationError{
@@ -54,13 +47,6 @@ func (m *TapConfig) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
-		}
-	}
-
-	if m.GetOutputConfig() == nil {
-		return TapConfigValidationError{
-			field:  "OutputConfig",
-			reason: "value is required",
 		}
 	}
 
@@ -188,13 +174,7 @@ func (m *MatchPredicate) Validate() error {
 		}
 
 	case *MatchPredicate_AnyMatch:
-
-		if m.GetAnyMatch() != true {
-			return MatchPredicateValidationError{
-				field:  "AnyMatch",
-				reason: "value must equal true",
-			}
-		}
+		// no validation rules for AnyMatch
 
 	case *MatchPredicate_HttpRequestHeadersMatch:
 
@@ -242,12 +222,6 @@ func (m *MatchPredicate) Validate() error {
 					cause:  err,
 				}
 			}
-		}
-
-	default:
-		return MatchPredicateValidationError{
-			field:  "Rule",
-			reason: "value is required",
 		}
 
 	}
@@ -397,13 +371,6 @@ func (m *OutputConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetSinks()) != 1 {
-		return OutputConfigValidationError{
-			field:  "Sinks",
-			reason: "value must contain exactly 1 item(s)",
-		}
-	}
-
 	for idx, item := range m.GetSinks() {
 		_, _ = idx, item
 
@@ -505,12 +472,7 @@ func (m *OutputSink) Validate() error {
 		return nil
 	}
 
-	if _, ok := OutputSink_Format_name[int32(m.GetFormat())]; !ok {
-		return OutputSinkValidationError{
-			field:  "Format",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for Format
 
 	switch m.OutputSinkType.(type) {
 
@@ -548,12 +510,6 @@ func (m *OutputSink) Validate() error {
 					cause:  err,
 				}
 			}
-		}
-
-	default:
-		return OutputSinkValidationError{
-			field:  "OutputSinkType",
-			reason: "value is required",
 		}
 
 	}
@@ -690,12 +646,7 @@ func (m *FilePerTapSink) Validate() error {
 		return nil
 	}
 
-	if len(m.GetPathPrefix()) < 1 {
-		return FilePerTapSinkValidationError{
-			field:  "PathPrefix",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for PathPrefix
 
 	return nil
 }
@@ -763,13 +714,6 @@ func (m *StreamingGrpcSink) Validate() error {
 	}
 
 	// no validation rules for TapId
-
-	if m.GetGrpcService() == nil {
-		return StreamingGrpcSinkValidationError{
-			field:  "GrpcService",
-			reason: "value is required",
-		}
-	}
 
 	if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -846,13 +790,6 @@ var _ interface {
 func (m *MatchPredicate_MatchSet) Validate() error {
 	if m == nil {
 		return nil
-	}
-
-	if len(m.GetRules()) < 2 {
-		return MatchPredicate_MatchSetValidationError{
-			field:  "Rules",
-			reason: "value must contain at least 2 item(s)",
-		}
 	}
 
 	for idx, item := range m.GetRules() {

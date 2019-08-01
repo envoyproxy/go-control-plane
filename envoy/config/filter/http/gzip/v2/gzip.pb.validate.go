@@ -40,62 +40,42 @@ func (m *Gzip) Validate() error {
 		return nil
 	}
 
-	if wrapper := m.GetMemoryLevel(); wrapper != nil {
-
-		if val := wrapper.GetValue(); val < 1 || val > 9 {
+	if v, ok := interface{}(m.GetMemoryLevel()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return GzipValidationError{
 				field:  "MemoryLevel",
-				reason: "value must be inside range [1, 9]",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if wrapper := m.GetContentLength(); wrapper != nil {
-
-		if wrapper.GetValue() < 30 {
+	if v, ok := interface{}(m.GetContentLength()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return GzipValidationError{
 				field:  "ContentLength",
-				reason: "value must be greater than or equal to 30",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if _, ok := Gzip_CompressionLevel_Enum_name[int32(m.GetCompressionLevel())]; !ok {
-		return GzipValidationError{
-			field:  "CompressionLevel",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for CompressionLevel
 
-	if _, ok := Gzip_CompressionStrategy_name[int32(m.GetCompressionStrategy())]; !ok {
-		return GzipValidationError{
-			field:  "CompressionStrategy",
-			reason: "value must be one of the defined enum values",
-		}
-	}
-
-	if len(m.GetContentType()) > 50 {
-		return GzipValidationError{
-			field:  "ContentType",
-			reason: "value must contain no more than 50 item(s)",
-		}
-	}
+	// no validation rules for CompressionStrategy
 
 	// no validation rules for DisableOnEtagHeader
 
 	// no validation rules for RemoveAcceptEncodingHeader
 
-	if wrapper := m.GetWindowBits(); wrapper != nil {
-
-		if val := wrapper.GetValue(); val < 9 || val > 15 {
+	if v, ok := interface{}(m.GetWindowBits()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return GzipValidationError{
 				field:  "WindowBits",
-				reason: "value must be inside range [9, 15]",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	return nil

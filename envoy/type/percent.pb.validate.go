@@ -40,12 +40,7 @@ func (m *Percent) Validate() error {
 		return nil
 	}
 
-	if val := m.GetValue(); val < 0 || val > 100 {
-		return PercentValidationError{
-			field:  "Value",
-			reason: "value must be inside range [0, 100]",
-		}
-	}
+	// no validation rules for Value
 
 	return nil
 }
@@ -114,12 +109,7 @@ func (m *FractionalPercent) Validate() error {
 
 	// no validation rules for Numerator
 
-	if _, ok := FractionalPercent_DenominatorType_name[int32(m.GetDenominator())]; !ok {
-		return FractionalPercentValidationError{
-			field:  "Denominator",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for Denominator
 
 	return nil
 }

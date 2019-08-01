@@ -41,12 +41,7 @@ func (m *HealthCheckEvent) Validate() error {
 		return nil
 	}
 
-	if _, ok := HealthCheckerType_name[int32(m.GetHealthCheckerType())]; !ok {
-		return HealthCheckEventValidationError{
-			field:  "HealthCheckerType",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for HealthCheckerType
 
 	if v, ok := interface{}(m.GetHost()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -58,12 +53,7 @@ func (m *HealthCheckEvent) Validate() error {
 		}
 	}
 
-	if len(m.GetClusterName()) < 1 {
-		return HealthCheckEventValidationError{
-			field:  "ClusterName",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for ClusterName
 
 	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -137,12 +127,6 @@ func (m *HealthCheckEvent) Validate() error {
 			}
 		}
 
-	default:
-		return HealthCheckEventValidationError{
-			field:  "Event",
-			reason: "value is required",
-		}
-
 	}
 
 	return nil
@@ -210,12 +194,7 @@ func (m *HealthCheckEjectUnhealthy) Validate() error {
 		return nil
 	}
 
-	if _, ok := HealthCheckFailureType_name[int32(m.GetFailureType())]; !ok {
-		return HealthCheckEjectUnhealthyValidationError{
-			field:  "FailureType",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for FailureType
 
 	return nil
 }
@@ -353,12 +332,7 @@ func (m *HealthCheckFailure) Validate() error {
 		return nil
 	}
 
-	if _, ok := HealthCheckFailureType_name[int32(m.GetFailureType())]; !ok {
-		return HealthCheckFailureValidationError{
-			field:  "FailureType",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for FailureType
 
 	// no validation rules for FirstCheck
 

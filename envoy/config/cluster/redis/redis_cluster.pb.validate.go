@@ -41,32 +41,24 @@ func (m *RedisClusterConfig) Validate() error {
 		return nil
 	}
 
-	if d := m.GetClusterRefreshRate(); d != nil {
-		dur := *d
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
+	if v, ok := interface{}(m.GetClusterRefreshRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return RedisClusterConfigValidationError{
 				field:  "ClusterRefreshRate",
-				reason: "value must be greater than 0s",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if d := m.GetClusterRefreshTimeout(); d != nil {
-		dur := *d
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
+	if v, ok := interface{}(m.GetClusterRefreshTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return RedisClusterConfigValidationError{
 				field:  "ClusterRefreshTimeout",
-				reason: "value must be greater than 0s",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	return nil

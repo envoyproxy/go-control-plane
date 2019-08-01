@@ -40,26 +40,9 @@ func (m *RateLimit) Validate() error {
 		return nil
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
-		return RateLimitValidationError{
-			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for StatPrefix
 
-	if len(m.GetDomain()) < 1 {
-		return RateLimitValidationError{
-			field:  "Domain",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
-
-	if len(m.GetDescriptors()) < 1 {
-		return RateLimitValidationError{
-			field:  "Descriptors",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
+	// no validation rules for Domain
 
 	for idx, item := range m.GetDescriptors() {
 		_, _ = idx, item
@@ -87,13 +70,6 @@ func (m *RateLimit) Validate() error {
 	}
 
 	// no validation rules for FailureModeDeny
-
-	if m.GetRateLimitService() == nil {
-		return RateLimitValidationError{
-			field:  "RateLimitService",
-			reason: "value is required",
-		}
-	}
 
 	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

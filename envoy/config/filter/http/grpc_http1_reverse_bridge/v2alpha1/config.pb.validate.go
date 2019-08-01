@@ -41,12 +41,7 @@ func (m *FilterConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetContentType()) < 1 {
-		return FilterConfigValidationError{
-			field:  "ContentType",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for ContentType
 
 	// no validation rules for WithholdGrpcFrames
 

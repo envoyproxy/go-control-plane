@@ -51,79 +51,54 @@ func (m *OutlierDetection) Validate() error {
 		}
 	}
 
-	if d := m.GetInterval(); d != nil {
-		dur, err := types.DurationFromProto(d)
-		if err != nil {
+	if v, ok := interface{}(m.GetInterval()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "Interval",
-				reason: "value is not a valid duration",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
-			return OutlierDetectionValidationError{
-				field:  "Interval",
-				reason: "value must be greater than 0s",
-			}
-		}
-
 	}
 
-	if d := m.GetBaseEjectionTime(); d != nil {
-		dur, err := types.DurationFromProto(d)
-		if err != nil {
+	if v, ok := interface{}(m.GetBaseEjectionTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "BaseEjectionTime",
-				reason: "value is not a valid duration",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
-			return OutlierDetectionValidationError{
-				field:  "BaseEjectionTime",
-				reason: "value must be greater than 0s",
-			}
-		}
-
 	}
 
-	if wrapper := m.GetMaxEjectionPercent(); wrapper != nil {
-
-		if wrapper.GetValue() > 100 {
+	if v, ok := interface{}(m.GetMaxEjectionPercent()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "MaxEjectionPercent",
-				reason: "value must be less than or equal to 100",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if wrapper := m.GetEnforcingConsecutive_5Xx(); wrapper != nil {
-
-		if wrapper.GetValue() > 100 {
+	if v, ok := interface{}(m.GetEnforcingConsecutive_5Xx()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "EnforcingConsecutive_5Xx",
-				reason: "value must be less than or equal to 100",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if wrapper := m.GetEnforcingSuccessRate(); wrapper != nil {
-
-		if wrapper.GetValue() > 100 {
+	if v, ok := interface{}(m.GetEnforcingSuccessRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "EnforcingSuccessRate",
-				reason: "value must be less than or equal to 100",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	if v, ok := interface{}(m.GetSuccessRateMinimumHosts()).(interface{ Validate() error }); ok {
@@ -166,15 +141,14 @@ func (m *OutlierDetection) Validate() error {
 		}
 	}
 
-	if wrapper := m.GetEnforcingConsecutiveGatewayFailure(); wrapper != nil {
-
-		if wrapper.GetValue() > 100 {
+	if v, ok := interface{}(m.GetEnforcingConsecutiveGatewayFailure()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "EnforcingConsecutiveGatewayFailure",
-				reason: "value must be less than or equal to 100",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	// no validation rules for SplitExternalLocalOriginErrors
@@ -189,26 +163,24 @@ func (m *OutlierDetection) Validate() error {
 		}
 	}
 
-	if wrapper := m.GetEnforcingConsecutiveLocalOriginFailure(); wrapper != nil {
-
-		if wrapper.GetValue() > 100 {
+	if v, ok := interface{}(m.GetEnforcingConsecutiveLocalOriginFailure()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "EnforcingConsecutiveLocalOriginFailure",
-				reason: "value must be less than or equal to 100",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if wrapper := m.GetEnforcingLocalOriginSuccessRate(); wrapper != nil {
-
-		if wrapper.GetValue() > 100 {
+	if v, ok := interface{}(m.GetEnforcingLocalOriginSuccessRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return OutlierDetectionValidationError{
 				field:  "EnforcingLocalOriginSuccessRate",
-				reason: "value must be less than or equal to 100",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	return nil

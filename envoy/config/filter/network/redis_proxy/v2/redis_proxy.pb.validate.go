@@ -40,21 +40,9 @@ func (m *RedisProxy) Validate() error {
 		return nil
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
-		return RedisProxyValidationError{
-			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for StatPrefix
 
 	// no validation rules for Cluster
-
-	if m.GetSettings() == nil {
-		return RedisProxyValidationError{
-			field:  "Settings",
-			reason: "value is required",
-		}
-	}
 
 	if v, ok := interface{}(m.GetSettings()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -230,10 +218,13 @@ func (m *RedisProxy_ConnPoolSettings) Validate() error {
 		return nil
 	}
 
-	if m.GetOpTimeout() == nil {
-		return RedisProxy_ConnPoolSettingsValidationError{
-			field:  "OpTimeout",
-			reason: "value is required",
+	if v, ok := interface{}(m.GetOpTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisProxy_ConnPoolSettingsValidationError{
+				field:  "OpTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
 	}
 
@@ -431,12 +422,7 @@ func (m *RedisProxy_PrefixRoutes_Route) Validate() error {
 
 	// no validation rules for RemovePrefix
 
-	if len(m.GetCluster()) < 1 {
-		return RedisProxy_PrefixRoutes_RouteValidationError{
-			field:  "Cluster",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Cluster
 
 	for idx, item := range m.GetRequestMirrorPolicy() {
 		_, _ = idx, item
@@ -522,12 +508,7 @@ func (m *RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCluster()) < 1 {
-		return RedisProxy_PrefixRoutes_Route_RequestMirrorPolicyValidationError{
-			field:  "Cluster",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Cluster
 
 	if v, ok := interface{}(m.GetRuntimeFraction()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

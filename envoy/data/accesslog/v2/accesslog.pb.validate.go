@@ -221,12 +221,7 @@ func (m *AccessLogCommon) Validate() error {
 		return nil
 	}
 
-	if m.GetSampleRate() > 1 {
-		return AccessLogCommonValidationError{
-			field:  "SampleRate",
-			reason: "value must be less than or equal to 1",
-		}
-	}
+	// no validation rules for SampleRate
 
 	if v, ok := interface{}(m.GetDownstreamRemoteAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

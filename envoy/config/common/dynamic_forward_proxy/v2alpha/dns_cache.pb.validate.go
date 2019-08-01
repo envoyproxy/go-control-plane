@@ -45,71 +45,38 @@ func (m *DnsCacheConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return DnsCacheConfigValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
-	if _, ok := v2.Cluster_DnsLookupFamily_name[int32(m.GetDnsLookupFamily())]; !ok {
-		return DnsCacheConfigValidationError{
-			field:  "DnsLookupFamily",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for DnsLookupFamily
 
-	if d := m.GetDnsRefreshRate(); d != nil {
-		dur, err := types.DurationFromProto(d)
-		if err != nil {
+	if v, ok := interface{}(m.GetDnsRefreshRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return DnsCacheConfigValidationError{
 				field:  "DnsRefreshRate",
-				reason: "value is not a valid duration",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
-			return DnsCacheConfigValidationError{
-				field:  "DnsRefreshRate",
-				reason: "value must be greater than 0s",
-			}
-		}
-
 	}
 
-	if d := m.GetHostTtl(); d != nil {
-		dur, err := types.DurationFromProto(d)
-		if err != nil {
+	if v, ok := interface{}(m.GetHostTtl()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return DnsCacheConfigValidationError{
 				field:  "HostTtl",
-				reason: "value is not a valid duration",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
-			return DnsCacheConfigValidationError{
-				field:  "HostTtl",
-				reason: "value must be greater than 0s",
-			}
-		}
-
 	}
 
-	if wrapper := m.GetMaxHosts(); wrapper != nil {
-
-		if wrapper.GetValue() <= 0 {
+	if v, ok := interface{}(m.GetMaxHosts()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return DnsCacheConfigValidationError{
 				field:  "MaxHosts",
-				reason: "value must be greater than 0",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	return nil

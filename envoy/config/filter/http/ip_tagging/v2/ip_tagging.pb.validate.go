@@ -40,19 +40,7 @@ func (m *IPTagging) Validate() error {
 		return nil
 	}
 
-	if _, ok := IPTagging_RequestType_name[int32(m.GetRequestType())]; !ok {
-		return IPTaggingValidationError{
-			field:  "RequestType",
-			reason: "value must be one of the defined enum values",
-		}
-	}
-
-	if len(m.GetIpTags()) < 1 {
-		return IPTaggingValidationError{
-			field:  "IpTags",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
+	// no validation rules for RequestType
 
 	for idx, item := range m.GetIpTags() {
 		_, _ = idx, item

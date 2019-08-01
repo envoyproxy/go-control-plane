@@ -40,12 +40,7 @@ func (m *Filter) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return FilterValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
 	switch m.ConfigType.(type) {
 
@@ -140,15 +135,14 @@ func (m *FilterChainMatch) Validate() error {
 		return nil
 	}
 
-	if wrapper := m.GetDestinationPort(); wrapper != nil {
-
-		if val := wrapper.GetValue(); val < 1 || val > 65535 {
+	if v, ok := interface{}(m.GetDestinationPort()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return FilterChainMatchValidationError{
 				field:  "DestinationPort",
-				reason: "value must be inside range [1, 65535]",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	for idx, item := range m.GetPrefixRanges() {
@@ -178,12 +172,7 @@ func (m *FilterChainMatch) Validate() error {
 		}
 	}
 
-	if _, ok := FilterChainMatch_ConnectionSourceType_name[int32(m.GetSourceType())]; !ok {
-		return FilterChainMatchValidationError{
-			field:  "SourceType",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for SourceType
 
 	for idx, item := range m.GetSourcePrefixRanges() {
 		_, _ = idx, item
@@ -195,18 +184,6 @@ func (m *FilterChainMatch) Validate() error {
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
-			}
-		}
-
-	}
-
-	for idx, item := range m.GetSourcePorts() {
-		_, _ = idx, item
-
-		if val := item; val < 1 || val > 65535 {
-			return FilterChainMatchValidationError{
-				field:  fmt.Sprintf("SourcePorts[%v]", idx),
-				reason: "value must be inside range [1, 65535]",
 			}
 		}
 
@@ -409,12 +386,7 @@ func (m *ListenerFilter) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return ListenerFilterValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
 	switch m.ConfigType.(type) {
 

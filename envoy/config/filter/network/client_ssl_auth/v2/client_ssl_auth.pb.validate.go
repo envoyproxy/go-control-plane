@@ -41,19 +41,9 @@ func (m *ClientSSLAuth) Validate() error {
 		return nil
 	}
 
-	if len(m.GetAuthApiCluster()) < 1 {
-		return ClientSSLAuthValidationError{
-			field:  "AuthApiCluster",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for AuthApiCluster
 
-	if len(m.GetStatPrefix()) < 1 {
-		return ClientSSLAuthValidationError{
-			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for StatPrefix
 
 	if v, ok := interface{}(m.GetRefreshDelay()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

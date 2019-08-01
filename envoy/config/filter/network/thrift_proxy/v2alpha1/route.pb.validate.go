@@ -124,13 +124,6 @@ func (m *Route) Validate() error {
 		return nil
 	}
 
-	if m.GetMatch() == nil {
-		return RouteValidationError{
-			field:  "Match",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
@@ -138,13 +131,6 @@ func (m *Route) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
-		}
-	}
-
-	if m.GetRoute() == nil {
-		return RouteValidationError{
-			field:  "Route",
-			reason: "value is required",
 		}
 	}
 
@@ -247,12 +233,6 @@ func (m *RouteMatch) Validate() error {
 	case *RouteMatch_ServiceName:
 		// no validation rules for ServiceName
 
-	default:
-		return RouteMatchValidationError{
-			field:  "MatchSpecifier",
-			reason: "value is required",
-		}
-
 	}
 
 	return nil
@@ -348,13 +328,7 @@ func (m *RouteAction) Validate() error {
 	switch m.ClusterSpecifier.(type) {
 
 	case *RouteAction_Cluster:
-
-		if len(m.GetCluster()) < 1 {
-			return RouteActionValidationError{
-				field:  "Cluster",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
+		// no validation rules for Cluster
 
 	case *RouteAction_WeightedClusters:
 
@@ -366,12 +340,6 @@ func (m *RouteAction) Validate() error {
 					cause:  err,
 				}
 			}
-		}
-
-	default:
-		return RouteActionValidationError{
-			field:  "ClusterSpecifier",
-			reason: "value is required",
 		}
 
 	}
@@ -439,13 +407,6 @@ var _ interface {
 func (m *WeightedCluster) Validate() error {
 	if m == nil {
 		return nil
-	}
-
-	if len(m.GetClusters()) < 1 {
-		return WeightedClusterValidationError{
-			field:  "Clusters",
-			reason: "value must contain at least 1 item(s)",
-		}
 	}
 
 	for idx, item := range m.GetClusters() {
@@ -528,22 +489,16 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return WeightedCluster_ClusterWeightValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
-	if wrapper := m.GetWeight(); wrapper != nil {
-
-		if wrapper.GetValue() < 1 {
+	if v, ok := interface{}(m.GetWeight()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return WeightedCluster_ClusterWeightValidationError{
 				field:  "Weight",
-				reason: "value must be greater than or equal to 1",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {

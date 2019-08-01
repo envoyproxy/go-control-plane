@@ -269,12 +269,7 @@ func (m *RuntimeUInt32) Validate() error {
 
 	// no validation rules for DefaultValue
 
-	if len(m.GetRuntimeKey()) < 1 {
-		return RuntimeUInt32ValidationError{
-			field:  "RuntimeKey",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for RuntimeKey
 
 	return nil
 }
@@ -341,19 +336,9 @@ func (m *HeaderValue) Validate() error {
 		return nil
 	}
 
-	if l := len(m.GetKey()); l < 1 || l > 16384 {
-		return HeaderValueValidationError{
-			field:  "Key",
-			reason: "value length must be between 1 and 16384 bytes, inclusive",
-		}
-	}
+	// no validation rules for Key
 
-	if len(m.GetValue()) > 16384 {
-		return HeaderValueValidationError{
-			field:  "Value",
-			reason: "value length must be at most 16384 bytes",
-		}
-	}
+	// no validation rules for Value
 
 	return nil
 }
@@ -418,13 +403,6 @@ var _ interface {
 func (m *HeaderValueOption) Validate() error {
 	if m == nil {
 		return nil
-	}
-
-	if m.GetHeader() == nil {
-		return HeaderValueOptionValidationError{
-			field:  "Header",
-			reason: "value is required",
-		}
 	}
 
 	if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
@@ -595,37 +573,13 @@ func (m *DataSource) Validate() error {
 	switch m.Specifier.(type) {
 
 	case *DataSource_Filename:
-
-		if len(m.GetFilename()) < 1 {
-			return DataSourceValidationError{
-				field:  "Filename",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
+		// no validation rules for Filename
 
 	case *DataSource_InlineBytes:
-
-		if len(m.GetInlineBytes()) < 1 {
-			return DataSourceValidationError{
-				field:  "InlineBytes",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
+		// no validation rules for InlineBytes
 
 	case *DataSource_InlineString:
-
-		if len(m.GetInlineString()) < 1 {
-			return DataSourceValidationError{
-				field:  "InlineString",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
-
-	default:
-		return DataSourceValidationError{
-			field:  "Specifier",
-			reason: "value is required",
-		}
+		// no validation rules for InlineString
 
 	}
 
@@ -694,13 +648,6 @@ func (m *RemoteDataSource) Validate() error {
 		return nil
 	}
 
-	if m.GetHttpUri() == nil {
-		return RemoteDataSourceValidationError{
-			field:  "HttpUri",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetHttpUri()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RemoteDataSourceValidationError{
@@ -711,12 +658,7 @@ func (m *RemoteDataSource) Validate() error {
 		}
 	}
 
-	if len(m.GetSha256()) < 1 {
-		return RemoteDataSourceValidationError{
-			field:  "Sha256",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Sha256
 
 	return nil
 }
@@ -809,12 +751,6 @@ func (m *AsyncDataSource) Validate() error {
 			}
 		}
 
-	default:
-		return AsyncDataSourceValidationError{
-			field:  "Specifier",
-			reason: "value is required",
-		}
-
 	}
 
 	return nil
@@ -882,12 +818,7 @@ func (m *TransportSocket) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return TransportSocketValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
 	switch m.ConfigType.(type) {
 
@@ -988,12 +919,7 @@ func (m *SocketOption) Validate() error {
 
 	// no validation rules for Name
 
-	if _, ok := SocketOption_SocketState_name[int32(m.GetState())]; !ok {
-		return SocketOptionValidationError{
-			field:  "State",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for State
 
 	switch m.Value.(type) {
 
@@ -1002,12 +928,6 @@ func (m *SocketOption) Validate() error {
 
 	case *SocketOption_BufValue:
 		// no validation rules for BufValue
-
-	default:
-		return SocketOptionValidationError{
-			field:  "Value",
-			reason: "value is required",
-		}
 
 	}
 
@@ -1074,13 +994,6 @@ var _ interface {
 func (m *RuntimeFractionalPercent) Validate() error {
 	if m == nil {
 		return nil
-	}
-
-	if m.GetDefaultValue() == nil {
-		return RuntimeFractionalPercentValidationError{
-			field:  "DefaultValue",
-			reason: "value is required",
-		}
 	}
 
 	if v, ok := interface{}(m.GetDefaultValue()).(interface{ Validate() error }); ok {

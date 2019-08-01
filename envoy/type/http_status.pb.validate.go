@@ -40,12 +40,7 @@ func (m *HttpStatus) Validate() error {
 		return nil
 	}
 
-	if _, ok := StatusCode_name[int32(m.GetCode())]; !ok {
-		return HttpStatusValidationError{
-			field:  "Code",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for Code
 
 	return nil
 }

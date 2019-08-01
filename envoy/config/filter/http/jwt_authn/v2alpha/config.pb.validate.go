@@ -41,12 +41,7 @@ func (m *JwtProvider) Validate() error {
 		return nil
 	}
 
-	if len(m.GetIssuer()) < 1 {
-		return JwtProviderValidationError{
-			field:  "Issuer",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Issuer
 
 	// no validation rules for Forward
 
@@ -93,12 +88,6 @@ func (m *JwtProvider) Validate() error {
 					cause:  err,
 				}
 			}
-		}
-
-	default:
-		return JwtProviderValidationError{
-			field:  "JwksSourceSpecifier",
-			reason: "value is required",
 		}
 
 	}
@@ -251,12 +240,7 @@ func (m *JwtHeader) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return JwtHeaderValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
 	// no validation rules for ValuePrefix
 
@@ -514,13 +498,6 @@ func (m *JwtRequirementOrList) Validate() error {
 		return nil
 	}
 
-	if len(m.GetRequirements()) < 2 {
-		return JwtRequirementOrListValidationError{
-			field:  "Requirements",
-			reason: "value must contain at least 2 item(s)",
-		}
-	}
-
 	for idx, item := range m.GetRequirements() {
 		_, _ = idx, item
 
@@ -603,13 +580,6 @@ func (m *JwtRequirementAndList) Validate() error {
 		return nil
 	}
 
-	if len(m.GetRequirements()) < 2 {
-		return JwtRequirementAndListValidationError{
-			field:  "Requirements",
-			reason: "value must contain at least 2 item(s)",
-		}
-	}
-
 	for idx, item := range m.GetRequirements() {
 		_, _ = idx, item
 
@@ -690,13 +660,6 @@ var _ interface {
 func (m *RequirementRule) Validate() error {
 	if m == nil {
 		return nil
-	}
-
-	if m.GetMatch() == nil {
-		return RequirementRuleValidationError{
-			field:  "Match",
-			reason: "value is required",
-		}
 	}
 
 	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
@@ -784,12 +747,7 @@ func (m *FilterStateRule) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
-		return FilterStateRuleValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Name
 
 	// no validation rules for Requires
 

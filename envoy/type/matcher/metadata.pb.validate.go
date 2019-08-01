@@ -41,19 +41,7 @@ func (m *MetadataMatcher) Validate() error {
 		return nil
 	}
 
-	if len(m.GetFilter()) < 1 {
-		return MetadataMatcherValidationError{
-			field:  "Filter",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
-
-	if len(m.GetPath()) < 1 {
-		return MetadataMatcherValidationError{
-			field:  "Path",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
+	// no validation rules for Filter
 
 	for idx, item := range m.GetPath() {
 		_, _ = idx, item
@@ -68,13 +56,6 @@ func (m *MetadataMatcher) Validate() error {
 			}
 		}
 
-	}
-
-	if m.GetValue() == nil {
-		return MetadataMatcherValidationError{
-			field:  "Value",
-			reason: "value is required",
-		}
 	}
 
 	if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
@@ -155,19 +136,7 @@ func (m *MetadataMatcher_PathSegment) Validate() error {
 	switch m.Segment.(type) {
 
 	case *MetadataMatcher_PathSegment_Key:
-
-		if len(m.GetKey()) < 1 {
-			return MetadataMatcher_PathSegmentValidationError{
-				field:  "Key",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
-
-	default:
-		return MetadataMatcher_PathSegmentValidationError{
-			field:  "Segment",
-			reason: "value is required",
-		}
+		// no validation rules for Key
 
 	}
 

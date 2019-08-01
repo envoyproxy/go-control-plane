@@ -40,12 +40,7 @@ func (m *Squash) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCluster()) < 1 {
-		return SquashValidationError{
-			field:  "Cluster",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Cluster
 
 	if v, ok := interface{}(m.GetAttachmentTemplate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

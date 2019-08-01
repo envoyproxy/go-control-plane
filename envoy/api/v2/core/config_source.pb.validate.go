@@ -41,12 +41,7 @@ func (m *ApiConfigSource) Validate() error {
 		return nil
 	}
 
-	if _, ok := ApiConfigSource_ApiType_name[int32(m.GetApiType())]; !ok {
-		return ApiConfigSourceValidationError{
-			field:  "ApiType",
-			reason: "value must be one of the defined enum values",
-		}
-	}
+	// no validation rules for ApiType
 
 	for idx, item := range m.GetGrpcServices() {
 		_, _ = idx, item
@@ -73,18 +68,14 @@ func (m *ApiConfigSource) Validate() error {
 		}
 	}
 
-	if d := m.GetRequestTimeout(); d != nil {
-		dur := *d
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
+	if v, ok := interface{}(m.GetRequestTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return ApiConfigSourceValidationError{
 				field:  "RequestTimeout",
-				reason: "value must be greater than 0s",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	if v, ok := interface{}(m.GetRateLimitSettings()).(interface{ Validate() error }); ok {
@@ -239,15 +230,14 @@ func (m *RateLimitSettings) Validate() error {
 		}
 	}
 
-	if wrapper := m.GetFillRate(); wrapper != nil {
-
-		if wrapper.GetValue() <= 0 {
+	if v, ok := interface{}(m.GetFillRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return RateLimitSettingsValidationError{
 				field:  "FillRate",
-				reason: "value must be greater than 0",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	return nil
@@ -354,12 +344,6 @@ func (m *ConfigSource) Validate() error {
 					cause:  err,
 				}
 			}
-		}
-
-	default:
-		return ConfigSourceValidationError{
-			field:  "ConfigSourceSpecifier",
-			reason: "value is required",
 		}
 
 	}

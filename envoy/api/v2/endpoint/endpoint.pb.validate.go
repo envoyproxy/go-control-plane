@@ -140,15 +140,14 @@ func (m *LbEndpoint) Validate() error {
 		}
 	}
 
-	if wrapper := m.GetLoadBalancingWeight(); wrapper != nil {
-
-		if wrapper.GetValue() < 1 {
+	if v, ok := interface{}(m.GetLoadBalancingWeight()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return LbEndpointValidationError{
 				field:  "LoadBalancingWeight",
-				reason: "value must be greater than or equal to 1",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	switch m.HostIdentifier.(type) {
@@ -260,23 +259,17 @@ func (m *LocalityLbEndpoints) Validate() error {
 
 	}
 
-	if wrapper := m.GetLoadBalancingWeight(); wrapper != nil {
-
-		if wrapper.GetValue() < 1 {
+	if v, ok := interface{}(m.GetLoadBalancingWeight()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return LocalityLbEndpointsValidationError{
 				field:  "LoadBalancingWeight",
-				reason: "value must be greater than or equal to 1",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
-	if m.GetPriority() > 128 {
-		return LocalityLbEndpointsValidationError{
-			field:  "Priority",
-			reason: "value must be less than or equal to 128",
-		}
-	}
+	// no validation rules for Priority
 
 	if v, ok := interface{}(m.GetProximity()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -355,12 +348,7 @@ func (m *Endpoint_HealthCheckConfig) Validate() error {
 		return nil
 	}
 
-	if m.GetPortValue() > 65535 {
-		return Endpoint_HealthCheckConfigValidationError{
-			field:  "PortValue",
-			reason: "value must be less than or equal to 65535",
-		}
-	}
+	// no validation rules for PortValue
 
 	return nil
 }

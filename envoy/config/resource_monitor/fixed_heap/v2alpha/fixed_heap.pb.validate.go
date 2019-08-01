@@ -41,12 +41,7 @@ func (m *FixedHeapConfig) Validate() error {
 		return nil
 	}
 
-	if m.GetMaxHeapSizeBytes() <= 0 {
-		return FixedHeapConfigValidationError{
-			field:  "MaxHeapSizeBytes",
-			reason: "value must be greater than 0",
-		}
-	}
+	// no validation rules for MaxHeapSizeBytes
 
 	return nil
 }

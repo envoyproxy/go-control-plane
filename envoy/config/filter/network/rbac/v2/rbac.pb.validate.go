@@ -60,12 +60,7 @@ func (m *RBAC) Validate() error {
 		}
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
-		return RBACValidationError{
-			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for StatPrefix
 
 	// no validation rules for EnforcementType
 

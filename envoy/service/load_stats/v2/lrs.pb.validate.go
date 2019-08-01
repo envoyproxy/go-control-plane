@@ -131,13 +131,6 @@ func (m *LoadStatsResponse) Validate() error {
 		return nil
 	}
 
-	if len(m.GetClusters()) < 1 {
-		return LoadStatsResponseValidationError{
-			field:  "Clusters",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
-
 	if v, ok := interface{}(m.GetLoadReportingInterval()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return LoadStatsResponseValidationError{

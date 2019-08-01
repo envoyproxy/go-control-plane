@@ -40,19 +40,7 @@ func (m *TapRequest) Validate() error {
 		return nil
 	}
 
-	if len(m.GetConfigId()) < 1 {
-		return TapRequestValidationError{
-			field:  "ConfigId",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
-
-	if m.GetTapConfig() == nil {
-		return TapRequestValidationError{
-			field:  "TapConfig",
-			reason: "value is required",
-		}
-	}
+	// no validation rules for ConfigId
 
 	if v, ok := interface{}(m.GetTapConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

@@ -41,13 +41,6 @@ func (m *HealthCheck) Validate() error {
 		return nil
 	}
 
-	if m.GetPassThroughMode() == nil {
-		return HealthCheckValidationError{
-			field:  "PassThroughMode",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetPassThroughMode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HealthCheckValidationError{

@@ -130,13 +130,6 @@ func (m *Route) Validate() error {
 		return nil
 	}
 
-	if m.GetMatch() == nil {
-		return RouteValidationError{
-			field:  "Match",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
@@ -144,13 +137,6 @@ func (m *Route) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
-		}
-	}
-
-	if m.GetRoute() == nil {
-		return RouteValidationError{
-			field:  "Route",
-			reason: "value is required",
 		}
 	}
 
@@ -333,12 +319,6 @@ func (m *RouteAction) Validate() error {
 					cause:  err,
 				}
 			}
-		}
-
-	default:
-		return RouteActionValidationError{
-			field:  "ClusterSpecifier",
-			reason: "value is required",
 		}
 
 	}

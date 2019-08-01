@@ -40,13 +40,6 @@ func (m *Tap) Validate() error {
 		return nil
 	}
 
-	if m.GetCommonConfig() == nil {
-		return TapValidationError{
-			field:  "CommonConfig",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TapValidationError{
@@ -54,13 +47,6 @@ func (m *Tap) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
-		}
-	}
-
-	if m.GetTransportSocket() == nil {
-		return TapValidationError{
-			field:  "TransportSocket",
-			reason: "value is required",
 		}
 	}
 

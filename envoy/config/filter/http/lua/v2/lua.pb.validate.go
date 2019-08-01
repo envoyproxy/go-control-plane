@@ -40,12 +40,7 @@ func (m *Lua) Validate() error {
 		return nil
 	}
 
-	if len(m.GetInlineCode()) < 1 {
-		return LuaValidationError{
-			field:  "InlineCode",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for InlineCode
 
 	return nil
 }

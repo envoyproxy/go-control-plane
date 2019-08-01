@@ -97,12 +97,6 @@ func (m *ValueMatcher) Validate() error {
 			}
 		}
 
-	default:
-		return ValueMatcherValidationError{
-			field:  "MatchPattern",
-			reason: "value is required",
-		}
-
 	}
 
 	return nil
@@ -182,12 +176,6 @@ func (m *ListMatcher) Validate() error {
 					cause:  err,
 				}
 			}
-		}
-
-	default:
-		return ListMatcherValidationError{
-			field:  "MatchPattern",
-			reason: "value is required",
 		}
 
 	}

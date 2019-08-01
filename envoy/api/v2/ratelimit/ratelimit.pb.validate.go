@@ -41,13 +41,6 @@ func (m *RateLimitDescriptor) Validate() error {
 		return nil
 	}
 
-	if len(m.GetEntries()) < 1 {
-		return RateLimitDescriptorValidationError{
-			field:  "Entries",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
-
 	for idx, item := range m.GetEntries() {
 		_, _ = idx, item
 
@@ -130,19 +123,9 @@ func (m *RateLimitDescriptor_Entry) Validate() error {
 		return nil
 	}
 
-	if len(m.GetKey()) < 1 {
-		return RateLimitDescriptor_EntryValidationError{
-			field:  "Key",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Key
 
-	if len(m.GetValue()) < 1 {
-		return RateLimitDescriptor_EntryValidationError{
-			field:  "Value",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
+	// no validation rules for Value
 
 	return nil
 }
