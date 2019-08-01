@@ -8,10 +8,10 @@ import (
 	fmt "fmt"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_ "github.com/gogo/googleapis/google/api"
 	proto "github.com/gogo/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	io "io"
+	_ "istio.io/gogo-genproto/googleapis/google/api"
 	v1 "istio.io/gogo-genproto/opencensus/proto/trace/v1"
 	math "math"
 )

@@ -17,7 +17,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	core "envoy/api/v2/core"
 )
 
 // ensure the imports are used
