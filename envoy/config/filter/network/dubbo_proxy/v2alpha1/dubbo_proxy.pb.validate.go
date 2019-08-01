@@ -40,11 +40,26 @@ func (m *DubboProxy) Validate() error {
 		return nil
 	}
 
-	// no validation rules for StatPrefix
+	if len(m.GetStatPrefix()) < 1 {
+		return DubboProxyValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for ProtocolType
+	if _, ok := ProtocolType_name[int32(m.GetProtocolType())]; !ok {
+		return DubboProxyValidationError{
+			field:  "ProtocolType",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
-	// no validation rules for SerializationType
+	if _, ok := SerializationType_name[int32(m.GetSerializationType())]; !ok {
+		return DubboProxyValidationError{
+			field:  "SerializationType",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	for idx, item := range m.GetRouteConfig() {
 		_, _ = idx, item
@@ -141,7 +156,12 @@ func (m *DubboFilter) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return DubboFilterValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

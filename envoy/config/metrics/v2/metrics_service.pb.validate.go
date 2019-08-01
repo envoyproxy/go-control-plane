@@ -41,6 +41,13 @@ func (m *MetricsServiceConfig) Validate() error {
 		return nil
 	}
 
+	if m.GetGrpcService() == nil {
+		return MetricsServiceConfigValidationError{
+			field:  "GrpcService",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return MetricsServiceConfigValidationError{

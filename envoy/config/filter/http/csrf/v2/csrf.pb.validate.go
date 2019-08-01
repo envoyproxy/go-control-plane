@@ -40,6 +40,13 @@ func (m *CsrfPolicy) Validate() error {
 		return nil
 	}
 
+	if m.GetFilterEnabled() == nil {
+		return CsrfPolicyValidationError{
+			field:  "FilterEnabled",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetFilterEnabled()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CsrfPolicyValidationError{

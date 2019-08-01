@@ -40,7 +40,12 @@ func (m *TcpProxy) Validate() error {
 		return nil
 	}
 
-	// no validation rules for StatPrefix
+	if len(m.GetStatPrefix()) < 1 {
+		return TcpProxyValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -52,14 +57,18 @@ func (m *TcpProxy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetIdleTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetIdleTimeout(); d != nil {
+		dur := *d
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
 			return TcpProxyValidationError{
 				field:  "IdleTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than 0s",
 			}
 		}
+
 	}
 
 	if v, ok := interface{}(m.GetDownstreamIdleTimeout()).(interface{ Validate() error }); ok {
@@ -107,14 +116,15 @@ func (m *TcpProxy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMaxConnectAttempts()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetMaxConnectAttempts(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
 			return TcpProxyValidationError{
 				field:  "MaxConnectAttempts",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than or equal to 1",
 			}
 		}
+
 	}
 
 	switch m.ClusterSpecifier.(type) {
@@ -132,6 +142,12 @@ func (m *TcpProxy) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return TcpProxyValidationError{
+			field:  "ClusterSpecifier",
+			reason: "value is required",
 		}
 
 	}
@@ -199,6 +215,13 @@ var _ interface {
 func (m *TcpProxy_DeprecatedV1) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetRoutes()) < 1 {
+		return TcpProxy_DeprecatedV1ValidationError{
+			field:  "Routes",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetRoutes() {
@@ -283,6 +306,13 @@ func (m *TcpProxy_WeightedCluster) Validate() error {
 		return nil
 	}
 
+	if len(m.GetClusters()) < 1 {
+		return TcpProxy_WeightedClusterValidationError{
+			field:  "Clusters",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetClusters() {
 		_, _ = idx, item
 
@@ -365,7 +395,12 @@ func (m *TcpProxy_DeprecatedV1_TCPRoute) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Cluster
+	if len(m.GetCluster()) < 1 {
+		return TcpProxy_DeprecatedV1_TCPRouteValidationError{
+			field:  "Cluster",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	for idx, item := range m.GetDestinationIpList() {
 		_, _ = idx, item
@@ -469,9 +504,19 @@ func (m *TcpProxy_WeightedCluster_ClusterWeight) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return TcpProxy_WeightedCluster_ClusterWeightValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for Weight
+	if m.GetWeight() < 1 {
+		return TcpProxy_WeightedCluster_ClusterWeightValidationError{
+			field:  "Weight",
+			reason: "value must be greater than or equal to 1",
+		}
+	}
 
 	return nil
 }

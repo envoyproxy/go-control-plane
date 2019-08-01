@@ -159,7 +159,12 @@ func (m *BufferSettings) Validate() error {
 		return nil
 	}
 
-	// no validation rules for MaxRequestBytes
+	if m.GetMaxRequestBytes() <= 0 {
+		return BufferSettingsValidationError{
+			field:  "MaxRequestBytes",
+			reason: "value must be greater than 0",
+		}
+	}
 
 	// no validation rules for AllowPartialMessage
 
@@ -507,9 +512,22 @@ func (m *ExtAuthzPerRoute) Validate() error {
 	switch m.Override.(type) {
 
 	case *ExtAuthzPerRoute_Disabled:
-		// no validation rules for Disabled
+
+		if m.GetDisabled() != true {
+			return ExtAuthzPerRouteValidationError{
+				field:  "Disabled",
+				reason: "value must equal true",
+			}
+		}
 
 	case *ExtAuthzPerRoute_CheckSettings:
+
+		if m.GetCheckSettings() == nil {
+			return ExtAuthzPerRouteValidationError{
+				field:  "CheckSettings",
+				reason: "value is required",
+			}
+		}
 
 		if v, ok := interface{}(m.GetCheckSettings()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
@@ -519,6 +537,12 @@ func (m *ExtAuthzPerRoute) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return ExtAuthzPerRouteValidationError{
+			field:  "Override",
+			reason: "value is required",
 		}
 
 	}

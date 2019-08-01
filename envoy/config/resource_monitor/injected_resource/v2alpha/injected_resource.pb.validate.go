@@ -41,7 +41,12 @@ func (m *InjectedResourceConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Filename
+	if len(m.GetFilename()) < 1 {
+		return InjectedResourceConfigValidationError{
+			field:  "Filename",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }

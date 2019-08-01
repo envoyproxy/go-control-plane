@@ -41,9 +41,19 @@ func (m *HttpConnectionManager) Validate() error {
 		return nil
 	}
 
-	// no validation rules for CodecType
+	if _, ok := HttpConnectionManager_CodecType_name[int32(m.GetCodecType())]; !ok {
+		return HttpConnectionManagerValidationError{
+			field:  "CodecType",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
-	// no validation rules for StatPrefix
+	if len(m.GetStatPrefix()) < 1 {
+		return HttpConnectionManagerValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	for idx, item := range m.GetHttpFilters() {
 		_, _ = idx, item
@@ -102,14 +112,15 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for ServerName
 
-	if v, ok := interface{}(m.GetMaxRequestHeadersKb()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetMaxRequestHeadersKb(); wrapper != nil {
+
+		if wrapper.GetValue() > 96 {
 			return HttpConnectionManagerValidationError{
 				field:  "MaxRequestHeadersKb",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be less than or equal to 96",
 			}
 		}
+
 	}
 
 	if v, ok := interface{}(m.GetIdleTimeout()).(interface{ Validate() error }); ok {
@@ -215,7 +226,12 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for PreserveExternalRequestId
 
-	// no validation rules for ForwardClientCertDetails
+	if _, ok := HttpConnectionManager_ForwardClientCertDetails_name[int32(m.GetForwardClientCertDetails())]; !ok {
+		return HttpConnectionManagerValidationError{
+			field:  "ForwardClientCertDetails",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	if v, ok := interface{}(m.GetSetCurrentClientCertDetails()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -296,6 +312,12 @@ func (m *HttpConnectionManager) Validate() error {
 			}
 		}
 
+	default:
+		return HttpConnectionManagerValidationError{
+			field:  "RouteSpecifier",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -364,6 +386,13 @@ func (m *Rds) Validate() error {
 		return nil
 	}
 
+	if m.GetConfigSource() == nil {
+		return RdsValidationError{
+			field:  "ConfigSource",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetConfigSource()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RdsValidationError{
@@ -374,7 +403,12 @@ func (m *Rds) Validate() error {
 		}
 	}
 
-	// no validation rules for RouteConfigName
+	if len(m.GetRouteConfigName()) < 1 {
+		return RdsValidationError{
+			field:  "RouteConfigName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -439,6 +473,13 @@ var _ interface {
 func (m *ScopedRouteConfigurationsList) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetScopedRouteConfigurations()) < 1 {
+		return ScopedRouteConfigurationsListValidationError{
+			field:  "ScopedRouteConfigurations",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetScopedRouteConfigurations() {
@@ -524,7 +565,19 @@ func (m *ScopedRoutes) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return ScopedRoutesValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if m.GetScopeKeyBuilder() == nil {
+		return ScopedRoutesValidationError{
+			field:  "ScopeKeyBuilder",
+			reason: "value is required",
+		}
+	}
 
 	if v, ok := interface{}(m.GetScopeKeyBuilder()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -533,6 +586,13 @@ func (m *ScopedRoutes) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
+		}
+	}
+
+	if m.GetRdsConfigSource() == nil {
+		return ScopedRoutesValidationError{
+			field:  "RdsConfigSource",
+			reason: "value is required",
 		}
 	}
 
@@ -570,6 +630,12 @@ func (m *ScopedRoutes) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return ScopedRoutesValidationError{
+			field:  "ConfigSpecifier",
+			reason: "value is required",
 		}
 
 	}
@@ -636,6 +702,13 @@ var _ interface {
 func (m *ScopedRds) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if m.GetScopedRdsConfigSource() == nil {
+		return ScopedRdsValidationError{
+			field:  "ScopedRdsConfigSource",
+			reason: "value is required",
+		}
 	}
 
 	if v, ok := interface{}(m.GetScopedRdsConfigSource()).(interface{ Validate() error }); ok {
@@ -712,7 +785,12 @@ func (m *HttpFilter) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return HttpFilterValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.ConfigType.(type) {
 
@@ -807,7 +885,12 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 		return nil
 	}
 
-	// no validation rules for OperationName
+	if _, ok := HttpConnectionManager_Tracing_OperationName_name[int32(m.GetOperationName())]; !ok {
+		return HttpConnectionManager_TracingValidationError{
+			field:  "OperationName",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	if v, ok := interface{}(m.GetClientSampling()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1168,6 +1251,13 @@ func (m *ScopedRoutes_ScopeKeyBuilder) Validate() error {
 		return nil
 	}
 
+	if len(m.GetFragments()) < 1 {
+		return ScopedRoutes_ScopeKeyBuilderValidationError{
+			field:  "Fragments",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetFragments() {
 		_, _ = idx, item
 
@@ -1265,6 +1355,12 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder) Validate() error {
 			}
 		}
 
+	default:
+		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilderValidationError{
+			field:  "Type",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -1337,7 +1433,12 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor) Vali
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractorValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for ElementSeparator
 
@@ -1438,9 +1539,19 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvEle
 		return nil
 	}
 
-	// no validation rules for Separator
+	if len(m.GetSeparator()) < 1 {
+		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElementValidationError{
+			field:  "Separator",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for Key
+	if len(m.GetKey()) < 1 {
+		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElementValidationError{
+			field:  "Key",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }

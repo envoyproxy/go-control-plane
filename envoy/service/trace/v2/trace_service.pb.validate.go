@@ -200,6 +200,13 @@ func (m *StreamTracesMessage_Identifier) Validate() error {
 		return nil
 	}
 
+	if m.GetNode() == nil {
+		return StreamTracesMessage_IdentifierValidationError{
+			field:  "Node",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return StreamTracesMessage_IdentifierValidationError{

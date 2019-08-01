@@ -41,9 +41,19 @@ func (m *TlsParameters) Validate() error {
 		return nil
 	}
 
-	// no validation rules for TlsMinimumProtocolVersion
+	if _, ok := TlsParameters_TlsProtocol_name[int32(m.GetTlsMinimumProtocolVersion())]; !ok {
+		return TlsParametersValidationError{
+			field:  "TlsMinimumProtocolVersion",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
-	// no validation rules for TlsMaximumProtocolVersion
+	if _, ok := TlsParameters_TlsProtocol_name[int32(m.GetTlsMaximumProtocolVersion())]; !ok {
+		return TlsParametersValidationError{
+			field:  "TlsMaximumProtocolVersion",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	return nil
 }
@@ -230,6 +240,13 @@ func (m *TlsSessionTicketKeys) Validate() error {
 		return nil
 	}
 
+	if len(m.GetKeys()) < 1 {
+		return TlsSessionTicketKeysValidationError{
+			field:  "Keys",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetKeys() {
 		_, _ = idx, item
 
@@ -320,6 +337,30 @@ func (m *CertificateValidationContext) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	for idx, item := range m.GetVerifyCertificateSpki() {
+		_, _ = idx, item
+
+		if len(item) != 44 {
+			return CertificateValidationContextValidationError{
+				field:  fmt.Sprintf("VerifyCertificateSpki[%v]", idx),
+				reason: "value length must be 44 bytes",
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetVerifyCertificateHash() {
+		_, _ = idx, item
+
+		if l := len(item); l < 64 || l > 95 {
+			return CertificateValidationContextValidationError{
+				field:  fmt.Sprintf("VerifyCertificateHash[%v]", idx),
+				reason: "value length must be between 64 and 95 bytes, inclusive",
+			}
+		}
+
 	}
 
 	if v, ok := interface{}(m.GetRequireOcspStaple()).(interface{ Validate() error }); ok {
@@ -445,6 +486,13 @@ func (m *CommonTlsContext) Validate() error {
 			}
 		}
 
+	}
+
+	if len(m.GetTlsCertificateSdsSecretConfigs()) > 1 {
+		return CommonTlsContextValidationError{
+			field:  "TlsCertificateSdsSecretConfigs",
+			reason: "value must contain no more than 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetTlsCertificateSdsSecretConfigs() {
@@ -577,7 +625,12 @@ func (m *UpstreamTlsContext) Validate() error {
 		}
 	}
 
-	// no validation rules for Sni
+	if len(m.GetSni()) > 255 {
+		return UpstreamTlsContextValidationError{
+			field:  "Sni",
+			reason: "value length must be at most 255 bytes",
+		}
+	}
 
 	// no validation rules for AllowRenegotiation
 
@@ -967,6 +1020,13 @@ func (m *CommonTlsContext_CombinedCertificateValidationContext) Validate() error
 		return nil
 	}
 
+	if m.GetDefaultValidationContext() == nil {
+		return CommonTlsContext_CombinedCertificateValidationContextValidationError{
+			field:  "DefaultValidationContext",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetDefaultValidationContext()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommonTlsContext_CombinedCertificateValidationContextValidationError{
@@ -974,6 +1034,13 @@ func (m *CommonTlsContext_CombinedCertificateValidationContext) Validate() error
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
+		}
+	}
+
+	if m.GetValidationContextSdsSecretConfig() == nil {
+		return CommonTlsContext_CombinedCertificateValidationContextValidationError{
+			field:  "ValidationContextSdsSecretConfig",
+			reason: "value is required",
 		}
 	}
 

@@ -137,7 +137,12 @@ func (m *Config_KeyValuePair) Validate() error {
 
 	// no validation rules for MetadataNamespace
 
-	// no validation rules for Key
+	if len(m.GetKey()) < 1 {
+		return Config_KeyValuePairValidationError{
+			field:  "Key",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for Value
 
@@ -210,7 +215,12 @@ func (m *Config_Rule) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Header
+	if len(m.GetHeader()) < 1 {
+		return Config_RuleValidationError{
+			field:  "Header",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetOnHeaderPresent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

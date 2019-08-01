@@ -56,14 +56,18 @@ func (m *FaultDelay) Validate() error {
 
 	case *FaultDelay_FixedDelay:
 
-		if v, ok := interface{}(m.GetFixedDelay()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
+		if d := m.GetFixedDelay(); d != nil {
+			dur := *d
+
+			gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur <= gt {
 				return FaultDelayValidationError{
 					field:  "FixedDelay",
-					reason: "embedded message failed validation",
-					cause:  err,
+					reason: "value must be greater than 0s",
 				}
 			}
+
 		}
 
 	case *FaultDelay_HeaderDelay_:
@@ -76,6 +80,12 @@ func (m *FaultDelay) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return FaultDelayValidationError{
+			field:  "FaultDelaySecifier",
+			reason: "value is required",
 		}
 
 	}
@@ -179,6 +189,12 @@ func (m *FaultRateLimit) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return FaultRateLimitValidationError{
+			field:  "LimitType",
+			reason: "value is required",
 		}
 
 	}
@@ -315,7 +331,12 @@ func (m *FaultRateLimit_FixedLimit) Validate() error {
 		return nil
 	}
 
-	// no validation rules for LimitKbps
+	if m.GetLimitKbps() < 1 {
+		return FaultRateLimit_FixedLimitValidationError{
+			field:  "LimitKbps",
+			reason: "value must be greater than or equal to 1",
+		}
+	}
 
 	return nil
 }

@@ -41,7 +41,12 @@ func (m *TapResource) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return TapResourceValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

@@ -58,6 +58,12 @@ func (m *DoubleMatcher) Validate() error {
 	case *DoubleMatcher_Exact:
 		// no validation rules for Exact
 
+	default:
+		return DoubleMatcherValidationError{
+			field:  "MatchPattern",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil

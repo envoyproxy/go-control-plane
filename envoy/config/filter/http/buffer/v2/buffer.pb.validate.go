@@ -40,14 +40,15 @@ func (m *Buffer) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMaxRequestBytes()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetMaxRequestBytes(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
 			return BufferValidationError{
 				field:  "MaxRequestBytes",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than 0",
 			}
 		}
+
 	}
 
 	return nil
@@ -118,9 +119,22 @@ func (m *BufferPerRoute) Validate() error {
 	switch m.Override.(type) {
 
 	case *BufferPerRoute_Disabled:
-		// no validation rules for Disabled
+
+		if m.GetDisabled() != true {
+			return BufferPerRouteValidationError{
+				field:  "Disabled",
+				reason: "value must equal true",
+			}
+		}
 
 	case *BufferPerRoute_Buffer:
+
+		if m.GetBuffer() == nil {
+			return BufferPerRouteValidationError{
+				field:  "Buffer",
+				reason: "value is required",
+			}
+		}
 
 		if v, ok := interface{}(m.GetBuffer()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
@@ -130,6 +144,12 @@ func (m *BufferPerRoute) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return BufferPerRouteValidationError{
+			field:  "Override",
+			reason: "value is required",
 		}
 
 	}

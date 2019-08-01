@@ -40,7 +40,12 @@ func (m *Alts) Validate() error {
 		return nil
 	}
 
-	// no validation rules for HandshakerService
+	if len(m.GetHandshakerService()) < 1 {
+		return AltsValidationError{
+			field:  "HandshakerService",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }

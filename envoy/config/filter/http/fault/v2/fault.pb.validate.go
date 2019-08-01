@@ -53,7 +53,19 @@ func (m *FaultAbort) Validate() error {
 	switch m.ErrorType.(type) {
 
 	case *FaultAbort_HttpStatus:
-		// no validation rules for HttpStatus
+
+		if val := m.GetHttpStatus(); val < 200 || val >= 600 {
+			return FaultAbortValidationError{
+				field:  "HttpStatus",
+				reason: "value must be inside range [200, 600)",
+			}
+		}
+
+	default:
+		return FaultAbortValidationError{
+			field:  "ErrorType",
+			reason: "value is required",
+		}
 
 	}
 

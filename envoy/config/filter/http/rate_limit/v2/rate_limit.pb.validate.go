@@ -40,9 +40,19 @@ func (m *RateLimit) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Domain
+	if len(m.GetDomain()) < 1 {
+		return RateLimitValidationError{
+			field:  "Domain",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for Stage
+	if m.GetStage() > 10 {
+		return RateLimitValidationError{
+			field:  "Stage",
+			reason: "value must be less than or equal to 10",
+		}
+	}
 
 	// no validation rules for RequestType
 
@@ -59,6 +69,13 @@ func (m *RateLimit) Validate() error {
 	// no validation rules for FailureModeDeny
 
 	// no validation rules for RateLimitedAsResourceExhausted
+
+	if m.GetRateLimitService() == nil {
+		return RateLimitValidationError{
+			field:  "RateLimitService",
+			reason: "value is required",
+		}
+	}
 
 	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

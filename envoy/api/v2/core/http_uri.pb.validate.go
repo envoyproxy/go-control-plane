@@ -40,22 +40,36 @@ func (m *HttpUri) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Uri
+	if len(m.GetUri()) < 1 {
+		return HttpUriValidationError{
+			field:  "Uri",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HttpUriValidationError{
-				field:  "Timeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
+	if m.GetTimeout() == nil {
+		return HttpUriValidationError{
+			field:  "Timeout",
+			reason: "value is required",
 		}
 	}
 
 	switch m.HttpUpstreamType.(type) {
 
 	case *HttpUri_Cluster:
-		// no validation rules for Cluster
+
+		if len(m.GetCluster()) < 1 {
+			return HttpUriValidationError{
+				field:  "Cluster",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
+
+	default:
+		return HttpUriValidationError{
+			field:  "HttpUpstreamType",
+			reason: "value is required",
+		}
 
 	}
 

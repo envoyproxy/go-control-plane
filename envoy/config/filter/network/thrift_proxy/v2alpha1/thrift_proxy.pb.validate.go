@@ -41,11 +41,26 @@ func (m *ThriftProxy) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Transport
+	if _, ok := TransportType_name[int32(m.GetTransport())]; !ok {
+		return ThriftProxyValidationError{
+			field:  "Transport",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
-	// no validation rules for Protocol
+	if _, ok := ProtocolType_name[int32(m.GetProtocol())]; !ok {
+		return ThriftProxyValidationError{
+			field:  "Protocol",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
-	// no validation rules for StatPrefix
+	if len(m.GetStatPrefix()) < 1 {
+		return ThriftProxyValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetRouteConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -137,7 +152,12 @@ func (m *ThriftFilter) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return ThriftFilterValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.ConfigType.(type) {
 
@@ -232,9 +252,19 @@ func (m *ThriftProtocolOptions) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Transport
+	if _, ok := TransportType_name[int32(m.GetTransport())]; !ok {
+		return ThriftProtocolOptionsValidationError{
+			field:  "Transport",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
-	// no validation rules for Protocol
+	if _, ok := ProtocolType_name[int32(m.GetProtocol())]; !ok {
+		return ThriftProtocolOptionsValidationError{
+			field:  "Protocol",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	return nil
 }

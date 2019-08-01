@@ -341,9 +341,21 @@ func (m *ClusterStats) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ClusterName
+	if len(m.GetClusterName()) < 1 {
+		return ClusterStatsValidationError{
+			field:  "ClusterName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for ClusterServiceName
+
+	if len(m.GetUpstreamLocalityStats()) < 1 {
+		return ClusterStatsValidationError{
+			field:  "UpstreamLocalityStats",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
 
 	for idx, item := range m.GetUpstreamLocalityStats() {
 		_, _ = idx, item
@@ -452,7 +464,12 @@ func (m *ClusterStats_DroppedRequests) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Category
+	if len(m.GetCategory()) < 1 {
+		return ClusterStats_DroppedRequestsValidationError{
+			field:  "Category",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for DroppedCount
 

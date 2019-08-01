@@ -41,7 +41,12 @@ func (m *ZooKeeperProxy) Validate() error {
 		return nil
 	}
 
-	// no validation rules for StatPrefix
+	if len(m.GetStatPrefix()) < 1 {
+		return ZooKeeperProxyValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for AccessLog
 

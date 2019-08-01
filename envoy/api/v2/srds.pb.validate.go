@@ -41,9 +41,26 @@ func (m *ScopedRouteConfiguration) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return ScopedRouteConfigurationValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for RouteConfigurationName
+	if len(m.GetRouteConfigurationName()) < 1 {
+		return ScopedRouteConfigurationValidationError{
+			field:  "RouteConfigurationName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if m.GetKey() == nil {
+		return ScopedRouteConfigurationValidationError{
+			field:  "Key",
+			reason: "value is required",
+		}
+	}
 
 	if v, ok := interface{}(m.GetKey()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -120,6 +137,13 @@ var _ interface {
 func (m *ScopedRouteConfiguration_Key) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetFragments()) < 1 {
+		return ScopedRouteConfiguration_KeyValidationError{
+			field:  "Fragments",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetFragments() {
@@ -209,6 +233,12 @@ func (m *ScopedRouteConfiguration_Key_Fragment) Validate() error {
 
 	case *ScopedRouteConfiguration_Key_Fragment_StringKey:
 		// no validation rules for StringKey
+
+	default:
+		return ScopedRouteConfiguration_Key_FragmentValidationError{
+			field:  "Type",
+			reason: "value is required",
+		}
 
 	}
 

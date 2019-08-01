@@ -41,6 +41,13 @@ func (m *HttpGrpcAccessLogConfig) Validate() error {
 		return nil
 	}
 
+	if m.GetCommonConfig() == nil {
+		return HttpGrpcAccessLogConfigValidationError{
+			field:  "CommonConfig",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpGrpcAccessLogConfigValidationError{
@@ -116,6 +123,13 @@ var _ interface {
 func (m *TcpGrpcAccessLogConfig) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if m.GetCommonConfig() == nil {
+		return TcpGrpcAccessLogConfigValidationError{
+			field:  "CommonConfig",
+			reason: "value is required",
+		}
 	}
 
 	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
@@ -195,7 +209,19 @@ func (m *CommonGrpcAccessLogConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for LogName
+	if len(m.GetLogName()) < 1 {
+		return CommonGrpcAccessLogConfigValidationError{
+			field:  "LogName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if m.GetGrpcService() == nil {
+		return CommonGrpcAccessLogConfigValidationError{
+			field:  "GrpcService",
+			reason: "value is required",
+		}
+	}
 
 	if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

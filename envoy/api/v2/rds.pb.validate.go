@@ -68,6 +68,13 @@ func (m *RouteConfiguration) Validate() error {
 		}
 	}
 
+	if len(m.GetResponseHeadersToAdd()) > 1000 {
+		return RouteConfigurationValidationError{
+			field:  "ResponseHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetResponseHeadersToAdd() {
 		_, _ = idx, item
 
@@ -81,6 +88,13 @@ func (m *RouteConfiguration) Validate() error {
 			}
 		}
 
+	}
+
+	if len(m.GetRequestHeadersToAdd()) > 1000 {
+		return RouteConfigurationValidationError{
+			field:  "RequestHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetRequestHeadersToAdd() {
@@ -172,6 +186,13 @@ var _ interface {
 func (m *Vhds) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if m.GetConfigSource() == nil {
+		return VhdsValidationError{
+			field:  "ConfigSource",
+			reason: "value is required",
+		}
 	}
 
 	if v, ok := interface{}(m.GetConfigSource()).(interface{ Validate() error }); ok {

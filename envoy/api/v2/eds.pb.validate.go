@@ -41,7 +41,12 @@ func (m *ClusterLoadAssignment) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ClusterName
+	if len(m.GetClusterName()) < 1 {
+		return ClusterLoadAssignmentValidationError{
+			field:  "ClusterName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	for idx, item := range m.GetEndpoints() {
 		_, _ = idx, item
@@ -152,24 +157,36 @@ func (m *ClusterLoadAssignment_Policy) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetOverprovisioningFactor()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetOverprovisioningFactor(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
 			return ClusterLoadAssignment_PolicyValidationError{
 				field:  "OverprovisioningFactor",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than 0",
 			}
 		}
+
 	}
 
-	if v, ok := interface{}(m.GetEndpointStaleAfter()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetEndpointStaleAfter(); d != nil {
+		dur, err := types.DurationFromProto(d)
+		if err != nil {
 			return ClusterLoadAssignment_PolicyValidationError{
 				field:  "EndpointStaleAfter",
-				reason: "embedded message failed validation",
+				reason: "value is not a valid duration",
 				cause:  err,
 			}
 		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return ClusterLoadAssignment_PolicyValidationError{
+				field:  "EndpointStaleAfter",
+				reason: "value must be greater than 0s",
+			}
+		}
+
 	}
 
 	return nil
@@ -240,7 +257,12 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Category
+	if len(m.GetCategory()) < 1 {
+		return ClusterLoadAssignment_Policy_DropOverloadValidationError{
+			field:  "Category",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetDropPercentage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

@@ -47,7 +47,19 @@ func (m *VirtualHost) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return VirtualHostValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if len(m.GetDomains()) < 1 {
+		return VirtualHostValidationError{
+			field:  "Domains",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
 
 	for idx, item := range m.GetRoutes() {
 		_, _ = idx, item
@@ -96,6 +108,13 @@ func (m *VirtualHost) Validate() error {
 
 	}
 
+	if len(m.GetRequestHeadersToAdd()) > 1000 {
+		return VirtualHostValidationError{
+			field:  "RequestHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
@@ -109,6 +128,13 @@ func (m *VirtualHost) Validate() error {
 			}
 		}
 
+	}
+
+	if len(m.GetResponseHeadersToAdd()) > 1000 {
+		return VirtualHostValidationError{
+			field:  "ResponseHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetResponseHeadersToAdd() {
@@ -228,6 +254,13 @@ func (m *Route) Validate() error {
 
 	// no validation rules for Name
 
+	if m.GetMatch() == nil {
+		return RouteValidationError{
+			field:  "Match",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
@@ -262,6 +295,13 @@ func (m *Route) Validate() error {
 
 	// no validation rules for TypedPerFilterConfig
 
+	if len(m.GetRequestHeadersToAdd()) > 1000 {
+		return RouteValidationError{
+			field:  "RequestHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
@@ -275,6 +315,13 @@ func (m *Route) Validate() error {
 			}
 		}
 
+	}
+
+	if len(m.GetResponseHeadersToAdd()) > 1000 {
+		return RouteValidationError{
+			field:  "ResponseHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetResponseHeadersToAdd() {
@@ -338,6 +385,12 @@ func (m *Route) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return RouteValidationError{
+			field:  "Action",
+			reason: "value is required",
 		}
 
 	}
@@ -407,6 +460,13 @@ func (m *WeightedCluster) Validate() error {
 		return nil
 	}
 
+	if len(m.GetClusters()) < 1 {
+		return WeightedClusterValidationError{
+			field:  "Clusters",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetClusters() {
 		_, _ = idx, item
 
@@ -422,14 +482,15 @@ func (m *WeightedCluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetTotalWeight()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetTotalWeight(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
 			return WeightedClusterValidationError{
 				field:  "TotalWeight",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than or equal to 1",
 			}
 		}
+
 	}
 
 	// no validation rules for RuntimeKeyPrefix
@@ -567,7 +628,19 @@ func (m *RouteMatch) Validate() error {
 		// no validation rules for Path
 
 	case *RouteMatch_Regex:
-		// no validation rules for Regex
+
+		if len(m.GetRegex()) > 1024 {
+			return RouteMatchValidationError{
+				field:  "Regex",
+				reason: "value length must be at most 1024 bytes",
+			}
+		}
+
+	default:
+		return RouteMatchValidationError{
+			field:  "PathSpecifier",
+			reason: "value is required",
+		}
 
 	}
 
@@ -633,6 +706,18 @@ var _ interface {
 func (m *CorsPolicy) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	for idx, item := range m.GetAllowOriginRegex() {
+		_, _ = idx, item
+
+		if len(item) > 1024 {
+			return CorsPolicyValidationError{
+				field:  fmt.Sprintf("AllowOriginRegex[%v]", idx),
+				reason: "value length must be at most 1024 bytes",
+			}
+		}
+
 	}
 
 	// no validation rules for AllowMethods
@@ -756,7 +841,12 @@ func (m *RouteAction) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ClusterNotFoundResponseCode
+	if _, ok := RouteAction_ClusterNotFoundResponseCode_name[int32(m.GetClusterNotFoundResponseCode())]; !ok {
+		return RouteActionValidationError{
+			field:  "ClusterNotFoundResponseCode",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -912,10 +1002,22 @@ func (m *RouteAction) Validate() error {
 	switch m.ClusterSpecifier.(type) {
 
 	case *RouteAction_Cluster:
-		// no validation rules for Cluster
+
+		if len(m.GetCluster()) < 1 {
+			return RouteActionValidationError{
+				field:  "Cluster",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
 
 	case *RouteAction_ClusterHeader:
-		// no validation rules for ClusterHeader
+
+		if len(m.GetClusterHeader()) < 1 {
+			return RouteActionValidationError{
+				field:  "ClusterHeader",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
 
 	case *RouteAction_WeightedClusters:
 
@@ -927,6 +1029,12 @@ func (m *RouteAction) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return RouteActionValidationError{
+			field:  "ClusterSpecifier",
+			reason: "value is required",
 		}
 
 	}
@@ -1142,14 +1250,15 @@ func (m *HedgePolicy) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetInitialRequests()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetInitialRequests(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
 			return HedgePolicyValidationError{
 				field:  "InitialRequests",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than or equal to 1",
 			}
 		}
+
 	}
 
 	if v, ok := interface{}(m.GetAdditionalRequestChance()).(interface{ Validate() error }); ok {
@@ -1233,7 +1342,12 @@ func (m *RedirectAction) Validate() error {
 
 	// no validation rules for PortRedirect
 
-	// no validation rules for ResponseCode
+	if _, ok := RedirectAction_RedirectResponseCode_name[int32(m.GetResponseCode())]; !ok {
+		return RedirectActionValidationError{
+			field:  "ResponseCode",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	// no validation rules for StripQuery
 
@@ -1322,7 +1436,12 @@ func (m *DirectResponseAction) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Status
+	if val := m.GetStatus(); val < 100 || val >= 600 {
+		return DirectResponseActionValidationError{
+			field:  "Status",
+			reason: "value must be inside range [100, 600)",
+		}
+	}
 
 	if v, ok := interface{}(m.GetBody()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1400,7 +1519,12 @@ func (m *Decorator) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Operation
+	if len(m.GetOperation()) < 1 {
+		return DecoratorValidationError{
+			field:  "Operation",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -1561,9 +1685,19 @@ func (m *VirtualCluster) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Pattern
+	if l := len(m.GetPattern()); l < 1 || l > 1024 {
+		return VirtualClusterValidationError{
+			field:  "Pattern",
+			reason: "value length must be between 1 and 1024 bytes, inclusive",
+		}
+	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return VirtualClusterValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for Method
 
@@ -1631,17 +1765,25 @@ func (m *RateLimit) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetStage()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetStage(); wrapper != nil {
+
+		if wrapper.GetValue() > 10 {
 			return RateLimitValidationError{
 				field:  "Stage",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be less than or equal to 10",
 			}
 		}
+
 	}
 
 	// no validation rules for DisableKey
+
+	if len(m.GetActions()) < 1 {
+		return RateLimitValidationError{
+			field:  "Actions",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
 
 	for idx, item := range m.GetActions() {
 		_, _ = idx, item
@@ -1723,7 +1865,12 @@ func (m *HeaderMatcher) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return HeaderMatcherValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for InvertMatch
 
@@ -1733,7 +1880,13 @@ func (m *HeaderMatcher) Validate() error {
 		// no validation rules for ExactMatch
 
 	case *HeaderMatcher_RegexMatch:
-		// no validation rules for RegexMatch
+
+		if len(m.GetRegexMatch()) > 1024 {
+			return HeaderMatcherValidationError{
+				field:  "RegexMatch",
+				reason: "value length must be at most 1024 bytes",
+			}
+		}
 
 	case *HeaderMatcher_RangeMatch:
 
@@ -1751,10 +1904,22 @@ func (m *HeaderMatcher) Validate() error {
 		// no validation rules for PresentMatch
 
 	case *HeaderMatcher_PrefixMatch:
-		// no validation rules for PrefixMatch
+
+		if len(m.GetPrefixMatch()) < 1 {
+			return HeaderMatcherValidationError{
+				field:  "PrefixMatch",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
 
 	case *HeaderMatcher_SuffixMatch:
-		// no validation rules for SuffixMatch
+
+		if len(m.GetSuffixMatch()) < 1 {
+			return HeaderMatcherValidationError{
+				field:  "SuffixMatch",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
 
 	}
 
@@ -1823,7 +1988,12 @@ func (m *QueryParameterMatcher) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if l := len(m.GetName()); l < 1 || l > 1024 {
+		return QueryParameterMatcherValidationError{
+			field:  "Name",
+			reason: "value length must be between 1 and 1024 bytes, inclusive",
+		}
+	}
 
 	// no validation rules for Value
 
@@ -1904,7 +2074,12 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return WeightedCluster_ClusterWeightValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetWeight()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1926,6 +2101,13 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		}
 	}
 
+	if len(m.GetRequestHeadersToAdd()) > 1000 {
+		return WeightedCluster_ClusterWeightValidationError{
+			field:  "RequestHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
 
@@ -1939,6 +2121,13 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 			}
 		}
 
+	}
+
+	if len(m.GetResponseHeadersToAdd()) > 1000 {
+		return WeightedCluster_ClusterWeightValidationError{
+			field:  "ResponseHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetResponseHeadersToAdd() {
@@ -2096,7 +2285,12 @@ func (m *RouteAction_RequestMirrorPolicy) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Cluster
+	if len(m.GetCluster()) < 1 {
+		return RouteAction_RequestMirrorPolicyValidationError{
+			field:  "Cluster",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for RuntimeKey
 
@@ -2216,6 +2410,12 @@ func (m *RouteAction_HashPolicy) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return RouteAction_HashPolicyValidationError{
+			field:  "PolicySpecifier",
+			reason: "value is required",
 		}
 
 	}
@@ -2366,7 +2566,12 @@ func (m *RouteAction_HashPolicy_Header) Validate() error {
 		return nil
 	}
 
-	// no validation rules for HeaderName
+	if len(m.GetHeaderName()) < 1 {
+		return RouteAction_HashPolicy_HeaderValidationError{
+			field:  "HeaderName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -2436,7 +2641,12 @@ func (m *RouteAction_HashPolicy_Cookie) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return RouteAction_HashPolicy_CookieValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetTtl()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -2588,7 +2798,12 @@ func (m *RetryPolicy_RetryPriority) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return RetryPolicy_RetryPriorityValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.ConfigType.(type) {
 
@@ -2685,7 +2900,12 @@ func (m *RetryPolicy_RetryHostPredicate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return RetryPolicy_RetryHostPredicateValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.ConfigType.(type) {
 
@@ -2783,24 +3003,39 @@ func (m *RetryPolicy_RetryBackOff) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetBaseInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RetryPolicy_RetryBackOffValidationError{
-				field:  "BaseInterval",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
+	if m.GetBaseInterval() == nil {
+		return RetryPolicy_RetryBackOffValidationError{
+			field:  "BaseInterval",
+			reason: "value is required",
 		}
 	}
 
-	if v, ok := interface{}(m.GetMaxInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetBaseInterval(); d != nil {
+		dur := *d
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
 			return RetryPolicy_RetryBackOffValidationError{
-				field:  "MaxInterval",
-				reason: "embedded message failed validation",
-				cause:  err,
+				field:  "BaseInterval",
+				reason: "value must be greater than 0s",
 			}
 		}
+
+	}
+
+	if d := m.GetMaxInterval(); d != nil {
+		dur := *d
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return RetryPolicy_RetryBackOffValidationError{
+				field:  "MaxInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
 	}
 
 	return nil
@@ -2942,6 +3177,12 @@ func (m *RateLimit_Action) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return RateLimit_ActionValidationError{
+			field:  "ActionSpecifier",
+			reason: "value is required",
 		}
 
 	}
@@ -3147,9 +3388,19 @@ func (m *RateLimit_Action_RequestHeaders) Validate() error {
 		return nil
 	}
 
-	// no validation rules for HeaderName
+	if len(m.GetHeaderName()) < 1 {
+		return RateLimit_Action_RequestHeadersValidationError{
+			field:  "HeaderName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for DescriptorKey
+	if len(m.GetDescriptorKey()) < 1 {
+		return RateLimit_Action_RequestHeadersValidationError{
+			field:  "DescriptorKey",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -3287,7 +3538,12 @@ func (m *RateLimit_Action_GenericKey) Validate() error {
 		return nil
 	}
 
-	// no validation rules for DescriptorValue
+	if len(m.GetDescriptorValue()) < 1 {
+		return RateLimit_Action_GenericKeyValidationError{
+			field:  "DescriptorValue",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -3357,7 +3613,12 @@ func (m *RateLimit_Action_HeaderValueMatch) Validate() error {
 		return nil
 	}
 
-	// no validation rules for DescriptorValue
+	if len(m.GetDescriptorValue()) < 1 {
+		return RateLimit_Action_HeaderValueMatchValidationError{
+			field:  "DescriptorValue",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetExpectMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -3366,6 +3627,13 @@ func (m *RateLimit_Action_HeaderValueMatch) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
+		}
+	}
+
+	if len(m.GetHeaders()) < 1 {
+		return RateLimit_Action_HeaderValueMatchValidationError{
+			field:  "Headers",
+			reason: "value must contain at least 1 item(s)",
 		}
 	}
 

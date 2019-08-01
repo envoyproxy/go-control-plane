@@ -79,6 +79,12 @@ func (m *CommonExtensionConfig) Validate() error {
 			}
 		}
 
+	default:
+		return CommonExtensionConfigValidationError{
+			field:  "ConfigType",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -148,7 +154,12 @@ func (m *AdminConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ConfigId
+	if len(m.GetConfigId()) < 1 {
+		return AdminConfigValidationError{
+			field:  "ConfigId",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -215,6 +226,13 @@ func (m *CommonExtensionConfig_TapDSConfig) Validate() error {
 		return nil
 	}
 
+	if m.GetConfigSource() == nil {
+		return CommonExtensionConfig_TapDSConfigValidationError{
+			field:  "ConfigSource",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetConfigSource()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommonExtensionConfig_TapDSConfigValidationError{
@@ -225,7 +243,12 @@ func (m *CommonExtensionConfig_TapDSConfig) Validate() error {
 		}
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return CommonExtensionConfig_TapDSConfigValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }

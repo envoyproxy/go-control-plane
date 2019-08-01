@@ -41,24 +41,46 @@ func (m *HealthCheck) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HealthCheckValidationError{
-				field:  "Timeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
+	if m.GetTimeout() == nil {
+		return HealthCheckValidationError{
+			field:  "Timeout",
+			reason: "value is required",
 		}
 	}
 
-	if v, ok := interface{}(m.GetInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetTimeout(); d != nil {
+		dur := *d
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
 			return HealthCheckValidationError{
-				field:  "Interval",
-				reason: "embedded message failed validation",
-				cause:  err,
+				field:  "Timeout",
+				reason: "value must be greater than 0s",
 			}
 		}
+
+	}
+
+	if m.GetInterval() == nil {
+		return HealthCheckValidationError{
+			field:  "Interval",
+			reason: "value is required",
+		}
+	}
+
+	if d := m.GetInterval(); d != nil {
+		dur := *d
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return HealthCheckValidationError{
+				field:  "Interval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
 	}
 
 	if v, ok := interface{}(m.GetInitialJitter()).(interface{ Validate() error }); ok {
@@ -123,44 +145,88 @@ func (m *HealthCheck) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetNoTrafficInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetNoTrafficInterval(); d != nil {
+		dur, err := types.DurationFromProto(d)
+		if err != nil {
 			return HealthCheckValidationError{
 				field:  "NoTrafficInterval",
-				reason: "embedded message failed validation",
+				reason: "value is not a valid duration",
 				cause:  err,
 			}
 		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return HealthCheckValidationError{
+				field:  "NoTrafficInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
 	}
 
-	if v, ok := interface{}(m.GetUnhealthyInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetUnhealthyInterval(); d != nil {
+		dur, err := types.DurationFromProto(d)
+		if err != nil {
 			return HealthCheckValidationError{
 				field:  "UnhealthyInterval",
-				reason: "embedded message failed validation",
+				reason: "value is not a valid duration",
 				cause:  err,
 			}
 		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return HealthCheckValidationError{
+				field:  "UnhealthyInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
 	}
 
-	if v, ok := interface{}(m.GetUnhealthyEdgeInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetUnhealthyEdgeInterval(); d != nil {
+		dur, err := types.DurationFromProto(d)
+		if err != nil {
 			return HealthCheckValidationError{
 				field:  "UnhealthyEdgeInterval",
-				reason: "embedded message failed validation",
+				reason: "value is not a valid duration",
 				cause:  err,
 			}
 		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return HealthCheckValidationError{
+				field:  "UnhealthyEdgeInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
 	}
 
-	if v, ok := interface{}(m.GetHealthyEdgeInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if d := m.GetHealthyEdgeInterval(); d != nil {
+		dur, err := types.DurationFromProto(d)
+		if err != nil {
 			return HealthCheckValidationError{
 				field:  "HealthyEdgeInterval",
-				reason: "embedded message failed validation",
+				reason: "value is not a valid duration",
 				cause:  err,
 			}
 		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return HealthCheckValidationError{
+				field:  "HealthyEdgeInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
 	}
 
 	// no validation rules for EventLogPath
@@ -215,6 +281,12 @@ func (m *HealthCheck) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return HealthCheckValidationError{
+			field:  "HealthChecker",
+			reason: "value is required",
 		}
 
 	}
@@ -287,10 +359,22 @@ func (m *HealthCheck_Payload) Validate() error {
 	switch m.Payload.(type) {
 
 	case *HealthCheck_Payload_Text:
-		// no validation rules for Text
+
+		if len(m.GetText()) < 1 {
+			return HealthCheck_PayloadValidationError{
+				field:  "Text",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
 
 	case *HealthCheck_Payload_Binary:
 		// no validation rules for Binary
+
+	default:
+		return HealthCheck_PayloadValidationError{
+			field:  "Payload",
+			reason: "value is required",
+		}
 
 	}
 
@@ -363,7 +447,12 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 
 	// no validation rules for Host
 
-	// no validation rules for Path
+	if len(m.GetPath()) < 1 {
+		return HealthCheck_HttpHealthCheckValidationError{
+			field:  "Path",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetSend()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -386,6 +475,13 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 	}
 
 	// no validation rules for ServiceName
+
+	if len(m.GetRequestHeadersToAdd()) > 1000 {
+		return HealthCheck_HttpHealthCheckValidationError{
+			field:  "RequestHeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+	}
 
 	for idx, item := range m.GetRequestHeadersToAdd() {
 		_, _ = idx, item
@@ -721,7 +817,12 @@ func (m *HealthCheck_CustomHealthCheck) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return HealthCheck_CustomHealthCheckValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.ConfigType.(type) {
 

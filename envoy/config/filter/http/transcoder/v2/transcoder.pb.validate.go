@@ -41,6 +41,13 @@ func (m *GrpcJsonTranscoder) Validate() error {
 		return nil
 	}
 
+	if len(m.GetServices()) < 1 {
+		return GrpcJsonTranscoderValidationError{
+			field:  "Services",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
 	if v, ok := interface{}(m.GetPrintOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GrpcJsonTranscoderValidationError{
@@ -64,6 +71,12 @@ func (m *GrpcJsonTranscoder) Validate() error {
 
 	case *GrpcJsonTranscoder_ProtoDescriptorBin:
 		// no validation rules for ProtoDescriptorBin
+
+	default:
+		return GrpcJsonTranscoderValidationError{
+			field:  "DescriptorSet",
+			reason: "value is required",
+		}
 
 	}
 

@@ -41,7 +41,12 @@ func (m *OutlierDetectionEvent) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Type
+	if _, ok := OutlierEjectionType_name[int32(m.GetType())]; !ok {
+		return OutlierDetectionEventValidationError{
+			field:  "Type",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	if v, ok := interface{}(m.GetTimestamp()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -63,11 +68,26 @@ func (m *OutlierDetectionEvent) Validate() error {
 		}
 	}
 
-	// no validation rules for ClusterName
+	if len(m.GetClusterName()) < 1 {
+		return OutlierDetectionEventValidationError{
+			field:  "ClusterName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for UpstreamUrl
+	if len(m.GetUpstreamUrl()) < 1 {
+		return OutlierDetectionEventValidationError{
+			field:  "UpstreamUrl",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for Action
+	if _, ok := Action_name[int32(m.GetAction())]; !ok {
+		return OutlierDetectionEventValidationError{
+			field:  "Action",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	// no validation rules for NumEjections
 
@@ -97,6 +117,12 @@ func (m *OutlierDetectionEvent) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return OutlierDetectionEventValidationError{
+			field:  "Event",
+			reason: "value is required",
 		}
 
 	}
@@ -168,11 +194,26 @@ func (m *OutlierEjectSuccessRate) Validate() error {
 		return nil
 	}
 
-	// no validation rules for HostSuccessRate
+	if m.GetHostSuccessRate() > 100 {
+		return OutlierEjectSuccessRateValidationError{
+			field:  "HostSuccessRate",
+			reason: "value must be less than or equal to 100",
+		}
+	}
 
-	// no validation rules for ClusterAverageSuccessRate
+	if m.GetClusterAverageSuccessRate() > 100 {
+		return OutlierEjectSuccessRateValidationError{
+			field:  "ClusterAverageSuccessRate",
+			reason: "value must be less than or equal to 100",
+		}
+	}
 
-	// no validation rules for ClusterSuccessRateEjectionThreshold
+	if m.GetClusterSuccessRateEjectionThreshold() > 100 {
+		return OutlierEjectSuccessRateValidationError{
+			field:  "ClusterSuccessRateEjectionThreshold",
+			reason: "value must be less than or equal to 100",
+		}
+	}
 
 	return nil
 }

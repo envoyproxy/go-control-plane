@@ -115,9 +115,19 @@ func (m *LightstepConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for CollectorCluster
+	if len(m.GetCollectorCluster()) < 1 {
+		return LightstepConfigValidationError{
+			field:  "CollectorCluster",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for AccessTokenFile
+	if len(m.GetAccessTokenFile()) < 1 {
+		return LightstepConfigValidationError{
+			field:  "AccessTokenFile",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -184,9 +194,19 @@ func (m *ZipkinConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for CollectorCluster
+	if len(m.GetCollectorCluster()) < 1 {
+		return ZipkinConfigValidationError{
+			field:  "CollectorCluster",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for CollectorEndpoint
+	if len(m.GetCollectorEndpoint()) < 1 {
+		return ZipkinConfigValidationError{
+			field:  "CollectorEndpoint",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for TraceId_128Bit
 
@@ -265,7 +285,12 @@ func (m *DynamicOtConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Library
+	if len(m.GetLibrary()) < 1 {
+		return DynamicOtConfigValidationError{
+			field:  "Library",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -342,9 +367,19 @@ func (m *DatadogConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for CollectorCluster
+	if len(m.GetCollectorCluster()) < 1 {
+		return DatadogConfigValidationError{
+			field:  "CollectorCluster",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	// no validation rules for ServiceName
+	if len(m.GetServiceName()) < 1 {
+		return DatadogConfigValidationError{
+			field:  "ServiceName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -496,6 +531,13 @@ func (m *TraceServiceConfig) Validate() error {
 		return nil
 	}
 
+	if m.GetGrpcService() == nil {
+		return TraceServiceConfigValidationError{
+			field:  "GrpcService",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TraceServiceConfigValidationError{
@@ -573,7 +615,12 @@ func (m *Tracing_Http) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return Tracing_HttpValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.ConfigType.(type) {
 

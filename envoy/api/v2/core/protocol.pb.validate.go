@@ -276,34 +276,37 @@ func (m *Http2ProtocolOptions) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMaxConcurrentStreams()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetMaxConcurrentStreams(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 1 || val > 2147483647 {
 			return Http2ProtocolOptionsValidationError{
 				field:  "MaxConcurrentStreams",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be inside range [1, 2147483647]",
 			}
 		}
+
 	}
 
-	if v, ok := interface{}(m.GetInitialStreamWindowSize()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetInitialStreamWindowSize(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 65535 || val > 2147483647 {
 			return Http2ProtocolOptionsValidationError{
 				field:  "InitialStreamWindowSize",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be inside range [65535, 2147483647]",
 			}
 		}
+
 	}
 
-	if v, ok := interface{}(m.GetInitialConnectionWindowSize()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetInitialConnectionWindowSize(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 65535 || val > 2147483647 {
 			return Http2ProtocolOptionsValidationError{
 				field:  "InitialConnectionWindowSize",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be inside range [65535, 2147483647]",
 			}
 		}
+
 	}
 
 	// no validation rules for AllowConnect

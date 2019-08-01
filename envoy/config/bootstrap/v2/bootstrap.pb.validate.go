@@ -630,7 +630,12 @@ func (m *RuntimeLayer) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return RuntimeLayerValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.LayerSpecifier.(type) {
 

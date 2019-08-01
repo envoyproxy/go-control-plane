@@ -41,6 +41,13 @@ func (m *ClusterConfig) Validate() error {
 		return nil
 	}
 
+	if m.GetDnsCacheConfig() == nil {
+		return ClusterConfigValidationError{
+			field:  "DnsCacheConfig",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetDnsCacheConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterConfigValidationError{

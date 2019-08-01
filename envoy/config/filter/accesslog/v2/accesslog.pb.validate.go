@@ -267,6 +267,12 @@ func (m *AccessLogFilter) Validate() error {
 			}
 		}
 
+	default:
+		return AccessLogFilterValidationError{
+			field:  "FilterSpecifier",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -334,7 +340,12 @@ func (m *ComparisonFilter) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Op
+	if _, ok := ComparisonFilter_Op_name[int32(m.GetOp())]; !ok {
+		return ComparisonFilterValidationError{
+			field:  "Op",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -411,6 +422,13 @@ func (m *StatusCodeFilter) Validate() error {
 		return nil
 	}
 
+	if m.GetComparison() == nil {
+		return StatusCodeFilterValidationError{
+			field:  "Comparison",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetComparison()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return StatusCodeFilterValidationError{
@@ -484,6 +502,13 @@ var _ interface {
 func (m *DurationFilter) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if m.GetComparison() == nil {
+		return DurationFilterValidationError{
+			field:  "Comparison",
+			reason: "value is required",
+		}
 	}
 
 	if v, ok := interface{}(m.GetComparison()).(interface{ Validate() error }); ok {
@@ -693,7 +718,12 @@ func (m *RuntimeFilter) Validate() error {
 		return nil
 	}
 
-	// no validation rules for RuntimeKey
+	if len(m.GetRuntimeKey()) < 1 {
+		return RuntimeFilterValidationError{
+			field:  "RuntimeKey",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetPercentSampled()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -769,6 +799,13 @@ var _ interface {
 func (m *AndFilter) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetFilters()) < 2 {
+		return AndFilterValidationError{
+			field:  "Filters",
+			reason: "value must contain at least 2 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetFilters() {
@@ -848,6 +885,13 @@ var _ interface {
 func (m *OrFilter) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetFilters()) < 2 {
+		return OrFilterValidationError{
+			field:  "Filters",
+			reason: "value must contain at least 2 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetFilters() {
@@ -930,6 +974,13 @@ func (m *HeaderFilter) Validate() error {
 		return nil
 	}
 
+	if m.GetHeader() == nil {
+		return HeaderFilterValidationError{
+			field:  "Header",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HeaderFilterValidationError{
@@ -1005,6 +1056,18 @@ func (m *ResponseFlagFilter) Validate() error {
 		return nil
 	}
 
+	for idx, item := range m.GetFlags() {
+		_, _ = idx, item
+
+		if _, ok := _ResponseFlagFilter_Flags_InLookup[item]; !ok {
+			return ResponseFlagFilterValidationError{
+				field:  fmt.Sprintf("Flags[%v]", idx),
+				reason: "value must be in list [LH UH UT LR UR UF UC UO NR DI FI RL UAEX RLSE DC URX SI IH]",
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -1064,12 +1127,45 @@ var _ interface {
 	ErrorName() string
 } = ResponseFlagFilterValidationError{}
 
+var _ResponseFlagFilter_Flags_InLookup = map[string]struct{}{
+	"LH":   {},
+	"UH":   {},
+	"UT":   {},
+	"LR":   {},
+	"UR":   {},
+	"UF":   {},
+	"UC":   {},
+	"UO":   {},
+	"NR":   {},
+	"DI":   {},
+	"FI":   {},
+	"RL":   {},
+	"UAEX": {},
+	"RLSE": {},
+	"DC":   {},
+	"URX":  {},
+	"SI":   {},
+	"IH":   {},
+}
+
 // Validate checks the field values on GrpcStatusFilter with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
 func (m *GrpcStatusFilter) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	for idx, item := range m.GetStatuses() {
+		_, _ = idx, item
+
+		if _, ok := GrpcStatusFilter_Status_name[int32(item)]; !ok {
+			return GrpcStatusFilterValidationError{
+				field:  fmt.Sprintf("Statuses[%v]", idx),
+				reason: "value must be one of the defined enum values",
+			}
+		}
+
 	}
 
 	// no validation rules for Exclude

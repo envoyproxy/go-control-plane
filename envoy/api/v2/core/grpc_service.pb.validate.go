@@ -92,6 +92,12 @@ func (m *GrpcService) Validate() error {
 			}
 		}
 
+	default:
+		return GrpcServiceValidationError{
+			field:  "TargetSpecifier",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -159,7 +165,12 @@ func (m *GrpcService_EnvoyGrpc) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ClusterName
+	if len(m.GetClusterName()) < 1 {
+		return GrpcService_EnvoyGrpcValidationError{
+			field:  "ClusterName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -228,7 +239,12 @@ func (m *GrpcService_GoogleGrpc) Validate() error {
 		return nil
 	}
 
-	// no validation rules for TargetUri
+	if len(m.GetTargetUri()) < 1 {
+		return GrpcService_GoogleGrpcValidationError{
+			field:  "TargetUri",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetChannelCredentials()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -255,7 +271,12 @@ func (m *GrpcService_GoogleGrpc) Validate() error {
 
 	}
 
-	// no validation rules for StatPrefix
+	if len(m.GetStatPrefix()) < 1 {
+		return GrpcService_GoogleGrpcValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for CredentialsFactoryName
 
@@ -541,6 +562,12 @@ func (m *GrpcService_GoogleGrpc_ChannelCredentials) Validate() error {
 			}
 		}
 
+	default:
+		return GrpcService_GoogleGrpc_ChannelCredentialsValidationError{
+			field:  "CredentialSpecifier",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -665,6 +692,12 @@ func (m *GrpcService_GoogleGrpc_CallCredentials) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return GrpcService_GoogleGrpc_CallCredentialsValidationError{
+			field:  "CredentialSpecifier",
+			reason: "value is required",
 		}
 
 	}

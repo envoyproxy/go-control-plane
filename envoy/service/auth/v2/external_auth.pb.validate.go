@@ -116,6 +116,13 @@ func (m *DeniedHttpResponse) Validate() error {
 		return nil
 	}
 
+	if m.GetStatus() == nil {
+		return DeniedHttpResponseValidationError{
+			field:  "Status",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetStatus()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DeniedHttpResponseValidationError{

@@ -40,7 +40,12 @@ func (m *Pipe) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Path
+	if len(m.GetPath()) < 1 {
+		return PipeValidationError{
+			field:  "Path",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -107,9 +112,19 @@ func (m *SocketAddress) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Protocol
+	if _, ok := SocketAddress_Protocol_name[int32(m.GetProtocol())]; !ok {
+		return SocketAddressValidationError{
+			field:  "Protocol",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
-	// no validation rules for Address
+	if len(m.GetAddress()) < 1 {
+		return SocketAddressValidationError{
+			field:  "Address",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for ResolverName
 
@@ -118,10 +133,22 @@ func (m *SocketAddress) Validate() error {
 	switch m.PortSpecifier.(type) {
 
 	case *SocketAddress_PortValue:
-		// no validation rules for PortValue
+
+		if m.GetPortValue() > 65535 {
+			return SocketAddressValidationError{
+				field:  "PortValue",
+				reason: "value must be less than or equal to 65535",
+			}
+		}
 
 	case *SocketAddress_NamedPort:
 		// no validation rules for NamedPort
+
+	default:
+		return SocketAddressValidationError{
+			field:  "PortSpecifier",
+			reason: "value is required",
+		}
 
 	}
 
@@ -284,6 +311,13 @@ func (m *BindConfig) Validate() error {
 		return nil
 	}
 
+	if m.GetSourceAddress() == nil {
+		return BindConfigValidationError{
+			field:  "SourceAddress",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetSourceAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BindConfigValidationError{
@@ -409,6 +443,12 @@ func (m *Address) Validate() error {
 			}
 		}
 
+	default:
+		return AddressValidationError{
+			field:  "Address",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -475,16 +515,22 @@ func (m *CidrRange) Validate() error {
 		return nil
 	}
 
-	// no validation rules for AddressPrefix
+	if len(m.GetAddressPrefix()) < 1 {
+		return CidrRangeValidationError{
+			field:  "AddressPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
-	if v, ok := interface{}(m.GetPrefixLen()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetPrefixLen(); wrapper != nil {
+
+		if wrapper.GetValue() > 128 {
 			return CidrRangeValidationError{
 				field:  "PrefixLen",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be less than or equal to 128",
 			}
 		}
+
 	}
 
 	return nil

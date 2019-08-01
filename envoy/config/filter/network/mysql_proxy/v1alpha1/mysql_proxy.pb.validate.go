@@ -40,7 +40,12 @@ func (m *MySQLProxy) Validate() error {
 		return nil
 	}
 
-	// no validation rules for StatPrefix
+	if len(m.GetStatPrefix()) < 1 {
+		return MySQLProxyValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	// no validation rules for AccessLog
 

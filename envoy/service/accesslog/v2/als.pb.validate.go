@@ -144,6 +144,12 @@ func (m *StreamAccessLogsMessage) Validate() error {
 			}
 		}
 
+	default:
+		return StreamAccessLogsMessageValidationError{
+			field:  "LogEntries",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -213,6 +219,13 @@ func (m *StreamAccessLogsMessage_Identifier) Validate() error {
 		return nil
 	}
 
+	if m.GetNode() == nil {
+		return StreamAccessLogsMessage_IdentifierValidationError{
+			field:  "Node",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return StreamAccessLogsMessage_IdentifierValidationError{
@@ -223,7 +236,12 @@ func (m *StreamAccessLogsMessage_Identifier) Validate() error {
 		}
 	}
 
-	// no validation rules for LogName
+	if len(m.GetLogName()) < 1 {
+		return StreamAccessLogsMessage_IdentifierValidationError{
+			field:  "LogName",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	return nil
 }
@@ -291,6 +309,13 @@ var _ interface {
 func (m *StreamAccessLogsMessage_HTTPAccessLogEntries) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetLogEntry()) < 1 {
+		return StreamAccessLogsMessage_HTTPAccessLogEntriesValidationError{
+			field:  "LogEntry",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetLogEntry() {
@@ -375,6 +400,13 @@ var _ interface {
 func (m *StreamAccessLogsMessage_TCPAccessLogEntries) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetLogEntry()) < 1 {
+		return StreamAccessLogsMessage_TCPAccessLogEntriesValidationError{
+			field:  "LogEntry",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetLogEntry() {

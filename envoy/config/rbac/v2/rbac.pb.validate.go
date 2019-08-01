@@ -108,6 +108,13 @@ func (m *Policy) Validate() error {
 		return nil
 	}
 
+	if len(m.GetPermissions()) < 1 {
+		return PolicyValidationError{
+			field:  "Permissions",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
 	for idx, item := range m.GetPermissions() {
 		_, _ = idx, item
 
@@ -121,6 +128,13 @@ func (m *Policy) Validate() error {
 			}
 		}
 
+	}
+
+	if len(m.GetPrincipals()) < 1 {
+		return PolicyValidationError{
+			field:  "Principals",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetPrincipals() {
@@ -229,7 +243,13 @@ func (m *Permission) Validate() error {
 		}
 
 	case *Permission_Any:
-		// no validation rules for Any
+
+		if m.GetAny() != true {
+			return PermissionValidationError{
+				field:  "Any",
+				reason: "value must equal true",
+			}
+		}
 
 	case *Permission_Header:
 
@@ -256,7 +276,13 @@ func (m *Permission) Validate() error {
 		}
 
 	case *Permission_DestinationPort:
-		// no validation rules for DestinationPort
+
+		if m.GetDestinationPort() > 65535 {
+			return PermissionValidationError{
+				field:  "DestinationPort",
+				reason: "value must be less than or equal to 65535",
+			}
+		}
 
 	case *Permission_Metadata:
 
@@ -292,6 +318,12 @@ func (m *Permission) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return PermissionValidationError{
+			field:  "Rule",
+			reason: "value is required",
 		}
 
 	}
@@ -387,7 +419,13 @@ func (m *Principal) Validate() error {
 		}
 
 	case *Principal_Any:
-		// no validation rules for Any
+
+		if m.GetAny() != true {
+			return PrincipalValidationError{
+				field:  "Any",
+				reason: "value must equal true",
+			}
+		}
 
 	case *Principal_Authenticated_:
 
@@ -447,6 +485,12 @@ func (m *Principal) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return PrincipalValidationError{
+			field:  "Identifier",
+			reason: "value is required",
 		}
 
 	}
@@ -514,6 +558,13 @@ var _ interface {
 func (m *Permission_Set) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetRules()) < 1 {
+		return Permission_SetValidationError{
+			field:  "Rules",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetRules() {
@@ -594,6 +645,13 @@ var _ interface {
 func (m *Principal_Set) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if len(m.GetIds()) < 1 {
+		return Principal_SetValidationError{
+			field:  "Ids",
+			reason: "value must contain at least 1 item(s)",
+		}
 	}
 
 	for idx, item := range m.GetIds() {

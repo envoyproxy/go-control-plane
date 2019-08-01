@@ -42,6 +42,13 @@ func (m *Listener) Validate() error {
 
 	// no validation rules for Name
 
+	if m.GetAddress() == nil {
+		return ListenerValidationError{
+			field:  "Address",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ListenerValidationError{

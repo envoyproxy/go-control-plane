@@ -41,7 +41,12 @@ func (m *ResourceMonitor) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return ResourceMonitorValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.ConfigType.(type) {
 
@@ -136,7 +141,12 @@ func (m *ThresholdTrigger) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Value
+	if val := m.GetValue(); val < 0 || val > 1 {
+		return ThresholdTriggerValidationError{
+			field:  "Value",
+			reason: "value must be inside range [0, 1]",
+		}
+	}
 
 	return nil
 }
@@ -202,7 +212,12 @@ func (m *Trigger) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return TriggerValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	switch m.TriggerOneof.(type) {
 
@@ -216,6 +231,12 @@ func (m *Trigger) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return TriggerValidationError{
+			field:  "TriggerOneof",
+			reason: "value is required",
 		}
 
 	}
@@ -285,7 +306,19 @@ func (m *OverloadAction) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return OverloadActionValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if len(m.GetTriggers()) < 1 {
+		return OverloadActionValidationError{
+			field:  "Triggers",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
 
 	for idx, item := range m.GetTriggers() {
 		_, _ = idx, item
@@ -374,6 +407,13 @@ func (m *OverloadManager) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
+		}
+	}
+
+	if len(m.GetResourceMonitors()) < 1 {
+		return OverloadManagerValidationError{
+			field:  "ResourceMonitors",
+			reason: "value must contain at least 1 item(s)",
 		}
 	}
 

@@ -264,6 +264,12 @@ func (m *StatsMatcher) Validate() error {
 			}
 		}
 
+	default:
+		return StatsMatcherValidationError{
+			field:  "StatsMatcher",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -336,7 +342,13 @@ func (m *TagSpecifier) Validate() error {
 	switch m.TagValue.(type) {
 
 	case *TagSpecifier_Regex:
-		// no validation rules for Regex
+
+		if len(m.GetRegex()) > 1024 {
+			return TagSpecifierValidationError{
+				field:  "Regex",
+				reason: "value length must be at most 1024 bytes",
+			}
+		}
 
 	case *TagSpecifier_FixedValue:
 		// no validation rules for FixedValue
@@ -426,6 +438,12 @@ func (m *StatsdSink) Validate() error {
 	case *StatsdSink_TcpClusterName:
 		// no validation rules for TcpClusterName
 
+	default:
+		return StatsdSinkValidationError{
+			field:  "StatsdSpecifier",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -507,6 +525,12 @@ func (m *DogStatsdSink) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return DogStatsdSinkValidationError{
+			field:  "DogStatsdSpecifier",
+			reason: "value is required",
 		}
 
 	}

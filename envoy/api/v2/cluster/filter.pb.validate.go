@@ -40,7 +40,12 @@ func (m *Filter) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Name
+	if len(m.GetName()) < 1 {
+		return FilterValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
 
 	if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
