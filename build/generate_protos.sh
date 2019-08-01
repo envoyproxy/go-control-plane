@@ -11,7 +11,7 @@ imports=(
   ${xds}
   "${root}/vendor/github.com/envoyproxy/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
-  "${root}/vendor/github.com/gogo/googleapis"
+  "${root}/vendor/istio.io/gogo-genproto/googleapis"
   "${root}/vendor/istio.io/gogo-genproto/prometheus"
   "${root}/vendor/istio.io/gogo-genproto"
 )
@@ -24,11 +24,11 @@ do
 done
 
 mappings=(
-  "google/api/annotations.proto=github.com/gogo/googleapis/google/api"
-  "google/api/http.proto=github.com/gogo/googleapis/google/api"
-  "google/rpc/code.proto=github.com/gogo/googleapis/google/rpc"
-  "google/rpc/error_details.proto=github.com/gogo/googleapis/google/rpc"
-  "google/rpc/status.proto=github.com/gogo/googleapis/google/rpc"
+  "google/api/annotations.proto=istio.io/gogo-genproto/googleapis/google/api"
+  "google/api/http.proto=istio.io/gogo-genproto/googleapis/google/api"
+  "google/rpc/code.proto=istio.io/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/error_details.proto=istio.io/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/status.proto=istio.io/gogo-genproto/googleapis/google/rpc"
   "google/protobuf/any.proto=github.com/gogo/protobuf/types"
   "google/protobuf/duration.proto=github.com/gogo/protobuf/types"
   "google/protobuf/empty.proto=github.com/gogo/protobuf/types"
