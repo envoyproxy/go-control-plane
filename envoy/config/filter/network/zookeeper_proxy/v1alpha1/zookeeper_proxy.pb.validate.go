@@ -50,12 +50,17 @@ func (m *ZooKeeperProxy) Validate() error {
 
 	// no validation rules for AccessLog
 
-	if v, ok := interface{}(m.GetMaxPacketBytes()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ZooKeeperProxyValidationError{
-				field:  "MaxPacketBytes",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetMaxPacketBytes()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return ZooKeeperProxyValidationError{
+					field:  "MaxPacketBytes",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

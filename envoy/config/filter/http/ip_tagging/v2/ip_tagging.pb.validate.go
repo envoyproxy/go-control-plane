@@ -57,12 +57,17 @@ func (m *IPTagging) Validate() error {
 	for idx, item := range m.GetIpTags() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return IPTaggingValidationError{
-					field:  fmt.Sprintf("IpTags[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return IPTaggingValidationError{
+						field:  fmt.Sprintf("IpTags[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}
@@ -139,12 +144,17 @@ func (m *IPTagging_IPTag) Validate() error {
 	for idx, item := range m.GetIpList() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return IPTagging_IPTagValidationError{
-					field:  fmt.Sprintf("IpList[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return IPTagging_IPTagValidationError{
+						field:  fmt.Sprintf("IpList[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}

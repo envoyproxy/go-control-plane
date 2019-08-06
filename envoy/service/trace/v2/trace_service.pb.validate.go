@@ -108,12 +108,17 @@ func (m *StreamTracesMessage) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetIdentifier()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return StreamTracesMessageValidationError{
-				field:  "Identifier",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetIdentifier()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return StreamTracesMessageValidationError{
+					field:  "Identifier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
@@ -121,12 +126,17 @@ func (m *StreamTracesMessage) Validate() error {
 	for idx, item := range m.GetSpans() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return StreamTracesMessageValidationError{
-					field:  fmt.Sprintf("Spans[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return StreamTracesMessageValidationError{
+						field:  fmt.Sprintf("Spans[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}
@@ -207,12 +217,17 @@ func (m *StreamTracesMessage_Identifier) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return StreamTracesMessage_IdentifierValidationError{
-				field:  "Node",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetNode()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return StreamTracesMessage_IdentifierValidationError{
+					field:  "Node",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

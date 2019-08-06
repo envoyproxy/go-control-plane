@@ -43,12 +43,17 @@ func (m *Config) Validate() error {
 	for idx, item := range m.GetRequestRules() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ConfigValidationError{
-					field:  fmt.Sprintf("RequestRules[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return ConfigValidationError{
+						field:  fmt.Sprintf("RequestRules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}
@@ -58,12 +63,17 @@ func (m *Config) Validate() error {
 	for idx, item := range m.GetResponseRules() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ConfigValidationError{
-					field:  fmt.Sprintf("ResponseRules[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return ConfigValidationError{
+						field:  fmt.Sprintf("ResponseRules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}
@@ -222,22 +232,32 @@ func (m *Config_Rule) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetOnHeaderPresent()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Config_RuleValidationError{
-				field:  "OnHeaderPresent",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetOnHeaderPresent()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return Config_RuleValidationError{
+					field:  "OnHeaderPresent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetOnHeaderMissing()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Config_RuleValidationError{
-				field:  "OnHeaderMissing",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetOnHeaderMissing()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return Config_RuleValidationError{
+					field:  "OnHeaderMissing",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

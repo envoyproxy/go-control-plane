@@ -48,12 +48,17 @@ func (m *ClusterConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDnsCacheConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ClusterConfigValidationError{
-				field:  "DnsCacheConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetDnsCacheConfig()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return ClusterConfigValidationError{
+					field:  "DnsCacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
