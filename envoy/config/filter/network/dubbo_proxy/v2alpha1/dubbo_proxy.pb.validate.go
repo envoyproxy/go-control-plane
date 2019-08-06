@@ -64,12 +64,17 @@ func (m *DubboProxy) Validate() error {
 	for idx, item := range m.GetRouteConfig() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return DubboProxyValidationError{
-					field:  fmt.Sprintf("RouteConfig[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return DubboProxyValidationError{
+						field:  fmt.Sprintf("RouteConfig[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}
@@ -79,12 +84,17 @@ func (m *DubboProxy) Validate() error {
 	for idx, item := range m.GetDubboFilters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return DubboProxyValidationError{
-					field:  fmt.Sprintf("DubboFilters[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return DubboProxyValidationError{
+						field:  fmt.Sprintf("DubboFilters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}
@@ -163,12 +173,17 @@ func (m *DubboFilter) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return DubboFilterValidationError{
-				field:  "Config",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetConfig()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return DubboFilterValidationError{
+					field:  "Config",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

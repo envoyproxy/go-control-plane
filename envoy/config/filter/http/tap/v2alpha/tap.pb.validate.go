@@ -47,12 +47,17 @@ func (m *Tap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return TapValidationError{
-				field:  "CommonConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetCommonConfig()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return TapValidationError{
+					field:  "CommonConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

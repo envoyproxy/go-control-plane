@@ -41,32 +41,47 @@ func (m *AttributeContext) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetSource()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AttributeContextValidationError{
-				field:  "Source",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetSource()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return AttributeContextValidationError{
+					field:  "Source",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetDestination()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AttributeContextValidationError{
-				field:  "Destination",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetDestination()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return AttributeContextValidationError{
+					field:  "Destination",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetRequest()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AttributeContextValidationError{
-				field:  "Request",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetRequest()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return AttributeContextValidationError{
+					field:  "Request",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
@@ -138,12 +153,17 @@ func (m *AttributeContext_Peer) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AttributeContext_PeerValidationError{
-				field:  "Address",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetAddress()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return AttributeContext_PeerValidationError{
+					field:  "Address",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
@@ -221,22 +241,32 @@ func (m *AttributeContext_Request) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTime()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AttributeContext_RequestValidationError{
-				field:  "Time",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetTime()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return AttributeContext_RequestValidationError{
+					field:  "Time",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetHttp()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return AttributeContext_RequestValidationError{
-				field:  "Http",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetHttp()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return AttributeContext_RequestValidationError{
+					field:  "Http",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

@@ -56,12 +56,17 @@ func (m *RateLimit) Validate() error {
 
 	// no validation rules for RequestType
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimitValidationError{
-				field:  "Timeout",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetTimeout()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return RateLimitValidationError{
+					field:  "Timeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
@@ -77,12 +82,17 @@ func (m *RateLimit) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RateLimitValidationError{
-				field:  "RateLimitService",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetRateLimitService()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return RateLimitValidationError{
+					field:  "RateLimitService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

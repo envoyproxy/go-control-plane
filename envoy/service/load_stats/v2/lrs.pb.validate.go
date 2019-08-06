@@ -41,12 +41,17 @@ func (m *LoadStatsRequest) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadStatsRequestValidationError{
-				field:  "Node",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetNode()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return LoadStatsRequestValidationError{
+					field:  "Node",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
@@ -54,12 +59,17 @@ func (m *LoadStatsRequest) Validate() error {
 	for idx, item := range m.GetClusterStats() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return LoadStatsRequestValidationError{
-					field:  fmt.Sprintf("ClusterStats[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
+		{
+			tmp := item
+
+			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+				if err := v.Validate(); err != nil {
+					return LoadStatsRequestValidationError{
+						field:  fmt.Sprintf("ClusterStats[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 		}
@@ -138,12 +148,17 @@ func (m *LoadStatsResponse) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLoadReportingInterval()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadStatsResponseValidationError{
-				field:  "LoadReportingInterval",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetLoadReportingInterval()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return LoadStatsResponseValidationError{
+					field:  "LoadReportingInterval",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}

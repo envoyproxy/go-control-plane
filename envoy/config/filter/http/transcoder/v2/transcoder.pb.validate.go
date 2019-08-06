@@ -48,12 +48,17 @@ func (m *GrpcJsonTranscoder) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetPrintOptions()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GrpcJsonTranscoderValidationError{
-				field:  "PrintOptions",
-				reason: "embedded message failed validation",
-				cause:  err,
+	{
+		tmp := m.GetPrintOptions()
+
+		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
+
+			if err := v.Validate(); err != nil {
+				return GrpcJsonTranscoderValidationError{
+					field:  "PrintOptions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 	}
