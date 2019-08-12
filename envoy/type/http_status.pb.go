@@ -5,11 +5,10 @@ package envoy_type
 
 import (
 	fmt "fmt"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	proto "github.com/gogo/protobuf/proto"
 	io "io"
 	math "math"
-
-	proto "github.com/gogo/protobuf/proto"
-	_ "github.com/lyft/protoc-gen-validate/validate"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -24,7 +23,7 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // HTTP response codes supported in Envoy.
-// For more details: http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+// For more details: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 type StatusCode int32
 
 const (

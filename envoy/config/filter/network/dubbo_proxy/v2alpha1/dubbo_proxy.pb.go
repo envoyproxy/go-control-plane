@@ -5,13 +5,12 @@ package v2
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
-	_ "github.com/lyft/protoc-gen-validate/validate"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -25,6 +24,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
+// Dubbo Protocol types supported by Envoy.
 type ProtocolType int32
 
 const (
@@ -47,6 +47,7 @@ func (ProtocolType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_8ee9c82d7d1be64c, []int{0}
 }
 
+// Dubbo Serialization types supported by Envoy.
 type SerializationType int32
 
 const (
@@ -69,8 +70,7 @@ func (SerializationType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_8ee9c82d7d1be64c, []int{1}
 }
 
-// [#protodoc-title: Dubbo Proxy]
-// Dubbo Proxy filter configuration.
+// [#comment:next free field: 6]
 type DubboProxy struct {
 	// The human readable prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`

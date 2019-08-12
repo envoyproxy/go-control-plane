@@ -6,16 +6,14 @@ package v2
 import (
 	context "context"
 	fmt "fmt"
-	io "io"
-	math "math"
-
-	rpc "github.com/gogo/googleapis/google/rpc"
-	proto "github.com/gogo/protobuf/proto"
-	_ "github.com/lyft/protoc-gen-validate/validate"
-	grpc "google.golang.org/grpc"
-
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	proto "github.com/gogo/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	io "io"
+	rpc "istio.io/gogo-genproto/googleapis/google/rpc"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

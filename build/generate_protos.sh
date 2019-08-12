@@ -5,22 +5,18 @@ set -o pipefail
 shopt -s nullglob
 
 root="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-xds=${root}/vendor/github.com/envoyproxy/data-plane-api
-
-echo "Expecting protoc version >= 3.5.0:"
-protoc=$(which protoc)
-$protoc --version
+xds="${root}/data-plane-api"
 
 imports=(
   ${xds}
-  "${root}/vendor/github.com/lyft/protoc-gen-validate"
+  "${root}/vendor/github.com/envoyproxy/protoc-gen-validate"
   "${root}/vendor/github.com/gogo/protobuf"
-  "${root}/vendor/github.com/gogo/protobuf/protobuf"
-  "${root}/vendor/istio.io/gogo-genproto/prometheus"
   "${root}/vendor/istio.io/gogo-genproto/googleapis"
-  "${root}/vendor/istio.io/gogo-genproto/opencensus/proto/trace/v1"
+  "${root}/vendor/istio.io/gogo-genproto/prometheus"
+  "${root}/vendor/istio.io/gogo-genproto"
 )
 
+protoc="protoc"
 protocarg=""
 for i in "${imports[@]}"
 do
@@ -28,11 +24,11 @@ do
 done
 
 mappings=(
-  "google/api/annotations.proto=github.com/gogo/googleapis/google/api"
-  "google/api/http.proto=github.com/gogo/googleapis/google/api"
-  "google/rpc/code.proto=github.com/gogo/googleapis/google/rpc"
-  "google/rpc/error_details.proto=github.com/gogo/googleapis/google/rpc"
-  "google/rpc/status.proto=github.com/gogo/googleapis/google/rpc"
+  "google/api/annotations.proto=istio.io/gogo-genproto/googleapis/google/api"
+  "google/api/http.proto=istio.io/gogo-genproto/googleapis/google/api"
+  "google/rpc/code.proto=istio.io/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/error_details.proto=istio.io/gogo-genproto/googleapis/google/rpc"
+  "google/rpc/status.proto=istio.io/gogo-genproto/googleapis/google/rpc"
   "google/protobuf/any.proto=github.com/gogo/protobuf/types"
   "google/protobuf/duration.proto=github.com/gogo/protobuf/types"
   "google/protobuf/empty.proto=github.com/gogo/protobuf/types"
@@ -40,8 +36,10 @@ mappings=(
   "google/protobuf/timestamp.proto=github.com/gogo/protobuf/types"
   "google/protobuf/wrappers.proto=github.com/gogo/protobuf/types"
   "gogoproto/gogo.proto=github.com/gogo/protobuf/gogoproto"
-  "trace.proto=istio.io/gogo-genproto/opencensus/proto/trace/v1"
+  "opencensus/proto/trace/v1/trace.proto=istio.io/gogo-genproto/opencensus/proto/trace/v1"
+  "opencensus/proto/trace/v1/trace_config.proto=istio.io/gogo-genproto/opencensus/proto/trace/v1"
   "metrics.proto=istio.io/gogo-genproto/prometheus"
+  "validate/validate.proto=github.com/envoyproxy/protoc-gen-validate/validate"
 )
 
 gogoarg="plugins=grpc"
@@ -73,7 +71,7 @@ do
   then
     echo "Generating protos ${path} ..."
     $protoc ${protocarg} ${path}/*.proto \
-      --plugin=protoc-gen-gogofast=${root}/bin/gogofast --gogofast_out=${gogoarg}:. \
-      --plugin=protoc-gen-validate=${root}/bin/validate --validate_out="lang=gogo:."
+      --gogofast_out=${gogoarg}:. \
+      --validate_out="lang=gogo:."
   fi
 done

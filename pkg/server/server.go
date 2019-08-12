@@ -129,13 +129,13 @@ func createResponse(resp *cache.Response, typeURL string) (*v2.DiscoveryResponse
 	if resp == nil {
 		return nil, errors.New("missing response")
 	}
-	resources := make([]types.Any, len(resp.Resources))
+	resources := make([]*types.Any, len(resp.Resources))
 	for i := 0; i < len(resp.Resources); i++ {
 		data, err := proto.Marshal(resp.Resources[i])
 		if err != nil {
 			return nil, err
 		}
-		resources[i] = types.Any{
+		resources[i] = &types.Any{
 			TypeUrl: typeURL,
 			Value:   data,
 		}
@@ -410,14 +410,26 @@ func (s *server) FetchSecrets(ctx context.Context, req *v2.DiscoveryRequest) (*v
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) IncrementalAggregatedResources(_ discovery.AggregatedDiscoveryService_IncrementalAggregatedResourcesServer) error {
+func (s *server) DeltaAggregatedResources(_ discovery.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return errors.New("not implemented")
 }
 
-func (s *server) IncrementalClusters(_ v2.ClusterDiscoveryService_IncrementalClustersServer) error {
+func (s *server) DeltaEndpoints(_ v2.EndpointDiscoveryService_DeltaEndpointsServer) error {
 	return errors.New("not implemented")
 }
 
-func (s *server) IncrementalRoutes(_ v2.RouteDiscoveryService_IncrementalRoutesServer) error {
+func (s *server) DeltaClusters(_ v2.ClusterDiscoveryService_DeltaClustersServer) error {
+	return errors.New("not implemented")
+}
+
+func (s *server) DeltaRoutes(_ v2.RouteDiscoveryService_DeltaRoutesServer) error {
+	return errors.New("not implemented")
+}
+
+func (s *server) DeltaListeners(_ v2.ListenerDiscoveryService_DeltaListenersServer) error {
+	return errors.New("not implemented")
+}
+
+func (s *server) DeltaSecrets(_ discovery.SecretDiscoveryService_DeltaSecretsServer) error {
 	return errors.New("not implemented")
 }

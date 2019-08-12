@@ -60,8 +60,8 @@ var (
 func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 	return &v2.ClusterLoadAssignment{
 		ClusterName: clusterName,
-		Endpoints: []endpoint.LocalityLbEndpoints{{
-			LbEndpoints: []endpoint.LbEndpoint{{
+		Endpoints: []*endpoint.LocalityLbEndpoints{{
+			LbEndpoints: []*endpoint.LbEndpoint{{
 				HostIdentifier: &endpoint.LbEndpoint_Endpoint{
 					Endpoint: &endpoint.Endpoint{
 						Address: &core.Address{
@@ -117,10 +117,11 @@ func MakeCluster(mode string, clusterName string) *v2.Cluster {
 		}
 	}
 
+	connectTimeout := 5 * time.Second
 	return &v2.Cluster{
-		Name:           clusterName,
-		ConnectTimeout: 5 * time.Second,
-		Type:           v2.Cluster_EDS,
+		Name:                 clusterName,
+		ConnectTimeout:       &connectTimeout,
+		ClusterDiscoveryType: &v2.Cluster_Type{Type: v2.Cluster_EDS},
 		EdsClusterConfig: &v2.Cluster_EdsClusterConfig{
 			EdsConfig: edsSource,
 		},
@@ -131,11 +132,11 @@ func MakeCluster(mode string, clusterName string) *v2.Cluster {
 func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
 	return &v2.RouteConfiguration{
 		Name: routeName,
-		VirtualHosts: []route.VirtualHost{{
+		VirtualHosts: []*route.VirtualHost{{
 			Name:    routeName,
 			Domains: []string{"*"},
-			Routes: []route.Route{{
-				Match: route.RouteMatch{
+			Routes: []*route.Route{{
+				Match: &route.RouteMatch{
 					PathSpecifier: &route.RouteMatch_Prefix{
 						Prefix: "/",
 					},
@@ -211,7 +212,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		StatPrefix: "http",
 		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
 			Rds: &hcm.Rds{
-				ConfigSource:    *rdsSource,
+				ConfigSource:    rdsSource,
 				RouteConfigName: route,
 			},
 		},
@@ -232,7 +233,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 
 	return &v2.Listener{
 		Name: listenerName,
-		Address: core.Address{
+		Address: &core.Address{
 			Address: &core.Address_SocketAddress{
 				SocketAddress: &core.SocketAddress{
 					Protocol: core.TCP,
@@ -243,8 +244,8 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 				},
 			},
 		},
-		FilterChains: []listener.FilterChain{{
-			Filters: []listener.Filter{{
+		FilterChains: []*listener.FilterChain{{
+			Filters: []*listener.Filter{{
 				Name: util.HTTPConnectionManager,
 				ConfigType: &listener.Filter_TypedConfig{
 					TypedConfig: pbst,
@@ -269,7 +270,7 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 	}
 	return &v2.Listener{
 		Name: listenerName,
-		Address: core.Address{
+		Address: &core.Address{
 			Address: &core.Address_SocketAddress{
 				SocketAddress: &core.SocketAddress{
 					Protocol: core.TCP,
@@ -280,8 +281,8 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 				},
 			},
 		},
-		FilterChains: []listener.FilterChain{{
-			Filters: []listener.Filter{{
+		FilterChains: []*listener.FilterChain{{
+			Filters: []*listener.Filter{{
 				Name: util.TCPProxy,
 				ConfigType: &listener.Filter_TypedConfig{
 					TypedConfig: pbst,

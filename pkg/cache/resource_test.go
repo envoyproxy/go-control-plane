@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	v2route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
@@ -48,6 +49,21 @@ func TestValidate(t *testing.T) {
 	}
 	if err := listener.Validate(); err != nil {
 		t.Error(err)
+	}
+
+	invalidRoute := &v2.RouteConfiguration{
+		Name: "test",
+		VirtualHosts: []*v2route.VirtualHost{{
+			Name:    "test",
+			Domains: []string{},
+		}},
+	}
+
+	if err := invalidRoute.Validate(); err == nil {
+		t.Error("expected an error")
+	}
+	if err := invalidRoute.VirtualHosts[0].Validate(); err == nil {
+		t.Error("expected an error")
 	}
 }
 
@@ -83,7 +99,8 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[string]bool{clusterName: true},
 		},
 		{
-			in:  &v2.Cluster{Name: clusterName, Type: v2.Cluster_EDS, EdsClusterConfig: &v2.Cluster_EdsClusterConfig{ServiceName: "test"}},
+			in: &v2.Cluster{Name: clusterName, ClusterDiscoveryType: &v2.Cluster_Type{Type: v2.Cluster_EDS},
+				EdsClusterConfig: &v2.Cluster_EdsClusterConfig{ServiceName: "test"}},
 			out: map[string]bool{"test": true},
 		},
 		{

@@ -5,17 +5,16 @@ package v2
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	_ "github.com/gogo/protobuf/types"
-	_ "github.com/lyft/protoc-gen-validate/validate"
-
 	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
 	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	_ "github.com/gogo/protobuf/gogoproto"
+	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
+	_ "github.com/gogo/protobuf/types"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -29,6 +28,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
+// [#comment:next free field: 6]
 type RouteConfiguration struct {
 	// The name of the route configuration. Reserved for future use in asynchronous route discovery.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -40,7 +40,7 @@ type RouteConfiguration struct {
 	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	// The list of routes that will be matched, in order, against incoming requests. The first route
 	// that matches will be used.
-	Routes               []Route  `protobuf:"bytes,5,rep,name=routes,proto3" json:"routes"`
+	Routes               []*Route `protobuf:"bytes,5,rep,name=routes,proto3" json:"routes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -56,16 +56,12 @@ func (m *RouteConfiguration) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *RouteConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RouteConfiguration.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *RouteConfiguration) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RouteConfiguration.Merge(m, src)
@@ -107,21 +103,22 @@ func (m *RouteConfiguration) GetVersion() string {
 	return ""
 }
 
-func (m *RouteConfiguration) GetRoutes() []Route {
+func (m *RouteConfiguration) GetRoutes() []*Route {
 	if m != nil {
 		return m.Routes
 	}
 	return nil
 }
 
+// [#comment:next free field: 3]
 type Route struct {
 	// Route matching parameters.
-	Match RouteMatch `protobuf:"bytes,1,opt,name=match,proto3" json:"match"`
+	Match *RouteMatch `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
 	// Route request to some upstream cluster.
-	Route                RouteAction `protobuf:"bytes,2,opt,name=route,proto3" json:"route"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
+	Route                *RouteAction `protobuf:"bytes,2,opt,name=route,proto3" json:"route,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
 func (m *Route) Reset()         { *m = Route{} }
@@ -134,16 +131,12 @@ func (m *Route) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *Route) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Route.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *Route) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Route.Merge(m, src)
@@ -157,20 +150,225 @@ func (m *Route) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Route proto.InternalMessageInfo
 
-func (m *Route) GetMatch() RouteMatch {
+func (m *Route) GetMatch() *RouteMatch {
 	if m != nil {
 		return m.Match
 	}
-	return RouteMatch{}
+	return nil
 }
 
-func (m *Route) GetRoute() RouteAction {
+func (m *Route) GetRoute() *RouteAction {
 	if m != nil {
 		return m.Route
 	}
-	return RouteAction{}
+	return nil
 }
 
+// [#comment:next free field: 3]
+type RouteMatch struct {
+	// Method level routing matching.
+	Method *MethodMatch `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
+	// Specifies a set of headers that the route should match on. The router will check the request’s
+	// headers against all the specified headers in the route config. A match will happen if all the
+	// headers in the route are present in the request with the same values (or based on presence if
+	// the value field is not in the config).
+	Headers              []*route.HeaderMatcher `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
+	XXX_unrecognized     []byte                 `json:"-"`
+	XXX_sizecache        int32                  `json:"-"`
+}
+
+func (m *RouteMatch) Reset()         { *m = RouteMatch{} }
+func (m *RouteMatch) String() string { return proto.CompactTextString(m) }
+func (*RouteMatch) ProtoMessage()    {}
+func (*RouteMatch) Descriptor() ([]byte, []int) {
+	return fileDescriptor_74a572433a3292e0, []int{2}
+}
+func (m *RouteMatch) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteMatch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteMatch) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteMatch.Merge(m, src)
+}
+func (m *RouteMatch) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteMatch) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteMatch.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteMatch proto.InternalMessageInfo
+
+func (m *RouteMatch) GetMethod() *MethodMatch {
+	if m != nil {
+		return m.Method
+	}
+	return nil
+}
+
+func (m *RouteMatch) GetHeaders() []*route.HeaderMatcher {
+	if m != nil {
+		return m.Headers
+	}
+	return nil
+}
+
+// [#comment:next free field: 3]
+type RouteAction struct {
+	// Types that are valid to be assigned to ClusterSpecifier:
+	//	*RouteAction_Cluster
+	//	*RouteAction_WeightedClusters
+	ClusterSpecifier     isRouteAction_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
+	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
+	XXX_unrecognized     []byte                         `json:"-"`
+	XXX_sizecache        int32                          `json:"-"`
+}
+
+func (m *RouteAction) Reset()         { *m = RouteAction{} }
+func (m *RouteAction) String() string { return proto.CompactTextString(m) }
+func (*RouteAction) ProtoMessage()    {}
+func (*RouteAction) Descriptor() ([]byte, []int) {
+	return fileDescriptor_74a572433a3292e0, []int{3}
+}
+func (m *RouteAction) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RouteAction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RouteAction) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RouteAction.Merge(m, src)
+}
+func (m *RouteAction) XXX_Size() int {
+	return m.Size()
+}
+func (m *RouteAction) XXX_DiscardUnknown() {
+	xxx_messageInfo_RouteAction.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RouteAction proto.InternalMessageInfo
+
+type isRouteAction_ClusterSpecifier interface {
+	isRouteAction_ClusterSpecifier()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type RouteAction_Cluster struct {
+	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3,oneof"`
+}
+type RouteAction_WeightedClusters struct {
+	WeightedClusters *route.WeightedCluster `protobuf:"bytes,2,opt,name=weighted_clusters,json=weightedClusters,proto3,oneof"`
+}
+
+func (*RouteAction_Cluster) isRouteAction_ClusterSpecifier()          {}
+func (*RouteAction_WeightedClusters) isRouteAction_ClusterSpecifier() {}
+
+func (m *RouteAction) GetClusterSpecifier() isRouteAction_ClusterSpecifier {
+	if m != nil {
+		return m.ClusterSpecifier
+	}
+	return nil
+}
+
+func (m *RouteAction) GetCluster() string {
+	if x, ok := m.GetClusterSpecifier().(*RouteAction_Cluster); ok {
+		return x.Cluster
+	}
+	return ""
+}
+
+func (m *RouteAction) GetWeightedClusters() *route.WeightedCluster {
+	if x, ok := m.GetClusterSpecifier().(*RouteAction_WeightedClusters); ok {
+		return x.WeightedClusters
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*RouteAction) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _RouteAction_OneofMarshaler, _RouteAction_OneofUnmarshaler, _RouteAction_OneofSizer, []interface{}{
+		(*RouteAction_Cluster)(nil),
+		(*RouteAction_WeightedClusters)(nil),
+	}
+}
+
+func _RouteAction_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*RouteAction)
+	// cluster_specifier
+	switch x := m.ClusterSpecifier.(type) {
+	case *RouteAction_Cluster:
+		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
+		_ = b.EncodeStringBytes(x.Cluster)
+	case *RouteAction_WeightedClusters:
+		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.WeightedClusters); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("RouteAction.ClusterSpecifier has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _RouteAction_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*RouteAction)
+	switch tag {
+	case 1: // cluster_specifier.cluster
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		x, err := b.DecodeStringBytes()
+		m.ClusterSpecifier = &RouteAction_Cluster{x}
+		return true, err
+	case 2: // cluster_specifier.weighted_clusters
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(route.WeightedCluster)
+		err := b.DecodeMessage(msg)
+		m.ClusterSpecifier = &RouteAction_WeightedClusters{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _RouteAction_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*RouteAction)
+	// cluster_specifier
+	switch x := m.ClusterSpecifier.(type) {
+	case *RouteAction_Cluster:
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(len(x.Cluster)))
+		n += len(x.Cluster)
+	case *RouteAction_WeightedClusters:
+		s := proto.Size(x.WeightedClusters)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
+// [#comment:next free field: 5]
 type MethodMatch struct {
 	// The name of the method.
 	Name *matcher.StringMatcher `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -187,22 +385,18 @@ func (m *MethodMatch) Reset()         { *m = MethodMatch{} }
 func (m *MethodMatch) String() string { return proto.CompactTextString(m) }
 func (*MethodMatch) ProtoMessage()    {}
 func (*MethodMatch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{2}
+	return fileDescriptor_74a572433a3292e0, []int{4}
 }
 func (m *MethodMatch) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *MethodMatch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MethodMatch.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *MethodMatch) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MethodMatch.Merge(m, src)
@@ -245,22 +439,18 @@ func (m *MethodMatch_ParameterMatchSpecifier) Reset()         { *m = MethodMatch
 func (m *MethodMatch_ParameterMatchSpecifier) String() string { return proto.CompactTextString(m) }
 func (*MethodMatch_ParameterMatchSpecifier) ProtoMessage()    {}
 func (*MethodMatch_ParameterMatchSpecifier) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{2, 0}
+	return fileDescriptor_74a572433a3292e0, []int{4, 0}
 }
 func (m *MethodMatch_ParameterMatchSpecifier) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *MethodMatch_ParameterMatchSpecifier) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MethodMatch_ParameterMatchSpecifier.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *MethodMatch_ParameterMatchSpecifier) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_MethodMatch_ParameterMatchSpecifier.Merge(m, src)
@@ -383,225 +573,14 @@ func _MethodMatch_ParameterMatchSpecifier_OneofSizer(msg proto.Message) (n int) 
 	return n
 }
 
-type RouteMatch struct {
-	// Method level routing matching.
-	Method *MethodMatch `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
-	// Specifies a set of headers that the route should match on. The router will check the request’s
-	// headers against all the specified headers in the route config. A match will happen if all the
-	// headers in the route are present in the request with the same values (or based on presence if
-	// the value field is not in the config).
-	Headers              []*route.HeaderMatcher `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
-}
-
-func (m *RouteMatch) Reset()         { *m = RouteMatch{} }
-func (m *RouteMatch) String() string { return proto.CompactTextString(m) }
-func (*RouteMatch) ProtoMessage()    {}
-func (*RouteMatch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{3}
-}
-func (m *RouteMatch) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RouteMatch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RouteMatch.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RouteMatch) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteMatch.Merge(m, src)
-}
-func (m *RouteMatch) XXX_Size() int {
-	return m.Size()
-}
-func (m *RouteMatch) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteMatch.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteMatch proto.InternalMessageInfo
-
-func (m *RouteMatch) GetMethod() *MethodMatch {
-	if m != nil {
-		return m.Method
-	}
-	return nil
-}
-
-func (m *RouteMatch) GetHeaders() []*route.HeaderMatcher {
-	if m != nil {
-		return m.Headers
-	}
-	return nil
-}
-
-// [#comment:next free field: 2]
-type RouteAction struct {
-	// Types that are valid to be assigned to ClusterSpecifier:
-	//	*RouteAction_Cluster
-	//	*RouteAction_WeightedClusters
-	ClusterSpecifier     isRouteAction_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
-	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
-	XXX_unrecognized     []byte                         `json:"-"`
-	XXX_sizecache        int32                          `json:"-"`
-}
-
-func (m *RouteAction) Reset()         { *m = RouteAction{} }
-func (m *RouteAction) String() string { return proto.CompactTextString(m) }
-func (*RouteAction) ProtoMessage()    {}
-func (*RouteAction) Descriptor() ([]byte, []int) {
-	return fileDescriptor_74a572433a3292e0, []int{4}
-}
-func (m *RouteAction) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RouteAction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RouteAction.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RouteAction) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteAction.Merge(m, src)
-}
-func (m *RouteAction) XXX_Size() int {
-	return m.Size()
-}
-func (m *RouteAction) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteAction.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteAction proto.InternalMessageInfo
-
-type isRouteAction_ClusterSpecifier interface {
-	isRouteAction_ClusterSpecifier()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type RouteAction_Cluster struct {
-	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3,oneof"`
-}
-type RouteAction_WeightedClusters struct {
-	WeightedClusters *route.WeightedCluster `protobuf:"bytes,2,opt,name=weighted_clusters,json=weightedClusters,proto3,oneof"`
-}
-
-func (*RouteAction_Cluster) isRouteAction_ClusterSpecifier()          {}
-func (*RouteAction_WeightedClusters) isRouteAction_ClusterSpecifier() {}
-
-func (m *RouteAction) GetClusterSpecifier() isRouteAction_ClusterSpecifier {
-	if m != nil {
-		return m.ClusterSpecifier
-	}
-	return nil
-}
-
-func (m *RouteAction) GetCluster() string {
-	if x, ok := m.GetClusterSpecifier().(*RouteAction_Cluster); ok {
-		return x.Cluster
-	}
-	return ""
-}
-
-func (m *RouteAction) GetWeightedClusters() *route.WeightedCluster {
-	if x, ok := m.GetClusterSpecifier().(*RouteAction_WeightedClusters); ok {
-		return x.WeightedClusters
-	}
-	return nil
-}
-
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*RouteAction) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _RouteAction_OneofMarshaler, _RouteAction_OneofUnmarshaler, _RouteAction_OneofSizer, []interface{}{
-		(*RouteAction_Cluster)(nil),
-		(*RouteAction_WeightedClusters)(nil),
-	}
-}
-
-func _RouteAction_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*RouteAction)
-	// cluster_specifier
-	switch x := m.ClusterSpecifier.(type) {
-	case *RouteAction_Cluster:
-		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
-		_ = b.EncodeStringBytes(x.Cluster)
-	case *RouteAction_WeightedClusters:
-		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
-		if err := b.EncodeMessage(x.WeightedClusters); err != nil {
-			return err
-		}
-	case nil:
-	default:
-		return fmt.Errorf("RouteAction.ClusterSpecifier has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _RouteAction_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*RouteAction)
-	switch tag {
-	case 1: // cluster_specifier.cluster
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeStringBytes()
-		m.ClusterSpecifier = &RouteAction_Cluster{x}
-		return true, err
-	case 2: // cluster_specifier.weighted_clusters
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		msg := new(route.WeightedCluster)
-		err := b.DecodeMessage(msg)
-		m.ClusterSpecifier = &RouteAction_WeightedClusters{msg}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _RouteAction_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*RouteAction)
-	// cluster_specifier
-	switch x := m.ClusterSpecifier.(type) {
-	case *RouteAction_Cluster:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(len(x.Cluster)))
-		n += len(x.Cluster)
-	case *RouteAction_WeightedClusters:
-		s := proto.Size(x.WeightedClusters)
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(s))
-		n += s
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
-}
-
 func init() {
 	proto.RegisterType((*RouteConfiguration)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.RouteConfiguration")
 	proto.RegisterType((*Route)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.Route")
+	proto.RegisterType((*RouteMatch)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.RouteMatch")
+	proto.RegisterType((*RouteAction)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.RouteAction")
 	proto.RegisterType((*MethodMatch)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.MethodMatch")
 	proto.RegisterMapType((map[uint32]*MethodMatch_ParameterMatchSpecifier)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.MethodMatch.ParamsMatchEntry")
 	proto.RegisterType((*MethodMatch_ParameterMatchSpecifier)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.MethodMatch.ParameterMatchSpecifier")
-	proto.RegisterType((*RouteMatch)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.RouteMatch")
-	proto.RegisterType((*RouteAction)(nil), "envoy.config.filter.network.dubbo_proxy.v2alpha1.RouteAction")
 }
 
 func init() {
@@ -609,52 +588,51 @@ func init() {
 }
 
 var fileDescriptor_74a572433a3292e0 = []byte{
-	// 706 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0xce, 0x26, 0x71, 0xab, 0xae, 0x01, 0xa5, 0xab, 0xaa, 0x0d, 0x01, 0xa5, 0x6d, 0xb8, 0xf4,
-	0x64, 0x83, 0xf9, 0x87, 0x16, 0x89, 0x54, 0x48, 0xe1, 0x50, 0x54, 0xb9, 0xaa, 0x90, 0x38, 0x10,
-	0x6d, 0x9c, 0x8d, 0x63, 0x35, 0xf1, 0x9a, 0xf5, 0xda, 0x69, 0x5e, 0x81, 0x33, 0x1c, 0xb8, 0xf1,
-	0x18, 0x88, 0x53, 0x8f, 0xbd, 0x20, 0xf5, 0x09, 0x10, 0xea, 0x01, 0xa9, 0x6f, 0x81, 0x3c, 0xbb,
-	0x56, 0x0c, 0xe5, 0xd2, 0xc2, 0x6d, 0x3c, 0x3b, 0xf3, 0x7d, 0xb3, 0xdf, 0x7c, 0x5e, 0xbc, 0xc9,
-	0xc2, 0x94, 0x4f, 0x6d, 0x8f, 0x87, 0x83, 0xc0, 0xb7, 0x07, 0xc1, 0x48, 0x32, 0x61, 0x87, 0x4c,
-	0x4e, 0xb8, 0x38, 0xb0, 0xfb, 0x49, 0xaf, 0xc7, 0xbb, 0x91, 0xe0, 0x87, 0x53, 0x3b, 0x75, 0xe8,
-	0x28, 0x1a, 0xd2, 0x3b, 0xb6, 0xe0, 0x89, 0x64, 0x56, 0x24, 0xb8, 0xe4, 0xe4, 0x36, 0x74, 0x5b,
-	0xaa, 0xdb, 0x52, 0xdd, 0x96, 0xee, 0xb6, 0x0a, 0xdd, 0x56, 0xde, 0xdd, 0x68, 0x2a, 0x3e, 0x1a,
-	0x05, 0x76, 0xea, 0x28, 0xac, 0x22, 0x62, 0x63, 0x55, 0x9d, 0xcb, 0x69, 0xc4, 0xec, 0x31, 0x95,
-	0xde, 0x90, 0x09, 0x3b, 0x96, 0x22, 0x08, 0x7d, 0x5d, 0xb0, 0x5c, 0x28, 0x10, 0x34, 0xf4, 0xf3,
-	0xc6, 0xa6, 0xcf, 0xb9, 0x3f, 0x62, 0x36, 0x7c, 0xf5, 0x92, 0x81, 0x3d, 0x11, 0x34, 0x8a, 0x98,
-	0x88, 0xf5, 0xf9, 0x4a, 0x4a, 0x47, 0x41, 0x9f, 0x4a, 0x66, 0xe7, 0x81, 0x3e, 0x58, 0xf2, 0xb9,
-	0xcf, 0x21, 0xb4, 0xb3, 0x48, 0x65, 0x5b, 0xdf, 0x10, 0x26, 0x6e, 0x36, 0xd7, 0x36, 0xdc, 0x2d,
-	0x11, 0x54, 0x06, 0x3c, 0x24, 0x04, 0x57, 0x43, 0x3a, 0x66, 0x75, 0xb4, 0x86, 0x36, 0x16, 0x5c,
-	0x88, 0xc9, 0x4d, 0xbc, 0x10, 0x84, 0x92, 0x89, 0x01, 0xf5, 0x58, 0xbd, 0x0c, 0x07, 0xb3, 0x04,
-	0x59, 0xc2, 0x86, 0x2f, 0x78, 0x12, 0xd5, 0x2b, 0x70, 0xa2, 0x3e, 0x48, 0x1d, 0xcf, 0xa7, 0x4c,
-	0xc4, 0x01, 0x0f, 0xeb, 0x55, 0xc8, 0xe7, 0x9f, 0x64, 0x1f, 0xcf, 0x81, 0x1e, 0x71, 0xdd, 0x58,
-	0xab, 0x6c, 0x98, 0xce, 0x43, 0xeb, 0xa2, 0x1a, 0x5b, 0x30, 0x77, 0xbb, 0x7a, 0xfc, 0x7d, 0xb5,
-	0xe4, 0x6a, 0xb0, 0xd6, 0x09, 0xc2, 0x06, 0xe4, 0x49, 0x0f, 0x1b, 0x20, 0x2c, 0xdc, 0xc1, 0x74,
-	0x36, 0x2f, 0x89, 0xbf, 0x93, 0x61, 0xb4, 0xaf, 0x65, 0x24, 0x5f, 0xcf, 0x8e, 0x2a, 0xc6, 0x7b,
-	0x54, 0xae, 0x21, 0x57, 0x41, 0x13, 0x0f, 0x1b, 0xc0, 0x0b, 0x72, 0x98, 0xce, 0xd6, 0x25, 0x39,
-	0x9e, 0x7b, 0x99, 0xe8, 0xe7, 0x49, 0x00, 0xbb, 0xf5, 0xb3, 0x82, 0xcd, 0x1d, 0x26, 0x87, 0xbc,
-	0x0f, 0xb3, 0x90, 0xfb, 0x85, 0xdd, 0x98, 0xce, 0xba, 0xe6, 0xcc, 0x8c, 0x62, 0x69, 0x27, 0x59,
-	0x7b, 0xe0, 0xa4, 0x1d, 0xf5, 0xa5, 0xd7, 0xf7, 0x0e, 0x5f, 0x89, 0xa8, 0xa0, 0xe3, 0xb8, 0xab,
-	0x64, 0x29, 0x83, 0xec, 0xaf, 0x2e, 0x3e, 0x72, 0x61, 0x16, 0x6b, 0x17, 0x10, 0x21, 0x7e, 0x11,
-	0x4a, 0x31, 0x75, 0xcd, 0x68, 0x96, 0x69, 0x7c, 0x40, 0x78, 0x05, 0x2a, 0x98, 0x64, 0x02, 0x52,
-	0x7b, 0x11, 0xf3, 0x82, 0x41, 0xc0, 0x04, 0x59, 0xc7, 0x26, 0x3b, 0xa4, 0x9e, 0xd4, 0xd3, 0x80,
-	0x6b, 0x3a, 0x25, 0x17, 0x43, 0x52, 0x5d, 0xf4, 0x31, 0x36, 0xc1, 0xf9, 0xba, 0xa4, 0x0a, 0xf7,
-	0x5d, 0x2e, 0xde, 0xf7, 0x65, 0x28, 0x1f, 0xdc, 0x73, 0xb3, 0x9a, 0xac, 0x15, 0x8a, 0xd5, 0xbe,
-	0x6e, 0xe0, 0xeb, 0x51, 0x4e, 0xac, 0xda, 0xbb, 0x71, 0x4e, 0xdd, 0xf8, 0x88, 0x70, 0xed, 0xcf,
-	0xc1, 0x49, 0x0d, 0x57, 0x0e, 0xd8, 0x14, 0x44, 0xbd, 0xea, 0x66, 0x21, 0x39, 0xc0, 0x46, 0x4a,
-	0x47, 0x49, 0xbe, 0xdc, 0xfd, 0xff, 0xa0, 0xd4, 0x79, 0x1d, 0x5c, 0xc5, 0xf1, 0xa4, 0xfc, 0x08,
-	0xb5, 0x3e, 0x23, 0x8c, 0x67, 0x9e, 0xcb, 0xfe, 0x90, 0x31, 0x00, 0xe8, 0x4d, 0x6f, 0xfd, 0xd3,
-	0x00, 0xae, 0x06, 0x23, 0x4f, 0xf1, 0xfc, 0x90, 0xd1, 0x3e, 0x13, 0xb1, 0xb6, 0x40, 0xee, 0x20,
-	0x1a, 0x05, 0x56, 0xea, 0x58, 0xea, 0x95, 0xea, 0x40, 0x49, 0xee, 0xa0, 0xbc, 0xa3, 0xf5, 0x09,
-	0x61, 0xb3, 0x60, 0x59, 0xd2, 0xc0, 0xf3, 0xde, 0x28, 0x89, 0x25, 0x13, 0xea, 0xa9, 0xe8, 0x94,
-	0xdc, 0x3c, 0x41, 0x5c, 0xbc, 0x38, 0x61, 0x81, 0x3f, 0x94, 0xac, 0xdf, 0xd5, 0xb9, 0x58, 0x6b,
-	0x79, 0xeb, 0x6f, 0x94, 0xaf, 0x75, 0xf1, 0xb6, 0xaa, 0xed, 0x94, 0xdc, 0xda, 0xe4, 0xf7, 0x54,
-	0xdc, 0x6e, 0xe0, 0x45, 0x0d, 0x35, 0xdb, 0x27, 0x31, 0xbe, 0x9c, 0x1d, 0x55, 0x50, 0xfb, 0xed,
-	0xf1, 0x69, 0x13, 0x9d, 0x9c, 0x36, 0xd1, 0x8f, 0xd3, 0x26, 0xc2, 0xcf, 0x02, 0xae, 0x48, 0x94,
-	0x24, 0x17, 0x95, 0xae, 0xad, 0x36, 0xb1, 0x9b, 0x3d, 0x92, 0xbb, 0xe8, 0x4d, 0x39, 0x75, 0x7a,
-	0x73, 0xf0, 0x62, 0xde, 0xfd, 0x15, 0x00, 0x00, 0xff, 0xff, 0xe6, 0x47, 0x4d, 0xda, 0x4b, 0x06,
-	0x00, 0x00,
+	// 699 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcf, 0x6f, 0xd3, 0x4a,
+	0x10, 0xee, 0x26, 0x75, 0xab, 0x8e, 0xdf, 0x93, 0xd2, 0x55, 0xd5, 0xe6, 0xe5, 0xa1, 0xd0, 0x86,
+	0x4b, 0x4f, 0x36, 0x84, 0xdf, 0x50, 0x90, 0x48, 0x85, 0x54, 0x0e, 0x85, 0xca, 0x55, 0x85, 0xc4,
+	0x81, 0x68, 0x93, 0x6c, 0x1c, 0xab, 0x89, 0xd7, 0xac, 0xd7, 0x4e, 0xf3, 0x2f, 0x70, 0x86, 0x03,
+	0x37, 0xfe, 0x0c, 0xc4, 0xa9, 0x37, 0x7a, 0xe4, 0xc8, 0x11, 0xe5, 0x80, 0xd4, 0xff, 0x02, 0x79,
+	0x76, 0x4d, 0x5c, 0xe0, 0xd2, 0xc2, 0x6d, 0x3c, 0x3b, 0xdf, 0x37, 0xf3, 0x7d, 0x9e, 0x5d, 0xd8,
+	0xe2, 0x61, 0x2a, 0x26, 0x6e, 0x57, 0x84, 0xfd, 0xc0, 0x77, 0xfb, 0xc1, 0x50, 0x71, 0xe9, 0x86,
+	0x5c, 0x8d, 0x85, 0x3c, 0x74, 0x7b, 0x49, 0xa7, 0x23, 0xda, 0x91, 0x14, 0x47, 0x13, 0x37, 0x6d,
+	0xb2, 0x61, 0x34, 0x60, 0xd7, 0x5c, 0x29, 0x12, 0xc5, 0x9d, 0x48, 0x0a, 0x25, 0xe8, 0x55, 0x44,
+	0x3b, 0x1a, 0xed, 0x68, 0xb4, 0x63, 0xd0, 0x4e, 0x01, 0xed, 0xe4, 0xe8, 0x5a, 0x5d, 0xf7, 0x63,
+	0x51, 0xe0, 0xa6, 0x4d, 0xcd, 0x55, 0x64, 0xac, 0x5d, 0xd6, 0xe7, 0x6a, 0x12, 0x71, 0x77, 0xc4,
+	0x54, 0x77, 0xc0, 0xa5, 0x1b, 0x2b, 0x19, 0x84, 0xbe, 0x29, 0x58, 0x2d, 0x14, 0x48, 0x16, 0xfa,
+	0x39, 0xb0, 0xee, 0x0b, 0xe1, 0x0f, 0xb9, 0x8b, 0x5f, 0x9d, 0xa4, 0xef, 0x8e, 0x25, 0x8b, 0x22,
+	0x2e, 0x63, 0x73, 0xbe, 0x96, 0xb2, 0x61, 0xd0, 0x63, 0x8a, 0xbb, 0x79, 0x60, 0x0e, 0x56, 0x7c,
+	0xe1, 0x0b, 0x0c, 0xdd, 0x2c, 0xd2, 0xd9, 0xc6, 0x27, 0x02, 0xd4, 0xcb, 0xe6, 0xda, 0x46, 0x6d,
+	0x89, 0x64, 0x2a, 0x10, 0x21, 0xa5, 0x30, 0x1f, 0xb2, 0x11, 0xaf, 0x92, 0x75, 0xb2, 0xb9, 0xe4,
+	0x61, 0x4c, 0x2f, 0xc1, 0x52, 0x10, 0x2a, 0x2e, 0xfb, 0xac, 0xcb, 0xab, 0x25, 0x3c, 0x98, 0x25,
+	0xe8, 0x0a, 0x58, 0xbe, 0x14, 0x49, 0x54, 0x2d, 0xe3, 0x89, 0xfe, 0xa0, 0x55, 0x58, 0x4c, 0xb9,
+	0x8c, 0x03, 0x11, 0x56, 0xe7, 0x31, 0x9f, 0x7f, 0xd2, 0x67, 0xb0, 0x80, 0x7e, 0xc4, 0x55, 0x6b,
+	0xbd, 0xbc, 0x69, 0x37, 0x6f, 0x3b, 0xe7, 0xf5, 0xd8, 0xc1, 0xb9, 0x3d, 0x43, 0xd3, 0x38, 0x21,
+	0x60, 0x61, 0x86, 0xbe, 0x04, 0x0b, 0x2d, 0xc5, 0xe9, 0xed, 0xe6, 0xd6, 0x05, 0x99, 0x77, 0x33,
+	0x8e, 0x16, 0x7c, 0x3c, 0x3d, 0x2e, 0x5b, 0xaf, 0x49, 0xa9, 0x42, 0x3c, 0x4d, 0x4b, 0xdb, 0x60,
+	0x61, 0x4f, 0x34, 0xc1, 0x6e, 0x3e, 0xb8, 0x20, 0xff, 0xa3, 0x6e, 0x66, 0xf5, 0xd9, 0x06, 0xc8,
+	0xdb, 0x78, 0x4f, 0x00, 0x66, 0x23, 0xd0, 0x03, 0x58, 0x18, 0x71, 0x35, 0x10, 0x3d, 0x23, 0xe8,
+	0x02, 0x0d, 0x77, 0x11, 0x8f, 0x74, 0x9e, 0x21, 0xa3, 0xf7, 0x61, 0x71, 0xc0, 0x59, 0x8f, 0xcb,
+	0xb8, 0x5a, 0xc2, 0x5f, 0xb0, 0x61, 0x78, 0x59, 0x14, 0x38, 0x69, 0xd3, 0xd1, 0xeb, 0xba, 0x83,
+	0x25, 0xbb, 0x7a, 0x45, 0xbd, 0x1c, 0xd1, 0x78, 0x47, 0xc0, 0x2e, 0xa8, 0xa0, 0x35, 0x58, 0xec,
+	0x0e, 0x93, 0x58, 0x71, 0xa9, 0x77, 0x66, 0x67, 0xce, 0xcb, 0x13, 0xd4, 0x83, 0xe5, 0x31, 0x0f,
+	0xfc, 0x81, 0xe2, 0xbd, 0xb6, 0xc9, 0xc5, 0xc6, 0xbb, 0x2b, 0xbf, 0x6b, 0xf9, 0xdc, 0x14, 0x6f,
+	0xeb, 0xda, 0x9d, 0x39, 0xaf, 0x32, 0x3e, 0x9b, 0x8a, 0x5b, 0x35, 0x58, 0x36, 0x54, 0xed, 0x38,
+	0xe2, 0xdd, 0xa0, 0x1f, 0x70, 0x49, 0xad, 0x0f, 0xa7, 0xc7, 0x65, 0xd2, 0xf8, 0x56, 0x06, 0xbb,
+	0x20, 0x98, 0xde, 0x2c, 0x2c, 0xf3, 0x4c, 0x65, 0x76, 0xb3, 0x1c, 0x73, 0xf5, 0x9c, 0x7d, 0xbc,
+	0x7a, 0xb9, 0x4a, 0xbd, 0xef, 0xaf, 0xe0, 0x9f, 0x88, 0x49, 0x36, 0x8a, 0xdb, 0x7a, 0x9b, 0xb4,
+	0x49, 0x4f, 0xff, 0xc8, 0x7c, 0x67, 0x0f, 0x19, 0x31, 0x7e, 0x1c, 0x2a, 0x39, 0xf1, 0xec, 0x68,
+	0x96, 0xa9, 0xbd, 0x21, 0xb0, 0x86, 0x15, 0x5c, 0x19, 0xcf, 0xf7, 0x7f, 0x88, 0xdb, 0x00, 0x9b,
+	0x1f, 0xb1, 0xae, 0x32, 0xd3, 0x94, 0x8d, 0xcb, 0x80, 0x49, 0x2d, 0xf4, 0x2e, 0xd8, 0xf8, 0x54,
+	0x98, 0x92, 0x79, 0xd4, 0xbb, 0x5a, 0xd4, 0xfb, 0x24, 0x54, 0xb7, 0x6e, 0x78, 0x59, 0x4d, 0x06,
+	0xc5, 0x62, 0xbd, 0xe6, 0xff, 0xc3, 0x7f, 0x51, 0xde, 0x58, 0xc3, 0x67, 0xbe, 0xd6, 0xde, 0x12,
+	0xa8, 0xfc, 0x3c, 0x38, 0xad, 0x40, 0xf9, 0x90, 0x4f, 0xd0, 0xd4, 0x7f, 0xbd, 0x2c, 0xa4, 0x87,
+	0x60, 0xa5, 0x6c, 0x98, 0xe4, 0xf7, 0xe2, 0xe0, 0x2f, 0x38, 0xf5, 0xab, 0x0f, 0x9e, 0xee, 0x71,
+	0xaf, 0x74, 0x87, 0xb4, 0x3a, 0x27, 0xd3, 0x3a, 0xf9, 0x3c, 0xad, 0x93, 0x2f, 0xd3, 0x3a, 0xf9,
+	0x3a, 0xad, 0x13, 0x78, 0x18, 0x08, 0xdd, 0x55, 0x13, 0x9f, 0x77, 0x80, 0x96, 0xbe, 0x76, 0x7b,
+	0xd9, 0xd3, 0xb8, 0x47, 0x5e, 0x94, 0xd2, 0x66, 0x67, 0x01, 0xdf, 0xc9, 0xeb, 0xdf, 0x03, 0x00,
+	0x00, 0xff, 0xff, 0xdd, 0x37, 0x98, 0x87, 0x41, 0x06, 0x00, 0x00,
 }
 
 func (m *RouteConfiguration) Marshal() (dAtA []byte, err error) {
@@ -729,136 +707,32 @@ func (m *Route) MarshalTo(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	dAtA[i] = 0xa
-	i++
-	i = encodeVarintRoute(dAtA, i, uint64(m.Match.Size()))
-	n1, err := m.Match.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n1
-	dAtA[i] = 0x12
-	i++
-	i = encodeVarintRoute(dAtA, i, uint64(m.Route.Size()))
-	n2, err := m.Route.MarshalTo(dAtA[i:])
-	if err != nil {
-		return 0, err
-	}
-	i += n2
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *MethodMatch) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MethodMatch) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Name != nil {
+	if m.Match != nil {
 		dAtA[i] = 0xa
 		i++
-		i = encodeVarintRoute(dAtA, i, uint64(m.Name.Size()))
-		n3, err := m.Name.MarshalTo(dAtA[i:])
+		i = encodeVarintRoute(dAtA, i, uint64(m.Match.Size()))
+		n1, err := m.Match.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n3
+		i += n1
 	}
-	if len(m.ParamsMatch) > 0 {
-		for k, _ := range m.ParamsMatch {
-			dAtA[i] = 0x12
-			i++
-			v := m.ParamsMatch[k]
-			msgSize := 0
-			if v != nil {
-				msgSize = v.Size()
-				msgSize += 1 + sovRoute(uint64(msgSize))
-			}
-			mapSize := 1 + sovRoute(uint64(k)) + msgSize
-			i = encodeVarintRoute(dAtA, i, uint64(mapSize))
-			dAtA[i] = 0x8
-			i++
-			i = encodeVarintRoute(dAtA, i, uint64(k))
-			if v != nil {
-				dAtA[i] = 0x12
-				i++
-				i = encodeVarintRoute(dAtA, i, uint64(v.Size()))
-				n4, err := v.MarshalTo(dAtA[i:])
-				if err != nil {
-					return 0, err
-				}
-				i += n4
-			}
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *MethodMatch_ParameterMatchSpecifier) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MethodMatch_ParameterMatchSpecifier) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.ParameterMatchSpecifier != nil {
-		nn5, err := m.ParameterMatchSpecifier.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += nn5
-	}
-	if m.XXX_unrecognized != nil {
-		i += copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return i, nil
-}
-
-func (m *MethodMatch_ParameterMatchSpecifier_ExactMatch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	dAtA[i] = 0x1a
-	i++
-	i = encodeVarintRoute(dAtA, i, uint64(len(m.ExactMatch)))
-	i += copy(dAtA[i:], m.ExactMatch)
-	return i, nil
-}
-func (m *MethodMatch_ParameterMatchSpecifier_RangeMatch) MarshalTo(dAtA []byte) (int, error) {
-	i := 0
-	if m.RangeMatch != nil {
-		dAtA[i] = 0x22
+	if m.Route != nil {
+		dAtA[i] = 0x12
 		i++
-		i = encodeVarintRoute(dAtA, i, uint64(m.RangeMatch.Size()))
-		n6, err := m.RangeMatch.MarshalTo(dAtA[i:])
+		i = encodeVarintRoute(dAtA, i, uint64(m.Route.Size()))
+		n2, err := m.Route.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i += n2
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
 	return i, nil
 }
+
 func (m *RouteMatch) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -878,11 +752,11 @@ func (m *RouteMatch) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintRoute(dAtA, i, uint64(m.Method.Size()))
-		n7, err := m.Method.MarshalTo(dAtA[i:])
+		n3, err := m.Method.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n7
+		i += n3
 	}
 	if len(m.Headers) > 0 {
 		for _, msg := range m.Headers {
@@ -918,11 +792,11 @@ func (m *RouteAction) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.ClusterSpecifier != nil {
-		nn8, err := m.ClusterSpecifier.MarshalTo(dAtA[i:])
+		nn4, err := m.ClusterSpecifier.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn8
+		i += nn4
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -944,7 +818,120 @@ func (m *RouteAction_WeightedClusters) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintRoute(dAtA, i, uint64(m.WeightedClusters.Size()))
-		n9, err := m.WeightedClusters.MarshalTo(dAtA[i:])
+		n5, err := m.WeightedClusters.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	return i, nil
+}
+func (m *MethodMatch) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MethodMatch) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Name != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintRoute(dAtA, i, uint64(m.Name.Size()))
+		n6, err := m.Name.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	if len(m.ParamsMatch) > 0 {
+		keysForParamsMatch := make([]uint32, 0, len(m.ParamsMatch))
+		for k, _ := range m.ParamsMatch {
+			keysForParamsMatch = append(keysForParamsMatch, uint32(k))
+		}
+		github_com_gogo_protobuf_sortkeys.Uint32s(keysForParamsMatch)
+		for _, k := range keysForParamsMatch {
+			dAtA[i] = 0x12
+			i++
+			v := m.ParamsMatch[uint32(k)]
+			msgSize := 0
+			if v != nil {
+				msgSize = v.Size()
+				msgSize += 1 + sovRoute(uint64(msgSize))
+			}
+			mapSize := 1 + sovRoute(uint64(k)) + msgSize
+			i = encodeVarintRoute(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0x8
+			i++
+			i = encodeVarintRoute(dAtA, i, uint64(k))
+			if v != nil {
+				dAtA[i] = 0x12
+				i++
+				i = encodeVarintRoute(dAtA, i, uint64(v.Size()))
+				n7, err := v.MarshalTo(dAtA[i:])
+				if err != nil {
+					return 0, err
+				}
+				i += n7
+			}
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *MethodMatch_ParameterMatchSpecifier) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MethodMatch_ParameterMatchSpecifier) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.ParameterMatchSpecifier != nil {
+		nn8, err := m.ParameterMatchSpecifier.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += nn8
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *MethodMatch_ParameterMatchSpecifier_ExactMatch) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	dAtA[i] = 0x1a
+	i++
+	i = encodeVarintRoute(dAtA, i, uint64(len(m.ExactMatch)))
+	i += copy(dAtA[i:], m.ExactMatch)
+	return i, nil
+}
+func (m *MethodMatch_ParameterMatchSpecifier_RangeMatch) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.RangeMatch != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintRoute(dAtA, i, uint64(m.RangeMatch.Size()))
+		n9, err := m.RangeMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
@@ -1001,16 +988,79 @@ func (m *Route) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.Match.Size()
-	n += 1 + l + sovRoute(uint64(l))
-	l = m.Route.Size()
-	n += 1 + l + sovRoute(uint64(l))
+	if m.Match != nil {
+		l = m.Match.Size()
+		n += 1 + l + sovRoute(uint64(l))
+	}
+	if m.Route != nil {
+		l = m.Route.Size()
+		n += 1 + l + sovRoute(uint64(l))
+	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
 
+func (m *RouteMatch) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Method != nil {
+		l = m.Method.Size()
+		n += 1 + l + sovRoute(uint64(l))
+	}
+	if len(m.Headers) > 0 {
+		for _, e := range m.Headers {
+			l = e.Size()
+			n += 1 + l + sovRoute(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *RouteAction) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ClusterSpecifier != nil {
+		n += m.ClusterSpecifier.Size()
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *RouteAction_Cluster) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Cluster)
+	n += 1 + l + sovRoute(uint64(l))
+	return n
+}
+func (m *RouteAction_WeightedClusters) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.WeightedClusters != nil {
+		l = m.WeightedClusters.Size()
+		n += 1 + l + sovRoute(uint64(l))
+	}
+	return n
+}
 func (m *MethodMatch) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1073,65 +1123,6 @@ func (m *MethodMatch_ParameterMatchSpecifier_RangeMatch) Size() (n int) {
 	_ = l
 	if m.RangeMatch != nil {
 		l = m.RangeMatch.Size()
-		n += 1 + l + sovRoute(uint64(l))
-	}
-	return n
-}
-func (m *RouteMatch) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Method != nil {
-		l = m.Method.Size()
-		n += 1 + l + sovRoute(uint64(l))
-	}
-	if len(m.Headers) > 0 {
-		for _, e := range m.Headers {
-			l = e.Size()
-			n += 1 + l + sovRoute(uint64(l))
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *RouteAction) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.ClusterSpecifier != nil {
-		n += m.ClusterSpecifier.Size()
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *RouteAction_Cluster) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Cluster)
-	n += 1 + l + sovRoute(uint64(l))
-	return n
-}
-func (m *RouteAction_WeightedClusters) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.WeightedClusters != nil {
-		l = m.WeightedClusters.Size()
 		n += 1 + l + sovRoute(uint64(l))
 	}
 	return n
@@ -1336,7 +1327,7 @@ func (m *RouteConfiguration) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Routes = append(m.Routes, Route{})
+			m.Routes = append(m.Routes, &Route{})
 			if err := m.Routes[len(m.Routes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1424,6 +1415,9 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
+			if m.Match == nil {
+				m.Match = &RouteMatch{}
+			}
 			if err := m.Match.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -1457,9 +1451,257 @@ func (m *Route) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
+			if m.Route == nil {
+				m.Route = &RouteAction{}
+			}
 			if err := m.Route.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRoute(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RouteMatch) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRoute
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteMatch: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteMatch: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Method", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRoute
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRoute
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Method == nil {
+				m.Method = &MethodMatch{}
+			}
+			if err := m.Method.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Headers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRoute
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRoute
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Headers = append(m.Headers, &route.HeaderMatcher{})
+			if err := m.Headers[len(m.Headers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRoute(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RouteAction) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRoute
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RouteAction: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RouteAction: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cluster", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRoute
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRoute
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClusterSpecifier = &RouteAction_Cluster{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WeightedClusters", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRoute
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRoute
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthRoute
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &route.WeightedCluster{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.ClusterSpecifier = &RouteAction_WeightedClusters{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1786,251 +2028,6 @@ func (m *MethodMatch_ParameterMatchSpecifier) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			m.ParameterMatchSpecifier = &MethodMatch_ParameterMatchSpecifier_RangeMatch{v}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRoute(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *RouteMatch) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRoute
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: RouteMatch: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RouteMatch: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Method", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRoute
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRoute
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Method == nil {
-				m.Method = &MethodMatch{}
-			}
-			if err := m.Method.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Headers", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRoute
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRoute
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Headers = append(m.Headers, &route.HeaderMatcher{})
-			if err := m.Headers[len(m.Headers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRoute(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *RouteAction) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRoute
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: RouteAction: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RouteAction: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cluster", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRoute
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthRoute
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ClusterSpecifier = &RouteAction_Cluster{string(dAtA[iNdEx:postIndex])}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WeightedClusters", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRoute
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRoute
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRoute
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &route.WeightedCluster{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.ClusterSpecifier = &RouteAction_WeightedClusters{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -21,12 +21,11 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"sync"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
@@ -78,9 +77,6 @@ func init() {
 // main returns code 1 if any of the batches failed to pass all requests
 func main() {
 	flag.Parse()
-	if debug {
-		log.SetLevel(log.DebugLevel)
-	}
 	ctx := context.Background()
 
 	// start upstream
@@ -109,23 +105,23 @@ func main() {
 	go test.RunManagementServer(ctx, srv, port)
 	go test.RunManagementGateway(ctx, srv, gatewayPort)
 
-	log.Infof("waiting for the first request...")
+	log.Println("waiting for the first request...")
 	<-signal
-	log.Infof("initial snapshot %+v", snapshots)
-	log.WithFields(log.Fields{"updates": updates, "requests": requests}).Info("executing sequence")
+	log.Printf("initial snapshot %+v\n", snapshots)
+	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
 	for i := 0; i < updates; i++ {
 		snapshots.Version = fmt.Sprintf("v%d", i)
-		log.WithFields(log.Fields{"version": snapshots.Version}).Info("update snapshot")
+		log.Printf("update snapshot %v\n", snapshots.Version)
 
 		snapshot := snapshots.Generate()
 		if err := snapshot.Consistent(); err != nil {
-			log.Errorf("snapshot inconsistency: %+v", snapshot)
+			log.Printf("snapshot inconsistency: %+v\n", snapshot)
 		}
 
 		err := config.SetSnapshot(nodeID, snapshot)
 		if err != nil {
-			log.Errorf("snapshot error %q for %+v", err, snapshot)
+			log.Printf("snapshot error %q for %+v\n", err, snapshot)
 			os.Exit(1)
 		}
 
@@ -136,7 +132,7 @@ func main() {
 			if failed == 0 && !pass {
 				pass = true
 			}
-			log.WithFields(log.Fields{"batch": j, "ok": ok, "failed": failed, "pass": pass}).Info("request batch")
+			log.Printf("request batch %d, ok %v, failed %v, pass %v\n", j, ok, failed, pass)
 			select {
 			case <-time.After(delay):
 			case <-ctx.Done():
@@ -144,16 +140,20 @@ func main() {
 			}
 		}
 
-		als.Dump(func(s string) { log.Debug(s) })
+		als.Dump(func(s string) {
+			if debug {
+				log.Println(s)
+			}
+		})
 		cb.Report()
 
 		if !pass {
-			log.Errorf("failed all requests in a run %d", i)
+			log.Printf("failed all requests in a run %d\n", i)
 			os.Exit(1)
 		}
 	}
 
-	log.Infof("Test for %s passed!", mode)
+	log.Printf("Test for %s passed!\n", mode)
 }
 
 // callEcho calls upstream echo service on all listener ports and returns an error
@@ -211,10 +211,12 @@ func callEcho() (int, int) {
 type logger struct{}
 
 func (logger logger) Infof(format string, args ...interface{}) {
-	log.Debugf(format, args...)
+	if debug {
+		log.Printf(format+"\n", args...)
+	}
 }
 func (logger logger) Errorf(format string, args ...interface{}) {
-	log.Errorf(format, args...)
+	log.Printf(format+"\n", args...)
 }
 
 type callbacks struct {
@@ -227,14 +229,18 @@ type callbacks struct {
 func (cb *callbacks) Report() {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-	log.WithFields(log.Fields{"fetches": cb.fetches, "requests": cb.requests}).Info("server callbacks")
+	log.Printf("server callbacks fetches=%d requests=%d\n", cb.fetches, cb.requests)
 }
 func (cb *callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error {
-	log.Debugf("stream %d open for %s", id, typ)
+	if debug {
+		log.Printf("stream %d open for %s\n", id, typ)
+	}
 	return nil
 }
 func (cb *callbacks) OnStreamClosed(id int64) {
-	log.Debugf("stream %d closed", id)
+	if debug {
+		log.Printf("stream %d closed\n", id)
+	}
 }
 func (cb *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) error {
 	cb.mu.Lock()

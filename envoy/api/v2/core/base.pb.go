@@ -6,15 +6,14 @@ package core
 import (
 	bytes "bytes"
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 	types "github.com/gogo/protobuf/types"
-	_ "github.com/lyft/protoc-gen-validate/validate"
-
-	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -73,6 +72,7 @@ const (
 	CONNECT            RequestMethod = 6
 	OPTIONS            RequestMethod = 7
 	TRACE              RequestMethod = 8
+	PATCH              RequestMethod = 9
 )
 
 var RequestMethod_name = map[int32]string{
@@ -85,6 +85,7 @@ var RequestMethod_name = map[int32]string{
 	6: "CONNECT",
 	7: "OPTIONS",
 	8: "TRACE",
+	9: "PATCH",
 }
 
 var RequestMethod_value = map[string]int32{
@@ -97,6 +98,7 @@ var RequestMethod_value = map[string]int32{
 	"CONNECT":            6,
 	"OPTIONS":            7,
 	"TRACE":              8,
+	"PATCH":              9,
 }
 
 func (x RequestMethod) String() string {
@@ -105,6 +107,38 @@ func (x RequestMethod) String() string {
 
 func (RequestMethod) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_a7738c0f9e1bfff4, []int{1}
+}
+
+// Identifies the direction of the traffic relative to the local Envoy.
+type TrafficDirection int32
+
+const (
+	// Default option is unspecified.
+	TrafficDirection_UNSPECIFIED TrafficDirection = 0
+	// The transport is used for incoming traffic.
+	TrafficDirection_INBOUND TrafficDirection = 1
+	// The transport is used for outgoing traffic.
+	TrafficDirection_OUTBOUND TrafficDirection = 2
+)
+
+var TrafficDirection_name = map[int32]string{
+	0: "UNSPECIFIED",
+	1: "INBOUND",
+	2: "OUTBOUND",
+}
+
+var TrafficDirection_value = map[string]int32{
+	"UNSPECIFIED": 0,
+	"INBOUND":     1,
+	"OUTBOUND":    2,
+}
+
+func (x TrafficDirection) String() string {
+	return proto.EnumName(TrafficDirection_name, int32(x))
+}
+
+func (TrafficDirection) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_a7738c0f9e1bfff4, []int{2}
 }
 
 type SocketOption_SocketState int32
@@ -135,7 +169,7 @@ func (x SocketOption_SocketState) String() string {
 }
 
 func (SocketOption_SocketState) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_a7738c0f9e1bfff4, []int{8, 0}
+	return fileDescriptor_a7738c0f9e1bfff4, []int{11, 0}
 }
 
 // Identifies location of where either Envoy runs or where upstream hosts run.
@@ -170,16 +204,12 @@ func (m *Locality) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *Locality) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Locality.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *Locality) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Locality.Merge(m, src)
@@ -261,16 +291,12 @@ func (m *Node) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *Node) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Node.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *Node) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Node.Merge(m, src)
@@ -359,16 +385,12 @@ func (m *Metadata) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *Metadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Metadata.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *Metadata) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Metadata.Merge(m, src)
@@ -410,16 +432,12 @@ func (m *RuntimeUInt32) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *RuntimeUInt32) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RuntimeUInt32.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *RuntimeUInt32) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RuntimeUInt32.Merge(m, src)
@@ -472,16 +490,12 @@ func (m *HeaderValue) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *HeaderValue) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_HeaderValue.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *HeaderValue) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_HeaderValue.Merge(m, src)
@@ -531,16 +545,12 @@ func (m *HeaderValueOption) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *HeaderValueOption) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_HeaderValueOption.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *HeaderValueOption) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_HeaderValueOption.Merge(m, src)
@@ -568,6 +578,50 @@ func (m *HeaderValueOption) GetAppend() *types.BoolValue {
 	return nil
 }
 
+// Wrapper for a set of headers.
+type HeaderMap struct {
+	Headers              []*HeaderValue `protobuf:"bytes,1,rep,name=headers,proto3" json:"headers,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *HeaderMap) Reset()         { *m = HeaderMap{} }
+func (m *HeaderMap) String() string { return proto.CompactTextString(m) }
+func (*HeaderMap) ProtoMessage()    {}
+func (*HeaderMap) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a7738c0f9e1bfff4, []int{6}
+}
+func (m *HeaderMap) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *HeaderMap) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *HeaderMap) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HeaderMap.Merge(m, src)
+}
+func (m *HeaderMap) XXX_Size() int {
+	return m.Size()
+}
+func (m *HeaderMap) XXX_DiscardUnknown() {
+	xxx_messageInfo_HeaderMap.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_HeaderMap proto.InternalMessageInfo
+
+func (m *HeaderMap) GetHeaders() []*HeaderValue {
+	if m != nil {
+		return m.Headers
+	}
+	return nil
+}
+
 // Data source consisting of either a file or an inline value.
 type DataSource struct {
 	// Types that are valid to be assigned to Specifier:
@@ -584,22 +638,18 @@ func (m *DataSource) Reset()         { *m = DataSource{} }
 func (m *DataSource) String() string { return proto.CompactTextString(m) }
 func (*DataSource) ProtoMessage()    {}
 func (*DataSource) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a7738c0f9e1bfff4, []int{6}
+	return fileDescriptor_a7738c0f9e1bfff4, []int{7}
 }
 func (m *DataSource) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *DataSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_DataSource.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *DataSource) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DataSource.Merge(m, src)
@@ -743,6 +793,212 @@ func _DataSource_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
+// The message specifies how to fetch data from remote and how to verify it.
+type RemoteDataSource struct {
+	// The HTTP URI to fetch the remote data.
+	HttpUri *HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
+	// SHA256 string for verifying data.
+	Sha256               string   `protobuf:"bytes,2,opt,name=sha256,proto3" json:"sha256,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RemoteDataSource) Reset()         { *m = RemoteDataSource{} }
+func (m *RemoteDataSource) String() string { return proto.CompactTextString(m) }
+func (*RemoteDataSource) ProtoMessage()    {}
+func (*RemoteDataSource) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a7738c0f9e1bfff4, []int{8}
+}
+func (m *RemoteDataSource) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RemoteDataSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *RemoteDataSource) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoteDataSource.Merge(m, src)
+}
+func (m *RemoteDataSource) XXX_Size() int {
+	return m.Size()
+}
+func (m *RemoteDataSource) XXX_DiscardUnknown() {
+	xxx_messageInfo_RemoteDataSource.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RemoteDataSource proto.InternalMessageInfo
+
+func (m *RemoteDataSource) GetHttpUri() *HttpUri {
+	if m != nil {
+		return m.HttpUri
+	}
+	return nil
+}
+
+func (m *RemoteDataSource) GetSha256() string {
+	if m != nil {
+		return m.Sha256
+	}
+	return ""
+}
+
+// Async data source which support async data fetch.
+type AsyncDataSource struct {
+	// Types that are valid to be assigned to Specifier:
+	//	*AsyncDataSource_Local
+	//	*AsyncDataSource_Remote
+	Specifier            isAsyncDataSource_Specifier `protobuf_oneof:"specifier"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *AsyncDataSource) Reset()         { *m = AsyncDataSource{} }
+func (m *AsyncDataSource) String() string { return proto.CompactTextString(m) }
+func (*AsyncDataSource) ProtoMessage()    {}
+func (*AsyncDataSource) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a7738c0f9e1bfff4, []int{9}
+}
+func (m *AsyncDataSource) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AsyncDataSource) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
+	}
+	return b[:n], nil
+}
+func (m *AsyncDataSource) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AsyncDataSource.Merge(m, src)
+}
+func (m *AsyncDataSource) XXX_Size() int {
+	return m.Size()
+}
+func (m *AsyncDataSource) XXX_DiscardUnknown() {
+	xxx_messageInfo_AsyncDataSource.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AsyncDataSource proto.InternalMessageInfo
+
+type isAsyncDataSource_Specifier interface {
+	isAsyncDataSource_Specifier()
+	Equal(interface{}) bool
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type AsyncDataSource_Local struct {
+	Local *DataSource `protobuf:"bytes,1,opt,name=local,proto3,oneof"`
+}
+type AsyncDataSource_Remote struct {
+	Remote *RemoteDataSource `protobuf:"bytes,2,opt,name=remote,proto3,oneof"`
+}
+
+func (*AsyncDataSource_Local) isAsyncDataSource_Specifier()  {}
+func (*AsyncDataSource_Remote) isAsyncDataSource_Specifier() {}
+
+func (m *AsyncDataSource) GetSpecifier() isAsyncDataSource_Specifier {
+	if m != nil {
+		return m.Specifier
+	}
+	return nil
+}
+
+func (m *AsyncDataSource) GetLocal() *DataSource {
+	if x, ok := m.GetSpecifier().(*AsyncDataSource_Local); ok {
+		return x.Local
+	}
+	return nil
+}
+
+func (m *AsyncDataSource) GetRemote() *RemoteDataSource {
+	if x, ok := m.GetSpecifier().(*AsyncDataSource_Remote); ok {
+		return x.Remote
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*AsyncDataSource) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _AsyncDataSource_OneofMarshaler, _AsyncDataSource_OneofUnmarshaler, _AsyncDataSource_OneofSizer, []interface{}{
+		(*AsyncDataSource_Local)(nil),
+		(*AsyncDataSource_Remote)(nil),
+	}
+}
+
+func _AsyncDataSource_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*AsyncDataSource)
+	// specifier
+	switch x := m.Specifier.(type) {
+	case *AsyncDataSource_Local:
+		_ = b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Local); err != nil {
+			return err
+		}
+	case *AsyncDataSource_Remote:
+		_ = b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Remote); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("AsyncDataSource.Specifier has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _AsyncDataSource_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*AsyncDataSource)
+	switch tag {
+	case 1: // specifier.local
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(DataSource)
+		err := b.DecodeMessage(msg)
+		m.Specifier = &AsyncDataSource_Local{msg}
+		return true, err
+	case 2: // specifier.remote
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(RemoteDataSource)
+		err := b.DecodeMessage(msg)
+		m.Specifier = &AsyncDataSource_Remote{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _AsyncDataSource_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*AsyncDataSource)
+	// specifier
+	switch x := m.Specifier.(type) {
+	case *AsyncDataSource_Local:
+		s := proto.Size(x.Local)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *AsyncDataSource_Remote:
+		s := proto.Size(x.Remote)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
+
 // Configuration for transport socket in :ref:`listeners <config_listeners>` and
 // :ref:`clusters <envoy_api_msg_Cluster>`. If the configuration is
 // empty, a default transport socket implementation and configuration will be
@@ -767,22 +1023,18 @@ func (m *TransportSocket) Reset()         { *m = TransportSocket{} }
 func (m *TransportSocket) String() string { return proto.CompactTextString(m) }
 func (*TransportSocket) ProtoMessage()    {}
 func (*TransportSocket) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a7738c0f9e1bfff4, []int{7}
+	return fileDescriptor_a7738c0f9e1bfff4, []int{10}
 }
 func (m *TransportSocket) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *TransportSocket) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_TransportSocket.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *TransportSocket) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_TransportSocket.Merge(m, src)
@@ -827,7 +1079,6 @@ func (m *TransportSocket) GetName() string {
 	return ""
 }
 
-// Deprecated: Do not use.
 func (m *TransportSocket) GetConfig() *types.Struct {
 	if x, ok := m.GetConfigType().(*TransportSocket_Config); ok {
 		return x.Config
@@ -942,22 +1193,18 @@ func (m *SocketOption) Reset()         { *m = SocketOption{} }
 func (m *SocketOption) String() string { return proto.CompactTextString(m) }
 func (*SocketOption) ProtoMessage()    {}
 func (*SocketOption) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a7738c0f9e1bfff4, []int{8}
+	return fileDescriptor_a7738c0f9e1bfff4, []int{11}
 }
 func (m *SocketOption) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *SocketOption) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_SocketOption.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *SocketOption) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_SocketOption.Merge(m, src)
@@ -1118,22 +1365,18 @@ func (m *RuntimeFractionalPercent) Reset()         { *m = RuntimeFractionalPerce
 func (m *RuntimeFractionalPercent) String() string { return proto.CompactTextString(m) }
 func (*RuntimeFractionalPercent) ProtoMessage()    {}
 func (*RuntimeFractionalPercent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a7738c0f9e1bfff4, []int{9}
+	return fileDescriptor_a7738c0f9e1bfff4, []int{12}
 }
 func (m *RuntimeFractionalPercent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *RuntimeFractionalPercent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RuntimeFractionalPercent.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *RuntimeFractionalPercent) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_RuntimeFractionalPercent.Merge(m, src)
@@ -1176,22 +1419,18 @@ func (m *ControlPlane) Reset()         { *m = ControlPlane{} }
 func (m *ControlPlane) String() string { return proto.CompactTextString(m) }
 func (*ControlPlane) ProtoMessage()    {}
 func (*ControlPlane) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a7738c0f9e1bfff4, []int{10}
+	return fileDescriptor_a7738c0f9e1bfff4, []int{13}
 }
 func (m *ControlPlane) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
 func (m *ControlPlane) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_ControlPlane.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalTo(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
+	b = b[:cap(b)]
+	n, err := m.MarshalTo(b)
+	if err != nil {
+		return nil, err
 	}
+	return b[:n], nil
 }
 func (m *ControlPlane) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ControlPlane.Merge(m, src)
@@ -1215,6 +1454,7 @@ func (m *ControlPlane) GetIdentifier() string {
 func init() {
 	proto.RegisterEnum("envoy.api.v2.core.RoutingPriority", RoutingPriority_name, RoutingPriority_value)
 	proto.RegisterEnum("envoy.api.v2.core.RequestMethod", RequestMethod_name, RequestMethod_value)
+	proto.RegisterEnum("envoy.api.v2.core.TrafficDirection", TrafficDirection_name, TrafficDirection_value)
 	proto.RegisterEnum("envoy.api.v2.core.SocketOption_SocketState", SocketOption_SocketState_name, SocketOption_SocketState_value)
 	proto.RegisterType((*Locality)(nil), "envoy.api.v2.core.Locality")
 	proto.RegisterType((*Node)(nil), "envoy.api.v2.core.Node")
@@ -1223,7 +1463,10 @@ func init() {
 	proto.RegisterType((*RuntimeUInt32)(nil), "envoy.api.v2.core.RuntimeUInt32")
 	proto.RegisterType((*HeaderValue)(nil), "envoy.api.v2.core.HeaderValue")
 	proto.RegisterType((*HeaderValueOption)(nil), "envoy.api.v2.core.HeaderValueOption")
+	proto.RegisterType((*HeaderMap)(nil), "envoy.api.v2.core.HeaderMap")
 	proto.RegisterType((*DataSource)(nil), "envoy.api.v2.core.DataSource")
+	proto.RegisterType((*RemoteDataSource)(nil), "envoy.api.v2.core.RemoteDataSource")
+	proto.RegisterType((*AsyncDataSource)(nil), "envoy.api.v2.core.AsyncDataSource")
 	proto.RegisterType((*TransportSocket)(nil), "envoy.api.v2.core.TransportSocket")
 	proto.RegisterType((*SocketOption)(nil), "envoy.api.v2.core.SocketOption")
 	proto.RegisterType((*RuntimeFractionalPercent)(nil), "envoy.api.v2.core.RuntimeFractionalPercent")
@@ -1233,79 +1476,89 @@ func init() {
 func init() { proto.RegisterFile("envoy/api/v2/core/base.proto", fileDescriptor_a7738c0f9e1bfff4) }
 
 var fileDescriptor_a7738c0f9e1bfff4 = []byte{
-	// 1140 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0x4d, 0x8f, 0x1b, 0x45,
-	0x13, 0xde, 0xf6, 0xd7, 0xda, 0x65, 0x7b, 0x77, 0xd2, 0x59, 0x25, 0xce, 0xbe, 0x59, 0x67, 0x5f,
-	0x73, 0x60, 0x15, 0xc4, 0x18, 0x39, 0x42, 0x7c, 0xdc, 0x76, 0xd6, 0xb3, 0x59, 0x8b, 0x8d, 0xed,
-	0x8c, 0x67, 0x03, 0xca, 0xc5, 0x8c, 0x3d, 0x6d, 0xa7, 0x95, 0xc9, 0xb4, 0xe9, 0xe9, 0x31, 0x38,
-	0xa7, 0x08, 0x71, 0x40, 0xe4, 0x67, 0x70, 0x41, 0xe2, 0xc4, 0x0d, 0x71, 0x8a, 0xc4, 0x85, 0x1b,
-	0xfc, 0x04, 0xb4, 0xb7, 0xfc, 0x0b, 0xd4, 0x1f, 0xde, 0x78, 0xe3, 0x15, 0xdc, 0xba, 0x9f, 0x7a,
-	0x9e, 0xea, 0xaa, 0xea, 0xaa, 0x82, 0xdb, 0x24, 0x9e, 0xb3, 0x45, 0x33, 0x98, 0xd1, 0xe6, 0xbc,
-	0xd5, 0x1c, 0x33, 0x4e, 0x9a, 0xa3, 0x20, 0x21, 0xf6, 0x8c, 0x33, 0xc1, 0xf0, 0x35, 0x65, 0xb5,
-	0x83, 0x19, 0xb5, 0xe7, 0x2d, 0x5b, 0x5a, 0x77, 0x6f, 0x4d, 0x19, 0x9b, 0x46, 0xa4, 0xa9, 0x08,
-	0xa3, 0x74, 0xd2, 0x0c, 0xe2, 0x85, 0x66, 0xef, 0xde, 0x7e, 0xdb, 0x94, 0x08, 0x9e, 0x8e, 0x85,
-	0xb1, 0xd6, 0xdf, 0xb6, 0x7e, 0xcd, 0x83, 0xd9, 0x8c, 0xf0, 0xc4, 0xd8, 0x6f, 0xce, 0x83, 0x88,
-	0x86, 0x81, 0x20, 0xcd, 0xe5, 0xc1, 0x18, 0x76, 0xa6, 0x6c, 0xca, 0xd4, 0xb1, 0x29, 0x4f, 0x06,
-	0xad, 0xe9, 0xc0, 0xc5, 0x62, 0x46, 0x9a, 0x33, 0xc2, 0xc7, 0x24, 0x36, 0x0f, 0x35, 0x1e, 0x42,
-	0xf1, 0x94, 0x8d, 0x83, 0x88, 0x8a, 0x05, 0xbe, 0x01, 0x05, 0x4e, 0xa6, 0x94, 0xc5, 0x35, 0xb4,
-	0x8f, 0x0e, 0x4a, 0x9e, 0xb9, 0x61, 0x0c, 0xb9, 0xe7, 0x2c, 0x26, 0xb5, 0x8c, 0x42, 0xd5, 0x19,
-	0xdf, 0x82, 0x62, 0x92, 0x8e, 0x86, 0x0a, 0xcf, 0x2a, 0x7c, 0x33, 0x49, 0x47, 0x8f, 0x59, 0x4c,
-	0x1a, 0xbf, 0x23, 0xc8, 0x75, 0x59, 0x48, 0xf0, 0x16, 0x64, 0x68, 0x68, 0x7c, 0x65, 0x68, 0x88,
-	0x6b, 0xb0, 0x39, 0x8e, 0xd2, 0x44, 0x10, 0x6e, 0x5c, 0x2d, 0xaf, 0xf8, 0x1e, 0x14, 0x9f, 0x11,
-	0x11, 0x84, 0x81, 0x08, 0x94, 0xb7, 0x72, 0xeb, 0xa6, 0xad, 0x2b, 0x60, 0x2f, 0x2b, 0x60, 0x0f,
-	0x54, 0x7d, 0xbc, 0x0b, 0x22, 0xfe, 0x08, 0x8a, 0x91, 0x09, 0xbd, 0x96, 0x53, 0xa2, 0xff, 0xd9,
-	0x6b, 0x5f, 0x60, 0x2f, 0xb3, 0xf3, 0x2e, 0xc8, 0xf8, 0x1d, 0xa8, 0x8e, 0x52, 0x1a, 0x85, 0xc3,
-	0x39, 0xe1, 0x89, 0x4c, 0x37, 0xaf, 0xa2, 0xa9, 0x28, 0xf0, 0x91, 0xc6, 0x1a, 0xaf, 0x10, 0x14,
-	0x1f, 0x2c, 0x9f, 0xfa, 0x02, 0xb6, 0x27, 0x34, 0x12, 0x84, 0x0f, 0x2f, 0xc2, 0x44, 0xfb, 0xd9,
-	0x83, 0x72, 0xab, 0x79, 0xc5, 0x8b, 0x4b, 0x95, 0x7d, 0xac, 0x24, 0xcb, 0xab, 0x1b, 0x0b, 0xbe,
-	0xf0, 0xb6, 0x26, 0x97, 0xc0, 0xdd, 0xc7, 0x70, 0xfd, 0x0a, 0x1a, 0xb6, 0x20, 0xfb, 0x94, 0x2c,
-	0x4c, 0xed, 0xe4, 0x11, 0xbf, 0x0f, 0xf9, 0x79, 0x10, 0xa5, 0xfa, 0x17, 0xfe, 0xa5, 0x3e, 0x9a,
-	0xf5, 0x69, 0xe6, 0x63, 0xd4, 0xf8, 0x12, 0xaa, 0x5e, 0x1a, 0x0b, 0xfa, 0x8c, 0x9c, 0x75, 0x62,
-	0x71, 0xaf, 0x25, 0x13, 0x0f, 0xc9, 0x24, 0x48, 0x23, 0x31, 0x7c, 0xe3, 0xab, 0xea, 0x55, 0x0c,
-	0xf8, 0x48, 0x62, 0xf8, 0x2e, 0x94, 0xb9, 0x56, 0x0d, 0x65, 0x08, 0xea, 0x73, 0x9d, 0xd2, 0x6f,
-	0xaf, 0x5f, 0x65, 0x73, 0x3c, 0xb3, 0x8f, 0x3c, 0x30, 0xd6, 0xcf, 0xc8, 0xa2, 0xf1, 0x10, 0xca,
-	0x27, 0x24, 0x08, 0x09, 0xd7, 0xd2, 0x3b, 0x2b, 0x51, 0x3b, 0x55, 0x29, 0x29, 0xf2, 0xc2, 0x3e,
-	0x3a, 0x78, 0xf1, 0x02, 0xe9, 0x24, 0xfe, 0xbf, 0x9a, 0x44, 0xc9, 0x29, 0x4b, 0x4a, 0x81, 0xe7,
-	0x14, 0x41, 0x5b, 0x1a, 0x2f, 0x11, 0x5c, 0x5b, 0xf1, 0xd9, 0x9b, 0x09, 0xd9, 0x82, 0x0e, 0x14,
-	0x9e, 0x28, 0x50, 0x39, 0x2f, 0xb7, 0xea, 0x57, 0xd4, 0x7d, 0x45, 0xe5, 0x80, 0xf4, 0x9c, 0xff,
-	0x01, 0x65, 0x2c, 0xe4, 0x19, 0x25, 0x6e, 0x41, 0x41, 0xce, 0x50, 0x1c, 0x9a, 0x12, 0xee, 0xae,
-	0x95, 0xd0, 0x61, 0x2c, 0x52, 0x7a, 0xcf, 0x30, 0x1b, 0x3f, 0x23, 0x80, 0x76, 0x20, 0x82, 0x01,
-	0x4b, 0xf9, 0x98, 0xe0, 0x77, 0xa1, 0x38, 0xa1, 0x11, 0x89, 0x83, 0x67, 0xc4, 0x64, 0xf9, 0xa6,
-	0x30, 0x27, 0x1b, 0xde, 0x85, 0x11, 0xdb, 0x50, 0xa1, 0x71, 0x44, 0x63, 0x32, 0x1c, 0x2d, 0x04,
-	0x49, 0xd4, 0x8b, 0x15, 0x43, 0x7e, 0x9e, 0xb1, 0x24, 0xb9, 0xac, 0x09, 0x8e, 0xb4, 0xe3, 0x0f,
-	0xa0, 0x6a, 0xf8, 0x89, 0xe0, 0x34, 0x9e, 0xae, 0x95, 0xfd, 0x64, 0xc3, 0x33, 0x1e, 0x07, 0x8a,
-	0xe0, 0x60, 0x28, 0x25, 0x33, 0x32, 0xa6, 0x13, 0x4a, 0x38, 0xce, 0xff, 0xfa, 0xfa, 0x55, 0x16,
-	0x35, 0x7e, 0x41, 0xb0, 0xed, 0xf3, 0x20, 0x4e, 0x66, 0x8c, 0x8b, 0x01, 0x1b, 0x3f, 0x25, 0x02,
-	0xef, 0x41, 0xee, 0xca, 0x70, 0x3d, 0x05, 0xe3, 0x0f, 0xa1, 0x30, 0x66, 0xf1, 0x84, 0x4e, 0xff,
-	0xa3, 0xaf, 0x9c, 0x4c, 0x4d, 0xc6, 0x60, 0xc8, 0xf8, 0x13, 0xa8, 0xc8, 0x65, 0x12, 0x0e, 0x8d,
-	0x58, 0x0f, 0xed, 0xce, 0x9a, 0xf8, 0x30, 0x5e, 0xc8, 0x54, 0x15, 0xf7, 0x48, 0x51, 0x9d, 0x2a,
-	0x94, 0xb5, 0x68, 0x28, 0xd1, 0xc6, 0x9f, 0x19, 0xa8, 0xe8, 0x50, 0xcd, 0x57, 0xef, 0x43, 0x39,
-	0x24, 0xc9, 0x98, 0x53, 0x75, 0x35, 0x23, 0xb0, 0x0a, 0xe1, 0x1d, 0xc8, 0x47, 0x64, 0x4e, 0x22,
-	0x15, 0x72, 0xd6, 0xd3, 0x17, 0xb9, 0xa5, 0x54, 0xa2, 0x59, 0x05, 0xea, 0xec, 0xf6, 0xa0, 0x44,
-	0xe3, 0x65, 0xb3, 0xcb, 0x1d, 0x91, 0x95, 0xbf, 0x44, 0x63, 0xd3, 0xea, 0x7b, 0x50, 0x1a, 0xa5,
-	0x13, 0x63, 0x96, 0x4b, 0xa0, 0x22, 0xcd, 0xa3, 0x74, 0xa2, 0xcd, 0x9f, 0x43, 0x3e, 0x11, 0x81,
-	0x20, 0x35, 0xd9, 0xc3, 0x5b, 0xad, 0xf7, 0xae, 0xe8, 0xb9, 0xd5, 0xc8, 0xcd, 0x65, 0x20, 0x25,
-	0xce, 0xce, 0x9b, 0x06, 0x54, 0xa7, 0x6f, 0x55, 0x2b, 0x6a, 0x7f, 0x8d, 0x53, 0x28, 0xaf, 0x70,
-	0xf1, 0x35, 0xa8, 0x0e, 0xfc, 0x43, 0xdf, 0x1d, 0xf6, 0x3d, 0xd7, 0xe9, 0x74, 0xdb, 0xd6, 0x06,
-	0xde, 0x86, 0xb2, 0x86, 0x9c, 0xde, 0x59, 0xb7, 0x6d, 0x21, 0x7c, 0x1d, 0xb6, 0x35, 0x70, 0xda,
-	0x19, 0xf8, 0x6e, 0xb7, 0xd3, 0xbd, 0x6f, 0x65, 0x76, 0x73, 0xdf, 0xff, 0x58, 0xdf, 0x70, 0xb6,
-	0xcc, 0x50, 0x2d, 0xbb, 0xe0, 0x25, 0x82, 0x9a, 0x99, 0xfb, 0x63, 0x1e, 0x8c, 0x65, 0x68, 0x41,
-	0xd4, 0xd7, 0x5b, 0x1f, 0x77, 0xdf, 0x5e, 0x01, 0x7a, 0x9e, 0xf6, 0x4c, 0x6e, 0xf2, 0x4b, 0xec,
-	0x35, 0xd5, 0xa5, 0x71, 0xba, 0xbc, 0x2d, 0xee, 0x5c, 0xde, 0x16, 0x7a, 0xaf, 0xaf, 0xae, 0x08,
-	0x1b, 0x2a, 0x47, 0x2c, 0x16, 0x9c, 0x45, 0xfd, 0x28, 0x88, 0x09, 0xae, 0x03, 0xd0, 0x90, 0xc4,
-	0x42, 0x35, 0xae, 0xf9, 0xdd, 0x15, 0xe4, 0xee, 0x01, 0x6c, 0x7b, 0x2c, 0x15, 0x34, 0x9e, 0xf6,
-	0x39, 0x65, 0x5c, 0xee, 0xeb, 0x32, 0x6c, 0xb6, 0xdd, 0xe3, 0xc3, 0xb3, 0x53, 0xdf, 0xda, 0xc0,
-	0x45, 0xc8, 0x9d, 0x74, 0xee, 0x9f, 0x58, 0xe8, 0xee, 0x77, 0x08, 0xaa, 0x1e, 0xf9, 0x2a, 0x25,
-	0x89, 0x78, 0x40, 0xc4, 0x13, 0x16, 0xe2, 0x1b, 0x80, 0x1f, 0xb8, 0xfe, 0x49, 0xaf, 0x3d, 0x3c,
-	0xeb, 0x0e, 0xfa, 0xee, 0x51, 0xe7, 0xb8, 0xe3, 0xca, 0x6a, 0x6e, 0x42, 0xf6, 0xbe, 0xeb, 0x5b,
-	0x48, 0x89, 0xdd, 0xc3, 0xb6, 0x95, 0x91, 0xa7, 0x7e, 0x6f, 0xe0, 0x5b, 0x59, 0x69, 0xec, 0x9f,
-	0xf9, 0x56, 0x0e, 0x03, 0x14, 0xda, 0xee, 0xa9, 0xeb, 0xbb, 0x56, 0x5e, 0x3e, 0x79, 0xd4, 0xeb,
-	0x76, 0xdd, 0x23, 0xdf, 0x2a, 0xc8, 0x4b, 0xaf, 0xef, 0x77, 0x7a, 0xdd, 0x81, 0xb5, 0x89, 0x4b,
-	0x90, 0xf7, 0xbd, 0xc3, 0x23, 0xd7, 0x2a, 0x9a, 0xf2, 0xb7, 0x7f, 0x3a, 0xaf, 0xa3, 0x3f, 0xce,
-	0xeb, 0xe8, 0xaf, 0xf3, 0x3a, 0xfa, 0xfb, 0xbc, 0x8e, 0xe0, 0x0e, 0x65, 0xba, 0x9c, 0x33, 0xce,
-	0xbe, 0x59, 0xac, 0x77, 0x8d, 0x53, 0x72, 0x82, 0x84, 0xf4, 0xe5, 0x8c, 0xf4, 0xd1, 0xe3, 0x9c,
-	0x84, 0x46, 0x05, 0x35, 0x32, 0xf7, 0xfe, 0x09, 0x00, 0x00, 0xff, 0xff, 0x4f, 0xbd, 0x04, 0xd6,
-	0x63, 0x08, 0x00, 0x00,
+	// 1302 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x55, 0xcd, 0x6f, 0x1b, 0x45,
+	0x14, 0xcf, 0xfa, 0xdb, 0xcf, 0x76, 0xb2, 0x9d, 0x56, 0x6d, 0x1a, 0x1a, 0x37, 0x75, 0x0f, 0x44,
+	0x41, 0xd8, 0xe0, 0xaa, 0x50, 0x90, 0x40, 0xf2, 0xc6, 0x9b, 0xda, 0x22, 0xb1, 0xdd, 0xf5, 0xba,
+	0x42, 0xbd, 0x98, 0xb5, 0x3d, 0x76, 0x46, 0xdd, 0xec, 0x2e, 0xb3, 0xb3, 0xa6, 0xee, 0xa9, 0xe2,
+	0x84, 0xe8, 0x81, 0x3f, 0x80, 0x23, 0x17, 0x24, 0xc4, 0x1d, 0x71, 0xaa, 0x84, 0x90, 0x38, 0x72,
+	0xe4, 0x88, 0x72, 0xeb, 0x7f, 0x81, 0xe6, 0xc3, 0xa9, 0x1d, 0x5b, 0xf4, 0x36, 0xf3, 0x7b, 0xbf,
+	0xdf, 0x9b, 0xf7, 0x31, 0xf3, 0x06, 0x6e, 0x61, 0x6f, 0xea, 0xcf, 0x2a, 0x4e, 0x40, 0x2a, 0xd3,
+	0x6a, 0x65, 0xe8, 0x53, 0x5c, 0x19, 0x38, 0x21, 0x2e, 0x07, 0xd4, 0x67, 0x3e, 0xba, 0x22, 0xac,
+	0x65, 0x27, 0x20, 0xe5, 0x69, 0xb5, 0xcc, 0xad, 0x3b, 0x7b, 0xab, 0x82, 0x53, 0xc6, 0x82, 0x7e,
+	0x44, 0x89, 0x14, 0xed, 0xdc, 0x9c, 0xf8, 0xfe, 0xc4, 0xc5, 0x15, 0xb1, 0x1b, 0x44, 0xe3, 0x8a,
+	0xe3, 0xcd, 0x94, 0xe9, 0xd6, 0x65, 0x53, 0xc8, 0x68, 0x34, 0x64, 0xca, 0x5a, 0xbc, 0x6c, 0xfd,
+	0x86, 0x3a, 0x41, 0x80, 0x69, 0xa8, 0xec, 0x37, 0xa6, 0x8e, 0x4b, 0x46, 0x0e, 0xc3, 0x95, 0xf9,
+	0x42, 0x19, 0xae, 0x4d, 0xfc, 0x89, 0x2f, 0x96, 0x15, 0xbe, 0x52, 0xe8, 0xb6, 0x8c, 0x94, 0xcd,
+	0x02, 0x5c, 0x09, 0x30, 0x1d, 0x62, 0x4f, 0x1d, 0x54, 0x7a, 0x04, 0x99, 0x63, 0x7f, 0xe8, 0xb8,
+	0x84, 0xcd, 0xd0, 0x75, 0x48, 0x51, 0x3c, 0x21, 0xbe, 0xb7, 0xad, 0xed, 0x69, 0xfb, 0x59, 0x4b,
+	0xed, 0x10, 0x82, 0xc4, 0x73, 0xdf, 0xc3, 0xdb, 0x31, 0x81, 0x8a, 0x35, 0xba, 0x09, 0x99, 0x30,
+	0x1a, 0xf4, 0x05, 0x1e, 0x17, 0x78, 0x3a, 0x8c, 0x06, 0x4f, 0x7c, 0x0f, 0x97, 0xfe, 0xd0, 0x20,
+	0xd1, 0xf2, 0x47, 0x18, 0x6d, 0x42, 0x8c, 0x8c, 0x94, 0xaf, 0x18, 0x19, 0xa1, 0x6d, 0x48, 0x0f,
+	0xdd, 0x28, 0x64, 0x98, 0x2a, 0x57, 0xf3, 0x2d, 0xba, 0x07, 0x99, 0x33, 0xcc, 0x9c, 0x91, 0xc3,
+	0x1c, 0xe1, 0x2d, 0x57, 0xbd, 0x51, 0x96, 0x15, 0x28, 0xcf, 0x2b, 0x50, 0xee, 0x8a, 0xfa, 0x58,
+	0x17, 0x44, 0xf4, 0x31, 0x64, 0x5c, 0x15, 0xfa, 0x76, 0x42, 0x88, 0xde, 0x29, 0xaf, 0x34, 0xa9,
+	0x3c, 0xcf, 0xce, 0xba, 0x20, 0xa3, 0xbb, 0x50, 0x18, 0x44, 0xc4, 0x1d, 0xf5, 0xa7, 0x98, 0x86,
+	0x3c, 0xdd, 0xa4, 0x88, 0x26, 0x2f, 0xc0, 0xc7, 0x12, 0x2b, 0xbd, 0xd2, 0x20, 0x73, 0x32, 0x3f,
+	0xea, 0x4b, 0xd8, 0x1a, 0x13, 0x97, 0x61, 0xda, 0xbf, 0x08, 0x53, 0xdb, 0x8b, 0xef, 0xe7, 0xaa,
+	0x95, 0x35, 0x27, 0xce, 0x55, 0xe5, 0x23, 0x21, 0x99, 0x6f, 0x4d, 0x8f, 0xd1, 0x99, 0xb5, 0x39,
+	0x5e, 0x02, 0x77, 0x9e, 0xc0, 0xd5, 0x35, 0x34, 0xa4, 0x43, 0xfc, 0x29, 0x9e, 0xa9, 0xda, 0xf1,
+	0x25, 0x7a, 0x1f, 0x92, 0x53, 0xc7, 0x8d, 0x64, 0x17, 0xfe, 0xa7, 0x3e, 0x92, 0xf5, 0x69, 0xec,
+	0x81, 0x56, 0xfa, 0x0a, 0x0a, 0x56, 0xe4, 0x31, 0x72, 0x86, 0x7b, 0x4d, 0x8f, 0xdd, 0xab, 0xf2,
+	0xc4, 0x47, 0x78, 0xec, 0x44, 0x2e, 0xeb, 0xbf, 0xf1, 0x55, 0xb0, 0xf2, 0x0a, 0x7c, 0xcc, 0x31,
+	0x74, 0x00, 0x39, 0x2a, 0x55, 0x7d, 0x1e, 0x82, 0x68, 0xae, 0x91, 0xfd, 0xfd, 0xf5, 0xab, 0x78,
+	0x82, 0xc6, 0xf6, 0x34, 0x0b, 0x94, 0xf5, 0x0b, 0x3c, 0x2b, 0x3d, 0x82, 0x5c, 0x03, 0x3b, 0x23,
+	0x4c, 0xa5, 0xf4, 0xf6, 0x42, 0xd4, 0x46, 0x81, 0x4b, 0x32, 0x34, 0xb5, 0xa7, 0xed, 0xbf, 0x78,
+	0xa1, 0xc9, 0x24, 0xee, 0x2c, 0x26, 0x91, 0x35, 0x72, 0x9c, 0x92, 0xa2, 0x09, 0x41, 0x90, 0x96,
+	0xd2, 0x4b, 0x0d, 0xae, 0x2c, 0xf8, 0x6c, 0x07, 0x8c, 0x5f, 0x41, 0x03, 0x52, 0xa7, 0x02, 0x14,
+	0xce, 0x73, 0xd5, 0xe2, 0x9a, 0xba, 0x2f, 0xa8, 0x0c, 0xe0, 0x9e, 0x93, 0xdf, 0x6b, 0x31, 0x5d,
+	0xb3, 0x94, 0x12, 0x55, 0x21, 0xc5, 0xdf, 0x90, 0x37, 0x52, 0x25, 0xdc, 0x59, 0x29, 0xa1, 0xe1,
+	0xfb, 0xae, 0xd0, 0x5b, 0x8a, 0x59, 0x32, 0x21, 0x2b, 0xdd, 0x9e, 0x38, 0x01, 0x7a, 0x00, 0x69,
+	0xe9, 0x2a, 0x54, 0xdd, 0x7f, 0x4b, 0x14, 0xd6, 0x9c, 0x5e, 0xfa, 0x45, 0x03, 0xa8, 0x3b, 0xcc,
+	0xe9, 0xfa, 0x11, 0x1d, 0x62, 0xf4, 0x2e, 0x64, 0xc6, 0xc4, 0xc5, 0x9e, 0x73, 0x86, 0x55, 0xb1,
+	0xde, 0xd4, 0xb7, 0xb1, 0x61, 0x5d, 0x18, 0x51, 0x19, 0xf2, 0xc4, 0x73, 0x89, 0x87, 0xfb, 0x83,
+	0x19, 0xc3, 0xa1, 0x08, 0x3c, 0xaf, 0xc8, 0xcf, 0x63, 0x3a, 0x27, 0xe7, 0x24, 0xc1, 0xe0, 0x76,
+	0xf4, 0x01, 0x14, 0x14, 0x3f, 0x64, 0x94, 0x78, 0x93, 0x95, 0xee, 0x35, 0x36, 0x2c, 0xe5, 0xb1,
+	0x2b, 0x08, 0x06, 0x82, 0x6c, 0x18, 0xe0, 0x21, 0x19, 0x13, 0x4c, 0x51, 0xf2, 0xb7, 0xd7, 0xaf,
+	0xe2, 0x5a, 0xe9, 0x19, 0xe8, 0x16, 0x3e, 0xf3, 0x19, 0x5e, 0x08, 0xb9, 0x06, 0x99, 0xf9, 0x6c,
+	0x53, 0x2d, 0xd8, 0x59, 0x97, 0x3c, 0x63, 0x41, 0x8f, 0x92, 0xa5, 0xf2, 0xa7, 0x4f, 0x25, 0x88,
+	0xee, 0x40, 0x2a, 0x3c, 0x75, 0xaa, 0xf7, 0x3f, 0x52, 0xdd, 0x5f, 0xb8, 0x53, 0xca, 0x50, 0xfa,
+	0x51, 0x83, 0xad, 0x5a, 0x38, 0xf3, 0x86, 0x0b, 0x27, 0xdf, 0x87, 0xa4, 0x78, 0xb9, 0xea, 0xd8,
+	0xdd, 0x35, 0xc7, 0xbe, 0x61, 0x37, 0x36, 0x2c, 0xc9, 0x46, 0x9f, 0xf1, 0x61, 0xc6, 0x93, 0x50,
+	0xdd, 0xbe, 0xbb, 0x46, 0x77, 0x39, 0xcb, 0xc6, 0x86, 0xa5, 0x44, 0x6b, 0xeb, 0xf2, 0xab, 0x06,
+	0x5b, 0x36, 0x75, 0xbc, 0x30, 0xf0, 0x29, 0xeb, 0xfa, 0xc3, 0xa7, 0x98, 0xa1, 0x5d, 0x48, 0xac,
+	0x6d, 0xa3, 0x25, 0x60, 0xf4, 0x21, 0xa4, 0x86, 0xbe, 0x37, 0x26, 0x93, 0xb7, 0x3c, 0x5b, 0x7e,
+	0xb2, 0x24, 0xa2, 0x4f, 0x20, 0xcf, 0xe7, 0xf4, 0xa8, 0xaf, 0x84, 0x72, 0x1e, 0x5e, 0x5b, 0x11,
+	0xd6, 0xbc, 0x19, 0x6f, 0xbf, 0xe0, 0x1e, 0x0a, 0xaa, 0x51, 0x80, 0x9c, 0x14, 0xf5, 0x39, 0x5a,
+	0xfa, 0x33, 0x06, 0x79, 0x19, 0xa6, 0x7a, 0x45, 0x7b, 0x90, 0x1b, 0xe1, 0x70, 0x48, 0x89, 0xd8,
+	0xaa, 0xe9, 0xb2, 0x08, 0xa1, 0x6b, 0x90, 0x74, 0xf1, 0x14, 0xbb, 0x22, 0xdc, 0xb8, 0x25, 0x37,
+	0xfc, 0x03, 0x10, 0x49, 0xc6, 0x05, 0x28, 0x33, 0xdb, 0x85, 0x2c, 0xf1, 0xe6, 0x73, 0x84, 0x8f,
+	0xdf, 0x38, 0xbf, 0xb9, 0xc4, 0x53, 0x53, 0x64, 0x17, 0xb2, 0x83, 0x68, 0xac, 0xcc, 0x7c, 0xbe,
+	0xe6, 0xb9, 0x79, 0x10, 0x8d, 0xa5, 0xf9, 0x04, 0x92, 0x21, 0x73, 0x18, 0xde, 0xe6, 0xe3, 0x61,
+	0xb3, 0xfa, 0xde, 0x9a, 0xe6, 0x2c, 0x46, 0xae, 0x36, 0x5d, 0x2e, 0x51, 0x97, 0xeb, 0x5b, 0x71,
+	0xb9, 0xa4, 0x97, 0xd2, 0x31, 0xe4, 0x16, 0x18, 0xe8, 0x0a, 0x14, 0xba, 0x76, 0xcd, 0x36, 0xfb,
+	0x1d, 0xcb, 0x34, 0x9a, 0xad, 0xba, 0xbe, 0x81, 0xb6, 0x20, 0x27, 0x21, 0xa3, 0xdd, 0x6b, 0xd5,
+	0x75, 0x0d, 0x5d, 0x85, 0x2d, 0x09, 0x1c, 0x37, 0xbb, 0xb6, 0xd9, 0x6a, 0xb6, 0x1e, 0xea, 0xb1,
+	0x9d, 0xc4, 0x77, 0x3f, 0x15, 0x37, 0x8c, 0x4d, 0x35, 0xa5, 0xe6, 0x7d, 0x7f, 0xa9, 0xc1, 0xb6,
+	0x1a, 0xa4, 0x47, 0xd4, 0x19, 0xf2, 0x80, 0x1c, 0xb7, 0x23, 0xbf, 0x51, 0xd4, 0xba, 0x3c, 0x53,
+	0x97, 0xaf, 0x29, 0x6f, 0x44, 0x79, 0x45, 0xb5, 0xf4, 0x40, 0x96, 0xc7, 0xef, 0xed, 0xe5, 0xf1,
+	0x2b, 0x3f, 0xca, 0xc5, 0x99, 0x5b, 0x86, 0xfc, 0xa1, 0xef, 0x31, 0xea, 0xbb, 0x1d, 0xd7, 0xf1,
+	0x30, 0x2a, 0x02, 0x90, 0x11, 0xf6, 0x98, 0xb8, 0xaa, 0xaa, 0xa7, 0x0b, 0xc8, 0xc1, 0x3e, 0x6c,
+	0x59, 0x7e, 0xc4, 0x88, 0x37, 0xe9, 0x50, 0xe2, 0x53, 0xfe, 0x01, 0xe6, 0x20, 0x5d, 0x37, 0x8f,
+	0x6a, 0xbd, 0x63, 0x5b, 0xdf, 0x40, 0x19, 0x48, 0x34, 0x9a, 0x0f, 0x1b, 0xba, 0x76, 0xf0, 0x83,
+	0x06, 0x05, 0x0b, 0x7f, 0x1d, 0xe1, 0x90, 0x9d, 0x60, 0x76, 0xea, 0x8f, 0xd0, 0x75, 0x40, 0x27,
+	0xa6, 0xdd, 0x68, 0xd7, 0xfb, 0xbd, 0x56, 0xb7, 0x63, 0x1e, 0x36, 0x8f, 0x9a, 0x26, 0xaf, 0x66,
+	0x1a, 0xe2, 0x0f, 0x4d, 0x5b, 0xd7, 0x84, 0xd8, 0xac, 0xd5, 0xf5, 0x18, 0x5f, 0x75, 0xda, 0x5d,
+	0x5b, 0x8f, 0x73, 0x63, 0xa7, 0x67, 0xeb, 0x09, 0x04, 0x90, 0xaa, 0x9b, 0xc7, 0xa6, 0x6d, 0xea,
+	0x49, 0x7e, 0xe4, 0x61, 0xbb, 0xd5, 0x32, 0x0f, 0x6d, 0x3d, 0xc5, 0x37, 0xed, 0x8e, 0xdd, 0x6c,
+	0xb7, 0xba, 0x7a, 0x1a, 0x65, 0x21, 0x69, 0x5b, 0xb5, 0x43, 0x53, 0xcf, 0xf0, 0x65, 0xa7, 0x66,
+	0x1f, 0x36, 0xf4, 0xac, 0xec, 0xc4, 0xc1, 0xe7, 0xa0, 0xdb, 0xd4, 0x19, 0x8f, 0xc9, 0xb0, 0x4e,
+	0x28, 0x16, 0x35, 0xe4, 0x9d, 0x5c, 0x0e, 0x26, 0x07, 0xe9, 0x66, 0x6b, 0xde, 0xd6, 0x3c, 0x64,
+	0xda, 0x3d, 0x5b, 0xee, 0x62, 0x46, 0xe3, 0xe7, 0xf3, 0xa2, 0xf6, 0xd7, 0x79, 0x51, 0xfb, 0xfb,
+	0xbc, 0xa8, 0xfd, 0x73, 0x5e, 0xd4, 0xfe, 0x3d, 0x2f, 0x6a, 0x70, 0x9b, 0xf8, 0xb2, 0x3b, 0x01,
+	0xf5, 0x9f, 0xcd, 0x56, 0xaf, 0x9e, 0x91, 0x35, 0x9c, 0x10, 0x77, 0xf8, 0x43, 0xeb, 0x68, 0x4f,
+	0x12, 0x1c, 0x1a, 0xa4, 0xc4, 0xbb, 0xbb, 0xf7, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x9f, 0xec,
+	0xb2, 0x56, 0x25, 0x0a, 0x00, 0x00,
 }
 
 func (this *Locality) Equal(that interface{}) bool {
@@ -1502,6 +1755,38 @@ func (this *HeaderValueOption) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *HeaderMap) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*HeaderMap)
+	if !ok {
+		that2, ok := that.(HeaderMap)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if len(this.Headers) != len(that1.Headers) {
+		return false
+	}
+	for i := range this.Headers {
+		if !this.Headers[i].Equal(that1.Headers[i]) {
+			return false
+		}
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
 func (this *DataSource) Equal(that interface{}) bool {
 	if that == nil {
 		return this == nil
@@ -1603,6 +1888,117 @@ func (this *DataSource_InlineString) Equal(that interface{}) bool {
 		return false
 	}
 	if this.InlineString != that1.InlineString {
+		return false
+	}
+	return true
+}
+func (this *RemoteDataSource) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*RemoteDataSource)
+	if !ok {
+		that2, ok := that.(RemoteDataSource)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.HttpUri.Equal(that1.HttpUri) {
+		return false
+	}
+	if this.Sha256 != that1.Sha256 {
+		return false
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *AsyncDataSource) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*AsyncDataSource)
+	if !ok {
+		that2, ok := that.(AsyncDataSource)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if that1.Specifier == nil {
+		if this.Specifier != nil {
+			return false
+		}
+	} else if this.Specifier == nil {
+		return false
+	} else if !this.Specifier.Equal(that1.Specifier) {
+		return false
+	}
+	if !bytes.Equal(this.XXX_unrecognized, that1.XXX_unrecognized) {
+		return false
+	}
+	return true
+}
+func (this *AsyncDataSource_Local) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*AsyncDataSource_Local)
+	if !ok {
+		that2, ok := that.(AsyncDataSource_Local)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Local.Equal(that1.Local) {
+		return false
+	}
+	return true
+}
+func (this *AsyncDataSource_Remote) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*AsyncDataSource_Remote)
+	if !ok {
+		that2, ok := that.(AsyncDataSource_Remote)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if !this.Remote.Equal(that1.Remote) {
 		return false
 	}
 	return true
@@ -1955,10 +2351,15 @@ func (m *Metadata) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if len(m.FilterMetadata) > 0 {
+		keysForFilterMetadata := make([]string, 0, len(m.FilterMetadata))
 		for k, _ := range m.FilterMetadata {
+			keysForFilterMetadata = append(keysForFilterMetadata, string(k))
+		}
+		github_com_gogo_protobuf_sortkeys.Strings(keysForFilterMetadata)
+		for _, k := range keysForFilterMetadata {
 			dAtA[i] = 0xa
 			i++
-			v := m.FilterMetadata[k]
+			v := m.FilterMetadata[string(k)]
 			msgSize := 0
 			if v != nil {
 				msgSize = v.Size()
@@ -2094,6 +2495,39 @@ func (m *HeaderValueOption) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *HeaderMap) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *HeaderMap) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Headers) > 0 {
+		for _, msg := range m.Headers {
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintBase(dAtA, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(dAtA[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
 func (m *DataSource) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2148,6 +2582,99 @@ func (m *DataSource_InlineString) MarshalTo(dAtA []byte) (int, error) {
 	i += copy(dAtA[i:], m.InlineString)
 	return i, nil
 }
+func (m *RemoteDataSource) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RemoteDataSource) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.HttpUri != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintBase(dAtA, i, uint64(m.HttpUri.Size()))
+		n7, err := m.HttpUri.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
+	}
+	if len(m.Sha256) > 0 {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintBase(dAtA, i, uint64(len(m.Sha256)))
+		i += copy(dAtA[i:], m.Sha256)
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *AsyncDataSource) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AsyncDataSource) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Specifier != nil {
+		nn8, err := m.Specifier.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += nn8
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
+func (m *AsyncDataSource_Local) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.Local != nil {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintBase(dAtA, i, uint64(m.Local.Size()))
+		n9, err := m.Local.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n9
+	}
+	return i, nil
+}
+func (m *AsyncDataSource_Remote) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.Remote != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintBase(dAtA, i, uint64(m.Remote.Size()))
+		n10, err := m.Remote.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n10
+	}
+	return i, nil
+}
 func (m *TransportSocket) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2170,11 +2697,11 @@ func (m *TransportSocket) MarshalTo(dAtA []byte) (int, error) {
 		i += copy(dAtA[i:], m.Name)
 	}
 	if m.ConfigType != nil {
-		nn7, err := m.ConfigType.MarshalTo(dAtA[i:])
+		nn11, err := m.ConfigType.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn7
+		i += nn11
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -2188,11 +2715,11 @@ func (m *TransportSocket_Config) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintBase(dAtA, i, uint64(m.Config.Size()))
-		n8, err := m.Config.MarshalTo(dAtA[i:])
+		n12, err := m.Config.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n8
+		i += n12
 	}
 	return i, nil
 }
@@ -2202,11 +2729,11 @@ func (m *TransportSocket_TypedConfig) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintBase(dAtA, i, uint64(m.TypedConfig.Size()))
-		n9, err := m.TypedConfig.MarshalTo(dAtA[i:])
+		n13, err := m.TypedConfig.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n9
+		i += n13
 	}
 	return i, nil
 }
@@ -2242,11 +2769,11 @@ func (m *SocketOption) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintBase(dAtA, i, uint64(m.Name))
 	}
 	if m.Value != nil {
-		nn10, err := m.Value.MarshalTo(dAtA[i:])
+		nn14, err := m.Value.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn10
+		i += nn14
 	}
 	if m.State != 0 {
 		dAtA[i] = 0x30
@@ -2295,11 +2822,11 @@ func (m *RuntimeFractionalPercent) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintBase(dAtA, i, uint64(m.DefaultValue.Size()))
-		n11, err := m.DefaultValue.MarshalTo(dAtA[i:])
+		n15, err := m.DefaultValue.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n11
+		i += n15
 	}
 	if len(m.RuntimeKey) > 0 {
 		dAtA[i] = 0x12
@@ -2489,6 +3016,24 @@ func (m *HeaderValueOption) Size() (n int) {
 	return n
 }
 
+func (m *HeaderMap) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Headers) > 0 {
+		for _, e := range m.Headers {
+			l = e.Size()
+			n += 1 + l + sovBase(uint64(l))
+		}
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
 func (m *DataSource) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2534,6 +3079,65 @@ func (m *DataSource_InlineString) Size() (n int) {
 	_ = l
 	l = len(m.InlineString)
 	n += 1 + l + sovBase(uint64(l))
+	return n
+}
+func (m *RemoteDataSource) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.HttpUri != nil {
+		l = m.HttpUri.Size()
+		n += 1 + l + sovBase(uint64(l))
+	}
+	l = len(m.Sha256)
+	if l > 0 {
+		n += 1 + l + sovBase(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *AsyncDataSource) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Specifier != nil {
+		n += m.Specifier.Size()
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *AsyncDataSource_Local) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Local != nil {
+		l = m.Local.Size()
+		n += 1 + l + sovBase(uint64(l))
+	}
+	return n
+}
+func (m *AsyncDataSource_Remote) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Remote != nil {
+		l = m.Remote.Size()
+		n += 1 + l + sovBase(uint64(l))
+	}
 	return n
 }
 func (m *TransportSocket) Size() (n int) {
@@ -3581,6 +4185,94 @@ func (m *HeaderValueOption) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *HeaderMap) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowBase
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: HeaderMap: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: HeaderMap: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Headers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBase
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthBase
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBase
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Headers = append(m.Headers, &HeaderValue{})
+			if err := m.Headers[len(m.Headers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipBase(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthBase
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthBase
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *DataSource) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -3706,6 +4398,252 @@ func (m *DataSource) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Specifier = &DataSource_InlineString{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipBase(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthBase
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthBase
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RemoteDataSource) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowBase
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RemoteDataSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RemoteDataSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HttpUri", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBase
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthBase
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBase
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.HttpUri == nil {
+				m.HttpUri = &HttpUri{}
+			}
+			if err := m.HttpUri.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Sha256", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBase
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthBase
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthBase
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Sha256 = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipBase(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthBase
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthBase
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AsyncDataSource) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowBase
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AsyncDataSource: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AsyncDataSource: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Local", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBase
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthBase
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBase
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &DataSource{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Specifier = &AsyncDataSource_Local{v}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Remote", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowBase
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthBase
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthBase
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &RemoteDataSource{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Specifier = &AsyncDataSource_Remote{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

@@ -5,14 +5,13 @@ package envoy_service_tap_v2alpha
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/gogo/protobuf/proto"
 	types "github.com/gogo/protobuf/types"
-	_ "github.com/lyft/protoc-gen-validate/validate"
-
-	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	io "io"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -26,8 +25,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-// Output format. All output is in the form of one or more :ref:`BufferedTraceWrapper
-// <envoy_api_msg_data.tap.v2alpha.BufferedTraceWrapper>` messages. This enumeration indicates
+// Output format. All output is in the form of one or more :ref:`TraceWrapper
+// <envoy_api_msg_data.tap.v2alpha.TraceWrapper>` messages. This enumeration indicates
 // how those messages are written. Note that not all sinks support all output formats. See
 // individual sink documentation for more information.
 type OutputSink_Format int32
@@ -52,22 +51,30 @@ const (
 	// useful. However, for certain sinks that are self-delimiting (e.g., one message per file)
 	// this output format makes consumption simpler.
 	OutputSink_PROTO_BINARY OutputSink_Format = 2
+	// Messages are written as a sequence tuples, where each tuple is the message length encoded
+	// as a `protobuf 32-bit varint
+	// <https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.io.coded_stream>`_
+	// followed by the binary message. The messages can be read back using the language specific
+	// protobuf coded stream implementation to obtain the message length and the message.
+	OutputSink_PROTO_BINARY_LENGTH_DELIMITED OutputSink_Format = 3
 	// Text proto format.
-	OutputSink_PROTO_TEXT OutputSink_Format = 3
+	OutputSink_PROTO_TEXT OutputSink_Format = 4
 )
 
 var OutputSink_Format_name = map[int32]string{
 	0: "JSON_BODY_AS_BYTES",
 	1: "JSON_BODY_AS_STRING",
 	2: "PROTO_BINARY",
-	3: "PROTO_TEXT",
+	3: "PROTO_BINARY_LENGTH_DELIMITED",
+	4: "PROTO_TEXT",
 }
 
 var OutputSink_Format_value = map[string]int32{
-	"JSON_BODY_AS_BYTES":  0,
-	"JSON_BODY_AS_STRING": 1,
-	"PROTO_BINARY":        2,
-	"PROTO_TEXT":          3,
+	"JSON_BODY_AS_BYTES":            0,
+	"JSON_BODY_AS_STRING":           1,
+	"PROTO_BINARY":                  2,
+	"PROTO_BINARY_LENGTH_DELIMITED": 3,
+	"PROTO_TEXT":                    4,
 }
 
 func (x OutputSink_Format) String() string {
@@ -85,10 +92,19 @@ type TapConfig struct {
 	MatchConfig *MatchPredicate `protobuf:"bytes,1,opt,name=match_config,json=matchConfig,proto3" json:"match_config,omitempty"`
 	// The tap output configuration. If a match configuration matches a data source being tapped,
 	// a tap will occur and the data will be written to the configured output.
-	OutputConfig         *OutputConfig `protobuf:"bytes,2,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	OutputConfig *OutputConfig `protobuf:"bytes,2,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
+	// [#not-implemented-hide:] Specify if Tap matching is enabled. The % of requests\connections for
+	// which the tap matching is enabled. When not enabled, the request\connection will not be
+	// recorded.
+	//
+	// .. note::
+	//
+	//   This field defaults to 100/:ref:`HUNDRED
+	//   <envoy_api_enum_type.FractionalPercent.DenominatorType>`.
+	TapEnabled           *core.RuntimeFractionalPercent `protobuf:"bytes,3,opt,name=tap_enabled,json=tapEnabled,proto3" json:"tap_enabled,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                       `json:"-"`
+	XXX_unrecognized     []byte                         `json:"-"`
+	XXX_sizecache        int32                          `json:"-"`
 }
 
 func (m *TapConfig) Reset()         { *m = TapConfig{} }
@@ -134,6 +150,13 @@ func (m *TapConfig) GetMatchConfig() *MatchPredicate {
 func (m *TapConfig) GetOutputConfig() *OutputConfig {
 	if m != nil {
 		return m.OutputConfig
+	}
+	return nil
+}
+
+func (m *TapConfig) GetTapEnabled() *core.RuntimeFractionalPercent {
+	if m != nil {
+		return m.TapEnabled
 	}
 	return nil
 }
@@ -591,10 +614,17 @@ type OutputConfig struct {
 	// truncation. If truncation occurs, the :ref:`truncated
 	// <envoy_api_field_data.tap.v2alpha.Body.truncated>` field will be set. If not specified, the
 	// default is 1KiB.
-	MaxBufferedTxBytes   *types.UInt32Value `protobuf:"bytes,3,opt,name=max_buffered_tx_bytes,json=maxBufferedTxBytes,proto3" json:"max_buffered_tx_bytes,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	MaxBufferedTxBytes *types.UInt32Value `protobuf:"bytes,3,opt,name=max_buffered_tx_bytes,json=maxBufferedTxBytes,proto3" json:"max_buffered_tx_bytes,omitempty"`
+	// Indicates whether taps produce a single buffered message per tap, or multiple streamed
+	// messages per tap in the emitted :ref:`TraceWrapper
+	// <envoy_api_msg_data.tap.v2alpha.TraceWrapper>` messages. Note that streamed tapping does not
+	// mean that no buffering takes place. Buffering may be required if data is processed before a
+	// match can be determined. See the HTTP tap filter :ref:`streaming
+	// <config_http_filters_tap_streaming>` documentation for more information.
+	Streaming            bool     `protobuf:"varint,4,opt,name=streaming,proto3" json:"streaming,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *OutputConfig) Reset()         { *m = OutputConfig{} }
@@ -651,6 +681,13 @@ func (m *OutputConfig) GetMaxBufferedTxBytes() *types.UInt32Value {
 	return nil
 }
 
+func (m *OutputConfig) GetStreaming() bool {
+	if m != nil {
+		return m.Streaming
+	}
+	return false
+}
+
 // Tap output sink configuration.
 type OutputSink struct {
 	// Sink output format.
@@ -658,6 +695,7 @@ type OutputSink struct {
 	// Types that are valid to be assigned to OutputSinkType:
 	//	*OutputSink_StreamingAdmin
 	//	*OutputSink_FilePerTap
+	//	*OutputSink_StreamingGrpc
 	OutputSinkType       isOutputSink_OutputSinkType `protobuf_oneof:"output_sink_type"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_unrecognized     []byte                      `json:"-"`
@@ -709,9 +747,13 @@ type OutputSink_StreamingAdmin struct {
 type OutputSink_FilePerTap struct {
 	FilePerTap *FilePerTapSink `protobuf:"bytes,3,opt,name=file_per_tap,json=filePerTap,proto3,oneof"`
 }
+type OutputSink_StreamingGrpc struct {
+	StreamingGrpc *StreamingGrpcSink `protobuf:"bytes,4,opt,name=streaming_grpc,json=streamingGrpc,proto3,oneof"`
+}
 
 func (*OutputSink_StreamingAdmin) isOutputSink_OutputSinkType() {}
 func (*OutputSink_FilePerTap) isOutputSink_OutputSinkType()     {}
+func (*OutputSink_StreamingGrpc) isOutputSink_OutputSinkType()  {}
 
 func (m *OutputSink) GetOutputSinkType() isOutputSink_OutputSinkType {
 	if m != nil {
@@ -741,11 +783,19 @@ func (m *OutputSink) GetFilePerTap() *FilePerTapSink {
 	return nil
 }
 
+func (m *OutputSink) GetStreamingGrpc() *StreamingGrpcSink {
+	if x, ok := m.GetOutputSinkType().(*OutputSink_StreamingGrpc); ok {
+		return x.StreamingGrpc
+	}
+	return nil
+}
+
 // XXX_OneofFuncs is for the internal use of the proto package.
 func (*OutputSink) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
 	return _OutputSink_OneofMarshaler, _OutputSink_OneofUnmarshaler, _OutputSink_OneofSizer, []interface{}{
 		(*OutputSink_StreamingAdmin)(nil),
 		(*OutputSink_FilePerTap)(nil),
+		(*OutputSink_StreamingGrpc)(nil),
 	}
 }
 
@@ -761,6 +811,11 @@ func _OutputSink_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
 	case *OutputSink_FilePerTap:
 		_ = b.EncodeVarint(3<<3 | proto.WireBytes)
 		if err := b.EncodeMessage(x.FilePerTap); err != nil {
+			return err
+		}
+	case *OutputSink_StreamingGrpc:
+		_ = b.EncodeVarint(4<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.StreamingGrpc); err != nil {
 			return err
 		}
 	case nil:
@@ -789,6 +844,14 @@ func _OutputSink_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buf
 		err := b.DecodeMessage(msg)
 		m.OutputSinkType = &OutputSink_FilePerTap{msg}
 		return true, err
+	case 4: // output_sink_type.streaming_grpc
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(StreamingGrpcSink)
+		err := b.DecodeMessage(msg)
+		m.OutputSinkType = &OutputSink_StreamingGrpc{msg}
+		return true, err
 	default:
 		return false, nil
 	}
@@ -805,6 +868,11 @@ func _OutputSink_OneofSizer(msg proto.Message) (n int) {
 		n += s
 	case *OutputSink_FilePerTap:
 		s := proto.Size(x.FilePerTap)
+		n += 1 // tag and wire
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *OutputSink_StreamingGrpc:
+		s := proto.Size(x.StreamingGrpc)
 		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(s))
 		n += s
@@ -906,6 +974,65 @@ func (m *FilePerTapSink) GetPathPrefix() string {
 	return ""
 }
 
+// [#not-implemented-hide:] Streaming gRPC sink configuration sends the taps to an external gRPC
+// server.
+type StreamingGrpcSink struct {
+	// Opaque identifier, that will be sent back to the streaming grpc server.
+	TapId string `protobuf:"bytes,1,opt,name=tap_id,json=tapId,proto3" json:"tap_id,omitempty"`
+	// The gRPC server that hosts the Tap Sink Service.
+	GrpcService          *core.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
+}
+
+func (m *StreamingGrpcSink) Reset()         { *m = StreamingGrpcSink{} }
+func (m *StreamingGrpcSink) String() string { return proto.CompactTextString(m) }
+func (*StreamingGrpcSink) ProtoMessage()    {}
+func (*StreamingGrpcSink) Descriptor() ([]byte, []int) {
+	return fileDescriptor_4f6a60461d532a14, []int{7}
+}
+func (m *StreamingGrpcSink) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *StreamingGrpcSink) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_StreamingGrpcSink.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *StreamingGrpcSink) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_StreamingGrpcSink.Merge(m, src)
+}
+func (m *StreamingGrpcSink) XXX_Size() int {
+	return m.Size()
+}
+func (m *StreamingGrpcSink) XXX_DiscardUnknown() {
+	xxx_messageInfo_StreamingGrpcSink.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_StreamingGrpcSink proto.InternalMessageInfo
+
+func (m *StreamingGrpcSink) GetTapId() string {
+	if m != nil {
+		return m.TapId
+	}
+	return ""
+}
+
+func (m *StreamingGrpcSink) GetGrpcService() *core.GrpcService {
+	if m != nil {
+		return m.GrpcService
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("envoy.service.tap.v2alpha.OutputSink_Format", OutputSink_Format_name, OutputSink_Format_value)
 	proto.RegisterType((*TapConfig)(nil), "envoy.service.tap.v2alpha.TapConfig")
@@ -916,6 +1043,7 @@ func init() {
 	proto.RegisterType((*OutputSink)(nil), "envoy.service.tap.v2alpha.OutputSink")
 	proto.RegisterType((*StreamingAdminSink)(nil), "envoy.service.tap.v2alpha.StreamingAdminSink")
 	proto.RegisterType((*FilePerTapSink)(nil), "envoy.service.tap.v2alpha.FilePerTapSink")
+	proto.RegisterType((*StreamingGrpcSink)(nil), "envoy.service.tap.v2alpha.StreamingGrpcSink")
 }
 
 func init() {
@@ -923,61 +1051,71 @@ func init() {
 }
 
 var fileDescriptor_4f6a60461d532a14 = []byte{
-	// 851 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x95, 0x4d, 0x6f, 0xdb, 0x36,
-	0x18, 0xc7, 0x43, 0x39, 0x76, 0xec, 0x27, 0xae, 0x27, 0x70, 0x2f, 0x79, 0x59, 0x61, 0x64, 0x06,
-	0xb6, 0x66, 0x6f, 0x12, 0xe0, 0x1e, 0xb7, 0x4b, 0xd4, 0x97, 0x39, 0x1b, 0x1a, 0x7b, 0xb2, 0xb6,
-	0x25, 0xd8, 0x41, 0x60, 0x6c, 0x3a, 0x56, 0x2b, 0x8b, 0x1c, 0x45, 0x7b, 0xf6, 0x75, 0xc7, 0x1d,
-	0xfb, 0x69, 0x86, 0x5d, 0xd6, 0x63, 0x8f, 0xfb, 0x08, 0x43, 0x6e, 0xfd, 0x0c, 0x3b, 0x6c, 0x10,
-	0x49, 0xa5, 0x96, 0x8b, 0xa6, 0x69, 0x72, 0x11, 0x44, 0xf2, 0xf9, 0xff, 0xfe, 0xcf, 0x43, 0x91,
-	0x8f, 0xe0, 0x13, 0x9a, 0xcc, 0xd8, 0xc2, 0x4d, 0xa9, 0x98, 0x45, 0x03, 0xea, 0x4a, 0xc2, 0xdd,
-	0x59, 0x9b, 0xc4, 0x7c, 0x4c, 0xdc, 0x01, 0x9b, 0x4c, 0x58, 0xe2, 0x70, 0xc1, 0x24, 0xc3, 0x3b,
-	0x2a, 0xce, 0x31, 0x71, 0x8e, 0x24, 0xdc, 0x31, 0x71, 0xbb, 0x4d, 0x8d, 0x20, 0x3c, 0x72, 0x67,
-	0x6d, 0x57, 0xb0, 0xa9, 0xa4, 0xfa, 0xa9, 0xa5, 0xbb, 0xcd, 0x33, 0xc6, 0xce, 0x62, 0xea, 0xaa,
-	0xd1, 0xe9, 0x74, 0xe4, 0xfe, 0x2a, 0x08, 0xe7, 0x54, 0xa4, 0x66, 0x7d, 0x6b, 0x46, 0xe2, 0x68,
-	0x48, 0x24, 0x75, 0xf3, 0x17, 0xbd, 0xd0, 0xfa, 0x0b, 0x41, 0x2d, 0x20, 0xfc, 0x1e, 0x4b, 0x46,
-	0xd1, 0x19, 0x3e, 0x86, 0xfa, 0x84, 0xc8, 0xc1, 0x38, 0x1c, 0xa8, 0xf1, 0x36, 0xda, 0x43, 0xfb,
-	0x9b, 0xed, 0x4f, 0x9d, 0xd7, 0x26, 0xe6, 0x3c, 0xca, 0xc2, 0x7b, 0x82, 0x0e, 0xa3, 0x01, 0x91,
-	0xd4, 0x83, 0x3f, 0x5f, 0x3c, 0x2b, 0x95, 0x7f, 0x47, 0x96, 0x8d, 0xfc, 0x4d, 0x85, 0xba, 0x20,
-	0xdf, 0x62, 0x53, 0xc9, 0xa7, 0x32, 0x47, 0x5b, 0x0a, 0x7d, 0xe7, 0x12, 0x74, 0x57, 0xc5, 0x6b,
-	0x7d, 0x01, 0x5c, 0x67, 0x4b, 0x2b, 0xad, 0xe7, 0x15, 0x68, 0x14, 0xb3, 0xc0, 0x5d, 0xa8, 0x32,
-	0x11, 0x2a, 0x7b, 0x53, 0x42, 0xfb, 0xca, 0x25, 0xe8, 0x61, 0x9f, 0xca, 0xce, 0x9a, 0xbf, 0xc1,
-	0x84, 0x1a, 0xe1, 0xef, 0xa1, 0x46, 0x92, 0xa1, 0x21, 0x5a, 0x37, 0x20, 0x56, 0x49, 0x32, 0xd4,
-	0xc8, 0x0e, 0xd4, 0x12, 0x26, 0x0d, 0xb2, 0xf4, 0x96, 0xfb, 0x9c, 0x91, 0x12, 0x26, 0x35, 0x69,
-	0x3f, 0x4b, 0x6e, 0x61, 0x48, 0xeb, 0x7b, 0x68, 0xbf, 0xea, 0xd5, 0xb2, 0xdd, 0x5a, 0x7f, 0x6c,
-	0x55, 0x91, 0xf6, 0x5c, 0xe8, 0xc8, 0xc7, 0xb0, 0x3b, 0x96, 0x92, 0x87, 0x82, 0xfe, 0x32, 0xa5,
-	0xa9, 0x0c, 0xc7, 0x94, 0x0c, 0xa9, 0x48, 0x8d, 0xb4, 0xac, 0x92, 0xf8, 0xfc, 0x92, 0x24, 0x3a,
-	0x52, 0xf2, 0x8e, 0xd6, 0x28, 0x60, 0x67, 0xcd, 0xdf, 0xca, 0x80, 0xbe, 0xe6, 0x2d, 0x2f, 0xe1,
-	0x18, 0x3e, 0x2c, 0x78, 0x49, 0x41, 0xa2, 0xf8, 0xa5, 0x59, 0xe5, 0x3a, 0x66, 0xdb, 0x4b, 0x66,
-	0x81, 0xe1, 0xad, 0xba, 0xa5, 0x9c, 0x25, 0x29, 0x5d, 0x29, 0x6d, 0xe3, 0x06, 0x6e, 0x1a, 0x58,
-	0xa8, 0x2d, 0x81, 0xdb, 0x45, 0xb7, 0x95, 0xe2, 0xaa, 0xd7, 0xb1, 0xdb, 0x59, 0xb6, 0x2b, 0x54,
-	0xb7, 0xfb, 0x13, 0x54, 0xf3, 0x33, 0x84, 0xbf, 0x83, 0xb2, 0x98, 0xc6, 0x34, 0xdd, 0x46, 0x7b,
-	0xa5, 0xeb, 0xdc, 0xcd, 0xa7, 0xc8, 0xaa, 0x5a, 0xbe, 0x66, 0x78, 0xb7, 0x60, 0x3d, 0x7b, 0xc1,
-	0xe5, 0x3f, 0x5e, 0x3c, 0x2b, 0xa1, 0x56, 0x17, 0xec, 0xd5, 0xc4, 0xf0, 0x57, 0xb0, 0x61, 0xf6,
-	0xd2, 0x38, 0x7e, 0x64, 0x1c, 0x09, 0x8f, 0x9c, 0x59, 0xdb, 0xd1, 0x5d, 0x48, 0x4b, 0x94, 0x82,
-	0x0a, 0x3f, 0x57, 0xb4, 0xfe, 0x45, 0x50, 0x5f, 0xbe, 0xc6, 0xf8, 0x10, 0xca, 0x69, 0x94, 0x3c,
-	0xc9, 0x59, 0x1f, 0xbf, 0xf1, 0xfa, 0xf7, 0xa3, 0xe4, 0x89, 0x57, 0xcf, 0x32, 0xdf, 0x78, 0x8a,
-	0xd6, 0xab, 0xc8, 0x46, 0xbe, 0x26, 0xe0, 0x2e, 0xbc, 0x3f, 0x21, 0xf3, 0xf0, 0x74, 0x3a, 0x1a,
-	0x51, 0x41, 0x87, 0xa1, 0x98, 0x87, 0xa7, 0x0b, 0x49, 0x53, 0x73, 0x3f, 0x6f, 0x3b, 0xba, 0x25,
-	0x3a, 0x79, 0x4b, 0x74, 0x7e, 0x38, 0x4c, 0xe4, 0xdd, 0xf6, 0x8f, 0x24, 0x9e, 0x52, 0x1f, 0x4f,
-	0xc8, 0xdc, 0x33, 0x4a, 0x7f, 0xee, 0x65, 0xba, 0x57, 0x80, 0x32, 0x07, 0x96, 0xde, 0x12, 0x18,
-	0x68, 0x60, 0xeb, 0x3f, 0x0b, 0xe0, 0x65, 0x15, 0xb8, 0x07, 0x95, 0x11, 0x13, 0x13, 0x22, 0x55,
-	0x4f, 0x6a, 0xb4, 0xbf, 0xb8, 0x52, 0xf1, 0xce, 0x43, 0xa5, 0x31, 0x5f, 0xef, 0x37, 0xd5, 0x00,
-	0x0d, 0x07, 0x1f, 0xc3, 0x3b, 0xa9, 0x14, 0x94, 0x4c, 0xa2, 0xe4, 0x2c, 0x24, 0xc3, 0x49, 0x94,
-	0x98, 0xe2, 0xbf, 0xbc, 0x04, 0xdd, 0xcf, 0x15, 0x07, 0x99, 0x20, 0xb3, 0xe8, 0xac, 0xf9, 0x8d,
-	0xb4, 0x30, 0x8b, 0x1f, 0x41, 0x7d, 0x14, 0xc5, 0x34, 0xe4, 0x54, 0x84, 0x92, 0xf0, 0x2b, 0x34,
-	0xa8, 0x87, 0x51, 0x4c, 0x7b, 0x54, 0x04, 0x84, 0x1b, 0x24, 0x8c, 0x2e, 0x66, 0x5a, 0x3f, 0x43,
-	0x45, 0x97, 0x81, 0x3f, 0x00, 0xfc, 0x6d, 0xbf, 0x7b, 0x14, 0x7a, 0xdd, 0xfb, 0x27, 0xe1, 0x41,
-	0x3f, 0xf4, 0x4e, 0x82, 0x07, 0x7d, 0x7b, 0x0d, 0x6f, 0xc1, 0xbb, 0x85, 0xf9, 0x7e, 0xe0, 0x1f,
-	0x1e, 0x7d, 0x63, 0x23, 0x6c, 0x43, 0xbd, 0xe7, 0x77, 0x83, 0x6e, 0xe8, 0x1d, 0x1e, 0x1d, 0xf8,
-	0x27, 0xb6, 0x85, 0x1b, 0x00, 0x7a, 0x26, 0x78, 0x70, 0x1c, 0xd8, 0x25, 0x6f, 0x07, 0x6c, 0xf3,
-	0x6b, 0xc9, 0x0e, 0x46, 0x28, 0x17, 0xfc, 0xe2, 0x40, 0xbf, 0x07, 0xf8, 0xd5, 0x72, 0x5b, 0x5f,
-	0x43, 0xa3, 0x98, 0x2d, 0xfe, 0x0c, 0x36, 0x39, 0x91, 0xe3, 0x90, 0x0b, 0x3a, 0x8a, 0xe6, 0xea,
-	0xfb, 0xd4, 0x4c, 0x13, 0x15, 0xd6, 0x1e, 0xf2, 0x21, 0x5b, 0xed, 0xa9, 0x45, 0xef, 0xfe, 0xf3,
-	0xf3, 0x26, 0xfa, 0xfb, 0xbc, 0x89, 0xfe, 0x39, 0x6f, 0x22, 0xb8, 0x13, 0x31, 0xbd, 0x29, 0x5c,
-	0xb0, 0xf9, 0xe2, 0xf5, 0xfb, 0xe3, 0x6d, 0xde, 0x53, 0xbf, 0xfa, 0x5e, 0x76, 0x78, 0x7a, 0xe8,
-	0xb4, 0xa2, 0x4e, 0xd1, 0xdd, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0x0c, 0x68, 0x9b, 0xf0, 0x1c,
-	0x08, 0x00, 0x00,
+	// 1016 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x96, 0xcf, 0x73, 0x1a, 0x37,
+	0x14, 0xc7, 0xbd, 0x60, 0x30, 0x3c, 0xb0, 0x4b, 0xd5, 0xa6, 0xfe, 0x51, 0x97, 0x71, 0x98, 0xb6,
+	0x71, 0x7f, 0x2d, 0x33, 0xe4, 0xd8, 0x5e, 0xbc, 0x31, 0x36, 0xb4, 0xb6, 0xa1, 0xcb, 0xa6, 0xb5,
+	0x4f, 0x1a, 0x01, 0x02, 0x6f, 0xb2, 0xac, 0x54, 0xad, 0xa0, 0x70, 0xe9, 0xa1, 0xc7, 0xce, 0xf4,
+	0x92, 0x5b, 0xff, 0x93, 0x4e, 0x4f, 0x39, 0xe6, 0xd8, 0x3f, 0xa1, 0xe3, 0x5b, 0xfe, 0x84, 0xde,
+	0x3a, 0xbb, 0xd2, 0x62, 0xd6, 0x4e, 0x5c, 0xc7, 0xb9, 0x30, 0x48, 0xef, 0xbd, 0xcf, 0x57, 0xef,
+	0x49, 0x7a, 0x5a, 0xf8, 0x94, 0xfa, 0x13, 0x36, 0xab, 0x06, 0x54, 0x4c, 0xdc, 0x1e, 0xad, 0x4a,
+	0xc2, 0xab, 0x93, 0x1a, 0xf1, 0xf8, 0x39, 0xa9, 0xf6, 0xd8, 0x68, 0xc4, 0x7c, 0x93, 0x0b, 0x26,
+	0x19, 0xda, 0x8c, 0xfc, 0x4c, 0xed, 0x67, 0x4a, 0xc2, 0x4d, 0xed, 0xb7, 0x55, 0x56, 0x08, 0xc2,
+	0xdd, 0xea, 0xa4, 0x56, 0x15, 0x6c, 0x2c, 0xa9, 0xfa, 0x55, 0xa1, 0x5b, 0xdb, 0x09, 0x7b, 0x8f,
+	0x09, 0x5a, 0xed, 0x92, 0x20, 0xb6, 0x7e, 0x7c, 0xdd, 0x3a, 0x14, 0xbc, 0x87, 0x63, 0x25, 0xe5,
+	0x55, 0x1e, 0x32, 0x36, 0xf4, 0x68, 0x35, 0x1a, 0x75, 0xc7, 0x83, 0xea, 0xcf, 0x82, 0x70, 0x4e,
+	0x45, 0xa0, 0xed, 0xeb, 0x13, 0xe2, 0xb9, 0x7d, 0x22, 0x69, 0x35, 0xfe, 0xa3, 0x0c, 0x95, 0xdf,
+	0x53, 0x90, 0x77, 0x08, 0x7f, 0xc4, 0xfc, 0x81, 0x3b, 0x44, 0xa7, 0x50, 0x1c, 0x11, 0xd9, 0x3b,
+	0xc7, 0xbd, 0x68, 0xbc, 0x61, 0xec, 0x18, 0xbb, 0x85, 0xda, 0x67, 0xe6, 0x6b, 0x93, 0x33, 0x8f,
+	0x43, 0xf7, 0xb6, 0xa0, 0x7d, 0xb7, 0x47, 0x24, 0xb5, 0xe0, 0xaf, 0x97, 0xcf, 0xd3, 0x99, 0xdf,
+	0x8c, 0x54, 0xc9, 0xb0, 0x0b, 0x11, 0x6a, 0x4e, 0x5e, 0x65, 0x63, 0xc9, 0xc7, 0x32, 0x46, 0xa7,
+	0x22, 0xf4, 0x83, 0x1b, 0xd0, 0xad, 0xc8, 0x5f, 0xc5, 0x27, 0xc0, 0x45, 0xb6, 0x60, 0x41, 0x47,
+	0x50, 0x90, 0x84, 0x63, 0xea, 0x93, 0xae, 0x47, 0xfb, 0x1b, 0xe9, 0x88, 0xfb, 0x85, 0xe6, 0x12,
+	0xee, 0x9a, 0x93, 0x9a, 0x19, 0x96, 0xcd, 0xb4, 0xc7, 0xbe, 0x74, 0x47, 0xf4, 0x40, 0x90, 0x9e,
+	0x74, 0x99, 0x4f, 0xbc, 0x36, 0x15, 0x3d, 0xea, 0x4b, 0x1b, 0x24, 0xe1, 0x75, 0x15, 0x5e, 0x79,
+	0x91, 0x85, 0xb5, 0x64, 0x4e, 0xa8, 0x05, 0x39, 0x26, 0x70, 0x94, 0x8c, 0x2e, 0x48, 0xed, 0xd6,
+	0x05, 0x51, 0xc3, 0x0e, 0x95, 0x8d, 0x25, 0x7b, 0x85, 0x89, 0x68, 0x84, 0xbe, 0x87, 0x3c, 0xf1,
+	0xfb, 0x9a, 0x98, 0x7a, 0x0b, 0x62, 0x8e, 0xf8, 0x7d, 0x85, 0x6c, 0x40, 0xde, 0x67, 0x52, 0x23,
+	0xd3, 0x6f, 0xb8, 0x6b, 0x21, 0xc9, 0x67, 0x52, 0x91, 0x76, 0xc3, 0xc5, 0xcd, 0x34, 0x69, 0x79,
+	0xc7, 0xd8, 0xcd, 0x59, 0xf9, 0xb0, 0xf6, 0xcb, 0x4f, 0x52, 0x39, 0x43, 0x69, 0xce, 0x94, 0xe7,
+	0x13, 0xd8, 0x3a, 0x97, 0x92, 0x63, 0x41, 0x7f, 0x1a, 0xd3, 0x40, 0xe2, 0x73, 0x4a, 0xfa, 0x54,
+	0x04, 0x3a, 0x34, 0x93, 0xd8, 0x87, 0x57, 0x2d, 0xa2, 0x21, 0x25, 0x6f, 0xa8, 0x98, 0x08, 0xd8,
+	0x58, 0xb2, 0xd7, 0x43, 0xa0, 0xad, 0x78, 0x8b, 0x26, 0xe4, 0xc1, 0x87, 0x09, 0x2d, 0x29, 0x88,
+	0xeb, 0x5d, 0x8a, 0x65, 0xef, 0x22, 0xb6, 0xb1, 0x20, 0xe6, 0x68, 0xde, 0x55, 0xb5, 0x80, 0x33,
+	0x3f, 0xa0, 0x57, 0x52, 0x5b, 0x79, 0x0b, 0x35, 0x05, 0x4c, 0xe4, 0xe6, 0xc3, 0x76, 0x52, 0xed,
+	0x4a, 0x72, 0xb9, 0xbb, 0xc8, 0x6d, 0x2e, 0xca, 0x25, 0xb2, 0xdb, 0xfa, 0x11, 0x72, 0xf1, 0x19,
+	0x42, 0xdf, 0x41, 0x46, 0x8c, 0x3d, 0x1a, 0x6c, 0x18, 0x3b, 0xe9, 0xbb, 0xdc, 0xf4, 0x67, 0x46,
+	0x2a, 0x97, 0xb2, 0x15, 0xc3, 0x5a, 0x85, 0xe5, 0xf0, 0x0f, 0xca, 0xfc, 0xf9, 0xf2, 0x79, 0xda,
+	0xa8, 0xb4, 0xa0, 0x74, 0x75, 0x61, 0xe8, 0x6b, 0x58, 0xd1, 0xb5, 0xd4, 0x8a, 0xf7, 0x93, 0x17,
+	0x55, 0xf5, 0x45, 0x15, 0x12, 0x45, 0x50, 0x61, 0xc7, 0x11, 0x95, 0x3f, 0x52, 0x50, 0x5c, 0x6c,
+	0x0a, 0xa8, 0x09, 0x99, 0xc0, 0xf5, 0x9f, 0xc6, 0xac, 0x4f, 0xfe, 0xb7, 0x99, 0x74, 0x5c, 0xff,
+	0xa9, 0x55, 0x0c, 0x57, 0xbe, 0xf2, 0xcc, 0x58, 0xce, 0x19, 0x25, 0xc3, 0x56, 0x04, 0xd4, 0x82,
+	0x7b, 0x23, 0x32, 0xc5, 0xdd, 0xf1, 0x60, 0x40, 0x05, 0xed, 0x63, 0x31, 0xc5, 0xdd, 0x99, 0xa4,
+	0x81, 0xbe, 0x9f, 0xdb, 0xa6, 0x6a, 0xb0, 0x66, 0xdc, 0x60, 0xcd, 0xc7, 0x4d, 0x5f, 0x3e, 0xac,
+	0xfd, 0x40, 0xbc, 0x31, 0xb5, 0xd1, 0x88, 0x4c, 0x2d, 0x1d, 0x69, 0x4f, 0xad, 0x30, 0xee, 0x1a,
+	0x50, 0xc6, 0xc0, 0xf4, 0x1b, 0x02, 0x1d, 0x0d, 0xdc, 0x86, 0x7c, 0x20, 0x05, 0x25, 0x23, 0xd7,
+	0x1f, 0xaa, 0x8b, 0x69, 0x5f, 0x4e, 0x54, 0xfe, 0x4d, 0x03, 0x5c, 0xe6, 0x88, 0xda, 0x90, 0x1d,
+	0x30, 0x31, 0x22, 0x32, 0xea, 0x58, 0x6b, 0xb5, 0x2f, 0x6f, 0x55, 0x1a, 0xf3, 0x20, 0x8a, 0xd1,
+	0x7b, 0xfb, 0x6b, 0xd4, 0x6c, 0x35, 0x07, 0x9d, 0xc2, 0x3b, 0x73, 0x35, 0x4c, 0xfa, 0x23, 0xd7,
+	0xd7, 0xa5, 0xf9, 0xea, 0x06, 0x74, 0x27, 0x8e, 0xd8, 0x0b, 0x03, 0x42, 0x89, 0xc6, 0x92, 0xbd,
+	0x16, 0x24, 0x66, 0xd1, 0x31, 0x14, 0x07, 0xae, 0x47, 0x31, 0xa7, 0x02, 0x4b, 0xc2, 0x6f, 0xd1,
+	0xbe, 0x0e, 0x5c, 0x8f, 0xb6, 0xa9, 0x70, 0x08, 0xd7, 0x48, 0x18, 0xcc, 0x67, 0xd0, 0x63, 0xb8,
+	0x14, 0xc0, 0xe1, 0x53, 0x19, 0x15, 0xab, 0x70, 0x63, 0x09, 0xe6, 0xeb, 0x3c, 0x14, 0xbc, 0xa7,
+	0x99, 0xab, 0xc1, 0xe2, 0x64, 0xe5, 0x17, 0xc8, 0xaa, 0xea, 0xa0, 0x0f, 0x00, 0x7d, 0xdb, 0x69,
+	0x9d, 0x60, 0xab, 0xb5, 0x7f, 0x86, 0xf7, 0x3a, 0xd8, 0x3a, 0x73, 0xea, 0x9d, 0xd2, 0x12, 0x5a,
+	0x87, 0xf7, 0x12, 0xf3, 0x1d, 0xc7, 0x6e, 0x9e, 0x1c, 0x96, 0x0c, 0x54, 0x82, 0x62, 0xdb, 0x6e,
+	0x39, 0x2d, 0x6c, 0x35, 0x4f, 0xf6, 0xec, 0xb3, 0x52, 0x0a, 0xdd, 0x87, 0x8f, 0x16, 0x67, 0xf0,
+	0x51, 0xfd, 0xe4, 0xd0, 0x69, 0xe0, 0xfd, 0xfa, 0x51, 0xf3, 0xb8, 0xe9, 0xd4, 0xf7, 0x4b, 0x69,
+	0xb4, 0x06, 0xa0, 0x5c, 0x9c, 0xfa, 0xa9, 0x53, 0x5a, 0xb6, 0x36, 0xa1, 0xa4, 0x1f, 0xd0, 0xf0,
+	0xc0, 0x62, 0x39, 0xe3, 0xf3, 0x8b, 0xf6, 0x3e, 0xa0, 0xeb, 0x85, 0xae, 0x7c, 0x03, 0x6b, 0xc9,
+	0x3a, 0xa1, 0xcf, 0xa1, 0xc0, 0x89, 0x3c, 0xc7, 0x5c, 0xd0, 0x81, 0x3b, 0x8d, 0x4e, 0x46, 0x5e,
+	0x37, 0x77, 0x91, 0xda, 0x31, 0x6c, 0x08, 0xad, 0xed, 0xc8, 0x58, 0x99, 0xc1, 0xbb, 0xd7, 0x8a,
+	0x82, 0xee, 0x41, 0x36, 0x7c, 0x6a, 0xdd, 0xbe, 0x8a, 0xb5, 0x33, 0x92, 0xf0, 0x66, 0x3f, 0xdc,
+	0xc0, 0xc5, 0x4f, 0x12, 0x7d, 0x2e, 0xca, 0xaf, 0x78, 0x82, 0x23, 0x92, 0xf2, 0x4a, 0x7e, 0x2a,
+	0x0c, 0x17, 0x0c, 0xfb, 0x2f, 0x2e, 0xca, 0xc6, 0xdf, 0x17, 0x65, 0xe3, 0x9f, 0x8b, 0xb2, 0x01,
+	0x0f, 0x5c, 0xa6, 0x40, 0x5c, 0xb0, 0xe9, 0xec, 0xf5, 0x7b, 0x68, 0x15, 0x1e, 0x45, 0xdf, 0x63,
+	0xed, 0xf0, 0x3e, 0xb5, 0x8d, 0x6e, 0x36, 0xba, 0x58, 0x0f, 0xff, 0x0b, 0x00, 0x00, 0xff, 0xff,
+	0x2d, 0xac, 0xef, 0x68, 0xc1, 0x09, 0x00, 0x00,
 }
 
 func (m *TapConfig) Marshal() (dAtA []byte, err error) {
@@ -1015,6 +1153,16 @@ func (m *TapConfig) MarshalTo(dAtA []byte) (int, error) {
 		}
 		i += n2
 	}
+	if m.TapEnabled != nil {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintCommon(dAtA, i, uint64(m.TapEnabled.Size()))
+		n3, err := m.TapEnabled.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
 	}
@@ -1037,11 +1185,11 @@ func (m *MatchPredicate) MarshalTo(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.Rule != nil {
-		nn3, err := m.Rule.MarshalTo(dAtA[i:])
+		nn4, err := m.Rule.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn3
+		i += nn4
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -1055,11 +1203,11 @@ func (m *MatchPredicate_OrMatch) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0xa
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.OrMatch.Size()))
-		n4, err := m.OrMatch.MarshalTo(dAtA[i:])
+		n5, err := m.OrMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n4
+		i += n5
 	}
 	return i, nil
 }
@@ -1069,11 +1217,11 @@ func (m *MatchPredicate_AndMatch) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.AndMatch.Size()))
-		n5, err := m.AndMatch.MarshalTo(dAtA[i:])
+		n6, err := m.AndMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n5
+		i += n6
 	}
 	return i, nil
 }
@@ -1083,11 +1231,11 @@ func (m *MatchPredicate_NotMatch) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.NotMatch.Size()))
-		n6, err := m.NotMatch.MarshalTo(dAtA[i:])
+		n7, err := m.NotMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i += n7
 	}
 	return i, nil
 }
@@ -1109,11 +1257,11 @@ func (m *MatchPredicate_HttpRequestHeadersMatch) MarshalTo(dAtA []byte) (int, er
 		dAtA[i] = 0x2a
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.HttpRequestHeadersMatch.Size()))
-		n7, err := m.HttpRequestHeadersMatch.MarshalTo(dAtA[i:])
+		n8, err := m.HttpRequestHeadersMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n7
+		i += n8
 	}
 	return i, nil
 }
@@ -1123,11 +1271,11 @@ func (m *MatchPredicate_HttpRequestTrailersMatch) MarshalTo(dAtA []byte) (int, e
 		dAtA[i] = 0x32
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.HttpRequestTrailersMatch.Size()))
-		n8, err := m.HttpRequestTrailersMatch.MarshalTo(dAtA[i:])
+		n9, err := m.HttpRequestTrailersMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n8
+		i += n9
 	}
 	return i, nil
 }
@@ -1137,11 +1285,11 @@ func (m *MatchPredicate_HttpResponseHeadersMatch) MarshalTo(dAtA []byte) (int, e
 		dAtA[i] = 0x3a
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.HttpResponseHeadersMatch.Size()))
-		n9, err := m.HttpResponseHeadersMatch.MarshalTo(dAtA[i:])
+		n10, err := m.HttpResponseHeadersMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n9
+		i += n10
 	}
 	return i, nil
 }
@@ -1151,11 +1299,11 @@ func (m *MatchPredicate_HttpResponseTrailersMatch) MarshalTo(dAtA []byte) (int, 
 		dAtA[i] = 0x42
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.HttpResponseTrailersMatch.Size()))
-		n10, err := m.HttpResponseTrailersMatch.MarshalTo(dAtA[i:])
+		n11, err := m.HttpResponseTrailersMatch.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n10
+		i += n11
 	}
 	return i, nil
 }
@@ -1256,21 +1404,31 @@ func (m *OutputConfig) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.MaxBufferedRxBytes.Size()))
-		n11, err := m.MaxBufferedRxBytes.MarshalTo(dAtA[i:])
+		n12, err := m.MaxBufferedRxBytes.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n11
+		i += n12
 	}
 	if m.MaxBufferedTxBytes != nil {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.MaxBufferedTxBytes.Size()))
-		n12, err := m.MaxBufferedTxBytes.MarshalTo(dAtA[i:])
+		n13, err := m.MaxBufferedTxBytes.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n12
+		i += n13
+	}
+	if m.Streaming {
+		dAtA[i] = 0x20
+		i++
+		if m.Streaming {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i++
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -1299,11 +1457,11 @@ func (m *OutputSink) MarshalTo(dAtA []byte) (int, error) {
 		i = encodeVarintCommon(dAtA, i, uint64(m.Format))
 	}
 	if m.OutputSinkType != nil {
-		nn13, err := m.OutputSinkType.MarshalTo(dAtA[i:])
+		nn14, err := m.OutputSinkType.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += nn13
+		i += nn14
 	}
 	if m.XXX_unrecognized != nil {
 		i += copy(dAtA[i:], m.XXX_unrecognized)
@@ -1317,11 +1475,11 @@ func (m *OutputSink_StreamingAdmin) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x12
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.StreamingAdmin.Size()))
-		n14, err := m.StreamingAdmin.MarshalTo(dAtA[i:])
+		n15, err := m.StreamingAdmin.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n14
+		i += n15
 	}
 	return i, nil
 }
@@ -1331,11 +1489,25 @@ func (m *OutputSink_FilePerTap) MarshalTo(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 		i++
 		i = encodeVarintCommon(dAtA, i, uint64(m.FilePerTap.Size()))
-		n15, err := m.FilePerTap.MarshalTo(dAtA[i:])
+		n16, err := m.FilePerTap.MarshalTo(dAtA[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n15
+		i += n16
+	}
+	return i, nil
+}
+func (m *OutputSink_StreamingGrpc) MarshalTo(dAtA []byte) (int, error) {
+	i := 0
+	if m.StreamingGrpc != nil {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintCommon(dAtA, i, uint64(m.StreamingGrpc.Size()))
+		n17, err := m.StreamingGrpc.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n17
 	}
 	return i, nil
 }
@@ -1387,6 +1559,43 @@ func (m *FilePerTapSink) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *StreamingGrpcSink) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *StreamingGrpcSink) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.TapId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintCommon(dAtA, i, uint64(len(m.TapId)))
+		i += copy(dAtA[i:], m.TapId)
+	}
+	if m.GrpcService != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintCommon(dAtA, i, uint64(m.GrpcService.Size()))
+		n18, err := m.GrpcService.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n18
+	}
+	if m.XXX_unrecognized != nil {
+		i += copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	return i, nil
+}
+
 func encodeVarintCommon(dAtA []byte, offset int, v uint64) int {
 	for v >= 1<<7 {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
@@ -1408,6 +1617,10 @@ func (m *TapConfig) Size() (n int) {
 	}
 	if m.OutputConfig != nil {
 		l = m.OutputConfig.Size()
+		n += 1 + l + sovCommon(uint64(l))
+	}
+	if m.TapEnabled != nil {
+		l = m.TapEnabled.Size()
 		n += 1 + l + sovCommon(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -1580,6 +1793,9 @@ func (m *OutputConfig) Size() (n int) {
 		l = m.MaxBufferedTxBytes.Size()
 		n += 1 + l + sovCommon(uint64(l))
 	}
+	if m.Streaming {
+		n += 2
+	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
 	}
@@ -1628,6 +1844,18 @@ func (m *OutputSink_FilePerTap) Size() (n int) {
 	}
 	return n
 }
+func (m *OutputSink_StreamingGrpc) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.StreamingGrpc != nil {
+		l = m.StreamingGrpc.Size()
+		n += 1 + l + sovCommon(uint64(l))
+	}
+	return n
+}
 func (m *StreamingAdminSink) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1648,6 +1876,26 @@ func (m *FilePerTapSink) Size() (n int) {
 	_ = l
 	l = len(m.PathPrefix)
 	if l > 0 {
+		n += 1 + l + sovCommon(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *StreamingGrpcSink) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.TapId)
+	if l > 0 {
+		n += 1 + l + sovCommon(uint64(l))
+	}
+	if m.GrpcService != nil {
+		l = m.GrpcService.Size()
 		n += 1 + l + sovCommon(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -1767,6 +2015,42 @@ func (m *TapConfig) Unmarshal(dAtA []byte) error {
 				m.OutputConfig = &OutputConfig{}
 			}
 			if err := m.OutputConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TapEnabled", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCommon
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.TapEnabled == nil {
+				m.TapEnabled = &core.RuntimeFractionalPercent{}
+			}
+			if err := m.TapEnabled.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2426,6 +2710,26 @@ func (m *OutputConfig) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Streaming", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Streaming = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCommon(dAtA[iNdEx:])
@@ -2569,6 +2873,41 @@ func (m *OutputSink) Unmarshal(dAtA []byte) error {
 			}
 			m.OutputSinkType = &OutputSink_FilePerTap{v}
 			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StreamingGrpc", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCommon
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := &StreamingGrpcSink{}
+			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.OutputSinkType = &OutputSink_StreamingGrpc{v}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCommon(dAtA[iNdEx:])
@@ -2708,6 +3047,128 @@ func (m *FilePerTapSink) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.PathPrefix = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCommon(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *StreamingGrpcSink) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCommon
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: StreamingGrpcSink: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: StreamingGrpcSink: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TapId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthCommon
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TapId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GrpcService", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthCommon
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.GrpcService == nil {
+				m.GrpcService = &core.GrpcService{}
+			}
+			if err := m.GrpcService.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

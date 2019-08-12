@@ -3,7 +3,6 @@
 [![CircleCI](https://circleci.com/gh/envoyproxy/go-control-plane.svg?style=svg)](https://circleci.com/gh/envoyproxy/go-control-plane)
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
 [![GoDoc](https://godoc.org/github.com/envoyproxy/go-control-plane?status.svg)](https://godoc.org/github.com/envoyproxy/go-control-plane)
-[![codecov](https://codecov.io/gh/envoyproxy/go-control-plane/branch/master/graph/badge.svg)](https://codecov.io/gh/envoyproxy/go-control-plane)
 
 
 This repository contains a Go-based implementation of an API server that
@@ -40,15 +39,15 @@ feedback, we might decided to revisit this aspect at a later point in time.
 
 ## Requirements
 
-1. Go 1.9+
+1. Go 1.12+
 
 ## Quick start
 
-1. Setup tools and dependencies
+1. Setup existing build:
 
 ```sh
-make tools
-make depend.install
+make build
+make test
 ```
 
 2. Generate proto files (if you update the [data-plane-api](https://github.com/envoyproxy/data-plane-api)
@@ -58,26 +57,28 @@ dependency)
 make generate
 ```
 
-3. Edit the code in your favorite IDE
-
-4. Format, vet and lint the code
+You should use the included [build image](Dockerfile.ci) to produce a consistent set of generated files, e.g.
 
 ```sh
-make check
+docker run -v $(pwd):/go-control-plane gcr.io/istio-testing/go-control-plane-ci:05-09-2019 make generate
 ```
 
-5. Build and test
+Format the code:
 
 ```sh
-make build
-make test
+make format
 ```
 
-6. Run [integration test](pkg/test/main/README.md) against the latest Envoy
-   docker image:
+__NOTE__: you may need to apply a small patch to correct imports in the generate files:
 
 ```sh
-make integration.docker
+make generate-patch
+```
+
+3. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
+
+```sh
+make integration
 ```
 
 ## Usage
@@ -113,7 +114,7 @@ func main() {
 }
 ```
 
-As mentioned in [Scope](https://github.com/envoyproxy/go-control-plane/blob/master/README.md#scope), you need to cache Envoy configurations.  
+As mentioned in [Scope](https://github.com/envoyproxy/go-control-plane/blob/master/README.md#scope), you need to cache Envoy configurations.
 Generate the key based on the node information as follows and cache the configurations.
 
 ```go
