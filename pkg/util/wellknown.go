@@ -46,6 +46,8 @@ const (
 	Squash = "envoy.squash"
 	// HTTPExternalAuthorization HTTP filter
 	HTTPExternalAuthorization = "envoy.ext_authz"
+	// Roles Based Access Control (RBAC) HTTP Filter
+	Rbac = "envoy.rbac"
 )
 
 // Network filter names
