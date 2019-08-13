@@ -43,43 +43,45 @@ feedback, we might decided to revisit this aspect at a later point in time.
 
 ## Quick start
 
+It's recommended to run the command with script `./build/run_docker.sh` as it executes the command
+in the same environment as the circle ci. This makes sure to produce a consistent set of generated files.
+
 1. Setup existing build:
 
-```sh
-make build
-make test
-```
+    ```sh
+    ./build/run_docker.sh make build test
+    ```
 
-2. Generate proto files (if you update the [data-plane-api](https://github.com/envoyproxy/data-plane-api)
+1. Generate proto files (if you update the [data-plane-api](https://github.com/envoyproxy/data-plane-api)
 dependency)
 
-```sh
-make generate
-```
+    ```sh
+    ./build/run_docker.sh make generate
+    ```
 
-You should use the included [build image](Dockerfile.ci) to produce a consistent set of generated files, e.g.
+    __NOTE__: you may need to apply a small patch to correct imports in the generate files:
 
-```sh
-docker run -v $(pwd):/go-control-plane gcr.io/istio-testing/go-control-plane-ci:05-09-2019 make generate
-```
+    ```sh
+    ./build/run_docker.sh make generate-patch
+    ```
 
-Format the code:
+    Format the code:
 
-```sh
-make format
-```
+    ```sh
+    ./build/run_docker.sh make format
+    ```
 
-__NOTE__: you may need to apply a small patch to correct imports in the generate files:
+    Run build and unit tests again:
 
-```sh
-make generate-patch
-```
+    ```sh
+    ./build/run_docker.sh make build test
+    ```
 
-3. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
+1. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
 
-```sh
-make integration
-```
+    ```sh
+    ./build/run_docker.sh make integration
+    ```
 
 ## Usage
 
