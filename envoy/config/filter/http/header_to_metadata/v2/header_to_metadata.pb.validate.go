@@ -158,6 +158,8 @@ func (m *Config_KeyValuePair) Validate() error {
 
 	// no validation rules for Type
 
+	// no validation rules for Encode
+
 	return nil
 }
 
