@@ -23,8 +23,8 @@ import (
 	"github.com/gogo/protobuf/jsonpb"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/ivanhan/go-control-plane/pkg/cache"
+	"github.com/ivanhan/go-control-plane/pkg/log"
 )
 
 // HTTPGateway is a custom implementation of [gRPC gateway](https://github.com/grpc-ecosystem/grpc-gateway)

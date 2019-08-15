@@ -22,7 +22,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/ivanhan/go-control-plane/pkg/log"
 )
 
 // SnapshotCache is a snapshot-based cache that maintains a single versioned

@@ -31,8 +31,8 @@ import (
 	alf "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	tcp "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/util"
+	"github.com/ivanhan/go-control-plane/pkg/cache"
+	"github.com/ivanhan/go-control-plane/pkg/util"
 )
 
 const (

@@ -23,8 +23,8 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/ivanhan/go-control-plane/pkg/cache"
+	"github.com/ivanhan/go-control-plane/pkg/test/resource"
 )
 
 type group struct{}

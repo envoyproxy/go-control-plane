@@ -20,8 +20,8 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	v2route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/ivanhan/go-control-plane/pkg/cache"
+	"github.com/ivanhan/go-control-plane/pkg/test/resource"
 )
 
 const (
