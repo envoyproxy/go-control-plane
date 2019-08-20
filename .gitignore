@@ -14,4 +14,4 @@
 # auto-generated test files, e.g. mockgen
 *_gen_test.go
 
-/envoy.log
+/envoy*.log

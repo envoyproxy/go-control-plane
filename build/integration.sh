@@ -16,7 +16,8 @@ SERVER_PID=$!
 
 # Envoy start-up command
 ENVOY=${ENVOY:-/usr/local/bin/envoy}
-ENVOY_LOG="envoy.log"
+ENVOY_LOG="envoy.${XDS}.log"
+echo Envoy log: ${ENVOY_LOG}
 
 # Start envoy: important to keep drain time short
 (${ENVOY} -c sample/bootstrap-${XDS}.yaml --drain-time-s 1 -l debug 2> ${ENVOY_LOG})&
@@ -24,8 +25,6 @@ ENVOY_PID=$!
 
 function cleanup() {
   kill ${ENVOY_PID}
-  echo Envoy log: ${ENVOY_LOG}
-  cat ${ENVOY_LOG}
 }
 trap cleanup EXIT
 

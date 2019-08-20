@@ -3,7 +3,7 @@ FROM golang:1.12.5-stretch
 WORKDIR /go-control-plane
 
 # Fetch and preserve module dependencies
-ENV GOPROXY=https://gocenter.io
+ENV GOPROXY=https://proxy.golang.org
 COPY go.mod ./
 RUN go mod download
 

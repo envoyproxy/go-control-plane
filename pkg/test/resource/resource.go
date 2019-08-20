@@ -96,7 +96,8 @@ func MakeCluster(mode string, clusterName string) *v2.Cluster {
 		edsSource = &core.ConfigSource{
 			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
 				ApiConfigSource: &core.ApiConfigSource{
-					ApiType: core.ApiConfigSource_GRPC,
+					ApiType:                   core.ApiConfigSource_GRPC,
+					SetNodeOnFirstMessageOnly: true,
 					GrpcServices: []*core.GrpcService{{
 						TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
 							EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
@@ -164,7 +165,8 @@ func configSource(mode string) *core.ConfigSource {
 	case Xds:
 		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
 			ApiConfigSource: &core.ApiConfigSource{
-				ApiType: core.ApiConfigSource_GRPC,
+				ApiType:                   core.ApiConfigSource_GRPC,
+				SetNodeOnFirstMessageOnly: true,
 				GrpcServices: []*core.GrpcService{{
 					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
 						EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},

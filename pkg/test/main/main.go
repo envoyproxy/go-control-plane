@@ -85,7 +85,7 @@ func main() {
 	// create a cache
 	signal := make(chan struct{})
 	cb := &callbacks{signal: signal}
-	config := cache.NewSnapshotCache(mode == resource.Ads, test.Hasher{}, logger{})
+	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
 	srv := server.NewServer(config, cb)
 	als := &test.AccessLogService{}
 
@@ -106,7 +106,13 @@ func main() {
 	go test.RunManagementGateway(ctx, srv, gatewayPort)
 
 	log.Println("waiting for the first request...")
-	<-signal
+	select {
+	case <-signal:
+		break
+	case <-time.After(1 * time.Minute):
+		log.Println("timeout waiting for the first request")
+		os.Exit(1)
+	}
 	log.Printf("initial snapshot %+v\n", snapshots)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
