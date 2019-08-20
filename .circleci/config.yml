@@ -9,3 +9,6 @@ jobs:
       - run: make build
       - run: make test
       - run: make integration
+      - run: mkdir logs && cp *.log logs/
+      - store_artifacts:
+          path: /go-control-plane/logs
