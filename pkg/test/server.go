@@ -36,18 +36,6 @@ const (
 	Hello = "Hi, there!\n"
 )
 
-// Hasher returns node ID as an ID
-type Hasher struct {
-}
-
-// ID function
-func (h Hasher) ID(node *core.Node) string {
-	if node == nil {
-		return "unknown"
-	}
-	return node.Id
-}
-
 type echo struct{}
 
 func (h echo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +47,7 @@ func (h echo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // RunHTTP opens a simple listener on the port.
 func RunHTTP(ctx context.Context, upstreamPort uint) {
-	log.Printf("upstream listening HTTP/1.1i on %d\n", upstreamPort)
+	log.Printf("upstream listening HTTP/1.1 on %d\n", upstreamPort)
 	server := &http.Server{Addr: fmt.Sprintf(":%d", upstreamPort), Handler: echo{}}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {

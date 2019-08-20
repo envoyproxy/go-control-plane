@@ -21,6 +21,16 @@ import (
 	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 )
 
+func TestIDHash(t *testing.T) {
+	node := &core.Node{Id: "test"}
+	if got := (IDHash{}).ID(node); got != "test" {
+		t.Errorf("IDHash.ID(%v) => got %s, want %s", node, got, node.Id)
+	}
+	if got := (IDHash{}).ID(nil); got != "" {
+		t.Errorf("IDHash.ID(nil) => got %s, want empty", got)
+	}
+}
+
 func TestNewStatusInfo(t *testing.T) {
 	node := &core.Node{Id: "test"}
 	info := newStatusInfo(node)

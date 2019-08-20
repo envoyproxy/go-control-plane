@@ -85,7 +85,7 @@ func main() {
 	// create a cache
 	signal := make(chan struct{})
 	cb := &callbacks{signal: signal}
-	config := cache.NewSnapshotCache(mode == resource.Ads, test.Hasher{}, logger{})
+	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
 	srv := server.NewServer(config, cb)
 	als := &test.AccessLogService{}
 
