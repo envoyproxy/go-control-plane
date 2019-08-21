@@ -37,7 +37,7 @@ func (svc *AccessLogService) StreamAccessLogs(stream als.AccessLogService_Stream
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
-			continue
+			return nil
 		}
 		if msg.Identifier != nil {
 			logName = msg.Identifier.LogName
