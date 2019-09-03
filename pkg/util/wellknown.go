@@ -84,6 +84,8 @@ const (
 	ProxyProtocol = "envoy.listener.proxy_protocol"
 	// TlsInspector listener filter
 	TlsInspector = "envoy.listener.tls_inspector"
+	// HttpInspector listener filter
+	HttpInspector = "envoy.listener.http_inspector"
 )
 
 // Tracing provider names
