@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	alf "github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v2"
-	als "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
+	alf "github.com/envoyproxy/go-control-plane/v2/envoy/data/accesslog/v2"
+	als "github.com/envoyproxy/go-control-plane/v2/envoy/service/accesslog/v2"
 )
 
 // AccessLogService buffers access logs from the remote Envoy nodes.

@@ -18,7 +18,7 @@ package cache
 import (
 	"context"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
 )
 
 // Request is an alias for the discovery request type.

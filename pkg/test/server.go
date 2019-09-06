@@ -24,10 +24,10 @@ import (
 
 	"google.golang.org/grpc"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	accesslog "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	xds "github.com/envoyproxy/go-control-plane/pkg/server"
+	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	accesslog "github.com/envoyproxy/go-control-plane/v2/envoy/service/accesslog/v2"
+	discovery "github.com/envoyproxy/go-control-plane/v2/envoy/service/discovery/v2"
+	xds "github.com/envoyproxy/go-control-plane/v2/pkg/server"
 )
 
 const (

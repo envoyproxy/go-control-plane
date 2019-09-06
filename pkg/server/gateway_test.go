@@ -22,8 +22,8 @@ import (
 	"testing"
 	"testing/iotest"
 
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/server"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/server"
 )
 
 type logger struct {

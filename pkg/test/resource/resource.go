@@ -19,20 +19,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/ptypes"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/listener"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
-	als "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v2"
-	alf "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
-	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
-	tcp "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/util"
+	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/auth"
+	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
+	endpoint "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/endpoint"
+	listener "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/listener"
+	route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/route"
+	als "github.com/envoyproxy/go-control-plane/v2/envoy/config/accesslog/v2"
+	alf "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/accesslog/v2"
+	hcm "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/http_connection_manager/v2"
+	tcp "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/tcp_proxy/v2"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/util"
 )
 
 const (
@@ -67,7 +67,7 @@ func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 						Address: &core.Address{
 							Address: &core.Address_SocketAddress{
 								SocketAddress: &core.SocketAddress{
-									Protocol: core.TCP,
+									Protocol: core.SocketAddress_TCP,
 									Address:  localhost,
 									PortSpecifier: &core.SocketAddress_PortValue{
 										PortValue: port,
@@ -112,7 +112,7 @@ func MakeCluster(mode string, clusterName string) *v2.Cluster {
 				ApiConfigSource: &core.ApiConfigSource{
 					ApiType:      core.ApiConfigSource_REST,
 					ClusterNames: []string{XdsCluster},
-					RefreshDelay: &RefreshDelay,
+					RefreshDelay: ptypes.DurationProto(RefreshDelay),
 				},
 			},
 		}
@@ -121,7 +121,7 @@ func MakeCluster(mode string, clusterName string) *v2.Cluster {
 	connectTimeout := 5 * time.Second
 	return &v2.Cluster{
 		Name:                 clusterName,
-		ConnectTimeout:       &connectTimeout,
+		ConnectTimeout:       ptypes.DurationProto(connectTimeout),
 		ClusterDiscoveryType: &v2.Cluster_Type{Type: v2.Cluster_EDS},
 		EdsClusterConfig: &v2.Cluster_EdsClusterConfig{
 			EdsConfig: edsSource,
@@ -179,7 +179,7 @@ func configSource(mode string) *core.ConfigSource {
 			ApiConfigSource: &core.ApiConfigSource{
 				ApiType:      core.ApiConfigSource_REST,
 				ClusterNames: []string{XdsCluster},
-				RefreshDelay: &RefreshDelay,
+				RefreshDelay: ptypes.DurationProto(RefreshDelay),
 			},
 		}
 	}
@@ -203,14 +203,14 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 			},
 		},
 	}
-	alsConfigPbst, err := types.MarshalAny(alsConfig)
+	alsConfigPbst, err := ptypes.MarshalAny(alsConfig)
 	if err != nil {
 		panic(err)
 	}
 
 	// HTTP filter configuration
 	manager := &hcm.HttpConnectionManager{
-		CodecType:  hcm.AUTO,
+		CodecType:  hcm.HttpConnectionManager_AUTO,
 		StatPrefix: "http",
 		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
 			Rds: &hcm.Rds{
@@ -228,7 +228,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 			},
 		}},
 	}
-	pbst, err := types.MarshalAny(manager)
+	pbst, err := ptypes.MarshalAny(manager)
 	if err != nil {
 		panic(err)
 	}
@@ -238,7 +238,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		Address: &core.Address{
 			Address: &core.Address_SocketAddress{
 				SocketAddress: &core.SocketAddress{
-					Protocol: core.TCP,
+					Protocol: core.SocketAddress_TCP,
 					Address:  localhost,
 					PortSpecifier: &core.SocketAddress_PortValue{
 						PortValue: port,
@@ -266,7 +266,7 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 			Cluster: clusterName,
 		},
 	}
-	pbst, err := types.MarshalAny(config)
+	pbst, err := ptypes.MarshalAny(config)
 	if err != nil {
 		panic(err)
 	}
@@ -275,7 +275,7 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 		Address: &core.Address{
 			Address: &core.Address_SocketAddress{
 				SocketAddress: &core.SocketAddress{
-					Protocol: core.TCP,
+					Protocol: core.SocketAddress_TCP,
 					Address:  localhost,
 					PortSpecifier: &core.SocketAddress_PortValue{
 						PortValue: port,

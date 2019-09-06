@@ -18,11 +18,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gogo/protobuf/types"
+	pstruct "github.com/golang/protobuf/ptypes/struct"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/pkg/util"
+	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/util"
 )
 
 func TestConversion(t *testing.T) {
@@ -34,11 +34,11 @@ func TestConversion(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error %v", err)
 	}
-	pbst := map[string]*types.Value{
-		"version_info": &types.Value{Kind: &types.Value_StringValue{StringValue: "test"}},
-		"node": &types.Value{Kind: &types.Value_StructValue{StructValue: &types.Struct{
-			Fields: map[string]*types.Value{
-				"id": &types.Value{Kind: &types.Value_StringValue{StringValue: "proxy"}},
+	pbst := map[string]*pstruct.Value{
+		"version_info": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "test"}},
+		"node": &pstruct.Value{Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
+			Fields: map[string]*pstruct.Value{
+				"id": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
 			},
 		}}},
 	}

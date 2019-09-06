@@ -24,11 +24,11 @@ import (
 
 	"google.golang.org/grpc"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/server"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/server"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/test/resource"
 )
 
 type mockConfigWatcher struct {
