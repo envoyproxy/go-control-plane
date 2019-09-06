@@ -12,7 +12,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-package util_test
+package conversion_test
 
 import (
 	"reflect"
@@ -22,7 +22,7 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/util"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/conversion"
 )
 
 func TestConversion(t *testing.T) {
@@ -30,7 +30,7 @@ func TestConversion(t *testing.T) {
 		VersionInfo: "test",
 		Node:        &core.Node{Id: "proxy"},
 	}
-	st, err := util.MessageToStruct(pb)
+	st, err := conversion.MessageToStruct(pb)
 	if err != nil {
 		t.Fatalf("unexpected error %v", err)
 	}
@@ -47,7 +47,7 @@ func TestConversion(t *testing.T) {
 	}
 
 	out := &v2.DiscoveryRequest{}
-	err = util.StructToMessage(st, out)
+	err = conversion.StructToMessage(st, out)
 	if err != nil {
 		t.Fatalf("unexpected error %v", err)
 	}
@@ -55,11 +55,11 @@ func TestConversion(t *testing.T) {
 		t.Errorf("StructToMessage(%v) => got %v, want %v", st, out, pb)
 	}
 
-	if _, err = util.MessageToStruct(nil); err == nil {
+	if _, err = conversion.MessageToStruct(nil); err == nil {
 		t.Error("MessageToStruct(nil) => got no error")
 	}
 
-	if err = util.StructToMessage(nil, &v2.DiscoveryRequest{}); err == nil {
+	if err = conversion.StructToMessage(nil, &v2.DiscoveryRequest{}); err == nil {
 		t.Error("StructToMessage(nil) => got no error")
 	}
 }

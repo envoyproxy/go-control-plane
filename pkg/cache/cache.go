@@ -68,3 +68,12 @@ type Response struct {
 	// Resources to be included in the response.
 	Resources []Resource
 }
+
+// SkipFetchError is the error returned when the cache fetch is short
+// circuited due to the client's version already being up-to-date.
+type SkipFetchError struct{}
+
+// Error satisfies the error interface
+func (e SkipFetchError) Error() string {
+	return "skip fetch: version up to date"
+}

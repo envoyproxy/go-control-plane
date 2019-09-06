@@ -12,7 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-package util
+// Package wellknown contains common names for filters, listeners, etc.
+package wellknown
 
 // HTTP filter names
 const (
@@ -115,12 +116,3 @@ const (
 	// HTTPGRPCAccessLog sink for the HTTP gRPC access log service
 	HTTPGRPCAccessLog = "envoy.http_grpc_access_log"
 )
-
-// SkipFetchError is the error returned when the cache fetch is short
-// circuited due to the client's version already being up-to-date.
-type SkipFetchError struct{}
-
-// Error satisfies the error interface
-func (e SkipFetchError) Error() string {
-	return "skip fetch: version up to date"
-}
