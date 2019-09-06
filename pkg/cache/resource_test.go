@@ -18,10 +18,10 @@ import (
 	"reflect"
 	"testing"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	v2route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	v2route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/route"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/test/resource"
 )
 
 const (
