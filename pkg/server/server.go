@@ -132,13 +132,17 @@ func createResponse(resp *cache.Response, typeURL string) (*v2.DiscoveryResponse
 	}
 	resources := make([]*any.Any, len(resp.Resources))
 	for i := 0; i < len(resp.Resources); i++ {
-		data, err := proto.Marshal(resp.Resources[i])
+		// Envoy relies on serialized protobuf bytes for detecting changes to the resources.
+		// This requires deterministic serialization.
+		b := proto.NewBuffer(nil)
+		b.SetDeterministic(true)
+		err := b.Marshal(resp.Resources[i])
 		if err != nil {
 			return nil, err
 		}
 		resources[i] = &any.Any{
 			TypeUrl: typeURL,
-			Value:   data,
+			Value:   b.Bytes(),
 		}
 	}
 	out := &v2.DiscoveryResponse{
