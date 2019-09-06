@@ -55,31 +55,6 @@ in the same environment as the circle ci. This makes sure to produce a consisten
     ./build/run_docker.sh make build test
     ```
 
-1. Generate proto files (if you update the [data-plane-api](https://github.com/envoyproxy/data-plane-api)
-dependency)
-
-    ```sh
-    ./build/run_docker.sh make generate
-    ```
-
-    __NOTE__: you may need to apply a small patch to correct imports in the generate files:
-
-    ```sh
-    ./build/run_docker.sh make generate-patch
-    ```
-
-    Format the code:
-
-    ```sh
-    ./build/run_docker.sh make format
-    ```
-
-    Run build and unit tests again:
-
-    ```sh
-    ./build/run_docker.sh make build test
-    ```
-
 1. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
 
     ```sh
