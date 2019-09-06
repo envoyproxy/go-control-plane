@@ -7,6 +7,7 @@ import (
 
 	alf "github.com/envoyproxy/go-control-plane/v2/envoy/data/accesslog/v2"
 	als "github.com/envoyproxy/go-control-plane/v2/envoy/service/accesslog/v2"
+	alsgrpc "github.com/envoyproxy/go-control-plane/v2/envoy/service/accesslog/v2"
 )
 
 // AccessLogService buffers access logs from the remote Envoy nodes.
@@ -32,7 +33,7 @@ func (svc *AccessLogService) Dump(f func(string)) {
 }
 
 // StreamAccessLogs implements the access log service.
-func (svc *AccessLogService) StreamAccessLogs(stream als.AccessLogService_StreamAccessLogsServer) error {
+func (svc *AccessLogService) StreamAccessLogs(stream alsgrpc.AccessLogService_StreamAccessLogsServer) error {
 	var logName string
 	for {
 		msg, err := stream.Recv()
