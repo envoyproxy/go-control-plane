@@ -4,7 +4,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
 [![GoDoc](https://godoc.org/github.com/envoyproxy/go-control-plane?status.svg)](https://godoc.org/github.com/envoyproxy/go-control-plane)
 
-_Warning!_ This is a v2 branch used containing golang/protobuf stubs instead gogo/protobuf stubs.
+_Warning!_ This is a v2 branch containing golang/protobuf stubs instead gogo/protobuf stubs.
+The functionality is identical. The future development is going to be focused on v2 branch.
 
 This repository contains a Go-based implementation of an API server that
 implements the discovery service APIs defined in
