@@ -21,7 +21,8 @@ import (
 	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
 	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/http_connection_manager/v2"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/util"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/conversion"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/wellknown"
 )
 
 // Resource is the base interface for the xDS payload.
@@ -102,7 +103,7 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 			// extract route configuration names from HTTP connection manager
 			for _, chain := range v.FilterChains {
 				for _, filter := range chain.Filters {
-					if filter.Name != util.HTTPConnectionManager {
+					if filter.Name != wellknown.HTTPConnectionManager {
 						continue
 					}
 
@@ -112,7 +113,7 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 					if typedConfig := filter.GetTypedConfig(); typedConfig != nil {
 						ptypes.UnmarshalAny(typedConfig, config)
 					} else {
-						util.StructToMessage(filter.GetConfig(), config)
+						conversion.StructToMessage(filter.GetConfig(), config)
 					}
 
 					if config == nil {

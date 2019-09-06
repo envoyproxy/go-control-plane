@@ -32,7 +32,7 @@ import (
 	hcm "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/http_connection_manager/v2"
 	tcp "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/tcp_proxy/v2"
 	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/util"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/wellknown"
 )
 
 const (
@@ -219,10 +219,10 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 			},
 		},
 		HttpFilters: []*hcm.HttpFilter{{
-			Name: util.Router,
+			Name: wellknown.Router,
 		}},
 		AccessLog: []*alf.AccessLog{{
-			Name: util.HTTPGRPCAccessLog,
+			Name: wellknown.HTTPGRPCAccessLog,
 			ConfigType: &alf.AccessLog_TypedConfig{
 				TypedConfig: alsConfigPbst,
 			},
@@ -248,7 +248,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		},
 		FilterChains: []*listener.FilterChain{{
 			Filters: []*listener.Filter{{
-				Name: util.HTTPConnectionManager,
+				Name: wellknown.HTTPConnectionManager,
 				ConfigType: &listener.Filter_TypedConfig{
 					TypedConfig: pbst,
 				},
@@ -285,7 +285,7 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 		},
 		FilterChains: []*listener.FilterChain{{
 			Filters: []*listener.Filter{{
-				Name: util.TCPProxy,
+				Name: wellknown.TCPProxy,
 				ConfigType: &listener.Filter_TypedConfig{
 					TypedConfig: pbst,
 				},

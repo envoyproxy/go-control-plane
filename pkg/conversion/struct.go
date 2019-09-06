@@ -12,8 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-// Package util contains shared utility functions.
-package util
+// Package conversion contains shared utility functions for converting xDS resources.
+package conversion
 
 import (
 	"bytes"
