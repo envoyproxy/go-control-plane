@@ -4,10 +4,12 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
 [![GoDoc](https://godoc.org/github.com/envoyproxy/go-control-plane?status.svg)](https://godoc.org/github.com/envoyproxy/go-control-plane)
 
+_Warning!_ This is a v2 branch used containing golang/protobuf stubs instead gogo/protobuf stubs.
 
 This repository contains a Go-based implementation of an API server that
 implements the discovery service APIs defined in
 [data-plane-api](https://github.com/envoyproxy/data-plane-api).
+
 
 ## Scope
 
@@ -91,10 +93,10 @@ Register services on the gRPC server as follows.
 import (
 	"net"
 
-	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	xds "github.com/envoyproxy/go-control-plane/pkg/server"
+	api "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/v2/envoy/service/discovery/v2"
+	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+	xds "github.com/envoyproxy/go-control-plane/v2/pkg/server"
 )
 
 func main() {
@@ -120,7 +122,7 @@ As mentioned in [Scope](https://github.com/envoyproxy/go-control-plane/blob/mast
 Generate the key based on the node information as follows and cache the configurations.
 
 ```go
-import "github.com/envoyproxy/go-control-plane/pkg/cache"
+import "github.com/envoyproxy/go-control-plane/v2/pkg/cache"
 
 var clusters, endpoints, routes, listeners []cache.Resource
 
