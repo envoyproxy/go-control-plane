@@ -1,3 +1,0 @@
-[submodule "data-plane-api"]
-	path = data-plane-api
-	url = https://github.com/envoyproxy/data-plane-api

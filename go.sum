@@ -4,6 +4,8 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/envoyproxy/data-plane-api v0.0.0-20190730231413-fce39f75ee60 h1:3PJr0uBxndYrm1fpF/fxHuZKewdYW6c9wDrHSwBQ6Pc=
 github.com/envoyproxy/data-plane-api v0.0.0-20190806154519-5ced57515167 h1:xXkGke1qGZU+++OsluEDb8YhKVuMFLKStX2+hTikqrQ=
 github.com/envoyproxy/data-plane-api v0.0.0-20190819213215-0392a9a41783 h1:Xhemy9at3Ad6DeC5kynb82JGBOIg67/LYUKx7I4scIo=
+github.com/envoyproxy/go-control-plane v0.8.6 h1:qygnyt9M1DjMSKIvr4YZS76yt28JiAu/o2LFEA68bko=
+github.com/envoyproxy/go-control-plane v0.8.6/go.mod h1:XB9+ce7x+IrsjgIVnRnql0O61gj/np0/bGDfhJI3sCU=
 github.com/envoyproxy/protoc-gen-validate v0.0.0-20190405222122-d6164de49109 h1:FNgqGzbOm637YKRbYGKb9cqGo8i50++w/LWvMau7jrw=
 github.com/envoyproxy/protoc-gen-validate v0.0.0-20190405222122-d6164de49109/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/gogo/protobuf v1.2.2-0.20190730201129-28a6bbf47e48 h1:X+zN6RZXsvnrSJaAIQhZezPfAfvsqihKKR8oiLHid34=
