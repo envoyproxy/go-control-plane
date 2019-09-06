@@ -125,7 +125,7 @@ import "github.com/envoyproxy/go-control-plane/pkg/cache"
 
 var clusters, endpoints, routes, listeners []cache.Resource
 
-snapshotCache := cache.NewSnapshotCache(false, hash{}, nil)
+snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
 snapshot := cache.NewSnapshot("1.0", endpoints, clusters, routes, listeners)
 _ = snapshotCache.SetSnapshot("node1", snapshot)
 ```
