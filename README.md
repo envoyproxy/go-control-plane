@@ -89,6 +89,7 @@ Register services on the gRPC server as follows.
 
 ```go
 import (
+	"google.golang.org/grpc"
 	"net"
 
 	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
@@ -98,7 +99,7 @@ import (
 )
 
 func main() {
-	snapshotCache := cache.NewSnapshotCache(false, hash{}, nil)
+	snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
 	server := xds.NewServer(snapshotCache, nil)
 	grpcServer := grpc.NewServer()
 	lis, _ := net.Listen("tcp", ":8080")
