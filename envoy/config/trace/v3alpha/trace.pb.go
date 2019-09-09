@@ -6,7 +6,7 @@ package envoy_config_trace_v3alpha
 import (
 	fmt "fmt"
 	v1 "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"

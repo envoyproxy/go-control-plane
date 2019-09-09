@@ -5,9 +5,9 @@ package envoy_config_filter_accesslog_v2
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/route"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"

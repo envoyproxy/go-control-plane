@@ -6,8 +6,8 @@ package envoy_api_v2
 import (
 	context "context"
 	fmt "fmt"
-	endpoint "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/endpoint"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
+	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"

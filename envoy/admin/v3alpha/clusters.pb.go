@@ -5,8 +5,8 @@ package envoy_admin_v3alpha
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	proto "github.com/golang/protobuf/proto"
 	math "math"
 )

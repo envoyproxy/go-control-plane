@@ -6,8 +6,8 @@ package envoy_api_v3alpha
 import (
 	context "context"
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/route"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/route"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"

@@ -15,9 +15,9 @@
 package resource
 
 import (
-	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/auth"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 )
 
 const (

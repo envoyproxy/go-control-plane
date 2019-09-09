@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 )
 
 // NodeHash computes string identifiers for Envoy nodes.

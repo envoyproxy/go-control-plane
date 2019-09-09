@@ -6,7 +6,7 @@ package envoy_service_discovery_v3alpha
 import (
 	context "context"
 	fmt "fmt"
-	v3alpha "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	math "math"

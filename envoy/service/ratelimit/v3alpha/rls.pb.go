@@ -6,8 +6,8 @@ package envoy_service_ratelimit_v3alpha
 import (
 	context "context"
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	ratelimit "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/ratelimit"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	ratelimit "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/ratelimit"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"

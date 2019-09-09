@@ -5,7 +5,7 @@ package envoy_config_filter_fault_v2
 
 import (
 	fmt "fmt"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"

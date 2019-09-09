@@ -5,9 +5,9 @@ package envoy_config_filter_network_dubbo_proxy_v3alpha
 
 import (
 	fmt "fmt"
-	route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/route"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
-	matcher "github.com/envoyproxy/go-control-plane/v2/envoy/type/matcher"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/route"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	_ "github.com/golang/protobuf/ptypes/wrappers"

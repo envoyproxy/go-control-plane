@@ -5,10 +5,10 @@ package envoy_config_filter_network_http_connection_manager_v2
 
 import (
 	fmt "fmt"
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	v21 "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/accesslog/v2"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	v21 "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"

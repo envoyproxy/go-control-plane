@@ -5,9 +5,9 @@ package envoy_config_filter_http_fault_v3alpha
 
 import (
 	fmt "fmt"
-	route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/route"
-	v3alpha "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/fault/v3alpha"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/route"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/filter/fault/v3alpha"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"

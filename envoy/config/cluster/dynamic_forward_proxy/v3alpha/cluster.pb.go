@@ -5,7 +5,7 @@ package envoy_config_cluster_dynamic_forward_proxy_v3alpha
 
 import (
 	fmt "fmt"
-	v3alpha "github.com/envoyproxy/go-control-plane/v2/envoy/config/common/dynamic_forward_proxy/v3alpha"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/common/dynamic_forward_proxy/v3alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	math "math"

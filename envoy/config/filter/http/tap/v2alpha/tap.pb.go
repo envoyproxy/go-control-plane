@@ -5,7 +5,7 @@ package envoy_config_filter_http_tap_v2alpha
 
 import (
 	fmt "fmt"
-	v2alpha "github.com/envoyproxy/go-control-plane/v2/envoy/config/common/tap/v2alpha"
+	v2alpha "github.com/envoyproxy/go-control-plane/envoy/config/common/tap/v2alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	math "math"

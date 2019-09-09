@@ -5,12 +5,12 @@ package envoy_config_bootstrap_v2
 
 import (
 	fmt "fmt"
-	v22 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/auth"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/config/metrics/v2"
-	v2alpha "github.com/envoyproxy/go-control-plane/v2/envoy/config/overload/v2alpha"
-	v21 "github.com/envoyproxy/go-control-plane/v2/envoy/config/trace/v2"
+	v22 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/config/metrics/v2"
+	v2alpha "github.com/envoyproxy/go-control-plane/envoy/config/overload/v2alpha"
+	v21 "github.com/envoyproxy/go-control-plane/envoy/config/trace/v2"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"

@@ -5,8 +5,8 @@ package envoy_api_v2_listener
 
 import (
 	fmt "fmt"
-	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/auth"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"

@@ -6,7 +6,7 @@ package envoy_service_auth_v2alpha
 import (
 	context "context"
 	fmt "fmt"
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/service/auth/v2"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	math "math"

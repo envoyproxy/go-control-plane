@@ -6,7 +6,7 @@
 
 SHELL 	:= /bin/bash
 BINDIR	:= bin
-PKG 		:= github.com/envoyproxy/go-control-plane/v2
+PKG 		:= github.com/envoyproxy/go-control-plane
 
 .PHONY: build
 build:

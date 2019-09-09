@@ -6,7 +6,7 @@ package envoy_service_metrics_v2
 import (
 	context "context"
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	_go "github.com/prometheus/client_model/go"

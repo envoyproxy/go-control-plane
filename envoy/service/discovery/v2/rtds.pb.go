@@ -6,7 +6,7 @@ package envoy_service_discovery_v2
 import (
 	context "context"
 	fmt "fmt"
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	_struct "github.com/golang/protobuf/ptypes/struct"

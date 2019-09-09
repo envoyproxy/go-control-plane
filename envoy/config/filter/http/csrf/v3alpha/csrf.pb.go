@@ -5,8 +5,8 @@ package envoy_config_filter_http_csrf_v3alpha
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	matcher "github.com/envoyproxy/go-control-plane/v2/envoy/type/matcher"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	math "math"

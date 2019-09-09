@@ -5,7 +5,7 @@ package envoy_admin_v2alpha
 
 import (
 	fmt "fmt"
-	v2alpha "github.com/envoyproxy/go-control-plane/v2/envoy/service/tap/v2alpha"
+	v2alpha "github.com/envoyproxy/go-control-plane/envoy/service/tap/v2alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	math "math"

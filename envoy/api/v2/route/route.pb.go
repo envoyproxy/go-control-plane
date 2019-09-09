@@ -5,9 +5,9 @@ package envoy_api_v2_route
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	_type "github.com/envoyproxy/go-control-plane/v2/envoy/type"
-	matcher "github.com/envoyproxy/go-control-plane/v2/envoy/type/matcher"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
+	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"

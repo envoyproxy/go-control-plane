@@ -5,7 +5,7 @@ package envoy_config_filter_http_rbac_v2
 
 import (
 	fmt "fmt"
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/config/rbac/v2"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/config/rbac/v2"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	math "math"

@@ -5,7 +5,7 @@ package envoy_config_common_dynamic_forward_proxy_v2alpha
 
 import (
 	fmt "fmt"
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"

@@ -5,7 +5,7 @@ package envoy_service_auth_v2
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	math "math"

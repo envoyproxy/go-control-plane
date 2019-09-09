@@ -5,7 +5,7 @@ package envoy_api_v3alpha
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
 	proto "github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"
 	status "google.golang.org/genproto/googleapis/rpc/status"

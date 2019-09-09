@@ -18,11 +18,11 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/auth"
-	hcm "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/http_connection_manager/v2"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/conversion"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/wellknown"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/conversion"
+	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
 // Resource is the base interface for the xDS payload.

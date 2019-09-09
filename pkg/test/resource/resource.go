@@ -21,18 +21,18 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/auth"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	endpoint "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/endpoint"
-	listener "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/listener"
-	route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/route"
-	als "github.com/envoyproxy/go-control-plane/v2/envoy/config/accesslog/v2"
-	alf "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/accesslog/v2"
-	hcm "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/http_connection_manager/v2"
-	tcp "github.com/envoyproxy/go-control-plane/v2/envoy/config/filter/network/tcp_proxy/v2"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/wellknown"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
+	listener "github.com/envoyproxy/go-control-plane/envoy/api/v2/listener"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	als "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v2"
+	alf "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
+	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
+	tcp "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
 const (

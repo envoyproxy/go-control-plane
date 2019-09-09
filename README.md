@@ -70,10 +70,10 @@ import (
 	"google.golang.org/grpc"
 	"net"
 
-	api "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	discovery "github.com/envoyproxy/go-control-plane/v2/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
-	xds "github.com/envoyproxy/go-control-plane/v2/pkg/server"
+	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	xds "github.com/envoyproxy/go-control-plane/pkg/server"
 )
 
 func main() {
@@ -99,7 +99,7 @@ As mentioned in [Scope](https://github.com/envoyproxy/go-control-plane/blob/mast
 Generate the key based on the node information as follows and cache the configurations.
 
 ```go
-import "github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+import "github.com/envoyproxy/go-control-plane/pkg/cache"
 
 var clusters, endpoints, routes, listeners []cache.Resource
 

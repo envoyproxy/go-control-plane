@@ -6,7 +6,7 @@ package envoy_service_discovery_v2
 import (
 	context "context"
 	fmt "fmt"
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"

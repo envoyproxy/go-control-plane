@@ -5,9 +5,9 @@ package envoy_admin_v3alpha
 
 import (
 	fmt "fmt"
-	v3alpha1 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha"
-	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/auth"
-	v3alpha "github.com/envoyproxy/go-control-plane/v2/envoy/config/bootstrap/v3alpha"
+	v3alpha1 "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/auth"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/bootstrap/v3alpha"
 	proto "github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"

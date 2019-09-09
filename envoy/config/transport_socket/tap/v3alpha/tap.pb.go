@@ -5,8 +5,8 @@ package envoy_config_transport_socket_tap_v3alpha
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	v3alpha "github.com/envoyproxy/go-control-plane/v2/envoy/config/common/tap/v3alpha"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/common/tap/v3alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	math "math"

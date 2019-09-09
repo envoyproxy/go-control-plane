@@ -27,11 +27,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	v2grpc "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	discoverygrpc "github.com/envoyproxy/go-control-plane/v2/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/cache"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	v2grpc "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 )
 
 // Server is a collection of handlers for streaming discovery requests.

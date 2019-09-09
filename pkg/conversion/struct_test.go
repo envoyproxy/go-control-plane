@@ -20,9 +20,9 @@ import (
 
 	pstruct "github.com/golang/protobuf/ptypes/struct"
 
-	v2 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/v2/pkg/conversion"
+	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	"github.com/envoyproxy/go-control-plane/pkg/conversion"
 )
 
 func TestConversion(t *testing.T) {

@@ -6,8 +6,8 @@ package envoy_service_discovery_v3alpha
 import (
 	context "context"
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	endpoint "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/endpoint"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/endpoint"
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	_ "google.golang.org/genproto/googleapis/api/annotations"

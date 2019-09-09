@@ -6,7 +6,7 @@ package envoy_service_tap_v3alpha
 import (
 	context "context"
 	fmt "fmt"
-	v3alpha "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"

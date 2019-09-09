@@ -5,12 +5,12 @@ package envoy_config_bootstrap_v3alpha
 
 import (
 	fmt "fmt"
-	v3alpha3 "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha"
-	auth "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/auth"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	v3alpha "github.com/envoyproxy/go-control-plane/v2/envoy/config/metrics/v3alpha"
-	v3alpha2 "github.com/envoyproxy/go-control-plane/v2/envoy/config/overload/v3alpha"
-	v3alpha1 "github.com/envoyproxy/go-control-plane/v2/envoy/config/trace/v3alpha"
+	v3alpha3 "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/auth"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/metrics/v3alpha"
+	v3alpha2 "github.com/envoyproxy/go-control-plane/envoy/config/overload/v3alpha"
+	v3alpha1 "github.com/envoyproxy/go-control-plane/envoy/config/trace/v3alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"

@@ -5,9 +5,9 @@ package envoy_config_rbac_v3alpha
 
 import (
 	fmt "fmt"
-	core "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/core"
-	route "github.com/envoyproxy/go-control-plane/v2/envoy/api/v3alpha/route"
-	matcher "github.com/envoyproxy/go-control-plane/v2/envoy/type/matcher"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/route"
+	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	v1alpha1 "google.golang.org/genproto/googleapis/api/expr/v1alpha1"
