@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/ptypes"
 )
 
 // ensure the imports are used
@@ -30,8 +30,11 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = types.DynamicAny{}
+	_ = ptypes.DynamicAny{}
 )
+
+// define the regex for a UUID once up-front
+var _common_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
 // Validate checks the field values on CommonExtensionConfig with the rules
 // defined in the proto definition for this message. If any rules are
@@ -45,51 +48,36 @@ func (m *CommonExtensionConfig) Validate() error {
 
 	case *CommonExtensionConfig_AdminConfig:
 
-		{
-			tmp := m.GetAdminConfig()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CommonExtensionConfigValidationError{
-						field:  "AdminConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetAdminConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommonExtensionConfigValidationError{
+					field:  "AdminConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
 
 	case *CommonExtensionConfig_StaticConfig:
 
-		{
-			tmp := m.GetStaticConfig()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CommonExtensionConfigValidationError{
-						field:  "StaticConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetStaticConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommonExtensionConfigValidationError{
+					field:  "StaticConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
 
 	case *CommonExtensionConfig_TapdsConfig:
 
-		{
-			tmp := m.GetTapdsConfig()
-
-			if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-				if err := v.Validate(); err != nil {
-					return CommonExtensionConfigValidationError{
-						field:  "TapdsConfig",
-						reason: "embedded message failed validation",
-						cause:  err,
-					}
+		if v, ok := interface{}(m.GetTapdsConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommonExtensionConfigValidationError{
+					field:  "TapdsConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
 				}
 			}
 		}
@@ -248,17 +236,12 @@ func (m *CommonExtensionConfig_TapDSConfig) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetConfigSource()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return CommonExtensionConfig_TapDSConfigValidationError{
-					field:  "ConfigSource",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetConfigSource()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonExtensionConfig_TapDSConfigValidationError{
+				field:  "ConfigSource",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}

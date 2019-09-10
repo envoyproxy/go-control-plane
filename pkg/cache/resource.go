@@ -15,19 +15,19 @@
 package cache
 
 import (
-	"github.com/gogo/protobuf/proto"
-	"github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/util"
+	"github.com/envoyproxy/go-control-plane/pkg/conversion"
+	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
 // Resource is the base interface for the xDS payload.
 type Resource interface {
 	proto.Message
-	Equal(interface{}) bool
 }
 
 // Resource types in xDS v2.
@@ -103,7 +103,7 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 			// extract route configuration names from HTTP connection manager
 			for _, chain := range v.FilterChains {
 				for _, filter := range chain.Filters {
-					if filter.Name != util.HTTPConnectionManager {
+					if filter.Name != wellknown.HTTPConnectionManager {
 						continue
 					}
 
@@ -111,9 +111,9 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 
 					// use typed config if available
 					if typedConfig := filter.GetTypedConfig(); typedConfig != nil {
-						types.UnmarshalAny(typedConfig, config)
+						ptypes.UnmarshalAny(typedConfig, config)
 					} else {
-						util.StructToMessage(filter.GetConfig(), config)
+						conversion.StructToMessage(filter.GetConfig(), config)
 					}
 
 					if config == nil {

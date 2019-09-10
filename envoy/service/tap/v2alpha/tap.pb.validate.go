@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/ptypes"
 )
 
 // ensure the imports are used
@@ -30,8 +30,11 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = types.DynamicAny{}
+	_ = ptypes.DynamicAny{}
 )
+
+// define the regex for a UUID once up-front
+var _tap_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
 // Validate checks the field values on StreamTapsRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, an
@@ -41,34 +44,24 @@ func (m *StreamTapsRequest) Validate() error {
 		return nil
 	}
 
-	{
-		tmp := m.GetIdentifier()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return StreamTapsRequestValidationError{
-					field:  "Identifier",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetIdentifier()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamTapsRequestValidationError{
+				field:  "Identifier",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
 
 	// no validation rules for TraceId
 
-	{
-		tmp := m.GetTrace()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return StreamTapsRequestValidationError{
-					field:  "Trace",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetTrace()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamTapsRequestValidationError{
+				field:  "Trace",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}
@@ -214,17 +207,12 @@ func (m *StreamTapsRequest_Identifier) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetNode()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return StreamTapsRequest_IdentifierValidationError{
-					field:  "Node",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StreamTapsRequest_IdentifierValidationError{
+				field:  "Node",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
 	}

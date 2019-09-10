@@ -4,10 +4,10 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
 [![GoDoc](https://godoc.org/github.com/envoyproxy/go-control-plane?status.svg)](https://godoc.org/github.com/envoyproxy/go-control-plane)
 
-
 This repository contains a Go-based implementation of an API server that
 implements the discovery service APIs defined in
 [data-plane-api](https://github.com/envoyproxy/data-plane-api).
+
 
 ## Scope
 
@@ -47,31 +47,6 @@ It's recommended to run the command with script `./build/run_docker.sh` as it ex
 in the same environment as the circle ci. This makes sure to produce a consistent set of generated files.
 
 1. Setup existing build:
-
-    ```sh
-    ./build/run_docker.sh make build test
-    ```
-
-1. Generate proto files (if you update the [data-plane-api](https://github.com/envoyproxy/data-plane-api)
-dependency)
-
-    ```sh
-    ./build/run_docker.sh make generate
-    ```
-
-    __NOTE__: you may need to apply a small patch to correct imports in the generate files:
-
-    ```sh
-    ./build/run_docker.sh make generate-patch
-    ```
-
-    Format the code:
-
-    ```sh
-    ./build/run_docker.sh make format
-    ```
-
-    Run build and unit tests again:
 
     ```sh
     ./build/run_docker.sh make build test

@@ -21,26 +21,27 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"github.com/gogo/protobuf/proto"
-	"github.com/gogo/protobuf/types"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/any"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	v2grpc "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 )
 
 // Server is a collection of handlers for streaming discovery requests.
 type Server interface {
-	v2.EndpointDiscoveryServiceServer
-	v2.ClusterDiscoveryServiceServer
-	v2.RouteDiscoveryServiceServer
-	v2.ListenerDiscoveryServiceServer
-	discovery.AggregatedDiscoveryServiceServer
-	discovery.SecretDiscoveryServiceServer
+	v2grpc.EndpointDiscoveryServiceServer
+	v2grpc.ClusterDiscoveryServiceServer
+	v2grpc.RouteDiscoveryServiceServer
+	v2grpc.ListenerDiscoveryServiceServer
+	discoverygrpc.AggregatedDiscoveryServiceServer
+	discoverygrpc.SecretDiscoveryServiceServer
 
 	// Fetch is the universal fetch method.
 	Fetch(context.Context, *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error)
@@ -130,15 +131,19 @@ func createResponse(resp *cache.Response, typeURL string) (*v2.DiscoveryResponse
 	if resp == nil {
 		return nil, errors.New("missing response")
 	}
-	resources := make([]*types.Any, len(resp.Resources))
+	resources := make([]*any.Any, len(resp.Resources))
 	for i := 0; i < len(resp.Resources); i++ {
-		data, err := proto.Marshal(resp.Resources[i])
+		// Envoy relies on serialized protobuf bytes for detecting changes to the resources.
+		// This requires deterministic serialization.
+		b := proto.NewBuffer(nil)
+		b.SetDeterministic(true)
+		err := b.Marshal(resp.Resources[i])
 		if err != nil {
 			return nil, err
 		}
-		resources[i] = &types.Any{
+		resources[i] = &any.Any{
 			TypeUrl: typeURL,
-			Value:   data,
+			Value:   b.Bytes(),
 		}
 	}
 	out := &v2.DiscoveryResponse{
@@ -339,27 +344,27 @@ func (s *server) handler(stream stream, typeURL string) error {
 	return err
 }
 
-func (s *server) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
+func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
 	return s.handler(stream, cache.AnyType)
 }
 
-func (s *server) StreamEndpoints(stream v2.EndpointDiscoveryService_StreamEndpointsServer) error {
+func (s *server) StreamEndpoints(stream v2grpc.EndpointDiscoveryService_StreamEndpointsServer) error {
 	return s.handler(stream, cache.EndpointType)
 }
 
-func (s *server) StreamClusters(stream v2.ClusterDiscoveryService_StreamClustersServer) error {
+func (s *server) StreamClusters(stream v2grpc.ClusterDiscoveryService_StreamClustersServer) error {
 	return s.handler(stream, cache.ClusterType)
 }
 
-func (s *server) StreamRoutes(stream v2.RouteDiscoveryService_StreamRoutesServer) error {
+func (s *server) StreamRoutes(stream v2grpc.RouteDiscoveryService_StreamRoutesServer) error {
 	return s.handler(stream, cache.RouteType)
 }
 
-func (s *server) StreamListeners(stream v2.ListenerDiscoveryService_StreamListenersServer) error {
+func (s *server) StreamListeners(stream v2grpc.ListenerDiscoveryService_StreamListenersServer) error {
 	return s.handler(stream, cache.ListenerType)
 }
 
-func (s *server) StreamSecrets(stream discovery.SecretDiscoveryService_StreamSecretsServer) error {
+func (s *server) StreamSecrets(stream discoverygrpc.SecretDiscoveryService_StreamSecretsServer) error {
 	return s.handler(stream, cache.SecretType)
 }
 
@@ -421,26 +426,26 @@ func (s *server) FetchSecrets(ctx context.Context, req *v2.DiscoveryRequest) (*v
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) DeltaAggregatedResources(_ discovery.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return errors.New("not implemented")
 }
 
-func (s *server) DeltaEndpoints(_ v2.EndpointDiscoveryService_DeltaEndpointsServer) error {
+func (s *server) DeltaEndpoints(_ v2grpc.EndpointDiscoveryService_DeltaEndpointsServer) error {
 	return errors.New("not implemented")
 }
 
-func (s *server) DeltaClusters(_ v2.ClusterDiscoveryService_DeltaClustersServer) error {
+func (s *server) DeltaClusters(_ v2grpc.ClusterDiscoveryService_DeltaClustersServer) error {
 	return errors.New("not implemented")
 }
 
-func (s *server) DeltaRoutes(_ v2.RouteDiscoveryService_DeltaRoutesServer) error {
+func (s *server) DeltaRoutes(_ v2grpc.RouteDiscoveryService_DeltaRoutesServer) error {
 	return errors.New("not implemented")
 }
 
-func (s *server) DeltaListeners(_ v2.ListenerDiscoveryService_DeltaListenersServer) error {
+func (s *server) DeltaListeners(_ v2grpc.ListenerDiscoveryService_DeltaListenersServer) error {
 	return errors.New("not implemented")
 }
 
-func (s *server) DeltaSecrets(_ discovery.SecretDiscoveryService_DeltaSecretsServer) error {
+func (s *server) DeltaSecrets(_ discoverygrpc.SecretDiscoveryService_DeltaSecretsServer) error {
 	return errors.New("not implemented")
 }

@@ -24,9 +24,9 @@ import (
 
 	"google.golang.org/grpc"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	accesslog "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	v2grpc "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
+	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server"
 )
 
@@ -55,7 +55,7 @@ func RunHTTP(ctx context.Context, upstreamPort uint) {
 	}()
 }
 
-// RunAccessLogServer starts an accesslog service.
+// RunAccessLogServer starts an accessloggrpc service.
 func RunAccessLogServer(ctx context.Context, als *AccessLogService, port uint) {
 	grpcServer := grpc.NewServer()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
@@ -63,7 +63,7 @@ func RunAccessLogServer(ctx context.Context, als *AccessLogService, port uint) {
 		log.Fatal(err)
 	}
 
-	accesslog.RegisterAccessLogServiceServer(grpcServer, als)
+	accessloggrpc.RegisterAccessLogServiceServer(grpcServer, als)
 	log.Printf("access log server listening on %d\n", port)
 
 	go func() {
@@ -94,12 +94,12 @@ func RunManagementServer(ctx context.Context, server xds.Server, port uint) {
 	}
 
 	// register services
-	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
-	v2.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
-	v2.RegisterClusterDiscoveryServiceServer(grpcServer, server)
-	v2.RegisterRouteDiscoveryServiceServer(grpcServer, server)
-	v2.RegisterListenerDiscoveryServiceServer(grpcServer, server)
-	discovery.RegisterSecretDiscoveryServiceServer(grpcServer, server)
+	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
+	v2grpc.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	v2grpc.RegisterClusterDiscoveryServiceServer(grpcServer, server)
+	v2grpc.RegisterRouteDiscoveryServiceServer(grpcServer, server)
+	v2grpc.RegisterListenerDiscoveryServiceServer(grpcServer, server)
+	discoverygrpc.RegisterSecretDiscoveryServiceServer(grpcServer, server)
 
 	log.Printf("management server listening on %d\n", port)
 	go func() {
