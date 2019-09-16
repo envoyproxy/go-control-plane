@@ -21,6 +21,7 @@ import (
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/conversion"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
@@ -32,12 +33,14 @@ type Resource interface {
 
 // Resource types in xDS v2.
 const (
-	typePrefix   = "type.googleapis.com/envoy.api.v2."
-	EndpointType = typePrefix + "ClusterLoadAssignment"
-	ClusterType  = typePrefix + "Cluster"
-	RouteType    = typePrefix + "RouteConfiguration"
-	ListenerType = typePrefix + "Listener"
-	SecretType   = typePrefix + "auth.Secret"
+	apiTypePrefix   = "type.googleapis.com/envoy.api.v2."
+	discoTypePrefix = "type.googleapis.com/envoy.service.discovery.v2."
+	EndpointType    = apiTypePrefix + "ClusterLoadAssignment"
+	ClusterType     = apiTypePrefix + "Cluster"
+	RouteType       = apiTypePrefix + "RouteConfiguration"
+	ListenerType    = apiTypePrefix + "Listener"
+	SecretType      = apiTypePrefix + "auth.Secret"
+	RuntimeType     = discoTypePrefix + "Runtime"
 
 	// AnyType is used only by ADS
 	AnyType = ""
@@ -51,6 +54,7 @@ var (
 		RouteType,
 		ListenerType,
 		SecretType,
+		RuntimeType,
 	}
 )
 
@@ -66,6 +70,8 @@ func GetResourceName(res Resource) string {
 	case *v2.Listener:
 		return v.GetName()
 	case *auth.Secret:
+		return v.GetName()
+	case *discovery.Runtime:
 		return v.GetName()
 	default:
 		return ""
@@ -125,6 +131,8 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 					}
 				}
 			}
+		case *discovery.Runtime:
+			// no dependencies
 		}
 	}
 	return out

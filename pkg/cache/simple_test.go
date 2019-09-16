@@ -48,13 +48,15 @@ var (
 		[]cache.Resource{endpoint},
 		[]cache.Resource{cluster},
 		[]cache.Resource{route},
-		[]cache.Resource{listener})
+		[]cache.Resource{listener},
+		[]cache.Resource{runtime})
 
 	names = map[string][]string{
 		cache.EndpointType: []string{clusterName},
 		cache.ClusterType:  nil,
 		cache.RouteType:    []string{routeName},
 		cache.ListenerType: nil,
+		cache.RuntimeType:  nil,
 	}
 
 	testTypes = []string{
@@ -62,6 +64,7 @@ var (
 		cache.ClusterType,
 		cache.RouteType,
 		cache.ListenerType,
+		cache.RuntimeType,
 	}
 )
 

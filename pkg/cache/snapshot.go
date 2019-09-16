@@ -63,6 +63,9 @@ type Snapshot struct {
 
 	// Secrets are items in the SDS response payload.
 	Secrets Resources
+
+	// Runtimes are items in the RTDS response payload.
+	Runtimes Resources
 }
 
 // NewSnapshot creates a snapshot from response types and a version.
@@ -70,12 +73,14 @@ func NewSnapshot(version string,
 	endpoints []Resource,
 	clusters []Resource,
 	routes []Resource,
-	listeners []Resource) Snapshot {
+	listeners []Resource,
+	runtimes []Resource) Snapshot {
 	return Snapshot{
 		Endpoints: NewResources(version, endpoints),
 		Clusters:  NewResources(version, clusters),
 		Routes:    NewResources(version, routes),
 		Listeners: NewResources(version, listeners),
+		Runtimes:  NewResources(version, runtimes),
 	}
 }
 
@@ -122,6 +127,8 @@ func (s *Snapshot) GetResources(typ string) map[string]Resource {
 		return s.Listeners.Items
 	case SecretType:
 		return s.Secrets.Items
+	case RuntimeType:
+		return s.Runtimes.Items
 	}
 	return nil
 }
@@ -142,6 +149,8 @@ func (s *Snapshot) GetVersion(typ string) string {
 		return s.Listeners.Version
 	case SecretType:
 		return s.Secrets.Version
+	case RuntimeType:
+		return s.Runtimes.Version
 	}
 	return ""
 }

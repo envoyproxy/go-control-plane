@@ -51,6 +51,7 @@ var (
 	clusters      int
 	httpListeners int
 	tcpListeners  int
+	runtimes      int
 	tls           bool
 
 	nodeID string
@@ -70,6 +71,7 @@ func init() {
 	flag.IntVar(&clusters, "clusters", 4, "Number of clusters")
 	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
 	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
+	flag.IntVar(&runtimes, "runtimes", 1, "Number of RTDS layers")
 	flag.StringVar(&nodeID, "nodeID", "test-id", "Node ID")
 	flag.BoolVar(&tls, "tls", false, "Enable TLS on all listeners and use SDS for secret delivery")
 }
@@ -98,6 +100,7 @@ func main() {
 		NumHTTPListeners: httpListeners,
 		NumTCPListeners:  tcpListeners,
 		TLS:              tls,
+		NumRuntimes:      runtimes,
 	}
 
 	// start the xDS server
