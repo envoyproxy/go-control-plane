@@ -29,7 +29,6 @@ const (
 	routeName    = "route0"
 	listenerName = "listener0"
 	runtimeName  = "runtime0"
-	fieldName    = "field0"
 )
 
 var (
