@@ -29,3 +29,14 @@ static_resources:
         address: 127.0.0.1
         port_value: 18001
     name: xds_cluster
+layered_runtime:
+  layers:
+    - name: runtime-0
+      rtds_layer:
+        rtds_config:
+          api_config_source:
+            api_type: REST
+            refresh_delay: {nanos: 500000000} # 1/2s
+            cluster_names:
+            - xds_cluster
+        name: runtime-0

@@ -33,14 +33,14 @@ type Resource interface {
 
 // Resource types in xDS v2.
 const (
-	apiTypePrefix   = "type.googleapis.com/envoy.api.v2."
-	discoTypePrefix = "type.googleapis.com/envoy.service.discovery.v2."
-	EndpointType    = apiTypePrefix + "ClusterLoadAssignment"
-	ClusterType     = apiTypePrefix + "Cluster"
-	RouteType       = apiTypePrefix + "RouteConfiguration"
-	ListenerType    = apiTypePrefix + "Listener"
-	SecretType      = apiTypePrefix + "auth.Secret"
-	RuntimeType     = discoTypePrefix + "Runtime"
+	apiTypePrefix       = "type.googleapis.com/envoy.api.v2."
+	discoveryTypePrefix = "type.googleapis.com/envoy.service.discovery.v2."
+	EndpointType        = apiTypePrefix + "ClusterLoadAssignment"
+	ClusterType         = apiTypePrefix + "Cluster"
+	RouteType           = apiTypePrefix + "RouteConfiguration"
+	ListenerType        = apiTypePrefix + "Listener"
+	SecretType          = apiTypePrefix + "auth.Secret"
+	RuntimeType         = discoveryTypePrefix + "Runtime"
 
 	// AnyType is used only by ADS
 	AnyType = ""

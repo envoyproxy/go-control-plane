@@ -297,11 +297,20 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 	}
 }
 
-// MakeRuntime creates an RTDS layer with no fields.
+// MakeRuntime creates an RTDS layer with some fields.
 func MakeRuntime(runtimeName string) *discovery.Runtime {
 	return &discovery.Runtime{
-		Name:  runtimeName,
-		Layer: &pstruct.Struct{},
+		Name: runtimeName,
+		Layer: &pstruct.Struct{
+			Fields: map[string]*pstruct.Value{
+				"field-0": &pstruct.Value{
+					Kind: &pstruct.Value_NumberValue{NumberValue: 100},
+				},
+				"field-1": &pstruct.Value{
+					Kind: &pstruct.Value_StringValue{StringValue: "foobar"},
+				},
+			},
+		},
 	}
 }
 
