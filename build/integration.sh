@@ -12,7 +12,11 @@ set -o pipefail
 XDS=${XDS:-ads}
 
 # Number of RTDS layers.
-[ "$XDS" = "ads" ] && RUNTIMES=2 || RUNTIMES=1
+if [ "$XDS" = "ads" ]; then
+  RUNTIMES=2
+else
+  RUNTIMES=1
+fi
 
 (bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug "$@")&
 SERVER_PID=$!
