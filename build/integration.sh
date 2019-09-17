@@ -11,7 +11,14 @@ set -o pipefail
 # Management server type. Valid values are "ads", "xds", "rest"
 XDS=${XDS:-ads}
 
-(bin/test --xds=${XDS} -debug "$@")&
+# Number of RTDS layers.
+if [ "$XDS" = "ads" ]; then
+  RUNTIMES=2
+else
+  RUNTIMES=1
+fi
+
+(bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug "$@")&
 SERVER_PID=$!
 
 # Envoy start-up command

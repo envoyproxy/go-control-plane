@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"time"
 
+	pstruct "github.com/golang/protobuf/ptypes/struct"
+
 	"github.com/golang/protobuf/ptypes"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
@@ -31,6 +33,7 @@ import (
 	alf "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	tcp "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
@@ -294,6 +297,23 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 	}
 }
 
+// MakeRuntime creates an RTDS layer with some fields.
+func MakeRuntime(runtimeName string) *discovery.Runtime {
+	return &discovery.Runtime{
+		Name: runtimeName,
+		Layer: &pstruct.Struct{
+			Fields: map[string]*pstruct.Value{
+				"field-0": &pstruct.Value{
+					Kind: &pstruct.Value_NumberValue{NumberValue: 100},
+				},
+				"field-1": &pstruct.Value{
+					Kind: &pstruct.Value_StringValue{StringValue: "foobar"},
+				},
+			},
+		},
+	}
+}
+
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
 	// Xds indicates snapshot mode: ads, xds, or rest
@@ -311,6 +331,8 @@ type TestSnapshot struct {
 	// NumTCPListeners is the total number of TCP listeners to generate.
 	// Listeners are assigned clusters in a round-robin fashion.
 	NumTCPListeners int
+	// NumRuntimes is the total number of RTDS layers to generate.
+	NumRuntimes int
 	// TLS enables SDS-enabled TLS mode on all listeners
 	TLS bool
 }
@@ -367,11 +389,18 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		listeners[i] = listener
 	}
 
+	runtimes := make([]cache.Resource, ts.NumRuntimes)
+	for i := 0; i < ts.NumRuntimes; i++ {
+		name := fmt.Sprintf("runtime-%d", i)
+		runtimes[i] = MakeRuntime(name)
+	}
+
 	out := cache.Snapshot{
 		Endpoints: cache.NewResources(ts.Version, endpoints),
 		Clusters:  cache.NewResources(ts.Version, clusters),
 		Routes:    cache.NewResources(ts.Version, routes),
 		Listeners: cache.NewResources(ts.Version, listeners),
+		Runtimes:  cache.NewResources(ts.Version, runtimes),
 	}
 
 	if ts.TLS {

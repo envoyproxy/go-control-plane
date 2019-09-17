@@ -42,6 +42,7 @@ type Server interface {
 	v2grpc.ListenerDiscoveryServiceServer
 	discoverygrpc.AggregatedDiscoveryServiceServer
 	discoverygrpc.SecretDiscoveryServiceServer
+	discoverygrpc.RuntimeDiscoveryServiceServer
 
 	// Fetch is the universal fetch method.
 	Fetch(context.Context, *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error)
@@ -94,18 +95,21 @@ type watches struct {
 	routes    chan cache.Response
 	listeners chan cache.Response
 	secrets   chan cache.Response
+	runtimes  chan cache.Response
 
 	endpointCancel func()
 	clusterCancel  func()
 	routeCancel    func()
 	listenerCancel func()
 	secretCancel   func()
+	runtimeCancel  func()
 
 	endpointNonce string
 	clusterNonce  string
 	routeNonce    string
 	listenerNonce string
 	secretNonce   string
+	runtimeNonce  string
 }
 
 // Cancel all watches
@@ -124,6 +128,9 @@ func (values watches) Cancel() {
 	}
 	if values.secretCancel != nil {
 		values.secretCancel()
+	}
+	if values.runtimeCancel != nil {
+		values.runtimeCancel()
 	}
 }
 
@@ -250,6 +257,16 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			}
 			values.secretNonce = nonce
 
+		case resp, more := <-values.runtimes:
+			if !more {
+				return status.Errorf(codes.Unavailable, "runtimes watch failed")
+			}
+			nonce, err := send(resp, cache.RuntimeType)
+			if err != nil {
+				return err
+			}
+			values.runtimeNonce = nonce
+
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -311,6 +328,11 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 					values.secretCancel()
 				}
 				values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
+			case req.TypeUrl == cache.RuntimeType && (values.runtimeNonce == "" || values.runtimeNonce == nonce):
+				if values.runtimeCancel != nil {
+					values.runtimeCancel()
+				}
+				values.runtimes, values.runtimeCancel = s.cache.CreateWatch(*req)
 			}
 		}
 	}
@@ -366,6 +388,10 @@ func (s *server) StreamListeners(stream v2grpc.ListenerDiscoveryService_StreamLi
 
 func (s *server) StreamSecrets(stream discoverygrpc.SecretDiscoveryService_StreamSecretsServer) error {
 	return s.handler(stream, cache.SecretType)
+}
+
+func (s *server) StreamRuntime(stream discoverygrpc.RuntimeDiscoveryService_StreamRuntimeServer) error {
+	return s.handler(stream, cache.RuntimeType)
 }
 
 // Fetch is the universal fetch method.
@@ -426,6 +452,14 @@ func (s *server) FetchSecrets(ctx context.Context, req *v2.DiscoveryRequest) (*v
 	return s.Fetch(ctx, req)
 }
 
+func (s *server) FetchRuntime(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.Unavailable, "empty request")
+	}
+	req.TypeUrl = cache.RuntimeType
+	return s.Fetch(ctx, req)
+}
+
 func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return errors.New("not implemented")
 }
@@ -447,5 +481,9 @@ func (s *server) DeltaListeners(_ v2grpc.ListenerDiscoveryService_DeltaListeners
 }
 
 func (s *server) DeltaSecrets(_ discoverygrpc.SecretDiscoveryService_DeltaSecretsServer) error {
+	return errors.New("not implemented")
+}
+
+func (s *server) DeltaRuntime(_ discoverygrpc.RuntimeDiscoveryService_DeltaRuntimeServer) error {
 	return errors.New("not implemented")
 }
