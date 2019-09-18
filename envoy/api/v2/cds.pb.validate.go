@@ -1466,6 +1466,8 @@ func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for FailTrafficOnPanic
+
 	return nil
 }
 
