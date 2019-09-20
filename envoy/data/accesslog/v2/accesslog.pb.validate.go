@@ -468,6 +468,16 @@ func (m *AccessLogCommon) Validate() error {
 
 	// no validation rules for RouteName
 
+	if v, ok := interface{}(m.GetDownstreamDirectRemoteAddress()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "DownstreamDirectRemoteAddress",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

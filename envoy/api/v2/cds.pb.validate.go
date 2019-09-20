@@ -371,6 +371,16 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetLrsServer()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "LrsServer",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.ClusterDiscoveryType.(type) {
 
 	case *Cluster_Type:
@@ -1465,6 +1475,8 @@ func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for FailTrafficOnPanic
 
 	return nil
 }
