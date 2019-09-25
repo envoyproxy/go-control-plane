@@ -35,8 +35,6 @@ var (
 	_ = ptypes.DynamicAny{}
 
 	_ = core.RoutingPriority(0)
-
-	_ = core.RequestMethod(0)
 )
 
 // define the regex for a UUID once up-front
@@ -630,15 +628,6 @@ func (m *RouteMatch) Validate() error {
 	case *RouteMatch_Path:
 		// no validation rules for Path
 
-	case *RouteMatch_Regex:
-
-		if len(m.GetRegex()) > 1024 {
-			return RouteMatchValidationError{
-				field:  "Regex",
-				reason: "value length must be at most 1024 bytes",
-			}
-		}
-
 	case *RouteMatch_SafeRegex:
 
 		if m.GetSafeRegex() == nil {
@@ -730,18 +719,6 @@ func (m *CorsPolicy) Validate() error {
 		return nil
 	}
 
-	for idx, item := range m.GetAllowOriginRegex() {
-		_, _ = idx, item
-
-		if len(item) > 1024 {
-			return CorsPolicyValidationError{
-				field:  fmt.Sprintf("AllowOriginRegex[%v]", idx),
-				reason: "value length must be at most 1024 bytes",
-			}
-		}
-
-	}
-
 	for idx, item := range m.GetAllowOriginStringMatch() {
 		_, _ = idx, item
 
@@ -786,18 +763,6 @@ func (m *CorsPolicy) Validate() error {
 	}
 
 	switch m.EnabledSpecifier.(type) {
-
-	case *CorsPolicy_Enabled:
-
-		if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return CorsPolicyValidationError{
-					field:  "Enabled",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
 
 	case *CorsPolicy_FilterEnabled:
 
@@ -1220,6 +1185,21 @@ func (m *RetryPolicy) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	for idx, item := range m.GetRetriableHeaders() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RetryPolicyValidationError{
+					field:  fmt.Sprintf("RetriableHeaders[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -1722,13 +1702,6 @@ func (m *VirtualCluster) Validate() error {
 		return nil
 	}
 
-	if len(m.GetPattern()) > 1024 {
-		return VirtualClusterValidationError{
-			field:  "Pattern",
-			reason: "value length must be at most 1024 bytes",
-		}
-	}
-
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
@@ -1750,8 +1723,6 @@ func (m *VirtualCluster) Validate() error {
 			reason: "value length must be at least 1 bytes",
 		}
 	}
-
-	// no validation rules for Method
 
 	return nil
 }
@@ -1931,15 +1902,6 @@ func (m *HeaderMatcher) Validate() error {
 	case *HeaderMatcher_ExactMatch:
 		// no validation rules for ExactMatch
 
-	case *HeaderMatcher_RegexMatch:
-
-		if len(m.GetRegexMatch()) > 1024 {
-			return HeaderMatcherValidationError{
-				field:  "RegexMatch",
-				reason: "value length must be at most 1024 bytes",
-			}
-		}
-
 	case *HeaderMatcher_SafeRegexMatch:
 
 		if v, ok := interface{}(m.GetSafeRegexMatch()).(interface{ Validate() error }); ok {
@@ -2056,18 +2018,6 @@ func (m *QueryParameterMatcher) Validate() error {
 		return QueryParameterMatcherValidationError{
 			field:  "Name",
 			reason: "value length must be between 1 and 1024 bytes, inclusive",
-		}
-	}
-
-	// no validation rules for Value
-
-	if v, ok := interface{}(m.GetRegex()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return QueryParameterMatcherValidationError{
-				field:  "Regex",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
 		}
 	}
 
@@ -2381,8 +2331,6 @@ func (m *RouteAction_RequestMirrorPolicy) Validate() error {
 			reason: "value length must be at least 1 bytes",
 		}
 	}
-
-	// no validation rules for RuntimeKey
 
 	if v, ok := interface{}(m.GetRuntimeFraction()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

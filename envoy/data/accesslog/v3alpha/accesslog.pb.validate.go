@@ -305,10 +305,10 @@ func (m *AccessLogCommon) Validate() error {
 		return nil
 	}
 
-	if m.GetSampleRate() > 1 {
+	if val := m.GetSampleRate(); val <= 0 || val > 1 {
 		return AccessLogCommonValidationError{
 			field:  "SampleRate",
-			reason: "value must be less than or equal to 1",
+			reason: "value must be inside range (0, 1]",
 		}
 	}
 
@@ -467,6 +467,16 @@ func (m *AccessLogCommon) Validate() error {
 	// no validation rules for UpstreamTransportFailureReason
 
 	// no validation rules for RouteName
+
+	if v, ok := interface{}(m.GetDownstreamDirectRemoteAddress()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AccessLogCommonValidationError{
+				field:  "DownstreamDirectRemoteAddress",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	return nil
 }
