@@ -43,6 +43,13 @@ func (m *HttpStatus) Validate() error {
 		return nil
 	}
 
+	if _, ok := _HttpStatus_Code_NotInLookup[m.GetCode()]; ok {
+		return HttpStatusValidationError{
+			field:  "Code",
+			reason: "value must not be in list [0]",
+		}
+	}
+
 	if _, ok := StatusCode_name[int32(m.GetCode())]; !ok {
 		return HttpStatusValidationError{
 			field:  "Code",
@@ -106,3 +113,7 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HttpStatusValidationError{}
+
+var _HttpStatus_Code_NotInLookup = map[StatusCode]struct{}{
+	0: {},
+}

@@ -124,10 +124,10 @@ func (m *HttpConnectionManager) Validate() error {
 
 	if wrapper := m.GetMaxRequestHeadersKb(); wrapper != nil {
 
-		if wrapper.GetValue() > 96 {
+		if val := wrapper.GetValue(); val <= 0 || val > 96 {
 			return HttpConnectionManagerValidationError{
 				field:  "MaxRequestHeadersKb",
-				reason: "value must be less than or equal to 96",
+				reason: "value must be inside range (0, 96]",
 			}
 		}
 
@@ -895,13 +895,6 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 		return nil
 	}
 
-	if _, ok := HttpConnectionManager_Tracing_OperationName_name[int32(m.GetOperationName())]; !ok {
-		return HttpConnectionManager_TracingValidationError{
-			field:  "OperationName",
-			reason: "value must be one of the defined enum values",
-		}
-	}
-
 	if v, ok := interface{}(m.GetClientSampling()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManager_TracingValidationError{
@@ -933,6 +926,16 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 	}
 
 	// no validation rules for Verbose
+
+	if v, ok := interface{}(m.GetMaxPathTagLength()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManager_TracingValidationError{
+				field:  "MaxPathTagLength",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	return nil
 }
