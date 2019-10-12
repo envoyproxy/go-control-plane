@@ -222,13 +222,13 @@ func TestConcurrentSetWatch(t *testing.T) {
 						Endpoints: cache.NewResources(fmt.Sprintf("v%d", i), []cache.Resource{resource.MakeEndpoint(clusterName, uint32(i))}),
 					})
 				} else {
-					if cancel != nil {
-						cancel()
-					}
 					_, cancel = c.CreateWatch(v2.DiscoveryRequest{
 						Node:    &core.Node{Id: id},
 						TypeUrl: cache.EndpointType,
 					})
+					if cancel != nil {
+						cancel()
+					}
 				}
 			})
 		}(i)
