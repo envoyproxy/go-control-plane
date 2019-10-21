@@ -229,12 +229,12 @@ func (m *Cluster) Validate() error {
 			}
 		}
 
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+		gt := time.Duration(0*time.Second + 1000000*time.Nanosecond)
 
 		if dur <= gt {
 			return ClusterValidationError{
 				field:  "DnsRefreshRate",
-				reason: "value must be greater than 0s",
+				reason: "value must be greater than 1ms",
 			}
 		}
 
