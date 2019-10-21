@@ -115,6 +115,8 @@ func (m *RouteConfiguration) Validate() error {
 
 	}
 
+	// no validation rules for MostSpecificHeaderMutationsWins
+
 	if v, ok := interface{}(m.GetValidateClusters()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteConfigurationValidationError{

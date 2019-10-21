@@ -155,6 +155,16 @@ func (m *AdaptiveConcurrency) Validate() error {
 		return nil
 	}
 
+	if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdaptiveConcurrencyValidationError{
+				field:  "Enabled",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.ConcurrencyControllerConfig.(type) {
 
 	case *AdaptiveConcurrency_GradientControllerConfig:
@@ -417,6 +427,16 @@ func (m *GradientControllerConfig_MinimumRTTCalculationParams) Validate() error 
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetJitter()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GradientControllerConfig_MinimumRTTCalculationParamsValidationError{
+				field:  "Jitter",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil

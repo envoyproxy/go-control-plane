@@ -16,6 +16,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/ptypes"
+
+	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 )
 
 // ensure the imports are used
@@ -31,6 +33,8 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = ptypes.DynamicAny{}
+
+	_ = _type.CodecClientType(0)
 )
 
 // define the regex for a UUID once up-front
@@ -530,6 +534,13 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 			}
 		}
 
+	}
+
+	if _, ok := _type.CodecClientType_name[int32(m.GetCodecClientType())]; !ok {
+		return HealthCheck_HttpHealthCheckValidationError{
+			field:  "CodecClientType",
+			reason: "value must be one of the defined enum values",
+		}
 	}
 
 	return nil

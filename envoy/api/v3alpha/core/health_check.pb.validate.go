@@ -16,6 +16,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/ptypes"
+
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/type/v3alpha"
 )
 
 // ensure the imports are used
@@ -31,6 +33,8 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = ptypes.DynamicAny{}
+
+	_ = v3alpha.CodecClientType(0)
 )
 
 // define the regex for a UUID once up-front
@@ -515,8 +519,6 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 
 	}
 
-	// no validation rules for UseHttp2
-
 	for idx, item := range m.GetExpectedStatuses() {
 		_, _ = idx, item
 
@@ -530,6 +532,13 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 			}
 		}
 
+	}
+
+	if _, ok := v3alpha.CodecClientType_name[int32(m.GetCodecClientType())]; !ok {
+		return HealthCheck_HttpHealthCheckValidationError{
+			field:  "CodecClientType",
+			reason: "value must be one of the defined enum values",
+		}
 	}
 
 	return nil

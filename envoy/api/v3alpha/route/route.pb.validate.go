@@ -620,6 +620,16 @@ func (m *RouteMatch) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTlsContext()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteMatchValidationError{
+				field:  "TlsContext",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.PathSpecifier.(type) {
 
 	case *RouteMatch_Prefix:
@@ -1194,6 +1204,21 @@ func (m *RetryPolicy) Validate() error {
 			if err := v.Validate(); err != nil {
 				return RetryPolicyValidationError{
 					field:  fmt.Sprintf("RetriableHeaders[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetRetriableRequestHeaders() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RetryPolicyValidationError{
+					field:  fmt.Sprintf("RetriableRequestHeaders[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2316,6 +2341,84 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteMatch_GrpcRouteMatchOptionsValidationError{}
+
+// Validate checks the field values on RouteMatch_TlsContextMatchOptions with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *RouteMatch_TlsContextMatchOptions) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetPresented()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteMatch_TlsContextMatchOptionsValidationError{
+				field:  "Presented",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RouteMatch_TlsContextMatchOptionsValidationError is the validation error
+// returned by RouteMatch_TlsContextMatchOptions.Validate if the designated
+// constraints aren't met.
+type RouteMatch_TlsContextMatchOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RouteMatch_TlsContextMatchOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RouteMatch_TlsContextMatchOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RouteMatch_TlsContextMatchOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RouteMatch_TlsContextMatchOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RouteMatch_TlsContextMatchOptionsValidationError) ErrorName() string {
+	return "RouteMatch_TlsContextMatchOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RouteMatch_TlsContextMatchOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRouteMatch_TlsContextMatchOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RouteMatch_TlsContextMatchOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RouteMatch_TlsContextMatchOptionsValidationError{}
 
 // Validate checks the field values on RouteAction_RequestMirrorPolicy with the
 // rules defined in the proto definition for this message. If any rules are

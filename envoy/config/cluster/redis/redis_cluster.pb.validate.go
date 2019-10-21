@@ -86,6 +86,26 @@ func (m *RedisClusterConfig) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetRedirectRefreshInterval()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisClusterConfigValidationError{
+				field:  "RedirectRefreshInterval",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetRedirectRefreshThreshold()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisClusterConfigValidationError{
+				field:  "RedirectRefreshThreshold",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
