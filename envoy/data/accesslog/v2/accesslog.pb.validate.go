@@ -753,7 +753,12 @@ func (m *HTTPRequestProperties) Validate() error {
 		return nil
 	}
 
-	// no validation rules for RequestMethod
+	if _, ok := core.RequestMethod_name[int32(m.GetRequestMethod())]; !ok {
+		return HTTPRequestPropertiesValidationError{
+			field:  "RequestMethod",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	// no validation rules for Scheme
 

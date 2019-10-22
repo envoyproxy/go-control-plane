@@ -128,7 +128,12 @@ func (m *CircuitBreakers_Thresholds) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Priority
+	if _, ok := core.RoutingPriority_name[int32(m.GetPriority())]; !ok {
+		return CircuitBreakers_ThresholdsValidationError{
+			field:  "Priority",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	if v, ok := interface{}(m.GetMaxConnections()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

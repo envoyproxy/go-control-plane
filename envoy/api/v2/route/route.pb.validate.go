@@ -947,7 +947,12 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	// no validation rules for Priority
+	if _, ok := core.RoutingPriority_name[int32(m.GetPriority())]; !ok {
+		return RouteActionValidationError{
+			field:  "Priority",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	for idx, item := range m.GetRateLimits() {
 		_, _ = idx, item
