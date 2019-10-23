@@ -11,6 +11,8 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -398,6 +400,14 @@ func (c *rateLimitServiceClient) ShouldRateLimit(ctx context.Context, in *RateLi
 // RateLimitServiceServer is the server API for RateLimitService service.
 type RateLimitServiceServer interface {
 	ShouldRateLimit(context.Context, *RateLimitRequest) (*RateLimitResponse, error)
+}
+
+// UnimplementedRateLimitServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedRateLimitServiceServer struct {
+}
+
+func (*UnimplementedRateLimitServiceServer) ShouldRateLimit(ctx context.Context, req *RateLimitRequest) (*RateLimitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShouldRateLimit not implemented")
 }
 
 func RegisterRateLimitServiceServer(s *grpc.Server, srv RateLimitServiceServer) {

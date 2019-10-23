@@ -12,6 +12,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -225,6 +227,14 @@ func (x *loadReportingServiceStreamLoadStatsClient) Recv() (*LoadStatsResponse, 
 // LoadReportingServiceServer is the server API for LoadReportingService service.
 type LoadReportingServiceServer interface {
 	StreamLoadStats(LoadReportingService_StreamLoadStatsServer) error
+}
+
+// UnimplementedLoadReportingServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedLoadReportingServiceServer struct {
+}
+
+func (*UnimplementedLoadReportingServiceServer) StreamLoadStats(srv LoadReportingService_StreamLoadStatsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamLoadStats not implemented")
 }
 
 func RegisterLoadReportingServiceServer(s *grpc.Server, srv LoadReportingServiceServer) {

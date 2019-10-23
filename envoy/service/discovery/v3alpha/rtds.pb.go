@@ -12,6 +12,8 @@ import (
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -241,6 +243,20 @@ type RuntimeDiscoveryServiceServer interface {
 	StreamRuntime(RuntimeDiscoveryService_StreamRuntimeServer) error
 	DeltaRuntime(RuntimeDiscoveryService_DeltaRuntimeServer) error
 	FetchRuntime(context.Context, *v3alpha.DiscoveryRequest) (*v3alpha.DiscoveryResponse, error)
+}
+
+// UnimplementedRuntimeDiscoveryServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedRuntimeDiscoveryServiceServer struct {
+}
+
+func (*UnimplementedRuntimeDiscoveryServiceServer) StreamRuntime(srv RuntimeDiscoveryService_StreamRuntimeServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamRuntime not implemented")
+}
+func (*UnimplementedRuntimeDiscoveryServiceServer) DeltaRuntime(srv RuntimeDiscoveryService_DeltaRuntimeServer) error {
+	return status.Errorf(codes.Unimplemented, "method DeltaRuntime not implemented")
+}
+func (*UnimplementedRuntimeDiscoveryServiceServer) FetchRuntime(ctx context.Context, req *v3alpha.DiscoveryRequest) (*v3alpha.DiscoveryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FetchRuntime not implemented")
 }
 
 func RegisterRuntimeDiscoveryServiceServer(s *grpc.Server, srv RuntimeDiscoveryServiceServer) {

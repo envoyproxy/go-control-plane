@@ -10,6 +10,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -326,6 +328,20 @@ type ScopedRoutesDiscoveryServiceServer interface {
 	StreamScopedRoutes(ScopedRoutesDiscoveryService_StreamScopedRoutesServer) error
 	DeltaScopedRoutes(ScopedRoutesDiscoveryService_DeltaScopedRoutesServer) error
 	FetchScopedRoutes(context.Context, *DiscoveryRequest) (*DiscoveryResponse, error)
+}
+
+// UnimplementedScopedRoutesDiscoveryServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedScopedRoutesDiscoveryServiceServer struct {
+}
+
+func (*UnimplementedScopedRoutesDiscoveryServiceServer) StreamScopedRoutes(srv ScopedRoutesDiscoveryService_StreamScopedRoutesServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamScopedRoutes not implemented")
+}
+func (*UnimplementedScopedRoutesDiscoveryServiceServer) DeltaScopedRoutes(srv ScopedRoutesDiscoveryService_DeltaScopedRoutesServer) error {
+	return status.Errorf(codes.Unimplemented, "method DeltaScopedRoutes not implemented")
+}
+func (*UnimplementedScopedRoutesDiscoveryServiceServer) FetchScopedRoutes(ctx context.Context, req *DiscoveryRequest) (*DiscoveryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FetchScopedRoutes not implemented")
 }
 
 func RegisterScopedRoutesDiscoveryServiceServer(s *grpc.Server, srv ScopedRoutesDiscoveryServiceServer) {

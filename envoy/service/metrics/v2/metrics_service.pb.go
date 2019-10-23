@@ -11,6 +11,8 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	_go "github.com/prometheus/client_model/go"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -237,6 +239,14 @@ func (x *metricsServiceStreamMetricsClient) CloseAndRecv() (*StreamMetricsRespon
 // MetricsServiceServer is the server API for MetricsService service.
 type MetricsServiceServer interface {
 	StreamMetrics(MetricsService_StreamMetricsServer) error
+}
+
+// UnimplementedMetricsServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedMetricsServiceServer struct {
+}
+
+func (*UnimplementedMetricsServiceServer) StreamMetrics(srv MetricsService_StreamMetricsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamMetrics not implemented")
 }
 
 func RegisterMetricsServiceServer(s *grpc.Server, srv MetricsServiceServer) {

@@ -9,6 +9,8 @@ import (
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -171,6 +173,17 @@ func (x *aggregatedDiscoveryServiceDeltaAggregatedResourcesClient) Recv() (*v2.D
 type AggregatedDiscoveryServiceServer interface {
 	StreamAggregatedResources(AggregatedDiscoveryService_StreamAggregatedResourcesServer) error
 	DeltaAggregatedResources(AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error
+}
+
+// UnimplementedAggregatedDiscoveryServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedAggregatedDiscoveryServiceServer struct {
+}
+
+func (*UnimplementedAggregatedDiscoveryServiceServer) StreamAggregatedResources(srv AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamAggregatedResources not implemented")
+}
+func (*UnimplementedAggregatedDiscoveryServiceServer) DeltaAggregatedResources(srv AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+	return status.Errorf(codes.Unimplemented, "method DeltaAggregatedResources not implemented")
 }
 
 func RegisterAggregatedDiscoveryServiceServer(s *grpc.Server, srv AggregatedDiscoveryServiceServer) {

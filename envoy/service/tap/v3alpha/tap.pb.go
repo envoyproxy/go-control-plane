@@ -11,6 +11,8 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -255,6 +257,14 @@ func (x *tapSinkServiceStreamTapsClient) CloseAndRecv() (*StreamTapsResponse, er
 // TapSinkServiceServer is the server API for TapSinkService service.
 type TapSinkServiceServer interface {
 	StreamTaps(TapSinkService_StreamTapsServer) error
+}
+
+// UnimplementedTapSinkServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedTapSinkServiceServer struct {
+}
+
+func (*UnimplementedTapSinkServiceServer) StreamTaps(srv TapSinkService_StreamTapsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamTaps not implemented")
 }
 
 func RegisterTapSinkServiceServer(s *grpc.Server, srv TapSinkServiceServer) {

@@ -15,6 +15,8 @@ import (
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -549,6 +551,20 @@ type ListenerDiscoveryServiceServer interface {
 	DeltaListeners(ListenerDiscoveryService_DeltaListenersServer) error
 	StreamListeners(ListenerDiscoveryService_StreamListenersServer) error
 	FetchListeners(context.Context, *DiscoveryRequest) (*DiscoveryResponse, error)
+}
+
+// UnimplementedListenerDiscoveryServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedListenerDiscoveryServiceServer struct {
+}
+
+func (*UnimplementedListenerDiscoveryServiceServer) DeltaListeners(srv ListenerDiscoveryService_DeltaListenersServer) error {
+	return status.Errorf(codes.Unimplemented, "method DeltaListeners not implemented")
+}
+func (*UnimplementedListenerDiscoveryServiceServer) StreamListeners(srv ListenerDiscoveryService_StreamListenersServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamListeners not implemented")
+}
+func (*UnimplementedListenerDiscoveryServiceServer) FetchListeners(ctx context.Context, req *DiscoveryRequest) (*DiscoveryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FetchListeners not implemented")
 }
 
 func RegisterListenerDiscoveryServiceServer(s *grpc.Server, srv ListenerDiscoveryServiceServer) {

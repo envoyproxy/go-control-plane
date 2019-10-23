@@ -9,6 +9,8 @@ import (
 	v2 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -77,6 +79,14 @@ func (c *authorizationClient) Check(ctx context.Context, in *v2.CheckRequest, op
 // AuthorizationServer is the server API for Authorization service.
 type AuthorizationServer interface {
 	Check(context.Context, *v2.CheckRequest) (*v2.CheckResponse, error)
+}
+
+// UnimplementedAuthorizationServer can be embedded to have forward compatible implementations.
+type UnimplementedAuthorizationServer struct {
+}
+
+func (*UnimplementedAuthorizationServer) Check(ctx context.Context, req *v2.CheckRequest) (*v2.CheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Check not implemented")
 }
 
 func RegisterAuthorizationServer(s *grpc.Server, srv AuthorizationServer) {

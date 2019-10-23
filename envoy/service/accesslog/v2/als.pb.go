@@ -11,6 +11,8 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -382,6 +384,14 @@ func (x *accessLogServiceStreamAccessLogsClient) CloseAndRecv() (*StreamAccessLo
 // AccessLogServiceServer is the server API for AccessLogService service.
 type AccessLogServiceServer interface {
 	StreamAccessLogs(AccessLogService_StreamAccessLogsServer) error
+}
+
+// UnimplementedAccessLogServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedAccessLogServiceServer struct {
+}
+
+func (*UnimplementedAccessLogServiceServer) StreamAccessLogs(srv AccessLogService_StreamAccessLogsServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamAccessLogs not implemented")
 }
 
 func RegisterAccessLogServiceServer(s *grpc.Server, srv AccessLogServiceServer) {

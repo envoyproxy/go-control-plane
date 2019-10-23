@@ -587,6 +587,8 @@ func (m *ResponseFlags) Validate() error {
 
 	// no validation rules for InvalidEnvoyRequestHeaders
 
+	// no validation rules for DownstreamProtocolError
+
 	return nil
 }
 
