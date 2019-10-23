@@ -189,6 +189,16 @@ func (m *VirtualHost) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetPerRequestBufferLimitBytes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VirtualHostValidationError{
+				field:  "PerRequestBufferLimitBytes",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -344,6 +354,16 @@ func (m *Route) Validate() error {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
 				field:  "Tracing",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetPerRequestBufferLimitBytes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteValidationError{
+				field:  "PerRequestBufferLimitBytes",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
