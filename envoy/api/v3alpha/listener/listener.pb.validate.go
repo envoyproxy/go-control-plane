@@ -292,16 +292,6 @@ func (m *FilterChain) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTlsContext()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return FilterChainValidationError{
-				field:  "TlsContext",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	for idx, item := range m.GetFilters() {
 		_, _ = idx, item
 
