@@ -121,6 +121,16 @@ func (m *HttpProtocolOptions) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetMaxConnectionDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpProtocolOptionsValidationError{
+				field:  "MaxConnectionDuration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if wrapper := m.GetMaxHeadersCount(); wrapper != nil {
 
 		if wrapper.GetValue() < 1 {
