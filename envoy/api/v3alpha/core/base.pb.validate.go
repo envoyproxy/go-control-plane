@@ -985,18 +985,6 @@ func (m *TransportSocket) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *TransportSocket_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return TransportSocketValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *TransportSocket_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {

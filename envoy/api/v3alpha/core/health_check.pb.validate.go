@@ -852,18 +852,6 @@ func (m *HealthCheck_CustomHealthCheck) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *HealthCheck_CustomHealthCheck_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return HealthCheck_CustomHealthCheckValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *HealthCheck_CustomHealthCheck_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {

@@ -57,18 +57,6 @@ func (m *AccessLog) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *AccessLog_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return AccessLogValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *AccessLog_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {

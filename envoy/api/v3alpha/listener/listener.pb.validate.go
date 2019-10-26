@@ -52,18 +52,6 @@ func (m *Filter) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *Filter_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FilterValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *Filter_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
@@ -412,18 +400,6 @@ func (m *ListenerFilter) Validate() error {
 	}
 
 	switch m.ConfigType.(type) {
-
-	case *ListenerFilter_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ListenerFilterValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
 
 	case *ListenerFilter_TypedConfig:
 

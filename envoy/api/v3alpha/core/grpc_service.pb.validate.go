@@ -942,18 +942,6 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) V
 
 	switch m.ConfigType.(type) {
 
-	case *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPluginValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {

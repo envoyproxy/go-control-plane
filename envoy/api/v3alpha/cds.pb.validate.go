@@ -205,8 +205,6 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	// no validation rules for ExtensionProtocolOptions
-
 	// no validation rules for TypedExtensionProtocolOptions
 
 	if d := m.GetDnsRefreshRate(); d != nil {
@@ -1845,16 +1843,6 @@ func (m *LoadBalancingPolicy_Policy) Validate() error {
 	}
 
 	// no validation rules for Name
-
-	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LoadBalancingPolicy_PolicyValidationError{
-				field:  "Config",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
 
 	if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

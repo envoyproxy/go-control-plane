@@ -718,18 +718,6 @@ func (m *Tracing_Http) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *Tracing_Http_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return Tracing_HttpValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *Tracing_Http_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {

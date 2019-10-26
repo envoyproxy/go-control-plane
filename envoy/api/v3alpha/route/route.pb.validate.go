@@ -163,8 +163,6 @@ func (m *VirtualHost) Validate() error {
 		}
 	}
 
-	// no validation rules for PerFilterConfig
-
 	// no validation rules for TypedPerFilterConfig
 
 	// no validation rules for IncludeRequestAttemptCount
@@ -301,8 +299,6 @@ func (m *Route) Validate() error {
 			}
 		}
 	}
-
-	// no validation rules for PerFilterConfig
 
 	// no validation rules for TypedPerFilterConfig
 
@@ -2235,8 +2231,6 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 
 	}
 
-	// no validation rules for PerFilterConfig
-
 	// no validation rules for TypedPerFilterConfig
 
 	return nil
@@ -2973,18 +2967,6 @@ func (m *RetryPolicy_RetryPriority) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *RetryPolicy_RetryPriority_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RetryPolicy_RetryPriorityValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *RetryPolicy_RetryPriority_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
@@ -3074,18 +3056,6 @@ func (m *RetryPolicy_RetryHostPredicate) Validate() error {
 	}
 
 	switch m.ConfigType.(type) {
-
-	case *RetryPolicy_RetryHostPredicate_Config:
-
-		if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RetryPolicy_RetryHostPredicateValidationError{
-					field:  "Config",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
 
 	case *RetryPolicy_RetryHostPredicate_TypedConfig:
 
