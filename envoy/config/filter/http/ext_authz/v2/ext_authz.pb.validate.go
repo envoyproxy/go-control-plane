@@ -69,6 +69,16 @@ func (m *ExtAuthz) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetFilterEnabled()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtAuthzValidationError{
+				field:  "FilterEnabled",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.Services.(type) {
 
 	case *ExtAuthz_GrpcService:
