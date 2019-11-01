@@ -126,6 +126,28 @@ func (m *TcpProxy) Validate() error {
 
 	}
 
+	if len(m.GetHashPolicy()) > 1 {
+		return TcpProxyValidationError{
+			field:  "HashPolicy",
+			reason: "value must contain no more than 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetHashPolicy() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TcpProxyValidationError{
+					field:  fmt.Sprintf("HashPolicy[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.ClusterSpecifier.(type) {
 
 	case *TcpProxy_Cluster:
