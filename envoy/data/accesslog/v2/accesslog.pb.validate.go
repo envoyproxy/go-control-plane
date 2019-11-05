@@ -478,6 +478,8 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
+	// no validation rules for FilterStateObjects
+
 	return nil
 }
 
