@@ -69,8 +69,8 @@ type Callbacks interface {
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(config cache.Cache, callbacks Callbacks) Server {
-	return &server{cache: config, callbacks: callbacks}
+func NewServer(config cache.Cache, callbacks Callbacks, done chan bool) Server {
+	return &server{cache: config, callbacks: callbacks, done: done}
 }
 
 type server struct {
@@ -79,6 +79,7 @@ type server struct {
 
 	// streamCount for counting bi-di streams
 	streamCount int64
+	done        chan bool
 }
 
 type stream interface {
@@ -206,6 +207,8 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 
 	for {
 		select {
+		case <-s.done:
+			return nil
 		// config watcher can send the requested resources types in any order
 		case resp, more := <-values.endpoints:
 			if !more {

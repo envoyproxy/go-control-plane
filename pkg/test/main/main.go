@@ -88,7 +88,7 @@ func main() {
 	signal := make(chan struct{})
 	cb := &callbacks{signal: signal}
 	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
-	srv := server.NewServer(config, cb)
+	srv := server.NewServer(config, cb, make(chan bool))
 	als := &test.AccessLogService{}
 
 	// create a test snapshot

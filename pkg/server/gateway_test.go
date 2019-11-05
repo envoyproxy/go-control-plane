@@ -49,7 +49,7 @@ func TestGateway(t *testing.T) {
 			Resources: []cache.Resource{listener},
 		}},
 	}
-	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(config, nil)}
+	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(config, nil, make(chan bool))}
 
 	failCases := []struct {
 		path   string

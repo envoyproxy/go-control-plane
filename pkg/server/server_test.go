@@ -198,12 +198,56 @@ func makeResponses() map[string][]cache.Response {
 	}
 }
 
+func TestServerShutdown(t *testing.T) {
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.responses = makeResponses()
+			done := make(chan bool)
+			shutdown := make(chan bool)
+
+			s := server.NewServer(config, &callbacks{}, done)
+
+			// make a request
+			resp := makeMockStream(t)
+			resp.recv <- &v2.DiscoveryRequest{Node: node}
+			go func() {
+				var err error
+				switch typ {
+				case cache.EndpointType:
+					err = s.StreamEndpoints(resp)
+				case cache.ClusterType:
+					err = s.StreamClusters(resp)
+				case cache.RouteType:
+					err = s.StreamRoutes(resp)
+				case cache.ListenerType:
+					err = s.StreamListeners(resp)
+				}
+				if err != nil {
+					t.Errorf("Stream() => got %v, want no error", err)
+				}
+				shutdown <- true
+			}()
+
+			go func() {
+				done <- true
+			}()
+
+			select {
+			case <-shutdown:
+			case <-time.After(1 * time.Second):
+				t.Fatalf("got no response")
+			}
+		})
+	}
+}
+
 func TestResponseHandlers(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(config, &callbacks{})
+			s := server.NewServer(config, &callbacks{}, make(chan bool))
 
 			// make a request
 			resp := makeMockStream(t)
@@ -243,7 +287,7 @@ func TestFetch(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.responses = makeResponses()
 	cb := &callbacks{}
-	s := server.NewServer(config, cb)
+	s := server.NewServer(config, cb, make(chan bool))
 	if out, err := s.FetchEndpoints(context.Background(), &v2.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for endpoints: %v", err)
 	}
@@ -314,7 +358,7 @@ func TestWatchClosed(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.closeWatch = true
-			s := server.NewServer(config, &callbacks{})
+			s := server.NewServer(config, &callbacks{}, make(chan bool))
 
 			// make a request
 			resp := makeMockStream(t)
@@ -338,7 +382,7 @@ func TestSendError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(config, &callbacks{})
+			s := server.NewServer(config, &callbacks{}, make(chan bool))
 
 			// make a request
 			resp := makeMockStream(t)
@@ -363,7 +407,7 @@ func TestStaleNonce(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(config, &callbacks{})
+			s := server.NewServer(config, &callbacks{}, make(chan bool))
 
 			resp := makeMockStream(t)
 			resp.recv <- &v2.DiscoveryRequest{
@@ -429,7 +473,7 @@ func TestAggregatedHandlers(t *testing.T) {
 		ResourceNames: []string{routeName},
 	}
 
-	s := server.NewServer(config, &callbacks{})
+	s := server.NewServer(config, &callbacks{}, make(chan bool))
 	go func() {
 		if err := s.StreamAggregatedResources(resp); err != nil {
 			t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
@@ -463,7 +507,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
-	s := server.NewServer(config, &callbacks{})
+	s := server.NewServer(config, &callbacks{}, make(chan bool))
 	resp := makeMockStream(t)
 	resp.recv <- &v2.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
@@ -476,7 +520,7 @@ func TestCallbackError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(config, &callbacks{callbackError: true})
+			s := server.NewServer(config, &callbacks{callbackError: true}, make(chan bool))
 
 			// make a request
 			resp := makeMockStream(t)

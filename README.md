@@ -75,7 +75,7 @@ import (
 
 func main() {
 	snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
-	server := xds.NewServer(snapshotCache, nil)
+	server := xds.NewServer(snapshotCache, nil, make(chan bool))
 	grpcServer := grpc.NewServer()
 	lis, _ := net.Listen("tcp", ":8080")
 
