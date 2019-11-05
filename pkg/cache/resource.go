@@ -78,6 +78,43 @@ func GetResourceName(res Resource) string {
 	}
 }
 
+// GetResourceType returns the type of resource.
+func GetResourceType(res Resource) string {
+	switch res.(type) {
+	case *v2.ClusterLoadAssignment:
+		return EndpointType
+	case *v2.Cluster:
+		return ClusterType
+	case *v2.RouteConfiguration:
+		return RouteType
+	case *v2.Listener:
+		return ListenerType
+	case *auth.Secret:
+		return SecretType
+	case *discovery.Runtime:
+		return RuntimeType
+	default:
+		return ""
+	}
+}
+
+// MarshalResource converts the Resource to MarshaledResource
+func MarshalResource(resource Resource) (*MarshaledResource, error) {
+	b := proto.NewBuffer(nil)
+	b.SetDeterministic(true)
+	err := b.Marshal(resource)
+	if err != nil {
+		return nil, err
+	}
+
+	res := MarshaledResource{
+		Bytes:        b.Bytes(),
+		ResourceType: GetResourceType(resource),
+	}
+
+	return &res, nil
+}
+
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
 func GetResourceReferences(resources map[string]Resource) map[string]bool {

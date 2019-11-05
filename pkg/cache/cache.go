@@ -65,8 +65,19 @@ type Response struct {
 	// Proxy responds with this version as an acknowledgement.
 	Version string
 
+	// The value indicating whether the resource is marshaled, and only one of `Resources` and `MarshaledResources` is available.
+	ResourceMarshaled bool
+
 	// Resources to be included in the response.
 	Resources []Resource
+
+	// Marshaled Resources to be included in the response.
+	MarshaledResources []MarshaledResource
+}
+
+type MarshaledResource struct {
+	Bytes []byte
+	ResourceType string
 }
 
 // SkipFetchError is the error returned when the cache fetch is short
