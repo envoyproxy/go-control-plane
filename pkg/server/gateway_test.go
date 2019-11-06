@@ -15,6 +15,7 @@
 package server_test
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -49,7 +50,7 @@ func TestGateway(t *testing.T) {
 			Resources: []cache.Resource{listener},
 		}},
 	}
-	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(config, nil, make(chan bool))}
+	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(context.Background(), config, nil)}
 
 	failCases := []struct {
 		path   string
