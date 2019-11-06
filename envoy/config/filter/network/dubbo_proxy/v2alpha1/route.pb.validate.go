@@ -421,7 +421,22 @@ func (m *MethodMatch) Validate() error {
 		}
 	}
 
-	// no validation rules for ParamsMatch
+	for key, val := range m.GetParamsMatch() {
+		_ = val
+
+		// no validation rules for ParamsMatch[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MethodMatchValidationError{
+					field:  fmt.Sprintf("ParamsMatch[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

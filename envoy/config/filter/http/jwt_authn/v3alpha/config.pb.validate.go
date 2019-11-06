@@ -794,7 +794,22 @@ func (m *FilterStateRule) Validate() error {
 		}
 	}
 
-	// no validation rules for Requires
+	for key, val := range m.GetRequires() {
+		_ = val
+
+		// no validation rules for Requires[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FilterStateRuleValidationError{
+					field:  fmt.Sprintf("Requires[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }
@@ -861,7 +876,22 @@ func (m *JwtAuthentication) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Providers
+	for key, val := range m.GetProviders() {
+		_ = val
+
+		// no validation rules for Providers[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return JwtAuthenticationValidationError{
+					field:  fmt.Sprintf("Providers[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	for idx, item := range m.GetRules() {
 		_, _ = idx, item

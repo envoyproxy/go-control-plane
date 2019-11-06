@@ -71,7 +71,22 @@ func (m *HealthCheck) Validate() error {
 		}
 	}
 
-	// no validation rules for ClusterMinHealthyPercentages
+	for key, val := range m.GetClusterMinHealthyPercentages() {
+		_ = val
+
+		// no validation rules for ClusterMinHealthyPercentages[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HealthCheckValidationError{
+					field:  fmt.Sprintf("ClusterMinHealthyPercentages[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item

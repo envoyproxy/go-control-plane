@@ -165,9 +165,39 @@ func (m *VirtualHost) Validate() error {
 		}
 	}
 
-	// no validation rules for PerFilterConfig
+	for key, val := range m.GetPerFilterConfig() {
+		_ = val
 
-	// no validation rules for TypedPerFilterConfig
+		// no validation rules for PerFilterConfig[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return VirtualHostValidationError{
+					field:  fmt.Sprintf("PerFilterConfig[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for key, val := range m.GetTypedPerFilterConfig() {
+		_ = val
+
+		// no validation rules for TypedPerFilterConfig[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return VirtualHostValidationError{
+					field:  fmt.Sprintf("TypedPerFilterConfig[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	// no validation rules for IncludeRequestAttemptCount
 
@@ -304,9 +334,39 @@ func (m *Route) Validate() error {
 		}
 	}
 
-	// no validation rules for PerFilterConfig
+	for key, val := range m.GetPerFilterConfig() {
+		_ = val
 
-	// no validation rules for TypedPerFilterConfig
+		// no validation rules for PerFilterConfig[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteValidationError{
+					field:  fmt.Sprintf("PerFilterConfig[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for key, val := range m.GetTypedPerFilterConfig() {
+		_ = val
+
+		// no validation rules for TypedPerFilterConfig[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteValidationError{
+					field:  fmt.Sprintf("TypedPerFilterConfig[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if len(m.GetRequestHeadersToAdd()) > 1000 {
 		return RouteValidationError{
@@ -2300,9 +2360,39 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 
 	}
 
-	// no validation rules for PerFilterConfig
+	for key, val := range m.GetPerFilterConfig() {
+		_ = val
 
-	// no validation rules for TypedPerFilterConfig
+		// no validation rules for PerFilterConfig[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WeightedCluster_ClusterWeightValidationError{
+					field:  fmt.Sprintf("PerFilterConfig[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for key, val := range m.GetTypedPerFilterConfig() {
+		_ = val
+
+		// no validation rules for TypedPerFilterConfig[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WeightedCluster_ClusterWeightValidationError{
+					field:  fmt.Sprintf("TypedPerFilterConfig[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

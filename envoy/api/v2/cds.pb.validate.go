@@ -215,9 +215,39 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	// no validation rules for ExtensionProtocolOptions
+	for key, val := range m.GetExtensionProtocolOptions() {
+		_ = val
 
-	// no validation rules for TypedExtensionProtocolOptions
+		// no validation rules for ExtensionProtocolOptions[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterValidationError{
+					field:  fmt.Sprintf("ExtensionProtocolOptions[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for key, val := range m.GetTypedExtensionProtocolOptions() {
+		_ = val
+
+		// no validation rules for TypedExtensionProtocolOptions[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterValidationError{
+					field:  fmt.Sprintf("TypedExtensionProtocolOptions[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if d := m.GetDnsRefreshRate(); d != nil {
 		dur, err := ptypes.Duration(d)

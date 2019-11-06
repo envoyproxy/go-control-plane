@@ -45,7 +45,22 @@ func (m *RBAC) Validate() error {
 
 	// no validation rules for Action
 
-	// no validation rules for Policies
+	for key, val := range m.GetPolicies() {
+		_ = val
+
+		// no validation rules for Policies[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RBACValidationError{
+					field:  fmt.Sprintf("Policies[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

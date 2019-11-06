@@ -478,7 +478,22 @@ func (m *AccessLogCommon) Validate() error {
 		}
 	}
 
-	// no validation rules for FilterStateObjects
+	for key, val := range m.GetFilterStateObjects() {
+		_ = val
+
+		// no validation rules for FilterStateObjects[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AccessLogCommonValidationError{
+					field:  fmt.Sprintf("FilterStateObjects[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

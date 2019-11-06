@@ -66,7 +66,22 @@ func (m *ClusterLoadAssignment) Validate() error {
 
 	}
 
-	// no validation rules for NamedEndpoints
+	for key, val := range m.GetNamedEndpoints() {
+		_ = val
+
+		// no validation rules for NamedEndpoints[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterLoadAssignmentValidationError{
+					field:  fmt.Sprintf("NamedEndpoints[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if v, ok := interface{}(m.GetPolicy()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
