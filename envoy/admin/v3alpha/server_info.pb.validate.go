@@ -166,6 +166,8 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for LogFormat
 
+	// no validation rules for LogFormatEscaped
+
 	// no validation rules for LogPath
 
 	// no validation rules for ServiceCluster
