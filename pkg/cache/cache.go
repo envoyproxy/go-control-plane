@@ -75,6 +75,7 @@ type Response struct {
 	MarshaledResources []MarshaledResource
 }
 
+// MarshaledResource is an alias for the serialized binary array.
 type MarshaledResource = []byte
 
 // SkipFetchError is the error returned when the cache fetch is short

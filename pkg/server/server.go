@@ -141,7 +141,7 @@ func createResponse(resp *cache.Response, typeURL string) (*v2.DiscoveryResponse
 	var resources []*any.Any
 	if resp.ResourceMarshaled {
 		resources = make([]*any.Any, len(resp.MarshaledResources))
-	} else{
+	} else {
 		resources = make([]*any.Any, len(resp.Resources))
 	}
 
