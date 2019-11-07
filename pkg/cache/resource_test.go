@@ -73,27 +73,6 @@ func TestValidate(t *testing.T) {
 }
 
 func TestGetResourceName(t *testing.T) {
-	if resourceType := cache.GetResourceType(endpoint); resourceType != cache.EndpointType {
-		t.Errorf("GetResourceType(%v) => got %q, want %q", endpoint, resourceType, cache.EndpointType)
-	}
-	if resourceType := cache.GetResourceType(cluster); resourceType != cache.ClusterType {
-		t.Errorf("GetResourceType(%v) => got %q, want %q", cluster, resourceType, clusterName)
-	}
-	if resourceType := cache.GetResourceType(route); resourceType != cache.RouteType {
-		t.Errorf("GetResourceType(%v) => got %q, want %q", route, resourceType, routeName)
-	}
-	if resourceType := cache.GetResourceType(listener); resourceType != cache.ListenerType {
-		t.Errorf("GetResourceType(%v) => got %q, want %q", listener, resourceType, listenerName)
-	}
-	if resourceType := cache.GetResourceType(runtime); resourceType != cache.RuntimeType {
-		t.Errorf("GetResourceType(%v) => got %q, want %q", runtime, resourceType, runtimeName)
-	}
-	if resourceType := cache.GetResourceType(nil); resourceType != "" {
-		t.Errorf("GetResourceType(nil) => got %q, want none", resourceType)
-	}
-}
-
-func TestGetResourceType(t *testing.T) {
 	if name := cache.GetResourceName(endpoint); name != clusterName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", endpoint, name, clusterName)
 	}

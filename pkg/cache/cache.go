@@ -75,10 +75,7 @@ type Response struct {
 	MarshaledResources []MarshaledResource
 }
 
-type MarshaledResource struct {
-	Bytes []byte
-	ResourceType string
-}
+type MarshaledResource = []byte
 
 // SkipFetchError is the error returned when the cache fetch is short
 // circuited due to the client's version already being up-to-date.
