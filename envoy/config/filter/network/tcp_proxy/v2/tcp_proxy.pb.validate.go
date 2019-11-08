@@ -539,6 +539,16 @@ func (m *TcpProxy_WeightedCluster_ClusterWeight) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TcpProxy_WeightedCluster_ClusterWeightValidationError{
+				field:  "MetadataMatch",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
