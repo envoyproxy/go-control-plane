@@ -62,6 +62,8 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for FailureModeAllow
 
+	// no validation rules for IncludePeerCertificate
+
 	return nil
 }
 
