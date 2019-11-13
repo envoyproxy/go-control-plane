@@ -142,13 +142,13 @@ func TestSnapshotCacheFetch(t *testing.T) {
 	// no response for missing snapshot
 	if resp, err := c.Fetch(context.Background(),
 		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
-		t.Errorf("missing snapshot: response is not nil %q", resp)
+		t.Errorf("missing snapshot: response is not nil %v", resp)
 	}
 
 	// no response for latest version
 	if resp, err := c.Fetch(context.Background(),
 		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, VersionInfo: version}); resp != nil || err == nil {
-		t.Errorf("latest version: response is not nil %q", resp)
+		t.Errorf("latest version: response is not nil %v", resp)
 	}
 }
 
