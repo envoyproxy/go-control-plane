@@ -439,6 +439,17 @@ func (m *GradientControllerConfig_MinimumRTTCalculationParams) Validate() error 
 		}
 	}
 
+	if wrapper := m.GetMinConcurrency(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			return GradientControllerConfig_MinimumRTTCalculationParamsValidationError{
+				field:  "MinConcurrency",
+				reason: "value must be greater than 0",
+			}
+		}
+
+	}
+
 	return nil
 }
 

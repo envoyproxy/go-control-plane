@@ -373,6 +373,15 @@ func (m *RouteAction) Validate() error {
 			}
 		}
 
+	case *RouteAction_ClusterHeader:
+
+		if len(m.GetClusterHeader()) < 1 {
+			return RouteActionValidationError{
+				field:  "ClusterHeader",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
+
 	default:
 		return RouteActionValidationError{
 			field:  "ClusterSpecifier",

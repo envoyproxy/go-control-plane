@@ -167,6 +167,8 @@ func (m *AttributeContext_Peer) Validate() error {
 
 	// no validation rules for Principal
 
+	// no validation rules for Certificate
+
 	return nil
 }
 

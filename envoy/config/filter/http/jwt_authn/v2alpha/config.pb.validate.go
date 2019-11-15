@@ -918,6 +918,8 @@ func (m *JwtAuthentication) Validate() error {
 		}
 	}
 
+	// no validation rules for BypassCorsPreflight
+
 	return nil
 }
 
