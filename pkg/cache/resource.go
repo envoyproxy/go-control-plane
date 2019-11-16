@@ -59,8 +59,7 @@ const (
 	UnknownType // token to count the total number of supported types
 )
 
-// GetResponseType returns the enumeration for the a valid xDS type URL (or ResponseTypes if it
-// does not match known types)
+// GetResponseType returns the enumeration for a valid xDS type URL
 func GetResponseType(typeURL string) ResponseType {
 	switch typeURL {
 	case EndpointType:
