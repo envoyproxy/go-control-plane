@@ -24,7 +24,7 @@ type Resources struct {
 	// Version information.
 	Version string
 
-	// Items in the group.
+	// Items in the group indexed by name.
 	Items map[string]Resource
 }
 
@@ -49,7 +49,7 @@ func NewResources(version string, items []Resource) Resources {
 // Consistentcy is important for the convergence as different resource types
 // from the snapshot may be delivered to the proxy in arbitrary order.
 type Snapshot struct {
-	Resources []Resources
+	Resources [UnknownType]Resources
 }
 
 // NewSnapshot creates a snapshot from response types and a version.
@@ -59,13 +59,13 @@ func NewSnapshot(version string,
 	routes []Resource,
 	listeners []Resource,
 	runtimes []Resource) Snapshot {
-	resources := make([]Resources, ResponseTypes)
-	resources[Endpoint] = NewResources(version, endpoints)
-	resources[Cluster] = NewResources(version, clusters)
-	resources[Route] = NewResources(version, routes)
-	resources[Listener] = NewResources(version, listeners)
-	resources[Runtime] = NewResources(version, runtimes)
-	return Snapshot{Resources: resources}
+	out := Snapshot{}
+	out.Resources[Endpoint] = NewResources(version, endpoints)
+	out.Resources[Cluster] = NewResources(version, clusters)
+	out.Resources[Route] = NewResources(version, routes)
+	out.Resources[Listener] = NewResources(version, listeners)
+	out.Resources[Runtime] = NewResources(version, runtimes)
+	return out
 }
 
 // Consistent check verifies that the dependent resources are exactly listed in the
@@ -101,7 +101,7 @@ func (s *Snapshot) GetResources(typeURL string) map[string]Resource {
 		return nil
 	}
 	typ := GetResponseType(typeURL)
-	if typ == ResponseTypes {
+	if typ == UnknownType {
 		return nil
 	}
 	return s.Resources[typ].Items
@@ -113,7 +113,7 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 		return ""
 	}
 	typ := GetResponseType(typeURL)
-	if typ == ResponseTypes {
+	if typ == UnknownType {
 		return ""
 	}
 	return s.Resources[typ].Version

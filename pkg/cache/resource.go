@@ -56,7 +56,7 @@ const (
 	Listener
 	Secret
 	Runtime
-	ResponseTypes // token to count the total number of supported types
+	UnknownType // token to count the total number of supported types
 )
 
 // GetResponseType returns the enumeration for the a valid xDS type URL (or ResponseTypes if it
@@ -76,7 +76,7 @@ func GetResponseType(typeURL string) ResponseType {
 	case RuntimeType:
 		return Runtime
 	}
-	return ResponseTypes
+	return UnknownType
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.

@@ -218,9 +218,9 @@ func TestConcurrentSetWatch(t *testing.T) {
 				id := fmt.Sprintf("%d", i%2)
 				var cancel func()
 				if i < 25 {
-					c.SetSnapshot(id, cache.Snapshot{
-						Endpoints: cache.NewResources(fmt.Sprintf("v%d", i), []cache.Resource{resource.MakeEndpoint(clusterName, uint32(i))}),
-					})
+					snap := cache.Snapshot{}
+					snap.Resources[cache.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []cache.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+					c.SetSnapshot(id, snap)
 				} else {
 					if cancel != nil {
 						cancel()
