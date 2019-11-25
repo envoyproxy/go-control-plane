@@ -262,17 +262,6 @@ func (m *GradientControllerConfig_ConcurrencyLimitCalculationParams) Validate() 
 		return nil
 	}
 
-	if wrapper := m.GetMaxGradient(); wrapper != nil {
-
-		if wrapper.GetValue() <= 1 {
-			return GradientControllerConfig_ConcurrencyLimitCalculationParamsValidationError{
-				field:  "MaxGradient",
-				reason: "value must be greater than 1",
-			}
-		}
-
-	}
-
 	if wrapper := m.GetMaxConcurrencyLimit(); wrapper != nil {
 
 		if wrapper.GetValue() <= 0 {
@@ -448,6 +437,16 @@ func (m *GradientControllerConfig_MinimumRTTCalculationParams) Validate() error 
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetBuffer()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GradientControllerConfig_MinimumRTTCalculationParamsValidationError{
+				field:  "Buffer",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil
