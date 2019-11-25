@@ -44,7 +44,24 @@ func (m *UdpProxyConfig) Validate() error {
 		return nil
 	}
 
-	switch m.ClusterSpecifier.(type) {
+	if len(m.GetStatPrefix()) < 1 {
+		return UdpProxyConfigValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if v, ok := interface{}(m.GetIdleTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UdpProxyConfigValidationError{
+				field:  "IdleTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	switch m.RouteSpecifier.(type) {
 
 	case *UdpProxyConfig_Cluster:
 
@@ -57,7 +74,7 @@ func (m *UdpProxyConfig) Validate() error {
 
 	default:
 		return UdpProxyConfigValidationError{
-			field:  "ClusterSpecifier",
+			field:  "RouteSpecifier",
 			reason: "value is required",
 		}
 
