@@ -1869,6 +1869,21 @@ func (m *Tracing) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetCustomTags() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TracingValidationError{
+					field:  fmt.Sprintf("CustomTags[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
