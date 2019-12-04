@@ -304,6 +304,8 @@ func (m *Cluster) Validate() error {
 
 	}
 
+	// no validation rules for UseTcpForDnsLookups
+
 	if v, ok := interface{}(m.GetOutlierDetection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
