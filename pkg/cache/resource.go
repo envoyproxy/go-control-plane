@@ -46,17 +46,37 @@ const (
 	AnyType = ""
 )
 
-var (
-	// ResponseTypes are supported response types.
-	ResponseTypes = []string{
-		EndpointType,
-		ClusterType,
-		RouteType,
-		ListenerType,
-		SecretType,
-		RuntimeType,
-	}
+// ResponseType enumeration of supported response types
+type ResponseType int
+
+const (
+	Endpoint ResponseType = iota
+	Cluster
+	Route
+	Listener
+	Secret
+	Runtime
+	UnknownType // token to count the total number of supported types
 )
+
+// GetResponseType returns the enumeration for a valid xDS type URL
+func GetResponseType(typeURL string) ResponseType {
+	switch typeURL {
+	case EndpointType:
+		return Endpoint
+	case ClusterType:
+		return Cluster
+	case RouteType:
+		return Route
+	case ListenerType:
+		return Listener
+	case SecretType:
+		return Secret
+	case RuntimeType:
+		return Runtime
+	}
+	return UnknownType
+}
 
 // GetResourceName returns the resource name for a valid xDS response type.
 func GetResourceName(res Resource) string {

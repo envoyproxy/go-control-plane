@@ -395,16 +395,17 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		runtimes[i] = MakeRuntime(name)
 	}
 
-	out := cache.Snapshot{
-		Endpoints: cache.NewResources(ts.Version, endpoints),
-		Clusters:  cache.NewResources(ts.Version, clusters),
-		Routes:    cache.NewResources(ts.Version, routes),
-		Listeners: cache.NewResources(ts.Version, listeners),
-		Runtimes:  cache.NewResources(ts.Version, runtimes),
-	}
+	out := cache.NewSnapshot(
+		ts.Version,
+		endpoints,
+		clusters,
+		routes,
+		listeners,
+		runtimes,
+	)
 
 	if ts.TLS {
-		out.Secrets = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
+		out.Resources[cache.Secret] = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
 	}
 
 	return out
