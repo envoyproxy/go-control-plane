@@ -227,6 +227,8 @@ func (m *Listener) Validate() error {
 		}
 	}
 
+	// no validation rules for ReusePort
+
 	return nil
 }
 
