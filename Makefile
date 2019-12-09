@@ -30,18 +30,19 @@ format:
 .PHONY: $(BINDIR)/test integration integration.ads integration.xds integration.rest integration.ads.tls
 
 $(BINDIR)/test:
-	@go build -race -o $@ pkg/test/main/main.go
+	echo "Building test linux binary"
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
 
 integration: integration.xds integration.ads integration.rest integration.ads.tls
 
 integration.ads: $(BINDIR)/test
-	env XDS=ads build/integration.sh
+	env XDS=ads build/run_integration.sh
 
 integration.xds: $(BINDIR)/test
-	env XDS=xds build/integration.sh
+	env XDS=xds build/run_integration.sh
 
 integration.rest: $(BINDIR)/test
-	env XDS=rest build/integration.sh
+	env XDS=rest build/run_integration.sh
 
 integration.ads.tls: $(BINDIR)/test
-	env XDS=ads build/integration.sh -tls
+	env XDS=ads build/run_integration.sh -tls
