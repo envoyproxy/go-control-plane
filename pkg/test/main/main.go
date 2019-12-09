@@ -29,13 +29,16 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	l "github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
+
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
 
 var (
-	debug bool
+	loggerLevel string
+	level       l.Level // flag.StringVar won't accept an underlying typed var so we create this instead
 
 	port         uint
 	gatewayPort  uint
@@ -58,7 +61,7 @@ var (
 )
 
 func init() {
-	flag.BoolVar(&debug, "debug", false, "Use debug logging")
+	flag.StringVar(&loggerLevel, "debug", "debug", "Use debug logging")
 	flag.UintVar(&port, "port", 18000, "Management server port")
 	flag.UintVar(&gatewayPort, "gateway", 18001, "Management server port for HTTP gateway")
 	flag.UintVar(&upstreamPort, "upstream", 18080, "Upstream HTTP/1.1 port")
@@ -79,6 +82,7 @@ func init() {
 // main returns code 1 if any of the batches failed to pass all requests
 func main() {
 	flag.Parse()
+	level = l.ParseLevel(loggerLevel)
 	ctx := context.Background()
 
 	// start upstream
@@ -150,7 +154,7 @@ func main() {
 		}
 
 		als.Dump(func(s string) {
-			if debug {
+			if level == l.DEBUG {
 				log.Println(s)
 			}
 		})
@@ -219,13 +223,28 @@ func callEcho() (int, int) {
 
 type logger struct{}
 
-func (logger logger) Infof(format string, args ...interface{}) {
-	if debug {
+func (logger logger) Debugf(format string, args ...interface{}) {
+	if level == l.DEBUG {
 		log.Printf(format+"\n", args...)
 	}
 }
+
+func (logger logger) Infof(format string, args ...interface{}) {
+	if level == l.INFO {
+		log.Printf(format+"\n", args...)
+	}
+}
+
+func (logger logger) Warnf(format string, args ...interface{}) {
+	if level == l.WARN {
+		log.Printf(format+"\n", args...)
+	}
+}
+
 func (logger logger) Errorf(format string, args ...interface{}) {
-	log.Printf(format+"\n", args...)
+	if level == l.ERROR {
+		log.Printf(format+"\n", args...)
+	}
 }
 
 type callbacks struct {
@@ -241,13 +260,13 @@ func (cb *callbacks) Report() {
 	log.Printf("server callbacks fetches=%d requests=%d\n", cb.fetches, cb.requests)
 }
 func (cb *callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error {
-	if debug {
+	if level == l.DEBUG {
 		log.Printf("stream %d open for %s\n", id, typ)
 	}
 	return nil
 }
 func (cb *callbacks) OnStreamClosed(id int64) {
-	if debug {
+	if level == l.DEBUG {
 		log.Printf("stream %d closed\n", id)
 	}
 }
