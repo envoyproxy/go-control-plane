@@ -128,11 +128,11 @@ func (m *PerRouteConfig) Validate() error {
 
 	switch m.HostRewriteSpecifier.(type) {
 
-	case *PerRouteConfig_HostRewrite:
-		// no validation rules for HostRewrite
+	case *PerRouteConfig_HostRewriteLiteral:
+		// no validation rules for HostRewriteLiteral
 
-	case *PerRouteConfig_AutoHostRewriteHeader:
-		// no validation rules for AutoHostRewriteHeader
+	case *PerRouteConfig_HostRewriteHeader:
+		// no validation rules for HostRewriteHeader
 
 	}
 

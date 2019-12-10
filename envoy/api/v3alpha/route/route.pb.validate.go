@@ -1191,8 +1191,8 @@ func (m *RouteAction) Validate() error {
 
 	switch m.HostRewriteSpecifier.(type) {
 
-	case *RouteAction_HostRewrite:
-		// no validation rules for HostRewrite
+	case *RouteAction_HostRewriteLiteral:
+		// no validation rules for HostRewriteLiteral
 
 	case *RouteAction_AutoHostRewrite:
 
@@ -1206,8 +1206,8 @@ func (m *RouteAction) Validate() error {
 			}
 		}
 
-	case *RouteAction_AutoHostRewriteHeader:
-		// no validation rules for AutoHostRewriteHeader
+	case *RouteAction_HostRewriteHeader:
+		// no validation rules for HostRewriteHeader
 
 	}
 

@@ -145,13 +145,13 @@ func (m *RateLimitResponse) Validate() error {
 
 	}
 
-	for idx, item := range m.GetHeaders() {
+	for idx, item := range m.GetResponseHeadersToAdd() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitResponseValidationError{
-					field:  fmt.Sprintf("Headers[%v]", idx),
+					field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
