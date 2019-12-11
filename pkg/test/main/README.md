@@ -45,7 +45,7 @@ Usage of bin/test:
     	Listener port (default 9000)
   -clusters int
     	Number of clusters (default 2)
-  -debug string
+  -debug
     	Use debug logging
   -delay duration
     	Interval between request batch retries (default 500ms)
