@@ -18,7 +18,7 @@ else
   RUNTIMES=1
 fi
 
-(bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug="debug" "$@")&
+(bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug "$@")&
 SERVER_PID=$!
 
 # Envoy start-up command
