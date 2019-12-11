@@ -35,7 +35,7 @@ eventually converges to use the latest pushed configuration) for each run.
 
 ## Customizing the test driver
 
-The test driver has the following options: 
+The test driver has the following options:
 
 ```
 Usage of bin/test:
@@ -45,7 +45,7 @@ Usage of bin/test:
     	Listener port (default 9000)
   -clusters int
     	Number of clusters (default 2)
-  -debug
+  -debug string
     	Use debug logging
   -delay duration
     	Interval between request batch retries (default 500ms)
