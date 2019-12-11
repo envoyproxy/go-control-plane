@@ -52,6 +52,11 @@ func (m *Buffer) Validate() error {
 			}
 		}
 
+	} else {
+		return BufferValidationError{
+			field:  "MaxRequestBytes",
+			reason: "value is required and must not be nil.",
+		}
 	}
 
 	return nil
