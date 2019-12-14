@@ -450,6 +450,18 @@ func (m *JwtRequirement) Validate() error {
 			}
 		}
 
+	case *JwtRequirement_AllowMissing:
+
+		if v, ok := interface{}(m.GetAllowMissing()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return JwtRequirementValidationError{
+					field:  "AllowMissing",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
