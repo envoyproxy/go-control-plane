@@ -31,6 +31,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
+
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
 
@@ -219,11 +220,22 @@ func callEcho() (int, int) {
 
 type logger struct{}
 
+func (logger logger) Debugf(format string, args ...interface{}) {
+	if debug {
+		log.Printf(format+"\n", args...)
+	}
+}
+
 func (logger logger) Infof(format string, args ...interface{}) {
 	if debug {
 		log.Printf(format+"\n", args...)
 	}
 }
+
+func (logger logger) Warnf(format string, args ...interface{}) {
+	log.Printf(format+"\n", args...)
+}
+
 func (logger logger) Errorf(format string, args ...interface{}) {
 	log.Printf(format+"\n", args...)
 }

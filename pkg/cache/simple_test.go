@@ -72,7 +72,9 @@ type logger struct {
 	t *testing.T
 }
 
+func (log logger) Debugf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
+func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
 func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
 func TestSnapshotCache(t *testing.T) {
