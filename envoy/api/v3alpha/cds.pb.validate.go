@@ -374,7 +374,7 @@ func (m *Cluster) Validate() error {
 
 	// no validation rules for CloseConnectionsOnHostHealthFailure
 
-	// no validation rules for DrainConnectionsOnHostRemoval
+	// no validation rules for IgnoreHealthOnHostRemoval
 
 	for idx, item := range m.GetFilters() {
 		_, _ = idx, item
