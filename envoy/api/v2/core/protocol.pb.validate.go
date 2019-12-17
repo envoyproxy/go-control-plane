@@ -233,6 +233,8 @@ func (m *Http1ProtocolOptions) Validate() error {
 		}
 	}
 
+	// no validation rules for EnableTrailers
+
 	return nil
 }
 
