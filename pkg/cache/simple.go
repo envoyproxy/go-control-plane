@@ -272,6 +272,32 @@ func createResponse(request Request, resources map[string]Resource, version stri
 	}
 }
 
+func createDeltaResponse(request DeltaRequest, resources map[string]Resource, version string) DeltaResponse {
+	filtered := make([]Resource, 0, len(resources))
+
+	// Reply only with the requested resources. Envoy may ask each resource
+	// individually in a separate stream. It is ok to reply with the same version
+	// on separate streams since requests do not share their response versions.
+	if len(request.ResourceNamesSubscribe) != 0 {
+		set := nameSet(request.ResourceNamesSubscribe)
+		for name, resource := range resources {
+			if set[name] {
+				filtered = append(filtered, resource)
+			}
+		}
+	} else {
+		for _, resource := range resources {
+			filtered = append(filtered, resource)
+		}
+	}
+
+	return DeltaResponse{
+		DeltaRequest: request,
+		Version:      version,
+		Resources:    filtered,
+	}
+}
+
 // Fetch implements the cache fetch function.
 // Fetch is called on multiple streams, so responding to individual names with the same version works.
 func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
@@ -293,6 +319,30 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Respon
 
 		resources := snapshot.GetResources(request.TypeUrl)
 		out := createResponse(request, resources, version)
+		return &out, nil
+	}
+
+	return nil, fmt.Errorf("missing snapshot for %q", nodeID)
+}
+
+// FetchDelta
+func (cache *snapshotCache) FetchDelta(ctx context.Context, request DeltaRequest) (*DeltaResponse, error) {
+	nodeID := cache.hash.ID(request.Node)
+
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+
+	if snapshot, exists := cache.snapshots[nodeID]; exists {
+		// Respond only if the request version is distinct from the current snapshot state.
+		// It might be beneficial to hold the request since Envoy will re-attempt the refresh.
+
+		// We don't need to check the version in a Delta request/response cycle
+		version := snapshot.GetVersion(request.TypeUrl)
+
+		// Need to add support for requesting fetched resources based on what the client subscribed too
+		resources := snapshot.GetSubscribedResources(request.GetResourceNamesSubscribe(), request.TypeUrl)
+
+		out := createDeltaResponse(request, resources, version)
 		return &out, nil
 	}
 

@@ -24,6 +24,9 @@ import (
 // Request is an alias for the discovery request type.
 type Request = v2.DiscoveryRequest
 
+// DeltaRequest is an alias for the delta discovery request type.
+type DeltaRequest = v2.DeltaDiscoveryRequest
+
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
 // the responses when they are ready. The watch can be cancelled by the
@@ -60,6 +63,25 @@ type Cache interface {
 type Response struct {
 	// Request is the original request.
 	Request v2.DiscoveryRequest
+
+	// Version of the resources as tracked by the cache for the given type.
+	// Proxy responds with this version as an acknowledgement.
+	Version string
+
+	// The value indicating whether the resource is marshaled, and only one of `Resources` and `MarshaledResources` is available.
+	ResourceMarshaled bool
+
+	// Resources to be included in the response.
+	Resources []Resource
+
+	// Marshaled Resources to be included in the response.
+	MarshaledResources []MarshaledResource
+}
+
+// DeltaResponse is a pre-serialized xDS response.
+type DeltaResponse struct {
+	// Request is the original request.
+	DeltaRequest v2.DeltaDiscoveryRequest
 
 	// Version of the resources as tracked by the cache for the given type.
 	// Proxy responds with this version as an acknowledgement.

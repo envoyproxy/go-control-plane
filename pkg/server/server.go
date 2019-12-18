@@ -45,6 +45,7 @@ type Server interface {
 
 	// Fetch is the universal fetch method.
 	Fetch(context.Context, *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error)
+	FetchDelta(context.Context, *v2.DeltaDiscoveryRequest) (*v2.DeltaDiscoveryResponse, error)
 }
 
 // Callbacks is a collection of callbacks inserted into the server operation.
@@ -60,11 +61,18 @@ type Callbacks interface {
 	OnStreamRequest(int64, *v2.DiscoveryRequest) error
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse)
+
+	OnStreamDeltaRequest(int64, *v2.DeltaDiscoveryRequest) error
+	OnStreamDeltaResponse(int64, *v2.DeltaDiscoveryRequest, *v2.DeltaDiscoveryResponse)
+
 	// OnFetchRequest is called for each Fetch request. Returning an error will end processing of the
 	// request and respond with an error.
 	OnFetchRequest(context.Context, *v2.DiscoveryRequest) error
 	// OnFetchResponse is called immediately prior to sending a response.
 	OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse)
+
+	OnFetchDeltaRequest(context.Context, *v2.DeltaDiscoveryRequest) error
+	OnFetchDeltaResponse(*v2.DeltaDiscoveryRequest, *v2.DeltaDiscoveryResponse)
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
@@ -425,6 +433,25 @@ func (s *server) Fetch(ctx context.Context, req *v2.DiscoveryRequest) (*v2.Disco
 		s.callbacks.OnFetchResponse(req, out)
 	}
 	return out, err
+}
+
+// FetchDelta is the universal fetch delta method.
+func (s *server) FetchDelta(ctx context.Context, req *v2.DeltaDiscoveryRequest) (*v2.DeltaDiscoveryResponse, error) {
+	if s.callbacks != nil {
+		if err := s.callbacks.OnFetchDeltaRequest(ctx, req); err != nil {
+			return nil, err
+		}
+	}
+
+	resp, err := s.cache.FetchDelta(ctx, *req)
+	if err != nil {
+		return nil, err
+	}
+	out, err := createResponse(resp, req.TypeUrl)
+	if s.callbacks != nil {
+		s.callbacks.OnFetchResponse(req, out)
+	}
+	return out, error
 }
 
 func (s *server) FetchEndpoints(ctx context.Context, req *v2.DiscoveryRequest) (*v2.DiscoveryResponse, error) {
