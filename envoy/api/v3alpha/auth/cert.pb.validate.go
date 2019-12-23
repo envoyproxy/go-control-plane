@@ -466,6 +466,21 @@ func (m *CertificateValidationContext) Validate() error {
 
 	}
 
+	for idx, item := range m.GetMatchSubjectAltNames() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CertificateValidationContextValidationError{
+					field:  fmt.Sprintf("MatchSubjectAltNames[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetRequireOcspStaple()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CertificateValidationContextValidationError{
