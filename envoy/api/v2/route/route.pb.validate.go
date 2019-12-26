@@ -1114,6 +1114,21 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetRequestMirrorPolicies() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteActionValidationError{
+					field:  fmt.Sprintf("RequestMirrorPolicies[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if _, ok := core.RoutingPriority_name[int32(m.GetPriority())]; !ok {
 		return RouteActionValidationError{
 			field:  "Priority",
