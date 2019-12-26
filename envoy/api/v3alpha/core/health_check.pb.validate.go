@@ -126,6 +126,13 @@ func (m *HealthCheck) Validate() error {
 
 	// no validation rules for IntervalJitterPercent
 
+	if m.GetUnhealthyThreshold() == nil {
+		return HealthCheckValidationError{
+			field:  "UnhealthyThreshold",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetUnhealthyThreshold()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HealthCheckValidationError{
@@ -133,6 +140,13 @@ func (m *HealthCheck) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
+		}
+	}
+
+	if m.GetHealthyThreshold() == nil {
+		return HealthCheckValidationError{
+			field:  "HealthyThreshold",
+			reason: "value is required",
 		}
 	}
 
