@@ -404,6 +404,8 @@ func (m *ConfigSource) Validate() error {
 		}
 	}
 
+	// no validation rules for XdsApiVersion
+
 	switch m.ConfigSourceSpecifier.(type) {
 
 	case *ConfigSource_Path:
