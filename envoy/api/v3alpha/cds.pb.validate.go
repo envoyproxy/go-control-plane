@@ -175,6 +175,16 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedTlsContext()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "HiddenEnvoyDeprecatedTlsContext",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetCommonHttpProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
@@ -203,6 +213,23 @@ func (m *Cluster) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	for key, val := range m.GetHiddenEnvoyDeprecatedExtensionProtocolOptions() {
+		_ = val
+
+		// no validation rules for HiddenEnvoyDeprecatedExtensionProtocolOptions[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterValidationError{
+					field:  fmt.Sprintf("HiddenEnvoyDeprecatedExtensionProtocolOptions[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	for key, val := range m.GetTypedExtensionProtocolOptions() {
@@ -1860,6 +1887,16 @@ func (m *LoadBalancingPolicy_Policy) Validate() error {
 	}
 
 	// no validation rules for Name
+
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LoadBalancingPolicy_PolicyValidationError{
+				field:  "HiddenEnvoyDeprecatedConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

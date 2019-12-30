@@ -162,6 +162,16 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedRuntime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BootstrapValidationError{
+				field:  "HiddenEnvoyDeprecatedRuntime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetLayeredRuntime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{

@@ -43,6 +43,8 @@ func (m *FaultDelay) Validate() error {
 		return nil
 	}
 
+	// no validation rules for HiddenEnvoyDeprecatedType
+
 	if v, ok := interface{}(m.GetPercentage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return FaultDelayValidationError{

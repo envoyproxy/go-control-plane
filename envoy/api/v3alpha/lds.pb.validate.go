@@ -81,6 +81,16 @@ func (m *Listener) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedUseOriginalDst()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListenerValidationError{
+				field:  "HiddenEnvoyDeprecatedUseOriginalDst",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetPerConnectionBufferLimitBytes()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ListenerValidationError{

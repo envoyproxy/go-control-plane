@@ -45,6 +45,8 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for FailureModeAllow
 
+	// no validation rules for HiddenEnvoyDeprecatedUseAlpha
+
 	if v, ok := interface{}(m.GetWithRequestBody()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtAuthzValidationError{

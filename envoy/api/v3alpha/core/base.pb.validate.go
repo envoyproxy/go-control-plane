@@ -1000,6 +1000,18 @@ func (m *TransportSocket) Validate() error {
 
 	switch m.ConfigType.(type) {
 
+	case *TransportSocket_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TransportSocketValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *TransportSocket_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
