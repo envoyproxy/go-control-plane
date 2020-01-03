@@ -17,7 +17,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v3alpha/core"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v3alpha"
 )
 
 // ensure the imports are used
@@ -34,7 +34,7 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = ptypes.DynamicAny{}
 
-	_ = core.RequestMethod(0)
+	_ = v3alpha.RequestMethod(0)
 )
 
 // define the regex for a UUID once up-front
@@ -772,7 +772,7 @@ func (m *HTTPRequestProperties) Validate() error {
 		return nil
 	}
 
-	if _, ok := core.RequestMethod_name[int32(m.GetRequestMethod())]; !ok {
+	if _, ok := v3alpha.RequestMethod_name[int32(m.GetRequestMethod())]; !ok {
 		return HTTPRequestPropertiesValidationError{
 			field:  "RequestMethod",
 			reason: "value must be one of the defined enum values",

@@ -1058,18 +1058,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_StsService) Validate() error {
 		return nil
 	}
 
-	if uri, err := url.Parse(m.GetTokenExchangeServiceUri()); err != nil {
-		return GrpcService_GoogleGrpc_CallCredentials_StsServiceValidationError{
-			field:  "TokenExchangeServiceUri",
-			reason: "value must be a valid URI",
-			cause:  err,
-		}
-	} else if !uri.IsAbs() {
-		return GrpcService_GoogleGrpc_CallCredentials_StsServiceValidationError{
-			field:  "TokenExchangeServiceUri",
-			reason: "value must be absolute",
-		}
-	}
+	// no validation rules for TokenExchangeServiceUri
 
 	// no validation rules for Resource
 
