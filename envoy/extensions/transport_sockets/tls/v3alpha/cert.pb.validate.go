@@ -871,6 +871,28 @@ func (m *DownstreamTlsContext) Validate() error {
 		}
 	}
 
+	if d := m.GetSessionTimeout(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return DownstreamTlsContextValidationError{
+				field:  "SessionTimeout",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		lt := time.Duration(4294967296*time.Second + 0*time.Nanosecond)
+		gte := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur < gte || dur >= lt {
+			return DownstreamTlsContextValidationError{
+				field:  "SessionTimeout",
+				reason: "value must be inside range [0s, 1193046h28m16s)",
+			}
+		}
+
+	}
+
 	switch m.SessionTicketKeysType.(type) {
 
 	case *DownstreamTlsContext_SessionTicketKeys:
