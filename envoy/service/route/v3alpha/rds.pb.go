@@ -7,12 +7,10 @@ import (
 	context "context"
 	fmt "fmt"
 	_ "github.com/cncf/udpa/go/udpa/annotations"
-	v3alpha1 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3alpha"
-	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/route/v3alpha"
-	v3alpha2 "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3alpha"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+	_ "github.com/golang/protobuf/ptypes/wrappers"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -31,159 +29,39 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type RouteConfiguration struct {
-	Name                            string                        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	VirtualHosts                    []*v3alpha.VirtualHost        `protobuf:"bytes,2,rep,name=virtual_hosts,json=virtualHosts,proto3" json:"virtual_hosts,omitempty"`
-	Vhds                            *Vhds                         `protobuf:"bytes,9,opt,name=vhds,proto3" json:"vhds,omitempty"`
-	InternalOnlyHeaders             []string                      `protobuf:"bytes,3,rep,name=internal_only_headers,json=internalOnlyHeaders,proto3" json:"internal_only_headers,omitempty"`
-	ResponseHeadersToAdd            []*v3alpha1.HeaderValueOption `protobuf:"bytes,4,rep,name=response_headers_to_add,json=responseHeadersToAdd,proto3" json:"response_headers_to_add,omitempty"`
-	ResponseHeadersToRemove         []string                      `protobuf:"bytes,5,rep,name=response_headers_to_remove,json=responseHeadersToRemove,proto3" json:"response_headers_to_remove,omitempty"`
-	RequestHeadersToAdd             []*v3alpha1.HeaderValueOption `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd,proto3" json:"request_headers_to_add,omitempty"`
-	RequestHeadersToRemove          []string                      `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove,proto3" json:"request_headers_to_remove,omitempty"`
-	MostSpecificHeaderMutationsWins bool                          `protobuf:"varint,10,opt,name=most_specific_header_mutations_wins,json=mostSpecificHeaderMutationsWins,proto3" json:"most_specific_header_mutations_wins,omitempty"`
-	ValidateClusters                *wrappers.BoolValue           `protobuf:"bytes,7,opt,name=validate_clusters,json=validateClusters,proto3" json:"validate_clusters,omitempty"`
-	XXX_NoUnkeyedLiteral            struct{}                      `json:"-"`
-	XXX_unrecognized                []byte                        `json:"-"`
-	XXX_sizecache                   int32                         `json:"-"`
+type RdsDummy struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *RouteConfiguration) Reset()         { *m = RouteConfiguration{} }
-func (m *RouteConfiguration) String() string { return proto.CompactTextString(m) }
-func (*RouteConfiguration) ProtoMessage()    {}
-func (*RouteConfiguration) Descriptor() ([]byte, []int) {
+func (m *RdsDummy) Reset()         { *m = RdsDummy{} }
+func (m *RdsDummy) String() string { return proto.CompactTextString(m) }
+func (*RdsDummy) ProtoMessage()    {}
+func (*RdsDummy) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e3086895b4b539fb, []int{0}
 }
 
-func (m *RouteConfiguration) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RouteConfiguration.Unmarshal(m, b)
+func (m *RdsDummy) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RdsDummy.Unmarshal(m, b)
 }
-func (m *RouteConfiguration) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RouteConfiguration.Marshal(b, m, deterministic)
+func (m *RdsDummy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RdsDummy.Marshal(b, m, deterministic)
 }
-func (m *RouteConfiguration) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteConfiguration.Merge(m, src)
+func (m *RdsDummy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RdsDummy.Merge(m, src)
 }
-func (m *RouteConfiguration) XXX_Size() int {
-	return xxx_messageInfo_RouteConfiguration.Size(m)
+func (m *RdsDummy) XXX_Size() int {
+	return xxx_messageInfo_RdsDummy.Size(m)
 }
-func (m *RouteConfiguration) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteConfiguration.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteConfiguration proto.InternalMessageInfo
-
-func (m *RouteConfiguration) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
+func (m *RdsDummy) XXX_DiscardUnknown() {
+	xxx_messageInfo_RdsDummy.DiscardUnknown(m)
 }
 
-func (m *RouteConfiguration) GetVirtualHosts() []*v3alpha.VirtualHost {
-	if m != nil {
-		return m.VirtualHosts
-	}
-	return nil
-}
-
-func (m *RouteConfiguration) GetVhds() *Vhds {
-	if m != nil {
-		return m.Vhds
-	}
-	return nil
-}
-
-func (m *RouteConfiguration) GetInternalOnlyHeaders() []string {
-	if m != nil {
-		return m.InternalOnlyHeaders
-	}
-	return nil
-}
-
-func (m *RouteConfiguration) GetResponseHeadersToAdd() []*v3alpha1.HeaderValueOption {
-	if m != nil {
-		return m.ResponseHeadersToAdd
-	}
-	return nil
-}
-
-func (m *RouteConfiguration) GetResponseHeadersToRemove() []string {
-	if m != nil {
-		return m.ResponseHeadersToRemove
-	}
-	return nil
-}
-
-func (m *RouteConfiguration) GetRequestHeadersToAdd() []*v3alpha1.HeaderValueOption {
-	if m != nil {
-		return m.RequestHeadersToAdd
-	}
-	return nil
-}
-
-func (m *RouteConfiguration) GetRequestHeadersToRemove() []string {
-	if m != nil {
-		return m.RequestHeadersToRemove
-	}
-	return nil
-}
-
-func (m *RouteConfiguration) GetMostSpecificHeaderMutationsWins() bool {
-	if m != nil {
-		return m.MostSpecificHeaderMutationsWins
-	}
-	return false
-}
-
-func (m *RouteConfiguration) GetValidateClusters() *wrappers.BoolValue {
-	if m != nil {
-		return m.ValidateClusters
-	}
-	return nil
-}
-
-type Vhds struct {
-	ConfigSource         *v3alpha1.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
-}
-
-func (m *Vhds) Reset()         { *m = Vhds{} }
-func (m *Vhds) String() string { return proto.CompactTextString(m) }
-func (*Vhds) ProtoMessage()    {}
-func (*Vhds) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e3086895b4b539fb, []int{1}
-}
-
-func (m *Vhds) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Vhds.Unmarshal(m, b)
-}
-func (m *Vhds) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Vhds.Marshal(b, m, deterministic)
-}
-func (m *Vhds) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Vhds.Merge(m, src)
-}
-func (m *Vhds) XXX_Size() int {
-	return xxx_messageInfo_Vhds.Size(m)
-}
-func (m *Vhds) XXX_DiscardUnknown() {
-	xxx_messageInfo_Vhds.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Vhds proto.InternalMessageInfo
-
-func (m *Vhds) GetConfigSource() *v3alpha1.ConfigSource {
-	if m != nil {
-		return m.ConfigSource
-	}
-	return nil
-}
+var xxx_messageInfo_RdsDummy proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*RouteConfiguration)(nil), "envoy.service.route.v3alpha.RouteConfiguration")
-	proto.RegisterType((*Vhds)(nil), "envoy.service.route.v3alpha.Vhds")
+	proto.RegisterType((*RdsDummy)(nil), "envoy.service.route.v3alpha.RdsDummy")
 }
 
 func init() {
@@ -191,56 +69,32 @@ func init() {
 }
 
 var fileDescriptor_e3086895b4b539fb = []byte{
-	// 778 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x54, 0x41, 0x4f, 0xe3, 0x46,
-	0x14, 0xee, 0x90, 0x00, 0xc9, 0x04, 0x24, 0x30, 0x05, 0x4c, 0xa8, 0x20, 0xa4, 0x2d, 0x4d, 0x51,
-	0x6b, 0xb7, 0x41, 0x6d, 0xd5, 0xf4, 0xd4, 0x80, 0x5a, 0x0e, 0x54, 0x20, 0xa7, 0x4a, 0x8f, 0xd6,
-	0x60, 0x0f, 0xc9, 0x48, 0xce, 0x8c, 0x3b, 0x63, 0x1b, 0xa2, 0xde, 0xaa, 0x1e, 0x10, 0xc7, 0xee,
-	0x6d, 0x4f, 0x7b, 0xde, 0x1f, 0xb1, 0xb7, 0xfd, 0x05, 0xfb, 0x17, 0xf6, 0xb0, 0xbf, 0x60, 0x0f,
-	0x9c, 0x56, 0x9e, 0x19, 0x87, 0x38, 0x61, 0x59, 0xa1, 0x95, 0x76, 0x6f, 0xf6, 0xbc, 0xef, 0x7d,
-	0xef, 0x7b, 0xf3, 0xbe, 0x79, 0xf0, 0x4b, 0x4c, 0x13, 0x36, 0xb4, 0x05, 0xe6, 0x09, 0xf1, 0xb0,
-	0xcd, 0x59, 0x1c, 0x61, 0x3b, 0xd9, 0x47, 0x41, 0xd8, 0x47, 0x36, 0xf7, 0x85, 0x15, 0x72, 0x16,
-	0x31, 0x63, 0x53, 0xc2, 0x2c, 0x0d, 0xb3, 0x24, 0xcc, 0xd2, 0xb0, 0xea, 0x17, 0x8a, 0xc3, 0x63,
-	0xf4, 0x9c, 0xf4, 0x6c, 0x8f, 0xf1, 0x5b, 0x86, 0x33, 0x24, 0xb0, 0xa2, 0xa8, 0x7e, 0xfb, 0x76,
-	0x94, 0x3a, 0x73, 0x05, 0x8b, 0xb9, 0x97, 0xc1, 0x77, 0x73, 0xf0, 0x09, 0x5d, 0xb2, 0xbc, 0xc2,
-	0xd9, 0xf9, 0x06, 0x7c, 0x22, 0x3c, 0x96, 0x60, 0x3e, 0x1c, 0x81, 0x47, 0x27, 0x3a, 0xe1, 0xb3,
-	0x1e, 0x63, 0xbd, 0x00, 0xdb, 0x28, 0x24, 0x36, 0xa2, 0x94, 0x45, 0x28, 0x22, 0x8c, 0xea, 0x46,
-	0xab, 0x5b, 0x3a, 0x2a, 0xff, 0xce, 0xe2, 0x73, 0xfb, 0x82, 0xa3, 0x30, 0xc4, 0x3c, 0x8b, 0xef,
-	0xc4, 0x7e, 0x88, 0xc6, 0xf3, 0xec, 0x04, 0x73, 0x41, 0x18, 0x25, 0xb4, 0xa7, 0x21, 0xeb, 0x09,
-	0x0a, 0x88, 0x8f, 0x52, 0xbd, 0xfa, 0x43, 0x05, 0xea, 0xaf, 0x67, 0xa1, 0xe1, 0xa4, 0xd2, 0x0f,
-	0x64, 0x53, 0x31, 0x97, 0x0c, 0x86, 0x01, 0x8b, 0x14, 0x0d, 0xb0, 0x09, 0x6a, 0xa0, 0x51, 0x76,
-	0xe4, 0xb7, 0x71, 0x0c, 0x17, 0x13, 0xc2, 0xa3, 0x18, 0x05, 0x6e, 0x9f, 0x89, 0x48, 0x98, 0x33,
-	0xb5, 0x42, 0xa3, 0xd2, 0xfc, 0xca, 0x52, 0x73, 0x50, 0xb7, 0x92, 0x1f, 0x83, 0xd5, 0x55, 0x09,
-	0x47, 0x4c, 0x44, 0xce, 0x42, 0x72, 0xfb, 0x23, 0x8c, 0x1f, 0x60, 0x31, 0xe9, 0xfb, 0xc2, 0x2c,
-	0xd7, 0x40, 0xa3, 0xd2, 0xdc, 0xb1, 0xee, 0x19, 0xa6, 0xd5, 0xed, 0xfb, 0xc2, 0x91, 0x70, 0xa3,
-	0x09, 0x57, 0x09, 0x8d, 0x30, 0xa7, 0x28, 0x70, 0x19, 0x0d, 0x86, 0x6e, 0x1f, 0x23, 0x1f, 0x73,
-	0x61, 0x16, 0x6a, 0x85, 0x46, 0xd9, 0x59, 0xc9, 0x82, 0x27, 0x34, 0x18, 0x1e, 0xa9, 0x90, 0x41,
-	0xe1, 0x3a, 0xc7, 0x22, 0x64, 0x54, 0xe0, 0x0c, 0xee, 0x46, 0xcc, 0x45, 0xbe, 0x6f, 0x16, 0x65,
-	0x0b, 0xdf, 0xe4, 0x5b, 0x48, 0x7d, 0x30, 0xaa, 0xad, 0x48, 0xba, 0x28, 0x88, 0xf1, 0x49, 0x98,
-	0xde, 0x4d, 0xbb, 0x7c, 0xd3, 0x9e, 0xfb, 0x1f, 0x14, 0x96, 0x5e, 0xcd, 0x3b, 0x9f, 0x66, 0xbc,
-	0xba, 0xd4, 0x9f, 0xec, 0x57, 0xdf, 0x37, 0x7e, 0x81, 0xd5, 0xbb, 0xea, 0x71, 0x3c, 0x60, 0x09,
-	0x36, 0x67, 0xa5, 0xd0, 0xf5, 0xa9, 0x4c, 0x47, 0x86, 0x8d, 0x00, 0xae, 0x71, 0xfc, 0x77, 0x8c,
-	0x45, 0x34, 0xa9, 0x75, 0xee, 0xfd, 0xb4, 0xae, 0x68, 0xda, 0x9c, 0xd4, 0x9f, 0xe1, 0xc6, 0x1d,
-	0xd5, 0xb4, 0xd2, 0x92, 0x54, 0xba, 0x36, 0x99, 0xa7, 0x85, 0x1e, 0xc3, 0xcf, 0x07, 0x4c, 0x44,
-	0xae, 0x08, 0xb1, 0x47, 0xce, 0x89, 0xa7, 0x09, 0xdc, 0x41, 0xac, 0x5d, 0xe8, 0x5e, 0x10, 0x2a,
-	0x4c, 0x58, 0x03, 0x8d, 0x92, 0xb3, 0x9d, 0x42, 0x3b, 0x1a, 0xa9, 0x98, 0xfe, 0xc8, 0x70, 0x7f,
-	0x11, 0x2a, 0x8c, 0xdf, 0xe1, 0x72, 0xe6, 0x4c, 0xd7, 0x0b, 0x62, 0x11, 0xa5, 0x33, 0x9d, 0x97,
-	0xde, 0xa8, 0x5a, 0xca, 0xff, 0x56, 0xe6, 0x7f, 0xab, 0xcd, 0x58, 0x20, 0xbb, 0x74, 0x96, 0xb2,
-	0xa4, 0x03, 0x9d, 0xd3, 0xda, 0x7d, 0xfc, 0xfc, 0x6a, 0x6b, 0x07, 0x6e, 0xab, 0x5b, 0x42, 0x21,
-	0xb1, 0x92, 0xa6, 0x35, 0xed, 0xf0, 0xfa, 0x25, 0x2c, 0xa6, 0xb6, 0x32, 0xba, 0x70, 0x31, 0xf7,
-	0xd4, 0xa5, 0xe5, 0xa7, 0x5c, 0x9d, 0xbb, 0x66, 0x45, 0xd4, 0x91, 0xf0, 0x76, 0xe9, 0xa6, 0x3d,
-	0x7b, 0x0d, 0x66, 0x96, 0x80, 0xb3, 0xe0, 0x8d, 0x9d, 0xb7, 0xcc, 0x54, 0xc7, 0x0a, 0x5c, 0xce,
-	0xe9, 0x48, 0x2b, 0x36, 0x9f, 0x15, 0xe0, 0xaa, 0x14, 0x74, 0x98, 0x6d, 0x81, 0x8e, 0x72, 0xbd,
-	0xf1, 0x0f, 0x5c, 0xe8, 0x44, 0x1c, 0xa3, 0x81, 0x0c, 0x0b, 0xe3, 0xfb, 0x89, 0x57, 0x71, 0xbb,
-	0x36, 0x32, 0x29, 0x23, 0x0a, 0x47, 0x0d, 0xa9, 0xda, 0x7c, 0x48, 0x8a, 0x72, 0x60, 0xfd, 0x93,
-	0x06, 0xf8, 0x0e, 0x18, 0xff, 0x01, 0x58, 0x39, 0xc4, 0x41, 0x84, 0x74, 0xf1, 0x1f, 0xdf, 0xcd,
-	0x94, 0xa2, 0xa7, 0x14, 0xfc, 0xf4, 0xe0, 0xbc, 0x9c, 0x8c, 0x27, 0x00, 0x56, 0x7e, 0xc3, 0x91,
-	0xd7, 0xff, 0xb0, 0x77, 0xb0, 0xf7, 0xef, 0x8b, 0x97, 0x8f, 0x66, 0x36, 0xeb, 0x1b, 0xd3, 0x3b,
-	0xba, 0x25, 0x97, 0x91, 0x90, 0x80, 0x42, 0x0b, 0xec, 0x35, 0x9f, 0x02, 0xb8, 0x39, 0xb6, 0xd8,
-	0xa6, 0xc6, 0x78, 0x0d, 0xe0, 0xb2, 0xec, 0xb1, 0x3b, 0xbe, 0xf0, 0x3e, 0xce, 0x7d, 0xb6, 0x5b,
-	0xf0, 0x6b, 0xc2, 0x14, 0x45, 0xc8, 0xd9, 0xe5, 0xf0, 0xbe, 0x45, 0xdb, 0x2e, 0x39, 0xbe, 0x38,
-	0x4d, 0x5f, 0xd9, 0x29, 0xb8, 0x02, 0xe0, 0x6c, 0x4e, 0xbe, 0xb8, 0xfd, 0x37, 0x01, 0x00, 0x00,
-	0xff, 0xff, 0x3c, 0x5c, 0xc9, 0x35, 0x91, 0x07, 0x00, 0x00,
+	// 386 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x53, 0xc1, 0x4a, 0x2b, 0x31,
+	0x14, 0x7d, 0x79, 0x85, 0xc7, 0x23, 0x7d, 0x9b, 0x37, 0x50, 0x8a, 0xd3, 0x52, 0xb0, 0x20, 0xd4,
+	0x2e, 0x12, 0x9d, 0x82, 0xc2, 0x2c, 0x4b, 0x11, 0x97, 0xa5, 0x05, 0xf7, 0x69, 0x27, 0xb6, 0x81,
+	0xe9, 0x24, 0x26, 0x99, 0xe8, 0xe0, 0x4e, 0x5c, 0x14, 0xb7, 0xee, 0x5c, 0xb9, 0xf6, 0x23, 0xdc,
+	0xf9, 0x05, 0xfe, 0x82, 0x1f, 0x22, 0x93, 0x49, 0x6b, 0x4b, 0x41, 0xe9, 0x46, 0x77, 0x33, 0x39,
+	0xe7, 0x9e, 0x7b, 0xcf, 0xcd, 0x09, 0xdc, 0xa3, 0x89, 0xe1, 0x19, 0x56, 0x54, 0x1a, 0x36, 0xa6,
+	0x58, 0xf2, 0x54, 0x53, 0x6c, 0x3a, 0x24, 0x16, 0x53, 0x82, 0x65, 0xa4, 0x90, 0x90, 0x5c, 0x73,
+	0xaf, 0x66, 0x69, 0xc8, 0xd1, 0x90, 0xa5, 0x21, 0x47, 0xf3, 0xf1, 0xba, 0x46, 0xc4, 0xd4, 0x98,
+	0x1b, 0x2a, 0xb3, 0xa5, 0xce, 0xf2, 0xa4, 0x50, 0xf3, 0xeb, 0x13, 0xce, 0x27, 0x31, 0xc5, 0x44,
+	0x30, 0x4c, 0x92, 0x84, 0x6b, 0xa2, 0x19, 0x4f, 0x5c, 0x2f, 0xbf, 0xe1, 0x50, 0xfb, 0x37, 0x4a,
+	0xcf, 0xf1, 0xa5, 0x24, 0x42, 0x50, 0xb9, 0xc0, 0x77, 0xd3, 0x48, 0x90, 0xd5, 0x3a, 0x6c, 0xa8,
+	0x54, 0x8c, 0x27, 0x2c, 0x99, 0x38, 0x4a, 0xd5, 0x90, 0x98, 0x45, 0x24, 0xb7, 0xe2, 0x3e, 0x0a,
+	0xa0, 0xd9, 0x82, 0x7f, 0x07, 0x91, 0xea, 0xa5, 0xb3, 0x59, 0x16, 0xd6, 0x1f, 0x5e, 0xe6, 0x8d,
+	0x2a, 0xac, 0x14, 0xd6, 0x88, 0x60, 0xc8, 0x04, 0x68, 0x81, 0x06, 0xcf, 0x25, 0x58, 0x19, 0xe4,
+	0x36, 0x7b, 0x8b, 0xe1, 0x87, 0x85, 0x3f, 0xef, 0x1a, 0xfe, 0x1b, 0x6a, 0x49, 0xc9, 0xcc, 0xc2,
+	0xca, 0x3b, 0x44, 0xeb, 0xcb, 0xf9, 0x70, 0xeb, 0xfc, 0xa3, 0xa5, 0xc4, 0x80, 0x5e, 0xa4, 0x54,
+	0x69, 0x3f, 0xd8, 0xa6, 0x44, 0x09, 0x9e, 0x28, 0xda, 0xfc, 0xd5, 0x02, 0x07, 0xc0, 0xbb, 0x05,
+	0xb0, 0xdc, 0xa3, 0xb1, 0x26, 0xae, 0xf9, 0xd1, 0xd7, 0x4a, 0x39, 0x7b, 0x63, 0x82, 0xe3, 0xad,
+	0xeb, 0xd6, 0xc6, 0x78, 0x04, 0xb0, 0x7c, 0x42, 0xf5, 0x78, 0xfa, 0xbd, 0x3b, 0x68, 0xdf, 0xbc,
+	0xbe, 0xdd, 0xff, 0xae, 0x35, 0x77, 0x36, 0xa3, 0x15, 0xda, 0x4c, 0x2a, 0x4b, 0x28, 0x85, 0xa0,
+	0x1d, 0x3c, 0x01, 0x58, 0x3b, 0x63, 0x52, 0xa7, 0x24, 0x3e, 0xe5, 0x4a, 0x6f, 0x5c, 0xe3, 0x1d,
+	0x80, 0xff, 0xad, 0xc7, 0x15, 0xd2, 0x4f, 0xed, 0xb3, 0x1b, 0xc2, 0x7d, 0xc6, 0x0b, 0x09, 0x21,
+	0xf9, 0x55, 0x86, 0x3e, 0x79, 0x6f, 0xdd, 0x3c, 0xc2, 0xfd, 0x3c, 0xce, 0x7d, 0x30, 0x07, 0x60,
+	0xf4, 0xc7, 0x46, 0xbb, 0xf3, 0x1e, 0x00, 0x00, 0xff, 0xff, 0xcd, 0x65, 0x03, 0x57, 0xcb, 0x03,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -257,7 +111,7 @@ const _ = grpc.SupportPackageIsVersion4
 type RouteDiscoveryServiceClient interface {
 	StreamRoutes(ctx context.Context, opts ...grpc.CallOption) (RouteDiscoveryService_StreamRoutesClient, error)
 	DeltaRoutes(ctx context.Context, opts ...grpc.CallOption) (RouteDiscoveryService_DeltaRoutesClient, error)
-	FetchRoutes(ctx context.Context, in *v3alpha2.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha2.DiscoveryResponse, error)
+	FetchRoutes(ctx context.Context, in *v3alpha.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha.DiscoveryResponse, error)
 }
 
 type routeDiscoveryServiceClient struct {
@@ -278,8 +132,8 @@ func (c *routeDiscoveryServiceClient) StreamRoutes(ctx context.Context, opts ...
 }
 
 type RouteDiscoveryService_StreamRoutesClient interface {
-	Send(*v3alpha2.DiscoveryRequest) error
-	Recv() (*v3alpha2.DiscoveryResponse, error)
+	Send(*v3alpha.DiscoveryRequest) error
+	Recv() (*v3alpha.DiscoveryResponse, error)
 	grpc.ClientStream
 }
 
@@ -287,12 +141,12 @@ type routeDiscoveryServiceStreamRoutesClient struct {
 	grpc.ClientStream
 }
 
-func (x *routeDiscoveryServiceStreamRoutesClient) Send(m *v3alpha2.DiscoveryRequest) error {
+func (x *routeDiscoveryServiceStreamRoutesClient) Send(m *v3alpha.DiscoveryRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *routeDiscoveryServiceStreamRoutesClient) Recv() (*v3alpha2.DiscoveryResponse, error) {
-	m := new(v3alpha2.DiscoveryResponse)
+func (x *routeDiscoveryServiceStreamRoutesClient) Recv() (*v3alpha.DiscoveryResponse, error) {
+	m := new(v3alpha.DiscoveryResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -309,8 +163,8 @@ func (c *routeDiscoveryServiceClient) DeltaRoutes(ctx context.Context, opts ...g
 }
 
 type RouteDiscoveryService_DeltaRoutesClient interface {
-	Send(*v3alpha2.DeltaDiscoveryRequest) error
-	Recv() (*v3alpha2.DeltaDiscoveryResponse, error)
+	Send(*v3alpha.DeltaDiscoveryRequest) error
+	Recv() (*v3alpha.DeltaDiscoveryResponse, error)
 	grpc.ClientStream
 }
 
@@ -318,20 +172,20 @@ type routeDiscoveryServiceDeltaRoutesClient struct {
 	grpc.ClientStream
 }
 
-func (x *routeDiscoveryServiceDeltaRoutesClient) Send(m *v3alpha2.DeltaDiscoveryRequest) error {
+func (x *routeDiscoveryServiceDeltaRoutesClient) Send(m *v3alpha.DeltaDiscoveryRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *routeDiscoveryServiceDeltaRoutesClient) Recv() (*v3alpha2.DeltaDiscoveryResponse, error) {
-	m := new(v3alpha2.DeltaDiscoveryResponse)
+func (x *routeDiscoveryServiceDeltaRoutesClient) Recv() (*v3alpha.DeltaDiscoveryResponse, error) {
+	m := new(v3alpha.DeltaDiscoveryResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (c *routeDiscoveryServiceClient) FetchRoutes(ctx context.Context, in *v3alpha2.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha2.DiscoveryResponse, error) {
-	out := new(v3alpha2.DiscoveryResponse)
+func (c *routeDiscoveryServiceClient) FetchRoutes(ctx context.Context, in *v3alpha.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha.DiscoveryResponse, error) {
+	out := new(v3alpha.DiscoveryResponse)
 	err := c.cc.Invoke(ctx, "/envoy.service.route.v3alpha.RouteDiscoveryService/FetchRoutes", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -343,7 +197,7 @@ func (c *routeDiscoveryServiceClient) FetchRoutes(ctx context.Context, in *v3alp
 type RouteDiscoveryServiceServer interface {
 	StreamRoutes(RouteDiscoveryService_StreamRoutesServer) error
 	DeltaRoutes(RouteDiscoveryService_DeltaRoutesServer) error
-	FetchRoutes(context.Context, *v3alpha2.DiscoveryRequest) (*v3alpha2.DiscoveryResponse, error)
+	FetchRoutes(context.Context, *v3alpha.DiscoveryRequest) (*v3alpha.DiscoveryResponse, error)
 }
 
 // UnimplementedRouteDiscoveryServiceServer can be embedded to have forward compatible implementations.
@@ -356,7 +210,7 @@ func (*UnimplementedRouteDiscoveryServiceServer) StreamRoutes(srv RouteDiscovery
 func (*UnimplementedRouteDiscoveryServiceServer) DeltaRoutes(srv RouteDiscoveryService_DeltaRoutesServer) error {
 	return status.Errorf(codes.Unimplemented, "method DeltaRoutes not implemented")
 }
-func (*UnimplementedRouteDiscoveryServiceServer) FetchRoutes(ctx context.Context, req *v3alpha2.DiscoveryRequest) (*v3alpha2.DiscoveryResponse, error) {
+func (*UnimplementedRouteDiscoveryServiceServer) FetchRoutes(ctx context.Context, req *v3alpha.DiscoveryRequest) (*v3alpha.DiscoveryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FetchRoutes not implemented")
 }
 
@@ -369,8 +223,8 @@ func _RouteDiscoveryService_StreamRoutes_Handler(srv interface{}, stream grpc.Se
 }
 
 type RouteDiscoveryService_StreamRoutesServer interface {
-	Send(*v3alpha2.DiscoveryResponse) error
-	Recv() (*v3alpha2.DiscoveryRequest, error)
+	Send(*v3alpha.DiscoveryResponse) error
+	Recv() (*v3alpha.DiscoveryRequest, error)
 	grpc.ServerStream
 }
 
@@ -378,12 +232,12 @@ type routeDiscoveryServiceStreamRoutesServer struct {
 	grpc.ServerStream
 }
 
-func (x *routeDiscoveryServiceStreamRoutesServer) Send(m *v3alpha2.DiscoveryResponse) error {
+func (x *routeDiscoveryServiceStreamRoutesServer) Send(m *v3alpha.DiscoveryResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *routeDiscoveryServiceStreamRoutesServer) Recv() (*v3alpha2.DiscoveryRequest, error) {
-	m := new(v3alpha2.DiscoveryRequest)
+func (x *routeDiscoveryServiceStreamRoutesServer) Recv() (*v3alpha.DiscoveryRequest, error) {
+	m := new(v3alpha.DiscoveryRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -395,8 +249,8 @@ func _RouteDiscoveryService_DeltaRoutes_Handler(srv interface{}, stream grpc.Ser
 }
 
 type RouteDiscoveryService_DeltaRoutesServer interface {
-	Send(*v3alpha2.DeltaDiscoveryResponse) error
-	Recv() (*v3alpha2.DeltaDiscoveryRequest, error)
+	Send(*v3alpha.DeltaDiscoveryResponse) error
+	Recv() (*v3alpha.DeltaDiscoveryRequest, error)
 	grpc.ServerStream
 }
 
@@ -404,12 +258,12 @@ type routeDiscoveryServiceDeltaRoutesServer struct {
 	grpc.ServerStream
 }
 
-func (x *routeDiscoveryServiceDeltaRoutesServer) Send(m *v3alpha2.DeltaDiscoveryResponse) error {
+func (x *routeDiscoveryServiceDeltaRoutesServer) Send(m *v3alpha.DeltaDiscoveryResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *routeDiscoveryServiceDeltaRoutesServer) Recv() (*v3alpha2.DeltaDiscoveryRequest, error) {
-	m := new(v3alpha2.DeltaDiscoveryRequest)
+func (x *routeDiscoveryServiceDeltaRoutesServer) Recv() (*v3alpha.DeltaDiscoveryRequest, error) {
+	m := new(v3alpha.DeltaDiscoveryRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -417,7 +271,7 @@ func (x *routeDiscoveryServiceDeltaRoutesServer) Recv() (*v3alpha2.DeltaDiscover
 }
 
 func _RouteDiscoveryService_FetchRoutes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v3alpha2.DiscoveryRequest)
+	in := new(v3alpha.DiscoveryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -429,7 +283,7 @@ func _RouteDiscoveryService_FetchRoutes_Handler(srv interface{}, ctx context.Con
 		FullMethod: "/envoy.service.route.v3alpha.RouteDiscoveryService/FetchRoutes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RouteDiscoveryServiceServer).FetchRoutes(ctx, req.(*v3alpha2.DiscoveryRequest))
+		return srv.(RouteDiscoveryServiceServer).FetchRoutes(ctx, req.(*v3alpha.DiscoveryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -485,8 +339,8 @@ func (c *virtualHostDiscoveryServiceClient) DeltaVirtualHosts(ctx context.Contex
 }
 
 type VirtualHostDiscoveryService_DeltaVirtualHostsClient interface {
-	Send(*v3alpha2.DeltaDiscoveryRequest) error
-	Recv() (*v3alpha2.DeltaDiscoveryResponse, error)
+	Send(*v3alpha.DeltaDiscoveryRequest) error
+	Recv() (*v3alpha.DeltaDiscoveryResponse, error)
 	grpc.ClientStream
 }
 
@@ -494,12 +348,12 @@ type virtualHostDiscoveryServiceDeltaVirtualHostsClient struct {
 	grpc.ClientStream
 }
 
-func (x *virtualHostDiscoveryServiceDeltaVirtualHostsClient) Send(m *v3alpha2.DeltaDiscoveryRequest) error {
+func (x *virtualHostDiscoveryServiceDeltaVirtualHostsClient) Send(m *v3alpha.DeltaDiscoveryRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *virtualHostDiscoveryServiceDeltaVirtualHostsClient) Recv() (*v3alpha2.DeltaDiscoveryResponse, error) {
-	m := new(v3alpha2.DeltaDiscoveryResponse)
+func (x *virtualHostDiscoveryServiceDeltaVirtualHostsClient) Recv() (*v3alpha.DeltaDiscoveryResponse, error) {
+	m := new(v3alpha.DeltaDiscoveryResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -528,8 +382,8 @@ func _VirtualHostDiscoveryService_DeltaVirtualHosts_Handler(srv interface{}, str
 }
 
 type VirtualHostDiscoveryService_DeltaVirtualHostsServer interface {
-	Send(*v3alpha2.DeltaDiscoveryResponse) error
-	Recv() (*v3alpha2.DeltaDiscoveryRequest, error)
+	Send(*v3alpha.DeltaDiscoveryResponse) error
+	Recv() (*v3alpha.DeltaDiscoveryRequest, error)
 	grpc.ServerStream
 }
 
@@ -537,12 +391,12 @@ type virtualHostDiscoveryServiceDeltaVirtualHostsServer struct {
 	grpc.ServerStream
 }
 
-func (x *virtualHostDiscoveryServiceDeltaVirtualHostsServer) Send(m *v3alpha2.DeltaDiscoveryResponse) error {
+func (x *virtualHostDiscoveryServiceDeltaVirtualHostsServer) Send(m *v3alpha.DeltaDiscoveryResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *virtualHostDiscoveryServiceDeltaVirtualHostsServer) Recv() (*v3alpha2.DeltaDiscoveryRequest, error) {
-	m := new(v3alpha2.DeltaDiscoveryRequest)
+func (x *virtualHostDiscoveryServiceDeltaVirtualHostsServer) Recv() (*v3alpha.DeltaDiscoveryRequest, error) {
+	m := new(v3alpha.DeltaDiscoveryRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}

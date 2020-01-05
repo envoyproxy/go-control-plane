@@ -16,8 +16,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/ptypes"
-
-	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v3alpha"
 )
 
 // ensure the imports are used
@@ -33,228 +31,33 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = ptypes.DynamicAny{}
-
-	_ = v3alpha.HealthStatus(0)
 )
 
 // define the regex for a UUID once up-front
 var _endpoint_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
-// Validate checks the field values on Endpoint with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *Endpoint) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return EndpointValidationError{
-				field:  "Address",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetHealthCheckConfig()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return EndpointValidationError{
-				field:  "HealthCheckConfig",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	return nil
-}
-
-// EndpointValidationError is the validation error returned by
-// Endpoint.Validate if the designated constraints aren't met.
-type EndpointValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e EndpointValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e EndpointValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e EndpointValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e EndpointValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e EndpointValidationError) ErrorName() string { return "EndpointValidationError" }
-
-// Error satisfies the builtin error interface
-func (e EndpointValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sEndpoint.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = EndpointValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = EndpointValidationError{}
-
-// Validate checks the field values on LbEndpoint with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *LbEndpoint) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for HealthStatus
-
-	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LbEndpointValidationError{
-				field:  "Metadata",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if wrapper := m.GetLoadBalancingWeight(); wrapper != nil {
-
-		if wrapper.GetValue() < 1 {
-			return LbEndpointValidationError{
-				field:  "LoadBalancingWeight",
-				reason: "value must be greater than or equal to 1",
-			}
-		}
-
-	}
-
-	switch m.HostIdentifier.(type) {
-
-	case *LbEndpoint_Endpoint:
-
-		if v, ok := interface{}(m.GetEndpoint()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return LbEndpointValidationError{
-					field:  "Endpoint",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *LbEndpoint_EndpointName:
-		// no validation rules for EndpointName
-
-	}
-
-	return nil
-}
-
-// LbEndpointValidationError is the validation error returned by
-// LbEndpoint.Validate if the designated constraints aren't met.
-type LbEndpointValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e LbEndpointValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e LbEndpointValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e LbEndpointValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e LbEndpointValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e LbEndpointValidationError) ErrorName() string { return "LbEndpointValidationError" }
-
-// Error satisfies the builtin error interface
-func (e LbEndpointValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sLbEndpoint.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = LbEndpointValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = LbEndpointValidationError{}
-
-// Validate checks the field values on LocalityLbEndpoints with the rules
+// Validate checks the field values on ClusterLoadAssignment with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *LocalityLbEndpoints) Validate() error {
+func (m *ClusterLoadAssignment) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetLocality()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return LocalityLbEndpointsValidationError{
-				field:  "Locality",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
+	if len(m.GetClusterName()) < 1 {
+		return ClusterLoadAssignmentValidationError{
+			field:  "ClusterName",
+			reason: "value length must be at least 1 bytes",
 		}
 	}
 
-	for idx, item := range m.GetLbEndpoints() {
+	for idx, item := range m.GetEndpoints() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return LocalityLbEndpointsValidationError{
-					field:  fmt.Sprintf("LbEndpoints[%v]", idx),
+				return ClusterLoadAssignmentValidationError{
+					field:  fmt.Sprintf("Endpoints[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -263,28 +66,27 @@ func (m *LocalityLbEndpoints) Validate() error {
 
 	}
 
-	if wrapper := m.GetLoadBalancingWeight(); wrapper != nil {
+	for key, val := range m.GetNamedEndpoints() {
+		_ = val
 
-		if wrapper.GetValue() < 1 {
-			return LocalityLbEndpointsValidationError{
-				field:  "LoadBalancingWeight",
-				reason: "value must be greater than or equal to 1",
+		// no validation rules for NamedEndpoints[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterLoadAssignmentValidationError{
+					field:  fmt.Sprintf("NamedEndpoints[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 
 	}
 
-	if m.GetPriority() > 128 {
-		return LocalityLbEndpointsValidationError{
-			field:  "Priority",
-			reason: "value must be less than or equal to 128",
-		}
-	}
-
-	if v, ok := interface{}(m.GetProximity()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetPolicy()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return LocalityLbEndpointsValidationError{
-				field:  "Proximity",
+			return ClusterLoadAssignmentValidationError{
+				field:  "Policy",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -294,9 +96,9 @@ func (m *LocalityLbEndpoints) Validate() error {
 	return nil
 }
 
-// LocalityLbEndpointsValidationError is the validation error returned by
-// LocalityLbEndpoints.Validate if the designated constraints aren't met.
-type LocalityLbEndpointsValidationError struct {
+// ClusterLoadAssignmentValidationError is the validation error returned by
+// ClusterLoadAssignment.Validate if the designated constraints aren't met.
+type ClusterLoadAssignmentValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -304,24 +106,24 @@ type LocalityLbEndpointsValidationError struct {
 }
 
 // Field function returns field value.
-func (e LocalityLbEndpointsValidationError) Field() string { return e.field }
+func (e ClusterLoadAssignmentValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LocalityLbEndpointsValidationError) Reason() string { return e.reason }
+func (e ClusterLoadAssignmentValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LocalityLbEndpointsValidationError) Cause() error { return e.cause }
+func (e ClusterLoadAssignmentValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LocalityLbEndpointsValidationError) Key() bool { return e.key }
+func (e ClusterLoadAssignmentValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LocalityLbEndpointsValidationError) ErrorName() string {
-	return "LocalityLbEndpointsValidationError"
+func (e ClusterLoadAssignmentValidationError) ErrorName() string {
+	return "ClusterLoadAssignmentValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e LocalityLbEndpointsValidationError) Error() string {
+func (e ClusterLoadAssignmentValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -333,14 +135,14 @@ func (e LocalityLbEndpointsValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLocalityLbEndpoints.%s: %s%s",
+		"invalid %sClusterLoadAssignment.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LocalityLbEndpointsValidationError{}
+var _ error = ClusterLoadAssignmentValidationError{}
 
 var _ interface {
 	Field() string
@@ -348,29 +150,157 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LocalityLbEndpointsValidationError{}
+} = ClusterLoadAssignmentValidationError{}
 
-// Validate checks the field values on Endpoint_HealthCheckConfig with the
+// Validate checks the field values on ClusterLoadAssignment_Policy with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *Endpoint_HealthCheckConfig) Validate() error {
+func (m *ClusterLoadAssignment_Policy) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	if m.GetPortValue() > 65535 {
-		return Endpoint_HealthCheckConfigValidationError{
-			field:  "PortValue",
-			reason: "value must be less than or equal to 65535",
+	for idx, item := range m.GetDropOverloads() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterLoadAssignment_PolicyValidationError{
+					field:  fmt.Sprintf("DropOverloads[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if wrapper := m.GetOverprovisioningFactor(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			return ClusterLoadAssignment_PolicyValidationError{
+				field:  "OverprovisioningFactor",
+				reason: "value must be greater than 0",
+			}
+		}
+
+	}
+
+	if d := m.GetEndpointStaleAfter(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return ClusterLoadAssignment_PolicyValidationError{
+				field:  "EndpointStaleAfter",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return ClusterLoadAssignment_PolicyValidationError{
+				field:  "EndpointStaleAfter",
+				reason: "value must be greater than 0s",
+			}
+		}
+
+	}
+
+	// no validation rules for DisableOverprovisioning
+
+	return nil
+}
+
+// ClusterLoadAssignment_PolicyValidationError is the validation error returned
+// by ClusterLoadAssignment_Policy.Validate if the designated constraints
+// aren't met.
+type ClusterLoadAssignment_PolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClusterLoadAssignment_PolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClusterLoadAssignment_PolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClusterLoadAssignment_PolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClusterLoadAssignment_PolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClusterLoadAssignment_PolicyValidationError) ErrorName() string {
+	return "ClusterLoadAssignment_PolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClusterLoadAssignment_PolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClusterLoadAssignment_Policy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClusterLoadAssignment_PolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClusterLoadAssignment_PolicyValidationError{}
+
+// Validate checks the field values on
+// ClusterLoadAssignment_Policy_DropOverload with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *ClusterLoadAssignment_Policy_DropOverload) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetCategory()) < 1 {
+		return ClusterLoadAssignment_Policy_DropOverloadValidationError{
+			field:  "Category",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if v, ok := interface{}(m.GetDropPercentage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterLoadAssignment_Policy_DropOverloadValidationError{
+				field:  "DropPercentage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
 	}
 
 	return nil
 }
 
-// Endpoint_HealthCheckConfigValidationError is the validation error returned
-// by Endpoint_HealthCheckConfig.Validate if the designated constraints aren't met.
-type Endpoint_HealthCheckConfigValidationError struct {
+// ClusterLoadAssignment_Policy_DropOverloadValidationError is the validation
+// error returned by ClusterLoadAssignment_Policy_DropOverload.Validate if the
+// designated constraints aren't met.
+type ClusterLoadAssignment_Policy_DropOverloadValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -378,24 +308,24 @@ type Endpoint_HealthCheckConfigValidationError struct {
 }
 
 // Field function returns field value.
-func (e Endpoint_HealthCheckConfigValidationError) Field() string { return e.field }
+func (e ClusterLoadAssignment_Policy_DropOverloadValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e Endpoint_HealthCheckConfigValidationError) Reason() string { return e.reason }
+func (e ClusterLoadAssignment_Policy_DropOverloadValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e Endpoint_HealthCheckConfigValidationError) Cause() error { return e.cause }
+func (e ClusterLoadAssignment_Policy_DropOverloadValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e Endpoint_HealthCheckConfigValidationError) Key() bool { return e.key }
+func (e ClusterLoadAssignment_Policy_DropOverloadValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e Endpoint_HealthCheckConfigValidationError) ErrorName() string {
-	return "Endpoint_HealthCheckConfigValidationError"
+func (e ClusterLoadAssignment_Policy_DropOverloadValidationError) ErrorName() string {
+	return "ClusterLoadAssignment_Policy_DropOverloadValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e Endpoint_HealthCheckConfigValidationError) Error() string {
+func (e ClusterLoadAssignment_Policy_DropOverloadValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -407,14 +337,14 @@ func (e Endpoint_HealthCheckConfigValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sEndpoint_HealthCheckConfig.%s: %s%s",
+		"invalid %sClusterLoadAssignment_Policy_DropOverload.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = Endpoint_HealthCheckConfigValidationError{}
+var _ error = ClusterLoadAssignment_Policy_DropOverloadValidationError{}
 
 var _ interface {
 	Field() string
@@ -422,4 +352,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = Endpoint_HealthCheckConfigValidationError{}
+} = ClusterLoadAssignment_Policy_DropOverloadValidationError{}

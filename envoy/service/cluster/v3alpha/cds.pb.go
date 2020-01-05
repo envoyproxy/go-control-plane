@@ -7,18 +7,8 @@ import (
 	context "context"
 	fmt "fmt"
 	_ "github.com/cncf/udpa/go/udpa/annotations"
-	v3alpha2 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3alpha"
-	v3alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v3alpha"
-	v3alpha3 "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3alpha"
-	v3alpha5 "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3alpha"
-	v3alpha1 "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3alpha"
-	v3alpha4 "github.com/envoyproxy/go-control-plane/envoy/type/v3alpha"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	v3alpha "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3alpha"
 	proto "github.com/golang/protobuf/proto"
-	any "github.com/golang/protobuf/ptypes/any"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -37,1545 +27,39 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type Cluster_DiscoveryType int32
-
-const (
-	Cluster_STATIC       Cluster_DiscoveryType = 0
-	Cluster_STRICT_DNS   Cluster_DiscoveryType = 1
-	Cluster_LOGICAL_DNS  Cluster_DiscoveryType = 2
-	Cluster_EDS          Cluster_DiscoveryType = 3
-	Cluster_ORIGINAL_DST Cluster_DiscoveryType = 4
-)
-
-var Cluster_DiscoveryType_name = map[int32]string{
-	0: "STATIC",
-	1: "STRICT_DNS",
-	2: "LOGICAL_DNS",
-	3: "EDS",
-	4: "ORIGINAL_DST",
+type CdsDummy struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-var Cluster_DiscoveryType_value = map[string]int32{
-	"STATIC":       0,
-	"STRICT_DNS":   1,
-	"LOGICAL_DNS":  2,
-	"EDS":          3,
-	"ORIGINAL_DST": 4,
-}
-
-func (x Cluster_DiscoveryType) String() string {
-	return proto.EnumName(Cluster_DiscoveryType_name, int32(x))
-}
-
-func (Cluster_DiscoveryType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 0}
-}
-
-type Cluster_LbPolicy int32
-
-const (
-	Cluster_ROUND_ROBIN                             Cluster_LbPolicy = 0
-	Cluster_LEAST_REQUEST                           Cluster_LbPolicy = 1
-	Cluster_RING_HASH                               Cluster_LbPolicy = 2
-	Cluster_RANDOM                                  Cluster_LbPolicy = 3
-	Cluster_hidden_envoy_deprecated_ORIGINAL_DST_LB Cluster_LbPolicy = 4 // Deprecated: Do not use.
-	Cluster_MAGLEV                                  Cluster_LbPolicy = 5
-	Cluster_CLUSTER_PROVIDED                        Cluster_LbPolicy = 6
-	Cluster_LOAD_BALANCING_POLICY_CONFIG            Cluster_LbPolicy = 7
-)
-
-var Cluster_LbPolicy_name = map[int32]string{
-	0: "ROUND_ROBIN",
-	1: "LEAST_REQUEST",
-	2: "RING_HASH",
-	3: "RANDOM",
-	4: "hidden_envoy_deprecated_ORIGINAL_DST_LB",
-	5: "MAGLEV",
-	6: "CLUSTER_PROVIDED",
-	7: "LOAD_BALANCING_POLICY_CONFIG",
-}
-
-var Cluster_LbPolicy_value = map[string]int32{
-	"ROUND_ROBIN":   0,
-	"LEAST_REQUEST": 1,
-	"RING_HASH":     2,
-	"RANDOM":        3,
-	"hidden_envoy_deprecated_ORIGINAL_DST_LB": 4,
-	"MAGLEV":                       5,
-	"CLUSTER_PROVIDED":             6,
-	"LOAD_BALANCING_POLICY_CONFIG": 7,
-}
-
-func (x Cluster_LbPolicy) String() string {
-	return proto.EnumName(Cluster_LbPolicy_name, int32(x))
-}
-
-func (Cluster_LbPolicy) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 1}
-}
-
-type Cluster_DnsLookupFamily int32
-
-const (
-	Cluster_AUTO    Cluster_DnsLookupFamily = 0
-	Cluster_V4_ONLY Cluster_DnsLookupFamily = 1
-	Cluster_V6_ONLY Cluster_DnsLookupFamily = 2
-)
-
-var Cluster_DnsLookupFamily_name = map[int32]string{
-	0: "AUTO",
-	1: "V4_ONLY",
-	2: "V6_ONLY",
-}
-
-var Cluster_DnsLookupFamily_value = map[string]int32{
-	"AUTO":    0,
-	"V4_ONLY": 1,
-	"V6_ONLY": 2,
-}
-
-func (x Cluster_DnsLookupFamily) String() string {
-	return proto.EnumName(Cluster_DnsLookupFamily_name, int32(x))
-}
-
-func (Cluster_DnsLookupFamily) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 2}
-}
-
-type Cluster_ClusterProtocolSelection int32
-
-const (
-	Cluster_USE_CONFIGURED_PROTOCOL Cluster_ClusterProtocolSelection = 0
-	Cluster_USE_DOWNSTREAM_PROTOCOL Cluster_ClusterProtocolSelection = 1
-)
-
-var Cluster_ClusterProtocolSelection_name = map[int32]string{
-	0: "USE_CONFIGURED_PROTOCOL",
-	1: "USE_DOWNSTREAM_PROTOCOL",
-}
-
-var Cluster_ClusterProtocolSelection_value = map[string]int32{
-	"USE_CONFIGURED_PROTOCOL": 0,
-	"USE_DOWNSTREAM_PROTOCOL": 1,
-}
-
-func (x Cluster_ClusterProtocolSelection) String() string {
-	return proto.EnumName(Cluster_ClusterProtocolSelection_name, int32(x))
-}
-
-func (Cluster_ClusterProtocolSelection) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 3}
-}
-
-type Cluster_LbSubsetConfig_LbSubsetFallbackPolicy int32
-
-const (
-	Cluster_LbSubsetConfig_NO_FALLBACK    Cluster_LbSubsetConfig_LbSubsetFallbackPolicy = 0
-	Cluster_LbSubsetConfig_ANY_ENDPOINT   Cluster_LbSubsetConfig_LbSubsetFallbackPolicy = 1
-	Cluster_LbSubsetConfig_DEFAULT_SUBSET Cluster_LbSubsetConfig_LbSubsetFallbackPolicy = 2
-)
-
-var Cluster_LbSubsetConfig_LbSubsetFallbackPolicy_name = map[int32]string{
-	0: "NO_FALLBACK",
-	1: "ANY_ENDPOINT",
-	2: "DEFAULT_SUBSET",
-}
-
-var Cluster_LbSubsetConfig_LbSubsetFallbackPolicy_value = map[string]int32{
-	"NO_FALLBACK":    0,
-	"ANY_ENDPOINT":   1,
-	"DEFAULT_SUBSET": 2,
-}
-
-func (x Cluster_LbSubsetConfig_LbSubsetFallbackPolicy) String() string {
-	return proto.EnumName(Cluster_LbSubsetConfig_LbSubsetFallbackPolicy_name, int32(x))
-}
-
-func (Cluster_LbSubsetConfig_LbSubsetFallbackPolicy) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 3, 0}
-}
-
-type Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy int32
-
-const (
-	Cluster_LbSubsetConfig_LbSubsetSelector_NOT_DEFINED    Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy = 0
-	Cluster_LbSubsetConfig_LbSubsetSelector_NO_FALLBACK    Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy = 1
-	Cluster_LbSubsetConfig_LbSubsetSelector_ANY_ENDPOINT   Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy = 2
-	Cluster_LbSubsetConfig_LbSubsetSelector_DEFAULT_SUBSET Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy = 3
-	Cluster_LbSubsetConfig_LbSubsetSelector_KEYS_SUBSET    Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy = 4
-)
-
-var Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy_name = map[int32]string{
-	0: "NOT_DEFINED",
-	1: "NO_FALLBACK",
-	2: "ANY_ENDPOINT",
-	3: "DEFAULT_SUBSET",
-	4: "KEYS_SUBSET",
-}
-
-var Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy_value = map[string]int32{
-	"NOT_DEFINED":    0,
-	"NO_FALLBACK":    1,
-	"ANY_ENDPOINT":   2,
-	"DEFAULT_SUBSET": 3,
-	"KEYS_SUBSET":    4,
-}
-
-func (x Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy) String() string {
-	return proto.EnumName(Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy_name, int32(x))
-}
-
-func (Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 3, 0, 0}
-}
-
-type Cluster_RingHashLbConfig_HashFunction int32
-
-const (
-	Cluster_RingHashLbConfig_XX_HASH       Cluster_RingHashLbConfig_HashFunction = 0
-	Cluster_RingHashLbConfig_MURMUR_HASH_2 Cluster_RingHashLbConfig_HashFunction = 1
-)
-
-var Cluster_RingHashLbConfig_HashFunction_name = map[int32]string{
-	0: "XX_HASH",
-	1: "MURMUR_HASH_2",
-}
-
-var Cluster_RingHashLbConfig_HashFunction_value = map[string]int32{
-	"XX_HASH":       0,
-	"MURMUR_HASH_2": 1,
-}
-
-func (x Cluster_RingHashLbConfig_HashFunction) String() string {
-	return proto.EnumName(Cluster_RingHashLbConfig_HashFunction_name, int32(x))
-}
-
-func (Cluster_RingHashLbConfig_HashFunction) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 5, 0}
-}
-
-type Cluster struct {
-	TransportSocketMatches []*Cluster_TransportSocketMatch `protobuf:"bytes,43,rep,name=transport_socket_matches,json=transportSocketMatches,proto3" json:"transport_socket_matches,omitempty"`
-	Name                   string                          `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	AltStatName            string                          `protobuf:"bytes,28,opt,name=alt_stat_name,json=altStatName,proto3" json:"alt_stat_name,omitempty"`
-	// Types that are valid to be assigned to ClusterDiscoveryType:
-	//	*Cluster_Type
-	//	*Cluster_ClusterType
-	ClusterDiscoveryType                          isCluster_ClusterDiscoveryType  `protobuf_oneof:"cluster_discovery_type"`
-	EdsClusterConfig                              *Cluster_EdsClusterConfig       `protobuf:"bytes,3,opt,name=eds_cluster_config,json=edsClusterConfig,proto3" json:"eds_cluster_config,omitempty"`
-	ConnectTimeout                                *duration.Duration              `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout,proto3" json:"connect_timeout,omitempty"`
-	PerConnectionBufferLimitBytes                 *wrappers.UInt32Value           `protobuf:"bytes,5,opt,name=per_connection_buffer_limit_bytes,json=perConnectionBufferLimitBytes,proto3" json:"per_connection_buffer_limit_bytes,omitempty"`
-	LbPolicy                                      Cluster_LbPolicy                `protobuf:"varint,6,opt,name=lb_policy,json=lbPolicy,proto3,enum=envoy.service.cluster.v3alpha.Cluster_LbPolicy" json:"lb_policy,omitempty"`
-	Hosts                                         []*v3alpha.Address              `protobuf:"bytes,7,rep,name=hosts,proto3" json:"hosts,omitempty"`
-	LoadAssignment                                *v3alpha1.ClusterLoadAssignment `protobuf:"bytes,33,opt,name=load_assignment,json=loadAssignment,proto3" json:"load_assignment,omitempty"`
-	HealthChecks                                  []*v3alpha.HealthCheck          `protobuf:"bytes,8,rep,name=health_checks,json=healthChecks,proto3" json:"health_checks,omitempty"`
-	MaxRequestsPerConnection                      *wrappers.UInt32Value           `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
-	CircuitBreakers                               *v3alpha2.CircuitBreakers       `protobuf:"bytes,10,opt,name=circuit_breakers,json=circuitBreakers,proto3" json:"circuit_breakers,omitempty"`
-	HiddenEnvoyDeprecatedTlsContext               *v3alpha3.UpstreamTlsContext    `protobuf:"bytes,11,opt,name=hidden_envoy_deprecated_tls_context,json=hiddenEnvoyDeprecatedTlsContext,proto3" json:"hidden_envoy_deprecated_tls_context,omitempty"` // Deprecated: Do not use.
-	CommonHttpProtocolOptions                     *v3alpha.HttpProtocolOptions    `protobuf:"bytes,29,opt,name=common_http_protocol_options,json=commonHttpProtocolOptions,proto3" json:"common_http_protocol_options,omitempty"`
-	HttpProtocolOptions                           *v3alpha.Http1ProtocolOptions   `protobuf:"bytes,13,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
-	Http2ProtocolOptions                          *v3alpha.Http2ProtocolOptions   `protobuf:"bytes,14,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
-	HiddenEnvoyDeprecatedExtensionProtocolOptions map[string]*_struct.Struct      `protobuf:"bytes,35,rep,name=hidden_envoy_deprecated_extension_protocol_options,json=hiddenEnvoyDeprecatedExtensionProtocolOptions,proto3" json:"hidden_envoy_deprecated_extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // Deprecated: Do not use.
-	TypedExtensionProtocolOptions                 map[string]*any.Any             `protobuf:"bytes,36,rep,name=typed_extension_protocol_options,json=typedExtensionProtocolOptions,proto3" json:"typed_extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	DnsRefreshRate                                *duration.Duration              `protobuf:"bytes,16,opt,name=dns_refresh_rate,json=dnsRefreshRate,proto3" json:"dns_refresh_rate,omitempty"`
-	DnsFailureRefreshRate                         *Cluster_RefreshRate            `protobuf:"bytes,44,opt,name=dns_failure_refresh_rate,json=dnsFailureRefreshRate,proto3" json:"dns_failure_refresh_rate,omitempty"`
-	RespectDnsTtl                                 bool                            `protobuf:"varint,39,opt,name=respect_dns_ttl,json=respectDnsTtl,proto3" json:"respect_dns_ttl,omitempty"`
-	DnsLookupFamily                               Cluster_DnsLookupFamily         `protobuf:"varint,17,opt,name=dns_lookup_family,json=dnsLookupFamily,proto3,enum=envoy.service.cluster.v3alpha.Cluster_DnsLookupFamily" json:"dns_lookup_family,omitempty"`
-	DnsResolvers                                  []*v3alpha.Address              `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers,proto3" json:"dns_resolvers,omitempty"`
-	UseTcpForDnsLookups                           bool                            `protobuf:"varint,45,opt,name=use_tcp_for_dns_lookups,json=useTcpForDnsLookups,proto3" json:"use_tcp_for_dns_lookups,omitempty"`
-	OutlierDetection                              *v3alpha2.OutlierDetection      `protobuf:"bytes,19,opt,name=outlier_detection,json=outlierDetection,proto3" json:"outlier_detection,omitempty"`
-	CleanupInterval                               *duration.Duration              `protobuf:"bytes,20,opt,name=cleanup_interval,json=cleanupInterval,proto3" json:"cleanup_interval,omitempty"`
-	UpstreamBindConfig                            *v3alpha.BindConfig             `protobuf:"bytes,21,opt,name=upstream_bind_config,json=upstreamBindConfig,proto3" json:"upstream_bind_config,omitempty"`
-	LbSubsetConfig                                *Cluster_LbSubsetConfig         `protobuf:"bytes,22,opt,name=lb_subset_config,json=lbSubsetConfig,proto3" json:"lb_subset_config,omitempty"`
-	// Types that are valid to be assigned to LbConfig:
-	//	*Cluster_RingHashLbConfig_
-	//	*Cluster_OriginalDstLbConfig_
-	//	*Cluster_LeastRequestLbConfig_
-	LbConfig                            isCluster_LbConfig               `protobuf_oneof:"lb_config"`
-	CommonLbConfig                      *Cluster_CommonLbConfig          `protobuf:"bytes,27,opt,name=common_lb_config,json=commonLbConfig,proto3" json:"common_lb_config,omitempty"`
-	TransportSocket                     *v3alpha.TransportSocket         `protobuf:"bytes,24,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
-	Metadata                            *v3alpha.Metadata                `protobuf:"bytes,25,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	ProtocolSelection                   Cluster_ClusterProtocolSelection `protobuf:"varint,26,opt,name=protocol_selection,json=protocolSelection,proto3,enum=envoy.service.cluster.v3alpha.Cluster_ClusterProtocolSelection" json:"protocol_selection,omitempty"`
-	UpstreamConnectionOptions           *UpstreamConnectionOptions       `protobuf:"bytes,30,opt,name=upstream_connection_options,json=upstreamConnectionOptions,proto3" json:"upstream_connection_options,omitempty"`
-	CloseConnectionsOnHostHealthFailure bool                             `protobuf:"varint,31,opt,name=close_connections_on_host_health_failure,json=closeConnectionsOnHostHealthFailure,proto3" json:"close_connections_on_host_health_failure,omitempty"`
-	IgnoreHealthOnHostRemoval           bool                             `protobuf:"varint,32,opt,name=ignore_health_on_host_removal,json=ignoreHealthOnHostRemoval,proto3" json:"ignore_health_on_host_removal,omitempty"`
-	Filters                             []*v3alpha2.Filter               `protobuf:"bytes,40,rep,name=filters,proto3" json:"filters,omitempty"`
-	LoadBalancingPolicy                 *LoadBalancingPolicy             `protobuf:"bytes,41,opt,name=load_balancing_policy,json=loadBalancingPolicy,proto3" json:"load_balancing_policy,omitempty"`
-	LrsServer                           *v3alpha.ConfigSource            `protobuf:"bytes,42,opt,name=lrs_server,json=lrsServer,proto3" json:"lrs_server,omitempty"`
-	XXX_NoUnkeyedLiteral                struct{}                         `json:"-"`
-	XXX_unrecognized                    []byte                           `json:"-"`
-	XXX_sizecache                       int32                            `json:"-"`
-}
-
-func (m *Cluster) Reset()         { *m = Cluster{} }
-func (m *Cluster) String() string { return proto.CompactTextString(m) }
-func (*Cluster) ProtoMessage()    {}
-func (*Cluster) Descriptor() ([]byte, []int) {
+func (m *CdsDummy) Reset()         { *m = CdsDummy{} }
+func (m *CdsDummy) String() string { return proto.CompactTextString(m) }
+func (*CdsDummy) ProtoMessage()    {}
+func (*CdsDummy) Descriptor() ([]byte, []int) {
 	return fileDescriptor_64e2d75d1d4b158d, []int{0}
 }
 
-func (m *Cluster) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster.Unmarshal(m, b)
+func (m *CdsDummy) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CdsDummy.Unmarshal(m, b)
 }
-func (m *Cluster) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster.Marshal(b, m, deterministic)
+func (m *CdsDummy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CdsDummy.Marshal(b, m, deterministic)
 }
-func (m *Cluster) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster.Merge(m, src)
+func (m *CdsDummy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CdsDummy.Merge(m, src)
 }
-func (m *Cluster) XXX_Size() int {
-	return xxx_messageInfo_Cluster.Size(m)
+func (m *CdsDummy) XXX_Size() int {
+	return xxx_messageInfo_CdsDummy.Size(m)
 }
-func (m *Cluster) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster.DiscardUnknown(m)
+func (m *CdsDummy) XXX_DiscardUnknown() {
+	xxx_messageInfo_CdsDummy.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Cluster proto.InternalMessageInfo
-
-func (m *Cluster) GetTransportSocketMatches() []*Cluster_TransportSocketMatch {
-	if m != nil {
-		return m.TransportSocketMatches
-	}
-	return nil
-}
-
-func (m *Cluster) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Cluster) GetAltStatName() string {
-	if m != nil {
-		return m.AltStatName
-	}
-	return ""
-}
-
-type isCluster_ClusterDiscoveryType interface {
-	isCluster_ClusterDiscoveryType()
-}
-
-type Cluster_Type struct {
-	Type Cluster_DiscoveryType `protobuf:"varint,2,opt,name=type,proto3,enum=envoy.service.cluster.v3alpha.Cluster_DiscoveryType,oneof"`
-}
-
-type Cluster_ClusterType struct {
-	ClusterType *Cluster_CustomClusterType `protobuf:"bytes,38,opt,name=cluster_type,json=clusterType,proto3,oneof"`
-}
-
-func (*Cluster_Type) isCluster_ClusterDiscoveryType() {}
-
-func (*Cluster_ClusterType) isCluster_ClusterDiscoveryType() {}
-
-func (m *Cluster) GetClusterDiscoveryType() isCluster_ClusterDiscoveryType {
-	if m != nil {
-		return m.ClusterDiscoveryType
-	}
-	return nil
-}
-
-func (m *Cluster) GetType() Cluster_DiscoveryType {
-	if x, ok := m.GetClusterDiscoveryType().(*Cluster_Type); ok {
-		return x.Type
-	}
-	return Cluster_STATIC
-}
-
-func (m *Cluster) GetClusterType() *Cluster_CustomClusterType {
-	if x, ok := m.GetClusterDiscoveryType().(*Cluster_ClusterType); ok {
-		return x.ClusterType
-	}
-	return nil
-}
-
-func (m *Cluster) GetEdsClusterConfig() *Cluster_EdsClusterConfig {
-	if m != nil {
-		return m.EdsClusterConfig
-	}
-	return nil
-}
-
-func (m *Cluster) GetConnectTimeout() *duration.Duration {
-	if m != nil {
-		return m.ConnectTimeout
-	}
-	return nil
-}
-
-func (m *Cluster) GetPerConnectionBufferLimitBytes() *wrappers.UInt32Value {
-	if m != nil {
-		return m.PerConnectionBufferLimitBytes
-	}
-	return nil
-}
-
-func (m *Cluster) GetLbPolicy() Cluster_LbPolicy {
-	if m != nil {
-		return m.LbPolicy
-	}
-	return Cluster_ROUND_ROBIN
-}
-
-func (m *Cluster) GetHosts() []*v3alpha.Address {
-	if m != nil {
-		return m.Hosts
-	}
-	return nil
-}
-
-func (m *Cluster) GetLoadAssignment() *v3alpha1.ClusterLoadAssignment {
-	if m != nil {
-		return m.LoadAssignment
-	}
-	return nil
-}
-
-func (m *Cluster) GetHealthChecks() []*v3alpha.HealthCheck {
-	if m != nil {
-		return m.HealthChecks
-	}
-	return nil
-}
-
-func (m *Cluster) GetMaxRequestsPerConnection() *wrappers.UInt32Value {
-	if m != nil {
-		return m.MaxRequestsPerConnection
-	}
-	return nil
-}
-
-func (m *Cluster) GetCircuitBreakers() *v3alpha2.CircuitBreakers {
-	if m != nil {
-		return m.CircuitBreakers
-	}
-	return nil
-}
-
-// Deprecated: Do not use.
-func (m *Cluster) GetHiddenEnvoyDeprecatedTlsContext() *v3alpha3.UpstreamTlsContext {
-	if m != nil {
-		return m.HiddenEnvoyDeprecatedTlsContext
-	}
-	return nil
-}
-
-func (m *Cluster) GetCommonHttpProtocolOptions() *v3alpha.HttpProtocolOptions {
-	if m != nil {
-		return m.CommonHttpProtocolOptions
-	}
-	return nil
-}
-
-func (m *Cluster) GetHttpProtocolOptions() *v3alpha.Http1ProtocolOptions {
-	if m != nil {
-		return m.HttpProtocolOptions
-	}
-	return nil
-}
-
-func (m *Cluster) GetHttp2ProtocolOptions() *v3alpha.Http2ProtocolOptions {
-	if m != nil {
-		return m.Http2ProtocolOptions
-	}
-	return nil
-}
-
-// Deprecated: Do not use.
-func (m *Cluster) GetHiddenEnvoyDeprecatedExtensionProtocolOptions() map[string]*_struct.Struct {
-	if m != nil {
-		return m.HiddenEnvoyDeprecatedExtensionProtocolOptions
-	}
-	return nil
-}
-
-func (m *Cluster) GetTypedExtensionProtocolOptions() map[string]*any.Any {
-	if m != nil {
-		return m.TypedExtensionProtocolOptions
-	}
-	return nil
-}
-
-func (m *Cluster) GetDnsRefreshRate() *duration.Duration {
-	if m != nil {
-		return m.DnsRefreshRate
-	}
-	return nil
-}
-
-func (m *Cluster) GetDnsFailureRefreshRate() *Cluster_RefreshRate {
-	if m != nil {
-		return m.DnsFailureRefreshRate
-	}
-	return nil
-}
-
-func (m *Cluster) GetRespectDnsTtl() bool {
-	if m != nil {
-		return m.RespectDnsTtl
-	}
-	return false
-}
-
-func (m *Cluster) GetDnsLookupFamily() Cluster_DnsLookupFamily {
-	if m != nil {
-		return m.DnsLookupFamily
-	}
-	return Cluster_AUTO
-}
-
-func (m *Cluster) GetDnsResolvers() []*v3alpha.Address {
-	if m != nil {
-		return m.DnsResolvers
-	}
-	return nil
-}
-
-func (m *Cluster) GetUseTcpForDnsLookups() bool {
-	if m != nil {
-		return m.UseTcpForDnsLookups
-	}
-	return false
-}
-
-func (m *Cluster) GetOutlierDetection() *v3alpha2.OutlierDetection {
-	if m != nil {
-		return m.OutlierDetection
-	}
-	return nil
-}
-
-func (m *Cluster) GetCleanupInterval() *duration.Duration {
-	if m != nil {
-		return m.CleanupInterval
-	}
-	return nil
-}
-
-func (m *Cluster) GetUpstreamBindConfig() *v3alpha.BindConfig {
-	if m != nil {
-		return m.UpstreamBindConfig
-	}
-	return nil
-}
-
-func (m *Cluster) GetLbSubsetConfig() *Cluster_LbSubsetConfig {
-	if m != nil {
-		return m.LbSubsetConfig
-	}
-	return nil
-}
-
-type isCluster_LbConfig interface {
-	isCluster_LbConfig()
-}
-
-type Cluster_RingHashLbConfig_ struct {
-	RingHashLbConfig *Cluster_RingHashLbConfig `protobuf:"bytes,23,opt,name=ring_hash_lb_config,json=ringHashLbConfig,proto3,oneof"`
-}
-
-type Cluster_OriginalDstLbConfig_ struct {
-	OriginalDstLbConfig *Cluster_OriginalDstLbConfig `protobuf:"bytes,34,opt,name=original_dst_lb_config,json=originalDstLbConfig,proto3,oneof"`
-}
-
-type Cluster_LeastRequestLbConfig_ struct {
-	LeastRequestLbConfig *Cluster_LeastRequestLbConfig `protobuf:"bytes,37,opt,name=least_request_lb_config,json=leastRequestLbConfig,proto3,oneof"`
-}
-
-func (*Cluster_RingHashLbConfig_) isCluster_LbConfig() {}
-
-func (*Cluster_OriginalDstLbConfig_) isCluster_LbConfig() {}
-
-func (*Cluster_LeastRequestLbConfig_) isCluster_LbConfig() {}
-
-func (m *Cluster) GetLbConfig() isCluster_LbConfig {
-	if m != nil {
-		return m.LbConfig
-	}
-	return nil
-}
-
-func (m *Cluster) GetRingHashLbConfig() *Cluster_RingHashLbConfig {
-	if x, ok := m.GetLbConfig().(*Cluster_RingHashLbConfig_); ok {
-		return x.RingHashLbConfig
-	}
-	return nil
-}
-
-func (m *Cluster) GetOriginalDstLbConfig() *Cluster_OriginalDstLbConfig {
-	if x, ok := m.GetLbConfig().(*Cluster_OriginalDstLbConfig_); ok {
-		return x.OriginalDstLbConfig
-	}
-	return nil
-}
-
-func (m *Cluster) GetLeastRequestLbConfig() *Cluster_LeastRequestLbConfig {
-	if x, ok := m.GetLbConfig().(*Cluster_LeastRequestLbConfig_); ok {
-		return x.LeastRequestLbConfig
-	}
-	return nil
-}
-
-func (m *Cluster) GetCommonLbConfig() *Cluster_CommonLbConfig {
-	if m != nil {
-		return m.CommonLbConfig
-	}
-	return nil
-}
-
-func (m *Cluster) GetTransportSocket() *v3alpha.TransportSocket {
-	if m != nil {
-		return m.TransportSocket
-	}
-	return nil
-}
-
-func (m *Cluster) GetMetadata() *v3alpha.Metadata {
-	if m != nil {
-		return m.Metadata
-	}
-	return nil
-}
-
-func (m *Cluster) GetProtocolSelection() Cluster_ClusterProtocolSelection {
-	if m != nil {
-		return m.ProtocolSelection
-	}
-	return Cluster_USE_CONFIGURED_PROTOCOL
-}
-
-func (m *Cluster) GetUpstreamConnectionOptions() *UpstreamConnectionOptions {
-	if m != nil {
-		return m.UpstreamConnectionOptions
-	}
-	return nil
-}
-
-func (m *Cluster) GetCloseConnectionsOnHostHealthFailure() bool {
-	if m != nil {
-		return m.CloseConnectionsOnHostHealthFailure
-	}
-	return false
-}
-
-func (m *Cluster) GetIgnoreHealthOnHostRemoval() bool {
-	if m != nil {
-		return m.IgnoreHealthOnHostRemoval
-	}
-	return false
-}
-
-func (m *Cluster) GetFilters() []*v3alpha2.Filter {
-	if m != nil {
-		return m.Filters
-	}
-	return nil
-}
-
-func (m *Cluster) GetLoadBalancingPolicy() *LoadBalancingPolicy {
-	if m != nil {
-		return m.LoadBalancingPolicy
-	}
-	return nil
-}
-
-func (m *Cluster) GetLrsServer() *v3alpha.ConfigSource {
-	if m != nil {
-		return m.LrsServer
-	}
-	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*Cluster) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*Cluster_Type)(nil),
-		(*Cluster_ClusterType)(nil),
-		(*Cluster_RingHashLbConfig_)(nil),
-		(*Cluster_OriginalDstLbConfig_)(nil),
-		(*Cluster_LeastRequestLbConfig_)(nil),
-	}
-}
-
-type Cluster_TransportSocketMatch struct {
-	Name                 string                   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Match                *_struct.Struct          `protobuf:"bytes,2,opt,name=match,proto3" json:"match,omitempty"`
-	TransportSocket      *v3alpha.TransportSocket `protobuf:"bytes,3,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
-}
-
-func (m *Cluster_TransportSocketMatch) Reset()         { *m = Cluster_TransportSocketMatch{} }
-func (m *Cluster_TransportSocketMatch) String() string { return proto.CompactTextString(m) }
-func (*Cluster_TransportSocketMatch) ProtoMessage()    {}
-func (*Cluster_TransportSocketMatch) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 0}
-}
-
-func (m *Cluster_TransportSocketMatch) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_TransportSocketMatch.Unmarshal(m, b)
-}
-func (m *Cluster_TransportSocketMatch) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_TransportSocketMatch.Marshal(b, m, deterministic)
-}
-func (m *Cluster_TransportSocketMatch) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_TransportSocketMatch.Merge(m, src)
-}
-func (m *Cluster_TransportSocketMatch) XXX_Size() int {
-	return xxx_messageInfo_Cluster_TransportSocketMatch.Size(m)
-}
-func (m *Cluster_TransportSocketMatch) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_TransportSocketMatch.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_TransportSocketMatch proto.InternalMessageInfo
-
-func (m *Cluster_TransportSocketMatch) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Cluster_TransportSocketMatch) GetMatch() *_struct.Struct {
-	if m != nil {
-		return m.Match
-	}
-	return nil
-}
-
-func (m *Cluster_TransportSocketMatch) GetTransportSocket() *v3alpha.TransportSocket {
-	if m != nil {
-		return m.TransportSocket
-	}
-	return nil
-}
-
-type Cluster_CustomClusterType struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	TypedConfig          *any.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Cluster_CustomClusterType) Reset()         { *m = Cluster_CustomClusterType{} }
-func (m *Cluster_CustomClusterType) String() string { return proto.CompactTextString(m) }
-func (*Cluster_CustomClusterType) ProtoMessage()    {}
-func (*Cluster_CustomClusterType) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 1}
-}
-
-func (m *Cluster_CustomClusterType) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_CustomClusterType.Unmarshal(m, b)
-}
-func (m *Cluster_CustomClusterType) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_CustomClusterType.Marshal(b, m, deterministic)
-}
-func (m *Cluster_CustomClusterType) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_CustomClusterType.Merge(m, src)
-}
-func (m *Cluster_CustomClusterType) XXX_Size() int {
-	return xxx_messageInfo_Cluster_CustomClusterType.Size(m)
-}
-func (m *Cluster_CustomClusterType) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_CustomClusterType.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_CustomClusterType proto.InternalMessageInfo
-
-func (m *Cluster_CustomClusterType) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Cluster_CustomClusterType) GetTypedConfig() *any.Any {
-	if m != nil {
-		return m.TypedConfig
-	}
-	return nil
-}
-
-type Cluster_EdsClusterConfig struct {
-	EdsConfig            *v3alpha.ConfigSource `protobuf:"bytes,1,opt,name=eds_config,json=edsConfig,proto3" json:"eds_config,omitempty"`
-	ServiceName          string                `protobuf:"bytes,2,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
-}
-
-func (m *Cluster_EdsClusterConfig) Reset()         { *m = Cluster_EdsClusterConfig{} }
-func (m *Cluster_EdsClusterConfig) String() string { return proto.CompactTextString(m) }
-func (*Cluster_EdsClusterConfig) ProtoMessage()    {}
-func (*Cluster_EdsClusterConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 2}
-}
-
-func (m *Cluster_EdsClusterConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_EdsClusterConfig.Unmarshal(m, b)
-}
-func (m *Cluster_EdsClusterConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_EdsClusterConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_EdsClusterConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_EdsClusterConfig.Merge(m, src)
-}
-func (m *Cluster_EdsClusterConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_EdsClusterConfig.Size(m)
-}
-func (m *Cluster_EdsClusterConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_EdsClusterConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_EdsClusterConfig proto.InternalMessageInfo
-
-func (m *Cluster_EdsClusterConfig) GetEdsConfig() *v3alpha.ConfigSource {
-	if m != nil {
-		return m.EdsConfig
-	}
-	return nil
-}
-
-func (m *Cluster_EdsClusterConfig) GetServiceName() string {
-	if m != nil {
-		return m.ServiceName
-	}
-	return ""
-}
-
-type Cluster_LbSubsetConfig struct {
-	FallbackPolicy       Cluster_LbSubsetConfig_LbSubsetFallbackPolicy `protobuf:"varint,1,opt,name=fallback_policy,json=fallbackPolicy,proto3,enum=envoy.service.cluster.v3alpha.Cluster_LbSubsetConfig_LbSubsetFallbackPolicy" json:"fallback_policy,omitempty"`
-	DefaultSubset        *_struct.Struct                               `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset,proto3" json:"default_subset,omitempty"`
-	SubsetSelectors      []*Cluster_LbSubsetConfig_LbSubsetSelector    `protobuf:"bytes,3,rep,name=subset_selectors,json=subsetSelectors,proto3" json:"subset_selectors,omitempty"`
-	LocalityWeightAware  bool                                          `protobuf:"varint,4,opt,name=locality_weight_aware,json=localityWeightAware,proto3" json:"locality_weight_aware,omitempty"`
-	ScaleLocalityWeight  bool                                          `protobuf:"varint,5,opt,name=scale_locality_weight,json=scaleLocalityWeight,proto3" json:"scale_locality_weight,omitempty"`
-	PanicModeAny         bool                                          `protobuf:"varint,6,opt,name=panic_mode_any,json=panicModeAny,proto3" json:"panic_mode_any,omitempty"`
-	ListAsAny            bool                                          `protobuf:"varint,7,opt,name=list_as_any,json=listAsAny,proto3" json:"list_as_any,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                      `json:"-"`
-	XXX_unrecognized     []byte                                        `json:"-"`
-	XXX_sizecache        int32                                         `json:"-"`
-}
-
-func (m *Cluster_LbSubsetConfig) Reset()         { *m = Cluster_LbSubsetConfig{} }
-func (m *Cluster_LbSubsetConfig) String() string { return proto.CompactTextString(m) }
-func (*Cluster_LbSubsetConfig) ProtoMessage()    {}
-func (*Cluster_LbSubsetConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 3}
-}
-
-func (m *Cluster_LbSubsetConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_LbSubsetConfig.Unmarshal(m, b)
-}
-func (m *Cluster_LbSubsetConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_LbSubsetConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_LbSubsetConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_LbSubsetConfig.Merge(m, src)
-}
-func (m *Cluster_LbSubsetConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_LbSubsetConfig.Size(m)
-}
-func (m *Cluster_LbSubsetConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_LbSubsetConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_LbSubsetConfig proto.InternalMessageInfo
-
-func (m *Cluster_LbSubsetConfig) GetFallbackPolicy() Cluster_LbSubsetConfig_LbSubsetFallbackPolicy {
-	if m != nil {
-		return m.FallbackPolicy
-	}
-	return Cluster_LbSubsetConfig_NO_FALLBACK
-}
-
-func (m *Cluster_LbSubsetConfig) GetDefaultSubset() *_struct.Struct {
-	if m != nil {
-		return m.DefaultSubset
-	}
-	return nil
-}
-
-func (m *Cluster_LbSubsetConfig) GetSubsetSelectors() []*Cluster_LbSubsetConfig_LbSubsetSelector {
-	if m != nil {
-		return m.SubsetSelectors
-	}
-	return nil
-}
-
-func (m *Cluster_LbSubsetConfig) GetLocalityWeightAware() bool {
-	if m != nil {
-		return m.LocalityWeightAware
-	}
-	return false
-}
-
-func (m *Cluster_LbSubsetConfig) GetScaleLocalityWeight() bool {
-	if m != nil {
-		return m.ScaleLocalityWeight
-	}
-	return false
-}
-
-func (m *Cluster_LbSubsetConfig) GetPanicModeAny() bool {
-	if m != nil {
-		return m.PanicModeAny
-	}
-	return false
-}
-
-func (m *Cluster_LbSubsetConfig) GetListAsAny() bool {
-	if m != nil {
-		return m.ListAsAny
-	}
-	return false
-}
-
-type Cluster_LbSubsetConfig_LbSubsetSelector struct {
-	Keys                 []string                                                               `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
-	FallbackPolicy       Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy `protobuf:"varint,2,opt,name=fallback_policy,json=fallbackPolicy,proto3,enum=envoy.service.cluster.v3alpha.Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy" json:"fallback_policy,omitempty"`
-	FallbackKeysSubset   []string                                                               `protobuf:"bytes,3,rep,name=fallback_keys_subset,json=fallbackKeysSubset,proto3" json:"fallback_keys_subset,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                                                               `json:"-"`
-	XXX_unrecognized     []byte                                                                 `json:"-"`
-	XXX_sizecache        int32                                                                  `json:"-"`
-}
-
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) Reset() {
-	*m = Cluster_LbSubsetConfig_LbSubsetSelector{}
-}
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) String() string { return proto.CompactTextString(m) }
-func (*Cluster_LbSubsetConfig_LbSubsetSelector) ProtoMessage()    {}
-func (*Cluster_LbSubsetConfig_LbSubsetSelector) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 3, 0}
-}
-
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_LbSubsetConfig_LbSubsetSelector.Unmarshal(m, b)
-}
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_LbSubsetConfig_LbSubsetSelector.Marshal(b, m, deterministic)
-}
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_LbSubsetConfig_LbSubsetSelector.Merge(m, src)
-}
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) XXX_Size() int {
-	return xxx_messageInfo_Cluster_LbSubsetConfig_LbSubsetSelector.Size(m)
-}
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_LbSubsetConfig_LbSubsetSelector.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_LbSubsetConfig_LbSubsetSelector proto.InternalMessageInfo
-
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) GetKeys() []string {
-	if m != nil {
-		return m.Keys
-	}
-	return nil
-}
-
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) GetFallbackPolicy() Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy {
-	if m != nil {
-		return m.FallbackPolicy
-	}
-	return Cluster_LbSubsetConfig_LbSubsetSelector_NOT_DEFINED
-}
-
-func (m *Cluster_LbSubsetConfig_LbSubsetSelector) GetFallbackKeysSubset() []string {
-	if m != nil {
-		return m.FallbackKeysSubset
-	}
-	return nil
-}
-
-type Cluster_LeastRequestLbConfig struct {
-	ChoiceCount          *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=choice_count,json=choiceCount,proto3" json:"choice_count,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
-}
-
-func (m *Cluster_LeastRequestLbConfig) Reset()         { *m = Cluster_LeastRequestLbConfig{} }
-func (m *Cluster_LeastRequestLbConfig) String() string { return proto.CompactTextString(m) }
-func (*Cluster_LeastRequestLbConfig) ProtoMessage()    {}
-func (*Cluster_LeastRequestLbConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 4}
-}
-
-func (m *Cluster_LeastRequestLbConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_LeastRequestLbConfig.Unmarshal(m, b)
-}
-func (m *Cluster_LeastRequestLbConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_LeastRequestLbConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_LeastRequestLbConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_LeastRequestLbConfig.Merge(m, src)
-}
-func (m *Cluster_LeastRequestLbConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_LeastRequestLbConfig.Size(m)
-}
-func (m *Cluster_LeastRequestLbConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_LeastRequestLbConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_LeastRequestLbConfig proto.InternalMessageInfo
-
-func (m *Cluster_LeastRequestLbConfig) GetChoiceCount() *wrappers.UInt32Value {
-	if m != nil {
-		return m.ChoiceCount
-	}
-	return nil
-}
-
-type Cluster_RingHashLbConfig struct {
-	MinimumRingSize      *wrappers.UInt64Value                 `protobuf:"bytes,1,opt,name=minimum_ring_size,json=minimumRingSize,proto3" json:"minimum_ring_size,omitempty"`
-	HashFunction         Cluster_RingHashLbConfig_HashFunction `protobuf:"varint,3,opt,name=hash_function,json=hashFunction,proto3,enum=envoy.service.cluster.v3alpha.Cluster_RingHashLbConfig_HashFunction" json:"hash_function,omitempty"`
-	MaximumRingSize      *wrappers.UInt64Value                 `protobuf:"bytes,4,opt,name=maximum_ring_size,json=maximumRingSize,proto3" json:"maximum_ring_size,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                              `json:"-"`
-	XXX_unrecognized     []byte                                `json:"-"`
-	XXX_sizecache        int32                                 `json:"-"`
-}
-
-func (m *Cluster_RingHashLbConfig) Reset()         { *m = Cluster_RingHashLbConfig{} }
-func (m *Cluster_RingHashLbConfig) String() string { return proto.CompactTextString(m) }
-func (*Cluster_RingHashLbConfig) ProtoMessage()    {}
-func (*Cluster_RingHashLbConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 5}
-}
-
-func (m *Cluster_RingHashLbConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_RingHashLbConfig.Unmarshal(m, b)
-}
-func (m *Cluster_RingHashLbConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_RingHashLbConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_RingHashLbConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_RingHashLbConfig.Merge(m, src)
-}
-func (m *Cluster_RingHashLbConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_RingHashLbConfig.Size(m)
-}
-func (m *Cluster_RingHashLbConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_RingHashLbConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_RingHashLbConfig proto.InternalMessageInfo
-
-func (m *Cluster_RingHashLbConfig) GetMinimumRingSize() *wrappers.UInt64Value {
-	if m != nil {
-		return m.MinimumRingSize
-	}
-	return nil
-}
-
-func (m *Cluster_RingHashLbConfig) GetHashFunction() Cluster_RingHashLbConfig_HashFunction {
-	if m != nil {
-		return m.HashFunction
-	}
-	return Cluster_RingHashLbConfig_XX_HASH
-}
-
-func (m *Cluster_RingHashLbConfig) GetMaximumRingSize() *wrappers.UInt64Value {
-	if m != nil {
-		return m.MaximumRingSize
-	}
-	return nil
-}
-
-type Cluster_OriginalDstLbConfig struct {
-	UseHttpHeader        bool     `protobuf:"varint,1,opt,name=use_http_header,json=useHttpHeader,proto3" json:"use_http_header,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Cluster_OriginalDstLbConfig) Reset()         { *m = Cluster_OriginalDstLbConfig{} }
-func (m *Cluster_OriginalDstLbConfig) String() string { return proto.CompactTextString(m) }
-func (*Cluster_OriginalDstLbConfig) ProtoMessage()    {}
-func (*Cluster_OriginalDstLbConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 6}
-}
-
-func (m *Cluster_OriginalDstLbConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_OriginalDstLbConfig.Unmarshal(m, b)
-}
-func (m *Cluster_OriginalDstLbConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_OriginalDstLbConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_OriginalDstLbConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_OriginalDstLbConfig.Merge(m, src)
-}
-func (m *Cluster_OriginalDstLbConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_OriginalDstLbConfig.Size(m)
-}
-func (m *Cluster_OriginalDstLbConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_OriginalDstLbConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_OriginalDstLbConfig proto.InternalMessageInfo
-
-func (m *Cluster_OriginalDstLbConfig) GetUseHttpHeader() bool {
-	if m != nil {
-		return m.UseHttpHeader
-	}
-	return false
-}
-
-type Cluster_CommonLbConfig struct {
-	HealthyPanicThreshold *v3alpha4.Percent `protobuf:"bytes,1,opt,name=healthy_panic_threshold,json=healthyPanicThreshold,proto3" json:"healthy_panic_threshold,omitempty"`
-	// Types that are valid to be assigned to LocalityConfigSpecifier:
-	//	*Cluster_CommonLbConfig_ZoneAwareLbConfig_
-	//	*Cluster_CommonLbConfig_LocalityWeightedLbConfig_
-	LocalityConfigSpecifier         isCluster_CommonLbConfig_LocalityConfigSpecifier `protobuf_oneof:"locality_config_specifier"`
-	UpdateMergeWindow               *duration.Duration                               `protobuf:"bytes,4,opt,name=update_merge_window,json=updateMergeWindow,proto3" json:"update_merge_window,omitempty"`
-	IgnoreNewHostsUntilFirstHc      bool                                             `protobuf:"varint,5,opt,name=ignore_new_hosts_until_first_hc,json=ignoreNewHostsUntilFirstHc,proto3" json:"ignore_new_hosts_until_first_hc,omitempty"`
-	CloseConnectionsOnHostSetChange bool                                             `protobuf:"varint,6,opt,name=close_connections_on_host_set_change,json=closeConnectionsOnHostSetChange,proto3" json:"close_connections_on_host_set_change,omitempty"`
-	XXX_NoUnkeyedLiteral            struct{}                                         `json:"-"`
-	XXX_unrecognized                []byte                                           `json:"-"`
-	XXX_sizecache                   int32                                            `json:"-"`
-}
-
-func (m *Cluster_CommonLbConfig) Reset()         { *m = Cluster_CommonLbConfig{} }
-func (m *Cluster_CommonLbConfig) String() string { return proto.CompactTextString(m) }
-func (*Cluster_CommonLbConfig) ProtoMessage()    {}
-func (*Cluster_CommonLbConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 7}
-}
-
-func (m *Cluster_CommonLbConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_CommonLbConfig.Unmarshal(m, b)
-}
-func (m *Cluster_CommonLbConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_CommonLbConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_CommonLbConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_CommonLbConfig.Merge(m, src)
-}
-func (m *Cluster_CommonLbConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_CommonLbConfig.Size(m)
-}
-func (m *Cluster_CommonLbConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_CommonLbConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_CommonLbConfig proto.InternalMessageInfo
-
-func (m *Cluster_CommonLbConfig) GetHealthyPanicThreshold() *v3alpha4.Percent {
-	if m != nil {
-		return m.HealthyPanicThreshold
-	}
-	return nil
-}
-
-type isCluster_CommonLbConfig_LocalityConfigSpecifier interface {
-	isCluster_CommonLbConfig_LocalityConfigSpecifier()
-}
-
-type Cluster_CommonLbConfig_ZoneAwareLbConfig_ struct {
-	ZoneAwareLbConfig *Cluster_CommonLbConfig_ZoneAwareLbConfig `protobuf:"bytes,2,opt,name=zone_aware_lb_config,json=zoneAwareLbConfig,proto3,oneof"`
-}
-
-type Cluster_CommonLbConfig_LocalityWeightedLbConfig_ struct {
-	LocalityWeightedLbConfig *Cluster_CommonLbConfig_LocalityWeightedLbConfig `protobuf:"bytes,3,opt,name=locality_weighted_lb_config,json=localityWeightedLbConfig,proto3,oneof"`
-}
-
-func (*Cluster_CommonLbConfig_ZoneAwareLbConfig_) isCluster_CommonLbConfig_LocalityConfigSpecifier() {}
-
-func (*Cluster_CommonLbConfig_LocalityWeightedLbConfig_) isCluster_CommonLbConfig_LocalityConfigSpecifier() {
-}
-
-func (m *Cluster_CommonLbConfig) GetLocalityConfigSpecifier() isCluster_CommonLbConfig_LocalityConfigSpecifier {
-	if m != nil {
-		return m.LocalityConfigSpecifier
-	}
-	return nil
-}
-
-func (m *Cluster_CommonLbConfig) GetZoneAwareLbConfig() *Cluster_CommonLbConfig_ZoneAwareLbConfig {
-	if x, ok := m.GetLocalityConfigSpecifier().(*Cluster_CommonLbConfig_ZoneAwareLbConfig_); ok {
-		return x.ZoneAwareLbConfig
-	}
-	return nil
-}
-
-func (m *Cluster_CommonLbConfig) GetLocalityWeightedLbConfig() *Cluster_CommonLbConfig_LocalityWeightedLbConfig {
-	if x, ok := m.GetLocalityConfigSpecifier().(*Cluster_CommonLbConfig_LocalityWeightedLbConfig_); ok {
-		return x.LocalityWeightedLbConfig
-	}
-	return nil
-}
-
-func (m *Cluster_CommonLbConfig) GetUpdateMergeWindow() *duration.Duration {
-	if m != nil {
-		return m.UpdateMergeWindow
-	}
-	return nil
-}
-
-func (m *Cluster_CommonLbConfig) GetIgnoreNewHostsUntilFirstHc() bool {
-	if m != nil {
-		return m.IgnoreNewHostsUntilFirstHc
-	}
-	return false
-}
-
-func (m *Cluster_CommonLbConfig) GetCloseConnectionsOnHostSetChange() bool {
-	if m != nil {
-		return m.CloseConnectionsOnHostSetChange
-	}
-	return false
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*Cluster_CommonLbConfig) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*Cluster_CommonLbConfig_ZoneAwareLbConfig_)(nil),
-		(*Cluster_CommonLbConfig_LocalityWeightedLbConfig_)(nil),
-	}
-}
-
-type Cluster_CommonLbConfig_ZoneAwareLbConfig struct {
-	RoutingEnabled       *v3alpha4.Percent     `protobuf:"bytes,1,opt,name=routing_enabled,json=routingEnabled,proto3" json:"routing_enabled,omitempty"`
-	MinClusterSize       *wrappers.UInt64Value `protobuf:"bytes,2,opt,name=min_cluster_size,json=minClusterSize,proto3" json:"min_cluster_size,omitempty"`
-	FailTrafficOnPanic   bool                  `protobuf:"varint,3,opt,name=fail_traffic_on_panic,json=failTrafficOnPanic,proto3" json:"fail_traffic_on_panic,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
-}
-
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) Reset() {
-	*m = Cluster_CommonLbConfig_ZoneAwareLbConfig{}
-}
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) String() string { return proto.CompactTextString(m) }
-func (*Cluster_CommonLbConfig_ZoneAwareLbConfig) ProtoMessage()    {}
-func (*Cluster_CommonLbConfig_ZoneAwareLbConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 7, 0}
-}
-
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_CommonLbConfig_ZoneAwareLbConfig.Unmarshal(m, b)
-}
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_CommonLbConfig_ZoneAwareLbConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_CommonLbConfig_ZoneAwareLbConfig.Merge(m, src)
-}
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_CommonLbConfig_ZoneAwareLbConfig.Size(m)
-}
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_CommonLbConfig_ZoneAwareLbConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_CommonLbConfig_ZoneAwareLbConfig proto.InternalMessageInfo
-
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) GetRoutingEnabled() *v3alpha4.Percent {
-	if m != nil {
-		return m.RoutingEnabled
-	}
-	return nil
-}
-
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) GetMinClusterSize() *wrappers.UInt64Value {
-	if m != nil {
-		return m.MinClusterSize
-	}
-	return nil
-}
-
-func (m *Cluster_CommonLbConfig_ZoneAwareLbConfig) GetFailTrafficOnPanic() bool {
-	if m != nil {
-		return m.FailTrafficOnPanic
-	}
-	return false
-}
-
-type Cluster_CommonLbConfig_LocalityWeightedLbConfig struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) Reset() {
-	*m = Cluster_CommonLbConfig_LocalityWeightedLbConfig{}
-}
-func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) String() string {
-	return proto.CompactTextString(m)
-}
-func (*Cluster_CommonLbConfig_LocalityWeightedLbConfig) ProtoMessage() {}
-func (*Cluster_CommonLbConfig_LocalityWeightedLbConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 7, 1}
-}
-
-func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_CommonLbConfig_LocalityWeightedLbConfig.Unmarshal(m, b)
-}
-func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_CommonLbConfig_LocalityWeightedLbConfig.Marshal(b, m, deterministic)
-}
-func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_CommonLbConfig_LocalityWeightedLbConfig.Merge(m, src)
-}
-func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) XXX_Size() int {
-	return xxx_messageInfo_Cluster_CommonLbConfig_LocalityWeightedLbConfig.Size(m)
-}
-func (m *Cluster_CommonLbConfig_LocalityWeightedLbConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_CommonLbConfig_LocalityWeightedLbConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_CommonLbConfig_LocalityWeightedLbConfig proto.InternalMessageInfo
-
-type Cluster_RefreshRate struct {
-	BaseInterval         *duration.Duration `protobuf:"bytes,1,opt,name=base_interval,json=baseInterval,proto3" json:"base_interval,omitempty"`
-	MaxInterval          *duration.Duration `protobuf:"bytes,2,opt,name=max_interval,json=maxInterval,proto3" json:"max_interval,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
-}
-
-func (m *Cluster_RefreshRate) Reset()         { *m = Cluster_RefreshRate{} }
-func (m *Cluster_RefreshRate) String() string { return proto.CompactTextString(m) }
-func (*Cluster_RefreshRate) ProtoMessage()    {}
-func (*Cluster_RefreshRate) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{0, 8}
-}
-
-func (m *Cluster_RefreshRate) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Cluster_RefreshRate.Unmarshal(m, b)
-}
-func (m *Cluster_RefreshRate) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Cluster_RefreshRate.Marshal(b, m, deterministic)
-}
-func (m *Cluster_RefreshRate) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Cluster_RefreshRate.Merge(m, src)
-}
-func (m *Cluster_RefreshRate) XXX_Size() int {
-	return xxx_messageInfo_Cluster_RefreshRate.Size(m)
-}
-func (m *Cluster_RefreshRate) XXX_DiscardUnknown() {
-	xxx_messageInfo_Cluster_RefreshRate.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Cluster_RefreshRate proto.InternalMessageInfo
-
-func (m *Cluster_RefreshRate) GetBaseInterval() *duration.Duration {
-	if m != nil {
-		return m.BaseInterval
-	}
-	return nil
-}
-
-func (m *Cluster_RefreshRate) GetMaxInterval() *duration.Duration {
-	if m != nil {
-		return m.MaxInterval
-	}
-	return nil
-}
-
-type LoadBalancingPolicy struct {
-	Policies             []*LoadBalancingPolicy_Policy `protobuf:"bytes,1,rep,name=policies,proto3" json:"policies,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                      `json:"-"`
-	XXX_unrecognized     []byte                        `json:"-"`
-	XXX_sizecache        int32                         `json:"-"`
-}
-
-func (m *LoadBalancingPolicy) Reset()         { *m = LoadBalancingPolicy{} }
-func (m *LoadBalancingPolicy) String() string { return proto.CompactTextString(m) }
-func (*LoadBalancingPolicy) ProtoMessage()    {}
-func (*LoadBalancingPolicy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{1}
-}
-
-func (m *LoadBalancingPolicy) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_LoadBalancingPolicy.Unmarshal(m, b)
-}
-func (m *LoadBalancingPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_LoadBalancingPolicy.Marshal(b, m, deterministic)
-}
-func (m *LoadBalancingPolicy) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_LoadBalancingPolicy.Merge(m, src)
-}
-func (m *LoadBalancingPolicy) XXX_Size() int {
-	return xxx_messageInfo_LoadBalancingPolicy.Size(m)
-}
-func (m *LoadBalancingPolicy) XXX_DiscardUnknown() {
-	xxx_messageInfo_LoadBalancingPolicy.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_LoadBalancingPolicy proto.InternalMessageInfo
-
-func (m *LoadBalancingPolicy) GetPolicies() []*LoadBalancingPolicy_Policy {
-	if m != nil {
-		return m.Policies
-	}
-	return nil
-}
-
-type LoadBalancingPolicy_Policy struct {
-	Name                        string          `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	HiddenEnvoyDeprecatedConfig *_struct.Struct `protobuf:"bytes,2,opt,name=hidden_envoy_deprecated_config,json=hiddenEnvoyDeprecatedConfig,proto3" json:"hidden_envoy_deprecated_config,omitempty"` // Deprecated: Do not use.
-	TypedConfig                 *any.Any        `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
-	XXX_NoUnkeyedLiteral        struct{}        `json:"-"`
-	XXX_unrecognized            []byte          `json:"-"`
-	XXX_sizecache               int32           `json:"-"`
-}
-
-func (m *LoadBalancingPolicy_Policy) Reset()         { *m = LoadBalancingPolicy_Policy{} }
-func (m *LoadBalancingPolicy_Policy) String() string { return proto.CompactTextString(m) }
-func (*LoadBalancingPolicy_Policy) ProtoMessage()    {}
-func (*LoadBalancingPolicy_Policy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{1, 0}
-}
-
-func (m *LoadBalancingPolicy_Policy) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_LoadBalancingPolicy_Policy.Unmarshal(m, b)
-}
-func (m *LoadBalancingPolicy_Policy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_LoadBalancingPolicy_Policy.Marshal(b, m, deterministic)
-}
-func (m *LoadBalancingPolicy_Policy) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_LoadBalancingPolicy_Policy.Merge(m, src)
-}
-func (m *LoadBalancingPolicy_Policy) XXX_Size() int {
-	return xxx_messageInfo_LoadBalancingPolicy_Policy.Size(m)
-}
-func (m *LoadBalancingPolicy_Policy) XXX_DiscardUnknown() {
-	xxx_messageInfo_LoadBalancingPolicy_Policy.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_LoadBalancingPolicy_Policy proto.InternalMessageInfo
-
-func (m *LoadBalancingPolicy_Policy) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-// Deprecated: Do not use.
-func (m *LoadBalancingPolicy_Policy) GetHiddenEnvoyDeprecatedConfig() *_struct.Struct {
-	if m != nil {
-		return m.HiddenEnvoyDeprecatedConfig
-	}
-	return nil
-}
-
-func (m *LoadBalancingPolicy_Policy) GetTypedConfig() *any.Any {
-	if m != nil {
-		return m.TypedConfig
-	}
-	return nil
-}
-
-type UpstreamBindConfig struct {
-	SourceAddress        *v3alpha.Address `protobuf:"bytes,1,opt,name=source_address,json=sourceAddress,proto3" json:"source_address,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
-}
-
-func (m *UpstreamBindConfig) Reset()         { *m = UpstreamBindConfig{} }
-func (m *UpstreamBindConfig) String() string { return proto.CompactTextString(m) }
-func (*UpstreamBindConfig) ProtoMessage()    {}
-func (*UpstreamBindConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{2}
-}
-
-func (m *UpstreamBindConfig) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpstreamBindConfig.Unmarshal(m, b)
-}
-func (m *UpstreamBindConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpstreamBindConfig.Marshal(b, m, deterministic)
-}
-func (m *UpstreamBindConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpstreamBindConfig.Merge(m, src)
-}
-func (m *UpstreamBindConfig) XXX_Size() int {
-	return xxx_messageInfo_UpstreamBindConfig.Size(m)
-}
-func (m *UpstreamBindConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpstreamBindConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpstreamBindConfig proto.InternalMessageInfo
-
-func (m *UpstreamBindConfig) GetSourceAddress() *v3alpha.Address {
-	if m != nil {
-		return m.SourceAddress
-	}
-	return nil
-}
-
-type UpstreamConnectionOptions struct {
-	TcpKeepalive         *v3alpha.TcpKeepalive `protobuf:"bytes,1,opt,name=tcp_keepalive,json=tcpKeepalive,proto3" json:"tcp_keepalive,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
-}
-
-func (m *UpstreamConnectionOptions) Reset()         { *m = UpstreamConnectionOptions{} }
-func (m *UpstreamConnectionOptions) String() string { return proto.CompactTextString(m) }
-func (*UpstreamConnectionOptions) ProtoMessage()    {}
-func (*UpstreamConnectionOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_64e2d75d1d4b158d, []int{3}
-}
-
-func (m *UpstreamConnectionOptions) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpstreamConnectionOptions.Unmarshal(m, b)
-}
-func (m *UpstreamConnectionOptions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpstreamConnectionOptions.Marshal(b, m, deterministic)
-}
-func (m *UpstreamConnectionOptions) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpstreamConnectionOptions.Merge(m, src)
-}
-func (m *UpstreamConnectionOptions) XXX_Size() int {
-	return xxx_messageInfo_UpstreamConnectionOptions.Size(m)
-}
-func (m *UpstreamConnectionOptions) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpstreamConnectionOptions.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpstreamConnectionOptions proto.InternalMessageInfo
-
-func (m *UpstreamConnectionOptions) GetTcpKeepalive() *v3alpha.TcpKeepalive {
-	if m != nil {
-		return m.TcpKeepalive
-	}
-	return nil
-}
+var xxx_messageInfo_CdsDummy proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterEnum("envoy.service.cluster.v3alpha.Cluster_DiscoveryType", Cluster_DiscoveryType_name, Cluster_DiscoveryType_value)
-	proto.RegisterEnum("envoy.service.cluster.v3alpha.Cluster_LbPolicy", Cluster_LbPolicy_name, Cluster_LbPolicy_value)
-	proto.RegisterEnum("envoy.service.cluster.v3alpha.Cluster_DnsLookupFamily", Cluster_DnsLookupFamily_name, Cluster_DnsLookupFamily_value)
-	proto.RegisterEnum("envoy.service.cluster.v3alpha.Cluster_ClusterProtocolSelection", Cluster_ClusterProtocolSelection_name, Cluster_ClusterProtocolSelection_value)
-	proto.RegisterEnum("envoy.service.cluster.v3alpha.Cluster_LbSubsetConfig_LbSubsetFallbackPolicy", Cluster_LbSubsetConfig_LbSubsetFallbackPolicy_name, Cluster_LbSubsetConfig_LbSubsetFallbackPolicy_value)
-	proto.RegisterEnum("envoy.service.cluster.v3alpha.Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy", Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy_name, Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy_value)
-	proto.RegisterEnum("envoy.service.cluster.v3alpha.Cluster_RingHashLbConfig_HashFunction", Cluster_RingHashLbConfig_HashFunction_name, Cluster_RingHashLbConfig_HashFunction_value)
-	proto.RegisterType((*Cluster)(nil), "envoy.service.cluster.v3alpha.Cluster")
-	proto.RegisterMapType((map[string]*_struct.Struct)(nil), "envoy.service.cluster.v3alpha.Cluster.HiddenEnvoyDeprecatedExtensionProtocolOptionsEntry")
-	proto.RegisterMapType((map[string]*any.Any)(nil), "envoy.service.cluster.v3alpha.Cluster.TypedExtensionProtocolOptionsEntry")
-	proto.RegisterType((*Cluster_TransportSocketMatch)(nil), "envoy.service.cluster.v3alpha.Cluster.TransportSocketMatch")
-	proto.RegisterType((*Cluster_CustomClusterType)(nil), "envoy.service.cluster.v3alpha.Cluster.CustomClusterType")
-	proto.RegisterType((*Cluster_EdsClusterConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.EdsClusterConfig")
-	proto.RegisterType((*Cluster_LbSubsetConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.LbSubsetConfig")
-	proto.RegisterType((*Cluster_LbSubsetConfig_LbSubsetSelector)(nil), "envoy.service.cluster.v3alpha.Cluster.LbSubsetConfig.LbSubsetSelector")
-	proto.RegisterType((*Cluster_LeastRequestLbConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.LeastRequestLbConfig")
-	proto.RegisterType((*Cluster_RingHashLbConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.RingHashLbConfig")
-	proto.RegisterType((*Cluster_OriginalDstLbConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.OriginalDstLbConfig")
-	proto.RegisterType((*Cluster_CommonLbConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.CommonLbConfig")
-	proto.RegisterType((*Cluster_CommonLbConfig_ZoneAwareLbConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.CommonLbConfig.ZoneAwareLbConfig")
-	proto.RegisterType((*Cluster_CommonLbConfig_LocalityWeightedLbConfig)(nil), "envoy.service.cluster.v3alpha.Cluster.CommonLbConfig.LocalityWeightedLbConfig")
-	proto.RegisterType((*Cluster_RefreshRate)(nil), "envoy.service.cluster.v3alpha.Cluster.RefreshRate")
-	proto.RegisterType((*LoadBalancingPolicy)(nil), "envoy.service.cluster.v3alpha.LoadBalancingPolicy")
-	proto.RegisterType((*LoadBalancingPolicy_Policy)(nil), "envoy.service.cluster.v3alpha.LoadBalancingPolicy.Policy")
-	proto.RegisterType((*UpstreamBindConfig)(nil), "envoy.service.cluster.v3alpha.UpstreamBindConfig")
-	proto.RegisterType((*UpstreamConnectionOptions)(nil), "envoy.service.cluster.v3alpha.UpstreamConnectionOptions")
+	proto.RegisterType((*CdsDummy)(nil), "envoy.service.cluster.v3alpha.CdsDummy")
 }
 
 func init() {
@@ -1583,224 +67,28 @@ func init() {
 }
 
 var fileDescriptor_64e2d75d1d4b158d = []byte{
-	// 3459 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x5a, 0xdd, 0x6f, 0x1b, 0xc7,
-	0x76, 0xd7, 0x92, 0xb2, 0x45, 0x8d, 0x24, 0x6a, 0x35, 0x92, 0xed, 0x35, 0x65, 0x3b, 0x32, 0xed,
-	0xd8, 0x8a, 0x12, 0x53, 0x09, 0xe3, 0x38, 0xb9, 0xba, 0x69, 0xee, 0xe5, 0x97, 0x2c, 0xc5, 0x14,
-	0xa9, 0xbb, 0xa4, 0xec, 0xb8, 0x45, 0x3b, 0x1d, 0xed, 0x0e, 0xc5, 0x85, 0x96, 0xbb, 0x9b, 0x9d,
-	0xa1, 0x2c, 0x1a, 0x28, 0x1a, 0x5c, 0x14, 0xed, 0x7d, 0x2b, 0x9a, 0x16, 0x68, 0x50, 0xa0, 0x6f,
-	0x7d, 0xca, 0xfd, 0x1f, 0x8a, 0xbe, 0x14, 0xb8, 0xcf, 0xed, 0xbf, 0x50, 0xa0, 0x0f, 0x7d, 0xea,
-	0xab, 0x5f, 0x5a, 0xcc, 0xc7, 0x52, 0xfc, 0x16, 0x95, 0x5b, 0xf4, 0x49, 0xda, 0x33, 0xe7, 0xfc,
-	0xce, 0x99, 0x9d, 0x33, 0xe7, 0x6b, 0x09, 0x1e, 0x13, 0xef, 0xcc, 0xef, 0x6c, 0x53, 0x12, 0x9e,
-	0x39, 0x16, 0xd9, 0xb6, 0xdc, 0x36, 0x65, 0x24, 0xdc, 0x3e, 0xfb, 0x14, 0xbb, 0x41, 0x13, 0x6f,
-	0x5b, 0x36, 0xcd, 0x04, 0xa1, 0xcf, 0x7c, 0x78, 0x57, 0x30, 0x66, 0x14, 0x63, 0x46, 0x31, 0x66,
-	0x14, 0x63, 0x2a, 0x2b, 0x71, 0x2c, 0xdf, 0x6b, 0x38, 0x27, 0xc3, 0x30, 0x4e, 0x68, 0xb5, 0x1d,
-	0x86, 0x8e, 0x43, 0x82, 0x4f, 0x49, 0x28, 0x21, 0x53, 0x1f, 0x4c, 0x94, 0x69, 0x38, 0x2e, 0xeb,
-	0xb2, 0x3e, 0x9d, 0xc8, 0xea, 0xb7, 0x99, 0xeb, 0x90, 0x10, 0xd9, 0x84, 0x11, 0x8b, 0x39, 0xbe,
-	0xa7, 0xa4, 0x1e, 0xf7, 0x4b, 0xf9, 0x21, 0xe9, 0x8a, 0x60, 0xdb, 0x0e, 0x09, 0x55, 0x9b, 0x4b,
-	0x3d, 0x1c, 0xcf, 0x78, 0x8c, 0x29, 0x51, 0x5c, 0x4f, 0xc6, 0x73, 0x49, 0x1a, 0xa2, 0x7e, 0x3b,
-	0xb4, 0x22, 0xf6, 0x8f, 0xc6, 0xb3, 0x37, 0x09, 0x76, 0x59, 0x13, 0x59, 0x4d, 0x62, 0x9d, 0x2a,
-	0xee, 0xcd, 0xf1, 0xdc, 0x82, 0xc1, 0xf2, 0x5d, 0xc5, 0xf9, 0x33, 0xc9, 0x49, 0xce, 0x19, 0xf1,
-	0xa8, 0xe3, 0x7b, 0x74, 0x9b, 0x85, 0xd8, 0xa3, 0x81, 0x1f, 0x32, 0x44, 0x7d, 0xeb, 0x94, 0x30,
-	0xba, 0xcd, 0x5c, 0x7a, 0x61, 0x1b, 0x09, 0x99, 0x12, 0xdd, 0xee, 0x3f, 0x6d, 0xdb, 0xa1, 0x96,
-	0x7f, 0x46, 0xc2, 0x4e, 0x97, 0xb7, 0x4b, 0xe9, 0xb7, 0x2a, 0x12, 0x20, 0x9e, 0x1d, 0xf8, 0x8e,
-	0xc7, 0xba, 0xfc, 0x24, 0xf2, 0x8f, 0xd4, 0x86, 0xe4, 0x64, 0x9d, 0xa0, 0xc7, 0x70, 0x12, 0x5a,
-	0xc4, 0x8b, 0x94, 0xdf, 0x39, 0xf1, 0xfd, 0x13, 0x97, 0x6c, 0xe3, 0xc0, 0xd9, 0xc6, 0x9e, 0xe7,
-	0x33, 0xcc, 0x8f, 0x2a, 0x92, 0xbf, 0xad, 0x56, 0xc5, 0xd3, 0x71, 0xbb, 0xb1, 0x8d, 0xbd, 0xc8,
-	0x88, 0x7b, 0x83, 0x4b, 0x76, 0x3b, 0xc4, 0x3d, 0xc7, 0x7c, 0x67, 0x70, 0x9d, 0xb2, 0xb0, 0x6d,
-	0xb1, 0x71, 0xd2, 0x6f, 0x42, 0x1c, 0x04, 0x24, 0x8c, 0x14, 0xdf, 0x6f, 0xdb, 0x01, 0xee, 0x35,
-	0x68, 0xfb, 0x8c, 0x84, 0xfc, 0xbd, 0x3a, 0xde, 0x89, 0x62, 0xb9, 0x75, 0x86, 0x5d, 0xc7, 0xc6,
-	0x8c, 0x6c, 0x47, 0xff, 0xc8, 0x85, 0xf4, 0x7f, 0xff, 0x12, 0xcc, 0x15, 0xa4, 0x33, 0xc2, 0x36,
-	0x30, 0x06, 0xcf, 0x01, 0xb5, 0x30, 0xb3, 0x9a, 0x84, 0x1a, 0x1f, 0x6e, 0xc4, 0x37, 0x17, 0xb2,
-	0x3f, 0xcf, 0x4c, 0xbc, 0x43, 0x19, 0x85, 0x94, 0xa9, 0x47, 0x30, 0x35, 0x81, 0x72, 0xc0, 0x41,
-	0xcc, 0x9b, 0x6c, 0x04, 0x95, 0x50, 0xb8, 0x0e, 0x66, 0x3d, 0xdc, 0x22, 0x86, 0xb6, 0xa1, 0x6d,
-	0xce, 0xe7, 0xe7, 0xde, 0xe5, 0x67, 0xc3, 0xd8, 0x86, 0x66, 0x0a, 0x22, 0x4c, 0x83, 0x25, 0xec,
-	0x32, 0x44, 0x19, 0x66, 0x48, 0x70, 0xdd, 0xe1, 0x5c, 0xe6, 0x02, 0x76, 0x59, 0x8d, 0x61, 0x56,
-	0xe1, 0x3c, 0x75, 0x30, 0xcb, 0x0f, 0xcd, 0x88, 0x6d, 0x68, 0x9b, 0xc9, 0xec, 0xd3, 0x29, 0x6d,
-	0x2c, 0x46, 0x8e, 0x52, 0xef, 0x04, 0x24, 0x9f, 0x78, 0x97, 0xbf, 0xf6, 0x6b, 0x2d, 0xa6, 0x6b,
-	0x7b, 0x33, 0xa6, 0x40, 0x83, 0x7f, 0x0c, 0x16, 0x95, 0x28, 0x12, 0xe8, 0x8f, 0x36, 0xb4, 0xcd,
-	0x85, 0xec, 0x17, 0x53, 0xa2, 0x17, 0xda, 0x94, 0xf9, 0x2d, 0xf5, 0xc4, 0x35, 0xec, 0xcd, 0x98,
-	0x0b, 0xd6, 0xc5, 0x23, 0x24, 0x00, 0x12, 0x9b, 0xa2, 0x48, 0x85, 0xbc, 0x35, 0x46, 0x5c, 0x28,
-	0xf9, 0x7c, 0x4a, 0x25, 0x25, 0x9b, 0xaa, 0x7f, 0x0b, 0x42, 0xdc, 0xd4, 0xc9, 0x00, 0x05, 0x96,
-	0xc1, 0xb2, 0xe5, 0x7b, 0x1e, 0xb1, 0x18, 0x62, 0x4e, 0x8b, 0xf8, 0x6d, 0x66, 0xcc, 0x0a, 0x1d,
-	0xb7, 0x33, 0xd2, 0xab, 0x32, 0x91, 0x57, 0x65, 0x8a, 0xca, 0x27, 0xc5, 0xbb, 0xf8, 0x51, 0x8b,
-	0x6d, 0xcd, 0x98, 0x49, 0x25, 0x5b, 0x97, 0xa2, 0xb0, 0x01, 0xee, 0x07, 0xd2, 0x58, 0x4f, 0x86,
-	0x29, 0x74, 0xdc, 0x6e, 0x34, 0x48, 0x88, 0x5c, 0xa7, 0xc5, 0x83, 0x63, 0x87, 0x11, 0x6a, 0x5c,
-	0x13, 0xf8, 0x77, 0x86, 0xf0, 0x8f, 0xf6, 0x3d, 0xf6, 0x69, 0xf6, 0x25, 0x76, 0xdb, 0xc4, 0xbc,
-	0x1b, 0x08, 0x0b, 0x15, 0x4a, 0x5e, 0x80, 0x94, 0x39, 0x46, 0x9e, 0x43, 0xc0, 0x97, 0x60, 0xde,
-	0x3d, 0x46, 0x81, 0xef, 0x3a, 0x56, 0xc7, 0xb8, 0x2e, 0x8e, 0x75, 0x7b, 0xca, 0x77, 0x52, 0x3e,
-	0x3e, 0x14, 0x62, 0x17, 0x27, 0x6a, 0x26, 0x5c, 0x45, 0x83, 0x5f, 0x80, 0x6b, 0x4d, 0x9f, 0x32,
-	0x6a, 0xcc, 0x09, 0x77, 0x4e, 0x2b, 0x4c, 0xf9, 0xf2, 0x33, 0x3c, 0x64, 0x75, 0xf1, 0x72, 0x32,
-	0xbc, 0x9a, 0x52, 0x00, 0xfe, 0x09, 0x58, 0x76, 0x7d, 0x6c, 0x23, 0x4c, 0xa9, 0x73, 0xe2, 0xb5,
-	0x88, 0xc7, 0x8c, 0xfb, 0x62, 0x9f, 0x9f, 0x0d, 0xd8, 0x15, 0x05, 0x98, 0x41, 0xc3, 0xca, 0x3e,
-	0xb6, 0x73, 0x5d, 0x61, 0x33, 0xe9, 0xf6, 0x3d, 0xc3, 0x17, 0x60, 0xa9, 0x37, 0xa4, 0x52, 0x23,
-	0x21, 0x2c, 0x7c, 0x34, 0xc1, 0xc2, 0x3d, 0xc1, 0x5f, 0xe0, 0xec, 0xe6, 0x62, 0xf3, 0xe2, 0x81,
-	0xc2, 0x3f, 0x02, 0xeb, 0x2d, 0x7c, 0x8e, 0x42, 0xf2, 0x6d, 0x9b, 0x50, 0x46, 0x51, 0xff, 0x99,
-	0x19, 0xf3, 0x53, 0x1c, 0x90, 0xd1, 0xc2, 0xe7, 0xa6, 0x92, 0x3f, 0xec, 0x3d, 0x2b, 0xf8, 0x0d,
-	0xd0, 0x07, 0x92, 0x21, 0x35, 0x80, 0x40, 0x7c, 0x32, 0x60, 0xec, 0xe0, 0x09, 0x49, 0xa9, 0xbc,
-	0x12, 0x32, 0x97, 0xad, 0x7e, 0x02, 0xfc, 0x3b, 0x0d, 0x3c, 0x68, 0x3a, 0xb6, 0x4d, 0x3c, 0x24,
-	0x80, 0x90, 0x4d, 0x82, 0x90, 0x58, 0x98, 0x11, 0x1b, 0x31, 0x97, 0xf2, 0x2d, 0x30, 0x72, 0xce,
-	0x8c, 0x05, 0xa1, 0x2d, 0xaf, 0xb4, 0x5d, 0x64, 0x91, 0xcc, 0x50, 0x16, 0xc9, 0x30, 0x97, 0x76,
-	0xf5, 0x1f, 0x05, 0x94, 0x85, 0x04, 0xb7, 0xea, 0x2e, 0x2d, 0x48, 0xa4, 0x7c, 0xcc, 0xd0, 0xcc,
-	0xf7, 0xa4, 0xca, 0x12, 0x07, 0x2b, 0x76, 0x15, 0x5e, 0x30, 0x41, 0x1f, 0xdc, 0xb1, 0xfc, 0x56,
-	0xcb, 0xf7, 0x50, 0x93, 0xb1, 0x00, 0x45, 0xb9, 0x0c, 0xf9, 0x81, 0x08, 0xb6, 0xc6, 0x5d, 0x61,
-	0x4e, 0x66, 0xd2, 0x49, 0x31, 0x16, 0x1c, 0x2a, 0xb1, 0xaa, 0x94, 0x32, 0x6f, 0x4b, 0xcc, 0x11,
-	0x4b, 0xd0, 0x02, 0x37, 0x46, 0x6b, 0x5a, 0x12, 0x9a, 0xb6, 0x2f, 0xd1, 0xf4, 0xc9, 0xa0, 0xaa,
-	0xd5, 0xe6, 0x08, 0x25, 0x04, 0xdc, 0xe4, 0xe4, 0xec, 0xb0, 0x96, 0xe4, 0x54, 0x5a, 0xb2, 0x83,
-	0x5a, 0xd6, 0x9a, 0x23, 0xa8, 0xf0, 0x77, 0x1a, 0xc8, 0x8e, 0x3b, 0xd3, 0xee, 0xc9, 0x0d, 0xdb,
-	0xf0, 0x40, 0x78, 0xff, 0xeb, 0x29, 0xef, 0xfc, 0xde, 0xa8, 0x13, 0x2c, 0x45, 0xe8, 0x03, 0x26,
-	0x95, 0x3c, 0x16, 0x76, 0xc4, 0xc9, 0x3f, 0x69, 0x5e, 0x45, 0x0e, 0x7e, 0xaf, 0x81, 0x0d, 0x9e,
-	0x09, 0x26, 0x1a, 0xfe, 0x50, 0x18, 0xbe, 0x3f, 0x6d, 0x9e, 0xe4, 0x70, 0x13, 0x0d, 0x35, 0xef,
-	0xb2, 0x49, 0x3c, 0xf0, 0x57, 0x40, 0xb7, 0x3d, 0x8a, 0x42, 0xd2, 0x08, 0x09, 0x6d, 0xa2, 0x10,
-	0x33, 0x62, 0xe8, 0x97, 0x05, 0xf8, 0xc5, 0x77, 0xf9, 0xf9, 0x1f, 0xb5, 0xeb, 0x5b, 0xb3, 0xfa,
-	0xbf, 0xfc, 0xc5, 0x1f, 0x98, 0x49, 0xdb, 0xa3, 0xa6, 0x94, 0x37, 0x31, 0x23, 0xf0, 0x14, 0x18,
-	0x1c, 0xb2, 0x81, 0x1d, 0xb7, 0x1d, 0x92, 0x7e, 0xe8, 0x8f, 0x04, 0x74, 0x76, 0xca, 0xed, 0xf5,
-	0xa0, 0x9a, 0x37, 0x6c, 0x8f, 0xee, 0x4a, 0xc8, 0x5e, 0x65, 0x8f, 0xc0, 0x72, 0x48, 0x68, 0xc0,
-	0xf3, 0x13, 0x57, 0xca, 0x98, 0x6b, 0x3c, 0xde, 0xd0, 0x36, 0x13, 0xe6, 0x92, 0x22, 0x17, 0x3d,
-	0x5a, 0x67, 0x2e, 0x74, 0xc1, 0x0a, 0x5f, 0x77, 0x7d, 0xff, 0xb4, 0x1d, 0xa0, 0x06, 0x6e, 0x39,
-	0x6e, 0xc7, 0x58, 0x11, 0x99, 0xe1, 0xd9, 0xb4, 0x09, 0xdf, 0xa3, 0x65, 0x21, 0xbe, 0x2b, 0xa4,
-	0x7b, 0x12, 0xc4, 0xb2, 0xdd, 0xbf, 0x04, 0x9f, 0x83, 0x25, 0xf9, 0x56, 0xa9, 0xef, 0xf2, 0x5a,
-	0xca, 0x80, 0x53, 0xe7, 0x8b, 0x45, 0xf1, 0x36, 0x95, 0x1c, 0x7c, 0x0a, 0x6e, 0xb5, 0x29, 0x41,
-	0xcc, 0x0a, 0x50, 0xc3, 0x0f, 0xd1, 0xc5, 0x16, 0xa8, 0xf1, 0x44, 0x6c, 0x73, 0xb5, 0x4d, 0x49,
-	0xdd, 0x0a, 0x76, 0xfd, 0xb0, 0x6b, 0x1e, 0x8f, 0xdf, 0x2b, 0x43, 0x0d, 0x81, 0xb1, 0x3a, 0x32,
-	0xcc, 0x0c, 0xec, 0xb5, 0x2a, 0xc5, 0x8a, 0x91, 0x94, 0xa9, 0xfb, 0x03, 0x14, 0x58, 0x01, 0xba,
-	0xe5, 0x12, 0xec, 0xb5, 0x03, 0xe4, 0x78, 0x8c, 0x84, 0x67, 0xd8, 0x35, 0xd6, 0xa6, 0x2f, 0x09,
-	0x96, 0x95, 0xf0, 0xbe, 0x92, 0x85, 0xaf, 0xc0, 0x5a, 0x5b, 0x45, 0x56, 0x74, 0xec, 0x78, 0x76,
-	0x54, 0xca, 0xdc, 0x10, 0x98, 0xef, 0x4f, 0x78, 0x65, 0x79, 0xc7, 0xb3, 0x55, 0xe1, 0x02, 0x23,
-	0x88, 0x0b, 0x1a, 0x44, 0x40, 0x77, 0x8f, 0x11, 0x6d, 0x1f, 0x53, 0xc2, 0x22, 0xd0, 0x9b, 0x23,
-	0x73, 0xee, 0xf8, 0x5a, 0xa0, 0x26, 0xa4, 0x95, 0x92, 0xa4, 0xdb, 0xf7, 0x0c, 0x9b, 0x60, 0x35,
-	0x74, 0xbc, 0x13, 0xd4, 0xc4, 0xb4, 0x89, 0xdc, 0xe3, 0x48, 0xc7, 0xad, 0x2b, 0xd5, 0x60, 0xa6,
-	0xe3, 0x9d, 0xec, 0x61, 0xda, 0x2c, 0x1f, 0x4b, 0xd4, 0x3d, 0xcd, 0xd4, 0xc3, 0x01, 0x1a, 0xfc,
-	0x16, 0xdc, 0xf4, 0x43, 0xe7, 0xc4, 0xf1, 0xb0, 0x8b, 0x6c, 0xca, 0x7a, 0x94, 0xa5, 0x85, 0xb2,
-	0x9d, 0x29, 0x95, 0x55, 0x15, 0x48, 0x91, 0xb2, 0x1e, 0x7d, 0xab, 0xfe, 0x30, 0x19, 0x32, 0x70,
-	0xcb, 0x25, 0x98, 0xb2, 0xa8, 0x0a, 0xe8, 0xd1, 0xf9, 0xbe, 0xd0, 0x39, 0x6d, 0x2d, 0x5f, 0xe6,
-	0x28, 0xaa, 0x14, 0xe8, 0x51, 0xba, 0xe6, 0x8e, 0xa0, 0xf3, 0x33, 0x53, 0xb9, 0xf2, 0x42, 0xdd,
-	0xfa, 0x95, 0xce, 0xac, 0x20, 0xc4, 0x23, 0x40, 0x5e, 0x81, 0xf6, 0x3e, 0xc3, 0x23, 0xa0, 0x0f,
-	0x66, 0x79, 0xc3, 0x10, 0x0a, 0xb6, 0x26, 0x78, 0xda, 0x40, 0x3f, 0x62, 0x2e, 0x0f, 0xb4, 0x22,
-	0xf0, 0x17, 0x20, 0xd1, 0x22, 0x0c, 0xdb, 0x98, 0x61, 0xe3, 0xb6, 0x80, 0x7b, 0x30, 0x01, 0xee,
-	0x40, 0xb1, 0x9a, 0x5d, 0x21, 0xe8, 0x01, 0xd8, 0xcd, 0x05, 0x94, 0xb8, 0xea, 0xce, 0xa6, 0x44,
-	0x80, 0xfa, 0xc5, 0xb4, 0x5b, 0x97, 0x7f, 0xa3, 0x10, 0x5f, 0x8b, 0x60, 0xcc, 0x95, 0x60, 0x90,
-	0x04, 0xcf, 0xc1, 0x7a, 0xf7, 0xd6, 0xf5, 0x94, 0xe3, 0x51, 0x1a, 0xba, 0x37, 0x55, 0xb3, 0x12,
-	0x55, 0x44, 0x17, 0xd5, 0x5d, 0xb7, 0x3a, 0x69, 0x8f, 0x5b, 0x82, 0x47, 0x60, 0xd3, 0x72, 0x7d,
-	0x4a, 0x7a, 0xd4, 0x52, 0xc4, 0x8b, 0x23, 0x9f, 0x32, 0xa4, 0x6a, 0x58, 0x95, 0x3b, 0x8c, 0xf7,
-	0x44, 0x8c, 0x7b, 0x20, 0xf8, 0x2f, 0x90, 0x68, 0xd5, 0xdb, 0xf3, 0x29, 0x93, 0xf5, 0xab, 0xca,
-	0x09, 0xf0, 0x97, 0xe0, 0xae, 0x73, 0xe2, 0xf9, 0x21, 0x89, 0x30, 0x22, 0xc8, 0x90, 0xb4, 0x7c,
-	0x1e, 0xa3, 0x36, 0x04, 0xd6, 0x6d, 0xc9, 0x24, 0x65, 0x25, 0x8e, 0x29, 0x19, 0xe0, 0x57, 0x60,
-	0x4e, 0x4e, 0x5c, 0xa8, 0xb1, 0x29, 0xc2, 0xf5, 0xc3, 0xc9, 0xb1, 0x72, 0x57, 0x30, 0x9b, 0x91,
-	0x10, 0x6c, 0x80, 0x1b, 0xa2, 0xc4, 0x3f, 0xc6, 0x2e, 0xf6, 0x2c, 0x1e, 0x18, 0x54, 0x03, 0xf2,
-	0xc1, 0x54, 0x49, 0x8f, 0x17, 0xf8, 0xf9, 0x48, 0x54, 0xf6, 0x1b, 0xe6, 0xaa, 0x3b, 0x4c, 0x84,
-	0xbb, 0x00, 0xb8, 0x21, 0x45, 0x1c, 0x87, 0x84, 0xc6, 0x96, 0x00, 0x7f, 0x3c, 0xc1, 0xdb, 0xa4,
-	0xe7, 0xd7, 0xc4, 0x60, 0xc6, 0x9c, 0x77, 0x43, 0x5a, 0x13, 0x92, 0xa9, 0xff, 0xd2, 0xc0, 0xda,
-	0xa8, 0x46, 0x7b, 0x64, 0x43, 0xad, 0x47, 0x0d, 0xf5, 0x13, 0x70, 0x4d, 0xf4, 0xf4, 0xa2, 0x5b,
-	0x5e, 0xc8, 0xde, 0x1a, 0x8a, 0xf9, 0x35, 0x31, 0x7a, 0x30, 0x25, 0xd7, 0xc8, 0xfb, 0x16, 0xff,
-	0xbd, 0xef, 0xdb, 0xce, 0xc7, 0xff, 0xf0, 0xaf, 0xbf, 0xb9, 0xf7, 0x21, 0x90, 0xf3, 0xb3, 0x0c,
-	0x0e, 0x9c, 0xcc, 0x59, 0x76, 0xe2, 0xf4, 0x20, 0xf5, 0x83, 0x06, 0x56, 0x86, 0x9a, 0xea, 0xc9,
-	0xb3, 0x83, 0xcf, 0xc1, 0xa2, 0xac, 0xd7, 0x54, 0x20, 0x92, 0x3b, 0x5e, 0x1b, 0xda, 0x71, 0xce,
-	0xeb, 0x98, 0x0b, 0x82, 0x53, 0xbe, 0xea, 0x9d, 0x27, 0xdc, 0xba, 0x4d, 0xf0, 0x68, 0xa4, 0x75,
-	0x43, 0x46, 0xa4, 0x7e, 0xab, 0x01, 0x7d, 0xb0, 0x15, 0xe7, 0xa7, 0x2c, 0xfa, 0x7b, 0xa9, 0x5a,
-	0xbb, 0xe2, 0x29, 0xf3, 0x3e, 0x5e, 0xe2, 0xdc, 0x07, 0x8b, 0xca, 0xe3, 0xe4, 0xfc, 0x23, 0x26,
-	0xe7, 0x1f, 0x8a, 0x56, 0xc1, 0x2d, 0xb2, 0xf3, 0x11, 0x37, 0xf7, 0x31, 0x78, 0x7f, 0xa4, 0xb9,
-	0x83, 0x86, 0xa5, 0xfe, 0x31, 0x01, 0x92, 0xfd, 0x89, 0x11, 0xfe, 0x39, 0x58, 0x6e, 0x60, 0xd7,
-	0x3d, 0xc6, 0xd6, 0x69, 0xe4, 0xf3, 0x9a, 0x88, 0x5c, 0xe5, 0x9f, 0x94, 0x68, 0xbb, 0x8f, 0xbb,
-	0x0a, 0x74, 0xa8, 0x23, 0x4f, 0x36, 0xfa, 0x56, 0xe0, 0x57, 0x20, 0x69, 0x93, 0x06, 0x6e, 0xbb,
-	0x4c, 0xe5, 0xfb, 0xcb, 0xbc, 0x73, 0x49, 0xb1, 0x4b, 0x3d, 0xf0, 0x5b, 0xa0, 0xab, 0x3a, 0x41,
-	0xc6, 0x5e, 0x3f, 0xa4, 0x46, 0x5c, 0xc4, 0x80, 0xdd, 0xdf, 0x6f, 0x07, 0x35, 0x05, 0x67, 0x2e,
-	0xd3, 0xbe, 0x67, 0x0a, 0xb3, 0x3c, 0x5a, 0x58, 0xd8, 0x75, 0x58, 0x07, 0xbd, 0x21, 0xce, 0x49,
-	0x93, 0x21, 0xfc, 0x06, 0x87, 0x44, 0x8c, 0x57, 0x12, 0xfc, 0xe6, 0xcb, 0xc5, 0x57, 0x62, 0x2d,
-	0xc7, 0x97, 0xb8, 0x0c, 0xb5, 0xb0, 0x4b, 0xd0, 0x80, 0xa4, 0x18, 0x99, 0x24, 0xcc, 0x55, 0xb1,
-	0x58, 0xee, 0x13, 0x84, 0x0f, 0x41, 0x32, 0xc0, 0x9e, 0x63, 0xa1, 0x96, 0x6f, 0x13, 0x84, 0x3d,
-	0x39, 0x0f, 0x49, 0x98, 0x8b, 0x82, 0x7a, 0xe0, 0xdb, 0x24, 0xe7, 0x75, 0xe0, 0x3d, 0xb0, 0xe0,
-	0x3a, 0x94, 0x21, 0x4c, 0x05, 0xcb, 0x9c, 0x60, 0x99, 0xe7, 0xa4, 0x1c, 0xcd, 0x79, 0x9d, 0xd4,
-	0x6f, 0xe3, 0x40, 0x1f, 0xdc, 0x13, 0x84, 0x60, 0xf6, 0x94, 0x74, 0xa8, 0xa1, 0x6d, 0xc4, 0x37,
-	0xe7, 0x4d, 0xf1, 0x3f, 0xfc, 0x41, 0x1b, 0xf6, 0x05, 0x39, 0x57, 0x23, 0xff, 0x37, 0x6f, 0x72,
-	0x88, 0x30, 0xb5, 0x93, 0x7c, 0x0c, 0xd6, 0xba, 0x96, 0x71, 0x5b, 0x23, 0x57, 0x89, 0x0b, 0xf3,
-	0x61, 0xb4, 0xf6, 0x82, 0x74, 0xa8, 0xd4, 0x90, 0xee, 0x80, 0x7b, 0x93, 0xb5, 0xc1, 0x65, 0xb0,
-	0x50, 0xa9, 0xd6, 0x51, 0xb1, 0xb4, 0xbb, 0x5f, 0x29, 0x15, 0xf5, 0x19, 0x49, 0x40, 0xbb, 0xb9,
-	0x72, 0x39, 0x9f, 0x2b, 0xbc, 0xd0, 0x35, 0xa8, 0x83, 0xc5, 0x5c, 0xe5, 0x35, 0x2a, 0x55, 0x8a,
-	0x87, 0xd5, 0xfd, 0x4a, 0x5d, 0x8f, 0x41, 0x08, 0x92, 0xc5, 0xd2, 0x6e, 0xee, 0xa8, 0x5c, 0x47,
-	0xb5, 0xa3, 0x7c, 0xad, 0x54, 0xd7, 0xe3, 0x5c, 0xec, 0x45, 0xe9, 0x75, 0x2d, 0x22, 0xcc, 0xee,
-	0xfc, 0x9c, 0xdf, 0xc9, 0x67, 0xe0, 0xe9, 0xc8, 0x3b, 0x79, 0xc9, 0x2b, 0x4a, 0x57, 0xc1, 0xcd,
-	0xd1, 0x57, 0x68, 0xd0, 0xbc, 0x99, 0x21, 0xf3, 0xb4, 0x11, 0xe6, 0xc5, 0x76, 0xb6, 0xb8, 0x35,
-	0xef, 0x83, 0x07, 0x53, 0x58, 0x93, 0xfa, 0x5e, 0x03, 0x6b, 0xa3, 0x6a, 0x3e, 0xb8, 0x07, 0x16,
-	0xad, 0xa6, 0xcf, 0x03, 0x91, 0xe5, 0xb7, 0x3d, 0xa6, 0x62, 0xda, 0xc4, 0x31, 0x92, 0x88, 0xc8,
-	0x5b, 0xb1, 0xcd, 0x98, 0xb9, 0x20, 0x45, 0x0b, 0x5c, 0x72, 0x72, 0xf4, 0x1f, 0xa5, 0x3b, 0xf5,
-	0xf7, 0x71, 0xa0, 0x0f, 0x56, 0xda, 0xb0, 0x0e, 0x56, 0x5a, 0x8e, 0xe7, 0xb4, 0xda, 0x2d, 0x24,
-	0xea, 0x78, 0xea, 0xbc, 0x25, 0x13, 0xad, 0x7a, 0xf6, 0x54, 0x5a, 0x05, 0xde, 0xe5, 0xe7, 0xb2,
-	0xd7, 0x8c, 0xef, 0xbe, 0xfb, 0x6e, 0xd6, 0x5c, 0x56, 0x10, 0x1c, 0xbd, 0xe6, 0xbc, 0x25, 0x90,
-	0x82, 0x25, 0xd1, 0x10, 0x34, 0xda, 0x9e, 0x2c, 0xe2, 0xe2, 0xc2, 0xfd, 0x8b, 0x3f, 0xb1, 0x1f,
-	0xc8, 0xf0, 0x87, 0x5d, 0x85, 0xd5, 0xe3, 0xdd, 0x8b, 0xcd, 0x1e, 0xba, 0xd8, 0x0a, 0x3e, 0x1f,
-	0xd8, 0xca, 0xec, 0x95, 0xb7, 0x22, 0x21, 0xa2, 0xad, 0xa4, 0x33, 0x60, 0xb1, 0x57, 0x3b, 0x5c,
-	0x00, 0x73, 0xdf, 0x7c, 0x83, 0xf6, 0x72, 0xb5, 0x3d, 0x7d, 0x06, 0xae, 0x80, 0xa5, 0x83, 0x23,
-	0xf3, 0xe0, 0xc8, 0x14, 0x04, 0x94, 0xd5, 0xb5, 0xc9, 0x89, 0x64, 0x70, 0x63, 0x5f, 0xcf, 0x26,
-	0x62, 0x7a, 0x3c, 0xe5, 0x81, 0xd5, 0x11, 0x5d, 0x09, 0xef, 0xeb, 0x79, 0xe3, 0x2b, 0xe6, 0x58,
-	0x4d, 0x82, 0x6d, 0x12, 0x8a, 0x93, 0x49, 0x98, 0x4b, 0x6d, 0x4a, 0xf6, 0x18, 0x0b, 0xf6, 0x04,
-	0x71, 0x67, 0x9b, 0xab, 0xdc, 0x02, 0x9b, 0x23, 0x55, 0x8e, 0x00, 0x4e, 0xfd, 0x4d, 0x02, 0x24,
-	0xfb, 0x7b, 0x04, 0x58, 0x03, 0xb7, 0x64, 0xcd, 0xd8, 0x41, 0x32, 0x54, 0xb2, 0x66, 0x48, 0x68,
-	0xd3, 0x77, 0x6d, 0xe5, 0x0d, 0xeb, 0xea, 0xec, 0x78, 0x8e, 0xef, 0x1e, 0xd8, 0xa1, 0xfc, 0xb4,
-	0x63, 0xde, 0x50, 0xb2, 0x87, 0x5c, 0xb4, 0x1e, 0x49, 0xc2, 0xb7, 0x60, 0xed, 0xad, 0xef, 0x11,
-	0x19, 0xd4, 0x7b, 0xba, 0x19, 0x99, 0x98, 0x9e, 0xff, 0xa4, 0x6e, 0x26, 0xf3, 0x87, 0xbe, 0x47,
-	0x44, 0x2a, 0xe8, 0x36, 0x52, 0x33, 0xe6, 0xca, 0xdb, 0x41, 0x22, 0xfc, 0x6b, 0x0d, 0xac, 0x0f,
-	0xa4, 0x08, 0x62, 0xf7, 0xd8, 0x20, 0x0b, 0xb0, 0xca, 0x4f, 0xb3, 0xa1, 0x3f, 0xbf, 0x10, 0xbb,
-	0xc7, 0x14, 0xc3, 0x1d, 0xb3, 0x06, 0xf7, 0xc1, 0x6a, 0x3b, 0xb0, 0x31, 0x23, 0xa8, 0x45, 0xc2,
-	0x13, 0x82, 0xde, 0x38, 0x9e, 0xed, 0xbf, 0xb9, 0xf4, 0x53, 0x82, 0xb9, 0x22, 0xa5, 0x0e, 0xb8,
-	0xd0, 0x2b, 0x21, 0x03, 0x0b, 0xe0, 0x3d, 0x55, 0xe8, 0x7b, 0xe4, 0x8d, 0x28, 0xf1, 0x29, 0x6a,
-	0x7b, 0xcc, 0x71, 0x51, 0xc3, 0x09, 0x79, 0x0b, 0x61, 0xa9, 0x74, 0x98, 0x92, 0x6c, 0x15, 0xf2,
-	0x86, 0x57, 0xf9, 0xf4, 0x88, 0xf3, 0xec, 0x72, 0x96, 0x3d, 0x0b, 0x1e, 0x80, 0x87, 0xe3, 0x9b,
-	0x10, 0x31, 0x2f, 0x68, 0x62, 0xef, 0x84, 0xa8, 0x5c, 0xf9, 0xde, 0xe8, 0x06, 0xa4, 0x46, 0x58,
-	0x41, 0xb0, 0xa5, 0xbe, 0x8f, 0x81, 0x95, 0xa1, 0xb3, 0x81, 0x45, 0xb0, 0x1c, 0xfa, 0x6d, 0xc6,
-	0xef, 0x23, 0xf1, 0xf0, 0xb1, 0x4b, 0xa6, 0xf2, 0xa7, 0xa4, 0x92, 0x29, 0x49, 0x11, 0xb8, 0x0b,
-	0xf4, 0x96, 0xe3, 0x75, 0x3f, 0xf4, 0x88, 0x9b, 0x1d, 0xbb, 0xfc, 0x66, 0x9b, 0xc9, 0x96, 0xe3,
-	0xa9, 0x23, 0x14, 0x71, 0xe9, 0x13, 0x70, 0x83, 0xb7, 0x55, 0x88, 0x85, 0xb8, 0xd1, 0x70, 0x2c,
-	0xbe, 0x5b, 0xe1, 0xed, 0xc2, 0x1b, 0x12, 0x3c, 0xff, 0x39, 0x6e, 0x5d, 0xae, 0x55, 0x3d, 0xe1,
-	0xcc, 0x3b, 0x5f, 0xf2, 0xcb, 0xf5, 0x39, 0xf8, 0x6c, 0x74, 0x1d, 0x7b, 0x89, 0x6b, 0xa6, 0x10,
-	0x30, 0xc6, 0xf9, 0xca, 0x4e, 0x81, 0x23, 0x7f, 0x05, 0xbe, 0x9c, 0x06, 0x79, 0x2c, 0xc8, 0xc4,
-	0xac, 0xd4, 0x0f, 0x92, 0x5f, 0x07, 0xb7, 0xbb, 0x37, 0x22, 0xfa, 0x54, 0x1d, 0x10, 0xcb, 0x69,
-	0x38, 0x24, 0x4c, 0xfd, 0x9b, 0x06, 0x16, 0x7a, 0x87, 0x8a, 0x15, 0xb0, 0x74, 0x8c, 0x29, 0xb9,
-	0x98, 0x6f, 0x69, 0x97, 0xcd, 0xb7, 0x92, 0xef, 0xf2, 0x0b, 0x3f, 0x6a, 0x89, 0x84, 0xa6, 0x66,
-	0xa2, 0x8b, 0x5c, 0xbe, 0x3b, 0xe2, 0xfa, 0x1a, 0x2c, 0xb6, 0xf0, 0xf9, 0x05, 0x5c, 0xec, 0x6a,
-	0x03, 0xd6, 0x85, 0x16, 0x3e, 0x8f, 0xb0, 0x76, 0x1e, 0xf3, 0x4d, 0xa7, 0xc1, 0xc6, 0xe8, 0x18,
-	0x7b, 0xb1, 0x89, 0x54, 0x07, 0x64, 0xaf, 0x3e, 0xd7, 0x86, 0x3a, 0x88, 0x9f, 0x12, 0x59, 0xbe,
-	0xcf, 0x9b, 0xfc, 0x5f, 0xde, 0xf0, 0x9d, 0x71, 0x87, 0xba, 0xb4, 0xe1, 0x13, 0x5c, 0x3b, 0xb1,
-	0x2f, 0xb4, 0x54, 0x03, 0xa4, 0x2f, 0x9f, 0x4c, 0x8f, 0x50, 0xb5, 0xd5, 0xaf, 0x6a, 0x74, 0xa7,
-	0x75, 0xa1, 0x27, 0xfd, 0x0a, 0x2c, 0xf5, 0x7d, 0x85, 0x85, 0x00, 0x5c, 0xaf, 0xd5, 0x73, 0xf5,
-	0xfd, 0x82, 0x3e, 0x03, 0x93, 0x00, 0xd4, 0xea, 0xe6, 0x7e, 0xa1, 0x8e, 0x8a, 0x95, 0x9a, 0xae,
-	0xf1, 0xd2, 0xa7, 0x5c, 0x7d, 0xbe, 0x5f, 0xc8, 0x95, 0x05, 0x21, 0x06, 0xe7, 0x40, 0xbc, 0x54,
-	0xac, 0xe9, 0x71, 0x5e, 0x03, 0x55, 0xcd, 0xfd, 0xe7, 0xfb, 0x15, 0xbe, 0x54, 0xab, 0xeb, 0xb3,
-	0xe9, 0x7f, 0xd6, 0x40, 0x22, 0xfa, 0x10, 0xc8, 0x05, 0xcd, 0xea, 0x51, 0xa5, 0x88, 0xcc, 0x6a,
-	0x7e, 0xbf, 0x22, 0x33, 0x5f, 0xb9, 0x94, 0xab, 0xd5, 0x91, 0x59, 0xfa, 0xd5, 0x51, 0xa9, 0xc6,
-	0x8b, 0xa6, 0x25, 0x30, 0x6f, 0xee, 0x57, 0x9e, 0xcb, 0xdc, 0x18, 0xe3, 0x76, 0x98, 0xb9, 0x4a,
-	0xb1, 0x7a, 0xa0, 0xc7, 0xe1, 0x36, 0x78, 0x3c, 0xee, 0x03, 0x46, 0xaf, 0x56, 0x54, 0xce, 0xeb,
-	0xb3, 0xa9, 0x58, 0x42, 0xe3, 0xc2, 0x07, 0xb9, 0xe7, 0xe5, 0xd2, 0x4b, 0xfd, 0x1a, 0x5c, 0x03,
-	0x7a, 0xa1, 0x7c, 0x54, 0xab, 0x97, 0x4c, 0x74, 0x68, 0x56, 0x5f, 0xee, 0x17, 0x4b, 0x45, 0xfd,
-	0x3a, 0xdc, 0x00, 0x77, 0xca, 0xd5, 0x5c, 0x11, 0xe5, 0x73, 0xe5, 0x5c, 0xa5, 0xc0, 0xf5, 0x1e,
-	0x56, 0xcb, 0xfb, 0x85, 0xd7, 0xa8, 0x50, 0xad, 0xec, 0xee, 0x3f, 0xd7, 0xe7, 0xd2, 0x9f, 0x81,
-	0xe5, 0x81, 0x71, 0x35, 0x4c, 0x80, 0xd9, 0xdc, 0x51, 0xbd, 0xaa, 0xcf, 0xf0, 0x34, 0xfe, 0xf2,
-	0x29, 0xaa, 0x56, 0xca, 0xaf, 0x75, 0x4d, 0x3c, 0x3c, 0x93, 0x0f, 0xb1, 0x74, 0x1d, 0x18, 0xe3,
-	0x86, 0x48, 0x70, 0x1d, 0xdc, 0x3a, 0xaa, 0x95, 0x94, 0x8a, 0x23, 0xb3, 0x54, 0xe4, 0x16, 0xd5,
-	0xab, 0x85, 0x6a, 0x59, 0x9f, 0x89, 0x16, 0x8b, 0xd5, 0x57, 0x95, 0x5a, 0xdd, 0x2c, 0xe5, 0x0e,
-	0x2e, 0x16, 0xb5, 0x9d, 0x75, 0xee, 0xb2, 0x37, 0xc1, 0xda, 0x28, 0x97, 0xcd, 0x1b, 0xe0, 0x66,
-	0x14, 0xda, 0xba, 0x3f, 0xbd, 0x10, 0x1f, 0xcc, 0xf3, 0x0b, 0xe2, 0x23, 0xae, 0x15, 0x15, 0x0b,
-	0x8b, 0xfa, 0xd2, 0xd7, 0xb3, 0x89, 0x65, 0x5d, 0x4f, 0xff, 0x4f, 0x0c, 0xac, 0x8e, 0x98, 0x96,
-	0xc0, 0x23, 0x90, 0x10, 0x1d, 0x87, 0x43, 0x64, 0x4f, 0xb2, 0x90, 0xfd, 0xd9, 0xd5, 0x67, 0x2e,
-	0x19, 0x35, 0x7a, 0xe9, 0x42, 0xa5, 0xfe, 0x53, 0x03, 0xd7, 0x95, 0x06, 0xd8, 0x3b, 0x2e, 0x50,
-	0x53, 0x82, 0x3f, 0x05, 0xf7, 0xc6, 0x9d, 0x6f, 0x5f, 0xca, 0x1f, 0x77, 0x71, 0xc4, 0xa7, 0xa4,
-	0xf5, 0x91, 0x9f, 0x92, 0x54, 0x1e, 0x19, 0x9c, 0x43, 0xc4, 0xa7, 0x9d, 0x43, 0x64, 0xf8, 0x8b,
-	0xff, 0x40, 0xfd, 0xc2, 0x29, 0x7a, 0xf1, 0xe3, 0xf7, 0x3c, 0x3a, 0xb6, 0x8c, 0xe0, 0x4f, 0xff,
-	0x95, 0x06, 0xe0, 0xd1, 0xf0, 0xc4, 0x7d, 0x1f, 0x24, 0xe5, 0xef, 0x7f, 0x90, 0xfa, 0x71, 0x91,
-	0x0a, 0x9c, 0xd3, 0x7c, 0xf7, 0x58, 0x92, 0x92, 0xea, 0x71, 0xe7, 0x11, 0x37, 0xe5, 0x3e, 0x78,
-	0xaf, 0xcf, 0x94, 0x61, 0x95, 0xe9, 0x1f, 0x34, 0x70, 0x7b, 0xec, 0x18, 0x12, 0x96, 0xc1, 0x12,
-	0xb3, 0x02, 0x74, 0x4a, 0x48, 0x80, 0x5d, 0xe7, 0x8c, 0x4c, 0x31, 0x47, 0xa9, 0x5b, 0xc1, 0x8b,
-	0x88, 0xdd, 0x5c, 0x64, 0x3d, 0x4f, 0xa3, 0xc7, 0x3a, 0x63, 0x95, 0x67, 0x7f, 0x17, 0x07, 0xb7,
-	0x94, 0x97, 0x77, 0xa3, 0x54, 0x4d, 0x3a, 0x22, 0xfc, 0x33, 0x90, 0xac, 0x49, 0x31, 0xc9, 0x40,
-	0xe1, 0x27, 0x03, 0xae, 0x7a, 0xf1, 0x3b, 0xa4, 0xc8, 0xb2, 0x2e, 0x88, 0x6a, 0x6e, 0x52, 0xd9,
-	0xab, 0x88, 0xd0, 0xc0, 0xf7, 0x28, 0x49, 0xcf, 0x6c, 0x6a, 0x1f, 0x6b, 0xf0, 0x2f, 0x35, 0xb0,
-	0x54, 0x24, 0x2e, 0xc3, 0x5d, 0xf5, 0xcf, 0x2e, 0xc7, 0xe2, 0xfc, 0x43, 0x36, 0x7c, 0x7e, 0x65,
-	0xb9, 0x3e, 0x43, 0xfe, 0x49, 0x03, 0x4b, 0xbb, 0x84, 0x59, 0xcd, 0xff, 0xef, 0xf7, 0xf0, 0xd1,
-	0xaf, 0xff, 0xfd, 0x3f, 0xfe, 0x36, 0x76, 0x37, 0xbd, 0x3e, 0xfc, 0xc3, 0xaf, 0x1d, 0x15, 0x25,
-	0xa8, 0x60, 0x89, 0xef, 0x68, 0x5b, 0xf9, 0x2f, 0xc1, 0x87, 0x8e, 0x2f, 0xb5, 0x04, 0xa1, 0x7f,
-	0xde, 0x99, 0x1c, 0x56, 0xf2, 0x89, 0x82, 0x4d, 0x45, 0x00, 0x3d, 0xd4, 0x7e, 0xa3, 0x69, 0xc7,
-	0xd7, 0xc5, 0x0d, 0xfd, 0xf4, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0x7f, 0xc2, 0xf4, 0xcc, 0x6a,
-	0x28, 0x00, 0x00,
+	// 333 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x92, 0xb1, 0x4a, 0x2b, 0x41,
+	0x14, 0x86, 0xef, 0xdc, 0x80, 0xc8, 0x40, 0x2c, 0x16, 0x24, 0xb0, 0x26, 0x82, 0x69, 0x0c, 0x2a,
+	0x33, 0x9a, 0x80, 0x42, 0xb0, 0x4a, 0x82, 0x75, 0x30, 0x4f, 0x30, 0xee, 0x1e, 0x92, 0x81, 0xcd,
+	0x9c, 0x71, 0x66, 0x76, 0x71, 0x0b, 0x1b, 0x0b, 0x49, 0x6f, 0x67, 0xed, 0xab, 0x08, 0xf6, 0xbe,
+	0x82, 0x0f, 0x22, 0xc9, 0x4e, 0x56, 0x43, 0x40, 0x49, 0x63, 0x3b, 0xfb, 0x9d, 0xff, 0x7c, 0x67,
+	0xf9, 0xe9, 0x21, 0xa8, 0x0c, 0x73, 0x6e, 0xc1, 0x64, 0x32, 0x02, 0x1e, 0x25, 0xa9, 0x75, 0x60,
+	0x78, 0xd6, 0x11, 0x89, 0x9e, 0x08, 0x1e, 0xc5, 0x96, 0x69, 0x83, 0x0e, 0x83, 0xc6, 0x02, 0x64,
+	0x1e, 0x64, 0x1e, 0x64, 0x1e, 0x0c, 0xf9, 0x6a, 0x4e, 0x2c, 0x6d, 0x84, 0x19, 0x98, 0xbc, 0x4c,
+	0x2a, 0x5f, 0x8a, 0xbc, 0xb0, 0x3e, 0x46, 0x1c, 0x27, 0xc0, 0x85, 0x96, 0x5c, 0x28, 0x85, 0x4e,
+	0x38, 0x89, 0xca, 0x6f, 0x0b, 0x0f, 0xd2, 0x58, 0x8b, 0xef, 0xef, 0x3c, 0x03, 0x63, 0x25, 0x2a,
+	0xa9, 0xc6, 0x05, 0xd2, 0x6c, 0xd1, 0xed, 0x7e, 0x6c, 0x07, 0xe9, 0x74, 0x9a, 0x77, 0xeb, 0xcf,
+	0xaf, 0xb3, 0xfd, 0x1a, 0xdd, 0x2d, 0x1c, 0x85, 0x96, 0x2c, 0x6b, 0xb3, 0xe5, 0xd7, 0xf6, 0x5b,
+	0x85, 0xd6, 0xfa, 0x85, 0xef, 0x60, 0x69, 0x31, 0x2a, 0x44, 0x83, 0x7b, 0xba, 0x33, 0x72, 0x06,
+	0xc4, 0xd4, 0x03, 0x36, 0x38, 0x63, 0xab, 0x97, 0x7e, 0x89, 0xfb, 0x53, 0x58, 0x19, 0x72, 0x0d,
+	0xb7, 0x29, 0x58, 0x17, 0xb6, 0x37, 0x19, 0xb1, 0x1a, 0x95, 0x85, 0xe6, 0xbf, 0x16, 0x39, 0x25,
+	0xc1, 0x23, 0xa1, 0xd5, 0x01, 0x24, 0x4e, 0x94, 0xeb, 0xcf, 0x7f, 0xcf, 0x9a, 0xf3, 0x6b, 0x0e,
+	0x17, 0x1b, 0xcf, 0xad, 0x88, 0xbc, 0x10, 0x5a, 0xbd, 0x02, 0x17, 0x4d, 0xfe, 0xfa, 0x3f, 0x9c,
+	0x3c, 0xbc, 0x7f, 0x3c, 0xfd, 0x6f, 0x34, 0xf7, 0xd6, 0x9b, 0xd2, 0xf5, 0x25, 0xb3, 0x0b, 0xa4,
+	0xd2, 0x25, 0x47, 0xbd, 0x4b, 0x7a, 0x2c, 0xb1, 0xd8, 0xa2, 0x0d, 0xde, 0xe5, 0xec, 0xc7, 0x56,
+	0xf6, 0xe6, 0x0d, 0x19, 0xce, 0xdb, 0x32, 0x24, 0x33, 0x42, 0x6e, 0xb6, 0x16, 0xcd, 0xe9, 0x7c,
+	0x06, 0x00, 0x00, 0xff, 0xff, 0x16, 0x56, 0xc9, 0xd7, 0xf5, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1817,7 +105,7 @@ const _ = grpc.SupportPackageIsVersion4
 type ClusterDiscoveryServiceClient interface {
 	StreamClusters(ctx context.Context, opts ...grpc.CallOption) (ClusterDiscoveryService_StreamClustersClient, error)
 	DeltaClusters(ctx context.Context, opts ...grpc.CallOption) (ClusterDiscoveryService_DeltaClustersClient, error)
-	FetchClusters(ctx context.Context, in *v3alpha5.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha5.DiscoveryResponse, error)
+	FetchClusters(ctx context.Context, in *v3alpha.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha.DiscoveryResponse, error)
 }
 
 type clusterDiscoveryServiceClient struct {
@@ -1838,8 +126,8 @@ func (c *clusterDiscoveryServiceClient) StreamClusters(ctx context.Context, opts
 }
 
 type ClusterDiscoveryService_StreamClustersClient interface {
-	Send(*v3alpha5.DiscoveryRequest) error
-	Recv() (*v3alpha5.DiscoveryResponse, error)
+	Send(*v3alpha.DiscoveryRequest) error
+	Recv() (*v3alpha.DiscoveryResponse, error)
 	grpc.ClientStream
 }
 
@@ -1847,12 +135,12 @@ type clusterDiscoveryServiceStreamClustersClient struct {
 	grpc.ClientStream
 }
 
-func (x *clusterDiscoveryServiceStreamClustersClient) Send(m *v3alpha5.DiscoveryRequest) error {
+func (x *clusterDiscoveryServiceStreamClustersClient) Send(m *v3alpha.DiscoveryRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *clusterDiscoveryServiceStreamClustersClient) Recv() (*v3alpha5.DiscoveryResponse, error) {
-	m := new(v3alpha5.DiscoveryResponse)
+func (x *clusterDiscoveryServiceStreamClustersClient) Recv() (*v3alpha.DiscoveryResponse, error) {
+	m := new(v3alpha.DiscoveryResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -1869,8 +157,8 @@ func (c *clusterDiscoveryServiceClient) DeltaClusters(ctx context.Context, opts 
 }
 
 type ClusterDiscoveryService_DeltaClustersClient interface {
-	Send(*v3alpha5.DeltaDiscoveryRequest) error
-	Recv() (*v3alpha5.DeltaDiscoveryResponse, error)
+	Send(*v3alpha.DeltaDiscoveryRequest) error
+	Recv() (*v3alpha.DeltaDiscoveryResponse, error)
 	grpc.ClientStream
 }
 
@@ -1878,20 +166,20 @@ type clusterDiscoveryServiceDeltaClustersClient struct {
 	grpc.ClientStream
 }
 
-func (x *clusterDiscoveryServiceDeltaClustersClient) Send(m *v3alpha5.DeltaDiscoveryRequest) error {
+func (x *clusterDiscoveryServiceDeltaClustersClient) Send(m *v3alpha.DeltaDiscoveryRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *clusterDiscoveryServiceDeltaClustersClient) Recv() (*v3alpha5.DeltaDiscoveryResponse, error) {
-	m := new(v3alpha5.DeltaDiscoveryResponse)
+func (x *clusterDiscoveryServiceDeltaClustersClient) Recv() (*v3alpha.DeltaDiscoveryResponse, error) {
+	m := new(v3alpha.DeltaDiscoveryResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (c *clusterDiscoveryServiceClient) FetchClusters(ctx context.Context, in *v3alpha5.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha5.DiscoveryResponse, error) {
-	out := new(v3alpha5.DiscoveryResponse)
+func (c *clusterDiscoveryServiceClient) FetchClusters(ctx context.Context, in *v3alpha.DiscoveryRequest, opts ...grpc.CallOption) (*v3alpha.DiscoveryResponse, error) {
+	out := new(v3alpha.DiscoveryResponse)
 	err := c.cc.Invoke(ctx, "/envoy.service.cluster.v3alpha.ClusterDiscoveryService/FetchClusters", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1903,7 +191,7 @@ func (c *clusterDiscoveryServiceClient) FetchClusters(ctx context.Context, in *v
 type ClusterDiscoveryServiceServer interface {
 	StreamClusters(ClusterDiscoveryService_StreamClustersServer) error
 	DeltaClusters(ClusterDiscoveryService_DeltaClustersServer) error
-	FetchClusters(context.Context, *v3alpha5.DiscoveryRequest) (*v3alpha5.DiscoveryResponse, error)
+	FetchClusters(context.Context, *v3alpha.DiscoveryRequest) (*v3alpha.DiscoveryResponse, error)
 }
 
 // UnimplementedClusterDiscoveryServiceServer can be embedded to have forward compatible implementations.
@@ -1916,7 +204,7 @@ func (*UnimplementedClusterDiscoveryServiceServer) StreamClusters(srv ClusterDis
 func (*UnimplementedClusterDiscoveryServiceServer) DeltaClusters(srv ClusterDiscoveryService_DeltaClustersServer) error {
 	return status.Errorf(codes.Unimplemented, "method DeltaClusters not implemented")
 }
-func (*UnimplementedClusterDiscoveryServiceServer) FetchClusters(ctx context.Context, req *v3alpha5.DiscoveryRequest) (*v3alpha5.DiscoveryResponse, error) {
+func (*UnimplementedClusterDiscoveryServiceServer) FetchClusters(ctx context.Context, req *v3alpha.DiscoveryRequest) (*v3alpha.DiscoveryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FetchClusters not implemented")
 }
 
@@ -1929,8 +217,8 @@ func _ClusterDiscoveryService_StreamClusters_Handler(srv interface{}, stream grp
 }
 
 type ClusterDiscoveryService_StreamClustersServer interface {
-	Send(*v3alpha5.DiscoveryResponse) error
-	Recv() (*v3alpha5.DiscoveryRequest, error)
+	Send(*v3alpha.DiscoveryResponse) error
+	Recv() (*v3alpha.DiscoveryRequest, error)
 	grpc.ServerStream
 }
 
@@ -1938,12 +226,12 @@ type clusterDiscoveryServiceStreamClustersServer struct {
 	grpc.ServerStream
 }
 
-func (x *clusterDiscoveryServiceStreamClustersServer) Send(m *v3alpha5.DiscoveryResponse) error {
+func (x *clusterDiscoveryServiceStreamClustersServer) Send(m *v3alpha.DiscoveryResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *clusterDiscoveryServiceStreamClustersServer) Recv() (*v3alpha5.DiscoveryRequest, error) {
-	m := new(v3alpha5.DiscoveryRequest)
+func (x *clusterDiscoveryServiceStreamClustersServer) Recv() (*v3alpha.DiscoveryRequest, error) {
+	m := new(v3alpha.DiscoveryRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -1955,8 +243,8 @@ func _ClusterDiscoveryService_DeltaClusters_Handler(srv interface{}, stream grpc
 }
 
 type ClusterDiscoveryService_DeltaClustersServer interface {
-	Send(*v3alpha5.DeltaDiscoveryResponse) error
-	Recv() (*v3alpha5.DeltaDiscoveryRequest, error)
+	Send(*v3alpha.DeltaDiscoveryResponse) error
+	Recv() (*v3alpha.DeltaDiscoveryRequest, error)
 	grpc.ServerStream
 }
 
@@ -1964,12 +252,12 @@ type clusterDiscoveryServiceDeltaClustersServer struct {
 	grpc.ServerStream
 }
 
-func (x *clusterDiscoveryServiceDeltaClustersServer) Send(m *v3alpha5.DeltaDiscoveryResponse) error {
+func (x *clusterDiscoveryServiceDeltaClustersServer) Send(m *v3alpha.DeltaDiscoveryResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *clusterDiscoveryServiceDeltaClustersServer) Recv() (*v3alpha5.DeltaDiscoveryRequest, error) {
-	m := new(v3alpha5.DeltaDiscoveryRequest)
+func (x *clusterDiscoveryServiceDeltaClustersServer) Recv() (*v3alpha.DeltaDiscoveryRequest, error) {
+	m := new(v3alpha.DeltaDiscoveryRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -1977,7 +265,7 @@ func (x *clusterDiscoveryServiceDeltaClustersServer) Recv() (*v3alpha5.DeltaDisc
 }
 
 func _ClusterDiscoveryService_FetchClusters_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(v3alpha5.DiscoveryRequest)
+	in := new(v3alpha.DiscoveryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1989,7 +277,7 @@ func _ClusterDiscoveryService_FetchClusters_Handler(srv interface{}, ctx context
 		FullMethod: "/envoy.service.cluster.v3alpha.ClusterDiscoveryService/FetchClusters",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ClusterDiscoveryServiceServer).FetchClusters(ctx, req.(*v3alpha5.DiscoveryRequest))
+		return srv.(ClusterDiscoveryServiceServer).FetchClusters(ctx, req.(*v3alpha.DiscoveryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
