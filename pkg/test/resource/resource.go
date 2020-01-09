@@ -87,39 +87,7 @@ func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 
 // MakeCluster creates a cluster using either ADS or EDS.
 func MakeCluster(mode string, clusterName string) *v2.Cluster {
-	var edsSource *core.ConfigSource
-	switch mode {
-	case Ads:
-		edsSource = &core.ConfigSource{
-			ConfigSourceSpecifier: &core.ConfigSource_Ads{
-				Ads: &core.AggregatedConfigSource{},
-			},
-		}
-	case Xds:
-		edsSource = &core.ConfigSource{
-			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
-				ApiConfigSource: &core.ApiConfigSource{
-					ApiType:                   core.ApiConfigSource_GRPC,
-					SetNodeOnFirstMessageOnly: true,
-					GrpcServices: []*core.GrpcService{{
-						TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
-							EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
-						},
-					}},
-				},
-			},
-		}
-	case Rest:
-		edsSource = &core.ConfigSource{
-			ConfigSourceSpecifier: &core.ConfigSource_ApiConfigSource{
-				ApiConfigSource: &core.ApiConfigSource{
-					ApiType:      core.ApiConfigSource_REST,
-					ClusterNames: []string{XdsCluster},
-					RefreshDelay: ptypes.DurationProto(RefreshDelay),
-				},
-			},
-		}
-	}
+	edsSource := configSource(mode)
 
 	connectTimeout := 5 * time.Second
 	return &v2.Cluster{

@@ -106,6 +106,10 @@ func (m *RedisClusterConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for FailureRefreshThreshold
+
+	// no validation rules for HostDegradedRefreshThreshold
+
 	return nil
 }
 

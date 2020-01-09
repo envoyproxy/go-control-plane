@@ -44,7 +44,12 @@ func (m *PreviousPrioritiesConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UpdateFrequency
+	if m.GetUpdateFrequency() <= 0 {
+		return PreviousPrioritiesConfigValidationError{
+			field:  "UpdateFrequency",
+			reason: "value must be greater than 0",
+		}
+	}
 
 	return nil
 }

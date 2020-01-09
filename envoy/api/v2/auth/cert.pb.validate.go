@@ -478,6 +478,21 @@ func (m *CertificateValidationContext) Validate() error {
 
 	}
 
+	for idx, item := range m.GetMatchSubjectAltNames() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CertificateValidationContextValidationError{
+					field:  fmt.Sprintf("MatchSubjectAltNames[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetRequireOcspStaple()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CertificateValidationContextValidationError{
@@ -854,6 +869,28 @@ func (m *DownstreamTlsContext) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	if d := m.GetSessionTimeout(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return DownstreamTlsContextValidationError{
+				field:  "SessionTimeout",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		lt := time.Duration(4294967296*time.Second + 0*time.Nanosecond)
+		gte := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur < gte || dur >= lt {
+			return DownstreamTlsContextValidationError{
+				field:  "SessionTimeout",
+				reason: "value must be inside range [0s, 1193046h28m16s)",
+			}
+		}
+
 	}
 
 	switch m.SessionTicketKeysType.(type) {
