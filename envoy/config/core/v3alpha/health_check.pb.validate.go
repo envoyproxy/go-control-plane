@@ -509,7 +509,7 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		}
 	}
 
-	// no validation rules for ServiceName
+	// no validation rules for HiddenEnvoyDeprecatedServiceName
 
 	if len(m.GetRequestHeadersToAdd()) > 1000 {
 		return HealthCheck_HttpHealthCheckValidationError{
@@ -554,6 +554,16 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "CodecClientType",
 			reason: "value must be one of the defined enum values",
+		}
+	}
+
+	if v, ok := interface{}(m.GetServiceNameMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HealthCheck_HttpHealthCheckValidationError{
+				field:  "ServiceNameMatcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
 	}
 

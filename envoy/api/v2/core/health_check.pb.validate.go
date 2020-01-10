@@ -557,6 +557,16 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetServiceNameMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HealthCheck_HttpHealthCheckValidationError{
+				field:  "ServiceNameMatcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
