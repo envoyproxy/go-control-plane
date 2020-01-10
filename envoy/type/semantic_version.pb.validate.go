@@ -44,9 +44,9 @@ func (m *SemanticVersion) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Major
+	// no validation rules for MajorNumber
 
-	// no validation rules for Minor
+	// no validation rules for MinorNumber
 
 	// no validation rules for Patch
 
