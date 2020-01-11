@@ -304,7 +304,7 @@ func (m *Node) Validate() error {
 		}
 	}
 
-	// no validation rules for BuildVersion
+	// no validation rules for HiddenEnvoyDeprecatedBuildVersion
 
 	// no validation rules for UserAgentName
 
