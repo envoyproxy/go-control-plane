@@ -448,6 +448,8 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
+	// no validation rules for TrackTimeoutBudgets
+
 	switch m.ClusterDiscoveryType.(type) {
 
 	case *Cluster_Type:
