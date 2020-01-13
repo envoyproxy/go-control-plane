@@ -1223,6 +1223,16 @@ func (m *RouteAction) Validate() error {
 
 	// no validation rules for InternalRedirectAction
 
+	if v, ok := interface{}(m.GetMaxInternalRedirects()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteActionValidationError{
+				field:  "MaxInternalRedirects",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetHedgePolicy()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
