@@ -115,13 +115,13 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	for idx, item := range m.GetHosts() {
+	for idx, item := range m.GetHiddenEnvoyDeprecatedHosts() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
-					field:  fmt.Sprintf("Hosts[%v]", idx),
+					field:  fmt.Sprintf("HiddenEnvoyDeprecatedHosts[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
