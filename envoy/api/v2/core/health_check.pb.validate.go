@@ -268,6 +268,16 @@ func (m *HealthCheck) Validate() error {
 
 	// no validation rules for AlwaysLogHealthCheckFailures
 
+	if v, ok := interface{}(m.GetTlsOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HealthCheckValidationError{
+				field:  "TlsOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.HealthChecker.(type) {
 
 	case *HealthCheck_HttpHealthCheck_:
@@ -554,6 +564,16 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "CodecClientType",
 			reason: "value must be one of the defined enum values",
+		}
+	}
+
+	if v, ok := interface{}(m.GetServiceNameMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HealthCheck_HttpHealthCheckValidationError{
+				field:  "ServiceNameMatcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
 	}
 
@@ -953,3 +973,70 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HealthCheck_CustomHealthCheckValidationError{}
+
+// Validate checks the field values on HealthCheck_TlsOptions with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HealthCheck_TlsOptions) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// HealthCheck_TlsOptionsValidationError is the validation error returned by
+// HealthCheck_TlsOptions.Validate if the designated constraints aren't met.
+type HealthCheck_TlsOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HealthCheck_TlsOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HealthCheck_TlsOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HealthCheck_TlsOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HealthCheck_TlsOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HealthCheck_TlsOptionsValidationError) ErrorName() string {
+	return "HealthCheck_TlsOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HealthCheck_TlsOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHealthCheck_TlsOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HealthCheck_TlsOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HealthCheck_TlsOptionsValidationError{}
