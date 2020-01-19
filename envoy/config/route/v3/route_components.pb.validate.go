@@ -79,7 +79,12 @@ func (m *VirtualHost) Validate() error {
 
 	}
 
-	// no validation rules for RequireTls
+	if _, ok := VirtualHost_TlsRequirementType_name[int32(m.GetRequireTls())]; !ok {
+		return VirtualHostValidationError{
+			field:  "RequireTls",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	for idx, item := range m.GetVirtualClusters() {
 		_, _ = idx, item
