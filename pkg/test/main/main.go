@@ -107,7 +107,7 @@ func main() {
 	// start the xDS server
 	go test.RunAccessLogServer(ctx, als, alsPort)
 	go test.RunManagementServer(ctx, srv, port)
-	go test.RunManagementGateway(ctx, srv, gatewayPort)
+	go test.RunManagementGateway(ctx, srv, gatewayPort, logger{})
 
 	log.Println("waiting for the first request...")
 	select {
