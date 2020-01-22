@@ -1,4 +1,4 @@
-FROM golang:1.12.5-stretch
+FROM golang:1.13.6-stretch
 
 WORKDIR /go-control-plane
 
@@ -8,7 +8,6 @@ COPY go.mod ./
 RUN go mod download
 
 # Fetch protoc modules
-RUN go get github.com/gogo/protobuf/protoc-gen-gogofast@v1.2.1
 RUN go get github.com/envoyproxy/protoc-gen-validate@d6164de4910977d3c3c8dbd9299b5064ea9e7c2b
 
 # Install protoc 3.6.1
@@ -22,4 +21,4 @@ RUN rm go.mod
 RUN rm go.sum
 
 # add envoy
-COPY --from=envoyproxy/envoy:latest /usr/local/bin/envoy /usr/local/bin/envoy
+COPY --from=envoyproxy/envoy:v1.13.0 /usr/local/bin/envoy /usr/local/bin/envoy

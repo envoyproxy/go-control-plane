@@ -52,6 +52,8 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		typeURL = cache.RouteType
 	case "/v2/discovery:secrets":
 		typeURL = cache.SecretType
+	case "/v2/discovery:runtime":
+		typeURL = cache.RuntimeType
 	default:
 		http.Error(resp, "no endpoint", http.StatusNotFound)
 		return

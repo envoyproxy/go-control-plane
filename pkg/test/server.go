@@ -27,6 +27,7 @@ import (
 	v2grpc "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	logger "github.com/envoyproxy/go-control-plane/pkg/log"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server"
 )
 
@@ -114,9 +115,9 @@ func RunManagementServer(ctx context.Context, server xds.Server, port uint) {
 }
 
 // RunManagementGateway starts an HTTP gateway to an xDS server.
-func RunManagementGateway(ctx context.Context, srv xds.Server, port uint) {
+func RunManagementGateway(ctx context.Context, srv xds.Server, port uint, lg logger.Logger) {
 	log.Printf("gateway listening HTTP/1.1 on %d\n", port)
-	server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &xds.HTTPGateway{Server: srv}}
+	server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &xds.HTTPGateway{Server: srv, Log: lg}}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
 			log.Println(err)

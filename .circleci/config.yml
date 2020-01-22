@@ -3,12 +3,14 @@ jobs:
   build:
     working_directory: /go-control-plane
     docker:
-      - image: gcr.io/istio-testing/go-control-plane-ci:08-20-2019
+      - image: gcr.io/istio-testing/go-control-plane-ci:01-22-2020
     steps:
       - checkout
       - run: make build
       - run: make test
       - run: make integration
-      - run: mkdir logs && cp *.log logs/
+      - run:
+          command: mkdir logs && cp *.log logs/
+          when: on_fail
       - store_artifacts:
           path: /go-control-plane/logs
