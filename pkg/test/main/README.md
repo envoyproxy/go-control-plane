@@ -27,6 +27,10 @@ To run the script with a single server configured to use `Fetch` through HTTP:
 
     make integration.rest
 
+To run the script with a single server configured to use ADS with TLS:
+
+    make integration.ads.tls
+
 You should see runs of configuration push events and request batch reports. The
 test executes batches of requests to exercise multiple listeners, routes, and
 clusters, and records the number of successful and failed requests. The test is
