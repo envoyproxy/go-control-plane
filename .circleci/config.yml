@@ -30,3 +30,20 @@ jobs:
             sudo tar -C /usr/local -xzf go.tar.gz
       - run: make test
       - run: make integration
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: /.*/
+      - test:
+          filters:
+            tags:
+              ignore: /.*/
+            branches:
+              only: /.*/
