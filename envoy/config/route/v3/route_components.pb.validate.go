@@ -2672,6 +2672,16 @@ func (m *RouteMatch_TlsContextMatchOptions) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetValidated()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteMatch_TlsContextMatchOptionsValidationError{
+				field:  "Validated",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

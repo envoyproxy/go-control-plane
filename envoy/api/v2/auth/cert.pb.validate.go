@@ -525,6 +525,13 @@ func (m *CertificateValidationContext) Validate() error {
 
 	// no validation rules for AllowExpiredCertificate
 
+	if _, ok := CertificateValidationContext_TrustChainVerification_name[int32(m.GetTrustChainVerification())]; !ok {
+		return CertificateValidationContextValidationError{
+			field:  "TrustChainVerification",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	return nil
 }
 
