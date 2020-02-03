@@ -31,7 +31,7 @@ format:
 
 $(BINDIR)/test:
 	echo "Building test linux binary"
-	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
 
 integration: integration.xds integration.ads integration.rest integration.ads.tls
 
