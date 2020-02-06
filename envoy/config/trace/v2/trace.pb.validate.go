@@ -469,6 +469,16 @@ func (m *OpenCensusConfig) Validate() error {
 
 	// no validation rules for StackdriverAddress
 
+	if v, ok := interface{}(m.GetStackdriverGrpcService()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OpenCensusConfigValidationError{
+				field:  "StackdriverGrpcService",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for ZipkinExporterEnabled
 
 	// no validation rules for ZipkinUrl
