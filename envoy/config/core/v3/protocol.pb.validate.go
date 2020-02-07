@@ -113,6 +113,8 @@ func (m *UpstreamHttpProtocolOptions) Validate() error {
 
 	// no validation rules for AutoSni
 
+	// no validation rules for AutoSanValidation
+
 	return nil
 }
 
