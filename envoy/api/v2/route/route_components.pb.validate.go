@@ -1805,6 +1805,16 @@ func (m *Decorator) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetPropagate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DecoratorValidationError{
+				field:  "Propagate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
