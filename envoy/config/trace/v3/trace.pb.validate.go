@@ -487,6 +487,16 @@ func (m *OpenCensusConfig) Validate() error {
 
 	// no validation rules for OcagentAddress
 
+	if v, ok := interface{}(m.GetOcagentGrpcService()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OpenCensusConfigValidationError{
+				field:  "OcagentGrpcService",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
