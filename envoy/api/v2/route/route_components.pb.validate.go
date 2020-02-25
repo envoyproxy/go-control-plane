@@ -64,6 +64,18 @@ func (m *VirtualHost) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetDomains() {
+		_, _ = idx, item
+
+		if !_VirtualHost_Domains_Pattern.MatchString(item) {
+			return VirtualHostValidationError{
+				field:  fmt.Sprintf("Domains[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00-\\b\\n-\\x1f\\u007f]*$\"",
+			}
+		}
+
+	}
+
 	for idx, item := range m.GetRoutes() {
 		_, _ = idx, item
 
@@ -292,6 +304,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = VirtualHostValidationError{}
+
+var _VirtualHost_Domains_Pattern = regexp.MustCompile("^[^\x00-\b\n-\x1f\u007f]*$")
 
 // Validate checks the field values on FilterAction with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -1268,6 +1282,13 @@ func (m *RouteAction) Validate() error {
 			}
 		}
 
+		if !_RouteAction_ClusterHeader_Pattern.MatchString(m.GetClusterHeader()) {
+			return RouteActionValidationError{
+				field:  "ClusterHeader",
+				reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+			}
+		}
+
 	case *RouteAction_WeightedClusters:
 
 		if v, ok := interface{}(m.GetWeightedClusters()).(interface{ Validate() error }); ok {
@@ -1366,6 +1387,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteActionValidationError{}
+
+var _RouteAction_ClusterHeader_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
 
 // Validate checks the field values on RetryPolicy with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -2191,6 +2214,13 @@ func (m *HeaderMatcher) Validate() error {
 		}
 	}
 
+	if !_HeaderMatcher_Name_Pattern.MatchString(m.GetName()) {
+		return HeaderMatcherValidationError{
+			field:  "Name",
+			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+		}
+	}
+
 	// no validation rules for InvertMatch
 
 	switch m.HeaderMatchSpecifier.(type) {
@@ -2310,6 +2340,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HeaderMatcherValidationError{}
+
+var _HeaderMatcher_Name_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
 
 // Validate checks the field values on QueryParameterMatcher with the rules
 // defined in the proto definition for this message. If any rules are
@@ -2974,7 +3006,12 @@ func (m *RouteAction_UpgradeConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UpgradeType
+	if !_RouteAction_UpgradeConfig_UpgradeType_Pattern.MatchString(m.GetUpgradeType()) {
+		return RouteAction_UpgradeConfigValidationError{
+			field:  "UpgradeType",
+			reason: "value does not match regex pattern \"^[^\\x00-\\b\\n-\\x1f\\u007f]*$\"",
+		}
+	}
 
 	if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -3045,6 +3082,8 @@ var _ interface {
 	ErrorName() string
 } = RouteAction_UpgradeConfigValidationError{}
 
+var _RouteAction_UpgradeConfig_UpgradeType_Pattern = regexp.MustCompile("^[^\x00-\b\n-\x1f\u007f]*$")
+
 // Validate checks the field values on RouteAction_HashPolicy_Header with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -3057,6 +3096,13 @@ func (m *RouteAction_HashPolicy_Header) Validate() error {
 		return RouteAction_HashPolicy_HeaderValidationError{
 			field:  "HeaderName",
 			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if !_RouteAction_HashPolicy_Header_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+		return RouteAction_HashPolicy_HeaderValidationError{
+			field:  "HeaderName",
+			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
 		}
 	}
 
@@ -3119,6 +3165,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteAction_HashPolicy_HeaderValidationError{}
+
+var _RouteAction_HashPolicy_Header_HeaderName_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
 
 // Validate checks the field values on RouteAction_HashPolicy_Cookie with the
 // rules defined in the proto definition for this message. If any rules are
@@ -3971,6 +4019,13 @@ func (m *RateLimit_Action_RequestHeaders) Validate() error {
 		}
 	}
 
+	if !_RateLimit_Action_RequestHeaders_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+		return RateLimit_Action_RequestHeadersValidationError{
+			field:  "HeaderName",
+			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+		}
+	}
+
 	if len(m.GetDescriptorKey()) < 1 {
 		return RateLimit_Action_RequestHeadersValidationError{
 			field:  "DescriptorKey",
@@ -4037,6 +4092,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimit_Action_RequestHeadersValidationError{}
+
+var _RateLimit_Action_RequestHeaders_HeaderName_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
 
 // Validate checks the field values on RateLimit_Action_RemoteAddress with the
 // rules defined in the proto definition for this message. If any rules are

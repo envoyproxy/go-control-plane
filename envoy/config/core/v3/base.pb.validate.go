@@ -660,10 +660,24 @@ func (m *HeaderValue) Validate() error {
 		}
 	}
 
+	if !_HeaderValue_Key_Pattern.MatchString(m.GetKey()) {
+		return HeaderValueValidationError{
+			field:  "Key",
+			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+		}
+	}
+
 	if len(m.GetValue()) > 16384 {
 		return HeaderValueValidationError{
 			field:  "Value",
 			reason: "value length must be at most 16384 bytes",
+		}
+	}
+
+	if !_HeaderValue_Value_Pattern.MatchString(m.GetValue()) {
+		return HeaderValueValidationError{
+			field:  "Value",
+			reason: "value does not match regex pattern \"^[^\\x00-\\b\\n-\\x1f\\u007f]*$\"",
 		}
 	}
 
@@ -723,6 +737,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HeaderValueValidationError{}
+
+var _HeaderValue_Key_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
+
+var _HeaderValue_Value_Pattern = regexp.MustCompile("^[^\x00-\b\n-\x1f\u007f]*$")
 
 // Validate checks the field values on HeaderValueOption with the rules defined
 // in the proto definition for this message. If any rules are violated, an
