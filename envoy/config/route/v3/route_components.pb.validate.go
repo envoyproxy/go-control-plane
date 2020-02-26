@@ -1093,6 +1093,16 @@ func (m *RouteAction) Validate() error {
 
 	// no validation rules for PrefixRewrite
 
+	if v, ok := interface{}(m.GetRegexRewrite()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteActionValidationError{
+				field:  "RegexRewrite",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
