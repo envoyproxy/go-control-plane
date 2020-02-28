@@ -116,3 +116,17 @@ const (
 	// HTTPGRPCAccessLog sink for the HTTP gRPC access log service
 	HTTPGRPCAccessLog = "envoy.http_grpc_access_log"
 )
+
+// Transport socket names
+const (
+	// TransportSocket Alts
+	TransportSocketAlts = "envoy.transport_sockets.alts"
+	// TransportSocket Tap
+	TransportSocketTap = "envoy.transport_sockets.tap"
+	// TransportSocket RawBuffer
+	TransportSocketRawBuffer = "envoy.transport_sockets.raw_buffer"
+	// TransportSocket Tls
+	TransportSocketTls = "envoy.transport_sockets.tls"
+	// TransportSocket Quic
+	TransportSocketQuic = "envoy.transport_sockets.quic"
+)
