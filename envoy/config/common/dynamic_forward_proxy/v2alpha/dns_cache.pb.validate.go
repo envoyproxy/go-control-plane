@@ -115,6 +115,16 @@ func (m *DnsCacheConfig) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetDnsFailureRefreshRate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DnsCacheConfigValidationError{
+				field:  "DnsFailureRefreshRate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
