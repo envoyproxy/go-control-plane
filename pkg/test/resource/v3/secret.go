@@ -15,9 +15,9 @@
 package resource
 
 import (
-	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	secret "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
+	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 )
 
 const (
@@ -98,27 +98,27 @@ yA==
 )
 
 // MakeSecrets generates an SDS secret
-func MakeSecrets(tlsName, rootName string) []cache.Resource {
-	return []cache.Resource{
-		&auth.Secret{
+func MakeSecrets(tlsName, rootName string) []cachev3.Resource {
+	return []cachev3.Resource{
+		&secret.Secret{
 			Name: tlsName,
-			Type: &auth.Secret_TlsCertificate{
-				TlsCertificate: &auth.TlsCertificate{
-					PrivateKey: &core.DataSource{
-						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(privateKey)},
+			Type: &secret.Secret_TlsCertificate{
+				TlsCertificate: &secret.TlsCertificate{
+					PrivateKey: &corev3.DataSource{
+						Specifier: &corev3.DataSource_InlineBytes{InlineBytes: []byte(privateKey)},
 					},
-					CertificateChain: &core.DataSource{
-						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(privateChain)},
+					CertificateChain: &corev3.DataSource{
+						Specifier: &corev3.DataSource_InlineBytes{InlineBytes: []byte(privateChain)},
 					},
 				},
 			},
 		},
-		&auth.Secret{
+		&secret.Secret{
 			Name: rootName,
-			Type: &auth.Secret_ValidationContext{
-				ValidationContext: &auth.CertificateValidationContext{
-					TrustedCa: &core.DataSource{
-						Specifier: &core.DataSource_InlineBytes{InlineBytes: []byte(rootCert)},
+			Type: &secret.Secret_ValidationContext{
+				ValidationContext: &secret.CertificateValidationContext{
+					TrustedCa: &corev3.DataSource{
+						Specifier: &corev3.DataSource_InlineBytes{InlineBytes: []byte(rootCert)},
 					},
 				},
 			},

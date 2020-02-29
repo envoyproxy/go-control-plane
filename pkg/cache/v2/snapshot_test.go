@@ -17,8 +17,8 @@ package cache_test
 import (
 	"testing"
 
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	cache "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	resource "github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
 
 func TestSnapshotConsistent(t *testing.T) {

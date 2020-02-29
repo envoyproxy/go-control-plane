@@ -22,8 +22,8 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	cache "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
 
@@ -42,17 +42,17 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 
 	typeURL := ""
 	switch p {
-	case "/v2/discovery:endpoints":
+	case "/v3/discovery:endpoints":
 		typeURL = cache.EndpointType
-	case "/v2/discovery:clusters":
+	case "/v3/discovery:clusters":
 		typeURL = cache.ClusterType
-	case "/v2/discovery:listeners":
+	case "/v3/discovery:listeners":
 		typeURL = cache.ListenerType
-	case "/v2/discovery:routes":
+	case "/v3/discovery:routes":
 		typeURL = cache.RouteType
-	case "/v2/discovery:secrets":
+	case "/v3/discovery:secrets":
 		typeURL = cache.SecretType
-	case "/v2/discovery:runtime":
+	case "/v3/discovery:runtime":
 		typeURL = cache.RuntimeType
 	default:
 		http.Error(resp, "no endpoint", http.StatusNotFound)
@@ -71,7 +71,7 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	// parse as JSON
-	out := &v2.DiscoveryRequest{}
+	out := &discovery.DiscoveryRequest{}
 	err = jsonpb.UnmarshalString(string(body), out)
 	if err != nil {
 		http.Error(resp, "cannot parse JSON body: "+err.Error(), http.StatusBadRequest)

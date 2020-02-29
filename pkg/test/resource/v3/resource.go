@@ -23,18 +23,18 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
-	listener "github.com/envoyproxy/go-control-plane/envoy/api/v2/listener"
-	route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
-	als "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v2"
-	alf "github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2"
-	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
-	tcp "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	alfv3 "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
+	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	corev3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	endpointv3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
+	listenerv3 "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
+	routev3 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
+	alsv3 "github.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/grpc/v3"
+	hcmv3 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
+	tcp "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/tcp_proxy/v3"
+	secret "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
+	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
+	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
@@ -60,19 +60,19 @@ var (
 )
 
 // MakeEndpoint creates a localhost endpoint on a given port.
-func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
-	return &v2.ClusterLoadAssignment{
+func MakeEndpoint(clusterName string, port uint32) *endpointv3.ClusterLoadAssignment {
+	return &endpointv3.ClusterLoadAssignment{
 		ClusterName: clusterName,
-		Endpoints: []*endpoint.LocalityLbEndpoints{{
-			LbEndpoints: []*endpoint.LbEndpoint{{
-				HostIdentifier: &endpoint.LbEndpoint_Endpoint{
-					Endpoint: &endpoint.Endpoint{
-						Address: &core.Address{
-							Address: &core.Address_SocketAddress{
-								SocketAddress: &core.SocketAddress{
-									Protocol: core.SocketAddress_TCP,
+		Endpoints: []*endpointv3.LocalityLbEndpoints{{
+			LbEndpoints: []*endpointv3.LbEndpoint{{
+				HostIdentifier: &endpointv3.LbEndpoint_Endpoint{
+					Endpoint: &endpointv3.Endpoint{
+						Address: &corev3.Address{
+							Address: &corev3.Address_SocketAddress{
+								SocketAddress: &corev3.SocketAddress{
+									Protocol: corev3.SocketAddress_TCP,
 									Address:  localhost,
-									PortSpecifier: &core.SocketAddress_PortValue{
+									PortSpecifier: &corev3.SocketAddress_PortValue{
 										PortValue: port,
 									},
 								},
@@ -86,36 +86,36 @@ func MakeEndpoint(clusterName string, port uint32) *v2.ClusterLoadAssignment {
 }
 
 // MakeCluster creates a cluster using either ADS or EDS.
-func MakeCluster(mode string, clusterName string) *v2.Cluster {
+func MakeCluster(mode string, clusterName string) *cluster.Cluster {
 	edsSource := configSource(mode)
 
 	connectTimeout := 5 * time.Second
-	return &v2.Cluster{
+	return &cluster.Cluster{
 		Name:                 clusterName,
 		ConnectTimeout:       ptypes.DurationProto(connectTimeout),
-		ClusterDiscoveryType: &v2.Cluster_Type{Type: v2.Cluster_EDS},
-		EdsClusterConfig: &v2.Cluster_EdsClusterConfig{
+		ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
+		EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{
 			EdsConfig: edsSource,
 		},
 	}
 }
 
 // MakeRoute creates an HTTP route that routes to a given cluster.
-func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
-	return &v2.RouteConfiguration{
+func MakeRoute(routeName, clusterName string) *routev3.RouteConfiguration {
+	return &routev3.RouteConfiguration{
 		Name: routeName,
-		VirtualHosts: []*route.VirtualHost{{
+		VirtualHosts: []*routev3.VirtualHost{{
 			Name:    routeName,
 			Domains: []string{"*"},
-			Routes: []*route.Route{{
-				Match: &route.RouteMatch{
-					PathSpecifier: &route.RouteMatch_Prefix{
+			Routes: []*routev3.Route{{
+				Match: &routev3.RouteMatch{
+					PathSpecifier: &routev3.RouteMatch_Prefix{
 						Prefix: "/",
 					},
 				},
-				Action: &route.Route_Route{
-					Route: &route.RouteAction{
-						ClusterSpecifier: &route.RouteAction_Cluster{
+				Action: &routev3.Route_Route{
+					Route: &routev3.RouteAction{
+						ClusterSpecifier: &routev3.RouteAction_Cluster{
 							Cluster: clusterName,
 						},
 					},
@@ -126,29 +126,29 @@ func MakeRoute(routeName, clusterName string) *v2.RouteConfiguration {
 }
 
 // data source configuration
-func configSource(mode string) *core.ConfigSource {
-	source := &core.ConfigSource{}
+func configSource(mode string) *corev3.ConfigSource {
+	source := &corev3.ConfigSource{}
 	switch mode {
 	case Ads:
-		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
-			Ads: &core.AggregatedConfigSource{},
+		source.ConfigSourceSpecifier = &corev3.ConfigSource_Ads{
+			Ads: &corev3.AggregatedConfigSource{},
 		}
 	case Xds:
-		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
-			ApiConfigSource: &core.ApiConfigSource{
-				ApiType:                   core.ApiConfigSource_GRPC,
+		source.ConfigSourceSpecifier = &corev3.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &corev3.ApiConfigSource{
+				ApiType:                   corev3.ApiConfigSource_GRPC,
 				SetNodeOnFirstMessageOnly: true,
-				GrpcServices: []*core.GrpcService{{
-					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
-						EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
+				GrpcServices: []*corev3.GrpcService{{
+					TargetSpecifier: &corev3.GrpcService_EnvoyGrpc_{
+						EnvoyGrpc: &corev3.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
 					},
 				}},
 			},
 		}
 	case Rest:
-		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
-			ApiConfigSource: &core.ApiConfigSource{
-				ApiType:      core.ApiConfigSource_REST,
+		source.ConfigSourceSpecifier = &corev3.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &corev3.ApiConfigSource{
+				ApiType:      corev3.ApiConfigSource_REST,
 				ClusterNames: []string{XdsCluster},
 				RefreshDelay: ptypes.DurationProto(RefreshDelay),
 			},
@@ -158,16 +158,16 @@ func configSource(mode string) *core.ConfigSource {
 }
 
 // MakeHTTPListener creates a listener using either ADS or RDS for the route.
-func MakeHTTPListener(mode string, listenerName string, port uint32, route string) *v2.Listener {
+func MakeHTTPListener(mode string, listenerName string, port uint32, route string) *listenerv3.Listener {
 	rdsSource := configSource(mode)
 
 	// access log service configuration
-	alsConfig := &als.HttpGrpcAccessLogConfig{
-		CommonConfig: &als.CommonGrpcAccessLogConfig{
+	alsConfig := &alsv3.HttpGrpcAccessLogConfig{
+		CommonConfig: &alsv3.CommonGrpcAccessLogConfig{
 			LogName: "echo",
-			GrpcService: &core.GrpcService{
-				TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
-					EnvoyGrpc: &core.GrpcService_EnvoyGrpc{
+			GrpcService: &corev3.GrpcService{
+				TargetSpecifier: &corev3.GrpcService_EnvoyGrpc_{
+					EnvoyGrpc: &corev3.GrpcService_EnvoyGrpc{
 						ClusterName: XdsCluster,
 					},
 				},
@@ -180,47 +180,48 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 	}
 
 	// HTTP filter configuration
-	manager := &hcm.HttpConnectionManager{
-		CodecType:  hcm.HttpConnectionManager_AUTO,
+	manager := &hcmv3.HttpConnectionManager{
+		CodecType:  hcmv3.HttpConnectionManager_AUTO,
 		StatPrefix: "http",
-		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
-			Rds: &hcm.Rds{
+		RouteSpecifier: &hcmv3.HttpConnectionManager_Rds{
+			Rds: &hcmv3.Rds{
 				ConfigSource:    rdsSource,
 				RouteConfigName: route,
 			},
 		},
-		HttpFilters: []*hcm.HttpFilter{{
+		HttpFilters: []*hcmv3.HttpFilter{{
 			Name: wellknown.Router,
 		}},
-		AccessLog: []*alf.AccessLog{{
+		AccessLog: []*alfv3.AccessLog{{
 			Name: wellknown.HTTPGRPCAccessLog,
-			ConfigType: &alf.AccessLog_TypedConfig{
+			ConfigType: &alfv3.AccessLog_TypedConfig{
 				TypedConfig: alsConfigPbst,
 			},
 		}},
 	}
 	pbst, err := ptypes.MarshalAny(manager)
+
 	if err != nil {
 		panic(err)
 	}
 
-	return &v2.Listener{
+	return &listenerv3.Listener{
 		Name: listenerName,
-		Address: &core.Address{
-			Address: &core.Address_SocketAddress{
-				SocketAddress: &core.SocketAddress{
-					Protocol: core.SocketAddress_TCP,
+		Address: &corev3.Address{
+			Address: &corev3.Address_SocketAddress{
+				SocketAddress: &corev3.SocketAddress{
+					Protocol: corev3.SocketAddress_TCP,
 					Address:  localhost,
-					PortSpecifier: &core.SocketAddress_PortValue{
+					PortSpecifier: &corev3.SocketAddress_PortValue{
 						PortValue: port,
 					},
 				},
 			},
 		},
-		FilterChains: []*listener.FilterChain{{
-			Filters: []*listener.Filter{{
+		FilterChains: []*listenerv3.FilterChain{{
+			Filters: []*listenerv3.Filter{{
 				Name: wellknown.HTTPConnectionManager,
-				ConfigType: &listener.Filter_TypedConfig{
+				ConfigType: &listenerv3.Filter_TypedConfig{
 					TypedConfig: pbst,
 				},
 			}},
@@ -229,7 +230,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 }
 
 // MakeTCPListener creates a TCP listener for a cluster.
-func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.Listener {
+func MakeTCPListener(listenerName string, port uint32, clusterName string) *listenerv3.Listener {
 	// TCP filter configuration
 	config := &tcp.TcpProxy{
 		StatPrefix: "tcp",
@@ -241,23 +242,23 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 	if err != nil {
 		panic(err)
 	}
-	return &v2.Listener{
+	return &listenerv3.Listener{
 		Name: listenerName,
-		Address: &core.Address{
-			Address: &core.Address_SocketAddress{
-				SocketAddress: &core.SocketAddress{
-					Protocol: core.SocketAddress_TCP,
+		Address: &corev3.Address{
+			Address: &corev3.Address_SocketAddress{
+				SocketAddress: &corev3.SocketAddress{
+					Protocol: corev3.SocketAddress_TCP,
 					Address:  localhost,
-					PortSpecifier: &core.SocketAddress_PortValue{
+					PortSpecifier: &corev3.SocketAddress_PortValue{
 						PortValue: port,
 					},
 				},
 			},
 		},
-		FilterChains: []*listener.FilterChain{{
-			Filters: []*listener.Filter{{
+		FilterChains: []*listenerv3.FilterChain{{
+			Filters: []*listenerv3.Filter{{
 				Name: wellknown.TCPProxy,
-				ConfigType: &listener.Filter_TypedConfig{
+				ConfigType: &listenerv3.Filter_TypedConfig{
 					TypedConfig: pbst,
 				},
 			}},
@@ -266,8 +267,8 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *v2.L
 }
 
 // MakeRuntime creates an RTDS layer with some fields.
-func MakeRuntime(runtimeName string) *discovery.Runtime {
-	return &discovery.Runtime{
+func MakeRuntime(runtimeName string) *runtime.Runtime {
+	return &runtime.Runtime{
 		Name: runtimeName,
 		Layer: &pstruct.Struct{
 			Fields: map[string]*pstruct.Value{
@@ -306,48 +307,55 @@ type TestSnapshot struct {
 }
 
 // Generate produces a snapshot from the parameters.
-func (ts TestSnapshot) Generate() cache.Snapshot {
-	clusters := make([]cache.Resource, ts.NumClusters)
-	endpoints := make([]cache.Resource, ts.NumClusters)
+func (ts TestSnapshot) Generate() cachev3.Snapshot {
+	clusters := make([]cachev3.Resource, ts.NumClusters)
+	endpoints := make([]cachev3.Resource, ts.NumClusters)
 	for i := 0; i < ts.NumClusters; i++ {
 		name := fmt.Sprintf("cluster-%s-%d", ts.Version, i)
 		clusters[i] = MakeCluster(ts.Xds, name)
 		endpoints[i] = MakeEndpoint(name, ts.UpstreamPort)
 	}
 
-	routes := make([]cache.Resource, ts.NumHTTPListeners)
+	routes := make([]cachev3.Resource, ts.NumHTTPListeners)
 	for i := 0; i < ts.NumHTTPListeners; i++ {
 		name := fmt.Sprintf("route-%s-%d", ts.Version, i)
-		routes[i] = MakeRoute(name, cache.GetResourceName(clusters[i%ts.NumClusters]))
+		routes[i] = MakeRoute(name, cachev3.GetResourceName(clusters[i%ts.NumClusters]))
 	}
 
 	total := ts.NumHTTPListeners + ts.NumTCPListeners
-	listeners := make([]cache.Resource, total)
+	listeners := make([]cachev3.Resource, total)
 	for i := 0; i < total; i++ {
 		port := ts.BasePort + uint32(i)
 		// listener name must be same since ports are shared and previous listener is drained
 		name := fmt.Sprintf("listener-%d", port)
-		var listener *v2.Listener
+		var listener *listenerv3.Listener
 		if i < ts.NumHTTPListeners {
-			listener = MakeHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]))
+			listener = MakeHTTPListener(ts.Xds, name, port, cachev3.GetResourceName(routes[i]))
 		} else {
-			listener = MakeTCPListener(name, port, cache.GetResourceName(clusters[i%ts.NumClusters]))
+			listener = MakeTCPListener(name, port, cachev3.GetResourceName(clusters[i%ts.NumClusters]))
 		}
 
 		if ts.TLS {
 			for i, chain := range listener.FilterChains {
-				chain.TlsContext = &auth.DownstreamTlsContext{
-					CommonTlsContext: &auth.CommonTlsContext{
-						TlsCertificateSdsSecretConfigs: []*auth.SdsSecretConfig{{
+				tlsc := &secret.DownstreamTlsContext{
+					CommonTlsContext: &secret.CommonTlsContext{
+						TlsCertificateSdsSecretConfigs: []*secret.SdsSecretConfig{{
 							Name:      tlsName,
 							SdsConfig: configSource(ts.Xds),
 						}},
-						ValidationContextType: &auth.CommonTlsContext_ValidationContextSdsSecretConfig{
-							ValidationContextSdsSecretConfig: &auth.SdsSecretConfig{
+						ValidationContextType: &secret.CommonTlsContext_ValidationContextSdsSecretConfig{
+							ValidationContextSdsSecretConfig: &secret.SdsSecretConfig{
 								Name:      rootName,
 								SdsConfig: configSource(ts.Xds),
 							},
 						},
+					},
+				}
+				mt, _ := ptypes.MarshalAny(tlsc)
+				chain.TransportSocket = &corev3.TransportSocket{
+					Name: "envoy.transport_sockets.tls",
+					ConfigType: &corev3.TransportSocket_TypedConfig{
+						TypedConfig: mt,
 					},
 				}
 				listener.FilterChains[i] = chain
@@ -357,13 +365,13 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		listeners[i] = listener
 	}
 
-	runtimes := make([]cache.Resource, ts.NumRuntimes)
+	runtimes := make([]cachev3.Resource, ts.NumRuntimes)
 	for i := 0; i < ts.NumRuntimes; i++ {
 		name := fmt.Sprintf("runtime-%d", i)
 		runtimes[i] = MakeRuntime(name)
 	}
 
-	out := cache.NewSnapshot(
+	out := cachev3.NewSnapshot(
 		ts.Version,
 		endpoints,
 		clusters,
@@ -373,7 +381,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 	)
 
 	if ts.TLS {
-		out.Resources[cache.Secret] = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
+		out.Resources[cachev3.Secret] = cachev3.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
 	}
 
 	return out
