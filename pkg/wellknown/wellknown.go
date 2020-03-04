@@ -49,6 +49,8 @@ const (
 	HTTPExternalAuthorization = "envoy.ext_authz"
 	// HTTPRoleBasedAccessControl HTTP filter
 	HTTPRoleBasedAccessControl = "envoy.filters.http.rbac"
+	// HTTPGRPCStats HTTP filter
+	HTTPGRPCStats = "envoy.filters.http.grpc_stats"
 )
 
 // Network filter names
