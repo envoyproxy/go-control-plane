@@ -2941,6 +2941,18 @@ func (m *RouteAction_HashPolicy) Validate() error {
 			}
 		}
 
+	case *RouteAction_HashPolicy_FilterState_:
+
+		if v, ok := interface{}(m.GetFilterState()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteAction_HashPolicyValidationError{
+					field:  "FilterState",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return RouteAction_HashPolicyValidationError{
 			field:  "PolicySpecifier",
@@ -3409,6 +3421,81 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteAction_HashPolicy_QueryParameterValidationError{}
+
+// Validate checks the field values on RouteAction_HashPolicy_FilterState with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *RouteAction_HashPolicy_FilterState) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetKey()) < 1 {
+		return RouteAction_HashPolicy_FilterStateValidationError{
+			field:  "Key",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	return nil
+}
+
+// RouteAction_HashPolicy_FilterStateValidationError is the validation error
+// returned by RouteAction_HashPolicy_FilterState.Validate if the designated
+// constraints aren't met.
+type RouteAction_HashPolicy_FilterStateValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RouteAction_HashPolicy_FilterStateValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RouteAction_HashPolicy_FilterStateValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RouteAction_HashPolicy_FilterStateValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RouteAction_HashPolicy_FilterStateValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RouteAction_HashPolicy_FilterStateValidationError) ErrorName() string {
+	return "RouteAction_HashPolicy_FilterStateValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RouteAction_HashPolicy_FilterStateValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRouteAction_HashPolicy_FilterState.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RouteAction_HashPolicy_FilterStateValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RouteAction_HashPolicy_FilterStateValidationError{}
 
 // Validate checks the field values on RetryPolicy_RetryPriority with the rules
 // defined in the proto definition for this message. If any rules are
