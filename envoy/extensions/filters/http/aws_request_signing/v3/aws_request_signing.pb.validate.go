@@ -58,6 +58,8 @@ func (m *AwsRequestSigning) Validate() error {
 		}
 	}
 
+	// no validation rules for HostRewrite
+
 	return nil
 }
 
