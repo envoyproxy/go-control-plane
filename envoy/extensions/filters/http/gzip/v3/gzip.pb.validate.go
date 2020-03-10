@@ -54,15 +54,14 @@ func (m *Gzip) Validate() error {
 
 	}
 
-	if wrapper := m.GetContentLength(); wrapper != nil {
-
-		if wrapper.GetValue() < 30 {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedContentLength()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return GzipValidationError{
-				field:  "ContentLength",
-				reason: "value must be greater than or equal to 30",
+				field:  "HiddenEnvoyDeprecatedContentLength",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	if _, ok := Gzip_CompressionLevel_Enum_name[int32(m.GetCompressionLevel())]; !ok {
@@ -79,16 +78,9 @@ func (m *Gzip) Validate() error {
 		}
 	}
 
-	if len(m.GetContentType()) > 50 {
-		return GzipValidationError{
-			field:  "ContentType",
-			reason: "value must contain no more than 50 item(s)",
-		}
-	}
+	// no validation rules for HiddenEnvoyDeprecatedDisableOnEtagHeader
 
-	// no validation rules for DisableOnEtagHeader
-
-	// no validation rules for RemoveAcceptEncodingHeader
+	// no validation rules for HiddenEnvoyDeprecatedRemoveAcceptEncodingHeader
 
 	if wrapper := m.GetWindowBits(); wrapper != nil {
 
@@ -99,6 +91,16 @@ func (m *Gzip) Validate() error {
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetCompressor()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GzipValidationError{
+				field:  "Compressor",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil
