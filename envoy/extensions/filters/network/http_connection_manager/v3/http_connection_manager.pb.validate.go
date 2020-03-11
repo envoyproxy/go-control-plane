@@ -969,6 +969,16 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManager_TracingValidationError{
+				field:  "Provider",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
