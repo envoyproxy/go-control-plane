@@ -333,7 +333,7 @@ func (m *CustomTag_Header) Validate() error {
 	if !_CustomTag_Header_Name_Pattern.MatchString(m.GetName()) {
 		return CustomTag_HeaderValidationError{
 			field:  "Name",
-			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 	}
 
@@ -396,7 +396,7 @@ var _ interface {
 	ErrorName() string
 } = CustomTag_HeaderValidationError{}
 
-var _CustomTag_Header_Name_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
+var _CustomTag_Header_Name_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on CustomTag_Metadata with the rules
 // defined in the proto definition for this message. If any rules are

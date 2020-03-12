@@ -663,7 +663,7 @@ func (m *HeaderValue) Validate() error {
 	if !_HeaderValue_Key_Pattern.MatchString(m.GetKey()) {
 		return HeaderValueValidationError{
 			field:  "Key",
-			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 	}
 
@@ -677,7 +677,7 @@ func (m *HeaderValue) Validate() error {
 	if !_HeaderValue_Value_Pattern.MatchString(m.GetValue()) {
 		return HeaderValueValidationError{
 			field:  "Value",
-			reason: "value does not match regex pattern \"^[^\\x00-\\b\\n-\\x1f\\u007f]*$\"",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 	}
 
@@ -738,9 +738,9 @@ var _ interface {
 	ErrorName() string
 } = HeaderValueValidationError{}
 
-var _HeaderValue_Key_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
+var _HeaderValue_Key_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
-var _HeaderValue_Value_Pattern = regexp.MustCompile("^[^\x00-\b\n-\x1f\u007f]*$")
+var _HeaderValue_Value_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on HeaderValueOption with the rules defined
 // in the proto definition for this message. If any rules are violated, an
