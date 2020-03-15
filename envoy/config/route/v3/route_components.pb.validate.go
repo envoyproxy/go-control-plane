@@ -1091,7 +1091,12 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	// no validation rules for PrefixRewrite
+	if !_RouteAction_PrefixRewrite_Pattern.MatchString(m.GetPrefixRewrite()) {
+		return RouteActionValidationError{
+			field:  "PrefixRewrite",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	if v, ok := interface{}(m.GetRegexRewrite()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1322,7 +1327,13 @@ func (m *RouteAction) Validate() error {
 	switch m.HostRewriteSpecifier.(type) {
 
 	case *RouteAction_HostRewriteLiteral:
-		// no validation rules for HostRewriteLiteral
+
+		if !_RouteAction_HostRewriteLiteral_Pattern.MatchString(m.GetHostRewriteLiteral()) {
+			return RouteActionValidationError{
+				field:  "HostRewriteLiteral",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
 
 	case *RouteAction_AutoHostRewrite:
 
@@ -1337,7 +1348,13 @@ func (m *RouteAction) Validate() error {
 		}
 
 	case *RouteAction_HostRewriteHeader:
-		// no validation rules for HostRewriteHeader
+
+		if !_RouteAction_HostRewriteHeader_Pattern.MatchString(m.GetHostRewriteHeader()) {
+			return RouteActionValidationError{
+				field:  "HostRewriteHeader",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
 
 	}
 
@@ -1399,6 +1416,12 @@ var _ interface {
 } = RouteActionValidationError{}
 
 var _RouteAction_ClusterHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RouteAction_PrefixRewrite_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RouteAction_HostRewriteLiteral_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RouteAction_HostRewriteHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on RetryPolicy with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -1650,7 +1673,12 @@ func (m *RedirectAction) Validate() error {
 		return nil
 	}
 
-	// no validation rules for HostRedirect
+	if !_RedirectAction_HostRedirect_Pattern.MatchString(m.GetHostRedirect()) {
+		return RedirectActionValidationError{
+			field:  "HostRedirect",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	// no validation rules for PortRedirect
 
@@ -1676,10 +1704,22 @@ func (m *RedirectAction) Validate() error {
 	switch m.PathRewriteSpecifier.(type) {
 
 	case *RedirectAction_PathRedirect:
-		// no validation rules for PathRedirect
+
+		if !_RedirectAction_PathRedirect_Pattern.MatchString(m.GetPathRedirect()) {
+			return RedirectActionValidationError{
+				field:  "PathRedirect",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
 
 	case *RedirectAction_PrefixRewrite:
-		// no validation rules for PrefixRewrite
+
+		if !_RedirectAction_PrefixRewrite_Pattern.MatchString(m.GetPrefixRewrite()) {
+			return RedirectActionValidationError{
+				field:  "PrefixRewrite",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
 
 	}
 
@@ -1739,6 +1779,12 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RedirectActionValidationError{}
+
+var _RedirectAction_HostRedirect_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RedirectAction_PathRedirect_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RedirectAction_PrefixRewrite_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on DirectResponseAction with the rules
 // defined in the proto definition for this message. If any rules are
