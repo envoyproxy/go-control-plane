@@ -2821,6 +2821,16 @@ func (m *RouteAction_RequestMirrorPolicy) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTraceSampled()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_RequestMirrorPolicyValidationError{
+				field:  "TraceSampled",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
