@@ -218,6 +218,8 @@ func (m *VirtualHost) Validate() error {
 
 	// no validation rules for IncludeRequestAttemptCount
 
+	// no validation rules for IncludeAttemptCountInResponse
+
 	if v, ok := interface{}(m.GetRetryPolicy()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return VirtualHostValidationError{
