@@ -230,6 +230,16 @@ func (m *VirtualHost) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetRetryPolicyTypedConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VirtualHostValidationError{
+				field:  "RetryPolicyTypedConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetHedgePolicy()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return VirtualHostValidationError{
@@ -1134,6 +1144,16 @@ func (m *RouteAction) Validate() error {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				field:  "RetryPolicy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetRetryPolicyTypedConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteActionValidationError{
+				field:  "RetryPolicyTypedConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
