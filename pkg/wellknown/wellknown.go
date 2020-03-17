@@ -46,7 +46,7 @@ const (
 	// Squash HTTP filter
 	Squash = "envoy.squash"
 	// HTTPExternalAuthorization HTTP filter
-	HTTPExternalAuthorization = "envoy.ext_authz"
+	HTTPExternalAuthorization = "envoy.filters.http.ext_authz"
 	// HTTPRoleBasedAccessControl HTTP filter
 	HTTPRoleBasedAccessControl = "envoy.filters.http.rbac"
 	// HTTPGRPCStats HTTP filter
@@ -74,7 +74,7 @@ const (
 	// MySQLProxy network filter
 	MySQLProxy = "envoy.filters.network.mysql_proxy"
 	// ExternalAuthorization network filter
-	ExternalAuthorization = "envoy.ext_authz"
+	ExternalAuthorization = "envoy.filters.network.ext_authz"
 	// RoleBasedAccessControl network filter
 	RoleBasedAccessControl = "envoy.filters.network.rbac"
 )
