@@ -17,7 +17,7 @@ package cache_test
 import (
 	"testing"
 
-	cache "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
 

@@ -23,7 +23,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	cache "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
 

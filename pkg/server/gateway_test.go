@@ -23,7 +23,7 @@ import (
 	"testing"
 	"testing/iotest"
 
-	cache "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 )
 
