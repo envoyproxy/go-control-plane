@@ -336,7 +336,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 
 		if ts.TLS {
 			for i, chain := range listener.FilterChains {
-				chain.TlsContext = &auth.DownstreamTlsContext{
+				tlsc := &auth.DownstreamTlsContext{
 					CommonTlsContext: &auth.CommonTlsContext{
 						TlsCertificateSdsSecretConfigs: []*auth.SdsSecretConfig{{
 							Name:      tlsName,
@@ -348,6 +348,13 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 								SdsConfig: configSource(ts.Xds),
 							},
 						},
+					},
+				}
+				mt, _ := ptypes.MarshalAny(tlsc)
+				chain.TransportSocket = &core.TransportSocket{
+					Name: "envoy.transport_sockets.tls",
+					ConfigType: &core.TransportSocket_TypedConfig{
+						TypedConfig: mt,
 					},
 				}
 				listener.FilterChains[i] = chain
