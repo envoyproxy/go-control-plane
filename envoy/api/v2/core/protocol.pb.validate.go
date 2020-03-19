@@ -214,6 +214,16 @@ func (m *HttpProtocolOptions) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetMaxStreamDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpProtocolOptionsValidationError{
+				field:  "MaxStreamDuration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
