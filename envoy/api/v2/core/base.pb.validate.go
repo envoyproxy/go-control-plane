@@ -323,6 +323,21 @@ func (m *Node) Validate() error {
 
 	}
 
+	for idx, item := range m.GetListeningAddresses() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeValidationError{
+					field:  fmt.Sprintf("ListeningAddresses[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.UserAgentVersionType.(type) {
 
 	case *Node_UserAgentVersion:
@@ -1398,100 +1413,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TransportSocketValidationError{}
-
-// Validate checks the field values on SocketOption with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *SocketOption) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Description
-
-	// no validation rules for Level
-
-	// no validation rules for Name
-
-	if _, ok := SocketOption_SocketState_name[int32(m.GetState())]; !ok {
-		return SocketOptionValidationError{
-			field:  "State",
-			reason: "value must be one of the defined enum values",
-		}
-	}
-
-	switch m.Value.(type) {
-
-	case *SocketOption_IntValue:
-		// no validation rules for IntValue
-
-	case *SocketOption_BufValue:
-		// no validation rules for BufValue
-
-	default:
-		return SocketOptionValidationError{
-			field:  "Value",
-			reason: "value is required",
-		}
-
-	}
-
-	return nil
-}
-
-// SocketOptionValidationError is the validation error returned by
-// SocketOption.Validate if the designated constraints aren't met.
-type SocketOptionValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e SocketOptionValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e SocketOptionValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e SocketOptionValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e SocketOptionValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e SocketOptionValidationError) ErrorName() string { return "SocketOptionValidationError" }
-
-// Error satisfies the builtin error interface
-func (e SocketOptionValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sSocketOption.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = SocketOptionValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = SocketOptionValidationError{}
 
 // Validate checks the field values on RuntimeFractionalPercent with the rules
 // defined in the proto definition for this message. If any rules are
