@@ -381,7 +381,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 	)
 
 	if ts.TLS {
-		out.Resources[cache.Secret] = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
+		out.Resources[common.Secret] = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
 	}
 
 	return out

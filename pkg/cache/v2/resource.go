@@ -42,36 +42,23 @@ const (
 	AnyType = ""
 )
 
-// ResponseType enumeration of supported response types
-type ResponseType int
-
-const (
-	Endpoint ResponseType = iota
-	Cluster
-	Route
-	Listener
-	Secret
-	Runtime
-	UnknownType // token to count the total number of supported types
-)
-
 // GetResponseType returns the enumeration for a valid xDS type URL
-func GetResponseType(typeURL string) ResponseType {
+func GetResponseType(typeURL string) common.ResponseType {
 	switch typeURL {
 	case EndpointType:
-		return Endpoint
+		return common.Endpoint
 	case ClusterType:
-		return Cluster
+		return common.Cluster
 	case RouteType:
-		return Route
+		return common.Route
 	case ListenerType:
-		return Listener
+		return common.Listener
 	case SecretType:
-		return Secret
+		return common.Secret
 	case RuntimeType:
-		return Runtime
+		return common.Runtime
 	}
-	return UnknownType
+	return common.UnknownType
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.
@@ -95,7 +82,7 @@ func GetResourceName(res common.Resource) string {
 }
 
 // MarshalResource converts the Resource to MarshaledResource
-func MarshalResource(resource common.Resource) (MarshaledResource, error) {
+func MarshalResource(resource common.Resource) (common.MarshaledResource, error) {
 	b := proto.NewBuffer(nil)
 	b.SetDeterministic(true)
 	err := b.Marshal(resource)

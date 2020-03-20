@@ -190,7 +190,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// set partially-versioned snapshot
 	snapshot2 := snapshot
-	snapshot2.Resources[cache.Endpoint] = cache.NewResources(version2, []common.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2.Resources[common.Endpoint] = cache.NewResources(version2, []common.Resource{resource.MakeEndpoint(clusterName, 9090)})
 	if err := c.SetSnapshot(key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -204,8 +204,8 @@ func TestSnapshotCacheWatch(t *testing.T) {
 		if out.Version != version2 {
 			t.Errorf("got version %q, want %q", out.Version, version2)
 		}
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[cache.Endpoint].Items) {
-			t.Errorf("get resources %v, want %v", out.Resources, snapshot2.Resources[cache.Endpoint].Items)
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[common.Endpoint].Items) {
+			t.Errorf("get resources %v, want %v", out.Resources, snapshot2.Resources[common.Endpoint].Items)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
@@ -222,7 +222,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 				var cancel func()
 				if i < 25 {
 					snap := cache.Snapshot{}
-					snap.Resources[cache.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []common.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+					snap.Resources[common.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []common.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
 					c.SetSnapshot(id, snap)
 				} else {
 					if cancel != nil {

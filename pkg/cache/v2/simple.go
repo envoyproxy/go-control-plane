@@ -289,7 +289,7 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Respon
 			if cache.log != nil {
 				cache.log.Warnf("skip fetch: version up to date")
 			}
-			return nil, &SkipFetchError{}
+			return nil, &common.SkipFetchError{}
 		}
 
 		resources := snapshot.GetResources(request.TypeUrl)

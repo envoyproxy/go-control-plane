@@ -51,7 +51,7 @@ func NewResources(version string, items []common.Resource) Resources {
 // Consistentcy is important for the convergence as different resource types
 // from the snapshot may be delivered to the proxy in arbitrary order.
 type Snapshot struct {
-	Resources [UnknownType]Resources
+	Resources [common.UnknownType]Resources
 }
 
 // NewSnapshot creates a snapshot from response types and a version.
@@ -62,11 +62,11 @@ func NewSnapshot(version string,
 	listeners []common.Resource,
 	runtimes []common.Resource) Snapshot {
 	out := Snapshot{}
-	out.Resources[Endpoint] = NewResources(version, endpoints)
-	out.Resources[Cluster] = NewResources(version, clusters)
-	out.Resources[Route] = NewResources(version, routes)
-	out.Resources[Listener] = NewResources(version, listeners)
-	out.Resources[Runtime] = NewResources(version, runtimes)
+	out.Resources[common.Endpoint] = NewResources(version, endpoints)
+	out.Resources[common.Cluster] = NewResources(version, clusters)
+	out.Resources[common.Route] = NewResources(version, routes)
+	out.Resources[common.Listener] = NewResources(version, listeners)
+	out.Resources[common.Runtime] = NewResources(version, runtimes)
 	return out
 }
 
@@ -82,19 +82,19 @@ func (s *Snapshot) Consistent() error {
 	if s == nil {
 		return errors.New("nil snapshot")
 	}
-	endpoints := GetResourceReferences(s.Resources[Cluster].Items)
-	if len(endpoints) != len(s.Resources[Endpoint].Items) {
-		return fmt.Errorf("mismatched endpoint reference and resource lengths: %v != %d", endpoints, len(s.Resources[Endpoint].Items))
+	endpoints := GetResourceReferences(s.Resources[common.Cluster].Items)
+	if len(endpoints) != len(s.Resources[common.Endpoint].Items) {
+		return fmt.Errorf("mismatched endpoint reference and resource lengths: %v != %d", endpoints, len(s.Resources[common.Endpoint].Items))
 	}
-	if err := superset(endpoints, s.Resources[Endpoint].Items); err != nil {
+	if err := superset(endpoints, s.Resources[common.Endpoint].Items); err != nil {
 		return err
 	}
 
-	routes := GetResourceReferences(s.Resources[Listener].Items)
-	if len(routes) != len(s.Resources[Route].Items) {
-		return fmt.Errorf("mismatched route reference and resource lengths: %v != %d", routes, len(s.Resources[Route].Items))
+	routes := GetResourceReferences(s.Resources[common.Listener].Items)
+	if len(routes) != len(s.Resources[common.Route].Items) {
+		return fmt.Errorf("mismatched route reference and resource lengths: %v != %d", routes, len(s.Resources[common.Route].Items))
 	}
-	return superset(routes, s.Resources[Route].Items)
+	return superset(routes, s.Resources[common.Route].Items)
 }
 
 // GetResources selects snapshot resources by type.
@@ -103,7 +103,7 @@ func (s *Snapshot) GetResources(typeURL string) map[string]common.Resource {
 		return nil
 	}
 	typ := GetResponseType(typeURL)
-	if typ == UnknownType {
+	if typ == common.UnknownType {
 		return nil
 	}
 	return s.Resources[typ].Items
@@ -115,7 +115,7 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 		return ""
 	}
 	typ := GetResponseType(typeURL)
-	if typ == UnknownType {
+	if typ == common.UnknownType {
 		return ""
 	}
 	return s.Resources[typ].Version
