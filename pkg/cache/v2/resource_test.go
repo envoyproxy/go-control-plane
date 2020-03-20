@@ -18,7 +18,7 @@ import (
 	"reflect"
 	"testing"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	v2route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
 	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
@@ -57,7 +57,7 @@ func TestValidate(t *testing.T) {
 		t.Error(err)
 	}
 
-	invalidRoute := &v2.RouteConfiguration{
+	invalidRoute := &discovery.RouteConfiguration{
 		Name: "test",
 		VirtualHosts: []*v2route.VirtualHost{{
 			Name:    "test",
@@ -108,8 +108,8 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[string]bool{clusterName: true},
 		},
 		{
-			in: &v2.Cluster{Name: clusterName, ClusterDiscoveryType: &v2.Cluster_Type{Type: v2.Cluster_EDS},
-				EdsClusterConfig: &v2.Cluster_EdsClusterConfig{ServiceName: "test"}},
+			in: &discovery.Cluster{Name: clusterName, ClusterDiscoveryType: &discovery.Cluster_Type{Type: discovery.Cluster_EDS},
+				EdsClusterConfig: &discovery.Cluster_EdsClusterConfig{ServiceName: "test"}},
 			out: map[string]bool{"test": true},
 		},
 		{

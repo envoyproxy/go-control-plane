@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
@@ -99,7 +99,7 @@ func TestSnapshotCache(t *testing.T) {
 
 	// try to get endpoints with incorrect list of names
 	// should not receive response
-	value, _ := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: cache.EndpointType, ResourceNames: []string{"none"}})
+	value, _ := c.CreateWatch(discovery.DiscoveryRequest{TypeUrl: cache.EndpointType, ResourceNames: []string{"none"}})
 	select {
 	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -108,7 +108,7 @@ func TestSnapshotCache(t *testing.T) {
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
-			value, _ := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+			value, _ := c.CreateWatch(discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 			select {
 			case out := <-value:
 				if out.Version != version {
@@ -132,7 +132,7 @@ func TestSnapshotCacheFetch(t *testing.T) {
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
-			resp, err := c.Fetch(context.Background(), v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+			resp, err := c.Fetch(context.Background(), discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 			if err != nil || resp == nil {
 				t.Fatal("unexpected error or null response")
 			}
@@ -144,13 +144,13 @@ func TestSnapshotCacheFetch(t *testing.T) {
 
 	// no response for missing snapshot
 	if resp, err := c.Fetch(context.Background(),
-		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
+		discovery.DiscoveryRequest{TypeUrl: cache.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
 		t.Errorf("missing snapshot: response is not nil %v", resp)
 	}
 
 	// no response for latest version
 	if resp, err := c.Fetch(context.Background(),
-		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, VersionInfo: version}); resp != nil || err == nil {
+		discovery.DiscoveryRequest{TypeUrl: cache.ClusterType, VersionInfo: version}); resp != nil || err == nil {
 		t.Errorf("latest version: response is not nil %v", resp)
 	}
 }
@@ -159,7 +159,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	watches := make(map[string]chan cache.Response)
 	for _, typ := range testTypes {
-		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+		watches[typ], _ = c.CreateWatch(discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 	}
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
@@ -182,7 +182,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// open new watches with the latest version
 	for _, typ := range testTypes {
-		watches[typ], _ = c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
+		watches[typ], _ = c.CreateWatch(discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
 	}
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
@@ -228,7 +228,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 					if cancel != nil {
 						cancel()
 					}
-					_, cancel = c.CreateWatch(v2.DiscoveryRequest{
+					_, cancel = c.CreateWatch(discovery.DiscoveryRequest{
 						Node:    &core.Node{Id: id},
 						TypeUrl: cache.EndpointType,
 					})
@@ -241,7 +241,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 func TestSnapshotCacheWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	for _, typ := range testTypes {
-		_, cancel := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+		_, cancel := c.CreateWatch(discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 		cancel()
 	}
 	// should be status info for the node

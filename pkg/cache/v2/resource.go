@@ -17,10 +17,10 @@ package cache
 import (
 	"github.com/golang/protobuf/proto"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	runtime "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	utils "github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
@@ -63,17 +63,17 @@ func GetResponseType(typeURL string) common.ResponseType {
 // GetResourceName returns the resource name for a valid xDS response type.
 func GetResourceName(res common.Resource) string {
 	switch v := res.(type) {
-	case *v2.ClusterLoadAssignment:
+	case *discovery.ClusterLoadAssignment:
 		return v.GetClusterName()
-	case *v2.Cluster:
+	case *discovery.Cluster:
 		return v.GetName()
-	case *v2.RouteConfiguration:
+	case *discovery.RouteConfiguration:
 		return v.GetName()
-	case *v2.Listener:
+	case *discovery.Listener:
 		return v.GetName()
 	case *auth.Secret:
 		return v.GetName()
-	case *discovery.Runtime:
+	case *runtime.Runtime:
 		return v.GetName()
 	default:
 		return ""
@@ -101,13 +101,13 @@ func GetResourceReferences(resources map[string]common.Resource) map[string]bool
 			continue
 		}
 		switch v := res.(type) {
-		case *v2.ClusterLoadAssignment:
+		case *discovery.ClusterLoadAssignment:
 			// no dependencies
-		case *v2.Cluster:
+		case *discovery.Cluster:
 			// for EDS type, use cluster name or ServiceName override
 			switch typ := v.ClusterDiscoveryType.(type) {
-			case *v2.Cluster_Type:
-				if typ.Type == v2.Cluster_EDS {
+			case *discovery.Cluster_Type:
+				if typ.Type == discovery.Cluster_EDS {
 					if v.EdsClusterConfig != nil && v.EdsClusterConfig.ServiceName != "" {
 						out[v.EdsClusterConfig.ServiceName] = true
 					} else {
@@ -115,11 +115,11 @@ func GetResourceReferences(resources map[string]common.Resource) map[string]bool
 					}
 				}
 			}
-		case *v2.RouteConfiguration:
+		case *discovery.RouteConfiguration:
 			// References to clusters in both routes (and listeners) are not included
 			// in the result, because the clusters are retrieved in bulk currently,
 			// and not by name.
-		case *v2.Listener:
+		case *discovery.Listener:
 			// extract route configuration names from HTTP connection manager
 			for _, chain := range v.FilterChains {
 				for _, filter := range chain.Filters {
@@ -138,7 +138,7 @@ func GetResourceReferences(resources map[string]common.Resource) map[string]bool
 					}
 				}
 			}
-		case *discovery.Runtime:
+		case *runtime.Runtime:
 			// no dependencies
 		}
 	}
