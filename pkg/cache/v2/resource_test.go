@@ -18,11 +18,12 @@ import (
 	"reflect"
 	"testing"
 
-	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	cluster "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	route "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	v2route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
 	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
 
 const (
@@ -33,31 +34,31 @@ const (
 )
 
 var (
-	endpoint = resource.MakeEndpoint(clusterName, 8080)
-	cluster  = resource.MakeCluster(resource.Ads, clusterName)
-	route    = resource.MakeRoute(routeName, clusterName)
-	listener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	runtime  = resource.MakeRuntime(runtimeName)
+	testEndpoint = resource.MakeEndpoint(clusterName, 8080)
+	testCluster  = resource.MakeCluster(resource.Ads, clusterName)
+	testRoute    = resource.MakeRoute(routeName, clusterName)
+	testListener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testRuntime  = resource.MakeRuntime(runtimeName)
 )
 
 func TestValidate(t *testing.T) {
-	if err := endpoint.Validate(); err != nil {
+	if err := testEndpoint.Validate(); err != nil {
 		t.Error(err)
 	}
-	if err := cluster.Validate(); err != nil {
+	if err := testCluster.Validate(); err != nil {
 		t.Error(err)
 	}
-	if err := route.Validate(); err != nil {
+	if err := testRoute.Validate(); err != nil {
 		t.Error(err)
 	}
-	if err := listener.Validate(); err != nil {
+	if err := testListener.Validate(); err != nil {
 		t.Error(err)
 	}
-	if err := runtime.Validate(); err != nil {
+	if err := testRuntime.Validate(); err != nil {
 		t.Error(err)
 	}
 
-	invalidRoute := &discovery.RouteConfiguration{
+	invalidRoute := &route.RouteConfiguration{
 		Name: "test",
 		VirtualHosts: []*v2route.VirtualHost{{
 			Name:    "test",
@@ -74,20 +75,20 @@ func TestValidate(t *testing.T) {
 }
 
 func TestGetResourceName(t *testing.T) {
-	if name := cache.GetResourceName(endpoint); name != clusterName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", endpoint, name, clusterName)
+	if name := cache.GetResourceName(testEndpoint); name != clusterName {
+		t.Errorf("GetResourceName(%v) => got %q, want %q", testEndpoint, name, clusterName)
 	}
-	if name := cache.GetResourceName(cluster); name != clusterName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", cluster, name, clusterName)
+	if name := cache.GetResourceName(testCluster); name != clusterName {
+		t.Errorf("GetResourceName(%v) => got %q, want %q", testCluster, name, clusterName)
 	}
-	if name := cache.GetResourceName(route); name != routeName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", route, name, routeName)
+	if name := cache.GetResourceName(testRoute); name != routeName {
+		t.Errorf("GetResourceName(%v) => got %q, want %q", testRoute, name, routeName)
 	}
-	if name := cache.GetResourceName(listener); name != listenerName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", listener, name, listenerName)
+	if name := cache.GetResourceName(testListener); name != listenerName {
+		t.Errorf("GetResourceName(%v) => got %q, want %q", testListener, name, listenerName)
 	}
-	if name := cache.GetResourceName(runtime); name != runtimeName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", runtime, name, runtimeName)
+	if name := cache.GetResourceName(testRuntime); name != runtimeName {
+		t.Errorf("GetResourceName(%v) => got %q, want %q", testRuntime, name, runtimeName)
 	}
 	if name := cache.GetResourceName(nil); name != "" {
 		t.Errorf("GetResourceName(nil) => got %q, want none", name)
@@ -104,12 +105,12 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[string]bool{},
 		},
 		{
-			in:  cluster,
+			in:  testCluster,
 			out: map[string]bool{clusterName: true},
 		},
 		{
-			in: &discovery.Cluster{Name: clusterName, ClusterDiscoveryType: &discovery.Cluster_Type{Type: discovery.Cluster_EDS},
-				EdsClusterConfig: &discovery.Cluster_EdsClusterConfig{ServiceName: "test"}},
+			in: &cluster.Cluster{Name: clusterName, ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
+				EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{ServiceName: "test"}},
 			out: map[string]bool{"test": true},
 		},
 		{
@@ -121,15 +122,15 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[string]bool{},
 		},
 		{
-			in:  route,
+			in:  testRoute,
 			out: map[string]bool{},
 		},
 		{
-			in:  endpoint,
+			in:  testEndpoint,
 			out: map[string]bool{},
 		},
 		{
-			in:  runtime,
+			in:  testRuntime,
 			out: map[string]bool{},
 		},
 	}

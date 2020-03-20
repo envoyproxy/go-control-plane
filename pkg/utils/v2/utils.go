@@ -8,6 +8,21 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/conversion"
 )
 
+// Resource types in xDS v2.
+const (
+	apiTypePrefix       = "type.googleapis.com/envoy.api.v2."
+	discoveryTypePrefix = "type.googleapis.com/envoy.service.discovery.v2."
+	EndpointType        = apiTypePrefix + "type.googleapis.com/envoy.api.v2.ClusterLoadAssignment"
+	ClusterType         = apiTypePrefix + "Cluster"
+	RouteType           = apiTypePrefix + "RouteConfiguration"
+	ListenerType        = apiTypePrefix + "Listener"
+	SecretType          = apiTypePrefix + "auth.Secret"
+	RuntimeType         = discoveryTypePrefix + "Runtime"
+
+	// AnyType is used only by ADS
+	AnyType = ""
+)
+
 // GetHTTPConnectionManager creates a HttpConnectionManager from filter
 func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManager {
 	config := &hcm.HttpConnectionManager{}
