@@ -17,6 +17,8 @@ package cache
 import (
 	"errors"
 	"fmt"
+
+	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 )
 
 // Resources is a versioned group of resources.
@@ -25,12 +27,12 @@ type Resources struct {
 	Version string
 
 	// Items in the group indexed by name.
-	Items map[string]Resource
+	Items map[string]common.Resource
 }
 
 // IndexResourcesByName creates a map from the resource name to the resource.
-func IndexResourcesByName(items []Resource) map[string]Resource {
-	indexed := make(map[string]Resource, len(items))
+func IndexResourcesByName(items []common.Resource) map[string]common.Resource {
+	indexed := make(map[string]common.Resource, len(items))
 	for _, item := range items {
 		indexed[GetResourceName(item)] = item
 	}
@@ -38,7 +40,7 @@ func IndexResourcesByName(items []Resource) map[string]Resource {
 }
 
 // NewResources creates a new resource group.
-func NewResources(version string, items []Resource) Resources {
+func NewResources(version string, items []common.Resource) Resources {
 	return Resources{
 		Version: version,
 		Items:   IndexResourcesByName(items),
@@ -54,11 +56,11 @@ type Snapshot struct {
 
 // NewSnapshot creates a snapshot from response types and a version.
 func NewSnapshot(version string,
-	endpoints []Resource,
-	clusters []Resource,
-	routes []Resource,
-	listeners []Resource,
-	runtimes []Resource) Snapshot {
+	endpoints []common.Resource,
+	clusters []common.Resource,
+	routes []common.Resource,
+	listeners []common.Resource,
+	runtimes []common.Resource) Snapshot {
 	out := Snapshot{}
 	out.Resources[Endpoint] = NewResources(version, endpoints)
 	out.Resources[Cluster] = NewResources(version, clusters)
@@ -96,7 +98,7 @@ func (s *Snapshot) Consistent() error {
 }
 
 // GetResources selects snapshot resources by type.
-func (s *Snapshot) GetResources(typeURL string) map[string]Resource {
+func (s *Snapshot) GetResources(typeURL string) map[string]common.Resource {
 	if s == nil {
 		return nil
 	}

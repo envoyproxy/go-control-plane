@@ -26,6 +26,7 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
@@ -181,19 +182,19 @@ func makeResponses() map[string][]cache.Response {
 	return map[string][]cache.Response{
 		cache.EndpointType: []cache.Response{{
 			Version:   "1",
-			Resources: []cache.Resource{endpoint},
+			Resources: []common.Resource{endpoint},
 		}},
 		cache.ClusterType: []cache.Response{{
 			Version:   "2",
-			Resources: []cache.Resource{cluster},
+			Resources: []common.Resource{cluster},
 		}},
 		cache.RouteType: []cache.Response{{
 			Version:   "3",
-			Resources: []cache.Resource{route},
+			Resources: []common.Resource{route},
 		}},
 		cache.ListenerType: []cache.Response{{
 			Version:   "4",
-			Resources: []cache.Resource{listener},
+			Resources: []common.Resource{listener},
 		}},
 	}
 }

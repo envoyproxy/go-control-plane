@@ -23,6 +23,7 @@ import (
 	"testing"
 	"testing/iotest"
 
+	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 )
@@ -41,15 +42,15 @@ func TestGateway(t *testing.T) {
 	config.responses = map[string][]cache.Response{
 		cache.ClusterType: []cache.Response{{
 			Version:   "2",
-			Resources: []cache.Resource{cluster},
+			Resources: []common.Resource{cluster},
 		}},
 		cache.RouteType: []cache.Response{{
 			Version:   "3",
-			Resources: []cache.Resource{route},
+			Resources: []common.Resource{route},
 		}},
 		cache.ListenerType: []cache.Response{{
 			Version:   "4",
-			Resources: []cache.Resource{listener},
+			Resources: []common.Resource{listener},
 		}},
 	}
 	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(context.Background(), config, nil)}

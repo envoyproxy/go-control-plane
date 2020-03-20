@@ -23,6 +23,7 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
@@ -45,11 +46,11 @@ var (
 	version2 = "y"
 
 	snapshot = cache.NewSnapshot(version,
-		[]cache.Resource{endpoint},
-		[]cache.Resource{cluster},
-		[]cache.Resource{route},
-		[]cache.Resource{listener},
-		[]cache.Resource{runtime})
+		[]common.Resource{endpoint},
+		[]common.Resource{cluster},
+		[]common.Resource{route},
+		[]common.Resource{listener},
+		[]common.Resource{runtime})
 
 	names = map[string][]string{
 		cache.EndpointType: []string{clusterName},
@@ -189,7 +190,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// set partially-versioned snapshot
 	snapshot2 := snapshot
-	snapshot2.Resources[cache.Endpoint] = cache.NewResources(version2, []cache.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2.Resources[cache.Endpoint] = cache.NewResources(version2, []common.Resource{resource.MakeEndpoint(clusterName, 9090)})
 	if err := c.SetSnapshot(key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -221,7 +222,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 				var cancel func()
 				if i < 25 {
 					snap := cache.Snapshot{}
-					snap.Resources[cache.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []cache.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+					snap.Resources[cache.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []common.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
 					c.SetSnapshot(id, snap)
 				} else {
 					if cancel != nil {
