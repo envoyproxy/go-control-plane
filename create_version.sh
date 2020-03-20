@@ -20,7 +20,9 @@ MODULES=(   'discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2":dis
             '"github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v2":"github.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/grpc/v3"'  
             '"github.com/envoyproxy/go-control-plane/envoy/config/filter/accesslog/v2":"github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"'  
             '"github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2":"github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/tcp_proxy/v3"'  
-            '"github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2":"github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"'  
+            'runtime "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2":runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"'
+            '"github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2":"github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"'
+            '"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2":"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"'
 )
 
 DIRS=(  "pkg/cache"
