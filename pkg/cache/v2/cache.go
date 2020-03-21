@@ -19,6 +19,7 @@ import (
 	"context"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/common"
 )
 
 // Request is an alias for the discovery request type.
@@ -69,20 +70,8 @@ type Response struct {
 	ResourceMarshaled bool
 
 	// Resources to be included in the response.
-	Resources []Resource
+	Resources []common.Resource
 
 	// Marshaled Resources to be included in the response.
-	MarshaledResources []MarshaledResource
-}
-
-// MarshaledResource is an alias for the serialized binary array.
-type MarshaledResource = []byte
-
-// SkipFetchError is the error returned when the cache fetch is short
-// circuited due to the client's version already being up-to-date.
-type SkipFetchError struct{}
-
-// Error satisfies the error interface
-func (e SkipFetchError) Error() string {
-	return "skip fetch: version up to date"
+	MarshaledResources []common.MarshaledResource
 }

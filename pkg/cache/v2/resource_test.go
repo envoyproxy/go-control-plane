@@ -20,8 +20,9 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	v2route "github.com/envoyproxy/go-control-plane/envoy/api/v2/route"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
 
 const (
@@ -95,7 +96,7 @@ func TestGetResourceName(t *testing.T) {
 
 func TestGetResourceReferences(t *testing.T) {
 	cases := []struct {
-		in  cache.Resource
+		in  common.Resource
 		out map[string]bool
 	}{
 		{
@@ -133,7 +134,7 @@ func TestGetResourceReferences(t *testing.T) {
 		},
 	}
 	for _, cs := range cases {
-		names := cache.GetResourceReferences(cache.IndexResourcesByName([]cache.Resource{cs.in}))
+		names := cache.GetResourceReferences(cache.IndexResourcesByName([]common.Resource{cs.in}))
 		if !reflect.DeepEqual(names, cs.out) {
 			t.Errorf("GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
 		}

@@ -23,8 +23,10 @@ import (
 	"testing"
 	"testing/iotest"
 
+	"github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
+	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 type logger struct {
@@ -39,17 +41,17 @@ func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format
 func TestGateway(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.responses = map[string][]cache.Response{
-		cache.ClusterType: []cache.Response{{
+		utils.ClusterType: []cache.Response{{
 			Version:   "2",
-			Resources: []cache.Resource{cluster},
+			Resources: []common.Resource{cluster},
 		}},
-		cache.RouteType: []cache.Response{{
+		utils.RouteType: []cache.Response{{
 			Version:   "3",
-			Resources: []cache.Resource{route},
+			Resources: []common.Resource{route},
 		}},
-		cache.ListenerType: []cache.Response{{
+		utils.ListenerType: []cache.Response{{
 			Version:   "4",
-			Resources: []cache.Resource{listener},
+			Resources: []common.Resource{listener},
 		}},
 	}
 	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(context.Background(), config, nil)}

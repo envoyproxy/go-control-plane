@@ -21,6 +21,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/envoyproxy/go-control-plane/pkg/cache/common"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
 
@@ -155,7 +156,7 @@ func nameSet(names []string) map[string]bool {
 }
 
 // superset checks that all resources are listed in the names set.
-func superset(names map[string]bool, resources map[string]Resource) error {
+func superset(names map[string]bool, resources map[string]common.Resource) error {
 	for resourceName := range resources {
 		if _, exists := names[resourceName]; !exists {
 			return fmt.Errorf("%q not listed", resourceName)
@@ -227,7 +228,7 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
 // TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
-func (cache *snapshotCache) respond(request Request, value chan Response, resources map[string]Resource, version string) {
+func (cache *snapshotCache) respond(request Request, value chan Response, resources map[string]common.Resource, version string) {
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
@@ -246,8 +247,8 @@ func (cache *snapshotCache) respond(request Request, value chan Response, resour
 	value <- createResponse(request, resources, version)
 }
 
-func createResponse(request Request, resources map[string]Resource, version string) Response {
-	filtered := make([]Resource, 0, len(resources))
+func createResponse(request Request, resources map[string]common.Resource, version string) Response {
+	filtered := make([]common.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
@@ -288,7 +289,7 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Respon
 			if cache.log != nil {
 				cache.log.Warnf("skip fetch: version up to date")
 			}
-			return nil, &SkipFetchError{}
+			return nil, &common.SkipFetchError{}
 		}
 
 		resources := snapshot.GetResources(request.TypeUrl)

@@ -16,70 +16,37 @@ package cache
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/conversion"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/common"
+	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
-// Resource is the base interface for the xDS payload.
-type Resource interface {
-	proto.Message
-}
-
-// Resource types in xDS v2.
-const (
-	apiTypePrefix       = "type.googleapis.com/envoy.api.v2."
-	discoveryTypePrefix = "type.googleapis.com/envoy.service.discovery.v2."
-	EndpointType        = apiTypePrefix + "ClusterLoadAssignment"
-	ClusterType         = apiTypePrefix + "Cluster"
-	RouteType           = apiTypePrefix + "RouteConfiguration"
-	ListenerType        = apiTypePrefix + "Listener"
-	SecretType          = apiTypePrefix + "auth.Secret"
-	RuntimeType         = discoveryTypePrefix + "Runtime"
-
-	// AnyType is used only by ADS
-	AnyType = ""
-)
-
-// ResponseType enumeration of supported response types
-type ResponseType int
-
-const (
-	Endpoint ResponseType = iota
-	Cluster
-	Route
-	Listener
-	Secret
-	Runtime
-	UnknownType // token to count the total number of supported types
-)
-
 // GetResponseType returns the enumeration for a valid xDS type URL
-func GetResponseType(typeURL string) ResponseType {
+func GetResponseType(typeURL string) common.ResponseType {
 	switch typeURL {
-	case EndpointType:
-		return Endpoint
-	case ClusterType:
-		return Cluster
-	case RouteType:
-		return Route
-	case ListenerType:
-		return Listener
-	case SecretType:
-		return Secret
-	case RuntimeType:
-		return Runtime
+	case utils.EndpointType:
+		return common.Endpoint
+	case utils.ClusterType:
+		return common.Cluster
+	case utils.RouteType:
+		return common.Route
+	case utils.ListenerType:
+		return common.Listener
+	case utils.SecretType:
+		return common.Secret
+	case utils.RuntimeType:
+		return common.Runtime
 	}
-	return UnknownType
+	return common.UnknownType
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.
-func GetResourceName(res Resource) string {
+func GetResourceName(res common.Resource) string {
 	switch v := res.(type) {
 	case *v2.ClusterLoadAssignment:
 		return v.GetClusterName()
@@ -99,7 +66,7 @@ func GetResourceName(res Resource) string {
 }
 
 // MarshalResource converts the Resource to MarshaledResource
-func MarshalResource(resource Resource) (MarshaledResource, error) {
+func MarshalResource(resource common.Resource) (common.MarshaledResource, error) {
 	b := proto.NewBuffer(nil)
 	b.SetDeterministic(true)
 	err := b.Marshal(resource)
@@ -112,7 +79,7 @@ func MarshalResource(resource Resource) (MarshaledResource, error) {
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources map[string]Resource) map[string]bool {
+func GetResourceReferences(resources map[string]common.Resource) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
 		if res == nil {
@@ -145,15 +112,7 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 						continue
 					}
 
-					config := &hcm.HttpConnectionManager{}
-
-					// use typed config if available
-					if typedConfig := filter.GetTypedConfig(); typedConfig != nil {
-						ptypes.UnmarshalAny(typedConfig, config)
-					} else {
-						conversion.StructToMessage(filter.GetConfig(), config)
-					}
-
+					config := utils.GetHTTPConnectionManager(filter)
 					if config == nil {
 						continue
 					}
