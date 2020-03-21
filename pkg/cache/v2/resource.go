@@ -30,6 +30,21 @@ type Resource interface {
 	proto.Message
 }
 
+// Resource types in xDS v2.
+const (
+	apiTypePrefix       = "type.googleapis.com/envoy.api.v2."
+	discoveryTypePrefix = "type.googleapis.com/envoy.service.discovery.v2."
+	EndpointType        = apiTypePrefix + "ClusterLoadAssignment"
+	ClusterType         = apiTypePrefix + "Cluster"
+	RouteType           = apiTypePrefix + "RouteConfiguration"
+	ListenerType        = apiTypePrefix + "Listener"
+	SecretType          = apiTypePrefix + "auth.Secret"
+	RuntimeType         = discoveryTypePrefix + "Runtime"
+
+	// AnyType is used only by ADS
+	AnyType = ""
+)
+
 // ResponseType enumeration of supported response types
 type ResponseType int
 
@@ -46,17 +61,17 @@ const (
 // GetResponseType returns the enumeration for a valid xDS type URL
 func GetResponseType(typeURL string) ResponseType {
 	switch typeURL {
-	case utils.EndpointType:
+	case EndpointType:
 		return Endpoint
-	case utils.ClusterType:
+	case ClusterType:
 		return Cluster
-	case utils.RouteType:
+	case RouteType:
 		return Route
-	case utils.ListenerType:
+	case ListenerType:
 		return Listener
-	case utils.SecretType:
+	case SecretType:
 		return Secret
-	case utils.RuntimeType:
+	case RuntimeType:
 		return Runtime
 	}
 	return UnknownType

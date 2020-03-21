@@ -19,7 +19,6 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
-	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 func TestSnapshotConsistent(t *testing.T) {
@@ -44,13 +43,13 @@ func TestSnapshotConsistent(t *testing.T) {
 
 func TestSnapshotGetters(t *testing.T) {
 	var nilsnap *cache.Snapshot
-	if out := nilsnap.GetResources(utils.EndpointType); out != nil {
+	if out := nilsnap.GetResources(cache.EndpointType); out != nil {
 		t.Errorf("got non-empty resources for nil snapshot: %#v", out)
 	}
 	if out := nilsnap.Consistent(); out == nil {
 		t.Errorf("nil snapshot should be inconsistent")
 	}
-	if out := nilsnap.GetVersion(utils.EndpointType); out != "" {
+	if out := nilsnap.GetVersion(cache.EndpointType); out != "" {
 		t.Errorf("got non-empty version for nil snapshot: %#v", out)
 	}
 	if out := snapshot.GetResources("not a type"); out != nil {
