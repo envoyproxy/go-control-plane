@@ -15,3 +15,6 @@
 *_gen_test.go
 
 /envoy*.log
+
+# vscode artifacts
+/.vscode
