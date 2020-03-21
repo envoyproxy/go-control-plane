@@ -25,6 +25,7 @@ import (
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 type group struct{}
@@ -52,19 +53,19 @@ var (
 		[]cache.Resource{runtime})
 
 	names = map[string][]string{
-		cache.EndpointType: []string{clusterName},
-		cache.ClusterType:  nil,
-		cache.RouteType:    []string{routeName},
-		cache.ListenerType: nil,
-		cache.RuntimeType:  nil,
+		utils.EndpointType: []string{clusterName},
+		utils.ClusterType:  nil,
+		utils.RouteType:    []string{routeName},
+		utils.ListenerType: nil,
+		utils.RuntimeType:  nil,
 	}
 
 	testTypes = []string{
-		cache.EndpointType,
-		cache.ClusterType,
-		cache.RouteType,
-		cache.ListenerType,
-		cache.RuntimeType,
+		utils.EndpointType,
+		utils.ClusterType,
+		utils.RouteType,
+		utils.ListenerType,
+		utils.RuntimeType,
 	}
 )
 
@@ -98,7 +99,7 @@ func TestSnapshotCache(t *testing.T) {
 
 	// try to get endpoints with incorrect list of names
 	// should not receive response
-	value, _ := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: cache.EndpointType, ResourceNames: []string{"none"}})
+	value, _ := c.CreateWatch(v2.DiscoveryRequest{TypeUrl: utils.EndpointType, ResourceNames: []string{"none"}})
 	select {
 	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -143,13 +144,13 @@ func TestSnapshotCacheFetch(t *testing.T) {
 
 	// no response for missing snapshot
 	if resp, err := c.Fetch(context.Background(),
-		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
+		v2.DiscoveryRequest{TypeUrl: utils.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
 		t.Errorf("missing snapshot: response is not nil %v", resp)
 	}
 
 	// no response for latest version
 	if resp, err := c.Fetch(context.Background(),
-		v2.DiscoveryRequest{TypeUrl: cache.ClusterType, VersionInfo: version}); resp != nil || err == nil {
+		v2.DiscoveryRequest{TypeUrl: utils.ClusterType, VersionInfo: version}); resp != nil || err == nil {
 		t.Errorf("latest version: response is not nil %v", resp)
 	}
 }
@@ -199,7 +200,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// validate response for endpoints
 	select {
-	case out := <-watches[cache.EndpointType]:
+	case out := <-watches[utils.EndpointType]:
 		if out.Version != version2 {
 			t.Errorf("got version %q, want %q", out.Version, version2)
 		}
@@ -229,7 +230,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 					}
 					_, cancel = c.CreateWatch(v2.DiscoveryRequest{
 						Node:    &core.Node{Id: id},
-						TypeUrl: cache.EndpointType,
+						TypeUrl: utils.EndpointType,
 					})
 				}
 			})
