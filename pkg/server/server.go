@@ -31,7 +31,6 @@ import (
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 // Server is a collection of handlers for streaming discovery requests.
@@ -227,7 +226,7 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			if !more {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
-			nonce, err := send(resp, utils.EndpointType)
+			nonce, err := send(resp, cache.EndpointType)
 			if err != nil {
 				return err
 			}
@@ -237,7 +236,7 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
-			nonce, err := send(resp, utils.ClusterType)
+			nonce, err := send(resp, cache.ClusterType)
 			if err != nil {
 				return err
 			}
@@ -247,7 +246,7 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
-			nonce, err := send(resp, utils.RouteType)
+			nonce, err := send(resp, cache.RouteType)
 			if err != nil {
 				return err
 			}
@@ -257,7 +256,7 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
-			nonce, err := send(resp, utils.ListenerType)
+			nonce, err := send(resp, cache.ListenerType)
 			if err != nil {
 				return err
 			}
@@ -267,7 +266,7 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			if !more {
 				return status.Errorf(codes.Unavailable, "secrets watch failed")
 			}
-			nonce, err := send(resp, utils.SecretType)
+			nonce, err := send(resp, cache.SecretType)
 			if err != nil {
 				return err
 			}
@@ -277,7 +276,7 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			if !more {
 				return status.Errorf(codes.Unavailable, "runtimes watch failed")
 			}
-			nonce, err := send(resp, utils.RuntimeType)
+			nonce, err := send(resp, cache.RuntimeType)
 			if err != nil {
 				return err
 			}
@@ -303,7 +302,7 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 			nonce := req.GetResponseNonce()
 
 			// type URL is required for ADS but is implicit for xDS
-			if defaultTypeURL == utils.AnyType {
+			if defaultTypeURL == cache.AnyType {
 				if req.TypeUrl == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
 				}
@@ -319,32 +318,32 @@ func (s *server) process(stream stream, reqCh <-chan *v2.DiscoveryRequest, defau
 
 			// cancel existing watches to (re-)request a newer version
 			switch {
-			case req.TypeUrl == utils.EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
+			case req.TypeUrl == cache.EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
 				if values.endpointCancel != nil {
 					values.endpointCancel()
 				}
 				values.endpoints, values.endpointCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == utils.ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
+			case req.TypeUrl == cache.ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
 				if values.clusterCancel != nil {
 					values.clusterCancel()
 				}
 				values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == utils.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
+			case req.TypeUrl == cache.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
 				if values.routeCancel != nil {
 					values.routeCancel()
 				}
 				values.routes, values.routeCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == utils.ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
+			case req.TypeUrl == cache.ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
 				if values.listenerCancel != nil {
 					values.listenerCancel()
 				}
 				values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == utils.SecretType && (values.secretNonce == "" || values.secretNonce == nonce):
+			case req.TypeUrl == cache.SecretType && (values.secretNonce == "" || values.secretNonce == nonce):
 				if values.secretCancel != nil {
 					values.secretCancel()
 				}
 				values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == utils.RuntimeType && (values.runtimeNonce == "" || values.runtimeNonce == nonce):
+			case req.TypeUrl == cache.RuntimeType && (values.runtimeNonce == "" || values.runtimeNonce == nonce):
 				if values.runtimeCancel != nil {
 					values.runtimeCancel()
 				}
@@ -383,31 +382,31 @@ func (s *server) handler(stream stream, typeURL string) error {
 }
 
 func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
-	return s.handler(stream, utils.AnyType)
+	return s.handler(stream, cache.AnyType)
 }
 
 func (s *server) StreamEndpoints(stream v2grpc.EndpointDiscoveryService_StreamEndpointsServer) error {
-	return s.handler(stream, utils.EndpointType)
+	return s.handler(stream, cache.EndpointType)
 }
 
 func (s *server) StreamClusters(stream v2grpc.ClusterDiscoveryService_StreamClustersServer) error {
-	return s.handler(stream, utils.ClusterType)
+	return s.handler(stream, cache.ClusterType)
 }
 
 func (s *server) StreamRoutes(stream v2grpc.RouteDiscoveryService_StreamRoutesServer) error {
-	return s.handler(stream, utils.RouteType)
+	return s.handler(stream, cache.RouteType)
 }
 
 func (s *server) StreamListeners(stream v2grpc.ListenerDiscoveryService_StreamListenersServer) error {
-	return s.handler(stream, utils.ListenerType)
+	return s.handler(stream, cache.ListenerType)
 }
 
 func (s *server) StreamSecrets(stream discoverygrpc.SecretDiscoveryService_StreamSecretsServer) error {
-	return s.handler(stream, utils.SecretType)
+	return s.handler(stream, cache.SecretType)
 }
 
 func (s *server) StreamRuntime(stream discoverygrpc.RuntimeDiscoveryService_StreamRuntimeServer) error {
-	return s.handler(stream, utils.RuntimeType)
+	return s.handler(stream, cache.RuntimeType)
 }
 
 // Fetch is the universal fetch method.
@@ -432,7 +431,7 @@ func (s *server) FetchEndpoints(ctx context.Context, req *v2.DiscoveryRequest) (
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
-	req.TypeUrl = utils.EndpointType
+	req.TypeUrl = cache.EndpointType
 	return s.Fetch(ctx, req)
 }
 
@@ -440,7 +439,7 @@ func (s *server) FetchClusters(ctx context.Context, req *v2.DiscoveryRequest) (*
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
-	req.TypeUrl = utils.ClusterType
+	req.TypeUrl = cache.ClusterType
 	return s.Fetch(ctx, req)
 }
 
@@ -448,7 +447,7 @@ func (s *server) FetchRoutes(ctx context.Context, req *v2.DiscoveryRequest) (*v2
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
-	req.TypeUrl = utils.RouteType
+	req.TypeUrl = cache.RouteType
 	return s.Fetch(ctx, req)
 }
 
@@ -456,7 +455,7 @@ func (s *server) FetchListeners(ctx context.Context, req *v2.DiscoveryRequest) (
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
-	req.TypeUrl = utils.ListenerType
+	req.TypeUrl = cache.ListenerType
 	return s.Fetch(ctx, req)
 }
 
@@ -464,7 +463,7 @@ func (s *server) FetchSecrets(ctx context.Context, req *v2.DiscoveryRequest) (*v
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
-	req.TypeUrl = utils.SecretType
+	req.TypeUrl = cache.SecretType
 	return s.Fetch(ctx, req)
 }
 
@@ -472,7 +471,7 @@ func (s *server) FetchRuntime(ctx context.Context, req *v2.DiscoveryRequest) (*v
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
-	req.TypeUrl = utils.RuntimeType
+	req.TypeUrl = cache.RuntimeType
 	return s.Fetch(ctx, req)
 }
 

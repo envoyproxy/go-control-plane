@@ -25,7 +25,6 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
-	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 type logger struct {
@@ -40,15 +39,15 @@ func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format
 func TestGateway(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.responses = map[string][]cache.Response{
-		utils.ClusterType: []cache.Response{{
+		cache.ClusterType: []cache.Response{{
 			Version:   "2",
 			Resources: []cache.Resource{cluster},
 		}},
-		utils.RouteType: []cache.Response{{
+		cache.RouteType: []cache.Response{{
 			Version:   "3",
 			Resources: []cache.Resource{route},
 		}},
-		utils.ListenerType: []cache.Response{{
+		cache.ListenerType: []cache.Response{{
 			Version:   "4",
 			Resources: []cache.Resource{listener},
 		}},

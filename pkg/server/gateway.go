@@ -25,7 +25,6 @@ import (
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
-	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 // HTTPGateway is a custom implementation of [gRPC gateway](https://github.com/grpc-ecosystem/grpc-gateway)
@@ -44,17 +43,17 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	typeURL := ""
 	switch p {
 	case "/v2/discovery:endpoints":
-		typeURL = utils.EndpointType
+		typeURL = cache.EndpointType
 	case "/v2/discovery:clusters":
-		typeURL = utils.ClusterType
+		typeURL = cache.ClusterType
 	case "/v2/discovery:listeners":
-		typeURL = utils.ListenerType
+		typeURL = cache.ListenerType
 	case "/v2/discovery:routes":
-		typeURL = utils.RouteType
+		typeURL = cache.RouteType
 	case "/v2/discovery:secrets":
-		typeURL = utils.SecretType
+		typeURL = cache.SecretType
 	case "/v2/discovery:runtime":
-		typeURL = utils.RuntimeType
+		typeURL = cache.RuntimeType
 	default:
 		http.Error(resp, "no endpoint", http.StatusNotFound)
 		return
