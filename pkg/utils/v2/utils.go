@@ -12,7 +12,7 @@ import (
 const (
 	apiTypePrefix       = "type.googleapis.com/envoy.api.v2."
 	discoveryTypePrefix = "type.googleapis.com/envoy.service.discovery.v2."
-	EndpointType        = apiTypePrefix + "type.googleapis.com/envoy.api.v2.ClusterLoadAssignment"
+	EndpointType        = apiTypePrefix + "ClusterLoadAssignment"
 	ClusterType         = apiTypePrefix + "Cluster"
 	RouteType           = apiTypePrefix + "RouteConfiguration"
 	ListenerType        = apiTypePrefix + "Listener"
