@@ -16,13 +16,12 @@ package cache
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/conversion"
+	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
@@ -145,14 +144,7 @@ func GetResourceReferences(resources map[string]Resource) map[string]bool {
 						continue
 					}
 
-					config := &hcm.HttpConnectionManager{}
-
-					// use typed config if available
-					if typedConfig := filter.GetTypedConfig(); typedConfig != nil {
-						ptypes.UnmarshalAny(typedConfig, config)
-					} else {
-						conversion.StructToMessage(filter.GetConfig(), config)
-					}
+					config := utils.GetHTTPConnectionManager(filter)
 
 					if config == nil {
 						continue
