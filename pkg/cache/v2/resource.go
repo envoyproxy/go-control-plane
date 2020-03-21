@@ -61,17 +61,17 @@ const (
 // GetResponseType returns the enumeration for a valid xDS type URL
 func GetResponseType(typeURL string) ResponseType {
 	switch typeURL {
-	case EndpointType:
+	case utils.EndpointType:
 		return Endpoint
-	case ClusterType:
+	case utils.ClusterType:
 		return Cluster
-	case RouteType:
+	case utils.RouteType:
 		return Route
-	case ListenerType:
+	case utils.ListenerType:
 		return Listener
-	case SecretType:
+	case utils.SecretType:
 		return Secret
-	case RuntimeType:
+	case utils.RuntimeType:
 		return Runtime
 	}
 	return UnknownType
