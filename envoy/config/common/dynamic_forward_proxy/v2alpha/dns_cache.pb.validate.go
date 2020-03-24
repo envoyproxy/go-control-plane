@@ -72,12 +72,12 @@ func (m *DnsCacheConfig) Validate() error {
 			}
 		}
 
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+		gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
 
-		if dur <= gt {
+		if dur < gte {
 			return DnsCacheConfigValidationError{
 				field:  "DnsRefreshRate",
-				reason: "value must be greater than 0s",
+				reason: "value must be greater than or equal to 1ms",
 			}
 		}
 

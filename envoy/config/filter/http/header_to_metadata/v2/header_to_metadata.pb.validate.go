@@ -227,6 +227,13 @@ func (m *Config_Rule) Validate() error {
 		}
 	}
 
+	if !_Config_Rule_Header_Pattern.MatchString(m.GetHeader()) {
+		return Config_RuleValidationError{
+			field:  "Header",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
 	if v, ok := interface{}(m.GetOnHeaderPresent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Config_RuleValidationError{
@@ -305,3 +312,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Config_RuleValidationError{}
+
+var _Config_Rule_Header_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
