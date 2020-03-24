@@ -24,32 +24,32 @@ import (
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
-	utils "github.com/envoyproxy/go-control-plane/pkg/utils/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
 // GetResponseType returns the enumeration for a valid xDS type URL
-func GetResponseType(typeURL string) common.ResponseType {
+func GetResponseType(typeURL string) types.ResponseType {
 	switch typeURL {
-	case utils.EndpointType:
-		return common.Endpoint
-	case utils.ClusterType:
-		return common.Cluster
-	case utils.RouteType:
-		return common.Route
-	case utils.ListenerType:
-		return common.Listener
-	case utils.SecretType:
-		return common.Secret
-	case utils.RuntimeType:
-		return common.Runtime
+	case resource.EndpointType:
+		return types.Endpoint
+	case resource.ClusterType:
+		return types.Cluster
+	case resource.RouteType:
+		return types.Route
+	case resource.ListenerType:
+		return types.Listener
+	case resource.SecretType:
+		return types.Secret
+	case resource.RuntimeType:
+		return types.Runtime
 	}
-	return common.UnknownType
+	return types.UnknownType
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.
-func GetResourceName(res common.Resource) string {
+func GetResourceName(res types.Resource) string {
 	switch v := res.(type) {
 	case *endpoint.ClusterLoadAssignment:
 		return v.GetClusterName()
@@ -69,7 +69,7 @@ func GetResourceName(res common.Resource) string {
 }
 
 // MarshalResource converts the Resource to MarshaledResource
-func MarshalResource(resource common.Resource) (common.MarshaledResource, error) {
+func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 	b := proto.NewBuffer(nil)
 	b.SetDeterministic(true)
 	err := b.Marshal(resource)
@@ -82,7 +82,7 @@ func MarshalResource(resource common.Resource) (common.MarshaledResource, error)
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources map[string]common.Resource) map[string]bool {
+func GetResourceReferences(resources map[string]types.Resource) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
 		if res == nil {
@@ -115,7 +115,7 @@ func GetResourceReferences(resources map[string]common.Resource) map[string]bool
 						continue
 					}
 
-					config := utils.GetHTTPConnectionManager(filter)
+					config := resource.GetHTTPConnectionManager(filter)
 
 					if config == nil {
 						continue

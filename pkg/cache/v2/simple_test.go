@@ -23,10 +23,11 @@ import (
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	types "github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
-	utils "github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 type group struct{}
@@ -47,26 +48,26 @@ var (
 	version2 = "y"
 
 	snapshot = cache.NewSnapshot(version,
-		[]common.Resource{testEndpoint},
-		[]common.Resource{testCluster},
-		[]common.Resource{testRoute},
-		[]common.Resource{testListener},
-		[]common.Resource{testRuntime})
+		[]types.Resource{testEndpoint},
+		[]types.Resource{testCluster},
+		[]types.Resource{testRoute},
+		[]types.Resource{testListener},
+		[]types.Resource{testRuntime})
 
 	names = map[string][]string{
-		utils.EndpointType: []string{clusterName},
-		utils.ClusterType:  nil,
-		utils.RouteType:    []string{routeName},
-		utils.ListenerType: nil,
-		utils.RuntimeType:  nil,
+		rsrc.EndpointType: []string{clusterName},
+		rsrc.ClusterType:  nil,
+		rsrc.RouteType:    []string{routeName},
+		rsrc.ListenerType: nil,
+		rsrc.RuntimeType:  nil,
 	}
 
 	testTypes = []string{
-		utils.EndpointType,
-		utils.ClusterType,
-		utils.RouteType,
-		utils.ListenerType,
-		utils.RuntimeType,
+		rsrc.EndpointType,
+		rsrc.ClusterType,
+		rsrc.RouteType,
+		rsrc.ListenerType,
+		rsrc.RuntimeType,
 	}
 )
 
@@ -100,7 +101,7 @@ func TestSnapshotCache(t *testing.T) {
 
 	// try to get endpoints with incorrect list of names
 	// should not receive response
-	value, _ := c.CreateWatch(discovery.DiscoveryRequest{TypeUrl: utils.EndpointType, ResourceNames: []string{"none"}})
+	value, _ := c.CreateWatch(discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}})
 	select {
 	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -145,13 +146,13 @@ func TestSnapshotCacheFetch(t *testing.T) {
 
 	// no response for missing snapshot
 	if resp, err := c.Fetch(context.Background(),
-		discovery.DiscoveryRequest{TypeUrl: utils.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
+		discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
 		t.Errorf("missing snapshot: response is not nil %v", resp)
 	}
 
 	// no response for latest version
 	if resp, err := c.Fetch(context.Background(),
-		discovery.DiscoveryRequest{TypeUrl: utils.ClusterType, VersionInfo: version}); resp != nil || err == nil {
+		discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, VersionInfo: version}); resp != nil || err == nil {
 		t.Errorf("latest version: response is not nil %v", resp)
 	}
 }
@@ -191,7 +192,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// set partially-versioned snapshot
 	snapshot2 := snapshot
-	snapshot2.Resources[common.Endpoint] = cache.NewResources(version2, []common.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
 	if err := c.SetSnapshot(key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -201,12 +202,12 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// validate response for endpoints
 	select {
-	case out := <-watches[utils.EndpointType]:
+	case out := <-watches[rsrc.EndpointType]:
 		if out.Version != version2 {
 			t.Errorf("got version %q, want %q", out.Version, version2)
 		}
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[common.Endpoint].Items) {
-			t.Errorf("get resources %v, want %v", out.Resources, snapshot2.Resources[common.Endpoint].Items)
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
+			t.Errorf("get resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
@@ -223,7 +224,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 				var cancel func()
 				if i < 25 {
 					snap := cache.Snapshot{}
-					snap.Resources[common.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []common.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+					snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
 					c.SetSnapshot(id, snap)
 				} else {
 					if cancel != nil {
@@ -231,7 +232,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 					}
 					_, cancel = c.CreateWatch(discovery.DiscoveryRequest{
 						Node:    &core.Node{Id: id},
-						TypeUrl: utils.EndpointType,
+						TypeUrl: rsrc.EndpointType,
 					})
 				}
 			})

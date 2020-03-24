@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 
 MODULES=(   'discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2":discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"'
-            '"github.com/envoyproxy/go-control-plane/pkg/utils/v2":"github.com/envoyproxy/go-control-plane/pkg/utils/v3"'
+            '"github.com/envoyproxy/go-control-plane/pkg/resource/v2":"github.com/envoyproxy/go-control-plane/pkg/resource/v3"'
             'cluster "github.com/envoyproxy/go-control-plane/envoy/api/v2":cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"'  
             'endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2":endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"'  
             'listener "github.com/envoyproxy/go-control-plane/envoy/api/v2":listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"'  

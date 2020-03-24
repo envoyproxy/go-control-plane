@@ -1,4 +1,4 @@
-package common
+package types
 
 import (
 	"github.com/golang/protobuf/proto"

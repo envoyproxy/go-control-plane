@@ -17,7 +17,7 @@ package resource
 import (
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
 const (
@@ -98,8 +98,8 @@ yA==
 )
 
 // MakeSecrets generates an SDS secret
-func MakeSecrets(tlsName, rootName string) []common.Resource {
-	return []common.Resource{
+func MakeSecrets(tlsName, rootName string) []types.Resource {
+	return []types.Resource{
 		&auth.Secret{
 			Name: tlsName,
 			Type: &auth.Secret_TlsCertificate{

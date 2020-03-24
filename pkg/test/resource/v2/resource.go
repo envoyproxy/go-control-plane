@@ -37,7 +37,7 @@ import (
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	tcp "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/tcp_proxy/v2"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
@@ -311,22 +311,22 @@ type TestSnapshot struct {
 
 // Generate produces a snapshot from the parameters.
 func (ts TestSnapshot) Generate() cache.Snapshot {
-	clusters := make([]common.Resource, ts.NumClusters)
-	endpoints := make([]common.Resource, ts.NumClusters)
+	clusters := make([]types.Resource, ts.NumClusters)
+	endpoints := make([]types.Resource, ts.NumClusters)
 	for i := 0; i < ts.NumClusters; i++ {
 		name := fmt.Sprintf("cluster-%s-%d", ts.Version, i)
 		clusters[i] = MakeCluster(ts.Xds, name)
 		endpoints[i] = MakeEndpoint(name, ts.UpstreamPort)
 	}
 
-	routes := make([]common.Resource, ts.NumHTTPListeners)
+	routes := make([]types.Resource, ts.NumHTTPListeners)
 	for i := 0; i < ts.NumHTTPListeners; i++ {
 		name := fmt.Sprintf("route-%s-%d", ts.Version, i)
 		routes[i] = MakeRoute(name, cache.GetResourceName(clusters[i%ts.NumClusters]))
 	}
 
 	total := ts.NumHTTPListeners + ts.NumTCPListeners
-	listeners := make([]common.Resource, total)
+	listeners := make([]types.Resource, total)
 	for i := 0; i < total; i++ {
 		port := ts.BasePort + uint32(i)
 		// listener name must be same since ports are shared and previous listener is drained
@@ -368,7 +368,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		listeners[i] = listener
 	}
 
-	runtimes := make([]common.Resource, ts.NumRuntimes)
+	runtimes := make([]types.Resource, ts.NumRuntimes)
 	for i := 0; i < ts.NumRuntimes; i++ {
 		name := fmt.Sprintf("runtime-%d", i)
 		runtimes[i] = MakeRuntime(name)
@@ -384,7 +384,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 	)
 
 	if ts.TLS {
-		out.Resources[common.Secret] = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
+		out.Resources[types.Secret] = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
 	}
 
 	return out

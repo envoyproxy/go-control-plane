@@ -26,11 +26,11 @@ import (
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/utils/v2"
 )
 
 type mockConfigWatcher struct {
@@ -172,30 +172,30 @@ var (
 	route     = resource.MakeRoute(routeName, clusterName)
 	listener  = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
 	testTypes = []string{
-		utils.EndpointType,
-		utils.ClusterType,
-		utils.RouteType,
-		utils.ListenerType,
+		rsrc.EndpointType,
+		rsrc.ClusterType,
+		rsrc.RouteType,
+		rsrc.ListenerType,
 	}
 )
 
 func makeResponses() map[string][]cache.Response {
 	return map[string][]cache.Response{
-		utils.EndpointType: []cache.Response{{
+		rsrc.EndpointType: []cache.Response{{
 			Version:   "1",
-			Resources: []common.Resource{endpoint},
+			Resources: []types.Resource{endpoint},
 		}},
-		utils.ClusterType: []cache.Response{{
+		rsrc.ClusterType: []cache.Response{{
 			Version:   "2",
-			Resources: []common.Resource{cluster},
+			Resources: []types.Resource{cluster},
 		}},
-		utils.RouteType: []cache.Response{{
+		rsrc.RouteType: []cache.Response{{
 			Version:   "3",
-			Resources: []common.Resource{route},
+			Resources: []types.Resource{route},
 		}},
-		utils.ListenerType: []cache.Response{{
+		rsrc.ListenerType: []cache.Response{{
 			Version:   "4",
-			Resources: []common.Resource{listener},
+			Resources: []types.Resource{listener},
 		}},
 	}
 }
@@ -215,13 +215,13 @@ func TestServerShutdown(t *testing.T) {
 			go func() {
 				var err error
 				switch typ {
-				case utils.EndpointType:
+				case rsrc.EndpointType:
 					err = s.StreamEndpoints(resp)
-				case utils.ClusterType:
+				case rsrc.ClusterType:
 					err = s.StreamClusters(resp)
-				case utils.RouteType:
+				case rsrc.RouteType:
 					err = s.StreamRoutes(resp)
-				case utils.ListenerType:
+				case rsrc.ListenerType:
 					err = s.StreamListeners(resp)
 				}
 				if err != nil {
@@ -256,13 +256,13 @@ func TestResponseHandlers(t *testing.T) {
 			go func() {
 				var err error
 				switch typ {
-				case utils.EndpointType:
+				case resource.EndpointType:
 					err = s.StreamEndpoints(resp)
-				case utils.ClusterType:
+				case resource.ClusterType:
 					err = s.StreamClusters(resp)
-				case utils.RouteType:
+				case resource.RouteType:
 					err = s.StreamRoutes(resp)
-				case utils.ListenerType:
+				case resource.ListenerType:
 					err = s.StreamListeners(resp)
 				}
 				if err != nil {
@@ -457,20 +457,20 @@ func TestAggregatedHandlers(t *testing.T) {
 
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:    node,
-		TypeUrl: utils.ListenerType,
+		TypeUrl: resource.ListenerType,
 	}
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:    node,
-		TypeUrl: utils.ClusterType,
+		TypeUrl: resource.ClusterType,
 	}
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:          node,
-		TypeUrl:       utils.EndpointType,
+		TypeUrl:       resource.EndpointType,
 		ResourceNames: []string{clusterName},
 	}
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:          node,
-		TypeUrl:       utils.RouteType,
+		TypeUrl:       resource.RouteType,
 		ResourceNames: []string{routeName},
 	}
 
@@ -489,10 +489,10 @@ func TestAggregatedHandlers(t *testing.T) {
 			if count >= 4 {
 				close(resp.recv)
 				if want := map[string]int{
-					utils.EndpointType: 1,
-					utils.ClusterType:  1,
-					utils.RouteType:    1,
-					utils.ListenerType: 1,
+					resource.EndpointType: 1,
+					resource.ClusterType:  1,
+					resource.RouteType:    1,
+					resource.ListenerType: 1,
 				}; !reflect.DeepEqual(want, config.counts) {
 					t.Errorf("watch counts => got %v, want %v", config.counts, want)
 				}

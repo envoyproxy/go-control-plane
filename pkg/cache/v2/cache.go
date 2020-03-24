@@ -19,7 +19,7 @@ import (
 	"context"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	common "github.com/envoyproxy/go-control-plane/pkg/cache/common"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
 // Request is an alias for the discovery request type.
@@ -70,8 +70,8 @@ type Response struct {
 	ResourceMarshaled bool
 
 	// Resources to be included in the response.
-	Resources []common.Resource
+	Resources []types.Resource
 
 	// Marshaled Resources to be included in the response.
-	MarshaledResources []common.MarshaledResource
+	MarshaledResources []types.MarshaledResource
 }
