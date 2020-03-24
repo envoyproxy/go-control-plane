@@ -32,7 +32,6 @@ MODULES=(   'clusterservice "github.com/envoyproxy/go-control-plane/envoy/api/v2
             '"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2":"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"'
             '"github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v2":"github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v3"'
             '"github.com/envoyproxy/go-control-plane/pkg/server/v2":"github.com/envoyproxy/go-control-plane/pkg/server/v3"'
-            
 )
 
 DIRS=(  "pkg/cache"
