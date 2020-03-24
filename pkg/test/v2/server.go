@@ -24,9 +24,14 @@ import (
 
 	"google.golang.org/grpc"
 
-	v2grpc "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	clusterservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	endpointservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	listenerservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	routeservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	logger "github.com/envoyproxy/go-control-plane/pkg/log"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
 )
@@ -96,12 +101,12 @@ func RunManagementServer(ctx context.Context, server xds.Server, port uint) {
 
 	// register services
 	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
-	v2grpc.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
-	v2grpc.RegisterClusterDiscoveryServiceServer(grpcServer, server)
-	v2grpc.RegisterRouteDiscoveryServiceServer(grpcServer, server)
-	v2grpc.RegisterListenerDiscoveryServiceServer(grpcServer, server)
-	discoverygrpc.RegisterSecretDiscoveryServiceServer(grpcServer, server)
-	discoverygrpc.RegisterRuntimeDiscoveryServiceServer(grpcServer, server)
+	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	clusterservice.RegisterClusterDiscoveryServiceServer(grpcServer, server)
+	routeservice.RegisterRouteDiscoveryServiceServer(grpcServer, server)
+	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)
+	secretservice.RegisterSecretDiscoveryServiceServer(grpcServer, server)
+	runtimeservice.RegisterRuntimeDiscoveryServiceServer(grpcServer, server)
 
 	log.Printf("management server listening on %d\n", port)
 	go func() {

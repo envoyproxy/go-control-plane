@@ -24,7 +24,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
@@ -39,7 +39,7 @@ type mockConfigWatcher struct {
 	closeWatch bool
 }
 
-func (config *mockConfigWatcher) CreateWatch(req v2.DiscoveryRequest) (chan cache.Response, func()) {
+func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.Response, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	out := make(chan cache.Response, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
@@ -51,7 +51,7 @@ func (config *mockConfigWatcher) CreateWatch(req v2.DiscoveryRequest) (chan cach
 	return out, func() {}
 }
 
-func (config *mockConfigWatcher) Fetch(ctx context.Context, req v2.DiscoveryRequest) (*cache.Response, error) {
+func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (*cache.Response, error) {
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out := config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
@@ -81,25 +81,26 @@ func (c *callbacks) OnStreamOpen(context.Context, int64, string) error {
 	}
 	return nil
 }
-func (c *callbacks) OnStreamClosed(int64)                                                {}
-func (c *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) error                   { return nil }
-func (c *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
-func (c *callbacks) OnFetchRequest(context.Context, *v2.DiscoveryRequest) error {
+func (c *callbacks) OnStreamClosed(int64)                                     {}
+func (c *callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error { return nil }
+func (c *callbacks) OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
+}
+func (c *callbacks) OnFetchRequest(context.Context, *discovery.DiscoveryRequest) error {
 	if c.callbackError {
 		return errors.New("fetch request error")
 	}
 	c.fetchReq++
 	return nil
 }
-func (c *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {
+func (c *callbacks) OnFetchResponse(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
 	c.fetchResp++
 }
 
 type mockStream struct {
 	t         *testing.T
 	ctx       context.Context
-	recv      chan *v2.DiscoveryRequest
-	sent      chan *v2.DiscoveryResponse
+	recv      chan *discovery.DiscoveryRequest
+	sent      chan *discovery.DiscoveryResponse
 	nonce     int
 	sendError bool
 	grpc.ServerStream
@@ -109,7 +110,7 @@ func (stream *mockStream) Context() context.Context {
 	return stream.ctx
 }
 
-func (stream *mockStream) Send(resp *v2.DiscoveryResponse) error {
+func (stream *mockStream) Send(resp *discovery.DiscoveryResponse) error {
 	// check that nonce is monotonically incrementing
 	stream.nonce = stream.nonce + 1
 	if resp.Nonce != fmt.Sprintf("%d", stream.nonce) {
@@ -139,7 +140,7 @@ func (stream *mockStream) Send(resp *v2.DiscoveryResponse) error {
 	return nil
 }
 
-func (stream *mockStream) Recv() (*v2.DiscoveryRequest, error) {
+func (stream *mockStream) Recv() (*discovery.DiscoveryRequest, error) {
 	req, more := <-stream.recv
 	if !more {
 		return nil, errors.New("empty")
@@ -151,8 +152,8 @@ func makeMockStream(t *testing.T) *mockStream {
 	return &mockStream{
 		t:    t,
 		ctx:  context.Background(),
-		sent: make(chan *v2.DiscoveryResponse, 10),
-		recv: make(chan *v2.DiscoveryRequest, 10),
+		sent: make(chan *discovery.DiscoveryResponse, 10),
+		recv: make(chan *discovery.DiscoveryRequest, 10),
 	}
 }
 
@@ -211,7 +212,7 @@ func TestServerShutdown(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &v2.DiscoveryRequest{Node: node}
+			resp.recv <- &discovery.DiscoveryRequest{Node: node}
 			go func() {
 				var err error
 				switch typ {
@@ -252,7 +253,7 @@ func TestResponseHandlers(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &v2.DiscoveryRequest{Node: node}
+			resp.recv <- &discovery.DiscoveryRequest{Node: node}
 			go func() {
 				var err error
 				switch typ {
@@ -289,30 +290,30 @@ func TestFetch(t *testing.T) {
 	config.responses = makeResponses()
 	cb := &callbacks{}
 	s := server.NewServer(context.Background(), config, cb)
-	if out, err := s.FetchEndpoints(context.Background(), &v2.DiscoveryRequest{Node: node}); out == nil || err != nil {
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for endpoints: %v", err)
 	}
-	if out, err := s.FetchClusters(context.Background(), &v2.DiscoveryRequest{Node: node}); out == nil || err != nil {
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for clusters: %v", err)
 	}
-	if out, err := s.FetchRoutes(context.Background(), &v2.DiscoveryRequest{Node: node}); out == nil || err != nil {
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for routes: %v", err)
 	}
-	if out, err := s.FetchListeners(context.Background(), &v2.DiscoveryRequest{Node: node}); out == nil || err != nil {
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for listeners: %v", err)
 	}
 
 	// try again and expect empty results
-	if out, err := s.FetchEndpoints(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil {
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
 		t.Errorf("expected empty or error for endpoints: %v", err)
 	}
-	if out, err := s.FetchClusters(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil {
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
 		t.Errorf("expected empty or error for clusters: %v", err)
 	}
-	if out, err := s.FetchRoutes(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil {
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
 		t.Errorf("expected empty or error for routes: %v", err)
 	}
-	if out, err := s.FetchListeners(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil {
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
 		t.Errorf("expected empty or error for listeners: %v", err)
 	}
 
@@ -332,16 +333,16 @@ func TestFetch(t *testing.T) {
 
 	// send error from callback
 	cb.callbackError = true
-	if out, err := s.FetchEndpoints(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
 		t.Errorf("expected empty or error due to callback error")
 	}
-	if out, err := s.FetchClusters(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
 		t.Errorf("expected empty or error due to callback error")
 	}
-	if out, err := s.FetchRoutes(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
 		t.Errorf("expected empty or error due to callback error")
 	}
-	if out, err := s.FetchListeners(context.Background(), &v2.DiscoveryRequest{Node: node}); out != nil || err == nil {
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
 		t.Errorf("expected empty or error due to callback error")
 	}
 
@@ -363,7 +364,7 @@ func TestWatchClosed(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &v2.DiscoveryRequest{
+			resp.recv <- &discovery.DiscoveryRequest{
 				Node:    node,
 				TypeUrl: typ,
 			}
@@ -388,7 +389,7 @@ func TestSendError(t *testing.T) {
 			// make a request
 			resp := makeMockStream(t)
 			resp.sendError = true
-			resp.recv <- &v2.DiscoveryRequest{
+			resp.recv <- &discovery.DiscoveryRequest{
 				Node:    node,
 				TypeUrl: typ,
 			}
@@ -411,7 +412,7 @@ func TestStaleNonce(t *testing.T) {
 			s := server.NewServer(context.Background(), config, &callbacks{})
 
 			resp := makeMockStream(t)
-			resp.recv <- &v2.DiscoveryRequest{
+			resp.recv <- &discovery.DiscoveryRequest{
 				Node:    node,
 				TypeUrl: typ,
 			}
@@ -429,13 +430,13 @@ func TestStaleNonce(t *testing.T) {
 			select {
 			case <-resp.sent:
 				// stale request
-				resp.recv <- &v2.DiscoveryRequest{
+				resp.recv <- &discovery.DiscoveryRequest{
 					Node:          node,
 					TypeUrl:       typ,
 					ResponseNonce: "xyz",
 				}
 				// fresh request
-				resp.recv <- &v2.DiscoveryRequest{
+				resp.recv <- &discovery.DiscoveryRequest{
 					VersionInfo:   "1",
 					Node:          node,
 					TypeUrl:       typ,
@@ -455,20 +456,20 @@ func TestAggregatedHandlers(t *testing.T) {
 	config.responses = makeResponses()
 	resp := makeMockStream(t)
 
-	resp.recv <- &v2.DiscoveryRequest{
+	resp.recv <- &discovery.DiscoveryRequest{
 		Node:    node,
 		TypeUrl: rsrc.ListenerType,
 	}
-	resp.recv <- &v2.DiscoveryRequest{
+	resp.recv <- &discovery.DiscoveryRequest{
 		Node:    node,
 		TypeUrl: rsrc.ClusterType,
 	}
-	resp.recv <- &v2.DiscoveryRequest{
+	resp.recv <- &discovery.DiscoveryRequest{
 		Node:          node,
 		TypeUrl:       rsrc.EndpointType,
 		ResourceNames: []string{clusterName},
 	}
-	resp.recv <- &v2.DiscoveryRequest{
+	resp.recv <- &discovery.DiscoveryRequest{
 		Node:          node,
 		TypeUrl:       rsrc.RouteType,
 		ResourceNames: []string{routeName},
@@ -510,7 +511,7 @@ func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
 	s := server.NewServer(context.Background(), config, &callbacks{})
 	resp := makeMockStream(t)
-	resp.recv <- &v2.DiscoveryRequest{Node: node}
+	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
 		t.Error("StreamAggregatedResources() => got nil, want an error")
 	}
@@ -525,7 +526,7 @@ func TestCallbackError(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &v2.DiscoveryRequest{
+			resp.recv <- &discovery.DiscoveryRequest{
 				Node:    node,
 				TypeUrl: typ,
 			}
