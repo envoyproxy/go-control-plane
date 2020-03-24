@@ -32,7 +32,7 @@ DIRS=(  "pkg/cache"
 for dir in "${DIRS[@]}" ; do
     v2dir="$dir/v2"
     v3dir="$dir/v3"
-    mkdir -p $v3dir
+    mkdir -p "$v3dir"
     cp -R "$v2dir/" "$v3dir"
     FILES=($(ls -p "$v3dir"))
     for file in "${FILES[@]}" ; do
@@ -40,8 +40,8 @@ for dir in "${DIRS[@]}" ; do
         for module in "${MODULES[@]}" ; do
             KEY=${module%%:*}
             VALUE=${module#*:}
-            sed -i.bak "s|$KEY|$VALUE|" $path && rm "$path.bak"
-            gofmt -s -w $path
+            sed -i.bak "s|$KEY|$VALUE|" "$path" && rm "$path.bak"
+            gofmt -s -w "$path"
         done
     done
 done
