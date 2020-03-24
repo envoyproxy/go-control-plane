@@ -256,13 +256,13 @@ func TestResponseHandlers(t *testing.T) {
 			go func() {
 				var err error
 				switch typ {
-				case resource.EndpointType:
+				case rsrc.EndpointType:
 					err = s.StreamEndpoints(resp)
-				case resource.ClusterType:
+				case rsrc.ClusterType:
 					err = s.StreamClusters(resp)
-				case resource.RouteType:
+				case rsrc.RouteType:
 					err = s.StreamRoutes(resp)
-				case resource.ListenerType:
+				case rsrc.ListenerType:
 					err = s.StreamListeners(resp)
 				}
 				if err != nil {
@@ -457,20 +457,20 @@ func TestAggregatedHandlers(t *testing.T) {
 
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:    node,
-		TypeUrl: resource.ListenerType,
+		TypeUrl: rsrc.ListenerType,
 	}
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:    node,
-		TypeUrl: resource.ClusterType,
+		TypeUrl: rsrc.ClusterType,
 	}
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:          node,
-		TypeUrl:       resource.EndpointType,
+		TypeUrl:       rsrc.EndpointType,
 		ResourceNames: []string{clusterName},
 	}
 	resp.recv <- &v2.DiscoveryRequest{
 		Node:          node,
-		TypeUrl:       resource.RouteType,
+		TypeUrl:       rsrc.RouteType,
 		ResourceNames: []string{routeName},
 	}
 
@@ -489,10 +489,10 @@ func TestAggregatedHandlers(t *testing.T) {
 			if count >= 4 {
 				close(resp.recv)
 				if want := map[string]int{
-					resource.EndpointType: 1,
-					resource.ClusterType:  1,
-					resource.RouteType:    1,
-					resource.ListenerType: 1,
+					rsrc.EndpointType: 1,
+					rsrc.ClusterType:  1,
+					rsrc.RouteType:    1,
+					rsrc.ListenerType: 1,
 				}; !reflect.DeepEqual(want, config.counts) {
 					t.Errorf("watch counts => got %v, want %v", config.counts, want)
 				}
