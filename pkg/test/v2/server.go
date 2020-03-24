@@ -29,7 +29,6 @@ import (
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	logger "github.com/envoyproxy/go-control-plane/pkg/log"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/test/v2"
 )
 
 const (
@@ -58,7 +57,7 @@ func RunHTTP(ctx context.Context, upstreamPort uint) {
 }
 
 // RunAccessLogServer starts an accessloggrpc service.
-func RunAccessLogServer(ctx context.Context, als *test.AccessLogService, port uint) {
+func RunAccessLogServer(ctx context.Context, als *AccessLogService, port uint) {
 	grpcServer := grpc.NewServer()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
