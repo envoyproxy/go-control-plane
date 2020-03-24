@@ -17,39 +17,41 @@ package cache_test
 import (
 	"testing"
 
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
 
 func TestSnapshotConsistent(t *testing.T) {
 	if err := snapshot.Consistent(); err != nil {
 		t.Errorf("got inconsistent snapshot for %#v", snapshot)
 	}
-	if snap := cache.NewSnapshot(version, []cache.Resource{endpoint}, nil, nil, nil, nil); snap.Consistent() == nil {
+	if snap := cache.NewSnapshot(version, []types.Resource{testEndpoint}, nil, nil, nil, nil); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
-	if snap := cache.NewSnapshot(version, []cache.Resource{resource.MakeEndpoint("missing", 8080)},
-		[]cache.Resource{cluster}, nil, nil, nil); snap.Consistent() == nil {
+	if snap := cache.NewSnapshot(version, []types.Resource{resource.MakeEndpoint("missing", 8080)},
+		[]types.Resource{testCluster}, nil, nil, nil); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
-	if snap := cache.NewSnapshot(version, nil, nil, nil, []cache.Resource{listener}, nil); snap.Consistent() == nil {
+	if snap := cache.NewSnapshot(version, nil, nil, nil, []types.Resource{testListener}, nil); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
 	if snap := cache.NewSnapshot(version, nil, nil,
-		[]cache.Resource{resource.MakeRoute("test", clusterName)}, []cache.Resource{listener}, nil); snap.Consistent() == nil {
+		[]types.Resource{resource.MakeRoute("test", clusterName)}, []types.Resource{testListener}, nil); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
 }
 
 func TestSnapshotGetters(t *testing.T) {
 	var nilsnap *cache.Snapshot
-	if out := nilsnap.GetResources(cache.EndpointType); out != nil {
+	if out := nilsnap.GetResources(rsrc.EndpointType); out != nil {
 		t.Errorf("got non-empty resources for nil snapshot: %#v", out)
 	}
 	if out := nilsnap.Consistent(); out == nil {
 		t.Errorf("nil snapshot should be inconsistent")
 	}
-	if out := nilsnap.GetVersion(cache.EndpointType); out != "" {
+	if out := nilsnap.GetVersion(rsrc.EndpointType); out != "" {
 		t.Errorf("got non-empty version for nil snapshot: %#v", out)
 	}
 	if out := snapshot.GetResources("not a type"); out != nil {

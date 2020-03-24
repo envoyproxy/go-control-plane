@@ -23,8 +23,9 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 )
 
 // HTTPGateway is a custom implementation of [gRPC gateway](https://github.com/grpc-ecosystem/grpc-gateway)
@@ -43,17 +44,17 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	typeURL := ""
 	switch p {
 	case "/v2/discovery:endpoints":
-		typeURL = cache.EndpointType
+		typeURL = resource.EndpointType
 	case "/v2/discovery:clusters":
-		typeURL = cache.ClusterType
+		typeURL = resource.ClusterType
 	case "/v2/discovery:listeners":
-		typeURL = cache.ListenerType
+		typeURL = resource.ListenerType
 	case "/v2/discovery:routes":
-		typeURL = cache.RouteType
+		typeURL = resource.RouteType
 	case "/v2/discovery:secrets":
-		typeURL = cache.SecretType
+		typeURL = resource.SecretType
 	case "/v2/discovery:runtime":
-		typeURL = cache.RuntimeType
+		typeURL = resource.RuntimeType
 	default:
 		http.Error(resp, "no endpoint", http.StatusNotFound)
 		return
@@ -84,7 +85,7 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		// SkipFetchErrors will return a 304 which will signify to the envoy client that
 		// it is already at the latest version; all other errors will 500 with a message.
-		if _, ok := err.(*cache.SkipFetchError); ok {
+		if _, ok := err.(*types.SkipFetchError); ok {
 			resp.WriteHeader(http.StatusNotModified)
 		} else {
 			http.Error(resp, "fetch error: "+err.Error(), http.StatusInternalServerError)

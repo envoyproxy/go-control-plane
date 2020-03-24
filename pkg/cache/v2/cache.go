@@ -18,11 +18,12 @@ package cache
 import (
 	"context"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
 // Request is an alias for the discovery request type.
-type Request = v2.DiscoveryRequest
+type Request = discovery.DiscoveryRequest
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
@@ -59,7 +60,7 @@ type Cache interface {
 // Response is a pre-serialized xDS response.
 type Response struct {
 	// Request is the original request.
-	Request v2.DiscoveryRequest
+	Request discovery.DiscoveryRequest
 
 	// Version of the resources as tracked by the cache for the given type.
 	// Proxy responds with this version as an acknowledgement.
@@ -69,20 +70,8 @@ type Response struct {
 	ResourceMarshaled bool
 
 	// Resources to be included in the response.
-	Resources []Resource
+	Resources []types.Resource
 
 	// Marshaled Resources to be included in the response.
-	MarshaledResources []MarshaledResource
-}
-
-// MarshaledResource is an alias for the serialized binary array.
-type MarshaledResource = []byte
-
-// SkipFetchError is the error returned when the cache fetch is short
-// circuited due to the client's version already being up-to-date.
-type SkipFetchError struct{}
-
-// Error satisfies the error interface
-func (e SkipFetchError) Error() string {
-	return "skip fetch: version up to date"
+	MarshaledResources []types.MarshaledResource
 }
