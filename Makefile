@@ -6,7 +6,7 @@
 
 SHELL 	:= /bin/bash
 BINDIR	:= bin
-PKG 		:= github.com/envoyproxy/go-control-plane
+PKG 	:= github.com/envoyproxy/go-control-plane
 
 .PHONY: build
 build:
@@ -23,6 +23,10 @@ cover:
 .PHONY: format
 format:
 	@goimports -local $(PKG) -w -l pkg
+
+.PHONY: create_version
+create_version:
+	./create_version.sh
 
 #-----------------
 #-- integration
