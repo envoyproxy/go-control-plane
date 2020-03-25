@@ -22,7 +22,7 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
@@ -72,7 +72,7 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	// parse as JSON
-	out := &v2.DiscoveryRequest{}
+	out := &discovery.DiscoveryRequest{}
 	err = jsonpb.UnmarshalString(string(body), out)
 	if err != nil {
 		http.Error(resp, "cannot parse JSON body: "+err.Error(), http.StatusBadRequest)

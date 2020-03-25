@@ -4,7 +4,14 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-MODULES=(   'discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2":discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"'
+MODULES=(   'clusterservice "github.com/envoyproxy/go-control-plane/envoy/api/v2":clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"'
+            'endpointservice "github.com/envoyproxy/go-control-plane/envoy/api/v2":endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"'
+            'listenerservice "github.com/envoyproxy/go-control-plane/envoy/api/v2":listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"'
+            'routeservice "github.com/envoyproxy/go-control-plane/envoy/api/v2":routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"'
+            'runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2":runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"'
+            'secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2":secretservice "github.com/envoyproxy/go-control-plane/envoy/service/secret/v3"'
+            'accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2":accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v3"'
+            'discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2":discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"'
             '"github.com/envoyproxy/go-control-plane/pkg/resource/v2":"github.com/envoyproxy/go-control-plane/pkg/resource/v3"'
             'cluster "github.com/envoyproxy/go-control-plane/envoy/api/v2":cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"'  
             'endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2":endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"'  
@@ -23,10 +30,14 @@ MODULES=(   'discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2":dis
             'runtime "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2":runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"'
             '"github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2":"github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"'
             '"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2":"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"'
+            '"github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v2":"github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v3"'
+            '"github.com/envoyproxy/go-control-plane/pkg/server/v2":"github.com/envoyproxy/go-control-plane/pkg/server/v3"'
 )
 
 DIRS=(  "pkg/cache"
+        "pkg/server"
         "pkg/test/resource"
+        "pkg/test"
 )
 
 for dir in "${DIRS[@]}" ; do

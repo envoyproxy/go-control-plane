@@ -6,8 +6,7 @@ import (
 	"time"
 
 	alf "github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v2"
-	als "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
-	alsgrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
+	accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
 )
 
 // AccessLogService buffers access logs from the remote Envoy nodes.
@@ -33,7 +32,7 @@ func (svc *AccessLogService) Dump(f func(string)) {
 }
 
 // StreamAccessLogs implements the access log service.
-func (svc *AccessLogService) StreamAccessLogs(stream alsgrpc.AccessLogService_StreamAccessLogsServer) error {
+func (svc *AccessLogService) StreamAccessLogs(stream accessloggrpc.AccessLogService_StreamAccessLogsServer) error {
 	var logName string
 	for {
 		msg, err := stream.Recv()
@@ -44,7 +43,7 @@ func (svc *AccessLogService) StreamAccessLogs(stream alsgrpc.AccessLogService_St
 			logName = msg.Identifier.LogName
 		}
 		switch entries := msg.LogEntries.(type) {
-		case *als.StreamAccessLogsMessage_HttpLogs:
+		case *accessloggrpc.StreamAccessLogsMessage_HttpLogs:
 			for _, entry := range entries.HttpLogs.LogEntry {
 				if entry != nil {
 					common := entry.CommonProperties
@@ -64,7 +63,7 @@ func (svc *AccessLogService) StreamAccessLogs(stream alsgrpc.AccessLogService_St
 						resp.ResponseCode.GetValue(), req.RequestId, common.UpstreamCluster))
 				}
 			}
-		case *als.StreamAccessLogsMessage_TcpLogs:
+		case *accessloggrpc.StreamAccessLogsMessage_TcpLogs:
 			for _, entry := range entries.TcpLogs.LogEntry {
 				if entry != nil {
 					common := entry.CommonProperties
