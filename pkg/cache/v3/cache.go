@@ -23,7 +23,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
-// Request is an alias for the discovery request type.
+// Request is an alias for the discovery requbest type.
 type Request = discovery.DiscoveryRequest
 
 // ConfigWatcher requests watches for configuration resources by a node, last
