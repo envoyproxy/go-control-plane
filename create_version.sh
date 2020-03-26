@@ -54,6 +54,9 @@ fi
 for dir in "${DIRS[@]}" ; do
     v2dir="$dir/v2"
     v3dir="$dir/v3"
+    printf "Deleting %s\n" "$v3dir"
+    rm -rf "$v3dir"
+    printf "Recreating %s\n" "$v3dir"
     mkdir -p "$v3dir"
     cp -R "$v2dir/" "$v3dir"
     FILES=($(ls -p "$v3dir"))
