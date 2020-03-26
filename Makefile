@@ -24,6 +24,10 @@ cover:
 format:
 	@goimports -local $(PKG) -w -l pkg
 
+.PHONY: create_version
+create_version:
+	./create_version.sh
+
 #-----------------
 #-- integration
 #-----------------

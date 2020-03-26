@@ -58,6 +58,18 @@ in the same environment as the circle ci. This makes sure to produce a consisten
     ./build/run_docker.sh make integration
     ```
 
+## Xds Api versioning
+
+The Envoy xDS APIs follow a well defined [versioning scheme](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/versioning).
+Due to lack of generics and function overloading in golang, creating a new version unfortunately involves code duplication.
+Based on the discussion [here](https://docs.google.com/document/d/1ZkHpz6DwEUmAlG0kb2Mgu4iaeQC2Bbb0egMbECoNNKY/edit?ts=5e602993#heading=h.15nsmgmjaaml) and [here](https://envoyproxy.slack.com/archives/C7LDJTM6Z/p1582925082005300), go-control-plane is adopting a mechanism to create a new version from an existing version by running a script.
+In order to handle deprecated/new fields between versions, make sure to create a shim such that duplication remains minimal. One such example today is how different [resource urls](https://github.com/envoyproxy/go-control-plane/tree/master/pkg/resource) are handled.
+
+For authoring changes, make changes to v2 and at the end, use `make create_version` to create the v3 specific files.
+Make sure to run `make build` and `make test` to identify and fix failures.
+
+When v2 version is frozen in the future, we will change the experience such that changes will need to happen to v3 and autogen will create the v2 version instead.
+
 ## Usage
 
 Register services on the gRPC server as follows.

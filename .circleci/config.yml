@@ -6,6 +6,7 @@ jobs:
       - image: gcr.io/istio-testing/go-control-plane-ci:01-22-2020
     steps:
       - checkout
+      - run: make create_version
       - run: make build
       - run: make test
       - run: make integration
