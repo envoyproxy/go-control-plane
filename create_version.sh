@@ -71,7 +71,7 @@ for dir in "${DIRS[@]}" ; do
     done
     modified=$(git status --porcelain "$v3dir")
     if [[ -n "${modified}" ]]; then
-        printf -e "\nerror: Make sure to not edit the auto generated files in %s \n" "$v3dir"
+        printf "\nerror: Make sure to not edit the auto generated files in %s \n" "$v3dir"
         exit 1
     fi
 done
