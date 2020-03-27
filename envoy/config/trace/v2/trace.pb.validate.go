@@ -132,6 +132,18 @@ func (m *LightstepConfig) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetPropagationModes() {
+		_, _ = idx, item
+
+		if _, ok := LightstepConfig_PropagationMode_name[int32(item)]; !ok {
+			return LightstepConfigValidationError{
+				field:  fmt.Sprintf("PropagationModes[%v]", idx),
+				reason: "value must be one of the defined enum values",
+			}
+		}
+
+	}
+
 	return nil
 }
 
