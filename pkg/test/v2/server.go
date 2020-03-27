@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net"
 	"net/http"
 
 	"google.golang.org/grpc"
@@ -33,6 +32,7 @@ import (
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	logger "github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
 )
 
@@ -61,44 +61,13 @@ func RunHTTP(ctx context.Context, upstreamPort uint) {
 	}()
 }
 
-// RunAccessLogServer starts an accessloggrpc service.
-func RunAccessLogServer(ctx context.Context, als *AccessLogService, port uint) {
-	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatal(err)
-	}
-
+// RegisterAccessLogServer starts an accessloggrpc service.
+func RegisterAccessLogServer(grpcServer *grpc.Server, als *AccessLogService) {
 	accessloggrpc.RegisterAccessLogServiceServer(grpcServer, als)
-	log.Printf("access log server listening on %d\n", port)
-
-	go func() {
-		if err = grpcServer.Serve(lis); err != nil {
-			log.Println(err)
-		}
-	}()
-	<-ctx.Done()
-
-	grpcServer.GracefulStop()
 }
 
-const grpcMaxConcurrentStreams = 1000000
-
-// RunManagementServer starts an xDS server at the given port.
-func RunManagementServer(ctx context.Context, server xds.Server, port uint) {
-	// gRPC golang library sets a very small upper bound for the number gRPC/h2
-	// streams over a single TCP connection. If a proxy multiplexes requests over
-	// a single connection to the management server, then it might lead to
-	// availability problems.
-	var grpcOptions []grpc.ServerOption
-	grpcOptions = append(grpcOptions, grpc.MaxConcurrentStreams(grpcMaxConcurrentStreams))
-	grpcServer := grpc.NewServer(grpcOptions...)
-
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatal(err)
-	}
-
+// RegisterServer registers with v2 services.
+func RegisterServer(grpcServer *grpc.Server, server server.Server) {
 	// register services
 	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
@@ -107,16 +76,6 @@ func RunManagementServer(ctx context.Context, server xds.Server, port uint) {
 	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 	secretservice.RegisterSecretDiscoveryServiceServer(grpcServer, server)
 	runtimeservice.RegisterRuntimeDiscoveryServiceServer(grpcServer, server)
-
-	log.Printf("management server listening on %d\n", port)
-	go func() {
-		if err = grpcServer.Serve(lis); err != nil {
-			log.Println(err)
-		}
-	}()
-	<-ctx.Done()
-
-	grpcServer.GracefulStop()
 }
 
 // RunManagementGateway starts an HTTP gateway to an xDS server.

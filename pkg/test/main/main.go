@@ -22,18 +22,23 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
-	test "github.com/envoyproxy/go-control-plane/pkg/test/v2"
+	cachev2 "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	serverv2 "github.com/envoyproxy/go-control-plane/pkg/server/v2"
+	serverv3 "github.com/envoyproxy/go-control-plane/pkg/server/v3"
+	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
+	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
+	"google.golang.org/grpc"
 
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
+
+const grpcMaxConcurrentStreams = 1000000
 
 var (
 	debug bool
@@ -83,14 +88,19 @@ func main() {
 	ctx := context.Background()
 
 	// start upstream
-	go test.RunHTTP(ctx, upstreamPort)
+	go testv2.RunHTTP(ctx, upstreamPort)
 
 	// create a cache
 	signal := make(chan struct{})
-	cb := &callbacks{signal: signal}
-	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
-	srv := server.NewServer(context.Background(), config, cb)
-	als := &test.AccessLogService{}
+	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
+	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
+
+	configv2 := cachev2.NewSnapshotCache(mode == resource.Ads, cachev2.IDHash{}, logger{})
+	configv3 := cachev3.NewSnapshotCache(mode == resource.Ads, cachev3.IDHash{}, logger{})
+	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2)
+	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3)
+	alsv2 := &testv2.AccessLogService{}
+	alsv3 := &testv3.AccessLogService{}
 
 	// create a test snapshot
 	snapshots := resource.TestSnapshot{
@@ -105,9 +115,9 @@ func main() {
 	}
 
 	// start the xDS server
-	go test.RunAccessLogServer(ctx, als, alsPort)
-	go test.RunManagementServer(ctx, srv, port)
-	go test.RunManagementGateway(ctx, srv, gatewayPort, logger{})
+	go runAccessLogServer(ctx, alsv2, alsv3)
+	go runManagementServer(ctx, srv2, srv3)
+	go testv2.RunManagementGateway(ctx, srv2, gatewayPort, logger{})
 
 	log.Println("waiting for the first request...")
 	select {
@@ -129,7 +139,7 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshot)
 		}
 
-		err := config.SetSnapshot(nodeID, snapshot)
+		err := configv2.SetSnapshot(nodeID, snapshot)
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshot)
 			os.Exit(1)
@@ -150,12 +160,12 @@ func main() {
 			}
 		}
 
-		als.Dump(func(s string) {
+		alsv2.Dump(func(s string) {
 			if debug {
 				log.Println(s)
 			}
 		})
-		cb.Report()
+		cbv2.Report()
 
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
@@ -197,7 +207,7 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			if string(body) != test.Hello {
+			if string(body) != testv2.Hello {
 				ch <- fmt.Errorf("unexpected return %q", string(body))
 				return
 			}
@@ -240,48 +250,51 @@ func (logger logger) Errorf(format string, args ...interface{}) {
 	log.Printf(format+"\n", args...)
 }
 
-type callbacks struct {
-	signal   chan struct{}
-	fetches  int
-	requests int
-	mu       sync.Mutex
+func runAccessLogServer(ctx context.Context, alsv2 *testv2.AccessLogService, alsv3 *testv3.AccessLogService) {
+	grpcServer := grpc.NewServer()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	testv2.RegisterAccessLogServer(grpcServer, alsv2)
+	log.Printf("access log server listening on %d\n", port)
+
+	go func() {
+		if err = grpcServer.Serve(lis); err != nil {
+			log.Println(err)
+		}
+	}()
+	<-ctx.Done()
+
+	grpcServer.GracefulStop()
 }
 
-func (cb *callbacks) Report() {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	log.Printf("server callbacks fetches=%d requests=%d\n", cb.fetches, cb.requests)
-}
-func (cb *callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error {
-	if debug {
-		log.Printf("stream %d open for %s\n", id, typ)
+// RunManagementServer starts an xDS server at the given port.
+func runManagementServer(ctx context.Context, srv2 serverv2.Server, srv3 serverv3.Server) {
+	// gRPC golang library sets a very small upper bound for the number gRPC/h2
+	// streams over a single TCP connection. If a proxy multiplexes requests over
+	// a single connection to the management server, then it might lead to
+	// availability problems.
+	var grpcOptions []grpc.ServerOption
+	grpcOptions = append(grpcOptions, grpc.MaxConcurrentStreams(grpcMaxConcurrentStreams))
+	grpcServer := grpc.NewServer(grpcOptions...)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		log.Fatal(err)
 	}
-	return nil
+
+	testv2.RegisterServer(grpcServer, srv2)
+	testv3.RegisterServer(grpcServer, srv3)
+
+	log.Printf("management server listening on %d\n", port)
+	go func() {
+		if err = grpcServer.Serve(lis); err != nil {
+			log.Println(err)
+		}
+	}()
+	<-ctx.Done()
+
+	grpcServer.GracefulStop()
 }
-func (cb *callbacks) OnStreamClosed(id int64) {
-	if debug {
-		log.Printf("stream %d closed\n", id)
-	}
-}
-func (cb *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) error {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	cb.requests++
-	if cb.signal != nil {
-		close(cb.signal)
-		cb.signal = nil
-	}
-	return nil
-}
-func (cb *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
-func (cb *callbacks) OnFetchRequest(_ context.Context, req *v2.DiscoveryRequest) error {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	cb.fetches++
-	if cb.signal != nil {
-		close(cb.signal)
-		cb.signal = nil
-	}
-	return nil
-}
-func (cb *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {}

@@ -7,6 +7,7 @@ jobs:
     steps:
       - checkout
       - run: make create_version
+      - run: make check_version_dirty
       - run: make build
       - run: make test
       - run: make integration

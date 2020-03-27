@@ -26,7 +26,11 @@ format:
 
 .PHONY: create_version
 create_version:
-	./create_version.sh
+	./scripts/create_version.sh
+
+.PHONY: check_version_dirty
+check_version_dirty:
+	./scripts/check_version_dirty.sh
 
 #-----------------
 #-- integration
