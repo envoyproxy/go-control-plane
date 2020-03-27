@@ -252,13 +252,13 @@ func (logger logger) Errorf(format string, args ...interface{}) {
 
 func runAccessLogServer(ctx context.Context, alsv2 *testv2.AccessLogService, alsv3 *testv3.AccessLogService) {
 	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", alsPort))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	testv2.RegisterAccessLogServer(grpcServer, alsv2)
-	log.Printf("access log server listening on %d\n", port)
+	log.Printf("access log server listening on %d\n", alsPort)
 
 	go func() {
 		if err = grpcServer.Serve(lis); err != nil {
