@@ -31,9 +31,7 @@ import (
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	logger "github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
-	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
 )
 
 const (
@@ -76,15 +74,4 @@ func RegisterServer(grpcServer *grpc.Server, server server.Server) {
 	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 	secretservice.RegisterSecretDiscoveryServiceServer(grpcServer, server)
 	runtimeservice.RegisterRuntimeDiscoveryServiceServer(grpcServer, server)
-}
-
-// RunManagementGateway starts an HTTP gateway to an xDS server.
-func RunManagementGateway(ctx context.Context, srv xds.Server, port uint, lg logger.Logger) {
-	log.Printf("gateway listening HTTP/1.1 on %d\n", port)
-	server := &http.Server{Addr: fmt.Sprintf(":%d", port), Handler: &xds.HTTPGateway{Server: srv, Log: lg}}
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			log.Println(err)
-		}
-	}()
 }

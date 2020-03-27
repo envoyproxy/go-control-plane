@@ -35,6 +35,7 @@ import (
 	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
 	"google.golang.org/grpc"
 
+	gcplogger "github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
 
@@ -117,7 +118,7 @@ func main() {
 	// start the xDS server
 	go runAccessLogServer(ctx, alsv2, alsv3)
 	go runManagementServer(ctx, srv2, srv3)
-	go testv2.RunManagementGateway(ctx, srv2, gatewayPort, logger{})
+	go runManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
 
 	log.Println("waiting for the first request...")
 	select {
@@ -297,4 +298,40 @@ func runManagementServer(ctx context.Context, srv2 serverv2.Server, srv3 serverv
 	<-ctx.Done()
 
 	grpcServer.GracefulStop()
+}
+
+// RunManagementGateway starts an HTTP gateway to an xDS server.
+func runManagementGateway(ctx context.Context, srv2 serverv2.Server, srv3 serverv3.Server, port uint, lg gcplogger.Logger) {
+	log.Printf("gateway listening HTTP/1.1 on %d\n", port)
+	server := &http.Server{
+		Addr: fmt.Sprintf(":%d", port),
+		Handler: &HTTPGateway{
+			GatewayV2: serverv2.HTTPGateway{Log: lg, Server: srv2},
+			GatewayV3: serverv3.HTTPGateway{Log: lg, Server: srv3},
+			Log:       lg,
+		},
+	}
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
+}
+
+// HTTPGateway is a custom implementation of [gRPC gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+// specialized to Envoy xDS API.
+type HTTPGateway struct {
+	// Log is an optional log for errors in response write
+	Log gcplogger.Logger
+
+	GatewayV2 serverv2.HTTPGateway
+
+	GatewayV3 serverv3.HTTPGateway
+}
+
+func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	err := h.GatewayV2.ServeHTTP(resp, req)
+	if err != nil {
+		h.GatewayV3.ServeHTTP(resp, req)
+	}
 }

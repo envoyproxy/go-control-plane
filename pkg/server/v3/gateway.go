@@ -17,6 +17,7 @@ package server
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -39,7 +40,7 @@ type HTTPGateway struct {
 	Server Server
 }
 
-func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) error {
 	p := path.Clean(req.URL.Path)
 
 	typeURL := ""
@@ -58,18 +59,18 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		typeURL = resource.RuntimeType
 	default:
 		http.Error(resp, "no endpoint", http.StatusNotFound)
-		return
+		return fmt.Errorf("no endpoint for v2")
 	}
 
 	if req.Body == nil {
 		http.Error(resp, "empty body", http.StatusBadRequest)
-		return
+		return nil
 	}
 
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		http.Error(resp, "cannot read body", http.StatusBadRequest)
-		return
+		return nil
 	}
 
 	// parse as JSON
@@ -77,7 +78,7 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	err = jsonpb.UnmarshalString(string(body), out)
 	if err != nil {
 		http.Error(resp, "cannot parse JSON body: "+err.Error(), http.StatusBadRequest)
-		return
+		return nil
 	}
 	out.TypeUrl = typeURL
 
@@ -91,7 +92,7 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		} else {
 			http.Error(resp, "fetch error: "+err.Error(), http.StatusInternalServerError)
 		}
-		return
+		return nil
 	}
 
 	buf := &bytes.Buffer{}
@@ -102,4 +103,6 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if _, err = resp.Write(buf.Bytes()); err != nil && h.Log != nil {
 		h.Log.Errorf("gateway error: %v", err)
 	}
+
+	return nil
 }
