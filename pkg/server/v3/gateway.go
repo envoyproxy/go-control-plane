@@ -45,21 +45,21 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) err
 
 	typeURL := ""
 	switch p {
-	case "/v2/discovery:endpoints":
+	case resource.FetchEndpoints:
 		typeURL = resource.EndpointType
-	case "/v2/discovery:clusters":
+	case resource.FetchClusters:
 		typeURL = resource.ClusterType
-	case "/v2/discovery:listeners":
+	case resource.FetchListeners:
 		typeURL = resource.ListenerType
-	case "/v2/discovery:routes":
+	case resource.FetchRoutes:
 		typeURL = resource.RouteType
-	case "/v2/discovery:secrets":
+	case resource.FetchSecrets:
 		typeURL = resource.SecretType
-	case "/v2/discovery:runtime":
+	case resource.FetchRuntimes:
 		typeURL = resource.RuntimeType
 	default:
 		http.Error(resp, "no endpoint", http.StatusNotFound)
-		return fmt.Errorf("no endpoint for v2")
+		return fmt.Errorf("no endpoint")
 	}
 
 	if req.Body == nil {

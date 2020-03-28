@@ -21,6 +21,16 @@ const (
 	AnyType = ""
 )
 
+// Fetch urls in xDS v3.
+const (
+	FetchEndpoints = "/v3/discovery:endpoints"
+	FetchClusters  = "/v3/discovery:clusters"
+	FetchListeners = "/v3/discovery:listeners"
+	FetchRoutes    = "/v3/discovery:routes"
+	FetchSecrets   = "/v3/discovery:secrets"
+	FetchRuntimes  = "/v3/discovery:runtime"
+)
+
 // GetHTTPConnectionManager creates a HttpConnectionManager from filter
 func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManager {
 	config := &hcm.HttpConnectionManager{}
