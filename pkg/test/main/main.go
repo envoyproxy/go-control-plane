@@ -39,7 +39,14 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
 
-const grpcMaxConcurrentStreams = 1000000
+const (
+	// Hello is the echo message
+	hello = "Hi, there!\n"
+
+	grpcMaxConcurrentStreams = 1000000
+)
+
+type echo struct{}
 
 var (
 	debug bool
@@ -89,7 +96,7 @@ func main() {
 	ctx := context.Background()
 
 	// start upstream
-	go testv2.RunHTTP(ctx, upstreamPort)
+	go runHTTP(ctx, upstreamPort)
 
 	// create a cache
 	signal := make(chan struct{})
@@ -208,7 +215,7 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			if string(body) != testv2.Hello {
+			if string(body) != hello {
 				ch <- fmt.Errorf("unexpected return %q", string(body))
 				return
 			}
@@ -334,4 +341,22 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		h.GatewayV3.ServeHTTP(resp, req)
 	}
+}
+
+func (h echo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/text")
+	if _, err := w.Write([]byte(hello)); err != nil {
+		log.Println(err)
+	}
+}
+
+// RunHTTP opens a simple listener on the port.
+func runHTTP(ctx context.Context, upstreamPort uint) {
+	log.Printf("upstream listening HTTP/1.1 on %d\n", upstreamPort)
+	server := &http.Server{Addr: fmt.Sprintf(":%d", upstreamPort), Handler: echo{}}
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
 }

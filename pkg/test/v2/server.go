@@ -16,11 +16,6 @@
 package test
 
 import (
-	"context"
-	"fmt"
-	"log"
-	"net/http"
-
 	"google.golang.org/grpc"
 
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
@@ -33,31 +28,6 @@ import (
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
 )
-
-const (
-	// Hello is the echo message
-	Hello = "Hi, there!\n"
-)
-
-type echo struct{}
-
-func (h echo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/text")
-	if _, err := w.Write([]byte(Hello)); err != nil {
-		log.Println(err)
-	}
-}
-
-// RunHTTP opens a simple listener on the port.
-func RunHTTP(ctx context.Context, upstreamPort uint) {
-	log.Printf("upstream listening HTTP/1.1 on %d\n", upstreamPort)
-	server := &http.Server{Addr: fmt.Sprintf(":%d", upstreamPort), Handler: echo{}}
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			log.Println(err)
-		}
-	}()
-}
 
 // RegisterAccessLogServer starts an accessloggrpc service.
 func RegisterAccessLogServer(grpcServer *grpc.Server, als *AccessLogService) {
