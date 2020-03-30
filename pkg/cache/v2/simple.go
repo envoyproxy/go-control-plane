@@ -52,6 +52,12 @@ type SnapshotCache interface {
 
 	// ClearSnapshot removes all status and snapshot information associated with a node.
 	ClearSnapshot(node string)
+
+	// GetStatusInfo retrieves status information for a node ID.
+	GetStatusInfo(string) StatusInfo
+
+	// GetStatusKeys retrieves node IDs for all statuses.
+	GetStatusKeys() []string
 }
 
 type snapshotCache struct {
