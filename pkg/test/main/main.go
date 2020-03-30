@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"time"
@@ -31,22 +30,12 @@ import (
 	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	serverv2 "github.com/envoyproxy/go-control-plane/pkg/server/v2"
 	serverv3 "github.com/envoyproxy/go-control-plane/pkg/server/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/test"
 	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
 	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
-	"google.golang.org/grpc"
 
-	gcplogger "github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
-
-const (
-	// Hello is the echo message
-	hello = "Hi, there!\n"
-
-	grpcMaxConcurrentStreams = 1000000
-)
-
-type echo struct{}
 
 var (
 	debug bool
@@ -96,7 +85,7 @@ func main() {
 	ctx := context.Background()
 
 	// start upstream
-	go runHTTP(ctx, upstreamPort)
+	go test.RunHTTP(ctx, upstreamPort)
 
 	// create a cache
 	signal := make(chan struct{})
@@ -123,9 +112,9 @@ func main() {
 	}
 
 	// start the xDS server
-	go runAccessLogServer(ctx, alsv2, alsv3)
-	go runManagementServer(ctx, srv2, srv3)
-	go runManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
+	go test.RunAccessLogServer(ctx, alsv2, alsv3, alsPort)
+	go test.RunManagementServer(ctx, srv2, srv3, port)
+	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
 
 	log.Println("waiting for the first request...")
 	select {
@@ -215,7 +204,7 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			if string(body) != hello {
+			if string(body) != test.Hello {
 				ch <- fmt.Errorf("unexpected return %q", string(body))
 				return
 			}
@@ -256,107 +245,4 @@ func (logger logger) Warnf(format string, args ...interface{}) {
 
 func (logger logger) Errorf(format string, args ...interface{}) {
 	log.Printf(format+"\n", args...)
-}
-
-func runAccessLogServer(ctx context.Context, alsv2 *testv2.AccessLogService, alsv3 *testv3.AccessLogService) {
-	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", alsPort))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	testv2.RegisterAccessLogServer(grpcServer, alsv2)
-	log.Printf("access log server listening on %d\n", alsPort)
-
-	go func() {
-		if err = grpcServer.Serve(lis); err != nil {
-			log.Println(err)
-		}
-	}()
-	<-ctx.Done()
-
-	grpcServer.GracefulStop()
-}
-
-// RunManagementServer starts an xDS server at the given port.
-func runManagementServer(ctx context.Context, srv2 serverv2.Server, srv3 serverv3.Server) {
-	// gRPC golang library sets a very small upper bound for the number gRPC/h2
-	// streams over a single TCP connection. If a proxy multiplexes requests over
-	// a single connection to the management server, then it might lead to
-	// availability problems.
-	var grpcOptions []grpc.ServerOption
-	grpcOptions = append(grpcOptions, grpc.MaxConcurrentStreams(grpcMaxConcurrentStreams))
-	grpcServer := grpc.NewServer(grpcOptions...)
-
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	testv2.RegisterServer(grpcServer, srv2)
-	testv3.RegisterServer(grpcServer, srv3)
-
-	log.Printf("management server listening on %d\n", port)
-	go func() {
-		if err = grpcServer.Serve(lis); err != nil {
-			log.Println(err)
-		}
-	}()
-	<-ctx.Done()
-
-	grpcServer.GracefulStop()
-}
-
-// RunManagementGateway starts an HTTP gateway to an xDS server.
-func runManagementGateway(ctx context.Context, srv2 serverv2.Server, srv3 serverv3.Server, port uint, lg gcplogger.Logger) {
-	log.Printf("gateway listening HTTP/1.1 on %d\n", port)
-	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", port),
-		Handler: &HTTPGateway{
-			GatewayV2: serverv2.HTTPGateway{Log: lg, Server: srv2},
-			GatewayV3: serverv3.HTTPGateway{Log: lg, Server: srv3},
-			Log:       lg,
-		},
-	}
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			log.Println(err)
-		}
-	}()
-}
-
-// HTTPGateway is a custom implementation of [gRPC gateway](https://github.com/grpc-ecosystem/grpc-gateway)
-// specialized to Envoy xDS API.
-type HTTPGateway struct {
-	// Log is an optional log for errors in response write
-	Log gcplogger.Logger
-
-	GatewayV2 serverv2.HTTPGateway
-
-	GatewayV3 serverv3.HTTPGateway
-}
-
-func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-	err := h.GatewayV2.ServeHTTP(resp, req)
-	if err != nil {
-		h.GatewayV3.ServeHTTP(resp, req)
-	}
-}
-
-func (h echo) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/text")
-	if _, err := w.Write([]byte(hello)); err != nil {
-		log.Println(err)
-	}
-}
-
-// RunHTTP opens a simple listener on the port.
-func runHTTP(ctx context.Context, upstreamPort uint) {
-	log.Printf("upstream listening HTTP/1.1 on %d\n", upstreamPort)
-	server := &http.Server{Addr: fmt.Sprintf(":%d", upstreamPort), Handler: echo{}}
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			log.Println(err)
-		}
-	}()
 }
