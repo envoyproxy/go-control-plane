@@ -18,6 +18,7 @@ package resource
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	pstruct "github.com/golang/protobuf/ptypes/struct"
@@ -91,8 +92,8 @@ func MakeEndpoint(clusterName string, port uint32) *endpoint.ClusterLoadAssignme
 }
 
 // MakeCluster creates a cluster using either ADS or EDS.
-func MakeCluster(mode string, clusterName string) *cluster.Cluster {
-	edsSource := configSource(mode)
+func MakeCluster(mode string, clusterName string, resourceAPIVersion string) *cluster.Cluster {
+	edsSource := configSource(mode, resourceAPIVersion)
 
 	connectTimeout := 5 * time.Second
 	return &cluster.Cluster{
@@ -131,8 +132,11 @@ func MakeRoute(routeName, clusterName string) *route.RouteConfiguration {
 }
 
 // data source configuration
-func configSource(mode string) *core.ConfigSource {
+func configSource(mode string, resourceAPIVersion string) *core.ConfigSource {
 	source := &core.ConfigSource{}
+	if strings.EqualFold(resourceAPIVersion, core.ApiVersion_V3.String()) {
+		source.ResourceApiVersion = core.ApiVersion_V3
+	}
 	switch mode {
 	case Ads:
 		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
@@ -163,8 +167,8 @@ func configSource(mode string) *core.ConfigSource {
 }
 
 // MakeHTTPListener creates a listener using either ADS or RDS for the route.
-func MakeHTTPListener(mode string, listenerName string, port uint32, route string) *listener.Listener {
-	rdsSource := configSource(mode)
+func MakeHTTPListener(mode string, listenerName string, port uint32, route string, resourceAPIVersion string) *listener.Listener {
+	rdsSource := configSource(mode, resourceAPIVersion)
 
 	// access log service configuration
 	alsConfig := &als.HttpGrpcAccessLogConfig{
@@ -311,12 +315,12 @@ type TestSnapshot struct {
 }
 
 // Generate produces a snapshot from the parameters.
-func (ts TestSnapshot) Generate() cache.Snapshot {
+func (ts TestSnapshot) Generate(resourceAPIVersion string) cache.Snapshot {
 	clusters := make([]types.Resource, ts.NumClusters)
 	endpoints := make([]types.Resource, ts.NumClusters)
 	for i := 0; i < ts.NumClusters; i++ {
 		name := fmt.Sprintf("cluster-%s-%d", ts.Version, i)
-		clusters[i] = MakeCluster(ts.Xds, name)
+		clusters[i] = MakeCluster(ts.Xds, name, resourceAPIVersion)
 		endpoints[i] = MakeEndpoint(name, ts.UpstreamPort)
 	}
 
@@ -334,7 +338,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		name := fmt.Sprintf("listener-%d", port)
 		var listener *listener.Listener
 		if i < ts.NumHTTPListeners {
-			listener = MakeHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]))
+			listener = MakeHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]), resourceAPIVersion)
 		} else {
 			listener = MakeTCPListener(name, port, cache.GetResourceName(clusters[i%ts.NumClusters]))
 		}
@@ -345,12 +349,12 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 					CommonTlsContext: &auth.CommonTlsContext{
 						TlsCertificateSdsSecretConfigs: []*auth.SdsSecretConfig{{
 							Name:      tlsName,
-							SdsConfig: configSource(ts.Xds),
+							SdsConfig: configSource(ts.Xds, resourceAPIVersion),
 						}},
 						ValidationContextType: &auth.CommonTlsContext_ValidationContextSdsSecretConfig{
 							ValidationContextSdsSecretConfig: &auth.SdsSecretConfig{
 								Name:      rootName,
-								SdsConfig: configSource(ts.Xds),
+								SdsConfig: configSource(ts.Xds, resourceAPIVersion),
 							},
 						},
 					},

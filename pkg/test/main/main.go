@@ -58,7 +58,8 @@ var (
 	runtimes      int
 	tls           bool
 
-	nodeID string
+	nodeID             string
+	resourceAPIVersion string
 )
 
 func init() {
@@ -78,6 +79,7 @@ func init() {
 	flag.IntVar(&runtimes, "runtimes", 1, "Number of RTDS layers")
 	flag.StringVar(&nodeID, "nodeID", "test-id", "Node ID")
 	flag.BoolVar(&tls, "tls", false, "Enable TLS on all listeners and use SDS for secret delivery")
+	flag.StringVar(&resourceAPIVersion, "resourceAPIVersion", "v2", "Envoy resource api version")
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
@@ -144,8 +146,8 @@ func main() {
 		snapshotsv3.Version = fmt.Sprintf("v%d", i)
 		log.Printf("update snapshot %v\n", snapshotsv3.Version)
 
-		snapshotv2 := snapshotsv2.Generate()
-		snapshotv3 := snapshotsv3.Generate()
+		snapshotv2 := snapshotsv2.Generate(resourceAPIVersion)
+		snapshotv3 := snapshotsv3.Generate(resourceAPIVersion)
 		if err := snapshotv2.Consistent(); err != nil {
 			log.Printf("snapshot inconsistency: %+v\n", snapshotv2)
 		}
