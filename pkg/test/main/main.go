@@ -34,7 +34,8 @@ import (
 	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
 	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
 
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
+	resourcev2 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
+	resourcev3 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
 var (
@@ -70,7 +71,7 @@ func init() {
 	flag.DurationVar(&delay, "delay", 500*time.Millisecond, "Interval between request batch retries")
 	flag.IntVar(&requests, "r", 5, "Number of requests between snapshot updates")
 	flag.IntVar(&updates, "u", 3, "Number of snapshot updates")
-	flag.StringVar(&mode, "xds", resource.Ads, "Management server type (ads, xds, rest)")
+	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management server type (ads, xds, rest)")
 	flag.IntVar(&clusters, "clusters", 4, "Number of clusters")
 	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
 	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
@@ -92,15 +93,25 @@ func main() {
 	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
 	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
 
-	configv2 := cachev2.NewSnapshotCache(mode == resource.Ads, cachev2.IDHash{}, logger{})
-	configv3 := cachev3.NewSnapshotCache(mode == resource.Ads, cachev3.IDHash{}, logger{})
+	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
+	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{})
 	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2)
 	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3)
 	alsv2 := &testv2.AccessLogService{}
 	alsv3 := &testv3.AccessLogService{}
 
 	// create a test snapshot
-	snapshots := resource.TestSnapshot{
+	snapshotsv2 := resourcev2.TestSnapshot{
+		Xds:              mode,
+		UpstreamPort:     uint32(upstreamPort),
+		BasePort:         uint32(basePort),
+		NumClusters:      clusters,
+		NumHTTPListeners: httpListeners,
+		NumTCPListeners:  tcpListeners,
+		TLS:              tls,
+		NumRuntimes:      runtimes,
+	}
+	snapshotsv3 := resourcev3.TestSnapshot{
 		Xds:              mode,
 		UpstreamPort:     uint32(upstreamPort),
 		BasePort:         uint32(basePort),
@@ -124,21 +135,33 @@ func main() {
 		log.Println("timeout waiting for the first request")
 		os.Exit(1)
 	}
-	log.Printf("initial snapshot %+v\n", snapshots)
+	log.Printf("initial snapshot %+v\n", snapshotsv2)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
 	for i := 0; i < updates; i++ {
-		snapshots.Version = fmt.Sprintf("v%d", i)
-		log.Printf("update snapshot %v\n", snapshots.Version)
+		snapshotsv2.Version = fmt.Sprintf("v%d", i)
+		log.Printf("update snapshot %v\n", snapshotsv2.Version)
+		snapshotsv3.Version = fmt.Sprintf("v%d", i)
+		log.Printf("update snapshot %v\n", snapshotsv3.Version)
 
-		snapshot := snapshots.Generate()
-		if err := snapshot.Consistent(); err != nil {
-			log.Printf("snapshot inconsistency: %+v\n", snapshot)
+		snapshotv2 := snapshotsv2.Generate()
+		snapshotv3 := snapshotsv3.Generate()
+		if err := snapshotv2.Consistent(); err != nil {
+			log.Printf("snapshot inconsistency: %+v\n", snapshotv2)
+		}
+		if err := snapshotv3.Consistent(); err != nil {
+			log.Printf("snapshot inconsistency: %+v\n", snapshotv3)
 		}
 
-		err := configv2.SetSnapshot(nodeID, snapshot)
+		err := configv2.SetSnapshot(nodeID, snapshotv2)
 		if err != nil {
-			log.Printf("snapshot error %q for %+v\n", err, snapshot)
+			log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
+			os.Exit(1)
+		}
+
+		err = configv3.SetSnapshot(nodeID, snapshotv3)
+		if err != nil {
+			log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
 			os.Exit(1)
 		}
 
@@ -163,6 +186,13 @@ func main() {
 			}
 		})
 		cbv2.Report()
+
+		alsv3.Dump(func(s string) {
+			if debug {
+				log.Println(s)
+			}
+		})
+		cbv3.Report()
 
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
