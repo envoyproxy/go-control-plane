@@ -24,13 +24,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
-	test "github.com/envoyproxy/go-control-plane/pkg/test/v2"
+	cachev2 "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	serverv2 "github.com/envoyproxy/go-control-plane/pkg/server/v2"
+	serverv3 "github.com/envoyproxy/go-control-plane/pkg/server/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/test"
+	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
+	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
 
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
@@ -87,10 +89,15 @@ func main() {
 
 	// create a cache
 	signal := make(chan struct{})
-	cb := &callbacks{signal: signal}
-	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
-	srv := server.NewServer(context.Background(), config, cb)
-	als := &test.AccessLogService{}
+	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
+	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
+
+	configv2 := cachev2.NewSnapshotCache(mode == resource.Ads, cachev2.IDHash{}, logger{})
+	configv3 := cachev3.NewSnapshotCache(mode == resource.Ads, cachev3.IDHash{}, logger{})
+	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2)
+	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3)
+	alsv2 := &testv2.AccessLogService{}
+	alsv3 := &testv3.AccessLogService{}
 
 	// create a test snapshot
 	snapshots := resource.TestSnapshot{
@@ -105,9 +112,9 @@ func main() {
 	}
 
 	// start the xDS server
-	go test.RunAccessLogServer(ctx, als, alsPort)
-	go test.RunManagementServer(ctx, srv, port)
-	go test.RunManagementGateway(ctx, srv, gatewayPort, logger{})
+	go test.RunAccessLogServer(ctx, alsv2, alsv3, alsPort)
+	go test.RunManagementServer(ctx, srv2, srv3, port)
+	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
 
 	log.Println("waiting for the first request...")
 	select {
@@ -129,7 +136,7 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshot)
 		}
 
-		err := config.SetSnapshot(nodeID, snapshot)
+		err := configv2.SetSnapshot(nodeID, snapshot)
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshot)
 			os.Exit(1)
@@ -150,12 +157,12 @@ func main() {
 			}
 		}
 
-		als.Dump(func(s string) {
+		alsv2.Dump(func(s string) {
 			if debug {
 				log.Println(s)
 			}
 		})
-		cb.Report()
+		cbv2.Report()
 
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
@@ -239,49 +246,3 @@ func (logger logger) Warnf(format string, args ...interface{}) {
 func (logger logger) Errorf(format string, args ...interface{}) {
 	log.Printf(format+"\n", args...)
 }
-
-type callbacks struct {
-	signal   chan struct{}
-	fetches  int
-	requests int
-	mu       sync.Mutex
-}
-
-func (cb *callbacks) Report() {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	log.Printf("server callbacks fetches=%d requests=%d\n", cb.fetches, cb.requests)
-}
-func (cb *callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error {
-	if debug {
-		log.Printf("stream %d open for %s\n", id, typ)
-	}
-	return nil
-}
-func (cb *callbacks) OnStreamClosed(id int64) {
-	if debug {
-		log.Printf("stream %d closed\n", id)
-	}
-}
-func (cb *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) error {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	cb.requests++
-	if cb.signal != nil {
-		close(cb.signal)
-		cb.signal = nil
-	}
-	return nil
-}
-func (cb *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
-func (cb *callbacks) OnFetchRequest(_ context.Context, req *v2.DiscoveryRequest) error {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	cb.fetches++
-	if cb.signal != nil {
-		close(cb.signal)
-		cb.signal = nil
-	}
-	return nil
-}
-func (cb *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {}

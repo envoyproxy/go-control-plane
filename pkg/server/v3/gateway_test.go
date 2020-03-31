@@ -67,22 +67,22 @@ func TestGateway(t *testing.T) {
 			expect: http.StatusNotFound,
 		},
 		{
-			path:   "/v2/discovery:endpoints",
+			path:   resource.FetchEndpoints,
 			expect: http.StatusBadRequest,
 		},
 		{
-			path:   "/v2/discovery:endpoints",
+			path:   resource.FetchEndpoints,
 			body:   iotest.TimeoutReader(strings.NewReader("hello")),
 			expect: http.StatusBadRequest,
 		},
 		{
-			path:   "/v2/discovery:endpoints",
+			path:   resource.FetchEndpoints,
 			body:   strings.NewReader("hello"),
 			expect: http.StatusBadRequest,
 		},
 		{
 			// missing response
-			path:   "/v2/discovery:endpoints",
+			path:   resource.FetchEndpoints,
 			body:   strings.NewReader("{\"node\": {\"id\": \"test\"}}"),
 			expect: http.StatusInternalServerError,
 		},
@@ -93,19 +93,19 @@ func TestGateway(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		gtw.ServeHTTP(rr, req)
+		_ = gtw.ServeHTTP(rr, req)
 		if status := rr.Code; status != cs.expect {
 			t.Errorf("handler returned wrong status: %d, want %d", status, cs.expect)
 		}
 	}
 
-	for _, path := range []string{"/v2/discovery:clusters", "/v2/discovery:routes", "/v2/discovery:listeners"} {
+	for _, path := range []string{resource.FetchClusters, resource.FetchRoutes, resource.FetchListeners} {
 		rr := httptest.NewRecorder()
 		req, err := http.NewRequest(http.MethodPost, path, strings.NewReader("{\"node\": {\"id\": \"test\"}}"))
 		if err != nil {
 			t.Fatal(err)
 		}
-		gtw.ServeHTTP(rr, req)
+		_ = gtw.ServeHTTP(rr, req)
 		if status := rr.Code; status != 200 {
 			t.Errorf("handler returned wrong status: %d, want %d", status, 200)
 		}
