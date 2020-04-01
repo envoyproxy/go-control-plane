@@ -40,6 +40,7 @@ import (
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
@@ -133,6 +134,7 @@ func MakeRoute(routeName, clusterName string) *route.RouteConfiguration {
 // data source configuration
 func configSource(mode string) *core.ConfigSource {
 	source := &core.ConfigSource{}
+	source.ResourceApiVersion = resource.DefaultAPIVersion
 	switch mode {
 	case Ads:
 		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
