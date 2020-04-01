@@ -3,6 +3,7 @@ package resource
 import (
 	"github.com/golang/protobuf/ptypes"
 
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 )
@@ -30,6 +31,9 @@ const (
 	FetchSecrets   = "/v3/discovery:secrets"
 	FetchRuntimes  = "/v3/discovery:runtime"
 )
+
+// DefaultAPIVersion is the api version
+const DefaultAPIVersion = core.ApiVersion_V3
 
 // GetHTTPConnectionManager creates a HttpConnectionManager from filter
 func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManager {
