@@ -20,7 +20,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
-	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
 
@@ -72,8 +71,7 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 
 	// parse as JSON
 	out := &discovery.DiscoveryRequest{}
-	unmarshaller := jsonpb.Unmarshaler{AllowUnknownFields: true}
-	err = unmarshaller.Unmarshal(strings.NewReader(string(body)), out)
+	err = jsonpb.UnmarshalString(string(body), out)
 	if err != nil {
 		return nil, http.StatusBadRequest, fmt.Errorf("cannot parse JSON body: " + err.Error())
 	}
