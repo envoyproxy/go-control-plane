@@ -926,6 +926,9 @@ func (m *DownstreamTlsContext) Validate() error {
 			}
 		}
 
+	case *DownstreamTlsContext_DisableStatelessSessionResumption:
+		// no validation rules for DisableStatelessSessionResumption
+
 	}
 
 	return nil
