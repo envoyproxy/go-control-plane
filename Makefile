@@ -35,12 +35,12 @@ check_version_dirty:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.ads.tls
+.PHONY: $(BINDIR)/test integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.rest.v3 integration.ads.tls
 
 $(BINDIR)/test:
 	@go build -race -o $@ pkg/test/main/main.go
 
-integration: integration.xds integration.xds.v3 integration.ads integration.ads.v3 integration.rest integration.ads.tls
+integration: integration.xds integration.xds.v3 integration.ads integration.ads.v3 integration.rest integration.rest.v3 integration.ads.tls
 
 integration.ads: $(BINDIR)/test
 	env XDS=ads build/integration.sh
@@ -56,6 +56,9 @@ integration.xds.v3: $(BINDIR)/test
 
 integration.rest: $(BINDIR)/test
 	env XDS=rest build/integration.sh
+
+integration.rest.v3: $(BINDIR)/test
+	env XDS=rest SUFFIX=v3 build/integration.sh
 
 integration.ads.tls: $(BINDIR)/test
 	env XDS=ads build/integration.sh -tls

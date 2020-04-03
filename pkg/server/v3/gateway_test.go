@@ -63,10 +63,6 @@ func TestGateway(t *testing.T) {
 		expect int
 	}{
 		{
-			path:   "/hello/",
-			expect: http.StatusNotFound,
-		},
-		{
 			path:   resource.FetchEndpoints,
 			expect: http.StatusBadRequest,
 		},

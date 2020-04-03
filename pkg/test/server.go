@@ -108,7 +108,12 @@ func RunManagementGateway(ctx context.Context, srv2 serverv2.Server, srv3 server
 func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	err := h.GatewayV2.ServeHTTP(resp, req)
 	if err != nil {
-		h.GatewayV3.ServeHTTP(resp, req)
+		err = h.GatewayV3.ServeHTTP(resp, req)
+	}
+
+	if err != nil {
+		http.Error(resp, "no endpoint", http.StatusNotFound)
+		return
 	}
 }
 
