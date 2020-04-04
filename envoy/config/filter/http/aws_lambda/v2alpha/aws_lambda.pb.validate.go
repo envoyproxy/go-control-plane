@@ -52,6 +52,13 @@ func (m *Config) Validate() error {
 
 	// no validation rules for PayloadPassthrough
 
+	if _, ok := Config_InvocationMode_name[int32(m.GetInvocationMode())]; !ok {
+		return ConfigValidationError{
+			field:  "InvocationMode",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	return nil
 }
 
