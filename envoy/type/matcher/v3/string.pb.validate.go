@@ -69,15 +69,6 @@ func (m *StringMatcher) Validate() error {
 			}
 		}
 
-	case *StringMatcher_HiddenEnvoyDeprecatedRegex:
-
-		if len(m.GetHiddenEnvoyDeprecatedRegex()) > 1024 {
-			return StringMatcherValidationError{
-				field:  "HiddenEnvoyDeprecatedRegex",
-				reason: "value length must be at most 1024 bytes",
-			}
-		}
-
 	case *StringMatcher_SafeRegex:
 
 		if m.GetSafeRegex() == nil {
@@ -94,6 +85,15 @@ func (m *StringMatcher) Validate() error {
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
+			}
+		}
+
+	case *StringMatcher_HiddenEnvoyDeprecatedRegex:
+
+		if len(m.GetHiddenEnvoyDeprecatedRegex()) > 1024 {
+			return StringMatcherValidationError{
+				field:  "HiddenEnvoyDeprecatedRegex",
+				reason: "value length must be at most 1024 bytes",
 			}
 		}
 

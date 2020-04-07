@@ -50,8 +50,6 @@ func (m *RedisProxy) Validate() error {
 		}
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedCluster
-
 	if m.GetSettings() == nil {
 		return RedisProxyValidationError{
 			field:  "Settings",
@@ -90,6 +88,8 @@ func (m *RedisProxy) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for HiddenEnvoyDeprecatedCluster
 
 	return nil
 }
@@ -360,8 +360,6 @@ func (m *RedisProxy_PrefixRoutes) Validate() error {
 
 	// no validation rules for CaseInsensitive
 
-	// no validation rules for HiddenEnvoyDeprecatedCatchAllCluster
-
 	if v, ok := interface{}(m.GetCatchAllRoute()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RedisProxy_PrefixRoutesValidationError{
@@ -371,6 +369,8 @@ func (m *RedisProxy_PrefixRoutes) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for HiddenEnvoyDeprecatedCatchAllCluster
 
 	return nil
 }

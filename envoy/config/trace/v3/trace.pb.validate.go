@@ -667,24 +667,24 @@ func (m *Tracing_Http) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *Tracing_Http_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return Tracing_HttpValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *Tracing_Http_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return Tracing_HttpValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Tracing_Http_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return Tracing_HttpValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

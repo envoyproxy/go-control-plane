@@ -529,8 +529,6 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		}
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedServiceName
-
 	if len(m.GetRequestHeadersToAdd()) > 1000 {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "RequestHeadersToAdd",
@@ -552,8 +550,6 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		}
 
 	}
-
-	// no validation rules for HiddenEnvoyDeprecatedUseHttp2
 
 	for idx, item := range m.GetExpectedStatuses() {
 		_, _ = idx, item
@@ -586,6 +582,10 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for HiddenEnvoyDeprecatedServiceName
+
+	// no validation rules for HiddenEnvoyDeprecatedUseHttp2
 
 	return nil
 }
@@ -898,24 +898,24 @@ func (m *HealthCheck_CustomHealthCheck) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *HealthCheck_CustomHealthCheck_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return HealthCheck_CustomHealthCheckValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *HealthCheck_CustomHealthCheck_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return HealthCheck_CustomHealthCheckValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *HealthCheck_CustomHealthCheck_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HealthCheck_CustomHealthCheckValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

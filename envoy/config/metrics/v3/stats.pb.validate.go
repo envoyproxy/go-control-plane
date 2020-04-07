@@ -47,24 +47,24 @@ func (m *StatsSink) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *StatsSink_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return StatsSinkValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *StatsSink_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return StatsSinkValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *StatsSink_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StatsSinkValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

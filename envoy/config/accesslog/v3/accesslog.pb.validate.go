@@ -57,24 +57,24 @@ func (m *AccessLog) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *AccessLog_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return AccessLogValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *AccessLog_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return AccessLogValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *AccessLog_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AccessLogValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1255,24 +1255,24 @@ func (m *ExtensionFilter) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *ExtensionFilter_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ExtensionFilterValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *ExtensionFilter_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ExtensionFilterValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ExtensionFilter_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExtensionFilterValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

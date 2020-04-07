@@ -164,24 +164,24 @@ func (m *ThriftFilter) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *ThriftFilter_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ThriftFilterValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *ThriftFilter_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ThriftFilterValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *ThriftFilter_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ThriftFilterValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

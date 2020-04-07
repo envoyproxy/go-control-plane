@@ -143,16 +143,6 @@ func (m *HttpConnectionManager) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIdleTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HttpConnectionManagerValidationError{
-				field:  "HiddenEnvoyDeprecatedIdleTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if v, ok := interface{}(m.GetStreamIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManagerValidationError{
@@ -298,6 +288,16 @@ func (m *HttpConnectionManager) Validate() error {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManagerValidationError{
 				field:  "RequestIdExtension",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIdleTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "HiddenEnvoyDeprecatedIdleTimeout",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -824,24 +824,24 @@ func (m *HttpFilter) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *HttpFilter_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return HttpFilterValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *HttpFilter_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return HttpFilterValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *HttpFilter_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpFilterValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -992,13 +992,6 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 		return nil
 	}
 
-	if _, ok := HttpConnectionManager_Tracing_OperationName_name[int32(m.GetHiddenEnvoyDeprecatedOperationName())]; !ok {
-		return HttpConnectionManager_TracingValidationError{
-			field:  "HiddenEnvoyDeprecatedOperationName",
-			reason: "value must be one of the defined enum values",
-		}
-	}
-
 	if v, ok := interface{}(m.GetClientSampling()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManager_TracingValidationError{
@@ -1063,6 +1056,13 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
+		}
+	}
+
+	if _, ok := HttpConnectionManager_Tracing_OperationName_name[int32(m.GetHiddenEnvoyDeprecatedOperationName())]; !ok {
+		return HttpConnectionManager_TracingValidationError{
+			field:  "HiddenEnvoyDeprecatedOperationName",
+			reason: "value must be one of the defined enum values",
 		}
 	}
 
