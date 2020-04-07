@@ -242,6 +242,8 @@ func (m *RateLimitResponse_RateLimit) Validate() error {
 		return nil
 	}
 
+	// no validation rules for Name
+
 	// no validation rules for RequestsPerUnit
 
 	// no validation rules for Unit
