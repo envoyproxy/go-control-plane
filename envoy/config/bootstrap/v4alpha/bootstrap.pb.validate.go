@@ -152,10 +152,10 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTracing()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedTracing()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
-				field:  "Tracing",
+				field:  "HiddenEnvoyDeprecatedTracing",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
