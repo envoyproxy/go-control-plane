@@ -111,7 +111,7 @@ Generate the key based on the node information as follows and cache the configur
 ```go
 import "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 
-var clusters, endpoints, routes, listeners []cache.Resource
+var clusters, endpoints, routes, listeners []types.Resource
 
 snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
 snapshot := cache.NewSnapshot("1.0", endpoints, clusters, routes, listeners)
