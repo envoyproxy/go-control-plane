@@ -173,7 +173,7 @@ func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryR
 	out := &discovery.DiscoveryResponse{
 		VersionInfo: resp.Version,
 		Resources:   resources,
-		TypeUrl:     typeURL,
+		TypeUrl:     resource.ConvertTypeURL(typeURL),
 	}
 	return out, nil
 }
