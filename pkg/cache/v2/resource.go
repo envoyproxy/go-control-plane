@@ -16,6 +16,7 @@ package cache
 
 import (
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/any"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2"
@@ -69,15 +70,18 @@ func GetResourceName(res types.Resource) string {
 }
 
 // MarshalResource converts the Resource to MarshaledResource
-func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
+func MarshalResource(rsrc types.Resource, typeURL string) (*any.Any, error) {
 	b := proto.NewBuffer(nil)
 	b.SetDeterministic(true)
-	err := b.Marshal(resource)
+	err := b.Marshal(rsrc)
 	if err != nil {
 		return nil, err
 	}
 
-	return b.Bytes(), nil
+	return &any.Any{
+		TypeUrl: resource.ConvertTypeURL(typeURL),
+		Value:   b.Bytes(),
+	}, nil
 }
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster

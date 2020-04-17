@@ -45,3 +45,23 @@ func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManage
 	}
 	return config
 }
+
+// ConvertTypeURL converts typeurl from v2->v3 and vice versa
+func ConvertTypeURL(typeURL string) string {
+	var convertedURL string
+	switch typeURL {
+	case EndpointType:
+		convertedURL = "type.googleapis.com/envoy.api.v2.ClusterLoadAssignment"
+	case ClusterType:
+		convertedURL = "type.googleapis.com/envoy.api.v2.Cluster"
+	case RouteType:
+		convertedURL = "type.googleapis.com/envoy.api.v2.RouteConfiguration"
+	case ListenerType:
+		convertedURL = "type.googleapis.com/envoy.api.v2.Listener"
+	case SecretType:
+		convertedURL = "type.googleapis.com/envoy.api.v2.auth.Secret"
+	case RuntimeType:
+		convertedURL = "type.googleapis.com/envoy.service.discovery.v2.Runtime"
+	}
+	return convertedURL
+}

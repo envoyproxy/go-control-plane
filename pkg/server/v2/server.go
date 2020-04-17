@@ -161,15 +161,12 @@ func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryR
 				Value:   resp.MarshaledResources[i],
 			}
 		} else {
-			marshaledResource, err := cache.MarshalResource(resp.Resources[i])
+			marshaledResource, err := cache.MarshalResource(resp.Resources[i], typeURL)
 			if err != nil {
 				return nil, err
 			}
 
-			resources[i] = &any.Any{
-				TypeUrl: typeURL,
-				Value:   marshaledResource,
-			}
+			resources[i] = marshaledResource
 		}
 	}
 	out := &discovery.DiscoveryResponse{
