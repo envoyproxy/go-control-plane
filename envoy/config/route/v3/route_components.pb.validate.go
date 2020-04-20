@@ -150,6 +150,25 @@ func (m *VirtualHost) Validate() error {
 
 	}
 
+	for idx, item := range m.GetRequestHeadersToRemove() {
+		_, _ = idx, item
+
+		if len(item) < 1 {
+			return VirtualHostValidationError{
+				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
+				reason: "value length must be at least 1 bytes",
+			}
+		}
+
+		if !_VirtualHost_RequestHeadersToRemove_Pattern.MatchString(item) {
+			return VirtualHostValidationError{
+				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	}
+
 	if len(m.GetResponseHeadersToAdd()) > 1000 {
 		return VirtualHostValidationError{
 			field:  "ResponseHeadersToAdd",
@@ -319,6 +338,8 @@ var _ interface {
 
 var _VirtualHost_Domains_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
+var _VirtualHost_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
 // Validate checks the field values on FilterAction with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -474,6 +495,25 @@ func (m *Route) Validate() error {
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetRequestHeadersToRemove() {
+		_, _ = idx, item
+
+		if len(item) < 1 {
+			return RouteValidationError{
+				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
+				reason: "value length must be at least 1 bytes",
+			}
+		}
+
+		if !_Route_RequestHeadersToRemove_Pattern.MatchString(item) {
+			return RouteValidationError{
+				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 			}
 		}
 
@@ -652,6 +692,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteValidationError{}
+
+var _Route_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on WeightedCluster with the rules defined
 // in the proto definition for this message. If any rules are violated, an
