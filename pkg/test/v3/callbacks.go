@@ -33,7 +33,8 @@ func (cb *Callbacks) OnStreamClosed(id int64) {
 		log.Printf("stream %d closed\n", id)
 	}
 }
-func (cb *Callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error {
+func (cb *Callbacks) OnStreamRequest(i int64, req *discovery.DiscoveryRequest) error {
+	log.Printf("node::::::::::::::: %s", req.GetNode())
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.Requests++
