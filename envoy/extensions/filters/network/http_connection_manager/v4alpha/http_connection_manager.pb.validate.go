@@ -236,6 +236,8 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for PreserveExternalRequestId
 
+	// no validation rules for AlwaysSetRequestIdInResponse
+
 	if _, ok := HttpConnectionManager_ForwardClientCertDetails_name[int32(m.GetForwardClientCertDetails())]; !ok {
 		return HttpConnectionManagerValidationError{
 			field:  "ForwardClientCertDetails",
