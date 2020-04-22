@@ -90,7 +90,7 @@ func main() {
 
 	// create a cache
 	signal := make(chan struct{})
-	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
+	cbv2 := &testv2.Callbacks{Signal: signal, Debug: true}
 	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
 
 	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
