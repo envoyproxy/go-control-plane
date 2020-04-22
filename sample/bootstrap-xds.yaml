@@ -8,6 +8,7 @@ admin:
 dynamic_resources:
   cds_config:
     api_config_source:
+      set_node_on_first_message_only: true
       api_type: GRPC
       grpc_services:
       - envoy_grpc:
@@ -15,6 +16,7 @@ dynamic_resources:
       set_node_on_first_message_only: true
   lds_config:
     api_config_source:
+      set_node_on_first_message_only: true
       api_type: GRPC
       grpc_services:
       - envoy_grpc:
@@ -43,6 +45,7 @@ layered_runtime:
       rtds_layer:
         rtds_config:
           api_config_source:
+            set_node_on_first_message_only: true
             api_type: GRPC
             grpc_services:
               envoy_grpc:
