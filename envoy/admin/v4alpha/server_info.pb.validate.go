@@ -216,6 +216,8 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for CpusetThreads
 
+	// no validation rules for BootstrapVersion
+
 	return nil
 }
 
