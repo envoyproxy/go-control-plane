@@ -899,6 +899,18 @@ func (m *RouteMatch) Validate() error {
 			}
 		}
 
+	case *RouteMatch_ConnectMatcher_:
+
+		if v, ok := interface{}(m.GetConnectMatcher()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteMatchValidationError{
+					field:  "ConnectMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *RouteMatch_HiddenEnvoyDeprecatedRegex:
 
 		if len(m.GetHiddenEnvoyDeprecatedRegex()) > 1024 {
@@ -2904,6 +2916,73 @@ var _ interface {
 	ErrorName() string
 } = RouteMatch_TlsContextMatchOptionsValidationError{}
 
+// Validate checks the field values on RouteMatch_ConnectMatcher with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RouteMatch_ConnectMatcher) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// RouteMatch_ConnectMatcherValidationError is the validation error returned by
+// RouteMatch_ConnectMatcher.Validate if the designated constraints aren't met.
+type RouteMatch_ConnectMatcherValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RouteMatch_ConnectMatcherValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RouteMatch_ConnectMatcherValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RouteMatch_ConnectMatcherValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RouteMatch_ConnectMatcherValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RouteMatch_ConnectMatcherValidationError) ErrorName() string {
+	return "RouteMatch_ConnectMatcherValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RouteMatch_ConnectMatcherValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRouteMatch_ConnectMatcher.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RouteMatch_ConnectMatcherValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RouteMatch_ConnectMatcherValidationError{}
+
 // Validate checks the field values on RouteAction_RequestMirrorPolicy with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -3159,6 +3238,16 @@ func (m *RouteAction_UpgradeConfig) Validate() error {
 		if err := v.Validate(); err != nil {
 			return RouteAction_UpgradeConfigValidationError{
 				field:  "Enabled",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetConnectConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_UpgradeConfigValidationError{
+				field:  "ConnectConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -3616,6 +3705,74 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteAction_HashPolicy_FilterStateValidationError{}
+
+// Validate checks the field values on RouteAction_UpgradeConfig_ConnectConfig
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *RouteAction_UpgradeConfig_ConnectConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// RouteAction_UpgradeConfig_ConnectConfigValidationError is the validation
+// error returned by RouteAction_UpgradeConfig_ConnectConfig.Validate if the
+// designated constraints aren't met.
+type RouteAction_UpgradeConfig_ConnectConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RouteAction_UpgradeConfig_ConnectConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RouteAction_UpgradeConfig_ConnectConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RouteAction_UpgradeConfig_ConnectConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RouteAction_UpgradeConfig_ConnectConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RouteAction_UpgradeConfig_ConnectConfigValidationError) ErrorName() string {
+	return "RouteAction_UpgradeConfig_ConnectConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RouteAction_UpgradeConfig_ConnectConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRouteAction_UpgradeConfig_ConnectConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RouteAction_UpgradeConfig_ConnectConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RouteAction_UpgradeConfig_ConnectConfigValidationError{}
 
 // Validate checks the field values on RetryPolicy_RetryPriority with the rules
 // defined in the proto definition for this message. If any rules are
