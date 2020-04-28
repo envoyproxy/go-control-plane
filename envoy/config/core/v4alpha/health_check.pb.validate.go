@@ -288,6 +288,16 @@ func (m *HealthCheck) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTransportSocketMatchCriteria()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HealthCheckValidationError{
+				field:  "TransportSocketMatchCriteria",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.HealthChecker.(type) {
 
 	case *HealthCheck_HttpHealthCheck_:
