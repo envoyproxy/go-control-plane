@@ -61,6 +61,16 @@ func (m *MetricsServiceConfig) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetReportCountersAsDeltas()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MetricsServiceConfigValidationError{
+				field:  "ReportCountersAsDeltas",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
