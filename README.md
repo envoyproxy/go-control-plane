@@ -1,4 +1,4 @@
-# control-plane
+# Go Control Plane
 
 [![CircleCI](https://circleci.com/gh/envoyproxy/go-control-plane.svg?style=svg)](https://circleci.com/gh/envoyproxy/go-control-plane)
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
@@ -7,7 +7,6 @@
 This repository contains a Go-based implementation of an API server that
 implements the discovery service APIs defined in
 [data-plane-api](https://github.com/envoyproxy/data-plane-api).
-
 
 ## Scope
 
@@ -58,7 +57,7 @@ in the same environment as the circle ci. This makes sure to produce a consisten
     ./build/run_docker.sh make integration
     ```
 
-## Xds Api versioning
+## xDS API Versioning
 
 The Envoy xDS APIs follow a well defined [versioning scheme](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/versioning).
 Due to lack of generics and function overloading in golang, creating a new version unfortunately involves code duplication.
