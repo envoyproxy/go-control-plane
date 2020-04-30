@@ -28,11 +28,17 @@ import (
 	"time"
 
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/server"
+	cachev2 "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	serverv2 "github.com/envoyproxy/go-control-plane/pkg/server/v2"
+	serverv3 "github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
+	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
+	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
+	"github.com/gogo/protobuf/jsonpb"
 
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	resourcev2 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
+	resourcev3 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
 var (
@@ -68,7 +74,7 @@ func init() {
 	flag.DurationVar(&delay, "delay", 500*time.Millisecond, "Interval between request batch retries")
 	flag.IntVar(&requests, "r", 5, "Number of requests between snapshot updates")
 	flag.IntVar(&updates, "u", 3, "Number of snapshot updates")
-	flag.StringVar(&mode, "xds", resource.Ads, "Management server type (ads, xds, rest)")
+	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management server type (ads, xds, rest, delta)")
 	flag.IntVar(&clusters, "clusters", 4, "Number of clusters")
 	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
 	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
@@ -81,19 +87,35 @@ func init() {
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+	var wait sync.WaitGroup
 
 	// start upstream
 	go test.RunHTTP(ctx, upstreamPort)
 
 	// create a cache
 	signal := make(chan struct{})
-	cb := &callbacks{signal: signal}
-	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
-	srv := server.NewServer(context.Background(), config, cb)
-	als := &test.AccessLogService{}
+	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
+	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
+
+	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
+	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{})
+	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2)
+	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3)
+	alsv2 := &testv2.AccessLogService{}
+	alsv3 := &testv3.AccessLogService{}
 
 	// create a test snapshot
-	snapshots := resource.TestSnapshot{
+	snapshotsv2 := resourcev2.TestSnapshot{
+		Xds:              mode,
+		UpstreamPort:     uint32(upstreamPort),
+		BasePort:         uint32(basePort),
+		NumClusters:      clusters,
+		NumHTTPListeners: httpListeners,
+		NumTCPListeners:  tcpListeners,
+		TLS:              tls,
+		NumRuntimes:      runtimes,
+	}
+	snapshotsv3 := resourcev3.TestSnapshot{
 		Xds:              mode,
 		UpstreamPort:     uint32(upstreamPort),
 		BasePort:         uint32(basePort),
@@ -105,33 +127,49 @@ func main() {
 	}
 
 	// start the xDS server
-	go test.RunAccessLogServer(ctx, als, alsPort)
-	go test.RunManagementServer(ctx, srv, port)
-	go test.RunManagementGateway(ctx, srv, gatewayPort, logger{})
+	go test.RunAccessLogServer(ctx, alsv2, alsv3, alsPort)
+	go func() {
+		wait.Add(1)
+		test.RunManagementServer(ctx, srv2, srv3, port)
+		wait.Done()
+	}()
+	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
 
-	log.Println("waiting for the first request...")
-	select {
-	case <-signal:
-		break
-	case <-time.After(1 * time.Minute):
-		log.Println("timeout waiting for the first request")
-		os.Exit(1)
-	}
-	log.Printf("initial snapshot %+v\n", snapshots)
+	// log.Println("waiting for the first request...")
+	// select {
+	// case <-signal:
+	// 	break
+	// case <-time.After(1 * time.Minute):
+	// 	log.Println("timeout waiting for the first request")
+	// 	os.Exit(1)
+	// }
+	log.Printf("initial snapshot %+v\n", snapshotsv2)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
 	for i := 0; i < updates; i++ {
-		snapshots.Version = fmt.Sprintf("v%d", i)
-		log.Printf("update snapshot %v\n", snapshots.Version)
+		snapshotsv2.Version = fmt.Sprintf("v%d", i)
+		log.Printf("update snapshot %v\n", snapshotsv2.Version)
+		snapshotsv3.Version = fmt.Sprintf("v%d", i)
+		log.Printf("update snapshot %v\n", snapshotsv3.Version)
 
-		snapshot := snapshots.Generate()
-		if err := snapshot.Consistent(); err != nil {
-			log.Printf("snapshot inconsistency: %+v\n", snapshot)
+		snapshotv2 := snapshotsv2.Generate()
+		snapshotv3 := snapshotsv3.Generate()
+		if err := snapshotv2.Consistent(); err != nil {
+			log.Printf("snapshot inconsistency: %+v\n", snapshotv2)
+		}
+		if err := snapshotv3.Consistent(); err != nil {
+			log.Printf("snapshot inconsistency: %+v\n", snapshotv3)
 		}
 
-		err := config.SetSnapshot(nodeID, snapshot)
+		err := configv2.SetSnapshot(nodeID, snapshotv2)
 		if err != nil {
-			log.Printf("snapshot error %q for %+v\n", err, snapshot)
+			log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
+			os.Exit(1)
+		}
+
+		err = configv3.SetSnapshot(nodeID, snapshotv3)
+		if err != nil {
+			log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
 			os.Exit(1)
 		}
 
@@ -150,20 +188,28 @@ func main() {
 			}
 		}
 
-		als.Dump(func(s string) {
+		alsv2.Dump(func(s string) {
 			if debug {
 				log.Println(s)
 			}
 		})
-		cb.Report()
+		cbv2.Report()
+
+		alsv3.Dump(func(s string) {
+			if debug {
+				log.Println(s)
+			}
+		})
+		cbv3.Report()
 
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
-			os.Exit(1)
+			break
 		}
 	}
 
 	log.Printf("Test for %s passed!\n", mode)
+	wait.Wait()
 }
 
 // callEcho calls upstream echo service on all listener ports and returns an error
@@ -285,3 +331,19 @@ func (cb *callbacks) OnFetchRequest(_ context.Context, req *v2.DiscoveryRequest)
 	return nil
 }
 func (cb *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
+func (cb *callbacks) OnStreamDeltaRequest(int64, *v2.DeltaDiscoveryRequest) error {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.requests++
+	if cb.signal != nil {
+		close(cb.signal)
+		cb.signal = nil
+	}
+	return nil
+}
+func (cb *callbacks) OnStreamDeltaResponse(streamID int64, req *v2.DeltaDiscoveryRequest, res *v2.DeltaDiscoveryResponse) {
+	m := jsonpb.Marshaler{}
+	rq, _ := m.MarshalToString(req)
+	rs, _ := m.MarshalToString(res)
+	log.Printf("OnStreamDeltaResponse() streamID: %d, original request %s, response %s\n", streamID, rq, rs)
+}

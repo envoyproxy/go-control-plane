@@ -15,3 +15,5 @@
 *_gen_test.go
 
 /envoy*.log
+
+.DS_Store

@@ -1,0 +1,404 @@
+digraph gocallvis {
+    label="github.com/envoyproxy/go-control-plane/pkg/test/main";
+    labeljust="l";
+    fontname="Arial";
+    fontsize="14";
+    rankdir="LR";
+    bgcolor="lightgray";
+    style="solid";
+    penwidth="0.5";
+    pad="0.0";
+    nodesep="0.35";
+
+    node [shape="ellipse" style="filled" fillcolor="honeydew" fontname="Verdana" penwidth="1.0" margin="0.05,0.0"];
+    edge [minlen="2"]
+
+    subgraph "cluster_focus" {
+        fontsize="18";
+bgcolor="#e6ecfa";
+label="main";
+labelloc="t";
+labeljust="c";
+        
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnFetchRequest" [ label="(*callbacks).OnFetchRequest" penwidth="1.5" fillcolor="lightblue" ]
+        "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Warnf" [ penwidth="1.5" fillcolor="lightblue" label="(logger).Warnf" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnFetchResponse" [ fillcolor="lightblue" label="(*callbacks).OnFetchResponse" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamClosed" [ fillcolor="lightblue" label="(*callbacks).OnStreamClosed" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamResponse" [ fillcolor="lightblue" label="(*callbacks).OnStreamResponse" penwidth="1.5" ]
+        "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Debugf" [ fillcolor="lightblue" label="(logger).Debugf" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamOpen" [ fillcolor="lightblue" label="(*callbacks).OnStreamOpen" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamRequest" [ fillcolor="lightblue" label="(*callbacks).OnStreamRequest" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaResponse" [ fillcolor="lightblue" label="(*callbacks).OnStreamDeltaResponse" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaRequest" [ fillcolor="lightblue" label="(*callbacks).OnStreamDeltaRequest" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).Report" [ fillcolor="lightblue" label="(*callbacks).Report" penwidth="1.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test/main.init#1" [ fillcolor="lightblue" label="init#1" penwidth="0.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test/main.init" [ fillcolor="lightblue" label="init" penwidth="0.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test/main.main" [ fillcolor="lightblue" label="main" penwidth="0.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test/main.main$1" [ fillcolor="lightblue" label="main$1" style="dotted,filled" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" [ fillcolor="lightblue" label="callEcho$1" style="dotted,filled" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho" [ fillcolor="lightblue" label="callEcho" penwidth="0.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test/main.main$2" [ fillcolor="lightblue" label="main$2" style="dotted,filled" ]
+        "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Infof" [ fillcolor="lightblue" label="(logger).Infof" penwidth="1.5" ]
+        "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Errorf" [ fillcolor="lightblue" label="(logger).Errorf" penwidth="1.5" ]
+        
+        subgraph "cluster_context" {
+        fontname="bold";
+rank="sink";
+URL="/?f=context";
+fontsize="16";
+style="filled";
+fillcolor="#E0FFE1";
+label="[context]";
+tooltip="package: context";
+penwidth="0.8";
+        
+        "context.Background" [ fillcolor="#adedad" label="Background" penwidth="1.5" ]
+        "(*context.emptyCtx).Done" [ fillcolor="#adedad" label="(*emptyCtx).Done" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_crypto/tls" {
+        fontsize="16";
+style="filled";
+fontname="bold";
+rank="sink";
+URL="/?f=crypto/tls";
+penwidth="0.8";
+fillcolor="#E0FFE1";
+label="[crypto/tls]";
+tooltip="package: crypto/tls";
+        
+        "(*crypto/tls.Conn).Close" [ fillcolor="#adedad" label="(*Conn).Close" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_flag" {
+        fontname="bold";
+rank="sink";
+label="[flag]";
+tooltip="package: flag";
+penwidth="0.8";
+fontsize="16";
+style="filled";
+fillcolor="#E0FFE1";
+URL="/?f=flag";
+        
+        "flag.BoolVar" [ penwidth="1.5" fillcolor="#adedad" label="BoolVar" ]
+        "flag.UintVar" [ penwidth="1.5" fillcolor="#adedad" label="UintVar" ]
+        "flag.DurationVar" [ fillcolor="#adedad" label="DurationVar" penwidth="1.5" ]
+        "flag.IntVar" [ fillcolor="#adedad" label="IntVar" penwidth="1.5" ]
+        "flag.StringVar" [ fillcolor="#adedad" label="StringVar" penwidth="1.5" ]
+        "flag.Parse" [ fillcolor="#adedad" label="Parse" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_fmt" {
+        fillcolor="#E0FFE1";
+fontname="bold";
+URL="/?f=fmt";
+tooltip="package: fmt";
+penwidth="0.8";
+style="filled";
+label="[fmt]";
+fontsize="16";
+rank="sink";
+        
+        "fmt.Sprintf" [ penwidth="1.5" fillcolor="#adedad" label="Sprintf" ]
+        "fmt.Errorf" [ fillcolor="#adedad" label="Errorf" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_github.com/envoyproxy/go-control-plane/pkg/cache" {
+        fontsize="16";
+style="filled";
+fontname="bold";
+tooltip="package: github.com/envoyproxy/go-control-plane/pkg/cache";
+penwidth="0.8";
+fillcolor="lightyellow";
+rank="sink";
+label="[cache]";
+URL="/?f=github.com/envoyproxy/go-control-plane/pkg/cache";
+        
+        "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).Fetch" [ label="(*snapshotCache).Fetch" penwidth="1.5" fillcolor="moccasin" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).respond" [ fillcolor="moccasin" label="(*snapshotCache).respond" penwidth="0.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).CreateWatch" [ fillcolor="moccasin" label="(*snapshotCache).CreateWatch" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).respondDelta" [ fillcolor="moccasin" label="(*snapshotCache).respondDelta" penwidth="0.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).CreateDeltaWatch" [ fillcolor="moccasin" label="(*snapshotCache).CreateDeltaWatch" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).SetSnapshot" [ fillcolor="moccasin" label="(*snapshotCache).SetSnapshot" penwidth="1.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/cache.NewSnapshotCache" [ penwidth="1.5" fillcolor="moccasin" label="NewSnapshotCache" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/cache.Snapshot).Consistent" [ label="(*Snapshot).Consistent" penwidth="1.5" fillcolor="moccasin" ]
+        
+    }
+
+        subgraph "cluster_github.com/envoyproxy/go-control-plane/pkg/server" {
+        label="[server]";
+URL="/?f=github.com/envoyproxy/go-control-plane/pkg/server";
+tooltip="package: github.com/envoyproxy/go-control-plane/pkg/server";
+style="filled";
+fillcolor="lightyellow";
+rank="sink";
+penwidth="0.8";
+fontsize="16";
+fontname="bold";
+        
+        "(*github.com/envoyproxy/go-control-plane/pkg/server.server).Fetch" [ fillcolor="moccasin" label="(*server).Fetch" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/server.server).process$1" [ fillcolor="moccasin" label="(*server).process$1" style="dotted,filled" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/server.server).process$2" [ fillcolor="moccasin" label="(*server).process$2" style="dotted,filled" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/server.server).process" [ fillcolor="moccasin" label="(*server).process" penwidth="0.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/server.server).processDelta$1" [ style="dotted,filled" fillcolor="moccasin" label="(*server).processDelta$1" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/server.server).processDelta$2" [ label="(*server).processDelta$2" style="dotted,filled" fillcolor="moccasin" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/server.server).processDelta" [ fillcolor="moccasin" label="(*server).processDelta" penwidth="0.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/server.NewServer" [ fillcolor="moccasin" label="NewServer" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_github.com/envoyproxy/go-control-plane/pkg/test" {
+        fontsize="16";
+style="filled";
+fillcolor="lightyellow";
+rank="sink";
+URL="/?f=github.com/envoyproxy/go-control-plane/pkg/test";
+tooltip="package: github.com/envoyproxy/go-control-plane/pkg/test";
+penwidth="0.8";
+fontname="bold";
+label="[test]";
+        
+        "github.com/envoyproxy/go-control-plane/pkg/test.RunHTTP" [ penwidth="1.5" fillcolor="moccasin" label="RunHTTP" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test.RunAccessLogServer" [ fillcolor="moccasin" label="RunAccessLogServer" penwidth="1.5" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer" [ label="RunManagementServer" penwidth="1.5" fillcolor="moccasin" ]
+        "github.com/envoyproxy/go-control-plane/pkg/test.RunManagementGateway" [ fillcolor="moccasin" label="RunManagementGateway" penwidth="1.5" ]
+        "(*github.com/envoyproxy/go-control-plane/pkg/test.AccessLogService).Dump" [ fillcolor="moccasin" label="(*AccessLogService).Dump" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_github.com/envoyproxy/go-control-plane/pkg/test/resource" {
+        tooltip="package: github.com/envoyproxy/go-control-plane/pkg/test/resource";
+penwidth="0.8";
+fontsize="16";
+fontname="bold";
+URL="/?f=github.com/envoyproxy/go-control-plane/pkg/test/resource";
+style="filled";
+fillcolor="lightyellow";
+rank="sink";
+label="[resource]";
+        
+        "(github.com/envoyproxy/go-control-plane/pkg/test/resource.TestSnapshot).Generate" [ fillcolor="moccasin" label="(TestSnapshot).Generate" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_github.com/gogo/protobuf/jsonpb" {
+        fillcolor="lightyellow";
+URL="/?f=github.com/gogo/protobuf/jsonpb";
+tooltip="package: github.com/gogo/protobuf/jsonpb";
+penwidth="0.8";
+fontsize="16";
+style="filled";
+fontname="bold";
+rank="sink";
+label="[jsonpb]";
+        
+        "(*github.com/gogo/protobuf/jsonpb.Marshaler).MarshalToString" [ fillcolor="moccasin" label="(*Marshaler).MarshalToString" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_io/ioutil" {
+        fontsize="16";
+fillcolor="#E0FFE1";
+label="[io/ioutil]";
+URL="/?f=io/ioutil";
+penwidth="0.8";
+style="filled";
+fontname="bold";
+rank="sink";
+tooltip="package: io/ioutil";
+        
+        "io/ioutil.ReadAll" [ fillcolor="#adedad" label="ReadAll" penwidth="1.5" ]
+        "(io/ioutil.nopCloser).Close" [ fillcolor="#adedad" label="(nopCloser).Close" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_log" {
+        URL="/?f=log";
+fontsize="16";
+fontname="bold";
+label="[log]";
+rank="sink";
+tooltip="package: log";
+penwidth="0.8";
+style="filled";
+fillcolor="#E0FFE1";
+        
+        "log.Printf" [ fillcolor="#adedad" label="Printf" penwidth="1.5" ]
+        "log.Println" [ label="Println" penwidth="1.5" fillcolor="#adedad" ]
+        
+    }
+
+        subgraph "cluster_net" {
+        fillcolor="#E0FFE1";
+tooltip="package: net";
+penwidth="0.8";
+style="filled";
+rank="sink";
+label="[net]";
+URL="/?f=net";
+fontsize="16";
+fontname="bold";
+        
+        "(*net.conn).Close" [ label="(*conn).Close" penwidth="1.5" fillcolor="#adedad" ]
+        
+    }
+
+        subgraph "cluster_net/http" {
+        fontsize="16";
+fontname="bold";
+URL="/?f=net/http";
+tooltip="package: net/http";
+penwidth="0.8";
+style="filled";
+fillcolor="#E0FFE1";
+rank="sink";
+label="[net/http]";
+        
+        "(*net/http.Client).Get" [ fillcolor="#adedad" label="(*Client).Get" penwidth="1.5" ]
+        "(*net/http.gzipReader).Close" [ fillcolor="#adedad" label="(*gzipReader).Close" penwidth="1.5" ]
+        "(*net/http.body).Close" [ fillcolor="#adedad" label="(*body).Close" penwidth="1.5" ]
+        "(*net/http.http2gzipReader).Close" [ fillcolor="#adedad" label="(*http2gzipReader).Close" penwidth="1.5" ]
+        "(*net/http.cancelTimerBody).Close" [ label="(*cancelTimerBody).Close" penwidth="1.5" fillcolor="#adedad" ]
+        "(net/http.http2transportResponseBody).Close" [ fillcolor="#adedad" label="(http2transportResponseBody).Close" penwidth="1.5" ]
+        "(net/http.noBody).Close" [ label="(noBody).Close" penwidth="1.5" fillcolor="#adedad" ]
+        "(*net/http.bodyEOFSignal).Close" [ fillcolor="#adedad" label="(*bodyEOFSignal).Close" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_os" {
+        fontsize="16";
+style="filled";
+fontname="bold";
+URL="/?f=os";
+penwidth="0.8";
+rank="sink";
+label="[os]";
+tooltip="package: os";
+fillcolor="#E0FFE1";
+        
+        "os.Exit" [ fillcolor="#adedad" label="Exit" penwidth="1.5" ]
+        
+    }
+
+        subgraph "cluster_sync" {
+        penwidth="0.8";
+fillcolor="#E0FFE1";
+fontname="bold";
+tooltip="package: sync";
+URL="/?f=sync";
+fontsize="16";
+style="filled";
+rank="sink";
+label="[sync]";
+        
+        "(*sync.Mutex).Lock" [ fillcolor="#adedad" label="(*Mutex).Lock" penwidth="1.5" ]
+        "(*sync.Mutex).Unlock" [ fillcolor="#adedad" label="(*Mutex).Unlock" penwidth="1.5" ]
+        "(*sync.WaitGroup).Add" [ fillcolor="#adedad" label="(*WaitGroup).Add" penwidth="1.5" ]
+        "(*sync.WaitGroup).Done" [ fillcolor="#adedad" label="(*WaitGroup).Done" penwidth="1.5" ]
+        "(*sync.WaitGroup).Wait" [ label="(*WaitGroup).Wait" penwidth="1.5" fillcolor="#adedad" ]
+        
+    }
+
+        subgraph "cluster_time" {
+        style="filled";
+URL="/?f=time";
+penwidth="0.8";
+fontsize="16";
+fillcolor="#E0FFE1";
+fontname="bold";
+rank="sink";
+label="[time]";
+tooltip="package: time";
+        
+        "time.After" [ fillcolor="#adedad" label="After" penwidth="1.5" ]
+        
+    }
+
+    }
+
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnFetchRequest" -> "(*sync.Mutex).Lock" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnFetchRequest" -> "(*sync.Mutex).Unlock" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).Fetch" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnFetchRequest" [ style="dashed" color="saddlebrown" ]
+    "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Warnf" -> "log.Printf" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).Fetch" -> "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Warnf" [ color="saddlebrown" style="dashed" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).Fetch" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnFetchResponse" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamClosed" -> "log.Printf" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).process$1" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamClosed" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).process$2" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamResponse" [ style="dashed" color="saddlebrown" ]
+    "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Debugf" -> "log.Printf" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).respond" -> "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Debugf" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).CreateWatch" -> "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Debugf" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamOpen" -> "log.Printf" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).process" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamOpen" [ color="saddlebrown" style="dashed" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamRequest" -> "(*sync.Mutex).Lock" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamRequest" -> "(*sync.Mutex).Unlock" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).process" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamRequest" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).processDelta$1" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamClosed" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaResponse" -> "(*github.com/gogo/protobuf/jsonpb.Marshaler).MarshalToString" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaResponse" -> "log.Printf" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).processDelta$2" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaResponse" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).respondDelta" -> "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Debugf" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).CreateDeltaWatch" -> "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Debugf" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).processDelta" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamOpen" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaRequest" -> "(*sync.Mutex).Lock" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaRequest" -> "(*sync.Mutex).Unlock" [ arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/server.server).processDelta" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).OnStreamDeltaRequest" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).SetSnapshot" -> "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).respond" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).SetSnapshot" -> "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Debugf" [ style="dashed" color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).Report" -> "(*sync.Mutex).Lock" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).Report" -> "(*sync.Mutex).Unlock" [ color="saddlebrown" arrowhead="normalnoneodiamond" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).Report" -> "log.Printf" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.init#1" -> "flag.BoolVar" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.init#1" -> "flag.UintVar" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.init#1" -> "flag.DurationVar" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.init#1" -> "flag.IntVar" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.init#1" -> "flag.StringVar" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.init" -> "github.com/envoyproxy/go-control-plane/pkg/test/main.init#1" [  ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "flag.Parse" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "context.Background" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "github.com/envoyproxy/go-control-plane/pkg/test.RunHTTP" [ arrowhead="normalnoneodot" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "github.com/envoyproxy/go-control-plane/pkg/cache.NewSnapshotCache" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "github.com/envoyproxy/go-control-plane/pkg/server.NewServer" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "github.com/envoyproxy/go-control-plane/pkg/test.RunAccessLogServer" [ arrowhead="normalnoneodot" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main$1" -> "(*sync.WaitGroup).Add" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main$1" -> "github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main$1" -> "(*sync.WaitGroup).Done" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "github.com/envoyproxy/go-control-plane/pkg/test/main.main$1" [ arrowhead="normalnoneodot" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "github.com/envoyproxy/go-control-plane/pkg/test.RunManagementGateway" [ arrowhead="normalnoneodot" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "log.Printf" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "fmt.Sprintf" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "(github.com/envoyproxy/go-control-plane/pkg/test/resource.TestSnapshot).Generate" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "(*github.com/envoyproxy/go-control-plane/pkg/cache.Snapshot).Consistent" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "(*sync.WaitGroup).Wait" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "os.Exit" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "fmt.Sprintf" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*net/http.Client).Get" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "io/ioutil.ReadAll" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "fmt.Errorf" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*net/http.gzipReader).Close" [ arrowhead="normalnoneodiamond" color="saddlebrown" style="dashed" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*net/http.body).Close" [ style="dashed" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*net/http.http2gzipReader).Close" [ style="dashed" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*net/http.cancelTimerBody).Close" [ style="dashed" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(net/http.http2transportResponseBody).Close" [ color="saddlebrown" style="dashed" arrowhead="normalnoneodiamond" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(net/http.noBody).Close" [ color="saddlebrown" style="dashed" arrowhead="normalnoneodiamond" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*net/http.bodyEOFSignal).Close" [ style="dashed" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*crypto/tls.Conn).Close" [ style="dashed" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(io/ioutil.nopCloser).Close" [ style="dashed" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" -> "(*net.conn).Close" [ style="dashed" arrowhead="normalnoneodiamond" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho" -> "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho$1" [ arrowhead="normalnoneodot" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "github.com/envoyproxy/go-control-plane/pkg/test/main.callEcho" [  ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main$2" -> "log.Println" [ color="saddlebrown" ]
+    "(*github.com/envoyproxy/go-control-plane/pkg/test.AccessLogService).Dump" -> "github.com/envoyproxy/go-control-plane/pkg/test/main.main$2" [ style="dashed" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "(*github.com/envoyproxy/go-control-plane/pkg/test.AccessLogService).Dump" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "(*github.com/envoyproxy/go-control-plane/pkg/test/main.callbacks).Report" [  ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "time.After" [ color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "(*github.com/envoyproxy/go-control-plane/pkg/cache.snapshotCache).SetSnapshot" [ style="dashed" color="saddlebrown" ]
+    "github.com/envoyproxy/go-control-plane/pkg/test/main.main" -> "(*context.emptyCtx).Done" [ style="dashed" color="saddlebrown" ]
+    "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Infof" -> "log.Printf" [ color="saddlebrown" ]
+    "(github.com/envoyproxy/go-control-plane/pkg/test/main.logger).Errorf" -> "log.Printf" [ color="saddlebrown" ]
+}

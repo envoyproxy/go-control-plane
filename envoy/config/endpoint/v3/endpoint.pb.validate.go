@@ -207,7 +207,7 @@ func (m *ClusterLoadAssignment_Policy) Validate() error {
 
 	}
 
-	// no validation rules for DisableOverprovisioning
+	// no validation rules for HiddenEnvoyDeprecatedDisableOverprovisioning
 
 	return nil
 }

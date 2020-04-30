@@ -1,0 +1,68 @@
+# Base config for a split xDS management server on 18000, admin port on 19000
+admin:
+  access_log_path: /dev/stdout
+  address:
+    socket_address:
+      address: 127.0.0.1
+      port_value: 19000
+
+dynamic_resources:
+  cds_config:
+    api_config_source:
+      api_type: DELTA_GRPC
+      grpc_services:
+      - envoy_grpc:
+          cluster_name: xds_cluster
+      set_node_on_first_message_only: true
+
+node:
+  cluster: test-cluster
+  id: test-id
+
+static_resources:
+  listeners:
+  - address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 9000
+    filter_chains:
+      filters:
+      - name: envoy.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager
+          use_remote_address: true
+          skip_xff_append: false
+          codec_type: auto
+          access_log:
+          - name: envoy.file_access_log
+            typed_config:
+              "@type": type.googleapis.com/envoy.config.accesslog.v2.FileAccessLog
+              path: "/dev/stdout"
+          stat_prefix: ingress_http
+          route_config:
+            validate_clusters: false # have to set this when we have a static cluster and some resources that haven't been loaded yet
+            virtual_hosts:
+            - name: backend
+              domains:
+              - "*"
+              routes:
+              - match:
+                  prefix: "/"
+                route:
+                  cluster: cluster-v0-0
+          http_filters:
+          - name: envoy.router
+            typed_config: {}
+  clusters:
+  - connect_timeout: 1s
+    load_assignment:
+      cluster_name: xds_cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 18000
+    http2_protocol_options: {}
+    name: xds_cluster

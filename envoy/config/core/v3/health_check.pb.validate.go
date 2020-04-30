@@ -266,6 +266,16 @@ func (m *HealthCheck) Validate() error {
 
 	// no validation rules for EventLogPath
 
+	if v, ok := interface{}(m.GetEventService()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HealthCheckValidationError{
+				field:  "EventService",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for AlwaysLogHealthCheckFailures
 
 	if v, ok := interface{}(m.GetTlsOptions()).(interface{ Validate() error }); ok {
@@ -490,12 +500,24 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Host
+	if !_HealthCheck_HttpHealthCheck_Host_Pattern.MatchString(m.GetHost()) {
+		return HealthCheck_HttpHealthCheckValidationError{
+			field:  "Host",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	if len(m.GetPath()) < 1 {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "Path",
 			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if !_HealthCheck_HttpHealthCheck_Path_Pattern.MatchString(m.GetPath()) {
+		return HealthCheck_HttpHealthCheckValidationError{
+			field:  "Path",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 	}
 
@@ -519,8 +541,6 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		}
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedServiceName
-
 	if len(m.GetRequestHeadersToAdd()) > 1000 {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "RequestHeadersToAdd",
@@ -543,7 +563,17 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedUseHttp2
+	for idx, item := range m.GetRequestHeadersToRemove() {
+		_, _ = idx, item
+
+		if !_HealthCheck_HttpHealthCheck_RequestHeadersToRemove_Pattern.MatchString(item) {
+			return HealthCheck_HttpHealthCheckValidationError{
+				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	}
 
 	for idx, item := range m.GetExpectedStatuses() {
 		_, _ = idx, item
@@ -576,6 +606,10 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for HiddenEnvoyDeprecatedServiceName
+
+	// no validation rules for HiddenEnvoyDeprecatedUseHttp2
 
 	return nil
 }
@@ -636,6 +670,12 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HealthCheck_HttpHealthCheckValidationError{}
+
+var _HealthCheck_HttpHealthCheck_Host_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _HealthCheck_HttpHealthCheck_Path_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _HealthCheck_HttpHealthCheck_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on HealthCheck_TcpHealthCheck with the
 // rules defined in the proto definition for this message. If any rules are
@@ -809,7 +849,12 @@ func (m *HealthCheck_GrpcHealthCheck) Validate() error {
 
 	// no validation rules for ServiceName
 
-	// no validation rules for Authority
+	if !_HealthCheck_GrpcHealthCheck_Authority_Pattern.MatchString(m.GetAuthority()) {
+		return HealthCheck_GrpcHealthCheckValidationError{
+			field:  "Authority",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	return nil
 }
@@ -871,6 +916,8 @@ var _ interface {
 	ErrorName() string
 } = HealthCheck_GrpcHealthCheckValidationError{}
 
+var _HealthCheck_GrpcHealthCheck_Authority_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
 // Validate checks the field values on HealthCheck_CustomHealthCheck with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -888,24 +935,24 @@ func (m *HealthCheck_CustomHealthCheck) Validate() error {
 
 	switch m.ConfigType.(type) {
 
-	case *HealthCheck_CustomHealthCheck_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return HealthCheck_CustomHealthCheckValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	case *HealthCheck_CustomHealthCheck_TypedConfig:
 
 		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return HealthCheck_CustomHealthCheckValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *HealthCheck_CustomHealthCheck_HiddenEnvoyDeprecatedConfig:
+
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HealthCheck_CustomHealthCheckValidationError{
+					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
