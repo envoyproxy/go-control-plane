@@ -3714,6 +3714,16 @@ func (m *RouteAction_UpgradeConfig_ConnectConfig) Validate() error {
 		return nil
 	}
 
+	if v, ok := interface{}(m.GetProxyProtocolConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_UpgradeConfig_ConnectConfigValidationError{
+				field:  "ProxyProtocolConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
