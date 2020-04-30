@@ -58,6 +58,7 @@ var (
 		rsrc.EndpointType: {clusterName},
 		rsrc.ClusterType:  nil,
 		rsrc.RouteType:    {routeName},
+		rsrc.EndpointType: {clusterName},
 		rsrc.ListenerType: nil,
 		rsrc.RuntimeType:  nil,
 	}
