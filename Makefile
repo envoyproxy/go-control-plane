@@ -66,14 +66,23 @@ integration.ads: $(BINDIR)/test
 integration.ads.v3: $(BINDIR)/test
 	env XDS=ads SUFFIX=v3 build/integration.sh
 
+integration.ads.v3: $(BINDIR)/test
+	env XDS=ads SUFFIX=v3 build/integration.sh
+
 integration.xds: $(BINDIR)/test
 	env XDS=xds build/run_integration.sh
 
 integration.xds.v3: $(BINDIR)/test
 	env XDS=xds SUFFIX=v3 build/integration.sh
 
+integration.xds.v3: $(BINDIR)/test
+	env XDS=xds SUFFIX=v3 build/integration.sh
+
 integration.rest: $(BINDIR)/test
 	env XDS=rest build/run_integration.sh
+
+integration.rest.v3: $(BINDIR)/test
+	env XDS=rest SUFFIX=v3 build/integration.sh
 
 integration.rest.v3: $(BINDIR)/test
 	env XDS=rest SUFFIX=v3 build/integration.sh

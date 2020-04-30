@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/cncf/udpa/go/udpa/annotations"
 	proto "github.com/golang/protobuf/proto"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

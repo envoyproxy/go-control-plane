@@ -6,7 +6,6 @@ package envoy_config_core_v4alpha
 import (
 	fmt "fmt"
 	math "math"
-
 	_ "github.com/cncf/udpa/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
