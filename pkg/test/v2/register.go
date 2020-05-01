@@ -23,7 +23,7 @@ import (
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v2"
-	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	discoveryservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
@@ -37,7 +37,7 @@ func RegisterAccessLogServer(grpcServer *grpc.Server, als *AccessLogService) {
 // RegisterServer registers with v2 services.
 func RegisterServer(grpcServer *grpc.Server, server server.Server) {
 	// register services
-	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
+	discoveryservice.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
 	clusterservice.RegisterClusterDiscoveryServiceServer(grpcServer, server)
 	routeservice.RegisterRouteDiscoveryServiceServer(grpcServer, server)

@@ -22,15 +22,16 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"github.com/golang/protobuf/ptypes/any"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	anypb "github.com/golang/protobuf/ptypes/any"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	discoveryservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
@@ -46,7 +47,7 @@ type Server interface {
 	clusterservice.ClusterDiscoveryServiceServer
 	routeservice.RouteDiscoveryServiceServer
 	listenerservice.ListenerDiscoveryServiceServer
-	discoverygrpc.AggregatedDiscoveryServiceServer
+	discoveryservice.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
 	runtimeservice.RuntimeDiscoveryServiceServer
 
@@ -146,18 +147,18 @@ func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryR
 		return nil, errors.New("missing response")
 	}
 
-	var resources []*any.Any
+	var resources []*anypb.Any
 	if resp.ResourceMarshaled {
-		resources = make([]*any.Any, len(resp.MarshaledResources))
+		resources = make([]*anypb.Any, len(resp.MarshaledResources))
 	} else {
-		resources = make([]*any.Any, len(resp.Resources))
+		resources = make([]*anypb.Any, len(resp.Resources))
 	}
 
 	for i := 0; i < len(resources); i++ {
 		// Envoy relies on serialized protobuf bytes for detecting changes to the resources.
 		// This requires deterministic serialization.
 		if resp.ResourceMarshaled {
-			resources[i] = &any.Any{
+			resources[i] = &anypb.Any{
 				TypeUrl: typeURL,
 				Value:   resp.MarshaledResources[i],
 			}
@@ -167,7 +168,7 @@ func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryR
 				return nil, err
 			}
 
-			resources[i] = &any.Any{
+			resources[i] = &anypb.Any{
 				TypeUrl: typeURL,
 				Value:   marshaledResource,
 			}
@@ -388,7 +389,7 @@ func (s *server) handler(stream stream, typeURL string) error {
 	return err
 }
 
-func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
+func (s *server) StreamAggregatedResources(stream discoveryservice.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
 	return s.handler(stream, resource.AnyType)
 }
 
@@ -482,7 +483,7 @@ func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryReque
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+func (s *server) DeltaAggregatedResources(_ discoveryservice.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return errors.New("not implemented")
 }
 
