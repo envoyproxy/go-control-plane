@@ -60,7 +60,6 @@ var (
 		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: {listenerName},
-		rsrc.ListenerType: nil,
 		rsrc.RuntimeType:  nil,
 	}
 
