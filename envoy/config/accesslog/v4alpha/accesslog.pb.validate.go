@@ -1065,7 +1065,7 @@ func (m *ResponseFlagFilter) Validate() error {
 		if _, ok := _ResponseFlagFilter_Flags_InLookup[item]; !ok {
 			return ResponseFlagFilterValidationError{
 				field:  fmt.Sprintf("Flags[%v]", idx),
-				reason: "value must be in list [LH UH UT LR UR UF UC UO NR DI FI RL UAEX RLSE DC URX SI IH DPE]",
+				reason: "value must be in list [LH UH UT LR UR UF UC UO NR DI FI RL UAEX RLSE DC URX SI IH DPE UMSDR]",
 			}
 		}
 
@@ -1131,25 +1131,26 @@ var _ interface {
 } = ResponseFlagFilterValidationError{}
 
 var _ResponseFlagFilter_Flags_InLookup = map[string]struct{}{
-	"LH":   {},
-	"UH":   {},
-	"UT":   {},
-	"LR":   {},
-	"UR":   {},
-	"UF":   {},
-	"UC":   {},
-	"UO":   {},
-	"NR":   {},
-	"DI":   {},
-	"FI":   {},
-	"RL":   {},
-	"UAEX": {},
-	"RLSE": {},
-	"DC":   {},
-	"URX":  {},
-	"SI":   {},
-	"IH":   {},
-	"DPE":  {},
+	"LH":    {},
+	"UH":    {},
+	"UT":    {},
+	"LR":    {},
+	"UR":    {},
+	"UF":    {},
+	"UC":    {},
+	"UO":    {},
+	"NR":    {},
+	"DI":    {},
+	"FI":    {},
+	"RL":    {},
+	"UAEX":  {},
+	"RLSE":  {},
+	"DC":    {},
+	"URX":   {},
+	"SI":    {},
+	"IH":    {},
+	"DPE":   {},
+	"UMSDR": {},
 }
 
 // Validate checks the field values on GrpcStatusFilter with the rules defined
