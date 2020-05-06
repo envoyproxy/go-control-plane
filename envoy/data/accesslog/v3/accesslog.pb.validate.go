@@ -606,6 +606,8 @@ func (m *ResponseFlags) Validate() error {
 
 	// no validation rules for DownstreamProtocolError
 
+	// no validation rules for UpstreamMaxStreamDurationReached
+
 	return nil
 }
 
