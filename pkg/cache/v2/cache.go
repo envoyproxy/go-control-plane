@@ -87,14 +87,10 @@ type Response struct {
 	MarshaledResources []types.MarshaledResource
 }
 
-// DeltaResponse is a pre-serialized xDS response.
+// DeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
 type DeltaResponse struct {
 	// Request is the original request.
 	DeltaRequest discovery.DeltaDiscoveryRequest
-
-	// Version of the resources as tracked by the cache for the given type.
-	// Proxy responds with this version as an acknowledgement.
-	Version string
 
 	// The value indicating whether the resource is marshaled, and only one of `Resources` and `MarshaledResources` is available.
 	ResourceMarshaled bool

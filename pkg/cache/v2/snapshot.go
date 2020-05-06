@@ -124,8 +124,9 @@ func (s *Snapshot) GetSubscribedResources(aliases []string, typeURL string) map[
 	}
 
 	subscribed := make(map[string]types.Resource, len(aliases))
-
 	r := s.Resources[t].Items
+
+	// TODO:
 	// This right now is O(n^2) which is not performant. Will need to revisit
 	for _, item := range r {
 		for _, alias := range aliases {
@@ -134,8 +135,6 @@ func (s *Snapshot) GetSubscribedResources(aliases []string, typeURL string) map[
 			}
 		}
 	}
-
-	fmt.Printf("\nReturning subscribed resources: %#v\n\n", subscribed)
 
 	return subscribed
 }
