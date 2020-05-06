@@ -163,6 +163,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			return nil
 			// config watcher can send the requested resources types in any order
 		case resp, more := <-values.deltaEndpoints:
+			log.Printf("Received values over deltaEndpoints chan")
 			if !more {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
@@ -184,6 +185,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			values.deltaClusterNonce = nonce
 
 		case resp, more := <-values.deltaRoutes:
+			log.Printf("Received values over deltaRoutes chan")
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
@@ -194,6 +196,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			values.routeNonce = nonce
 
 		case resp, more := <-values.deltaListeners:
+			log.Printf("Received values over deltaListeners chan")
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
@@ -233,14 +236,16 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 
 			// node field in discovery request is delta-compressed
+			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
+			var nonce string
 			if req.Node != nil {
 				node = req.Node
+				nonce = req.GetResponseNonce()
 			} else {
 				req.Node = node
+				// If we have no nonce, i.e. this is the first request on a delta stream, set one
+				nonce = strconv.FormatInt(streamNonce, 10)
 			}
-
-			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
-			nonce := req.GetResponseNonce()
 
 			// type URL is required for ADS but is implicit for xDS
 			if defaultTypeURL == resource.AnyType {

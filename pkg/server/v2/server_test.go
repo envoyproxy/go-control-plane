@@ -77,7 +77,6 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRe
 
 		// We should only send back subscribed resources here
 		out <- cache.DeltaResponse{
-			Version:            res.Version,
 			ResourceMarshaled:  res.ResourceMarshaled,
 			MarshaledResources: res.MarshaledResources,
 			Resources:          subscribed,
@@ -321,20 +320,16 @@ func makeResponses() map[string][]cache.Response {
 func makeDeltaResponses() map[string][]cache.DeltaResponse {
 	return map[string][]cache.DeltaResponse{
 		rsrc.EndpointType: []cache.DeltaResponse{{
-			Version:   "1",
 			Resources: []types.Resource{endpoint},
 		}},
 		rsrc.ClusterType: []cache.DeltaResponse{{
-			Version:   "2",
 			Resources: []types.Resource{deltaCluster, deltaCluster2},
 		}},
 
 		rsrc.RouteType: []cache.DeltaResponse{{
-			Version:   "3",
 			Resources: []types.Resource{route},
 		}},
 		rsrc.ListenerType: []cache.DeltaResponse{{
-			Version:   "4",
 			Resources: []types.Resource{listener},
 		}},
 	}
