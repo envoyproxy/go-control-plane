@@ -269,12 +269,6 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// validate response for endpoints
-	// TODO:
-	// This fails because delta discovery has no concept of request version_info
-	// Previously resources would've matched versions with the request version_info
-	// but that no longer exists, so now watches are never deleted when a new resource version appears
-	// So instead of one new versionY watch, we will receive back all resources with their old versions, i.e. everything set at versionX
-	// We are also currently not overwriting the watches with their new versioned objects once their snapshot is created
 	select {
 	case out := <-watches[rsrc.EndpointType]:
 		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
