@@ -149,34 +149,6 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	return nil
 }
 
-func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) error {
-	cache.mu.Lock()
-	defer cache.mu.Unlock()
-
-	// update the existing entry
-	cache.snapshots[node] = snapshot
-
-	// trigger existing watches for which version changed
-	if info, ok := cache.status[node]; ok {
-		info.mu.Lock()
-		for id, watch := range info.deltaWatches {
-			if cache.log != nil {
-				cache.log.Debugf("respond open watch ID:%d Resources:%v", id, watch.Request.GetResourceNamesSubscribe())
-			}
-
-			// Respond to our delta stream with the subcribed resources
-			cache.respondDelta(
-				watch.Request,
-				watch.Response,
-				snapshot.GetSubscribedResources(watch.Request.ResourceNamesSubscribe, watch.Request.TypeUrl),
-			)
-		}
-		info.mu.Unlock()
-	}
-
-	return nil
-}
-
 // GetSnapshots gets the snapshot for a node, and returns an error if not found.
 func (cache *snapshotCache) GetSnapshot(node string) (Snapshot, error) {
 	cache.mu.RLock()
@@ -260,60 +232,8 @@ func (cache *snapshotCache) CreateWatch(request Request) (chan Response, func())
 	return value, nil
 }
 
-// CreateDeltaWatch returns a watch for a delta xDS request.
-func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaResponse, func()) {
-	nodeID := cache.hash.ID(request.Node)
-
-	cache.mu.Lock()
-	defer cache.mu.Unlock()
-
-	info, ok := cache.status[nodeID]
-	if !ok {
-		info = newStatusInfo(request.Node)
-		cache.status[nodeID] = info
-	}
-
-	// update last watch request time
-	info.mu.Lock()
-	info.lastDeltaWatchRequestTime = time.Now()
-	info.mu.Unlock()
-
-	// allocate capacity 1 to allow one-time non-blocking use
-	value := make(chan DeltaResponse, 1)
-
-	// find the current cache snapshot for the provided node
-	snapshot, exists := cache.snapshots[nodeID]
-
-	// if the requested version is up-to-date or missing a response, leave an open watch
-	if !exists {
-		watchID := cache.nextDeltaWatchID()
-		if cache.log != nil {
-			cache.log.Debugf("open watch ID:%d for %s Resources:%v from nodeID: %q, nonce %q", watchID,
-				request.TypeUrl, request.GetResourceNamesSubscribe(), nodeID, request.GetResponseNonce())
-		}
-		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value}
-		info.mu.Unlock()
-		return value, cache.cancelWatch(nodeID, watchID)
-	}
-
-	// otherwise, the watch may be responded to immediately with the subscribed resources
-	// we don't want to ask for all the resources by type here
-	cache.respondDelta(
-		request,
-		value,
-		snapshot.GetSubscribedResources(request.GetResourceNamesSubscribe(), request.GetTypeUrl()),
-	)
-
-	return value, nil
-}
-
 func (cache *snapshotCache) nextWatchID() int64 {
 	return atomic.AddInt64(&cache.watchCount, 1)
-}
-
-func (cache *snapshotCache) nextDeltaWatchID() int64 {
-	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
 // cancellation function for cleaning stale watches
@@ -351,21 +271,6 @@ func (cache *snapshotCache) respond(request Request, value chan Response, resour
 	value <- createResponse(request, resources, version)
 }
 
-func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource) {
-	// info, _ := cache.status[request.Node.GetId()]
-	// cache.log.Debugf(info.node.GetId() + "\n")
-	// cache.log.Debugf(info.node.GetCluster() + "\n")
-	// cache.log.Debugf(info.node.String() + "\n")
-	// cache.log.Debugf("%+v \n", info.watches)
-
-	if cache.log != nil {
-		cache.log.Debugf("respond %s %v with nonce %q",
-			request.TypeUrl, request.ResourceNamesSubscribe, request.ResponseNonce)
-	}
-
-	value <- createDeltaResponse(request, resources)
-}
-
 func createResponse(request Request, resources map[string]types.Resource, version string) Response {
 	filtered := make([]types.Resource, 0, len(resources))
 
@@ -389,33 +294,6 @@ func createResponse(request Request, resources map[string]types.Resource, versio
 		Request:   request,
 		Version:   version,
 		Resources: filtered,
-	}
-}
-
-func createDeltaResponse(request DeltaRequest, resources map[string]types.Resource) DeltaResponse {
-	filtered := make([]types.Resource, 0, len(resources))
-
-	// Reply only with the requested resources. Envoy may ask each resource
-	// individually in a separate stream. It is ok to reply with the same version
-	// on separate streams since requests do not share their response versions.
-
-	// This logic is probably broken so we'll revisit
-	if len(request.ResourceNamesSubscribe) != 0 {
-		set := nameSet(request.ResourceNamesSubscribe)
-		for name, resource := range resources {
-			if set[name] {
-				filtered = append(filtered, resource)
-			}
-		}
-	} else {
-		for _, resource := range resources {
-			filtered = append(filtered, resource)
-		}
-	}
-
-	return DeltaResponse{
-		DeltaRequest: request,
-		Resources:    filtered,
 	}
 }
 

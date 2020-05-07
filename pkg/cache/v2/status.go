@@ -61,7 +61,7 @@ type StatusInfo interface {
 	GetLastDeltaWatchRequestTime() time.Time
 
 	// GetDeltaState returns the current resource subscription state of a particular node
-	GetDeltaState() []string
+	GetDeltaState() map[string]Resources
 }
 
 type statusInfo struct {
@@ -74,9 +74,9 @@ type statusInfo struct {
 	// deltaWatches are indexed channels for the delta response watches and the original requests
 	deltaWatches map[int64]DeltaResponseWatch
 
-	// deltaState is the list of resources names/aliases used for diffing when the server needs to send out updates for subcribed resources
+	// deltaState is the list of resources used for diffing when the server needs to send out updates for subcribed resources
 	// this list should be used to keep track of node state
-	deltaState []string
+	deltaState map[string]Resources
 
 	// the timestamp of the last watch request
 	lastWatchRequestTime time.Time
@@ -113,7 +113,7 @@ func newStatusInfo(node *core.Node) *statusInfo {
 		node:         node,
 		watches:      make(map[int64]ResponseWatch),
 		deltaWatches: make(map[int64]DeltaResponseWatch),
-		deltaState:   make([]string, 0),
+		deltaState:   make(map[string]Resources),
 	}
 	return &out
 }
@@ -148,7 +148,7 @@ func (info *statusInfo) GetLastDeltaWatchRequestTime() time.Time {
 	return info.lastDeltaWatchRequestTime
 }
 
-func (info *statusInfo) GetDeltaState() []string {
+func (info *statusInfo) GetDeltaState() map[string]Resources {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.deltaState

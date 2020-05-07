@@ -258,17 +258,14 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		t.Errorf("watches should be created for the latest version: %d", count)
 	}
 
-	co := c.GetStatusInfo(key).GetNumDeltaWatches()
-	t.Logf("count before snapshot2 %d", co)
-
 	// set partially-versioned snapshot
 	snapshot2 := snapshot
 	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
 	if err := c.SetSnapshotDelta(key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
-	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-		t.Errorf("watches should be preserved for all types: %d", count)
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
+		t.Errorf("watches should be preserved for all but one: %d", count)
 	}
 
 	// validate response for endpoints
@@ -278,7 +275,6 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// but that no longer exists, so now watches are never deleted when a new resource version appears
 	// So instead of one new versionY watch, we will receive back all resources with their old versions, i.e. everything set at versionX
 	// We are also currently not overwriting the watches with their new versioned objects once their snapshot is created
-	t.Logf("%+v", c.GetStatusInfo(key))
 	select {
 	case out := <-watches[rsrc.EndpointType]:
 		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {

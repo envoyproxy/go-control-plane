@@ -6,6 +6,7 @@ package envoy_config_bootstrap_v4alpha
 import (
 	fmt "fmt"
 	math "math"
+
 	_ "github.com/cncf/udpa/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v4alpha4 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v4alpha"

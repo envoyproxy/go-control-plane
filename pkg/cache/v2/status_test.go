@@ -56,6 +56,6 @@ func TestNewStatusInfo(t *testing.T) {
 	}
 
 	if got := info.GetDeltaState(); len(got) != 0 {
-		t.Errorf("GetDeltaState() => got %v, want zero length", len(got))
+		t.Errorf("GetDeltaState() => got %v, want zero length for state per type", len(got))
 	}
 }
