@@ -1491,9 +1491,9 @@ var _ interface {
 	ErrorName() string
 } = RouteActionValidationError{}
 
-var _RouteAction_PrefixRewrite_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
-
 var _RouteAction_ClusterHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RouteAction_PrefixRewrite_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _RouteAction_HostRewriteLiteral_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
