@@ -296,6 +296,8 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
+	// no validation rules for PreserveUpstreamDate
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManagerValidationError{
