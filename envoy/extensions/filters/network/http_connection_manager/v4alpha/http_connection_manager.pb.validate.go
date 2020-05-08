@@ -298,6 +298,8 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for PreserveUpstreamDate
 
+	// no validation rules for StripMatchingHostPort
+
 	switch m.RouteSpecifier.(type) {
 
 	case *HttpConnectionManager_Rds:

@@ -298,6 +298,8 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for PreserveUpstreamDate
 
+	// no validation rules for StripMatchingHostPort
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManagerValidationError{
