@@ -218,6 +218,49 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	}
 }
 
+func TestCheckState(t *testing.T) {
+	deltaState := map[string][]string{
+		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta"},
+		rsrc.ClusterType:  {clusterName},
+		rsrc.RouteType:    {routeName},
+		rsrc.ListenerType: {listenerName},
+		rsrc.RuntimeType:  nil,
+	}
+	subscribed := map[string][]string{
+		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta", "clusterDelta2"},
+		rsrc.ClusterType:  {clusterName},
+		rsrc.RouteType:    {routeName},
+		rsrc.ListenerType: {listenerName},
+		rsrc.RuntimeType:  nil,
+	}
+
+	mb := make(map[string][]string, len(deltaState))
+	diff := make(map[string][]string, 0)
+
+	for key, value := range deltaState {
+		mb[key] = value
+	}
+
+	// Check our diff map to see what has changed
+	// Even is an underlying resource has changed we need to update the diff
+	for key, value := range subscribed {
+		t.Log(key)
+		if _, found := mb[key]; !found {
+			t.Log("Found a new key, adding to diff")
+			diff[key] = value
+		} else if resources, found := mb[key]; found && (len(resources) != len(value)) {
+			t.Log("Found a new resource to an existing key, modifying resource map")
+			diff[key] = value
+		} else {
+			t.Log("Found no changes")
+		}
+	}
+
+	if len(diff) == 0 {
+		t.Fatalf("Expected diff greater than 0")
+	}
+}
+
 func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	watches := make(map[string]chan cache.DeltaResponse)

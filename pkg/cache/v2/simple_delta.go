@@ -74,7 +74,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				// Diff function is failing because it only checks by alias
 				// We are going to have to compare resource object themselves because an update can change an object and leave the alias
 				// Depending on what operation occurs, an add or remove woud be the only thing that triggers this currently
-				diff := checkState(subscribed, info.deltaState[t].Items)
+				diff := cache.checkState(subscribed, info.deltaState[t].Items)
 				cache.log.Debugf("diff state: %v", diff)
 
 				if len(diff) > 0 {
@@ -122,9 +122,9 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 
 // difference returns the elements in `a` that aren't in `b`.
 // TODO: currently O(n) time so this will need to be revisited
-func checkState(resources, deltaState map[string]types.Resource) map[string]types.Resource {
+func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Resource) map[string]types.Resource {
 	mb := make(map[string]types.Resource, len(deltaState))
-	var diff map[string]types.Resource
+	diff := make(map[string]types.Resource, 0)
 
 	for key, value := range deltaState {
 		mb[key] = value
@@ -134,10 +134,13 @@ func checkState(resources, deltaState map[string]types.Resource) map[string]type
 	// Even is an underlying resource has changed we need to update the diff
 	for key, value := range resources {
 		if _, found := mb[key]; !found {
+			cache.log.Debugf("Found a new key, adding to diff")
 			diff[key] = value
-		} else if resource, found := mb[key]; found && (resource != mb[key]) {
+		} else if resource, found := mb[key]; found && (resource != value) {
+			cache.log.Debugf("Found a new resource to an existing key, modifying resource map")
 			diff[key] = value
 		}
+		cache.log.Debugf("Found no changes")
 	}
 
 	return diff
