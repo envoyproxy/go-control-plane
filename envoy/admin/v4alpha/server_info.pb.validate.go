@@ -156,6 +156,8 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for RejectUnknownDynamicFields
 
+	// no validation rules for IgnoreUnknownDynamicFields
+
 	// no validation rules for AdminAddressPath
 
 	// no validation rules for LocalAddressIpVersion
