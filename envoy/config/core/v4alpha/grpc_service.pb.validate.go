@@ -293,6 +293,16 @@ func (m *GrpcService_GoogleGrpc) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetPerStreamBufferLimitBytes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GrpcService_GoogleGrpcValidationError{
+				field:  "PerStreamBufferLimitBytes",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
