@@ -312,13 +312,15 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// validate response for endpoints
-	select {
-	case out := <-watches[rsrc.EndpointType]:
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
-			t.Errorf("got resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
+	for {
+		select {
+		case out := <-watches[rsrc.EndpointType]:
+			if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
+				t.Logf("got resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
+			}
+		case <-time.After(time.Second * 10):
+			t.Fatal("failed to receive snapshot response")
 		}
-	case <-time.After(time.Second):
-		t.Fatal("failed to receive snapshot response")
 	}
 }
 

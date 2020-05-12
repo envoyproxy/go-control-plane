@@ -75,8 +75,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				// We are going to have to compare resource object themselves because an update can change an object and leave the alias
 				// Depending on what operation occurs, an add or remove woud be the only thing that triggers this currently
 				diff := cache.checkState(subscribed, info.deltaState[t].Items)
-				cache.log.Debugf("diff state: %v", diff)
-
 				if len(diff) > 0 {
 					cache.log.Debugf("found new items to subscribed too: %v", diff)
 
@@ -84,23 +82,24 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					r := Resources{
 						Version: version,
 					}
-					for key := range diff {
+					for key, value := range diff {
 						for rKey := range info.deltaState[t].Items {
 							// Handle the case when a new item could be added to the state and also if we need to overwrite a previous resource
 							if key == rKey {
-								info.deltaState[t].Items[key] = diff[key]
+								info.deltaState[t].Items[key] = value
 							} else if _, found := info.deltaState[t].Items[key]; !found {
-								info.deltaState[t].Items[key] = diff[key]
+								info.deltaState[t].Items[key] = value
 							}
 						}
 					}
+					r.Items = info.deltaState[t].Items
 
 					info.deltaState[t] = r
 				}
 
 				if cache.log != nil {
-					cache.log.Debugf("respond open watch ID:%d Resources:%+v", id, info.deltaState[t])
-					cache.log.Debugf("only sending updated resources: %v", diff)
+					// We only want to show the specific resources we're sending back from the diff
+					cache.log.Debugf("delta respond open watch ID:%d Resources:%+v", id, diff)
 				}
 
 				// Respond to our delta stream with the subcribed resources
@@ -134,13 +133,12 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 	// Even is an underlying resource has changed we need to update the diff
 	for key, value := range resources {
 		if _, found := mb[key]; !found {
-			cache.log.Debugf("Found a new key, adding to diff")
+			cache.log.Debugf("found new key: %s", key)
 			diff[key] = value
 		} else if resource, found := mb[key]; found && (resource != value) {
-			cache.log.Debugf("Found a new resource to an existing key, modifying resource map")
+			cache.log.Debugf("found updated resource from existing key %s, modifying resource map", key)
 			diff[key] = value
 		}
-		cache.log.Debugf("Found no changes")
 	}
 
 	return diff
@@ -149,6 +147,8 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 // CreateDeltaWatch returns a watch for a delta xDS request.
 func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
+	t := request.GetTypeUrl()
+	aliases := request.GetResourceNamesSubscribe()
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -174,12 +174,19 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaRe
 	if !exists {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
-			cache.log.Debugf("open watch ID:%d for %s Resources:%v from nodeID: %q, nonce %q", watchID,
-				request.TypeUrl, request.GetResourceNamesSubscribe(), nodeID, request.GetResponseNonce())
+			cache.log.Debugf("open delta watch ID:%d for %s Resources:%v from nodeID: %q, nonce %q", watchID,
+				t, aliases, nodeID, request.GetResponseNonce())
 		}
+
 		info.mu.Lock()
 		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value}
+		// Set our initial state when a watch is created
+		info.deltaState[t] = Resources{
+			Version: snapshot.GetVersion(t),
+			Items:   snapshot.GetSubscribedResources(aliases, t),
+		}
 		info.mu.Unlock()
+
 		return value, cache.cancelWatch(nodeID, watchID)
 	}
 
@@ -188,7 +195,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaRe
 	cache.respondDelta(
 		request,
 		value,
-		snapshot.GetSubscribedResources(request.GetResourceNamesSubscribe(), request.GetTypeUrl()),
+		info.deltaState[t].Items,
 	)
 
 	return value, nil
@@ -199,15 +206,9 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 }
 
 func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource) {
-	// info, _ := cache.status[request.Node.GetId()]
-	// cache.log.Debugf(info.node.GetId() + "\n")
-	// cache.log.Debugf(info.node.GetCluster() + "\n")
-	// cache.log.Debugf(info.node.String() + "\n")
-	// cache.log.Debugf("%+v \n", info.watches)
-
 	if cache.log != nil {
-		cache.log.Debugf("respond %s %v with nonce %q",
-			request.TypeUrl, request.ResourceNamesSubscribe, request.ResponseNonce)
+		cache.log.Debugf("sending delta response %s %v with nonce %q",
+			request.TypeUrl, resources, request.ResponseNonce)
 	}
 
 	value <- createDeltaResponse(request, resources)
