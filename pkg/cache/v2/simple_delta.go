@@ -41,19 +41,14 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
 		for id, watch := range info.deltaWatches {
-			// TODO:
-			// We need some sort of logic that will check to see if the current resource versions are okay
-			// If they are not we will need to find cancel the watch for an existing resource such as the previous SOTW logic does
-			// And then send out an update ONLY for that new updated resource with a new version
-
 			// Get the version of the current resources per type url
 			t := watch.Request.GetTypeUrl()
 			subscribed := snapshot.GetSubscribedResources(watch.Request.GetResourceNamesSubscribe(), watch.Request.GetTypeUrl())
 			version := snapshot.GetVersion(t)
 
 			if info.deltaState[t].Version == "" && len(info.deltaState[t].Items) == 0 {
-				// Handle the case of a first request and having no previous state
-				// We can assume we just want to set the state as the initially request resources
+				// Handle the case of an initial delta request and having no previous state
+				// We can assume we just want to set the state as the initially requested resources
 				info.deltaState[t] = Resources{
 					Version: version,
 					Items:   subscribed,
@@ -69,14 +64,10 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					info.deltaState[t].Items,
 				)
 			} else if version != info.deltaState[t].Version {
-				// Assume we've received a new item and we want to send new resources and cancel old watches
-
-				// Diff function is failing because it only checks by alias
-				// We are going to have to compare resource object themselves because an update can change an object and leave the alias
-				// Depending on what operation occurs, an add or remove woud be the only thing that triggers this currently
+				// Assume we've received a new resource and we want to send new resources and cancel old watches
 				diff := cache.checkState(subscribed, info.deltaState[t].Items)
 				if len(diff) > 0 {
-					cache.log.Debugf("found new items to subscribed too: %v", diff)
+					cache.log.Debugf("found new items to subscribe too: %v", diff)
 
 					// Add our new subscription items to our state to watch that we've found
 					r := Resources{

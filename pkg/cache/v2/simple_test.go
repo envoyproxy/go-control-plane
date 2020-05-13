@@ -290,12 +290,10 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// open new watches with the latest version
-	for _, typ := range testTypes {
-		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
-			TypeUrl:                typ,
-			ResourceNamesSubscribe: names[typ],
-		})
-	}
+	watches[rsrc.EndpointType], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+		TypeUrl:                rsrc.EndpointType,
+		ResourceNamesSubscribe: []string{"cluster0"},
+	})
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
@@ -312,15 +310,13 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// validate response for endpoints
-	for {
-		select {
-		case out := <-watches[rsrc.EndpointType]:
-			if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
-				t.Logf("got resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
-			}
-		case <-time.After(time.Second * 10):
-			t.Fatal("failed to receive snapshot response")
+	select {
+	case out := <-watches[rsrc.EndpointType]:
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
+			t.Fatalf("got resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
+	case <-time.After(time.Second):
+		t.Fatal("failed to receive snapshot response")
 	}
 }
 
