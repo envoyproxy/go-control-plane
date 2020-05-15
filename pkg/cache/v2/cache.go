@@ -52,8 +52,13 @@ type Cache interface {
 	Fetch(context.Context, Request) (*Response, error)
 }
 
+type ResponseType interface {
+	GetMarshalled() ([]*any.Any, error)
+}
+
 // Response is a pre-serialized xDS response.
 type Response struct {
+	ResponseType
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
@@ -69,6 +74,19 @@ type Response struct {
 
 	// Marshaled Resources to be included in the response.
 	marshaledResources []*any.Any
+}
+
+type PassthroughResponse struct {
+	ResponseType
+	// Request is the original request.
+	Request discovery.DiscoveryRequest
+
+	// Version of the resources as tracked by the cache for the given type.
+	// Proxy responds with this version as an acknowledgement.
+	Version string
+
+	// Resources to be included in the response.
+	Resources []*any.Any
 }
 
 func (r Response) GetMarshalled() ([]*any.Any, error) {
@@ -92,4 +110,8 @@ func (r Response) GetMarshalled() ([]*any.Any, error) {
 	r.isResourceMarshaled = true
 
 	return r.marshaledResources, nil
+}
+
+func (r PassthroughResponse) GetMarshalled() ([]*any.Any, error) {
+	return r.Resources, nil
 }
