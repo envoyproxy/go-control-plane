@@ -137,8 +137,8 @@ func TestSnapshotCacheFetch(t *testing.T) {
 			if err != nil || resp == nil {
 				t.Fatal("unexpected error or null response")
 			}
-			if resp.Version != version {
-				t.Errorf("got version %q, want %q", resp.Version, version)
+			if resp.GetVersion() != version {
+				t.Errorf("got version %q, want %q", resp.GetVersion(), version)
 			}
 		})
 	}

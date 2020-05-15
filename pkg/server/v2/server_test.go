@@ -51,7 +51,7 @@ func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (ch
 	return out, func() {}
 }
 
-func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (*cache.Response, error) {
+func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (cache.ResponseIface, error) {
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out := config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]

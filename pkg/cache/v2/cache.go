@@ -49,7 +49,7 @@ type Cache interface {
 	ConfigWatcher
 
 	// Fetch implements the polling method of the config cache using a non-empty request.
-	Fetch(context.Context, Request) (*Response, error)
+	Fetch(context.Context, Request) (ResponseIface, error)
 }
 
 type ResponseIface interface {

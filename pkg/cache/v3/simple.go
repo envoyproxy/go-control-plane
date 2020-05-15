@@ -254,7 +254,7 @@ func (cache *snapshotCache) respond(request Request, value chan ResponseIface, r
 	value <- createResponse(request, resources, version)
 }
 
-func createResponse(request Request, resources map[string]types.Resource, version string) Response {
+func createResponse(request Request, resources map[string]types.Resource, version string) ResponseIface {
 	filtered := make([]types.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
@@ -282,7 +282,7 @@ func createResponse(request Request, resources map[string]types.Resource, versio
 
 // Fetch implements the cache fetch function.
 // Fetch is called on multiple streams, so responding to individual names with the same version works.
-func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
+func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (ResponseIface, error) {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.RLock()
@@ -301,7 +301,7 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Respon
 
 		resources := snapshot.GetResources(request.TypeUrl)
 		out := createResponse(request, resources, version)
-		return &out, nil
+		return out, nil
 	}
 
 	return nil, fmt.Errorf("missing snapshot for %q", nodeID)
