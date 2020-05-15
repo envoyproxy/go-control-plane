@@ -54,9 +54,9 @@ var (
 		[]types.Resource{testRuntime})
 
 	names = map[string][]string{
-		rsrc.EndpointType: []string{clusterName},
+		rsrc.EndpointType: {clusterName},
 		rsrc.ClusterType:  nil,
-		rsrc.RouteType:    []string{routeName},
+		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: nil,
 		rsrc.RuntimeType:  nil,
 	}
