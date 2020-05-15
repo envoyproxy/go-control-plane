@@ -85,10 +85,6 @@ type PassthroughResponse struct {
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
-	// Version of the resources as tracked by the cache for the given type.
-	// Proxy responds with this version as an acknowledgement.
-	Version string
-
 	// Resources to be included in the response.
 	Response *discovery.DiscoveryResponse
 }
@@ -137,5 +133,5 @@ func (r PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
 }
 
 func (r PassthroughResponse) GetVersion() string {
-	return r.Version
+	return r.Response.VersionInfo
 }
