@@ -19,7 +19,6 @@ import (
 	"context"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/golang/protobuf/ptypes/any"
 )
@@ -80,7 +79,7 @@ func (r Response) GetMarshalled() ([]*any.Any, error) {
 	r.marshaledResources = make([]*any.Any, len(r.Resources))
 
 	for i, resource := range r.Resources {
-		marshaledResource, err := cache.MarshalResource(resource)
+		marshaledResource, err := MarshalResource(resource)
 		if err != nil {
 			return nil, err
 		}
