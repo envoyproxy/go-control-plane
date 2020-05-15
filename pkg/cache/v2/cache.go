@@ -73,7 +73,7 @@ type Response struct {
 	isResourceMarshaled bool
 
 	// Marshaled Resources to be included in the response.
-	marshaledResources []*any.Any
+	marshaledResponse *discovery.DiscoveryResponse
 }
 
 type PassthroughResponse struct {
@@ -86,22 +86,22 @@ type PassthroughResponse struct {
 	Version string
 
 	// Resources to be included in the response.
-	Resources []*any.Any
+	Response *discovery.DiscoveryResponse
 }
 
-func (r Response) GetMarshalled() ([]*any.Any, error) {
+func (r Response) GetMarshalled() (*discovery.DiscoveryResponse, error) {
 	if r.isResourceMarshaled {
-		return r.marshaledResources, nil
+		return r.marshaledResponse, nil
 	}
 
-	r.marshaledResources = make([]*any.Any, len(r.Resources))
+	marshaledResources := make([]*any.Any, len(r.Resources))
 
 	for i, resource := range r.Resources {
 		marshaledResource, err := MarshalResource(resource)
 		if err != nil {
 			return nil, err
 		}
-		r.marshaledResources[i] = &any.Any{
+		marshaledResources[i] = &any.Any{
 			TypeUrl: r.Request.TypeUrl,
 			Value:   marshaledResource,
 		}
@@ -109,9 +109,13 @@ func (r Response) GetMarshalled() ([]*any.Any, error) {
 
 	r.isResourceMarshaled = true
 
-	return r.marshaledResources, nil
+	return &discovery.DiscoveryResponse{
+		VersionInfo: r.Version,
+		Resources:   marshaledResources,
+		TypeUrl:     r.Request.TypeUrl,
+	}, nil
 }
 
-func (r PassthroughResponse) GetMarshalled() ([]*any.Any, error) {
-	return r.Resources, nil
+func (r PassthroughResponse) GetMarshalled() (*discovery.DiscoveryResponse, error) {
+	return r.Response, nil
 }

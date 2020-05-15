@@ -145,16 +145,12 @@ func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryR
 		return nil, errors.New("missing response")
 	}
 
-	marshalledResources, err := resp.GetMarshalled()
+	marshalledResponse, err := resp.GetMarshalled()
 	if err != nil {
 		return nil, err
 	}
-	out := &discovery.DiscoveryResponse{
-		VersionInfo: resp.Version,
-		Resources:   marshalledResources,
-		TypeUrl:     typeURL,
-	}
-	return out, nil
+
+	return marshalledResponse, nil
 }
 
 // process handles a bi-di stream request
