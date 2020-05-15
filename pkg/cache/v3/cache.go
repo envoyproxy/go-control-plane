@@ -20,7 +20,9 @@ import (
 	"context"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/golang/protobuf/ptypes/any"
 )
 
 // Request is an alias for the discovery request type.
@@ -61,12 +63,32 @@ type Response struct {
 	// Proxy responds with this version as an acknowledgement.
 	Version string
 
-	// The value indicating whether the resource is marshaled, and only one of `Resources` and `MarshaledResources` is available.
-	ResourceMarshaled bool
-
 	// Resources to be included in the response.
 	Resources []types.Resource
 
+	// The value indicating whether the resource is marshaled, and only one of `Resources` and `MarshaledResources` is available.
+	isResourceMarshaled bool
+
 	// Marshaled Resources to be included in the response.
-	MarshaledResources []types.MarshaledResource
+	marshaledResources []*any.Any
+}
+
+func (r Response) GetMarshalled() ([]*any.Any, error) {
+	if r.isResourceMarshaled {
+		return r.marshaledResources, nil
+	}
+
+	r.marshaledResources = make([]*any.Any, len(r.Resources))
+
+	for i, resource := range r.Resources {
+		marshaledResource, err := cache.MarshalResource(resource)
+		if err != nil {
+			return nil, err
+		}
+		r.marshaledResources[i] = &any.Any{
+			TypeUrl: r.Request.TypeUrl,
+			Value:   marshaledResource,
+		}
+	}
+	return r.marshaledResources, nil
 }
