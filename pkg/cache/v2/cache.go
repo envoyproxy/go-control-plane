@@ -89,5 +89,8 @@ func (r Response) GetMarshalled() ([]*any.Any, error) {
 			Value:   marshaledResource,
 		}
 	}
+
+	r.isResourceMarshaled = true
+
 	return r.marshaledResources, nil
 }
