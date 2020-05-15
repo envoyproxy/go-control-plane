@@ -22,9 +22,11 @@ import (
 	"testing"
 	"testing/iotest"
 
+	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
 )
 
@@ -40,17 +42,20 @@ func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format
 func TestGateway(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.responses = map[string][]cache.Response{
-		resource.ClusterType: []cache.Response{{
+		resource.ClusterType: {{
 			Version:   "2",
 			Resources: []types.Resource{cluster},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
 		}},
-		resource.RouteType: []cache.Response{{
+		resource.RouteType: {{
 			Version:   "3",
 			Resources: []types.Resource{route},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
 		}},
-		resource.ListenerType: []cache.Response{{
+		resource.ListenerType: {{
 			Version:   "4",
 			Resources: []types.Resource{listener},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 		}},
 	}
 	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(context.Background(), config, nil)}

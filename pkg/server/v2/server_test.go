@@ -179,21 +179,25 @@ var (
 
 func makeResponses() map[string][]cache.Response {
 	return map[string][]cache.Response{
-		rsrc.EndpointType: []cache.Response{{
+		rsrc.EndpointType: {{
 			Version:   "1",
 			Resources: []types.Resource{endpoint},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
 		}},
-		rsrc.ClusterType: []cache.Response{{
+		rsrc.ClusterType: {{
 			Version:   "2",
 			Resources: []types.Resource{cluster},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
 		}},
-		rsrc.RouteType: []cache.Response{{
+		rsrc.RouteType: {{
 			Version:   "3",
 			Resources: []types.Resource{route},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
 		}},
-		rsrc.ListenerType: []cache.Response{{
+		rsrc.ListenerType: {{
 			Version:   "4",
 			Resources: []types.Resource{listener},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 		}},
 	}
 }
@@ -250,7 +254,7 @@ func TestResponseHandlers(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &discovery.DiscoveryRequest{Node: node}
+			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
 			go func() {
 				var err error
 				switch typ {

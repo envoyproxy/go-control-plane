@@ -23,9 +23,11 @@ import (
 	"testing"
 	"testing/iotest"
 
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 )
 
@@ -44,14 +46,17 @@ func TestGateway(t *testing.T) {
 		resource.ClusterType: {{
 			Version:   "2",
 			Resources: []types.Resource{cluster},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
 		}},
 		resource.RouteType: {{
 			Version:   "3",
 			Resources: []types.Resource{route},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
 		}},
 		resource.ListenerType: {{
 			Version:   "4",
 			Resources: []types.Resource{listener},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 		}},
 	}
 	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(context.Background(), config, nil)}
