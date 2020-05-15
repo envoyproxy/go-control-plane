@@ -21,7 +21,6 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"github.com/golang/protobuf/ptypes/any"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -145,36 +144,13 @@ func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryR
 		return nil, errors.New("missing response")
 	}
 
-	var resources []*any.Any
-	if resp.ResourceMarshaled {
-		resources = make([]*any.Any, len(resp.MarshaledResources))
-	} else {
-		resources = make([]*any.Any, len(resp.Resources))
-	}
-
-	for i := 0; i < len(resources); i++ {
-		// Envoy relies on serialized protobuf bytes for detecting changes to the resources.
-		// This requires deterministic serialization.
-		if resp.ResourceMarshaled {
-			resources[i] = &any.Any{
-				TypeUrl: typeURL,
-				Value:   resp.MarshaledResources[i],
-			}
-		} else {
-			marshaledResource, err := cache.MarshalResource(resp.Resources[i])
-			if err != nil {
-				return nil, err
-			}
-
-			resources[i] = &any.Any{
-				TypeUrl: typeURL,
-				Value:   marshaledResource,
-			}
-		}
+	marshalledResources, err := resp.GetMarshalled()
+	if err != nil {
+		return nil, err
 	}
 	out := &discovery.DiscoveryResponse{
 		VersionInfo: resp.Version,
-		Resources:   resources,
+		Resources:   marshalledResources,
 		TypeUrl:     typeURL,
 	}
 	return out, nil
