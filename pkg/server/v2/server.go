@@ -95,12 +95,12 @@ type stream interface {
 
 // watches for all xDS resource types
 type watches struct {
-	endpoints chan cache.Response
-	clusters  chan cache.Response
-	routes    chan cache.Response
-	listeners chan cache.Response
-	secrets   chan cache.Response
-	runtimes  chan cache.Response
+	endpoints chan cache.ResponseIface
+	clusters  chan cache.ResponseIface
+	routes    chan cache.ResponseIface
+	listeners chan cache.ResponseIface
+	secrets   chan cache.ResponseIface
+	runtimes  chan cache.ResponseIface
 
 	endpointCancel func()
 	clusterCancel  func()
@@ -139,12 +139,12 @@ func (values watches) Cancel() {
 	}
 }
 
-func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
+func createResponse(resp cache.ResponseIface, typeURL string) (*discovery.DiscoveryResponse, error) {
 	if resp == nil {
 		return nil, errors.New("missing response")
 	}
 
-	marshalledResponse, err := resp.GetMarshalled()
+	marshalledResponse, err := resp.GetDiscoveryResponse()
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +171,8 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 	}()
 
 	// sends a response by serializing to protobuf Any
-	send := func(resp cache.Response, typeURL string) (string, error) {
-		out, err := createResponse(&resp, typeURL)
+	send := func(resp cache.ResponseIface, typeURL string) (string, error) {
+		out, err := createResponse(resp, typeURL)
 		if err != nil {
 			return "", err
 		}
@@ -181,7 +181,7 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
-			s.callbacks.OnStreamResponse(streamID, &resp.Request, out)
+			s.callbacks.OnStreamResponse(streamID, resp.GetRequest(), out)
 		}
 		return out.Nonce, stream.Send(out)
 	}

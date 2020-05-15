@@ -42,7 +42,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(Request) (value chan Response, cancel func())
+	CreateWatch(Request) (value chan ResponseIface, cancel func())
 }
 
 // Cache is a generic config cache with a watcher.
@@ -53,13 +53,17 @@ type Cache interface {
 	Fetch(context.Context, Request) (*Response, error)
 }
 
-type ResponseType interface {
-	GetMarshalled() ([]*any.Any, error)
+type ResponseIface interface {
+	GetDiscoveryResponse() (*discovery.DiscoveryResponse, error)
+
+	GetRequest() *discovery.DiscoveryRequest
+
+	GetVersion() string
 }
 
 // Response is a pre-serialized xDS response.
 type Response struct {
-	ResponseType
+	ResponseIface
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
@@ -78,7 +82,7 @@ type Response struct {
 }
 
 type PassthroughResponse struct {
-	ResponseType
+	ResponseIface
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
@@ -90,7 +94,7 @@ type PassthroughResponse struct {
 	Response *discovery.DiscoveryResponse
 }
 
-func (r Response) GetMarshalled() (*discovery.DiscoveryResponse, error) {
+func (r Response) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	if r.isResourceMarshaled {
 		return r.marshaledResponse, nil
 	}
@@ -117,6 +121,22 @@ func (r Response) GetMarshalled() (*discovery.DiscoveryResponse, error) {
 	}, nil
 }
 
-func (r PassthroughResponse) GetMarshalled() (*discovery.DiscoveryResponse, error) {
+func (r Response) GetRequest() *discovery.DiscoveryRequest {
+	return &r.Request
+}
+
+func (r Response) GetVersion() string {
+	return r.Version
+}
+
+func (r PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	return r.Response, nil
+}
+
+func (r PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
+	return &r.Request
+}
+
+func (r PassthroughResponse) GetVersion() string {
+	return r.Version
 }

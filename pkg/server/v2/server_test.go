@@ -39,9 +39,9 @@ type mockConfigWatcher struct {
 	closeWatch bool
 }
 
-func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.Response, func()) {
+func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.ResponseIface, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
-	out := make(chan cache.Response, 1)
+	out := make(chan cache.ResponseIface, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
