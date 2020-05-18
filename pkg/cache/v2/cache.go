@@ -80,15 +80,19 @@ type Response struct {
 	marshaledResponse *discovery.DiscoveryResponse
 }
 
+// PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
 type PassthroughResponse struct {
 	ResponseIface
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
-	// Resources to be included in the response.
+	// The discovery response that needs to be sent as is, without any marshalling transformations.
 	Response *discovery.DiscoveryResponse
 }
 
+// GetDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
+// This is necessary because the marshalled response does not change across the calls.
+// This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
 func (r Response) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	if r.isResourceMarshaled {
 		return r.marshaledResponse, nil
