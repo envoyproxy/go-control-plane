@@ -54,10 +54,13 @@ type Cache interface {
 }
 
 type ResponseIface interface {
+	// Get the Ccontructed DiscoveryResponse
 	GetDiscoveryResponse() (*discovery.DiscoveryResponse, error)
 
+	// Get te original Request for the Response.
 	GetRequest() *discovery.DiscoveryRequest
 
+	// Get the version in the Response.
 	GetVersion() string
 }
 
