@@ -4528,6 +4528,8 @@ func (m *RateLimit_Action_RequestHeaders) Validate() error {
 		}
 	}
 
+	// no validation rules for SkipIfAbsent
+
 	return nil
 }
 
