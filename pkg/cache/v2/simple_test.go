@@ -269,7 +269,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		})
+		}, version)
 	}
 
 	if err := c.SetSnapshotDelta(key, snapshot); err != nil {
@@ -293,7 +293,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	watches[rsrc.EndpointType], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
 		TypeUrl:                rsrc.EndpointType,
 		ResourceNamesSubscribe: []string{"cluster0"},
-	})
+	}, version2)
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)

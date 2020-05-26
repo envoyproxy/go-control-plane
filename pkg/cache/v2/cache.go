@@ -57,7 +57,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(DeltaRequest) (value chan DeltaResponse, cancel func())
+	CreateDeltaWatch(DeltaRequest, string) (value chan DeltaResponse, cancel func())
 }
 
 // Cache is a generic config cache with a watcher.
@@ -100,6 +100,9 @@ type DeltaResponse struct {
 
 	// Marshaled Resources to be included in the response.
 	MarshaledResources []MarshaledResource
+
+	// System Version Info
+	SystemVersion string
 }
 
 // MarshaledResource is an alias for the serialized binary array.

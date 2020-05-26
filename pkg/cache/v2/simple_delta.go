@@ -62,6 +62,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					watch.Request,
 					watch.Response,
 					info.deltaState[t].Items,
+					version,
 				)
 			} else if version != info.deltaState[t].Version {
 				// Assume we've received a new resource and we want to send new resources and cancel old watches
@@ -98,6 +99,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					watch.Request,
 					watch.Response,
 					diff, // We want to only send the updated resources here
+					version,
 				)
 
 				//discard the old watch
@@ -136,7 +138,8 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 }
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
-func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaResponse, func()) {
+// Requester now sets version info when creating new delta watches
+func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersion string) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 	aliases := request.GetResourceNamesSubscribe()
@@ -160,9 +163,10 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaRe
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
+	version := snapshot.GetVersion(t)
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
-	if !exists {
+	if !exists || version == requestVersion {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Debugf("open delta watch ID:%d for %s Resources:%v from nodeID: %q, nonce %q", watchID,
@@ -173,7 +177,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaRe
 		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value}
 		// Set our initial state when a watch is created
 		info.deltaState[t] = Resources{
-			Version: snapshot.GetVersion(t),
+			Version: requestVersion,
 			Items:   snapshot.GetSubscribedResources(aliases, t),
 		}
 		info.mu.Unlock()
@@ -187,6 +191,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest) (chan DeltaRe
 		request,
 		value,
 		info.deltaState[t].Items,
+		info.deltaState[t].Version,
 	)
 
 	return value, nil
@@ -196,16 +201,16 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
-func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource) {
+func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, version string) {
 	if cache.log != nil {
 		cache.log.Debugf("sending delta response %s %v with nonce %q",
 			request.TypeUrl, resources, request.ResponseNonce)
 	}
 
-	value <- createDeltaResponse(request, resources)
+	value <- createDeltaResponse(request, resources, version)
 }
 
-func createDeltaResponse(request DeltaRequest, resources map[string]types.Resource) DeltaResponse {
+func createDeltaResponse(request DeltaRequest, resources map[string]types.Resource, version string) DeltaResponse {
 	filtered := make([]types.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
@@ -227,7 +232,8 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 	}
 
 	return DeltaResponse{
-		DeltaRequest: request,
-		Resources:    filtered,
+		DeltaRequest:  request,
+		Resources:     filtered,
+		SystemVersion: version,
 	}
 }
