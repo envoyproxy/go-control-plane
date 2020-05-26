@@ -296,6 +296,16 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetLocalReplyConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "LocalReplyConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for StripMatchingHostPort
 
 	switch m.RouteSpecifier.(type) {
@@ -402,6 +412,209 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HttpConnectionManagerValidationError{}
+
+// Validate checks the field values on LocalReplyConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *LocalReplyConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetMappers() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LocalReplyConfigValidationError{
+					field:  fmt.Sprintf("Mappers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetBodyFormat()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LocalReplyConfigValidationError{
+				field:  "BodyFormat",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// LocalReplyConfigValidationError is the validation error returned by
+// LocalReplyConfig.Validate if the designated constraints aren't met.
+type LocalReplyConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocalReplyConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocalReplyConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocalReplyConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocalReplyConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocalReplyConfigValidationError) ErrorName() string { return "LocalReplyConfigValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LocalReplyConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocalReplyConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocalReplyConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocalReplyConfigValidationError{}
+
+// Validate checks the field values on ResponseMapper with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ResponseMapper) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetFilter() == nil {
+		return ResponseMapperValidationError{
+			field:  "Filter",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetFilter()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResponseMapperValidationError{
+				field:  "Filter",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if wrapper := m.GetStatusCode(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 200 || val >= 600 {
+			return ResponseMapperValidationError{
+				field:  "StatusCode",
+				reason: "value must be inside range [200, 600)",
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetBody()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResponseMapperValidationError{
+				field:  "Body",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetBodyFormatOverride()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResponseMapperValidationError{
+				field:  "BodyFormatOverride",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ResponseMapperValidationError is the validation error returned by
+// ResponseMapper.Validate if the designated constraints aren't met.
+type ResponseMapperValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResponseMapperValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResponseMapperValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResponseMapperValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResponseMapperValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResponseMapperValidationError) ErrorName() string { return "ResponseMapperValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ResponseMapperValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResponseMapper.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResponseMapperValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResponseMapperValidationError{}
 
 // Validate checks the field values on Rds with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.
