@@ -64,6 +64,9 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					info.deltaState[t].Items,
 					version,
 				)
+
+				// discard the old watch
+				delete(info.deltaWatches, id)
 			} else if version != info.deltaState[t].Version {
 				// Assume we've received a new resource and we want to send new resources and cancel old watches
 				diff := cache.checkState(subscribed, info.deltaState[t].Items)
@@ -104,7 +107,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					version,
 				)
 
-				//discard the old watch
+				// discard the old watch
 				delete(info.deltaWatches, id)
 			}
 		}
