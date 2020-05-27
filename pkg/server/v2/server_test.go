@@ -54,7 +54,7 @@ func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (ch
 	return out, func() {}
 }
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRequest) (chan cache.DeltaResponse, func()) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRequest, version string) (chan cache.DeltaResponse, func()) {
 	fmt.Println("Creating a delta watch...")
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 

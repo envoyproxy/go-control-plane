@@ -268,32 +268,34 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				if values.endpointCancel != nil {
 					values.endpointCancel()
 				}
-				values.deltaEndpoints, values.endpointCancel = s.cache.CreateDeltaWatch(*req)
+
+				values.deltaEndpoints, values.endpointCancel = s.cache.CreateDeltaWatch(*req, nonce)
 			case req.TypeUrl == resource.ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
 				if values.clusterCancel != nil {
 					values.clusterCancel()
 				}
-				values.deltaClusters, values.clusterCancel = s.cache.CreateDeltaWatch(*req)
+
+				values.deltaClusters, values.clusterCancel = s.cache.CreateDeltaWatch(*req, nonce)
 			case req.TypeUrl == resource.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
 				if values.routeCancel != nil {
 					values.routeCancel()
 				}
-				values.deltaRoutes, values.routeCancel = s.cache.CreateDeltaWatch(*req)
+				values.deltaRoutes, values.routeCancel = s.cache.CreateDeltaWatch(*req, nonce)
 			case req.TypeUrl == resource.ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
 				if values.listenerCancel != nil {
 					values.listenerCancel()
 				}
-				values.deltaListeners, values.listenerCancel = s.cache.CreateDeltaWatch(*req)
+				values.deltaListeners, values.listenerCancel = s.cache.CreateDeltaWatch(*req, nonce)
 			case req.TypeUrl == resource.SecretType && (values.secretNonce == "" || values.secretNonce == nonce):
 				if values.secretCancel != nil {
 					values.secretCancel()
 				}
-				values.deltaSecrets, values.secretCancel = s.cache.CreateDeltaWatch(*req)
+				values.deltaSecrets, values.secretCancel = s.cache.CreateDeltaWatch(*req, nonce)
 			case req.TypeUrl == resource.RuntimeType && (values.runtimeNonce == "" || values.runtimeNonce == nonce):
 				if values.runtimeCancel != nil {
 					values.runtimeCancel()
 				}
-				values.deltaRuntimes, values.runtimeCancel = s.cache.CreateDeltaWatch(*req)
+				values.deltaRuntimes, values.runtimeCancel = s.cache.CreateDeltaWatch(*req, nonce)
 			}
 		}
 	}
