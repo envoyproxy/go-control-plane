@@ -68,7 +68,9 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				// Assume we've received a new resource and we want to send new resources and cancel old watches
 				diff := cache.checkState(subscribed, info.deltaState[t].Items)
 				if len(diff) > 0 {
-					cache.log.Debugf("found new items to subscribe too: %v", diff)
+					if cache.log != nil {
+						cache.log.Debugf("found new items to subscribe too: %v", diff)
+					}
 
 					// Add our new subscription items to our state to watch that we've found
 					r := Resources{
@@ -91,7 +93,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 
 				if cache.log != nil {
 					// We only want to show the specific resources we're sending back from the diff
-					cache.log.Debugf("delta respond open watch ID:%d Resources:%+v", id, diff)
+					cache.log.Debugf("delta respond open watch ID:%d Resources:%+v with new version %q", id, diff, version)
 				}
 
 				// Respond to our delta stream with the subcribed resources
@@ -169,8 +171,8 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	if !exists || version == requestVersion {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
-			cache.log.Debugf("open delta watch ID:%d for %s Resources:%v from nodeID: %q, nonce %q", watchID,
-				t, aliases, nodeID, request.GetResponseNonce())
+			cache.log.Debugf("open delta watch ID:%d for %s Resources:%v from nodeID: %q, version %q", watchID,
+				t, aliases, nodeID, requestVersion)
 		}
 
 		info.mu.Lock()
@@ -203,8 +205,8 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 
 func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, version string) {
 	if cache.log != nil {
-		cache.log.Debugf("sending delta response %s %v with nonce %q",
-			request.TypeUrl, resources, request.ResponseNonce)
+		cache.log.Debugf("sending delta response %s %v with version %q",
+			request.TypeUrl, resources, version)
 	}
 
 	value <- createDeltaResponse(request, resources, version)
