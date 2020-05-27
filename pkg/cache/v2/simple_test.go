@@ -250,10 +250,12 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// open new watches with the latest version
-	watches[rsrc.EndpointType], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
-		TypeUrl:                rsrc.EndpointType,
-		ResourceNamesSubscribe: []string{"cluster0"},
-	}, version)
+	for _, typ := range testTypes {
+		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+			TypeUrl:                typ,
+			ResourceNamesSubscribe: names[typ],
+		}, version)
+	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
@@ -265,18 +267,17 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	if err := c.SetSnapshotDelta(key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
-	// if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
-	// 	t.Errorf("watches should be preserved for all but one: %d", count)
-	// }
+
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
+		t.Errorf("watches should be preserved for all but one: %d", count)
+	}
 
 	// validate response for endpoints
 	select {
 	case out := <-watches[rsrc.EndpointType]:
-		t.Logf("got version %q", out.SystemVersion)
 		if out.SystemVersion != version2 {
 			t.Errorf("got version %q, want %q", out.SystemVersion, version2)
 		}
-		t.Logf("got resources %v", out.Resources)
 		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
 			t.Fatalf("got resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
