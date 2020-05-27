@@ -320,17 +320,20 @@ func makeResponses() map[string][]cache.Response {
 func makeDeltaResponses() map[string][]cache.DeltaResponse {
 	return map[string][]cache.DeltaResponse{
 		rsrc.EndpointType: []cache.DeltaResponse{{
-			Resources: []types.Resource{endpoint},
+			Resources:     []types.Resource{endpoint},
+			SystemVersion: "1",
 		}},
 		rsrc.ClusterType: []cache.DeltaResponse{{
-			Resources: []types.Resource{deltaCluster, deltaCluster2},
+			Resources:     []types.Resource{deltaCluster, deltaCluster2},
+			SystemVersion: "2",
 		}},
-
 		rsrc.RouteType: []cache.DeltaResponse{{
-			Resources: []types.Resource{route},
+			Resources:     []types.Resource{route},
+			SystemVersion: "3",
 		}},
 		rsrc.ListenerType: []cache.DeltaResponse{{
-			Resources: []types.Resource{listener},
+			Resources:     []types.Resource{listener},
+			SystemVersion: "4",
 		}},
 	}
 }
