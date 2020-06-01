@@ -54,7 +54,7 @@ type Cache interface {
 }
 
 type ResponseIface interface {
-	// Get the Ccontructed DiscoveryResponse
+	// Get the Constructed DiscoveryResponse
 	GetDiscoveryResponse() (*discovery.DiscoveryResponse, error)
 
 	// Get te original Request for the Response.
