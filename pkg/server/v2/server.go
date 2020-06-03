@@ -72,6 +72,66 @@ type Callbacks interface {
 	OnFetchResponse(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
+// CallbackFuncs is a convenience type for implementing the Callbacks interface.
+type CallbackFuncs struct {
+	StreamOpenFunc     func(context.Context, int64, string) error
+	StreamClosedFunc   func(int64)
+	StreamRequestFunc  func(int64, *discovery.DiscoveryRequest) error
+	StreamResponseFunc func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	FetchRequestFunc   func(context.Context, *discovery.DiscoveryRequest) error
+	FetchResponseFunc  func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+}
+
+var _ Callbacks = CallbackFuncs{}
+
+// OnStreamOpen invokes StreamOpenFunc.
+func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL string) error {
+	if c.StreamOpenFunc != nil {
+		return c.StreamOpenFunc(ctx, streamID, typeURL)
+	}
+
+	return nil
+}
+
+// OnStreamClosed invokes StreamClosedFunc.
+func (c CallbackFuncs) OnStreamClosed(streamID int64) {
+	if c.StreamClosedFunc != nil {
+		c.StreamClosedFunc(streamID)
+	}
+}
+
+// OnStreamRequest invokes StreamRequestFunc.
+func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryRequest) error {
+	if c.StreamRequestFunc != nil {
+		return c.StreamRequestFunc(streamID, req)
+	}
+
+	return nil
+}
+
+// OnStreamResponse invokes StreamResponseFunc.
+func (c CallbackFuncs) OnStreamResponse(streamID int64, req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
+	if c.StreamResponseFunc != nil {
+		c.StreamResponseFunc(streamID, req, resp)
+	}
+}
+
+// OnFetchRequest invokes FetchRequestFunc.
+func (c CallbackFuncs) OnFetchRequest(ctx context.Context, req *discovery.DiscoveryRequest) error {
+	if c.FetchRequestFunc != nil {
+		return c.FetchRequestFunc(ctx, req)
+	}
+
+	return nil
+}
+
+// OnFetchResponse invoked FetchResponseFunc.
+func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
+	if c.FetchResponseFunc != nil {
+		c.FetchResponseFunc(req, resp)
+	}
+}
+
 // NewServer creates handlers from a config watcher and callbacks.
 func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
 	return &server{cache: config, callbacks: callbacks, ctx: ctx}
