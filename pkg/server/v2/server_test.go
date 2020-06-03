@@ -35,13 +35,13 @@ import (
 
 type mockConfigWatcher struct {
 	counts     map[string]int
-	responses  map[string][]cache.Response
+	responses  map[string][]cache.RawResponse
 	closeWatch bool
 }
 
-func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.ResponseIface, func()) {
+func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.Response, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
-	out := make(chan cache.ResponseIface, 1)
+	out := make(chan cache.Response, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
@@ -51,7 +51,7 @@ func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (ch
 	return out, func() {}
 }
 
-func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (cache.ResponseIface, error) {
+func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (cache.Response, error) {
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out := config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
@@ -177,8 +177,8 @@ var (
 	}
 )
 
-func makeResponses() map[string][]cache.Response {
-	return map[string][]cache.Response{
+func makeResponses() map[string][]cache.RawResponse {
+	return map[string][]cache.RawResponse{
 		rsrc.EndpointType: {{
 			Version:   "1",
 			Resources: []types.Resource{endpoint},

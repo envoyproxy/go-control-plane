@@ -41,7 +41,7 @@ func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format
 
 func TestGateway(t *testing.T) {
 	config := makeMockConfigWatcher()
-	config.responses = map[string][]cache.Response{
+	config.responses = map[string][]cache.RawResponse{
 		resource.ClusterType: {{
 			Version:   "2",
 			Resources: []types.Resource{cluster},
