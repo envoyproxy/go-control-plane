@@ -20,7 +20,7 @@ const (
 
 func TestResponseGetDiscoveryResponse(t *testing.T) {
 	routes := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
-	resp := cache.Response{
+	resp := cache.RawResponse{
 		Request:   discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",
 		Resources: routes,
@@ -47,13 +47,13 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 		VersionInfo: "v",
 	}
 	resp := cache.PassthroughResponse{
-		Request:  discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
-		Response: dr,
+		Request:           discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
+		DiscoveryResponse: dr,
 	}
 
 	discoveryResponse, err := resp.GetDiscoveryResponse()
 	assert.Nil(t, err)
-	assert.Equal(t, discoveryResponse.VersionInfo, resp.Response.VersionInfo)
+	assert.Equal(t, discoveryResponse.VersionInfo, resp.DiscoveryResponse.VersionInfo)
 	assert.Equal(t, len(discoveryResponse.Resources), 1)
 
 	r := &route.RouteConfiguration{}

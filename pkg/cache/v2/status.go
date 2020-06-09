@@ -73,8 +73,8 @@ type ResponseWatch struct {
 	// Request is the original request for the watch.
 	Request Request
 
-	// Response is the channel to push response to.
-	Response chan ResponseIface
+	// Response is the channel to push responses to.
+	Response chan Response
 }
 
 // newStatusInfo initializes a status info data structure.
