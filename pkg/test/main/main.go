@@ -27,7 +27,6 @@ import (
 	"sync"
 	"time"
 
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	cachev2 "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	serverv2 "github.com/envoyproxy/go-control-plane/pkg/server/v2"
@@ -35,7 +34,8 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test"
 	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
 	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
-	"github.com/gogo/protobuf/jsonpb"
+
+	"github.com/rs/zerolog"
 
 	resourcev2 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 	resourcev3 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
@@ -62,6 +62,8 @@ var (
 	tls           bool
 
 	nodeID string
+
+	zeroLogger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
 )
 
 func init() {
@@ -97,9 +99,9 @@ func main() {
 	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
 	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
 
-	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
-	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{})
-	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2)
+	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{log: zeroLogger})
+	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{log: zeroLogger})
+	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2, logger{log: zeroLogger})
 	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3)
 	alsv2 := &testv2.AccessLogService{}
 	alsv3 := &testv3.AccessLogService{}
@@ -133,16 +135,17 @@ func main() {
 		test.RunManagementServer(ctx, srv2, srv3, port)
 		wait.Done()
 	}()
-	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
+	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{log: zeroLogger})
 
-	// log.Println("waiting for the first request...")
-	// select {
-	// case <-signal:
-	// 	break
-	// case <-time.After(1 * time.Minute):
-	// 	log.Println("timeout waiting for the first request")
-	// 	os.Exit(1)
-	// }
+	log.Println("waiting for the first request...")
+	select {
+	case <-signal:
+		break
+	case <-time.After(1 * time.Minute):
+		log.Println("timeout waiting for the first request")
+		os.Exit(1)
+	}
+
 	log.Printf("initial snapshot %+v\n", snapshotsv2)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
@@ -161,13 +164,22 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshotv3)
 		}
 
-		err := configv2.SetSnapshot(nodeID, snapshotv2)
-		if err != nil {
-			log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
-			os.Exit(1)
+		if mode == "delta" {
+			log.Printf("setting v2 delta snapshot")
+			err := configv2.SetSnapshotDelta(nodeID, snapshotv2)
+			if err != nil {
+				log.Printf("delta snapshot error %q for %+v\n", err, snapshotv2)
+			}
+		} else {
+			log.Printf("setting v2 snapshot")
+			err := configv2.SetSnapshot(nodeID, snapshotv2)
+			if err != nil {
+				log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
+				os.Exit(1)
+			}
 		}
 
-		err = configv3.SetSnapshot(nodeID, snapshotv3)
+		err := configv3.SetSnapshot(nodeID, snapshotv3)
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
 			os.Exit(1)
@@ -264,86 +276,26 @@ func callEcho() (int, int) {
 	}
 }
 
-type logger struct{}
+type logger struct {
+	log zerolog.Logger
+}
 
-func (logger logger) Debugf(format string, args ...interface{}) {
+func (l logger) Debugf(format string, args ...interface{}) {
 	if debug {
-		log.Printf(format+"\n", args...)
+		l.log.Debug().Msgf(format, args...)
 	}
 }
 
-func (logger logger) Infof(format string, args ...interface{}) {
+func (l logger) Infof(format string, args ...interface{}) {
 	if debug {
-		log.Printf(format+"\n", args...)
+		l.log.Info().Msgf(format, args...)
 	}
 }
 
-func (logger logger) Warnf(format string, args ...interface{}) {
-	log.Printf(format+"\n", args...)
+func (l logger) Warnf(format string, args ...interface{}) {
+	l.log.Warn().Msgf(format, args...)
 }
 
-func (logger logger) Errorf(format string, args ...interface{}) {
-	log.Printf(format+"\n", args...)
-}
-
-type callbacks struct {
-	signal   chan struct{}
-	fetches  int
-	requests int
-	mu       sync.Mutex
-}
-
-func (cb *callbacks) Report() {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	log.Printf("server callbacks fetches=%d requests=%d\n", cb.fetches, cb.requests)
-}
-func (cb *callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error {
-	if debug {
-		log.Printf("stream %d open for %s\n", id, typ)
-	}
-	return nil
-}
-func (cb *callbacks) OnStreamClosed(id int64) {
-	if debug {
-		log.Printf("stream %d closed\n", id)
-	}
-}
-func (cb *callbacks) OnStreamRequest(int64, *v2.DiscoveryRequest) error {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	cb.requests++
-	if cb.signal != nil {
-		close(cb.signal)
-		cb.signal = nil
-	}
-	return nil
-}
-func (cb *callbacks) OnStreamResponse(int64, *v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
-func (cb *callbacks) OnFetchRequest(_ context.Context, req *v2.DiscoveryRequest) error {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	cb.fetches++
-	if cb.signal != nil {
-		close(cb.signal)
-		cb.signal = nil
-	}
-	return nil
-}
-func (cb *callbacks) OnFetchResponse(*v2.DiscoveryRequest, *v2.DiscoveryResponse) {}
-func (cb *callbacks) OnStreamDeltaRequest(int64, *v2.DeltaDiscoveryRequest) error {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
-	cb.requests++
-	if cb.signal != nil {
-		close(cb.signal)
-		cb.signal = nil
-	}
-	return nil
-}
-func (cb *callbacks) OnStreamDeltaResponse(streamID int64, req *v2.DeltaDiscoveryRequest, res *v2.DeltaDiscoveryResponse) {
-	m := jsonpb.Marshaler{}
-	rq, _ := m.MarshalToString(req)
-	rs, _ := m.MarshalToString(res)
-	log.Printf("OnStreamDeltaResponse() streamID: %d, original request %s, response %s\n", streamID, rq, rs)
+func (l logger) Errorf(format string, args ...interface{}) {
+	l.log.Error().Msgf(format, args...)
 }

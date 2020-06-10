@@ -53,7 +53,7 @@ func TestGateway(t *testing.T) {
 			Resources: []types.Resource{listener},
 		}},
 	}
-	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(context.Background(), config, nil)}
+	gtw := server.HTTPGateway{Log: logger{t: t}, Server: server.NewServer(context.Background(), config, nil, logger{})}
 
 	failCases := []struct {
 		path   string

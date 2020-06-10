@@ -16,7 +16,6 @@ package server
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"sync/atomic"
 
@@ -88,7 +87,6 @@ func (s *server) deltaHandler(stream deltaStream, typeURL string) error {
 	reqStop := int32(0)
 
 	go func() {
-		log.Printf("Started deltaHandler() request go routine for resource Type: %s\n", typeURL)
 		for {
 			req, err := stream.Recv()
 			if atomic.LoadInt32(&reqStop) != 0 {
@@ -113,8 +111,6 @@ func (s *server) deltaHandler(stream deltaStream, typeURL string) error {
 }
 
 func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
-	log.Printf("processDelta() for Type: %s\n", defaultTypeURL)
-
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
@@ -156,14 +152,12 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 	// node may only be set on the first discovery request
 	var node = &core.Node{}
 
-	log.Printf("Starting send loop and watching for values on watches:")
 	for {
 		select {
 		case <-s.ctx.Done():
 			return nil
 			// config watcher can send the requested resources types in any order
 		case resp, more := <-values.deltaEndpoints:
-			log.Printf("Received values over deltaEndpoints chan")
 			if !more {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
@@ -174,7 +168,6 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			values.endpointNonce = nonce
 
 		case resp, more := <-values.deltaClusters:
-			log.Printf("Received values over deltaClusters chan")
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
@@ -185,7 +178,6 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			values.deltaClusterNonce = nonce
 
 		case resp, more := <-values.deltaRoutes:
-			log.Printf("Received values over deltaRoutes chan")
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
@@ -196,7 +188,6 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			values.routeNonce = nonce
 
 		case resp, more := <-values.deltaListeners:
-			log.Printf("Received values over deltaListeners chan")
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
@@ -233,6 +224,11 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 			if req == nil {
 				return status.Errorf(codes.Unavailable, "empty request")
+			}
+
+			// Log out our error detail from envoy if we get one but don't do anything crazy here yet
+			if req.ErrorDetail != nil {
+				s.log.Errorf("received error from envoy: %s", req.ErrorDetail.String())
 			}
 
 			// node field in discovery request is delta-compressed

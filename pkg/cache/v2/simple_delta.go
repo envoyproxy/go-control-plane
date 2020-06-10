@@ -46,15 +46,38 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 			subscribed := snapshot.GetSubscribedResources(watch.Request.GetResourceNamesSubscribe(), watch.Request.GetTypeUrl())
 			version := snapshot.GetVersion(t)
 
+			// Handle the case of an initial delta request and having no previous state
+			// We can assume we just want to set the state as the initially requested resources
 			if info.deltaState[t].Version == "" && len(info.deltaState[t].Items) == 0 {
-				// Handle the case of an initial delta request and having no previous state
-				// We can assume we just want to set the state as the initially requested resources
 				info.deltaState[t] = Resources{
 					Version: version,
 					Items:   subscribed,
 				}
+
+				// handle wildcard on the initial request
+				// if this case is met, just subscribe to all clusters and listeners in the snapshot
+				if len(subscribed) == 0 {
+					cache.log.Debugf("setting wildcard")
+					// Maybe set the resources for all the types here???
+					for i := 0; i < int(types.UnknownType); i++ {
+						tURL := GetResponseTypeURL(types.ResponseType(i))
+						info.deltaState[tURL] = Resources{
+							Version: version,
+							Items:   snapshot.GetResources(tURL),
+						}
+					}
+
+					// info.deltaState[t] = Resources{
+					// 	Version: version,
+					// 	Items:   snapshot.GetResources(t),
+					// }
+				}
+
 				if cache.log != nil {
-					cache.log.Debugf("initial snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
+					if subscribed := watch.Request.GetResourceNamesSubscribe(); len(subscribed) != 0 {
+						cache.log.Debugf("subscribing to resources: %+v", subscribed)
+					}
+					cache.log.Infof("initial snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
 				}
 
 				// Send out the response right away since we have nothing else to do
@@ -72,7 +95,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				diff := cache.checkState(subscribed, info.deltaState[t].Items)
 				if len(diff) > 0 {
 					if cache.log != nil {
-						cache.log.Debugf("found new items to subscribe too: %v", diff)
+						cache.log.Debugf("node: %s, found new items to subscribe too: %v ", watch.Request.GetNode().GetId(), diff)
 					}
 
 					// Add our new subscription items to our state to watch that we've found
@@ -118,7 +141,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 }
 
 // difference returns the elements in `a` that aren't in `b`.
-// TODO: currently O(n) time so this will need to be revisited
+// TODO: SLOW this will need to be revisited
 func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Resource) map[string]types.Resource {
 	mb := make(map[string]types.Resource, len(deltaState))
 	diff := make(map[string]types.Resource, 0)
@@ -174,7 +197,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	if !exists || version == requestVersion {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
-			cache.log.Debugf("open delta watch ID:%d for %s Resources:%v from nodeID: %q, version %q", watchID,
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, version %q", watchID,
 				t, aliases, nodeID, requestVersion)
 		}
 
@@ -208,8 +231,8 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 
 func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, version string) {
 	if cache.log != nil {
-		cache.log.Debugf("sending delta response %s %v with version %q",
-			request.TypeUrl, resources, version)
+		cache.log.Debugf("node: %s sending delta response %s with version %q",
+			request.GetNode().GetId(), request.TypeUrl, version)
 	}
 
 	value <- createDeltaResponse(request, resources, version)

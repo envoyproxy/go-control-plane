@@ -33,6 +33,7 @@ import (
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 )
 
@@ -75,8 +76,8 @@ type Callbacks interface {
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
-	return &server{cache: config, callbacks: callbacks, ctx: ctx}
+func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks, log log.Logger) Server {
+	return &server{cache: config, callbacks: callbacks, ctx: ctx, log: log}
 }
 
 type server struct {
@@ -86,6 +87,8 @@ type server struct {
 	// streamCount for counting bi-di streams
 	streamCount int64
 	ctx         context.Context
+
+	log log.Logger
 }
 
 // watches for all xDS resource types

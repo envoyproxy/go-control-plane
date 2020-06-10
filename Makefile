@@ -8,6 +8,15 @@ SHELL 	:= /bin/bash
 BINDIR	:= bin
 PKG 		:= github.com/envoyproxy/go-control-plane
 
+# Build args for testing
+UNAME_S := $(shell uname -s)
+TEST_BIN_FLAGS := CGO_ENABLED=1
+ifeq ($(UNAME_S), Darwin)
+	TEST_BIN_FLAGS += GOOS=darwin GOARCH=amd64
+else 
+	TEST_BIN_FLAGS += GOOS=linux GOARCH=amd64
+endif
+
 .PHONY: build
 build:
 	@echo "--> building go-control-plane"
@@ -16,7 +25,7 @@ build:
 .PHONY: build.test
 build.test:
 	@echo "--> building go-control-plane test binary"
-	@go build -v -race -o $(BINDIR)/test pkg/test/main/main.go
+	@$(TEST_BIN_FLAGS) go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $(BINDIR)/test  pkg/test/main/main.go
 
 .PHONY: clean
 clean:
@@ -52,43 +61,35 @@ check_version_dirty:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.rest.v3 integration.ads.tls
+.PHONY: $(BINDIR)/test integration integration.ads integration.ads.tls integration.ads.v3 integration.xds integration.xds.delta integration.xds.v3 integration.rest integration.rest.v3
 
 $(BINDIR)/test:
-	echo "Building test linux binary"
-	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
+	echo "Building test binary"
+	$(TEST_BIN_FLAGS) go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
 
-integration: integration.xds integration.xds.v3 integration.ads integration.ads.v3 integration.rest integration.rest.v3 integration.ads.tls integration.xds.delta
+integration: integration.xds integration.xds.delta integration.xds.v3 integration.ads integration.ads.tls integration.ads.v3 integration.rest integration.rest.v3
 
 integration.ads: $(BINDIR)/test
-	env XDS=ads build/run_integration.sh
+	env XDS=ads build/integration.sh
 
-integration.ads.v3: $(BINDIR)/test
-	env XDS=ads SUFFIX=v3 build/integration.sh
+integration.ads.tls: $(BINDIR)/test
+	env XDS=ads build/integration.sh -tls
 
 integration.ads.v3: $(BINDIR)/test
 	env XDS=ads SUFFIX=v3 build/integration.sh
 
 integration.xds: $(BINDIR)/test
-	env XDS=xds build/run_integration.sh
+	env XDS=xds build/integration.sh
 
-integration.xds.v3: $(BINDIR)/test
-	env XDS=xds SUFFIX=v3 build/integration.sh
+integration.xds.delta: $(BINDIR)/test
+	env XDS=delta build/integration.sh
 
 integration.xds.v3: $(BINDIR)/test
 	env XDS=xds SUFFIX=v3 build/integration.sh
 
 integration.rest: $(BINDIR)/test
-	env XDS=rest build/run_integration.sh
+	env XDS=rest build/integration.sh
 
 integration.rest.v3: $(BINDIR)/test
 	env XDS=rest SUFFIX=v3 build/integration.sh
 
-integration.rest.v3: $(BINDIR)/test
-	env XDS=rest SUFFIX=v3 build/integration.sh
-
-integration.ads.tls: $(BINDIR)/test
-	env XDS=ads build/run_integration.sh -tls
-
-integration.xds.delta: $(BINDIR)/test
-	env XDS=delta build/integration.sh

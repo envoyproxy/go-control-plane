@@ -307,7 +307,7 @@ func MakeRuntime(runtimeName string) *runtime.Runtime {
 
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
-	// Xds indicates snapshot mode: ads, xds, or rest
+	// Xds indicates snapshot mode: ads, xds, rest, or deleta
 	Xds string
 	// Version for the snapshot.
 	Version string

@@ -345,7 +345,7 @@ func TestServerShutdown(t *testing.T) {
 			config.responses = makeResponses()
 			shutdown := make(chan bool)
 			ctx, cancel := context.WithCancel(context.Background())
-			s := server.NewServer(ctx, config, &callbacks{})
+			s := server.NewServer(ctx, config, &callbacks{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -386,7 +386,7 @@ func TestResponseHandlers(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, &callbacks{})
+			s := server.NewServer(context.Background(), config, &callbacks{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -426,7 +426,7 @@ func TestDeltaResponseClusterHandler(t *testing.T) {
 	t.Run(testTypes[1], func(t *testing.T) {
 		config := makeMockConfigWatcher()
 		config.deltaResponses = makeDeltaResponses()
-		s := server.NewServer(context.Background(), config, &callbacks{})
+		s := server.NewServer(context.Background(), config, &callbacks{}, logger{})
 
 		// make a request
 		resp := makeMockDeltaStream(t)
@@ -458,7 +458,7 @@ func TestFetch(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.responses = makeResponses()
 	cb := &callbacks{}
-	s := server.NewServer(context.Background(), config, cb)
+	s := server.NewServer(context.Background(), config, cb, logger{})
 	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for endpoints: %v", err)
 	}
@@ -529,7 +529,7 @@ func TestWatchClosed(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.closeWatch = true
-			s := server.NewServer(context.Background(), config, &callbacks{})
+			s := server.NewServer(context.Background(), config, &callbacks{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -553,7 +553,7 @@ func TestSendError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, &callbacks{})
+			s := server.NewServer(context.Background(), config, &callbacks{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -578,7 +578,7 @@ func TestStaleNonce(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, &callbacks{})
+			s := server.NewServer(context.Background(), config, &callbacks{}, logger{})
 
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{
@@ -644,7 +644,7 @@ func TestAggregatedHandlers(t *testing.T) {
 		ResourceNames: []string{routeName},
 	}
 
-	s := server.NewServer(context.Background(), config, &callbacks{})
+	s := server.NewServer(context.Background(), config, &callbacks{}, logger{})
 	go func() {
 		if err := s.StreamAggregatedResources(resp); err != nil {
 			t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
@@ -678,7 +678,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
-	s := server.NewServer(context.Background(), config, &callbacks{})
+	s := server.NewServer(context.Background(), config, &callbacks{}, logger{})
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
@@ -691,7 +691,7 @@ func TestCallbackError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, &callbacks{callbackError: true})
+			s := server.NewServer(context.Background(), config, &callbacks{callbackError: true}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
