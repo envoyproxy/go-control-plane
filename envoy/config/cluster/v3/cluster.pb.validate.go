@@ -415,6 +415,16 @@ func (m *Cluster) Validate() error {
 
 	// no validation rules for TrackTimeoutBudgets
 
+	if v, ok := interface{}(m.GetUpstreamConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "UpstreamConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetHiddenEnvoyDeprecatedHosts() {
 		_, _ = idx, item
 
