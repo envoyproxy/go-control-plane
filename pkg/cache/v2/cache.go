@@ -82,6 +82,18 @@ type Response interface {
 	GetVersion() (string, error)
 }
 
+// DeltaResponse is a wrapper around Envoy's DeltaDiscoveryResponse
+type DeltaResponse interface {
+	// Get the constructed DeltaDiscoveryResponse
+	GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error)
+
+	// Get te original Request for the Response.
+	GetDeltaRequest() *discovery.DeltaDiscoveryRequest
+
+	// Get the version in the Response.
+	GetSystemVersion() (string, error)
+}
+
 // RawResponse is a pre-serialized xDS response containing the raw resources to
 // be included in the final Discovery Response.
 type RawResponse struct {
@@ -105,14 +117,48 @@ type RawResponse struct {
 	marshaledResponse *discovery.DiscoveryResponse
 }
 
+// DeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
+type RawDeltaResponse struct {
+	DeltaResponse
+
+	// Request is the original request.
+	DeltaRequest discovery.DeltaDiscoveryRequest
+
+	// System Version Info
+	SystemVersion string
+
+	// Resources to be included in the response.
+	Resources []types.Resource
+
+	// isResourceMarshaled indicates whether the resources have been marshaled.
+	// This is internally maintained by go-control-plane to prevent future
+	// duplication in marshaling efforts.
+	isResourceMarshaled bool
+
+	// Marshaled Resources to be included in the response.
+	marshaledResponse *discovery.DeltaDiscoveryResponse
+}
+
 // PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
 type PassthroughResponse struct {
 	Response
+
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
 	// The discovery response that needs to be sent as is, without any marshalling transformations.
 	DiscoveryResponse *discovery.DiscoveryResponse
+}
+
+// DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
+type DeltaPassthroughResponse struct {
+	DeltaResponse
+
+	// Request is the original request
+	DeltaRequest discovery.DeltaDiscoveryRequest
+
+	// This discovery response that needs to be sent as is, without any marshalling transformations
+	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
 }
 
 // GetDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
@@ -145,9 +191,46 @@ func (r RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error
 	}, nil
 }
 
+func (r RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
+	if r.isResourceMarshaled {
+		return r.marshaledResponse, nil
+	}
+
+	marshaledResources := make([]*discovery.Resource, len(r.Resources))
+
+	for i, resource := range r.Resources {
+		marshaledResource, err := MarshalResource(resource)
+		if err != nil {
+			return nil, err
+		}
+
+		name := GetResourceName(resource)
+		marshaledResources[i] = &discovery.Resource{
+			Name:    name,
+			Aliases: []string{name},
+			Resource: &any.Any{
+				TypeUrl: r.DeltaRequest.TypeUrl,
+				Value:   marshaledResource,
+			},
+		}
+	}
+
+	r.isResourceMarshaled = true
+
+	return &discovery.DeltaDiscoveryResponse{
+		SystemVersionInfo: r.SystemVersion,
+		Resources:         marshaledResources,
+		TypeUrl:           r.DeltaRequest.TypeUrl,
+	}, nil
+}
+
 // GetRequest returns the original Discovery Request.
 func (r RawResponse) GetRequest() *discovery.DiscoveryRequest {
 	return &r.Request
+}
+
+func (r RawDeltaResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
+	return &r.DeltaRequest
 }
 
 // GetVersion returns the response version.
@@ -155,14 +238,26 @@ func (r RawResponse) GetVersion() (string, error) {
 	return r.Version, nil
 }
 
+func (r RawDeltaResponse) GetSystemVersion() (string, error) {
+	return r.SystemVersion, nil
+}
+
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
 func (r PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	return r.DiscoveryResponse, nil
 }
 
+func (r DeltaPassthroughResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
+	return r.DeltaDiscoveryResponse, nil
+}
+
 // GetRequest returns the original Discovery Request
 func (r PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
 	return &r.Request
+}
+
+func (r DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
+	return &r.DeltaRequest
 }
 
 // GetVersion returns the response version.
@@ -173,32 +268,10 @@ func (r PassthroughResponse) GetVersion() (string, error) {
 	return "", fmt.Errorf("DiscoveryResponse is nil")
 }
 
-// DeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
-type DeltaResponse struct {
-	// Request is the original request.
-	DeltaRequest discovery.DeltaDiscoveryRequest
-
-	// The value indicating whether the resource is marshaled, and only one of `Resources` and `MarshaledResources` is available.
-	ResourceMarshaled bool
-
-	// Resources to be included in the response.
-	Resources []types.Resource
-
-	// Marshaled Resources to be included in the response.
-	MarshaledResources []MarshaledResource
-
-	// System Version Info
-	SystemVersion string
-}
-
-// MarshaledResource is an alias for the serialized binary array.
-type MarshaledResource = []byte
-
-// SkipFetchError is the error returned when the cache fetch is short
-// circuited due to the client's version already being up-to-date.
-type SkipFetchError struct{}
-
-// Error satisfies the error interface
-func (e SkipFetchError) Error() string {
-	return "skip fetch: version up to date"
+// GetSystemVersion returns the response version.
+func (r DeltaPassthroughResponse) GetSystemVersion() (string, error) {
+	if r.DeltaDiscoveryResponse != nil {
+		return r.DeltaDiscoveryResponse.SystemVersionInfo, nil
+	}
+	return "", fmt.Errorf("DeltaDiscoveryResponse is nil")
 }

@@ -24,7 +24,6 @@ import (
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
-	"github.com/golang/protobuf/ptypes/any"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -37,48 +36,17 @@ type deltaStream interface {
 	Recv() (*discovery.DeltaDiscoveryRequest, error)
 }
 
-func createDeltaResponse(resp *cache.DeltaResponse, typeURL string) (*v2.DeltaDiscoveryResponse, error) {
+func createDeltaResponse(resp cache.DeltaResponse, typeURL string) (*v2.DeltaDiscoveryResponse, error) {
 	if resp == nil {
 		return nil, errors.New("missing response")
 	}
 
-	var resources []*v2.Resource
-	if resp.ResourceMarshaled {
-		resources = make([]*v2.Resource, len(resp.MarshaledResources))
-	} else {
-		resources = make([]*v2.Resource, len(resp.Resources))
+	marshalledResponse, err := resp.GetDeltaDiscoveryResponse()
+	if err != nil {
+		return nil, err
 	}
 
-	for i := 0; i < len(resources); i++ {
-		// Envoy relies on serialized protobuf bytes for detecting changes to the resources.
-		// This requires deterministic serialization.
-		if resp.ResourceMarshaled {
-			resources[i] = &v2.Resource{
-				Name: cache.GetResourceName(resp.Resources[i]),
-				Resource: &any.Any{
-					TypeUrl: typeURL,
-					Value:   resp.MarshaledResources[i],
-				},
-			}
-		} else {
-			marshaledResource, err := cache.MarshalResource(resp.Resources[i])
-			if err != nil {
-				return nil, err
-			}
-			resources[i] = &v2.Resource{
-				Name: cache.GetResourceName(resp.Resources[i]),
-				Resource: &any.Any{
-					TypeUrl: typeURL,
-					Value:   marshaledResource,
-				},
-			}
-		}
-	}
-	out := &v2.DeltaDiscoveryResponse{
-		Resources: resources,
-		TypeUrl:   typeURL,
-	}
-	return out, nil
+	return marshalledResponse, nil
 }
 
 func (s *server) deltaHandler(stream deltaStream, typeURL string) error {
@@ -129,7 +97,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 
 	// sends a response by serializing to protobuf Any
 	send := func(resp cache.DeltaResponse, typeURL string) (string, error) {
-		out, err := createDeltaResponse(&resp, typeURL)
+		out, err := createDeltaResponse(resp, typeURL)
 		if err != nil {
 			return "", err
 		}
@@ -138,7 +106,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
-			s.callbacks.OnStreamDeltaResponse(streamID, &resp.DeltaRequest, out)
+			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), out)
 		}
 		return out.Nonce, stream.Send(out)
 	}

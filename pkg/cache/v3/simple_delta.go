@@ -64,11 +64,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 							Items:   snapshot.GetResources(tURL),
 						}
 					}
-
-					// info.deltaState[t] = Resources{
-					// 	Version: version,
-					// 	Items:   snapshot.GetResources(t),
-					// }
 				}
 
 				if cache.log != nil {
@@ -89,6 +84,31 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				// discard the old watch
 				delete(info.deltaWatches, id)
 			} else if version != info.deltaState[t].Version {
+				// handle wildcard on the initial request
+				// if this case is met, just subscribe to all clusters and listeners in the snapshot
+				if len(subscribed) == 0 {
+					cache.log.Debugf("setting wildcard")
+					// Maybe set the resources for all the types here???
+					for i := 0; i < int(types.UnknownType); i++ {
+						tURL := GetResponseTypeURL(types.ResponseType(i))
+						info.deltaState[tURL] = Resources{
+							Version: version,
+							Items:   snapshot.GetResources(tURL),
+						}
+					}
+
+					// Respond to our delta stream with the subcribed resources
+					cache.respondDelta(
+						watch.Request,
+						watch.Response,
+						info.deltaState[t].Items, // We want to only send the updated resources here
+						version,
+					)
+
+					// discard the old watch
+					delete(info.deltaWatches, id)
+				}
+
 				// Assume we've received a new resource and we want to send new resources and cancel old watches
 				diff := cache.checkState(subscribed, info.deltaState[t].Items)
 				if len(diff) > 0 {
@@ -257,7 +277,7 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 		}
 	}
 
-	return DeltaResponse{
+	return RawDeltaResponse{
 		DeltaRequest:  request,
 		Resources:     filtered,
 		SystemVersion: version,

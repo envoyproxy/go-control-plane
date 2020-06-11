@@ -58,6 +58,9 @@ const (
 
 	// Rest mode for resources: polling using Fetch
 	Rest = "rest"
+
+	// Delta mode for resources: individual delta xDS services (Envoy only supports CDS currently)
+	Delta = "delta"
 )
 
 var (
@@ -143,8 +146,8 @@ func configSource(mode string) *core.ConfigSource {
 	case Xds:
 		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
 			ApiConfigSource: &core.ApiConfigSource{
-				TransportApiVersion:       resource.DefaultAPIVersion,
 				ApiType:                   core.ApiConfigSource_GRPC,
+				TransportApiVersion:       resource.DefaultAPIVersion,
 				SetNodeOnFirstMessageOnly: true,
 				GrpcServices: []*core.GrpcService{{
 					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
@@ -160,6 +163,19 @@ func configSource(mode string) *core.ConfigSource {
 				TransportApiVersion: resource.DefaultAPIVersion,
 				ClusterNames:        []string{XdsCluster},
 				RefreshDelay:        ptypes.DurationProto(RefreshDelay),
+			},
+		}
+	case Delta:
+		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &core.ApiConfigSource{
+				ApiType:                   core.ApiConfigSource_DELTA_GRPC,
+				TransportApiVersion:       resource.DefaultAPIVersion,
+				SetNodeOnFirstMessageOnly: true,
+				GrpcServices: []*core.GrpcService{{
+					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+						EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
+					},
+				}},
 			},
 		}
 	}

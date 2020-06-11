@@ -175,13 +175,6 @@ type watches struct {
 	secrets   chan cache.Response
 	runtimes  chan cache.Response
 
-	deltaEndpoints chan cache.DeltaResponse
-	deltaClusters  chan cache.DeltaResponse
-	deltaRoutes    chan cache.DeltaResponse
-	deltaListeners chan cache.DeltaResponse
-	deltaSecrets   chan cache.DeltaResponse
-	deltaRuntimes  chan cache.DeltaResponse
-
 	endpointCancel func()
 	clusterCancel  func()
 	routeCancel    func()
@@ -195,6 +188,13 @@ type watches struct {
 	listenerNonce string
 	secretNonce   string
 	runtimeNonce  string
+
+	deltaEndpoints chan cache.DeltaResponse
+	deltaClusters  chan cache.DeltaResponse
+	deltaRoutes    chan cache.DeltaResponse
+	deltaListeners chan cache.DeltaResponse
+	deltaSecrets   chan cache.DeltaResponse
+	deltaRuntimes  chan cache.DeltaResponse
 
 	deltaClusterCancel  func()
 	deltaEndpointCancel func()

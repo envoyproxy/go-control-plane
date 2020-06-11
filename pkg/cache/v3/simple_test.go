@@ -233,11 +233,11 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				if out.SystemVersion != version {
-					t.Errorf("got version %q, want %q", out.SystemVersion, version)
+				if v, _ := out.GetSystemVersion(); v != version {
+					t.Errorf("got version %q, want %q", v, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot.GetSubscribedResources(names[typ], typ)) {
-					t.Errorf("get resources %v, want %v", out.Resources, snapshot.GetSubscribedResources(names[typ], typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(cache.RawDeltaResponse).Resources), snapshot.GetSubscribedResources(names[typ], typ)) {
+					t.Errorf("get resources %v, want %v", out.(cache.RawDeltaResponse).Resources, snapshot.GetSubscribedResources(names[typ], typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -271,11 +271,11 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// validate response for endpoints
 	select {
 	case out := <-watches[rsrc.EndpointType]:
-		if out.SystemVersion != version2 {
-			t.Errorf("got version %q, want %q", out.SystemVersion, version2)
+		if v, _ := out.GetSystemVersion(); v != version2 {
+			t.Errorf("got version %q, want %q", v, version2)
 		}
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
-			t.Fatalf("got resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(cache.RawDeltaResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
+			t.Fatalf("got resources %v, want %v", out.(cache.RawDeltaResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
 	case <-time.After(time.Second * 5):
 		t.Fatal("failed to receive snapshot response")

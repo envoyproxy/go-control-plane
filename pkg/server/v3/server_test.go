@@ -37,13 +37,15 @@ import (
 type mockConfigWatcher struct {
 	counts         map[string]int
 	responses      map[string][]cache.RawResponse
-	deltaResponses map[string][]cache.DeltaResponse
+	deltaResponses map[string][]cache.RawDeltaResponse
 	closeWatch     bool
 }
 
 func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.Response, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+
 	out := make(chan cache.Response, 1)
+
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
@@ -54,37 +56,31 @@ func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (ch
 }
 
 func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRequest, version string) (chan cache.DeltaResponse, func()) {
-	fmt.Println("Creating a delta watch...")
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 
 	// Create our out watch channel to return with a buffer of one
 	out := make(chan cache.DeltaResponse, 1)
 
 	if len(config.deltaResponses[req.TypeUrl]) > 0 {
-
 		res := config.deltaResponses[req.TypeUrl][0]
 		var subscribed []types.Resource
 
 		// Only return back the subscribed resources to our request type
-		for _, resource := range res.Resources {
+		r, _ := res.GetDeltaDiscoveryResponse()
+		for _, resource := range r.Resources {
 			for _, alias := range req.GetResourceNamesSubscribe() {
-				if cache.GetResourceName(resource) == alias {
+				if resource.GetName() == alias {
 					subscribed = append(subscribed, resource)
 				}
 			}
 		}
 
 		// We should only send back subscribed resources here
-		out <- cache.DeltaResponse{
-			ResourceMarshaled:  res.ResourceMarshaled,
-			MarshaledResources: res.MarshaledResources,
-			Resources:          subscribed,
+		out <- cache.RawDeltaResponse{
+			DeltaRequest:  req,
+			Resources:     subscribed,
+			SystemVersion: version,
 		}
-
-		// fmt.Println(len(config.deltaResponses[req.TypeUrl]))
-		// config.deltaResponses[req.TypeUrl] = config.deltaResponses[req.TypeUrl][1:]
-		// fmt.Printf("New list: %+v\n", config.deltaResponses[req.TypeUrl][1:])
-
 	} else if config.closeWatch {
 		fmt.Printf("No resources... closing watch\n")
 		close(out)
@@ -241,10 +237,15 @@ var (
 		Id:      "test-id",
 		Cluster: "test-cluster",
 	}
-	endpoint  = resource.MakeEndpoint(clusterName, 8080)
-	cluster   = resource.MakeCluster(resource.Ads, clusterName)
-	route     = resource.MakeRoute(routeName, clusterName)
-	listener  = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	endpoint = resource.MakeEndpoint(clusterName, 8080)
+	cluster  = resource.MakeCluster(resource.Ads, clusterName)
+	cluster2 = resource.MakeCluster(resource.Ads, "cluster1")
+	route    = resource.MakeRoute(routeName, clusterName)
+	listener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+
+	deltaCluster  = resource.MakeCluster(resource.Delta, clusterName)
+	deltaCluster2 = resource.MakeCluster(resource.Delta, "cluster1")
+
 	testTypes = []string{
 		rsrc.EndpointType,
 		rsrc.ClusterType,
@@ -274,6 +275,31 @@ func makeResponses() map[string][]cache.RawResponse {
 			Version:   "4",
 			Resources: []types.Resource{listener},
 			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
+		}},
+	}
+}
+
+func makeDeltaResponses() map[string][]cache.RawDeltaResponse {
+	return map[string][]cache.RawDeltaResponse{
+		rsrc.EndpointType: {{
+			Resources:     []types.Resource{endpoint},
+			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
+			SystemVersion: "1",
+		}},
+		rsrc.ClusterType: {{
+			Resources:     []types.Resource{deltaCluster, deltaCluster2},
+			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
+			SystemVersion: "2",
+		}},
+		rsrc.RouteType: {{
+			Resources:     []types.Resource{route},
+			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
+			SystemVersion: "3",
+		}},
+		rsrc.ListenerType: {{
+			Resources:     []types.Resource{listener},
+			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
+			SystemVersion: "4",
 		}},
 	}
 }
@@ -360,6 +386,38 @@ func TestResponseHandlers(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestDeltaResponseClusterHandler(t *testing.T) {
+	t.Run(testTypes[1], func(t *testing.T) {
+		config := makeMockConfigWatcher()
+		config.deltaResponses = makeDeltaResponses()
+		s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+
+		// make a request
+		resp := makeMockDeltaStream(t)
+		resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: testTypes[1], ResourceNamesSubscribe: []string{"cluster0"}}
+
+		go func() {
+			err := s.DeltaClusters(resp)
+
+			if err != nil {
+				t.Errorf("Delta() => got %v, want no error", err)
+			}
+		}()
+
+		// check a response
+		select {
+		case <-resp.sent:
+			close(resp.recv)
+
+			if want := map[string]int{testTypes[1]: 1}; !reflect.DeepEqual(want, config.counts) {
+				t.Errorf("watch counts => got %v, want %v", config.counts, want)
+			}
+		case <-time.After(1 * time.Second):
+			t.Fatalf("got no response")
+		}
+	})
 }
 
 func TestFetch(t *testing.T) {

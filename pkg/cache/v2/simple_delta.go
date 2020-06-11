@@ -245,7 +245,6 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 	// individually in a separate stream. It is ok to reply with the same version
 	// on separate streams since requests do not share their response versions.
 
-	// This logic is probably broken so we'll revisit
 	if len(request.ResourceNamesSubscribe) != 0 {
 		set := nameSet(request.ResourceNamesSubscribe)
 		for name, resource := range resources {
@@ -259,7 +258,7 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 		}
 	}
 
-	return DeltaResponse{
+	return RawDeltaResponse{
 		DeltaRequest:  request,
 		Resources:     filtered,
 		SystemVersion: version,

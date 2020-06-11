@@ -102,7 +102,7 @@ func main() {
 	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{log: zeroLogger})
 	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{log: zeroLogger})
 	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2, logger{log: zeroLogger})
-	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3)
+	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3, logger{log: zeroLogger})
 	alsv2 := &testv2.AccessLogService{}
 	alsv3 := &testv3.AccessLogService{}
 
@@ -164,11 +164,19 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshotv3)
 		}
 
+		// Check to see if they want to run the delta integration tests
+		// if not run through the regular sotw xds
 		if mode == "delta" {
 			log.Printf("setting v2 delta snapshot")
 			err := configv2.SetSnapshotDelta(nodeID, snapshotv2)
 			if err != nil {
 				log.Printf("delta snapshot error %q for %+v\n", err, snapshotv2)
+			}
+
+			log.Printf("setting v3 delta snapshot")
+			err = configv3.SetSnapshotDelta(nodeID, snapshotv3)
+			if err != nil {
+				log.Printf("delta snapshot error %q for %+v\n", err, snapshotv3)
 			}
 		} else {
 			log.Printf("setting v2 snapshot")
@@ -177,12 +185,13 @@ func main() {
 				log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
 				os.Exit(1)
 			}
-		}
 
-		err := configv3.SetSnapshot(nodeID, snapshotv3)
-		if err != nil {
-			log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
-			os.Exit(1)
+			log.Printf("setting v3 snapshot")
+			err = configv3.SetSnapshot(nodeID, snapshotv3)
+			if err != nil {
+				log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
+				os.Exit(1)
+			}
 		}
 
 		// pass is true if all requests succeed at least once in a run
