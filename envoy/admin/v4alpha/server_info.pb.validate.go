@@ -202,6 +202,8 @@ func (m *CommandLineOptions) Validate() error {
 		}
 	}
 
+	// no validation rules for DrainStrategy
+
 	if v, ok := interface{}(m.GetParentShutdownTime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommandLineOptionsValidationError{
