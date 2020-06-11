@@ -146,6 +146,10 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for BaseId
 
+	// no validation rules for UseDynamicBaseId
+
+	// no validation rules for BaseIdPath
+
 	// no validation rules for Concurrency
 
 	// no validation rules for ConfigPath

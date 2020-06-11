@@ -10,7 +10,6 @@ import (
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
-	"github.com/golang/protobuf/ptypes/any"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -23,44 +22,17 @@ type stream interface {
 	Recv() (*v2.DiscoveryRequest, error)
 }
 
-func createResponse(resp *cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
+func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
 	if resp == nil {
 		return nil, errors.New("missing response")
 	}
 
-	var resources []*any.Any
-	if resp.ResourceMarshaled {
-		resources = make([]*any.Any, len(resp.MarshaledResources))
-	} else {
-		resources = make([]*any.Any, len(resp.Resources))
+	marshalledResponse, err := resp.GetDiscoveryResponse()
+	if err != nil {
+		return nil, err
 	}
 
-	for i := 0; i < len(resources); i++ {
-		// Envoy relies on serialized protobuf bytes for detecting changes to the resources.
-		// This requires deterministic serialization.
-		if resp.ResourceMarshaled {
-			resources[i] = &any.Any{
-				TypeUrl: typeURL,
-				Value:   resp.MarshaledResources[i],
-			}
-		} else {
-			marshaledResource, err := cache.MarshalResource(resp.Resources[i])
-			if err != nil {
-				return nil, err
-			}
-
-			resources[i] = &any.Any{
-				TypeUrl: typeURL,
-				Value:   marshaledResource,
-			}
-		}
-	}
-	out := &discovery.DiscoveryResponse{
-		VersionInfo: resp.Version,
-		Resources:   resources,
-		TypeUrl:     typeURL,
-	}
-	return out, nil
+	return marshalledResponse, nil
 }
 
 // process handles a bi-di stream request
@@ -83,7 +55,7 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 
 	// sends a response by serializing to protobuf Any
 	send := func(resp cache.Response, typeURL string) (string, error) {
-		out, err := createResponse(&resp, typeURL)
+		out, err := createResponse(resp, typeURL)
 		if err != nil {
 			return "", err
 		}
@@ -92,7 +64,7 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
-			s.callbacks.OnStreamResponse(streamID, &resp.Request, out)
+			s.callbacks.OnStreamResponse(streamID, resp.GetRequest(), out)
 		}
 		return out.Nonce, stream.Send(out)
 	}

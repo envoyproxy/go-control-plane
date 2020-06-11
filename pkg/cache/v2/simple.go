@@ -290,7 +290,7 @@ func createResponse(request Request, resources map[string]types.Resource, versio
 		}
 	}
 
-	return Response{
+	return RawResponse{
 		Request:   request,
 		Version:   version,
 		Resources: filtered,
@@ -299,7 +299,7 @@ func createResponse(request Request, resources map[string]types.Resource, versio
 
 // Fetch implements the cache fetch function.
 // Fetch is called on multiple streams, so responding to individual names with the same version works.
-func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Response, error) {
+func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (Response, error) {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.RLock()
@@ -318,7 +318,7 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request Request) (*Respon
 
 		resources := snapshot.GetResources(request.TypeUrl)
 		out := createResponse(request, resources, version)
-		return &out, nil
+		return out, nil
 	}
 
 	return nil, fmt.Errorf("missing snapshot for %q", nodeID)

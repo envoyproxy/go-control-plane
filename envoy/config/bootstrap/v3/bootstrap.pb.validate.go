@@ -208,6 +208,21 @@ func (m *Bootstrap) Validate() error {
 
 	// no validation rules for UseTcpForDnsLookups
 
+	for idx, item := range m.GetBootstrapExtensions() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BootstrapValidationError{
+					field:  fmt.Sprintf("BootstrapExtensions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedRuntime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{

@@ -37,7 +37,7 @@ import (
 
 type mockConfigWatcher struct {
 	counts         map[string]int
-	responses      map[string][]cache.Response
+	responses      map[string][]cache.RawResponse
 	deltaResponses map[string][]cache.DeltaResponse
 	closeWatch     bool
 }
@@ -94,7 +94,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRe
 	return out, func() {}
 }
 
-func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (*cache.Response, error) {
+func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (cache.Response, error) {
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out := config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
@@ -296,23 +296,27 @@ var (
 	}
 )
 
-func makeResponses() map[string][]cache.Response {
-	return map[string][]cache.Response{
-		rsrc.EndpointType: []cache.Response{{
+func makeResponses() map[string][]cache.RawResponse {
+	return map[string][]cache.RawResponse{
+		rsrc.EndpointType: {{
 			Version:   "1",
 			Resources: []types.Resource{endpoint},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
 		}},
-		rsrc.ClusterType: []cache.Response{{
+		rsrc.ClusterType: {{
 			Version:   "2",
 			Resources: []types.Resource{cluster},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
 		}},
-		rsrc.RouteType: []cache.Response{{
+		rsrc.RouteType: {{
 			Version:   "3",
 			Resources: []types.Resource{route},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
 		}},
-		rsrc.ListenerType: []cache.Response{{
+		rsrc.ListenerType: {{
 			Version:   "4",
 			Resources: []types.Resource{listener},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 		}},
 	}
 }
@@ -390,7 +394,7 @@ func TestResponseHandlers(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &discovery.DiscoveryRequest{Node: node}
+			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
 			go func() {
 				var err error
 				switch typ {

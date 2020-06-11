@@ -20,7 +20,7 @@ const (
 	// Buffer HTTP filter
 	Buffer = "envoy.buffer"
 	// CORS HTTP filter
-	CORS = "envoy.cors"
+	CORS = "envoy.filters.http.cors"
 	// Dynamo HTTP filter
 	Dynamo = "envoy.http_dynamo_filter"
 	// Fault HTTP filter
