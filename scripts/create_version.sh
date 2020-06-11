@@ -43,7 +43,7 @@ case "${OSTYPE}" in
 esac
 
 if ! which $SED > /dev/null; then
-    printf "Please install $SED"
+    printf "Please install $SED\n"
     exit 1
 fi
 
