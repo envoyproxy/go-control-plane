@@ -18,15 +18,10 @@ package server
 
 import (
 	"context"
-	"errors"
-	"strconv"
-	"sync/atomic"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -36,6 +31,7 @@ import (
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/secret/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
@@ -66,6 +62,10 @@ type Callbacks interface {
 	OnStreamRequest(int64, *discovery.DiscoveryRequest) error
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+
+	OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error
+	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
+
 	// OnFetchRequest is called for each Fetch request. Returning an error will end processing of the
 	// request and respond with an error.
 	OnFetchRequest(context.Context, *discovery.DiscoveryRequest) error
@@ -75,12 +75,14 @@ type Callbacks interface {
 
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
 type CallbackFuncs struct {
-	StreamOpenFunc     func(context.Context, int64, string) error
-	StreamClosedFunc   func(int64)
-	StreamRequestFunc  func(int64, *discovery.DiscoveryRequest) error
-	StreamResponseFunc func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-	FetchRequestFunc   func(context.Context, *discovery.DiscoveryRequest) error
-	FetchResponseFunc  func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamOpenFunc          func(context.Context, int64, string) error
+	StreamClosedFunc        func(int64)
+	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
+	StreamResponseFunc      func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
+	StreamDeltaResponseFunc func(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
+	FetchRequestFunc        func(context.Context, *discovery.DiscoveryRequest) error
+	FetchResponseFunc       func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
 var _ Callbacks = CallbackFuncs{}
@@ -117,6 +119,21 @@ func (c CallbackFuncs) OnStreamResponse(streamID int64, req *discovery.Discovery
 	}
 }
 
+func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discovery.DeltaDiscoveryRequest) error {
+	if c.StreamDeltaRequestFunc != nil {
+		return c.StreamDeltaRequestFunc(streamID, req)
+	}
+
+	return nil
+}
+
+// OnStreamResponse invokes StreamResponseFunc.
+func (c CallbackFuncs) OnStreamDeltaResponse(streamID int64, req *discovery.DeltaDiscoveryRequest, resp *discovery.DeltaDiscoveryResponse) {
+	if c.StreamDeltaResponseFunc != nil {
+		c.StreamDeltaResponseFunc(streamID, req, resp)
+	}
+}
+
 // OnFetchRequest invokes FetchRequestFunc.
 func (c CallbackFuncs) OnFetchRequest(ctx context.Context, req *discovery.DiscoveryRequest) error {
 	if c.FetchRequestFunc != nil {
@@ -134,8 +151,8 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
-	return &server{cache: config, callbacks: callbacks, ctx: ctx}
+func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks, log log.Logger) Server {
+	return &server{cache: config, callbacks: callbacks, ctx: ctx, log: log}
 }
 
 type server struct {
@@ -145,13 +162,8 @@ type server struct {
 	// streamCount for counting bi-di streams
 	streamCount int64
 	ctx         context.Context
-}
 
-type stream interface {
-	grpc.ServerStream
-
-	Send(*discovery.DiscoveryResponse) error
-	Recv() (*discovery.DiscoveryRequest, error)
+	log log.Logger
 }
 
 // watches for all xDS resource types
@@ -162,6 +174,13 @@ type watches struct {
 	listeners chan cache.Response
 	secrets   chan cache.Response
 	runtimes  chan cache.Response
+
+	deltaEndpoints chan cache.DeltaResponse
+	deltaClusters  chan cache.DeltaResponse
+	deltaRoutes    chan cache.DeltaResponse
+	deltaListeners chan cache.DeltaResponse
+	deltaSecrets   chan cache.DeltaResponse
+	deltaRuntimes  chan cache.DeltaResponse
 
 	endpointCancel func()
 	clusterCancel  func()
@@ -176,6 +195,20 @@ type watches struct {
 	listenerNonce string
 	secretNonce   string
 	runtimeNonce  string
+
+	deltaClusterCancel  func()
+	deltaEndpointCancel func()
+	deltaRouteCancel    func()
+	deltaListenerCancel func()
+	deltaSecretCancel   func()
+	deltaRuntimeCancel  func()
+
+	deltaClusterNonce  string
+	deltaEndpointNonce string
+	deltaRouteNonce    string
+	deltaListenerNonce string
+	deltaSecretNonce   string
+	deltaRuntimeNonce  string
 }
 
 // Cancel all watches
@@ -198,226 +231,26 @@ func (values watches) Cancel() {
 	if values.runtimeCancel != nil {
 		values.runtimeCancel()
 	}
-}
 
-func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
-	if resp == nil {
-		return nil, errors.New("missing response")
+	// deltaWatches
+	if values.deltaEndpointCancel != nil {
+		values.deltaEndpointCancel()
 	}
-
-	marshalledResponse, err := resp.GetDiscoveryResponse()
-	if err != nil {
-		return nil, err
+	if values.deltaClusterCancel != nil {
+		values.deltaClusterCancel()
 	}
-
-	return marshalledResponse, nil
-}
-
-// process handles a bi-di stream request
-func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
-	// increment stream count
-	streamID := atomic.AddInt64(&s.streamCount, 1)
-
-	// unique nonce generator for req-resp pairs per xDS stream; the server
-	// ignores stale nonces. nonce is only modified within send() function.
-	var streamNonce int64
-
-	// a collection of watches per request type
-	var values watches
-	defer func() {
-		values.Cancel()
-		if s.callbacks != nil {
-			s.callbacks.OnStreamClosed(streamID)
-		}
-	}()
-
-	// sends a response by serializing to protobuf Any
-	send := func(resp cache.Response, typeURL string) (string, error) {
-		out, err := createResponse(resp, typeURL)
-		if err != nil {
-			return "", err
-		}
-
-		// increment nonce
-		streamNonce = streamNonce + 1
-		out.Nonce = strconv.FormatInt(streamNonce, 10)
-		if s.callbacks != nil {
-			s.callbacks.OnStreamResponse(streamID, resp.GetRequest(), out)
-		}
-		return out.Nonce, stream.Send(out)
+	if values.deltaListenerCancel != nil {
+		values.deltaListenerCancel()
 	}
-
-	if s.callbacks != nil {
-		if err := s.callbacks.OnStreamOpen(stream.Context(), streamID, defaultTypeURL); err != nil {
-			return err
-		}
+	if values.deltaRouteCancel != nil {
+		values.deltaRouteCancel()
 	}
-
-	// node may only be set on the first discovery request
-	var node = &core.Node{}
-
-	for {
-		select {
-		case <-s.ctx.Done():
-			return nil
-		// config watcher can send the requested resources types in any order
-		case resp, more := <-values.endpoints:
-			if !more {
-				return status.Errorf(codes.Unavailable, "endpoints watch failed")
-			}
-			nonce, err := send(resp, resource.EndpointType)
-			if err != nil {
-				return err
-			}
-			values.endpointNonce = nonce
-
-		case resp, more := <-values.clusters:
-			if !more {
-				return status.Errorf(codes.Unavailable, "clusters watch failed")
-			}
-			nonce, err := send(resp, resource.ClusterType)
-			if err != nil {
-				return err
-			}
-			values.clusterNonce = nonce
-
-		case resp, more := <-values.routes:
-			if !more {
-				return status.Errorf(codes.Unavailable, "routes watch failed")
-			}
-			nonce, err := send(resp, resource.RouteType)
-			if err != nil {
-				return err
-			}
-			values.routeNonce = nonce
-
-		case resp, more := <-values.listeners:
-			if !more {
-				return status.Errorf(codes.Unavailable, "listeners watch failed")
-			}
-			nonce, err := send(resp, resource.ListenerType)
-			if err != nil {
-				return err
-			}
-			values.listenerNonce = nonce
-
-		case resp, more := <-values.secrets:
-			if !more {
-				return status.Errorf(codes.Unavailable, "secrets watch failed")
-			}
-			nonce, err := send(resp, resource.SecretType)
-			if err != nil {
-				return err
-			}
-			values.secretNonce = nonce
-
-		case resp, more := <-values.runtimes:
-			if !more {
-				return status.Errorf(codes.Unavailable, "runtimes watch failed")
-			}
-			nonce, err := send(resp, resource.RuntimeType)
-			if err != nil {
-				return err
-			}
-			values.runtimeNonce = nonce
-
-		case req, more := <-reqCh:
-			// input stream ended or errored out
-			if !more {
-				return nil
-			}
-			if req == nil {
-				return status.Errorf(codes.Unavailable, "empty request")
-			}
-
-			// node field in discovery request is delta-compressed
-			if req.Node != nil {
-				node = req.Node
-			} else {
-				req.Node = node
-			}
-
-			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
-			nonce := req.GetResponseNonce()
-
-			// type URL is required for ADS but is implicit for xDS
-			if defaultTypeURL == resource.AnyType {
-				if req.TypeUrl == "" {
-					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
-				}
-			} else if req.TypeUrl == "" {
-				req.TypeUrl = defaultTypeURL
-			}
-
-			if s.callbacks != nil {
-				if err := s.callbacks.OnStreamRequest(streamID, req); err != nil {
-					return err
-				}
-			}
-
-			// cancel existing watches to (re-)request a newer version
-			switch {
-			case req.TypeUrl == resource.EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
-				if values.endpointCancel != nil {
-					values.endpointCancel()
-				}
-				values.endpoints, values.endpointCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
-				if values.clusterCancel != nil {
-					values.clusterCancel()
-				}
-				values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
-				if values.routeCancel != nil {
-					values.routeCancel()
-				}
-				values.routes, values.routeCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
-				if values.listenerCancel != nil {
-					values.listenerCancel()
-				}
-				values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.SecretType && (values.secretNonce == "" || values.secretNonce == nonce):
-				if values.secretCancel != nil {
-					values.secretCancel()
-				}
-				values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.RuntimeType && (values.runtimeNonce == "" || values.runtimeNonce == nonce):
-				if values.runtimeCancel != nil {
-					values.runtimeCancel()
-				}
-				values.runtimes, values.runtimeCancel = s.cache.CreateWatch(*req)
-			}
-		}
+	if values.deltaSecretCancel != nil {
+		values.deltaSecretCancel()
 	}
-}
-
-// handler converts a blocking read call to channels and initiates stream processing
-func (s *server) handler(stream stream, typeURL string) error {
-	// a channel for receiving incoming requests
-	reqCh := make(chan *discovery.DiscoveryRequest)
-	reqStop := int32(0)
-	go func() {
-		for {
-			req, err := stream.Recv()
-			if atomic.LoadInt32(&reqStop) != 0 {
-				return
-			}
-			if err != nil {
-				close(reqCh)
-				return
-			}
-			reqCh <- req
-		}
-	}()
-
-	err := s.process(stream, reqCh, typeURL)
-
-	// prevents writing to a closed channel if send failed on blocked recv
-	// TODO(kuat) figure out how to unblock recv through gRPC API
-	atomic.StoreInt32(&reqStop, 1)
-
-	return err
+	if values.deltaRuntimeCancel != nil {
+		values.deltaRuntimeCancel()
+	}
 }
 
 func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
@@ -514,30 +347,30 @@ func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryReque
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+	return s.deltaHandler(stream, resource.AnyType)
 }
 
-func (s *server) DeltaEndpoints(_ endpointservice.EndpointDiscoveryService_DeltaEndpointsServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaEndpoints(stream endpointservice.EndpointDiscoveryService_DeltaEndpointsServer) error {
+	return s.deltaHandler(stream, resource.EndpointType)
 }
 
-func (s *server) DeltaClusters(_ clusterservice.ClusterDiscoveryService_DeltaClustersServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaClusters(stream clusterservice.ClusterDiscoveryService_DeltaClustersServer) error {
+	return s.deltaHandler(stream, resource.ClusterType)
 }
 
-func (s *server) DeltaRoutes(_ routeservice.RouteDiscoveryService_DeltaRoutesServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaRoutes(stream routeservice.RouteDiscoveryService_DeltaRoutesServer) error {
+	return s.deltaHandler(stream, resource.RouteType)
 }
 
-func (s *server) DeltaListeners(_ listenerservice.ListenerDiscoveryService_DeltaListenersServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaListeners(stream listenerservice.ListenerDiscoveryService_DeltaListenersServer) error {
+	return s.deltaHandler(stream, resource.ListenerType)
 }
 
-func (s *server) DeltaSecrets(_ secretservice.SecretDiscoveryService_DeltaSecretsServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaSecrets(stream secretservice.SecretDiscoveryService_DeltaSecretsServer) error {
+	return s.deltaHandler(stream, resource.SecretType)
 }
 
-func (s *server) DeltaRuntime(_ runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaRuntime(stream runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
+	return s.deltaHandler(stream, resource.RuntimeType)
 }

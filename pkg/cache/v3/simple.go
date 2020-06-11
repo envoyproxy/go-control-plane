@@ -48,6 +48,14 @@ type SnapshotCache interface {
 	// the version differs from the snapshot version.
 	SetSnapshot(node string, snapshot Snapshot) error
 
+	// SetSnapshotDelta sets a response snapshot for a node using the delta watches. For ADS, the snapshots
+	// should have distinct versions and be internally consistent (e.g. all
+	// referenced resources must be included in the snapshot).
+	//
+	// This method will cause the server to respond to all open delta watches, for which
+	// the version differs from the snapshot version.
+	SetSnapshotDelta(node string, snapshot Snapshot) error
+
 	// GetSnapshots gets the snapshot for a node.
 	GetSnapshot(node string) (Snapshot, error)
 
@@ -78,6 +86,9 @@ type snapshotCache struct {
 
 	// watchCount is an atomic counter incremented for each watch
 	watchCount int64
+
+	// deltaWatchCount is an atomic counter incremented for each delta watch opened
+	deltaWatchCount int64
 
 	mu sync.RWMutex
 }

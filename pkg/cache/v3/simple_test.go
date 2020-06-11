@@ -214,6 +214,117 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	}
 }
 
+func TestSnapshotCacheDeltaWatch(t *testing.T) {
+	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	watches := make(map[string]chan cache.DeltaResponse)
+
+	for _, typ := range testTypes {
+		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+			TypeUrl:                typ,
+			ResourceNamesSubscribe: names[typ],
+		}, "")
+	}
+
+	if err := c.SetSnapshotDelta(key, snapshot); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			select {
+			case out := <-watches[typ]:
+				if out.SystemVersion != version {
+					t.Errorf("got version %q, want %q", out.SystemVersion, version)
+				}
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot.GetSubscribedResources(names[typ], typ)) {
+					t.Errorf("get resources %v, want %v", out.Resources, snapshot.GetSubscribedResources(names[typ], typ))
+				}
+			case <-time.After(time.Second):
+				t.Fatal("failed to receive snapshot response")
+			}
+		})
+	}
+
+	// open new watches with the latest version
+	for _, typ := range testTypes {
+		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+			TypeUrl:                typ,
+			ResourceNamesSubscribe: names[typ],
+		}, version)
+	}
+
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
+		t.Errorf("watches should be created for the latest version: %d", count)
+	}
+
+	// set partially-versioned snapshot
+	snapshot2 := snapshot
+	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	if err := c.SetSnapshotDelta(key, snapshot2); err != nil {
+		t.Fatal(err)
+	}
+
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
+		t.Errorf("watches should be preserved for all but one: %d", count)
+	}
+
+	// validate response for endpoints
+	select {
+	case out := <-watches[rsrc.EndpointType]:
+		if out.SystemVersion != version2 {
+			t.Errorf("got version %q, want %q", out.SystemVersion, version2)
+		}
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.Resources), snapshot2.Resources[types.Endpoint].Items) {
+			t.Fatalf("got resources %v, want %v", out.Resources, snapshot2.Resources[types.Endpoint].Items)
+		}
+	case <-time.After(time.Second * 5):
+		t.Fatal("failed to receive snapshot response")
+	}
+}
+
+func TestCheckState(t *testing.T) {
+	deltaState := map[string][]string{
+		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta"},
+		rsrc.ClusterType:  {clusterName},
+		rsrc.RouteType:    {routeName},
+		rsrc.ListenerType: {listenerName},
+		rsrc.RuntimeType:  nil,
+	}
+	subscribed := map[string][]string{
+		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta", "clusterDelta2"},
+		rsrc.ClusterType:  {clusterName},
+		rsrc.RouteType:    {routeName},
+		rsrc.ListenerType: {listenerName},
+		rsrc.RuntimeType:  nil,
+	}
+
+	mb := make(map[string][]string, len(deltaState))
+	diff := make(map[string][]string, 0)
+
+	for key, value := range deltaState {
+		mb[key] = value
+	}
+
+	// Check our diff map to see what has changed
+	// Even is an underlying resource has changed we need to update the diff
+	for key, value := range subscribed {
+		t.Log(key)
+		if _, found := mb[key]; !found {
+			t.Log("Found a new key, adding to diff")
+			diff[key] = value
+		} else if resources, found := mb[key]; found && (len(resources) != len(value)) {
+			t.Log("Found a new resource to an existing key, modifying resource map")
+			diff[key] = value
+		} else {
+			t.Log("Found no changes")
+		}
+	}
+
+	if len(diff) == 0 {
+		t.Fatalf("Expected diff greater than 0")
+	}
+}
+
 func TestConcurrentSetWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	for i := 0; i < 50; i++ {

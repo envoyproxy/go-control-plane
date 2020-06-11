@@ -110,6 +110,34 @@ func (s *Snapshot) GetResources(typeURL string) map[string]types.Resource {
 	return s.Resources[typ].Items
 }
 
+// GetSubscribedResources selects requested snapshot resources by type and alias.
+// This function is used for Incremental/Delta xDS and follows the subscribed resource model.
+func (s *Snapshot) GetSubscribedResources(aliases []string, typeURL string) map[string]types.Resource {
+	if s == nil {
+		return nil
+	}
+
+	t := GetResponseType(typeURL)
+	if t == types.UnknownType {
+		return nil
+	}
+
+	subscribed := make(map[string]types.Resource, len(aliases))
+	r := s.Resources[t].Items
+
+	// TODO:
+	// This right now is O(n^2) which is not performant. Will need to revisit
+	for _, item := range r {
+		for _, alias := range aliases {
+			if GetResourceName(item) == alias {
+				subscribed[alias] = item
+			}
+		}
+	}
+
+	return subscribed
+}
+
 // GetVersion returns the version for a resource type.
 func (s *Snapshot) GetVersion(typeURL string) string {
 	if s == nil {

@@ -28,6 +28,9 @@ import (
 // Request is an alias for the discovery request type.
 type Request = discovery.DiscoveryRequest
 
+// DeltaRequest is an alias for the delta discovery request type.
+type DeltaRequest = discovery.DeltaDiscoveryRequest
+
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
 // the responses when they are ready. The watch can be cancelled by the
@@ -44,6 +47,17 @@ type ConfigWatcher interface {
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
 	CreateWatch(Request) (value chan Response, cancel func())
+
+	// CreateDeltaWatch returns a new open incremental xDS watch.
+	//
+	// Value channel produces requested resources, or spontaneous updates in accordance
+	// with the incremental xDS specification. If the channel is closed
+	// prior to cancellation of the watch, an unrecoverable error has occurred in the producer,
+	// and the consumer should close the corresponding stream.
+	//
+	// Cancel is an optional function to release resources in the producer. If
+	// provided, the consumer may call this function multiple times.
+	CreateDeltaWatch(DeltaRequest, string) (value chan DeltaResponse, cancel func())
 }
 
 // Cache is a generic config cache with a watcher.
@@ -64,6 +78,36 @@ type Response interface {
 
 	// Get the version in the Response.
 	GetVersion() (string, error)
+}
+
+// DeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
+type DeltaResponse struct {
+	// Request is the original request.
+	DeltaRequest discovery.DeltaDiscoveryRequest
+
+	// The value indicating whether the resource is marshaled, and only one of `Resources` and `MarshaledResources` is available.
+	ResourceMarshaled bool
+
+	// Resources to be included in the response.
+	Resources []types.Resource
+
+	// Marshaled Resources to be included in the response.
+	MarshaledResources []MarshaledResource
+
+	// System Version Info
+	SystemVersion string
+}
+
+// MarshaledResource is an alias for the serialized binary array.
+type MarshaledResource = []byte
+
+// SkipFetchError is the error returned when the cache fetch is short
+// circuited due to the client's version already being up-to-date.
+type SkipFetchError struct{}
+
+// Error satisfies the error interface
+func (e SkipFetchError) Error() string {
+	return "skip fetch: version up to date"
 }
 
 // RawResponse is a pre-serialized xDS response containing the raw resources to

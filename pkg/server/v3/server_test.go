@@ -35,9 +35,10 @@ import (
 )
 
 type mockConfigWatcher struct {
-	counts     map[string]int
-	responses  map[string][]cache.RawResponse
-	closeWatch bool
+	counts         map[string]int
+	responses      map[string][]cache.RawResponse
+	deltaResponses map[string][]cache.DeltaResponse
+	closeWatch     bool
 }
 
 func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.Response, func()) {
@@ -49,6 +50,46 @@ func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (ch
 	} else if config.closeWatch {
 		close(out)
 	}
+	return out, func() {}
+}
+
+func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRequest, version string) (chan cache.DeltaResponse, func()) {
+	fmt.Println("Creating a delta watch...")
+	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+
+	// Create our out watch channel to return with a buffer of one
+	out := make(chan cache.DeltaResponse, 1)
+
+	if len(config.deltaResponses[req.TypeUrl]) > 0 {
+
+		res := config.deltaResponses[req.TypeUrl][0]
+		var subscribed []types.Resource
+
+		// Only return back the subscribed resources to our request type
+		for _, resource := range res.Resources {
+			for _, alias := range req.GetResourceNamesSubscribe() {
+				if cache.GetResourceName(resource) == alias {
+					subscribed = append(subscribed, resource)
+				}
+			}
+		}
+
+		// We should only send back subscribed resources here
+		out <- cache.DeltaResponse{
+			ResourceMarshaled:  res.ResourceMarshaled,
+			MarshaledResources: res.MarshaledResources,
+			Resources:          subscribed,
+		}
+
+		// fmt.Println(len(config.deltaResponses[req.TypeUrl]))
+		// config.deltaResponses[req.TypeUrl] = config.deltaResponses[req.TypeUrl][1:]
+		// fmt.Printf("New list: %+v\n", config.deltaResponses[req.TypeUrl][1:])
+
+	} else if config.closeWatch {
+		fmt.Printf("No resources... closing watch\n")
+		close(out)
+	}
+
 	return out, func() {}
 }
 
@@ -128,6 +169,67 @@ func makeMockStream(t *testing.T) *mockStream {
 	}
 }
 
+type mockDeltaStream struct {
+	t         *testing.T
+	ctx       context.Context
+	recv      chan *discovery.DeltaDiscoveryRequest
+	sent      chan *discovery.DeltaDiscoveryResponse
+	nonce     int
+	sendError bool
+	grpc.ServerStream
+}
+
+func (stream *mockDeltaStream) Context() context.Context {
+	return stream.ctx
+}
+
+func (stream *mockDeltaStream) Send(resp *discovery.DeltaDiscoveryResponse) error {
+	// check that nonce is monotonically incrementing
+	stream.nonce = stream.nonce + 1
+	if resp.Nonce != fmt.Sprintf("%d", stream.nonce) {
+		stream.t.Errorf("Nonce => got %q, want %d", resp.Nonce, stream.nonce)
+	}
+	// check resources are non-empty
+	if len(resp.Resources) == 0 {
+		stream.t.Error("Resources => got none, want non-empty")
+	}
+	// check that type URL matches in resources
+	if resp.TypeUrl == "" {
+		stream.t.Error("TypeUrl => got none, want non-empty")
+	}
+
+	// TODO:
+	// Not sure this is a valid check because I think one incremental payload can carry various types of resources
+	for _, res := range resp.Resources {
+		if res.Resource.TypeUrl != resp.TypeUrl {
+			stream.t.Errorf("TypeUrl => got %q, want %q", res.Resource.TypeUrl, resp.TypeUrl)
+		}
+	}
+
+	stream.sent <- resp
+	if stream.sendError {
+		return errors.New("send error")
+	}
+	return nil
+}
+
+func (stream *mockDeltaStream) Recv() (*discovery.DeltaDiscoveryRequest, error) {
+	req, more := <-stream.recv
+	if !more {
+		return nil, errors.New("empty")
+	}
+	return req, nil
+}
+
+func makeMockDeltaStream(t *testing.T) *mockDeltaStream {
+	return &mockDeltaStream{
+		t:    t,
+		ctx:  context.Background(),
+		sent: make(chan *discovery.DeltaDiscoveryResponse, 10),
+		recv: make(chan *discovery.DeltaDiscoveryRequest, 10),
+	}
+}
+
 const (
 	clusterName  = "cluster0"
 	routeName    = "route0"
@@ -183,7 +285,7 @@ func TestServerShutdown(t *testing.T) {
 			config.responses = makeResponses()
 			shutdown := make(chan bool)
 			ctx, cancel := context.WithCancel(context.Background())
-			s := server.NewServer(ctx, config, server.CallbackFuncs{})
+			s := server.NewServer(ctx, config, server.CallbackFuncs{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -224,7 +326,7 @@ func TestResponseHandlers(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -287,7 +389,7 @@ func TestFetch(t *testing.T) {
 		},
 	}
 
-	s := server.NewServer(context.Background(), config, cb)
+	s := server.NewServer(context.Background(), config, cb, logger{})
 	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for endpoints: %v", err)
 	}
@@ -358,7 +460,7 @@ func TestWatchClosed(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.closeWatch = true
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -382,7 +484,7 @@ func TestSendError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -407,7 +509,7 @@ func TestStaleNonce(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
 
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{
@@ -473,7 +575,7 @@ func TestAggregatedHandlers(t *testing.T) {
 		ResourceNames: []string{routeName},
 	}
 
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
 	go func() {
 		if err := s.StreamAggregatedResources(resp); err != nil {
 			t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
@@ -507,7 +609,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
@@ -525,7 +627,7 @@ func TestCallbackError(t *testing.T) {
 				StreamOpenFunc: func(ctx context.Context, i int64, s string) error {
 					return errors.New("stream open error")
 				},
-			})
+			}, logger{})
 
 			// make a request
 			resp := makeMockStream(t)

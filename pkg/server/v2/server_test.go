@@ -108,43 +108,6 @@ func makeMockConfigWatcher() *mockConfigWatcher {
 	}
 }
 
-// type callbacks struct {
-// 	fetchReq      int
-// 	fetchResp     int
-// 	callbackError bool
-// }
-
-// func (c *callbacks) OnStreamOpen(ctz context.Context, id int64, typ string) error {
-// 	log.Printf("stream %d open for %s\n", id, typ)
-
-// 	if c.callbackError {
-// 		return errors.New("stream open error")
-// 	}
-// 	return nil
-// }
-// func (c *callbacks) OnStreamClosed(int64)                                     {}
-// func (c *callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error { return nil }
-// func (c *callbacks) OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
-// }
-// func (c *callbacks) OnFetchRequest(context.Context, *discovery.DiscoveryRequest) error {
-// 	if c.callbackError {
-// 		return errors.New("fetch request error")
-// 	}
-// 	c.fetchReq++
-// 	return nil
-// }
-// func (c *callbacks) OnFetchResponse(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
-// 	c.fetchResp++
-// }
-// func (c *callbacks) OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error {
-// 	log.Printf("Recieved delta request in process function")
-
-// 	return nil
-// }
-// func (c *callbacks) OnStreamDeltaResponse(streamID int64, req *discovery.DeltaDiscoveryRequest, res *discovery.DeltaDiscoveryResponse) {
-// 	log.Printf("OnStreamDeltaResponse() streamID: %d", streamID)
-// }
-
 type mockStream struct {
 	t         *testing.T
 	ctx       context.Context
