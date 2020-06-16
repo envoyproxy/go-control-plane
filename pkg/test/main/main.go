@@ -24,7 +24,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
 	cachev2 "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
@@ -89,7 +88,6 @@ func init() {
 func main() {
 	flag.Parse()
 	ctx := context.Background()
-	var wait sync.WaitGroup
 
 	// start upstream
 	go test.RunHTTP(ctx, upstreamPort)
@@ -130,11 +128,7 @@ func main() {
 
 	// start the xDS server
 	go test.RunAccessLogServer(ctx, alsv2, alsv3, alsPort)
-	go func() {
-		wait.Add(1)
-		test.RunManagementServer(ctx, srv2, srv3, port)
-		wait.Done()
-	}()
+	go test.RunManagementServer(ctx, srv2, srv3, port)
 	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{log: zeroLogger})
 
 	log.Println("waiting for the first request...")
@@ -225,12 +219,11 @@ func main() {
 
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
-			break
+			os.Exit(1)
 		}
 	}
 
 	log.Printf("Test for %s passed!\n", mode)
-	wait.Wait()
 }
 
 // callEcho calls upstream echo service on all listener ports and returns an error

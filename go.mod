@@ -6,7 +6,6 @@ require (
 	github.com/census-instrumentation/opencensus-proto v0.2.1
 	github.com/cncf/udpa/go v0.0.0-20200313221541-5f7e5dd04533
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
-	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-cmp v0.2.0
 	github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4
