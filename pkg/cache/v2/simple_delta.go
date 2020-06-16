@@ -54,30 +54,26 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					Items:   subscribed,
 				}
 
-				// handle wildcard on the initial request
-				// if this case is met, just subscribe to all clusters and listeners in the snapshot
-				if len(subscribed) == 0 {
-					cache.log.Debugf("setting wildcard")
-					// Maybe set the resources for all the types here???
-					for i := 0; i < int(types.UnknownType); i++ {
-						tURL := GetResponseTypeURL(types.ResponseType(i))
-						info.deltaState[tURL] = Resources{
-							Version: version,
-							Items:   snapshot.GetResources(tURL),
-						}
-					}
-
-					// info.deltaState[t] = Resources{
-					// 	Version: version,
-					// 	Items:   snapshot.GetResources(t),
-					// }
-				}
-
 				if cache.log != nil {
 					if subscribed := watch.Request.GetResourceNamesSubscribe(); len(subscribed) != 0 {
 						cache.log.Debugf("subscribing to resources: %+v", subscribed)
 					}
-					cache.log.Infof("initial snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
+					cache.log.Infof("initial delta snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
+				}
+
+				// check the wildcard
+				if len(subscribed) == 0 {
+					cache.log.Debugf("received wildcard request")
+
+					// Set all resources for the current type if we get a wildcard request
+					info.deltaState[t] = Resources{
+						Version: version,
+						Items:   snapshot.GetResources(t),
+					}
+
+					if cache.log != nil {
+						cache.log.Debugf("intial delta snapshot set with wildcard - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
+					}
 				}
 
 				// Send out the response right away since we have nothing else to do
@@ -91,47 +87,73 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				// discard the old watch
 				delete(info.deltaWatches, id)
 			} else if version != info.deltaState[t].Version {
-				// Assume we've received a new resource and we want to send new resources and cancel old watches
-				diff := cache.checkState(subscribed, info.deltaState[t].Items)
-				if len(diff) > 0 {
-					if cache.log != nil {
-						cache.log.Debugf("node: %s, found new items to subscribe too: %v ", watch.Request.GetNode().GetId(), diff)
+				// assume we've recieved a wildcard request
+				if len(subscribed) == 0 {
+					cache.log.Debugf("received wildcard request")
+
+					// Set all resources for the current type if we get a wildcard request
+					info.deltaState[t] = Resources{
+						Version: version,
+						Items:   snapshot.GetResources(t),
 					}
 
-					// Add our new subscription items to our state to watch that we've found
-					r := Resources{
-						Version: version,
+					if cache.log != nil {
+						cache.log.Debugf("delta respond with wildcard - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
 					}
-					for key, value := range diff {
-						for rKey := range info.deltaState[t].Items {
-							// Handle the case when a new item could be added to the state and also if we need to overwrite a previous resource
-							if key == rKey {
-								info.deltaState[t].Items[key] = value
-							} else if _, found := info.deltaState[t].Items[key]; !found {
-								info.deltaState[t].Items[key] = value
+
+					// Respond to our delta stream with the subcribed resources
+					cache.respondDelta(
+						watch.Request,
+						watch.Response,
+						info.deltaState[t].Items, // We want to only send the updated resources here
+						version,
+					)
+
+					// discard the old watch
+					delete(info.deltaWatches, id)
+				} else {
+					// Assume we've received a new resource and we want to send new resources and cancel old watches
+					diff := cache.checkState(subscribed, info.deltaState[t].Items)
+					if len(diff) > 0 {
+						if cache.log != nil {
+							cache.log.Debugf("node: %s, found new items to subscribe too: %v ", watch.Request.GetNode().GetId(), diff)
+						}
+
+						// Add our new subscription items to our state to watch that we've found
+						r := Resources{
+							Version: version,
+						}
+						for key, value := range diff {
+							for rKey := range info.deltaState[t].Items {
+								// Handle the case when a new item could be added to the state and also if we need to overwrite a previous resource
+								if key == rKey {
+									info.deltaState[t].Items[key] = value
+								} else if _, found := info.deltaState[t].Items[key]; !found {
+									info.deltaState[t].Items[key] = value
+								}
 							}
 						}
+						r.Items = info.deltaState[t].Items
+
+						info.deltaState[t] = r
 					}
-					r.Items = info.deltaState[t].Items
 
-					info.deltaState[t] = r
+					if cache.log != nil {
+						// We only want to show the specific resources we're sending back from the diff
+						cache.log.Debugf("delta respond open watch ID:%d Resources:%+v with new version %q", id, diff, version)
+					}
+
+					// Respond to our delta stream with the subcribed resources
+					cache.respondDelta(
+						watch.Request,
+						watch.Response,
+						diff, // We want to only send the updated resources here
+						version,
+					)
+
+					// discard the old watch
+					delete(info.deltaWatches, id)
 				}
-
-				if cache.log != nil {
-					// We only want to show the specific resources we're sending back from the diff
-					cache.log.Debugf("delta respond open watch ID:%d Resources:%+v with new version %q", id, diff, version)
-				}
-
-				// Respond to our delta stream with the subcribed resources
-				cache.respondDelta(
-					watch.Request,
-					watch.Response,
-					diff, // We want to only send the updated resources here
-					version,
-				)
-
-				// discard the old watch
-				delete(info.deltaWatches, id)
 			}
 		}
 		info.mu.Unlock()

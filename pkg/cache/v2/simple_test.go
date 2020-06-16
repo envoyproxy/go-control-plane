@@ -240,8 +240,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 				if v, _ := out.GetSystemVersion(); v != version {
 					t.Errorf("got version %q, want %q", v, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(cache.RawDeltaResponse).Resources), snapshot.GetSubscribedResources(names[typ], typ)) {
-					t.Errorf("get resources %v, want %v", out.(cache.RawDeltaResponse).Resources, snapshot.GetSubscribedResources(names[typ], typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+					t.Errorf("get resources %v, want %v", out.(cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")

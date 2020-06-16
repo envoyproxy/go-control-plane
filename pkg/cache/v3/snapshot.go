@@ -138,6 +138,25 @@ func (s *Snapshot) GetSubscribedResources(aliases []string, typeURL string) map[
 	return subscribed
 }
 
+func (s *Snapshot) GetResource(alias string, typeURL string) types.Resource {
+	if s == nil {
+		return nil
+	}
+
+	t := GetResponseType(typeURL)
+	if t == types.UnknownType {
+		return nil
+	}
+
+	for key, item := range s.Resources[t].Items {
+		if alias == key {
+			return item
+		}
+	}
+
+	return nil
+}
+
 // GetVersion returns the version for a resource type.
 func (s *Snapshot) GetVersion(typeURL string) string {
 	if s == nil {

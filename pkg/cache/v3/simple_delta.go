@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
 func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) error {
@@ -29,13 +30,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 	cache.snapshots[node] = snapshot
 
 	// trigger existing watches for which version changed
-	// TODO:
-	// Note the discarding of an old watch in regular SOTW snapshot set when a new version is found
-	// In delta there's no concept of versioning against the request since the version_info field is no longer applicable
-	// IDEA:
-	// My current belief would be that this is where the diff needs to happen, so if the state of the node does not match up to what we have a watch for
-	// then we need to discard the watch and it's resource version
-	// I'm not sure how this will get done or if it's correct but that idea just popped into my head
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
 		for id, watch := range info.deltaWatches {
@@ -45,17 +39,26 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 			version := snapshot.GetVersion(t)
 
 			// Handle the case of an initial delta request and having no previous state
-			// We can assume we just want to set the state as the initially requested resources
-			if info.deltaState[t].Version == "" && len(info.deltaState[t].Items) == 0 {
+			if info.deltaState[t].Version == "" && watch.Request.InitialResourceVersions == nil {
 				info.deltaState[t] = Resources{
 					Version: version,
-					Items:   subscribed,
+					Items:   snapshot.GetResources(t),
 				}
 
-				// handle wildcard on the initial request
-				// if this case is met, just subscribe to all clusters and listeners in the snapshot
-				if len(subscribed) == 0 {
-					cache.log.Debugf("setting wildcard")
+				if cache.log != nil {
+					if s := watch.Request.GetResourceNamesSubscribe(); len(s) != 0 {
+						cache.log.Debugf("subscribing to resources: %+v", s)
+					}
+					cache.log.Infof("initial delta snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
+				}
+
+				// TODO:
+				// not sure if this logic works properly yet, we're entering a full loop with the control-plane and envoy
+				// yet it's receiving all the resouces it should be
+				// check the wildcard
+				if (t == resource.ClusterType || t == resource.ListenerType) && len(subscribed) == 0 {
+					cache.log.Debugf("received wildcard request")
+
 					// Maybe set the resources for all the types here???
 					for i := 0; i < int(types.UnknownType); i++ {
 						tURL := GetResponseTypeURL(types.ResponseType(i))
@@ -64,13 +67,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 							Items:   snapshot.GetResources(tURL),
 						}
 					}
-				}
-
-				if cache.log != nil {
-					if subscribed := watch.Request.GetResourceNamesSubscribe(); len(subscribed) != 0 {
-						cache.log.Debugf("subscribing to resources: %+v", subscribed)
-					}
-					cache.log.Infof("initial snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
 				}
 
 				// Send out the response right away since we have nothing else to do
@@ -84,29 +80,9 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				// discard the old watch
 				delete(info.deltaWatches, id)
 			} else if version != info.deltaState[t].Version {
-				// handle wildcard on the initial request
-				// if this case is met, just subscribe to all clusters and listeners in the snapshot
+
 				if len(subscribed) == 0 {
-					cache.log.Debugf("setting wildcard")
-					// Maybe set the resources for all the types here???
-					for i := 0; i < int(types.UnknownType); i++ {
-						tURL := GetResponseTypeURL(types.ResponseType(i))
-						info.deltaState[tURL] = Resources{
-							Version: version,
-							Items:   snapshot.GetResources(tURL),
-						}
-					}
-
-					// Respond to our delta stream with the subcribed resources
-					cache.respondDelta(
-						watch.Request,
-						watch.Response,
-						info.deltaState[t].Items, // We want to only send the updated resources here
-						version,
-					)
-
-					// discard the old watch
-					delete(info.deltaWatches, id)
+					cache.log.Debugf("wildcard request")
 				}
 
 				// Assume we've received a new resource and we want to send new resources and cancel old watches

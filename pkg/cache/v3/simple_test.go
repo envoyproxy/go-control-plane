@@ -218,10 +218,11 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	watches := make(map[string]chan cache.DeltaResponse)
 
+	// Make this a wildcard type
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
 			TypeUrl:                typ,
-			ResourceNamesSubscribe: names[typ],
+			ResourceNamesSubscribe: []string{},
 		}, "")
 	}
 
@@ -236,8 +237,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 				if v, _ := out.GetSystemVersion(); v != version {
 					t.Errorf("got version %q, want %q", v, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(cache.RawDeltaResponse).Resources), snapshot.GetSubscribedResources(names[typ], typ)) {
-					t.Errorf("get resources %v, want %v", out.(cache.RawDeltaResponse).Resources, snapshot.GetSubscribedResources(names[typ], typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+					t.Errorf("get resources %v, want %v", out.(cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
