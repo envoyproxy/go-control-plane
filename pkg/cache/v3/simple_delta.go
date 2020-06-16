@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
 func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) error {
@@ -56,7 +55,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				// not sure if this logic works properly yet, we're entering a full loop with the control-plane and envoy
 				// yet it's receiving all the resouces it should be
 				// check the wildcard
-				if (t == resource.ClusterType || t == resource.ListenerType) && len(subscribed) == 0 {
+				if len(subscribed) == 0 {
 					cache.log.Debugf("received wildcard request")
 
 					// Maybe set the resources for all the types here???
