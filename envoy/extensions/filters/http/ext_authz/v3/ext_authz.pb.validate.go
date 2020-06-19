@@ -16,6 +16,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/ptypes"
+
+	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 )
 
 // ensure the imports are used
@@ -31,6 +33,8 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = ptypes.DynamicAny{}
+
+	_ = v3.ApiVersion(0)
 )
 
 // define the regex for a UUID once up-front
@@ -41,6 +45,13 @@ var _ext_authz_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-
 func (m *ExtAuthz) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	if _, ok := v3.ApiVersion_name[int32(m.GetTransportApiVersion())]; !ok {
+		return ExtAuthzValidationError{
+			field:  "TransportApiVersion",
+			reason: "value must be one of the defined enum values",
+		}
 	}
 
 	// no validation rules for FailureModeAllow

@@ -16,6 +16,8 @@ import (
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/ptypes"
+
+	v4alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v4alpha"
 )
 
 // ensure the imports are used
@@ -31,6 +33,8 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = ptypes.DynamicAny{}
+
+	_ = v4alpha.ApiVersion(0)
 )
 
 // define the regex for a UUID once up-front
@@ -58,6 +62,13 @@ func (m *MetricsServiceConfig) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
+		}
+	}
+
+	if _, ok := v4alpha.ApiVersion_name[int32(m.GetTransportApiVersion())]; !ok {
+		return MetricsServiceConfigValidationError{
+			field:  "TransportApiVersion",
+			reason: "value must be one of the defined enum values",
 		}
 	}
 
