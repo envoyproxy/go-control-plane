@@ -1274,6 +1274,12 @@ func (m *GrpcService_GoogleGrpc_ChannelArgs_Value) Validate() error {
 	case *GrpcService_GoogleGrpc_ChannelArgs_Value_IntValue:
 		// no validation rules for IntValue
 
+	default:
+		return GrpcService_GoogleGrpc_ChannelArgs_ValueValidationError{
+			field:  "ValueSpecifier",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
