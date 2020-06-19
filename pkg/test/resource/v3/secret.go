@@ -18,7 +18,6 @@ package resource
 import (
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	auth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
 const (
@@ -99,9 +98,9 @@ yA==
 )
 
 // MakeSecrets generates an SDS secret
-func MakeSecrets(tlsName, rootName string) []types.Resource {
-	return []types.Resource{
-		&auth.Secret{
+func MakeSecrets(tlsName, rootName string) []*auth.Secret {
+	return []*auth.Secret{
+		{
 			Name: tlsName,
 			Type: &auth.Secret_TlsCertificate{
 				TlsCertificate: &auth.TlsCertificate{
@@ -114,7 +113,7 @@ func MakeSecrets(tlsName, rootName string) []types.Resource {
 				},
 			},
 		},
-		&auth.Secret{
+		{
 			Name: rootName,
 			Type: &auth.Secret_ValidationContext{
 				ValidationContext: &auth.CertificateValidationContext{
