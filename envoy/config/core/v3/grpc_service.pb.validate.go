@@ -496,7 +496,9 @@ type GrpcService_GoogleGrpc_GoogleLocalCredentialsValidationError struct {
 func (e GrpcService_GoogleGrpc_GoogleLocalCredentialsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GrpcService_GoogleGrpc_GoogleLocalCredentialsValidationError) Reason() string { return e.reason }
+func (e GrpcService_GoogleGrpc_GoogleLocalCredentialsValidationError) Reason() string {
+	return e.reason
+}
 
 // Cause function returns cause value.
 func (e GrpcService_GoogleGrpc_GoogleLocalCredentialsValidationError) Cause() error { return e.cause }
@@ -1273,6 +1275,12 @@ func (m *GrpcService_GoogleGrpc_ChannelArgs_Value) Validate() error {
 
 	case *GrpcService_GoogleGrpc_ChannelArgs_Value_IntValue:
 		// no validation rules for IntValue
+
+	default:
+		return GrpcService_GoogleGrpc_ChannelArgs_ValueValidationError{
+			field:  "ValueSpecifier",
+			reason: "value is required",
+		}
 
 	}
 
