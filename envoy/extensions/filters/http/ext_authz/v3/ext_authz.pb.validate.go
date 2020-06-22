@@ -468,6 +468,16 @@ func (m *AuthorizationResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetAllowedUpstreamHeadersToAppend()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AuthorizationResponseValidationError{
+				field:  "AllowedUpstreamHeadersToAppend",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetAllowedClientHeaders()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AuthorizationResponseValidationError{
