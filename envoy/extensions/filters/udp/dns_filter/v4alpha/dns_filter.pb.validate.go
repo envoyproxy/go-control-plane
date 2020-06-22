@@ -248,12 +248,12 @@ func (m *DnsFilterConfig_ClientContextConfig) Validate() error {
 			}
 		}
 
-		gte := time.Duration(5*time.Second + 0*time.Nanosecond)
+		gte := time.Duration(1*time.Second + 0*time.Nanosecond)
 
 		if dur < gte {
 			return DnsFilterConfig_ClientContextConfigValidationError{
 				field:  "ResolverTimeout",
-				reason: "value must be greater than or equal to 5s",
+				reason: "value must be greater than or equal to 1s",
 			}
 		}
 
@@ -269,13 +269,23 @@ func (m *DnsFilterConfig_ClientContextConfig) Validate() error {
 	for idx, item := range m.GetUpstreamResolvers() {
 		_, _ = idx, item
 
-		if utf8.RuneCountInString(item) < 3 {
-			return DnsFilterConfig_ClientContextConfigValidationError{
-				field:  fmt.Sprintf("UpstreamResolvers[%v]", idx),
-				reason: "value length must be at least 3 runes",
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DnsFilterConfig_ClientContextConfigValidationError{
+					field:  fmt.Sprintf("UpstreamResolvers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 
+	}
+
+	if m.GetMaxPendingLookups() < 1 {
+		return DnsFilterConfig_ClientContextConfigValidationError{
+			field:  "MaxPendingLookups",
+			reason: "value must be greater than or equal to 1",
+		}
 	}
 
 	return nil
