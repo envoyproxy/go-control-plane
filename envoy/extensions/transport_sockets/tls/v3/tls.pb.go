@@ -372,7 +372,8 @@ type CommonTlsContext_ValidationContextCertificateProvider struct {
 
 func (*CommonTlsContext_ValidationContext) isCommonTlsContext_ValidationContextType() {}
 
-func (*CommonTlsContext_ValidationContextSdsSecretConfig) isCommonTlsContext_ValidationContextType() {}
+func (*CommonTlsContext_ValidationContextSdsSecretConfig) isCommonTlsContext_ValidationContextType() {
+}
 
 func (*CommonTlsContext_CombinedValidationContext) isCommonTlsContext_ValidationContextType() {}
 

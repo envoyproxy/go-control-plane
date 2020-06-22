@@ -289,7 +289,9 @@ type AdmissionControl_SuccessCriteria_HttpCriteriaValidationError struct {
 func (e AdmissionControl_SuccessCriteria_HttpCriteriaValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AdmissionControl_SuccessCriteria_HttpCriteriaValidationError) Reason() string { return e.reason }
+func (e AdmissionControl_SuccessCriteria_HttpCriteriaValidationError) Reason() string {
+	return e.reason
+}
 
 // Cause function returns cause value.
 func (e AdmissionControl_SuccessCriteria_HttpCriteriaValidationError) Cause() error { return e.cause }
@@ -365,7 +367,9 @@ type AdmissionControl_SuccessCriteria_GrpcCriteriaValidationError struct {
 func (e AdmissionControl_SuccessCriteria_GrpcCriteriaValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AdmissionControl_SuccessCriteria_GrpcCriteriaValidationError) Reason() string { return e.reason }
+func (e AdmissionControl_SuccessCriteria_GrpcCriteriaValidationError) Reason() string {
+	return e.reason
+}
 
 // Cause function returns cause value.
 func (e AdmissionControl_SuccessCriteria_GrpcCriteriaValidationError) Cause() error { return e.cause }
