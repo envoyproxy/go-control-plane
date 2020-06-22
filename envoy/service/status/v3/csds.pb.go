@@ -148,6 +148,7 @@ type PerXdsConfig struct {
 	//	*PerXdsConfig_ClusterConfig
 	//	*PerXdsConfig_RouteConfig
 	//	*PerXdsConfig_ScopedRouteConfig
+	//	*PerXdsConfig_EndpointConfig
 	PerXdsConfig isPerXdsConfig_PerXdsConfig `protobuf_oneof:"per_xds_config"`
 }
 
@@ -225,6 +226,13 @@ func (x *PerXdsConfig) GetScopedRouteConfig() *v31.ScopedRoutesConfigDump {
 	return nil
 }
 
+func (x *PerXdsConfig) GetEndpointConfig() *v31.EndpointsConfigDump {
+	if x, ok := x.GetPerXdsConfig().(*PerXdsConfig_EndpointConfig); ok {
+		return x.EndpointConfig
+	}
+	return nil
+}
+
 type isPerXdsConfig_PerXdsConfig interface {
 	isPerXdsConfig_PerXdsConfig()
 }
@@ -245,6 +253,10 @@ type PerXdsConfig_ScopedRouteConfig struct {
 	ScopedRouteConfig *v31.ScopedRoutesConfigDump `protobuf:"bytes,5,opt,name=scoped_route_config,json=scopedRouteConfig,proto3,oneof"`
 }
 
+type PerXdsConfig_EndpointConfig struct {
+	EndpointConfig *v31.EndpointsConfigDump `protobuf:"bytes,6,opt,name=endpoint_config,json=endpointConfig,proto3,oneof"`
+}
+
 func (*PerXdsConfig_ListenerConfig) isPerXdsConfig_PerXdsConfig() {}
 
 func (*PerXdsConfig_ClusterConfig) isPerXdsConfig_PerXdsConfig() {}
@@ -252,6 +264,8 @@ func (*PerXdsConfig_ClusterConfig) isPerXdsConfig_PerXdsConfig() {}
 func (*PerXdsConfig_RouteConfig) isPerXdsConfig_PerXdsConfig() {}
 
 func (*PerXdsConfig_ScopedRouteConfig) isPerXdsConfig_PerXdsConfig() {}
+
+func (*PerXdsConfig_EndpointConfig) isPerXdsConfig_PerXdsConfig() {}
 
 type ClientConfig struct {
 	state         protoimpl.MessageState
@@ -385,7 +399,7 @@ var file_envoy_service_status_v3_csds_proto_rawDesc = []byte{
 	0x73, 0x3a, 0x32, 0x9a, 0xc5, 0x88, 0x1e, 0x2d, 0x0a, 0x2b, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e,
 	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x2e, 0x76,
 	0x32, 0x2e, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0xca, 0x03, 0x0a, 0x0c, 0x50, 0x65, 0x72, 0x58, 0x64, 0x73,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x9a, 0x04, 0x0a, 0x0c, 0x50, 0x65, 0x72, 0x58, 0x64, 0x73,
 	0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x3d, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x25, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73,
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x2e, 0x76, 0x33,
@@ -410,6 +424,11 @@ var file_envoy_service_status_v3_csds_proto_rawDesc = []byte{
 	0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x53, 0x63, 0x6f, 0x70, 0x65, 0x64, 0x52, 0x6f,
 	0x75, 0x74, 0x65, 0x73, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x44, 0x75, 0x6d, 0x70, 0x48, 0x00,
 	0x52, 0x11, 0x73, 0x63, 0x6f, 0x70, 0x65, 0x64, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x12, 0x4e, 0x0a, 0x0f, 0x65, 0x6e, 0x64, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x5f,
+	0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x65,
+	0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x45, 0x6e,
+	0x64, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x44, 0x75, 0x6d,
+	0x70, 0x48, 0x00, 0x52, 0x0e, 0x65, 0x6e, 0x64, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x43, 0x6f, 0x6e,
 	0x66, 0x69, 0x67, 0x3a, 0x2b, 0x9a, 0xc5, 0x88, 0x1e, 0x26, 0x0a, 0x24, 0x65, 0x6e, 0x76, 0x6f,
 	0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73,
 	0x2e, 0x76, 0x32, 0x2e, 0x50, 0x65, 0x72, 0x58, 0x64, 0x73, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
@@ -491,7 +510,8 @@ var file_envoy_service_status_v3_csds_proto_goTypes = []interface{}{
 	(*v31.ClustersConfigDump)(nil),     // 7: envoy.admin.v3.ClustersConfigDump
 	(*v31.RoutesConfigDump)(nil),       // 8: envoy.admin.v3.RoutesConfigDump
 	(*v31.ScopedRoutesConfigDump)(nil), // 9: envoy.admin.v3.ScopedRoutesConfigDump
-	(*v32.Node)(nil),                   // 10: envoy.config.core.v3.Node
+	(*v31.EndpointsConfigDump)(nil),    // 10: envoy.admin.v3.EndpointsConfigDump
+	(*v32.Node)(nil),                   // 11: envoy.config.core.v3.Node
 }
 var file_envoy_service_status_v3_csds_proto_depIdxs = []int32{
 	5,  // 0: envoy.service.status.v3.ClientStatusRequest.node_matchers:type_name -> envoy.type.matcher.v3.NodeMatcher
@@ -500,18 +520,19 @@ var file_envoy_service_status_v3_csds_proto_depIdxs = []int32{
 	7,  // 3: envoy.service.status.v3.PerXdsConfig.cluster_config:type_name -> envoy.admin.v3.ClustersConfigDump
 	8,  // 4: envoy.service.status.v3.PerXdsConfig.route_config:type_name -> envoy.admin.v3.RoutesConfigDump
 	9,  // 5: envoy.service.status.v3.PerXdsConfig.scoped_route_config:type_name -> envoy.admin.v3.ScopedRoutesConfigDump
-	10, // 6: envoy.service.status.v3.ClientConfig.node:type_name -> envoy.config.core.v3.Node
-	2,  // 7: envoy.service.status.v3.ClientConfig.xds_config:type_name -> envoy.service.status.v3.PerXdsConfig
-	3,  // 8: envoy.service.status.v3.ClientStatusResponse.config:type_name -> envoy.service.status.v3.ClientConfig
-	1,  // 9: envoy.service.status.v3.ClientStatusDiscoveryService.StreamClientStatus:input_type -> envoy.service.status.v3.ClientStatusRequest
-	1,  // 10: envoy.service.status.v3.ClientStatusDiscoveryService.FetchClientStatus:input_type -> envoy.service.status.v3.ClientStatusRequest
-	4,  // 11: envoy.service.status.v3.ClientStatusDiscoveryService.StreamClientStatus:output_type -> envoy.service.status.v3.ClientStatusResponse
-	4,  // 12: envoy.service.status.v3.ClientStatusDiscoveryService.FetchClientStatus:output_type -> envoy.service.status.v3.ClientStatusResponse
-	11, // [11:13] is the sub-list for method output_type
-	9,  // [9:11] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	10, // 6: envoy.service.status.v3.PerXdsConfig.endpoint_config:type_name -> envoy.admin.v3.EndpointsConfigDump
+	11, // 7: envoy.service.status.v3.ClientConfig.node:type_name -> envoy.config.core.v3.Node
+	2,  // 8: envoy.service.status.v3.ClientConfig.xds_config:type_name -> envoy.service.status.v3.PerXdsConfig
+	3,  // 9: envoy.service.status.v3.ClientStatusResponse.config:type_name -> envoy.service.status.v3.ClientConfig
+	1,  // 10: envoy.service.status.v3.ClientStatusDiscoveryService.StreamClientStatus:input_type -> envoy.service.status.v3.ClientStatusRequest
+	1,  // 11: envoy.service.status.v3.ClientStatusDiscoveryService.FetchClientStatus:input_type -> envoy.service.status.v3.ClientStatusRequest
+	4,  // 12: envoy.service.status.v3.ClientStatusDiscoveryService.StreamClientStatus:output_type -> envoy.service.status.v3.ClientStatusResponse
+	4,  // 13: envoy.service.status.v3.ClientStatusDiscoveryService.FetchClientStatus:output_type -> envoy.service.status.v3.ClientStatusResponse
+	12, // [12:14] is the sub-list for method output_type
+	10, // [10:12] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_envoy_service_status_v3_csds_proto_init() }
@@ -574,6 +595,7 @@ func file_envoy_service_status_v3_csds_proto_init() {
 		(*PerXdsConfig_ClusterConfig)(nil),
 		(*PerXdsConfig_RouteConfig)(nil),
 		(*PerXdsConfig_ScopedRouteConfig)(nil),
+		(*PerXdsConfig_EndpointConfig)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
