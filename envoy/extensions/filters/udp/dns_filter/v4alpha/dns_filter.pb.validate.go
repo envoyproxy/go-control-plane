@@ -259,13 +259,6 @@ func (m *DnsFilterConfig_ClientContextConfig) Validate() error {
 
 	}
 
-	if len(m.GetUpstreamResolvers()) < 1 {
-		return DnsFilterConfig_ClientContextConfigValidationError{
-			field:  "UpstreamResolvers",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
-
 	for idx, item := range m.GetUpstreamResolvers() {
 		_, _ = idx, item
 
