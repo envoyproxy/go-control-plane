@@ -81,15 +81,17 @@ integration.ads.v3: $(BINDIR)/test
 integration.xds: $(BINDIR)/test
 	env XDS=xds build/integration.sh
 
+integration.xds.v3: $(BINDIR)/test
+	env XDS=xds SUFFIX=v3 build/integration.sh
+
 integration.xds.delta: $(BINDIR)/test
 	env XDS=delta build/integration.sh
 
-integration.xds.v3: $(BINDIR)/test
-	env XDS=xds SUFFIX=v3 build/integration.sh
+integration.xds.delta.v3: $(BINDIR)/test
+	env XDS=delta SUFFIX=v3 build/integration.sh
 
 integration.rest: $(BINDIR)/test
 	env XDS=rest build/integration.sh
 
 integration.rest.v3: $(BINDIR)/test
 	env XDS=rest SUFFIX=v3 build/integration.sh
-

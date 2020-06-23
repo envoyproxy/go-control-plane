@@ -28,7 +28,6 @@ import (
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
@@ -65,8 +64,8 @@ type Callbacks interface {
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 
-	OnStreamDeltaRequest(int64, *v2.DeltaDiscoveryRequest) error
-	OnStreamDeltaResponse(int64, *v2.DeltaDiscoveryRequest, *v2.DeltaDiscoveryResponse)
+	OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error
+	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
 
 	// OnFetchRequest is called for each Fetch request. Returning an error will end processing of the
 	// request and respond with an error.
@@ -339,10 +338,10 @@ func (s *server) DeltaListeners(stream listenerservice.ListenerDiscoveryService_
 	return s.deltaHandler(stream, resource.ListenerType)
 }
 
-func (s *server) DeltaSecrets(stream discoverygrpc.SecretDiscoveryService_DeltaSecretsServer) error {
+func (s *server) DeltaSecrets(stream secretservice.SecretDiscoveryService_DeltaSecretsServer) error {
 	return s.deltaHandler(stream, resource.SecretType)
 }
 
-func (s *server) DeltaRuntime(stream discoverygrpc.RuntimeDiscoveryService_DeltaRuntimeServer) error {
+func (s *server) DeltaRuntime(stream runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
 	return s.deltaHandler(stream, resource.RuntimeType)
 }

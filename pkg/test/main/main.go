@@ -98,7 +98,7 @@ func main() {
 	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
 
 	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{log: zeroLogger})
-	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{log: zeroLogger})
+	configv3 := cachev3.NewSnapshotCache(mode == resourcev3.Ads, cachev3.IDHash{}, logger{log: zeroLogger})
 	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2, logger{log: zeroLogger})
 	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3, logger{log: zeroLogger})
 	alsv2 := &testv2.AccessLogService{}
@@ -165,12 +165,14 @@ func main() {
 			err := configv2.SetSnapshotDelta(nodeID, snapshotv2)
 			if err != nil {
 				log.Printf("delta snapshot error %q for %+v\n", err, snapshotv2)
+				os.Exit(1)
 			}
 
 			log.Printf("setting v3 delta snapshot")
 			err = configv3.SetSnapshotDelta(nodeID, snapshotv3)
 			if err != nil {
 				log.Printf("delta snapshot error %q for %+v\n", err, snapshotv3)
+				os.Exit(1)
 			}
 		} else {
 			log.Printf("setting v2 snapshot")

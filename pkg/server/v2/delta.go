@@ -20,7 +20,6 @@ import (
 	"sync/atomic"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
@@ -36,7 +35,7 @@ type deltaStream interface {
 	Recv() (*discovery.DeltaDiscoveryRequest, error)
 }
 
-func createDeltaResponse(resp cache.DeltaResponse, typeURL string) (*v2.DeltaDiscoveryResponse, error) {
+func createDeltaResponse(resp cache.DeltaResponse, typeURL string) (*discovery.DeltaDiscoveryResponse, error) {
 	if resp == nil {
 		return nil, errors.New("missing response")
 	}
@@ -51,7 +50,7 @@ func createDeltaResponse(resp cache.DeltaResponse, typeURL string) (*v2.DeltaDis
 
 func (s *server) deltaHandler(stream deltaStream, typeURL string) error {
 	// a channel for receiving incoming delta requests
-	reqCh := make(chan *v2.DeltaDiscoveryRequest)
+	reqCh := make(chan *discovery.DeltaDiscoveryRequest)
 	reqStop := int32(0)
 
 	go func() {

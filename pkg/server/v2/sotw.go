@@ -6,7 +6,6 @@ import (
 	"sync/atomic"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
@@ -18,8 +17,8 @@ import (
 type stream interface {
 	grpc.ServerStream
 
-	Send(*v2.DiscoveryResponse) error
-	Recv() (*v2.DiscoveryRequest, error)
+	Send(*discovery.DiscoveryResponse) error
+	Recv() (*discovery.DiscoveryRequest, error)
 }
 
 func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
