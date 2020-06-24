@@ -15,6 +15,12 @@
 package cache
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
+	"encoding/hex"
+	"math/rand"
+	"time"
+
 	"github.com/golang/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/api/v2"
@@ -46,6 +52,25 @@ func GetResponseType(typeURL string) types.ResponseType {
 		return types.Runtime
 	}
 	return types.UnknownType
+}
+
+// GetResponseTypeURL returns the type url for a valid enum
+func GetResponseTypeURL(responseType types.ResponseType) string {
+	switch responseType {
+	case types.Endpoint:
+		return resource.EndpointType
+	case types.Cluster:
+		return resource.ClusterType
+	case types.Route:
+		return resource.RouteType
+	case types.Listener:
+		return resource.ListenerType
+	case types.Secret:
+		return resource.SecretType
+	case types.Runtime:
+		return resource.RuntimeType
+	}
+	return resource.AnyType
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.
@@ -131,4 +156,40 @@ func GetResourceReferences(resources map[string]types.Resource) map[string]bool 
 		}
 	}
 	return out
+}
+
+// HashResources will take a list of resources and create a SHA256 hash sum out of the marshaled bytes
+func HashResources(resources []types.Resource) (string, error) {
+	var source []byte
+	hasher := sha256.New()
+
+	// Add our resources to the byte source for the hash
+	for _, resource := range resources {
+		b := proto.NewBuffer(nil)
+		b.SetDeterministic(true)
+		err := b.Marshal(resource)
+		if err != nil {
+			return "", err
+		}
+
+		source = append(source, b.Bytes()...)
+	}
+
+	// Use the bytes as our hashing source
+	hasher.Write(source)
+	return hex.EncodeToString(hasher.Sum(nil)), nil
+}
+
+// RandomHash will take a list of resources and create a SHA256 hash sum out of the marshaled bytes
+func RandomHash() string {
+	// Use current time in nanoseconds
+	source := rand.NewSource(time.Now().UnixNano())
+
+	b := make([]byte, 32)
+	binary.LittleEndian.PutUint64(b[0:], rand.New(source).Uint64())
+
+	hasher := sha256.New()
+	hasher.Write(b)
+
+	return hex.EncodeToString(hasher.Sum(nil))
 }

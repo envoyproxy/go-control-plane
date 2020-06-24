@@ -8,6 +8,9 @@
 # Eclipse artifacts
 /.project
 
+# VS Code artifacts
+.vscode
+
 # codecov.io test coverage
 /coverage.out
 
@@ -15,3 +18,5 @@
 *_gen_test.go
 
 /envoy*.log
+
+.DS_Store

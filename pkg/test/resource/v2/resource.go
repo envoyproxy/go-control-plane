@@ -57,6 +57,9 @@ const (
 
 	// Rest mode for resources: polling using Fetch
 	Rest = "rest"
+
+	// Delta mode for resources: individual delta xDS services (Envoy only supports CDS currently)
+	Delta = "delta"
 )
 
 var (
@@ -159,6 +162,18 @@ func configSource(mode string) *core.ConfigSource {
 				TransportApiVersion: resource.DefaultAPIVersion,
 				ClusterNames:        []string{XdsCluster},
 				RefreshDelay:        ptypes.DurationProto(RefreshDelay),
+			},
+		}
+	case Delta:
+		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &core.ApiConfigSource{
+				ApiType:                   core.ApiConfigSource_DELTA_GRPC,
+				SetNodeOnFirstMessageOnly: true,
+				GrpcServices: []*core.GrpcService{{
+					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+						EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
+					},
+				}},
 			},
 		}
 	}
@@ -292,7 +307,7 @@ func MakeRuntime(runtimeName string) *runtime.Runtime {
 
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
-	// Xds indicates snapshot mode: ads, xds, or rest
+	// Xds indicates snapshot mode: ads, xds, rest, or deleta
 	Xds string
 	// Version for the snapshot.
 	Version string
@@ -319,6 +334,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 	endpoints := make([]types.Resource, ts.NumClusters)
 	for i := 0; i < ts.NumClusters; i++ {
 		name := fmt.Sprintf("cluster-%s-%d", ts.Version, i)
+		fmt.Println(name)
 		clusters[i] = MakeCluster(ts.Xds, name)
 		endpoints[i] = MakeEndpoint(name, ts.UpstreamPort)
 	}
@@ -326,6 +342,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 	routes := make([]types.Resource, ts.NumHTTPListeners)
 	for i := 0; i < ts.NumHTTPListeners; i++ {
 		name := fmt.Sprintf("route-%s-%d", ts.Version, i)
+		fmt.Println(name)
 		routes[i] = MakeRoute(name, cache.GetResourceName(clusters[i%ts.NumClusters]))
 	}
 
@@ -375,6 +392,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 	runtimes := make([]types.Resource, ts.NumRuntimes)
 	for i := 0; i < ts.NumRuntimes; i++ {
 		name := fmt.Sprintf("runtime-%d", i)
+		fmt.Println(name)
 		runtimes[i] = MakeRuntime(name)
 	}
 

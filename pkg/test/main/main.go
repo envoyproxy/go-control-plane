@@ -34,6 +34,8 @@ import (
 	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
 	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
 
+	"github.com/rs/zerolog"
+
 	resourcev2 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 	resourcev3 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -61,6 +63,8 @@ var (
 	mux           bool
 
 	nodeID string
+
+	zeroLogger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
 )
 
 func init() {
@@ -201,7 +205,7 @@ func main() {
 	// start the xDS server
 	go test.RunAccessLogServer(ctx, alsv2, alsv3, alsPort)
 	go test.RunManagementServer(ctx, srv2, srv3, port)
-	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
+	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{log: zeroLogger})
 
 	log.Println("waiting for the first request...")
 	select {
@@ -211,6 +215,7 @@ func main() {
 		log.Println("timeout waiting for the first request")
 		os.Exit(1)
 	}
+
 	log.Printf("initial snapshot %+v\n", snapshotsv2)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
@@ -229,16 +234,36 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshotv3)
 		}
 
-		err := configv2.SetSnapshot(nodeID, snapshotv2)
-		if err != nil {
-			log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
-			os.Exit(1)
-		}
+		// Check to see if they want to run the delta integration tests
+		// if not run through the regular sotw xds
+		if mode == "delta" {
+			log.Printf("setting v2 delta snapshot")
+			err := configv2.SetSnapshotDelta(nodeID, snapshotv2)
+			if err != nil {
+				log.Printf("delta snapshot error %q for %+v\n", err, snapshotv2)
+				os.Exit(1)
+			}
 
-		err = configv3.SetSnapshot(nodeID, snapshotv3)
-		if err != nil {
-			log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
-			os.Exit(1)
+			log.Printf("setting v3 delta snapshot")
+			err = configv3.SetSnapshotDelta(nodeID, snapshotv3)
+			if err != nil {
+				log.Printf("delta snapshot error %q for %+v\n", err, snapshotv3)
+				os.Exit(1)
+			}
+		} else {
+			log.Printf("setting v2 snapshot")
+			err := configv2.SetSnapshot(nodeID, snapshotv2)
+			if err != nil {
+				log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
+				os.Exit(1)
+			}
+
+			log.Printf("setting v3 snapshot")
+			err = configv3.SetSnapshot(nodeID, snapshotv3)
+			if err != nil {
+				log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
+				os.Exit(1)
+			}
 		}
 		if mux {
 			for name, res := range snapshotv3.GetResources(typeURL) {
@@ -336,24 +361,26 @@ func callEcho() (int, int) {
 	}
 }
 
-type logger struct{}
+type logger struct {
+	log zerolog.Logger
+}
 
-func (logger logger) Debugf(format string, args ...interface{}) {
+func (l logger) Debugf(format string, args ...interface{}) {
 	if debug {
-		log.Printf(format+"\n", args...)
+		l.log.Debug().Msgf(format, args...)
 	}
 }
 
-func (logger logger) Infof(format string, args ...interface{}) {
+func (l logger) Infof(format string, args ...interface{}) {
 	if debug {
-		log.Printf(format+"\n", args...)
+		l.log.Info().Msgf(format, args...)
 	}
 }
 
-func (logger logger) Warnf(format string, args ...interface{}) {
-	log.Printf(format+"\n", args...)
+func (l logger) Warnf(format string, args ...interface{}) {
+	l.log.Warn().Msgf(format, args...)
 }
 
-func (logger logger) Errorf(format string, args ...interface{}) {
-	log.Printf(format+"\n", args...)
+func (l logger) Errorf(format string, args ...interface{}) {
+	l.log.Error().Msgf(format, args...)
 }
