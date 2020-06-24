@@ -149,7 +149,7 @@ type PerXdsConfig struct {
 	//	*PerXdsConfig_RouteConfig
 	//	*PerXdsConfig_ScopedRouteConfig
 	//	*PerXdsConfig_EndpointConfig
-	PerXdsConfig isPerXdsConfig_PerXdsConfig `protobuf_oneof:"per_xds_config"`
+	PerXdsConfig IsPerXdsConfig_PerXdsConfig `protobuf_oneof:"per_xds_config"`
 }
 
 func (x *PerXdsConfig) Reset() {
@@ -191,7 +191,7 @@ func (x *PerXdsConfig) GetStatus() ConfigStatus {
 	return ConfigStatus_UNKNOWN
 }
 
-func (m *PerXdsConfig) GetPerXdsConfig() isPerXdsConfig_PerXdsConfig {
+func (m *PerXdsConfig) GetPerXdsConfig() IsPerXdsConfig_PerXdsConfig {
 	if m != nil {
 		return m.PerXdsConfig
 	}
@@ -233,7 +233,7 @@ func (x *PerXdsConfig) GetEndpointConfig() *v31.EndpointsConfigDump {
 	return nil
 }
 
-type isPerXdsConfig_PerXdsConfig interface {
+type IsPerXdsConfig_PerXdsConfig interface {
 	isPerXdsConfig_PerXdsConfig()
 }
 
