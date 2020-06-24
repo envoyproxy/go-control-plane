@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"log"
 	"strconv"
 	"sync/atomic"
 
@@ -187,6 +188,7 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 				if values.clusterCancel != nil {
 					values.clusterCancel()
 				}
+				log.Println(nonce)
 				values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
 			case req.TypeUrl == resource.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
 				if values.routeCancel != nil {

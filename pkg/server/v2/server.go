@@ -19,6 +19,7 @@ package server
 
 import (
 	"context"
+	"sync"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -31,6 +32,7 @@ import (
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
@@ -153,12 +155,23 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 
 // NewServer creates handlers from a config watcher and callbacks.
 func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks, log log.Logger) Server {
-	return &server{cache: config, callbacks: callbacks, ctx: ctx, log: log}
+	return &server{
+		cache:         config,
+		callbacks:     callbacks,
+		deltaVersions: make(map[string]string, types.UnknownType),
+		deltaLock:     &sync.RWMutex{},
+		ctx:           ctx,
+		log:           log,
+	}
 }
 
 type server struct {
 	cache     cache.Cache
 	callbacks Callbacks
+
+	// [resourceTypeURL]currentVersion
+	deltaLock     *sync.RWMutex
+	deltaVersions map[string]string
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -176,13 +189,6 @@ type watches struct {
 	secrets   chan cache.Response
 	runtimes  chan cache.Response
 
-	deltaEndpoints chan cache.DeltaResponse
-	deltaClusters  chan cache.DeltaResponse
-	deltaRoutes    chan cache.DeltaResponse
-	deltaListeners chan cache.DeltaResponse
-	deltaSecrets   chan cache.DeltaResponse
-	deltaRuntimes  chan cache.DeltaResponse
-
 	endpointCancel func()
 	clusterCancel  func()
 	routeCancel    func()
@@ -197,9 +203,26 @@ type watches struct {
 	secretNonce   string
 	runtimeNonce  string
 
-	deltaClusterCancel func()
+	deltaEndpoints chan cache.DeltaResponse
+	deltaClusters  chan cache.DeltaResponse
+	deltaRoutes    chan cache.DeltaResponse
+	deltaListeners chan cache.DeltaResponse
+	deltaSecrets   chan cache.DeltaResponse
+	deltaRuntimes  chan cache.DeltaResponse
 
-	deltaClusterNonce string
+	deltaEndpointCancel func()
+	deltaClusterCancel  func()
+	deltaRouteCancel    func()
+	deltaListenerCancel func()
+	deltaSecretCancel   func()
+	deltaRuntimeCancel  func()
+
+	deltaEndpointNonce string
+	deltaClusterNonce  string
+	deltaRouteNonce    string
+	deltaListenerNonce string
+	deltaSecretNonce   string
+	deltaRuntimeNonce  string
 }
 
 // Cancel all watches
@@ -220,6 +243,25 @@ func (values watches) Cancel() {
 		values.secretCancel()
 	}
 	if values.runtimeCancel != nil {
+		values.runtimeCancel()
+	}
+
+	if values.deltaEndpointCancel != nil {
+		values.endpointCancel()
+	}
+	if values.deltaClusterCancel != nil {
+		values.clusterCancel()
+	}
+	if values.deltaRouteCancel != nil {
+		values.routeCancel()
+	}
+	if values.deltaListenerCancel != nil {
+		values.listenerCancel()
+	}
+	if values.deltaSecretCancel != nil {
+		values.secretCancel()
+	}
+	if values.deltaRuntimeCancel != nil {
 		values.runtimeCancel()
 	}
 }

@@ -17,3 +17,5 @@
 /envoy*.log
 
 .DS_Store
+
+.vscode

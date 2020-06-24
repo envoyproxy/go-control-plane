@@ -132,13 +132,27 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.endpointNonce = nonce
+			// set state version info
+			s.deltaLock.Lock()
+			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
+			if err != nil {
+				return err
+			}
+			values.deltaEndpointNonce = nonce
 
 		case resp, more := <-values.deltaClusters:
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
 			nonce, err := send(resp, resource.ClusterType)
+			if err != nil {
+				return err
+			}
+			// set state version info
+			s.deltaLock.Lock()
+			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -152,7 +166,14 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.routeNonce = nonce
+			// set state version info
+			s.deltaLock.Lock()
+			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
+			if err != nil {
+				return err
+			}
+			values.deltaRouteNonce = nonce
 
 		case resp, more := <-values.deltaListeners:
 			if !more {
@@ -162,7 +183,14 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.listenerNonce = nonce
+			// set state version info
+			s.deltaLock.Lock()
+			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
+			if err != nil {
+				return err
+			}
+			values.deltaListenerNonce = nonce
 
 		case resp, more := <-values.deltaSecrets:
 			if !more {
@@ -172,7 +200,14 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.secretNonce = nonce
+			// set state version info
+			s.deltaLock.Lock()
+			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
+			if err != nil {
+				return err
+			}
+			values.deltaSecretNonce = nonce
 
 		case resp, more := <-values.deltaRuntimes:
 			if !more {
@@ -182,7 +217,14 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.runtimeNonce = nonce
+			// set state version info
+			s.deltaLock.Lock()
+			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
+			if err != nil {
+				return err
+			}
+			values.deltaRuntimeNonce = nonce
 
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -227,38 +269,48 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 
 			// cancel existing watches to (re-)request a newer version
 			switch {
-			case req.TypeUrl == resource.EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
-				if values.endpointCancel != nil {
-					values.endpointCancel()
+			case req.TypeUrl == resource.EndpointType && (values.deltaEndpointNonce == "" || values.deltaEndpointNonce == nonce):
+				if values.deltaEndpointCancel != nil {
+					values.deltaEndpointCancel()
 				}
-
-				values.deltaEndpoints, values.endpointCancel = s.cache.CreateDeltaWatch(*req, nonce)
-			case req.TypeUrl == resource.ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
-				if values.clusterCancel != nil {
-					values.clusterCancel()
+				s.deltaLock.RLock()
+				values.deltaEndpoints, values.deltaEndpointCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
+				s.deltaLock.RUnlock()
+			case req.TypeUrl == resource.ClusterType && (values.deltaClusterNonce == "" || values.deltaClusterNonce == nonce):
+				if values.deltaClusterCancel != nil {
+					values.deltaClusterCancel()
 				}
-
-				values.deltaClusters, values.clusterCancel = s.cache.CreateDeltaWatch(*req, nonce)
-			case req.TypeUrl == resource.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
-				if values.routeCancel != nil {
-					values.routeCancel()
+				s.deltaLock.RLock()
+				values.deltaClusters, values.deltaClusterCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
+				s.deltaLock.RUnlock()
+			case req.TypeUrl == resource.RouteType && (values.deltaRouteNonce == "" || values.deltaRouteNonce == nonce):
+				if values.deltaRouteCancel != nil {
+					values.deltaRouteCancel()
 				}
-				values.deltaRoutes, values.routeCancel = s.cache.CreateDeltaWatch(*req, nonce)
-			case req.TypeUrl == resource.ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
-				if values.listenerCancel != nil {
-					values.listenerCancel()
+				s.deltaLock.RLock()
+				values.deltaRoutes, values.deltaRouteCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
+				s.deltaLock.RUnlock()
+			case req.TypeUrl == resource.ListenerType && (values.deltaListenerNonce == "" || values.deltaListenerNonce == nonce):
+				if values.deltaListenerCancel != nil {
+					values.deltaListenerCancel()
 				}
-				values.deltaListeners, values.listenerCancel = s.cache.CreateDeltaWatch(*req, nonce)
-			case req.TypeUrl == resource.SecretType && (values.secretNonce == "" || values.secretNonce == nonce):
-				if values.secretCancel != nil {
-					values.secretCancel()
+				s.deltaLock.RLock()
+				values.deltaListeners, values.deltaListenerCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
+				s.deltaLock.RUnlock()
+			case req.TypeUrl == resource.SecretType && (values.deltaSecretNonce == "" || values.deltaSecretNonce == nonce):
+				if values.deltaSecretCancel != nil {
+					values.deltaSecretCancel()
 				}
-				values.deltaSecrets, values.secretCancel = s.cache.CreateDeltaWatch(*req, nonce)
-			case req.TypeUrl == resource.RuntimeType && (values.runtimeNonce == "" || values.runtimeNonce == nonce):
-				if values.runtimeCancel != nil {
-					values.runtimeCancel()
+				s.deltaLock.RLock()
+				values.deltaSecrets, values.deltaSecretCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
+				s.deltaLock.RUnlock()
+			case req.TypeUrl == resource.RuntimeType && (values.deltaRuntimeNonce == "" || values.deltaRuntimeNonce == nonce):
+				if values.deltaRuntimeCancel != nil {
+					values.deltaRuntimeCancel()
 				}
-				values.deltaRuntimes, values.runtimeCancel = s.cache.CreateDeltaWatch(*req, nonce)
+				s.deltaLock.RLock()
+				values.deltaRuntimes, values.deltaRuntimeCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
+				s.deltaLock.RUnlock()
 			}
 		}
 	}

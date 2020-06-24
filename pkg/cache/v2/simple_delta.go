@@ -82,13 +82,35 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 
 				if len(subscribed) == 0 {
 					cache.log.Debugf("wildcard request")
+
+					// we should set our delta state here somehow
+					// Maybe set the resources for all the types here???
+					for i := 0; i < int(types.UnknownType); i++ {
+						tURL := GetResponseTypeURL(types.ResponseType(i))
+						info.deltaState[tURL] = Resources{
+							Version: version,
+							Items:   snapshot.GetResources(tURL),
+						}
+					}
+
+					cache.respondDelta(
+						watch.Request,
+						watch.Response,
+						info.deltaState[t].Items,
+						version,
+					)
+
+					delete(info.deltaWatches, id)
+
+					info.mu.Unlock()
+					return nil
 				}
 
 				// Assume we've received a new resource and we want to send new resources and cancel old watches
 				diff := cache.checkState(subscribed, info.deltaState[t].Items)
 				if len(diff) > 0 {
 					if cache.log != nil {
-						cache.log.Debugf("node: %s, found new items to subscribe too: %v ", watch.Request.GetNode().GetId(), diff)
+						cache.log.Debugf("node: %s, found new items to subscribe too: %v ", node, diff)
 					}
 
 					// Add our new subscription items to our state to watch that we've found
