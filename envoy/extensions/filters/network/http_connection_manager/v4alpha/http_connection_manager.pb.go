@@ -993,6 +993,7 @@ type HttpFilter struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to ConfigType:
 	//	*HttpFilter_TypedConfig
+	//	*HttpFilter_FilterConfigDs
 	ConfigType isHttpFilter_ConfigType `protobuf_oneof:"config_type"`
 }
 
@@ -1049,6 +1050,13 @@ func (x *HttpFilter) GetTypedConfig() *any.Any {
 	return nil
 }
 
+func (x *HttpFilter) GetFilterConfigDs() *HttpFilter_HttpFilterConfigSource {
+	if x, ok := x.GetConfigType().(*HttpFilter_FilterConfigDs); ok {
+		return x.FilterConfigDs
+	}
+	return nil
+}
+
 type isHttpFilter_ConfigType interface {
 	isHttpFilter_ConfigType()
 }
@@ -1057,7 +1065,13 @@ type HttpFilter_TypedConfig struct {
 	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
+type HttpFilter_FilterConfigDs struct {
+	FilterConfigDs *HttpFilter_HttpFilterConfigSource `protobuf:"bytes,5,opt,name=filter_config_ds,json=filterConfigDs,proto3,oneof"`
+}
+
 func (*HttpFilter_TypedConfig) isHttpFilter_ConfigType() {}
+
+func (*HttpFilter_FilterConfigDs) isHttpFilter_ConfigType() {}
 
 type RequestIDExtension struct {
 	state         protoimpl.MessageState
@@ -1655,6 +1669,69 @@ func (x *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvEle
 		return x.Key
 	}
 	return ""
+}
+
+type HttpFilter_HttpFilterConfigSource struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ConfigSource                     *v4alpha.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
+	DefaultConfig                    *any.Any              `protobuf:"bytes,2,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
+	ApplyDefaultConfigWithoutWarming bool                  `protobuf:"varint,3,opt,name=apply_default_config_without_warming,json=applyDefaultConfigWithoutWarming,proto3" json:"apply_default_config_without_warming,omitempty"`
+}
+
+func (x *HttpFilter_HttpFilterConfigSource) Reset() {
+	*x = HttpFilter_HttpFilterConfigSource{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HttpFilter_HttpFilterConfigSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HttpFilter_HttpFilterConfigSource) ProtoMessage() {}
+
+func (x *HttpFilter_HttpFilterConfigSource) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HttpFilter_HttpFilterConfigSource.ProtoReflect.Descriptor instead.
+func (*HttpFilter_HttpFilterConfigSource) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_rawDescGZIP(), []int{7, 0}
+}
+
+func (x *HttpFilter_HttpFilterConfigSource) GetConfigSource() *v4alpha.ConfigSource {
+	if x != nil {
+		return x.ConfigSource
+	}
+	return nil
+}
+
+func (x *HttpFilter_HttpFilterConfigSource) GetDefaultConfig() *any.Any {
+	if x != nil {
+		return x.DefaultConfig
+	}
+	return nil
+}
+
+func (x *HttpFilter_HttpFilterConfigSource) GetApplyDefaultConfigWithoutWarming() bool {
+	if x != nil {
+		return x.ApplyDefaultConfigWithoutWarming
+	}
+	return false
 }
 
 var File_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto protoreflect.FileDescriptor
@@ -2258,39 +2335,70 @@ var file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_c
 	0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e,
 	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x5f, 0x63, 0x6f, 0x6e,
 	0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2e,
-	0x76, 0x33, 0x2e, 0x53, 0x63, 0x6f, 0x70, 0x65, 0x64, 0x52, 0x64, 0x73, 0x22, 0xd6, 0x01, 0x0a,
+	0x76, 0x33, 0x2e, 0x53, 0x63, 0x6f, 0x70, 0x65, 0x64, 0x52, 0x64, 0x73, 0x22, 0xc4, 0x05, 0x0a,
 	0x0a, 0x48, 0x74, 0x74, 0x70, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x1b, 0x0a, 0x04, 0x6e,
 	0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x07, 0xfa, 0x42, 0x04, 0x72, 0x02,
 	0x20, 0x01, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x39, 0x0a, 0x0c, 0x74, 0x79, 0x70, 0x65,
 	0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14,
 	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
 	0x2e, 0x41, 0x6e, 0x79, 0x48, 0x00, 0x52, 0x0b, 0x74, 0x79, 0x70, 0x65, 0x64, 0x43, 0x6f, 0x6e,
-	0x66, 0x69, 0x67, 0x3a, 0x4d, 0x9a, 0xc5, 0x88, 0x1e, 0x48, 0x0a, 0x46, 0x65, 0x6e, 0x76, 0x6f,
+	0x66, 0x69, 0x67, 0x12, 0x8f, 0x01, 0x0a, 0x10, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x5f, 0x63,
+	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x64, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x63,
+	0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e,
+	0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
+	0x6b, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f,
+	0x6e, 0x5f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2e, 0x76, 0x34, 0x61, 0x6c, 0x70, 0x68,
+	0x61, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x2e, 0x48, 0x74, 0x74,
+	0x70, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x53, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x48, 0x00, 0x52, 0x0e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x44, 0x73, 0x1a, 0xd9, 0x02, 0x0a, 0x16, 0x48, 0x74, 0x74, 0x70, 0x46, 0x69,
+	0x6c, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x12, 0x4c, 0x0a, 0x0d, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e,
+	0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x34, 0x61, 0x6c,
+	0x70, 0x68, 0x61, 0x2e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x52, 0x0c, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x3b,
+	0x0a, 0x0e, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x41, 0x6e, 0x79, 0x52, 0x0d, 0x64, 0x65,
+	0x66, 0x61, 0x75, 0x6c, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x4e, 0x0a, 0x24, 0x61,
+	0x70, 0x70, 0x6c, 0x79, 0x5f, 0x64, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x5f, 0x63, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x5f, 0x77, 0x69, 0x74, 0x68, 0x6f, 0x75, 0x74, 0x5f, 0x77, 0x61, 0x72, 0x6d,
+	0x69, 0x6e, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x20, 0x61, 0x70, 0x70, 0x6c, 0x79,
+	0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x57, 0x69, 0x74,
+	0x68, 0x6f, 0x75, 0x74, 0x57, 0x61, 0x72, 0x6d, 0x69, 0x6e, 0x67, 0x3a, 0x64, 0x9a, 0xc5, 0x88,
+	0x1e, 0x5f, 0x0a, 0x5d, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73,
+	0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x2e,
+	0x48, 0x74, 0x74, 0x70, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x46,
+	0x69, 0x6c, 0x74, 0x65, 0x72, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x53, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x3a, 0x4d, 0x9a, 0xc5, 0x88, 0x1e, 0x48, 0x0a, 0x46, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e,
+	0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65,
+	0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x5f,
+	0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x61, 0x6e, 0x61, 0x67,
+	0x65, 0x72, 0x2e, 0x76, 0x33, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72,
+	0x42, 0x0d, 0x0a, 0x0b, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x4a,
+	0x04, 0x08, 0x03, 0x10, 0x04, 0x4a, 0x04, 0x08, 0x02, 0x10, 0x03, 0x52, 0x06, 0x63, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x22, 0xa4, 0x01, 0x0a, 0x12, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x49,
+	0x44, 0x45, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x37, 0x0a, 0x0c, 0x74, 0x79,
+	0x70, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x14, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2e, 0x41, 0x6e, 0x79, 0x52, 0x0b, 0x74, 0x79, 0x70, 0x65, 0x64, 0x43, 0x6f, 0x6e,
+	0x66, 0x69, 0x67, 0x3a, 0x55, 0x9a, 0xc5, 0x88, 0x1e, 0x50, 0x0a, 0x4e, 0x65, 0x6e, 0x76, 0x6f,
 	0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c,
 	0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x68, 0x74, 0x74,
 	0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x61, 0x6e,
-	0x61, 0x67, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x46, 0x69, 0x6c, 0x74,
-	0x65, 0x72, 0x42, 0x0d, 0x0a, 0x0b, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x74, 0x79, 0x70,
-	0x65, 0x4a, 0x04, 0x08, 0x03, 0x10, 0x04, 0x4a, 0x04, 0x08, 0x02, 0x10, 0x03, 0x52, 0x06, 0x63,
-	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x22, 0xa4, 0x01, 0x0a, 0x12, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x49, 0x44, 0x45, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x37, 0x0a, 0x0c,
-	0x74, 0x79, 0x70, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x14, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x41, 0x6e, 0x79, 0x52, 0x0b, 0x74, 0x79, 0x70, 0x65, 0x64, 0x43,
-	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x3a, 0x55, 0x9a, 0xc5, 0x88, 0x1e, 0x50, 0x0a, 0x4e, 0x65, 0x6e,
-	0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66,
-	0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x68,
-	0x74, 0x74, 0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d,
-	0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x49, 0x44, 0x45, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x76, 0x0a, 0x4e,
-	0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e,
-	0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66,
-	0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x68,
-	0x74, 0x74, 0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d,
-	0x61, 0x6e, 0x61, 0x67, 0x65, 0x72, 0x2e, 0x76, 0x34, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x42, 0x1a,
-	0x48, 0x74, 0x74, 0x70, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x61,
-	0x6e, 0x61, 0x67, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1,
-	0x06, 0x02, 0x10, 0x03, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x67, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x49,
+	0x44, 0x45, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x76, 0x0a, 0x4e, 0x69, 0x6f,
+	0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f,
+	0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c,
+	0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x68, 0x74, 0x74,
+	0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x6d, 0x61, 0x6e,
+	0x61, 0x67, 0x65, 0x72, 0x2e, 0x76, 0x34, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x42, 0x1a, 0x48, 0x74,
+	0x74, 0x70, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4d, 0x61, 0x6e, 0x61,
+	0x67, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02,
+	0x10, 0x03, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2306,7 +2414,7 @@ func file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_
 }
 
 var file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_goTypes = []interface{}{
 	(HttpConnectionManager_CodecType)(0),                                                // 0: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.CodecType
 	(HttpConnectionManager_ServerHeaderTransformation)(0),                               // 1: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.ServerHeaderTransformation
@@ -2329,83 +2437,87 @@ var file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_c
 	(*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder)(nil),                                // 18: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder
 	(*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor)(nil),           // 19: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor
 	(*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElement)(nil), // 20: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor.KvElement
-	(*v4alpha2.RouteConfiguration)(nil),                                                 // 21: envoy.config.route.v4alpha.RouteConfiguration
-	(*wrappers.BoolValue)(nil),                                                          // 22: google.protobuf.BoolValue
-	(*v4alpha.HttpProtocolOptions)(nil),                                                 // 23: envoy.config.core.v4alpha.HttpProtocolOptions
-	(*v4alpha.Http1ProtocolOptions)(nil),                                                // 24: envoy.config.core.v4alpha.Http1ProtocolOptions
-	(*v4alpha.Http2ProtocolOptions)(nil),                                                // 25: envoy.config.core.v4alpha.Http2ProtocolOptions
-	(*wrappers.UInt32Value)(nil),                                                        // 26: google.protobuf.UInt32Value
-	(*duration.Duration)(nil),                                                           // 27: google.protobuf.Duration
-	(*v4alpha1.AccessLog)(nil),                                                          // 28: envoy.config.accesslog.v4alpha.AccessLog
-	(*v4alpha.SubstitutionFormatString)(nil),                                            // 29: envoy.config.core.v4alpha.SubstitutionFormatString
-	(*v4alpha1.AccessLogFilter)(nil),                                                    // 30: envoy.config.accesslog.v4alpha.AccessLogFilter
-	(*v4alpha.DataSource)(nil),                                                          // 31: envoy.config.core.v4alpha.DataSource
-	(*v4alpha.ConfigSource)(nil),                                                        // 32: envoy.config.core.v4alpha.ConfigSource
-	(*v4alpha2.ScopedRouteConfiguration)(nil),                                           // 33: envoy.config.route.v4alpha.ScopedRouteConfiguration
-	(*any.Any)(nil),                                                                     // 34: google.protobuf.Any
-	(*v3.Percent)(nil),                                                                  // 35: envoy.type.v3.Percent
-	(*v31.CustomTag)(nil),                                                               // 36: envoy.type.tracing.v3.CustomTag
-	(*v4alpha3.Tracing_Http)(nil),                                                       // 37: envoy.config.trace.v4alpha.Tracing.Http
+	(*HttpFilter_HttpFilterConfigSource)(nil),                                           // 21: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter.HttpFilterConfigSource
+	(*v4alpha2.RouteConfiguration)(nil),                                                 // 22: envoy.config.route.v4alpha.RouteConfiguration
+	(*wrappers.BoolValue)(nil),                                                          // 23: google.protobuf.BoolValue
+	(*v4alpha.HttpProtocolOptions)(nil),                                                 // 24: envoy.config.core.v4alpha.HttpProtocolOptions
+	(*v4alpha.Http1ProtocolOptions)(nil),                                                // 25: envoy.config.core.v4alpha.Http1ProtocolOptions
+	(*v4alpha.Http2ProtocolOptions)(nil),                                                // 26: envoy.config.core.v4alpha.Http2ProtocolOptions
+	(*wrappers.UInt32Value)(nil),                                                        // 27: google.protobuf.UInt32Value
+	(*duration.Duration)(nil),                                                           // 28: google.protobuf.Duration
+	(*v4alpha1.AccessLog)(nil),                                                          // 29: envoy.config.accesslog.v4alpha.AccessLog
+	(*v4alpha.SubstitutionFormatString)(nil),                                            // 30: envoy.config.core.v4alpha.SubstitutionFormatString
+	(*v4alpha1.AccessLogFilter)(nil),                                                    // 31: envoy.config.accesslog.v4alpha.AccessLogFilter
+	(*v4alpha.DataSource)(nil),                                                          // 32: envoy.config.core.v4alpha.DataSource
+	(*v4alpha.ConfigSource)(nil),                                                        // 33: envoy.config.core.v4alpha.ConfigSource
+	(*v4alpha2.ScopedRouteConfiguration)(nil),                                           // 34: envoy.config.route.v4alpha.ScopedRouteConfiguration
+	(*any.Any)(nil),                                                                     // 35: google.protobuf.Any
+	(*v3.Percent)(nil),                                                                  // 36: envoy.type.v3.Percent
+	(*v31.CustomTag)(nil),                                                               // 37: envoy.type.tracing.v3.CustomTag
+	(*v4alpha3.Tracing_Http)(nil),                                                       // 38: envoy.config.trace.v4alpha.Tracing.Http
 }
 var file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_depIdxs = []int32{
 	0,  // 0: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.codec_type:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.CodecType
 	7,  // 1: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.rds:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.Rds
-	21, // 2: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.route_config:type_name -> envoy.config.route.v4alpha.RouteConfiguration
+	22, // 2: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.route_config:type_name -> envoy.config.route.v4alpha.RouteConfiguration
 	9,  // 3: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.scoped_routes:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes
 	11, // 4: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.http_filters:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter
-	22, // 5: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.add_user_agent:type_name -> google.protobuf.BoolValue
+	23, // 5: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.add_user_agent:type_name -> google.protobuf.BoolValue
 	13, // 6: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.tracing:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing
-	23, // 7: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.common_http_protocol_options:type_name -> envoy.config.core.v4alpha.HttpProtocolOptions
-	24, // 8: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.http_protocol_options:type_name -> envoy.config.core.v4alpha.Http1ProtocolOptions
-	25, // 9: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.http2_protocol_options:type_name -> envoy.config.core.v4alpha.Http2ProtocolOptions
+	24, // 7: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.common_http_protocol_options:type_name -> envoy.config.core.v4alpha.HttpProtocolOptions
+	25, // 8: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.http_protocol_options:type_name -> envoy.config.core.v4alpha.Http1ProtocolOptions
+	26, // 9: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.http2_protocol_options:type_name -> envoy.config.core.v4alpha.Http2ProtocolOptions
 	1,  // 10: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.server_header_transformation:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.ServerHeaderTransformation
-	26, // 11: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.max_request_headers_kb:type_name -> google.protobuf.UInt32Value
-	27, // 12: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.stream_idle_timeout:type_name -> google.protobuf.Duration
-	27, // 13: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.request_timeout:type_name -> google.protobuf.Duration
-	27, // 14: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.drain_timeout:type_name -> google.protobuf.Duration
-	27, // 15: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.delayed_close_timeout:type_name -> google.protobuf.Duration
-	28, // 16: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.access_log:type_name -> envoy.config.accesslog.v4alpha.AccessLog
-	22, // 17: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.use_remote_address:type_name -> google.protobuf.BoolValue
+	27, // 11: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.max_request_headers_kb:type_name -> google.protobuf.UInt32Value
+	28, // 12: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.stream_idle_timeout:type_name -> google.protobuf.Duration
+	28, // 13: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.request_timeout:type_name -> google.protobuf.Duration
+	28, // 14: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.drain_timeout:type_name -> google.protobuf.Duration
+	28, // 15: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.delayed_close_timeout:type_name -> google.protobuf.Duration
+	29, // 16: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.access_log:type_name -> envoy.config.accesslog.v4alpha.AccessLog
+	23, // 17: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.use_remote_address:type_name -> google.protobuf.BoolValue
 	14, // 18: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.internal_address_config:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.InternalAddressConfig
-	22, // 19: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.generate_request_id:type_name -> google.protobuf.BoolValue
+	23, // 19: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.generate_request_id:type_name -> google.protobuf.BoolValue
 	2,  // 20: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.forward_client_cert_details:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.ForwardClientCertDetails
 	15, // 21: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.set_current_client_cert_details:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.SetCurrentClientCertDetails
 	16, // 22: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.upgrade_configs:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.UpgradeConfig
-	22, // 23: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.normalize_path:type_name -> google.protobuf.BoolValue
+	23, // 23: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.normalize_path:type_name -> google.protobuf.BoolValue
 	12, // 24: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.request_id_extension:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.RequestIDExtension
 	5,  // 25: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.local_reply_config:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.LocalReplyConfig
 	6,  // 26: envoy.extensions.filters.network.http_connection_manager.v4alpha.LocalReplyConfig.mappers:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper
-	29, // 27: envoy.extensions.filters.network.http_connection_manager.v4alpha.LocalReplyConfig.body_format:type_name -> envoy.config.core.v4alpha.SubstitutionFormatString
-	30, // 28: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.filter:type_name -> envoy.config.accesslog.v4alpha.AccessLogFilter
-	26, // 29: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.status_code:type_name -> google.protobuf.UInt32Value
-	31, // 30: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.body:type_name -> envoy.config.core.v4alpha.DataSource
-	29, // 31: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.body_format_override:type_name -> envoy.config.core.v4alpha.SubstitutionFormatString
-	32, // 32: envoy.extensions.filters.network.http_connection_manager.v4alpha.Rds.config_source:type_name -> envoy.config.core.v4alpha.ConfigSource
-	33, // 33: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRouteConfigurationsList.scoped_route_configurations:type_name -> envoy.config.route.v4alpha.ScopedRouteConfiguration
+	30, // 27: envoy.extensions.filters.network.http_connection_manager.v4alpha.LocalReplyConfig.body_format:type_name -> envoy.config.core.v4alpha.SubstitutionFormatString
+	31, // 28: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.filter:type_name -> envoy.config.accesslog.v4alpha.AccessLogFilter
+	27, // 29: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.status_code:type_name -> google.protobuf.UInt32Value
+	32, // 30: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.body:type_name -> envoy.config.core.v4alpha.DataSource
+	30, // 31: envoy.extensions.filters.network.http_connection_manager.v4alpha.ResponseMapper.body_format_override:type_name -> envoy.config.core.v4alpha.SubstitutionFormatString
+	33, // 32: envoy.extensions.filters.network.http_connection_manager.v4alpha.Rds.config_source:type_name -> envoy.config.core.v4alpha.ConfigSource
+	34, // 33: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRouteConfigurationsList.scoped_route_configurations:type_name -> envoy.config.route.v4alpha.ScopedRouteConfiguration
 	17, // 34: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.scope_key_builder:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder
-	32, // 35: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.rds_config_source:type_name -> envoy.config.core.v4alpha.ConfigSource
+	33, // 35: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.rds_config_source:type_name -> envoy.config.core.v4alpha.ConfigSource
 	8,  // 36: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.scoped_route_configurations_list:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRouteConfigurationsList
 	10, // 37: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.scoped_rds:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRds
-	32, // 38: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRds.scoped_rds_config_source:type_name -> envoy.config.core.v4alpha.ConfigSource
-	34, // 39: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter.typed_config:type_name -> google.protobuf.Any
-	34, // 40: envoy.extensions.filters.network.http_connection_manager.v4alpha.RequestIDExtension.typed_config:type_name -> google.protobuf.Any
-	35, // 41: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.client_sampling:type_name -> envoy.type.v3.Percent
-	35, // 42: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.random_sampling:type_name -> envoy.type.v3.Percent
-	35, // 43: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.overall_sampling:type_name -> envoy.type.v3.Percent
-	26, // 44: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.max_path_tag_length:type_name -> google.protobuf.UInt32Value
-	36, // 45: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.custom_tags:type_name -> envoy.type.tracing.v3.CustomTag
-	37, // 46: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.provider:type_name -> envoy.config.trace.v4alpha.Tracing.Http
-	22, // 47: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.SetCurrentClientCertDetails.subject:type_name -> google.protobuf.BoolValue
-	11, // 48: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.UpgradeConfig.filters:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter
-	22, // 49: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.UpgradeConfig.enabled:type_name -> google.protobuf.BoolValue
-	18, // 50: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.fragments:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder
-	19, // 51: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.header_value_extractor:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor
-	20, // 52: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor.element:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor.KvElement
-	53, // [53:53] is the sub-list for method output_type
-	53, // [53:53] is the sub-list for method input_type
-	53, // [53:53] is the sub-list for extension type_name
-	53, // [53:53] is the sub-list for extension extendee
-	0,  // [0:53] is the sub-list for field type_name
+	33, // 38: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRds.scoped_rds_config_source:type_name -> envoy.config.core.v4alpha.ConfigSource
+	35, // 39: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter.typed_config:type_name -> google.protobuf.Any
+	21, // 40: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter.filter_config_ds:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter.HttpFilterConfigSource
+	35, // 41: envoy.extensions.filters.network.http_connection_manager.v4alpha.RequestIDExtension.typed_config:type_name -> google.protobuf.Any
+	36, // 42: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.client_sampling:type_name -> envoy.type.v3.Percent
+	36, // 43: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.random_sampling:type_name -> envoy.type.v3.Percent
+	36, // 44: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.overall_sampling:type_name -> envoy.type.v3.Percent
+	27, // 45: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.max_path_tag_length:type_name -> google.protobuf.UInt32Value
+	37, // 46: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.custom_tags:type_name -> envoy.type.tracing.v3.CustomTag
+	38, // 47: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.provider:type_name -> envoy.config.trace.v4alpha.Tracing.Http
+	23, // 48: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.SetCurrentClientCertDetails.subject:type_name -> google.protobuf.BoolValue
+	11, // 49: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.UpgradeConfig.filters:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter
+	23, // 50: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.UpgradeConfig.enabled:type_name -> google.protobuf.BoolValue
+	18, // 51: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.fragments:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder
+	19, // 52: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.header_value_extractor:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor
+	20, // 53: envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor.element:type_name -> envoy.extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor.KvElement
+	33, // 54: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter.HttpFilterConfigSource.config_source:type_name -> envoy.config.core.v4alpha.ConfigSource
+	35, // 55: envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpFilter.HttpFilterConfigSource.default_config:type_name -> google.protobuf.Any
+	56, // [56:56] is the sub-list for method output_type
+	56, // [56:56] is the sub-list for method input_type
+	56, // [56:56] is the sub-list for extension type_name
+	56, // [56:56] is the sub-list for extension extendee
+	0,  // [0:56] is the sub-list for field type_name
 }
 
 func init() {
@@ -2620,6 +2732,18 @@ func file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_
 				return nil
 			}
 		}
+		file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HttpFilter_HttpFilterConfigSource); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*HttpConnectionManager_Rds)(nil),
@@ -2632,6 +2756,7 @@ func file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_
 	}
 	file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes[7].OneofWrappers = []interface{}{
 		(*HttpFilter_TypedConfig)(nil),
+		(*HttpFilter_FilterConfigDs)(nil),
 	}
 	file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_msgTypes[14].OneofWrappers = []interface{}{
 		(*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_)(nil),
@@ -2646,7 +2771,7 @@ func file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_rawDesc,
 			NumEnums:      4,
-			NumMessages:   17,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -1053,6 +1053,18 @@ func (m *HttpFilter) Validate() error {
 			}
 		}
 
+	case *HttpFilter_FilterConfigDs:
+
+		if v, ok := interface{}(m.GetFilterConfigDs()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpFilterValidationError{
+					field:  "FilterConfigDs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *HttpFilter_HiddenEnvoyDeprecatedConfig:
 
 		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
@@ -1980,3 +1992,93 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElementValidationError{}
+
+// Validate checks the field values on HttpFilter_HttpFilterConfigSource with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *HttpFilter_HttpFilterConfigSource) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetConfigSource()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpFilter_HttpFilterConfigSourceValidationError{
+				field:  "ConfigSource",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetDefaultConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpFilter_HttpFilterConfigSourceValidationError{
+				field:  "DefaultConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ApplyDefaultConfigWithoutWarming
+
+	return nil
+}
+
+// HttpFilter_HttpFilterConfigSourceValidationError is the validation error
+// returned by HttpFilter_HttpFilterConfigSource.Validate if the designated
+// constraints aren't met.
+type HttpFilter_HttpFilterConfigSourceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpFilter_HttpFilterConfigSourceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpFilter_HttpFilterConfigSourceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HttpFilter_HttpFilterConfigSourceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpFilter_HttpFilterConfigSourceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpFilter_HttpFilterConfigSourceValidationError) ErrorName() string {
+	return "HttpFilter_HttpFilterConfigSourceValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpFilter_HttpFilterConfigSourceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpFilter_HttpFilterConfigSource.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpFilter_HttpFilterConfigSourceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpFilter_HttpFilterConfigSourceValidationError{}
