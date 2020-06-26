@@ -18,77 +18,81 @@ package wellknown
 // HTTP filter names
 const (
 	// Buffer HTTP filter
-	Buffer = "envoy.buffer"
+	Buffer = "envoy.filters.http.buffer"
 	// CORS HTTP filter
 	CORS = "envoy.filters.http.cors"
 	// Dynamo HTTP filter
 	Dynamo = "envoy.http_dynamo_filter"
 	// Fault HTTP filter
-	Fault = "envoy.fault"
+	Fault = "envoy.filters.http.fault"
 	// GRPCHTTP1Bridge HTTP filter
 	GRPCHTTP1Bridge = "envoy.grpc_http1_bridge"
 	// GRPCJSONTranscoder HTTP filter
 	GRPCJSONTranscoder = "envoy.grpc_json_transcoder"
 	// GRPCWeb HTTP filter
-	GRPCWeb = "envoy.grpc_web"
+	GRPCWeb = "envoy.filters.http.grpc_web"
 	// Gzip HTTP filter
-	Gzip = "envoy.gzip"
+	Gzip = "envoy.filters.http.gzip"
 	// IPTagging HTTP filter
-	IPTagging = "envoy.ip_tagging"
+	IPTagging = "envoy.filters.http.ip_tagging"
 	// HTTPRateLimit filter
 	HTTPRateLimit = "envoy.rate_limit"
 	// Router HTTP filter
-	Router = "envoy.router"
+	Router = "envoy.filters.http.router"
 	// Health checking HTTP filter
-	HealthCheck = "envoy.health_check"
+	HealthCheck = "envoy.filters.http.health_check"
 	// Lua HTTP filter
-	Lua = "envoy.lua"
+	Lua = "envoy.filters.http.lua"
 	// Squash HTTP filter
-	Squash = "envoy.squash"
+	Squash = "envoy.filters.http.squash"
 	// HTTPExternalAuthorization HTTP filter
 	HTTPExternalAuthorization = "envoy.filters.http.ext_authz"
 	// HTTPRoleBasedAccessControl HTTP filter
 	HTTPRoleBasedAccessControl = "envoy.filters.http.rbac"
 	// HTTPGRPCStats HTTP filter
 	HTTPGRPCStats = "envoy.filters.http.grpc_stats"
+	// Tap HTTP Filter
+	HTTPTap = "envoy.filters.http.tap"
 )
 
 // Network filter names
 const (
 	// ClientSSLAuth network filter
-	ClientSSLAuth = "envoy.client_ssl_auth"
+	ClientSSLAuth = "envoy.filters.network.client_ssl_auth"
 	// Echo network filter
-	Echo = "envoy.echo"
+	Echo = "envoy.filters.network.echo"
 	// HTTPConnectionManager network filter
 	HTTPConnectionManager = "envoy.http_connection_manager"
 	// TCPProxy network filter
-	TCPProxy = "envoy.tcp_proxy"
+	TCPProxy = "envoy.filters.network.tcp_proxy"
 	// RateLimit network filter
-	RateLimit = "envoy.ratelimit"
+	RateLimit = "envoy.filters.network.ratelimit"
 	// MongoProxy network filter
-	MongoProxy = "envoy.mongo_proxy"
+	MongoProxy = "envoy.filters.network.mongo_proxy"
 	// ThriftProxy network filter
 	ThriftProxy = "envoy.filters.network.thrift_proxy"
 	// RedisProxy network filter
-	RedisProxy = "envoy.redis_proxy"
+	RedisProxy = "envoy.filters.network.redis_proxy"
 	// MySQLProxy network filter
 	MySQLProxy = "envoy.filters.network.mysql_proxy"
 	// ExternalAuthorization network filter
 	ExternalAuthorization = "envoy.filters.network.ext_authz"
 	// RoleBasedAccessControl network filter
 	RoleBasedAccessControl = "envoy.filters.network.rbac"
+	// SNI Cluster network filter
+	SniCluster = "envoy.filters.network.sni_cluster"
 )
 
 // Listener filter names
 const (
 	// OriginalDestination listener filter
-	OriginalDestination = "envoy.listener.original_dst"
+	OriginalDestination = "envoy.filters.listener.original_dst"
 	// ProxyProtocol listener filter
-	ProxyProtocol = "envoy.listener.proxy_protocol"
+	ProxyProtocol = "envoy.filters.listener.proxy_protocol"
 	// TlsInspector listener filter
-	TlsInspector = "envoy.listener.tls_inspector"
+	TlsInspector = "envoy.filters.listener.tls_inspector"
 	// HttpInspector listener filter
-	HttpInspector = "envoy.listener.http_inspector"
+	HttpInspector = "envoy.filters.listener.http_inspector"
 )
 
 // Tracing provider names
@@ -116,7 +120,9 @@ const (
 	// FileAccessLog sink name
 	FileAccessLog = "envoy.file_access_log"
 	// HTTPGRPCAccessLog sink for the HTTP gRPC access log service
-	HTTPGRPCAccessLog = "envoy.http_grpc_access_log"
+	HTTPGRPCAccessLog = "envoy.access_loggers.http_grpc"
+	// TCPGRPCAccessLog sing for the HTTP gRPC access log service
+	TCPGRPCAccessLog = "envoy.access_loggers.tcp_grpc"
 )
 
 // Transport socket names
