@@ -4298,6 +4298,18 @@ func (m *RateLimit_Action) Validate() error {
 			}
 		}
 
+	case *RateLimit_Action_DynamicMetadata:
+
+		if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimit_ActionValidationError{
+					field:  "DynamicMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return RateLimit_ActionValidationError{
 			field:  "ActionSpecifier",
@@ -4841,3 +4853,95 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimit_Action_HeaderValueMatchValidationError{}
+
+// Validate checks the field values on RateLimit_Action_DynamicMetaData with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *RateLimit_Action_DynamicMetaData) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetDescriptorKey()) < 1 {
+		return RateLimit_Action_DynamicMetaDataValidationError{
+			field:  "DescriptorKey",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if m.GetMetadataKey() == nil {
+		return RateLimit_Action_DynamicMetaDataValidationError{
+			field:  "MetadataKey",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimit_Action_DynamicMetaDataValidationError{
+				field:  "MetadataKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RateLimit_Action_DynamicMetaDataValidationError is the validation error
+// returned by RateLimit_Action_DynamicMetaData.Validate if the designated
+// constraints aren't met.
+type RateLimit_Action_DynamicMetaDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimit_Action_DynamicMetaDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimit_Action_DynamicMetaDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimit_Action_DynamicMetaDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimit_Action_DynamicMetaDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimit_Action_DynamicMetaDataValidationError) ErrorName() string {
+	return "RateLimit_Action_DynamicMetaDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimit_Action_DynamicMetaDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimit_Action_DynamicMetaData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimit_Action_DynamicMetaDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimit_Action_DynamicMetaDataValidationError{}
