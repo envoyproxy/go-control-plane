@@ -2284,6 +2284,16 @@ func (m *RateLimit) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetLimit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitValidationError{
+				field:  "Limit",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -4375,6 +4385,95 @@ var _ interface {
 	ErrorName() string
 } = RateLimit_ActionValidationError{}
 
+// Validate checks the field values on RateLimit_Override with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RateLimit_Override) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.OverrideSpecifier.(type) {
+
+	case *RateLimit_Override_DynamicMetadata_:
+
+		if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimit_OverrideValidationError{
+					field:  "DynamicMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		return RateLimit_OverrideValidationError{
+			field:  "OverrideSpecifier",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// RateLimit_OverrideValidationError is the validation error returned by
+// RateLimit_Override.Validate if the designated constraints aren't met.
+type RateLimit_OverrideValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimit_OverrideValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimit_OverrideValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimit_OverrideValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimit_OverrideValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimit_OverrideValidationError) ErrorName() string {
+	return "RateLimit_OverrideValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimit_OverrideValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimit_Override.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimit_OverrideValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimit_OverrideValidationError{}
+
 // Validate checks the field values on RateLimit_Action_SourceCluster with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -4945,3 +5044,88 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimit_Action_DynamicMetaDataValidationError{}
+
+// Validate checks the field values on RateLimit_Override_DynamicMetadata with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *RateLimit_Override_DynamicMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetMetadataKey() == nil {
+		return RateLimit_Override_DynamicMetadataValidationError{
+			field:  "MetadataKey",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimit_Override_DynamicMetadataValidationError{
+				field:  "MetadataKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RateLimit_Override_DynamicMetadataValidationError is the validation error
+// returned by RateLimit_Override_DynamicMetadata.Validate if the designated
+// constraints aren't met.
+type RateLimit_Override_DynamicMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimit_Override_DynamicMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimit_Override_DynamicMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimit_Override_DynamicMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimit_Override_DynamicMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimit_Override_DynamicMetadataValidationError) ErrorName() string {
+	return "RateLimit_Override_DynamicMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimit_Override_DynamicMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimit_Override_DynamicMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimit_Override_DynamicMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimit_Override_DynamicMetadataValidationError{}
