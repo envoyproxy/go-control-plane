@@ -17,6 +17,7 @@ const (
 	ListenerType  = apiTypePrefix + "envoy.config.listener.v3.Listener"
 	SecretType    = apiTypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
 	RuntimeType   = apiTypePrefix + "envoy.service.runtime.v3.Runtime"
+	ExtensionType = apiTypePrefix + "envoy.config.core.v3.TypedExtensionConfig"
 
 	// AnyType is used only by ADS
 	AnyType = ""

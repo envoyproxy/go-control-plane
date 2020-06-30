@@ -31,6 +31,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
+	extensionservice "github.com/envoyproxy/go-control-plane/envoy/service/filter/v3"
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
@@ -48,6 +49,7 @@ type Server interface {
 	discoverygrpc.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
 	runtimeservice.RuntimeDiscoveryServiceServer
+	extensionservice.FilterConfigDiscoveryServiceServer
 
 	// Fetch is the universal fetch method.
 	Fetch(context.Context, *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error)
@@ -156,26 +158,29 @@ type stream interface {
 
 // watches for all xDS resource types
 type watches struct {
-	endpoints chan cache.Response
-	clusters  chan cache.Response
-	routes    chan cache.Response
-	listeners chan cache.Response
-	secrets   chan cache.Response
-	runtimes  chan cache.Response
+	endpoints  chan cache.Response
+	clusters   chan cache.Response
+	routes     chan cache.Response
+	listeners  chan cache.Response
+	secrets    chan cache.Response
+	runtimes   chan cache.Response
+	extensions chan cache.Response
 
-	endpointCancel func()
-	clusterCancel  func()
-	routeCancel    func()
-	listenerCancel func()
-	secretCancel   func()
-	runtimeCancel  func()
+	endpointCancel  func()
+	clusterCancel   func()
+	routeCancel     func()
+	listenerCancel  func()
+	secretCancel    func()
+	runtimeCancel   func()
+	extensionCancel func()
 
-	endpointNonce string
-	clusterNonce  string
-	routeNonce    string
-	listenerNonce string
-	secretNonce   string
-	runtimeNonce  string
+	endpointNonce  string
+	clusterNonce   string
+	routeNonce     string
+	listenerNonce  string
+	secretNonce    string
+	runtimeNonce   string
+	extensionNonce string
 }
 
 // Cancel all watches
@@ -197,6 +202,9 @@ func (values watches) Cancel() {
 	}
 	if values.runtimeCancel != nil {
 		values.runtimeCancel()
+	}
+	if values.extensionCancel != nil {
+		values.extensionCancel()
 	}
 }
 
@@ -321,6 +329,16 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 			}
 			values.runtimeNonce = nonce
 
+		case resp, more := <-values.extensions:
+			if !more {
+				return status.Errorf(codes.Unavailable, "extensions watch failed")
+			}
+			nonce, err := send(resp, resource.ExtensionType)
+			if err != nil {
+				return err
+			}
+			values.extensionNonce = nonce
+
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -387,6 +405,11 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 					values.runtimeCancel()
 				}
 				values.runtimes, values.runtimeCancel = s.cache.CreateWatch(*req)
+			case req.TypeUrl == resource.ExtensionType && (values.extensionNonce == "" || values.extensionNonce == nonce):
+				if values.extensionCancel != nil {
+					values.extensionCancel()
+				}
+				values.extensions, values.extensionCancel = s.cache.CreateWatch(*req)
 			}
 		}
 	}
@@ -446,6 +469,10 @@ func (s *server) StreamSecrets(stream secretservice.SecretDiscoveryService_Strea
 
 func (s *server) StreamRuntime(stream runtimeservice.RuntimeDiscoveryService_StreamRuntimeServer) error {
 	return s.handler(stream, resource.RuntimeType)
+}
+
+func (s *server) StreamFilterConfigs(stream extensionservice.FilterConfigDiscoveryService_StreamFilterConfigsServer) error {
+	return s.handler(stream, resource.ExtensionType)
 }
 
 // Fetch is the universal fetch method.
@@ -514,6 +541,14 @@ func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryReque
 	return s.Fetch(ctx, req)
 }
 
+func (s *server) FetchFilterConfigs(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.Unavailable, "empty request")
+	}
+	req.TypeUrl = resource.ExtensionType
+	return s.Fetch(ctx, req)
+}
+
 func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return errors.New("not implemented")
 }
@@ -539,5 +574,9 @@ func (s *server) DeltaSecrets(_ secretservice.SecretDiscoveryService_DeltaSecret
 }
 
 func (s *server) DeltaRuntime(_ runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
+	return errors.New("not implemented")
+}
+
+func (s *server) DeltaFilterConfigs(_ extensionservice.FilterConfigDiscoveryService_DeltaFilterConfigsServer) error {
 	return errors.New("not implemented")
 }

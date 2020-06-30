@@ -16,6 +16,7 @@
 package cache
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -33,6 +34,7 @@ type IDHash struct{}
 
 // ID uses the node ID field
 func (IDHash) ID(node *core.Node) string {
+	log.Printf("node %s", node.Id)
 	if node == nil {
 		return ""
 	}

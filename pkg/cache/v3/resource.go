@@ -19,6 +19,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
@@ -45,6 +46,8 @@ func GetResponseType(typeURL string) types.ResponseType {
 		return types.Secret
 	case resource.RuntimeType:
 		return types.Runtime
+	case resource.ExtensionType:
+		return types.Extension
 	}
 	return types.UnknownType
 }
@@ -63,6 +66,8 @@ func GetResourceName(res types.Resource) string {
 	case *auth.Secret:
 		return v.GetName()
 	case *runtime.Runtime:
+		return v.GetName()
+	case *core.TypedExtensionConfig:
 		return v.GetName()
 	default:
 		return ""

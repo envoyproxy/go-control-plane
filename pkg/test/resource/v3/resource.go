@@ -31,9 +31,11 @@ import (
 	endpointv2 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	listenerv2 "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
+	rbacrule "github.com/envoyproxy/go-control-plane/envoy/config/rbac/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	routev2 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	als "github.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/grpc/v3"
+	rbac "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/rbac/v3"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 	tcp "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/tcp_proxy/v3"
 	auth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
@@ -387,6 +389,27 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		listeners,
 		runtimes,
 	)
+
+	pbst, err := ptypes.MarshalAny(&rbac.RBAC{
+		ShadowRules: &rbacrule.RBAC{
+			Action: rbacrule.RBAC_DENY,
+			Policies: map[string]*rbacrule.Policy{
+				"test": &rbacrule.Policy{
+					Permissions: []*rbacrule.Permission{{Rule: &rbacrule.Permission_Any{Any: true}}},
+					Principals:  []*rbacrule.Principal{{Identifier: &rbacrule.Principal_Any{Any: true}}},
+				},
+			},
+		}})
+	if err != nil {
+		panic(err)
+	}
+
+	configs := make([]types.Resource, 1)
+	configs[0] = &core.TypedExtensionConfig{
+		Name:        "filter-config",
+		TypedConfig: pbst,
+	}
+	out.Resources[types.Extension] = cache.NewResources(ts.Version, configs)
 
 	if ts.TLS {
 		out.Resources[types.Secret] = cache.NewResources(ts.Version, MakeSecrets(tlsName, rootName))
