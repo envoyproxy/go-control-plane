@@ -121,6 +121,16 @@ func (m *SdsSecretConfig) Validate() error {
 
 	// no validation rules for Name
 
+	if v, ok := interface{}(m.GetSdsResourceLocator()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SdsSecretConfigValidationError{
+				field:  "SdsResourceLocator",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetSdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SdsSecretConfigValidationError{

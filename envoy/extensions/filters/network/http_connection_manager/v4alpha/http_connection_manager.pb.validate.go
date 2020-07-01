@@ -640,11 +640,23 @@ func (m *Rds) Validate() error {
 		}
 	}
 
-	if len(m.GetRouteConfigName()) < 1 {
-		return RdsValidationError{
-			field:  "RouteConfigName",
-			reason: "value length must be at least 1 bytes",
+	switch m.NameSpecifier.(type) {
+
+	case *Rds_RouteConfigName:
+		// no validation rules for RouteConfigName
+
+	case *Rds_RdsResourceLocator:
+
+		if v, ok := interface{}(m.GetRdsResourceLocator()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RdsValidationError{
+					field:  "RdsResourceLocator",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
 		}
+
 	}
 
 	return nil

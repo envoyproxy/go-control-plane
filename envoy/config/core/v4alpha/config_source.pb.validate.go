@@ -408,6 +408,21 @@ func (m *ConfigSource) Validate() error {
 		return nil
 	}
 
+	for idx, item := range m.GetAuthorities() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ConfigSourceValidationError{
+					field:  fmt.Sprintf("Authorities[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetInitialFetchTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ConfigSourceValidationError{
