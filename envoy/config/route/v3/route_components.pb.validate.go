@@ -3458,6 +3458,16 @@ func (m *RouteAction_HashPolicy_Header) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetRegexRewrite()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_HashPolicy_HeaderValidationError{
+				field:  "RegexRewrite",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
