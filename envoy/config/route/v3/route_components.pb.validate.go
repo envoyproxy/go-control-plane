@@ -541,6 +541,25 @@ func (m *Route) Validate() error {
 
 	}
 
+	for idx, item := range m.GetResponseHeadersToRemove() {
+		_, _ = idx, item
+
+		if len(item) < 1 {
+			return RouteValidationError{
+				field:  fmt.Sprintf("ResponseHeadersToRemove[%v]", idx),
+				reason: "value length must be at least 1 bytes",
+			}
+		}
+
+		if !_Route_ResponseHeadersToRemove_Pattern.MatchString(item) {
+			return RouteValidationError{
+				field:  fmt.Sprintf("ResponseHeadersToRemove[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetTracing()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteValidationError{
@@ -694,6 +713,8 @@ var _ interface {
 } = RouteValidationError{}
 
 var _Route_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _Route_ResponseHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on WeightedCluster with the rules defined
 // in the proto definition for this message. If any rules are violated, an

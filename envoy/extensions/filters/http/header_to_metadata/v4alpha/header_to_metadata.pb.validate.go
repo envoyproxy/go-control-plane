@@ -147,7 +147,12 @@ func (m *Config_KeyValuePair) Validate() error {
 		}
 	}
 
-	// no validation rules for Type
+	if _, ok := Config_ValueType_name[int32(m.GetType())]; !ok {
+		return Config_KeyValuePairValidationError{
+			field:  "Type",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	// no validation rules for Encode
 
