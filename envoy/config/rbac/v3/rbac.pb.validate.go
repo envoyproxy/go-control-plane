@@ -180,6 +180,16 @@ func (m *Policy) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetCheckedCondition()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PolicyValidationError{
+				field:  "CheckedCondition",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

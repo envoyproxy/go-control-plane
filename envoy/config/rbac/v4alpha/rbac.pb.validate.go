@@ -170,14 +170,32 @@ func (m *Policy) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetCondition()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return PolicyValidationError{
-				field:  "Condition",
-				reason: "embedded message failed validation",
-				cause:  err,
+	switch m.ExpressionSpecifier.(type) {
+
+	case *Policy_Condition:
+
+		if v, ok := interface{}(m.GetCondition()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PolicyValidationError{
+					field:  "Condition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
+	case *Policy_CheckedCondition:
+
+		if v, ok := interface{}(m.GetCheckedCondition()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PolicyValidationError{
+					field:  "CheckedCondition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
