@@ -247,6 +247,30 @@ func (m *MatchPredicate) Validate() error {
 			}
 		}
 
+	case *MatchPredicate_HttpRequestGenericBodyMatch:
+
+		if v, ok := interface{}(m.GetHttpRequestGenericBodyMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MatchPredicateValidationError{
+					field:  "HttpRequestGenericBodyMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *MatchPredicate_HttpResponseGenericBodyMatch:
+
+		if v, ok := interface{}(m.GetHttpResponseGenericBodyMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MatchPredicateValidationError{
+					field:  "HttpResponseGenericBodyMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return MatchPredicateValidationError{
 			field:  "Rule",
@@ -391,6 +415,97 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HttpHeadersMatchValidationError{}
+
+// Validate checks the field values on HttpGenericBodyMatch with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HttpGenericBodyMatch) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for BytesLimit
+
+	if len(m.GetPatterns()) < 1 {
+		return HttpGenericBodyMatchValidationError{
+			field:  "Patterns",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetPatterns() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpGenericBodyMatchValidationError{
+					field:  fmt.Sprintf("Patterns[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// HttpGenericBodyMatchValidationError is the validation error returned by
+// HttpGenericBodyMatch.Validate if the designated constraints aren't met.
+type HttpGenericBodyMatchValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpGenericBodyMatchValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpGenericBodyMatchValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HttpGenericBodyMatchValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpGenericBodyMatchValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpGenericBodyMatchValidationError) ErrorName() string {
+	return "HttpGenericBodyMatchValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpGenericBodyMatchValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpGenericBodyMatch.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpGenericBodyMatchValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpGenericBodyMatchValidationError{}
 
 // Validate checks the field values on OutputConfig with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
@@ -931,3 +1046,87 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MatchPredicate_MatchSetValidationError{}
+
+// Validate checks the field values on HttpGenericBodyMatch_GenericTextMatch
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *HttpGenericBodyMatch_GenericTextMatch) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Rule.(type) {
+
+	case *HttpGenericBodyMatch_GenericTextMatch_StringMatch:
+		// no validation rules for StringMatch
+
+	case *HttpGenericBodyMatch_GenericTextMatch_BinaryMatch:
+		// no validation rules for BinaryMatch
+
+	default:
+		return HttpGenericBodyMatch_GenericTextMatchValidationError{
+			field:  "Rule",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// HttpGenericBodyMatch_GenericTextMatchValidationError is the validation error
+// returned by HttpGenericBodyMatch_GenericTextMatch.Validate if the
+// designated constraints aren't met.
+type HttpGenericBodyMatch_GenericTextMatchValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpGenericBodyMatch_GenericTextMatchValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpGenericBodyMatch_GenericTextMatchValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HttpGenericBodyMatch_GenericTextMatchValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpGenericBodyMatch_GenericTextMatchValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpGenericBodyMatch_GenericTextMatchValidationError) ErrorName() string {
+	return "HttpGenericBodyMatch_GenericTextMatchValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpGenericBodyMatch_GenericTextMatchValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpGenericBodyMatch_GenericTextMatch.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpGenericBodyMatch_GenericTextMatchValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpGenericBodyMatch_GenericTextMatchValidationError{}
