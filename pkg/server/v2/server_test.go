@@ -131,6 +131,8 @@ const (
 	clusterName  = "cluster0"
 	routeName    = "route0"
 	listenerName = "listener0"
+	secretName   = "secret0"
+	runtimeName  = "runtime0"
 )
 
 var (
@@ -138,15 +140,22 @@ var (
 		Id:      "test-id",
 		Cluster: "test-cluster",
 	}
-	endpoint  = resource.MakeEndpoint(clusterName, 8080)
-	cluster   = resource.MakeCluster(resource.Ads, clusterName)
-	route     = resource.MakeRoute(routeName, clusterName)
-	listener  = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	testTypes = []string{
+	endpoint   = resource.MakeEndpoint(clusterName, 8080)
+	cluster    = resource.MakeCluster(resource.Ads, clusterName)
+	route      = resource.MakeRoute(routeName, clusterName)
+	listener   = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	secret     = resource.MakeSecrets(secretName, "test")[0]
+	runtime    = resource.MakeRuntime(runtimeName)
+	opaque     = &core.Address{}
+	opaqueType = "unknown-type"
+	testTypes  = []string{
 		rsrc.EndpointType,
 		rsrc.ClusterType,
 		rsrc.RouteType,
 		rsrc.ListenerType,
+		rsrc.SecretType,
+		rsrc.RuntimeType,
+		opaqueType,
 	}
 )
 
@@ -171,6 +180,22 @@ func makeResponses() map[string][]cache.RawResponse {
 			Version:   "4",
 			Resources: []types.Resource{listener},
 			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
+		}},
+		rsrc.SecretType: {{
+			Version:   "5",
+			Resources: []types.Resource{secret},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
+		}},
+		rsrc.RuntimeType: {{
+			Version:   "6",
+			Resources: []types.Resource{runtime},
+			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
+		}},
+		// Pass-through type (xDS does not exist for this type)
+		opaqueType: {{
+			Version:   "7",
+			Resources: []types.Resource{opaque},
+			Request:   discovery.DiscoveryRequest{TypeUrl: opaqueType},
 		}},
 	}
 }
@@ -198,6 +223,12 @@ func TestServerShutdown(t *testing.T) {
 					err = s.StreamRoutes(resp)
 				case rsrc.ListenerType:
 					err = s.StreamListeners(resp)
+				case rsrc.SecretType:
+					err = s.StreamSecrets(resp)
+				case rsrc.RuntimeType:
+					err = s.StreamRuntime(resp)
+				case opaqueType:
+					err = s.StreamAggregatedResources(resp)
 				}
 				if err != nil {
 					t.Errorf("Stream() => got %v, want no error", err)
@@ -239,6 +270,12 @@ func TestResponseHandlers(t *testing.T) {
 					err = s.StreamRoutes(resp)
 				case rsrc.ListenerType:
 					err = s.StreamListeners(resp)
+				case rsrc.SecretType:
+					err = s.StreamSecrets(resp)
+				case rsrc.RuntimeType:
+					err = s.StreamRuntime(resp)
+				case opaqueType:
+					err = s.StreamAggregatedResources(resp)
 				}
 				if err != nil {
 					t.Errorf("Stream() => got %v, want no error", err)
@@ -299,6 +336,12 @@ func TestFetch(t *testing.T) {
 	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for listeners: %v", err)
 	}
+	if out, err := s.FetchSecrets(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for listeners: %v", err)
+	}
+	if out, err := s.FetchRuntime(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for listeners: %v", err)
+	}
 
 	// try again and expect empty results
 	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
@@ -327,6 +370,12 @@ func TestFetch(t *testing.T) {
 	if out, err := s.FetchListeners(context.Background(), nil); out != nil {
 		t.Errorf("expected empty on empty request: %v", err)
 	}
+	if out, err := s.FetchSecrets(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchRuntime(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
 
 	// send error from callback
 	callbackError = true
@@ -344,10 +393,10 @@ func TestFetch(t *testing.T) {
 	}
 
 	// verify fetch callbacks
-	if want := 8; requestCount != want {
+	if want := 10; requestCount != want {
 		t.Errorf("unexpected number of fetch requests: got %d, want %d", requestCount, want)
 	}
-	if want := 4; responseCount != want {
+	if want := 6; responseCount != want {
 		t.Errorf("unexpected number of fetch responses: got %d, want %d", responseCount, want)
 	}
 }
@@ -457,17 +506,15 @@ func TestAggregatedHandlers(t *testing.T) {
 		Node:    node,
 		TypeUrl: rsrc.ListenerType,
 	}
+	// Delta compress node
 	resp.recv <- &discovery.DiscoveryRequest{
-		Node:    node,
 		TypeUrl: rsrc.ClusterType,
 	}
 	resp.recv <- &discovery.DiscoveryRequest{
-		Node:          node,
 		TypeUrl:       rsrc.EndpointType,
 		ResourceNames: []string{clusterName},
 	}
 	resp.recv <- &discovery.DiscoveryRequest{
-		Node:          node,
 		TypeUrl:       rsrc.RouteType,
 		ResourceNames: []string{routeName},
 	}

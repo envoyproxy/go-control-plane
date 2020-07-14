@@ -176,10 +176,25 @@ type watches struct {
 	listenerNonce string
 	secretNonce   string
 	runtimeNonce  string
+
+	// Opaque resources share a muxed channel. Nonces and watch cancellations are indexed by type URL.
+	responses            chan cache.Response
+	cancellations        map[string]func()
+	nonces               map[string]string
+	stopResponseRoutines chan struct{}
+}
+
+// Initialize all watches
+func (values *watches) Init() {
+	// muxed channel needs a buffer to release go-routines populating it
+	values.responses = make(chan cache.Response, 5)
+	values.cancellations = make(map[string]func())
+	values.nonces = make(map[string]string)
+	values.stopResponseRoutines = make(chan struct{})
 }
 
 // Cancel all watches
-func (values watches) Cancel() {
+func (values *watches) Cancel() {
 	if values.endpointCancel != nil {
 		values.endpointCancel()
 	}
@@ -198,6 +213,10 @@ func (values watches) Cancel() {
 	if values.runtimeCancel != nil {
 		values.runtimeCancel()
 	}
+	for _, cancel := range values.cancellations {
+		cancel()
+	}
+	close(values.stopResponseRoutines)
 }
 
 func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
@@ -222,8 +241,9 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
 
-	// a collection of watches per request type
+	// a collection of stack allocated watches per request type
 	var values watches
+	values.Init()
 	defer func() {
 		values.Cancel()
 		if s.callbacks != nil {
@@ -321,6 +341,17 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 			}
 			values.runtimeNonce = nonce
 
+		case resp, more := <-values.responses:
+			if !more {
+				return status.Errorf(codes.Unavailable, "resource watch failed")
+			}
+			typeUrl := resp.GetRequest().TypeUrl
+			nonce, err := send(resp, typeUrl)
+			if err != nil {
+				return err
+			}
+			values.nonces[typeUrl] = nonce
+
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -357,36 +388,72 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 
 			// cancel existing watches to (re-)request a newer version
 			switch {
-			case req.TypeUrl == resource.EndpointType && (values.endpointNonce == "" || values.endpointNonce == nonce):
-				if values.endpointCancel != nil {
-					values.endpointCancel()
+			case req.TypeUrl == resource.EndpointType:
+				if values.endpointNonce == "" || values.endpointNonce == nonce {
+					if values.endpointCancel != nil {
+						values.endpointCancel()
+					}
+					values.endpoints, values.endpointCancel = s.cache.CreateWatch(*req)
 				}
-				values.endpoints, values.endpointCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.ClusterType && (values.clusterNonce == "" || values.clusterNonce == nonce):
-				if values.clusterCancel != nil {
-					values.clusterCancel()
+			case req.TypeUrl == resource.ClusterType:
+				if values.clusterNonce == "" || values.clusterNonce == nonce {
+					if values.clusterCancel != nil {
+						values.clusterCancel()
+					}
+					values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
 				}
-				values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.RouteType && (values.routeNonce == "" || values.routeNonce == nonce):
-				if values.routeCancel != nil {
-					values.routeCancel()
+			case req.TypeUrl == resource.RouteType:
+				if values.routeNonce == "" || values.routeNonce == nonce {
+					if values.routeCancel != nil {
+						values.routeCancel()
+					}
+					values.routes, values.routeCancel = s.cache.CreateWatch(*req)
 				}
-				values.routes, values.routeCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.ListenerType && (values.listenerNonce == "" || values.listenerNonce == nonce):
-				if values.listenerCancel != nil {
-					values.listenerCancel()
+			case req.TypeUrl == resource.ListenerType:
+				if values.listenerNonce == "" || values.listenerNonce == nonce {
+					if values.listenerCancel != nil {
+						values.listenerCancel()
+					}
+					values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
 				}
-				values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.SecretType && (values.secretNonce == "" || values.secretNonce == nonce):
-				if values.secretCancel != nil {
-					values.secretCancel()
+			case req.TypeUrl == resource.SecretType:
+				if values.secretNonce == "" || values.secretNonce == nonce {
+					if values.secretCancel != nil {
+						values.secretCancel()
+					}
+					values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
 				}
-				values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
-			case req.TypeUrl == resource.RuntimeType && (values.runtimeNonce == "" || values.runtimeNonce == nonce):
-				if values.runtimeCancel != nil {
-					values.runtimeCancel()
+			case req.TypeUrl == resource.RuntimeType:
+				if values.runtimeNonce == "" || values.runtimeNonce == nonce {
+					if values.runtimeCancel != nil {
+						values.runtimeCancel()
+					}
+					values.runtimes, values.runtimeCancel = s.cache.CreateWatch(*req)
 				}
-				values.runtimes, values.runtimeCancel = s.cache.CreateWatch(*req)
+			default:
+				responseNonce, seen := values.nonces[req.TypeUrl]
+				if !seen || responseNonce == nonce {
+					if cancel, seen := values.cancellations[req.TypeUrl]; seen {
+						cancel()
+					}
+					var watch chan cache.Response
+					watch, values.cancellations[req.TypeUrl] = s.cache.CreateWatch(*req)
+					// Muxing watches across multiple type URLs onto a single channel requires spawning
+					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
+					go func() {
+						select {
+						case resp, more := <-watch:
+							if more {
+								values.responses <- resp
+							} else {
+								close(values.responses)
+							}
+							break
+						case <-values.stopResponseRoutines:
+							break
+						}
+					}()
+				}
 			}
 		}
 	}
