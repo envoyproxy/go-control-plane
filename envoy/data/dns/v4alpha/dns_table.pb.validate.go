@@ -323,10 +323,10 @@ func (m *DnsTable_DnsVirtualDomain) Validate() error {
 		return nil
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 2 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return DnsTable_DnsVirtualDomainValidationError{
 			field:  "Name",
-			reason: "value length must be at least 2 runes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -357,12 +357,12 @@ func (m *DnsTable_DnsVirtualDomain) Validate() error {
 			}
 		}
 
-		gte := time.Duration(60*time.Second + 0*time.Nanosecond)
+		gte := time.Duration(30*time.Second + 0*time.Nanosecond)
 
 		if dur < gte {
 			return DnsTable_DnsVirtualDomainValidationError{
 				field:  "AnswerTtl",
-				reason: "value must be greater than or equal to 1m0s",
+				reason: "value must be greater than or equal to 30s",
 			}
 		}
 
