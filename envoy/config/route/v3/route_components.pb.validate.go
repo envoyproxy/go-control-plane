@@ -5016,6 +5016,8 @@ func (m *RateLimit_Action_DynamicMetaData) Validate() error {
 		}
 	}
 
+	// no validation rules for DefaultValue
+
 	return nil
 }
 
