@@ -69,7 +69,6 @@ type Response interface {
 // RawResponse is a pre-serialized xDS response containing the raw resources to
 // be included in the final Discovery Response.
 type RawResponse struct {
-	Response
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
@@ -91,7 +90,6 @@ type RawResponse struct {
 
 // PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
 type PassthroughResponse struct {
-	Response
 	// Request is the original request.
 	Request discovery.DiscoveryRequest
 
