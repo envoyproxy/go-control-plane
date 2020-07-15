@@ -432,7 +432,7 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 			default:
 				responseNonce, seen := values.nonces[req.TypeUrl]
 				if !seen || responseNonce == nonce {
-					if cancel, seen := values.cancellations[req.TypeUrl]; seen {
+					if cancel, seen := values.cancellations[req.TypeUrl]; seen && cancel != nil {
 						cancel()
 					}
 					var watch chan cache.Response
