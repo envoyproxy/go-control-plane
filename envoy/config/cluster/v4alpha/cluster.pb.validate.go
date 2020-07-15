@@ -1265,6 +1265,16 @@ func (m *Cluster_LeastRequestLbConfig) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetActiveRequestBias()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Cluster_LeastRequestLbConfigValidationError{
+				field:  "ActiveRequestBias",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
