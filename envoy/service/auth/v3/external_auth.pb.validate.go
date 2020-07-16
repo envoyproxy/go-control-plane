@@ -235,6 +235,16 @@ func (m *OkHttpResponse) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OkHttpResponseValidationError{
+				field:  "DynamicMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
