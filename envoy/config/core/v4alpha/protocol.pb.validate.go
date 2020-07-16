@@ -486,7 +486,17 @@ func (m *Http2ProtocolOptions) Validate() error {
 
 	}
 
-	// no validation rules for StreamErrorOnInvalidHttpMessaging
+	// no validation rules for HiddenEnvoyDeprecatedStreamErrorOnInvalidHttpMessaging
+
+	if v, ok := interface{}(m.GetOverrideStreamErrorOnInvalidHttpMessage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Http2ProtocolOptionsValidationError{
+				field:  "OverrideStreamErrorOnInvalidHttpMessage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	for idx, item := range m.GetCustomSettingsParameters() {
 		_, _ = idx, item

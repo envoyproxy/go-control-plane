@@ -334,19 +334,21 @@ type Http2ProtocolOptions struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	HpackTableSize                               *wrappers.UInt32Value                     `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize,proto3" json:"hpack_table_size,omitempty"`
-	MaxConcurrentStreams                         *wrappers.UInt32Value                     `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
-	InitialStreamWindowSize                      *wrappers.UInt32Value                     `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
-	InitialConnectionWindowSize                  *wrappers.UInt32Value                     `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
-	AllowConnect                                 bool                                      `protobuf:"varint,5,opt,name=allow_connect,json=allowConnect,proto3" json:"allow_connect,omitempty"`
-	AllowMetadata                                bool                                      `protobuf:"varint,6,opt,name=allow_metadata,json=allowMetadata,proto3" json:"allow_metadata,omitempty"`
-	MaxOutboundFrames                            *wrappers.UInt32Value                     `protobuf:"bytes,7,opt,name=max_outbound_frames,json=maxOutboundFrames,proto3" json:"max_outbound_frames,omitempty"`
-	MaxOutboundControlFrames                     *wrappers.UInt32Value                     `protobuf:"bytes,8,opt,name=max_outbound_control_frames,json=maxOutboundControlFrames,proto3" json:"max_outbound_control_frames,omitempty"`
-	MaxConsecutiveInboundFramesWithEmptyPayload  *wrappers.UInt32Value                     `protobuf:"bytes,9,opt,name=max_consecutive_inbound_frames_with_empty_payload,json=maxConsecutiveInboundFramesWithEmptyPayload,proto3" json:"max_consecutive_inbound_frames_with_empty_payload,omitempty"`
-	MaxInboundPriorityFramesPerStream            *wrappers.UInt32Value                     `protobuf:"bytes,10,opt,name=max_inbound_priority_frames_per_stream,json=maxInboundPriorityFramesPerStream,proto3" json:"max_inbound_priority_frames_per_stream,omitempty"`
-	MaxInboundWindowUpdateFramesPerDataFrameSent *wrappers.UInt32Value                     `protobuf:"bytes,11,opt,name=max_inbound_window_update_frames_per_data_frame_sent,json=maxInboundWindowUpdateFramesPerDataFrameSent,proto3" json:"max_inbound_window_update_frames_per_data_frame_sent,omitempty"`
-	StreamErrorOnInvalidHttpMessaging            bool                                      `protobuf:"varint,12,opt,name=stream_error_on_invalid_http_messaging,json=streamErrorOnInvalidHttpMessaging,proto3" json:"stream_error_on_invalid_http_messaging,omitempty"`
-	CustomSettingsParameters                     []*Http2ProtocolOptions_SettingsParameter `protobuf:"bytes,13,rep,name=custom_settings_parameters,json=customSettingsParameters,proto3" json:"custom_settings_parameters,omitempty"`
+	HpackTableSize                               *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize,proto3" json:"hpack_table_size,omitempty"`
+	MaxConcurrentStreams                         *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
+	InitialStreamWindowSize                      *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
+	InitialConnectionWindowSize                  *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
+	AllowConnect                                 bool                  `protobuf:"varint,5,opt,name=allow_connect,json=allowConnect,proto3" json:"allow_connect,omitempty"`
+	AllowMetadata                                bool                  `protobuf:"varint,6,opt,name=allow_metadata,json=allowMetadata,proto3" json:"allow_metadata,omitempty"`
+	MaxOutboundFrames                            *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=max_outbound_frames,json=maxOutboundFrames,proto3" json:"max_outbound_frames,omitempty"`
+	MaxOutboundControlFrames                     *wrappers.UInt32Value `protobuf:"bytes,8,opt,name=max_outbound_control_frames,json=maxOutboundControlFrames,proto3" json:"max_outbound_control_frames,omitempty"`
+	MaxConsecutiveInboundFramesWithEmptyPayload  *wrappers.UInt32Value `protobuf:"bytes,9,opt,name=max_consecutive_inbound_frames_with_empty_payload,json=maxConsecutiveInboundFramesWithEmptyPayload,proto3" json:"max_consecutive_inbound_frames_with_empty_payload,omitempty"`
+	MaxInboundPriorityFramesPerStream            *wrappers.UInt32Value `protobuf:"bytes,10,opt,name=max_inbound_priority_frames_per_stream,json=maxInboundPriorityFramesPerStream,proto3" json:"max_inbound_priority_frames_per_stream,omitempty"`
+	MaxInboundWindowUpdateFramesPerDataFrameSent *wrappers.UInt32Value `protobuf:"bytes,11,opt,name=max_inbound_window_update_frames_per_data_frame_sent,json=maxInboundWindowUpdateFramesPerDataFrameSent,proto3" json:"max_inbound_window_update_frames_per_data_frame_sent,omitempty"`
+	// Deprecated: Do not use.
+	StreamErrorOnInvalidHttpMessaging       bool                                      `protobuf:"varint,12,opt,name=stream_error_on_invalid_http_messaging,json=streamErrorOnInvalidHttpMessaging,proto3" json:"stream_error_on_invalid_http_messaging,omitempty"`
+	OverrideStreamErrorOnInvalidHttpMessage *wrappers.BoolValue                       `protobuf:"bytes,14,opt,name=override_stream_error_on_invalid_http_message,json=overrideStreamErrorOnInvalidHttpMessage,proto3" json:"override_stream_error_on_invalid_http_message,omitempty"`
+	CustomSettingsParameters                []*Http2ProtocolOptions_SettingsParameter `protobuf:"bytes,13,rep,name=custom_settings_parameters,json=customSettingsParameters,proto3" json:"custom_settings_parameters,omitempty"`
 }
 
 func (x *Http2ProtocolOptions) Reset() {
@@ -458,11 +460,19 @@ func (x *Http2ProtocolOptions) GetMaxInboundWindowUpdateFramesPerDataFrameSent()
 	return nil
 }
 
+// Deprecated: Do not use.
 func (x *Http2ProtocolOptions) GetStreamErrorOnInvalidHttpMessaging() bool {
 	if x != nil {
 		return x.StreamErrorOnInvalidHttpMessaging
 	}
 	return false
+}
+
+func (x *Http2ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wrappers.BoolValue {
+	if x != nil {
+		return x.OverrideStreamErrorOnInvalidHttpMessage
+	}
+	return nil
 }
 
 func (x *Http2ProtocolOptions) GetCustomSettingsParameters() []*Http2ProtocolOptions_SettingsParameter {
@@ -791,7 +801,7 @@ var file_envoy_config_core_v3_protocol_proto_rawDesc = []byte{
 	0x74, 0x12, 0x03, 0xf8, 0x42, 0x01, 0x3a, 0x2d, 0x9a, 0xc5, 0x88, 0x1e, 0x28, 0x0a, 0x26, 0x65,
 	0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x32, 0x2e, 0x63, 0x6f, 0x72, 0x65,
 	0x2e, 0x48, 0x74, 0x74, 0x70, 0x31, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x4f, 0x70,
-	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x9c, 0x0c, 0x0a, 0x14, 0x48, 0x74, 0x74, 0x70, 0x32, 0x50,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x9c, 0x0d, 0x0a, 0x14, 0x48, 0x74, 0x74, 0x70, 0x32, 0x50,
 	0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x46,
 	0x0a, 0x10, 0x68, 0x70, 0x61, 0x63, 0x6b, 0x5f, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x73, 0x69,
 	0x7a, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
@@ -858,13 +868,21 @@ var file_envoy_config_core_v3_protocol_proto_rawDesc = []byte{
 	0x33, 0x32, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x07, 0xfa, 0x42, 0x04, 0x2a, 0x02, 0x28, 0x01,
 	0x52, 0x2c, 0x6d, 0x61, 0x78, 0x49, 0x6e, 0x62, 0x6f, 0x75, 0x6e, 0x64, 0x57, 0x69, 0x6e, 0x64,
 	0x6f, 0x77, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x46, 0x72, 0x61, 0x6d, 0x65, 0x73, 0x50, 0x65,
-	0x72, 0x44, 0x61, 0x74, 0x61, 0x46, 0x72, 0x61, 0x6d, 0x65, 0x53, 0x65, 0x6e, 0x74, 0x12, 0x51,
+	0x72, 0x44, 0x61, 0x74, 0x61, 0x46, 0x72, 0x61, 0x6d, 0x65, 0x53, 0x65, 0x6e, 0x74, 0x12, 0x55,
 	0x0a, 0x26, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x5f, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6f,
 	0x6e, 0x5f, 0x69, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x5f, 0x68, 0x74, 0x74, 0x70, 0x5f, 0x6d,
-	0x65, 0x73, 0x73, 0x61, 0x67, 0x69, 0x6e, 0x67, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x08, 0x52, 0x21,
-	0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x4f, 0x6e, 0x49, 0x6e, 0x76,
-	0x61, 0x6c, 0x69, 0x64, 0x48, 0x74, 0x74, 0x70, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x69, 0x6e,
-	0x67, 0x12, 0x7a, 0x0a, 0x1a, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x5f, 0x73, 0x65, 0x74, 0x74,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x69, 0x6e, 0x67, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x08, 0x42, 0x02,
+	0x18, 0x01, 0x52, 0x21, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x4f,
+	0x6e, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x48, 0x74, 0x74, 0x70, 0x4d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x69, 0x6e, 0x67, 0x12, 0x7a, 0x0a, 0x2d, 0x6f, 0x76, 0x65, 0x72, 0x72, 0x69, 0x64,
+	0x65, 0x5f, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x5f, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6f,
+	0x6e, 0x5f, 0x69, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x5f, 0x68, 0x74, 0x74, 0x70, 0x5f, 0x6d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42,
+	0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x27, 0x6f, 0x76, 0x65, 0x72, 0x72, 0x69,
+	0x64, 0x65, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x4f, 0x6e, 0x49,
+	0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x48, 0x74, 0x74, 0x70, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x12, 0x7a, 0x0a, 0x1a, 0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x5f, 0x73, 0x65, 0x74, 0x74,
 	0x69, 0x6e, 0x67, 0x73, 0x5f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x65, 0x74, 0x65, 0x72, 0x73, 0x18,
 	0x0d, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x3c, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f,
 	0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x33, 0x2e, 0x48, 0x74, 0x74,
@@ -953,16 +971,17 @@ var file_envoy_config_core_v3_protocol_proto_depIdxs = []int32{
 	11, // 13: envoy.config.core.v3.Http2ProtocolOptions.max_consecutive_inbound_frames_with_empty_payload:type_name -> google.protobuf.UInt32Value
 	11, // 14: envoy.config.core.v3.Http2ProtocolOptions.max_inbound_priority_frames_per_stream:type_name -> google.protobuf.UInt32Value
 	11, // 15: envoy.config.core.v3.Http2ProtocolOptions.max_inbound_window_update_frames_per_data_frame_sent:type_name -> google.protobuf.UInt32Value
-	9,  // 16: envoy.config.core.v3.Http2ProtocolOptions.custom_settings_parameters:type_name -> envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter
-	5,  // 17: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	8,  // 18: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
-	11, // 19: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
-	11, // 20: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	12, // 16: envoy.config.core.v3.Http2ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	9,  // 17: envoy.config.core.v3.Http2ProtocolOptions.custom_settings_parameters:type_name -> envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter
+	5,  // 18: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	8,  // 19: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
+	11, // 20: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
+	11, // 21: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
+	22, // [22:22] is the sub-list for method output_type
+	22, // [22:22] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_protocol_proto_init() }
