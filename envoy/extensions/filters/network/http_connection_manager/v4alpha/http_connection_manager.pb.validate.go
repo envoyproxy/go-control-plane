@@ -569,6 +569,28 @@ func (m *ResponseMapper) Validate() error {
 		}
 	}
 
+	if len(m.GetHeadersToAdd()) > 1000 {
+		return ResponseMapperValidationError{
+			field:  "HeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetHeadersToAdd() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ResponseMapperValidationError{
+					field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
