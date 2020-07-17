@@ -34,6 +34,7 @@ type Request = discovery.DiscoveryRequest
 // ConfigWatcher implementation must be thread-safe.
 type ConfigWatcher interface {
 	// CreateWatch returns a new open watch from a non-empty request.
+	// An individual consumer normally issues a single open watch by each type URL.
 	//
 	// Value channel produces requested resources, once they are available.  If
 	// the channel is closed prior to cancellation of the watch, an unrecoverable
@@ -58,7 +59,7 @@ type Response interface {
 	// Get the Constructed DiscoveryResponse
 	GetDiscoveryResponse() (*discovery.DiscoveryResponse, error)
 
-	// Get te original Request for the Response.
+	// Get the original Request for the Response.
 	GetRequest() *discovery.DiscoveryRequest
 
 	// Get the version in the Response.

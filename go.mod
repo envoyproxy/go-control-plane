@@ -4,7 +4,7 @@ go 1.11
 
 require (
 	github.com/census-instrumentation/opencensus-proto v0.2.1
-	github.com/cncf/udpa/go v0.0.0-20200313221541-5f7e5dd04533
+	github.com/cncf/udpa/go v0.0.0-20200629203442-efcf912fb354
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.4.0
