@@ -285,6 +285,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	case <-time.After(time.Second * 5):
 		t.Fatal("failed to receive snapshot response")
 	}
+
+	// test an unsubscribe scenario
 }
 
 func TestCheckState(t *testing.T) {

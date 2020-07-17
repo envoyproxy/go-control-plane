@@ -35,6 +35,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 			// Get the version of the current resources per type url
 			t := watch.Request.GetTypeUrl()
 			subscribed := snapshot.GetSubscribedResources(watch.Request.GetResourceNamesSubscribe(), watch.Request.GetTypeUrl())
+			unsubscribed := watch.Request.GetResourceNamesUnsubscribe()
 			version := snapshot.GetVersion(t)
 
 			// Handle the case of an initial delta request and having no previous state
@@ -80,7 +81,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				delete(info.deltaWatches, id)
 			} else if version != info.deltaState[t].Version {
 
-				if len(subscribed) == 0 {
+				if len(subscribed) == 0 && len(unsubscribed) == 0 {
 					cache.log.Debugf("wildcard request")
 
 					// we should set our delta state here somehow
@@ -104,6 +105,18 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 
 					info.mu.Unlock()
 					return nil
+				}
+
+				if len(unsubscribed) != 0 {
+					// we need to remove the previously subscribed resources from the state so we no longer send updates
+					if cache.log != nil {
+						cache.log.Debugf("node: %s, recieved items to unsubscribe from: %v", node, unsubscribed)
+					}
+
+					newState := cache.unsubscribe(unsubscribed, info.deltaState)
+					for typ := range info.deltaState {
+						info.deltaState[typ] = newState[typ]
+					}
 				}
 
 				// Assume we've received a new resource and we want to send new resources and cancel old watches
@@ -178,6 +191,18 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 	}
 
 	return diff
+}
+
+// Unscrubscribe will remove resources from the tracked list in the management server when received from a client
+func (cache *snapshotCache) unsubscribe(resources []string, deltaState map[string]Resources) map[string]Resources {
+	// here we need to search and remove from the current subscribed list in the snapshot
+	for _, items := range deltaState {
+		for i := 0; i < len(resources); i++ {
+			delete(items.Items, resources[i])
+		}
+	}
+
+	return deltaState
 }
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
