@@ -47,6 +47,7 @@ func (group) ID(node *core.Node) string {
 var (
 	version  = "x"
 	version2 = "y"
+	version3 = "z"
 
 	snapshot = cache.NewSnapshot(version,
 		[]types.Resource{testEndpoint, testEndpoint1, testEndpoint2},
@@ -287,6 +288,16 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// test an unsubscribe scenario
+
+	// Assume we got a request from the grpc server to unsubscribe from a resource so we can initiate a request
+	watches[testTypes[0]], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+		TypeUrl:                  testTypes[0],
+		ResourceNamesUnsubscribe: []string{clusterName},
+	}, version2)
+
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
+		t.Errorf("watches should be preserved for all but one %d", count)
+	}
 }
 
 func TestCheckState(t *testing.T) {

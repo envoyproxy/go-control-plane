@@ -35,6 +35,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 			// Get the version of the current resources per type url
 			t := watch.Request.GetTypeUrl()
 			subscribed := snapshot.GetSubscribedResources(watch.Request.GetResourceNamesSubscribe(), watch.Request.GetTypeUrl())
+			// This can be nil, so we don't need to worry about passing nil to our deltaResponse creators
 			unsubscribed := watch.Request.GetResourceNamesUnsubscribe()
 			version := snapshot.GetVersion(t)
 
@@ -74,13 +75,16 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					watch.Request,
 					watch.Response,
 					info.deltaState[t].Items,
+					unsubscribed,
 					version,
 				)
 
 				// discard the old watch
 				delete(info.deltaWatches, id)
-			} else if version != info.deltaState[t].Version {
 
+				info.mu.Unlock()
+				return nil
+			} else if version != info.deltaState[t].Version {
 				if len(subscribed) == 0 && len(unsubscribed) == 0 {
 					cache.log.Debugf("wildcard request")
 
@@ -98,6 +102,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 						watch.Request,
 						watch.Response,
 						info.deltaState[t].Items,
+						unsubscribed,
 						version,
 					)
 
@@ -105,18 +110,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 
 					info.mu.Unlock()
 					return nil
-				}
-
-				if len(unsubscribed) != 0 {
-					// we need to remove the previously subscribed resources from the state so we no longer send updates
-					if cache.log != nil {
-						cache.log.Debugf("node: %s, recieved items to unsubscribe from: %v", node, unsubscribed)
-					}
-
-					newState := cache.unsubscribe(unsubscribed, info.deltaState)
-					for typ := range info.deltaState {
-						info.deltaState[typ] = newState[typ]
-					}
 				}
 
 				// Assume we've received a new resource and we want to send new resources and cancel old watches
@@ -145,6 +138,18 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					info.deltaState[t] = r
 				}
 
+				if len(unsubscribed) > 0 {
+					// we need to remove the previously subscribed resources from the state so we no longer send updates
+					if cache.log != nil {
+						cache.log.Debugf("node: %s, recieved items to unsubscribe from: %v", node, unsubscribed)
+					}
+
+					newState := cache.unsubscribe(unsubscribed, info.deltaState)
+					for typ := range info.deltaState {
+						info.deltaState[typ] = newState[typ]
+					}
+				}
+
 				if cache.log != nil {
 					// We only want to show the specific resources we're sending back from the diff
 					cache.log.Debugf("delta respond open watch ID:%d Resources:%+v with new version %q", id, diff, version)
@@ -155,6 +160,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					watch.Request,
 					watch.Response,
 					diff, // We want to only send the updated resources here
+					unsubscribed,
 					version,
 				)
 
@@ -259,6 +265,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 		request,
 		value,
 		info.deltaState[t].Items,
+		request.GetResourceNamesUnsubscribe(),
 		info.deltaState[t].Version,
 	)
 
@@ -269,16 +276,16 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
-func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, version string) {
+func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, unsubscribed []string, version string) {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with version %q",
 			request.GetNode().GetId(), request.TypeUrl, version)
 	}
 
-	value <- createDeltaResponse(request, resources, version)
+	value <- createDeltaResponse(request, resources, unsubscribed, version)
 }
 
-func createDeltaResponse(request DeltaRequest, resources map[string]types.Resource, version string) DeltaResponse {
+func createDeltaResponse(request DeltaRequest, resources map[string]types.Resource, unsubscribed []string, version string) DeltaResponse {
 	filtered := make([]types.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
@@ -300,8 +307,9 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 	}
 
 	return RawDeltaResponse{
-		DeltaRequest:  request,
-		Resources:     filtered,
-		SystemVersion: version,
+		DeltaRequest:     request,
+		Resources:        filtered,
+		RemovedResources: unsubscribed,
+		SystemVersion:    version,
 	}
 }

@@ -130,6 +130,9 @@ type RawDeltaResponse struct {
 	// Resources to be included in the response.
 	Resources []types.Resource
 
+	// RemovedResources is a list of unsubscribed aliases to be included in the response
+	RemovedResources []string
+
 	// isResourceMarshaled indicates whether the resources have been marshaled.
 	// This is internally maintained by go-control-plane to prevent future
 	// duplication in marshaling efforts.
@@ -224,6 +227,7 @@ func (r RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscovery
 	return &discovery.DeltaDiscoveryResponse{
 		SystemVersionInfo: r.SystemVersion,
 		Resources:         marshaledResources,
+		RemovedResources:  r.RemovedResources,
 		TypeUrl:           r.DeltaRequest.TypeUrl,
 	}, nil
 }
