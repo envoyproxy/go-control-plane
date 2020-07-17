@@ -248,6 +248,8 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
+	// no validation rules for DefaultSocketInterface
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedRuntime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
