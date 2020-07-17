@@ -137,6 +137,18 @@ func TestLinearDeletion(t *testing.T) {
 	checkWatchCount(t, c, "b", 0)
 }
 
+func TestLinearWatchTwo(t *testing.T) {
+	c := NewLinearCache(testType, map[string]types.Resource{"a": testResource("a"), "b": testResource("b")})
+	w, _ := c.CreateWatch(Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: "0"})
+	mustBlock(t, w)
+	w1, _ := c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "0"})
+	mustBlock(t, w1)
+	c.UpdateResource("a", testResource("aa"))
+	// should only get the modified resource
+	verifyResponse(t, w, "1", 1)
+	verifyResponse(t, w1, "1", 2)
+}
+
 func TestLinearCancel(t *testing.T) {
 	c := NewLinearCache(testType, nil)
 	c.UpdateResource("a", testResource("a"))
