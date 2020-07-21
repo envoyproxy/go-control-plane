@@ -504,6 +504,17 @@ func (m *DogStatsdSink) Validate() error {
 
 	// no validation rules for Prefix
 
+	if wrapper := m.GetMaxBytesPerDatagram(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			return DogStatsdSinkValidationError{
+				field:  "MaxBytesPerDatagram",
+				reason: "value must be greater than 0",
+			}
+		}
+
+	}
+
 	switch m.DogStatsdSpecifier.(type) {
 
 	case *DogStatsdSink_Address:
