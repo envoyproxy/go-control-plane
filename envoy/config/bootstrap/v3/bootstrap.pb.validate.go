@@ -554,6 +554,16 @@ func (m *Watchdog) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetMultikillThreshold()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WatchdogValidationError{
+				field:  "MultikillThreshold",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
