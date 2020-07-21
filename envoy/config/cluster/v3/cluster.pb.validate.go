@@ -502,6 +502,16 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTrackClusterStats()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "TrackClusterStats",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetHiddenEnvoyDeprecatedHosts() {
 		_, _ = idx, item
 
@@ -905,6 +915,77 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpstreamConnectionOptionsValidationError{}
+
+// Validate checks the field values on TrackClusterStats with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *TrackClusterStats) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for TimeoutBudgets
+
+	// no validation rules for RequestResponseSizes
+
+	return nil
+}
+
+// TrackClusterStatsValidationError is the validation error returned by
+// TrackClusterStats.Validate if the designated constraints aren't met.
+type TrackClusterStatsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TrackClusterStatsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TrackClusterStatsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TrackClusterStatsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TrackClusterStatsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TrackClusterStatsValidationError) ErrorName() string {
+	return "TrackClusterStatsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TrackClusterStatsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTrackClusterStats.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TrackClusterStatsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TrackClusterStatsValidationError{}
 
 // Validate checks the field values on Cluster_TransportSocketMatch with the
 // rules defined in the proto definition for this message. If any rules are
