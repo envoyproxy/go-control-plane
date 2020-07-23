@@ -41,11 +41,12 @@ import (
 var (
 	debug bool
 
-	port         uint
-	gatewayPort  uint
-	upstreamPort uint
-	basePort     uint
-	alsPort      uint
+	port            uint
+	gatewayPort     uint
+	upstreamPort    uint
+	upstreamMessage string
+	basePort        uint
+	alsPort         uint
 
 	delay    time.Duration
 	requests int
@@ -139,9 +140,6 @@ func init() {
 func main() {
 	flag.Parse()
 	ctx := context.Background()
-
-	// start upstream
-	go test.RunHTTP(ctx, upstreamPort)
 
 	// create a cache
 	signal := make(chan struct{})
@@ -289,7 +287,7 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			if string(body) != test.Hello {
+			if string(body) != upstreamMessage {
 				ch <- fmt.Errorf("unexpected return %q", string(body))
 				return
 			}
