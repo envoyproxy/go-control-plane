@@ -173,6 +173,21 @@ func (m *StatsConfig) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetHistogramBucketSettings() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return StatsConfigValidationError{
+					field:  fmt.Sprintf("HistogramBucketSettings[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -414,6 +429,97 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TagSpecifierValidationError{}
+
+// Validate checks the field values on HistogramBucketSettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HistogramBucketSettings) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetMatch() == nil {
+		return HistogramBucketSettingsValidationError{
+			field:  "Match",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HistogramBucketSettingsValidationError{
+				field:  "Match",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(m.GetBuckets()) < 1 {
+		return HistogramBucketSettingsValidationError{
+			field:  "Buckets",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	return nil
+}
+
+// HistogramBucketSettingsValidationError is the validation error returned by
+// HistogramBucketSettings.Validate if the designated constraints aren't met.
+type HistogramBucketSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HistogramBucketSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HistogramBucketSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HistogramBucketSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HistogramBucketSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HistogramBucketSettingsValidationError) ErrorName() string {
+	return "HistogramBucketSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HistogramBucketSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHistogramBucketSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HistogramBucketSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HistogramBucketSettingsValidationError{}
 
 // Validate checks the field values on StatsdSink with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
