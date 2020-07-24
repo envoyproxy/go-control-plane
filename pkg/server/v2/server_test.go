@@ -211,7 +211,7 @@ func TestServerShutdown(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &discovery.DiscoveryRequest{Node: node}
+			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
 			go func() {
 				var err error
 				switch typ {
@@ -231,7 +231,7 @@ func TestServerShutdown(t *testing.T) {
 					err = s.StreamAggregatedResources(resp)
 				}
 				if err != nil {
-					t.Errorf("Stream() => got %v, want no error", err)
+					t.Errorf("Stream() => got %v for %#v, want no error", err, typ)
 				}
 				shutdown <- true
 			}()
