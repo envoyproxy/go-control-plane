@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /go-control-plane
     docker:
-      - image: gcr.io/istio-testing/go-control-plane-ci:07-23-2020
+      - image: gcr.io/istio-testing/go-control-plane-ci:07-24-2020
     steps:
       - checkout
       - run: make create_version
