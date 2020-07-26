@@ -65,3 +65,14 @@ integration.rest.v3: $(BINDIR)/test $(BINDIR)/upstream
 
 integration.ads.tls: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh -tls
+
+#--------------------------------------
+#-- example xDS control plane server
+#--------------------------------------
+.PHONY: $(BINDIR)/example example
+
+$(BINDIR)/example:
+	@go build -race -o $@ internal/example/main/main.go
+
+example: $(BINDIR)/example
+	@build/example.sh

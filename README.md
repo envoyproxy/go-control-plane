@@ -58,6 +58,9 @@ in the same environment as the circle ci. This makes sure to produce a consisten
     ./build/run_docker.sh make integration
     ```
 
+1. Take a look at the [example server](internal/example/README.md).
+
+
 ## Xds Api versioning
 
 The Envoy xDS APIs follow a well defined [versioning scheme](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/versioning).
@@ -72,51 +75,4 @@ When v2 version is frozen in the future, we will change the experience such that
 
 ## Usage
 
-Register services on the gRPC server as follows.
-
-```go
-import (
-	"context"
-	"google.golang.org/grpc"
-	"net"
-
-	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
-)
-
-func main() {
-	snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
-	server := xds.NewServer(context.Background(), snapshotCache, nil)
-	grpcServer := grpc.NewServer()
-	lis, _ := net.Listen("tcp", ":8080")
-
-	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
-	api.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
-	api.RegisterClusterDiscoveryServiceServer(grpcServer, server)
-	api.RegisterRouteDiscoveryServiceServer(grpcServer, server)
-	api.RegisterListenerDiscoveryServiceServer(grpcServer, server)
-	go func() {
-		if err := grpcServer.Serve(lis); err != nil {
-			// error handling
-		}
-	}()
-}
-```
-
-As mentioned in [Scope](https://github.com/envoyproxy/go-control-plane/blob/master/README.md#scope), you need to cache Envoy configurations.
-Generate the key based on the node information as follows and cache the configurations.
-
-```go
-import (
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
- 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-)
-
-var clusters, endpoints, routes, listeners, runtimes []types.Resource
-
-snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
-snapshot := cache.NewSnapshot("1.0", endpoints, clusters, routes, listeners, runtimes)
-_ = snapshotCache.SetSnapshot("node1", snapshot)
-```
+The [example server](internal/example/README.md) demonstrates how to integrate the go-control-plane with your code.
