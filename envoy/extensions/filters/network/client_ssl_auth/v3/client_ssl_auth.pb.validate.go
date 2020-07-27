@@ -51,6 +51,13 @@ func (m *ClientSSLAuth) Validate() error {
 		}
 	}
 
+	if !_ClientSSLAuth_AuthApiCluster_Pattern.MatchString(m.GetAuthApiCluster()) {
+		return ClientSSLAuthValidationError{
+			field:  "AuthApiCluster",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
 	if len(m.GetStatPrefix()) < 1 {
 		return ClientSSLAuthValidationError{
 			field:  "StatPrefix",
@@ -139,3 +146,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ClientSSLAuthValidationError{}
+
+var _ClientSSLAuth_AuthApiCluster_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
