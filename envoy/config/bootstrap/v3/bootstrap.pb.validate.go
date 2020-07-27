@@ -250,6 +250,23 @@ func (m *Bootstrap) Validate() error {
 
 	// no validation rules for DefaultSocketInterface
 
+	for key, val := range m.GetCertificateProviderInstances() {
+		_ = val
+
+		// no validation rules for CertificateProviderInstances[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BootstrapValidationError{
+					field:  fmt.Sprintf("CertificateProviderInstances[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedRuntime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
