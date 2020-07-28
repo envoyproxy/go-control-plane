@@ -24,7 +24,7 @@ else
 fi
 
 # Start the http server that sits upstream of Envoy
-(bin/upstream -debug -message="$MESSAGE")&
+(bin/upstream -message="$MESSAGE")&
 UPSTREAM_PID=$!
 
 # Envoy start-up command

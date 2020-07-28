@@ -22,12 +22,10 @@ import (
 
 func main() {
 	var (
-		debug        bool
 		upstreamPort uint
 		hello        string
 	)
 
-	flag.BoolVar(&debug, "debug", false, "Use debug logging")
 	flag.UintVar(&upstreamPort, "upstream", 18080, "Upstream HTTP/1.1 port")
 	flag.StringVar(&hello, "message", "Default message", "Message to send in response")
 	flag.Parse()
