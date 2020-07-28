@@ -66,7 +66,7 @@ integration.rest.v3: $(BINDIR)/test $(BINDIR)/upstream
 integration.ads.tls: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh -tls
 
-integration.xds.mux.v3: $(BINDIR)/test
+integration.xds.mux.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=xds SUFFIX=v3 build/integration.sh -mux
 
 #--------------------------------------
