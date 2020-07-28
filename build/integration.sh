@@ -8,6 +8,8 @@ set -o pipefail
 ## This is a wrapper around the test app `pkg/test/main` that spawns/kills Envoy.
 ##
 
+MESSAGE=$'Hi, there!\n'
+
 # Management server type. Valid values are "ads", "xds", "rest"
 XDS=${XDS:-ads}
 
@@ -21,8 +23,9 @@ else
   RUNTIMES=1
 fi
 
-(bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug "$@")&
-SERVER_PID=$!
+# Start the http server that sits upstream of Envoy
+(bin/upstream -message="$MESSAGE")&
+UPSTREAM_PID=$!
 
 # Envoy start-up command
 ENVOY=${ENVOY:-/usr/local/bin/envoy}
@@ -35,7 +38,9 @@ ENVOY_PID=$!
 
 function cleanup() {
   kill ${ENVOY_PID}
+  kill ${UPSTREAM_PID}
 }
 trap cleanup EXIT
 
-wait ${SERVER_PID}
+# run the test suite (which also contains the control plane)
+bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug -message="$MESSAGE" "$@"

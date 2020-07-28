@@ -1058,10 +1058,22 @@ func (m *HttpGenericBodyMatch_GenericTextMatch) Validate() error {
 	switch m.Rule.(type) {
 
 	case *HttpGenericBodyMatch_GenericTextMatch_StringMatch:
-		// no validation rules for StringMatch
+
+		if utf8.RuneCountInString(m.GetStringMatch()) < 1 {
+			return HttpGenericBodyMatch_GenericTextMatchValidationError{
+				field:  "StringMatch",
+				reason: "value length must be at least 1 runes",
+			}
+		}
 
 	case *HttpGenericBodyMatch_GenericTextMatch_BinaryMatch:
-		// no validation rules for BinaryMatch
+
+		if len(m.GetBinaryMatch()) < 1 {
+			return HttpGenericBodyMatch_GenericTextMatchValidationError{
+				field:  "BinaryMatch",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
 
 	default:
 		return HttpGenericBodyMatch_GenericTextMatchValidationError{

@@ -212,6 +212,8 @@ func (m *DnsCacheConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for UseTcpForDnsLookups
+
 	return nil
 }
 

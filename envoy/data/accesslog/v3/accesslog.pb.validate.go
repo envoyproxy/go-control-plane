@@ -610,6 +610,8 @@ func (m *ResponseFlags) Validate() error {
 
 	// no validation rules for ResponseFromCacheFilter
 
+	// no validation rules for NoFilterConfigFound
+
 	return nil
 }
 

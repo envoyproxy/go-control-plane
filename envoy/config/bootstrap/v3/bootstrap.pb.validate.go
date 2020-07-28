@@ -250,6 +250,23 @@ func (m *Bootstrap) Validate() error {
 
 	// no validation rules for DefaultSocketInterface
 
+	for key, val := range m.GetCertificateProviderInstances() {
+		_ = val
+
+		// no validation rules for CertificateProviderInstances[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BootstrapValidationError{
+					field:  fmt.Sprintf("CertificateProviderInstances[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedRuntime()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
@@ -548,6 +565,16 @@ func (m *Watchdog) Validate() error {
 		if err := v.Validate(); err != nil {
 			return WatchdogValidationError{
 				field:  "MultikillTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMultikillThreshold()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WatchdogValidationError{
+				field:  "MultikillThreshold",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
