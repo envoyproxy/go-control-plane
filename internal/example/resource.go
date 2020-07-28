@@ -31,11 +31,11 @@ import (
 )
 
 const (
-	ClusterName  = "service_acnodal"
+	ClusterName  = "example_proxy_cluster"
 	RouteName    = "local_route"
 	ListenerName = "listener_0"
 	ListenerPort = 10000
-	UpstreamHost = "www.acnodal.io"
+	UpstreamHost = "www.envoyproxy.io"
 	UpstreamPort = 80
 )
 

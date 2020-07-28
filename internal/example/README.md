@@ -6,7 +6,7 @@ This is an example of a trivial xDS V3 control plane server.  It serves an Envoy
 go-control-plane$ make example
 ```
 
-The Makefile builds the example server and then runs `build/example.sh` which runs both Envoy and the example server.  The example server serves a configuration defined in `internal/example/resource.go`.  If everything works correctly, you should be able to open a browser to [http://localhost:10000](http://localhost:10000) and see Acnodal.io's website.
+The Makefile builds the example server and then runs `build/example.sh` which runs both Envoy and the example server.  The example server serves a configuration defined in `internal/example/resource.go`.  If everything works correctly, you should be able to open a browser to [http://localhost:10000](http://localhost:10000) and see Envoy's website.
 
 ## Files
 
