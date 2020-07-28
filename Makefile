@@ -35,30 +35,44 @@ check_version_dirty:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.rest.v3 integration.ads.tls
+.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.rest.v3 integration.ads.tls
+
+$(BINDIR)/upstream:
+	@go build -race -o $@ internal/upstream/main.go
 
 $(BINDIR)/test:
 	@go build -race -o $@ pkg/test/main/main.go
 
 integration: integration.xds integration.xds.v3 integration.ads integration.ads.v3 integration.rest integration.rest.v3 integration.ads.tls
 
-integration.ads: $(BINDIR)/test
+integration.ads: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh
 
-integration.ads.v3: $(BINDIR)/test
+integration.ads.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads SUFFIX=v3 build/integration.sh
 
-integration.xds: $(BINDIR)/test
+integration.xds: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=xds build/integration.sh
 
-integration.xds.v3: $(BINDIR)/test
+integration.xds.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=xds SUFFIX=v3 build/integration.sh
 
-integration.rest: $(BINDIR)/test
+integration.rest: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=rest build/integration.sh
 
-integration.rest.v3: $(BINDIR)/test
+integration.rest.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=rest SUFFIX=v3 build/integration.sh
 
-integration.ads.tls: $(BINDIR)/test
+integration.ads.tls: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh -tls
+
+#--------------------------------------
+#-- example xDS control plane server
+#--------------------------------------
+.PHONY: $(BINDIR)/example example
+
+$(BINDIR)/example:
+	@go build -race -o $@ internal/example/main/main.go
+
+example: $(BINDIR)/example
+	@build/example.sh

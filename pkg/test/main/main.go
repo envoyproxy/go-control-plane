@@ -41,11 +41,12 @@ import (
 var (
 	debug bool
 
-	port         uint
-	gatewayPort  uint
-	upstreamPort uint
-	basePort     uint
-	alsPort      uint
+	port            uint
+	gatewayPort     uint
+	upstreamPort    uint
+	upstreamMessage string
+	basePort        uint
+	alsPort         uint
 
 	delay    time.Duration
 	requests int
@@ -63,30 +64,82 @@ var (
 
 func init() {
 	flag.BoolVar(&debug, "debug", false, "Use debug logging")
-	flag.UintVar(&port, "port", 18000, "Management server port")
-	flag.UintVar(&gatewayPort, "gateway", 18001, "Management server port for HTTP gateway")
+
+	//
+	// These parameters control the ports that the integration test
+	// components use to talk to one another
+	//
+
+	// The port that the Envoy xDS client uses to talk to the control
+	// plane xDS server (part of this program)
+	flag.UintVar(&port, "port", 18000, "xDS management server port")
+
+	// The port that the Envoy REST client uses to talk to the control
+	// plane gateway (which translates from REST to xDS)
+	flag.UintVar(&gatewayPort, "gateway", 18001, "Management HTTP gateway (from HTTP to xDS) server port")
+
+	// The port that Envoy uses to talk to the upstream http "echo"
+	// server
 	flag.UintVar(&upstreamPort, "upstream", 18080, "Upstream HTTP/1.1 port")
-	flag.UintVar(&basePort, "base", 9000, "Listener port")
-	flag.UintVar(&alsPort, "als", 18090, "Accesslog server port")
-	flag.DurationVar(&delay, "delay", 500*time.Millisecond, "Interval between request batch retries")
-	flag.IntVar(&requests, "r", 5, "Number of requests between snapshot updates")
-	flag.IntVar(&updates, "u", 3, "Number of snapshot updates")
-	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management server type (ads, xds, rest)")
-	flag.IntVar(&clusters, "clusters", 4, "Number of clusters")
-	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
-	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
-	flag.IntVar(&runtimes, "runtimes", 1, "Number of RTDS layers")
+
+	// The port that the tests below use to talk to Envoy's proxy of the
+	// upstream server
+	flag.UintVar(&basePort, "base", 9000, "Envoy Proxy listener port")
+
+	// The control plane accesslog server port (currently unused)
+	flag.UintVar(&alsPort, "als", 18090, "Control plane accesslog server port")
+
+	//
+	// These parameters control Envoy configuration
+	//
+
+	// Tell Envoy to request configurations from the control plane using
+	// this protocol
+	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management protocol to test (ADS, xDS, REST)")
+
+	// Tell Envoy to use this Node ID
 	flag.StringVar(&nodeID, "nodeID", "test-id", "Node ID")
+
+	// Tell Envoy to use TLS to talk to the control plane
 	flag.BoolVar(&tls, "tls", false, "Enable TLS on all listeners and use SDS for secret delivery")
+
+	// Tell Envoy to configure this many clusters for each snapshot
+	flag.IntVar(&clusters, "clusters", 4, "Number of clusters")
+
+	// Tell Envoy to configure this many Runtime Discovery Service
+	// layers for each snapshot
+	flag.IntVar(&runtimes, "runtimes", 1, "Number of RTDS layers")
+
+	//
+	// These parameters control the test harness
+	//
+
+	// The message that the tests expect to receive from the upstream
+	// server
+	flag.StringVar(&upstreamMessage, "message", "Default message", "Upstream HTTP server response message")
+
+	// Time to wait between test request batches
+	flag.DurationVar(&delay, "delay", 500*time.Millisecond, "Interval between request batch retries")
+
+	// Each test loads a configuration snapshot into the control plane
+	// which is then picked up by Envoy.  This parameter specifies how
+	// many snapshots to test
+	flag.IntVar(&updates, "u", 3, "Number of snapshot updates")
+
+	// Each snapshot test sends this many requests to the upstream
+	// server for each snapshot for each listener port
+	flag.IntVar(&requests, "r", 5, "Number of requests between snapshot updates")
+
+	// Test this many HTTP listeners per snapshot
+	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
+	// Test this many TCP listeners per snapshot
+	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
 func main() {
 	flag.Parse()
 	ctx := context.Background()
-
-	// start upstream
-	go test.RunHTTP(ctx, upstreamPort)
 
 	// create a cache
 	signal := make(chan struct{})
@@ -234,7 +287,7 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			if string(body) != test.Hello {
+			if string(body) != upstreamMessage {
 				ch <- fmt.Errorf("unexpected return %q", string(body))
 				return
 			}
