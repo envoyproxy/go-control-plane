@@ -89,6 +89,8 @@ type RawResponse struct {
 	marshaledResponse *discovery.DiscoveryResponse
 }
 
+var _ Response = &RawResponse{}
+
 // PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
 type PassthroughResponse struct {
 	// Request is the original request.
@@ -97,6 +99,8 @@ type PassthroughResponse struct {
 	// The discovery response that needs to be sent as is, without any marshalling transformations.
 	DiscoveryResponse *discovery.DiscoveryResponse
 }
+
+var _ Response = &PassthroughResponse{}
 
 // GetDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
 // This is necessary because the marshalled response does not change across the calls.
