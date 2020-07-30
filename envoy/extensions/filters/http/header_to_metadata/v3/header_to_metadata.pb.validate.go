@@ -235,16 +235,16 @@ func (m *Config_Rule) Validate() error {
 		return nil
 	}
 
-	if len(m.GetHeader()) < 1 {
-		return Config_RuleValidationError{
-			field:  "Header",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
-
 	if !_Config_Rule_Header_Pattern.MatchString(m.GetHeader()) {
 		return Config_RuleValidationError{
 			field:  "Header",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
+	if !_Config_Rule_Cookie_Pattern.MatchString(m.GetCookie()) {
+		return Config_RuleValidationError{
+			field:  "Cookie",
 			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 	}
@@ -329,3 +329,5 @@ var _ interface {
 } = Config_RuleValidationError{}
 
 var _Config_Rule_Header_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _Config_Rule_Cookie_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")

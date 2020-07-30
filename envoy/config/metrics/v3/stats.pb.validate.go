@@ -462,6 +462,29 @@ func (m *HistogramBucketSettings) Validate() error {
 		}
 	}
 
+	_HistogramBucketSettings_Buckets_Unique := make(map[float64]struct{}, len(m.GetBuckets()))
+
+	for idx, item := range m.GetBuckets() {
+		_, _ = idx, item
+
+		if _, exists := _HistogramBucketSettings_Buckets_Unique[item]; exists {
+			return HistogramBucketSettingsValidationError{
+				field:  fmt.Sprintf("Buckets[%v]", idx),
+				reason: "repeated value must contain unique items",
+			}
+		} else {
+			_HistogramBucketSettings_Buckets_Unique[item] = struct{}{}
+		}
+
+		if item <= 0 {
+			return HistogramBucketSettingsValidationError{
+				field:  fmt.Sprintf("Buckets[%v]", idx),
+				reason: "value must be greater than 0",
+			}
+		}
+
+	}
+
 	return nil
 }
 

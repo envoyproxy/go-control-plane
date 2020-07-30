@@ -74,6 +74,8 @@ func (m *VmConfig) Validate() error {
 
 	// no validation rules for AllowPrecompiled
 
+	// no validation rules for NackOnCodeCacheMiss
+
 	return nil
 }
 
@@ -141,7 +143,7 @@ func (m *PluginConfig) Validate() error {
 
 	// no validation rules for Name
 
-	// no validation rules for GroupName
+	// no validation rules for RootId
 
 	if v, ok := interface{}(m.GetConfiguration()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -152,6 +154,8 @@ func (m *PluginConfig) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for FailOpen
 
 	switch m.VmConfig.(type) {
 
