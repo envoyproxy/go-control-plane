@@ -19,6 +19,12 @@ import (
 	"errors"
 )
 
+// MuxCache multiplexes across several caches using a classification function.
+// If there is no matching cache for a classification result, the cache
+// responds with an empty closed channel, which effectively terminates the
+// stream on the server. It might be preferred to respond with a "nil" channel
+// instead which will leave the stream open in case the stream is aggregated by
+// making sure there is always a matching cache.
 type MuxCache struct {
 	// Classification functions.
 	Classify func(Request) string
@@ -32,7 +38,9 @@ func (mux *MuxCache) CreateWatch(request Request) (chan Response, func()) {
 	key := mux.Classify(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
-		return nil, nil
+		value := make(chan Response, 0)
+		close(value)
+		return value, nil
 	}
 	return cache.CreateWatch(request)
 }
