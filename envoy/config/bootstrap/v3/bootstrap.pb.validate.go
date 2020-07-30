@@ -561,6 +561,27 @@ func (m *Watchdog) Validate() error {
 		}
 	}
 
+	if d := m.GetMaxKillTimeoutJitter(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return WatchdogValidationError{
+				field:  "MaxKillTimeoutJitter",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gte := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur < gte {
+			return WatchdogValidationError{
+				field:  "MaxKillTimeoutJitter",
+				reason: "value must be greater than or equal to 0s",
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetMultikillTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return WatchdogValidationError{
