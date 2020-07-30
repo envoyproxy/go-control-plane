@@ -242,20 +242,6 @@ func (m *Config_Rule) Validate() error {
 		return nil
 	}
 
-	if len(m.GetHeader()) < 1 {
-		return Config_RuleValidationError{
-			field:  "Header",
-			reason: "value length must be at least 1 bytes",
-		}
-	}
-
-	if !_Config_Rule_Header_Pattern.MatchString(m.GetHeader()) {
-		return Config_RuleValidationError{
-			field:  "Header",
-			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
-		}
-	}
-
 	if v, ok := interface{}(m.GetOnHeaderPresent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Config_RuleValidationError{
@@ -277,6 +263,28 @@ func (m *Config_Rule) Validate() error {
 	}
 
 	// no validation rules for Remove
+
+	switch m.HeaderCookieSpecifier.(type) {
+
+	case *Config_Rule_Header:
+
+		if !_Config_Rule_Header_Pattern.MatchString(m.GetHeader()) {
+			return Config_RuleValidationError{
+				field:  "Header",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	case *Config_Rule_Cookie:
+
+		if !_Config_Rule_Cookie_Pattern.MatchString(m.GetCookie()) {
+			return Config_RuleValidationError{
+				field:  "Cookie",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	}
 
 	return nil
 }
@@ -336,3 +344,5 @@ var _ interface {
 } = Config_RuleValidationError{}
 
 var _Config_Rule_Header_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _Config_Rule_Cookie_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
