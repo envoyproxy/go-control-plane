@@ -26,6 +26,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/envoyproxy/go-control-plane/pkg/probe"
+
 	cachev2 "github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	serverv2 "github.com/envoyproxy/go-control-plane/pkg/server/v2"
@@ -47,6 +49,7 @@ var (
 	upstreamMessage string
 	basePort        uint
 	alsPort         uint
+	adminPort       uint
 
 	delay    time.Duration
 	requests int
@@ -88,6 +91,9 @@ func init() {
 
 	// The control plane accesslog server port (currently unused)
 	flag.UintVar(&alsPort, "als", 18090, "Control plane accesslog server port")
+
+	// Envoy admin port
+	flag.UintVar(&adminPort, "admin", 19000, "Admin port")
 
 	//
 	// These parameters control Envoy configuration
@@ -142,9 +148,8 @@ func main() {
 	ctx := context.Background()
 
 	// create a cache
-	signal := make(chan struct{})
-	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
-	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
+	cbv2 := &testv2.Callbacks{Debug: debug}
+	cbv3 := &testv3.Callbacks{Debug: debug}
 
 	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
 	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{})
@@ -180,17 +185,10 @@ func main() {
 	go test.RunManagementServer(ctx, srv2, srv3, port)
 	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
 
-	log.Println("waiting for the first request...")
-	select {
-	case <-signal:
-		break
-	case <-time.After(1 * time.Minute):
-		log.Println("timeout waiting for the first request")
-		os.Exit(1)
-	}
 	log.Printf("initial snapshot %+v\n", snapshotsv2)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
+	ready := false
 	for i := 0; i < updates; i++ {
 		snapshotsv2.Version = fmt.Sprintf("v%d", i)
 		log.Printf("update snapshot %v\n", snapshotsv2.Version)
@@ -216,6 +214,12 @@ func main() {
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
 			os.Exit(1)
+		}
+
+		// wait for config to apply before testing
+		if !ready {
+			waitEnvoyReady()
+			ready = true
 		}
 
 		// pass is true if all requests succeed at least once in a run
@@ -306,6 +310,22 @@ func callEcho() (int, int) {
 			return ok, failed
 		}
 	}
+}
+
+func waitEnvoyReady() {
+	log.Println("checking for envoy readiness...")
+	client := &http.Client{Timeout: time.Second}
+	for i := 0; i < 30; i++ {
+		ready, err := probe.IsReady(client, fmt.Sprintf("127.0.0.1:%d", adminPort))
+		if err != nil {
+			log.Println(err)
+		} else if ready {
+			return
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+	log.Println("envoy did not initialize")
+	os.Exit(1)
 }
 
 type logger struct{}

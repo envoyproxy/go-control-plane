@@ -9,7 +9,6 @@ import (
 )
 
 type Callbacks struct {
-	Signal   chan struct{}
 	Debug    bool
 	Fetches  int
 	Requests int
@@ -36,10 +35,6 @@ func (cb *Callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.Requests++
-	if cb.Signal != nil {
-		close(cb.Signal)
-		cb.Signal = nil
-	}
 	return nil
 }
 func (cb *Callbacks) OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
@@ -48,10 +43,6 @@ func (cb *Callbacks) OnFetchRequest(_ context.Context, req *discovery.DiscoveryR
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.Fetches++
-	if cb.Signal != nil {
-		close(cb.Signal)
-		cb.Signal = nil
-	}
 	return nil
 }
 func (cb *Callbacks) OnFetchResponse(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {}
