@@ -33,9 +33,7 @@ func (mux *MuxCache) CreateWatch(request Request) (chan Response, func()) {
 	key := mux.Classify(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
-		value := make(chan Response, 1)
-		value <- RawResponse{Request: request}
-		return value, nil
+		return nil, nil
 	}
 	return cache.CreateWatch(request)
 }
