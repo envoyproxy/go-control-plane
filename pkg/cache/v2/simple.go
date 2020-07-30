@@ -173,6 +173,7 @@ func superset(names map[string]bool, resources map[string]types.Resource) error 
 
 // CreateWatch returns a watch for an xDS request.
 func (cache *snapshotCache) CreateWatch(request Request) (chan Response, func()) {
+	cache.log.Infof("node %v", request.Node)
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.Lock()
