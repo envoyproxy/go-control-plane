@@ -51,16 +51,15 @@ in the same environment as the circle ci. This makes sure to produce a consisten
     ./build/run_docker.sh make build test
     ```
 
-1. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
+2. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
 
     ```sh
     ./build/run_docker.sh make integration
     ```
 
-1. Take a look at the [example server](internal/example/README.md).
+For an example on getting up and running with go-control-plane, check out the [example server code](internal/example/README.md).
 
-
-## XDS API versioning
+## xDS API Versioning
 
 The Envoy xDS APIs follow a well defined [versioning scheme](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/versioning).
 Due to lack of generics and function overloading in golang, creating a new version unfortunately involves code duplication.
