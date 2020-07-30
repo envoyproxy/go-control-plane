@@ -98,6 +98,10 @@ func RunManagementGateway(ctx context.Context, srv2 serverv2.Server, srv3 server
 			log.Println(err)
 		}
 	}()
+	<-ctx.Done()
+
+	// Cleanup our gateway if we receive a shutdown
+	server.Shutdown(ctx)
 }
 
 func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
