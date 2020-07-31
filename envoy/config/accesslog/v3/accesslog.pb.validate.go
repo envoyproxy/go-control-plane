@@ -282,6 +282,18 @@ func (m *AccessLogFilter) Validate() error {
 			}
 		}
 
+	case *AccessLogFilter_MetadataFilter:
+
+		if v, ok := interface{}(m.GetMetadataFilter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AccessLogFilterValidationError{
+					field:  "MetadataFilter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return AccessLogFilterValidationError{
 			field:  "FilterSpecifier",
@@ -1245,6 +1257,91 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GrpcStatusFilterValidationError{}
+
+// Validate checks the field values on MetadataFilter with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *MetadataFilter) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MetadataFilterValidationError{
+				field:  "Matcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMatchIfKeyNotFound()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MetadataFilterValidationError{
+				field:  "MatchIfKeyNotFound",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MetadataFilterValidationError is the validation error returned by
+// MetadataFilter.Validate if the designated constraints aren't met.
+type MetadataFilterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MetadataFilterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MetadataFilterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MetadataFilterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MetadataFilterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MetadataFilterValidationError) ErrorName() string { return "MetadataFilterValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MetadataFilterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMetadataFilter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MetadataFilterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MetadataFilterValidationError{}
 
 // Validate checks the field values on ExtensionFilter with the rules defined
 // in the proto definition for this message. If any rules are violated, an
