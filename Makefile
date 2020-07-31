@@ -35,7 +35,7 @@ check_version_dirty:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.rest.v3 integration.ads.tls
+.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.rest.v3 integration.ads.tls integration.xds.mux.v3
 
 $(BINDIR)/upstream:
 	@go build -race -o $@ internal/upstream/main.go
@@ -65,6 +65,9 @@ integration.rest.v3: $(BINDIR)/test $(BINDIR)/upstream
 
 integration.ads.tls: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh -tls
+
+integration.xds.mux.v3: $(BINDIR)/test $(BINDIR)/upstream
+	env XDS=xds SUFFIX=v3 build/integration.sh -mux
 
 #--------------------------------------
 #-- example xDS control plane server

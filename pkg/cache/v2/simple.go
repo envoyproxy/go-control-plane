@@ -87,7 +87,7 @@ type snapshotCache struct {
 // resources are explicitly named in the request. This avoids the problem of a
 // partial request over a single stream for a subset of resources which would
 // require generating a fresh version for acknowledgement. ADS flag requires
-// snapshot consistency. For non-ADS case (and fetch), mutliple partial
+// snapshot consistency. For non-ADS case (and fetch), multiple partial
 // requests are sent across multiple streams and re-using the snapshot version
 // is OK.
 //

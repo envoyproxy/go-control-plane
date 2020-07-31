@@ -29,7 +29,7 @@ UPSTREAM_PID=$!
 
 # Envoy start-up command
 ENVOY=${ENVOY:-/usr/local/bin/envoy}
-ENVOY_LOG="envoy.${XDS}${SUFFIX}.log"
+ENVOY_LOG="envoy.${XDS}${SUFFIX}$@.log"
 echo Envoy log: ${ENVOY_LOG}
 
 # Start envoy: important to keep drain time short

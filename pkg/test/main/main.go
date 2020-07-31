@@ -58,6 +58,7 @@ var (
 	tcpListeners  int
 	runtimes      int
 	tls           bool
+	mux           bool
 
 	nodeID string
 )
@@ -134,6 +135,9 @@ func init() {
 	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
 	// Test this many TCP listeners per snapshot
 	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
+
+	// Enable a muxed cache with partial snapshots
+	flag.BoolVar(&mux, "mux", false, "Enable muxed linear cache for EDS")
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
@@ -149,7 +153,26 @@ func main() {
 	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
 	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{})
 	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2)
-	srv3 := serverv3.NewServer(context.Background(), configv3, cbv3)
+
+	// mux integration
+	var configCachev3 cachev3.Cache = configv3
+	typeURL := "type.googleapis.com/envoy.config.endpoint.v3.ClusterLoadAssignment"
+	eds := cachev3.NewLinearCache(typeURL, nil)
+	if mux {
+		configCachev3 = &cachev3.MuxCache{
+			Classify: func(req cachev3.Request) string {
+				if req.TypeUrl == typeURL {
+					return "eds"
+				}
+				return "default"
+			},
+			Caches: map[string]cachev3.Cache{
+				"default": configv3,
+				"eds":     eds,
+			},
+		}
+	}
+	srv3 := serverv3.NewServer(context.Background(), configCachev3, cbv3)
 	alsv2 := &testv2.AccessLogService{}
 	alsv3 := &testv3.AccessLogService{}
 
@@ -216,6 +239,11 @@ func main() {
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
 			os.Exit(1)
+		}
+		if mux {
+			for name, res := range snapshotv3.GetResources(typeURL) {
+				eds.UpdateResource(name, res)
+			}
 		}
 
 		// pass is true if all requests succeed at least once in a run
