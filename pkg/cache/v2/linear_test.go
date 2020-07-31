@@ -83,8 +83,16 @@ func TestLinearCornerCases(t *testing.T) {
 	if err == nil {
 		t.Error("expected error on nil resource")
 	}
-	w, _ := c.CreateWatch(Request{})
-	verifyResponse(t, w, "0", 0)
+	// create an incorrect type URL request
+	w, _ := c.CreateWatch(Request{TypeUrl: "test"})
+	select {
+	case _, more := <-w:
+		if more {
+			t.Error("should be closed by the producer")
+		}
+	default:
+		t.Error("channel should be closed")
+	}
 }
 
 func TestLinearBasic(t *testing.T) {

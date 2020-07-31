@@ -144,7 +144,7 @@ func (cache *LinearCache) DeleteResource(name string) error {
 func (cache *LinearCache) CreateWatch(request Request) (chan Response, func()) {
 	value := make(chan Response, 1)
 	if request.TypeUrl != cache.typeURL {
-		value <- RawResponse{Request: Request{TypeUrl: cache.typeURL}, Version: strconv.FormatUint(cache.version, 10)}
+		close(value)
 		return value, nil
 	}
 	// If the version is not up to date, check whether any requested resource has
