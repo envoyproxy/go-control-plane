@@ -50,6 +50,8 @@ type Server interface {
 
 	// Fetch is the universal fetch method.
 	Fetch(context.Context, *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error)
+	// StreamHandler is the universal stream method.
+	StreamHandler(stream Stream, typeURL string) error
 }
 
 // Callbacks is a collection of callbacks inserted into the server operation.
@@ -146,7 +148,8 @@ type server struct {
 	ctx         context.Context
 }
 
-type stream interface {
+// Generic RPC stream.
+type Stream interface {
 	grpc.ServerStream
 
 	Send(*discovery.DiscoveryResponse) error
@@ -232,7 +235,7 @@ func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryRe
 }
 
 // process handles a bi-di stream request
-func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
@@ -458,8 +461,8 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 	}
 }
 
-// handler converts a blocking read call to channels and initiates stream processing
-func (s *server) handler(stream stream, typeURL string) error {
+// StreamHandler converts a blocking read call to channels and initiates stream processing
+func (s *server) StreamHandler(stream Stream, typeURL string) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *discovery.DiscoveryRequest)
 	reqStop := int32(0)
@@ -487,31 +490,31 @@ func (s *server) handler(stream stream, typeURL string) error {
 }
 
 func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
-	return s.handler(stream, resource.AnyType)
+	return s.StreamHandler(stream, resource.AnyType)
 }
 
 func (s *server) StreamEndpoints(stream endpointservice.EndpointDiscoveryService_StreamEndpointsServer) error {
-	return s.handler(stream, resource.EndpointType)
+	return s.StreamHandler(stream, resource.EndpointType)
 }
 
 func (s *server) StreamClusters(stream clusterservice.ClusterDiscoveryService_StreamClustersServer) error {
-	return s.handler(stream, resource.ClusterType)
+	return s.StreamHandler(stream, resource.ClusterType)
 }
 
 func (s *server) StreamRoutes(stream routeservice.RouteDiscoveryService_StreamRoutesServer) error {
-	return s.handler(stream, resource.RouteType)
+	return s.StreamHandler(stream, resource.RouteType)
 }
 
 func (s *server) StreamListeners(stream listenerservice.ListenerDiscoveryService_StreamListenersServer) error {
-	return s.handler(stream, resource.ListenerType)
+	return s.StreamHandler(stream, resource.ListenerType)
 }
 
 func (s *server) StreamSecrets(stream secretservice.SecretDiscoveryService_StreamSecretsServer) error {
-	return s.handler(stream, resource.SecretType)
+	return s.StreamHandler(stream, resource.SecretType)
 }
 
 func (s *server) StreamRuntime(stream runtimeservice.RuntimeDiscoveryService_StreamRuntimeServer) error {
-	return s.handler(stream, resource.RuntimeType)
+	return s.StreamHandler(stream, resource.RuntimeType)
 }
 
 // Fetch is the universal fetch method.
