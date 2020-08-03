@@ -34,22 +34,6 @@ following guidelines for all code, APIs, and documentation:
   practices evolve. Additional comments on this topic may be provided by maintainers during code
   review.
 
-## Breaking change policy
-
-Both API and implementation stability are important to Envoy. Since the API is consumed by clients
-beyond Envoy, it has a distinct set of versioning guidelines]. Below, we
-articulate the Envoy implementation stability rules, which operate within the context of the API
-versioning guidelines:
-
-* Features may be marked as deprecated in a given versioned API at any point in time, but this may
-  only be done when a replacement implementation and configuration path is available in go-control-plane on master. Deprecators must implement a conversion from the deprecated configuration to the latest
-  `vNalpha` (with the deprecated field) that go-control-plane uses internally. The PR author deprecating the old configuration is responsible for
-  updating all tests and canonical configuration. The majority of tests and
-  configuration for a feature should be expressed in terms of the latest go-control-plane internal
-  configuration (i.e. `vNalpha`).
-* We will delete deprecated configuration across major API versions. E.g. a field marked deprecated
-  in v2 will be removed in v3.
-
 ## Submitting a PR
 
 * Fork the repo.

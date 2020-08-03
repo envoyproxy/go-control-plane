@@ -33,29 +33,3 @@ functionality:
   `rebase`.
 * Automatically running DCO and format checks on all files in the diff, before
   push.
-
-[filter]: https://github.com/envoyproxy/envoy-filter-example
-
-## Fixing Format Problems
-
-If the pre-push format checks detect any problems, you can either fix the
-affected files manually or run the provided formatting script.
-
-To run the format fix script directly:
-
-```
-./tools/code_format/check_format.py fix && ./tools/code_format/format_python_tools.sh fix
-```
-
-To run the format fix script under Docker:
-
-```
-./ci/run_envoy_docker.sh './ci/do_ci.sh fix_format'
-```
-
-To run clang-tidy under Docker, run the following (this creates a full
-compilation db and takes a long time):
-
-```
-./ci/run_envoy_docker.sh ci/do_ci.sh bazel.clang_tidy
-```
