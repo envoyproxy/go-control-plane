@@ -73,7 +73,6 @@ following guidelines for all code, APIs, and documentation:
 
 ## PR review policy for maintainers
 
-* Typically we try to turn around reviews within one business day.
 * See [OWNERS.md](OWNERS.md) for the current list of maintainers.
 * It is generally expected that a senior maintainer should review every PR.
 * It is also generally expected that a "domain expert" for the code the PR touches should review the
