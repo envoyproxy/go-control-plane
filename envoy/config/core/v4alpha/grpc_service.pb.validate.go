@@ -175,6 +175,20 @@ func (m *GrpcService_EnvoyGrpc) Validate() error {
 		}
 	}
 
+	if l := len(m.GetAuthority()); l < 0 || l > 16384 {
+		return GrpcService_EnvoyGrpcValidationError{
+			field:  "Authority",
+			reason: "value length must be between 0 and 16384 bytes, inclusive",
+		}
+	}
+
+	if !_GrpcService_EnvoyGrpc_Authority_Pattern.MatchString(m.GetAuthority()) {
+		return GrpcService_EnvoyGrpcValidationError{
+			field:  "Authority",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
 	return nil
 }
 
@@ -233,6 +247,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GrpcService_EnvoyGrpcValidationError{}
+
+var _GrpcService_EnvoyGrpc_Authority_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on GrpcService_GoogleGrpc with the rules
 // defined in the proto definition for this message. If any rules are
