@@ -23,6 +23,10 @@ else
   RUNTIMES=1
 fi
 
+# Start the http server that sits upstream of Envoy
+(bin/upstream -message="$MESSAGE")&
+UPSTREAM_PID=$!
+
 (bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug=true "$@")&
 SERVER_PID=$!
 

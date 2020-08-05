@@ -8,24 +8,10 @@ SHELL 	:= /bin/bash
 BINDIR	:= bin
 PKG 		:= github.com/envoyproxy/go-control-plane
 
-# Build args for testing
-UNAME_S := $(shell uname -s)
-TEST_BIN_FLAGS := CGO_ENABLED=1
-ifeq ($(UNAME_S), Darwin)
-	TEST_BIN_FLAGS += GOOS=darwin GOARCH=amd64
-else 
-	TEST_BIN_FLAGS += GOOS=linux GOARCH=amd64
-endif
-
 .PHONY: build
 build:
 	@echo "--> building go-control-plane"
 	@go build ./pkg/... ./envoy/...
-
-.PHONY: build.test
-build.test:
-	@echo "--> building go-control-plane test binary"
-	@$(TEST_BIN_FLAGS) go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $(BINDIR)/test  pkg/test/main/main.go
 
 .PHONY: clean
 clean:
@@ -38,7 +24,7 @@ clean:
 .PHONY: test
 test:
 	@echo "--> testing go-control-plane"
-	@go test ./pkg/...
+	@go test -count=1 ./pkg/...
 
 .PHONY: cover
 cover:

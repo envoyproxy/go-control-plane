@@ -36,14 +36,13 @@ const (
 )
 
 var (
-	testEndpoint  = resource.MakeEndpoint(clusterName, 8080)
-	testEndpoint1 = resource.MakeEndpoint("cluster1", 8080)
-	testEndpoint2 = resource.MakeEndpoint("clusterDelta", 8080)
-	testCluster   = resource.MakeCluster(resource.Ads, clusterName)
-	testRoute     = resource.MakeRoute(routeName, clusterName)
-	testListener  = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	testRuntime   = resource.MakeRuntime(runtimeName)
-	testSecret    = resource.MakeSecrets(tlsName, rootName)
+	testEndpoint = resource.MakeEndpoint(clusterName, 8080)
+
+	testCluster  = resource.MakeCluster(resource.Ads, clusterName)
+	testRoute    = resource.MakeRoute(routeName, clusterName)
+	testListener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testRuntime  = resource.MakeRuntime(runtimeName)
+	testSecret   = resource.MakeSecrets(tlsName, rootName)
 )
 
 func TestValidate(t *testing.T) {

@@ -50,15 +50,16 @@ var (
 	version3 = "z"
 
 	snapshot = cache.NewSnapshot(version,
-		[]types.Resource{testEndpoint, testEndpoint1, testEndpoint2},
+		[]types.Resource{testEndpoint},
 		[]types.Resource{testCluster},
 		[]types.Resource{testRoute},
 		[]types.Resource{testListener},
 		[]types.Resource{testRuntime},
-		[]types.Resource{testSecret[0]})
+		[]types.Resource{testSecret[0]},
+	)
 
 	names = map[string][]string{
-		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta"},
+		rsrc.EndpointType: {clusterName},
 		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: {listenerName},
@@ -311,14 +312,14 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 
 func TestCheckState(t *testing.T) {
 	deltaState := map[string][]string{
-		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta"},
+		rsrc.EndpointType: {clusterName},
 		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: {listenerName},
 		rsrc.RuntimeType:  nil,
 	}
 	subscribed := map[string][]string{
-		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta", "clusterDelta2"},
+		rsrc.EndpointType: {clusterName, "clusterDelta2"},
 		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: {listenerName},

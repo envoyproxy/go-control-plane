@@ -50,15 +50,16 @@ var (
 	version2 = "y"
 
 	snapshot = cache.NewSnapshot(version,
-		[]types.Resource{testEndpoint, testEndpoint1, testEndpoint2},
+		[]types.Resource{testEndpoint},
 		[]types.Resource{testCluster},
 		[]types.Resource{testRoute},
 		[]types.Resource{testListener},
 		[]types.Resource{testRuntime},
-		[]types.Resource{testSecret[0]})
+		[]types.Resource{testSecret[0]},
+	)
 
 	names = map[string][]string{
-		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta"},
+		rsrc.EndpointType: {clusterName},
 		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: {listenerName},
@@ -226,6 +227,9 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+			Node: &core.Node{
+				Id: "node",
+			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
 		}, "")
@@ -254,6 +258,9 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// open new watches with the latest version
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+			Node: &core.Node{
+				Id: "node",
+			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
 		}, version)
@@ -286,18 +293,33 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	case <-time.After(time.Second * 5):
 		t.Fatal("failed to receive snapshot response")
 	}
+
+	// test an unsubscribe scenario
+
+	// Assume we got a request from the grpc server to unsubscribe from a resource so we can initiate a request
+	watches[testTypes[0]], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+		Node: &core.Node{
+			Id: "node",
+		},
+		TypeUrl:                  testTypes[0],
+		ResourceNamesUnsubscribe: []string{clusterName},
+	}, version2)
+
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
+		t.Errorf("watches should be preserved for all but one %d", count)
+	}
 }
 
 func TestCheckState(t *testing.T) {
 	deltaState := map[string][]string{
-		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta"},
+		rsrc.EndpointType: {clusterName},
 		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: {listenerName},
 		rsrc.RuntimeType:  nil,
 	}
 	subscribed := map[string][]string{
-		rsrc.EndpointType: {clusterName, "cluster1", "clusterDelta", "clusterDelta2"},
+		rsrc.EndpointType: {clusterName, "clusterDelta2"},
 		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
 		rsrc.ListenerType: {listenerName},

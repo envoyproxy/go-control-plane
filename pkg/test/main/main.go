@@ -34,8 +34,6 @@ import (
 	testv2 "github.com/envoyproxy/go-control-plane/pkg/test/v2"
 	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
 
-	"github.com/rs/zerolog"
-
 	resourcev2 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 	resourcev3 "github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -63,8 +61,6 @@ var (
 	mux           bool
 
 	nodeID string
-
-	zeroLogger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}).With().Timestamp().Logger()
 )
 
 func init() {
@@ -156,7 +152,7 @@ func main() {
 
 	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
 	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{})
-	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2)
+	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2, logger{})
 
 	// mux integration
 	var configCachev3 cachev3.Cache = configv3
@@ -176,7 +172,7 @@ func main() {
 			},
 		}
 	}
-	srv3 := serverv3.NewServer(context.Background(), configCachev3, cbv3)
+	srv3 := serverv3.NewServer(context.Background(), configCachev3, cbv3, logger{})
 	alsv2 := &testv2.AccessLogService{}
 	alsv3 := &testv3.AccessLogService{}
 
@@ -205,7 +201,7 @@ func main() {
 	// start the xDS server
 	go test.RunAccessLogServer(ctx, alsv2, alsv3, alsPort)
 	go test.RunManagementServer(ctx, srv2, srv3, port)
-	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{log: zeroLogger})
+	go test.RunManagementGateway(ctx, srv2, srv3, gatewayPort, logger{})
 
 	log.Println("waiting for the first request...")
 	select {
@@ -215,23 +211,22 @@ func main() {
 		log.Println("timeout waiting for the first request")
 		os.Exit(1)
 	}
-
 	log.Printf("initial snapshot %+v\n", snapshotsv2)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
 	for i := 0; i < updates; i++ {
 		snapshotsv2.Version = fmt.Sprintf("v%d", i)
-		log.Printf("update snapshot v2 %v\n", snapshotsv2.Version)
+		log.Printf("update snapshot %v\n", snapshotsv2.Version)
 		snapshotsv3.Version = fmt.Sprintf("v%d", i)
-		log.Printf("update snapshot v3 %v\n", snapshotsv3.Version)
+		log.Printf("update snapshot %v\n", snapshotsv3.Version)
 
 		snapshotv2 := snapshotsv2.Generate()
 		snapshotv3 := snapshotsv3.Generate()
 		if err := snapshotv2.Consistent(); err != nil {
-			log.Printf("v2 snapshot inconsistency: %+v\n", snapshotv2)
+			log.Printf("snapshot inconsistency: %+v\n", snapshotv2)
 		}
 		if err := snapshotv3.Consistent(); err != nil {
-			log.Printf("v3 snapshot inconsistency: %+v\n", snapshotv3)
+			log.Printf("snapshot inconsistency: %+v\n", snapshotv3)
 		}
 
 		// Check to see if they want to run the delta integration tests
@@ -361,26 +356,24 @@ func callEcho() (int, int) {
 	}
 }
 
-type logger struct {
-	log zerolog.Logger
-}
+type logger struct{}
 
-func (l logger) Debugf(format string, args ...interface{}) {
+func (logger logger) Debugf(format string, args ...interface{}) {
 	if debug {
-		l.log.Debug().Msgf(format, args...)
+		log.Printf(format+"\n", args...)
 	}
 }
 
-func (l logger) Infof(format string, args ...interface{}) {
+func (logger logger) Infof(format string, args ...interface{}) {
 	if debug {
-		l.log.Info().Msgf(format, args...)
+		log.Printf(format+"\n", args...)
 	}
 }
 
-func (l logger) Warnf(format string, args ...interface{}) {
-	l.log.Warn().Msgf(format, args...)
+func (logger logger) Warnf(format string, args ...interface{}) {
+	log.Printf(format+"\n", args...)
 }
 
-func (l logger) Errorf(format string, args ...interface{}) {
-	l.log.Error().Msgf(format, args...)
+func (logger logger) Errorf(format string, args ...interface{}) {
+	log.Printf(format+"\n", args...)
 }
