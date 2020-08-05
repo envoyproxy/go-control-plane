@@ -96,7 +96,7 @@ func init() {
 
 	// Tell Envoy to request configurations from the control plane using
 	// this protocol
-	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management protocol to test (ADS, xDS, REST)")
+	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management protocol to test (ADS, xDS, REST, DELTA)")
 
 	// Tell Envoy to use this Node ID
 	flag.StringVar(&nodeID, "nodeID", "test-id", "Node ID")

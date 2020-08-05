@@ -10,7 +10,7 @@ set -o pipefail
 
 MESSAGE=$'Hi, there!\n'
 
-# Management server type. Valid values are "ads", "xds", "rest"
+# Management server type. Valid values are "ads", "xds", "rest", or "delta"
 XDS=${XDS:-ads}
 
 #Represents SUFFIX api version
@@ -26,9 +26,6 @@ fi
 # Start the http server that sits upstream of Envoy
 (bin/upstream -message="$MESSAGE")&
 UPSTREAM_PID=$!
-
-(bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug=true "$@")&
-SERVER_PID=$!
 
 # Envoy start-up command
 ENVOY=${ENVOY:-/usr/local/bin/envoy}
