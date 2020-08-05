@@ -41,9 +41,10 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 
 			// Handle the case of an initial delta request and having no previous state
 			if info.deltaState[t].Version == "" && watch.Request.InitialResourceVersions == nil {
+				// Always initialize state
 				info.deltaState[t] = Resources{
 					Version: version,
-					Items:   snapshot.GetResources(t),
+					Items:   subscribed,
 				}
 
 				if cache.log != nil {
@@ -53,9 +54,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					cache.log.Infof("initial delta snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
 				}
 
-				// TODO:
-				// not sure if this logic works properly yet, we're entering a full loop with the control-plane and envoy
-				// yet it's receiving all the resouces it should be
 				// check the wildcard
 				if len(subscribed) == 0 {
 					cache.log.Debugf("received wildcard request")
@@ -81,9 +79,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 
 				// discard the old watch
 				delete(info.deltaWatches, id)
-
-				info.mu.Unlock()
-				return nil
 			} else if version != info.deltaState[t].Version {
 				if len(subscribed) == 0 && len(unsubscribed) == 0 {
 					cache.log.Debugf("wildcard request")
@@ -97,19 +92,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 							Items:   snapshot.GetResources(tURL),
 						}
 					}
-
-					cache.respondDelta(
-						watch.Request,
-						watch.Response,
-						info.deltaState[t].Items,
-						unsubscribed,
-						version,
-					)
-
-					delete(info.deltaWatches, id)
-
-					info.mu.Unlock()
-					return nil
 				}
 
 				// Assume we've received a new resource and we want to send new resources and cancel old watches

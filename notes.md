@@ -1,15 +1,15 @@
-NOTES
+# NOTES
 
-Snapshot cache delta unit test is failing intermittenly because the Cluster and Endpoint watches are failing to return a snapshot
-But the other resources types always pass regardless of the test case
+All unit tests pass for the delta snapshot cache. They also pass for the delta server code.
 
-As of right now, I am noticing that the management server is only creating new watches for a singular resource type when it receives a new snapshot
+For some reason the management server will respond to envoys initial request of the runtime payload, then die. Need to dig into that
 
 
 
 Running:
 
 ./test --xds=delta  -debug=true 2> xds.delta.log
+
 envoy -c ../sample/bootstrap-delta.yaml --drain-time-s 1 -l debug 2> envoy.delta.log
 
 

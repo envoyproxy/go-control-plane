@@ -226,6 +226,9 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+			Node: &core.Node{
+				Id: "node",
+			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
 		}, "")
@@ -254,6 +257,9 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// open new watches with the latest version
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+			Node: &core.Node{
+				Id: "node",
+			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
 		}, version)
@@ -291,6 +297,9 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 
 	// Assume we got a request from the grpc server to unsubscribe from a resource so we can initiate a request
 	watches[testTypes[0]], _ = c.CreateDeltaWatch(discovery.DeltaDiscoveryRequest{
+		Node: &core.Node{
+			Id: "node",
+		},
 		TypeUrl:                  testTypes[0],
 		ResourceNamesUnsubscribe: []string{clusterName},
 	}, version2)
