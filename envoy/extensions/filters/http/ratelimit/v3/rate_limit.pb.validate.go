@@ -95,6 +95,13 @@ func (m *RateLimit) Validate() error {
 		}
 	}
 
+	if _, ok := RateLimit_XRateLimitHeadersRFCVersion_name[int32(m.GetEnableXRatelimitHeaders())]; !ok {
+		return RateLimitValidationError{
+			field:  "EnableXRatelimitHeaders",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	return nil
 }
 

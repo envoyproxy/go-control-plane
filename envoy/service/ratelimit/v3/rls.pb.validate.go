@@ -330,6 +330,16 @@ func (m *RateLimitResponse_DescriptorStatus) Validate() error {
 
 	// no validation rules for LimitRemaining
 
+	if v, ok := interface{}(m.GetDurationUntilReset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitResponse_DescriptorStatusValidationError{
+				field:  "DurationUntilReset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
