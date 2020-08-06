@@ -1,4 +1,4 @@
-// Copyright 2018 Envoyproxy Authors
+// Copyright 2020 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -126,10 +126,8 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 						cache.log.Debugf("node: %s, recieved items to unsubscribe from: %v", node, unsubscribed)
 					}
 
-					newState := cache.unsubscribe(unsubscribed, info.deltaState)
-					for typ := range info.deltaState {
-						info.deltaState[typ] = newState[typ]
-					}
+					// Mutates deltaState and will remove the items from the map
+					cache.unsubscribe(unsubscribed, info.deltaState)
 				}
 
 				if cache.log != nil {
@@ -160,7 +158,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 // TODO: SLOW this will need to be revisited
 func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Resource) map[string]types.Resource {
 	mb := make(map[string]types.Resource, len(deltaState))
-	diff := make(map[string]types.Resource, 0)
+	diff := make(map[string]types.Resource, len(deltaState))
 
 	for key, value := range deltaState {
 		mb[key] = value
@@ -169,11 +167,11 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 	// Check our diff map to see what has changed
 	// Even is an underlying resource has changed we need to update the diff
 	for key, value := range resources {
-		if _, found := mb[key]; !found {
-			cache.log.Debugf("found new key: %s", key)
-			diff[key] = value
-		} else if resource, found := mb[key]; found && (resource != value) {
-			cache.log.Debugf("found updated resource from existing key %s, modifying resource map", key)
+		resource, found := deltaState[key]
+		if !found || resource != value {
+			if cache.log != nil {
+				cache.log.Debugf("Detected change in deltaState: %v", resource)
+			}
 			diff[key] = value
 		}
 	}
@@ -182,15 +180,13 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 }
 
 // Unscrubscribe will remove resources from the tracked list in the management server when received from a client
-func (cache *snapshotCache) unsubscribe(resources []string, deltaState map[string]Resources) map[string]Resources {
+func (cache *snapshotCache) unsubscribe(resources []string, deltaState map[string]Resources) {
 	// here we need to search and remove from the current subscribed list in the snapshot
 	for _, items := range deltaState {
 		for i := 0; i < len(resources); i++ {
 			delete(items.Items, resources[i])
 		}
 	}
-
-	return deltaState
 }
 
 // CreateDeltaWatch returns a watch for a delta xDS request.

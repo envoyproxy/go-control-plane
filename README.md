@@ -1,4 +1,4 @@
-# Go Control Plane
+# control-plane
 
 [![CircleCI](https://circleci.com/gh/envoyproxy/go-control-plane.svg?style=svg)](https://circleci.com/gh/envoyproxy/go-control-plane)
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
@@ -51,13 +51,13 @@ in the same environment as the circle ci. This makes sure to produce a consisten
     ./build/run_docker.sh make build test
     ```
 
-2. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
+1. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
 
     ```sh
     ./build/run_docker.sh make integration
     ```
 
-For an example on getting up and running with go-control-plane, check out the [example server code](internal/example/README.md).
+1. Take a look at the [example server](internal/example/README.md).
 
 ## xDS API Versioning
 

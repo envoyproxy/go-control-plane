@@ -239,7 +239,12 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 	}
 }
 
-func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response, error) {
+// TODO: implement CreateDeltaWatch for linear cache
+func (cache *LinearCache) CreateDeltaWatch(request DeltaRequest, version string) (chan DeltaResponse, func()) {
+	return nil, nil
+}
+
+func (cache *LinearCache) Fetch(ctx context.Context, request Request) (Response, error) {
 	return nil, errors.New("not implemented")
 }
 

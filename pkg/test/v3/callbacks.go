@@ -62,9 +62,9 @@ func (cb *Callbacks) OnStreamDeltaResponse(id int64, req *discovery.DeltaDiscove
 
 // OnStreamDeltaRequest ...
 func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscoveryRequest) error {
-	if cb.Debug {
-		log.Printf("request: %s", req.String())
-	}
+	// if cb.Debug {
+	// 	log.Printf("request: %s", req.String())
+	// }
 
 	cb.mu.Lock()
 	defer cb.mu.Unlock()

@@ -57,8 +57,8 @@ $(BINDIR)/upstream:
 	@go build -race -o $@ internal/upstream/main.go
 
 $(BINDIR)/test:
-	echo "Building test binary"
-	$(TEST_BIN_FLAGS) go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
+	@echo "Building test binary"
+	@go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
 
 integration: integration.xds integration.xds.delta integration.xds.v3 integration.ads integration.ads.tls integration.ads.v3 integration.rest integration.rest.v3
 
@@ -102,3 +102,7 @@ $(BINDIR)/example:
 
 example: $(BINDIR)/example
 	@build/example.sh
+<<<<<<< HEAD
+=======
+	
+>>>>>>> address some pr comments

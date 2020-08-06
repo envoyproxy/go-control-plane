@@ -38,7 +38,6 @@ const (
 
 var (
 	testEndpoint = resource.MakeEndpoint(clusterName, 8080)
-
 	testCluster  = resource.MakeCluster(resource.Ads, clusterName)
 	testRoute    = resource.MakeRoute(routeName, clusterName)
 	testListener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)

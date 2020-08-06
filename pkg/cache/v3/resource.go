@@ -161,23 +161,22 @@ func GetResourceReferences(resources map[string]types.Resource) map[string]bool 
 
 // HashResources will take a list of resources and create a SHA256 hash sum out of the marshaled bytes
 func HashResources(resources []types.Resource) (string, error) {
-	var source []byte
 	hasher := sha256.New()
 
-	// Add our resources to the byte source for the hash
+	buffer := proto.NewBuffer(nil)
+	buffer.SetDeterministic(true)
+
 	for _, resource := range resources {
-		b := proto.NewBuffer(nil)
-		b.SetDeterministic(true)
-		err := b.Marshal(resource)
+		err := buffer.Marshal(resource)
 		if err != nil {
 			return "", err
 		}
 
-		source = append(source, b.Bytes()...)
+		hasher.Write(buffer.Bytes())
+
+		buffer.Reset()
 	}
 
-	// Use the bytes as our hashing source
-	hasher.Write(source)
 	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
 
