@@ -123,12 +123,13 @@ func (r RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error
 	}
 
 	r.isResourceMarshaled = true
-
-	return &discovery.DiscoveryResponse{
+	r.marshaledResponse = &discovery.DiscoveryResponse{
 		VersionInfo: r.Version,
 		Resources:   marshaledResources,
 		TypeUrl:     r.Request.TypeUrl,
-	}, nil
+	}
+
+	return r.marshaledResponse, nil
 }
 
 // GetRequest returns the original Discovery Request.
