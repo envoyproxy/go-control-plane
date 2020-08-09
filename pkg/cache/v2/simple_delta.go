@@ -157,12 +157,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 // difference returns the elements in `a` that aren't in `b`.
 // TODO: SLOW this will need to be revisited
 func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Resource) map[string]types.Resource {
-	mb := make(map[string]types.Resource, len(deltaState))
 	diff := make(map[string]types.Resource, len(deltaState))
-
-	for key, value := range deltaState {
-		mb[key] = value
-	}
 
 	// Check our diff map to see what has changed
 	// Even is an underlying resource has changed we need to update the diff
