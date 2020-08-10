@@ -85,8 +85,8 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 			}
 		}
 	}
-	value <- RawResponse{
-		Request:   Request{TypeUrl: cache.typeURL},
+	value <- &RawResponse{
+		Request:   &Request{TypeUrl: cache.typeURL},
 		Resources: resources,
 		Version:   strconv.FormatUint(cache.version, 10),
 	}
@@ -142,7 +142,7 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	return nil
 }
 
-func (cache *LinearCache) CreateWatch(request Request) (chan Response, func()) {
+func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) {
 	value := make(chan Response, 1)
 	if request.TypeUrl != cache.typeURL {
 		close(value)
@@ -208,7 +208,7 @@ func (cache *LinearCache) CreateWatch(request Request) (chan Response, func()) {
 	}
 }
 
-func (cache *LinearCache) Fetch(ctx context.Context, request Request) (Response, error) {
+func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response, error) {
 	return nil, errors.New("not implemented")
 }
 
