@@ -157,7 +157,7 @@ func main() {
 	// mux integration
 	var configCachev3 cachev3.Cache = configv3
 	typeURL := "type.googleapis.com/envoy.config.endpoint.v3.ClusterLoadAssignment"
-	eds := cachev3.NewLinearCache(typeURL, nil)
+	eds := cachev3.NewLinearCache(typeURL)
 	if mux {
 		configCachev3 = &cachev3.MuxCache{
 			Classify: func(req cachev3.Request) string {
