@@ -33,7 +33,7 @@ ENVOY_LOG="envoy.${XDS}${SUFFIX}$@.log"
 echo Envoy log: ${ENVOY_LOG}
 
 # Start envoy: important to keep drain time short
-(${ENVOY} -c sample/bootstrap-${XDS}${SUFFIX}.yaml --drain-time-s 1 --base-id 1 -l debug 2> ${ENVOY_LOG})&
+(${ENVOY} -c sample/bootstrap-${XDS}${SUFFIX}.yaml --drain-time-s 1 -l debug 2> ${ENVOY_LOG})&
 ENVOY_PID=$!
 
 function cleanup() {

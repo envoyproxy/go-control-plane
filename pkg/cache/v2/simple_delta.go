@@ -279,7 +279,7 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 		}
 	}
 
-	return RawDeltaResponse{
+	return &RawDeltaResponse{
 		DeltaRequest:     request,
 		Resources:        filtered,
 		RemovedResources: unsubscribed,

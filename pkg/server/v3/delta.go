@@ -227,6 +227,17 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 			values.deltaRuntimeNonce = nonce
 
+		case resp, more := <-values.deltaResponses:
+			if !more {
+				return status.Errorf(codes.Unavailable, "resource watch failed")
+			}
+			typeURL := resp.GetDeltaRequest().TypeUrl
+			nonce, err := send(resp, typeURL)
+			if err != nil {
+				return err
+			}
+			values.nonces[typeURL] = nonce
+
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {

@@ -50,12 +50,36 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (c
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
 	} else if config.closeWatch {
 		close(out)
-	} else {
-		config.watches += 1
-		return out, func() {
-			// it is ok to close the channel after cancellation and not wait for it to be garbage collected
-			close(out)
-			config.watches -= 1
+	}
+	return out, func() {}
+}
+
+func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRequest, version string) (chan cache.DeltaResponse, func()) {
+	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+
+	// Create our out watch channel to return with a buffer of one
+	out := make(chan cache.DeltaResponse, 1)
+
+	if len(config.deltaResponses[req.TypeUrl]) > 0 {
+
+		res := config.deltaResponses[req.TypeUrl][0]
+		var subscribed []types.Resource
+
+		// Only return back the subscribed resources to our request type
+		r, _ := res.GetDeltaDiscoveryResponse()
+		for _, resource := range r.Resources {
+			for _, alias := range req.GetResourceNamesSubscribe() {
+				if resource.GetName() == alias {
+					subscribed = append(subscribed, resource)
+				}
+			}
+		}
+
+		// We should only send back subscribed resources here
+		out <- &cache.RawDeltaResponse{
+			DeltaRequest:  req,
+			Resources:     subscribed,
+			SystemVersion: version,
 		}
 	}
 	return out, nil
