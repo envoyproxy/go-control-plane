@@ -54,7 +54,7 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (c
 	return out, func() {}
 }
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req discovery.DeltaDiscoveryRequest, version string) (chan cache.DeltaResponse, func()) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, version string) (chan cache.DeltaResponse, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 
 	// Create our out watch channel to return with a buffer of one
