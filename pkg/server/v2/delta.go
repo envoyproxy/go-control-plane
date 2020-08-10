@@ -120,6 +120,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 	var node = &core.Node{}
 
 	for {
+		s.deltaLock.Lock()
 		select {
 		case <-s.ctx.Done():
 			return nil
@@ -133,9 +134,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
-			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -150,9 +149,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
-			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -167,9 +164,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
-			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -184,9 +179,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
-			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -201,9 +194,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
-			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -218,9 +209,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
-			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -324,5 +313,6 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				s.deltaLock.RUnlock()
 			}
 		}
+		s.deltaLock.Unlock()
 	}
 }

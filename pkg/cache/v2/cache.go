@@ -200,36 +200,34 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 // This is necessary because the marshalled response does not change across the calls.
 // This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
 func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
-	if r.isResourceMarshaled {
-		return r.marshaledResponse, nil
-	}
+	if !r.isResourceMarshaled {
+		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
-	marshaledResources := make([]*discovery.Resource, len(r.Resources))
+		for i, resource := range r.Resources {
+			marshaledResource, err := MarshalResource(resource)
+			if err != nil {
+				return nil, err
+			}
 
-	for i, resource := range r.Resources {
-		marshaledResource, err := MarshalResource(resource)
-		if err != nil {
-			return nil, err
+			name := GetResourceName(resource)
+			marshaledResources[i] = &discovery.Resource{
+				Name:    name,
+				Aliases: []string{name},
+				Resource: &any.Any{
+					TypeUrl: r.DeltaRequest.TypeUrl,
+					Value:   marshaledResource,
+				},
+			}
 		}
 
-		name := GetResourceName(resource)
-		marshaledResources[i] = &discovery.Resource{
-			Name:    name,
-			Aliases: []string{name},
-			Resource: &any.Any{
-				TypeUrl: r.DeltaRequest.TypeUrl,
-				Value:   marshaledResource,
-			},
+		r.marshaledResponse = &discovery.DeltaDiscoveryResponse{
+			SystemVersionInfo: r.SystemVersion,
+			Resources:         marshaledResources,
+			RemovedResources:  r.RemovedResources,
+			TypeUrl:           r.DeltaRequest.TypeUrl,
 		}
+		r.isResourceMarshaled = true
 	}
-
-	r.marshaledResponse = &discovery.DeltaDiscoveryResponse{
-		SystemVersionInfo: r.SystemVersion,
-		Resources:         marshaledResources,
-		RemovedResources:  r.RemovedResources,
-		TypeUrl:           r.DeltaRequest.TypeUrl,
-	}
-	r.isResourceMarshaled = true
 
 	return r.marshaledResponse, nil
 }

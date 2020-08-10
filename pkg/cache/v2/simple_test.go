@@ -301,7 +301,6 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// test an unsubscribe scenario
-
 	// Assume we got a request from the grpc server to unsubscribe from a resource so we can initiate a request
 	watches[testTypes[0]], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 		Node: &core.Node{

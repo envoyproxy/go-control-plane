@@ -40,46 +40,47 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 			version := snapshot.GetVersion(t)
 
 			// Handle the case of an initial delta request and having no previous state
-			if info.deltaState[t].Version == "" && watch.Request.InitialResourceVersions == nil {
-				// Always initialize state
-				info.deltaState[t] = Resources{
-					Version: version,
-					Items:   subscribed,
-				}
+			// if info.deltaState[t].Version == "" {
+			// 	// Always initialize state
+			// 	info.deltaState[t] = Resources{
+			// 		Version: version,
+			// 		Items:   subscribed,
+			// 	}
 
-				if cache.log != nil {
-					if s := watch.Request.GetResourceNamesSubscribe(); len(s) != 0 {
-						cache.log.Debugf("subscribing to resources: %+v", s)
-					}
-					cache.log.Infof("initial delta snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
-				}
+			// 	if cache.log != nil {
+			// 		if s := watch.Request.GetResourceNamesSubscribe(); len(s) != 0 {
+			// 			cache.log.Debugf("subscribing to resources: %+v", s)
+			// 		}
+			// 		cache.log.Infof("initial delta snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
+			// 	}
 
-				// check the wildcard
-				if len(subscribed) == 0 {
-					cache.log.Debugf("received wildcard request")
+			// 	// check the wildcard
+			// 	if len(subscribed) == 0 {
+			// 		cache.log.Debugf("received wildcard request")
 
-					// Maybe set the resources for all the types here???
-					for i := 0; i < int(types.UnknownType); i++ {
-						tURL := GetResponseTypeURL(types.ResponseType(i))
-						info.deltaState[tURL] = Resources{
-							Version: version,
-							Items:   snapshot.GetResources(tURL),
-						}
-					}
-				}
+			// 		// Maybe set the resources for all the types here???
+			// 		for i := 0; i < int(types.UnknownType); i++ {
+			// 			tURL := GetResponseTypeURL(types.ResponseType(i))
+			// 			info.deltaState[tURL] = Resources{
+			// 				Version: version,
+			// 				Items:   snapshot.GetResources(tURL),
+			// 			}
+			// 		}
+			// 	}
 
-				// Send out the response right away since we have nothing else to do
-				cache.respondDelta(
-					watch.Request,
-					watch.Response,
-					info.deltaState[t].Items,
-					unsubscribed,
-					version,
-				)
+			// 	// Send out the response right away since we have nothing else to do
+			// 	cache.respondDelta(
+			// 		watch.Request,
+			// 		watch.Response,
+			// 		info.deltaState[t].Items,
+			// 		unsubscribed,
+			// 		version,
+			// 	)
 
-				// discard the old watch
-				delete(info.deltaWatches, id)
-			} else if version != info.deltaState[t].Version {
+			// 	// discard the old watch
+			// 	delete(info.deltaWatches, id)
+			// } else
+			if version != info.deltaState[t].Version {
 				if len(subscribed) == 0 && len(unsubscribed) == 0 {
 					cache.log.Debugf("wildcard request")
 
@@ -165,7 +166,7 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 		resource, found := deltaState[key]
 		if !found || resource != value {
 			if cache.log != nil {
-				cache.log.Debugf("Detected change in deltaState: %v", resource)
+				cache.log.Debugf("Detected change in deltaState: %s -> %s\n", key, value.String())
 			}
 			diff[key] = value
 		}
