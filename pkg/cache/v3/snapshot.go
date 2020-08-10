@@ -140,6 +140,7 @@ func (s *Snapshot) GetSubscribedResources(aliases []string, typeURL string) map[
 	return subscribed
 }
 
+// GetResource will return a single resource by alias within a given resource group
 func (s *Snapshot) GetResource(alias string, typeURL string) types.Resource {
 	if s == nil {
 		return nil

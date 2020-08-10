@@ -31,7 +31,7 @@ import (
 type Request = discovery.DiscoveryRequest
 
 // DeltaRequest is an alias for the delta discovery request type.
-type DeltaRequest = discovery.DeltaDiscoveryRequest
+type DeltaRequest = *discovery.DeltaDiscoveryRequest
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
@@ -121,7 +121,7 @@ type RawDeltaResponse struct {
 	DeltaResponse
 
 	// Request is the original request.
-	DeltaRequest discovery.DeltaDiscoveryRequest
+	DeltaRequest *discovery.DeltaDiscoveryRequest
 
 	// System Version Info
 	SystemVersion string
@@ -221,12 +221,12 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 		}
 	}
 
-	r.isResourceMarshaled = true
 	r.marshaledResponse = &discovery.DeltaDiscoveryResponse{
 		SystemVersionInfo: r.SystemVersion,
 		Resources:         marshaledResources,
 		TypeUrl:           r.DeltaRequest.TypeUrl,
 	}
+	r.isResourceMarshaled = true
 
 	return r.marshaledResponse, nil
 }
@@ -236,8 +236,9 @@ func (r *RawResponse) GetRequest() *discovery.DiscoveryRequest {
 	return r.Request
 }
 
+// GetDeltaRequest returns the original DeltaRequest
 func (r *RawDeltaResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
-	return &r.DeltaRequest
+	return r.DeltaRequest
 }
 
 // GetVersion returns the response version.
@@ -245,6 +246,7 @@ func (r *RawResponse) GetVersion() (string, error) {
 	return r.Version, nil
 }
 
+// GetSystemVersion returns the raw SystemVersion
 func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 	return r.SystemVersion, nil
 }
@@ -254,6 +256,7 @@ func (r *PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryRespon
 	return r.DiscoveryResponse, nil
 }
 
+// GetDeltaDiscoveryResponse returns the final passthrough Delta Discovery Response.
 func (r *DeltaPassthroughResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
 	return r.DeltaDiscoveryResponse, nil
 }
@@ -263,6 +266,7 @@ func (r *PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
 	return r.Request
 }
 
+// GetDeltaRequest returns the original Delta Discovery Request
 func (r *DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
 	return &r.DeltaRequest
 }

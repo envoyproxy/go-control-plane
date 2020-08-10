@@ -219,7 +219,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 		}
 
 		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value}
+		info.deltaWatches[watchID] = &DeltaResponseWatch{Request: request, Response: value}
 		// Set our initial state when a watch is created
 		info.deltaState[t] = Resources{
 			Version: requestVersion,
