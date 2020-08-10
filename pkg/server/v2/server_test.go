@@ -338,22 +338,22 @@ func makeDeltaResponses() map[string][]cache.RawDeltaResponse {
 	return map[string][]cache.RawDeltaResponse{
 		rsrc.EndpointType: {{
 			Resources:     []types.Resource{endpoint},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
+			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
 			SystemVersion: "1",
 		}},
 		rsrc.ClusterType: {{
 			Resources:     []types.Resource{deltaCluster, deltaCluster2},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
+			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
 			SystemVersion: "2",
 		}},
 		rsrc.RouteType: {{
 			Resources:     []types.Resource{route},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
+			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
 			SystemVersion: "3",
 		}},
 		rsrc.ListenerType: {{
 			Resources:     []types.Resource{listener},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
+			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
 			SystemVersion: "4",
 		}},
 	}

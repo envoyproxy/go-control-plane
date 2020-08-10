@@ -30,7 +30,7 @@ import (
 type Request = discovery.DiscoveryRequest
 
 // DeltaRequest is an alias for the delta discovery request type.
-type DeltaRequest = discovery.DeltaDiscoveryRequest
+type DeltaRequest = *discovery.DeltaDiscoveryRequest
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
@@ -115,12 +115,12 @@ type RawResponse struct {
 	marshaledResponse atomic.Value
 }
 
-// DeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
+// RawDeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
 type RawDeltaResponse struct {
 	DeltaResponse
 
 	// Request is the original request.
-	DeltaRequest discovery.DeltaDiscoveryRequest
+	DeltaRequest *discovery.DeltaDiscoveryRequest
 
 	// System Version Info
 	SystemVersion string
@@ -196,6 +196,9 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 	return marshaledResponse.(*discovery.DiscoveryResponse), nil
 }
 
+// GetDeltaDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
+// This is necessary because the marshalled response does not change across the calls.
+// This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
 func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
 	if r.isResourceMarshaled {
 		return r.marshaledResponse, nil
@@ -220,13 +223,13 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 		}
 	}
 
-	r.isResourceMarshaled = true
 	r.marshaledResponse = &discovery.DeltaDiscoveryResponse{
 		SystemVersionInfo: r.SystemVersion,
 		Resources:         marshaledResources,
 		RemovedResources:  r.RemovedResources,
 		TypeUrl:           r.DeltaRequest.TypeUrl,
 	}
+	r.isResourceMarshaled = true
 
 	return r.marshaledResponse, nil
 }
@@ -236,8 +239,9 @@ func (r *RawResponse) GetRequest() *discovery.DiscoveryRequest {
 	return r.Request
 }
 
+// GetDeltaRequest returns the original DeltaRequest
 func (r *RawDeltaResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
-	return &r.DeltaRequest
+	return r.DeltaRequest
 }
 
 // GetVersion returns the response version.
@@ -245,6 +249,7 @@ func (r *RawResponse) GetVersion() (string, error) {
 	return r.Version, nil
 }
 
+// GetSystemVersion returns the raw SystemVersion
 func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 	return r.SystemVersion, nil
 }
@@ -254,6 +259,7 @@ func (r *PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryRespon
 	return r.DiscoveryResponse, nil
 }
 
+// GetDeltaDiscoveryResponse returns the final passthrough Delta Discovery Response.
 func (r *DeltaPassthroughResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
 	return r.DeltaDiscoveryResponse, nil
 }
@@ -263,6 +269,7 @@ func (r *PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
 	return r.Request
 }
 
+// GetDeltaRequest returns the original Delta Discovery Request
 func (r *DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
 	return &r.DeltaRequest
 }

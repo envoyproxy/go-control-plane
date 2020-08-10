@@ -116,7 +116,7 @@ type RawResponse struct {
 	marshaledResponse atomic.Value
 }
 
-// DeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
+// RawDeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
 type RawDeltaResponse struct {
 	DeltaResponse
 
@@ -194,6 +194,9 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 	return marshaledResponse.(*discovery.DiscoveryResponse), nil
 }
 
+// GetDeltaDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
+// This is necessary because the marshalled response does not change across the calls.
+// This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
 func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
 	if r.isResourceMarshaled {
 		return r.marshaledResponse, nil

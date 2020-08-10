@@ -70,7 +70,7 @@ type statusInfo struct {
 	watches map[int64]ResponseWatch
 
 	// deltaWatches are indexed channels for the delta response watches and the original requests
-	deltaWatches map[int64]DeltaResponseWatch
+	deltaWatches map[int64]*DeltaResponseWatch
 
 	// deltaState is the list of resources used for diffing when the server needs to send out updates for subcribed resources
 	// this list should be used to keep track of node state
@@ -110,7 +110,7 @@ func newStatusInfo(node *core.Node) *statusInfo {
 	out := statusInfo{
 		node:         node,
 		watches:      make(map[int64]ResponseWatch),
-		deltaWatches: make(map[int64]DeltaResponseWatch),
+		deltaWatches: make(map[int64]*DeltaResponseWatch),
 		deltaState:   make(map[string]Resources),
 	}
 	return &out
