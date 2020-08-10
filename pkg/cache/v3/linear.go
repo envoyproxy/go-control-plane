@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -43,6 +44,8 @@ type LinearCache struct {
 	watchAll watches
 	// Continously incremented version
 	version uint64
+	// Version prefix to be sent to the clients
+	versionPrefix string
 	// Versions for each resource by name.
 	versionVector map[string]uint64
 	mu            sync.Mutex
@@ -50,20 +53,40 @@ type LinearCache struct {
 
 var _ Cache = &LinearCache{}
 
-func NewLinearCache(typeURL string, initialResources map[string]types.Resource) *LinearCache {
-	if initialResources == nil {
-		initialResources = make(map[string]types.Resource)
+// Options for modifying the behavior of the linear cache.
+type LinearCacheOption func(*LinearCache)
+
+// WithVersionPrefix sets a version prefix of the form "prefixN" in the version info.
+// Version prefix can be used to distinguish replicated instances of the cache, in case
+// a client re-connects to another instance.
+func WithVersionPrefix(prefix string) LinearCacheOption {
+	return func(cache *LinearCache) {
+		cache.versionPrefix = prefix
 	}
+}
+
+// WithInitialResources initializes the initial set of resources.
+func WithInitialResources(resources map[string]types.Resource) LinearCacheOption {
+	return func(cache *LinearCache) {
+		cache.resources = resources
+		for name := range resources {
+			cache.versionVector[name] = 0
+		}
+	}
+}
+
+// NewLinearCache creates a new cache. See the comments on the struct definition.
+func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	out := &LinearCache{
 		typeURL:       typeURL,
-		resources:     initialResources,
+		resources:     make(map[string]types.Resource),
 		watches:       make(map[string]watches),
 		watchAll:      make(watches),
 		version:       0,
 		versionVector: make(map[string]uint64),
 	}
-	for name := range initialResources {
-		out.versionVector[name] = 0
+	for _, opt := range opts {
+		opt(out)
 	}
 	return out
 }
@@ -88,7 +111,7 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 	value <- RawResponse{
 		Request:   Request{TypeUrl: cache.typeURL},
 		Resources: resources,
-		Version:   strconv.FormatUint(cache.version, 10),
+		Version:   cache.versionPrefix + strconv.FormatUint(cache.version, 10),
 	}
 }
 
@@ -153,7 +176,15 @@ func (cache *LinearCache) CreateWatch(request Request) (chan Response, func()) {
 	// of sending empty updates whenever an irrelevant resource changes.
 	stale := false
 	staleResources := []string{} // empty means all
-	lastVersion, err := strconv.ParseUint(request.VersionInfo, 0, 64)
+
+	// strip version prefix if it is present
+	var lastVersion uint64
+	var err error
+	if strings.HasPrefix(request.VersionInfo, cache.versionPrefix) {
+		lastVersion, err = strconv.ParseUint(request.VersionInfo[len(cache.versionPrefix):], 0, 64)
+	} else {
+		err = errors.New("mis-matched version prefix")
+	}
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
