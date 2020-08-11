@@ -592,10 +592,10 @@ func TestCancellations(t *testing.T) {
 func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 	config := makeMockConfigWatcher()
 	resp := makeMockStream(t)
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 10; i++ {
 		resp.recv <- &discovery.DiscoveryRequest{
 			Node:    node,
-			TypeUrl: opaqueType,
+			TypeUrl: fmt.Sprintf("%s%d", opaqueType, i%2),
 			// each subsequent request is assumed to supercede the previous request
 			ResourceNames: []string{fmt.Sprintf("%d", i)},
 		}
