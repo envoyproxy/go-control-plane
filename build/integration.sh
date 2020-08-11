@@ -37,7 +37,13 @@ echo Envoy log: ${ENVOY_LOG}
 ENVOY_PID=$!
 
 function cleanup() {
+  # tribute to @acnodal-tc for fixing this below race condition
+  # signal Envoy and the upsteam server to shut down
   kill ${ENVOY_PID} ${UPSTREAM_PID}
+
+  # wait for Envoy and the upstream server to shut down.  The upstream
+  # server usually exits quickly, before the "wait" command even runs,
+  # so the redirect silences wait's message about that
   wait ${ENVOY_PID} ${UPSTREAM_PID} 2> /dev/null || true
 }
 trap cleanup EXIT
