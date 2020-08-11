@@ -46,6 +46,7 @@ func makeCluster(clusterName string) *cluster.Cluster {
 		ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_LOGICAL_DNS},
 		LbPolicy:             cluster.Cluster_ROUND_ROBIN,
 		LoadAssignment:       makeEndpoint(clusterName),
+		DnsLookupFamily:      cluster.Cluster_V4_ONLY,
 	}
 }
 
