@@ -9,7 +9,7 @@ This example comes with sample terraform to run a Kubernetes-aware control plane
 ### Prerequisites
 
 You will need:
-1. [terraform cli](https://www.terraform.io/downloads.html) installed 
+1. [terraform cli](https://www.terraform.io/downloads.html) installed (>v0.12)
 1. An AWS account with credentials set up locally in `~/.aws/credentials`
 
 ### Setup
