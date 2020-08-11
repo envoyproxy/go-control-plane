@@ -1405,6 +1405,18 @@ func (m *RouteAction) Validate() error {
 			}
 		}
 
+	case *RouteAction_HostRewritePathRegex:
+
+		if v, ok := interface{}(m.GetHostRewritePathRegex()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteActionValidationError{
+					field:  "HostRewritePathRegex",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
