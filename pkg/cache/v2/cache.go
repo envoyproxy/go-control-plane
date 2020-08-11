@@ -122,12 +122,12 @@ func (r RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error
 		}
 	}
 
-	r.isResourceMarshaled = true
 	r.marshaledResponse = &discovery.DiscoveryResponse{
 		VersionInfo: r.Version,
 		Resources:   marshaledResources,
 		TypeUrl:     r.Request.TypeUrl,
 	}
+	r.isResourceMarshaled = true
 
 	return r.marshaledResponse, nil
 }
