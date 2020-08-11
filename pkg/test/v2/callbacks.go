@@ -10,18 +10,21 @@ import (
 
 // Callbacks ...
 type Callbacks struct {
-	Signal   chan struct{}
-	Debug    bool
-	Fetches  int
-	Requests int
-	mu       sync.Mutex
+	Signal         chan struct{}
+	Debug          bool
+	Fetches        int
+	Requests       int
+	Responses      int
+	DeltaRequests  int
+	DeltaResponses int
+	mu             sync.Mutex
 }
 
 // Report ...
 func (cb *Callbacks) Report() {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-	log.Printf("server callbacks fetches=%d requests=%d\n", cb.Fetches, cb.Requests)
+	log.Printf("server callbacks fetches=%d requests=%d responses=%d delta-requests=%d delta-responses=%d\n", cb.Fetches, cb.Requests, cb.Responses, cb.DeltaRequests, cb.DeltaResponses)
 }
 
 // OnStreamOpen ...
@@ -53,10 +56,16 @@ func (cb *Callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error {
 
 // OnStreamResponse ...
 func (cb *Callbacks) OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.Responses++
 }
 
 // OnStreamDeltaResponse ...
 func (cb *Callbacks) OnStreamDeltaResponse(id int64, req *discovery.DeltaDiscoveryRequest, res *discovery.DeltaDiscoveryResponse) {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.DeltaResponses++
 }
 
 // OnStreamDeltaRequest ...
@@ -67,7 +76,7 @@ func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscover
 
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-	cb.Requests++
+	cb.DeltaRequests++
 	if cb.Signal != nil {
 		close(cb.Signal)
 		cb.Signal = nil
