@@ -19,6 +19,7 @@ package cache
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -80,8 +81,8 @@ type RawResponse struct {
 	// Resources to be included in the response.
 	Resources []types.Resource
 
-	// marshaledResponse holds the serialized discovery response.
-	marshaledResponse *discovery.DiscoveryResponse
+	// marshaledResponse holds an atomic reference to the serialized discovery response.
+	marshaledResponse atomic.Value
 }
 
 var _ Response = &RawResponse{}
@@ -102,7 +103,9 @@ var _ Response = &PassthroughResponse{}
 // This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
 func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 
-	if r.marshaledResponse == nil {
+	marshaledResponse := r.marshaledResponse.Load()
+
+	if marshaledResponse == nil {
 
 		marshaledResources := make([]*any.Any, len(r.Resources))
 
@@ -117,14 +120,16 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 			}
 		}
 
-		r.marshaledResponse = &discovery.DiscoveryResponse{
+		marshaledResponse = &discovery.DiscoveryResponse{
 			VersionInfo: r.Version,
 			Resources:   marshaledResources,
 			TypeUrl:     r.Request.TypeUrl,
 		}
+
+		r.marshaledResponse.Store(marshaledResponse)
 	}
 
-	return r.marshaledResponse, nil
+	return marshaledResponse.(*discovery.DiscoveryResponse), nil
 }
 
 // GetRequest returns the original Discovery Request.
