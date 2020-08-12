@@ -18,6 +18,7 @@ package cache
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -43,7 +44,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(Request) (value chan Response, cancel func())
+	CreateWatch(*Request) (value chan Response, cancel func())
 }
 
 // Cache is a generic config cache with a watcher.
@@ -51,7 +52,7 @@ type Cache interface {
 	ConfigWatcher
 
 	// Fetch implements the polling method of the config cache using a non-empty request.
-	Fetch(context.Context, Request) (Response, error)
+	Fetch(context.Context, *Request) (Response, error)
 }
 
 // Response is a wrapper around Envoy's DiscoveryResponse.
@@ -70,7 +71,7 @@ type Response interface {
 // be included in the final Discovery Response.
 type RawResponse struct {
 	// Request is the original request.
-	Request discovery.DiscoveryRequest
+	Request *discovery.DiscoveryRequest
 
 	// Version of the resources as tracked by the cache for the given type.
 	// Proxy responds with this version as an acknowledgement.
@@ -79,13 +80,8 @@ type RawResponse struct {
 	// Resources to be included in the response.
 	Resources []types.Resource
 
-	// isResourceMarshaled indicates whether the resources have been marshaled.
-	// This is internally maintained by go-control-plane to prevent future
-	// duplication in marshaling efforts.
-	isResourceMarshaled bool
-
-	// marshaledResponse holds the serialized discovery response.
-	marshaledResponse *discovery.DiscoveryResponse
+	// marshaledResponse holds an atomic reference to the serialized discovery response.
+	marshaledResponse atomic.Value
 }
 
 var _ Response = &RawResponse{}
@@ -93,7 +89,7 @@ var _ Response = &RawResponse{}
 // PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
 type PassthroughResponse struct {
 	// Request is the original request.
-	Request discovery.DiscoveryRequest
+	Request *discovery.DiscoveryRequest
 
 	// The discovery response that needs to be sent as is, without any marshalling transformations.
 	DiscoveryResponse *discovery.DiscoveryResponse
@@ -104,55 +100,59 @@ var _ Response = &PassthroughResponse{}
 // GetDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
 // This is necessary because the marshalled response does not change across the calls.
 // This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
-func (r RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
-	if r.isResourceMarshaled {
-		return r.marshaledResponse, nil
+func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
+
+	marshaledResponse := r.marshaledResponse.Load()
+
+	if marshaledResponse == nil {
+
+		marshaledResources := make([]*any.Any, len(r.Resources))
+
+		for i, resource := range r.Resources {
+			marshaledResource, err := MarshalResource(resource)
+			if err != nil {
+				return nil, err
+			}
+			marshaledResources[i] = &any.Any{
+				TypeUrl: r.Request.TypeUrl,
+				Value:   marshaledResource,
+			}
+		}
+
+		marshaledResponse = &discovery.DiscoveryResponse{
+			VersionInfo: r.Version,
+			Resources:   marshaledResources,
+			TypeUrl:     r.Request.TypeUrl,
+		}
+
+		r.marshaledResponse.Store(marshaledResponse)
 	}
 
-	marshaledResources := make([]*any.Any, len(r.Resources))
-
-	for i, resource := range r.Resources {
-		marshaledResource, err := MarshalResource(resource)
-		if err != nil {
-			return nil, err
-		}
-		marshaledResources[i] = &any.Any{
-			TypeUrl: r.Request.TypeUrl,
-			Value:   marshaledResource,
-		}
-	}
-
-	r.isResourceMarshaled = true
-
-	return &discovery.DiscoveryResponse{
-		VersionInfo: r.Version,
-		Resources:   marshaledResources,
-		TypeUrl:     r.Request.TypeUrl,
-	}, nil
+	return marshaledResponse.(*discovery.DiscoveryResponse), nil
 }
 
 // GetRequest returns the original Discovery Request.
-func (r RawResponse) GetRequest() *discovery.DiscoveryRequest {
-	return &r.Request
+func (r *RawResponse) GetRequest() *discovery.DiscoveryRequest {
+	return r.Request
 }
 
 // GetVersion returns the response version.
-func (r RawResponse) GetVersion() (string, error) {
+func (r *RawResponse) GetVersion() (string, error) {
 	return r.Version, nil
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
-func (r PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
+func (r *PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	return r.DiscoveryResponse, nil
 }
 
 // GetRequest returns the original Discovery Request
-func (r PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
-	return &r.Request
+func (r *PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
+	return r.Request
 }
 
 // GetVersion returns the response version.
-func (r PassthroughResponse) GetVersion() (string, error) {
+func (r *PassthroughResponse) GetVersion() (string, error) {
 	if r.DiscoveryResponse != nil {
 		return r.DiscoveryResponse.VersionInfo, nil
 	}

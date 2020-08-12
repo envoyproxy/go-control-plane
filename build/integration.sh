@@ -37,8 +37,8 @@ echo Envoy log: ${ENVOY_LOG}
 ENVOY_PID=$!
 
 function cleanup() {
-  kill ${ENVOY_PID}
-  kill ${UPSTREAM_PID}
+  kill ${ENVOY_PID} ${UPSTREAM_PID}
+  wait ${ENVOY_PID} ${UPSTREAM_PID} 2> /dev/null || true
 }
 trap cleanup EXIT
 
