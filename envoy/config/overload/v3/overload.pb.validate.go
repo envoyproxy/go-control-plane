@@ -208,6 +208,85 @@ var _ interface {
 	ErrorName() string
 } = ThresholdTriggerValidationError{}
 
+// Validate checks the field values on ScaledTrigger with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ScaledTrigger) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if val := m.GetScalingThreshold(); val < 0 || val > 1 {
+		return ScaledTriggerValidationError{
+			field:  "ScalingThreshold",
+			reason: "value must be inside range [0, 1]",
+		}
+	}
+
+	if val := m.GetSaturationThreshold(); val < 0 || val > 1 {
+		return ScaledTriggerValidationError{
+			field:  "SaturationThreshold",
+			reason: "value must be inside range [0, 1]",
+		}
+	}
+
+	return nil
+}
+
+// ScaledTriggerValidationError is the validation error returned by
+// ScaledTrigger.Validate if the designated constraints aren't met.
+type ScaledTriggerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ScaledTriggerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ScaledTriggerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ScaledTriggerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ScaledTriggerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ScaledTriggerValidationError) ErrorName() string { return "ScaledTriggerValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ScaledTriggerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sScaledTrigger.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ScaledTriggerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ScaledTriggerValidationError{}
+
 // Validate checks the field values on Trigger with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Trigger) Validate() error {
@@ -230,6 +309,18 @@ func (m *Trigger) Validate() error {
 			if err := v.Validate(); err != nil {
 				return TriggerValidationError{
 					field:  "Threshold",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Trigger_Scaled:
+
+		if v, ok := interface{}(m.GetScaled()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TriggerValidationError{
+					field:  "Scaled",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
