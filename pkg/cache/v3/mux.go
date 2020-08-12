@@ -35,8 +35,8 @@ type MuxCache struct {
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request Request) (chan Response, func()) {
-	key := mux.Classify(request)
+func (mux *MuxCache) CreateWatch(request *Request) (chan Response, func()) {
+	key := mux.Classify(*request)
 	cache, exists := mux.Caches[key]
 	if !exists {
 		value := make(chan Response, 0)
@@ -46,6 +46,6 @@ func (mux *MuxCache) CreateWatch(request Request) (chan Response, func()) {
 	return cache.CreateWatch(request)
 }
 
-func (mux *MuxCache) Fetch(ctx context.Context, request Request) (Response, error) {
+func (mux *MuxCache) Fetch(ctx context.Context, request *Request) (Response, error) {
 	return nil, errors.New("not implemented")
 }
