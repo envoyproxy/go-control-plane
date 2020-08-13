@@ -321,6 +321,16 @@ func (m *Listener) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTcpBacklogSize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListenerValidationError{
+				field:  "TcpBacklogSize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
