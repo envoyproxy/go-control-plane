@@ -36,12 +36,12 @@ import (
 
 type mockConfigWatcher struct {
 	counts     map[string]int
-	responses  map[string][]cache.RawResponse
+	responses  map[string][]cache.Response
 	closeWatch bool
 	watches    int
 }
 
-func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (chan cache.Response, func()) {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	out := make(chan cache.Response, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
@@ -60,11 +60,11 @@ func (config *mockConfigWatcher) CreateWatch(req discovery.DiscoveryRequest) (ch
 	return out, nil
 }
 
-func (config *mockConfigWatcher) Fetch(ctx context.Context, req discovery.DiscoveryRequest) (cache.Response, error) {
+func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out := config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
-		return &out, nil
+		return out, nil
 	}
 	return nil, errors.New("missing")
 }
@@ -168,44 +168,58 @@ var (
 	}
 )
 
-func makeResponses() map[string][]cache.RawResponse {
-	return map[string][]cache.RawResponse{
-		rsrc.EndpointType: {{
-			Version:   "1",
-			Resources: []types.Resource{endpoint},
-			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
-		}},
-		rsrc.ClusterType: {{
-			Version:   "2",
-			Resources: []types.Resource{cluster},
-			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
-		}},
-		rsrc.RouteType: {{
-			Version:   "3",
-			Resources: []types.Resource{route},
-			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
-		}},
-		rsrc.ListenerType: {{
-			Version:   "4",
-			Resources: []types.Resource{listener},
-			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
-		}},
-		rsrc.SecretType: {{
-			Version:   "5",
-			Resources: []types.Resource{secret},
-			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
-		}},
-		rsrc.RuntimeType: {{
-			Version:   "6",
-			Resources: []types.Resource{runtime},
-			Request:   discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
-		}},
+func makeResponses() map[string][]cache.Response {
+	return map[string][]cache.Response{
+		rsrc.EndpointType: {
+			&cache.RawResponse{
+				Version:   "1",
+				Resources: []types.Resource{endpoint},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
+			},
+		},
+		rsrc.ClusterType: {
+			&cache.RawResponse{
+				Version:   "2",
+				Resources: []types.Resource{cluster},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
+			},
+		},
+		rsrc.RouteType: {
+			&cache.RawResponse{
+				Version:   "3",
+				Resources: []types.Resource{route},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
+			},
+		},
+		rsrc.ListenerType: {
+			&cache.RawResponse{
+				Version:   "4",
+				Resources: []types.Resource{listener},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
+			},
+		},
+		rsrc.SecretType: {
+			&cache.RawResponse{
+				Version:   "5",
+				Resources: []types.Resource{secret},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
+			},
+		},
+		rsrc.RuntimeType: {
+			&cache.RawResponse{
+				Version:   "6",
+				Resources: []types.Resource{runtime},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
+			},
+		},
 		// Pass-through type (xDS does not exist for this type)
-		opaqueType: {{
-			Version:   "7",
-			Resources: []types.Resource{opaque},
-			Request:   discovery.DiscoveryRequest{TypeUrl: opaqueType},
-		}},
+		opaqueType: {
+			&cache.RawResponse{
+				Version:   "7",
+				Resources: []types.Resource{opaque},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
+			},
+		},
 	}
 }
 

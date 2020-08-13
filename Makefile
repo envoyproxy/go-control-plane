@@ -32,6 +32,10 @@ create_version:
 check_version_dirty:
 	./scripts/check_version_dirty.sh
 
+.PHONY: examples
+examples:
+	@pushd examples/dyplomat && go build ./... && popd
+
 #-----------------
 #-- integration
 #-----------------

@@ -405,42 +405,42 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					if values.endpointCancel != nil {
 						values.endpointCancel()
 					}
-					values.endpoints, values.endpointCancel = s.cache.CreateWatch(*req)
+					values.endpoints, values.endpointCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.ClusterType:
 				if values.clusterNonce == "" || values.clusterNonce == nonce {
 					if values.clusterCancel != nil {
 						values.clusterCancel()
 					}
-					values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
+					values.clusters, values.clusterCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.RouteType:
 				if values.routeNonce == "" || values.routeNonce == nonce {
 					if values.routeCancel != nil {
 						values.routeCancel()
 					}
-					values.routes, values.routeCancel = s.cache.CreateWatch(*req)
+					values.routes, values.routeCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.ListenerType:
 				if values.listenerNonce == "" || values.listenerNonce == nonce {
 					if values.listenerCancel != nil {
 						values.listenerCancel()
 					}
-					values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
+					values.listeners, values.listenerCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.SecretType:
 				if values.secretNonce == "" || values.secretNonce == nonce {
 					if values.secretCancel != nil {
 						values.secretCancel()
 					}
-					values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
+					values.secrets, values.secretCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.RuntimeType:
 				if values.runtimeNonce == "" || values.runtimeNonce == nonce {
 					if values.runtimeCancel != nil {
 						values.runtimeCancel()
 					}
-					values.runtimes, values.runtimeCancel = s.cache.CreateWatch(*req)
+					values.runtimes, values.runtimeCancel = s.cache.CreateWatch(req)
 				}
 			default:
 				typeUrl := req.TypeUrl
@@ -455,7 +455,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						cancel()
 					}
 					var watch chan cache.Response
-					watch, values.cancellations[typeUrl] = s.cache.CreateWatch(*req)
+					watch, values.cancellations[typeUrl] = s.cache.CreateWatch(req)
 					// Muxing watches across multiple type URLs onto a single channel requires spawning
 					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
 					terminate := make(chan struct{})
@@ -549,7 +549,7 @@ func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*d
 			return nil, err
 		}
 	}
-	resp, err := s.cache.Fetch(ctx, *req)
+	resp, err := s.cache.Fetch(ctx, req)
 	if err != nil {
 		return nil, err
 	}
