@@ -142,6 +142,17 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 			}
 			values.runtimeNonce = nonce
 
+		case resp, more := <-values.responses:
+			if !more {
+				return status.Errorf(codes.Unavailable, "resource watch failed")
+			}
+			typeURL := resp.GetRequest().TypeUrl
+			nonce, err := send(resp, typeURL)
+			if err != nil {
+				return err
+			}
+			values.nonces[typeURL] = nonce
+
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {

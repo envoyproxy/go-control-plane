@@ -36,8 +36,8 @@ import (
 
 type mockConfigWatcher struct {
 	counts         map[string]int
-	responses      map[string][]cache.RawResponse
-	deltaResponses map[string][]cache.RawDeltaResponse
+	responses      map[string][]cache.Response
+	deltaResponses map[string][]cache.DeltaResponse
 	closeWatch     bool
 	watches        int
 }
@@ -309,53 +309,36 @@ func makeResponses() map[string][]cache.Response {
 	}
 }
 
-func makeDeltaResponses() map[string][]cache.RawDeltaResponse {
-	return map[string][]cache.RawDeltaResponse{
-		rsrc.EndpointType: {{
-			Resources:     []types.Resource{endpoint},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
-			SystemVersion: "1",
-		}},
-		rsrc.ClusterType: {{
-			Resources:     []types.Resource{deltaCluster, deltaCluster2},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
-			SystemVersion: "2",
-		}},
-		rsrc.RouteType: {{
-			Resources:     []types.Resource{route},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
-			SystemVersion: "3",
-		}},
-		rsrc.ListenerType: {{
-			Resources:     []types.Resource{listener},
-			DeltaRequest:  discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
-			SystemVersion: "4",
-		}},
-	}
-}
-
-func makeDeltaResponses() map[string][]cache.RawDeltaResponse {
-	return map[string][]cache.RawDeltaResponse{
-		rsrc.EndpointType: {{
-			Resources:     []types.Resource{endpoint},
-			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
-			SystemVersion: "1",
-		}},
-		rsrc.ClusterType: {{
-			Resources:     []types.Resource{deltaCluster, deltaCluster2},
-			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
-			SystemVersion: "2",
-		}},
-		rsrc.RouteType: {{
-			Resources:     []types.Resource{route},
-			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
-			SystemVersion: "3",
-		}},
-		rsrc.ListenerType: {{
-			Resources:     []types.Resource{listener},
-			DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
-			SystemVersion: "4",
-		}},
+func makeDeltaResponses() map[string][]cache.DeltaResponse {
+	return map[string][]cache.DeltaResponse{
+		rsrc.EndpointType: {
+			&cache.RawDeltaResponse{
+				Resources:     []types.Resource{endpoint},
+				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
+				SystemVersion: "1",
+			},
+		},
+		rsrc.ClusterType: {
+			&cache.RawDeltaResponse{
+				Resources:     []types.Resource{deltaCluster, deltaCluster2},
+				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
+				SystemVersion: "2",
+			},
+		},
+		rsrc.RouteType: {
+			&cache.RawDeltaResponse{
+				Resources:     []types.Resource{route},
+				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
+				SystemVersion: "3",
+			},
+		},
+		rsrc.ListenerType: {
+			&cache.RawDeltaResponse{
+				Resources:     []types.Resource{listener},
+				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
+				SystemVersion: "4",
+			},
+		},
 	}
 }
 
