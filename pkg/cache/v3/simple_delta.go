@@ -181,7 +181,7 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
 // Requester now sets version info when creating new delta watches
-func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersion string) (chan DeltaResponse, func()) {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, requestVersion string) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 	aliases := request.GetResourceNamesSubscribe()
@@ -243,7 +243,7 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
-func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, version string) {
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, unsubscribed []string, version string) {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with version %q",
 			request.GetNode().GetId(), request.TypeUrl, version)
@@ -252,7 +252,7 @@ func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaR
 	value <- createDeltaResponse(request, resources, version)
 }
 
-func createDeltaResponse(request DeltaRequest, resources map[string]types.Resource, version string) DeltaResponse {
+func createDeltaResponse(request *DeltaRequest, resources map[string]types.Resource, unsubscribed []string, version string) DeltaResponse {
 	filtered := make([]types.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource

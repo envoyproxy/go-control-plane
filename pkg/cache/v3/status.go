@@ -100,7 +100,7 @@ type ResponseWatch struct {
 // DeltaResponseWatch is a watch record keeping both the delta request and an open channel for the delta response.
 type DeltaResponseWatch struct {
 	// Request is the original delta request for the watch
-	Request DeltaRequest
+	Request *DeltaRequest
 
 	// Response is the channel to push the delta responses to
 	Response chan DeltaResponse

@@ -240,7 +240,7 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 }
 
 // TODO: implement CreateDeltaWatch for linear cache
-func (cache *LinearCache) CreateDeltaWatch(request DeltaRequest, version string) (chan DeltaResponse, func()) {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, version string) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 

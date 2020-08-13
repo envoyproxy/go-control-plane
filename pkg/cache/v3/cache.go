@@ -31,7 +31,7 @@ import (
 type Request = discovery.DiscoveryRequest
 
 // DeltaRequest is an alias for the delta discovery request type.
-type DeltaRequest = *discovery.DeltaDiscoveryRequest
+type DeltaRequest = discovery.DeltaDiscoveryRequest
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
@@ -49,7 +49,11 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
+<<<<<<< HEAD
 	CreateWatch(Request) (value chan Response, cancel func())
+=======
+	CreateWatch(*Request) (value chan Response, cancel func())
+>>>>>>> generated v3 of upstream changes and delta updates
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	//
@@ -60,6 +64,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
+<<<<<<< HEAD
 	CreateDeltaWatch(DeltaRequest, string) (value chan DeltaResponse, cancel func())
 }
 
@@ -67,6 +72,9 @@ type ConfigWatcher interface {
 type ConfigFetcher interface {
 	// Fetch implements the polling method of the config cache using a non-empty request.
 	Fetch(context.Context, *Request) (Response, error)
+=======
+	CreateDeltaWatch(*DeltaRequest, string) (value chan DeltaResponse, cancel func())
+>>>>>>> generated v3 of upstream changes and delta updates
 }
 
 // Cache is a generic config cache with a watcher.
@@ -118,8 +126,6 @@ type RawResponse struct {
 
 // RawDeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
 type RawDeltaResponse struct {
-	DeltaResponse
-
 	// Request is the original request.
 	DeltaRequest *discovery.DeltaDiscoveryRequest
 
@@ -135,7 +141,7 @@ type RawDeltaResponse struct {
 	isResourceMarshaled bool
 
 	// Marshaled Resources to be included in the response.
-	marshaledResponse *discovery.DeltaDiscoveryResponse
+	marshaledResponse atomic.Value
 }
 
 // PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
@@ -151,10 +157,8 @@ type PassthroughResponse struct {
 
 // DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
 type DeltaPassthroughResponse struct {
-	DeltaResponse
-
 	// Request is the original request
-	DeltaRequest discovery.DeltaDiscoveryRequest
+	DeltaRequest *discovery.DeltaDiscoveryRequest
 
 	// This discovery response that needs to be sent as is, without any marshalling transformations
 	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
@@ -198,7 +202,9 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 // This is necessary because the marshalled response does not change across the calls.
 // This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
 func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
-	if !r.isResourceMarshaled {
+	marshaledResponse := r.marshaledResponse.Load()
+
+	if marshaledResponse == nil {
 		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
 		for i, resource := range r.Resources {
@@ -218,15 +224,16 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 			}
 		}
 
-		r.marshaledResponse = &discovery.DeltaDiscoveryResponse{
+		marshaledResponse = &discovery.DeltaDiscoveryResponse{
 			SystemVersionInfo: r.SystemVersion,
 			Resources:         marshaledResources,
 			RemovedResources:  r.RemovedResources,
 			TypeUrl:           r.DeltaRequest.TypeUrl,
 		}
-		r.isResourceMarshaled = true
+		r.marshaledResponse.Store(marshaledResponse)
 	}
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 	r.marshaledResponse = &discovery.DeltaDiscoveryResponse{
 		SystemVersionInfo: r.SystemVersion,
@@ -238,6 +245,9 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 =======
 >>>>>>> don't use intial request logic (breaking things?) fix up copying around locks
 	return r.marshaledResponse, nil
+=======
+	return marshaledResponse.(*discovery.DeltaDiscoveryResponse), nil
+>>>>>>> generated v3 of upstream changes and delta updates
 }
 
 // GetRequest returns the original Discovery Request.
@@ -277,7 +287,7 @@ func (r *PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
 
 // GetDeltaRequest returns the original Delta Discovery Request
 func (r *DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
-	return &r.DeltaRequest
+	return r.DeltaRequest
 }
 
 // GetVersion returns the response version.
