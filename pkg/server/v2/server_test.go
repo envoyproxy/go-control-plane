@@ -37,6 +37,7 @@ type mockConfigWatcher struct {
 	counts     map[string]int
 	responses  map[string][]cache.Response
 	closeWatch bool
+	watches    int
 }
 
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
@@ -47,8 +48,15 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (c
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
 	} else if config.closeWatch {
 		close(out)
+	} else {
+		config.watches += 1
+		return out, func() {
+			// it is ok to close the channel after cancellation and not wait for it to be garbage collected
+			close(out)
+			config.watches -= 1
+		}
 	}
-	return out, func() {}
+	return out, nil
 }
 
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
@@ -225,7 +233,7 @@ func TestServerShutdown(t *testing.T) {
 
 			// make a request
 			resp := makeMockStream(t)
-			resp.recv <- &discovery.DiscoveryRequest{Node: node}
+			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
 			go func() {
 				var err error
 				switch typ {
@@ -572,6 +580,46 @@ func TestAggregateRequestType(t *testing.T) {
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
 		t.Error("StreamAggregatedResources() => got nil, want an error")
+	}
+}
+
+func TestCancellations(t *testing.T) {
+	config := makeMockConfigWatcher()
+	resp := makeMockStream(t)
+	for _, typ := range testTypes {
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:    node,
+			TypeUrl: typ,
+		}
+	}
+	close(resp.recv)
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	if err := s.StreamAggregatedResources(resp); err != nil {
+		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+	}
+	if config.watches != 0 {
+		t.Errorf("Expect all watches cancelled, got %q", config.watches)
+	}
+}
+
+func TestOpaqueRequestsChannelMuxing(t *testing.T) {
+	config := makeMockConfigWatcher()
+	resp := makeMockStream(t)
+	for i := 0; i < 10; i++ {
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:    node,
+			TypeUrl: fmt.Sprintf("%s%d", opaqueType, i%2),
+			// each subsequent request is assumed to supercede the previous request
+			ResourceNames: []string{fmt.Sprintf("%d", i)},
+		}
+	}
+	close(resp.recv)
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	if err := s.StreamAggregatedResources(resp); err != nil {
+		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+	}
+	if config.watches != 0 {
+		t.Errorf("Expect all watches cancelled, got %q", config.watches)
 	}
 }
 
