@@ -133,8 +133,7 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 	// Check our diff map to see what has changed
 	// Even is an underlying resource has changed we need to update the diff
 	for key, value := range resources {
-		resource, found := deltaState[key]
-		if !found || resource != value {
+		if resource, found := deltaState[key]; !found || resource != value {
 			if cache.log != nil {
 				cache.log.Debugf("Detected change in deltaState: %s -> %s\n", key, GetResourceName(resource))
 			}
@@ -150,6 +149,9 @@ func (cache *snapshotCache) unsubscribe(resources []string, deltaState map[strin
 	// here we need to search and remove from the current subscribed list in the snapshot
 	for _, items := range deltaState {
 		for i := 0; i < len(resources); i++ {
+			if cache.log != nil {
+				cache.log.Debugf("unsubscribing from resource: %s", resources[i])
+			}
 			delete(items.Items, resources[i])
 		}
 	}
@@ -161,6 +163,14 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 	aliases := request.GetResourceNamesSubscribe()
+
+	// populate our alias set
+	// the reason we do this is so we don't append pre-existing items in deltaState into the alias list when creating a watch
+	// this removes the need to process the diff if we don't have to when setting a snapshot
+	aliasSet := make(map[string]struct{}, len(aliases))
+	for _, alias := range aliases {
+		aliasSet[alias] = struct{}{}
+	}
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -174,6 +184,16 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	// update last watch request times
 	info.mu.Lock()
 	info.lastDeltaWatchRequestTime = time.Now()
+
+	if len(info.deltaState[t].Items) > 0 {
+		for _, alias := range info.deltaState[t].Items {
+			name := GetResourceName(alias)
+
+			if _, found := aliasSet[name]; !found {
+				aliases = append(aliases, name)
+			}
+		}
+	}
 	info.mu.Unlock()
 
 	// allocate capacity 1 to allow one-time non-blocking use
@@ -208,8 +228,8 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	cache.respondDelta(
 		request,
 		value,
-		info.deltaState[t].Items,
-		request.GetResourceNamesUnsubscribe(),
+		snapshot.GetSubscribedResources(aliases, t),
+		nil,
 		info.deltaState[t].Version,
 	)
 

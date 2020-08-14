@@ -195,8 +195,7 @@ func (cache *snapshotCache) checkState(resources, deltaState map[string]types.Re
 	// Check our diff map to see what has changed
 	// Even is an underlying resource has changed we need to update the diff
 	for key, value := range resources {
-		resource, found := deltaState[key]
-		if !found || resource != value {
+		if resource, found := deltaState[key]; !found || resource != value {
 			if cache.log != nil {
 				cache.log.Debugf("Detected change in deltaState: %s -> %s\n", key, GetResourceName(resource))
 			}
@@ -214,6 +213,14 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, requestVersi
 	t := request.GetTypeUrl()
 	aliases := request.GetResourceNamesSubscribe()
 
+	// populate our alias set
+	// the reason we do this is so we don't append pre-existing items in deltaState into the alias list when creating a watch
+	// this removes the need to process the diff if we don't have to when setting a snapshot
+	aliasSet := make(map[string]struct{}, len(aliases))
+	for _, alias := range aliases {
+		aliasSet[alias] = struct{}{}
+	}
+
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -226,6 +233,16 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, requestVersi
 	// update last watch request times
 	info.mu.Lock()
 	info.lastDeltaWatchRequestTime = time.Now()
+
+	if len(info.deltaState[t].Items) > 0 {
+		for _, alias := range info.deltaState[t].Items {
+			name := GetResourceName(alias)
+
+			if _, found := aliasSet[name]; !found {
+				aliases = append(aliases, name)
+			}
+		}
+	}
 	info.mu.Unlock()
 
 	// allocate capacity 1 to allow one-time non-blocking use
@@ -260,7 +277,12 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, requestVersi
 	cache.respondDelta(
 		request,
 		value,
+<<<<<<< HEAD
 		info.deltaState[t].Items,
+=======
+		snapshot.GetSubscribedResources(aliases, t),
+		nil,
+>>>>>>> more logging, CreateDeltaWatch now checks for pre-subscribed resources
 		info.deltaState[t].Version,
 	)
 

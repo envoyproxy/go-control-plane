@@ -216,17 +216,17 @@ func main() {
 
 	for i := 0; i < updates; i++ {
 		snapshotsv2.Version = fmt.Sprintf("v%d", i)
-		log.Printf("update snapshot %v\n", snapshotsv2.Version)
+		log.Printf("update v2 snapshot %v\n", snapshotsv2.Version)
 		snapshotsv3.Version = fmt.Sprintf("v%d", i)
-		log.Printf("update snapshot %v\n", snapshotsv3.Version)
+		log.Printf("update v3 snapshot %v\n", snapshotsv3.Version)
 
 		snapshotv2 := snapshotsv2.Generate()
 		snapshotv3 := snapshotsv3.Generate()
 		if err := snapshotv2.Consistent(); err != nil {
-			log.Printf("snapshot inconsistency: %+v\n", snapshotv2)
+			log.Printf("v2 snapshot inconsistency: %+v\n", snapshotv2)
 		}
 		if err := snapshotv3.Consistent(); err != nil {
-			log.Printf("snapshot inconsistency: %+v\n", snapshotv3)
+			log.Printf("v3 snapshot inconsistency: %+v\n", snapshotv3)
 		}
 
 		// Check to see if they want to run the delta integration tests
@@ -249,14 +249,14 @@ func main() {
 			log.Printf("setting v2 snapshot")
 			err := configv2.SetSnapshot(nodeID, snapshotv2)
 			if err != nil {
-				log.Printf("snapshot error %q for %+v\n", err, snapshotv2)
+				log.Printf("v2 snapshot error %q for %+v\n", err, snapshotv2)
 				os.Exit(1)
 			}
 
 			log.Printf("setting v3 snapshot")
 			err = configv3.SetSnapshot(nodeID, snapshotv3)
 			if err != nil {
-				log.Printf("snapshot error %q for %+v\n", err, snapshotv3)
+				log.Printf("v3 snapshot error %q for %+v\n", err, snapshotv3)
 				os.Exit(1)
 			}
 		}
@@ -267,6 +267,7 @@ func main() {
 		}
 
 		// pass is true if all requests succeed at least once in a run
+		time.Sleep(time.Second * 5)
 		pass := false
 		for j := 0; j < requests; j++ {
 			ok, failed := callEcho()
