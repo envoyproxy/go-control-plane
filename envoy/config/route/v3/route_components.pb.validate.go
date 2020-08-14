@@ -1630,6 +1630,16 @@ func (m *RetryPolicy) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetRateLimitedRetryBackOff()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RetryPolicyValidationError{
+				field:  "RateLimitedRetryBackOff",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetRetriableHeaders() {
 		_, _ = idx, item
 
@@ -4289,6 +4299,207 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RetryPolicy_RetryBackOffValidationError{}
+
+// Validate checks the field values on RetryPolicy_ResetHeader with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RetryPolicy_ResetHeader) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetName()) < 1 {
+		return RetryPolicy_ResetHeaderValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 bytes",
+		}
+	}
+
+	if !_RetryPolicy_ResetHeader_Name_Pattern.MatchString(m.GetName()) {
+		return RetryPolicy_ResetHeaderValidationError{
+			field:  "Name",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
+	if _, ok := RetryPolicy_ResetHeaderFormat_name[int32(m.GetFormat())]; !ok {
+		return RetryPolicy_ResetHeaderValidationError{
+			field:  "Format",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
+	return nil
+}
+
+// RetryPolicy_ResetHeaderValidationError is the validation error returned by
+// RetryPolicy_ResetHeader.Validate if the designated constraints aren't met.
+type RetryPolicy_ResetHeaderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RetryPolicy_ResetHeaderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RetryPolicy_ResetHeaderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RetryPolicy_ResetHeaderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RetryPolicy_ResetHeaderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RetryPolicy_ResetHeaderValidationError) ErrorName() string {
+	return "RetryPolicy_ResetHeaderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RetryPolicy_ResetHeaderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRetryPolicy_ResetHeader.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RetryPolicy_ResetHeaderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RetryPolicy_ResetHeaderValidationError{}
+
+var _RetryPolicy_ResetHeader_Name_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on RetryPolicy_RateLimitedRetryBackOff with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *RetryPolicy_RateLimitedRetryBackOff) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetResetHeaders()) < 1 {
+		return RetryPolicy_RateLimitedRetryBackOffValidationError{
+			field:  "ResetHeaders",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetResetHeaders() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RetryPolicy_RateLimitedRetryBackOffValidationError{
+					field:  fmt.Sprintf("ResetHeaders[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if d := m.GetMaxInterval(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return RetryPolicy_RateLimitedRetryBackOffValidationError{
+				field:  "MaxInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return RetryPolicy_RateLimitedRetryBackOffValidationError{
+				field:  "MaxInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// RetryPolicy_RateLimitedRetryBackOffValidationError is the validation error
+// returned by RetryPolicy_RateLimitedRetryBackOff.Validate if the designated
+// constraints aren't met.
+type RetryPolicy_RateLimitedRetryBackOffValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RetryPolicy_RateLimitedRetryBackOffValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RetryPolicy_RateLimitedRetryBackOffValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RetryPolicy_RateLimitedRetryBackOffValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RetryPolicy_RateLimitedRetryBackOffValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RetryPolicy_RateLimitedRetryBackOffValidationError) ErrorName() string {
+	return "RetryPolicy_RateLimitedRetryBackOffValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RetryPolicy_RateLimitedRetryBackOffValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRetryPolicy_RateLimitedRetryBackOff.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RetryPolicy_RateLimitedRetryBackOffValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RetryPolicy_RateLimitedRetryBackOffValidationError{}
 
 // Validate checks the field values on RateLimit_Action with the rules defined
 // in the proto definition for this message. If any rules are violated, an

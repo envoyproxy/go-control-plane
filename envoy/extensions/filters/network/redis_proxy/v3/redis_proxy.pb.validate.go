@@ -575,7 +575,12 @@ func (m *RedisProxy_PrefixRoutes_Route) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Prefix
+	if len(m.GetPrefix()) > 1000 {
+		return RedisProxy_PrefixRoutes_RouteValidationError{
+			field:  "Prefix",
+			reason: "value length must be at most 1000 bytes",
+		}
+	}
 
 	// no validation rules for RemovePrefix
 
