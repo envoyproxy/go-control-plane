@@ -226,6 +226,8 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for BootstrapVersion
 
+	// no validation rules for EnableFineGrainLogging
+
 	// no validation rules for HiddenEnvoyDeprecatedMaxStats
 
 	// no validation rules for HiddenEnvoyDeprecatedMaxObjNameLen

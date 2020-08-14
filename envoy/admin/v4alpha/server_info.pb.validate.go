@@ -226,6 +226,8 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for BootstrapVersion
 
+	// no validation rules for EnableFineGrainLogging
+
 	return nil
 }
 
