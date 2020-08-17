@@ -321,13 +321,13 @@ func (m *Node) Validate() error {
 
 	}
 
-	for idx, item := range m.GetListeningAddresses() {
+	for idx, item := range m.GetHiddenEnvoyDeprecatedListeningAddresses() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return NodeValidationError{
-					field:  fmt.Sprintf("ListeningAddresses[%v]", idx),
+					field:  fmt.Sprintf("HiddenEnvoyDeprecatedListeningAddresses[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
