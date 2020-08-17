@@ -74,7 +74,7 @@ func TestLinearInitialResources(t *testing.T) {
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
 	w, _ := c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType})
 	verifyResponse(t, w, "0", 1)
-	w, _ = c.CreateWatch(Request{TypeUrl: testType})
+	w, _ = c.CreateWatch(&Request{TypeUrl: testType})
 	verifyResponse(t, w, "0", 2)
 }
 
@@ -85,7 +85,7 @@ func TestLinearCornerCases(t *testing.T) {
 		t.Error("expected error on nil resource")
 	}
 	// create an incorrect type URL request
-	w, _ := c.CreateWatch(Request{TypeUrl: "test"})
+	w, _ := c.CreateWatch(&Request{TypeUrl: "test"})
 	select {
 	case _, more := <-w:
 		if more {
@@ -100,9 +100,9 @@ func TestLinearBasic(t *testing.T) {
 	c := NewLinearCache(testType)
 
 	// Create watches before a resource is ready
-	w1, _ := c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
+	w1, _ := c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
 	mustBlock(t, w1)
-	w, _ := c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "0"})
+	w, _ := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"})
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 2)
 	checkWatchCount(t, c, "b", 1)
@@ -113,19 +113,19 @@ func TestLinearBasic(t *testing.T) {
 	verifyResponse(t, w, "1", 1)
 
 	// Request again, should get same response
-	w, _ = c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
+	w, _ = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
 	checkWatchCount(t, c, "a", 0)
 	verifyResponse(t, w, "1", 1)
-	w, _ = c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "0"})
+	w, _ = c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"})
 	checkWatchCount(t, c, "a", 0)
 	verifyResponse(t, w, "1", 1)
 
 	// Add another element and update the first, response should be different
 	c.UpdateResource("b", testResource("b"))
 	c.UpdateResource("a", testResource("aa"))
-	w, _ = c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
+	w, _ = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
 	verifyResponse(t, w, "3", 1)
-	w, _ = c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "0"})
+	w, _ = c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"})
 	verifyResponse(t, w, "3", 2)
 }
 
@@ -152,11 +152,11 @@ func TestLinearDeletion(t *testing.T) {
 	c.DeleteResource("a")
 	verifyResponse(t, w, "1", 0)
 	checkWatchCount(t, c, "a", 0)
-	w, _ = c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "0"})
+	w, _ = c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"})
 	verifyResponse(t, w, "1", 1)
 	checkWatchCount(t, c, "b", 0)
 	c.DeleteResource("b")
-	w, _ = c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "1"})
+	w, _ = c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"})
 	verifyResponse(t, w, "2", 0)
 	checkWatchCount(t, c, "b", 0)
 }
@@ -165,7 +165,7 @@ func TestLinearWatchTwo(t *testing.T) {
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
 	w, _ := c.CreateWatch(Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: "0"})
 	mustBlock(t, w)
-	w1, _ := c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "0"})
+	w1, _ := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"})
 	mustBlock(t, w1)
 	c.UpdateResource("a", testResource("aa"))
 	// should only get the modified resource
@@ -178,24 +178,24 @@ func TestLinearCancel(t *testing.T) {
 	c.UpdateResource("a", testResource("a"))
 
 	// cancel watch-all
-	w, cancel := c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "1"})
+	w, cancel := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"})
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 	cancel()
 	checkWatchCount(t, c, "a", 0)
 
 	// cancel watch for "a"
-	w, cancel = c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"})
+	w, cancel = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"})
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 	cancel()
 	checkWatchCount(t, c, "a", 0)
 
 	// open four watches for "a" and "b" and two for all, cancel one of each, make sure the second one is unaffected
-	w, cancel = c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"})
-	w2, cancel2 := c.CreateWatch(Request{ResourceNames: []string{"b"}, TypeUrl: testType, VersionInfo: "1"})
-	w3, cancel3 := c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "1"})
-	w4, cancel4 := c.CreateWatch(Request{TypeUrl: testType, VersionInfo: "1"})
+	w, cancel = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"})
+	w2, cancel2 := c.CreateWatch(&Request{ResourceNames: []string{"b"}, TypeUrl: testType, VersionInfo: "1"})
+	w3, cancel3 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"})
+	w4, cancel4 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"})
 	mustBlock(t, w)
 	mustBlock(t, w2)
 	mustBlock(t, w3)
@@ -228,7 +228,7 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 				} else {
 					id2 := fmt.Sprintf("%d", i-1)
 					t.Logf("request resources %q and %q", id, id2)
-					value, _ := c.CreateWatch(Request{
+					value, _ := c.CreateWatch(&Request{
 						// Only expect one to become stale
 						ResourceNames: []string{id, id2},
 						VersionInfo:   "0",

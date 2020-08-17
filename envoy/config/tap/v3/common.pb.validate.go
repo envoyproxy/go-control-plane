@@ -43,17 +43,20 @@ func (m *TapConfig) Validate() error {
 		return nil
 	}
 
-	if m.GetMatchConfig() == nil {
-		return TapConfigValidationError{
-			field:  "MatchConfig",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetMatchConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TapConfigValidationError{
 				field:  "MatchConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMatch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TapConfigValidationError{
+				field:  "Match",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -1,0 +1,7 @@
+# bootstrapYaml is a simple cluster discovery mechanism to register the Kubernetes clusters we will be extending the mesh to.
+- name: demo1-eks
+  server: DEMO1_API_SERVER_URL
+  ca: DEMO1_BASE_64_ENCODED_CA
+- name: demo2-eks
+  server: DEMO2_API_SERVER_URL
+  ca: DEMO2_BASE_64_ENCODED_CA

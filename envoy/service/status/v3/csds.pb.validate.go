@@ -59,6 +59,16 @@ func (m *ClientStatusRequest) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetNode()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientStatusRequestValidationError{
+				field:  "Node",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
