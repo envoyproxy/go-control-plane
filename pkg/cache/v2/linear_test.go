@@ -71,7 +71,7 @@ func mustBlock(t *testing.T, w <-chan Response) {
 
 func TestLinearInitialResources(t *testing.T) {
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
-	w, _ := c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType})
+	w, _ := c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType})
 	verifyResponse(t, w, "0", 1)
 	w, _ = c.CreateWatch(&Request{TypeUrl: testType})
 	verifyResponse(t, w, "0", 2)
@@ -131,21 +131,21 @@ func TestLinearBasic(t *testing.T) {
 func TestLinearVersionPrefix(t *testing.T) {
 	c := NewLinearCache(testType, WithVersionPrefix("instance1-"))
 
-	w, _ := c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
+	w, _ := c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
 	verifyResponse(t, w, "instance1-0", 0)
 
 	c.UpdateResource("a", testResource("a"))
-	w, _ = c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
+	w, _ = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
 	verifyResponse(t, w, "instance1-1", 1)
 
-	w, _ = c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "instance1-1"})
+	w, _ = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "instance1-1"})
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 }
 
 func TestLinearDeletion(t *testing.T) {
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
-	w, _ := c.CreateWatch(Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
+	w, _ := c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"})
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 	c.DeleteResource("a")
@@ -162,7 +162,7 @@ func TestLinearDeletion(t *testing.T) {
 
 func TestLinearWatchTwo(t *testing.T) {
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
-	w, _ := c.CreateWatch(Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: "0"})
+	w, _ := c.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: "0"})
 	mustBlock(t, w)
 	w1, _ := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"})
 	mustBlock(t, w1)
