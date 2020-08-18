@@ -452,13 +452,13 @@ func (m *EndpointHealthResponse) Validate() error {
 		return nil
 	}
 
-	for idx, item := range m.GetEndpointsHealth() {
+	for idx, item := range m.GetHiddenEnvoyDeprecatedEndpointsHealth() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return EndpointHealthResponseValidationError{
-					field:  fmt.Sprintf("EndpointsHealth[%v]", idx),
+					field:  fmt.Sprintf("HiddenEnvoyDeprecatedEndpointsHealth[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
