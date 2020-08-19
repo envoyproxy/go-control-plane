@@ -130,7 +130,7 @@ type RawDeltaResponse struct {
 	DeltaRequest *discovery.DeltaDiscoveryRequest
 
 	// System Version Info
-	SystemVersion string
+	SystemVersionInfo string
 
 	// Resources to be included in the response.
 	Resources []types.Resource
@@ -221,11 +221,12 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 					TypeUrl: r.DeltaRequest.TypeUrl,
 					Value:   marshaledResource,
 				},
+				Version: r.SystemVersionInfo,
 			}
 		}
 
 		marshaledResponse = &discovery.DeltaDiscoveryResponse{
-			SystemVersionInfo: r.SystemVersion,
+			SystemVersionInfo: r.SystemVersionInfo,
 			Resources:         marshaledResources,
 			RemovedResources:  r.RemovedResources,
 			TypeUrl:           r.DeltaRequest.TypeUrl,
@@ -267,7 +268,7 @@ func (r *RawResponse) GetVersion() (string, error) {
 
 // GetSystemVersion returns the raw SystemVersion
 func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
-	return r.SystemVersion, nil
+	return r.SystemVersionInfo, nil
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.

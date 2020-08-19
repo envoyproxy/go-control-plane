@@ -38,54 +38,9 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 			subscribed := snapshot.GetSubscribedResources(watch.Request.GetResourceNamesSubscribe(), watch.Request.GetTypeUrl())
 			version := snapshot.GetVersion(t)
 
-<<<<<<< HEAD
-			// Handle the case of an initial delta request and having no previous state
-			if info.deltaState[t].Version == "" && watch.Request.InitialResourceVersions == nil {
-				// Always initialize state
-				info.deltaState[t] = Resources{
-					Version: version,
-					Items:   subscribed,
-				}
-
-				if cache.log != nil {
-					if s := watch.Request.GetResourceNamesSubscribe(); len(s) != 0 {
-						cache.log.Debugf("subscribing to resources: %+v", s)
-					}
-					cache.log.Infof("initial delta snapshot set - respond to open watch ID:%d Resources:%+v", id, info.deltaState[t])
-				}
-
-				// check the wildcard
-				if len(subscribed) == 0 {
-					cache.log.Debugf("received wildcard request")
-
-					// Maybe set the resources for all the types here???
-					for i := 0; i < int(types.UnknownType); i++ {
-						tURL := GetResponseTypeURL(types.ResponseType(i))
-						info.deltaState[tURL] = Resources{
-							Version: version,
-							Items:   snapshot.GetResources(tURL),
-						}
-					}
-				}
-
-				// Send out the response right away since we have nothing else to do
-				cache.respondDelta(
-					watch.Request,
-					watch.Response,
-					info.deltaState[t].Items,
-					version,
-				)
-
-				// discard the old watch
-				delete(info.deltaWatches, id)
-			} else if version != info.deltaState[t].Version {
-
-				if len(subscribed) == 0 {
-=======
 			if version != info.deltaState[t].Version {
 				// We want to perform some pre-processing before we create the diff
 				if len(subscribed) == 0 && len(unsubscribed) == 0 {
->>>>>>> Unit tests passgit add . Added more tests :)
 					cache.log.Debugf("wildcard request")
 
 					// Set the new state and since this is wildcard
@@ -95,19 +50,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 						Items:   snapshot.GetResources(t),
 					}
 
-<<<<<<< HEAD
-					cache.respondDelta(
-						watch.Request,
-						watch.Response,
-						info.deltaState[t].Items,
-						version,
-					)
-
-					delete(info.deltaWatches, id)
-
-					info.mu.Unlock()
-					return nil
-=======
 					// Respond immediately
 					cache.respondDelta(
 						watch.Request,
@@ -120,7 +62,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					// Clean up and since we've responded we can continue going through the rest of the watches
 					delete(info.deltaWatches, id)
 					continue
->>>>>>> Unit tests passgit add . Added more tests :)
 				}
 
 				if len(unsubscribed) > 0 {
@@ -274,6 +215,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, requestVersi
 
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
+<<<<<<< HEAD
 	cache.respondDelta(
 		request,
 		value,
@@ -285,6 +227,11 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, requestVersi
 >>>>>>> more logging, CreateDeltaWatch now checks for pre-subscribed resources
 		info.deltaState[t].Version,
 	)
+=======
+	info.mu.RLock()
+	cache.respondDelta(request, value, snapshot.GetSubscribedResources(aliases, t), nil, info.deltaState[t].Version)
+	info.mu.RUnlock()
+>>>>>>> version is not making it through like it should
 
 	return value, nil
 }
@@ -323,9 +270,17 @@ func createDeltaResponse(request *DeltaRequest, resources map[string]types.Resou
 		}
 	}
 
+<<<<<<< HEAD
 	return RawDeltaResponse{
 		DeltaRequest:  request,
 		Resources:     filtered,
 		SystemVersion: version,
+=======
+	return &RawDeltaResponse{
+		DeltaRequest:      request,
+		Resources:         filtered,
+		RemovedResources:  unsubscribed,
+		SystemVersionInfo: version,
+>>>>>>> version is not making it through like it should
 	}
 }

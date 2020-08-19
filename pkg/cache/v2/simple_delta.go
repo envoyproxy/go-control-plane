@@ -225,13 +225,9 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
-	cache.respondDelta(
-		request,
-		value,
-		snapshot.GetSubscribedResources(aliases, t),
-		nil,
-		info.deltaState[t].Version,
-	)
+	info.mu.RLock()
+	cache.respondDelta(request, value, snapshot.GetSubscribedResources(aliases, t), nil, info.deltaState[t].Version)
+	info.mu.RUnlock()
 
 	return value, nil
 }
@@ -271,9 +267,9 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 	}
 
 	return &RawDeltaResponse{
-		DeltaRequest:     request,
-		Resources:        filtered,
-		RemovedResources: unsubscribed,
-		SystemVersion:    version,
+		DeltaRequest:      request,
+		Resources:         filtered,
+		RemovedResources:  unsubscribed,
+		SystemVersionInfo: version,
 	}
 }

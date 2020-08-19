@@ -34,6 +34,15 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
+type logger struct {
+	t *testing.T
+}
+
+func (log logger) Debugf(format string, args ...interface{}) { log.t.Logf(format, args...) }
+func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
+func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
+func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
+
 type mockConfigWatcher struct {
 	counts         map[string]int
 	responses      map[string][]cache.Response
@@ -77,9 +86,9 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 
 		// We should only send back subscribed resources here
 		out <- &cache.RawDeltaResponse{
-			DeltaRequest:  req,
-			Resources:     subscribed,
-			SystemVersion: version,
+			DeltaRequest:      req,
+			Resources:         subscribed,
+			SystemVersionInfo: version,
 		}
 	}
 	return out, nil
@@ -313,30 +322,30 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 	return map[string][]cache.DeltaResponse{
 		rsrc.EndpointType: {
 			&cache.RawDeltaResponse{
-				Resources:     []types.Resource{endpoint},
-				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
-				SystemVersion: "1",
+				Resources:         []types.Resource{endpoint},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
+				SystemVersionInfo: "1",
 			},
 		},
 		rsrc.ClusterType: {
 			&cache.RawDeltaResponse{
-				Resources:     []types.Resource{deltaCluster, deltaCluster2},
-				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
-				SystemVersion: "2",
+				Resources:         []types.Resource{deltaCluster, deltaCluster2},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
+				SystemVersionInfo: "2",
 			},
 		},
 		rsrc.RouteType: {
 			&cache.RawDeltaResponse{
-				Resources:     []types.Resource{route},
-				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
-				SystemVersion: "3",
+				Resources:         []types.Resource{route},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
+				SystemVersionInfo: "3",
 			},
 		},
 		rsrc.ListenerType: {
 			&cache.RawDeltaResponse{
-				Resources:     []types.Resource{listener},
-				DeltaRequest:  &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
-				SystemVersion: "4",
+				Resources:         []types.Resource{listener},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
+				SystemVersionInfo: "4",
 			},
 		},
 	}
@@ -349,7 +358,7 @@ func TestServerShutdown(t *testing.T) {
 			config.responses = makeResponses()
 			shutdown := make(chan bool)
 			ctx, cancel := context.WithCancel(context.Background())
-			s := server.NewServer(ctx, config, server.CallbackFuncs{}, logger{})
+			s := server.NewServer(ctx, config, server.CallbackFuncs{}, logger{t})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -396,7 +405,7 @@ func TestResponseHandlers(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -442,7 +451,7 @@ func TestDeltaResponseClusterHandler(t *testing.T) {
 	t.Run(testTypes[1], func(t *testing.T) {
 		config := makeMockConfigWatcher()
 		config.deltaResponses = makeDeltaResponses()
-		s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+		s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 
 		// make a request
 		resp := makeMockDeltaStream(t)
@@ -458,11 +467,15 @@ func TestDeltaResponseClusterHandler(t *testing.T) {
 
 		// check a response
 		select {
-		case <-resp.sent:
+		case res := <-resp.sent:
 			close(resp.recv)
 
 			if want := map[string]int{testTypes[1]: 1}; !reflect.DeepEqual(want, config.counts) {
 				t.Errorf("watch counts => got %v, want %v", config.counts, want)
+			}
+
+			if want := res.GetSystemVersionInfo(); want == "" {
+				t.Errorf("response was missing version")
 			}
 		case <-time.After(1 * time.Second):
 			t.Fatalf("got no response")
@@ -497,7 +510,7 @@ func TestFetch(t *testing.T) {
 		},
 	}
 
-	s := server.NewServer(context.Background(), config, cb, logger{})
+	s := server.NewServer(context.Background(), config, cb, logger{t})
 	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for endpoints: %v", err)
 	}
@@ -580,7 +593,7 @@ func TestWatchClosed(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.closeWatch = true
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -604,7 +617,7 @@ func TestSendError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -629,7 +642,7 @@ func TestStaleNonce(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{
@@ -693,7 +706,7 @@ func TestAggregatedHandlers(t *testing.T) {
 		ResourceNames: []string{routeName},
 	}
 
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 	go func() {
 		if err := s.StreamAggregatedResources(resp); err != nil {
 			t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
@@ -727,7 +740,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{})
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
@@ -785,7 +798,7 @@ func TestCallbackError(t *testing.T) {
 				StreamOpenFunc: func(ctx context.Context, i int64, s string) error {
 					return errors.New("stream open error")
 				},
-			}, logger{})
+			}, logger{t})
 
 			// make a request
 			resp := makeMockStream(t)

@@ -16,6 +16,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"sync/atomic"
 
@@ -44,6 +45,8 @@ func createDeltaResponse(resp cache.DeltaResponse, typeURL string) (*discovery.D
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println("from createDeltaResponse " + marshalledResponse.SystemVersionInfo)
 
 	return marshalledResponse, nil
 }
@@ -101,6 +104,8 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			return "", err
 		}
 
+		fmt.Println("from send " + out.SystemVersionInfo)
+
 		// increment nonce
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
@@ -120,7 +125,6 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 	var node = &core.Node{}
 
 	for {
-		s.deltaLock.Lock()
 		select {
 		case <-s.ctx.Done():
 			return nil
@@ -134,13 +138,18 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
+			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
 			values.deltaEndpointNonce = nonce
 
 		case resp, more := <-values.deltaClusters:
+			if s.log != nil {
+				s.log.Debugf("%+v", resp)
+			}
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
@@ -148,11 +157,18 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
+
 			// set state version info
+			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
+			if s.log != nil {
+				s.log.Debugf("Set deltaVersion for %s as %s\n", resp.GetDeltaRequest().GetTypeUrl(), s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()])
+			}
+
 			values.deltaClusterNonce = nonce
 
 		case resp, more := <-values.deltaRoutes:
@@ -164,7 +180,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
+			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -179,7 +197,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
+			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -194,7 +214,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
+			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
@@ -209,12 +231,13 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				return err
 			}
 			// set state version info
+			s.deltaLock.Lock()
 			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaLock.Unlock()
 			if err != nil {
 				return err
 			}
 			values.deltaRuntimeNonce = nonce
-
 		case resp, more := <-values.deltaResponses:
 			if !more {
 				return status.Errorf(codes.Unavailable, "resource watch failed")
@@ -313,6 +336,5 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				s.deltaLock.RUnlock()
 			}
 		}
-		s.deltaLock.Unlock()
 	}
 }

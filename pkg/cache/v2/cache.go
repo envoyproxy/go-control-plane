@@ -123,18 +123,13 @@ type RawDeltaResponse struct {
 	DeltaRequest *discovery.DeltaDiscoveryRequest
 
 	// System Version Info
-	SystemVersion string
+	SystemVersionInfo string
 
 	// Resources to be included in the response.
 	Resources []types.Resource
 
 	// RemovedResources is a list of unsubscribed aliases to be included in the response
 	RemovedResources []string
-
-	// isResourceMarshaled indicates whether the resources have been marshaled.
-	// This is internally maintained by go-control-plane to prevent future
-	// duplication in marshaling efforts.
-	isResourceMarshaled bool
 
 	// Marshaled Resources to be included in the response.
 	marshaledResponse *discovery.DeltaDiscoveryResponse
@@ -217,6 +212,7 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 					TypeUrl: r.DeltaRequest.TypeUrl,
 					Value:   marshaledResource,
 				},
+				Version: r.SystemVersionInfo,
 			}
 		}
 
@@ -249,7 +245,7 @@ func (r *RawResponse) GetVersion() (string, error) {
 
 // GetSystemVersion returns the raw SystemVersion
 func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
-	return r.SystemVersion, nil
+	return r.SystemVersionInfo, nil
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
