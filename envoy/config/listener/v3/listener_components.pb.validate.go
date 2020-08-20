@@ -339,6 +339,16 @@ func (m *FilterChain) Validate() error {
 
 	// no validation rules for Name
 
+	if v, ok := interface{}(m.GetOnDemandConfiguration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FilterChainValidationError{
+				field:  "OnDemandConfiguration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedTlsContext()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainValidationError{
@@ -650,6 +660,84 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListenerFilterValidationError{}
+
+// Validate checks the field values on FilterChain_OnDemandConfiguration with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *FilterChain_OnDemandConfiguration) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetRebuildTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FilterChain_OnDemandConfigurationValidationError{
+				field:  "RebuildTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// FilterChain_OnDemandConfigurationValidationError is the validation error
+// returned by FilterChain_OnDemandConfiguration.Validate if the designated
+// constraints aren't met.
+type FilterChain_OnDemandConfigurationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FilterChain_OnDemandConfigurationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FilterChain_OnDemandConfigurationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FilterChain_OnDemandConfigurationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FilterChain_OnDemandConfigurationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FilterChain_OnDemandConfigurationValidationError) ErrorName() string {
+	return "FilterChain_OnDemandConfigurationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e FilterChain_OnDemandConfigurationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFilterChain_OnDemandConfiguration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FilterChain_OnDemandConfigurationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FilterChain_OnDemandConfigurationValidationError{}
 
 // Validate checks the field values on
 // ListenerFilterChainMatchPredicate_MatchSet with the rules defined in the
