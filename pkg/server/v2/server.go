@@ -18,8 +18,8 @@ package server
 import (
 	"context"
 	"errors"
-	"github.com/envoyproxy/go-control-plane/pkg/server/v2/rest"
-	"github.com/envoyproxy/go-control-plane/pkg/server/v2/sotw"
+	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
