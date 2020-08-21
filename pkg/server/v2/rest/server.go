@@ -19,12 +19,12 @@ type Callbacks interface {
 	OnFetchResponse(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
-func NewServer(config cache.Cache, callbacks Callbacks) Server {
+func NewServer(config cache.ConfigFetcher, callbacks Callbacks) Server {
 	return &server{cache: config, callbacks: callbacks}
 }
 
 type server struct {
-	cache     cache.Cache
+	cache     cache.ConfigFetcher
 	callbacks Callbacks
 }
 

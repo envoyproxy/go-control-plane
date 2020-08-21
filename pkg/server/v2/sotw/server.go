@@ -34,12 +34,12 @@ type Callbacks interface {
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
+func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks) Server {
 	return &server{cache: config, callbacks: callbacks, ctx: ctx}
 }
 
 type server struct {
-	cache     cache.Cache
+	cache     cache.ConfigWatcher
 	callbacks Callbacks
 	ctx       context.Context
 
