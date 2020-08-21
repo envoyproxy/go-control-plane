@@ -228,19 +228,6 @@ func (values *watches) Cancel() {
 	}
 }
 
-func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
-	if resp == nil {
-		return nil, errors.New("missing response")
-	}
-
-	marshalledResponse, err := resp.GetDiscoveryResponse()
-	if err != nil {
-		return nil, err
-	}
-
-	return marshalledResponse, nil
-}
-
 // process handles a bi-di stream request
 func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
@@ -262,7 +249,11 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 
 	// sends a response by serializing to protobuf Any
 	send := func(resp cache.Response, typeURL string) (string, error) {
-		out, err := createResponse(resp, typeURL)
+		if resp == nil {
+			return "", errors.New("missing response")
+		}
+
+		out, err := resp.GetDiscoveryResponse()
 		if err != nil {
 			return "", err
 		}
@@ -552,7 +543,10 @@ func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*d
 	if err != nil {
 		return nil, err
 	}
-	out, err := createResponse(resp, req.TypeUrl)
+	if resp == nil {
+		return nil, errors.New("missing response")
+	}
+	out, err := resp.GetDiscoveryResponse()
 	if s.callbacks != nil {
 		s.callbacks.OnFetchResponse(req, out)
 	}
