@@ -43,7 +43,12 @@ func (m *RBAC) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Action
+	if _, ok := RBAC_Action_name[int32(m.GetAction())]; !ok {
+		return RBACValidationError{
+			field:  "Action",
+			reason: "value must be one of the defined enum values",
+		}
+	}
 
 	for key, val := range m.GetPolicies() {
 		_ = val
