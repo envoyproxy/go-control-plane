@@ -34,6 +34,7 @@ import (
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/secret/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
@@ -143,6 +144,16 @@ func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Ser
 
 func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server) Server {
 	return &server{rest: restServer, sotw: sotwServer}
+}
+
+func initDeltaMap() map[string]string {
+	v := make(map[string]string, types.UnknownType)
+
+	for i := 0; i < int(types.UnknownType); i++ {
+		v[cache.GetResponseTypeURL(types.ResponseType(i))] = "v0"
+	}
+
+	return v
 }
 
 type server struct {
