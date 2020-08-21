@@ -242,20 +242,20 @@ func (m *Config_Rule) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetOnHeaderPresent()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetOnPresent()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Config_RuleValidationError{
-				field:  "OnHeaderPresent",
+				field:  "OnPresent",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetOnHeaderMissing()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetOnMissing()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Config_RuleValidationError{
-				field:  "OnHeaderMissing",
+				field:  "OnMissing",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

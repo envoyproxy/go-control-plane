@@ -29,7 +29,7 @@ UPSTREAM_PID=$!
 
 # Envoy start-up command
 ENVOY=${ENVOY:-/usr/local/bin/envoy}
-ENVOY_LOG="envoy.${XDS}${SUFFIX}.log"
+ENVOY_LOG="envoy.${XDS}${SUFFIX}$@.log"
 echo Envoy log: ${ENVOY_LOG}
 
 # Start envoy: important to keep drain time short
@@ -37,8 +37,8 @@ echo Envoy log: ${ENVOY_LOG}
 ENVOY_PID=$!
 
 function cleanup() {
-  kill ${ENVOY_PID}
-  kill ${UPSTREAM_PID}
+  kill ${ENVOY_PID} ${UPSTREAM_PID}
+  wait ${ENVOY_PID} ${UPSTREAM_PID} 2> /dev/null || true
 }
 trap cleanup EXIT
 

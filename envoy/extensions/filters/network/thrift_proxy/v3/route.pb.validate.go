@@ -382,6 +382,13 @@ func (m *RouteAction) Validate() error {
 			}
 		}
 
+		if !_RouteAction_ClusterHeader_Pattern.MatchString(m.GetClusterHeader()) {
+			return RouteActionValidationError{
+				field:  "ClusterHeader",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
 	default:
 		return RouteActionValidationError{
 			field:  "ClusterSpecifier",
@@ -446,6 +453,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteActionValidationError{}
+
+var _RouteAction_ClusterHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on WeightedCluster with the rules defined
 // in the proto definition for this message. If any rules are violated, an

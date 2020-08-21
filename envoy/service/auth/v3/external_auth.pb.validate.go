@@ -320,6 +320,16 @@ func (m *CheckResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CheckResponseValidationError{
+				field:  "DynamicMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.HttpResponse.(type) {
 
 	case *CheckResponse_DeniedResponse:

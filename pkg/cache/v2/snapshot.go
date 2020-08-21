@@ -48,7 +48,7 @@ func NewResources(version string, items []types.Resource) Resources {
 }
 
 // Snapshot is an internally consistent snapshot of xDS resources.
-// Consistentcy is important for the convergence as different resource types
+// Consistency is important for the convergence as different resource types
 // from the snapshot may be delivered to the proxy in arbitrary order.
 type Snapshot struct {
 	Resources [types.UnknownType]Resources

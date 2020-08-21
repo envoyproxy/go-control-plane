@@ -50,6 +50,8 @@ type Server interface {
 
 	// Fetch is the universal fetch method.
 	Fetch(context.Context, *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error)
+	// StreamHandler is the universal stream method.
+	StreamHandler(stream Stream, typeURL string) error
 }
 
 // Callbacks is a collection of callbacks inserted into the server operation.
@@ -146,7 +148,8 @@ type server struct {
 	ctx         context.Context
 }
 
-type stream interface {
+// Generic RPC stream.
+type Stream interface {
 	grpc.ServerStream
 
 	Send(*discovery.DiscoveryResponse) error
@@ -177,10 +180,10 @@ type watches struct {
 	runtimeNonce  string
 
 	// Opaque resources share a muxed channel. Nonces and watch cancellations are indexed by type URL.
-	responses            chan cache.Response
-	cancellations        map[string]func()
-	nonces               map[string]string
-	stopResponseRoutines chan struct{}
+	responses     chan cache.Response
+	cancellations map[string]func()
+	nonces        map[string]string
+	terminations  map[string]chan struct{}
 }
 
 // Initialize all watches
@@ -189,8 +192,11 @@ func (values *watches) Init() {
 	values.responses = make(chan cache.Response, 5)
 	values.cancellations = make(map[string]func())
 	values.nonces = make(map[string]string)
-	values.stopResponseRoutines = make(chan struct{})
+	values.terminations = make(map[string]chan struct{})
 }
+
+// Token response value used to signal a watch failure in muxed watches.
+var errorResponse = &cache.RawResponse{}
 
 // Cancel all watches
 func (values *watches) Cancel() {
@@ -213,9 +219,13 @@ func (values *watches) Cancel() {
 		values.runtimeCancel()
 	}
 	for _, cancel := range values.cancellations {
-		cancel()
+		if cancel != nil {
+			cancel()
+		}
 	}
-	close(values.stopResponseRoutines)
+	for _, terminate := range values.terminations {
+		close(terminate)
+	}
 }
 
 func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryResponse, error) {
@@ -232,7 +242,7 @@ func createResponse(resp cache.Response, typeURL string) (*discovery.DiscoveryRe
 }
 
 // process handles a bi-di stream request
-func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
@@ -341,15 +351,17 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 			values.runtimeNonce = nonce
 
 		case resp, more := <-values.responses:
-			if !more {
-				return status.Errorf(codes.Unavailable, "resource watch failed")
+			if more {
+				if resp == errorResponse {
+					return status.Errorf(codes.Unavailable, "resource watch failed")
+				}
+				typeUrl := resp.GetRequest().TypeUrl
+				nonce, err := send(resp, typeUrl)
+				if err != nil {
+					return err
+				}
+				values.nonces[typeUrl] = nonce
 			}
-			typeUrl := resp.GetRequest().TypeUrl
-			nonce, err := send(resp, typeUrl)
-			if err != nil {
-				return err
-			}
-			values.nonces[typeUrl] = nonce
 
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -392,63 +404,78 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 					if values.endpointCancel != nil {
 						values.endpointCancel()
 					}
-					values.endpoints, values.endpointCancel = s.cache.CreateWatch(*req)
+					values.endpoints, values.endpointCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.ClusterType:
 				if values.clusterNonce == "" || values.clusterNonce == nonce {
 					if values.clusterCancel != nil {
 						values.clusterCancel()
 					}
-					values.clusters, values.clusterCancel = s.cache.CreateWatch(*req)
+					values.clusters, values.clusterCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.RouteType:
 				if values.routeNonce == "" || values.routeNonce == nonce {
 					if values.routeCancel != nil {
 						values.routeCancel()
 					}
-					values.routes, values.routeCancel = s.cache.CreateWatch(*req)
+					values.routes, values.routeCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.ListenerType:
 				if values.listenerNonce == "" || values.listenerNonce == nonce {
 					if values.listenerCancel != nil {
 						values.listenerCancel()
 					}
-					values.listeners, values.listenerCancel = s.cache.CreateWatch(*req)
+					values.listeners, values.listenerCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.SecretType:
 				if values.secretNonce == "" || values.secretNonce == nonce {
 					if values.secretCancel != nil {
 						values.secretCancel()
 					}
-					values.secrets, values.secretCancel = s.cache.CreateWatch(*req)
+					values.secrets, values.secretCancel = s.cache.CreateWatch(req)
 				}
 			case req.TypeUrl == resource.RuntimeType:
 				if values.runtimeNonce == "" || values.runtimeNonce == nonce {
 					if values.runtimeCancel != nil {
 						values.runtimeCancel()
 					}
-					values.runtimes, values.runtimeCancel = s.cache.CreateWatch(*req)
+					values.runtimes, values.runtimeCancel = s.cache.CreateWatch(req)
 				}
 			default:
-				responseNonce, seen := values.nonces[req.TypeUrl]
+				typeUrl := req.TypeUrl
+				responseNonce, seen := values.nonces[typeUrl]
 				if !seen || responseNonce == nonce {
-					if cancel, seen := values.cancellations[req.TypeUrl]; seen && cancel != nil {
+					// We must signal goroutine termination to prevent a race between the cancel closing the watch
+					// and the producer closing the watch.
+					if terminate, exists := values.terminations[typeUrl]; exists {
+						close(terminate)
+					}
+					if cancel, seen := values.cancellations[typeUrl]; seen && cancel != nil {
 						cancel()
 					}
 					var watch chan cache.Response
-					watch, values.cancellations[req.TypeUrl] = s.cache.CreateWatch(*req)
+					watch, values.cancellations[typeUrl] = s.cache.CreateWatch(req)
 					// Muxing watches across multiple type URLs onto a single channel requires spawning
 					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
+					terminate := make(chan struct{})
+					values.terminations[typeUrl] = terminate
 					go func() {
 						select {
 						case resp, more := <-watch:
 							if more {
 								values.responses <- resp
 							} else {
-								close(values.responses)
+								// Check again if the watch is cancelled.
+								select {
+								case <-terminate: // do nothing
+								default:
+									// We cannot close the responses channel since it can be closed twice.
+									// Instead we send a fake error response.
+									values.responses <- errorResponse
+								}
 							}
 							break
-						case <-values.stopResponseRoutines:
+						case <-terminate:
 							break
 						}
 					}()
@@ -458,8 +485,8 @@ func (s *server) process(stream stream, reqCh <-chan *discovery.DiscoveryRequest
 	}
 }
 
-// handler converts a blocking read call to channels and initiates stream processing
-func (s *server) handler(stream stream, typeURL string) error {
+// StreamHandler converts a blocking read call to channels and initiates stream processing
+func (s *server) StreamHandler(stream Stream, typeURL string) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *discovery.DiscoveryRequest)
 	reqStop := int32(0)
@@ -487,31 +514,31 @@ func (s *server) handler(stream stream, typeURL string) error {
 }
 
 func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
-	return s.handler(stream, resource.AnyType)
+	return s.StreamHandler(stream, resource.AnyType)
 }
 
 func (s *server) StreamEndpoints(stream endpointservice.EndpointDiscoveryService_StreamEndpointsServer) error {
-	return s.handler(stream, resource.EndpointType)
+	return s.StreamHandler(stream, resource.EndpointType)
 }
 
 func (s *server) StreamClusters(stream clusterservice.ClusterDiscoveryService_StreamClustersServer) error {
-	return s.handler(stream, resource.ClusterType)
+	return s.StreamHandler(stream, resource.ClusterType)
 }
 
 func (s *server) StreamRoutes(stream routeservice.RouteDiscoveryService_StreamRoutesServer) error {
-	return s.handler(stream, resource.RouteType)
+	return s.StreamHandler(stream, resource.RouteType)
 }
 
 func (s *server) StreamListeners(stream listenerservice.ListenerDiscoveryService_StreamListenersServer) error {
-	return s.handler(stream, resource.ListenerType)
+	return s.StreamHandler(stream, resource.ListenerType)
 }
 
 func (s *server) StreamSecrets(stream secretservice.SecretDiscoveryService_StreamSecretsServer) error {
-	return s.handler(stream, resource.SecretType)
+	return s.StreamHandler(stream, resource.SecretType)
 }
 
 func (s *server) StreamRuntime(stream runtimeservice.RuntimeDiscoveryService_StreamRuntimeServer) error {
-	return s.handler(stream, resource.RuntimeType)
+	return s.StreamHandler(stream, resource.RuntimeType)
 }
 
 // Fetch is the universal fetch method.
@@ -521,7 +548,7 @@ func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*d
 			return nil, err
 		}
 	}
-	resp, err := s.cache.Fetch(ctx, *req)
+	resp, err := s.cache.Fetch(ctx, req)
 	if err != nil {
 		return nil, err
 	}

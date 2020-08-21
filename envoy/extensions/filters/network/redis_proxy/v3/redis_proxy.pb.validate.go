@@ -89,6 +89,21 @@ func (m *RedisProxy) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetFaults() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RedisProxyValidationError{
+					field:  fmt.Sprintf("Faults[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetDownstreamAuthUsername()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RedisProxyValidationError{
@@ -451,6 +466,107 @@ var _ interface {
 	ErrorName() string
 } = RedisProxy_PrefixRoutesValidationError{}
 
+// Validate checks the field values on RedisProxy_RedisFault with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RedisProxy_RedisFault) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if _, ok := RedisProxy_RedisFault_RedisFaultType_name[int32(m.GetFaultType())]; !ok {
+		return RedisProxy_RedisFaultValidationError{
+			field:  "FaultType",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
+	if m.GetFaultEnabled() == nil {
+		return RedisProxy_RedisFaultValidationError{
+			field:  "FaultEnabled",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetFaultEnabled()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisProxy_RedisFaultValidationError{
+				field:  "FaultEnabled",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetDelay()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RedisProxy_RedisFaultValidationError{
+				field:  "Delay",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RedisProxy_RedisFaultValidationError is the validation error returned by
+// RedisProxy_RedisFault.Validate if the designated constraints aren't met.
+type RedisProxy_RedisFaultValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RedisProxy_RedisFaultValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RedisProxy_RedisFaultValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RedisProxy_RedisFaultValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RedisProxy_RedisFaultValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RedisProxy_RedisFaultValidationError) ErrorName() string {
+	return "RedisProxy_RedisFaultValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RedisProxy_RedisFaultValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRedisProxy_RedisFault.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RedisProxy_RedisFaultValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RedisProxy_RedisFaultValidationError{}
+
 // Validate checks the field values on RedisProxy_PrefixRoutes_Route with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -459,7 +575,12 @@ func (m *RedisProxy_PrefixRoutes_Route) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Prefix
+	if len(m.GetPrefix()) > 1000 {
+		return RedisProxy_PrefixRoutes_RouteValidationError{
+			field:  "Prefix",
+			reason: "value length must be at most 1000 bytes",
+		}
+	}
 
 	// no validation rules for RemovePrefix
 
