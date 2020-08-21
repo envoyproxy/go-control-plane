@@ -2401,6 +2401,15 @@ func (m *HeaderMatcher) Validate() error {
 			}
 		}
 
+	case *HeaderMatcher_ContainsMatch:
+
+		if len(m.GetContainsMatch()) < 1 {
+			return HeaderMatcherValidationError{
+				field:  "ContainsMatch",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
+
 	}
 
 	return nil

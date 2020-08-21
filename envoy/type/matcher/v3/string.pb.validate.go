@@ -88,6 +88,15 @@ func (m *StringMatcher) Validate() error {
 			}
 		}
 
+	case *StringMatcher_Contains:
+
+		if len(m.GetContains()) < 1 {
+			return StringMatcherValidationError{
+				field:  "Contains",
+				reason: "value length must be at least 1 bytes",
+			}
+		}
+
 	case *StringMatcher_HiddenEnvoyDeprecatedRegex:
 
 		if len(m.GetHiddenEnvoyDeprecatedRegex()) > 1024 {
