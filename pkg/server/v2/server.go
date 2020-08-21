@@ -118,7 +118,11 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 
 // NewServer creates handlers from a config watcher and callbacks.
 func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
-	return &server{rest: rest.NewServer(config, callbacks), sotw: sotw.NewServer(ctx, config, callbacks)}
+	return NewServerAdvanced(rest.NewServer(config, callbacks), sotw.NewServer(ctx, config, callbacks))
+}
+
+func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server) Server {
+	return &server{rest: restServer, sotw: sotwServer}
 }
 
 type server struct {
