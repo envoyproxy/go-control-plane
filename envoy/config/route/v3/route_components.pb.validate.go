@@ -5070,6 +5070,8 @@ func (m *RateLimit_Action_GenericKey) Validate() error {
 		}
 	}
 
+	// no validation rules for DescriptorKey
+
 	return nil
 }
 
