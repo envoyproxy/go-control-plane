@@ -1,11 +1,11 @@
-# Knowledage Base
+# Knowledge Base
 
 Below lies a list of resources that may be helpful to those looking to understand the go-control-plane API. The aim of these artifacts is to provide enough knowledge and understanding to newcomers and users who wish to use this API within their own codebases to implement an xDS compliant control-plane.
 
 ## Snapshot Cache
 The following guides may be helpful on how to use go-control-plane's Snapshot Cache:
 - [Snapshot.md](cache/Snapshot.md)
-- [Watch.md](cache/Watch.md)
+- [Server.md](cache/Server.md)
 
 ## Getting Started
 Below is an example of a simple xDS ready server utilizing the provided Snapshot Cache and gRPC server logic.
