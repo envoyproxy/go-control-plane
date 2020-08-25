@@ -1,4 +1,4 @@
-# Knowledage Base
+# Knowledge Base
 
 Below lies a list of resources that may be helpful to those looking to understand the go-control-plane API. The aim of these artifacts is to provide enough knowledge and understanding to newcomers and users who wish to use this API within their own codebases to implement an xDS compliant control-plane.
 

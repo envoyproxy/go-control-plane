@@ -1,10 +1,10 @@
 # xDS Server Implementation
 
-go-control-plane ships with a full streaming implementation of the xDS protocol. We provide an interface as well as helper functions to instanstiate a fully xDS compliant gRPC server which utilizes the [SnapshotCache](Snapshot.md) logic behind the scenes.
+go-control-plane ships with a full streaming implementation of the xDS protocol. We provide an interface as well as helper functions to instantiate a fully xDS compliant gRPC server which utilizes the [SnapshotCache](Snapshot.md) logic behind the scenes.
 
 ## Getting Started
 
-Below is an example of a functional gRPC server utilizing the go-control-plane interfaces and helpers functions.
+Below is an example of a functional gRPC server utilizing the go-control-plane interfaces and helper functions.
 
 ```go
 // Create a cache
@@ -31,7 +31,7 @@ srv := serverv3.NewServer(ctx, cache, cb)
 example.RunServer(ctx, srv, port)
 ```
 
-For a full in-depth example on this code, please view the integration test located in `pkg/test/main` and the example code in `internal/example`.
+For a full in-depth example of this code, please view the integration test located in `pkg/test/main` and the example code in `internal/example`.
 
 ### Callbacks
 
@@ -95,7 +95,6 @@ func (cb *Callbacks) OnFetchResponse(*discovery.DiscoveryRequest, *discovery.Dis
 
 ## Info
 
-The provided gRPC server will take care of create new watches when new Envoy nodes register with the management server.
+The provided gRPC server will take care of creating new watches when new Envoy nodes register with the management server.
 
 > *NOTE*: The server supports REST/JSON as well as gRPC streaming
-
