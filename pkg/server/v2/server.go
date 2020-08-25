@@ -45,8 +45,8 @@ type Server interface {
 	secretservice.SecretDiscoveryServiceServer
 	runtimeservice.RuntimeDiscoveryServiceServer
 
-	// Fetch is the universal fetch method.
-	Fetch(context.Context, *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error)
+	rest.Server
+	sotw.Server
 }
 
 // Callbacks is a collection of callbacks inserted into the server operation.
