@@ -5,7 +5,7 @@ Below lies a list of resources that may be helpful to those looking to understan
 ## Snapshot Cache
 The following guides may be helpful on how to use go-control-plane's Snapshot Cache:
 - [Snapshot.md](cache/Snapshot.md)
-- [Watch.md](cache/Watch.md)
+- [Server.md](cache/Server.md)
 
 ## Getting Started
 Below is an example of a simple xDS ready server utilizing the provided Snapshot Cache and gRPC server logic.
