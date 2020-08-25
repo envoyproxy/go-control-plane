@@ -164,14 +164,6 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	t := request.GetTypeUrl()
 	aliases := request.GetResourceNamesSubscribe()
 
-	// populate our alias set
-	// the reason we do this is so we don't append pre-existing items in deltaState into the alias list when creating a watch
-	// this removes the need to process the diff if we don't have to when setting a snapshot
-	aliasSet := make(map[string]struct{}, len(aliases))
-	for _, alias := range aliases {
-		aliasSet[alias] = struct{}{}
-	}
-
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -184,16 +176,6 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	// update last watch request times
 	info.mu.Lock()
 	info.lastDeltaWatchRequestTime = time.Now()
-
-	if len(info.deltaState[t].Items) > 0 {
-		for _, alias := range info.deltaState[t].Items {
-			name := GetResourceName(alias)
-
-			if _, found := aliasSet[name]; !found {
-				aliases = append(aliases, name)
-			}
-		}
-	}
 	info.mu.Unlock()
 
 	// allocate capacity 1 to allow one-time non-blocking use
@@ -220,13 +202,13 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 		}
 		info.mu.Unlock()
 
-		return value, cache.cancelWatch(nodeID, watchID)
+		return value, cache.cancelDeltaWatch(nodeID, watchID)
 	}
 
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
 	info.mu.RLock()
-	cache.respondDelta(request, value, snapshot.GetSubscribedResources(aliases, t), nil, info.deltaState[t].Version)
+	cache.respondDelta(request, value, info.deltaState[t].Items, nil, info.deltaState[t].Version)
 	info.mu.RUnlock()
 
 	return value, nil
@@ -236,7 +218,21 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
-func (cache *snapshotCache) respondDelta(request DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, unsubscribed []string, version string) {
+// cancellation function for cleaning stale watches
+func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func() {
+	return func() {
+		// uses the cache mutex
+		cache.mu.Lock()
+		defer cache.mu.Unlock()
+		if info, ok := cache.status[nodeID]; ok {
+			info.mu.Lock()
+			delete(info.deltaWatches, watchID)
+			info.mu.Unlock()
+		}
+	}
+}
+
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, unsubscribed []string, version string) {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with version %q",
 			request.GetNode().GetId(), request.TypeUrl, version)
@@ -253,18 +249,18 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 	// on separate streams since requests do not share their response versions.
 
 	// This logic is probably broken so we'll revisit
-	if len(request.ResourceNamesSubscribe) != 0 {
-		set := nameSet(request.ResourceNamesSubscribe)
-		for name, resource := range resources {
-			if set[name] {
-				filtered = append(filtered, resource)
-			}
-		}
-	} else {
-		for _, resource := range resources {
-			filtered = append(filtered, resource)
-		}
+	// if len(request.ResourceNamesSubscribe) != 0 {
+	// 	set := nameSet(request.ResourceNamesSubscribe)
+	// 	for name, resource := range resources {
+	// 		if set[name] {
+	// 			filtered = append(filtered, resource)
+	// 		}
+	// 	}
+	// } else {
+	for _, resource := range resources {
+		filtered = append(filtered, resource)
 	}
+	// }
 
 	return &RawDeltaResponse{
 		DeltaRequest:      request,

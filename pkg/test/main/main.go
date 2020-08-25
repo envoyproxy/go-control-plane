@@ -267,7 +267,6 @@ func main() {
 		}
 
 		// pass is true if all requests succeed at least once in a run
-		time.Sleep(time.Second * 5)
 		pass := false
 		for j := 0; j < requests; j++ {
 			ok, failed := callEcho()

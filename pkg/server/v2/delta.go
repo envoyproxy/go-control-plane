@@ -16,7 +16,6 @@ package server
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"sync/atomic"
 
@@ -36,6 +35,7 @@ type deltaStream interface {
 	Recv() (*discovery.DeltaDiscoveryRequest, error)
 }
 
+<<<<<<< HEAD
 func createDeltaResponse(resp cache.DeltaResponse, typeURL string) (*discovery.DeltaDiscoveryResponse, error) {
 	if resp == nil {
 		return nil, errors.New("missing response")
@@ -80,6 +80,8 @@ func (s *server) deltaHandler(stream deltaStream, typeURL string) error {
 	return err
 }
 
+=======
+>>>>>>> more progress, cluster endpoint now responds successfully
 func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
@@ -99,12 +101,14 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 
 	// sends a response by serializing to protobuf Any
 	send := func(resp cache.DeltaResponse, typeURL string) (string, error) {
-		out, err := createDeltaResponse(resp, typeURL)
+		if resp == nil {
+			return "", errors.New("missing response")
+		}
+
+		out, err := resp.GetDeltaDiscoveryResponse()
 		if err != nil {
 			return "", err
 		}
-
-		fmt.Println("from send " + out.SystemVersionInfo)
 
 		// increment nonce
 		streamNonce = streamNonce + 1
@@ -127,6 +131,10 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 	for {
 		select {
 		case <-s.ctx.Done():
+			if s.log != nil {
+				s.log.Debugf("received signal to end! closing delta processor...")
+			}
+
 			return nil
 			// config watcher can send the requested resources types in any order
 		case resp, more := <-values.deltaEndpoints:
@@ -139,16 +147,21 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 			// set state version info
 			s.deltaLock.Lock()
-			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
+			s.deltaVersions[resource.EndpointType], err = resp.GetSystemVersion()
 			if err != nil {
 				return err
 			}
+			if s.log != nil {
+				s.log.Debugf("Set deltaVersion for %s as %s\n", resource.EndpointType, s.deltaVersions[resource.EndpointType])
+			}
+			s.deltaLock.Unlock()
+
 			values.deltaEndpointNonce = nonce
 
 		case resp, more := <-values.deltaClusters:
+			r, _ := resp.GetDeltaDiscoveryResponse()
 			if s.log != nil {
-				s.log.Debugf("%+v", resp)
+				s.log.Debugf("%+v", r)
 			}
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
@@ -160,14 +173,14 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 
 			// set state version info
 			s.deltaLock.Lock()
-			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
-			s.deltaLock.Unlock()
+			s.deltaVersions[resource.ClusterType], err = resp.GetSystemVersion()
 			if err != nil {
 				return err
 			}
 			if s.log != nil {
-				s.log.Debugf("Set deltaVersion for %s as %s\n", resp.GetDeltaRequest().GetTypeUrl(), s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()])
+				s.log.Debugf("Set deltaVersion for %s as %s\n", resource.ClusterType, s.deltaVersions[resource.ClusterType])
 			}
+			s.deltaLock.Unlock()
 
 			values.deltaClusterNonce = nonce
 
@@ -181,7 +194,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 			// set state version info
 			s.deltaLock.Lock()
-			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaVersions[resource.RouteType], err = resp.GetSystemVersion()
 			s.deltaLock.Unlock()
 			if err != nil {
 				return err
@@ -198,7 +211,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 			// set state version info
 			s.deltaLock.Lock()
-			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaVersions[resource.ListenerType], err = resp.GetSystemVersion()
 			s.deltaLock.Unlock()
 			if err != nil {
 				return err
@@ -215,7 +228,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 			// set state version info
 			s.deltaLock.Lock()
-			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaVersions[resource.SecretType], err = resp.GetSystemVersion()
 			s.deltaLock.Unlock()
 			if err != nil {
 				return err
@@ -232,7 +245,7 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			}
 			// set state version info
 			s.deltaLock.Lock()
-			s.deltaVersions[resp.GetDeltaRequest().GetTypeUrl()], err = resp.GetSystemVersion()
+			s.deltaVersions[resource.RuntimeType], err = resp.GetSystemVersion()
 			s.deltaLock.Unlock()
 			if err != nil {
 				return err
@@ -317,19 +330,68 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				if values.deltaListenerCancel != nil {
 					values.deltaListenerCancel()
 				}
-				s.deltaLock.RLock()
-				values.deltaListeners, values.deltaListenerCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
-				s.deltaLock.RUnlock()
-			case req.TypeUrl == resource.SecretType && (values.deltaSecretNonce == "" || values.deltaSecretNonce == nonce):
-				if values.deltaSecretCancel != nil {
-					values.deltaSecretCancel()
+			case req.TypeUrl == resource.SecretType:
+				if values.deltaSecretNonce == "" || values.deltaSecretNonce == nonce {
+					if values.deltaSecretCancel != nil {
+						values.deltaSecretCancel()
+					}
+					s.deltaLock.RLock()
+					values.deltaSecrets, values.deltaSecretCancel = s.cache.CreateDeltaWatch(req, s.deltaVersions[resource.SecretType])
+					s.deltaLock.RUnlock()
 				}
-				s.deltaLock.RLock()
-				values.deltaSecrets, values.deltaSecretCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])
-				s.deltaLock.RUnlock()
-			case req.TypeUrl == resource.RuntimeType && (values.deltaRuntimeNonce == "" || values.deltaRuntimeNonce == nonce):
-				if values.deltaRuntimeCancel != nil {
-					values.deltaRuntimeCancel()
+			case req.TypeUrl == resource.RuntimeType:
+				if values.deltaRuntimeNonce == "" || values.deltaRuntimeNonce == nonce {
+					if values.deltaRuntimeCancel != nil {
+						values.deltaRuntimeCancel()
+					}
+					s.deltaLock.RLock()
+					values.deltaRuntimes, values.deltaRuntimeCancel = s.cache.CreateDeltaWatch(req, s.deltaVersions[resource.RuntimeType])
+					s.deltaLock.RUnlock()
+				}
+			default:
+				typeURL := req.TypeUrl
+				responseNonce, seen := values.deltaNonces[typeURL]
+				if !seen || responseNonce == nonce {
+					// We must signal goroutine termination to prevent a race between the cancel closing the watch
+					// and the producer closing the watch.
+					if terminate, exists := values.deltaTerminations[typeURL]; exists {
+						close(terminate)
+					}
+					if cancel, seen := values.deltaCancellations[typeURL]; seen && cancel != nil {
+						cancel()
+					}
+					var watch chan cache.DeltaResponse
+
+					s.deltaLock.RLock()
+					watch, values.cancellations[typeURL] = s.cache.CreateDeltaWatch(req, s.deltaVersions[typeURL])
+					s.deltaLock.RUnlock()
+
+					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
+					terminate := make(chan struct{})
+					values.deltaTerminations[typeURL] = terminate
+					go func() {
+						select {
+						case resp, more := <-watch:
+							if more {
+								values.deltaResponses <- resp
+							} else {
+								// Check again if the watch is cancelled.
+								select {
+								case <-terminate: // do nothing
+								default:
+									// We cannot close the responses channel since it can be closed twice.
+									// Instead we send a fake error response.
+									values.deltaResponses <- deltaErrorResponse
+								}
+							}
+							break
+						case <-terminate:
+							if s.log != nil {
+								s.log.Debugf("received a terminate on a delta watch")
+							}
+							break
+						}
+					}()
 				}
 				s.deltaLock.RLock()
 				values.deltaRuntimes, values.deltaRuntimeCancel = s.cache.CreateDeltaWatch(*req, s.deltaVersions[req.GetTypeUrl()])

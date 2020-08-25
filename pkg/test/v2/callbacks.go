@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"log"
+	"os"
 	"sync"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
@@ -70,10 +71,6 @@ func (cb *Callbacks) OnStreamDeltaResponse(id int64, req *discovery.DeltaDiscove
 
 // OnStreamDeltaRequest ...
 func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscoveryRequest) error {
-	// if cb.Debug {
-	// 	log.Printf("request: %s", req.String())
-	// }
-
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaRequests++
@@ -81,6 +78,11 @@ func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscover
 		close(cb.Signal)
 		cb.Signal = nil
 	}
+
+	if cb.DeltaRequests > 20 {
+		os.Exit(1)
+	}
+
 	return nil
 }
 

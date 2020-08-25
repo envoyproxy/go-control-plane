@@ -148,9 +148,9 @@ func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server) Server {
 func initDeltaMap() map[string]string {
 	v := make(map[string]string, types.UnknownType)
 
-	for i := 0; i < int(types.UnknownType); i++ {
-		v[cache.GetResponseTypeURL(types.ResponseType(i))] = "v0"
-	}
+	// for i := 0; i < int(types.UnknownType); i++ {
+	// 	v[cache.GetResponseTypeURL(types.ResponseType(i))] = "v0"
+	// }
 
 	return v
 }
