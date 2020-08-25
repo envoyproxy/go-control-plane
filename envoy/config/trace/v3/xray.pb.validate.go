@@ -70,6 +70,16 @@ func (m *XRayConfig) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetSegmentFields()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return XRayConfigValidationError{
+				field:  "SegmentFields",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -126,3 +136,82 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = XRayConfigValidationError{}
+
+// Validate checks the field values on XRayConfig_SegmentFields with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *XRayConfig_SegmentFields) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Origin
+
+	if v, ok := interface{}(m.GetAws()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return XRayConfig_SegmentFieldsValidationError{
+				field:  "Aws",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// XRayConfig_SegmentFieldsValidationError is the validation error returned by
+// XRayConfig_SegmentFields.Validate if the designated constraints aren't met.
+type XRayConfig_SegmentFieldsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e XRayConfig_SegmentFieldsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e XRayConfig_SegmentFieldsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e XRayConfig_SegmentFieldsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e XRayConfig_SegmentFieldsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e XRayConfig_SegmentFieldsValidationError) ErrorName() string {
+	return "XRayConfig_SegmentFieldsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e XRayConfig_SegmentFieldsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sXRayConfig_SegmentFields.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = XRayConfig_SegmentFieldsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = XRayConfig_SegmentFieldsValidationError{}
