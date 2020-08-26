@@ -61,6 +61,8 @@ func (m *UdpProxyConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for UseOriginalSrcIp
+
 	switch m.RouteSpecifier.(type) {
 
 	case *UdpProxyConfig_Cluster:
