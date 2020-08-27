@@ -151,8 +151,11 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 	}
 }
 
+<<<<<<< HEAD
 // TESTS =======================================================================================
 
+=======
+>>>>>>> split delta server tests out and add test for all response handlers
 func TestDeltaResponseClusterHandler(t *testing.T) {
 	t.Run(testTypes[1], func(t *testing.T) {
 		config := makeMockConfigWatcher()
@@ -188,3 +191,56 @@ func TestDeltaResponseClusterHandler(t *testing.T) {
 		}
 	})
 }
+<<<<<<< HEAD
+=======
+
+func TestDeltaResponseHandlers(t *testing.T) {
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.deltaResponses = makeDeltaResponses()
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
+
+			resp := makeMockDeltaStream(t)
+			// This should put through a wildcard request but the test configWatcher might not work here
+			resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: typ, ResourceNamesSubscribe: []string{clusterName}}
+
+			go func() {
+				var err error
+				switch typ {
+				case rsrc.EndpointType:
+					err = s.DeltaEndpoints(resp)
+				case rsrc.ClusterType:
+					err = s.DeltaClusters(resp)
+				case rsrc.RouteType:
+					err = s.DeltaRoutes(resp)
+				case rsrc.ListenerType:
+					err = s.DeltaListeners(resp)
+				case rsrc.SecretType:
+					err = s.DeltaSecrets(resp)
+				case rsrc.RuntimeType:
+					err = s.DeltaRuntime(resp)
+				}
+
+				if err != nil {
+					t.Errorf("Delta() => got %v, want no error", err)
+				}
+			}()
+
+			select {
+			case res := <-resp.sent:
+				close(resp.recv)
+				if want := map[string]int{typ: 1}; !reflect.DeepEqual(want, config.counts) {
+					t.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}
+
+				if v := res.GetSystemVersionInfo(); v != "" {
+					t.Errorf("should've had an emtpy version for first request, got %s", v)
+				}
+			case <-time.After(1 * time.Second):
+				t.Fatalf("got no response")
+			}
+		})
+	}
+}
+>>>>>>> split delta server tests out and add test for all response handlers
