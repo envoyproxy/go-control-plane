@@ -522,6 +522,8 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
+	// no validation rules for ConnectionPoolPerDownstreamConnection
+
 	switch m.ClusterDiscoveryType.(type) {
 
 	case *Cluster_Type:
