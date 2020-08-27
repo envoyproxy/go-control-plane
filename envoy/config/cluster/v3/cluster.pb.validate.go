@@ -522,6 +522,8 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
+	// no validation rules for ConnectionPoolPerDownstreamConnection
+
 	for idx, item := range m.GetHiddenEnvoyDeprecatedHosts() {
 		_, _ = idx, item
 
