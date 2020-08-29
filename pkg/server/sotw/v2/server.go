@@ -1,19 +1,4 @@
-// Copyright 2018 Envoyproxy Authors
-//
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
-
-// Package server provides an implementation of a streaming xDS server.
-package server
+package sotw
 
 import (
 	"context"
@@ -25,37 +10,16 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	clusterservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	endpointservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	listenerservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	routeservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 )
 
-// Server is a collection of handlers for streaming discovery requests.
 type Server interface {
-	endpointservice.EndpointDiscoveryServiceServer
-	clusterservice.ClusterDiscoveryServiceServer
-	routeservice.RouteDiscoveryServiceServer
-	listenerservice.ListenerDiscoveryServiceServer
-	discoverygrpc.AggregatedDiscoveryServiceServer
-	secretservice.SecretDiscoveryServiceServer
-	runtimeservice.RuntimeDiscoveryServiceServer
-
-	// Fetch is the universal fetch method.
-	Fetch(context.Context, *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error)
-	// StreamHandler is the universal stream method.
 	StreamHandler(stream Stream, typeURL string) error
 }
 
-// Callbacks is a collection of callbacks inserted into the server operation.
-// The callbacks are invoked synchronously.
 type Callbacks interface {
 	// OnStreamOpen is called once an xDS stream is open with a stream ID and the type URL (or "" for ADS).
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
@@ -67,85 +31,20 @@ type Callbacks interface {
 	OnStreamRequest(int64, *discovery.DiscoveryRequest) error
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-	// OnFetchRequest is called for each Fetch request. Returning an error will end processing of the
-	// request and respond with an error.
-	OnFetchRequest(context.Context, *discovery.DiscoveryRequest) error
-	// OnFetchResponse is called immediately prior to sending a response.
-	OnFetchResponse(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-}
-
-// CallbackFuncs is a convenience type for implementing the Callbacks interface.
-type CallbackFuncs struct {
-	StreamOpenFunc     func(context.Context, int64, string) error
-	StreamClosedFunc   func(int64)
-	StreamRequestFunc  func(int64, *discovery.DiscoveryRequest) error
-	StreamResponseFunc func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-	FetchRequestFunc   func(context.Context, *discovery.DiscoveryRequest) error
-	FetchResponseFunc  func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-}
-
-var _ Callbacks = CallbackFuncs{}
-
-// OnStreamOpen invokes StreamOpenFunc.
-func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL string) error {
-	if c.StreamOpenFunc != nil {
-		return c.StreamOpenFunc(ctx, streamID, typeURL)
-	}
-
-	return nil
-}
-
-// OnStreamClosed invokes StreamClosedFunc.
-func (c CallbackFuncs) OnStreamClosed(streamID int64) {
-	if c.StreamClosedFunc != nil {
-		c.StreamClosedFunc(streamID)
-	}
-}
-
-// OnStreamRequest invokes StreamRequestFunc.
-func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryRequest) error {
-	if c.StreamRequestFunc != nil {
-		return c.StreamRequestFunc(streamID, req)
-	}
-
-	return nil
-}
-
-// OnStreamResponse invokes StreamResponseFunc.
-func (c CallbackFuncs) OnStreamResponse(streamID int64, req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
-	if c.StreamResponseFunc != nil {
-		c.StreamResponseFunc(streamID, req, resp)
-	}
-}
-
-// OnFetchRequest invokes FetchRequestFunc.
-func (c CallbackFuncs) OnFetchRequest(ctx context.Context, req *discovery.DiscoveryRequest) error {
-	if c.FetchRequestFunc != nil {
-		return c.FetchRequestFunc(ctx, req)
-	}
-
-	return nil
-}
-
-// OnFetchResponse invoked FetchResponseFunc.
-func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
-	if c.FetchResponseFunc != nil {
-		c.FetchResponseFunc(req, resp)
-	}
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
+func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks) Server {
 	return &server{cache: config, callbacks: callbacks, ctx: ctx}
 }
 
 type server struct {
-	cache     cache.Cache
+	cache     cache.ConfigWatcher
 	callbacks Callbacks
+	ctx       context.Context
 
 	// streamCount for counting bi-di streams
 	streamCount int64
-	ctx         context.Context
 }
 
 // Generic RPC stream.
@@ -502,129 +401,4 @@ func (s *server) StreamHandler(stream Stream, typeURL string) error {
 	atomic.StoreInt32(&reqStop, 1)
 
 	return err
-}
-
-func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
-	return s.StreamHandler(stream, resource.AnyType)
-}
-
-func (s *server) StreamEndpoints(stream endpointservice.EndpointDiscoveryService_StreamEndpointsServer) error {
-	return s.StreamHandler(stream, resource.EndpointType)
-}
-
-func (s *server) StreamClusters(stream clusterservice.ClusterDiscoveryService_StreamClustersServer) error {
-	return s.StreamHandler(stream, resource.ClusterType)
-}
-
-func (s *server) StreamRoutes(stream routeservice.RouteDiscoveryService_StreamRoutesServer) error {
-	return s.StreamHandler(stream, resource.RouteType)
-}
-
-func (s *server) StreamListeners(stream listenerservice.ListenerDiscoveryService_StreamListenersServer) error {
-	return s.StreamHandler(stream, resource.ListenerType)
-}
-
-func (s *server) StreamSecrets(stream secretservice.SecretDiscoveryService_StreamSecretsServer) error {
-	return s.StreamHandler(stream, resource.SecretType)
-}
-
-func (s *server) StreamRuntime(stream runtimeservice.RuntimeDiscoveryService_StreamRuntimeServer) error {
-	return s.StreamHandler(stream, resource.RuntimeType)
-}
-
-// Fetch is the universal fetch method.
-func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if s.callbacks != nil {
-		if err := s.callbacks.OnFetchRequest(ctx, req); err != nil {
-			return nil, err
-		}
-	}
-	resp, err := s.cache.Fetch(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	if resp == nil {
-		return nil, errors.New("missing response")
-	}
-	out, err := resp.GetDiscoveryResponse()
-	if s.callbacks != nil {
-		s.callbacks.OnFetchResponse(req, out)
-	}
-	return out, err
-}
-
-func (s *server) FetchEndpoints(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.Unavailable, "empty request")
-	}
-	req.TypeUrl = resource.EndpointType
-	return s.Fetch(ctx, req)
-}
-
-func (s *server) FetchClusters(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.Unavailable, "empty request")
-	}
-	req.TypeUrl = resource.ClusterType
-	return s.Fetch(ctx, req)
-}
-
-func (s *server) FetchRoutes(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.Unavailable, "empty request")
-	}
-	req.TypeUrl = resource.RouteType
-	return s.Fetch(ctx, req)
-}
-
-func (s *server) FetchListeners(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.Unavailable, "empty request")
-	}
-	req.TypeUrl = resource.ListenerType
-	return s.Fetch(ctx, req)
-}
-
-func (s *server) FetchSecrets(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.Unavailable, "empty request")
-	}
-	req.TypeUrl = resource.SecretType
-	return s.Fetch(ctx, req)
-}
-
-func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.Unavailable, "empty request")
-	}
-	req.TypeUrl = resource.RuntimeType
-	return s.Fetch(ctx, req)
-}
-
-func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
-	return errors.New("not implemented")
-}
-
-func (s *server) DeltaEndpoints(_ endpointservice.EndpointDiscoveryService_DeltaEndpointsServer) error {
-	return errors.New("not implemented")
-}
-
-func (s *server) DeltaClusters(_ clusterservice.ClusterDiscoveryService_DeltaClustersServer) error {
-	return errors.New("not implemented")
-}
-
-func (s *server) DeltaRoutes(_ routeservice.RouteDiscoveryService_DeltaRoutesServer) error {
-	return errors.New("not implemented")
-}
-
-func (s *server) DeltaListeners(_ listenerservice.ListenerDiscoveryService_DeltaListenersServer) error {
-	return errors.New("not implemented")
-}
-
-func (s *server) DeltaSecrets(_ secretservice.SecretDiscoveryService_DeltaSecretsServer) error {
-	return errors.New("not implemented")
-}
-
-func (s *server) DeltaRuntime(_ runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
-	return errors.New("not implemented")
 }
