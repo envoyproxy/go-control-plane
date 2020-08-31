@@ -319,6 +319,8 @@ func (m *Http1ProtocolOptions) Validate() error {
 
 	// no validation rules for EnableTrailers
 
+	// no validation rules for AllowChunkedLength
+
 	return nil
 }
 
