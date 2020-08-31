@@ -2167,6 +2167,17 @@ func (m *Cluster_CommonLbConfig_ConsistentHashingLbConfig) Validate() error {
 
 	// no validation rules for UseHostnameForHashing
 
+	if wrapper := m.GetHashBalanceFactor(); wrapper != nil {
+
+		if wrapper.GetValue() < 100 {
+			return Cluster_CommonLbConfig_ConsistentHashingLbConfigValidationError{
+				field:  "HashBalanceFactor",
+				reason: "value must be greater than or equal to 100",
+			}
+		}
+
+	}
+
 	return nil
 }
 
