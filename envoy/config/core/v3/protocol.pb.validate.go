@@ -321,6 +321,16 @@ func (m *Http1ProtocolOptions) Validate() error {
 
 	// no validation rules for AllowChunkedLength
 
+	if v, ok := interface{}(m.GetOverrideStreamErrorOnInvalidHttpMessage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Http1ProtocolOptionsValidationError{
+				field:  "OverrideStreamErrorOnInvalidHttpMessage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
