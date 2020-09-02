@@ -16,7 +16,6 @@
 package cache
 
 import (
-	"context"
 	"fmt"
 	"sync/atomic"
 
@@ -59,13 +58,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(DeltaRequest, string) (value chan DeltaResponse, cancel func())
-}
-
-// ConfigFetcher fetches configuration resources from cache
-type ConfigFetcher interface {
-	// Fetch implements the polling method of the config cache using a non-empty request.
-	Fetch(context.Context, *Request) (Response, error)
+	CreateDeltaWatch(*DeltaRequest) (value chan DeltaResponse, cancel func())
 }
 
 // Cache is a generic config cache with a watcher.
@@ -126,7 +119,7 @@ type RawDeltaResponse struct {
 	SystemVersionInfo string
 
 	// Resources to be included in the response.
-	Resources []types.Resource
+	Resources map[string]types.Resource
 
 	// RemovedResources is a list of unsubscribed aliases to be included in the response
 	RemovedResources []string
@@ -198,7 +191,9 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 	if !r.isResourceMarshaled {
 		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
-		for i, resource := range r.Resources {
+		i := 0
+		for version, resource := range r.Resources {
+
 			marshaledResource, err := MarshalResource(resource)
 			if err != nil {
 				return nil, err
@@ -212,8 +207,9 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 					TypeUrl: r.DeltaRequest.TypeUrl,
 					Value:   marshaledResource,
 				},
-				Version: r.SystemVersionInfo,
+				Version: version,
 			}
+			i++
 		}
 
 		r.marshaledResponse = &discovery.DeltaDiscoveryResponse{

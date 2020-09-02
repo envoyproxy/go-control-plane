@@ -30,6 +30,20 @@ type Resources struct {
 	Items map[string]types.Resource
 }
 
+// DeltaResources is a versioned group of resources which also contains individual resource versions per the incremental xDS protocol
+type DeltaResources struct {
+	// Version information
+	SystemVersion string
+
+	// Items in the group indexed by name
+	Items resourceItems
+}
+
+type resourceItems struct {
+	Version string
+	Items   map[string]types.Resource
+}
+
 // IndexResourcesByName creates a map from the resource name to the resource.
 func IndexResourcesByName(items []types.Resource) map[string]types.Resource {
 	indexed := make(map[string]types.Resource, len(items))

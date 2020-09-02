@@ -74,7 +74,7 @@ type statusInfo struct {
 
 	// deltaState is the list of resources used for diffing when the server needs to send out updates for subcribed resources
 	// this list should be used to keep track of node state
-	deltaState map[string]Resources
+	deltaState deltaState
 
 	// the timestamp of the last watch request
 	lastWatchRequestTime time.Time
@@ -85,6 +85,11 @@ type statusInfo struct {
 	// mutex to protect the status fields.
 	// should not acquire mutex of the parent cache after acquiring this mutex.
 	mu sync.RWMutex
+}
+
+type deltaState struct {
+	state         map[string]Resources
+	SystemVersion string
 }
 
 // ResponseWatch is a watch record keeping both the request and an open channel for the response.
@@ -111,7 +116,10 @@ func newStatusInfo(node *core.Node) *statusInfo {
 		node:         node,
 		watches:      make(map[int64]ResponseWatch),
 		deltaWatches: make(map[int64]DeltaResponseWatch),
-		deltaState:   make(map[string]Resources),
+		deltaState: deltaState{
+			state:         make(map[string]Resources),
+			SystemVersion: "",
+		},
 	}
 	return &out
 }
@@ -149,5 +157,11 @@ func (info *statusInfo) GetLastDeltaWatchRequestTime() time.Time {
 func (info *statusInfo) GetDeltaState() map[string]Resources {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
-	return info.deltaState
+	return info.deltaState.state
+}
+
+func (info *statusInfo) GetDeltaStateSystemVersion() string {
+	info.mu.RLock()
+	defer info.mu.RUnlock()
+	return info.deltaState.SystemVersion
 }

@@ -67,11 +67,21 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 }
 
 func TestResponseGetDeltaDiscoveryResponse(t *testing.T) {
-	routes := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+	r := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+	routes := make(map[string]types.Resource, len(r))
+
+	// Build our resource version map
+	for _, route := range r {
+		version, err := cache.HashResource(route)
+		if err != nil {
+			t.Fatal(err)
+		}
+		routes[version] = route
+	}
+
 	resp := cache.RawDeltaResponse{
-		DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: resource.RouteType},
-		SystemVersionInfo: "v0",
-		Resources:         routes,
+		DeltaRequest: &discovery.DeltaDiscoveryRequest{TypeUrl: resource.RouteType},
+		Resources:    routes,
 	}
 
 	discoveryResponse, err := resp.GetDeltaDiscoveryResponse()
@@ -83,10 +93,10 @@ func TestResponseGetDeltaDiscoveryResponse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Same(t, discoveryResponse, cachedResponse)
 
-	r := &route.RouteConfiguration{}
-	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0].GetResource(), r)
+	route := &route.RouteConfiguration{}
+	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0].GetResource(), route)
 	assert.Nil(t, err)
-	assert.Equal(t, r.Name, resourceName)
+	assert.Equal(t, route.Name, resourceName)
 }
 
 func TestDeltaPassthroughResponseGetDiscoveryResponse(t *testing.T) {

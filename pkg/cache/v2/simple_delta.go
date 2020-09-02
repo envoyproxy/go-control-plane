@@ -39,14 +39,14 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 			unsubscribed := watch.Request.GetResourceNamesUnsubscribe()
 			version := snapshot.GetVersion(t)
 
-			if version != info.deltaState[t].Version {
+			if version != info.deltaState.state[t].Version {
 				// We want to perform some pre-processing before we create the diff
 				if len(subscribed) == 0 && len(unsubscribed) == 0 {
 					cache.log.Debugf("wildcard request")
 
 					// Set the new state and since this is wildcard
 					// we can just populat the state with all since that is what the stream has requested
-					info.deltaState[t] = Resources{
+					info.deltaState.state[t] = Resources{
 						Version: version,
 						Items:   snapshot.GetResources(t),
 					}
@@ -57,7 +57,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 						watch.Response,
 						snapshot.GetResources(t),
 						unsubscribed,
-						version,
 					)
 
 					// Clean up and since we've responded we can continue going through the rest of the watches
@@ -72,11 +71,11 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					}
 
 					// Mutates deltaState and will remove the items from the map
-					cache.unsubscribe(unsubscribed, info.deltaState)
+					cache.unsubscribe(unsubscribed, info.deltaState.state)
 				}
 
 				// Now calculate the diff and see what has changed in the state
-				diff := cache.checkState(subscribed, info.deltaState[t].Items)
+				diff := cache.checkState(subscribed, info.deltaState.state[t].Items)
 				if len(diff) > 0 {
 					if cache.log != nil {
 						cache.log.Debugf("node: %s, found new items to subscribe too: %v ", node, diff)
@@ -87,18 +86,18 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 						Version: version,
 					}
 					for key, value := range diff {
-						for rKey := range info.deltaState[t].Items {
+						for rKey := range info.deltaState.state[t].Items {
 							// Handle the case when a new item could be added to the state and also if we need to overwrite a previous resource
 							if key == rKey {
-								info.deltaState[t].Items[key] = value
-							} else if _, found := info.deltaState[t].Items[key]; !found {
-								info.deltaState[t].Items[key] = value
+								info.deltaState.state[t].Items[key] = value
+							} else if _, found := info.deltaState.state[t].Items[key]; !found {
+								info.deltaState.state[t].Items[key] = value
 							}
 						}
 					}
-					r.Items = info.deltaState[t].Items
+					r.Items = info.deltaState.state[t].Items
 
-					info.deltaState[t] = r
+					info.deltaState.state[t] = r
 				}
 
 				if cache.log != nil {
@@ -112,7 +111,6 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					watch.Response,
 					diff, // We want to only send the updated resources here
 					unsubscribed,
-					version,
 				)
 
 				// discard the old watch
@@ -159,7 +157,11 @@ func (cache *snapshotCache) unsubscribe(resources []string, deltaState map[strin
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
 // Requester now sets version info when creating new delta watches
+<<<<<<< HEAD
 func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersion string) (chan DeltaResponse, func()) {
+=======
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest) (chan DeltaResponse, func()) {
+>>>>>>> progress save... restructuring version logic in cache
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 	aliases := request.GetResourceNamesSubscribe()
@@ -183,22 +185,37 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
-	version := snapshot.GetVersion(t)
+
+	// I don't think we use the snapshot version here it is pretty much irrelevant for delta xDS
+	snapshotVersion := snapshot.GetVersion(t)
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
-	if !exists || version == requestVersion {
+	if !exists || snapshotVersion != info.GetDeltaStateSystemVersion() {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, version %q", watchID,
-				t, aliases, nodeID, requestVersion)
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
+				t, aliases, nodeID, snapshotVersion)
 		}
 
 		info.mu.Lock()
 		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value}
 		// Set our initial state when a watch is created
-		info.deltaState[t] = Resources{
-			Version: requestVersion,
-			Items:   snapshot.GetSubscribedResources(aliases, t),
+		if snapshotVersion != "" {
+			// Create our delta state versions if the snapshot exists
+			for _, resource := range snapshot.GetSubscribedResources(aliases, t) {
+				v, err := HashResource(resource)
+				if err != nil {
+					panic(err)
+				}
+
+				cache.log.Debugf("resource version created: %s", v)
+			}
+			info.deltaState.state[t] = Resources{}
+		} else {
+			info.deltaState.state[t] = Resources{
+				Version: "",
+				Items:   snapshot.GetSubscribedResources(aliases, t),
+			}
 		}
 		info.mu.Unlock()
 
@@ -208,7 +225,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request DeltaRequest, requestVersio
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
 	info.mu.RLock()
-	cache.respondDelta(request, value, info.deltaState[t].Items, nil, info.deltaState[t].Version)
+	cache.respondDelta(request, value, info.deltaState.state[t].Items, nil)
 	info.mu.RUnlock()
 
 	return value, nil
@@ -232,17 +249,17 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, unsubscribed []string, version string) {
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, unsubscribed []string) {
 	if cache.log != nil {
-		cache.log.Debugf("node: %s sending delta response %s with version %q",
-			request.GetNode().GetId(), request.TypeUrl, version)
+		cache.log.Debugf("node: %s sending delta response %s with resource versions: %q",
+			request.GetNode().GetId(), request.TypeUrl)
 	}
 
-	value <- createDeltaResponse(request, resources, unsubscribed, version)
+	value <- createDeltaResponse(request, resources, unsubscribed)
 }
 
-func createDeltaResponse(request DeltaRequest, resources map[string]types.Resource, unsubscribed []string, version string) DeltaResponse {
-	filtered := make([]types.Resource, 0, len(resources))
+func createDeltaResponse(request *DeltaRequest, resources map[string]types.Resource, unsubscribed []string) DeltaResponse {
+	filtered := make(map[string]types.Resource, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
@@ -257,15 +274,14 @@ func createDeltaResponse(request DeltaRequest, resources map[string]types.Resour
 	// 		}
 	// 	}
 	// } else {
-	for _, resource := range resources {
-		filtered = append(filtered, resource)
+	for version, resource := range resources {
+		filtered[version] = resource
 	}
 	// }
 
 	return &RawDeltaResponse{
-		DeltaRequest:      request,
-		Resources:         filtered,
-		RemovedResources:  unsubscribed,
-		SystemVersionInfo: version,
+		DeltaRequest:     request,
+		Resources:        filtered,
+		RemovedResources: unsubscribed,
 	}
 }

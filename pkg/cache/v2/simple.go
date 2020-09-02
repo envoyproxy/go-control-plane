@@ -47,14 +47,6 @@ type SnapshotCache interface {
 	// the version differs from the snapshot version.
 	SetSnapshot(node string, snapshot Snapshot) error
 
-	// SetSnapshotDelta sets a response snapshot for a node using the delta watches. For ADS, the snapshots
-	// should have distinct versions and be internally consistent (e.g. all
-	// referenced resources must be included in the snapshot).
-	//
-	// This method will cause the server to respond to all open delta watches, for which
-	// the version differs from the snapshot version.
-	SetSnapshotDelta(node string, snapshot Snapshot) error
-
 	// GetSnapshots gets the snapshot for a node.
 	GetSnapshot(node string) (Snapshot, error)
 
@@ -135,6 +127,27 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 				// discard the watch
 				delete(info.watches, id)
 			}
+		}
+
+		for id, watch := range info.deltaWatches {
+			resources := snapshot.GetResources(watch.Request.GetTypeUrl())
+			for _, resource := range resources {
+				v, err := HashResource(resource)
+				if err != nil {
+					return err
+				}
+				if cache.log != nil {
+					cache.log.Debugf("creating version: %s for resource: %s\n", v, GetResourceName(resource))
+				}
+
+				// Modify our state here and do our comparisons to see which resources should be sent out
+				// When we do our comparisons, we can compare the hash which should take less compute time than comparing a whole protobuf resource
+			}
+
+			// TODO:
+			// should this logic be done outside the resource version for lo
+
+			delete(info.deltaWatches, id)
 		}
 		info.mu.Unlock()
 	}
