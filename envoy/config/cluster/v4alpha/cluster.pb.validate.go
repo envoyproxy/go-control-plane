@@ -1925,6 +1925,8 @@ func (m *Cluster_LbSubsetConfig_LbSubsetSelector) Validate() error {
 		return nil
 	}
 
+	// no validation rules for SingleHostPerSubset
+
 	if _, ok := Cluster_LbSubsetConfig_LbSubsetSelector_LbSubsetSelectorFallbackPolicy_name[int32(m.GetFallbackPolicy())]; !ok {
 		return Cluster_LbSubsetConfig_LbSubsetSelectorValidationError{
 			field:  "FallbackPolicy",
