@@ -63,6 +63,28 @@ func (m *UdpProxyConfig) Validate() error {
 
 	// no validation rules for UseOriginalSrcIp
 
+	if len(m.GetHashPolicies()) > 1 {
+		return UdpProxyConfigValidationError{
+			field:  "HashPolicies",
+			reason: "value must contain no more than 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetHashPolicies() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UdpProxyConfigValidationError{
+					field:  fmt.Sprintf("HashPolicies[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.RouteSpecifier.(type) {
 
 	case *UdpProxyConfig_Cluster:
@@ -138,3 +160,89 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UdpProxyConfigValidationError{}
+
+// Validate checks the field values on UdpProxyConfig_HashPolicy with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UdpProxyConfig_HashPolicy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.PolicySpecifier.(type) {
+
+	case *UdpProxyConfig_HashPolicy_SourceIp:
+
+		if m.GetSourceIp() != true {
+			return UdpProxyConfig_HashPolicyValidationError{
+				field:  "SourceIp",
+				reason: "value must equal true",
+			}
+		}
+
+	default:
+		return UdpProxyConfig_HashPolicyValidationError{
+			field:  "PolicySpecifier",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// UdpProxyConfig_HashPolicyValidationError is the validation error returned by
+// UdpProxyConfig_HashPolicy.Validate if the designated constraints aren't met.
+type UdpProxyConfig_HashPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UdpProxyConfig_HashPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UdpProxyConfig_HashPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UdpProxyConfig_HashPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UdpProxyConfig_HashPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UdpProxyConfig_HashPolicyValidationError) ErrorName() string {
+	return "UdpProxyConfig_HashPolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UdpProxyConfig_HashPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUdpProxyConfig_HashPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UdpProxyConfig_HashPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UdpProxyConfig_HashPolicyValidationError{}
