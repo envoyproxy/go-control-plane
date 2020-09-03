@@ -605,6 +605,18 @@ func (m *Cluster) Validate() error {
 			}
 		}
 
+	case *Cluster_MaglevLbConfig_:
+
+		if v, ok := interface{}(m.GetMaglevLbConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterValidationError{
+					field:  "MaglevLbConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *Cluster_OriginalDstLbConfig_:
 
 		if v, ok := interface{}(m.GetOriginalDstLbConfig()).(interface{ Validate() error }); ok {
@@ -1558,6 +1570,83 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Cluster_RingHashLbConfigValidationError{}
+
+// Validate checks the field values on Cluster_MaglevLbConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *Cluster_MaglevLbConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetTableSize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Cluster_MaglevLbConfigValidationError{
+				field:  "TableSize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// Cluster_MaglevLbConfigValidationError is the validation error returned by
+// Cluster_MaglevLbConfig.Validate if the designated constraints aren't met.
+type Cluster_MaglevLbConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Cluster_MaglevLbConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Cluster_MaglevLbConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Cluster_MaglevLbConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Cluster_MaglevLbConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Cluster_MaglevLbConfigValidationError) ErrorName() string {
+	return "Cluster_MaglevLbConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Cluster_MaglevLbConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCluster_MaglevLbConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Cluster_MaglevLbConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Cluster_MaglevLbConfigValidationError{}
 
 // Validate checks the field values on Cluster_OriginalDstLbConfig with the
 // rules defined in the proto definition for this message. If any rules are
