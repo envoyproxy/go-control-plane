@@ -152,6 +152,18 @@ func (m *LuaPerRoute) Validate() error {
 			}
 		}
 
+	case *LuaPerRoute_SourceCode:
+
+		if v, ok := interface{}(m.GetSourceCode()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LuaPerRouteValidationError{
+					field:  "SourceCode",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return LuaPerRouteValidationError{
 			field:  "Override",
