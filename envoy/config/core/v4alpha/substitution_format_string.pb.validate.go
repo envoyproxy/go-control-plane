@@ -44,6 +44,8 @@ func (m *SubstitutionFormatString) Validate() error {
 		return nil
 	}
 
+	// no validation rules for OmitEmptyValues
+
 	switch m.Format.(type) {
 
 	case *SubstitutionFormatString_TextFormat:
