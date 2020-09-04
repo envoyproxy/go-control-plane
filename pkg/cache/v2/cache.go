@@ -16,6 +16,7 @@
 package cache
 
 import (
+	"errors"
 	"fmt"
 	"sync/atomic"
 
@@ -89,6 +90,18 @@ type DeltaResponse interface {
 
 	// Get the version in the Response.
 	GetSystemVersion() (string, error)
+
+	// Get the version map of the internal cache
+	GetDeltaVersionMap() (map[string][]DeltaVersionInfo, error)
+}
+
+// DeltaVersionInfo maps together the alias of an objet to its correct version hash
+type DeltaVersionInfo struct {
+	// Alias name for the resource
+	Alias string
+
+	// Version for the resource (typically a hash)
+	Version string
 }
 
 // RawResponse is a pre-serialized xDS response containing the raw resources to
@@ -124,6 +137,9 @@ type RawDeltaResponse struct {
 	// RemovedResources is a list of unsubscribed aliases to be included in the response
 	RemovedResources []string
 
+	// VersionMap is a list of version applied internally to the cache
+	VersionMap map[string][]DeltaVersionInfo
+
 	// Marshaled Resources to be included in the response.
 	marshaledResponse *discovery.DeltaDiscoveryResponse
 }
@@ -145,6 +161,9 @@ type DeltaPassthroughResponse struct {
 
 	// Request is the original request
 	DeltaRequest discovery.DeltaDiscoveryRequest
+
+	// VersionMap is a list of version applied internally to the cache
+	VersionMap map[string][]DeltaVersionInfo
 
 	// This discovery response that needs to be sent as is, without any marshalling transformations
 	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
@@ -244,6 +263,14 @@ func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 	return r.SystemVersionInfo, nil
 }
 
+// GetDeltaVersionMap returns the delta version map built internally by the cache for the state of a snapshot
+func (r *RawDeltaResponse) GetDeltaVersionMap() (map[string][]DeltaVersionInfo, error) {
+	if r.VersionMap != nil {
+		return r.VersionMap, nil
+	}
+	return nil, errors.New("missing delta version map")
+}
+
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
 func (r *PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	return r.DiscoveryResponse, nil
@@ -278,4 +305,12 @@ func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 		return r.DeltaDiscoveryResponse.SystemVersionInfo, nil
 	}
 	return "", fmt.Errorf("DeltaDiscoveryResponse is nil")
+}
+
+// GetDeltaVersionMap ...
+func (r *DeltaPassthroughResponse) GetDeltaVersionMap() (map[string][]DeltaVersionInfo, error) {
+	if r.VersionMap != nil {
+		return r.VersionMap, nil
+	}
+	return nil, errors.New("missing delta version map")
 }

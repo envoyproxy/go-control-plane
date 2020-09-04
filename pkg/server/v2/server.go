@@ -33,7 +33,6 @@ import (
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 )
@@ -143,16 +142,6 @@ func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Ser
 
 func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server) Server {
 	return &server{rest: restServer, sotw: sotwServer}
-}
-
-func initDeltaMap() map[string]string {
-	v := make(map[string]string, types.UnknownType)
-
-	// for i := 0; i < int(types.UnknownType); i++ {
-	// 	v[cache.GetResponseTypeURL(types.ResponseType(i))] = "v0"
-	// }
-
-	return v
 }
 
 type server struct {
