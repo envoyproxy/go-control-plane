@@ -132,12 +132,12 @@ type RawDeltaResponse struct {
 	SystemVersionInfo string
 
 	// Resources to be included in the response.
-	Resources map[string]types.Resource
+	Resources []types.Resource
 
 	// RemovedResources is a list of unsubscribed aliases to be included in the response
 	RemovedResources []string
 
-	// VersionMap is a list of version applied internally to the cache
+	// VersionMap is a list of version applied internally to the cache grouped by type
 	VersionMap map[string][]DeltaVersionInfo
 
 	// Marshaled Resources to be included in the response.
@@ -210,12 +210,15 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 	if !r.isResourceMarshaled {
 		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
-		i := 0
-		for version, resource := range r.Resources {
+		for i, resource := range r.Resources {
 
 			marshaledResource, err := MarshalResource(resource)
 			if err != nil {
 				return nil, err
+			}
+			version, err := HashResource(resource)
+			if err != nil {
+				panic(err)
 			}
 
 			name := GetResourceName(resource)
@@ -228,7 +231,6 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 				},
 				Version: version,
 			}
-			i++
 		}
 
 		r.marshaledResponse = &discovery.DeltaDiscoveryResponse{

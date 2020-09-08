@@ -43,6 +43,11 @@ func TestSnapshotCacheDelta(t *testing.T) {
 					t.Fatal(err)
 				}
 				t.Log(res)
+				vMap, err := out.GetDeltaVersionMap()
+				if err != nil {
+					t.Fatal(err)
+				}
+				t.Log(vMap)
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}

@@ -55,6 +55,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 					cache.respondDelta(
 						watch.Request,
 						watch.Response,
+						snapshot.GetVersionMap(),
 						snapshot.GetResources(t),
 						unsubscribed,
 					)
@@ -109,6 +110,7 @@ func (cache *snapshotCache) SetSnapshotDelta(node string, snapshot Snapshot) err
 				cache.respondDelta(
 					watch.Request,
 					watch.Response,
+					snapshot.GetVersionMap(),
 					diff, // We want to only send the updated resources here
 					unsubscribed,
 				)
@@ -188,7 +190,10 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest) (chan DeltaR
 
 	// I don't think we use the snapshot version here it is pretty much irrelevant for delta xDS
 	snapshotVersion := snapshot.GetVersion(t)
+	vMap := snapshot.GetVersionMap()
 
+	// This logic is going to need to change to compare individual resource versions,
+	// if we detect a change in resource version from the previous snapshot then we should create a new watch accordingly
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	if !exists || snapshotVersion != info.GetDeltaStateSystemVersion() {
 		watchID := cache.nextDeltaWatchID()
@@ -224,8 +229,9 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest) (chan DeltaR
 
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
+	// we do want to respond with the full resource version map though
 	info.mu.RLock()
-	cache.respondDelta(request, value, info.deltaState.state[t].Items, nil)
+	cache.respondDelta(request, value, vMap, info.deltaState.state[t].Items, nil)
 	info.mu.RUnlock()
 
 	return value, nil
@@ -249,17 +255,17 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, resources map[string]types.Resource, unsubscribed []string) {
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string][]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with resource versions: %q",
 			request.GetNode().GetId(), request.TypeUrl)
 	}
 
-	value <- createDeltaResponse(request, resources, unsubscribed)
+	value <- createDeltaResponse(request, versionMap, resources, unsubscribed)
 }
 
-func createDeltaResponse(request *DeltaRequest, resources map[string]types.Resource, unsubscribed []string) DeltaResponse {
-	filtered := make(map[string]types.Resource, len(resources))
+func createDeltaResponse(request *DeltaRequest, versionMap map[string][]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) DeltaResponse {
+	filtered := make([]types.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
@@ -274,14 +280,16 @@ func createDeltaResponse(request *DeltaRequest, resources map[string]types.Resou
 	// 		}
 	// 	}
 	// } else {
-	for version, resource := range resources {
-		filtered[version] = resource
+	for _, resource := range resources {
+		filtered = append(filtered, resource)
 	}
 	// }
 
+	// send through our version map
 	return &RawDeltaResponse{
 		DeltaRequest:     request,
 		Resources:        filtered,
+		VersionMap:       versionMap,
 		RemovedResources: unsubscribed,
 	}
 }

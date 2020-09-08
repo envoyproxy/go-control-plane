@@ -231,34 +231,18 @@ func main() {
 
 		// Check to see if they want to run the delta integration tests
 		// if not run through the regular sotw xds
-		if mode == "delta" {
-			log.Printf("setting v2 delta snapshot")
-			err := configv2.SetSnapshotDelta(nodeID, snapshotv2)
-			if err != nil {
-				log.Printf("delta v2 snapshot error %q for %+v\n", err, snapshotv2)
-				os.Exit(1)
-			}
+		log.Printf("setting v2 snapshot")
+		err := configv2.SetSnapshot(nodeID, snapshotv2)
+		if err != nil {
+			log.Printf("v2 snapshot error %q for %+v\n", err, snapshotv2)
+			os.Exit(1)
+		}
 
-			log.Printf("setting v3 delta snapshot")
-			err = configv3.SetSnapshotDelta(nodeID, snapshotv3)
-			if err != nil {
-				log.Printf("delta v3 snapshot error %q for %+v\n", err, snapshotv3)
-				os.Exit(1)
-			}
-		} else {
-			log.Printf("setting v2 snapshot")
-			err := configv2.SetSnapshot(nodeID, snapshotv2)
-			if err != nil {
-				log.Printf("v2 snapshot error %q for %+v\n", err, snapshotv2)
-				os.Exit(1)
-			}
-
-			log.Printf("setting v3 snapshot")
-			err = configv3.SetSnapshot(nodeID, snapshotv3)
-			if err != nil {
-				log.Printf("v3 snapshot error %q for %+v\n", err, snapshotv3)
-				os.Exit(1)
-			}
+		log.Printf("setting v3 snapshot")
+		err = configv3.SetSnapshot(nodeID, snapshotv3)
+		if err != nil {
+			log.Printf("v3 snapshot error %q for %+v\n", err, snapshotv3)
+			os.Exit(1)
 		}
 		if mux {
 			for name, res := range snapshotv3.GetResources(typeURL) {

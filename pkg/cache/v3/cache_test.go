@@ -68,11 +68,11 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 }
 
 func TestResponseGetDeltaDiscoveryResponse(t *testing.T) {
-	routes := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+	r := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+
 	resp := cache.RawDeltaResponse{
-		DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: resource.RouteType},
-		SystemVersionInfo: "v0",
-		Resources:         routes,
+		DeltaRequest: &discovery.DeltaDiscoveryRequest{TypeUrl: resource.RouteType},
+		Resources:    r,
 	}
 
 	discoveryResponse, err := resp.GetDeltaDiscoveryResponse()
@@ -84,10 +84,10 @@ func TestResponseGetDeltaDiscoveryResponse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Same(t, discoveryResponse, cachedResponse)
 
-	r := &route.RouteConfiguration{}
-	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0].GetResource(), r)
+	route := &route.RouteConfiguration{}
+	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0].GetResource(), route)
 	assert.Nil(t, err)
-	assert.Equal(t, r.Name, resourceName)
+	assert.Equal(t, route.Name, resourceName)
 }
 
 func TestDeltaPassthroughResponseGetDiscoveryResponse(t *testing.T) {

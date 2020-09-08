@@ -68,20 +68,10 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 
 func TestResponseGetDeltaDiscoveryResponse(t *testing.T) {
 	r := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
-	routes := make(map[string]types.Resource, len(r))
-
-	// Build our resource version map
-	for _, route := range r {
-		version, err := cache.HashResource(route)
-		if err != nil {
-			t.Fatal(err)
-		}
-		routes[version] = route
-	}
 
 	resp := cache.RawDeltaResponse{
 		DeltaRequest: &discovery.DeltaDiscoveryRequest{TypeUrl: resource.RouteType},
-		Resources:    routes,
+		Resources:    r,
 	}
 
 	discoveryResponse, err := resp.GetDeltaDiscoveryResponse()

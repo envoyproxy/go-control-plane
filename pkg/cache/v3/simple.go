@@ -48,14 +48,6 @@ type SnapshotCache interface {
 	// the version differs from the snapshot version.
 	SetSnapshot(node string, snapshot Snapshot) error
 
-	// SetSnapshotDelta sets a response snapshot for a node using the delta watches. For ADS, the snapshots
-	// should have distinct versions and be internally consistent (e.g. all
-	// referenced resources must be included in the snapshot).
-	//
-	// This method will cause the server to respond to all open delta watches, for which
-	// the version differs from the snapshot version.
-	SetSnapshotDelta(node string, snapshot Snapshot) error
-
 	// GetSnapshots gets the snapshot for a node.
 	GetSnapshot(node string) (Snapshot, error)
 
@@ -136,6 +128,16 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 				// discard the watch
 				delete(info.watches, id)
 			}
+		}
+
+		for id, watch := range info.deltaWatches {
+			resources := snapshot.GetResources(watch.Request.GetTypeUrl())
+			// perform state modification here and build our version map for the server
+
+			// placeholder response
+			cache.respondDelta(watch.Request, watch.Response, snapshot.GetVersionMap(), resources, nil)
+
+			delete(info.deltaWatches, id)
 		}
 		info.mu.Unlock()
 	}

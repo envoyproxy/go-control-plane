@@ -131,21 +131,10 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 		for id, watch := range info.deltaWatches {
 			resources := snapshot.GetResources(watch.Request.GetTypeUrl())
-			for _, resource := range resources {
-				v, err := HashResource(resource)
-				if err != nil {
-					return err
-				}
-				if cache.log != nil {
-					cache.log.Debugf("creating version: %s for resource: %s\n", v, GetResourceName(resource))
-				}
+			// perform state modification here and build our version map for the server
 
-				// Modify our state here and do our comparisons to see which resources should be sent out
-				// When we do our comparisons, we can compare the hash which should take less compute time than comparing a whole protobuf resource
-			}
-
-			// TODO:
-			// should this logic be done outside the resource version for lo
+			// placeholder response
+			cache.respondDelta(watch.Request, watch.Response, snapshot.GetVersionMap(), resources, nil)
 
 			delete(info.deltaWatches, id)
 		}

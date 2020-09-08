@@ -80,7 +80,7 @@ func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscover
 		cb.Signal = nil
 	}
 
-	if cb.DeltaRequests > 100 {
+	if cb.DeltaRequests > 20 {
 		os.Exit(1)
 	}
 

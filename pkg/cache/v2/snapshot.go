@@ -184,3 +184,30 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 	}
 	return s.Resources[typ].Version
 }
+
+// GetVersionMap will build a verison map off the current state of a snapshot
+func (s *Snapshot) GetVersionMap() map[string][]DeltaVersionInfo {
+	if s == nil {
+		return nil
+	}
+
+	versionMap := make(map[string][]DeltaVersionInfo, types.UnknownType)
+
+	for i := 0; i < int(types.UnknownType); i++ {
+		typeURL := GetResponseTypeURL(types.ResponseType(i))
+		resources := s.GetResources(typeURL)
+		for _, resource := range resources {
+			// hash our verison in here and build the version map
+			v, err := HashResource(resource)
+			if err != nil {
+				panic(err)
+			}
+			versionMap[typeURL] = append(versionMap[typeURL], DeltaVersionInfo{
+				Alias:   GetResourceName(resource),
+				Version: v,
+			})
+		}
+	}
+
+	return versionMap
+}
