@@ -123,7 +123,12 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
-	// no validation rules for ServerName
+	if !_HttpConnectionManager_ServerName_Pattern.MatchString(m.GetServerName()) {
+		return HttpConnectionManagerValidationError{
+			field:  "ServerName",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	if _, ok := HttpConnectionManager_ServerHeaderTransformation_name[int32(m.GetServerHeaderTransformation())]; !ok {
 		return HttpConnectionManagerValidationError{
@@ -432,6 +437,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HttpConnectionManagerValidationError{}
+
+var _HttpConnectionManager_ServerName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on LocalReplyConfig with the rules defined
 // in the proto definition for this message. If any rules are violated, an
