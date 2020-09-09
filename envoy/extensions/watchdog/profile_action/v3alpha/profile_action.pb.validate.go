@@ -61,7 +61,7 @@ func (m *ProfileActionConfig) Validate() error {
 		}
 	}
 
-	// no validation rules for MaxProfilesPerThread
+	// no validation rules for MaxProfiles
 
 	return nil
 }
