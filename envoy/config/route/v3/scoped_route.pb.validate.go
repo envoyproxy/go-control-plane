@@ -44,6 +44,8 @@ func (m *ScopedRouteConfiguration) Validate() error {
 		return nil
 	}
 
+	// no validation rules for OnDemand
+
 	if len(m.GetName()) < 1 {
 		return ScopedRouteConfigurationValidationError{
 			field:  "Name",
