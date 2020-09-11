@@ -48,14 +48,19 @@ func (m *ListenerCollection) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetEntries()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ListenerCollectionValidationError{
-				field:  "Entries",
-				reason: "embedded message failed validation",
-				cause:  err,
+	for idx, item := range m.GetEntries() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListenerCollectionValidationError{
+					field:  fmt.Sprintf("Entries[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
 	}
 
 	return nil
