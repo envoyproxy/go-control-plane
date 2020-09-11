@@ -357,6 +357,16 @@ func (m *CommonTlsContext) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetCustomHandshaker()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonTlsContextValidationError{
+				field:  "CustomHandshaker",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.ValidationContextType.(type) {
 
 	case *CommonTlsContext_ValidationContext:
