@@ -2838,6 +2838,18 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 
 	}
 
+	for idx, item := range m.GetRequestHeadersToRemove() {
+		_, _ = idx, item
+
+		if !_WeightedCluster_ClusterWeight_RequestHeadersToRemove_Pattern.MatchString(item) {
+			return WeightedCluster_ClusterWeightValidationError{
+				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	}
+
 	if len(m.GetResponseHeadersToAdd()) > 1000 {
 		return WeightedCluster_ClusterWeightValidationError{
 			field:  "ResponseHeadersToAdd",
@@ -2855,6 +2867,18 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetResponseHeadersToRemove() {
+		_, _ = idx, item
+
+		if !_WeightedCluster_ClusterWeight_ResponseHeadersToRemove_Pattern.MatchString(item) {
+			return WeightedCluster_ClusterWeightValidationError{
+				field:  fmt.Sprintf("ResponseHeadersToRemove[%v]", idx),
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 			}
 		}
 
@@ -2953,6 +2977,10 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WeightedCluster_ClusterWeightValidationError{}
+
+var _WeightedCluster_ClusterWeight_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _WeightedCluster_ClusterWeight_ResponseHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on RouteMatch_GrpcRouteMatchOptions with
 // the rules defined in the proto definition for this message. If any rules
