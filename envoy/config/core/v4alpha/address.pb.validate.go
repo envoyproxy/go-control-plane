@@ -114,6 +114,86 @@ var _ interface {
 	ErrorName() string
 } = PipeValidationError{}
 
+// Validate checks the field values on EnvoyInternalAddress with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EnvoyInternalAddress) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.AddressNameSpecifier.(type) {
+
+	case *EnvoyInternalAddress_ServerListenerName:
+		// no validation rules for ServerListenerName
+
+	default:
+		return EnvoyInternalAddressValidationError{
+			field:  "AddressNameSpecifier",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// EnvoyInternalAddressValidationError is the validation error returned by
+// EnvoyInternalAddress.Validate if the designated constraints aren't met.
+type EnvoyInternalAddressValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnvoyInternalAddressValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnvoyInternalAddressValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnvoyInternalAddressValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnvoyInternalAddressValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnvoyInternalAddressValidationError) ErrorName() string {
+	return "EnvoyInternalAddressValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EnvoyInternalAddressValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnvoyInternalAddress.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnvoyInternalAddressValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnvoyInternalAddressValidationError{}
+
 // Validate checks the field values on SocketAddress with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -447,6 +527,18 @@ func (m *Address) Validate() error {
 			if err := v.Validate(); err != nil {
 				return AddressValidationError{
 					field:  "Pipe",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Address_EnvoyInternalAddress:
+
+		if v, ok := interface{}(m.GetEnvoyInternalAddress()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AddressValidationError{
+					field:  "EnvoyInternalAddress",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
