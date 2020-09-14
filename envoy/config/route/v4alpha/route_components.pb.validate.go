@@ -1326,6 +1326,16 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetMaxStreamDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteActionValidationError{
+				field:  "MaxStreamDuration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.ClusterSpecifier.(type) {
 
 	case *RouteAction_Cluster:
@@ -3408,6 +3418,104 @@ var _ interface {
 } = RouteAction_UpgradeConfigValidationError{}
 
 var _RouteAction_UpgradeConfig_UpgradeType_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on RouteAction_MaxStreamDuration with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RouteAction_MaxStreamDuration) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetMaxStreamDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_MaxStreamDurationValidationError{
+				field:  "MaxStreamDuration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetGrpcMaxTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_MaxStreamDurationValidationError{
+				field:  "GrpcMaxTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetGrpcTimeoutOffset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_MaxStreamDurationValidationError{
+				field:  "GrpcTimeoutOffset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RouteAction_MaxStreamDurationValidationError is the validation error
+// returned by RouteAction_MaxStreamDuration.Validate if the designated
+// constraints aren't met.
+type RouteAction_MaxStreamDurationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RouteAction_MaxStreamDurationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RouteAction_MaxStreamDurationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RouteAction_MaxStreamDurationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RouteAction_MaxStreamDurationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RouteAction_MaxStreamDurationValidationError) ErrorName() string {
+	return "RouteAction_MaxStreamDurationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RouteAction_MaxStreamDurationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRouteAction_MaxStreamDuration.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RouteAction_MaxStreamDurationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RouteAction_MaxStreamDurationValidationError{}
 
 // Validate checks the field values on RouteAction_HashPolicy_Header with the
 // rules defined in the proto definition for this message. If any rules are
