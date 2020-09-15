@@ -287,6 +287,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 	var node = &core.Node{}
 
 	for {
+		chosen := map[string]cache.Response{}
 		select {
 		case <-s.ctx.Done():
 			return nil
@@ -295,41 +296,25 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
-			nonce, err := send(resp, resource.EndpointType)
-			if err != nil {
-				return err
-			}
-			values.endpointNonce = nonce
+			chosen[resource.EndpointType] = resp
 
 		case resp, more := <-values.clusters:
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
-			nonce, err := send(resp, resource.ClusterType)
-			if err != nil {
-				return err
-			}
-			values.clusterNonce = nonce
+			chosen[resource.ClusterType] = resp
 
 		case resp, more := <-values.routes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
-			nonce, err := send(resp, resource.RouteType)
-			if err != nil {
-				return err
-			}
-			values.routeNonce = nonce
+			chosen[resource.RouteType] = resp
 
 		case resp, more := <-values.listeners:
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
-			nonce, err := send(resp, resource.ListenerType)
-			if err != nil {
-				return err
-			}
-			values.listenerNonce = nonce
+			chosen[resource.ListenerType] = resp
 
 		case resp, more := <-values.secrets:
 			if !more {
@@ -481,6 +466,67 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						}
 					}()
 				}
+			}
+		}
+		if len(chosen) > 0 {
+			if _, ok := chosen[resource.ClusterType]; !ok {
+				select {
+				case resp := <-values.clusters:
+					chosen[resource.ClusterType] = resp
+				default:
+				}
+			}
+			if resp, ok := chosen[resource.ClusterType]; ok {
+				nonce, err := send(resp, resource.ClusterType)
+				if err != nil {
+					return err
+				}
+				values.clusterNonce = nonce
+			}
+
+			if _, ok := chosen[resource.EndpointType]; !ok {
+				select {
+				case resp := <-values.endpoints:
+					chosen[resource.EndpointType] = resp
+				default:
+				}
+			}
+			if resp, ok := chosen[resource.EndpointType]; ok {
+				nonce, err := send(resp, resource.EndpointType)
+				if err != nil {
+					return err
+				}
+				values.endpointNonce = nonce
+			}
+
+			if _, ok := chosen[resource.ListenerType]; !ok {
+				select {
+				case resp := <-values.listeners:
+					chosen[resource.ListenerType] = resp
+				default:
+				}
+			}
+			if resp, ok := chosen[resource.ListenerType]; ok {
+				nonce, err := send(resp, resource.ListenerType)
+				if err != nil {
+					return err
+				}
+				values.listenerNonce = nonce
+			}
+
+			if _, ok := chosen[resource.RouteType]; !ok {
+				select {
+				case resp := <-values.routes:
+					chosen[resource.RouteType] = resp
+				default:
+				}
+			}
+			if resp, ok := chosen[resource.RouteType]; ok {
+				nonce, err := send(resp, resource.RouteType)
+				if err != nil {
+					return err
+				}
+				values.routeNonce = nonce
 			}
 		}
 	}
