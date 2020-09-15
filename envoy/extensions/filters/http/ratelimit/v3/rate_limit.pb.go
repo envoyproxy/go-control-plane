@@ -75,6 +75,55 @@ func (RateLimit_XRateLimitHeadersRFCVersion) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{0, 0}
 }
 
+type RateLimitPerRoute_VhRateLimitsOptions int32
+
+const (
+	RateLimitPerRoute_OVERRIDE RateLimitPerRoute_VhRateLimitsOptions = 0
+	RateLimitPerRoute_INCLUDE  RateLimitPerRoute_VhRateLimitsOptions = 1
+	RateLimitPerRoute_IGNORE   RateLimitPerRoute_VhRateLimitsOptions = 2
+)
+
+// Enum value maps for RateLimitPerRoute_VhRateLimitsOptions.
+var (
+	RateLimitPerRoute_VhRateLimitsOptions_name = map[int32]string{
+		0: "OVERRIDE",
+		1: "INCLUDE",
+		2: "IGNORE",
+	}
+	RateLimitPerRoute_VhRateLimitsOptions_value = map[string]int32{
+		"OVERRIDE": 0,
+		"INCLUDE":  1,
+		"IGNORE":   2,
+	}
+)
+
+func (x RateLimitPerRoute_VhRateLimitsOptions) Enum() *RateLimitPerRoute_VhRateLimitsOptions {
+	p := new(RateLimitPerRoute_VhRateLimitsOptions)
+	*p = x
+	return p
+}
+
+func (x RateLimitPerRoute_VhRateLimitsOptions) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RateLimitPerRoute_VhRateLimitsOptions) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_enumTypes[1].Descriptor()
+}
+
+func (RateLimitPerRoute_VhRateLimitsOptions) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_enumTypes[1]
+}
+
+func (x RateLimitPerRoute_VhRateLimitsOptions) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RateLimitPerRoute_VhRateLimitsOptions.Descriptor instead.
+func (RateLimitPerRoute_VhRateLimitsOptions) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{1, 0}
+}
+
 type RateLimit struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -178,6 +227,53 @@ func (x *RateLimit) GetEnableXRatelimitHeaders() RateLimit_XRateLimitHeadersRFCV
 	return RateLimit_OFF
 }
 
+type RateLimitPerRoute struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	VhRateLimits RateLimitPerRoute_VhRateLimitsOptions `protobuf:"varint,1,opt,name=vh_rate_limits,json=vhRateLimits,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute_VhRateLimitsOptions" json:"vh_rate_limits,omitempty"`
+}
+
+func (x *RateLimitPerRoute) Reset() {
+	*x = RateLimitPerRoute{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RateLimitPerRoute) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RateLimitPerRoute) ProtoMessage() {}
+
+func (x *RateLimitPerRoute) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RateLimitPerRoute.ProtoReflect.Descriptor instead.
+func (*RateLimitPerRoute) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RateLimitPerRoute) GetVhRateLimits() RateLimitPerRoute_VhRateLimitsOptions {
+	if x != nil {
+		return x.VhRateLimits
+	}
+	return RateLimitPerRoute_OVERRIDE
+}
+
 var File_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto protoreflect.FileDescriptor
 
 var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc = []byte{
@@ -241,13 +337,26 @@ var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc = [
 	0x9a, 0xc5, 0x88, 0x1e, 0x32, 0x0a, 0x30, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e,
 	0x66, 0x69, 0x67, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x2e,
 	0x72, 0x61, 0x74, 0x65, 0x5f, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x2e, 0x76, 0x32, 0x2e, 0x52, 0x61,
-	0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x42, 0x54, 0x0a, 0x38, 0x69, 0x6f, 0x2e, 0x65, 0x6e,
-	0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65,
+	0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x22, 0xd5, 0x01, 0x0a, 0x11, 0x52, 0x61, 0x74, 0x65,
+	0x4c, 0x69, 0x6d, 0x69, 0x74, 0x50, 0x65, 0x72, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x12, 0x81, 0x01,
+	0x0a, 0x0e, 0x76, 0x68, 0x5f, 0x72, 0x61, 0x74, 0x65, 0x5f, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x73,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x51, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65,
 	0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72,
 	0x73, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x2e, 0x72, 0x61, 0x74, 0x65, 0x6c, 0x69, 0x6d, 0x69, 0x74,
-	0x2e, 0x76, 0x33, 0x42, 0x0e, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x50, 0x72,
-	0x6f, 0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x76, 0x33, 0x2e, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x50, 0x65, 0x72,
+	0x52, 0x6f, 0x75, 0x74, 0x65, 0x2e, 0x56, 0x68, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69,
+	0x74, 0x73, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x82, 0x01,
+	0x02, 0x10, 0x01, 0x52, 0x0c, 0x76, 0x68, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74,
+	0x73, 0x22, 0x3c, 0x0a, 0x13, 0x56, 0x68, 0x52, 0x61, 0x74, 0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74,
+	0x73, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x56, 0x45, 0x52,
+	0x52, 0x49, 0x44, 0x45, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07, 0x49, 0x4e, 0x43, 0x4c, 0x55, 0x44,
+	0x45, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x49, 0x47, 0x4e, 0x4f, 0x52, 0x45, 0x10, 0x02, 0x42,
+	0x54, 0x0a, 0x38, 0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79,
+	0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e,
+	0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x68, 0x74, 0x74, 0x70, 0x2e, 0x72,
+	0x61, 0x74, 0x65, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x2e, 0x76, 0x33, 0x42, 0x0e, 0x52, 0x61, 0x74,
+	0x65, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8,
+	0xd1, 0x06, 0x02, 0x10, 0x02, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -262,23 +371,26 @@ func file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZI
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_goTypes = []interface{}{
 	(RateLimit_XRateLimitHeadersRFCVersion)(0), // 0: envoy.extensions.filters.http.ratelimit.v3.RateLimit.XRateLimitHeadersRFCVersion
-	(*RateLimit)(nil),                          // 1: envoy.extensions.filters.http.ratelimit.v3.RateLimit
-	(*duration.Duration)(nil),                  // 2: google.protobuf.Duration
-	(*v3.RateLimitServiceConfig)(nil),          // 3: envoy.config.ratelimit.v3.RateLimitServiceConfig
+	(RateLimitPerRoute_VhRateLimitsOptions)(0), // 1: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.VhRateLimitsOptions
+	(*RateLimit)(nil),                          // 2: envoy.extensions.filters.http.ratelimit.v3.RateLimit
+	(*RateLimitPerRoute)(nil),                  // 3: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute
+	(*duration.Duration)(nil),                  // 4: google.protobuf.Duration
+	(*v3.RateLimitServiceConfig)(nil),          // 5: envoy.config.ratelimit.v3.RateLimitServiceConfig
 }
 var file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_depIdxs = []int32{
-	2, // 0: envoy.extensions.filters.http.ratelimit.v3.RateLimit.timeout:type_name -> google.protobuf.Duration
-	3, // 1: envoy.extensions.filters.http.ratelimit.v3.RateLimit.rate_limit_service:type_name -> envoy.config.ratelimit.v3.RateLimitServiceConfig
+	4, // 0: envoy.extensions.filters.http.ratelimit.v3.RateLimit.timeout:type_name -> google.protobuf.Duration
+	5, // 1: envoy.extensions.filters.http.ratelimit.v3.RateLimit.rate_limit_service:type_name -> envoy.config.ratelimit.v3.RateLimitServiceConfig
 	0, // 2: envoy.extensions.filters.http.ratelimit.v3.RateLimit.enable_x_ratelimit_headers:type_name -> envoy.extensions.filters.http.ratelimit.v3.RateLimit.XRateLimitHeadersRFCVersion
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // 3: envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.vh_rate_limits:type_name -> envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute.VhRateLimitsOptions
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_init() }
@@ -299,14 +411,26 @@ func file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_init() {
 				return nil
 			}
 		}
+		file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RateLimitPerRoute); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDesc,
-			NumEnums:      1,
-			NumMessages:   1,
+			NumEnums:      2,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
