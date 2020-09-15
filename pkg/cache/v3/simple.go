@@ -327,7 +327,7 @@ func (cache *snapshotCache) respond(request *Request, value chan Response, resou
 	if len(request.ResourceNames) != 0 && cache.ads {
 		if err := superset(nameSet(request.ResourceNames), resources); err != nil {
 			if cache.log != nil {
-				cache.log.Debugf("ADS mode: not responding to request: %v", err)
+				cache.log.Warnf("ADS mode: not responding to request: %v", err)
 			}
 			return
 		}
