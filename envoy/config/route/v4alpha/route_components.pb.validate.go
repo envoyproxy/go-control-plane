@@ -1224,10 +1224,10 @@ func (m *RouteAction) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetIncludeVhRateLimits()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIncludeVhRateLimits()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
-				field:  "IncludeVhRateLimits",
+				field:  "HiddenEnvoyDeprecatedIncludeVhRateLimits",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
