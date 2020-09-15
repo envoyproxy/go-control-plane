@@ -47,12 +47,16 @@ type ConfigWatcher interface {
 	CreateWatch(*Request) (value chan Response, cancel func())
 }
 
+// ConfigFetcher fetches configuration resources from cache
+type ConfigFetcher interface {
+	// Fetch implements the polling method of the config cache using a non-empty request.
+	Fetch(context.Context, *Request) (Response, error)
+}
+
 // Cache is a generic config cache with a watcher.
 type Cache interface {
 	ConfigWatcher
-
-	// Fetch implements the polling method of the config cache using a non-empty request.
-	Fetch(context.Context, *Request) (Response, error)
+	ConfigFetcher
 }
 
 // Response is a wrapper around Envoy's DiscoveryResponse.
