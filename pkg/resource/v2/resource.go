@@ -37,6 +37,16 @@ const (
 // DefaultAPIVersion is the api version
 const DefaultAPIVersion = core.ApiVersion_V2
 
+// List of type urls in the right order to avoid traffic drops
+var TypeUrls = []string{
+	ClusterType,
+	EndpointType,
+	ListenerType,
+	RouteType,
+	SecretType,
+	RuntimeType,
+}
+
 // GetHTTPConnectionManager creates a HttpConnectionManager from filter
 func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManager {
 	config := &hcm.HttpConnectionManager{}

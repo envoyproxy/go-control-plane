@@ -23,6 +23,7 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 )
 
 // SnapshotCache is a snapshot-based cache that maintains a single versioned
@@ -102,8 +103,16 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache 
 	}
 }
 
+type responseInfo struct {
+	id      int64
+	watch   ResponseWatch
+	version string
+}
+
 // SetSnapshotCache updates a snapshot for a node.
 func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
+	toRespond := map[string][]responseInfo{}
+
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -116,16 +125,27 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 		for id, watch := range info.watches {
 			version := snapshot.GetVersion(watch.Request.TypeUrl)
 			if version != watch.Request.VersionInfo {
-				if cache.log != nil {
-					cache.log.Debugf("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
-				}
-				cache.respond(watch.Request, watch.Response, snapshot.GetResources(watch.Request.TypeUrl), version)
+				toRespond[watch.Request.TypeUrl] = append(toRespond[watch.Request.TypeUrl], responseInfo{
+					id:      id,
+					watch:   watch,
+					version: version,
+				})
 
 				// discard the watch
 				delete(info.watches, id)
 			}
 		}
 		info.mu.Unlock()
+	}
+
+	for _, typeUrl := range resource.TypeUrls {
+		resources := snapshot.GetResources(typeUrl)
+		for _, info := range toRespond[typeUrl] {
+			if cache.log != nil {
+				cache.log.Debugf("respond open watch %d%v with new version %q", info.id, info.watch.Request.ResourceNames, info.version)
+			}
+			cache.respond(info.watch.Request, info.watch.Response, resources, info.version)
+		}
 	}
 
 	return nil

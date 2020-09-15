@@ -275,3 +275,70 @@ func TestSnapshotClear(t *testing.T) {
 		t.Errorf("keys should be empty")
 	}
 }
+
+func TestResponseOrdering(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	endpointWatch, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]})
+	clusterWatch, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, ResourceNames: names[rsrc.ClusterType]})
+	routeWatch, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType, ResourceNames: names[rsrc.RouteType]})
+	listenerWatch, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType, ResourceNames: names[rsrc.ListenerType]})
+	typeUrlCh := make(chan []string)
+	go func() {
+		var responseTypeUrls []string
+		for len(responseTypeUrls) < 4 {
+			chosen := map[string]bool{}
+			select {
+			case <-clusterWatch:
+				chosen[rsrc.ClusterType] = true
+			case <-endpointWatch:
+				chosen[rsrc.EndpointType] = true
+			case <-listenerWatch:
+				chosen[rsrc.ListenerType] = true
+			case <-routeWatch:
+				chosen[rsrc.RouteType] = true
+			}
+			if !chosen[rsrc.ClusterType] {
+				select {
+				case <-clusterWatch:
+					chosen[rsrc.ClusterType] = true
+				default:
+				}
+			}
+			if !chosen[rsrc.EndpointType] {
+				select {
+				case <-endpointWatch:
+					chosen[rsrc.EndpointType] = true
+				default:
+				}
+			}
+			if !chosen[rsrc.ListenerType] {
+				select {
+				case <-listenerWatch:
+					chosen[rsrc.ListenerType] = true
+				default:
+				}
+			}
+			if !chosen[rsrc.RouteType] {
+				select {
+				case <-routeWatch:
+					chosen[rsrc.RouteType] = true
+				default:
+				}
+			}
+			for _, key := range []string{rsrc.ClusterType, rsrc.EndpointType, rsrc.ListenerType, rsrc.RouteType} {
+				if chosen[key] {
+					responseTypeUrls = append(responseTypeUrls, key)
+				}
+			}
+		}
+		typeUrlCh <- responseTypeUrls
+	}()
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		t.Fatal(err)
+	}
+	typeUrls := <-typeUrlCh
+	if !reflect.DeepEqual(typeUrls, []string{rsrc.ClusterType, rsrc.EndpointType, rsrc.ListenerType, rsrc.RouteType}) {
+		t.Fatalf("incorrect types order: got %v, expected %v", typeUrls, []string{rsrc.ClusterType, rsrc.EndpointType, rsrc.ListenerType, rsrc.RouteType})
+	}
+
+}
