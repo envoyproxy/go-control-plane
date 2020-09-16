@@ -35,55 +35,6 @@ type deltaStream interface {
 	Recv() (*discovery.DeltaDiscoveryRequest, error)
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-func createDeltaResponse(resp cache.DeltaResponse, typeURL string) (*discovery.DeltaDiscoveryResponse, error) {
-	if resp == nil {
-		return nil, errors.New("missing response")
-	}
-
-	marshalledResponse, err := resp.GetDeltaDiscoveryResponse()
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("from createDeltaResponse " + marshalledResponse.SystemVersionInfo)
-
-	return marshalledResponse, nil
-}
-
-func (s *server) deltaHandler(stream deltaStream, typeURL string) error {
-	// a channel for receiving incoming delta requests
-	reqCh := make(chan *discovery.DeltaDiscoveryRequest)
-	reqStop := int32(0)
-
-	go func() {
-		for {
-			req, err := stream.Recv()
-			if atomic.LoadInt32(&reqStop) != 0 {
-				return
-			}
-			if err != nil {
-				close(reqCh)
-				return
-			}
-
-			reqCh <- req
-		}
-	}()
-
-	err := s.processDelta(stream, reqCh, typeURL)
-
-	// prevents writing to a closed channel if send failed on blocked recv
-	// TODO(kuat) figure out how to unblock recv through gRPC API
-	atomic.StoreInt32(&reqStop, 1)
-
-	return err
-}
-
-=======
->>>>>>> more progress, cluster endpoint now responds successfully
-=======
 // streamState will keep track of resource state on a stream
 type streamState struct {
 	// Keep track of a version on the stream
@@ -93,7 +44,6 @@ type streamState struct {
 	ResourceVersions map[string]string `json:"resource_versions"`
 }
 
->>>>>>> start implementing version map
 func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
@@ -147,6 +97,24 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 		return out.Nonce, stream.Send(out)
 	}
 
+	// updatest
+	update := func(resp cache.DeltaResponse, nonce string) (StreamState, error) {
+		sv, err := resp.GetSystemVersion()
+		if err != nil {
+			return StreamState{}, err
+		}
+		vm, err := resp.GetDeltaVersionMap()
+		if err != nil {
+			return StreamState{}, err
+		}
+
+		return StreamState{
+			Nonce:            nonce,
+			ResourceVersions: vm,
+			SystemVersion:    sv,
+		}, nil
+	}
+
 	if s.callbacks != nil {
 		if err := s.callbacks.OnStreamOpen(stream.Context(), streamID, defaultTypeURL); err != nil {
 			return err
@@ -173,8 +141,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-
-			values.deltaEndpointNonce = nonce
+			values.mu.Lock()
+			values.deltaStreamStates[resource.EndpointType], err = update(resp, nonce)
+			values.mu.Unlock()
 		case resp, more := <-values.deltaClusters:
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
@@ -183,7 +152,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.deltaClusterNonce = nonce
+			values.mu.Lock()
+			values.deltaStreamStates[resource.ClusterType], err = update(resp, nonce)
+			values.mu.Unlock()
 		case resp, more := <-values.deltaRoutes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
@@ -192,7 +163,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.deltaRouteNonce = nonce
+			values.mu.Lock()
+			values.deltaStreamStates[resource.RouteType], err = update(resp, nonce)
+			values.mu.Unlock()
 		case resp, more := <-values.deltaListeners:
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
@@ -201,7 +174,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.deltaListenerNonce = nonce
+			values.mu.Lock()
+			values.deltaStreamStates[resource.ListenerType], err = update(resp, nonce)
+			values.mu.Unlock()
 		case resp, more := <-values.deltaSecrets:
 			if !more {
 				return status.Errorf(codes.Unavailable, "secrets watch failed")
@@ -210,7 +185,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.deltaSecretNonce = nonce
+			values.mu.Lock()
+			values.deltaStreamStates[resource.SecretType], err = update(resp, nonce)
+			values.mu.Unlock()
 		case resp, more := <-values.deltaRuntimes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "runtimes watch failed")
@@ -219,7 +196,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 			if err != nil {
 				return err
 			}
-			values.deltaRuntimeNonce = nonce
+			values.mu.Lock()
+			values.deltaStreamStates[resource.RuntimeType], err = update(resp, nonce)
+			values.mu.Unlock()
 		case resp, more := <-values.deltaResponses:
 			if more {
 				if resp == deltaErrorResponse {
@@ -230,11 +209,9 @@ func (s *server) processDelta(stream deltaStream, reqCh <-chan *discovery.DeltaD
 				if err != nil {
 					return err
 				}
-
-				values.nonces[typeURL] = nonce
-				if err != nil {
-					return err
-				}
+				values.mu.Lock()
+				values.deltaStreamStates[typeURL], err = update(resp, nonce)
+				values.mu.Unlock()
 			}
 			values.nonces[typeURL] = nonce
 

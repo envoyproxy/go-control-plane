@@ -4,7 +4,6 @@ package test
 import (
 	"context"
 	"log"
-	"os"
 	"sync"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -78,10 +77,6 @@ func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscover
 	if cb.Signal != nil {
 		close(cb.Signal)
 		cb.Signal = nil
-	}
-
-	if cb.DeltaRequests > 20 {
-		os.Exit(1)
 	}
 
 	return nil

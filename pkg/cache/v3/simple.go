@@ -134,10 +134,50 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			resources := snapshot.GetResources(watch.Request.GetTypeUrl())
 			// perform state modification here and build our version map for the server
 
-			// placeholder response
-			cache.respondDelta(watch.Request, watch.Response, snapshot.GetVersionMap(), resources, nil)
+			if len(watch.Request.ResourceNamesSubscribe) == 0 && len(watch.Request.ResourceNamesUnsubscribe) == 0 {
+				if cache.log != nil {
+					cache.log.Debugf("assuming delta wildcard mode, no resource subscriptions or unsubscriptions provided")
+					cache.log.Debugf("respond open delta watch %d with new version %v", id, watch.VersionMap)
+				}
 
-			delete(info.deltaWatches, id)
+				for alias, newV := range snapshotVersions {
+					oldV, ok := watchVersions[alias]
+					// cache.log.Debugf("%s comparing versions for alias: %s", typ, alias)
+					if !ok || newV.Version != oldV.Version {
+						// cache.log.Debugf("%s found new version of resource: %s", typ, alias)
+						process(alias)
+					}
+				}
+			} else {
+				if cache.log != nil {
+					cache.log.Debugf("respond open delta watch %d with new version %v", id, watch.VersionMap)
+				}
+				for _, alias := range watch.Request.GetResourceNamesSubscribe() {
+					oldV, ok := watchVersions[alias]
+					if !ok {
+						if cache.log != nil {
+							// cache.log.Debugf("%s couldn't find previous version for %s", typ, alias)
+						}
+						process(alias)
+					}
+					if oldV.Version != snapshotVersions[alias].Version {
+						if cache.log != nil {
+							// cache.log.Debugf("%s found new version of resource %s, updating...", typ, alias)
+							process(alias)
+						}
+					}
+				}
+			}
+
+			// respond to the watch only if new resources have been changed, otherwise leave an open watch
+			if len(res) > 0 {
+				cache.respondDelta(watch.Request, watch.Response, versionsToSend, res, nil)
+				delete(info.deltaWatches, id)
+			} else {
+				if cache.log != nil {
+					cache.log.Debugf("response length for watch was 0... not responding")
+				}
+			}
 		}
 		info.mu.Unlock()
 	}

@@ -238,7 +238,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		log.Printf("setting v3 snapshot")
+		log.Printf("setting v3 snapshot %v\n", snapshotsv3.Version)
 		err = configv3.SetSnapshot(nodeID, snapshotv3)
 		if err != nil {
 			log.Printf("v3 snapshot error %q for %+v\n", err, snapshotv3)
