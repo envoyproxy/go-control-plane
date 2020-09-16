@@ -35,6 +35,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Different Envoy instances may have different capabilities (e.g. Redis)
+// and/or have ports enabled for different protocols.
 type Capability_Protocol int32
 
 const (
@@ -84,6 +86,8 @@ func (Capability_Protocol) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_service_health_v3_hds_proto_rawDescGZIP(), []int{0, 0}
 }
 
+// Defines supported protocols etc, so the management server can assign proper
+// endpoints to healthcheck.
 type Capability struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -241,6 +245,7 @@ func (x *EndpointHealth) GetHealthStatus() v3.HealthStatus {
 	return v3.HealthStatus_UNKNOWN
 }
 
+// Group endpoint health by locality under each cluster.
 type LocalityEndpointsHealth struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -296,6 +301,8 @@ func (x *LocalityEndpointsHealth) GetEndpointsHealth() []*EndpointHealth {
 	return nil
 }
 
+// The health status of endpoints in a cluster. The cluster name and locality
+// should match the corresponding fields in ClusterHealthCheck message.
 type ClusterEndpointsHealth struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -356,8 +363,11 @@ type EndpointHealthResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Deprecated - Flat list of endpoint health information.
+	//
 	// Deprecated: Do not use.
-	EndpointsHealth        []*EndpointHealth         `protobuf:"bytes,1,rep,name=endpoints_health,json=endpointsHealth,proto3" json:"endpoints_health,omitempty"`
+	EndpointsHealth []*EndpointHealth `protobuf:"bytes,1,rep,name=endpoints_health,json=endpointsHealth,proto3" json:"endpoints_health,omitempty"`
+	// Organize Endpoint health information by cluster.
 	ClusterEndpointsHealth []*ClusterEndpointsHealth `protobuf:"bytes,2,rep,name=cluster_endpoints_health,json=clusterEndpointsHealth,proto3" json:"cluster_endpoints_health,omitempty"`
 }
 
@@ -545,14 +555,21 @@ func (x *LocalityEndpoints) GetEndpoints() []*v31.Endpoint {
 	return nil
 }
 
+// The cluster name and locality is provided to Envoy for the endpoints that it
+// health checks to support statistics reporting, logging and debugging by the
+// Envoy instance (outside of HDS). For maximum usefulness, it should match the
+// same cluster structure as that provided by EDS.
 type ClusterHealthCheck struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ClusterName            string                              `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
-	HealthChecks           []*v3.HealthCheck                   `protobuf:"bytes,2,rep,name=health_checks,json=healthChecks,proto3" json:"health_checks,omitempty"`
-	LocalityEndpoints      []*LocalityEndpoints                `protobuf:"bytes,3,rep,name=locality_endpoints,json=localityEndpoints,proto3" json:"locality_endpoints,omitempty"`
+	ClusterName       string               `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
+	HealthChecks      []*v3.HealthCheck    `protobuf:"bytes,2,rep,name=health_checks,json=healthChecks,proto3" json:"health_checks,omitempty"`
+	LocalityEndpoints []*LocalityEndpoints `protobuf:"bytes,3,rep,name=locality_endpoints,json=localityEndpoints,proto3" json:"locality_endpoints,omitempty"`
+	// Optional map that gets filtered by :ref:`health_checks.transport_socket_match_criteria <envoy_api_field_config.core.v3.HealthCheck.transport_socket_match_criteria>`
+	// on connection when health checking. For more details, see
+	// :ref:`config.cluster.v3.Cluster.transport_socket_matches <envoy_api_field_config.cluster.v3.Cluster.transport_socket_matches>`.
 	TransportSocketMatches []*v32.Cluster_TransportSocketMatch `protobuf:"bytes,4,rep,name=transport_socket_matches,json=transportSocketMatches,proto3" json:"transport_socket_matches,omitempty"`
 }
 
@@ -622,7 +639,8 @@ type HealthCheckSpecifier struct {
 	unknownFields protoimpl.UnknownFields
 
 	ClusterHealthChecks []*ClusterHealthCheck `protobuf:"bytes,1,rep,name=cluster_health_checks,json=clusterHealthChecks,proto3" json:"cluster_health_checks,omitempty"`
-	Interval            *duration.Duration    `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
+	// The default is 1 second.
+	Interval *duration.Duration `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
 }
 
 func (x *HealthCheckSpecifier) Reset() {
@@ -1106,7 +1124,44 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type HealthDiscoveryServiceClient interface {
+	// 1. Envoy starts up and if its can_healthcheck option in the static
+	//    bootstrap config is enabled, sends HealthCheckRequest to the management
+	//    server. It supplies its capabilities (which protocol it can health check
+	//    with, what zone it resides in, etc.).
+	// 2. In response to (1), the management server designates this Envoy as a
+	//    healthchecker to health check a subset of all upstream hosts for a given
+	//    cluster (for example upstream Host 1 and Host 2). It streams
+	//    HealthCheckSpecifier messages with cluster related configuration for all
+	//    clusters this Envoy is designated to health check. Subsequent
+	//    HealthCheckSpecifier message will be sent on changes to:
+	//    a. Endpoints to health checks
+	//    b. Per cluster configuration change
+	// 3. Envoy creates a health probe based on the HealthCheck config and sends
+	//    it to endpoint(ip:port) of Host 1 and 2. Based on the HealthCheck
+	//    configuration Envoy waits upon the arrival of the probe response and
+	//    looks at the content of the response to decide whether the endpoint is
+	//    healthy or not. If a response hasn't been received within the timeout
+	//    interval, the endpoint health status is considered TIMEOUT.
+	// 4. Envoy reports results back in an EndpointHealthResponse message.
+	//    Envoy streams responses as often as the interval configured by the
+	//    management server in HealthCheckSpecifier.
+	// 5. The management Server collects health statuses for all endpoints in the
+	//    cluster (for all clusters) and uses this information to construct
+	//    EndpointDiscoveryResponse messages.
+	// 6. Once Envoy has a list of upstream endpoints to send traffic to, it load
+	//    balances traffic to them without additional health checking. It may
+	//    use inline healthcheck (i.e. consider endpoint UNHEALTHY if connection
+	//    failed to a particular endpoint to account for health status propagation
+	//    delay between HDS and EDS).
+	// By default, can_healthcheck is true. If can_healthcheck is false, Cluster
+	// configuration may not contain HealthCheck message.
+	// TODO(htuch): How is can_healthcheck communicated to CDS to ensure the above
+	// invariant?
+	// TODO(htuch): Add @amb67's diagram.
 	StreamHealthCheck(ctx context.Context, opts ...grpc.CallOption) (HealthDiscoveryService_StreamHealthCheckClient, error)
+	// TODO(htuch): Unlike the gRPC version, there is no stream-based binding of
+	// request/response. Should we add an identifier to the HealthCheckSpecifier
+	// to bind with the response?
 	FetchHealthCheck(ctx context.Context, in *HealthCheckRequestOrEndpointHealthResponse, opts ...grpc.CallOption) (*HealthCheckSpecifier, error)
 }
 
@@ -1160,7 +1215,44 @@ func (c *healthDiscoveryServiceClient) FetchHealthCheck(ctx context.Context, in 
 
 // HealthDiscoveryServiceServer is the server API for HealthDiscoveryService service.
 type HealthDiscoveryServiceServer interface {
+	// 1. Envoy starts up and if its can_healthcheck option in the static
+	//    bootstrap config is enabled, sends HealthCheckRequest to the management
+	//    server. It supplies its capabilities (which protocol it can health check
+	//    with, what zone it resides in, etc.).
+	// 2. In response to (1), the management server designates this Envoy as a
+	//    healthchecker to health check a subset of all upstream hosts for a given
+	//    cluster (for example upstream Host 1 and Host 2). It streams
+	//    HealthCheckSpecifier messages with cluster related configuration for all
+	//    clusters this Envoy is designated to health check. Subsequent
+	//    HealthCheckSpecifier message will be sent on changes to:
+	//    a. Endpoints to health checks
+	//    b. Per cluster configuration change
+	// 3. Envoy creates a health probe based on the HealthCheck config and sends
+	//    it to endpoint(ip:port) of Host 1 and 2. Based on the HealthCheck
+	//    configuration Envoy waits upon the arrival of the probe response and
+	//    looks at the content of the response to decide whether the endpoint is
+	//    healthy or not. If a response hasn't been received within the timeout
+	//    interval, the endpoint health status is considered TIMEOUT.
+	// 4. Envoy reports results back in an EndpointHealthResponse message.
+	//    Envoy streams responses as often as the interval configured by the
+	//    management server in HealthCheckSpecifier.
+	// 5. The management Server collects health statuses for all endpoints in the
+	//    cluster (for all clusters) and uses this information to construct
+	//    EndpointDiscoveryResponse messages.
+	// 6. Once Envoy has a list of upstream endpoints to send traffic to, it load
+	//    balances traffic to them without additional health checking. It may
+	//    use inline healthcheck (i.e. consider endpoint UNHEALTHY if connection
+	//    failed to a particular endpoint to account for health status propagation
+	//    delay between HDS and EDS).
+	// By default, can_healthcheck is true. If can_healthcheck is false, Cluster
+	// configuration may not contain HealthCheck message.
+	// TODO(htuch): How is can_healthcheck communicated to CDS to ensure the above
+	// invariant?
+	// TODO(htuch): Add @amb67's diagram.
 	StreamHealthCheck(HealthDiscoveryService_StreamHealthCheckServer) error
+	// TODO(htuch): Unlike the gRPC version, there is no stream-based binding of
+	// request/response. Should we add an identifier to the HealthCheckSpecifier
+	// to bind with the response?
 	FetchHealthCheck(context.Context, *HealthCheckRequestOrEndpointHealthResponse) (*HealthCheckSpecifier, error)
 }
 

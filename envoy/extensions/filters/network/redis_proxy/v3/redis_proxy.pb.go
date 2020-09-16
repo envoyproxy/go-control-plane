@@ -31,14 +31,26 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// ReadPolicy controls how Envoy routes read commands to Redis nodes. This is currently
+// supported for Redis Cluster. All ReadPolicy settings except MASTER may return stale data
+// because replication is asynchronous and requires some delay. You need to ensure that your
+// application can tolerate stale data.
 type RedisProxy_ConnPoolSettings_ReadPolicy int32
 
 const (
-	RedisProxy_ConnPoolSettings_MASTER         RedisProxy_ConnPoolSettings_ReadPolicy = 0
-	RedisProxy_ConnPoolSettings_PREFER_MASTER  RedisProxy_ConnPoolSettings_ReadPolicy = 1
-	RedisProxy_ConnPoolSettings_REPLICA        RedisProxy_ConnPoolSettings_ReadPolicy = 2
+	// Default mode. Read from the current primary node.
+	RedisProxy_ConnPoolSettings_MASTER RedisProxy_ConnPoolSettings_ReadPolicy = 0
+	// Read from the primary, but if it is unavailable, read from replica nodes.
+	RedisProxy_ConnPoolSettings_PREFER_MASTER RedisProxy_ConnPoolSettings_ReadPolicy = 1
+	// Read from replica nodes. If multiple replica nodes are present within a shard, a random
+	// node is selected. Healthy nodes have precedent over unhealthy nodes.
+	RedisProxy_ConnPoolSettings_REPLICA RedisProxy_ConnPoolSettings_ReadPolicy = 2
+	// Read from the replica nodes (similar to REPLICA), but if all replicas are unavailable (not
+	// present or unhealthy), read from the primary.
 	RedisProxy_ConnPoolSettings_PREFER_REPLICA RedisProxy_ConnPoolSettings_ReadPolicy = 3
-	RedisProxy_ConnPoolSettings_ANY            RedisProxy_ConnPoolSettings_ReadPolicy = 4
+	// Read from any node of the cluster. A random node is selected among the primary and
+	// replicas, healthy nodes have precedent over unhealthy nodes.
+	RedisProxy_ConnPoolSettings_ANY RedisProxy_ConnPoolSettings_ReadPolicy = 4
 )
 
 // Enum value maps for RedisProxy_ConnPoolSettings_ReadPolicy.
@@ -89,7 +101,9 @@ func (RedisProxy_ConnPoolSettings_ReadPolicy) EnumDescriptor() ([]byte, []int) {
 type RedisProxy_RedisFault_RedisFaultType int32
 
 const (
+	// Delays requests. This is the base fault; other faults can have delays added.
 	RedisProxy_RedisFault_DELAY RedisProxy_RedisFault_RedisFaultType = 0
+	// Returns errors on requests.
 	RedisProxy_RedisFault_ERROR RedisProxy_RedisFault_RedisFaultType = 1
 )
 
@@ -132,18 +146,95 @@ func (RedisProxy_RedisFault_RedisFaultType) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_network_redis_proxy_v3_redis_proxy_proto_rawDescGZIP(), []int{0, 2, 0}
 }
 
+// [#next-free-field: 9]
 type RedisProxy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StatPrefix             string                       `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
-	Settings               *RedisProxy_ConnPoolSettings `protobuf:"bytes,3,opt,name=settings,proto3" json:"settings,omitempty"`
-	LatencyInMicros        bool                         `protobuf:"varint,4,opt,name=latency_in_micros,json=latencyInMicros,proto3" json:"latency_in_micros,omitempty"`
-	PrefixRoutes           *RedisProxy_PrefixRoutes     `protobuf:"bytes,5,opt,name=prefix_routes,json=prefixRoutes,proto3" json:"prefix_routes,omitempty"`
-	DownstreamAuthPassword *v3.DataSource               `protobuf:"bytes,6,opt,name=downstream_auth_password,json=downstreamAuthPassword,proto3" json:"downstream_auth_password,omitempty"`
-	Faults                 []*RedisProxy_RedisFault     `protobuf:"bytes,8,rep,name=faults,proto3" json:"faults,omitempty"`
-	DownstreamAuthUsername *v3.DataSource               `protobuf:"bytes,7,opt,name=downstream_auth_username,json=downstreamAuthUsername,proto3" json:"downstream_auth_username,omitempty"`
+	// The prefix to use when emitting :ref:`statistics <config_network_filters_redis_proxy_stats>`.
+	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	// Network settings for the connection pool to the upstream clusters.
+	Settings *RedisProxy_ConnPoolSettings `protobuf:"bytes,3,opt,name=settings,proto3" json:"settings,omitempty"`
+	// Indicates that latency stat should be computed in microseconds. By default it is computed in
+	// milliseconds. This does not apply to upstream command stats currently.
+	LatencyInMicros bool `protobuf:"varint,4,opt,name=latency_in_micros,json=latencyInMicros,proto3" json:"latency_in_micros,omitempty"`
+	// List of **unique** prefixes used to separate keys from different workloads to different
+	// clusters. Envoy will always favor the longest match first in case of overlap. A catch-all
+	// cluster can be used to forward commands when there is no match. Time complexity of the
+	// lookups are in O(min(longest key prefix, key length)).
+	//
+	// Example:
+	//
+	// .. code-block:: yaml
+	//
+	//    prefix_routes:
+	//      routes:
+	//        - prefix: "ab"
+	//          cluster: "cluster_a"
+	//        - prefix: "abc"
+	//          cluster: "cluster_b"
+	//
+	// When using the above routes, the following prefixes would be sent to:
+	//
+	// * ``get abc:users`` would retrieve the key 'abc:users' from cluster_b.
+	// * ``get ab:users`` would retrieve the key 'ab:users' from cluster_a.
+	// * ``get z:users`` would return a NoUpstreamHost error. A :ref:`catch-all
+	//   route<envoy_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.catch_all_route>`
+	//   would have retrieved the key from that cluster instead.
+	//
+	// See the :ref:`configuration section
+	// <arch_overview_redis_configuration>` of the architecture overview for recommendations on
+	// configuring the backing clusters.
+	PrefixRoutes *RedisProxy_PrefixRoutes `protobuf:"bytes,5,opt,name=prefix_routes,json=prefixRoutes,proto3" json:"prefix_routes,omitempty"`
+	// Authenticate Redis client connections locally by forcing downstream clients to issue a `Redis
+	// AUTH command <https://redis.io/commands/auth>`_ with this password before enabling any other
+	// command. If an AUTH command's password matches this password, an "OK" response will be returned
+	// to the client. If the AUTH command password does not match this password, then an "ERR invalid
+	// password" error will be returned. If any other command is received before AUTH when this
+	// password is set, then a "NOAUTH Authentication required." error response will be sent to the
+	// client. If an AUTH command is received when the password is not set, then an "ERR Client sent
+	// AUTH, but no password is set" error will be returned.
+	DownstreamAuthPassword *v3.DataSource `protobuf:"bytes,6,opt,name=downstream_auth_password,json=downstreamAuthPassword,proto3" json:"downstream_auth_password,omitempty"`
+	// List of faults to inject. Faults currently come in two flavors:
+	// - Delay, which delays a request.
+	// - Error, which responds to a request with an error. Errors can also have delays attached.
+	//
+	// Example:
+	//
+	// .. code-block:: yaml
+	//
+	//    faults:
+	//    - fault_type: ERROR
+	//      fault_enabled:
+	//        default_value:
+	//          numerator: 10
+	//          denominator: HUNDRED
+	//        runtime_key: "bogus_key"
+	//        commands:
+	//        - GET
+	//      - fault_type: DELAY
+	//        fault_enabled:
+	//          default_value:
+	//            numerator: 10
+	//            denominator: HUNDRED
+	//          runtime_key: "bogus_key"
+	//        delay: 2s
+	//
+	// See the :ref:`fault injection section
+	// <config_network_filters_redis_proxy_fault_injection>` for more information on how to configure this.
+	Faults []*RedisProxy_RedisFault `protobuf:"bytes,8,rep,name=faults,proto3" json:"faults,omitempty"`
+	// If a username is provided an ACL style AUTH command will be required with a username and password.
+	// Authenticate Redis client connections locally by forcing downstream clients to issue a `Redis
+	// AUTH command <https://redis.io/commands/auth>`_ with this username and the *downstream_auth_password*
+	// before enabling any other command. If an AUTH command's username and password matches this username
+	// and the *downstream_auth_password* , an "OK" response will be returned to the client. If the AUTH
+	// command username or password does not match this username or the *downstream_auth_password*, then an
+	// "WRONGPASS invalid username-password pair" error will be returned. If any other command is received before AUTH when this
+	// password is set, then a "NOAUTH Authentication required." error response will be sent to the
+	// client. If an AUTH command is received when the password is not set, then an "ERR Client sent
+	// AUTH, but no ACL is set" error will be returned.
+	DownstreamAuthUsername *v3.DataSource `protobuf:"bytes,7,opt,name=downstream_auth_username,json=downstreamAuthUsername,proto3" json:"downstream_auth_username,omitempty"`
 	// Deprecated: Do not use.
 	HiddenEnvoyDeprecatedCluster string `protobuf:"bytes,2,opt,name=hidden_envoy_deprecated_cluster,json=hiddenEnvoyDeprecatedCluster,proto3" json:"hidden_envoy_deprecated_cluster,omitempty"`
 }
@@ -237,12 +328,19 @@ func (x *RedisProxy) GetHiddenEnvoyDeprecatedCluster() string {
 	return ""
 }
 
+// RedisProtocolOptions specifies Redis upstream protocol options. This object is used in
+// :ref:`typed_extension_protocol_options<envoy_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
+// keyed by the name `envoy.filters.network.redis_proxy`.
 type RedisProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Upstream server password as defined by the `requirepass` directive
+	// <https://redis.io/topics/config>`_ in the server's configuration file.
 	AuthPassword *v3.DataSource `protobuf:"bytes,1,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
+	// Upstream server username as defined by the `user` directive
+	// <https://redis.io/topics/acl>`_ in the server's configuration file.
 	AuthUsername *v3.DataSource `protobuf:"bytes,2,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 }
 
@@ -292,19 +390,67 @@ func (x *RedisProtocolOptions) GetAuthUsername() *v3.DataSource {
 	return nil
 }
 
+// Redis connection pool settings.
+// [#next-free-field: 9]
 type RedisProxy_ConnPoolSettings struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	OpTimeout                     *duration.Duration                     `protobuf:"bytes,1,opt,name=op_timeout,json=opTimeout,proto3" json:"op_timeout,omitempty"`
-	EnableHashtagging             bool                                   `protobuf:"varint,2,opt,name=enable_hashtagging,json=enableHashtagging,proto3" json:"enable_hashtagging,omitempty"`
-	EnableRedirection             bool                                   `protobuf:"varint,3,opt,name=enable_redirection,json=enableRedirection,proto3" json:"enable_redirection,omitempty"`
-	MaxBufferSizeBeforeFlush      uint32                                 `protobuf:"varint,4,opt,name=max_buffer_size_before_flush,json=maxBufferSizeBeforeFlush,proto3" json:"max_buffer_size_before_flush,omitempty"`
-	BufferFlushTimeout            *duration.Duration                     `protobuf:"bytes,5,opt,name=buffer_flush_timeout,json=bufferFlushTimeout,proto3" json:"buffer_flush_timeout,omitempty"`
-	MaxUpstreamUnknownConnections *wrappers.UInt32Value                  `protobuf:"bytes,6,opt,name=max_upstream_unknown_connections,json=maxUpstreamUnknownConnections,proto3" json:"max_upstream_unknown_connections,omitempty"`
-	EnableCommandStats            bool                                   `protobuf:"varint,8,opt,name=enable_command_stats,json=enableCommandStats,proto3" json:"enable_command_stats,omitempty"`
-	ReadPolicy                    RedisProxy_ConnPoolSettings_ReadPolicy `protobuf:"varint,7,opt,name=read_policy,json=readPolicy,proto3,enum=envoy.extensions.filters.network.redis_proxy.v3.RedisProxy_ConnPoolSettings_ReadPolicy" json:"read_policy,omitempty"`
+	// Per-operation timeout in milliseconds. The timer starts when the first
+	// command of a pipeline is written to the backend connection. Each response received from Redis
+	// resets the timer since it signifies that the next command is being processed by the backend.
+	// The only exception to this behavior is when a connection to a backend is not yet established.
+	// In that case, the connect timeout on the cluster will govern the timeout until the connection
+	// is ready.
+	OpTimeout *duration.Duration `protobuf:"bytes,1,opt,name=op_timeout,json=opTimeout,proto3" json:"op_timeout,omitempty"`
+	// Use hash tagging on every redis key to guarantee that keys with the same hash tag will be
+	// forwarded to the same upstream. The hash key used for determining the upstream in a
+	// consistent hash ring configuration will be computed from the hash tagged key instead of the
+	// whole key. The algorithm used to compute the hash tag is identical to the `redis-cluster
+	// implementation <https://redis.io/topics/cluster-spec#keys-hash-tags>`_.
+	//
+	// Examples:
+	//
+	// * '{user1000}.following' and '{user1000}.followers' **will** be sent to the same upstream
+	// * '{user1000}.following' and '{user1001}.following' **might** be sent to the same upstream
+	EnableHashtagging bool `protobuf:"varint,2,opt,name=enable_hashtagging,json=enableHashtagging,proto3" json:"enable_hashtagging,omitempty"`
+	// Accept `moved and ask redirection
+	// <https://redis.io/topics/cluster-spec#redirection-and-resharding>`_ errors from upstream
+	// redis servers, and retry commands to the specified target server. The target server does not
+	// need to be known to the cluster manager. If the command cannot be redirected, then the
+	// original error is passed downstream unchanged. By default, this support is not enabled.
+	EnableRedirection bool `protobuf:"varint,3,opt,name=enable_redirection,json=enableRedirection,proto3" json:"enable_redirection,omitempty"`
+	// Maximum size of encoded request buffer before flush is triggered and encoded requests
+	// are sent upstream. If this is unset, the buffer flushes whenever it receives data
+	// and performs no batching.
+	// This feature makes it possible for multiple clients to send requests to Envoy and have
+	// them batched- for example if one is running several worker processes, each with its own
+	// Redis connection. There is no benefit to using this with a single downstream process.
+	// Recommended size (if enabled) is 1024 bytes.
+	MaxBufferSizeBeforeFlush uint32 `protobuf:"varint,4,opt,name=max_buffer_size_before_flush,json=maxBufferSizeBeforeFlush,proto3" json:"max_buffer_size_before_flush,omitempty"`
+	// The encoded request buffer is flushed N milliseconds after the first request has been
+	// encoded, unless the buffer size has already exceeded `max_buffer_size_before_flush`.
+	// If `max_buffer_size_before_flush` is not set, this flush timer is not used. Otherwise,
+	// the timer should be set according to the number of clients, overall request rate and
+	// desired maximum latency for a single command. For example, if there are many requests
+	// being batched together at a high rate, the buffer will likely be filled before the timer
+	// fires. Alternatively, if the request rate is lower the buffer will not be filled as often
+	// before the timer fires.
+	// If `max_buffer_size_before_flush` is set, but `buffer_flush_timeout` is not, the latter
+	// defaults to 3ms.
+	BufferFlushTimeout *duration.Duration `protobuf:"bytes,5,opt,name=buffer_flush_timeout,json=bufferFlushTimeout,proto3" json:"buffer_flush_timeout,omitempty"`
+	// `max_upstream_unknown_connections` controls how many upstream connections to unknown hosts
+	// can be created at any given time by any given worker thread (see `enable_redirection` for
+	// more details). If the host is unknown and a connection cannot be created due to enforcing
+	// this limit, then redirection will fail and the original redirection error will be passed
+	// downstream unchanged. This limit defaults to 100.
+	MaxUpstreamUnknownConnections *wrappers.UInt32Value `protobuf:"bytes,6,opt,name=max_upstream_unknown_connections,json=maxUpstreamUnknownConnections,proto3" json:"max_upstream_unknown_connections,omitempty"`
+	// Enable per-command statistics per upstream cluster, in addition to the filter level aggregate
+	// count. These commands are measured in microseconds.
+	EnableCommandStats bool `protobuf:"varint,8,opt,name=enable_command_stats,json=enableCommandStats,proto3" json:"enable_command_stats,omitempty"`
+	// Read policy. The default is to read from the primary.
+	ReadPolicy RedisProxy_ConnPoolSettings_ReadPolicy `protobuf:"varint,7,opt,name=read_policy,json=readPolicy,proto3,enum=envoy.extensions.filters.network.redis_proxy.v3.RedisProxy_ConnPoolSettings_ReadPolicy" json:"read_policy,omitempty"`
 }
 
 func (x *RedisProxy_ConnPoolSettings) Reset() {
@@ -400,9 +546,13 @@ type RedisProxy_PrefixRoutes struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Routes          []*RedisProxy_PrefixRoutes_Route `protobuf:"bytes,1,rep,name=routes,proto3" json:"routes,omitempty"`
-	CaseInsensitive bool                             `protobuf:"varint,2,opt,name=case_insensitive,json=caseInsensitive,proto3" json:"case_insensitive,omitempty"`
-	CatchAllRoute   *RedisProxy_PrefixRoutes_Route   `protobuf:"bytes,4,opt,name=catch_all_route,json=catchAllRoute,proto3" json:"catch_all_route,omitempty"`
+	// List of prefix routes.
+	Routes []*RedisProxy_PrefixRoutes_Route `protobuf:"bytes,1,rep,name=routes,proto3" json:"routes,omitempty"`
+	// Indicates that prefix matching should be case insensitive.
+	CaseInsensitive bool `protobuf:"varint,2,opt,name=case_insensitive,json=caseInsensitive,proto3" json:"case_insensitive,omitempty"`
+	// Optional catch-all route to forward commands that doesn't match any of the routes. The
+	// catch-all route becomes required when no routes are specified.
+	CatchAllRoute *RedisProxy_PrefixRoutes_Route `protobuf:"bytes,4,opt,name=catch_all_route,json=catchAllRoute,proto3" json:"catch_all_route,omitempty"`
 	// Deprecated: Do not use.
 	HiddenEnvoyDeprecatedCatchAllCluster string `protobuf:"bytes,3,opt,name=hidden_envoy_deprecated_catch_all_cluster,json=hiddenEnvoyDeprecatedCatchAllCluster,proto3" json:"hidden_envoy_deprecated_catch_all_cluster,omitempty"`
 }
@@ -468,15 +618,21 @@ func (x *RedisProxy_PrefixRoutes) GetHiddenEnvoyDeprecatedCatchAllCluster() stri
 	return ""
 }
 
+// RedisFault defines faults used for fault injection.
 type RedisProxy_RedisFault struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	FaultType    RedisProxy_RedisFault_RedisFaultType `protobuf:"varint,1,opt,name=fault_type,json=faultType,proto3,enum=envoy.extensions.filters.network.redis_proxy.v3.RedisProxy_RedisFault_RedisFaultType" json:"fault_type,omitempty"`
-	FaultEnabled *v3.RuntimeFractionalPercent         `protobuf:"bytes,2,opt,name=fault_enabled,json=faultEnabled,proto3" json:"fault_enabled,omitempty"`
-	Delay        *duration.Duration                   `protobuf:"bytes,3,opt,name=delay,proto3" json:"delay,omitempty"`
-	Commands     []string                             `protobuf:"bytes,4,rep,name=commands,proto3" json:"commands,omitempty"`
+	// Fault type.
+	FaultType RedisProxy_RedisFault_RedisFaultType `protobuf:"varint,1,opt,name=fault_type,json=faultType,proto3,enum=envoy.extensions.filters.network.redis_proxy.v3.RedisProxy_RedisFault_RedisFaultType" json:"fault_type,omitempty"`
+	// Percentage of requests fault applies to.
+	FaultEnabled *v3.RuntimeFractionalPercent `protobuf:"bytes,2,opt,name=fault_enabled,json=faultEnabled,proto3" json:"fault_enabled,omitempty"`
+	// Delay for all faults. If not set, defaults to zero
+	Delay *duration.Duration `protobuf:"bytes,3,opt,name=delay,proto3" json:"delay,omitempty"`
+	// Commands fault is restricted to, if any. If not set, fault applies to all commands
+	// other than auth and ping (due to special handling of those commands in Envoy).
+	Commands []string `protobuf:"bytes,4,rep,name=commands,proto3" json:"commands,omitempty"`
 }
 
 func (x *RedisProxy_RedisFault) Reset() {
@@ -544,9 +700,14 @@ type RedisProxy_PrefixRoutes_Route struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Prefix              string                                               `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	RemovePrefix        bool                                                 `protobuf:"varint,2,opt,name=remove_prefix,json=removePrefix,proto3" json:"remove_prefix,omitempty"`
-	Cluster             string                                               `protobuf:"bytes,3,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	// String prefix that must match the beginning of the keys. Envoy will always favor the
+	// longest match.
+	Prefix string `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	// Indicates if the prefix needs to be removed from the key when forwarded.
+	RemovePrefix bool `protobuf:"varint,2,opt,name=remove_prefix,json=removePrefix,proto3" json:"remove_prefix,omitempty"`
+	// Upstream cluster to forward the command to.
+	Cluster string `protobuf:"bytes,3,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	// Indicates that the route has a request mirroring policy.
 	RequestMirrorPolicy []*RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy `protobuf:"bytes,4,rep,name=request_mirror_policy,json=requestMirrorPolicy,proto3" json:"request_mirror_policy,omitempty"`
 }
 
@@ -610,14 +771,27 @@ func (x *RedisProxy_PrefixRoutes_Route) GetRequestMirrorPolicy() []*RedisProxy_P
 	return nil
 }
 
+// The router is capable of shadowing traffic from one cluster to another. The current
+// implementation is "fire and forget," meaning Envoy will not wait for the shadow cluster to
+// respond before returning the response from the primary cluster. All normal statistics are
+// collected for the shadow cluster making this feature useful for testing.
 type RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Cluster             string                       `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
-	RuntimeFraction     *v3.RuntimeFractionalPercent `protobuf:"bytes,2,opt,name=runtime_fraction,json=runtimeFraction,proto3" json:"runtime_fraction,omitempty"`
-	ExcludeReadCommands bool                         `protobuf:"varint,3,opt,name=exclude_read_commands,json=excludeReadCommands,proto3" json:"exclude_read_commands,omitempty"`
+	// Specifies the cluster that requests will be mirrored to. The cluster must
+	// exist in the cluster manager configuration.
+	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	// If not specified or the runtime key is not present, all requests to the target cluster
+	// will be mirrored.
+	//
+	// If specified, Envoy will lookup the runtime key to get the percentage of requests to the
+	// mirror.
+	RuntimeFraction *v3.RuntimeFractionalPercent `protobuf:"bytes,2,opt,name=runtime_fraction,json=runtimeFraction,proto3" json:"runtime_fraction,omitempty"`
+	// Set this to TRUE to only mirror write commands, this is effectively replicating the
+	// writes in a "fire and forget" manner.
+	ExcludeReadCommands bool `protobuf:"varint,3,opt,name=exclude_read_commands,json=excludeReadCommands,proto3" json:"exclude_read_commands,omitempty"`
 }
 
 func (x *RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy) Reset() {

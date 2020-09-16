@@ -28,13 +28,21 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// DynamicOtConfig is used to dynamically load a tracer from a shared library
+// that implements the `OpenTracing dynamic loading API
+// <https://github.com/opentracing/opentracing-cpp>`_.
+// [#extension: envoy.tracers.dynamic_ot]
 type DynamicOtConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Library string          `protobuf:"bytes,1,opt,name=library,proto3" json:"library,omitempty"`
-	Config  *_struct.Struct `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
+	// Dynamic library implementing the `OpenTracing API
+	// <https://github.com/opentracing/opentracing-cpp>`_.
+	Library string `protobuf:"bytes,1,opt,name=library,proto3" json:"library,omitempty"`
+	// The configuration to use when creating a tracer from the given dynamic
+	// library.
+	Config *_struct.Struct `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 }
 
 func (x *DynamicOtConfig) Reset() {

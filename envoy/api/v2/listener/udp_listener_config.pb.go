@@ -33,7 +33,13 @@ type UdpListenerConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Used to look up UDP listener factory, matches "raw_udp_listener" or
+	// "quic_listener" to create a specific udp listener.
+	// If not specified, treat as "raw_udp_listener".
 	UdpListenerName string `protobuf:"bytes,1,opt,name=udp_listener_name,json=udpListenerName,proto3" json:"udp_listener_name,omitempty"`
+	// Used to create a specific listener factory. To some factory, e.g.
+	// "raw_udp_listener", config is not needed.
+	//
 	// Types that are assignable to ConfigType:
 	//	*UdpListenerConfig_Config
 	//	*UdpListenerConfig_TypedConfig

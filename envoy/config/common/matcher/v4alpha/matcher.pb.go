@@ -28,6 +28,9 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Match configuration. This is a recursive structure which allows complex nested match
+// configurations to be built using various logical operators.
+// [#next-free-field: 11]
 type MatchPredicate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -161,42 +164,54 @@ type isMatchPredicate_Rule interface {
 }
 
 type MatchPredicate_OrMatch struct {
+	// A set that describes a logical OR. If any member of the set matches, the match configuration
+	// matches.
 	OrMatch *MatchPredicate_MatchSet `protobuf:"bytes,1,opt,name=or_match,json=orMatch,proto3,oneof"`
 }
 
 type MatchPredicate_AndMatch struct {
+	// A set that describes a logical AND. If all members of the set match, the match configuration
+	// matches.
 	AndMatch *MatchPredicate_MatchSet `protobuf:"bytes,2,opt,name=and_match,json=andMatch,proto3,oneof"`
 }
 
 type MatchPredicate_NotMatch struct {
+	// A negation match. The match configuration will match if the negated match condition matches.
 	NotMatch *MatchPredicate `protobuf:"bytes,3,opt,name=not_match,json=notMatch,proto3,oneof"`
 }
 
 type MatchPredicate_AnyMatch struct {
+	// The match configuration will always match.
 	AnyMatch bool `protobuf:"varint,4,opt,name=any_match,json=anyMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpRequestHeadersMatch struct {
+	// HTTP request headers match configuration.
 	HttpRequestHeadersMatch *HttpHeadersMatch `protobuf:"bytes,5,opt,name=http_request_headers_match,json=httpRequestHeadersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpRequestTrailersMatch struct {
+	// HTTP request trailers match configuration.
 	HttpRequestTrailersMatch *HttpHeadersMatch `protobuf:"bytes,6,opt,name=http_request_trailers_match,json=httpRequestTrailersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpResponseHeadersMatch struct {
+	// HTTP response headers match configuration.
 	HttpResponseHeadersMatch *HttpHeadersMatch `protobuf:"bytes,7,opt,name=http_response_headers_match,json=httpResponseHeadersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpResponseTrailersMatch struct {
+	// HTTP response trailers match configuration.
 	HttpResponseTrailersMatch *HttpHeadersMatch `protobuf:"bytes,8,opt,name=http_response_trailers_match,json=httpResponseTrailersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpRequestGenericBodyMatch struct {
+	// HTTP request generic body match configuration.
 	HttpRequestGenericBodyMatch *HttpGenericBodyMatch `protobuf:"bytes,9,opt,name=http_request_generic_body_match,json=httpRequestGenericBodyMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpResponseGenericBodyMatch struct {
+	// HTTP response generic body match configuration.
 	HttpResponseGenericBodyMatch *HttpGenericBodyMatch `protobuf:"bytes,10,opt,name=http_response_generic_body_match,json=httpResponseGenericBodyMatch,proto3,oneof"`
 }
 
@@ -220,11 +235,13 @@ func (*MatchPredicate_HttpRequestGenericBodyMatch) isMatchPredicate_Rule() {}
 
 func (*MatchPredicate_HttpResponseGenericBodyMatch) isMatchPredicate_Rule() {}
 
+// HTTP headers match configuration.
 type HttpHeadersMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// HTTP headers to match.
 	Headers []*v4alpha.HeaderMatcher `protobuf:"bytes,1,rep,name=headers,proto3" json:"headers,omitempty"`
 }
 
@@ -267,13 +284,25 @@ func (x *HttpHeadersMatch) GetHeaders() []*v4alpha.HeaderMatcher {
 	return nil
 }
 
+// HTTP generic body match configuration.
+// List of text strings and hex strings to be located in HTTP body.
+// All specified strings must be found in the HTTP body for positive match.
+// The search may be limited to specified number of bytes from the body start.
+//
+// .. attention::
+//
+//   Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
+//   If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
+//   to scan only part of the http body.
 type HttpGenericBodyMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	BytesLimit uint32                                   `protobuf:"varint,1,opt,name=bytes_limit,json=bytesLimit,proto3" json:"bytes_limit,omitempty"`
-	Patterns   []*HttpGenericBodyMatch_GenericTextMatch `protobuf:"bytes,2,rep,name=patterns,proto3" json:"patterns,omitempty"`
+	// Limits search to specified number of bytes - default zero (no limit - match entire captured buffer).
+	BytesLimit uint32 `protobuf:"varint,1,opt,name=bytes_limit,json=bytesLimit,proto3" json:"bytes_limit,omitempty"`
+	// List of patterns to match.
+	Patterns []*HttpGenericBodyMatch_GenericTextMatch `protobuf:"bytes,2,rep,name=patterns,proto3" json:"patterns,omitempty"`
 }
 
 func (x *HttpGenericBodyMatch) Reset() {
@@ -322,11 +351,13 @@ func (x *HttpGenericBodyMatch) GetPatterns() []*HttpGenericBodyMatch_GenericText
 	return nil
 }
 
+// A set of match configurations used for logical operations.
 type MatchPredicate_MatchSet struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The list of rules that make up the set.
 	Rules []*MatchPredicate `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
 }
 
@@ -438,10 +469,12 @@ type isHttpGenericBodyMatch_GenericTextMatch_Rule interface {
 }
 
 type HttpGenericBodyMatch_GenericTextMatch_StringMatch struct {
+	// Text string to be located in HTTP body.
 	StringMatch string `protobuf:"bytes,1,opt,name=string_match,json=stringMatch,proto3,oneof"`
 }
 
 type HttpGenericBodyMatch_GenericTextMatch_BinaryMatch struct {
+	// Sequence of bytes to be located in HTTP body.
 	BinaryMatch []byte `protobuf:"bytes,2,opt,name=binary_match,json=binaryMatch,proto3,oneof"`
 }
 

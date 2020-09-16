@@ -28,13 +28,19 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Rate limit :ref:`configuration overview <config_rate_limit_service>`.
 type RateLimitServiceConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	GrpcService         *v3.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
-	TransportApiVersion v3.ApiVersion   `protobuf:"varint,4,opt,name=transport_api_version,json=transportApiVersion,proto3,enum=envoy.config.core.v3.ApiVersion" json:"transport_api_version,omitempty"`
+	// Specifies the gRPC service that hosts the rate limit service. The client
+	// will connect to this cluster when it needs to make rate limit service
+	// requests.
+	GrpcService *v3.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
+	// API version for rate limit transport protocol. This describes the rate limit gRPC endpoint and
+	// version of messages used on the wire.
+	TransportApiVersion v3.ApiVersion `protobuf:"varint,4,opt,name=transport_api_version,json=transportApiVersion,proto3,enum=envoy.config.core.v3.ApiVersion" json:"transport_api_version,omitempty"`
 }
 
 func (x *RateLimitServiceConfig) Reset() {

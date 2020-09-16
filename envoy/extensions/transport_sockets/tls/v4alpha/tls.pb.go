@@ -36,10 +36,27 @@ type UpstreamTlsContext struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CommonTlsContext   *CommonTlsContext     `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext,proto3" json:"common_tls_context,omitempty"`
-	Sni                string                `protobuf:"bytes,2,opt,name=sni,proto3" json:"sni,omitempty"`
-	AllowRenegotiation bool                  `protobuf:"varint,3,opt,name=allow_renegotiation,json=allowRenegotiation,proto3" json:"allow_renegotiation,omitempty"`
-	MaxSessionKeys     *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=max_session_keys,json=maxSessionKeys,proto3" json:"max_session_keys,omitempty"`
+	// Common TLS context settings.
+	//
+	// .. attention::
+	//
+	//   Server certificate verification is not enabled by default. Configure
+	//   :ref:`trusted_ca<envoy_api_field_extensions.transport_sockets.tls.v4alpha.CertificateValidationContext.trusted_ca>` to enable
+	//   verification.
+	CommonTlsContext *CommonTlsContext `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext,proto3" json:"common_tls_context,omitempty"`
+	// SNI string to use when creating TLS backend connections.
+	Sni string `protobuf:"bytes,2,opt,name=sni,proto3" json:"sni,omitempty"`
+	// If true, server-initiated TLS renegotiation will be allowed.
+	//
+	// .. attention::
+	//
+	//   TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary.
+	AllowRenegotiation bool `protobuf:"varint,3,opt,name=allow_renegotiation,json=allowRenegotiation,proto3" json:"allow_renegotiation,omitempty"`
+	// Maximum number of session keys (Pre-Shared Keys for TLSv1.3+, Session IDs and Session Tickets
+	// for TLSv1.2 and older) to store for the purpose of session resumption.
+	//
+	// Defaults to 1, setting this to 0 disables session resumption.
+	MaxSessionKeys *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=max_session_keys,json=maxSessionKeys,proto3" json:"max_session_keys,omitempty"`
 }
 
 func (x *UpstreamTlsContext) Reset() {
@@ -102,20 +119,30 @@ func (x *UpstreamTlsContext) GetMaxSessionKeys() *wrappers.UInt32Value {
 	return nil
 }
 
+// [#next-free-field: 8]
 type DownstreamTlsContext struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CommonTlsContext         *CommonTlsContext   `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext,proto3" json:"common_tls_context,omitempty"`
+	// Common TLS context settings.
+	CommonTlsContext *CommonTlsContext `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext,proto3" json:"common_tls_context,omitempty"`
+	// If specified, Envoy will reject connections without a valid client
+	// certificate.
 	RequireClientCertificate *wrappers.BoolValue `protobuf:"bytes,2,opt,name=require_client_certificate,json=requireClientCertificate,proto3" json:"require_client_certificate,omitempty"`
-	RequireSni               *wrappers.BoolValue `protobuf:"bytes,3,opt,name=require_sni,json=requireSni,proto3" json:"require_sni,omitempty"`
+	// If specified, Envoy will reject connections without a valid and matching SNI.
+	// [#not-implemented-hide:]
+	RequireSni *wrappers.BoolValue `protobuf:"bytes,3,opt,name=require_sni,json=requireSni,proto3" json:"require_sni,omitempty"`
 	// Types that are assignable to SessionTicketKeysType:
 	//	*DownstreamTlsContext_SessionTicketKeys
 	//	*DownstreamTlsContext_SessionTicketKeysSdsSecretConfig
 	//	*DownstreamTlsContext_DisableStatelessSessionResumption
 	SessionTicketKeysType isDownstreamTlsContext_SessionTicketKeysType `protobuf_oneof:"session_ticket_keys_type"`
-	SessionTimeout        *duration.Duration                           `protobuf:"bytes,6,opt,name=session_timeout,json=sessionTimeout,proto3" json:"session_timeout,omitempty"`
+	// If specified, session_timeout will change maximum lifetime (in seconds) of TLS session
+	// Currently this value is used as a hint to `TLS session ticket lifetime (for TLSv1.2)
+	// <https://tools.ietf.org/html/rfc5077#section-5.6>`
+	// only seconds could be specified (fractional seconds are going to be ignored).
+	SessionTimeout *duration.Duration `protobuf:"bytes,6,opt,name=session_timeout,json=sessionTimeout,proto3" json:"session_timeout,omitempty"`
 }
 
 func (x *DownstreamTlsContext) Reset() {
@@ -211,14 +238,24 @@ type isDownstreamTlsContext_SessionTicketKeysType interface {
 }
 
 type DownstreamTlsContext_SessionTicketKeys struct {
+	// TLS session ticket key settings.
 	SessionTicketKeys *TlsSessionTicketKeys `protobuf:"bytes,4,opt,name=session_ticket_keys,json=sessionTicketKeys,proto3,oneof"`
 }
 
 type DownstreamTlsContext_SessionTicketKeysSdsSecretConfig struct {
+	// Config for fetching TLS session ticket keys via SDS API.
 	SessionTicketKeysSdsSecretConfig *SdsSecretConfig `protobuf:"bytes,5,opt,name=session_ticket_keys_sds_secret_config,json=sessionTicketKeysSdsSecretConfig,proto3,oneof"`
 }
 
 type DownstreamTlsContext_DisableStatelessSessionResumption struct {
+	// Config for controlling stateless TLS session resumption: setting this to true will cause the TLS
+	// server to not issue TLS session tickets for the purposes of stateless TLS session resumption.
+	// If set to false, the TLS server will issue TLS session tickets and encrypt/decrypt them using
+	// the keys specified through either :ref:`session_ticket_keys <envoy_api_field_extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_ticket_keys>`
+	// or :ref:`session_ticket_keys_sds_secret_config <envoy_api_field_extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_ticket_keys_sds_secret_config>`.
+	// If this config is set to false and no keys are explicitly configured, the TLS server will issue
+	// TLS session tickets and encrypt/decrypt them using an internally-generated and managed key, with the
+	// implication that sessions cannot be resumed across hot restarts or on different hosts.
 	DisableStatelessSessionResumption bool `protobuf:"varint,7,opt,name=disable_stateless_session_resumption,json=disableStatelessSessionResumption,proto3,oneof"`
 }
 
@@ -230,15 +267,30 @@ func (*DownstreamTlsContext_SessionTicketKeysSdsSecretConfig) isDownstreamTlsCon
 func (*DownstreamTlsContext_DisableStatelessSessionResumption) isDownstreamTlsContext_SessionTicketKeysType() {
 }
 
+// TLS context shared by both client and server TLS contexts.
+// [#next-free-field: 14]
 type CommonTlsContext struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TlsParams                                 *TlsParameters                                `protobuf:"bytes,1,opt,name=tls_params,json=tlsParams,proto3" json:"tls_params,omitempty"`
-	TlsCertificates                           []*TlsCertificate                             `protobuf:"bytes,2,rep,name=tls_certificates,json=tlsCertificates,proto3" json:"tls_certificates,omitempty"`
-	TlsCertificateSdsSecretConfigs            []*SdsSecretConfig                            `protobuf:"bytes,6,rep,name=tls_certificate_sds_secret_configs,json=tlsCertificateSdsSecretConfigs,proto3" json:"tls_certificate_sds_secret_configs,omitempty"`
-	TlsCertificateCertificateProvider         *CommonTlsContext_CertificateProvider         `protobuf:"bytes,9,opt,name=tls_certificate_certificate_provider,json=tlsCertificateCertificateProvider,proto3" json:"tls_certificate_certificate_provider,omitempty"`
+	// TLS protocol versions, cipher suites etc.
+	TlsParams *TlsParameters `protobuf:"bytes,1,opt,name=tls_params,json=tlsParams,proto3" json:"tls_params,omitempty"`
+	// :ref:`Multiple TLS certificates <arch_overview_ssl_cert_select>` can be associated with the
+	// same context to allow both RSA and ECDSA certificates.
+	//
+	// Only a single TLS certificate is supported in client contexts. In server contexts, the first
+	// RSA certificate is used for clients that only support RSA and the first ECDSA certificate is
+	// used for clients that support ECDSA.
+	TlsCertificates []*TlsCertificate `protobuf:"bytes,2,rep,name=tls_certificates,json=tlsCertificates,proto3" json:"tls_certificates,omitempty"`
+	// Configs for fetching TLS certificates via SDS API. Note SDS API allows certificates to be
+	// fetched/refreshed over the network asynchronously with respect to the TLS handshake.
+	TlsCertificateSdsSecretConfigs []*SdsSecretConfig `protobuf:"bytes,6,rep,name=tls_certificate_sds_secret_configs,json=tlsCertificateSdsSecretConfigs,proto3" json:"tls_certificate_sds_secret_configs,omitempty"`
+	// Certificate provider for fetching TLS certificates.
+	// [#not-implemented-hide:]
+	TlsCertificateCertificateProvider *CommonTlsContext_CertificateProvider `protobuf:"bytes,9,opt,name=tls_certificate_certificate_provider,json=tlsCertificateCertificateProvider,proto3" json:"tls_certificate_certificate_provider,omitempty"`
+	// Certificate provider instance for fetching TLS certificates.
+	// [#not-implemented-hide:]
 	TlsCertificateCertificateProviderInstance *CommonTlsContext_CertificateProviderInstance `protobuf:"bytes,11,opt,name=tls_certificate_certificate_provider_instance,json=tlsCertificateCertificateProviderInstance,proto3" json:"tls_certificate_certificate_provider_instance,omitempty"`
 	// Types that are assignable to ValidationContextType:
 	//	*CommonTlsContext_ValidationContext
@@ -247,8 +299,20 @@ type CommonTlsContext struct {
 	//	*CommonTlsContext_ValidationContextCertificateProvider
 	//	*CommonTlsContext_ValidationContextCertificateProviderInstance
 	ValidationContextType isCommonTlsContext_ValidationContextType `protobuf_oneof:"validation_context_type"`
-	AlpnProtocols         []string                                 `protobuf:"bytes,4,rep,name=alpn_protocols,json=alpnProtocols,proto3" json:"alpn_protocols,omitempty"`
-	CustomHandshaker      *v4alpha.TypedExtensionConfig            `protobuf:"bytes,13,opt,name=custom_handshaker,json=customHandshaker,proto3" json:"custom_handshaker,omitempty"`
+	// Supplies the list of ALPN protocols that the listener should expose. In
+	// practice this is likely to be set to one of two values (see the
+	// :ref:`codec_type
+	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.codec_type>`
+	// parameter in the HTTP connection manager for more information):
+	//
+	// * "h2,http/1.1" If the listener is going to support both HTTP/2 and HTTP/1.1.
+	// * "http/1.1" If the listener is only going to support HTTP/1.1.
+	//
+	// There is no default for this parameter. If empty, Envoy will not expose ALPN.
+	AlpnProtocols []string `protobuf:"bytes,4,rep,name=alpn_protocols,json=alpnProtocols,proto3" json:"alpn_protocols,omitempty"`
+	// Custom TLS handshaker. If empty, defaults to native TLS handshaking
+	// behavior.
+	CustomHandshaker *v4alpha.TypedExtensionConfig `protobuf:"bytes,13,opt,name=custom_handshaker,json=customHandshaker,proto3" json:"custom_handshaker,omitempty"`
 }
 
 func (x *CommonTlsContext) Reset() {
@@ -379,22 +443,36 @@ type isCommonTlsContext_ValidationContextType interface {
 }
 
 type CommonTlsContext_ValidationContext struct {
+	// How to validate peer certificates.
 	ValidationContext *CertificateValidationContext `protobuf:"bytes,3,opt,name=validation_context,json=validationContext,proto3,oneof"`
 }
 
 type CommonTlsContext_ValidationContextSdsSecretConfig struct {
+	// Config for fetching validation context via SDS API. Note SDS API allows certificates to be
+	// fetched/refreshed over the network asynchronously with respect to the TLS handshake.
 	ValidationContextSdsSecretConfig *SdsSecretConfig `protobuf:"bytes,7,opt,name=validation_context_sds_secret_config,json=validationContextSdsSecretConfig,proto3,oneof"`
 }
 
 type CommonTlsContext_CombinedValidationContext struct {
+	// Combined certificate validation context holds a default CertificateValidationContext
+	// and SDS config. When SDS server returns dynamic CertificateValidationContext, both dynamic
+	// and default CertificateValidationContext are merged into a new CertificateValidationContext
+	// for validation. This merge is done by Message::MergeFrom(), so dynamic
+	// CertificateValidationContext overwrites singular fields in default
+	// CertificateValidationContext, and concatenates repeated fields to default
+	// CertificateValidationContext, and logical OR is applied to boolean fields.
 	CombinedValidationContext *CommonTlsContext_CombinedCertificateValidationContext `protobuf:"bytes,8,opt,name=combined_validation_context,json=combinedValidationContext,proto3,oneof"`
 }
 
 type CommonTlsContext_ValidationContextCertificateProvider struct {
+	// Certificate provider for fetching validation context.
+	// [#not-implemented-hide:]
 	ValidationContextCertificateProvider *CommonTlsContext_CertificateProvider `protobuf:"bytes,10,opt,name=validation_context_certificate_provider,json=validationContextCertificateProvider,proto3,oneof"`
 }
 
 type CommonTlsContext_ValidationContextCertificateProviderInstance struct {
+	// Certificate provider instance for fetching validation context.
+	// [#not-implemented-hide:]
 	ValidationContextCertificateProviderInstance *CommonTlsContext_CertificateProviderInstance `protobuf:"bytes,12,opt,name=validation_context_certificate_provider_instance,json=validationContextCertificateProviderInstance,proto3,oneof"`
 }
 
@@ -411,12 +489,23 @@ func (*CommonTlsContext_ValidationContextCertificateProvider) isCommonTlsContext
 func (*CommonTlsContext_ValidationContextCertificateProviderInstance) isCommonTlsContext_ValidationContextType() {
 }
 
+// Config for Certificate provider to get certificates. This provider should allow certificates to be
+// fetched/refreshed over the network asynchronously with respect to the TLS handshake.
 type CommonTlsContext_CertificateProvider struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// opaque name used to specify certificate instances or types. For example, "ROOTCA" to specify
+	// a root-certificate (validation context) or "TLS" to specify a new tls-certificate.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Provider specific config.
+	// Note: an implementation is expected to dedup multiple instances of the same config
+	// to maintain a single certificate-provider instance. The sharing can happen, for
+	// example, among multiple clusters or between the tls_certificate and validation_context
+	// certificate providers of a cluster.
+	// This config could be supplied inline or (in future) a named xDS resource.
+	//
 	// Types that are assignable to Config:
 	//	*CommonTlsContext_CertificateProvider_TypedConfig
 	Config isCommonTlsContext_CertificateProvider_Config `protobuf_oneof:"config"`
@@ -486,12 +575,26 @@ type CommonTlsContext_CertificateProvider_TypedConfig struct {
 func (*CommonTlsContext_CertificateProvider_TypedConfig) isCommonTlsContext_CertificateProvider_Config() {
 }
 
+// Similar to CertificateProvider above, but allows the provider instances to be configured on
+// the client side instead of being sent from the control plane.
 type CommonTlsContext_CertificateProviderInstance struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	InstanceName    string `protobuf:"bytes,1,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty"`
+	// Provider instance name. This name must be defined in the client's configuration (e.g., a
+	// bootstrap file) to correspond to a provider instance (i.e., the same data in the typed_config
+	// field that would be sent in the CertificateProvider message if the config was sent by the
+	// control plane). If not present, defaults to "default".
+	//
+	// Instance names should generally be defined not in terms of the underlying provider
+	// implementation (e.g., "file_watcher") but rather in terms of the function of the
+	// certificates (e.g., "foo_deployment_identity").
+	InstanceName string `protobuf:"bytes,1,opt,name=instance_name,json=instanceName,proto3" json:"instance_name,omitempty"`
+	// Opaque name used to specify certificate instances or types. For example, "ROOTCA" to specify
+	// a root-certificate (validation context) or "example.com" to specify a certificate for a
+	// particular domain. Not all provider instances will actually use this field, so the value
+	// defaults to the empty string.
 	CertificateName string `protobuf:"bytes,2,opt,name=certificate_name,json=certificateName,proto3" json:"certificate_name,omitempty"`
 }
 
@@ -546,6 +649,7 @@ type CommonTlsContext_CombinedCertificateValidationContext struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// How to validate peer certificates.
 	DefaultValidationContext *CertificateValidationContext `protobuf:"bytes,1,opt,name=default_validation_context,json=defaultValidationContext,proto3" json:"default_validation_context,omitempty"`
 	// Types that are assignable to DynamicValidationContext:
 	//	*CommonTlsContext_CombinedCertificateValidationContext_ValidationContextSdsSecretConfig
@@ -626,14 +730,26 @@ type isCommonTlsContext_CombinedCertificateValidationContext_DynamicValidationCo
 }
 
 type CommonTlsContext_CombinedCertificateValidationContext_ValidationContextSdsSecretConfig struct {
+	// Config for fetching validation context via SDS API. Note SDS API allows certificates to be
+	// fetched/refreshed over the network asynchronously with respect to the TLS handshake.
+	// Only one of validation_context_sds_secret_config, validation_context_certificate_provider,
+	// or validation_context_certificate_provider_instance may be used.
 	ValidationContextSdsSecretConfig *SdsSecretConfig `protobuf:"bytes,2,opt,name=validation_context_sds_secret_config,json=validationContextSdsSecretConfig,proto3,oneof"`
 }
 
 type CommonTlsContext_CombinedCertificateValidationContext_ValidationContextCertificateProvider struct {
+	// Certificate provider for fetching validation context.
+	// Only one of validation_context_sds_secret_config, validation_context_certificate_provider,
+	// or validation_context_certificate_provider_instance may be used.
+	// [#not-implemented-hide:]
 	ValidationContextCertificateProvider *CommonTlsContext_CertificateProvider `protobuf:"bytes,3,opt,name=validation_context_certificate_provider,json=validationContextCertificateProvider,proto3,oneof"`
 }
 
 type CommonTlsContext_CombinedCertificateValidationContext_ValidationContextCertificateProviderInstance struct {
+	// Certificate provider instance for fetching validation context.
+	// Only one of validation_context_sds_secret_config, validation_context_certificate_provider,
+	// or validation_context_certificate_provider_instance may be used.
+	// [#not-implemented-hide:]
 	ValidationContextCertificateProviderInstance *CommonTlsContext_CertificateProviderInstance `protobuf:"bytes,4,opt,name=validation_context_certificate_provider_instance,json=validationContextCertificateProviderInstance,proto3,oneof"`
 }
 

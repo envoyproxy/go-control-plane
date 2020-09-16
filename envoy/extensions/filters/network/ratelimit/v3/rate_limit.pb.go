@@ -30,16 +30,29 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#next-free-field: 7]
 type RateLimit struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StatPrefix       string                      `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
-	Domain           string                      `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
-	Descriptors      []*v3.RateLimitDescriptor   `protobuf:"bytes,3,rep,name=descriptors,proto3" json:"descriptors,omitempty"`
-	Timeout          *duration.Duration          `protobuf:"bytes,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	FailureModeDeny  bool                        `protobuf:"varint,5,opt,name=failure_mode_deny,json=failureModeDeny,proto3" json:"failure_mode_deny,omitempty"`
+	// The prefix to use when emitting :ref:`statistics <config_network_filters_rate_limit_stats>`.
+	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	// The rate limit domain to use in the rate limit service request.
+	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
+	// The rate limit descriptor list to use in the rate limit service request.
+	Descriptors []*v3.RateLimitDescriptor `protobuf:"bytes,3,rep,name=descriptors,proto3" json:"descriptors,omitempty"`
+	// The timeout in milliseconds for the rate limit service RPC. If not
+	// set, this defaults to 20ms.
+	Timeout *duration.Duration `protobuf:"bytes,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// The filter's behaviour in case the rate limiting service does
+	// not respond back. When it is set to true, Envoy will not allow traffic in case of
+	// communication failure between rate limiting service and the proxy.
+	// Defaults to false.
+	FailureModeDeny bool `protobuf:"varint,5,opt,name=failure_mode_deny,json=failureModeDeny,proto3" json:"failure_mode_deny,omitempty"`
+	// Configuration for an external rate limit service provider. If not
+	// specified, any calls to the rate limit service will immediately return
+	// success.
 	RateLimitService *v31.RateLimitServiceConfig `protobuf:"bytes,6,opt,name=rate_limit_service,json=rateLimitService,proto3" json:"rate_limit_service,omitempty"`
 }
 

@@ -37,8 +37,11 @@ const _ = proto.ProtoPackageIsVersion4
 type ComparisonFilter_Op int32
 
 const (
+	// =
 	ComparisonFilter_EQ ComparisonFilter_Op = 0
+	// >=
 	ComparisonFilter_GE ComparisonFilter_Op = 1
+	// <=
 	ComparisonFilter_LE ComparisonFilter_Op = 2
 )
 
@@ -179,8 +182,25 @@ type AccessLog struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name   string           `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the access log implementation to instantiate. The name must
+	// match a statically registered access log. Current built-in loggers include:
+	//
+	// #. "envoy.access_loggers.file"
+	// #. "envoy.access_loggers.http_grpc"
+	// #. "envoy.access_loggers.tcp_grpc"
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Filter which is used to determine if the access log needs to be written.
 	Filter *AccessLogFilter `protobuf:"bytes,2,opt,name=filter,proto3" json:"filter,omitempty"`
+	// Custom configuration that depends on the access log being instantiated.
+	// Built-in configurations include:
+	//
+	// #. "envoy.access_loggers.file": :ref:`FileAccessLog
+	//    <envoy_api_msg_extensions.access_loggers.file.v3.FileAccessLog>`
+	// #. "envoy.access_loggers.http_grpc": :ref:`HttpGrpcAccessLogConfig
+	//    <envoy_api_msg_extensions.access_loggers.grpc.v3.HttpGrpcAccessLogConfig>`
+	// #. "envoy.access_loggers.tcp_grpc": :ref:`TcpGrpcAccessLogConfig
+	//    <envoy_api_msg_extensions.access_loggers.grpc.v3.TcpGrpcAccessLogConfig>`
+	//
 	// Types that are assignable to ConfigType:
 	//	*AccessLog_TypedConfig
 	//	*AccessLog_HiddenEnvoyDeprecatedConfig
@@ -272,6 +292,7 @@ func (*AccessLog_TypedConfig) isAccessLog_ConfigType() {}
 
 func (*AccessLog_HiddenEnvoyDeprecatedConfig) isAccessLog_ConfigType() {}
 
+// [#next-free-field: 13]
 type AccessLogFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -421,50 +442,62 @@ type isAccessLogFilter_FilterSpecifier interface {
 }
 
 type AccessLogFilter_StatusCodeFilter struct {
+	// Status code filter.
 	StatusCodeFilter *StatusCodeFilter `protobuf:"bytes,1,opt,name=status_code_filter,json=statusCodeFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_DurationFilter struct {
+	// Duration filter.
 	DurationFilter *DurationFilter `protobuf:"bytes,2,opt,name=duration_filter,json=durationFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_NotHealthCheckFilter struct {
+	// Not health check filter.
 	NotHealthCheckFilter *NotHealthCheckFilter `protobuf:"bytes,3,opt,name=not_health_check_filter,json=notHealthCheckFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_TraceableFilter struct {
+	// Traceable filter.
 	TraceableFilter *TraceableFilter `protobuf:"bytes,4,opt,name=traceable_filter,json=traceableFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_RuntimeFilter struct {
+	// Runtime filter.
 	RuntimeFilter *RuntimeFilter `protobuf:"bytes,5,opt,name=runtime_filter,json=runtimeFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_AndFilter struct {
+	// And filter.
 	AndFilter *AndFilter `protobuf:"bytes,6,opt,name=and_filter,json=andFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_OrFilter struct {
+	// Or filter.
 	OrFilter *OrFilter `protobuf:"bytes,7,opt,name=or_filter,json=orFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_HeaderFilter struct {
+	// Header filter.
 	HeaderFilter *HeaderFilter `protobuf:"bytes,8,opt,name=header_filter,json=headerFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_ResponseFlagFilter struct {
+	// Response flag filter.
 	ResponseFlagFilter *ResponseFlagFilter `protobuf:"bytes,9,opt,name=response_flag_filter,json=responseFlagFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_GrpcStatusFilter struct {
+	// gRPC status filter.
 	GrpcStatusFilter *GrpcStatusFilter `protobuf:"bytes,10,opt,name=grpc_status_filter,json=grpcStatusFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_ExtensionFilter struct {
+	// Extension filter.
 	ExtensionFilter *ExtensionFilter `protobuf:"bytes,11,opt,name=extension_filter,json=extensionFilter,proto3,oneof"`
 }
 
 type AccessLogFilter_MetadataFilter struct {
+	// Metadata Filter
 	MetadataFilter *MetadataFilter `protobuf:"bytes,12,opt,name=metadata_filter,json=metadataFilter,proto3,oneof"`
 }
 
@@ -492,13 +525,16 @@ func (*AccessLogFilter_ExtensionFilter) isAccessLogFilter_FilterSpecifier() {}
 
 func (*AccessLogFilter_MetadataFilter) isAccessLogFilter_FilterSpecifier() {}
 
+// Filter on an integer comparison.
 type ComparisonFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Op    ComparisonFilter_Op `protobuf:"varint,1,opt,name=op,proto3,enum=envoy.config.accesslog.v3.ComparisonFilter_Op" json:"op,omitempty"`
-	Value *v3.RuntimeUInt32   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	// Comparison operator.
+	Op ComparisonFilter_Op `protobuf:"varint,1,opt,name=op,proto3,enum=envoy.config.accesslog.v3.ComparisonFilter_Op" json:"op,omitempty"`
+	// Value to compare against.
+	Value *v3.RuntimeUInt32 `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (x *ComparisonFilter) Reset() {
@@ -547,11 +583,13 @@ func (x *ComparisonFilter) GetValue() *v3.RuntimeUInt32 {
 	return nil
 }
 
+// Filters on HTTP response/status code.
 type StatusCodeFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Comparison.
 	Comparison *ComparisonFilter `protobuf:"bytes,1,opt,name=comparison,proto3" json:"comparison,omitempty"`
 }
 
@@ -594,11 +632,13 @@ func (x *StatusCodeFilter) GetComparison() *ComparisonFilter {
 	return nil
 }
 
+// Filters on total request duration in milliseconds.
 type DurationFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Comparison.
 	Comparison *ComparisonFilter `protobuf:"bytes,1,opt,name=comparison,proto3" json:"comparison,omitempty"`
 }
 
@@ -641,6 +681,8 @@ func (x *DurationFilter) GetComparison() *ComparisonFilter {
 	return nil
 }
 
+// Filters for requests that are not health check requests. A health check
+// request is marked by the health check filter.
 type NotHealthCheckFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -679,6 +721,8 @@ func (*NotHealthCheckFilter) Descriptor() ([]byte, []int) {
 	return file_envoy_config_accesslog_v3_accesslog_proto_rawDescGZIP(), []int{5}
 }
 
+// Filters for requests that are traceable. See the tracing overview for more
+// information on how a request becomes traceable.
 type TraceableFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -717,14 +761,35 @@ func (*TraceableFilter) Descriptor() ([]byte, []int) {
 	return file_envoy_config_accesslog_v3_accesslog_proto_rawDescGZIP(), []int{6}
 }
 
+// Filters for random sampling of requests.
 type RuntimeFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	RuntimeKey               string                 `protobuf:"bytes,1,opt,name=runtime_key,json=runtimeKey,proto3" json:"runtime_key,omitempty"`
-	PercentSampled           *v31.FractionalPercent `protobuf:"bytes,2,opt,name=percent_sampled,json=percentSampled,proto3" json:"percent_sampled,omitempty"`
-	UseIndependentRandomness bool                   `protobuf:"varint,3,opt,name=use_independent_randomness,json=useIndependentRandomness,proto3" json:"use_independent_randomness,omitempty"`
+	// Runtime key to get an optional overridden numerator for use in the
+	// *percent_sampled* field. If found in runtime, this value will replace the
+	// default numerator.
+	RuntimeKey string `protobuf:"bytes,1,opt,name=runtime_key,json=runtimeKey,proto3" json:"runtime_key,omitempty"`
+	// The default sampling percentage. If not specified, defaults to 0% with
+	// denominator of 100.
+	PercentSampled *v31.FractionalPercent `protobuf:"bytes,2,opt,name=percent_sampled,json=percentSampled,proto3" json:"percent_sampled,omitempty"`
+	// By default, sampling pivots on the header
+	// :ref:`x-request-id<config_http_conn_man_headers_x-request-id>` being
+	// present. If :ref:`x-request-id<config_http_conn_man_headers_x-request-id>`
+	// is present, the filter will consistently sample across multiple hosts based
+	// on the runtime key value and the value extracted from
+	// :ref:`x-request-id<config_http_conn_man_headers_x-request-id>`. If it is
+	// missing, or *use_independent_randomness* is set to true, the filter will
+	// randomly sample based on the runtime key value alone.
+	// *use_independent_randomness* can be used for logging kill switches within
+	// complex nested :ref:`AndFilter
+	// <envoy_api_msg_config.accesslog.v3.AndFilter>` and :ref:`OrFilter
+	// <envoy_api_msg_config.accesslog.v3.OrFilter>` blocks that are easier to
+	// reason about from a probability perspective (i.e., setting to true will
+	// cause the filter to behave like an independent random variable when
+	// composed within logical operator filters).
+	UseIndependentRandomness bool `protobuf:"varint,3,opt,name=use_independent_randomness,json=useIndependentRandomness,proto3" json:"use_independent_randomness,omitempty"`
 }
 
 func (x *RuntimeFilter) Reset() {
@@ -780,6 +845,9 @@ func (x *RuntimeFilter) GetUseIndependentRandomness() bool {
 	return false
 }
 
+// Performs a logical “and” operation on the result of each filter in filters.
+// Filters are evaluated sequentially and if one of them returns false, the
+// filter returns false immediately.
 type AndFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -827,6 +895,9 @@ func (x *AndFilter) GetFilters() []*AccessLogFilter {
 	return nil
 }
 
+// Performs a logical “or” operation on the result of each individual filter.
+// Filters are evaluated sequentially and if one of them returns true, the
+// filter returns true immediately.
 type OrFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -874,11 +945,14 @@ func (x *OrFilter) GetFilters() []*AccessLogFilter {
 	return nil
 }
 
+// Filters requests based on the presence or value of a request header.
 type HeaderFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Only requests with a header which matches the specified HeaderMatcher will
+	// pass the filter check.
 	Header *v32.HeaderMatcher `protobuf:"bytes,1,opt,name=header,proto3" json:"header,omitempty"`
 }
 
@@ -921,11 +995,18 @@ func (x *HeaderFilter) GetHeader() *v32.HeaderMatcher {
 	return nil
 }
 
+// Filters requests that received responses with an Envoy response flag set.
+// A list of the response flags can be found
+// in the access log formatter
+// :ref:`documentation<config_access_log_format_response_flags>`.
 type ResponseFlagFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Only responses with the any of the flags listed in this field will be
+	// logged. This field is optional. If it is not specified, then any response
+	// flag will pass the filter check.
 	Flags []string `protobuf:"bytes,1,rep,name=flags,proto3" json:"flags,omitempty"`
 }
 
@@ -968,13 +1049,19 @@ func (x *ResponseFlagFilter) GetFlags() []string {
 	return nil
 }
 
+// Filters gRPC requests based on their response status. If a gRPC status is not
+// provided, the filter will infer the status from the HTTP status code.
 type GrpcStatusFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Logs only responses that have any one of the gRPC statuses in this field.
 	Statuses []GrpcStatusFilter_Status `protobuf:"varint,1,rep,packed,name=statuses,proto3,enum=envoy.config.accesslog.v3.GrpcStatusFilter_Status" json:"statuses,omitempty"`
-	Exclude  bool                      `protobuf:"varint,2,opt,name=exclude,proto3" json:"exclude,omitempty"`
+	// If included and set to true, the filter will instead block all responses
+	// with a gRPC status or inferred gRPC status enumerated in statuses, and
+	// allow all other responses.
+	Exclude bool `protobuf:"varint,2,opt,name=exclude,proto3" json:"exclude,omitempty"`
 }
 
 func (x *GrpcStatusFilter) Reset() {
@@ -1023,13 +1110,24 @@ func (x *GrpcStatusFilter) GetExclude() bool {
 	return false
 }
 
+// Filters based on matching dynamic metadata.
+// If the matcher path and key correspond to an existing key in dynamic
+// metadata, the request is logged only if the matcher value is equal to the
+// metadata value. If the matcher path and key *do not* correspond to an
+// existing key in dynamic metadata, the request is logged only if
+// match_if_key_not_found is "true" or unset.
 type MetadataFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Matcher            *v33.MetadataMatcher `protobuf:"bytes,1,opt,name=matcher,proto3" json:"matcher,omitempty"`
-	MatchIfKeyNotFound *wrappers.BoolValue  `protobuf:"bytes,2,opt,name=match_if_key_not_found,json=matchIfKeyNotFound,proto3" json:"match_if_key_not_found,omitempty"`
+	// Matcher to check metadata for specified value. For example, to match on the
+	// access_log_hint metadata, set the filter to "envoy.common" and the path to
+	// "access_log_hint", and the value to "true".
+	Matcher *v33.MetadataMatcher `protobuf:"bytes,1,opt,name=matcher,proto3" json:"matcher,omitempty"`
+	// Default result if the key does not exist in dynamic metadata: if unset or
+	// true, then log; if false, then don't log.
+	MatchIfKeyNotFound *wrappers.BoolValue `protobuf:"bytes,2,opt,name=match_if_key_not_found,json=matchIfKeyNotFound,proto3" json:"match_if_key_not_found,omitempty"`
 }
 
 func (x *MetadataFilter) Reset() {
@@ -1078,12 +1176,17 @@ func (x *MetadataFilter) GetMatchIfKeyNotFound() *wrappers.BoolValue {
 	return nil
 }
 
+// Extension filter is statically registered at runtime.
 type ExtensionFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the filter implementation to instantiate. The name must
+	// match a statically registered filter.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Custom configuration that depends on the filter being instantiated.
+	//
 	// Types that are assignable to ConfigType:
 	//	*ExtensionFilter_TypedConfig
 	//	*ExtensionFilter_HiddenEnvoyDeprecatedConfig

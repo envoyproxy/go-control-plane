@@ -32,6 +32,7 @@ type Config struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Response data as a data source.
 	Response *v3.DataSource `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
 }
 

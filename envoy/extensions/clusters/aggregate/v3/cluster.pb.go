@@ -27,11 +27,16 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Configuration for the aggregate cluster. See the :ref:`architecture overview
+// <arch_overview_aggregate_cluster>` for more information.
+// [#extension: envoy.clusters.aggregate]
 type ClusterConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Load balancing clusters in aggregate cluster. Clusters are prioritized based on the order they
+	// appear in this list.
 	Clusters []string `protobuf:"bytes,1,rep,name=clusters,proto3" json:"clusters,omitempty"`
 }
 

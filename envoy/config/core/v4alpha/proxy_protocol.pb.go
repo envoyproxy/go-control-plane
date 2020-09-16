@@ -30,7 +30,9 @@ const _ = proto.ProtoPackageIsVersion4
 type ProxyProtocolConfig_Version int32
 
 const (
+	// PROXY protocol version 1. Human readable format.
 	ProxyProtocolConfig_V1 ProxyProtocolConfig_Version = 0
+	// PROXY protocol version 2. Binary format.
 	ProxyProtocolConfig_V2 ProxyProtocolConfig_Version = 1
 )
 
@@ -78,6 +80,7 @@ type ProxyProtocolConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The PROXY protocol version to use. See https://www.haproxy.org/download/2.1/doc/proxy-protocol.txt for details
 	Version ProxyProtocolConfig_Version `protobuf:"varint,1,opt,name=version,proto3,enum=envoy.config.core.v4alpha.ProxyProtocolConfig_Version" json:"version,omitempty"`
 }
 

@@ -28,6 +28,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#not-implemented-hide:]
+// Configuration specific to the Udp Gso Batch Writer.
 type UdpGsoBatchWriterOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

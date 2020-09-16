@@ -29,10 +29,13 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Defines the version of the standard to use for X-RateLimit headers.
 type RateLimit_XRateLimitHeadersRFCVersion int32
 
 const (
-	RateLimit_OFF              RateLimit_XRateLimitHeadersRFCVersion = 0
+	// X-RateLimit headers disabled.
+	RateLimit_OFF RateLimit_XRateLimitHeadersRFCVersion = 0
+	// Use `draft RFC Version 03 <https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html>`_.
 	RateLimit_DRAFT_VERSION_03 RateLimit_XRateLimitHeadersRFCVersion = 1
 )
 
@@ -78,9 +81,12 @@ func (RateLimit_XRateLimitHeadersRFCVersion) EnumDescriptor() ([]byte, []int) {
 type RateLimitPerRoute_VhRateLimitsOptions int32
 
 const (
+	// Use the virtual host rate limits unless the route has a rate limit policy.
 	RateLimitPerRoute_OVERRIDE RateLimitPerRoute_VhRateLimitsOptions = 0
-	RateLimitPerRoute_INCLUDE  RateLimitPerRoute_VhRateLimitsOptions = 1
-	RateLimitPerRoute_IGNORE   RateLimitPerRoute_VhRateLimitsOptions = 2
+	// Use the virtual host rate limits even if the route has a rate limit policy.
+	RateLimitPerRoute_INCLUDE RateLimitPerRoute_VhRateLimitsOptions = 1
+	// Ignore the virtual host rate limits even if the route does not have a rate limit policy.
+	RateLimitPerRoute_IGNORE RateLimitPerRoute_VhRateLimitsOptions = 2
 )
 
 // Enum value maps for RateLimitPerRoute_VhRateLimitsOptions.
@@ -124,19 +130,68 @@ func (RateLimitPerRoute_VhRateLimitsOptions) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{1, 0}
 }
 
+// [#next-free-field: 9]
 type RateLimit struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Domain                         string                                `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
-	Stage                          uint32                                `protobuf:"varint,2,opt,name=stage,proto3" json:"stage,omitempty"`
-	RequestType                    string                                `protobuf:"bytes,3,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
-	Timeout                        *duration.Duration                    `protobuf:"bytes,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	FailureModeDeny                bool                                  `protobuf:"varint,5,opt,name=failure_mode_deny,json=failureModeDeny,proto3" json:"failure_mode_deny,omitempty"`
-	RateLimitedAsResourceExhausted bool                                  `protobuf:"varint,6,opt,name=rate_limited_as_resource_exhausted,json=rateLimitedAsResourceExhausted,proto3" json:"rate_limited_as_resource_exhausted,omitempty"`
-	RateLimitService               *v3.RateLimitServiceConfig            `protobuf:"bytes,7,opt,name=rate_limit_service,json=rateLimitService,proto3" json:"rate_limit_service,omitempty"`
-	EnableXRatelimitHeaders        RateLimit_XRateLimitHeadersRFCVersion `protobuf:"varint,8,opt,name=enable_x_ratelimit_headers,json=enableXRatelimitHeaders,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimit_XRateLimitHeadersRFCVersion" json:"enable_x_ratelimit_headers,omitempty"`
+	// The rate limit domain to use when calling the rate limit service.
+	Domain string `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
+	// Specifies the rate limit configurations to be applied with the same
+	// stage number. If not set, the default stage number is 0.
+	//
+	// .. note::
+	//
+	//  The filter supports a range of 0 - 10 inclusively for stage numbers.
+	Stage uint32 `protobuf:"varint,2,opt,name=stage,proto3" json:"stage,omitempty"`
+	// The type of requests the filter should apply to. The supported
+	// types are *internal*, *external* or *both*. A request is considered internal if
+	// :ref:`x-envoy-internal<config_http_conn_man_headers_x-envoy-internal>` is set to true. If
+	// :ref:`x-envoy-internal<config_http_conn_man_headers_x-envoy-internal>` is not set or false, a
+	// request is considered external. The filter defaults to *both*, and it will apply to all request
+	// types.
+	RequestType string `protobuf:"bytes,3,opt,name=request_type,json=requestType,proto3" json:"request_type,omitempty"`
+	// The timeout in milliseconds for the rate limit service RPC. If not
+	// set, this defaults to 20ms.
+	Timeout *duration.Duration `protobuf:"bytes,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// The filter's behaviour in case the rate limiting service does
+	// not respond back. When it is set to true, Envoy will not allow traffic in case of
+	// communication failure between rate limiting service and the proxy.
+	// Defaults to false.
+	FailureModeDeny bool `protobuf:"varint,5,opt,name=failure_mode_deny,json=failureModeDeny,proto3" json:"failure_mode_deny,omitempty"`
+	// Specifies whether a `RESOURCE_EXHAUSTED` gRPC code must be returned instead
+	// of the default `UNAVAILABLE` gRPC code for a rate limited gRPC call. The
+	// HTTP code will be 200 for a gRPC response.
+	RateLimitedAsResourceExhausted bool `protobuf:"varint,6,opt,name=rate_limited_as_resource_exhausted,json=rateLimitedAsResourceExhausted,proto3" json:"rate_limited_as_resource_exhausted,omitempty"`
+	// Configuration for an external rate limit service provider. If not
+	// specified, any calls to the rate limit service will immediately return
+	// success.
+	RateLimitService *v3.RateLimitServiceConfig `protobuf:"bytes,7,opt,name=rate_limit_service,json=rateLimitService,proto3" json:"rate_limit_service,omitempty"`
+	// Defines the standard version to use for X-RateLimit headers emitted by the filter:
+	//
+	// * ``X-RateLimit-Limit`` - indicates the request-quota associated to the
+	//   client in the current time-window followed by the description of the
+	//   quota policy. The values are returned by the rate limiting service in
+	//   :ref:`current_limit<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.current_limit>`
+	//   field. Example: `10, 10;w=1;name="per-ip", 1000;w=3600`.
+	// * ``X-RateLimit-Remaining`` - indicates the remaining requests in the
+	//   current time-window. The values are returned by the rate limiting service
+	//   in :ref:`limit_remaining<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.limit_remaining>`
+	//   field.
+	// * ``X-RateLimit-Reset`` - indicates the number of seconds until reset of
+	//   the current time-window. The values are returned by the rate limiting service
+	//   in :ref:`duration_until_reset<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.duration_until_reset>`
+	//   field.
+	//
+	// In case rate limiting policy specifies more then one time window, the values
+	// above represent the window that is closest to reaching its limit.
+	//
+	// For more information about the headers specification see selected version of
+	// the `draft RFC <https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html>`_.
+	//
+	// Disabled by default.
+	EnableXRatelimitHeaders RateLimit_XRateLimitHeadersRFCVersion `protobuf:"varint,8,opt,name=enable_x_ratelimit_headers,json=enableXRatelimitHeaders,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimit_XRateLimitHeadersRFCVersion" json:"enable_x_ratelimit_headers,omitempty"`
 }
 
 func (x *RateLimit) Reset() {
@@ -232,6 +287,7 @@ type RateLimitPerRoute struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Specifies if the rate limit filter should include the virtual host rate limits.
 	VhRateLimits RateLimitPerRoute_VhRateLimitsOptions `protobuf:"varint,1,opt,name=vh_rate_limits,json=vhRateLimits,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute_VhRateLimitsOptions" json:"vh_rate_limits,omitempty"`
 }
 

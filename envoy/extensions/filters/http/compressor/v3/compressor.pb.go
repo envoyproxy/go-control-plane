@@ -30,17 +30,38 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#next-free-field: 7]
 type Compressor struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ContentLength              *wrappers.UInt32Value    `protobuf:"bytes,1,opt,name=content_length,json=contentLength,proto3" json:"content_length,omitempty"`
-	ContentType                []string                 `protobuf:"bytes,2,rep,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
-	DisableOnEtagHeader        bool                     `protobuf:"varint,3,opt,name=disable_on_etag_header,json=disableOnEtagHeader,proto3" json:"disable_on_etag_header,omitempty"`
-	RemoveAcceptEncodingHeader bool                     `protobuf:"varint,4,opt,name=remove_accept_encoding_header,json=removeAcceptEncodingHeader,proto3" json:"remove_accept_encoding_header,omitempty"`
-	RuntimeEnabled             *v3.RuntimeFeatureFlag   `protobuf:"bytes,5,opt,name=runtime_enabled,json=runtimeEnabled,proto3" json:"runtime_enabled,omitempty"`
-	CompressorLibrary          *v3.TypedExtensionConfig `protobuf:"bytes,6,opt,name=compressor_library,json=compressorLibrary,proto3" json:"compressor_library,omitempty"`
+	// Minimum response length, in bytes, which will trigger compression. The default value is 30.
+	ContentLength *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=content_length,json=contentLength,proto3" json:"content_length,omitempty"`
+	// Set of strings that allows specifying which mime-types yield compression; e.g.,
+	// application/json, text/html, etc. When this field is not defined, compression will be applied
+	// to the following mime-types: "application/javascript", "application/json",
+	// "application/xhtml+xml", "image/svg+xml", "text/css", "text/html", "text/plain", "text/xml"
+	// and their synonyms.
+	ContentType []string `protobuf:"bytes,2,rep,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	// If true, disables compression when the response contains an etag header. When it is false, the
+	// filter will preserve weak etags and remove the ones that require strong validation.
+	DisableOnEtagHeader bool `protobuf:"varint,3,opt,name=disable_on_etag_header,json=disableOnEtagHeader,proto3" json:"disable_on_etag_header,omitempty"`
+	// If true, removes accept-encoding from the request headers before dispatching it to the upstream
+	// so that responses do not get compressed before reaching the filter.
+	// .. attention:
+	//
+	//    To avoid interfering with other compression filters in the same chain use this option in
+	//    the filter closest to the upstream.
+	RemoveAcceptEncodingHeader bool `protobuf:"varint,4,opt,name=remove_accept_encoding_header,json=removeAcceptEncodingHeader,proto3" json:"remove_accept_encoding_header,omitempty"`
+	// Runtime flag that controls whether the filter is enabled or not. If set to false, the
+	// filter will operate as a pass-through filter. If not specified, defaults to enabled.
+	RuntimeEnabled *v3.RuntimeFeatureFlag `protobuf:"bytes,5,opt,name=runtime_enabled,json=runtimeEnabled,proto3" json:"runtime_enabled,omitempty"`
+	// A compressor library to use for compression. Currently only
+	// :ref:`envoy.compression.gzip.compressor<envoy_api_msg_extensions.compression.gzip.compressor.v3.Gzip>`
+	// is included in Envoy.
+	// This field is ignored if used in the context of the gzip http-filter, but is mandatory otherwise.
+	CompressorLibrary *v3.TypedExtensionConfig `protobuf:"bytes,6,opt,name=compressor_library,json=compressorLibrary,proto3" json:"compressor_library,omitempty"`
 }
 
 func (x *Compressor) Reset() {

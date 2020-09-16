@@ -32,6 +32,7 @@ type GenericSecret struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Secret of generic type and is available to filters.
 	Secret *core.DataSource `protobuf:"bytes,1,opt,name=secret,proto3" json:"secret,omitempty"`
 }
 
@@ -79,6 +80,9 @@ type SdsSecretConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Name (FQDN, UUID, SPKI, SHA256, etc.) by which the secret can be uniquely referred to.
+	// When both name and config are specified, then secret can be fetched and/or reloaded via
+	// SDS. When only name is specified, then secret will be loaded from static resources.
 	Name      string             `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	SdsConfig *core.ConfigSource `protobuf:"bytes,2,opt,name=sds_config,json=sdsConfig,proto3" json:"sds_config,omitempty"`
 }
@@ -129,11 +133,13 @@ func (x *SdsSecretConfig) GetSdsConfig() *core.ConfigSource {
 	return nil
 }
 
+// [#next-free-field: 6]
 type Secret struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Name (FQDN, UUID, SPKI, SHA256, etc.) by which the secret can be uniquely referred to.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to Type:
 	//	*Secret_TlsCertificate

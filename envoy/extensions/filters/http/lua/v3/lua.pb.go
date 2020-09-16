@@ -33,7 +33,28 @@ type Lua struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	InlineCode  string                    `protobuf:"bytes,1,opt,name=inline_code,json=inlineCode,proto3" json:"inline_code,omitempty"`
+	// The Lua code that Envoy will execute. This can be a very small script that
+	// further loads code from disk if desired. Note that if JSON configuration is used, the code must
+	// be properly escaped. YAML configuration may be easier to read since YAML supports multi-line
+	// strings so complex scripts can be easily expressed inline in the configuration.
+	InlineCode string `protobuf:"bytes,1,opt,name=inline_code,json=inlineCode,proto3" json:"inline_code,omitempty"`
+	// Map of named Lua source codes that can be referenced in :ref:`LuaPerRoute
+	// <envoy_v3_api_msg_extensions.filters.http.lua.v3.LuaPerRoute>`. The Lua source codes can be
+	// loaded from inline string or local files.
+	//
+	// Example:
+	//
+	// .. code-block:: yaml
+	//
+	//   source_codes:
+	//     hello.lua:
+	//       inline_string: |
+	//         function envoy_on_response(response_handle)
+	//           -- Do something.
+	//         end
+	//     world.lua:
+	//       filename: /etc/lua/world.lua
+	//
 	SourceCodes map[string]*v3.DataSource `protobuf:"bytes,2,rep,name=source_codes,json=sourceCodes,proto3" json:"source_codes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -160,14 +181,19 @@ type isLuaPerRoute_Override interface {
 }
 
 type LuaPerRoute_Disabled struct {
+	// Disable the Lua filter for this particular vhost or route. If disabled is specified in
+	// multiple per-filter-configs, the most specific one will be used.
 	Disabled bool `protobuf:"varint,1,opt,name=disabled,proto3,oneof"`
 }
 
 type LuaPerRoute_Name struct {
+	// A name of a Lua source code stored in
+	// :ref:`Lua.source_codes <envoy_v3_api_field_extensions.filters.http.lua.v3.Lua.source_codes>`.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3,oneof"`
 }
 
 type LuaPerRoute_SourceCode struct {
+	// A configured per-route Lua source code that can be served by RDS or provided inline.
 	SourceCode *v3.DataSource `protobuf:"bytes,3,opt,name=source_code,json=sourceCode,proto3,oneof"`
 }
 

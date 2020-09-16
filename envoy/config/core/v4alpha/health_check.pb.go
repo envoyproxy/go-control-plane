@@ -34,15 +34,27 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Endpoint health status.
 type HealthStatus int32
 
 const (
-	HealthStatus_UNKNOWN   HealthStatus = 0
-	HealthStatus_HEALTHY   HealthStatus = 1
+	// The health status is not known. This is interpreted by Envoy as *HEALTHY*.
+	HealthStatus_UNKNOWN HealthStatus = 0
+	// Healthy.
+	HealthStatus_HEALTHY HealthStatus = 1
+	// Unhealthy.
 	HealthStatus_UNHEALTHY HealthStatus = 2
-	HealthStatus_DRAINING  HealthStatus = 3
-	HealthStatus_TIMEOUT   HealthStatus = 4
-	HealthStatus_DEGRADED  HealthStatus = 5
+	// Connection draining in progress. E.g.,
+	// `<https://aws.amazon.com/blogs/aws/elb-connection-draining-remove-instances-from-service-with-care/>`_
+	// or
+	// `<https://cloud.google.com/compute/docs/load-balancing/enabling-connection-draining>`_.
+	// This is interpreted by Envoy as *UNHEALTHY*.
+	HealthStatus_DRAINING HealthStatus = 3
+	// Health check timed out. This is part of HDS and is interpreted by Envoy as
+	// *UNHEALTHY*.
+	HealthStatus_TIMEOUT HealthStatus = 4
+	// Degraded.
+	HealthStatus_DEGRADED HealthStatus = 5
 )
 
 // Enum value maps for HealthStatus.
@@ -92,35 +104,121 @@ func (HealthStatus) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_config_core_v4alpha_health_check_proto_rawDescGZIP(), []int{0}
 }
 
+// [#next-free-field: 24]
 type HealthCheck struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Timeout               *duration.Duration    `protobuf:"bytes,1,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Interval              *duration.Duration    `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
-	InitialJitter         *duration.Duration    `protobuf:"bytes,20,opt,name=initial_jitter,json=initialJitter,proto3" json:"initial_jitter,omitempty"`
-	IntervalJitter        *duration.Duration    `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter,proto3" json:"interval_jitter,omitempty"`
-	IntervalJitterPercent uint32                `protobuf:"varint,18,opt,name=interval_jitter_percent,json=intervalJitterPercent,proto3" json:"interval_jitter_percent,omitempty"`
-	UnhealthyThreshold    *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold,proto3" json:"unhealthy_threshold,omitempty"`
-	HealthyThreshold      *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold,proto3" json:"healthy_threshold,omitempty"`
-	AltPort               *wrappers.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort,proto3" json:"alt_port,omitempty"`
-	ReuseConnection       *wrappers.BoolValue   `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection,proto3" json:"reuse_connection,omitempty"`
+	// The time to wait for a health check response. If the timeout is reached the
+	// health check attempt will be considered a failure.
+	Timeout *duration.Duration `protobuf:"bytes,1,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// The interval between health checks.
+	Interval *duration.Duration `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
+	// An optional jitter amount in milliseconds. If specified, Envoy will start health
+	// checking after for a random time in ms between 0 and initial_jitter. This only
+	// applies to the first health check.
+	InitialJitter *duration.Duration `protobuf:"bytes,20,opt,name=initial_jitter,json=initialJitter,proto3" json:"initial_jitter,omitempty"`
+	// An optional jitter amount in milliseconds. If specified, during every
+	// interval Envoy will add interval_jitter to the wait time.
+	IntervalJitter *duration.Duration `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter,proto3" json:"interval_jitter,omitempty"`
+	// An optional jitter amount as a percentage of interval_ms. If specified,
+	// during every interval Envoy will add interval_ms *
+	// interval_jitter_percent / 100 to the wait time.
+	//
+	// If interval_jitter_ms and interval_jitter_percent are both set, both of
+	// them will be used to increase the wait time.
+	IntervalJitterPercent uint32 `protobuf:"varint,18,opt,name=interval_jitter_percent,json=intervalJitterPercent,proto3" json:"interval_jitter_percent,omitempty"`
+	// The number of unhealthy health checks required before a host is marked
+	// unhealthy. Note that for *http* health checking if a host responds with 503
+	// this threshold is ignored and the host is considered unhealthy immediately.
+	UnhealthyThreshold *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold,proto3" json:"unhealthy_threshold,omitempty"`
+	// The number of healthy health checks required before a host is marked
+	// healthy. Note that during startup, only a single successful health check is
+	// required to mark a host healthy.
+	HealthyThreshold *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold,proto3" json:"healthy_threshold,omitempty"`
+	// [#not-implemented-hide:] Non-serving port for health checking.
+	AltPort *wrappers.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort,proto3" json:"alt_port,omitempty"`
+	// Reuse health check connection between health checks. Default is true.
+	ReuseConnection *wrappers.BoolValue `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection,proto3" json:"reuse_connection,omitempty"`
 	// Types that are assignable to HealthChecker:
 	//	*HealthCheck_HttpHealthCheck_
 	//	*HealthCheck_TcpHealthCheck_
 	//	*HealthCheck_GrpcHealthCheck_
 	//	*HealthCheck_CustomHealthCheck_
-	HealthChecker                isHealthCheck_HealthChecker `protobuf_oneof:"health_checker"`
-	NoTrafficInterval            *duration.Duration          `protobuf:"bytes,12,opt,name=no_traffic_interval,json=noTrafficInterval,proto3" json:"no_traffic_interval,omitempty"`
-	UnhealthyInterval            *duration.Duration          `protobuf:"bytes,14,opt,name=unhealthy_interval,json=unhealthyInterval,proto3" json:"unhealthy_interval,omitempty"`
-	UnhealthyEdgeInterval        *duration.Duration          `protobuf:"bytes,15,opt,name=unhealthy_edge_interval,json=unhealthyEdgeInterval,proto3" json:"unhealthy_edge_interval,omitempty"`
-	HealthyEdgeInterval          *duration.Duration          `protobuf:"bytes,16,opt,name=healthy_edge_interval,json=healthyEdgeInterval,proto3" json:"healthy_edge_interval,omitempty"`
-	EventLogPath                 string                      `protobuf:"bytes,17,opt,name=event_log_path,json=eventLogPath,proto3" json:"event_log_path,omitempty"`
-	EventService                 *EventServiceConfig         `protobuf:"bytes,22,opt,name=event_service,json=eventService,proto3" json:"event_service,omitempty"`
-	AlwaysLogHealthCheckFailures bool                        `protobuf:"varint,19,opt,name=always_log_health_check_failures,json=alwaysLogHealthCheckFailures,proto3" json:"always_log_health_check_failures,omitempty"`
-	TlsOptions                   *HealthCheck_TlsOptions     `protobuf:"bytes,21,opt,name=tls_options,json=tlsOptions,proto3" json:"tls_options,omitempty"`
-	TransportSocketMatchCriteria *_struct.Struct             `protobuf:"bytes,23,opt,name=transport_socket_match_criteria,json=transportSocketMatchCriteria,proto3" json:"transport_socket_match_criteria,omitempty"`
+	HealthChecker isHealthCheck_HealthChecker `protobuf_oneof:"health_checker"`
+	// The "no traffic interval" is a special health check interval that is used when a cluster has
+	// never had traffic routed to it. This lower interval allows cluster information to be kept up to
+	// date, without sending a potentially large amount of active health checking traffic for no
+	// reason. Once a cluster has been used for traffic routing, Envoy will shift back to using the
+	// standard health check interval that is defined. Note that this interval takes precedence over
+	// any other.
+	//
+	// The default value for "no traffic interval" is 60 seconds.
+	NoTrafficInterval *duration.Duration `protobuf:"bytes,12,opt,name=no_traffic_interval,json=noTrafficInterval,proto3" json:"no_traffic_interval,omitempty"`
+	// The "unhealthy interval" is a health check interval that is used for hosts that are marked as
+	// unhealthy. As soon as the host is marked as healthy, Envoy will shift back to using the
+	// standard health check interval that is defined.
+	//
+	// The default value for "unhealthy interval" is the same as "interval".
+	UnhealthyInterval *duration.Duration `protobuf:"bytes,14,opt,name=unhealthy_interval,json=unhealthyInterval,proto3" json:"unhealthy_interval,omitempty"`
+	// The "unhealthy edge interval" is a special health check interval that is used for the first
+	// health check right after a host is marked as unhealthy. For subsequent health checks
+	// Envoy will shift back to using either "unhealthy interval" if present or the standard health
+	// check interval that is defined.
+	//
+	// The default value for "unhealthy edge interval" is the same as "unhealthy interval".
+	UnhealthyEdgeInterval *duration.Duration `protobuf:"bytes,15,opt,name=unhealthy_edge_interval,json=unhealthyEdgeInterval,proto3" json:"unhealthy_edge_interval,omitempty"`
+	// The "healthy edge interval" is a special health check interval that is used for the first
+	// health check right after a host is marked as healthy. For subsequent health checks
+	// Envoy will shift back to using the standard health check interval that is defined.
+	//
+	// The default value for "healthy edge interval" is the same as the default interval.
+	HealthyEdgeInterval *duration.Duration `protobuf:"bytes,16,opt,name=healthy_edge_interval,json=healthyEdgeInterval,proto3" json:"healthy_edge_interval,omitempty"`
+	// Specifies the path to the :ref:`health check event log <arch_overview_health_check_logging>`.
+	// If empty, no event log will be written.
+	EventLogPath string `protobuf:"bytes,17,opt,name=event_log_path,json=eventLogPath,proto3" json:"event_log_path,omitempty"`
+	// [#not-implemented-hide:]
+	// The gRPC service for the health check event service.
+	// If empty, health check events won't be sent to a remote endpoint.
+	EventService *EventServiceConfig `protobuf:"bytes,22,opt,name=event_service,json=eventService,proto3" json:"event_service,omitempty"`
+	// If set to true, health check failure events will always be logged. If set to false, only the
+	// initial health check failure event will be logged.
+	// The default value is false.
+	AlwaysLogHealthCheckFailures bool `protobuf:"varint,19,opt,name=always_log_health_check_failures,json=alwaysLogHealthCheckFailures,proto3" json:"always_log_health_check_failures,omitempty"`
+	// This allows overriding the cluster TLS settings, just for health check connections.
+	TlsOptions *HealthCheck_TlsOptions `protobuf:"bytes,21,opt,name=tls_options,json=tlsOptions,proto3" json:"tls_options,omitempty"`
+	// Optional key/value pairs that will be used to match a transport socket from those specified in the cluster's
+	// :ref:`tranport socket matches <envoy_api_field_config.cluster.v4alpha.Cluster.transport_socket_matches>`.
+	// For example, the following match criteria
+	//
+	// .. code-block:: yaml
+	//
+	//  transport_socket_match_criteria:
+	//    useMTLS: true
+	//
+	// Will match the following :ref:`cluster socket match <envoy_api_msg_config.cluster.v4alpha.Cluster.TransportSocketMatch>`
+	//
+	// .. code-block:: yaml
+	//
+	//  transport_socket_matches:
+	//  - name: "useMTLS"
+	//    match:
+	//      useMTLS: true
+	//    transport_socket:
+	//      name: envoy.transport_sockets.tls
+	//      config: { ... } # tls socket configuration
+	//
+	// If this field is set, then for health checks it will supersede an entry of *envoy.transport_socket* in the
+	// :ref:`LbEndpoint.Metadata <envoy_api_field_config.endpoint.v3.LbEndpoint.metadata>`.
+	// This allows using different transport socket capabilities for health checking versus proxying to the
+	// endpoint.
+	//
+	// If the key/values pairs specified do not match any
+	// :ref:`transport socket matches <envoy_api_field_config.cluster.v4alpha.Cluster.transport_socket_matches>`,
+	// the cluster's :ref:`transport socket <envoy_api_field_config.cluster.v4alpha.Cluster.transport_socket>`
+	// will be used for health check socket configuration.
+	TransportSocketMatchCriteria *_struct.Struct `protobuf:"bytes,23,opt,name=transport_socket_match_criteria,json=transportSocketMatchCriteria,proto3" json:"transport_socket_match_criteria,omitempty"`
 }
 
 func (x *HealthCheck) Reset() {
@@ -321,18 +419,22 @@ type isHealthCheck_HealthChecker interface {
 }
 
 type HealthCheck_HttpHealthCheck_ struct {
+	// HTTP health check.
 	HttpHealthCheck *HealthCheck_HttpHealthCheck `protobuf:"bytes,8,opt,name=http_health_check,json=httpHealthCheck,proto3,oneof"`
 }
 
 type HealthCheck_TcpHealthCheck_ struct {
+	// TCP health check.
 	TcpHealthCheck *HealthCheck_TcpHealthCheck `protobuf:"bytes,9,opt,name=tcp_health_check,json=tcpHealthCheck,proto3,oneof"`
 }
 
 type HealthCheck_GrpcHealthCheck_ struct {
+	// gRPC health check.
 	GrpcHealthCheck *HealthCheck_GrpcHealthCheck `protobuf:"bytes,11,opt,name=grpc_health_check,json=grpcHealthCheck,proto3,oneof"`
 }
 
 type HealthCheck_CustomHealthCheck_ struct {
+	// Custom health check.
 	CustomHealthCheck *HealthCheck_CustomHealthCheck `protobuf:"bytes,13,opt,name=custom_health_check,json=customHealthCheck,proto3,oneof"`
 }
 
@@ -344,6 +446,7 @@ func (*HealthCheck_GrpcHealthCheck_) isHealthCheck_HealthChecker() {}
 
 func (*HealthCheck_CustomHealthCheck_) isHealthCheck_HealthChecker() {}
 
+// Describes the encoding of the payload bytes in the payload.
 type HealthCheck_Payload struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -413,10 +516,12 @@ type isHealthCheck_Payload_Payload interface {
 }
 
 type HealthCheck_Payload_Text struct {
+	// Hex encoded payload. E.g., "000000FF".
 	Text string `protobuf:"bytes,1,opt,name=text,proto3,oneof"`
 }
 
 type HealthCheck_Payload_Binary struct {
+	// [#not-implemented-hide:] Binary payload.
 	Binary []byte `protobuf:"bytes,2,opt,name=binary,proto3,oneof"`
 }
 
@@ -424,20 +529,44 @@ func (*HealthCheck_Payload_Text) isHealthCheck_Payload_Payload() {}
 
 func (*HealthCheck_Payload_Binary) isHealthCheck_Payload_Payload() {}
 
+// [#next-free-field: 12]
 type HealthCheck_HttpHealthCheck struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Host                   string                 `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
-	Path                   string                 `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	Send                   *HealthCheck_Payload   `protobuf:"bytes,3,opt,name=send,proto3" json:"send,omitempty"`
-	Receive                *HealthCheck_Payload   `protobuf:"bytes,4,opt,name=receive,proto3" json:"receive,omitempty"`
-	RequestHeadersToAdd    []*HeaderValueOption   `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd,proto3" json:"request_headers_to_add,omitempty"`
-	RequestHeadersToRemove []string               `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove,proto3" json:"request_headers_to_remove,omitempty"`
-	ExpectedStatuses       []*v3.Int64Range       `protobuf:"bytes,9,rep,name=expected_statuses,json=expectedStatuses,proto3" json:"expected_statuses,omitempty"`
-	CodecClientType        v3.CodecClientType     `protobuf:"varint,10,opt,name=codec_client_type,json=codecClientType,proto3,enum=envoy.type.v3.CodecClientType" json:"codec_client_type,omitempty"`
-	ServiceNameMatcher     *v4alpha.StringMatcher `protobuf:"bytes,11,opt,name=service_name_matcher,json=serviceNameMatcher,proto3" json:"service_name_matcher,omitempty"`
+	// The value of the host header in the HTTP health check request. If
+	// left empty (default value), the name of the cluster this health check is associated
+	// with will be used. The host header can be customized for a specific endpoint by setting the
+	// :ref:`hostname <envoy_api_field_config.endpoint.v3.Endpoint.HealthCheckConfig.hostname>` field.
+	Host string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
+	// Specifies the HTTP path that will be requested during health checking. For example
+	// */healthcheck*.
+	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	// [#not-implemented-hide:] HTTP specific payload.
+	Send *HealthCheck_Payload `protobuf:"bytes,3,opt,name=send,proto3" json:"send,omitempty"`
+	// [#not-implemented-hide:] HTTP specific response.
+	Receive *HealthCheck_Payload `protobuf:"bytes,4,opt,name=receive,proto3" json:"receive,omitempty"`
+	// Specifies a list of HTTP headers that should be added to each request that is sent to the
+	// health checked cluster. For more information, including details on header value syntax, see
+	// the documentation on :ref:`custom request headers
+	// <config_http_conn_man_headers_custom_request_headers>`.
+	RequestHeadersToAdd []*HeaderValueOption `protobuf:"bytes,6,rep,name=request_headers_to_add,json=requestHeadersToAdd,proto3" json:"request_headers_to_add,omitempty"`
+	// Specifies a list of HTTP headers that should be removed from each request that is sent to the
+	// health checked cluster.
+	RequestHeadersToRemove []string `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove,proto3" json:"request_headers_to_remove,omitempty"`
+	// Specifies a list of HTTP response statuses considered healthy. If provided, replaces default
+	// 200-only policy - 200 must be included explicitly as needed. Ranges follow half-open
+	// semantics of :ref:`Int64Range <envoy_api_msg_type.v3.Int64Range>`. The start and end of each
+	// range are required. Only statuses in the range [100, 600) are allowed.
+	ExpectedStatuses []*v3.Int64Range `protobuf:"bytes,9,rep,name=expected_statuses,json=expectedStatuses,proto3" json:"expected_statuses,omitempty"`
+	// Use specified application protocol for health checks.
+	CodecClientType v3.CodecClientType `protobuf:"varint,10,opt,name=codec_client_type,json=codecClientType,proto3,enum=envoy.type.v3.CodecClientType" json:"codec_client_type,omitempty"`
+	// An optional service name parameter which is used to validate the identity of
+	// the health checked cluster using a :ref:`StringMatcher
+	// <envoy_api_msg_type.matcher.v4alpha.StringMatcher>`. See the :ref:`architecture overview
+	// <arch_overview_health_checking_identity>` for more information.
+	ServiceNameMatcher *v4alpha.StringMatcher `protobuf:"bytes,11,opt,name=service_name_matcher,json=serviceNameMatcher,proto3" json:"service_name_matcher,omitempty"`
 }
 
 func (x *HealthCheck_HttpHealthCheck) Reset() {
@@ -540,7 +669,11 @@ type HealthCheck_TcpHealthCheck struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Send    *HealthCheck_Payload   `protobuf:"bytes,1,opt,name=send,proto3" json:"send,omitempty"`
+	// Empty payloads imply a connect-only health check.
+	Send *HealthCheck_Payload `protobuf:"bytes,1,opt,name=send,proto3" json:"send,omitempty"`
+	// When checking the response, “fuzzy” matching is performed such that each
+	// binary block must be found, and in the order specified, but not
+	// necessarily contiguous.
 	Receive []*HealthCheck_Payload `protobuf:"bytes,2,rep,name=receive,proto3" json:"receive,omitempty"`
 }
 
@@ -595,6 +728,10 @@ type HealthCheck_RedisHealthCheck struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// If set, optionally perform ``EXISTS <key>`` instead of ``PING``. A return value
+	// from Redis of 0 (does not exist) is considered a passing healthcheck. A return value other
+	// than 0 is considered a failure. This allows the user to mark a Redis instance for maintenance
+	// by setting the specified key to any value and waiting for traffic to drain.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 }
 
@@ -637,13 +774,26 @@ func (x *HealthCheck_RedisHealthCheck) GetKey() string {
 	return ""
 }
 
+// `grpc.health.v1.Health
+// <https://github.com/grpc/grpc/blob/master/src/proto/grpc/health/v1/health.proto>`_-based
+// healthcheck. See `gRPC doc <https://github.com/grpc/grpc/blob/master/doc/health-checking.md>`_
+// for details.
 type HealthCheck_GrpcHealthCheck struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// An optional service name parameter which will be sent to gRPC service in
+	// `grpc.health.v1.HealthCheckRequest
+	// <https://github.com/grpc/grpc/blob/master/src/proto/grpc/health/v1/health.proto#L20>`_.
+	// message. See `gRPC health-checking overview
+	// <https://github.com/grpc/grpc/blob/master/doc/health-checking.md>`_ for more information.
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
-	Authority   string `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
+	// The value of the :authority header in the gRPC health check request. If
+	// left empty (default value), the name of the cluster this health check is associated
+	// with will be used. The authority header can be customized for a specific endpoint by setting
+	// the :ref:`hostname <envoy_api_field_config.endpoint.v3.Endpoint.HealthCheckConfig.hostname>` field.
+	Authority string `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
 }
 
 func (x *HealthCheck_GrpcHealthCheck) Reset() {
@@ -692,12 +842,17 @@ func (x *HealthCheck_GrpcHealthCheck) GetAuthority() string {
 	return ""
 }
 
+// Custom health check.
 type HealthCheck_CustomHealthCheck struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The registered name of the custom health checker.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// A custom health checker specific configuration which depends on the custom health checker
+	// being instantiated. See :api:`envoy/config/health_checker` for reference.
+	//
 	// Types that are assignable to ConfigType:
 	//	*HealthCheck_CustomHealthCheck_TypedConfig
 	ConfigType isHealthCheck_CustomHealthCheck_ConfigType `protobuf_oneof:"config_type"`
@@ -766,11 +921,19 @@ type HealthCheck_CustomHealthCheck_TypedConfig struct {
 
 func (*HealthCheck_CustomHealthCheck_TypedConfig) isHealthCheck_CustomHealthCheck_ConfigType() {}
 
+// Health checks occur over the transport socket specified for the cluster. This implies that if a
+// cluster is using a TLS-enabled transport socket, the health check will also occur over TLS.
+//
+// This allows overriding the cluster TLS settings, just for health check connections.
 type HealthCheck_TlsOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Specifies the ALPN protocols for health check connections. This is useful if the
+	// corresponding upstream is using ALPN-based :ref:`FilterChainMatch
+	// <envoy_api_msg_config.listener.v4alpha.FilterChainMatch>` along with different protocols for health checks
+	// versus data connections. If empty, no ALPN protocols will be set on health check connections.
 	AlpnProtocols []string `protobuf:"bytes,1,rep,name=alpn_protocols,json=alpnProtocols,proto3" json:"alpn_protocols,omitempty"`
 }
 

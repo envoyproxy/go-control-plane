@@ -32,8 +32,18 @@ type AwsIamConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The `service namespace
+	// <https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces>`_
+	// of the Grpc endpoint.
+	//
+	// Example: appmesh
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
-	Region      string `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	// The `region <https://docs.aws.amazon.com/general/latest/gr/rande.html>`_ hosting the Grpc
+	// endpoint. If unspecified, the extension will use the value in the ``AWS_REGION`` environment
+	// variable.
+	//
+	// Example: us-west-2
+	Region string `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 }
 
 func (x *AwsIamConfig) Reset() {

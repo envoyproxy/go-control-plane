@@ -103,6 +103,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AuthorizationClient interface {
+	// Performs authorization check based on the attributes associated with the
+	// incoming request, and returns status `OK` or not `OK`.
 	Check(ctx context.Context, in *v2.CheckRequest, opts ...grpc.CallOption) (*v2.CheckResponse, error)
 }
 
@@ -125,6 +127,8 @@ func (c *authorizationClient) Check(ctx context.Context, in *v2.CheckRequest, op
 
 // AuthorizationServer is the server API for Authorization service.
 type AuthorizationServer interface {
+	// Performs authorization check based on the attributes associated with the
+	// incoming request, and returns status `OK` or not `OK`.
 	Check(context.Context, *v2.CheckRequest) (*v2.CheckResponse, error)
 }
 

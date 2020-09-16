@@ -31,6 +31,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#not-implemented-hide:] Not configuration. Workaround c++ protobuf issue with importing
+// services: https://github.com/google/protobuf/issues/4221
 type AdsDummy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -186,6 +188,7 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AggregatedDiscoveryServiceClient interface {
+	// This is a gRPC-only API.
 	StreamAggregatedResources(ctx context.Context, opts ...grpc.CallOption) (AggregatedDiscoveryService_StreamAggregatedResourcesClient, error)
 	DeltaAggregatedResources(ctx context.Context, opts ...grpc.CallOption) (AggregatedDiscoveryService_DeltaAggregatedResourcesClient, error)
 }
@@ -262,6 +265,7 @@ func (x *aggregatedDiscoveryServiceDeltaAggregatedResourcesClient) Recv() (*v2.D
 
 // AggregatedDiscoveryServiceServer is the server API for AggregatedDiscoveryService service.
 type AggregatedDiscoveryServiceServer interface {
+	// This is a gRPC-only API.
 	StreamAggregatedResources(AggregatedDiscoveryService_StreamAggregatedResourcesServer) error
 	DeltaAggregatedResources(AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error
 }

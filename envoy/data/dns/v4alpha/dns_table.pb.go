@@ -29,14 +29,22 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// This message contains the configuration for the DNS Filter if populated
+// from the control plane
 type DnsTable struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ExternalRetryCount uint32                       `protobuf:"varint,1,opt,name=external_retry_count,json=externalRetryCount,proto3" json:"external_retry_count,omitempty"`
-	VirtualDomains     []*DnsTable_DnsVirtualDomain `protobuf:"bytes,2,rep,name=virtual_domains,json=virtualDomains,proto3" json:"virtual_domains,omitempty"`
-	KnownSuffixes      []*v4alpha.StringMatcher     `protobuf:"bytes,3,rep,name=known_suffixes,json=knownSuffixes,proto3" json:"known_suffixes,omitempty"`
+	// Control how many times Envoy makes an attempt to forward a query to an external DNS server
+	ExternalRetryCount uint32 `protobuf:"varint,1,opt,name=external_retry_count,json=externalRetryCount,proto3" json:"external_retry_count,omitempty"`
+	// Fully qualified domain names for which Envoy will respond to DNS queries. By leaving this
+	// list empty, Envoy will forward all queries to external resolvers
+	VirtualDomains []*DnsTable_DnsVirtualDomain `protobuf:"bytes,2,rep,name=virtual_domains,json=virtualDomains,proto3" json:"virtual_domains,omitempty"`
+	// This field serves to help Envoy determine whether it can authoritatively answer a query
+	// for a name matching a suffix in this list. If the query name does not match a suffix in
+	// this list, Envoy will forward the query to an upstream DNS server
+	KnownSuffixes []*v4alpha.StringMatcher `protobuf:"bytes,3,rep,name=known_suffixes,json=knownSuffixes,proto3" json:"known_suffixes,omitempty"`
 }
 
 func (x *DnsTable) Reset() {
@@ -92,11 +100,17 @@ func (x *DnsTable) GetKnownSuffixes() []*v4alpha.StringMatcher {
 	return nil
 }
 
+// This message contains a list of IP addresses returned for a query for a known name
 type DnsTable_AddressList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// This field contains a well formed IP address that is returned in the answer for a
+	// name query. The address field can be an IPv4 or IPv6 address. Address family
+	// detection is done automatically when Envoy parses the string. Since this field is
+	// repeated, Envoy will return as many entries from this list in the DNS response while
+	// keeping the response under 512 bytes
 	Address []string `protobuf:"bytes,1,rep,name=address,proto3" json:"address,omitempty"`
 }
 
@@ -139,6 +153,7 @@ func (x *DnsTable_AddressList) GetAddress() []string {
 	return nil
 }
 
+// Specify the service protocol using a numeric or string value
 type DnsTable_DnsServiceProtocol struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -208,10 +223,15 @@ type isDnsTable_DnsServiceProtocol_ProtocolConfig interface {
 }
 
 type DnsTable_DnsServiceProtocol_Number struct {
+	// Specify the protocol number for the service. Envoy will try to resolve the number to
+	// the protocol name. For example, 6 will resolve to "tcp". Refer to:
+	// https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
+	// for protocol names and numbers
 	Number uint32 `protobuf:"varint,1,opt,name=number,proto3,oneof"`
 }
 
 type DnsTable_DnsServiceProtocol_Name struct {
+	// Specify the protocol name for the service.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3,oneof"`
 }
 
@@ -219,18 +239,27 @@ func (*DnsTable_DnsServiceProtocol_Number) isDnsTable_DnsServiceProtocol_Protoco
 
 func (*DnsTable_DnsServiceProtocol_Name) isDnsTable_DnsServiceProtocol_ProtocolConfig() {}
 
+// Specify the target for a given DNS service
+// [#next-free-field: 6]
 type DnsTable_DnsServiceTarget struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Specify the name of the endpoint for the Service. The name is a hostname or a cluster
+	//
 	// Types that are assignable to EndpointType:
 	//	*DnsTable_DnsServiceTarget_HostName
 	//	*DnsTable_DnsServiceTarget_ClusterName
 	EndpointType isDnsTable_DnsServiceTarget_EndpointType `protobuf_oneof:"endpoint_type"`
-	Priority     uint32                                   `protobuf:"varint,3,opt,name=priority,proto3" json:"priority,omitempty"`
-	Weight       uint32                                   `protobuf:"varint,4,opt,name=weight,proto3" json:"weight,omitempty"`
-	Port         uint32                                   `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
+	// The priority of the service record target
+	Priority uint32 `protobuf:"varint,3,opt,name=priority,proto3" json:"priority,omitempty"`
+	// The weight of the service record target
+	Weight uint32 `protobuf:"varint,4,opt,name=weight,proto3" json:"weight,omitempty"`
+	// The port to which the service is bound. This value is optional if the target is a
+	// cluster. Setting port to zero in this case makes the filter use the port value
+	// from the cluster host
+	Port uint32 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
 }
 
 func (x *DnsTable_DnsServiceTarget) Reset() {
@@ -312,10 +341,12 @@ type isDnsTable_DnsServiceTarget_EndpointType interface {
 }
 
 type DnsTable_DnsServiceTarget_HostName struct {
+	// Use a resolvable hostname as the endpoint for a service.
 	HostName string `protobuf:"bytes,1,opt,name=host_name,json=hostName,proto3,oneof"`
 }
 
 type DnsTable_DnsServiceTarget_ClusterName struct {
+	// Use a cluster name as the endpoint for a service.
 	ClusterName string `protobuf:"bytes,2,opt,name=cluster_name,json=clusterName,proto3,oneof"`
 }
 
@@ -323,15 +354,20 @@ func (*DnsTable_DnsServiceTarget_HostName) isDnsTable_DnsServiceTarget_EndpointT
 
 func (*DnsTable_DnsServiceTarget_ClusterName) isDnsTable_DnsServiceTarget_EndpointType() {}
 
+// This message defines a service selection record returned for a service query in a domain
 type DnsTable_DnsService struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ServiceName string                       `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
-	Protocol    *DnsTable_DnsServiceProtocol `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	Ttl         *duration.Duration           `protobuf:"bytes,3,opt,name=ttl,proto3" json:"ttl,omitempty"`
-	Targets     []*DnsTable_DnsServiceTarget `protobuf:"bytes,4,rep,name=targets,proto3" json:"targets,omitempty"`
+	// The name of the service without the protocol or domain name
+	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
+	// The service protocol. This can be specified as a string or the numeric value of the protocol
+	Protocol *DnsTable_DnsServiceProtocol `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`
+	// The service entry time to live. This is independent from the DNS Answer record TTL
+	Ttl *duration.Duration `protobuf:"bytes,3,opt,name=ttl,proto3" json:"ttl,omitempty"`
+	// The list of targets hosting the service
+	Targets []*DnsTable_DnsServiceTarget `protobuf:"bytes,4,rep,name=targets,proto3" json:"targets,omitempty"`
 }
 
 func (x *DnsTable_DnsService) Reset() {
@@ -394,6 +430,7 @@ func (x *DnsTable_DnsService) GetTargets() []*DnsTable_DnsServiceTarget {
 	return nil
 }
 
+// Define a list of service records for a given service
 type DnsTable_DnsServiceList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -518,14 +555,17 @@ type isDnsTable_DnsEndpoint_EndpointConfig interface {
 }
 
 type DnsTable_DnsEndpoint_AddressList struct {
+	// Define a list of addresses to return for the specified endpoint
 	AddressList *DnsTable_AddressList `protobuf:"bytes,1,opt,name=address_list,json=addressList,proto3,oneof"`
 }
 
 type DnsTable_DnsEndpoint_ClusterName struct {
+	// Define a cluster whose addresses are returned for the specified endpoint
 	ClusterName string `protobuf:"bytes,2,opt,name=cluster_name,json=clusterName,proto3,oneof"`
 }
 
 type DnsTable_DnsEndpoint_ServiceList struct {
+	// Define a DNS Service List for the specified endpoint
 	ServiceList *DnsTable_DnsServiceList `protobuf:"bytes,3,opt,name=service_list,json=serviceList,proto3,oneof"`
 }
 
@@ -540,9 +580,12 @@ type DnsTable_DnsVirtualDomain struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name      string                `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Endpoint  *DnsTable_DnsEndpoint `protobuf:"bytes,2,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	AnswerTtl *duration.Duration    `protobuf:"bytes,3,opt,name=answer_ttl,json=answerTtl,proto3" json:"answer_ttl,omitempty"`
+	// A domain name for which Envoy will respond to query requests
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The configuration containing the method to determine the address of this endpoint
+	Endpoint *DnsTable_DnsEndpoint `protobuf:"bytes,2,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	// Sets the TTL in DNS answers from Envoy returned to the client. The default TTL is 300s
+	AnswerTtl *duration.Duration `protobuf:"bytes,3,opt,name=answer_ttl,json=answerTtl,proto3" json:"answer_ttl,omitempty"`
 }
 
 func (x *DnsTable_DnsVirtualDomain) Reset() {

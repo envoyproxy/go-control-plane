@@ -32,6 +32,7 @@ type ProxyProtocol struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The list of rules to apply to requests.
 	Rules []*ProxyProtocol_Rule `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
 }
 
@@ -79,8 +80,10 @@ type ProxyProtocol_KeyValuePair struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The namespace — if this is empty, the filter's namespace will be used.
 	MetadataNamespace string `protobuf:"bytes,1,opt,name=metadata_namespace,json=metadataNamespace,proto3" json:"metadata_namespace,omitempty"`
-	Key               string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// The key to use within the namespace.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 }
 
 func (x *ProxyProtocol_KeyValuePair) Reset() {
@@ -129,12 +132,17 @@ func (x *ProxyProtocol_KeyValuePair) GetKey() string {
 	return ""
 }
 
+// A Rule defines what metadata to apply when a header is present or missing.
 type ProxyProtocol_Rule struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TlvType      uint32                      `protobuf:"varint,1,opt,name=tlv_type,json=tlvType,proto3" json:"tlv_type,omitempty"`
+	// The type that triggers the rule - required
+	// TLV type is defined as uint8_t in proxy protocol. See `the spec
+	// <https://www.haproxy.org/download/2.1/doc/proxy-protocol.txt>`_ for details.
+	TlvType uint32 `protobuf:"varint,1,opt,name=tlv_type,json=tlvType,proto3" json:"tlv_type,omitempty"`
+	// If the TLV type is present, apply this metadata KeyValuePair.
 	OnTlvPresent *ProxyProtocol_KeyValuePair `protobuf:"bytes,2,opt,name=on_tlv_present,json=onTlvPresent,proto3" json:"on_tlv_present,omitempty"`
 }
 

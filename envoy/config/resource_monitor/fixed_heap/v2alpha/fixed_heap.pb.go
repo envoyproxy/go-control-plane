@@ -27,6 +27,9 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// The fixed heap resource monitor reports the Envoy process memory pressure, computed as a
+// fraction of currently reserved heap memory divided by a statically configured maximum
+// specified in the FixedHeapConfig.
 type FixedHeapConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

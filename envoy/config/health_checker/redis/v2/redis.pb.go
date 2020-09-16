@@ -31,6 +31,10 @@ type Redis struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// If set, optionally perform ``EXISTS <key>`` instead of ``PING``. A return value
+	// from Redis of 0 (does not exist) is considered a passing healthcheck. A return value other
+	// than 0 is considered a failure. This allows the user to mark a Redis instance for maintenance
+	// by setting the specified key to any value and waiting for traffic to drain.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 }
 

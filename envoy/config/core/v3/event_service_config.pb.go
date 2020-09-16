@@ -27,6 +27,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#not-implemented-hide:]
+// Configuration of the event reporting service endpoint.
 type EventServiceConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -88,6 +90,7 @@ type isEventServiceConfig_ConfigSourceSpecifier interface {
 }
 
 type EventServiceConfig_GrpcService struct {
+	// Specifies the gRPC service that hosts the event reporting service.
 	GrpcService *GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,proto3,oneof"`
 }
 

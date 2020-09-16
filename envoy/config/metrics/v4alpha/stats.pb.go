@@ -32,12 +32,25 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Configuration for pluggable stats sinks.
 type StatsSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the stats sink to instantiate. The name must match a supported
+	// stats sink. The built-in stats sinks are:
+	//
+	// * :ref:`envoy.stat_sinks.statsd <envoy_api_msg_config.metrics.v4alpha.StatsdSink>`
+	// * :ref:`envoy.stat_sinks.dog_statsd <envoy_api_msg_config.metrics.v4alpha.DogStatsdSink>`
+	// * :ref:`envoy.stat_sinks.metrics_service <envoy_api_msg_config.metrics.v4alpha.MetricsServiceConfig>`
+	// * :ref:`envoy.stat_sinks.hystrix <envoy_api_msg_config.metrics.v4alpha.HystrixSink>`
+	//
+	// Sinks optionally support tagged/multiple dimensional metrics.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Stats sink specific configuration which depends on the sink being instantiated. See
+	// :ref:`StatsdSink <envoy_api_msg_config.metrics.v4alpha.StatsdSink>` for an example.
+	//
 	// Types that are assignable to ConfigType:
 	//	*StatsSink_TypedConfig
 	ConfigType isStatsSink_ConfigType `protobuf_oneof:"config_type"`
@@ -106,14 +119,68 @@ type StatsSink_TypedConfig struct {
 
 func (*StatsSink_TypedConfig) isStatsSink_ConfigType() {}
 
+// Statistics configuration such as tagging.
 type StatsConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StatsTags               []*TagSpecifier            `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags,proto3" json:"stats_tags,omitempty"`
-	UseAllDefaultTags       *wrappers.BoolValue        `protobuf:"bytes,2,opt,name=use_all_default_tags,json=useAllDefaultTags,proto3" json:"use_all_default_tags,omitempty"`
-	StatsMatcher            *StatsMatcher              `protobuf:"bytes,3,opt,name=stats_matcher,json=statsMatcher,proto3" json:"stats_matcher,omitempty"`
+	// Each stat name is iteratively processed through these tag specifiers.
+	// When a tag is matched, the first capture group is removed from the name so
+	// later :ref:`TagSpecifiers <envoy_api_msg_config.metrics.v4alpha.TagSpecifier>` cannot match that
+	// same portion of the match.
+	StatsTags []*TagSpecifier `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags,proto3" json:"stats_tags,omitempty"`
+	// Use all default tag regexes specified in Envoy. These can be combined with
+	// custom tags specified in :ref:`stats_tags
+	// <envoy_api_field_config.metrics.v4alpha.StatsConfig.stats_tags>`. They will be processed before
+	// the custom tags.
+	//
+	// .. note::
+	//
+	//   If any default tags are specified twice, the config will be considered
+	//   invalid.
+	//
+	// See :repo:`well_known_names.h <source/common/config/well_known_names.h>` for a list of the
+	// default tags in Envoy.
+	//
+	// If not provided, the value is assumed to be true.
+	UseAllDefaultTags *wrappers.BoolValue `protobuf:"bytes,2,opt,name=use_all_default_tags,json=useAllDefaultTags,proto3" json:"use_all_default_tags,omitempty"`
+	// Inclusion/exclusion matcher for stat name creation. If not provided, all stats are instantiated
+	// as normal. Preventing the instantiation of certain families of stats can improve memory
+	// performance for Envoys running especially large configs.
+	//
+	// .. warning::
+	//   Excluding stats may affect Envoy's behavior in undocumented ways. See
+	//   `issue #8771 <https://github.com/envoyproxy/envoy/issues/8771>`_ for more information.
+	//   If any unexpected behavior changes are observed, please open a new issue immediately.
+	StatsMatcher *StatsMatcher `protobuf:"bytes,3,opt,name=stats_matcher,json=statsMatcher,proto3" json:"stats_matcher,omitempty"`
+	// Defines rules for setting the histogram buckets. Rules are evaluated in order, and the first
+	// match is applied. If no match is found (or if no rules are set), the following default buckets
+	// are used:
+	//
+	//   .. code-block:: json
+	//
+	//     [
+	//       0.5,
+	//       1,
+	//       5,
+	//       10,
+	//       25,
+	//       50,
+	//       100,
+	//       250,
+	//       500,
+	//       1000,
+	//       2500,
+	//       5000,
+	//       10000,
+	//       30000,
+	//       60000,
+	//       300000,
+	//       600000,
+	//       1800000,
+	//       3600000
+	//     ]
 	HistogramBucketSettings []*HistogramBucketSettings `protobuf:"bytes,4,rep,name=histogram_bucket_settings,json=histogramBucketSettings,proto3" json:"histogram_bucket_settings,omitempty"`
 }
 
@@ -177,6 +244,7 @@ func (x *StatsConfig) GetHistogramBucketSettings() []*HistogramBucketSettings {
 	return nil
 }
 
+// Configuration for disabling stat instantiation.
 type StatsMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -254,14 +322,20 @@ type isStatsMatcher_StatsMatcher interface {
 }
 
 type StatsMatcher_RejectAll struct {
+	// If `reject_all` is true, then all stats are disabled. If `reject_all` is false, then all
+	// stats are enabled.
 	RejectAll bool `protobuf:"varint,1,opt,name=reject_all,json=rejectAll,proto3,oneof"`
 }
 
 type StatsMatcher_ExclusionList struct {
+	// Exclusive match. All stats are enabled except for those matching one of the supplied
+	// StringMatcher protos.
 	ExclusionList *v4alpha.ListStringMatcher `protobuf:"bytes,2,opt,name=exclusion_list,json=exclusionList,proto3,oneof"`
 }
 
 type StatsMatcher_InclusionList struct {
+	// Inclusive match. No stats are enabled except for those matching one of the supplied
+	// StringMatcher protos.
 	InclusionList *v4alpha.ListStringMatcher `protobuf:"bytes,3,opt,name=inclusion_list,json=inclusionList,proto3,oneof"`
 }
 
@@ -271,11 +345,27 @@ func (*StatsMatcher_ExclusionList) isStatsMatcher_StatsMatcher() {}
 
 func (*StatsMatcher_InclusionList) isStatsMatcher_StatsMatcher() {}
 
+// Designates a tag name and value pair. The value may be either a fixed value
+// or a regex providing the value via capture groups. The specified tag will be
+// unconditionally set if a fixed value, otherwise it will only be set if one
+// or more capture groups in the regex match.
 type TagSpecifier struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Attaches an identifier to the tag values to identify the tag being in the
+	// sink. Envoy has a set of default names and regexes to extract dynamic
+	// portions of existing stats, which can be found in :repo:`well_known_names.h
+	// <source/common/config/well_known_names.h>` in the Envoy repository. If a :ref:`tag_name
+	// <envoy_api_field_config.metrics.v4alpha.TagSpecifier.tag_name>` is provided in the config and
+	// neither :ref:`regex <envoy_api_field_config.metrics.v4alpha.TagSpecifier.regex>` or
+	// :ref:`fixed_value <envoy_api_field_config.metrics.v4alpha.TagSpecifier.fixed_value>` were specified,
+	// Envoy will attempt to find that name in its set of defaults and use the accompanying regex.
+	//
+	// .. note::
+	//
+	//   It is invalid to specify the same tag name twice in a config.
 	TagName string `protobuf:"bytes,1,opt,name=tag_name,json=tagName,proto3" json:"tag_name,omitempty"`
 	// Types that are assignable to TagValue:
 	//	*TagSpecifier_Regex
@@ -348,10 +438,65 @@ type isTagSpecifier_TagValue interface {
 }
 
 type TagSpecifier_Regex struct {
+	// Designates a tag to strip from the tag extracted name and provide as a named
+	// tag value for all statistics. This will only occur if any part of the name
+	// matches the regex provided with one or more capture groups.
+	//
+	// The first capture group identifies the portion of the name to remove. The
+	// second capture group (which will normally be nested inside the first) will
+	// designate the value of the tag for the statistic. If no second capture
+	// group is provided, the first will also be used to set the value of the tag.
+	// All other capture groups will be ignored.
+	//
+	// Example 1. a stat name ``cluster.foo_cluster.upstream_rq_timeout`` and
+	// one tag specifier:
+	//
+	// .. code-block:: json
+	//
+	//   {
+	//     "tag_name": "envoy.cluster_name",
+	//     "regex": "^cluster\.((.+?)\.)"
+	//   }
+	//
+	// Note that the regex will remove ``foo_cluster.`` making the tag extracted
+	// name ``cluster.upstream_rq_timeout`` and the tag value for
+	// ``envoy.cluster_name`` will be ``foo_cluster`` (note: there will be no
+	// ``.`` character because of the second capture group).
+	//
+	// Example 2. a stat name
+	// ``http.connection_manager_1.user_agent.ios.downstream_cx_total`` and two
+	// tag specifiers:
+	//
+	// .. code-block:: json
+	//
+	//   [
+	//     {
+	//       "tag_name": "envoy.http_user_agent",
+	//       "regex": "^http(?=\.).*?\.user_agent\.((.+?)\.)\w+?$"
+	//     },
+	//     {
+	//       "tag_name": "envoy.http_conn_manager_prefix",
+	//       "regex": "^http\.((.*?)\.)"
+	//     }
+	//   ]
+	//
+	// The two regexes of the specifiers will be processed in the definition order.
+	//
+	// The first regex will remove ``ios.``, leaving the tag extracted name
+	// ``http.connection_manager_1.user_agent.downstream_cx_total``. The tag
+	// ``envoy.http_user_agent`` will be added with tag value ``ios``.
+	//
+	// The second regex will remove ``connection_manager_1.`` from the tag
+	// extracted name produced by the first regex
+	// ``http.connection_manager_1.user_agent.downstream_cx_total``, leaving
+	// ``http.user_agent.downstream_cx_total`` as the tag extracted name. The tag
+	// ``envoy.http_conn_manager_prefix`` will be added with the tag value
+	// ``connection_manager_1``.
 	Regex string `protobuf:"bytes,2,opt,name=regex,proto3,oneof"`
 }
 
 type TagSpecifier_FixedValue struct {
+	// Specifies a fixed tag value for the ``tag_name``.
 	FixedValue string `protobuf:"bytes,3,opt,name=fixed_value,json=fixedValue,proto3,oneof"`
 }
 
@@ -359,13 +504,18 @@ func (*TagSpecifier_Regex) isTagSpecifier_TagValue() {}
 
 func (*TagSpecifier_FixedValue) isTagSpecifier_TagValue() {}
 
+// Specifies a matcher for stats and the buckets that matching stats should use.
 type HistogramBucketSettings struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Match   *v4alpha.StringMatcher `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
-	Buckets []float64              `protobuf:"fixed64,2,rep,packed,name=buckets,proto3" json:"buckets,omitempty"`
+	// The stats that this rule applies to. The match is applied to the original stat name
+	// before tag-extraction, for example `cluster.exampleclustername.upstream_cx_length_ms`.
+	Match *v4alpha.StringMatcher `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
+	// Each value is the upper bound of a bucket. Each bucket must be greater than 0 and unique.
+	// The order of the buckets does not matter.
+	Buckets []float64 `protobuf:"fixed64,2,rep,packed,name=buckets,proto3" json:"buckets,omitempty"`
 }
 
 func (x *HistogramBucketSettings) Reset() {
@@ -414,6 +564,9 @@ func (x *HistogramBucketSettings) GetBuckets() []float64 {
 	return nil
 }
 
+// Stats configuration proto schema for built-in *envoy.stat_sinks.statsd* sink. This sink does not support
+// tagged metrics.
+// [#extension: envoy.stat_sinks.statsd]
 type StatsdSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -423,7 +576,33 @@ type StatsdSink struct {
 	//	*StatsdSink_Address
 	//	*StatsdSink_TcpClusterName
 	StatsdSpecifier isStatsdSink_StatsdSpecifier `protobuf_oneof:"statsd_specifier"`
-	Prefix          string                       `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	// Optional custom prefix for StatsdSink. If
+	// specified, this will override the default prefix.
+	// For example:
+	//
+	// .. code-block:: json
+	//
+	//   {
+	//     "prefix" : "envoy-prod"
+	//   }
+	//
+	// will change emitted stats to
+	//
+	// .. code-block:: cpp
+	//
+	//   envoy-prod.test_counter:1|c
+	//   envoy-prod.test_timer:5|ms
+	//
+	// Note that the default prefix, "envoy", will be used if a prefix is not
+	// specified.
+	//
+	// Stats with default prefix:
+	//
+	// .. code-block:: cpp
+	//
+	//   envoy.test_counter:1|c
+	//   envoy.test_timer:5|ms
+	Prefix string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
 }
 
 func (x *StatsdSink) Reset() {
@@ -491,10 +670,16 @@ type isStatsdSink_StatsdSpecifier interface {
 }
 
 type StatsdSink_Address struct {
+	// The UDP address of a running `statsd <https://github.com/etsy/statsd>`_
+	// compliant listener. If specified, statistics will be flushed to this
+	// address.
 	Address *v4alpha1.Address `protobuf:"bytes,1,opt,name=address,proto3,oneof"`
 }
 
 type StatsdSink_TcpClusterName struct {
+	// The name of a cluster that is running a TCP `statsd
+	// <https://github.com/etsy/statsd>`_ compliant listener. If specified,
+	// Envoy will connect to this cluster to flush statistics.
 	TcpClusterName string `protobuf:"bytes,2,opt,name=tcp_cluster_name,json=tcpClusterName,proto3,oneof"`
 }
 
@@ -502,6 +687,11 @@ func (*StatsdSink_Address) isStatsdSink_StatsdSpecifier() {}
 
 func (*StatsdSink_TcpClusterName) isStatsdSink_StatsdSpecifier() {}
 
+// Stats configuration proto schema for built-in *envoy.stat_sinks.dog_statsd* sink.
+// The sink emits stats with `DogStatsD <https://docs.datadoghq.com/guides/dogstatsd/>`_
+// compatible tags. Tags are configurable via :ref:`StatsConfig
+// <envoy_api_msg_config.metrics.v4alpha.StatsConfig>`.
+// [#extension: envoy.stat_sinks.dog_statsd]
 type DogStatsdSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -509,9 +699,17 @@ type DogStatsdSink struct {
 
 	// Types that are assignable to DogStatsdSpecifier:
 	//	*DogStatsdSink_Address
-	DogStatsdSpecifier  isDogStatsdSink_DogStatsdSpecifier `protobuf_oneof:"dog_statsd_specifier"`
-	Prefix              string                             `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
-	MaxBytesPerDatagram *wrappers.UInt64Value              `protobuf:"bytes,4,opt,name=max_bytes_per_datagram,json=maxBytesPerDatagram,proto3" json:"max_bytes_per_datagram,omitempty"`
+	DogStatsdSpecifier isDogStatsdSink_DogStatsdSpecifier `protobuf_oneof:"dog_statsd_specifier"`
+	// Optional custom metric name prefix. See :ref:`StatsdSink's prefix field
+	// <envoy_api_field_config.metrics.v4alpha.StatsdSink.prefix>` for more details.
+	Prefix string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	// Optional max datagram size to use when sending UDP messages. By default Envoy
+	// will emit one metric per datagram. By specifying a max-size larger than a single
+	// metric, Envoy will emit multiple, new-line separated metrics. The max datagram
+	// size should not exceed your network's MTU.
+	//
+	// Note that this value may not be respected if smaller than a single metric.
+	MaxBytesPerDatagram *wrappers.UInt64Value `protobuf:"bytes,4,opt,name=max_bytes_per_datagram,json=maxBytesPerDatagram,proto3" json:"max_bytes_per_datagram,omitempty"`
 }
 
 func (x *DogStatsdSink) Reset() {
@@ -579,16 +777,39 @@ type isDogStatsdSink_DogStatsdSpecifier interface {
 }
 
 type DogStatsdSink_Address struct {
+	// The UDP address of a running DogStatsD compliant listener. If specified,
+	// statistics will be flushed to this address.
 	Address *v4alpha1.Address `protobuf:"bytes,1,opt,name=address,proto3,oneof"`
 }
 
 func (*DogStatsdSink_Address) isDogStatsdSink_DogStatsdSpecifier() {}
 
+// Stats configuration proto schema for built-in *envoy.stat_sinks.hystrix* sink.
+// The sink emits stats in `text/event-stream
+// <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events>`_
+// formatted stream for use by `Hystrix dashboard
+// <https://github.com/Netflix-Skunkworks/hystrix-dashboard/wiki>`_.
+//
+// Note that only a single HystrixSink should be configured.
+//
+// Streaming is started through an admin endpoint :http:get:`/hystrix_event_stream`.
+// [#extension: envoy.stat_sinks.hystrix]
 type HystrixSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The number of buckets the rolling statistical window is divided into.
+	//
+	// Each time the sink is flushed, all relevant Envoy statistics are sampled and
+	// added to the rolling window (removing the oldest samples in the window
+	// in the process). The sink then outputs the aggregate statistics across the
+	// current rolling window to the event stream(s).
+	//
+	// rolling_window(ms) = stats_flush_interval(ms) * num_of_buckets
+	//
+	// More detailed explanation can be found in `Hystrix wiki
+	// <https://github.com/Netflix/Hystrix/wiki/Metrics-and-Monitoring#hystrixrollingnumber>`_.
 	NumBuckets int64 `protobuf:"varint,1,opt,name=num_buckets,json=numBuckets,proto3" json:"num_buckets,omitempty"`
 }
 

@@ -26,6 +26,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Cors filter config.
 type Cors struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -26,6 +26,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// gRPC Web filter config.
 type GrpcWeb struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

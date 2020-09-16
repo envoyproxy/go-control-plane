@@ -35,7 +35,16 @@ type ResourceMonitor struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the resource monitor to instantiate. Must match a registered
+	// resource monitor type. The built-in resource monitors are:
+	//
+	// * :ref:`envoy.resource_monitors.fixed_heap
+	//   <envoy_api_msg_config.resource_monitor.fixed_heap.v2alpha.FixedHeapConfig>`
+	// * :ref:`envoy.resource_monitors.injected_resource
+	//   <envoy_api_msg_config.resource_monitor.injected_resource.v2alpha.InjectedResourceConfig>`
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Configuration for the resource monitor being instantiated.
+	//
 	// Types that are assignable to ConfigType:
 	//	*ResourceMonitor_TypedConfig
 	//	*ResourceMonitor_HiddenEnvoyDeprecatedConfig
@@ -125,6 +134,8 @@ type ThresholdTrigger struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// If the resource pressure is greater than or equal to this value, the trigger
+	// will enter saturation.
 	Value float64 `protobuf:"fixed64,1,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -172,7 +183,11 @@ type ScaledTrigger struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ScalingThreshold    float64 `protobuf:"fixed64,1,opt,name=scaling_threshold,json=scalingThreshold,proto3" json:"scaling_threshold,omitempty"`
+	// If the resource pressure is greater than this value, the trigger will be in the
+	// :ref:`scaling <arch_overview_overload_manager-triggers-state>` state with value
+	// `(pressure - scaling_threshold) / (saturation_threshold - scaling_threshold)`.
+	ScalingThreshold float64 `protobuf:"fixed64,1,opt,name=scaling_threshold,json=scalingThreshold,proto3" json:"scaling_threshold,omitempty"`
+	// If the resource pressure is greater than this value, the trigger will enter saturation.
 	SaturationThreshold float64 `protobuf:"fixed64,2,opt,name=saturation_threshold,json=saturationThreshold,proto3" json:"saturation_threshold,omitempty"`
 }
 
@@ -227,6 +242,7 @@ type Trigger struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the resource this is a trigger for.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to TriggerOneof:
 	//	*Trigger_Threshold
@@ -315,7 +331,13 @@ type OverloadAction struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name     string     `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the overload action. This is just a well-known string that listeners can
+	// use for registering callbacks. Custom overload actions should be named using reverse
+	// DNS to ensure uniqueness.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// A set of triggers for this action. The state of the action is the maximum
+	// state of all triggers, which can be scaling between 0 and 1 or saturated. Listeners
+	// are notified when the overload action changes state.
 	Triggers []*Trigger `protobuf:"bytes,2,rep,name=triggers,proto3" json:"triggers,omitempty"`
 }
 
@@ -370,9 +392,12 @@ type OverloadManager struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	RefreshInterval  *duration.Duration `protobuf:"bytes,1,opt,name=refresh_interval,json=refreshInterval,proto3" json:"refresh_interval,omitempty"`
+	// The interval for refreshing resource usage.
+	RefreshInterval *duration.Duration `protobuf:"bytes,1,opt,name=refresh_interval,json=refreshInterval,proto3" json:"refresh_interval,omitempty"`
+	// The set of resources to monitor.
 	ResourceMonitors []*ResourceMonitor `protobuf:"bytes,2,rep,name=resource_monitors,json=resourceMonitors,proto3" json:"resource_monitors,omitempty"`
-	Actions          []*OverloadAction  `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
+	// The set of overload actions.
+	Actions []*OverloadAction `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
 }
 
 func (x *OverloadManager) Reset() {

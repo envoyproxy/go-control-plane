@@ -28,6 +28,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Specifies the way to match a string.
+// [#next-free-field: 7]
 type StringMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -40,7 +42,10 @@ type StringMatcher struct {
 	//	*StringMatcher_Regex
 	//	*StringMatcher_SafeRegex
 	MatchPattern isStringMatcher_MatchPattern `protobuf_oneof:"match_pattern"`
-	IgnoreCase   bool                         `protobuf:"varint,6,opt,name=ignore_case,json=ignoreCase,proto3" json:"ignore_case,omitempty"`
+	// If true, indicates the exact/prefix/suffix matching should be case insensitive. This has no
+	// effect for the safe_regex match.
+	// For example, the matcher *data* will match both input string *Data* and *data* if set to true.
+	IgnoreCase bool `protobuf:"varint,6,opt,name=ignore_case,json=ignoreCase,proto3" json:"ignore_case,omitempty"`
 }
 
 func (x *StringMatcher) Reset() {
@@ -130,23 +135,55 @@ type isStringMatcher_MatchPattern interface {
 }
 
 type StringMatcher_Exact struct {
+	// The input string must match exactly the string specified here.
+	//
+	// Examples:
+	//
+	// * *abc* only matches the value *abc*.
 	Exact string `protobuf:"bytes,1,opt,name=exact,proto3,oneof"`
 }
 
 type StringMatcher_Prefix struct {
+	// The input string must have the prefix specified here.
+	// Note: empty prefix is not allowed, please use regex instead.
+	//
+	// Examples:
+	//
+	// * *abc* matches the value *abc.xyz*
 	Prefix string `protobuf:"bytes,2,opt,name=prefix,proto3,oneof"`
 }
 
 type StringMatcher_Suffix struct {
+	// The input string must have the suffix specified here.
+	// Note: empty prefix is not allowed, please use regex instead.
+	//
+	// Examples:
+	//
+	// * *abc* matches the value *xyz.abc*
 	Suffix string `protobuf:"bytes,3,opt,name=suffix,proto3,oneof"`
 }
 
 type StringMatcher_Regex struct {
+	// The input string must match the regular expression specified here.
+	// The regex grammar is defined `here
+	// <https://en.cppreference.com/w/cpp/regex/ecmascript>`_.
+	//
+	// Examples:
+	//
+	// * The regex ``\d{3}`` matches the value *123*
+	// * The regex ``\d{3}`` does not match the value *1234*
+	// * The regex ``\d{3}`` does not match the value *123.456*
+	//
+	// .. attention::
+	//   This field has been deprecated in favor of `safe_regex` as it is not safe for use with
+	//   untrusted input in all cases.
+	//
 	// Deprecated: Do not use.
 	Regex string `protobuf:"bytes,4,opt,name=regex,proto3,oneof"`
 }
 
 type StringMatcher_SafeRegex struct {
+	// The input string must match the regular expression specified here.
 	SafeRegex *RegexMatcher `protobuf:"bytes,5,opt,name=safe_regex,json=safeRegex,proto3,oneof"`
 }
 
@@ -160,6 +197,7 @@ func (*StringMatcher_Regex) isStringMatcher_MatchPattern() {}
 
 func (*StringMatcher_SafeRegex) isStringMatcher_MatchPattern() {}
 
+// Specifies a list of ways to match a string.
 type ListStringMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

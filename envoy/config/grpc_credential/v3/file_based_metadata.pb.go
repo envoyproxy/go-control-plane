@@ -32,9 +32,15 @@ type FileBasedMetadataConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SecretData   *v3.DataSource `protobuf:"bytes,1,opt,name=secret_data,json=secretData,proto3" json:"secret_data,omitempty"`
-	HeaderKey    string         `protobuf:"bytes,2,opt,name=header_key,json=headerKey,proto3" json:"header_key,omitempty"`
-	HeaderPrefix string         `protobuf:"bytes,3,opt,name=header_prefix,json=headerPrefix,proto3" json:"header_prefix,omitempty"`
+	// Location or inline data of secret to use for authentication of the Google gRPC connection
+	// this secret will be attached to a header of the gRPC connection
+	SecretData *v3.DataSource `protobuf:"bytes,1,opt,name=secret_data,json=secretData,proto3" json:"secret_data,omitempty"`
+	// Metadata header key to use for sending the secret data
+	// if no header key is set, "authorization" header will be used
+	HeaderKey string `protobuf:"bytes,2,opt,name=header_key,json=headerKey,proto3" json:"header_key,omitempty"`
+	// Prefix to prepend to the secret in the metadata header
+	// if no prefix is set, the default is to use no prefix
+	HeaderPrefix string `protobuf:"bytes,3,opt,name=header_prefix,json=headerPrefix,proto3" json:"header_prefix,omitempty"`
 }
 
 func (x *FileBasedMetadataConfig) Reset() {

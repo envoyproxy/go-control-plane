@@ -40,6 +40,12 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// The events are fired in this order: KILL, MULTIKILL, MEGAMISS, MISS.
+// Within an event type, actions execute in the order they are configured.
+// For KILL/MULTIKILL there is a default PANIC that will run after the
+// registered actions and kills the process if it wasn't already killed.
+// It might be useful to specify several debug actions, and possibly an
+// alternate FATAL action.
 type Watchdog_WatchdogAction_WatchdogEvent int32
 
 const (
@@ -95,35 +101,149 @@ func (Watchdog_WatchdogAction_WatchdogEvent) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_config_bootstrap_v3_bootstrap_proto_rawDescGZIP(), []int{3, 0, 0}
 }
 
+// Bootstrap :ref:`configuration overview <config_overview_bootstrap>`.
+// [#next-free-field: 27]
 type Bootstrap struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Node               *v3.Node                    `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
-	NodeContextParams  []string                    `protobuf:"bytes,26,rep,name=node_context_params,json=nodeContextParams,proto3" json:"node_context_params,omitempty"`
-	StaticResources    *Bootstrap_StaticResources  `protobuf:"bytes,2,opt,name=static_resources,json=staticResources,proto3" json:"static_resources,omitempty"`
-	DynamicResources   *Bootstrap_DynamicResources `protobuf:"bytes,3,opt,name=dynamic_resources,json=dynamicResources,proto3" json:"dynamic_resources,omitempty"`
-	ClusterManager     *ClusterManager             `protobuf:"bytes,4,opt,name=cluster_manager,json=clusterManager,proto3" json:"cluster_manager,omitempty"`
-	HdsConfig          *v3.ApiConfigSource         `protobuf:"bytes,14,opt,name=hds_config,json=hdsConfig,proto3" json:"hds_config,omitempty"`
-	FlagsPath          string                      `protobuf:"bytes,5,opt,name=flags_path,json=flagsPath,proto3" json:"flags_path,omitempty"`
-	StatsSinks         []*v31.StatsSink            `protobuf:"bytes,6,rep,name=stats_sinks,json=statsSinks,proto3" json:"stats_sinks,omitempty"`
-	StatsConfig        *v31.StatsConfig            `protobuf:"bytes,13,opt,name=stats_config,json=statsConfig,proto3" json:"stats_config,omitempty"`
-	StatsFlushInterval *duration.Duration          `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval,proto3" json:"stats_flush_interval,omitempty"`
-	Watchdog           *Watchdog                   `protobuf:"bytes,8,opt,name=watchdog,proto3" json:"watchdog,omitempty"`
+	// Node identity to present to the management server and for instance
+	// identification purposes (e.g. in generated headers).
+	Node *v3.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
+	// A list of :ref:`Node <envoy_v3_api_msg_config.core.v3.Node>` field names
+	// that will be included in the context parameters of the effective
+	// *UdpaResourceLocator* that is sent in a discovery request when resource
+	// locators are used for LDS/CDS. Any non-string field will have its JSON
+	// encoding set as the context parameter value, with the exception of
+	// metadata, which will be flattened (see example below). The supported field
+	// names are:
+	// - "cluster"
+	// - "id"
+	// - "locality.region"
+	// - "locality.sub_zone"
+	// - "locality.zone"
+	// - "metadata"
+	// - "user_agent_build_version.metadata"
+	// - "user_agent_build_version.version"
+	// - "user_agent_name"
+	// - "user_agent_version"
+	//
+	// The node context parameters act as a base layer dictionary for the context
+	// parameters (i.e. more specific resource specific context parameters will
+	// override). Field names will be prefixed with “udpa.node.” when included in
+	// context parameters.
+	//
+	// For example, if node_context_params is ``["user_agent_name", "metadata"]``,
+	// the implied context parameters might be::
+	//
+	//   node.user_agent_name: "envoy"
+	//   node.metadata.foo: "{\"bar\": \"baz\"}"
+	//   node.metadata.some: "42"
+	//   node.metadata.thing: "\"thing\""
+	//
+	// [#not-implemented-hide:]
+	NodeContextParams []string `protobuf:"bytes,26,rep,name=node_context_params,json=nodeContextParams,proto3" json:"node_context_params,omitempty"`
+	// Statically specified resources.
+	StaticResources *Bootstrap_StaticResources `protobuf:"bytes,2,opt,name=static_resources,json=staticResources,proto3" json:"static_resources,omitempty"`
+	// xDS configuration sources.
+	DynamicResources *Bootstrap_DynamicResources `protobuf:"bytes,3,opt,name=dynamic_resources,json=dynamicResources,proto3" json:"dynamic_resources,omitempty"`
+	// Configuration for the cluster manager which owns all upstream clusters
+	// within the server.
+	ClusterManager *ClusterManager `protobuf:"bytes,4,opt,name=cluster_manager,json=clusterManager,proto3" json:"cluster_manager,omitempty"`
+	// Health discovery service config option.
+	// (:ref:`core.ApiConfigSource <envoy_api_msg_config.core.v3.ApiConfigSource>`)
+	HdsConfig *v3.ApiConfigSource `protobuf:"bytes,14,opt,name=hds_config,json=hdsConfig,proto3" json:"hds_config,omitempty"`
+	// Optional file system path to search for startup flag files.
+	FlagsPath string `protobuf:"bytes,5,opt,name=flags_path,json=flagsPath,proto3" json:"flags_path,omitempty"`
+	// Optional set of stats sinks.
+	StatsSinks []*v31.StatsSink `protobuf:"bytes,6,rep,name=stats_sinks,json=statsSinks,proto3" json:"stats_sinks,omitempty"`
+	// Configuration for internal processing of stats.
+	StatsConfig *v31.StatsConfig `protobuf:"bytes,13,opt,name=stats_config,json=statsConfig,proto3" json:"stats_config,omitempty"`
+	// Optional duration between flushes to configured stats sinks. For
+	// performance reasons Envoy latches counters and only flushes counters and
+	// gauges at a periodic interval. If not specified the default is 5000ms (5
+	// seconds).
+	// Duration must be at least 1ms and at most 5 min.
+	StatsFlushInterval *duration.Duration `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval,proto3" json:"stats_flush_interval,omitempty"`
+	// Optional watchdog configuration.
+	Watchdog *Watchdog `protobuf:"bytes,8,opt,name=watchdog,proto3" json:"watchdog,omitempty"`
+	// Configuration for an external tracing provider.
+	//
+	// .. attention::
+	//  This field has been deprecated in favor of :ref:`HttpConnectionManager.Tracing.provider
+	//  <envoy_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.provider>`.
+	//
 	// Deprecated: Do not use.
-	Tracing                      *v32.Tracing                        `protobuf:"bytes,9,opt,name=tracing,proto3" json:"tracing,omitempty"`
-	LayeredRuntime               *LayeredRuntime                     `protobuf:"bytes,17,opt,name=layered_runtime,json=layeredRuntime,proto3" json:"layered_runtime,omitempty"`
-	Admin                        *Admin                              `protobuf:"bytes,12,opt,name=admin,proto3" json:"admin,omitempty"`
-	OverloadManager              *v33.OverloadManager                `protobuf:"bytes,15,opt,name=overload_manager,json=overloadManager,proto3" json:"overload_manager,omitempty"`
-	EnableDispatcherStats        bool                                `protobuf:"varint,16,opt,name=enable_dispatcher_stats,json=enableDispatcherStats,proto3" json:"enable_dispatcher_stats,omitempty"`
-	HeaderPrefix                 string                              `protobuf:"bytes,18,opt,name=header_prefix,json=headerPrefix,proto3" json:"header_prefix,omitempty"`
-	StatsServerVersionOverride   *wrappers.UInt64Value               `protobuf:"bytes,19,opt,name=stats_server_version_override,json=statsServerVersionOverride,proto3" json:"stats_server_version_override,omitempty"`
-	UseTcpForDnsLookups          bool                                `protobuf:"varint,20,opt,name=use_tcp_for_dns_lookups,json=useTcpForDnsLookups,proto3" json:"use_tcp_for_dns_lookups,omitempty"`
-	BootstrapExtensions          []*v3.TypedExtensionConfig          `protobuf:"bytes,21,rep,name=bootstrap_extensions,json=bootstrapExtensions,proto3" json:"bootstrap_extensions,omitempty"`
-	ConfigSources                []*v3.ConfigSource                  `protobuf:"bytes,22,rep,name=config_sources,json=configSources,proto3" json:"config_sources,omitempty"`
-	DefaultConfigSource          *v3.ConfigSource                    `protobuf:"bytes,23,opt,name=default_config_source,json=defaultConfigSource,proto3" json:"default_config_source,omitempty"`
-	DefaultSocketInterface       string                              `protobuf:"bytes,24,opt,name=default_socket_interface,json=defaultSocketInterface,proto3" json:"default_socket_interface,omitempty"`
+	Tracing *v32.Tracing `protobuf:"bytes,9,opt,name=tracing,proto3" json:"tracing,omitempty"`
+	// Configuration for the runtime configuration provider. If not
+	// specified, a “null” provider will be used which will result in all defaults
+	// being used.
+	LayeredRuntime *LayeredRuntime `protobuf:"bytes,17,opt,name=layered_runtime,json=layeredRuntime,proto3" json:"layered_runtime,omitempty"`
+	// Configuration for the local administration HTTP server.
+	Admin *Admin `protobuf:"bytes,12,opt,name=admin,proto3" json:"admin,omitempty"`
+	// Optional overload manager configuration.
+	OverloadManager *v33.OverloadManager `protobuf:"bytes,15,opt,name=overload_manager,json=overloadManager,proto3" json:"overload_manager,omitempty"`
+	// Enable :ref:`stats for event dispatcher <operations_performance>`, defaults to false.
+	// Note that this records a value for each iteration of the event loop on every thread. This
+	// should normally be minimal overhead, but when using
+	// :ref:`statsd <envoy_api_msg_config.metrics.v3.StatsdSink>`, it will send each observed value
+	// over the wire individually because the statsd protocol doesn't have any way to represent a
+	// histogram summary. Be aware that this can be a very large volume of data.
+	EnableDispatcherStats bool `protobuf:"varint,16,opt,name=enable_dispatcher_stats,json=enableDispatcherStats,proto3" json:"enable_dispatcher_stats,omitempty"`
+	// Optional string which will be used in lieu of x-envoy in prefixing headers.
+	//
+	// For example, if this string is present and set to X-Foo, then x-envoy-retry-on will be
+	// transformed into x-foo-retry-on etc.
+	//
+	// Note this applies to the headers Envoy will generate, the headers Envoy will sanitize, and the
+	// headers Envoy will trust for core code and core extensions only. Be VERY careful making
+	// changes to this string, especially in multi-layer Envoy deployments or deployments using
+	// extensions which are not upstream.
+	HeaderPrefix string `protobuf:"bytes,18,opt,name=header_prefix,json=headerPrefix,proto3" json:"header_prefix,omitempty"`
+	// Optional proxy version which will be used to set the value of :ref:`server.version statistic
+	// <server_statistics>` if specified. Envoy will not process this value, it will be sent as is to
+	// :ref:`stats sinks <envoy_api_msg_config.metrics.v3.StatsSink>`.
+	StatsServerVersionOverride *wrappers.UInt64Value `protobuf:"bytes,19,opt,name=stats_server_version_override,json=statsServerVersionOverride,proto3" json:"stats_server_version_override,omitempty"`
+	// Always use TCP queries instead of UDP queries for DNS lookups.
+	// This may be overridden on a per-cluster basis in cds_config,
+	// when :ref:`dns_resolvers <envoy_api_field_config.cluster.v3.Cluster.dns_resolvers>` and
+	// :ref:`use_tcp_for_dns_lookups <envoy_api_field_config.cluster.v3.Cluster.use_tcp_for_dns_lookups>` are
+	// specified.
+	UseTcpForDnsLookups bool `protobuf:"varint,20,opt,name=use_tcp_for_dns_lookups,json=useTcpForDnsLookups,proto3" json:"use_tcp_for_dns_lookups,omitempty"`
+	// Specifies optional bootstrap extensions to be instantiated at startup time.
+	// Each item contains extension specific configuration.
+	BootstrapExtensions []*v3.TypedExtensionConfig `protobuf:"bytes,21,rep,name=bootstrap_extensions,json=bootstrapExtensions,proto3" json:"bootstrap_extensions,omitempty"`
+	// Configuration sources that will participate in
+	// *udpa.core.v1.ResourceLocator* authority resolution. The algorithm is as
+	// follows:
+	// 1. The authority field is taken from the *udpa.core.v1.ResourceLocator*, call
+	//    this *resource_authority*.
+	// 2. *resource_authority* is compared against the authorities in any peer
+	//    *ConfigSource*. The peer *ConfigSource* is the configuration source
+	//    message which would have been used unconditionally for resolution
+	//    with opaque resource names. If there is a match with an authority, the
+	//    peer *ConfigSource* message is used.
+	// 3. *resource_authority* is compared sequentially with the authorities in
+	//    each configuration source in *config_sources*. The first *ConfigSource*
+	//    to match wins.
+	// 4. As a fallback, if no configuration source matches, then
+	//    *default_config_source* is used.
+	// 5. If *default_config_source* is not specified, resolution fails.
+	// [#not-implemented-hide:]
+	ConfigSources []*v3.ConfigSource `protobuf:"bytes,22,rep,name=config_sources,json=configSources,proto3" json:"config_sources,omitempty"`
+	// Default configuration source for *udpa.core.v1.ResourceLocator* if all
+	// other resolution fails.
+	// [#not-implemented-hide:]
+	DefaultConfigSource *v3.ConfigSource `protobuf:"bytes,23,opt,name=default_config_source,json=defaultConfigSource,proto3" json:"default_config_source,omitempty"`
+	// Optional overriding of default socket interface. The value must be the name of one of the
+	// socket interface factories initialized through a bootstrap extension
+	DefaultSocketInterface string `protobuf:"bytes,24,opt,name=default_socket_interface,json=defaultSocketInterface,proto3" json:"default_socket_interface,omitempty"`
+	// Global map of CertificateProvider instances. These instances are referred to by name in the
+	// :ref:`CommonTlsContext.CertificateProviderInstance.instance_name
+	// <envoy_api_field_extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstance.instance_name>`
+	// field.
+	// [#not-implemented-hide:]
 	CertificateProviderInstances map[string]*v3.TypedExtensionConfig `protobuf:"bytes,25,rep,name=certificate_provider_instances,json=certificateProviderInstances,proto3" json:"certificate_provider_instances,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Deprecated: Do not use.
 	HiddenEnvoyDeprecatedRuntime *Runtime `protobuf:"bytes,11,opt,name=hidden_envoy_deprecated_runtime,json=hiddenEnvoyDeprecatedRuntime,proto3" json:"hidden_envoy_deprecated_runtime,omitempty"`
@@ -338,14 +458,25 @@ func (x *Bootstrap) GetHiddenEnvoyDeprecatedRuntime() *Runtime {
 	return nil
 }
 
+// Administration interface :ref:`operations documentation
+// <operations_admin_interface>`.
 type Admin struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	AccessLogPath string             `protobuf:"bytes,1,opt,name=access_log_path,json=accessLogPath,proto3" json:"access_log_path,omitempty"`
-	ProfilePath   string             `protobuf:"bytes,2,opt,name=profile_path,json=profilePath,proto3" json:"profile_path,omitempty"`
-	Address       *v3.Address        `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	// The path to write the access log for the administration server. If no
+	// access log is desired specify ‘/dev/null’. This is only required if
+	// :ref:`address <envoy_api_field_config.bootstrap.v3.Admin.address>` is set.
+	AccessLogPath string `protobuf:"bytes,1,opt,name=access_log_path,json=accessLogPath,proto3" json:"access_log_path,omitempty"`
+	// The cpu profiler output path for the administration server. If no profile
+	// path is specified, the default is ‘/var/log/envoy/envoy.prof’.
+	ProfilePath string `protobuf:"bytes,2,opt,name=profile_path,json=profilePath,proto3" json:"profile_path,omitempty"`
+	// The TCP address that the administration server will listen on.
+	// If not specified, Envoy will not start an administration server.
+	Address *v3.Address `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
+	// Additional socket options that may not be present in Envoy source code or
+	// precompiled binaries.
 	SocketOptions []*v3.SocketOption `protobuf:"bytes,4,rep,name=socket_options,json=socketOptions,proto3" json:"socket_options,omitempty"`
 }
 
@@ -409,15 +540,32 @@ func (x *Admin) GetSocketOptions() []*v3.SocketOption {
 	return nil
 }
 
+// Cluster manager :ref:`architecture overview <arch_overview_cluster_manager>`.
 type ClusterManager struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	LocalClusterName   string                           `protobuf:"bytes,1,opt,name=local_cluster_name,json=localClusterName,proto3" json:"local_cluster_name,omitempty"`
-	OutlierDetection   *ClusterManager_OutlierDetection `protobuf:"bytes,2,opt,name=outlier_detection,json=outlierDetection,proto3" json:"outlier_detection,omitempty"`
-	UpstreamBindConfig *v3.BindConfig                   `protobuf:"bytes,3,opt,name=upstream_bind_config,json=upstreamBindConfig,proto3" json:"upstream_bind_config,omitempty"`
-	LoadStatsConfig    *v3.ApiConfigSource              `protobuf:"bytes,4,opt,name=load_stats_config,json=loadStatsConfig,proto3" json:"load_stats_config,omitempty"`
+	// Name of the local cluster (i.e., the cluster that owns the Envoy running
+	// this configuration). In order to enable :ref:`zone aware routing
+	// <arch_overview_load_balancing_zone_aware_routing>` this option must be set.
+	// If *local_cluster_name* is defined then :ref:`clusters
+	// <envoy_api_msg_config.cluster.v3.Cluster>` must be defined in the :ref:`Bootstrap
+	// static cluster resources
+	// <envoy_api_field_config.bootstrap.v3.Bootstrap.StaticResources.clusters>`. This is unrelated to
+	// the :option:`--service-cluster` option which does not `affect zone aware
+	// routing <https://github.com/envoyproxy/envoy/issues/774>`_.
+	LocalClusterName string `protobuf:"bytes,1,opt,name=local_cluster_name,json=localClusterName,proto3" json:"local_cluster_name,omitempty"`
+	// Optional global configuration for outlier detection.
+	OutlierDetection *ClusterManager_OutlierDetection `protobuf:"bytes,2,opt,name=outlier_detection,json=outlierDetection,proto3" json:"outlier_detection,omitempty"`
+	// Optional configuration used to bind newly established upstream connections.
+	// This may be overridden on a per-cluster basis by upstream_bind_config in the cds_config.
+	UpstreamBindConfig *v3.BindConfig `protobuf:"bytes,3,opt,name=upstream_bind_config,json=upstreamBindConfig,proto3" json:"upstream_bind_config,omitempty"`
+	// A management server endpoint to stream load stats to via
+	// *StreamLoadStats*. This must have :ref:`api_type
+	// <envoy_api_field_config.core.v3.ApiConfigSource.api_type>` :ref:`GRPC
+	// <envoy_api_enum_value_config.core.v3.ApiConfigSource.ApiType.GRPC>`.
+	LoadStatsConfig *v3.ApiConfigSource `protobuf:"bytes,4,opt,name=load_stats_config,json=loadStatsConfig,proto3" json:"load_stats_config,omitempty"`
 }
 
 func (x *ClusterManager) Reset() {
@@ -480,18 +628,43 @@ func (x *ClusterManager) GetLoadStatsConfig() *v3.ApiConfigSource {
 	return nil
 }
 
+// Envoy process watchdog configuration. When configured, this monitors for
+// nonresponsive threads and kills the process after the configured thresholds.
+// See the :ref:`watchdog documentation <operations_performance_watchdog>` for more information.
+// [#next-free-field: 8]
 type Watchdog struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Actions              []*Watchdog_WatchdogAction `protobuf:"bytes,7,rep,name=actions,proto3" json:"actions,omitempty"`
-	MissTimeout          *duration.Duration         `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout,proto3" json:"miss_timeout,omitempty"`
-	MegamissTimeout      *duration.Duration         `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout,proto3" json:"megamiss_timeout,omitempty"`
-	KillTimeout          *duration.Duration         `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout,proto3" json:"kill_timeout,omitempty"`
-	MaxKillTimeoutJitter *duration.Duration         `protobuf:"bytes,6,opt,name=max_kill_timeout_jitter,json=maxKillTimeoutJitter,proto3" json:"max_kill_timeout_jitter,omitempty"`
-	MultikillTimeout     *duration.Duration         `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout,proto3" json:"multikill_timeout,omitempty"`
-	MultikillThreshold   *v34.Percent               `protobuf:"bytes,5,opt,name=multikill_threshold,json=multikillThreshold,proto3" json:"multikill_threshold,omitempty"`
+	// Register actions that will fire on given WatchDog events.
+	// See *WatchDogAction* for priority of events.
+	Actions []*Watchdog_WatchdogAction `protobuf:"bytes,7,rep,name=actions,proto3" json:"actions,omitempty"`
+	// The duration after which Envoy counts a nonresponsive thread in the
+	// *watchdog_miss* statistic. If not specified the default is 200ms.
+	MissTimeout *duration.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout,proto3" json:"miss_timeout,omitempty"`
+	// The duration after which Envoy counts a nonresponsive thread in the
+	// *watchdog_mega_miss* statistic. If not specified the default is
+	// 1000ms.
+	MegamissTimeout *duration.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout,proto3" json:"megamiss_timeout,omitempty"`
+	// If a watched thread has been nonresponsive for this duration, assume a
+	// programming error and kill the entire Envoy process. Set to 0 to disable
+	// kill behavior. If not specified the default is 0 (disabled).
+	KillTimeout *duration.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout,proto3" json:"kill_timeout,omitempty"`
+	// Defines the maximum jitter used to adjust the *kill_timeout* if *kill_timeout* is
+	// enabled. Enabling this feature would help to reduce risk of synchronized
+	// watchdog kill events across proxies due to external triggers. Set to 0 to
+	// disable. If not specified the default is 0 (disabled).
+	MaxKillTimeoutJitter *duration.Duration `protobuf:"bytes,6,opt,name=max_kill_timeout_jitter,json=maxKillTimeoutJitter,proto3" json:"max_kill_timeout_jitter,omitempty"`
+	// If max(2, ceil(registered_threads * Fraction(*multikill_threshold*)))
+	// threads have been nonresponsive for at least this duration kill the entire
+	// Envoy process. Set to 0 to disable this behavior. If not specified the
+	// default is 0 (disabled).
+	MultikillTimeout *duration.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout,proto3" json:"multikill_timeout,omitempty"`
+	// Sets the threshold for *multikill_timeout* in terms of the percentage of
+	// nonresponsive threads required for the *multikill_timeout*.
+	// If not specified the default is 0.
+	MultikillThreshold *v34.Percent `protobuf:"bytes,5,opt,name=multikill_threshold,json=multikillThreshold,proto3" json:"multikill_threshold,omitempty"`
 }
 
 func (x *Watchdog) Reset() {
@@ -575,15 +748,35 @@ func (x *Watchdog) GetMultikillThreshold() *v34.Percent {
 	return nil
 }
 
+// Runtime :ref:`configuration overview <config_runtime>` (deprecated).
 type Runtime struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SymlinkRoot          string          `protobuf:"bytes,1,opt,name=symlink_root,json=symlinkRoot,proto3" json:"symlink_root,omitempty"`
-	Subdirectory         string          `protobuf:"bytes,2,opt,name=subdirectory,proto3" json:"subdirectory,omitempty"`
-	OverrideSubdirectory string          `protobuf:"bytes,3,opt,name=override_subdirectory,json=overrideSubdirectory,proto3" json:"override_subdirectory,omitempty"`
-	Base                 *_struct.Struct `protobuf:"bytes,4,opt,name=base,proto3" json:"base,omitempty"`
+	// The implementation assumes that the file system tree is accessed via a
+	// symbolic link. An atomic link swap is used when a new tree should be
+	// switched to. This parameter specifies the path to the symbolic link. Envoy
+	// will watch the location for changes and reload the file system tree when
+	// they happen. If this parameter is not set, there will be no disk based
+	// runtime.
+	SymlinkRoot string `protobuf:"bytes,1,opt,name=symlink_root,json=symlinkRoot,proto3" json:"symlink_root,omitempty"`
+	// Specifies the subdirectory to load within the root directory. This is
+	// useful if multiple systems share the same delivery mechanism. Envoy
+	// configuration elements can be contained in a dedicated subdirectory.
+	Subdirectory string `protobuf:"bytes,2,opt,name=subdirectory,proto3" json:"subdirectory,omitempty"`
+	// Specifies an optional subdirectory to load within the root directory. If
+	// specified and the directory exists, configuration values within this
+	// directory will override those found in the primary subdirectory. This is
+	// useful when Envoy is deployed across many different types of servers.
+	// Sometimes it is useful to have a per service cluster directory for runtime
+	// configuration. See below for exactly how the override directory is used.
+	OverrideSubdirectory string `protobuf:"bytes,3,opt,name=override_subdirectory,json=overrideSubdirectory,proto3" json:"override_subdirectory,omitempty"`
+	// Static base runtime. This will be :ref:`overridden
+	// <config_runtime_layering>` by other runtime layers, e.g.
+	// disk or admin. This follows the :ref:`runtime protobuf JSON representation
+	// encoding <config_runtime_proto_json>`.
+	Base *_struct.Struct `protobuf:"bytes,4,opt,name=base,proto3" json:"base,omitempty"`
 }
 
 func (x *Runtime) Reset() {
@@ -646,11 +839,14 @@ func (x *Runtime) GetBase() *_struct.Struct {
 	return nil
 }
 
+// [#next-free-field: 6]
 type RuntimeLayer struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Descriptive name for the runtime layer. This is only used for the runtime
+	// :http:get:`/runtime` output.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to LayerSpecifier:
 	//	*RuntimeLayer_StaticLayer
@@ -739,6 +935,10 @@ type isRuntimeLayer_LayerSpecifier interface {
 }
 
 type RuntimeLayer_StaticLayer struct {
+	// :ref:`Static runtime <config_runtime_bootstrap>` layer.
+	// This follows the :ref:`runtime protobuf JSON representation encoding
+	// <config_runtime_proto_json>`. Unlike static xDS resources, this static
+	// layer is overridable by later layers in the runtime virtual filesystem.
 	StaticLayer *_struct.Struct `protobuf:"bytes,2,opt,name=static_layer,json=staticLayer,proto3,oneof"`
 }
 
@@ -762,11 +962,14 @@ func (*RuntimeLayer_AdminLayer_) isRuntimeLayer_LayerSpecifier() {}
 
 func (*RuntimeLayer_RtdsLayer_) isRuntimeLayer_LayerSpecifier() {}
 
+// Runtime :ref:`configuration overview <config_runtime>`.
 type LayeredRuntime struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The :ref:`layers <config_runtime_layering>` of the runtime. This is ordered
+	// such that later layers in the list overlay earlier entries.
 	Layers []*RuntimeLayer `protobuf:"bytes,1,rep,name=layers,proto3" json:"layers,omitempty"`
 }
 
@@ -814,9 +1017,19 @@ type Bootstrap_StaticResources struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Static :ref:`Listeners <envoy_api_msg_config.listener.v3.Listener>`. These listeners are
+	// available regardless of LDS configuration.
 	Listeners []*v35.Listener `protobuf:"bytes,1,rep,name=listeners,proto3" json:"listeners,omitempty"`
-	Clusters  []*v36.Cluster  `protobuf:"bytes,2,rep,name=clusters,proto3" json:"clusters,omitempty"`
-	Secrets   []*v37.Secret   `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	// If a network based configuration source is specified for :ref:`cds_config
+	// <envoy_api_field_config.bootstrap.v3.Bootstrap.DynamicResources.cds_config>`, it's necessary
+	// to have some initial cluster definitions available to allow Envoy to know
+	// how to speak to the management server. These cluster definitions may not
+	// use :ref:`EDS <arch_overview_dynamic_config_eds>` (i.e. they should be static
+	// IP or DNS-based).
+	Clusters []*v36.Cluster `protobuf:"bytes,2,rep,name=clusters,proto3" json:"clusters,omitempty"`
+	// These static secrets can be used by :ref:`SdsSecretConfig
+	// <envoy_api_msg_extensions.transport_sockets.tls.v3.SdsSecretConfig>`
+	Secrets []*v37.Secret `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
 }
 
 func (x *Bootstrap_StaticResources) Reset() {
@@ -872,16 +1085,33 @@ func (x *Bootstrap_StaticResources) GetSecrets() []*v37.Secret {
 	return nil
 }
 
+// [#next-free-field: 7]
 type Bootstrap_DynamicResources struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	LdsConfig           *v3.ConfigSource    `protobuf:"bytes,1,opt,name=lds_config,json=ldsConfig,proto3" json:"lds_config,omitempty"`
+	// All :ref:`Listeners <envoy_api_msg_config.listener.v3.Listener>` are provided by a single
+	// :ref:`LDS <arch_overview_dynamic_config_lds>` configuration source.
+	LdsConfig *v3.ConfigSource `protobuf:"bytes,1,opt,name=lds_config,json=ldsConfig,proto3" json:"lds_config,omitempty"`
+	// Resource locator for listener collection.
+	// [#not-implemented-hide:]
 	LdsResourcesLocator *v1.ResourceLocator `protobuf:"bytes,5,opt,name=lds_resources_locator,json=ldsResourcesLocator,proto3" json:"lds_resources_locator,omitempty"`
-	CdsConfig           *v3.ConfigSource    `protobuf:"bytes,2,opt,name=cds_config,json=cdsConfig,proto3" json:"cds_config,omitempty"`
+	// All post-bootstrap :ref:`Cluster <envoy_api_msg_config.cluster.v3.Cluster>` definitions are
+	// provided by a single :ref:`CDS <arch_overview_dynamic_config_cds>`
+	// configuration source.
+	CdsConfig *v3.ConfigSource `protobuf:"bytes,2,opt,name=cds_config,json=cdsConfig,proto3" json:"cds_config,omitempty"`
+	// Resource locator for cluster collection.
+	// [#not-implemented-hide:]
 	CdsResourcesLocator *v1.ResourceLocator `protobuf:"bytes,6,opt,name=cds_resources_locator,json=cdsResourcesLocator,proto3" json:"cds_resources_locator,omitempty"`
-	AdsConfig           *v3.ApiConfigSource `protobuf:"bytes,3,opt,name=ads_config,json=adsConfig,proto3" json:"ads_config,omitempty"`
+	// A single :ref:`ADS <config_overview_ads>` source may be optionally
+	// specified. This must have :ref:`api_type
+	// <envoy_api_field_config.core.v3.ApiConfigSource.api_type>` :ref:`GRPC
+	// <envoy_api_enum_value_config.core.v3.ApiConfigSource.ApiType.GRPC>`. Only
+	// :ref:`ConfigSources <envoy_api_msg_config.core.v3.ConfigSource>` that have
+	// the :ref:`ads <envoy_api_field_config.core.v3.ConfigSource.ads>` field set will be
+	// streamed on the ADS channel.
+	AdsConfig *v3.ApiConfigSource `protobuf:"bytes,3,opt,name=ads_config,json=adsConfig,proto3" json:"ads_config,omitempty"`
 }
 
 func (x *Bootstrap_DynamicResources) Reset() {
@@ -956,7 +1186,11 @@ type ClusterManager_OutlierDetection struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	EventLogPath string                 `protobuf:"bytes,1,opt,name=event_log_path,json=eventLogPath,proto3" json:"event_log_path,omitempty"`
+	// Specifies the path to the outlier event log.
+	EventLogPath string `protobuf:"bytes,1,opt,name=event_log_path,json=eventLogPath,proto3" json:"event_log_path,omitempty"`
+	// [#not-implemented-hide:]
+	// The gRPC service for the outlier detection event service.
+	// If empty, outlier detection events won't be sent to a remote endpoint.
 	EventService *v3.EventServiceConfig `protobuf:"bytes,2,opt,name=event_service,json=eventService,proto3" json:"event_service,omitempty"`
 }
 
@@ -1011,6 +1245,7 @@ type Watchdog_WatchdogAction struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Extension specific configuration for the action.
 	Config *v3.TypedExtensionConfig              `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
 	Event  Watchdog_WatchdogAction_WatchdogEvent `protobuf:"varint,2,opt,name=event,proto3,enum=envoy.config.bootstrap.v3.Watchdog_WatchdogAction_WatchdogEvent" json:"event,omitempty"`
 }
@@ -1061,14 +1296,27 @@ func (x *Watchdog_WatchdogAction) GetEvent() Watchdog_WatchdogAction_WatchdogEve
 	return Watchdog_WatchdogAction_UNKNOWN
 }
 
+// :ref:`Disk runtime <config_runtime_local_disk>` layer.
 type RuntimeLayer_DiskLayer struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SymlinkRoot          string `protobuf:"bytes,1,opt,name=symlink_root,json=symlinkRoot,proto3" json:"symlink_root,omitempty"`
-	Subdirectory         string `protobuf:"bytes,3,opt,name=subdirectory,proto3" json:"subdirectory,omitempty"`
-	AppendServiceCluster bool   `protobuf:"varint,2,opt,name=append_service_cluster,json=appendServiceCluster,proto3" json:"append_service_cluster,omitempty"`
+	// The implementation assumes that the file system tree is accessed via a
+	// symbolic link. An atomic link swap is used when a new tree should be
+	// switched to. This parameter specifies the path to the symbolic link.
+	// Envoy will watch the location for changes and reload the file system tree
+	// when they happen. See documentation on runtime :ref:`atomicity
+	// <config_runtime_atomicity>` for further details on how reloads are
+	// treated.
+	SymlinkRoot string `protobuf:"bytes,1,opt,name=symlink_root,json=symlinkRoot,proto3" json:"symlink_root,omitempty"`
+	// Specifies the subdirectory to load within the root directory. This is
+	// useful if multiple systems share the same delivery mechanism. Envoy
+	// configuration elements can be contained in a dedicated subdirectory.
+	Subdirectory string `protobuf:"bytes,3,opt,name=subdirectory,proto3" json:"subdirectory,omitempty"`
+	// :ref:`Append <config_runtime_local_disk_service_cluster_subdirs>` the
+	// service cluster to the path under symlink root.
+	AppendServiceCluster bool `protobuf:"varint,2,opt,name=append_service_cluster,json=appendServiceCluster,proto3" json:"append_service_cluster,omitempty"`
 }
 
 func (x *RuntimeLayer_DiskLayer) Reset() {
@@ -1124,6 +1372,7 @@ func (x *RuntimeLayer_DiskLayer) GetAppendServiceCluster() bool {
 	return false
 }
 
+// :ref:`Admin console runtime <config_runtime_admin>` layer.
 type RuntimeLayer_AdminLayer struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1162,14 +1411,19 @@ func (*RuntimeLayer_AdminLayer) Descriptor() ([]byte, []int) {
 	return file_envoy_config_bootstrap_v3_bootstrap_proto_rawDescGZIP(), []int{5, 1}
 }
 
+// :ref:`Runtime Discovery Service (RTDS) <config_runtime_rtds>` layer.
 type RuntimeLayer_RtdsLayer struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name                string              `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Resource to subscribe to at *rtds_config* for the RTDS layer.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Resource locator for RTDS layer. This is mutually exclusive to *name*.
+	// [#not-implemented-hide:]
 	RtdsResourceLocator *v1.ResourceLocator `protobuf:"bytes,3,opt,name=rtds_resource_locator,json=rtdsResourceLocator,proto3" json:"rtds_resource_locator,omitempty"`
-	RtdsConfig          *v3.ConfigSource    `protobuf:"bytes,2,opt,name=rtds_config,json=rtdsConfig,proto3" json:"rtds_config,omitempty"`
+	// RTDS configuration source.
+	RtdsConfig *v3.ConfigSource `protobuf:"bytes,2,opt,name=rtds_config,json=rtdsConfig,proto3" json:"rtds_config,omitempty"`
 }
 
 func (x *RuntimeLayer_RtdsLayer) Reset() {

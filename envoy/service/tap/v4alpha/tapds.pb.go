@@ -34,12 +34,16 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#not-implemented-hide:] A tap resource is essentially a tap configuration with a name
+// The filter TapDS config references this name.
 type TapResource struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name   string             `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the tap configuration.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Tap config to apply
 	Config *v4alpha.TapConfig `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 }
 

@@ -35,7 +35,10 @@ type RouteConfiguration struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name   string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the route configuration.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The list of routes that will be matched, in order, against incoming requests. The first route
+	// that matches will be used.
 	Routes []*Route `protobuf:"bytes,2,rep,name=routes,proto3" json:"routes,omitempty"`
 }
 
@@ -90,7 +93,9 @@ type Route struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Match *RouteMatch  `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
+	// Route matching parameters.
+	Match *RouteMatch `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
+	// Route request to some upstream cluster.
 	Route *RouteAction `protobuf:"bytes,2,opt,name=route,proto3" json:"route,omitempty"`
 }
 
@@ -145,7 +150,12 @@ type RouteMatch struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Topic   *v4alpha.StringMatcher    `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
+	// The name of the topic.
+	Topic *v4alpha.StringMatcher `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
+	// Specifies a set of headers that the route should match on. The router will check the request’s
+	// headers against all the specified headers in the route config. A match will happen if all the
+	// headers in the route are present in the request with the same values (or based on presence if
+	// the value field is not in the config).
 	Headers []*v4alpha1.HeaderMatcher `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
 }
 
@@ -200,7 +210,9 @@ type RouteAction struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Cluster       string             `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	// Indicates the upstream cluster to which the request should be routed.
+	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	// Optional endpoint metadata match criteria used by the subset load balancer.
 	MetadataMatch *v4alpha2.Metadata `protobuf:"bytes,2,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 }
 

@@ -36,9 +36,12 @@ const _ = proto.ProtoPackageIsVersion4
 type FilterChainMatch_ConnectionSourceType int32
 
 const (
-	FilterChainMatch_ANY                 FilterChainMatch_ConnectionSourceType = 0
+	// Any connection source matches.
+	FilterChainMatch_ANY FilterChainMatch_ConnectionSourceType = 0
+	// Match a connection originating from the same host.
 	FilterChainMatch_SAME_IP_OR_LOOPBACK FilterChainMatch_ConnectionSourceType = 1
-	FilterChainMatch_EXTERNAL            FilterChainMatch_ConnectionSourceType = 2
+	// Match a connection originating from a different host.
+	FilterChainMatch_EXTERNAL FilterChainMatch_ConnectionSourceType = 2
 )
 
 // Enum value maps for FilterChainMatch_ConnectionSourceType.
@@ -87,7 +90,12 @@ type Filter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the filter to instantiate. The name must match a
+	// :ref:`supported filter <config_network_filters>`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Filter specific configuration which depends on the filter being
+	// instantiated. See the supported filters for further documentation.
+	//
 	// Types that are assignable to ConfigType:
 	//	*Filter_TypedConfig
 	ConfigType isFilter_ConfigType `protobuf_oneof:"config_type"`
@@ -156,21 +164,107 @@ type Filter_TypedConfig struct {
 
 func (*Filter_TypedConfig) isFilter_ConfigType() {}
 
+// Specifies the match criteria for selecting a specific filter chain for a
+// listener.
+//
+// In order for a filter chain to be selected, *ALL* of its criteria must be
+// fulfilled by the incoming connection, properties of which are set by the
+// networking stack and/or listener filters.
+//
+// The following order applies:
+//
+// 1. Destination port.
+// 2. Destination IP address.
+// 3. Server name (e.g. SNI for TLS protocol),
+// 4. Transport protocol.
+// 5. Application protocols (e.g. ALPN for TLS protocol).
+// 6. Source type (e.g. any, local or external network).
+// 7. Source IP address.
+// 8. Source port.
+//
+// For criteria that allow ranges or wildcards, the most specific value in any
+// of the configured filter chains that matches the incoming connection is going
+// to be used (e.g. for SNI ``www.example.com`` the most specific match would be
+// ``www.example.com``, then ``*.example.com``, then ``*.com``, then any filter
+// chain without ``server_names`` requirements).
+//
+// [#comment: Implemented rules are kept in the preference order, with deprecated fields
+// listed at the end, because that's how we want to list them in the docs.
+//
+// [#comment:TODO(PiotrSikora): Add support for configurable precedence of the rules]
+// [#next-free-field: 13]
 type FilterChainMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	DestinationPort      *wrappers.UInt32Value                 `protobuf:"bytes,8,opt,name=destination_port,json=destinationPort,proto3" json:"destination_port,omitempty"`
-	PrefixRanges         []*v4alpha.CidrRange                  `protobuf:"bytes,3,rep,name=prefix_ranges,json=prefixRanges,proto3" json:"prefix_ranges,omitempty"`
-	AddressSuffix        string                                `protobuf:"bytes,4,opt,name=address_suffix,json=addressSuffix,proto3" json:"address_suffix,omitempty"`
-	SuffixLen            *wrappers.UInt32Value                 `protobuf:"bytes,5,opt,name=suffix_len,json=suffixLen,proto3" json:"suffix_len,omitempty"`
-	SourceType           FilterChainMatch_ConnectionSourceType `protobuf:"varint,12,opt,name=source_type,json=sourceType,proto3,enum=envoy.config.listener.v4alpha.FilterChainMatch_ConnectionSourceType" json:"source_type,omitempty"`
-	SourcePrefixRanges   []*v4alpha.CidrRange                  `protobuf:"bytes,6,rep,name=source_prefix_ranges,json=sourcePrefixRanges,proto3" json:"source_prefix_ranges,omitempty"`
-	SourcePorts          []uint32                              `protobuf:"varint,7,rep,packed,name=source_ports,json=sourcePorts,proto3" json:"source_ports,omitempty"`
-	ServerNames          []string                              `protobuf:"bytes,11,rep,name=server_names,json=serverNames,proto3" json:"server_names,omitempty"`
-	TransportProtocol    string                                `protobuf:"bytes,9,opt,name=transport_protocol,json=transportProtocol,proto3" json:"transport_protocol,omitempty"`
-	ApplicationProtocols []string                              `protobuf:"bytes,10,rep,name=application_protocols,json=applicationProtocols,proto3" json:"application_protocols,omitempty"`
+	// Optional destination port to consider when use_original_dst is set on the
+	// listener in determining a filter chain match.
+	DestinationPort *wrappers.UInt32Value `protobuf:"bytes,8,opt,name=destination_port,json=destinationPort,proto3" json:"destination_port,omitempty"`
+	// If non-empty, an IP address and prefix length to match addresses when the
+	// listener is bound to 0.0.0.0/:: or when use_original_dst is specified.
+	PrefixRanges []*v4alpha.CidrRange `protobuf:"bytes,3,rep,name=prefix_ranges,json=prefixRanges,proto3" json:"prefix_ranges,omitempty"`
+	// If non-empty, an IP address and suffix length to match addresses when the
+	// listener is bound to 0.0.0.0/:: or when use_original_dst is specified.
+	// [#not-implemented-hide:]
+	AddressSuffix string `protobuf:"bytes,4,opt,name=address_suffix,json=addressSuffix,proto3" json:"address_suffix,omitempty"`
+	// [#not-implemented-hide:]
+	SuffixLen *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=suffix_len,json=suffixLen,proto3" json:"suffix_len,omitempty"`
+	// Specifies the connection source IP match type. Can be any, local or external network.
+	SourceType FilterChainMatch_ConnectionSourceType `protobuf:"varint,12,opt,name=source_type,json=sourceType,proto3,enum=envoy.config.listener.v4alpha.FilterChainMatch_ConnectionSourceType" json:"source_type,omitempty"`
+	// The criteria is satisfied if the source IP address of the downstream
+	// connection is contained in at least one of the specified subnets. If the
+	// parameter is not specified or the list is empty, the source IP address is
+	// ignored.
+	SourcePrefixRanges []*v4alpha.CidrRange `protobuf:"bytes,6,rep,name=source_prefix_ranges,json=sourcePrefixRanges,proto3" json:"source_prefix_ranges,omitempty"`
+	// The criteria is satisfied if the source port of the downstream connection
+	// is contained in at least one of the specified ports. If the parameter is
+	// not specified, the source port is ignored.
+	SourcePorts []uint32 `protobuf:"varint,7,rep,packed,name=source_ports,json=sourcePorts,proto3" json:"source_ports,omitempty"`
+	// If non-empty, a list of server names (e.g. SNI for TLS protocol) to consider when determining
+	// a filter chain match. Those values will be compared against the server names of a new
+	// connection, when detected by one of the listener filters.
+	//
+	// The server name will be matched against all wildcard domains, i.e. ``www.example.com``
+	// will be first matched against ``www.example.com``, then ``*.example.com``, then ``*.com``.
+	//
+	// Note that partial wildcards are not supported, and values like ``*w.example.com`` are invalid.
+	//
+	// .. attention::
+	//
+	//   See the :ref:`FAQ entry <faq_how_to_setup_sni>` on how to configure SNI for more
+	//   information.
+	ServerNames []string `protobuf:"bytes,11,rep,name=server_names,json=serverNames,proto3" json:"server_names,omitempty"`
+	// If non-empty, a transport protocol to consider when determining a filter chain match.
+	// This value will be compared against the transport protocol of a new connection, when
+	// it's detected by one of the listener filters.
+	//
+	// Suggested values include:
+	//
+	// * ``raw_buffer`` - default, used when no transport protocol is detected,
+	// * ``tls`` - set by :ref:`envoy.filters.listener.tls_inspector <config_listener_filters_tls_inspector>`
+	//   when TLS protocol is detected.
+	TransportProtocol string `protobuf:"bytes,9,opt,name=transport_protocol,json=transportProtocol,proto3" json:"transport_protocol,omitempty"`
+	// If non-empty, a list of application protocols (e.g. ALPN for TLS protocol) to consider when
+	// determining a filter chain match. Those values will be compared against the application
+	// protocols of a new connection, when detected by one of the listener filters.
+	//
+	// Suggested values include:
+	//
+	// * ``http/1.1`` - set by :ref:`envoy.filters.listener.tls_inspector
+	//   <config_listener_filters_tls_inspector>`,
+	// * ``h2`` - set by :ref:`envoy.filters.listener.tls_inspector <config_listener_filters_tls_inspector>`
+	//
+	// .. attention::
+	//
+	//   Currently, only :ref:`TLS Inspector <config_listener_filters_tls_inspector>` provides
+	//   application protocol detection based on the requested
+	//   `ALPN <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_ values.
+	//
+	//   However, the use of ALPN is pretty much limited to the HTTP/2 traffic on the Internet,
+	//   and matching on values other than ``h2`` is going to lead to a lot of false negatives,
+	//   unless all connecting clients are known to use ALPN.
+	ApplicationProtocols []string `protobuf:"bytes,10,rep,name=application_protocols,json=applicationProtocols,proto3" json:"application_protocols,omitempty"`
 }
 
 func (x *FilterChainMatch) Reset() {
@@ -275,17 +369,43 @@ func (x *FilterChainMatch) GetApplicationProtocols() []string {
 	return nil
 }
 
+// A filter chain wraps a set of match criteria, an option TLS context, a set of filters, and
+// various other parameters.
+// [#next-free-field: 9]
 type FilterChain struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	FilterChainMatch      *FilterChainMatch                  `protobuf:"bytes,1,opt,name=filter_chain_match,json=filterChainMatch,proto3" json:"filter_chain_match,omitempty"`
-	Filters               []*Filter                          `protobuf:"bytes,3,rep,name=filters,proto3" json:"filters,omitempty"`
-	UseProxyProto         *wrappers.BoolValue                `protobuf:"bytes,4,opt,name=use_proxy_proto,json=useProxyProto,proto3" json:"use_proxy_proto,omitempty"`
-	Metadata              *v4alpha.Metadata                  `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	TransportSocket       *v4alpha.TransportSocket           `protobuf:"bytes,6,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
-	Name                  string                             `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
+	// The criteria to use when matching a connection to this filter chain.
+	FilterChainMatch *FilterChainMatch `protobuf:"bytes,1,opt,name=filter_chain_match,json=filterChainMatch,proto3" json:"filter_chain_match,omitempty"`
+	// A list of individual network filters that make up the filter chain for
+	// connections established with the listener. Order matters as the filters are
+	// processed sequentially as connection events happen. Note: If the filter
+	// list is empty, the connection will close by default.
+	Filters []*Filter `protobuf:"bytes,3,rep,name=filters,proto3" json:"filters,omitempty"`
+	// Whether the listener should expect a PROXY protocol V1 header on new
+	// connections. If this option is enabled, the listener will assume that that
+	// remote address of the connection is the one specified in the header. Some
+	// load balancers including the AWS ELB support this option. If the option is
+	// absent or set to false, Envoy will use the physical peer address of the
+	// connection as the remote address.
+	UseProxyProto *wrappers.BoolValue `protobuf:"bytes,4,opt,name=use_proxy_proto,json=useProxyProto,proto3" json:"use_proxy_proto,omitempty"`
+	// [#not-implemented-hide:] filter chain metadata.
+	Metadata *v4alpha.Metadata `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// Optional custom transport socket implementation to use for downstream connections.
+	// To setup TLS, set a transport socket with name `tls` and
+	// :ref:`DownstreamTlsContext <envoy_api_msg_extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext>` in the `typed_config`.
+	// If no transport socket configuration is specified, new connections
+	// will be set up with plaintext.
+	TransportSocket *v4alpha.TransportSocket `protobuf:"bytes,6,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
+	// [#not-implemented-hide:] The unique name (or empty) by which this filter chain is known. If no
+	// name is provided, Envoy will allocate an internal UUID for the filter chain. If the filter
+	// chain is to be dynamically updated or removed via FCDS a unique name must be provided.
+	Name string `protobuf:"bytes,7,opt,name=name,proto3" json:"name,omitempty"`
+	// [#not-implemented-hide:] The configuration to specify whether the filter chain will be built on-demand.
+	// If this field is not empty, the filter chain will be built on-demand.
+	// Otherwise, the filter chain will be built normally and block listener warming.
 	OnDemandConfiguration *FilterChain_OnDemandConfiguration `protobuf:"bytes,8,opt,name=on_demand_configuration,json=onDemandConfiguration,proto3" json:"on_demand_configuration,omitempty"`
 }
 
@@ -370,6 +490,33 @@ func (x *FilterChain) GetOnDemandConfiguration() *FilterChain_OnDemandConfigurat
 	return nil
 }
 
+// Listener filter chain match configuration. This is a recursive structure which allows complex
+// nested match configurations to be built using various logical operators.
+//
+// Examples:
+//
+// * Matches if the destination port is 3306.
+//
+// .. code-block:: yaml
+//
+//  destination_port_range:
+//   start: 3306
+//   end: 3307
+//
+// * Matches if the destination port is 3306 or 15000.
+//
+// .. code-block:: yaml
+//
+//  or_match:
+//    rules:
+//      - destination_port_range:
+//          start: 3306
+//          end: 3306
+//      - destination_port_range:
+//          start: 15000
+//          end: 15001
+//
+// [#next-free-field: 6]
 type ListenerFilterChainMatchPredicate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -463,22 +610,30 @@ type isListenerFilterChainMatchPredicate_Rule interface {
 }
 
 type ListenerFilterChainMatchPredicate_OrMatch struct {
+	// A set that describes a logical OR. If any member of the set matches, the match configuration
+	// matches.
 	OrMatch *ListenerFilterChainMatchPredicate_MatchSet `protobuf:"bytes,1,opt,name=or_match,json=orMatch,proto3,oneof"`
 }
 
 type ListenerFilterChainMatchPredicate_AndMatch struct {
+	// A set that describes a logical AND. If all members of the set match, the match configuration
+	// matches.
 	AndMatch *ListenerFilterChainMatchPredicate_MatchSet `protobuf:"bytes,2,opt,name=and_match,json=andMatch,proto3,oneof"`
 }
 
 type ListenerFilterChainMatchPredicate_NotMatch struct {
+	// A negation match. The match configuration will match if the negated match condition matches.
 	NotMatch *ListenerFilterChainMatchPredicate `protobuf:"bytes,3,opt,name=not_match,json=notMatch,proto3,oneof"`
 }
 
 type ListenerFilterChainMatchPredicate_AnyMatch struct {
+	// The match configuration will always match.
 	AnyMatch bool `protobuf:"varint,4,opt,name=any_match,json=anyMatch,proto3,oneof"`
 }
 
 type ListenerFilterChainMatchPredicate_DestinationPortRange struct {
+	// Match destination port. Particularly, the match evaluation must use the recovered local port if
+	// the owning listener filter is after :ref:`an original_dst listener filter <config_listener_filters_original_dst>`.
 	DestinationPortRange *v3.Int32Range `protobuf:"bytes,5,opt,name=destination_port_range,json=destinationPortRange,proto3,oneof"`
 }
 
@@ -498,10 +653,18 @@ type ListenerFilter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the filter to instantiate. The name must match a
+	// :ref:`supported filter <config_listener_filters>`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Filter specific configuration which depends on the filter being instantiated.
+	// See the supported filters for further documentation.
+	//
 	// Types that are assignable to ConfigType:
 	//	*ListenerFilter_TypedConfig
-	ConfigType     isListenerFilter_ConfigType        `protobuf_oneof:"config_type"`
+	ConfigType isListenerFilter_ConfigType `protobuf_oneof:"config_type"`
+	// Optional match predicate used to disable the filter. The filter is enabled when this field is empty.
+	// See :ref:`ListenerFilterChainMatchPredicate <envoy_api_msg_config.listener.v4alpha.ListenerFilterChainMatchPredicate>`
+	// for further examples.
 	FilterDisabled *ListenerFilterChainMatchPredicate `protobuf:"bytes,4,opt,name=filter_disabled,json=filterDisabled,proto3" json:"filter_disabled,omitempty"`
 }
 
@@ -575,11 +738,22 @@ type ListenerFilter_TypedConfig struct {
 
 func (*ListenerFilter_TypedConfig) isListenerFilter_ConfigType() {}
 
+// The configuration for on-demand filter chain. If this field is not empty in FilterChain message,
+// a filter chain will be built on-demand.
+// On-demand filter chains help speedup the warming up of listeners since the building and initialization of
+// an on-demand filter chain will be postponed to the arrival of new connection requests that require this filter chain.
+// Filter chains that are not often used can be set as on-demand.
 type FilterChain_OnDemandConfiguration struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The timeout to wait for filter chain placeholders to complete rebuilding.
+	// 1. If this field is set to 0, timeout is disabled.
+	// 2. If not specified, a default timeout of 15s is used.
+	// Rebuilding will wait until dependencies are ready, have failed, or this timeout is reached.
+	// Upon failure or timeout, all connections related to this filter chain will be closed.
+	// Rebuilding will start again on the next new connection.
 	RebuildTimeout *duration.Duration `protobuf:"bytes,1,opt,name=rebuild_timeout,json=rebuildTimeout,proto3" json:"rebuild_timeout,omitempty"`
 }
 
@@ -622,11 +796,13 @@ func (x *FilterChain_OnDemandConfiguration) GetRebuildTimeout() *duration.Durati
 	return nil
 }
 
+// A set of match configurations used for logical operations.
 type ListenerFilterChainMatchPredicate_MatchSet struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The list of rules that make up the set.
 	Rules []*ListenerFilterChainMatchPredicate `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
 }
 

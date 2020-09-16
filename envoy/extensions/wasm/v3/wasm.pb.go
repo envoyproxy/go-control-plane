@@ -29,17 +29,37 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [[#not-implemented-hide:]
+// Configuration for a Wasm VM.
+// [#next-free-field: 7]
 type VmConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	VmId                string              `protobuf:"bytes,1,opt,name=vm_id,json=vmId,proto3" json:"vm_id,omitempty"`
-	Runtime             string              `protobuf:"bytes,2,opt,name=runtime,proto3" json:"runtime,omitempty"`
-	Code                *v3.AsyncDataSource `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
-	Configuration       *any.Any            `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
-	AllowPrecompiled    bool                `protobuf:"varint,5,opt,name=allow_precompiled,json=allowPrecompiled,proto3" json:"allow_precompiled,omitempty"`
-	NackOnCodeCacheMiss bool                `protobuf:"varint,6,opt,name=nack_on_code_cache_miss,json=nackOnCodeCacheMiss,proto3" json:"nack_on_code_cache_miss,omitempty"`
+	// An ID which will be used along with a hash of the wasm code (or the name of the registered Null
+	// VM plugin) to determine which VM will be used for the plugin. All plugins which use the same
+	// *vm_id* and code will use the same VM. May be left blank. Sharing a VM between plugins can
+	// reduce memory utilization and make sharing of data easier which may have security implications.
+	// See ref: "TODO: add ref" for details.
+	VmId string `protobuf:"bytes,1,opt,name=vm_id,json=vmId,proto3" json:"vm_id,omitempty"`
+	// The Wasm runtime type (either "v8" or "null" for code compiled into Envoy).
+	Runtime string `protobuf:"bytes,2,opt,name=runtime,proto3" json:"runtime,omitempty"`
+	// The Wasm code that Envoy will execute.
+	Code *v3.AsyncDataSource `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	// The Wasm configuration used in initialization of a new VM
+	// (proxy_on_start). `google.protobuf.Struct` is serialized as JSON before
+	// passing it to the plugin. `google.protobuf.BytesValue` and
+	// `google.protobuf.StringValue` are passed directly without the wrapper.
+	Configuration *any.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
+	// Allow the wasm file to include pre-compiled code on VMs which support it.
+	// Warning: this should only be enable for trusted sources as the precompiled code is not
+	// verified.
+	AllowPrecompiled bool `protobuf:"varint,5,opt,name=allow_precompiled,json=allowPrecompiled,proto3" json:"allow_precompiled,omitempty"`
+	// If true and the code needs to be remotely fetched and it is not in the cache then NACK the configuration
+	// update and do a background fetch to fill the cache, otherwise fetch the code asynchronously and enter
+	// warming state.
+	NackOnCodeCacheMiss bool `protobuf:"varint,6,opt,name=nack_on_code_cache_miss,json=nackOnCodeCacheMiss,proto3" json:"nack_on_code_cache_miss,omitempty"`
 }
 
 func (x *VmConfig) Reset() {
@@ -116,18 +136,39 @@ func (x *VmConfig) GetNackOnCodeCacheMiss() bool {
 	return false
 }
 
+// [[#not-implemented-hide:]
+// Base Configuration for Wasm Plugins e.g. filters and services.
+// [#next-free-field: 6]
 type PluginConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name   string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// A unique name for a filters/services in a VM for use in identifying the filter/service if
+	// multiple filters/services are handled by the same *vm_id* and *root_id* and for
+	// logging/debugging.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// A unique ID for a set of filters/services in a VM which will share a RootContext and Contexts
+	// if applicable (e.g. an Wasm HttpFilter and an Wasm AccessLog). If left blank, all
+	// filters/services with a blank root_id with the same *vm_id* will share Context(s).
 	RootId string `protobuf:"bytes,2,opt,name=root_id,json=rootId,proto3" json:"root_id,omitempty"`
+	// Configuration for finding or starting VM.
+	//
 	// Types that are assignable to VmConfig:
 	//	*PluginConfig_InlineVmConfig
-	VmConfig      isPluginConfig_VmConfig `protobuf_oneof:"vm_config"`
-	Configuration *any.Any                `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
-	FailOpen      bool                    `protobuf:"varint,5,opt,name=fail_open,json=failOpen,proto3" json:"fail_open,omitempty"`
+	VmConfig isPluginConfig_VmConfig `protobuf_oneof:"vm_config"`
+	// Filter/service configuration used to configure or reconfigure a plugin
+	// (proxy_on_configuration).
+	// `google.protobuf.Struct` is serialized as JSON before
+	// passing it to the plugin. `google.protobuf.BytesValue` and
+	// `google.protobuf.StringValue` are passed directly without the wrapper.
+	Configuration *any.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
+	// If there is a fatal error on the VM (e.g. exception, abort(), on_start or on_configure return false),
+	// then all plugins associated with the VM will either fail closed (by default), e.g. by returning an HTTP 503 error,
+	// or fail open (if 'fail_open' is set to true) by bypassing the filter. Note: when on_start or on_configure return false
+	// during xDS updates the xDS configuration will be rejected and when on_start or on_configuration return false on initial
+	// startup the proxy will not start.
+	FailOpen bool `protobuf:"varint,5,opt,name=fail_open,json=failOpen,proto3" json:"fail_open,omitempty"`
 }
 
 func (x *PluginConfig) Reset() {
@@ -209,18 +250,24 @@ type isPluginConfig_VmConfig interface {
 }
 
 type PluginConfig_InlineVmConfig struct {
-	InlineVmConfig *VmConfig `protobuf:"bytes,3,opt,name=inline_vm_config,json=inlineVmConfig,proto3,oneof"`
+	InlineVmConfig *VmConfig `protobuf:"bytes,3,opt,name=inline_vm_config,json=inlineVmConfig,proto3,oneof"` // In the future add referential VM configurations.
 }
 
 func (*PluginConfig_InlineVmConfig) isPluginConfig_VmConfig() {}
 
+// [[#not-implemented-hide:]
+// WasmService is configured as a built-in *envoy.wasm_service* :ref:`WasmService
+// <config_wasm_service>` This opaque configuration will be used to create a Wasm Service.
 type WasmService struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Config    *PluginConfig `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
-	Singleton bool          `protobuf:"varint,2,opt,name=singleton,proto3" json:"singleton,omitempty"`
+	// General plugin configuration.
+	Config *PluginConfig `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+	// If true, create a single VM rather than creating one VM per worker. Such a singleton can
+	// not be used with filters.
+	Singleton bool `protobuf:"varint,2,opt,name=singleton,proto3" json:"singleton,omitempty"`
 }
 
 func (x *WasmService) Reset() {

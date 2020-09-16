@@ -28,12 +28,21 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Message type for extension configuration.
+// [#next-major-version: revisit all existing typed_config that doesn't use this wrapper.].
 type TypedExtensionConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name        string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of an extension. This is not used to select the extension, instead
+	// it serves the role of an opaque identifier.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The typed config for the extension. The type URL will be used to identify
+	// the extension. In the case that the type URL is *udpa.type.v1.TypedStruct*,
+	// the inner type URL of *TypedStruct* will be utilized. See the
+	// :ref:`extension configuration overview
+	// <config_overview_extension_configuration>` for further details.
 	TypedConfig *any.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 
@@ -83,15 +92,34 @@ func (x *TypedExtensionConfig) GetTypedConfig() *any.Any {
 	return nil
 }
 
+// Configuration source specifier for a late-bound extension configuration. The
+// parent resource is warmed until all the initial extension configurations are
+// received, unless the flag to apply the default configuration is set.
+// Subsequent extension updates are atomic on a per-worker basis. Once an
+// extension configuration is applied to a request or a connection, it remains
+// constant for the duration of processing. If the initial delivery of the
+// extension configuration fails, due to a timeout for example, the optional
+// default configuration is applied. Without a default configuration, the
+// extension is disabled, until an extension configuration is received. The
+// behavior of a disabled extension depends on the context. For example, a
+// filter chain with a disabled extension filter rejects all incoming streams.
 type ExtensionConfigSource struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ConfigSource                     *ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
-	DefaultConfig                    *any.Any      `protobuf:"bytes,2,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
-	ApplyDefaultConfigWithoutWarming bool          `protobuf:"varint,3,opt,name=apply_default_config_without_warming,json=applyDefaultConfigWithoutWarming,proto3" json:"apply_default_config_without_warming,omitempty"`
-	TypeUrls                         []string      `protobuf:"bytes,4,rep,name=type_urls,json=typeUrls,proto3" json:"type_urls,omitempty"`
+	ConfigSource *ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
+	// Optional default configuration to use as the initial configuration if
+	// there is a failure to receive the initial extension configuration or if
+	// `apply_default_config_without_warming` flag is set.
+	DefaultConfig *any.Any `protobuf:"bytes,2,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
+	// Use the default config as the initial configuration without warming and
+	// waiting for the first discovery response. Requires the default configuration
+	// to be supplied.
+	ApplyDefaultConfigWithoutWarming bool `protobuf:"varint,3,opt,name=apply_default_config_without_warming,json=applyDefaultConfigWithoutWarming,proto3" json:"apply_default_config_without_warming,omitempty"`
+	// A set of permitted extension type URLs. Extension configuration updates are rejected
+	// if they do not match any type URL in the set.
+	TypeUrls []string `protobuf:"bytes,4,rep,name=type_urls,json=typeUrls,proto3" json:"type_urls,omitempty"`
 }
 
 func (x *ExtensionConfigSource) Reset() {

@@ -35,14 +35,21 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Status of a config.
 type ConfigStatus int32
 
 const (
-	ConfigStatus_UNKNOWN  ConfigStatus = 0
-	ConfigStatus_SYNCED   ConfigStatus = 1
+	// Status info is not available/unknown.
+	ConfigStatus_UNKNOWN ConfigStatus = 0
+	// Management server has sent the config to client and received ACK.
+	ConfigStatus_SYNCED ConfigStatus = 1
+	// Config is not sent.
 	ConfigStatus_NOT_SENT ConfigStatus = 2
-	ConfigStatus_STALE    ConfigStatus = 3
-	ConfigStatus_ERROR    ConfigStatus = 4
+	// Management server has sent the config to client but hasn’t received
+	// ACK/NACK.
+	ConfigStatus_STALE ConfigStatus = 3
+	// Management server has sent the config to client but received NACK.
+	ConfigStatus_ERROR ConfigStatus = 4
 )
 
 // Enum value maps for ConfigStatus.
@@ -90,13 +97,17 @@ func (ConfigStatus) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_service_status_v3_csds_proto_rawDescGZIP(), []int{0}
 }
 
+// Request for client status of clients identified by a list of NodeMatchers.
 type ClientStatusRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Management server can use these match criteria to identify clients.
+	// The match follows OR semantics.
 	NodeMatchers []*v3.NodeMatcher `protobuf:"bytes,1,rep,name=node_matchers,json=nodeMatchers,proto3" json:"node_matchers,omitempty"`
-	Node         *v31.Node         `protobuf:"bytes,2,opt,name=node,proto3" json:"node,omitempty"`
+	// The node making the csds request.
+	Node *v31.Node `protobuf:"bytes,2,opt,name=node,proto3" json:"node,omitempty"`
 }
 
 func (x *ClientStatusRequest) Reset() {
@@ -145,6 +156,8 @@ func (x *ClientStatusRequest) GetNode() *v31.Node {
 	return nil
 }
 
+// Detailed config (per xDS) with status.
+// [#next-free-field: 7]
 type PerXdsConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -275,11 +288,13 @@ func (*PerXdsConfig_ScopedRouteConfig) isPerXdsConfig_PerXdsConfig() {}
 
 func (*PerXdsConfig_EndpointConfig) isPerXdsConfig_PerXdsConfig() {}
 
+// All xds configs for a particular client.
 type ClientConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Node for a particular client.
 	Node      *v31.Node       `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
 	XdsConfig []*PerXdsConfig `protobuf:"bytes,2,rep,name=xds_config,json=xdsConfig,proto3" json:"xds_config,omitempty"`
 }
@@ -335,6 +350,7 @@ type ClientStatusResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Client configs for the clients specified in the ClientStatusRequest.
 	Config []*ClientConfig `protobuf:"bytes,1,rep,name=config,proto3" json:"config,omitempty"`
 }
 

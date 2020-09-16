@@ -27,6 +27,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Specifies the hash policy
 type HashPolicy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -93,6 +94,8 @@ type HashPolicy_SourceIp_ struct {
 
 func (*HashPolicy_SourceIp_) isHashPolicy_PolicySpecifier() {}
 
+// The source IP will be used to compute the hash used by hash-based load balancing
+// algorithms.
 type HashPolicy_SourceIp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

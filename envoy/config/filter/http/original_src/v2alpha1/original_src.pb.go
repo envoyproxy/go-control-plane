@@ -27,11 +27,18 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// The Original Src filter binds upstream connections to the original source address determined
+// for the request. This address could come from something like the Proxy Protocol filter, or it
+// could come from trusted http headers.
+// [#extension: envoy.filters.http.original_src]
 type OriginalSrc struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Sets the SO_MARK option on the upstream connection's socket to the provided value. Used to
+	// ensure that non-local addresses may be routed back through envoy when binding to the original
+	// source address. The option will not be applied if the mark is 0.
 	Mark uint32 `protobuf:"varint,1,opt,name=mark,proto3" json:"mark,omitempty"`
 }
 

@@ -28,6 +28,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Configuration to use multiple :ref:`command operators <config_access_log_command_operators>`
+// to generate a new string in either plain text or JSON format.
 type SubstitutionFormatString struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -36,8 +38,13 @@ type SubstitutionFormatString struct {
 	// Types that are assignable to Format:
 	//	*SubstitutionFormatString_TextFormat
 	//	*SubstitutionFormatString_JsonFormat
-	Format          isSubstitutionFormatString_Format `protobuf_oneof:"format"`
-	OmitEmptyValues bool                              `protobuf:"varint,3,opt,name=omit_empty_values,json=omitEmptyValues,proto3" json:"omit_empty_values,omitempty"`
+	Format isSubstitutionFormatString_Format `protobuf_oneof:"format"`
+	// If set to true, when command operators are evaluated to null,
+	//
+	// * for ``text_format``, the output of the empty operator is changed from ``-`` to an
+	//   empty string, so that empty values are omitted entirely.
+	// * for ``json_format`` the keys with null values are omitted in the output structure.
+	OmitEmptyValues bool `protobuf:"varint,3,opt,name=omit_empty_values,json=omitEmptyValues,proto3" json:"omit_empty_values,omitempty"`
 }
 
 func (x *SubstitutionFormatString) Reset() {
@@ -105,10 +112,44 @@ type isSubstitutionFormatString_Format interface {
 }
 
 type SubstitutionFormatString_TextFormat struct {
+	// Specify a format with command operators to form a text string.
+	// Its details is described in :ref:`format string<config_access_log_format_strings>`.
+	//
+	// .. code-block::
+	//
+	//   text_format: %LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=$REQ(:path)%
+	//
+	// The following plain text will be created:
+	//
+	// .. code-block::
+	//
+	//   upstream connect error:204:path=/foo
+	//
 	TextFormat string `protobuf:"bytes,1,opt,name=text_format,json=textFormat,proto3,oneof"`
 }
 
 type SubstitutionFormatString_JsonFormat struct {
+	// Specify a format with command operators to form a JSON string.
+	// Its details is described in :ref:`format dictionary<config_access_log_format_dictionaries>`.
+	// Values are rendered as strings, numbers, or boolean values as appropriate.
+	// Nested JSON objects may be produced by some command operators (e.g. FILTER_STATE or DYNAMIC_METADATA).
+	// See the documentation for a specific command operator for details.
+	//
+	// .. code-block::
+	//
+	//  json_format:
+	//    status: %RESPONSE_CODE%
+	//    message: %LOCAL_REPLY_BODY%
+	//
+	// The following JSON object would be created:
+	//
+	// .. code-block:: json
+	//
+	//  {
+	//    "status": 500,
+	//    "message": "My error message"
+	//  }
+	//
 	JsonFormat *_struct.Struct `protobuf:"bytes,2,opt,name=json_format,json=jsonFormat,proto3,oneof"`
 }
 

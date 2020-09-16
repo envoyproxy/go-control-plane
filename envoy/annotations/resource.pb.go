@@ -31,6 +31,8 @@ type ResourceAnnotation struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Annotation for xDS services that indicates the fully-qualified Protobuf type for the resource
+	// type.
 	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
 }
 

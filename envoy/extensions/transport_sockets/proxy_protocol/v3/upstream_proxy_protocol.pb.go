@@ -28,13 +28,18 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#protodoc-title: Upstream Proxy Protocol]
+// [#extension: envoy.transport_sockets.upstream_proxy_protocol]
+// [#not-implemented-hide:]
+// Configuration for PROXY protocol socket
 type ProxyProtocolUpstreamTransport struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Config          *v3.ProxyProtocolConfig `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
-	TransportSocket *v3.TransportSocket     `protobuf:"bytes,2,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
+	Config *v3.ProxyProtocolConfig `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+	// The underlying transport socket being wrapped.
+	TransportSocket *v3.TransportSocket `protobuf:"bytes,2,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
 }
 
 func (x *ProxyProtocolUpstreamTransport) Reset() {
