@@ -34,10 +34,15 @@ type RocketmqProxy struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StatPrefix              string              `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
-	RouteConfig             *RouteConfiguration `protobuf:"bytes,2,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
-	TransientObjectLifeSpan *duration.Duration  `protobuf:"bytes,3,opt,name=transient_object_life_span,json=transientObjectLifeSpan,proto3" json:"transient_object_life_span,omitempty"`
-	DevelopMode             bool                `protobuf:"varint,4,opt,name=develop_mode,json=developMode,proto3" json:"develop_mode,omitempty"`
+	// The human readable prefix to use when emitting statistics.
+	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	// The route table for the connection manager is specified in this property.
+	RouteConfig *RouteConfiguration `protobuf:"bytes,2,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
+	// The largest duration transient object expected to live, more than 10s is recommended.
+	TransientObjectLifeSpan *duration.Duration `protobuf:"bytes,3,opt,name=transient_object_life_span,json=transientObjectLifeSpan,proto3" json:"transient_object_life_span,omitempty"`
+	// If develop_mode is enabled, this proxy plugin may work without dedicated traffic intercepting
+	// facility without considering backward compatibility of exiting RocketMQ client SDK.
+	DevelopMode bool `protobuf:"varint,4,opt,name=develop_mode,json=developMode,proto3" json:"develop_mode,omitempty"`
 }
 
 func (x *RocketmqProxy) Reset() {

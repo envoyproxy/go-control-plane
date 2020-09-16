@@ -38,12 +38,26 @@ type AdmissionControl struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// If set to false, the admission control filter will operate as a pass-through filter. If the
+	// message is unspecified, the filter will be enabled.
 	Enabled *v3.RuntimeFeatureFlag `protobuf:"bytes,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	// Defines how a request is considered a success/failure.
+	//
 	// Types that are assignable to EvaluationCriteria:
 	//	*AdmissionControl_SuccessCriteria_
-	EvaluationCriteria    isAdmissionControl_EvaluationCriteria `protobuf_oneof:"evaluation_criteria"`
-	SamplingWindow        *duration.Duration                    `protobuf:"bytes,3,opt,name=sampling_window,json=samplingWindow,proto3" json:"sampling_window,omitempty"`
-	AggressionCoefficient *v3.RuntimeDouble                     `protobuf:"bytes,4,opt,name=aggression_coefficient,json=aggressionCoefficient,proto3" json:"aggression_coefficient,omitempty"`
+	EvaluationCriteria isAdmissionControl_EvaluationCriteria `protobuf_oneof:"evaluation_criteria"`
+	// The sliding time window over which the success rate is calculated. The window is rounded to the
+	// nearest second. Defaults to 120s.
+	SamplingWindow *duration.Duration `protobuf:"bytes,3,opt,name=sampling_window,json=samplingWindow,proto3" json:"sampling_window,omitempty"`
+	// Rejection probability is defined by the formula::
+	//
+	//     max(0, (rq_count - aggression_coefficient * rq_success_count) / (rq_count + 1))
+	//
+	// The coefficient dictates how aggressively the admission controller will throttle requests as
+	// the success rate drops. Lower values will cause throttling to kick in at higher success rates
+	// and result in more aggressive throttling. Any values less than 1.0, will be set to 1.0. If the
+	// message is unspecified, the coefficient is 2.0.
+	AggressionCoefficient *v3.RuntimeDouble `protobuf:"bytes,4,opt,name=aggression_coefficient,json=aggressionCoefficient,proto3" json:"aggression_coefficient,omitempty"`
 }
 
 func (x *AdmissionControl) Reset() {
@@ -123,12 +137,32 @@ type AdmissionControl_SuccessCriteria_ struct {
 
 func (*AdmissionControl_SuccessCriteria_) isAdmissionControl_EvaluationCriteria() {}
 
+// Default method of specifying what constitutes a successful request. All status codes that
+// indicate a successful request must be explicitly specified if not relying on the default
+// values.
 type AdmissionControl_SuccessCriteria struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// If HTTP criteria are unspecified, all HTTP status codes below 500 are treated as successful
+	// responses.
+	//
+	// .. note::
+	//
+	//    The default HTTP codes considered successful by the admission controller are done so due
+	//    to the unlikelihood that sending fewer requests would change their behavior (for example:
+	//    redirects, unauthorized access, or bad requests won't be alleviated by sending less
+	//    traffic).
 	HttpCriteria *AdmissionControl_SuccessCriteria_HttpCriteria `protobuf:"bytes,1,opt,name=http_criteria,json=httpCriteria,proto3" json:"http_criteria,omitempty"`
+	// GRPC status codes to consider as request successes. If unspecified, defaults to: Ok,
+	// Cancelled, Unknown, InvalidArgument, NotFound, AlreadyExists, Unauthenticated,
+	// FailedPrecondition, OutOfRange, PermissionDenied, and Unimplemented.
+	//
+	// .. note::
+	//
+	//    The default gRPC codes that are considered successful by the admission controller are
+	//    chosen because of the unlikelihood that sending fewer requests will change the behavior.
 	GrpcCriteria *AdmissionControl_SuccessCriteria_GrpcCriteria `protobuf:"bytes,2,opt,name=grpc_criteria,json=grpcCriteria,proto3" json:"grpc_criteria,omitempty"`
 }
 
@@ -183,6 +217,8 @@ type AdmissionControl_SuccessCriteria_HttpCriteria struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Status code ranges that constitute a successful request. Configurable codes are in the
+	// range [100, 600).
 	HttpSuccessStatus []*v31.Int32Range `protobuf:"bytes,1,rep,name=http_success_status,json=httpSuccessStatus,proto3" json:"http_success_status,omitempty"`
 }
 
@@ -230,6 +266,8 @@ type AdmissionControl_SuccessCriteria_GrpcCriteria struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Status codes that constitute a successful request.
+	// Mappings can be found at: https://github.com/grpc/grpc/blob/master/doc/statuscodes.md.
 	GrpcSuccessStatus []uint32 `protobuf:"varint,1,rep,packed,name=grpc_success_status,json=grpcSuccessStatus,proto3" json:"grpc_success_status,omitempty"`
 }
 

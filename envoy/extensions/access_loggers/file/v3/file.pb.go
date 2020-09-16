@@ -29,11 +29,16 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Custom configuration for an :ref:`AccessLog <envoy_api_msg_config.accesslog.v3.AccessLog>`
+// that writes log entries directly to a file. Configures the built-in *envoy.access_loggers.file*
+// AccessLog.
+// [#next-free-field: 6]
 type FileAccessLog struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// A path to a local file to which to write the access log entries.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	// Types that are assignable to AccessLogFormat:
 	//	*FileAccessLog_Format
@@ -125,21 +130,41 @@ type isFileAccessLog_AccessLogFormat interface {
 }
 
 type FileAccessLog_Format struct {
+	// Access log :ref:`format string<config_access_log_format_strings>`.
+	// Envoy supports :ref:`custom access log formats <config_access_log_format>` as well as a
+	// :ref:`default format <config_access_log_default_format>`.
+	// This field is deprecated.
+	// Please use :ref:`log_format <envoy_v3_api_field_extensions.access_loggers.file.v3.FileAccessLog.log_format>`.
+	//
 	// Deprecated: Do not use.
 	Format string `protobuf:"bytes,2,opt,name=format,proto3,oneof"`
 }
 
 type FileAccessLog_JsonFormat struct {
+	// Access log :ref:`format dictionary<config_access_log_format_dictionaries>`. All values
+	// are rendered as strings.
+	// This field is deprecated.
+	// Please use :ref:`log_format <envoy_v3_api_field_extensions.access_loggers.file.v3.FileAccessLog.log_format>`.
+	//
 	// Deprecated: Do not use.
 	JsonFormat *_struct.Struct `protobuf:"bytes,3,opt,name=json_format,json=jsonFormat,proto3,oneof"`
 }
 
 type FileAccessLog_TypedJsonFormat struct {
+	// Access log :ref:`format dictionary<config_access_log_format_dictionaries>`. Values are
+	// rendered as strings, numbers, or boolean values as appropriate. Nested JSON objects may
+	// be produced by some command operators (e.g.FILTER_STATE or DYNAMIC_METADATA). See the
+	// documentation for a specific command operator for details.
+	// This field is deprecated.
+	// Please use :ref:`log_format <envoy_v3_api_field_extensions.access_loggers.file.v3.FileAccessLog.log_format>`.
+	//
 	// Deprecated: Do not use.
 	TypedJsonFormat *_struct.Struct `protobuf:"bytes,4,opt,name=typed_json_format,json=typedJsonFormat,proto3,oneof"`
 }
 
 type FileAccessLog_LogFormat struct {
+	// Configuration to form access log data and format.
+	// If not specified, use :ref:`default format <config_access_log_default_format>`.
 	LogFormat *v3.SubstitutionFormatString `protobuf:"bytes,5,opt,name=log_format,json=logFormat,proto3,oneof"`
 }
 

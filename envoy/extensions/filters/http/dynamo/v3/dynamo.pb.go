@@ -26,6 +26,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Dynamo filter config.
 type Dynamo struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

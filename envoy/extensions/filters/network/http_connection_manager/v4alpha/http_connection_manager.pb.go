@@ -42,9 +42,21 @@ const _ = proto.ProtoPackageIsVersion4
 type HttpConnectionManager_CodecType int32
 
 const (
-	HttpConnectionManager_AUTO  HttpConnectionManager_CodecType = 0
+	// For every new connection, the connection manager will determine which
+	// codec to use. This mode supports both ALPN for TLS listeners as well as
+	// protocol inference for plaintext listeners. If ALPN data is available, it
+	// is preferred, otherwise protocol inference is used. In almost all cases,
+	// this is the right option to choose for this setting.
+	HttpConnectionManager_AUTO HttpConnectionManager_CodecType = 0
+	// The connection manager will assume that the client is speaking HTTP/1.1.
 	HttpConnectionManager_HTTP1 HttpConnectionManager_CodecType = 1
+	// The connection manager will assume that the client is speaking HTTP/2
+	// (Envoy does not require HTTP/2 to take place over TLS or to use ALPN.
+	// Prior knowledge is allowed).
 	HttpConnectionManager_HTTP2 HttpConnectionManager_CodecType = 2
+	// [#not-implemented-hide:] QUIC implementation is not production ready yet. Use this enum with
+	// caution to prevent accidental execution of QUIC code. I.e. `!= HTTP2` is no longer sufficient
+	// to distinguish HTTP1 and HTTP2 traffic.
 	HttpConnectionManager_HTTP3 HttpConnectionManager_CodecType = 3
 )
 
@@ -94,9 +106,14 @@ func (HttpConnectionManager_CodecType) EnumDescriptor() ([]byte, []int) {
 type HttpConnectionManager_ServerHeaderTransformation int32
 
 const (
-	HttpConnectionManager_OVERWRITE        HttpConnectionManager_ServerHeaderTransformation = 0
+	// Overwrite any Server header with the contents of server_name.
+	HttpConnectionManager_OVERWRITE HttpConnectionManager_ServerHeaderTransformation = 0
+	// If no Server header is present, append Server server_name
+	// If a Server header is present, pass it through.
 	HttpConnectionManager_APPEND_IF_ABSENT HttpConnectionManager_ServerHeaderTransformation = 1
-	HttpConnectionManager_PASS_THROUGH     HttpConnectionManager_ServerHeaderTransformation = 2
+	// Pass through the value of the server header, and do not append a header
+	// if none is present.
+	HttpConnectionManager_PASS_THROUGH HttpConnectionManager_ServerHeaderTransformation = 2
 )
 
 // Enum value maps for HttpConnectionManager_ServerHeaderTransformation.
@@ -140,13 +157,24 @@ func (HttpConnectionManager_ServerHeaderTransformation) EnumDescriptor() ([]byte
 	return file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_rawDescGZIP(), []int{0, 1}
 }
 
+// How to handle the :ref:`config_http_conn_man_headers_x-forwarded-client-cert` (XFCC) HTTP
+// header.
 type HttpConnectionManager_ForwardClientCertDetails int32
 
 const (
-	HttpConnectionManager_SANITIZE            HttpConnectionManager_ForwardClientCertDetails = 0
-	HttpConnectionManager_FORWARD_ONLY        HttpConnectionManager_ForwardClientCertDetails = 1
-	HttpConnectionManager_APPEND_FORWARD      HttpConnectionManager_ForwardClientCertDetails = 2
-	HttpConnectionManager_SANITIZE_SET        HttpConnectionManager_ForwardClientCertDetails = 3
+	// Do not send the XFCC header to the next hop. This is the default value.
+	HttpConnectionManager_SANITIZE HttpConnectionManager_ForwardClientCertDetails = 0
+	// When the client connection is mTLS (Mutual TLS), forward the XFCC header
+	// in the request.
+	HttpConnectionManager_FORWARD_ONLY HttpConnectionManager_ForwardClientCertDetails = 1
+	// When the client connection is mTLS, append the client certificate
+	// information to the request’s XFCC header and forward it.
+	HttpConnectionManager_APPEND_FORWARD HttpConnectionManager_ForwardClientCertDetails = 2
+	// When the client connection is mTLS, reset the XFCC header with the client
+	// certificate information and send it to the next hop.
+	HttpConnectionManager_SANITIZE_SET HttpConnectionManager_ForwardClientCertDetails = 3
+	// Always forward the XFCC header in the request, regardless of whether the
+	// client connection is mTLS.
 	HttpConnectionManager_ALWAYS_FORWARD_ONLY HttpConnectionManager_ForwardClientCertDetails = 4
 )
 
@@ -198,8 +226,10 @@ func (HttpConnectionManager_ForwardClientCertDetails) EnumDescriptor() ([]byte, 
 type HttpConnectionManager_Tracing_OperationName int32
 
 const (
+	// The HTTP listener is used for ingress/incoming requests.
 	HttpConnectionManager_Tracing_INGRESS HttpConnectionManager_Tracing_OperationName = 0
-	HttpConnectionManager_Tracing_EGRESS  HttpConnectionManager_Tracing_OperationName = 1
+	// The HTTP listener is used for egress/outgoing requests.
+	HttpConnectionManager_Tracing_EGRESS HttpConnectionManager_Tracing_OperationName = 1
 )
 
 // Enum value maps for HttpConnectionManager_Tracing_OperationName.
@@ -241,51 +271,273 @@ func (HttpConnectionManager_Tracing_OperationName) EnumDescriptor() ([]byte, []i
 	return file_envoy_extensions_filters_network_http_connection_manager_v4alpha_http_connection_manager_proto_rawDescGZIP(), []int{0, 0, 0}
 }
 
+// [#next-free-field: 41]
 type HttpConnectionManager struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CodecType  HttpConnectionManager_CodecType `protobuf:"varint,1,opt,name=codec_type,json=codecType,proto3,enum=envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager_CodecType" json:"codec_type,omitempty"`
-	StatPrefix string                          `protobuf:"bytes,2,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	// Supplies the type of codec that the connection manager should use.
+	CodecType HttpConnectionManager_CodecType `protobuf:"varint,1,opt,name=codec_type,json=codecType,proto3,enum=envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager_CodecType" json:"codec_type,omitempty"`
+	// The human readable prefix to use when emitting statistics for the
+	// connection manager. See the :ref:`statistics documentation <config_http_conn_man_stats>` for
+	// more information.
+	StatPrefix string `protobuf:"bytes,2,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to RouteSpecifier:
 	//	*HttpConnectionManager_Rds
 	//	*HttpConnectionManager_RouteConfig
 	//	*HttpConnectionManager_ScopedRoutes
-	RouteSpecifier                             isHttpConnectionManager_RouteSpecifier             `protobuf_oneof:"route_specifier"`
-	HttpFilters                                []*HttpFilter                                      `protobuf:"bytes,5,rep,name=http_filters,json=httpFilters,proto3" json:"http_filters,omitempty"`
-	AddUserAgent                               *wrappers.BoolValue                                `protobuf:"bytes,6,opt,name=add_user_agent,json=addUserAgent,proto3" json:"add_user_agent,omitempty"`
-	Tracing                                    *HttpConnectionManager_Tracing                     `protobuf:"bytes,7,opt,name=tracing,proto3" json:"tracing,omitempty"`
-	CommonHttpProtocolOptions                  *v4alpha.HttpProtocolOptions                       `protobuf:"bytes,35,opt,name=common_http_protocol_options,json=commonHttpProtocolOptions,proto3" json:"common_http_protocol_options,omitempty"`
-	HttpProtocolOptions                        *v4alpha.Http1ProtocolOptions                      `protobuf:"bytes,8,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
-	Http2ProtocolOptions                       *v4alpha.Http2ProtocolOptions                      `protobuf:"bytes,9,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
-	ServerName                                 string                                             `protobuf:"bytes,10,opt,name=server_name,json=serverName,proto3" json:"server_name,omitempty"`
-	ServerHeaderTransformation                 HttpConnectionManager_ServerHeaderTransformation   `protobuf:"varint,34,opt,name=server_header_transformation,json=serverHeaderTransformation,proto3,enum=envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager_ServerHeaderTransformation" json:"server_header_transformation,omitempty"`
-	MaxRequestHeadersKb                        *wrappers.UInt32Value                              `protobuf:"bytes,29,opt,name=max_request_headers_kb,json=maxRequestHeadersKb,proto3" json:"max_request_headers_kb,omitempty"`
-	StreamIdleTimeout                          *duration.Duration                                 `protobuf:"bytes,24,opt,name=stream_idle_timeout,json=streamIdleTimeout,proto3" json:"stream_idle_timeout,omitempty"`
-	RequestTimeout                             *duration.Duration                                 `protobuf:"bytes,28,opt,name=request_timeout,json=requestTimeout,proto3" json:"request_timeout,omitempty"`
-	DrainTimeout                               *duration.Duration                                 `protobuf:"bytes,12,opt,name=drain_timeout,json=drainTimeout,proto3" json:"drain_timeout,omitempty"`
-	DelayedCloseTimeout                        *duration.Duration                                 `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
-	AccessLog                                  []*v4alpha1.AccessLog                              `protobuf:"bytes,13,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
-	UseRemoteAddress                           *wrappers.BoolValue                                `protobuf:"bytes,14,opt,name=use_remote_address,json=useRemoteAddress,proto3" json:"use_remote_address,omitempty"`
-	XffNumTrustedHops                          uint32                                             `protobuf:"varint,19,opt,name=xff_num_trusted_hops,json=xffNumTrustedHops,proto3" json:"xff_num_trusted_hops,omitempty"`
-	InternalAddressConfig                      *HttpConnectionManager_InternalAddressConfig       `protobuf:"bytes,25,opt,name=internal_address_config,json=internalAddressConfig,proto3" json:"internal_address_config,omitempty"`
-	SkipXffAppend                              bool                                               `protobuf:"varint,21,opt,name=skip_xff_append,json=skipXffAppend,proto3" json:"skip_xff_append,omitempty"`
-	Via                                        string                                             `protobuf:"bytes,22,opt,name=via,proto3" json:"via,omitempty"`
-	GenerateRequestId                          *wrappers.BoolValue                                `protobuf:"bytes,15,opt,name=generate_request_id,json=generateRequestId,proto3" json:"generate_request_id,omitempty"`
-	PreserveExternalRequestId                  bool                                               `protobuf:"varint,32,opt,name=preserve_external_request_id,json=preserveExternalRequestId,proto3" json:"preserve_external_request_id,omitempty"`
-	AlwaysSetRequestIdInResponse               bool                                               `protobuf:"varint,37,opt,name=always_set_request_id_in_response,json=alwaysSetRequestIdInResponse,proto3" json:"always_set_request_id_in_response,omitempty"`
-	ForwardClientCertDetails                   HttpConnectionManager_ForwardClientCertDetails     `protobuf:"varint,16,opt,name=forward_client_cert_details,json=forwardClientCertDetails,proto3,enum=envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager_ForwardClientCertDetails" json:"forward_client_cert_details,omitempty"`
-	SetCurrentClientCertDetails                *HttpConnectionManager_SetCurrentClientCertDetails `protobuf:"bytes,17,opt,name=set_current_client_cert_details,json=setCurrentClientCertDetails,proto3" json:"set_current_client_cert_details,omitempty"`
-	Proxy_100Continue                          bool                                               `protobuf:"varint,18,opt,name=proxy_100_continue,json=proxy100Continue,proto3" json:"proxy_100_continue,omitempty"`
-	RepresentIpv4RemoteAddressAsIpv4MappedIpv6 bool                                               `protobuf:"varint,20,opt,name=represent_ipv4_remote_address_as_ipv4_mapped_ipv6,json=representIpv4RemoteAddressAsIpv4MappedIpv6,proto3" json:"represent_ipv4_remote_address_as_ipv4_mapped_ipv6,omitempty"`
-	UpgradeConfigs                             []*HttpConnectionManager_UpgradeConfig             `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs,proto3" json:"upgrade_configs,omitempty"`
-	NormalizePath                              *wrappers.BoolValue                                `protobuf:"bytes,30,opt,name=normalize_path,json=normalizePath,proto3" json:"normalize_path,omitempty"`
-	MergeSlashes                               bool                                               `protobuf:"varint,33,opt,name=merge_slashes,json=mergeSlashes,proto3" json:"merge_slashes,omitempty"`
-	RequestIdExtension                         *RequestIDExtension                                `protobuf:"bytes,36,opt,name=request_id_extension,json=requestIdExtension,proto3" json:"request_id_extension,omitempty"`
-	LocalReplyConfig                           *LocalReplyConfig                                  `protobuf:"bytes,38,opt,name=local_reply_config,json=localReplyConfig,proto3" json:"local_reply_config,omitempty"`
-	StripMatchingHostPort                      bool                                               `protobuf:"varint,39,opt,name=strip_matching_host_port,json=stripMatchingHostPort,proto3" json:"strip_matching_host_port,omitempty"`
-	StreamErrorOnInvalidHttpMessage            *wrappers.BoolValue                                `protobuf:"bytes,40,opt,name=stream_error_on_invalid_http_message,json=streamErrorOnInvalidHttpMessage,proto3" json:"stream_error_on_invalid_http_message,omitempty"`
+	RouteSpecifier isHttpConnectionManager_RouteSpecifier `protobuf_oneof:"route_specifier"`
+	// A list of individual HTTP filters that make up the filter chain for
+	// requests made to the connection manager. :ref:`Order matters <arch_overview_http_filters_ordering>`
+	// as the filters are processed sequentially as request events happen.
+	HttpFilters []*HttpFilter `protobuf:"bytes,5,rep,name=http_filters,json=httpFilters,proto3" json:"http_filters,omitempty"`
+	// Whether the connection manager manipulates the :ref:`config_http_conn_man_headers_user-agent`
+	// and :ref:`config_http_conn_man_headers_downstream-service-cluster` headers. See the linked
+	// documentation for more information. Defaults to false.
+	AddUserAgent *wrappers.BoolValue `protobuf:"bytes,6,opt,name=add_user_agent,json=addUserAgent,proto3" json:"add_user_agent,omitempty"`
+	// Presence of the object defines whether the connection manager
+	// emits :ref:`tracing <arch_overview_tracing>` data to the :ref:`configured tracing provider
+	// <envoy_api_msg_config.trace.v4alpha.Tracing>`.
+	Tracing *HttpConnectionManager_Tracing `protobuf:"bytes,7,opt,name=tracing,proto3" json:"tracing,omitempty"`
+	// Additional settings for HTTP requests handled by the connection manager. These will be
+	// applicable to both HTTP1 and HTTP2 requests.
+	CommonHttpProtocolOptions *v4alpha.HttpProtocolOptions `protobuf:"bytes,35,opt,name=common_http_protocol_options,json=commonHttpProtocolOptions,proto3" json:"common_http_protocol_options,omitempty"`
+	// Additional HTTP/1 settings that are passed to the HTTP/1 codec.
+	HttpProtocolOptions *v4alpha.Http1ProtocolOptions `protobuf:"bytes,8,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
+	// Additional HTTP/2 settings that are passed directly to the HTTP/2 codec.
+	Http2ProtocolOptions *v4alpha.Http2ProtocolOptions `protobuf:"bytes,9,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
+	// An optional override that the connection manager will write to the server
+	// header in responses. If not set, the default is *envoy*.
+	ServerName string `protobuf:"bytes,10,opt,name=server_name,json=serverName,proto3" json:"server_name,omitempty"`
+	// Defines the action to be applied to the Server header on the response path.
+	// By default, Envoy will overwrite the header with the value specified in
+	// server_name.
+	ServerHeaderTransformation HttpConnectionManager_ServerHeaderTransformation `protobuf:"varint,34,opt,name=server_header_transformation,json=serverHeaderTransformation,proto3,enum=envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager_ServerHeaderTransformation" json:"server_header_transformation,omitempty"`
+	// The maximum request headers size for incoming connections.
+	// If unconfigured, the default max request headers allowed is 60 KiB.
+	// Requests that exceed this limit will receive a 431 response.
+	// The max configurable limit is 96 KiB, based on current implementation
+	// constraints.
+	MaxRequestHeadersKb *wrappers.UInt32Value `protobuf:"bytes,29,opt,name=max_request_headers_kb,json=maxRequestHeadersKb,proto3" json:"max_request_headers_kb,omitempty"`
+	// The stream idle timeout for connections managed by the connection manager.
+	// If not specified, this defaults to 5 minutes. The default value was selected
+	// so as not to interfere with any smaller configured timeouts that may have
+	// existed in configurations prior to the introduction of this feature, while
+	// introducing robustness to TCP connections that terminate without a FIN.
+	//
+	// This idle timeout applies to new streams and is overridable by the
+	// :ref:`route-level idle_timeout
+	// <envoy_api_field_config.route.v4alpha.RouteAction.idle_timeout>`. Even on a stream in
+	// which the override applies, prior to receipt of the initial request
+	// headers, the :ref:`stream_idle_timeout
+	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.stream_idle_timeout>`
+	// applies. Each time an encode/decode event for headers or data is processed
+	// for the stream, the timer will be reset. If the timeout fires, the stream
+	// is terminated with a 408 Request Timeout error code if no upstream response
+	// header has been received, otherwise a stream reset occurs.
+	//
+	// This timeout also specifies the amount of time that Envoy will wait for the peer to open enough
+	// window to write any remaining stream data once the entirety of stream data (local end stream is
+	// true) has been buffered pending available window. In other words, this timeout defends against
+	// a peer that does not release enough window to completely write the stream, even though all
+	// data has been proxied within available flow control windows. If the timeout is hit in this
+	// case, the :ref:`tx_flush_timeout <config_http_conn_man_stats_per_codec>` counter will be
+	// incremented. Note that :ref:`max_stream_duration
+	// <envoy_api_field_config.core.v4alpha.HttpProtocolOptions.max_stream_duration>` does not apply to
+	// this corner case.
+	//
+	// Note that it is possible to idle timeout even if the wire traffic for a stream is non-idle, due
+	// to the granularity of events presented to the connection manager. For example, while receiving
+	// very large request headers, it may be the case that there is traffic regularly arriving on the
+	// wire while the connection manage is only able to observe the end-of-headers event, hence the
+	// stream may still idle timeout.
+	//
+	// A value of 0 will completely disable the connection manager stream idle
+	// timeout, although per-route idle timeout overrides will continue to apply.
+	StreamIdleTimeout *duration.Duration `protobuf:"bytes,24,opt,name=stream_idle_timeout,json=streamIdleTimeout,proto3" json:"stream_idle_timeout,omitempty"`
+	// The amount of time that Envoy will wait for the entire request to be received.
+	// The timer is activated when the request is initiated, and is disarmed when the last byte of the
+	// request is sent upstream (i.e. all decoding filters have processed the request), OR when the
+	// response is initiated. If not specified or set to 0, this timeout is disabled.
+	RequestTimeout *duration.Duration `protobuf:"bytes,28,opt,name=request_timeout,json=requestTimeout,proto3" json:"request_timeout,omitempty"`
+	// The time that Envoy will wait between sending an HTTP/2 “shutdown
+	// notification” (GOAWAY frame with max stream ID) and a final GOAWAY frame.
+	// This is used so that Envoy provides a grace period for new streams that
+	// race with the final GOAWAY frame. During this grace period, Envoy will
+	// continue to accept new streams. After the grace period, a final GOAWAY
+	// frame is sent and Envoy will start refusing new streams. Draining occurs
+	// both when a connection hits the idle timeout or during general server
+	// draining. The default grace period is 5000 milliseconds (5 seconds) if this
+	// option is not specified.
+	DrainTimeout *duration.Duration `protobuf:"bytes,12,opt,name=drain_timeout,json=drainTimeout,proto3" json:"drain_timeout,omitempty"`
+	// The delayed close timeout is for downstream connections managed by the HTTP connection manager.
+	// It is defined as a grace period after connection close processing has been locally initiated
+	// during which Envoy will wait for the peer to close (i.e., a TCP FIN/RST is received by Envoy
+	// from the downstream connection) prior to Envoy closing the socket associated with that
+	// connection.
+	// NOTE: This timeout is enforced even when the socket associated with the downstream connection
+	// is pending a flush of the write buffer. However, any progress made writing data to the socket
+	// will restart the timer associated with this timeout. This means that the total grace period for
+	// a socket in this state will be
+	// <total_time_waiting_for_write_buffer_flushes>+<delayed_close_timeout>.
+	//
+	// Delaying Envoy's connection close and giving the peer the opportunity to initiate the close
+	// sequence mitigates a race condition that exists when downstream clients do not drain/process
+	// data in a connection's receive buffer after a remote close has been detected via a socket
+	// write(). This race leads to such clients failing to process the response code sent by Envoy,
+	// which could result in erroneous downstream processing.
+	//
+	// If the timeout triggers, Envoy will close the connection's socket.
+	//
+	// The default timeout is 1000 ms if this option is not specified.
+	//
+	// .. NOTE::
+	//    To be useful in avoiding the race condition described above, this timeout must be set
+	//    to *at least* <max round trip time expected between clients and Envoy>+<100ms to account for
+	//    a reasonable "worst" case processing time for a full iteration of Envoy's event loop>.
+	//
+	// .. WARNING::
+	//    A value of 0 will completely disable delayed close processing. When disabled, the downstream
+	//    connection's socket will be closed immediately after the write flush is completed or will
+	//    never close if the write flush does not complete.
+	DelayedCloseTimeout *duration.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
+	// Configuration for :ref:`HTTP access logs <arch_overview_access_logs>`
+	// emitted by the connection manager.
+	AccessLog []*v4alpha1.AccessLog `protobuf:"bytes,13,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// If set to true, the connection manager will use the real remote address
+	// of the client connection when determining internal versus external origin and manipulating
+	// various headers. If set to false or absent, the connection manager will use the
+	// :ref:`config_http_conn_man_headers_x-forwarded-for` HTTP header. See the documentation for
+	// :ref:`config_http_conn_man_headers_x-forwarded-for`,
+	// :ref:`config_http_conn_man_headers_x-envoy-internal`, and
+	// :ref:`config_http_conn_man_headers_x-envoy-external-address` for more information.
+	UseRemoteAddress *wrappers.BoolValue `protobuf:"bytes,14,opt,name=use_remote_address,json=useRemoteAddress,proto3" json:"use_remote_address,omitempty"`
+	// The number of additional ingress proxy hops from the right side of the
+	// :ref:`config_http_conn_man_headers_x-forwarded-for` HTTP header to trust when
+	// determining the origin client's IP address. The default is zero if this option
+	// is not specified. See the documentation for
+	// :ref:`config_http_conn_man_headers_x-forwarded-for` for more information.
+	XffNumTrustedHops uint32 `protobuf:"varint,19,opt,name=xff_num_trusted_hops,json=xffNumTrustedHops,proto3" json:"xff_num_trusted_hops,omitempty"`
+	// Configures what network addresses are considered internal for stats and header sanitation
+	// purposes. If unspecified, only RFC1918 IP addresses will be considered internal.
+	// See the documentation for :ref:`config_http_conn_man_headers_x-envoy-internal` for more
+	// information about internal/external addresses.
+	InternalAddressConfig *HttpConnectionManager_InternalAddressConfig `protobuf:"bytes,25,opt,name=internal_address_config,json=internalAddressConfig,proto3" json:"internal_address_config,omitempty"`
+	// If set, Envoy will not append the remote address to the
+	// :ref:`config_http_conn_man_headers_x-forwarded-for` HTTP header. This may be used in
+	// conjunction with HTTP filters that explicitly manipulate XFF after the HTTP connection manager
+	// has mutated the request headers. While :ref:`use_remote_address
+	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.use_remote_address>`
+	// will also suppress XFF addition, it has consequences for logging and other
+	// Envoy uses of the remote address, so *skip_xff_append* should be used
+	// when only an elision of XFF addition is intended.
+	SkipXffAppend bool `protobuf:"varint,21,opt,name=skip_xff_append,json=skipXffAppend,proto3" json:"skip_xff_append,omitempty"`
+	// Via header value to append to request and response headers. If this is
+	// empty, no via header will be appended.
+	Via string `protobuf:"bytes,22,opt,name=via,proto3" json:"via,omitempty"`
+	// Whether the connection manager will generate the :ref:`x-request-id
+	// <config_http_conn_man_headers_x-request-id>` header if it does not exist. This defaults to
+	// true. Generating a random UUID4 is expensive so in high throughput scenarios where this feature
+	// is not desired it can be disabled.
+	GenerateRequestId *wrappers.BoolValue `protobuf:"bytes,15,opt,name=generate_request_id,json=generateRequestId,proto3" json:"generate_request_id,omitempty"`
+	// Whether the connection manager will keep the :ref:`x-request-id
+	// <config_http_conn_man_headers_x-request-id>` header if passed for a request that is edge
+	// (Edge request is the request from external clients to front Envoy) and not reset it, which
+	// is the current Envoy behaviour. This defaults to false.
+	PreserveExternalRequestId bool `protobuf:"varint,32,opt,name=preserve_external_request_id,json=preserveExternalRequestId,proto3" json:"preserve_external_request_id,omitempty"`
+	// If set, Envoy will always set :ref:`x-request-id <config_http_conn_man_headers_x-request-id>` header in response.
+	// If this is false or not set, the request ID is returned in responses only if tracing is forced using
+	// :ref:`x-envoy-force-trace <config_http_conn_man_headers_x-envoy-force-trace>` header.
+	AlwaysSetRequestIdInResponse bool `protobuf:"varint,37,opt,name=always_set_request_id_in_response,json=alwaysSetRequestIdInResponse,proto3" json:"always_set_request_id_in_response,omitempty"`
+	// How to handle the :ref:`config_http_conn_man_headers_x-forwarded-client-cert` (XFCC) HTTP
+	// header.
+	ForwardClientCertDetails HttpConnectionManager_ForwardClientCertDetails `protobuf:"varint,16,opt,name=forward_client_cert_details,json=forwardClientCertDetails,proto3,enum=envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager_ForwardClientCertDetails" json:"forward_client_cert_details,omitempty"`
+	// This field is valid only when :ref:`forward_client_cert_details
+	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.forward_client_cert_details>`
+	// is APPEND_FORWARD or SANITIZE_SET and the client connection is mTLS. It specifies the fields in
+	// the client certificate to be forwarded. Note that in the
+	// :ref:`config_http_conn_man_headers_x-forwarded-client-cert` header, *Hash* is always set, and
+	// *By* is always set when the client certificate presents the URI type Subject Alternative Name
+	// value.
+	SetCurrentClientCertDetails *HttpConnectionManager_SetCurrentClientCertDetails `protobuf:"bytes,17,opt,name=set_current_client_cert_details,json=setCurrentClientCertDetails,proto3" json:"set_current_client_cert_details,omitempty"`
+	// If proxy_100_continue is true, Envoy will proxy incoming "Expect:
+	// 100-continue" headers upstream, and forward "100 Continue" responses
+	// downstream. If this is false or not set, Envoy will instead strip the
+	// "Expect: 100-continue" header, and send a "100 Continue" response itself.
+	Proxy_100Continue bool `protobuf:"varint,18,opt,name=proxy_100_continue,json=proxy100Continue,proto3" json:"proxy_100_continue,omitempty"`
+	// If
+	// :ref:`use_remote_address
+	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.use_remote_address>`
+	// is true and represent_ipv4_remote_address_as_ipv4_mapped_ipv6 is true and the remote address is
+	// an IPv4 address, the address will be mapped to IPv6 before it is appended to *x-forwarded-for*.
+	// This is useful for testing compatibility of upstream services that parse the header value. For
+	// example, 50.0.0.1 is represented as ::FFFF:50.0.0.1. See `IPv4-Mapped IPv6 Addresses
+	// <https://tools.ietf.org/html/rfc4291#section-2.5.5.2>`_ for details. This will also affect the
+	// :ref:`config_http_conn_man_headers_x-envoy-external-address` header. See
+	// :ref:`http_connection_manager.represent_ipv4_remote_address_as_ipv4_mapped_ipv6
+	// <config_http_conn_man_runtime_represent_ipv4_remote_address_as_ipv4_mapped_ipv6>` for runtime
+	// control.
+	// [#not-implemented-hide:]
+	RepresentIpv4RemoteAddressAsIpv4MappedIpv6 bool                                   `protobuf:"varint,20,opt,name=represent_ipv4_remote_address_as_ipv4_mapped_ipv6,json=representIpv4RemoteAddressAsIpv4MappedIpv6,proto3" json:"represent_ipv4_remote_address_as_ipv4_mapped_ipv6,omitempty"`
+	UpgradeConfigs                             []*HttpConnectionManager_UpgradeConfig `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs,proto3" json:"upgrade_configs,omitempty"`
+	// Should paths be normalized according to RFC 3986 before any processing of
+	// requests by HTTP filters or routing? This affects the upstream *:path* header
+	// as well. For paths that fail this check, Envoy will respond with 400 to
+	// paths that are malformed. This defaults to false currently but will default
+	// true in the future. When not specified, this value may be overridden by the
+	// runtime variable
+	// :ref:`http_connection_manager.normalize_path<config_http_conn_man_runtime_normalize_path>`.
+	// See `Normalization and Comparison <https://tools.ietf.org/html/rfc3986#section-6>`_
+	// for details of normalization.
+	// Note that Envoy does not perform
+	// `case normalization <https://tools.ietf.org/html/rfc3986#section-6.2.2.1>`_
+	NormalizePath *wrappers.BoolValue `protobuf:"bytes,30,opt,name=normalize_path,json=normalizePath,proto3" json:"normalize_path,omitempty"`
+	// Determines if adjacent slashes in the path are merged into one before any processing of
+	// requests by HTTP filters or routing. This affects the upstream *:path* header as well. Without
+	// setting this option, incoming requests with path `//dir///file` will not match against route
+	// with `prefix` match set to `/dir`. Defaults to `false`. Note that slash merging is not part of
+	// `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
+	MergeSlashes bool `protobuf:"varint,33,opt,name=merge_slashes,json=mergeSlashes,proto3" json:"merge_slashes,omitempty"`
+	// The configuration of the request ID extension. This includes operations such as
+	// generation, validation, and associated tracing operations.
+	//
+	// If not set, Envoy uses the default UUID-based behavior:
+	//
+	// 1. Request ID is propagated using *x-request-id* header.
+	//
+	// 2. Request ID is a universally unique identifier (UUID).
+	//
+	// 3. Tracing decision (sampled, forced, etc) is set in 14th byte of the UUID.
+	RequestIdExtension *RequestIDExtension `protobuf:"bytes,36,opt,name=request_id_extension,json=requestIdExtension,proto3" json:"request_id_extension,omitempty"`
+	// The configuration to customize local reply returned by Envoy. It can customize status code,
+	// body text and response content type. If not specified, status code and text body are hard
+	// coded in Envoy, the response content type is plain text.
+	LocalReplyConfig *LocalReplyConfig `protobuf:"bytes,38,opt,name=local_reply_config,json=localReplyConfig,proto3" json:"local_reply_config,omitempty"`
+	// Determines if the port part should be removed from host/authority header before any processing
+	// of request by HTTP filters or routing. The port would be removed only if it is equal to the :ref:`listener's<envoy_api_field_config.listener.v4alpha.Listener.address>`
+	// local port and request method is not CONNECT. This affects the upstream host header as well.
+	// Without setting this option, incoming requests with host `example:443` will not match against
+	// route with :ref:`domains<envoy_api_field_config.route.v4alpha.VirtualHost.domains>` match set to `example`. Defaults to `false`. Note that port removal is not part
+	// of `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
+	StripMatchingHostPort bool `protobuf:"varint,39,opt,name=strip_matching_host_port,json=stripMatchingHostPort,proto3" json:"strip_matching_host_port,omitempty"`
+	// Governs Envoy's behavior when receiving invalid HTTP from downstream.
+	// If this option is false (default), Envoy will err on the conservative side handling HTTP
+	// errors, terminating both HTTP/1.1 and HTTP/2 connections when receiving an invalid request.
+	// If this option is set to true, Envoy will be more permissive, only resetting the invalid
+	// stream in the case of HTTP/2 and leaving the connection open where possible (if the entire
+	// request is read for HTTP/1.1)
+	// In general this should be true for deployments receiving trusted traffic (L2 Envoys,
+	// company-internal mesh) and false when receiving untrusted traffic (edge deployments).
+	//
+	// If different behaviors for invalid_http_message for HTTP/1 and HTTP/2 are
+	// desired, one should use the new HTTP/1 option :ref:`override_stream_error_on_invalid_http_message
+	// <envoy_v3_api_field_config.core.v3.Http1ProtocolOptions.override_stream_error_on_invalid_http_message>` or the new HTTP/2 option
+	// :ref:`override_stream_error_on_invalid_http_message
+	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.override_stream_error_on_invalid_http_message>`
+	// *not* the deprecated but similarly named :ref:`stream_error_on_invalid_http_messaging
+	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.stream_error_on_invalid_http_messaging>`
+	StreamErrorOnInvalidHttpMessage *wrappers.BoolValue `protobuf:"bytes,40,opt,name=stream_error_on_invalid_http_message,json=streamErrorOnInvalidHttpMessage,proto3" json:"stream_error_on_invalid_http_message,omitempty"`
 }
 
 func (x *HttpConnectionManager) Reset() {
@@ -598,14 +850,19 @@ type isHttpConnectionManager_RouteSpecifier interface {
 }
 
 type HttpConnectionManager_Rds struct {
+	// The connection manager’s route table will be dynamically loaded via the RDS API.
 	Rds *Rds `protobuf:"bytes,3,opt,name=rds,proto3,oneof"`
 }
 
 type HttpConnectionManager_RouteConfig struct {
+	// The route table for the connection manager is static and is specified in this property.
 	RouteConfig *v4alpha2.RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,proto3,oneof"`
 }
 
 type HttpConnectionManager_ScopedRoutes struct {
+	// A route table will be dynamically assigned to each request based on request attributes
+	// (e.g., the value of a header). The "routing scopes" (i.e., route tables) and "scope keys" are
+	// specified in this message.
 	ScopedRoutes *ScopedRoutes `protobuf:"bytes,31,opt,name=scoped_routes,json=scopedRoutes,proto3,oneof"`
 }
 
@@ -615,12 +872,51 @@ func (*HttpConnectionManager_RouteConfig) isHttpConnectionManager_RouteSpecifier
 
 func (*HttpConnectionManager_ScopedRoutes) isHttpConnectionManager_RouteSpecifier() {}
 
+// The configuration to customize local reply returned by Envoy.
 type LocalReplyConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Mappers    []*ResponseMapper                 `protobuf:"bytes,1,rep,name=mappers,proto3" json:"mappers,omitempty"`
+	// Configuration of list of mappers which allows to filter and change local response.
+	// The mappers will be checked by the specified order until one is matched.
+	Mappers []*ResponseMapper `protobuf:"bytes,1,rep,name=mappers,proto3" json:"mappers,omitempty"`
+	// The configuration to form response body from the :ref:`command operators <config_access_log_command_operators>`
+	// and to specify response content type as one of: plain/text or application/json.
+	//
+	// Example one: plain/text body_format.
+	//
+	// .. code-block::
+	//
+	//   text_format: %LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=$REQ(:path)%
+	//
+	// The following response body in `plain/text` format will be generated for a request with
+	// local reply body of "upstream connection error", response_code=503 and path=/foo.
+	//
+	// .. code-block::
+	//
+	//   upstream connect error:503:path=/foo
+	//
+	//  Example two: application/json body_format.
+	//
+	// .. code-block::
+	//
+	//  json_format:
+	//    status: %RESPONSE_CODE%
+	//    message: %LOCAL_REPLY_BODY%
+	//    path: $REQ(:path)%
+	//
+	// The following response body in "application/json" format would be generated for a request with
+	// local reply body of "upstream connection error", response_code=503 and path=/foo.
+	//
+	// .. code-block:: json
+	//
+	//  {
+	//    "status": 503,
+	//    "message": "upstream connection error",
+	//    "path": "/foo"
+	//  }
+	//
 	BodyFormat *v4alpha.SubstitutionFormatString `protobuf:"bytes,2,opt,name=body_format,json=bodyFormat,proto3" json:"body_format,omitempty"`
 }
 
@@ -670,16 +966,26 @@ func (x *LocalReplyConfig) GetBodyFormat() *v4alpha.SubstitutionFormatString {
 	return nil
 }
 
+// The configuration to filter and change local response.
+// [#next-free-field: 6]
 type ResponseMapper struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Filter             *v4alpha1.AccessLogFilter         `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
-	StatusCode         *wrappers.UInt32Value             `protobuf:"bytes,2,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
-	Body               *v4alpha.DataSource               `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
+	// Filter to determine if this mapper should apply.
+	Filter *v4alpha1.AccessLogFilter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
+	// The new response status code if specified.
+	StatusCode *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	// The new local reply body text if specified. It will be used in the `%LOCAL_REPLY_BODY%`
+	// command operator in the `body_format`.
+	Body *v4alpha.DataSource `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
+	// A per mapper `body_format` to override the :ref:`body_format <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.LocalReplyConfig.body_format>`.
+	// It will be used when this mapper is matched.
 	BodyFormatOverride *v4alpha.SubstitutionFormatString `protobuf:"bytes,4,opt,name=body_format_override,json=bodyFormatOverride,proto3" json:"body_format_override,omitempty"`
-	HeadersToAdd       []*v4alpha.HeaderValueOption      `protobuf:"bytes,5,rep,name=headers_to_add,json=headersToAdd,proto3" json:"headers_to_add,omitempty"`
+	// HTTP headers to add to a local reply. This allows the response mapper to append, to add
+	// or to override headers of any local reply before it is sent to a downstream client.
+	HeadersToAdd []*v4alpha.HeaderValueOption `protobuf:"bytes,5,rep,name=headers_to_add,json=headersToAdd,proto3" json:"headers_to_add,omitempty"`
 }
 
 func (x *ResponseMapper) Reset() {
@@ -754,6 +1060,7 @@ type Rds struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Configuration source specifier for RDS.
 	ConfigSource *v4alpha.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
 	// Types that are assignable to NameSpecifier:
 	//	*Rds_RouteConfigName
@@ -826,10 +1133,16 @@ type isRds_NameSpecifier interface {
 }
 
 type Rds_RouteConfigName struct {
+	// The name of the route configuration. This name will be passed to the RDS
+	// API. This allows an Envoy configuration with multiple HTTP listeners (and
+	// associated HTTP connection manager filters) to use different route
+	// configurations.
 	RouteConfigName string `protobuf:"bytes,2,opt,name=route_config_name,json=routeConfigName,proto3,oneof"`
 }
 
 type Rds_RdsResourceLocator struct {
+	// Resource locator for RDS. This is mutually exclusive to *route_config_name*.
+	// [#not-implemented-hide:]
 	RdsResourceLocator *v1.ResourceLocator `protobuf:"bytes,3,opt,name=rds_resource_locator,json=rdsResourceLocator,proto3,oneof"`
 }
 
@@ -837,6 +1150,7 @@ func (*Rds_RouteConfigName) isRds_NameSpecifier() {}
 
 func (*Rds_RdsResourceLocator) isRds_NameSpecifier() {}
 
+// This message is used to work around the limitations with 'oneof' and repeated fields.
 type ScopedRouteConfigurationsList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -884,14 +1198,20 @@ func (x *ScopedRouteConfigurationsList) GetScopedRouteConfigurations() []*v4alph
 	return nil
 }
 
+// [#next-free-field: 6]
 type ScopedRoutes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name            string                        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name assigned to the scoped routing configuration.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The algorithm to use for constructing a scope key for each request.
 	ScopeKeyBuilder *ScopedRoutes_ScopeKeyBuilder `protobuf:"bytes,2,opt,name=scope_key_builder,json=scopeKeyBuilder,proto3" json:"scope_key_builder,omitempty"`
-	RdsConfigSource *v4alpha.ConfigSource         `protobuf:"bytes,3,opt,name=rds_config_source,json=rdsConfigSource,proto3" json:"rds_config_source,omitempty"`
+	// Configuration source specifier for RDS.
+	// This config source is used to subscribe to RouteConfiguration resources specified in
+	// ScopedRouteConfiguration messages.
+	RdsConfigSource *v4alpha.ConfigSource `protobuf:"bytes,3,opt,name=rds_config_source,json=rdsConfigSource,proto3" json:"rds_config_source,omitempty"`
 	// Types that are assignable to ConfigSpecifier:
 	//	*ScopedRoutes_ScopedRouteConfigurationsList
 	//	*ScopedRoutes_ScopedRds
@@ -977,10 +1297,20 @@ type isScopedRoutes_ConfigSpecifier interface {
 }
 
 type ScopedRoutes_ScopedRouteConfigurationsList struct {
+	// The set of routing scopes corresponding to the HCM. A scope is assigned to a request by
+	// matching a key constructed from the request's attributes according to the algorithm specified
+	// by the
+	// :ref:`ScopeKeyBuilder<envoy_api_msg_extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder>`
+	// in this message.
 	ScopedRouteConfigurationsList *ScopedRouteConfigurationsList `protobuf:"bytes,4,opt,name=scoped_route_configurations_list,json=scopedRouteConfigurationsList,proto3,oneof"`
 }
 
 type ScopedRoutes_ScopedRds struct {
+	// The set of routing scopes associated with the HCM will be dynamically loaded via the SRDS
+	// API. A scope is assigned to a request by matching a key constructed from the request's
+	// attributes according to the algorithm specified by the
+	// :ref:`ScopeKeyBuilder<envoy_api_msg_extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder>`
+	// in this message.
 	ScopedRds *ScopedRds `protobuf:"bytes,5,opt,name=scoped_rds,json=scopedRds,proto3,oneof"`
 }
 
@@ -993,6 +1323,7 @@ type ScopedRds struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Configuration source specifier for scoped RDS.
 	ScopedRdsConfigSource *v4alpha.ConfigSource `protobuf:"bytes,1,opt,name=scoped_rds_config_source,json=scopedRdsConfigSource,proto3" json:"scoped_rds_config_source,omitempty"`
 }
 
@@ -1035,12 +1366,19 @@ func (x *ScopedRds) GetScopedRdsConfigSource() *v4alpha.ConfigSource {
 	return nil
 }
 
+// [#next-free-field: 6]
 type HttpFilter struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the filter configuration. The name is used as a fallback to
+	// select an extension if the type of the configuration proto is not
+	// sufficient. It also serves as a resource name in ExtensionConfigDS.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Filter specific configuration which depends on the filter being instantiated. See the supported
+	// filters for further documentation.
+	//
 	// Types that are assignable to ConfigType:
 	//	*HttpFilter_TypedConfig
 	//	*HttpFilter_ConfigDiscovery
@@ -1116,6 +1454,9 @@ type HttpFilter_TypedConfig struct {
 }
 
 type HttpFilter_ConfigDiscovery struct {
+	// Configuration source specifier for an extension configuration discovery service.
+	// In case of a failure and without the default configuration, the HTTP listener responds with 500.
+	// Extension configs delivered through this mechanism are not expected to require warming (see https://github.com/envoyproxy/envoy/issues/12061).
 	ConfigDiscovery *v4alpha.ExtensionConfigSource `protobuf:"bytes,5,opt,name=config_discovery,json=configDiscovery,proto3,oneof"`
 }
 
@@ -1128,6 +1469,7 @@ type RequestIDExtension struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Request ID extension specific configuration.
 	TypedConfig *any.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 
@@ -1170,18 +1512,54 @@ func (x *RequestIDExtension) GetTypedConfig() *any.Any {
 	return nil
 }
 
+// [#next-free-field: 10]
 type HttpConnectionManager_Tracing struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ClientSampling   *v3.Percent            `protobuf:"bytes,3,opt,name=client_sampling,json=clientSampling,proto3" json:"client_sampling,omitempty"`
-	RandomSampling   *v3.Percent            `protobuf:"bytes,4,opt,name=random_sampling,json=randomSampling,proto3" json:"random_sampling,omitempty"`
-	OverallSampling  *v3.Percent            `protobuf:"bytes,5,opt,name=overall_sampling,json=overallSampling,proto3" json:"overall_sampling,omitempty"`
-	Verbose          bool                   `protobuf:"varint,6,opt,name=verbose,proto3" json:"verbose,omitempty"`
-	MaxPathTagLength *wrappers.UInt32Value  `protobuf:"bytes,7,opt,name=max_path_tag_length,json=maxPathTagLength,proto3" json:"max_path_tag_length,omitempty"`
-	CustomTags       []*v31.CustomTag       `protobuf:"bytes,8,rep,name=custom_tags,json=customTags,proto3" json:"custom_tags,omitempty"`
-	Provider         *v4alpha3.Tracing_Http `protobuf:"bytes,9,opt,name=provider,proto3" json:"provider,omitempty"`
+	// Target percentage of requests managed by this HTTP connection manager that will be force
+	// traced if the :ref:`x-client-trace-id <config_http_conn_man_headers_x-client-trace-id>`
+	// header is set. This field is a direct analog for the runtime variable
+	// 'tracing.client_sampling' in the :ref:`HTTP Connection Manager
+	// <config_http_conn_man_runtime>`.
+	// Default: 100%
+	ClientSampling *v3.Percent `protobuf:"bytes,3,opt,name=client_sampling,json=clientSampling,proto3" json:"client_sampling,omitempty"`
+	// Target percentage of requests managed by this HTTP connection manager that will be randomly
+	// selected for trace generation, if not requested by the client or not forced. This field is
+	// a direct analog for the runtime variable 'tracing.random_sampling' in the
+	// :ref:`HTTP Connection Manager <config_http_conn_man_runtime>`.
+	// Default: 100%
+	RandomSampling *v3.Percent `protobuf:"bytes,4,opt,name=random_sampling,json=randomSampling,proto3" json:"random_sampling,omitempty"`
+	// Target percentage of requests managed by this HTTP connection manager that will be traced
+	// after all other sampling checks have been applied (client-directed, force tracing, random
+	// sampling). This field functions as an upper limit on the total configured sampling rate. For
+	// instance, setting client_sampling to 100% but overall_sampling to 1% will result in only 1%
+	// of client requests with the appropriate headers to be force traced. This field is a direct
+	// analog for the runtime variable 'tracing.global_enabled' in the
+	// :ref:`HTTP Connection Manager <config_http_conn_man_runtime>`.
+	// Default: 100%
+	OverallSampling *v3.Percent `protobuf:"bytes,5,opt,name=overall_sampling,json=overallSampling,proto3" json:"overall_sampling,omitempty"`
+	// Whether to annotate spans with additional data. If true, spans will include logs for stream
+	// events.
+	Verbose bool `protobuf:"varint,6,opt,name=verbose,proto3" json:"verbose,omitempty"`
+	// Maximum length of the request path to extract and include in the HttpUrl tag. Used to
+	// truncate lengthy request paths to meet the needs of a tracing backend.
+	// Default: 256
+	MaxPathTagLength *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=max_path_tag_length,json=maxPathTagLength,proto3" json:"max_path_tag_length,omitempty"`
+	// A list of custom tags with unique tag name to create tags for the active span.
+	CustomTags []*v31.CustomTag `protobuf:"bytes,8,rep,name=custom_tags,json=customTags,proto3" json:"custom_tags,omitempty"`
+	// Configuration for an external tracing provider.
+	// If not specified, no tracing will be performed.
+	//
+	// .. attention::
+	//   Please be aware that *envoy.tracers.opencensus* provider can only be configured once
+	//   in Envoy lifetime.
+	//   Any attempts to reconfigure it or to use different configurations for different HCM filters
+	//   will be rejected.
+	//   Such a constraint is inherent to OpenCensus itself. It cannot be overcome without changes
+	//   on OpenCensus side.
+	Provider *v4alpha3.Tracing_Http `protobuf:"bytes,9,opt,name=provider,proto3" json:"provider,omitempty"`
 }
 
 func (x *HttpConnectionManager_Tracing) Reset() {
@@ -1270,6 +1648,7 @@ type HttpConnectionManager_InternalAddressConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Whether unix socket addresses should be considered internal.
 	UnixSockets bool `protobuf:"varint,1,opt,name=unix_sockets,json=unixSockets,proto3" json:"unix_sockets,omitempty"`
 }
 
@@ -1312,16 +1691,29 @@ func (x *HttpConnectionManager_InternalAddressConfig) GetUnixSockets() bool {
 	return false
 }
 
+// [#next-free-field: 7]
 type HttpConnectionManager_SetCurrentClientCertDetails struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Whether to forward the subject of the client cert. Defaults to false.
 	Subject *wrappers.BoolValue `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
-	Cert    bool                `protobuf:"varint,3,opt,name=cert,proto3" json:"cert,omitempty"`
-	Chain   bool                `protobuf:"varint,6,opt,name=chain,proto3" json:"chain,omitempty"`
-	Dns     bool                `protobuf:"varint,4,opt,name=dns,proto3" json:"dns,omitempty"`
-	Uri     bool                `protobuf:"varint,5,opt,name=uri,proto3" json:"uri,omitempty"`
+	// Whether to forward the entire client cert in URL encoded PEM format. This will appear in the
+	// XFCC header comma separated from other values with the value Cert="PEM".
+	// Defaults to false.
+	Cert bool `protobuf:"varint,3,opt,name=cert,proto3" json:"cert,omitempty"`
+	// Whether to forward the entire client cert chain (including the leaf cert) in URL encoded PEM
+	// format. This will appear in the XFCC header comma separated from other values with the value
+	// Chain="PEM".
+	// Defaults to false.
+	Chain bool `protobuf:"varint,6,opt,name=chain,proto3" json:"chain,omitempty"`
+	// Whether to forward the DNS type Subject Alternative Names of the client cert.
+	// Defaults to false.
+	Dns bool `protobuf:"varint,4,opt,name=dns,proto3" json:"dns,omitempty"`
+	// Whether to forward the URI type Subject Alternative Name of the client cert. Defaults to
+	// false.
+	Uri bool `protobuf:"varint,5,opt,name=uri,proto3" json:"uri,omitempty"`
 }
 
 func (x *HttpConnectionManager_SetCurrentClientCertDetails) Reset() {
@@ -1391,14 +1783,37 @@ func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetUri() bool {
 	return false
 }
 
+// The configuration for HTTP upgrades.
+// For each upgrade type desired, an UpgradeConfig must be added.
+//
+// .. warning::
+//
+//    The current implementation of upgrade headers does not handle
+//    multi-valued upgrade headers. Support for multi-valued headers may be
+//    added in the future if needed.
+//
+// .. warning::
+//    The current implementation of upgrade headers does not work with HTTP/2
+//    upstreams.
 type HttpConnectionManager_UpgradeConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UpgradeType string              `protobuf:"bytes,1,opt,name=upgrade_type,json=upgradeType,proto3" json:"upgrade_type,omitempty"`
-	Filters     []*HttpFilter       `protobuf:"bytes,2,rep,name=filters,proto3" json:"filters,omitempty"`
-	Enabled     *wrappers.BoolValue `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	// The case-insensitive name of this upgrade, e.g. "websocket".
+	// For each upgrade type present in upgrade_configs, requests with
+	// Upgrade: [upgrade_type]
+	// will be proxied upstream.
+	UpgradeType string `protobuf:"bytes,1,opt,name=upgrade_type,json=upgradeType,proto3" json:"upgrade_type,omitempty"`
+	// If present, this represents the filter chain which will be created for
+	// this type of upgrade. If no filters are present, the filter chain for
+	// HTTP connections will be used for this upgrade type.
+	Filters []*HttpFilter `protobuf:"bytes,2,rep,name=filters,proto3" json:"filters,omitempty"`
+	// Determines if upgrades are enabled or disabled by default. Defaults to true.
+	// This can be overridden on a per-route basis with :ref:`cluster
+	// <envoy_api_field_config.route.v4alpha.RouteAction.upgrade_configs>` as documented in the
+	// :ref:`upgrade documentation <arch_overview_upgrades>`.
+	Enabled *wrappers.BoolValue `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
 }
 
 func (x *HttpConnectionManager_UpgradeConfig) Reset() {
@@ -1454,11 +1869,23 @@ func (x *HttpConnectionManager_UpgradeConfig) GetEnabled() *wrappers.BoolValue {
 	return nil
 }
 
+// Specifies the mechanism for constructing "scope keys" based on HTTP request attributes. These
+// keys are matched against a set of :ref:`Key<envoy_api_msg_config.route.v4alpha.ScopedRouteConfiguration.Key>`
+// objects assembled from :ref:`ScopedRouteConfiguration<envoy_api_msg_config.route.v4alpha.ScopedRouteConfiguration>`
+// messages distributed via SRDS (the Scoped Route Discovery Service) or assigned statically via
+// :ref:`scoped_route_configurations_list<envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.scoped_route_configurations_list>`.
+//
+// Upon receiving a request's headers, the Router will build a key using the algorithm specified
+// by this message. This key will be used to look up the routing table (i.e., the
+// :ref:`RouteConfiguration<envoy_api_msg_config.route.v4alpha.RouteConfiguration>`) to use for the request.
 type ScopedRoutes_ScopeKeyBuilder struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The final(built) scope key consists of the ordered union of these fragments, which are compared in order with the
+	// fragments of a :ref:`ScopedRouteConfiguration<envoy_api_msg_config.route.v4alpha.ScopedRouteConfiguration>`.
+	// A missing fragment during comparison will make the key invalid, i.e., the computed key doesn't match any key.
 	Fragments []*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder `protobuf:"bytes,1,rep,name=fragments,proto3" json:"fragments,omitempty"`
 }
 
@@ -1501,6 +1928,7 @@ func (x *ScopedRoutes_ScopeKeyBuilder) GetFragments() []*ScopedRoutes_ScopeKeyBu
 	return nil
 }
 
+// Specifies the mechanism for constructing key fragments which are composed into scope keys.
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1562,18 +1990,41 @@ type isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_Type interface {
 }
 
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_ struct {
+	// Specifies how a header field's value should be extracted.
 	HeaderValueExtractor *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor `protobuf:"bytes,1,opt,name=header_value_extractor,json=headerValueExtractor,proto3,oneof"`
 }
 
 func (*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_) isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_Type() {
 }
 
+// Specifies how the value of a header should be extracted.
+// The following example maps the structure of a header to the fields in this message.
+//
+// .. code::
+//
+//              <0> <1>   <-- index
+//    X-Header: a=b;c=d
+//    |         || |
+//    |         || \----> <element_separator>
+//    |         ||
+//    |         |\----> <element.separator>
+//    |         |
+//    |         \----> <element.key>
+//    |
+//    \----> <name>
+//
+//    Each 'a=b' key-value pair constitutes an 'element' of the header field.
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name             string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the header field to extract the value from.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The element separator (e.g., ';' separates 'a;b;c;d').
+	// Default: empty string. This causes the entirety of the header field to be extracted.
+	// If this field is set to an empty string and 'index' is used in the oneof below, 'index'
+	// must be set to 0.
 	ElementSeparator string `protobuf:"bytes,2,opt,name=element_separator,json=elementSeparator,proto3" json:"element_separator,omitempty"`
 	// Types that are assignable to ExtractType:
 	//	*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index
@@ -1653,10 +2104,14 @@ type isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Extract
 }
 
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index struct {
+	// Specifies the zero based index of the element to extract.
+	// Note Envoy concatenates multiple values of the same header key into a comma separated
+	// string, the splitting always happens after the concatenation.
 	Index uint32 `protobuf:"varint,3,opt,name=index,proto3,oneof"`
 }
 
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Element struct {
+	// Specifies the key value pair to extract the value from.
 	Element *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElement `protobuf:"bytes,4,opt,name=element,proto3,oneof"`
 }
 
@@ -1666,13 +2121,20 @@ func (*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index) 
 func (*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Element) isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_ExtractType() {
 }
 
+// Specifies a header field's key value pair to match on.
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElement struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The separator between key and value (e.g., '=' separates 'k=v;...').
+	// If an element is an empty string, the element is ignored.
+	// If an element contains no separator, the whole element is parsed as key and the
+	// fragment value is an empty string.
+	// If there are multiple values for a matched key, the first value is returned.
 	Separator string `protobuf:"bytes,1,opt,name=separator,proto3" json:"separator,omitempty"`
-	Key       string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// The key to match on.
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 }
 
 func (x *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElement) Reset() {

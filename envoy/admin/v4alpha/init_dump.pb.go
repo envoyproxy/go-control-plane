@@ -26,11 +26,17 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Dumps of unready targets of envoy init managers. Envoy's admin fills this message with init managers,
+// which provides the information of their unready targets.
+// The :ref:`/init_dump <operations_admin_interface_init_dump>` will dump all unready targets information.
 type UnreadyTargetsDumps struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// You can choose specific component to dump unready targets with mask query parameter.
+	// See :ref:`/init_dump?mask={} <operations_admin_interface_init_dump_by_mask>` for more information.
+	// The dumps of unready targets of all init managers.
 	UnreadyTargetsDumps []*UnreadyTargetsDumps_UnreadyTargetsDump `protobuf:"bytes,1,rep,name=unready_targets_dumps,json=unreadyTargetsDumps,proto3" json:"unready_targets_dumps,omitempty"`
 }
 
@@ -73,12 +79,15 @@ func (x *UnreadyTargetsDumps) GetUnreadyTargetsDumps() []*UnreadyTargetsDumps_Un
 	return nil
 }
 
+// Message of unready targets information of an init manager.
 type UnreadyTargetsDumps_UnreadyTargetsDump struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name        string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Name of the init manager. Example: "init_manager_xxx".
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Names of unready targets of the init manager. Example: "target_xxx".
 	TargetNames []string `protobuf:"bytes,2,rep,name=target_names,json=targetNames,proto3" json:"target_names,omitempty"`
 }
 

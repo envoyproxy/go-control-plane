@@ -27,11 +27,16 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// An internal redirect predicate that accepts only explicitly allowed target routes.
+// [#extension: envoy.internal_redirect_predicates.allow_listed_routes]
 type AllowListedRoutesConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The list of routes that's allowed as redirect target by this predicate,
+	// identified by the route's :ref:`name <envoy_api_field_config.route.v3.Route.route>`.
+	// Empty route names are not allowed.
 	AllowedRouteNames []string `protobuf:"bytes,1,rep,name=allowed_route_names,json=allowedRouteNames,proto3" json:"allowed_route_names,omitempty"`
 }
 

@@ -28,6 +28,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Specifies the way to match a string.
+// [#next-free-field: 8]
 type StringMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -40,7 +42,10 @@ type StringMatcher struct {
 	//	*StringMatcher_SafeRegex
 	//	*StringMatcher_Contains
 	MatchPattern isStringMatcher_MatchPattern `protobuf_oneof:"match_pattern"`
-	IgnoreCase   bool                         `protobuf:"varint,6,opt,name=ignore_case,json=ignoreCase,proto3" json:"ignore_case,omitempty"`
+	// If true, indicates the exact/prefix/suffix matching should be case insensitive. This has no
+	// effect for the safe_regex match.
+	// For example, the matcher *data* will match both input string *Data* and *data* if set to true.
+	IgnoreCase bool `protobuf:"varint,6,opt,name=ignore_case,json=ignoreCase,proto3" json:"ignore_case,omitempty"`
 }
 
 func (x *StringMatcher) Reset() {
@@ -129,22 +134,46 @@ type isStringMatcher_MatchPattern interface {
 }
 
 type StringMatcher_Exact struct {
+	// The input string must match exactly the string specified here.
+	//
+	// Examples:
+	//
+	// * *abc* only matches the value *abc*.
 	Exact string `protobuf:"bytes,1,opt,name=exact,proto3,oneof"`
 }
 
 type StringMatcher_Prefix struct {
+	// The input string must have the prefix specified here.
+	// Note: empty prefix is not allowed, please use regex instead.
+	//
+	// Examples:
+	//
+	// * *abc* matches the value *abc.xyz*
 	Prefix string `protobuf:"bytes,2,opt,name=prefix,proto3,oneof"`
 }
 
 type StringMatcher_Suffix struct {
+	// The input string must have the suffix specified here.
+	// Note: empty prefix is not allowed, please use regex instead.
+	//
+	// Examples:
+	//
+	// * *abc* matches the value *xyz.abc*
 	Suffix string `protobuf:"bytes,3,opt,name=suffix,proto3,oneof"`
 }
 
 type StringMatcher_SafeRegex struct {
+	// The input string must match the regular expression specified here.
 	SafeRegex *RegexMatcher `protobuf:"bytes,5,opt,name=safe_regex,json=safeRegex,proto3,oneof"`
 }
 
 type StringMatcher_Contains struct {
+	// The input string must have the substring specified here.
+	// Note: empty contains match is not allowed, please use regex instead.
+	//
+	// Examples:
+	//
+	// * *abc* matches the value *xyz.abc.def*
 	Contains string `protobuf:"bytes,7,opt,name=contains,proto3,oneof"`
 }
 
@@ -158,6 +187,7 @@ func (*StringMatcher_SafeRegex) isStringMatcher_MatchPattern() {}
 
 func (*StringMatcher_Contains) isStringMatcher_MatchPattern() {}
 
+// Specifies a list of ways to match a string.
 type ListStringMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

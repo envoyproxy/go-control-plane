@@ -27,6 +27,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// A list of gRPC methods which can be used as an allowlist, for example.
 type GrpcMethodList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -79,7 +80,9 @@ type GrpcMethodList_Service struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name        string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the gRPC service.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The names of the gRPC methods in this service.
 	MethodNames []string `protobuf:"bytes,2,rep,name=method_names,json=methodNames,proto3" json:"method_names,omitempty"`
 }
 

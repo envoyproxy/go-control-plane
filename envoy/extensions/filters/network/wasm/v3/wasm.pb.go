@@ -28,11 +28,13 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [[#not-implemented-hide:]
 type Wasm struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// General Plugin configuration.
 	Config *v3.PluginConfig `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
 }
 

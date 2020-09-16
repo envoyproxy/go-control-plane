@@ -32,6 +32,7 @@ type KafkaBroker struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The prefix to use when emitting :ref:`statistics <config_network_filters_kafka_broker_stats>`.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 }
 

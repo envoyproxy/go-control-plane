@@ -28,6 +28,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Specifies the way to match a double value.
 type DoubleMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -97,10 +98,13 @@ type isDoubleMatcher_MatchPattern interface {
 }
 
 type DoubleMatcher_Range struct {
+	// If specified, the input double value must be in the range specified here.
+	// Note: The range is using half-open interval semantics [start, end).
 	Range *_type.DoubleRange `protobuf:"bytes,1,opt,name=range,proto3,oneof"`
 }
 
 type DoubleMatcher_Exact struct {
+	// If specified, the input double value must be equal to the value specified here.
 	Exact float64 `protobuf:"fixed64,2,opt,name=exact,proto3,oneof"`
 }
 

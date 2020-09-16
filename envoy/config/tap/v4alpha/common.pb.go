@@ -31,14 +31,40 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Output format. All output is in the form of one or more :ref:`TraceWrapper
+// <envoy_api_msg_data.tap.v3.TraceWrapper>` messages. This enumeration indicates
+// how those messages are written. Note that not all sinks support all output formats. See
+// individual sink documentation for more information.
 type OutputSink_Format int32
 
 const (
-	OutputSink_JSON_BODY_AS_BYTES            OutputSink_Format = 0
-	OutputSink_JSON_BODY_AS_STRING           OutputSink_Format = 1
-	OutputSink_PROTO_BINARY                  OutputSink_Format = 2
+	// Each message will be written as JSON. Any :ref:`body <envoy_api_msg_data.tap.v3.Body>`
+	// data will be present in the :ref:`as_bytes
+	// <envoy_api_field_data.tap.v3.Body.as_bytes>` field. This means that body data will be
+	// base64 encoded as per the `proto3 JSON mappings
+	// <https://developers.google.com/protocol-buffers/docs/proto3#json>`_.
+	OutputSink_JSON_BODY_AS_BYTES OutputSink_Format = 0
+	// Each message will be written as JSON. Any :ref:`body <envoy_api_msg_data.tap.v3.Body>`
+	// data will be present in the :ref:`as_string
+	// <envoy_api_field_data.tap.v3.Body.as_string>` field. This means that body data will be
+	// string encoded as per the `proto3 JSON mappings
+	// <https://developers.google.com/protocol-buffers/docs/proto3#json>`_. This format type is
+	// useful when it is known that that body is human readable (e.g., JSON over HTTP) and the
+	// user wishes to view it directly without being forced to base64 decode the body.
+	OutputSink_JSON_BODY_AS_STRING OutputSink_Format = 1
+	// Binary proto format. Note that binary proto is not self-delimiting. If a sink writes
+	// multiple binary messages without any length information the data stream will not be
+	// useful. However, for certain sinks that are self-delimiting (e.g., one message per file)
+	// this output format makes consumption simpler.
+	OutputSink_PROTO_BINARY OutputSink_Format = 2
+	// Messages are written as a sequence tuples, where each tuple is the message length encoded
+	// as a `protobuf 32-bit varint
+	// <https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.io.coded_stream>`_
+	// followed by the binary message. The messages can be read back using the language specific
+	// protobuf coded stream implementation to obtain the message length and the message.
 	OutputSink_PROTO_BINARY_LENGTH_DELIMITED OutputSink_Format = 3
-	OutputSink_PROTO_TEXT                    OutputSink_Format = 4
+	// Text proto format.
+	OutputSink_PROTO_TEXT OutputSink_Format = 4
 )
 
 // Enum value maps for OutputSink_Format.
@@ -86,16 +112,38 @@ func (OutputSink_Format) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_config_tap_v4alpha_common_proto_rawDescGZIP(), []int{5, 0}
 }
 
+// Tap configuration.
 type TapConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The match configuration. If the configuration matches the data source being tapped, a tap will
+	// occur, with the result written to the configured output.
+	// Exactly one of :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` and
+	// :ref:`match_config <envoy_api_field_config.tap.v4alpha.TapConfig.match_config>` must be set. If both
+	// are set, the :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` will be used.
+	//
 	// Deprecated: Do not use.
-	HiddenEnvoyDeprecatedMatchConfig *MatchPredicate                    `protobuf:"bytes,1,opt,name=hidden_envoy_deprecated_match_config,json=hiddenEnvoyDeprecatedMatchConfig,proto3" json:"hidden_envoy_deprecated_match_config,omitempty"`
-	Match                            *v4alpha.MatchPredicate            `protobuf:"bytes,4,opt,name=match,proto3" json:"match,omitempty"`
-	OutputConfig                     *OutputConfig                      `protobuf:"bytes,2,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
-	TapEnabled                       *v4alpha1.RuntimeFractionalPercent `protobuf:"bytes,3,opt,name=tap_enabled,json=tapEnabled,proto3" json:"tap_enabled,omitempty"`
+	HiddenEnvoyDeprecatedMatchConfig *MatchPredicate `protobuf:"bytes,1,opt,name=hidden_envoy_deprecated_match_config,json=hiddenEnvoyDeprecatedMatchConfig,proto3" json:"hidden_envoy_deprecated_match_config,omitempty"`
+	// The match configuration. If the configuration matches the data source being tapped, a tap will
+	// occur, with the result written to the configured output.
+	// Exactly one of :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` and
+	// :ref:`match_config <envoy_api_field_config.tap.v4alpha.TapConfig.match_config>` must be set. If both
+	// are set, the :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` will be used.
+	Match *v4alpha.MatchPredicate `protobuf:"bytes,4,opt,name=match,proto3" json:"match,omitempty"`
+	// The tap output configuration. If a match configuration matches a data source being tapped,
+	// a tap will occur and the data will be written to the configured output.
+	OutputConfig *OutputConfig `protobuf:"bytes,2,opt,name=output_config,json=outputConfig,proto3" json:"output_config,omitempty"`
+	// [#not-implemented-hide:] Specify if Tap matching is enabled. The % of requests\connections for
+	// which the tap matching is enabled. When not enabled, the request\connection will not be
+	// recorded.
+	//
+	// .. note::
+	//
+	//   This field defaults to 100/:ref:`HUNDRED
+	//   <envoy_api_enum_type.v3.FractionalPercent.DenominatorType>`.
+	TapEnabled *v4alpha1.RuntimeFractionalPercent `protobuf:"bytes,3,opt,name=tap_enabled,json=tapEnabled,proto3" json:"tap_enabled,omitempty"`
 }
 
 func (x *TapConfig) Reset() {
@@ -159,6 +207,9 @@ func (x *TapConfig) GetTapEnabled() *v4alpha1.RuntimeFractionalPercent {
 	return nil
 }
 
+// Tap match configuration. This is a recursive structure which allows complex nested match
+// configurations to be built using various logical operators.
+// [#next-free-field: 11]
 type MatchPredicate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -292,42 +343,54 @@ type isMatchPredicate_Rule interface {
 }
 
 type MatchPredicate_OrMatch struct {
+	// A set that describes a logical OR. If any member of the set matches, the match configuration
+	// matches.
 	OrMatch *MatchPredicate_MatchSet `protobuf:"bytes,1,opt,name=or_match,json=orMatch,proto3,oneof"`
 }
 
 type MatchPredicate_AndMatch struct {
+	// A set that describes a logical AND. If all members of the set match, the match configuration
+	// matches.
 	AndMatch *MatchPredicate_MatchSet `protobuf:"bytes,2,opt,name=and_match,json=andMatch,proto3,oneof"`
 }
 
 type MatchPredicate_NotMatch struct {
+	// A negation match. The match configuration will match if the negated match condition matches.
 	NotMatch *MatchPredicate `protobuf:"bytes,3,opt,name=not_match,json=notMatch,proto3,oneof"`
 }
 
 type MatchPredicate_AnyMatch struct {
+	// The match configuration will always match.
 	AnyMatch bool `protobuf:"varint,4,opt,name=any_match,json=anyMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpRequestHeadersMatch struct {
+	// HTTP request headers match configuration.
 	HttpRequestHeadersMatch *HttpHeadersMatch `protobuf:"bytes,5,opt,name=http_request_headers_match,json=httpRequestHeadersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpRequestTrailersMatch struct {
+	// HTTP request trailers match configuration.
 	HttpRequestTrailersMatch *HttpHeadersMatch `protobuf:"bytes,6,opt,name=http_request_trailers_match,json=httpRequestTrailersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpResponseHeadersMatch struct {
+	// HTTP response headers match configuration.
 	HttpResponseHeadersMatch *HttpHeadersMatch `protobuf:"bytes,7,opt,name=http_response_headers_match,json=httpResponseHeadersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpResponseTrailersMatch struct {
+	// HTTP response trailers match configuration.
 	HttpResponseTrailersMatch *HttpHeadersMatch `protobuf:"bytes,8,opt,name=http_response_trailers_match,json=httpResponseTrailersMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpRequestGenericBodyMatch struct {
+	// HTTP request generic body match configuration.
 	HttpRequestGenericBodyMatch *HttpGenericBodyMatch `protobuf:"bytes,9,opt,name=http_request_generic_body_match,json=httpRequestGenericBodyMatch,proto3,oneof"`
 }
 
 type MatchPredicate_HttpResponseGenericBodyMatch struct {
+	// HTTP response generic body match configuration.
 	HttpResponseGenericBodyMatch *HttpGenericBodyMatch `protobuf:"bytes,10,opt,name=http_response_generic_body_match,json=httpResponseGenericBodyMatch,proto3,oneof"`
 }
 
@@ -351,11 +414,13 @@ func (*MatchPredicate_HttpRequestGenericBodyMatch) isMatchPredicate_Rule() {}
 
 func (*MatchPredicate_HttpResponseGenericBodyMatch) isMatchPredicate_Rule() {}
 
+// HTTP headers match configuration.
 type HttpHeadersMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// HTTP headers to match.
 	Headers []*v4alpha2.HeaderMatcher `protobuf:"bytes,1,rep,name=headers,proto3" json:"headers,omitempty"`
 }
 
@@ -398,13 +463,25 @@ func (x *HttpHeadersMatch) GetHeaders() []*v4alpha2.HeaderMatcher {
 	return nil
 }
 
+// HTTP generic body match configuration.
+// List of text strings and hex strings to be located in HTTP body.
+// All specified strings must be found in the HTTP body for positive match.
+// The search may be limited to specified number of bytes from the body start.
+//
+// .. attention::
+//
+//   Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
+//   If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
+//   to scan only part of the http body.
 type HttpGenericBodyMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	BytesLimit uint32                                   `protobuf:"varint,1,opt,name=bytes_limit,json=bytesLimit,proto3" json:"bytes_limit,omitempty"`
-	Patterns   []*HttpGenericBodyMatch_GenericTextMatch `protobuf:"bytes,2,rep,name=patterns,proto3" json:"patterns,omitempty"`
+	// Limits search to specified number of bytes - default zero (no limit - match entire captured buffer).
+	BytesLimit uint32 `protobuf:"varint,1,opt,name=bytes_limit,json=bytesLimit,proto3" json:"bytes_limit,omitempty"`
+	// List of patterns to match.
+	Patterns []*HttpGenericBodyMatch_GenericTextMatch `protobuf:"bytes,2,rep,name=patterns,proto3" json:"patterns,omitempty"`
 }
 
 func (x *HttpGenericBodyMatch) Reset() {
@@ -453,15 +530,32 @@ func (x *HttpGenericBodyMatch) GetPatterns() []*HttpGenericBodyMatch_GenericText
 	return nil
 }
 
+// Tap output configuration.
 type OutputConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Sinks              []*OutputSink         `protobuf:"bytes,1,rep,name=sinks,proto3" json:"sinks,omitempty"`
+	// Output sinks for tap data. Currently a single sink is allowed in the list. Once multiple
+	// sink types are supported this constraint will be relaxed.
+	Sinks []*OutputSink `protobuf:"bytes,1,rep,name=sinks,proto3" json:"sinks,omitempty"`
+	// For buffered tapping, the maximum amount of received body that will be buffered prior to
+	// truncation. If truncation occurs, the :ref:`truncated
+	// <envoy_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
+	// default is 1KiB.
 	MaxBufferedRxBytes *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_buffered_rx_bytes,json=maxBufferedRxBytes,proto3" json:"max_buffered_rx_bytes,omitempty"`
+	// For buffered tapping, the maximum amount of transmitted body that will be buffered prior to
+	// truncation. If truncation occurs, the :ref:`truncated
+	// <envoy_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
+	// default is 1KiB.
 	MaxBufferedTxBytes *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=max_buffered_tx_bytes,json=maxBufferedTxBytes,proto3" json:"max_buffered_tx_bytes,omitempty"`
-	Streaming          bool                  `protobuf:"varint,4,opt,name=streaming,proto3" json:"streaming,omitempty"`
+	// Indicates whether taps produce a single buffered message per tap, or multiple streamed
+	// messages per tap in the emitted :ref:`TraceWrapper
+	// <envoy_api_msg_data.tap.v3.TraceWrapper>` messages. Note that streamed tapping does not
+	// mean that no buffering takes place. Buffering may be required if data is processed before a
+	// match can be determined. See the HTTP tap filter :ref:`streaming
+	// <config_http_filters_tap_streaming>` documentation for more information.
+	Streaming bool `protobuf:"varint,4,opt,name=streaming,proto3" json:"streaming,omitempty"`
 }
 
 func (x *OutputConfig) Reset() {
@@ -524,11 +618,13 @@ func (x *OutputConfig) GetStreaming() bool {
 	return false
 }
 
+// Tap output sink configuration.
 type OutputSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Sink output format.
 	Format OutputSink_Format `protobuf:"varint,1,opt,name=format,proto3,enum=envoy.config.tap.v4alpha.OutputSink_Format" json:"format,omitempty"`
 	// Types that are assignable to OutputSinkType:
 	//	*OutputSink_StreamingAdmin
@@ -609,14 +705,26 @@ type isOutputSink_OutputSinkType interface {
 }
 
 type OutputSink_StreamingAdmin struct {
+	// Tap output will be streamed out the :http:post:`/tap` admin endpoint.
+	//
+	// .. attention::
+	//
+	//   It is only allowed to specify the streaming admin output sink if the tap is being
+	//   configured from the :http:post:`/tap` admin endpoint. Thus, if an extension has
+	//   been configured to receive tap configuration from some other source (e.g., static
+	//   file, XDS, etc.) configuring the streaming admin output type will fail.
 	StreamingAdmin *StreamingAdminSink `protobuf:"bytes,2,opt,name=streaming_admin,json=streamingAdmin,proto3,oneof"`
 }
 
 type OutputSink_FilePerTap struct {
+	// Tap output will be written to a file per tap sink.
 	FilePerTap *FilePerTapSink `protobuf:"bytes,3,opt,name=file_per_tap,json=filePerTap,proto3,oneof"`
 }
 
 type OutputSink_StreamingGrpc struct {
+	// [#not-implemented-hide:]
+	// GrpcService to stream data to. The format argument must be PROTO_BINARY.
+	// [#comment: TODO(samflattery): remove cleanup in uber_per_filter.cc once implemented]
 	StreamingGrpc *StreamingGrpcSink `protobuf:"bytes,4,opt,name=streaming_grpc,json=streamingGrpc,proto3,oneof"`
 }
 
@@ -626,6 +734,7 @@ func (*OutputSink_FilePerTap) isOutputSink_OutputSinkType() {}
 
 func (*OutputSink_StreamingGrpc) isOutputSink_OutputSinkType() {}
 
+// Streaming admin sink configuration.
 type StreamingAdminSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -664,11 +773,15 @@ func (*StreamingAdminSink) Descriptor() ([]byte, []int) {
 	return file_envoy_config_tap_v4alpha_common_proto_rawDescGZIP(), []int{6}
 }
 
+// The file per tap sink outputs a discrete file for every tapped stream.
 type FilePerTapSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Path prefix. The output file will be of the form <path_prefix>_<id>.pb, where <id> is an
+	// identifier distinguishing the recorded trace for stream instances (the Envoy
+	// connection ID, HTTP stream ID, etc.).
 	PathPrefix string `protobuf:"bytes,1,opt,name=path_prefix,json=pathPrefix,proto3" json:"path_prefix,omitempty"`
 }
 
@@ -711,12 +824,16 @@ func (x *FilePerTapSink) GetPathPrefix() string {
 	return ""
 }
 
+// [#not-implemented-hide:] Streaming gRPC sink configuration sends the taps to an external gRPC
+// server.
 type StreamingGrpcSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TapId       string                `protobuf:"bytes,1,opt,name=tap_id,json=tapId,proto3" json:"tap_id,omitempty"`
+	// Opaque identifier, that will be sent back to the streaming grpc server.
+	TapId string `protobuf:"bytes,1,opt,name=tap_id,json=tapId,proto3" json:"tap_id,omitempty"`
+	// The gRPC server that hosts the Tap Sink Service.
 	GrpcService *v4alpha1.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 }
 
@@ -766,11 +883,13 @@ func (x *StreamingGrpcSink) GetGrpcService() *v4alpha1.GrpcService {
 	return nil
 }
 
+// A set of match configurations used for logical operations.
 type MatchPredicate_MatchSet struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The list of rules that make up the set.
 	Rules []*MatchPredicate `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
 }
 
@@ -882,10 +1001,12 @@ type isHttpGenericBodyMatch_GenericTextMatch_Rule interface {
 }
 
 type HttpGenericBodyMatch_GenericTextMatch_StringMatch struct {
+	// Text string to be located in HTTP body.
 	StringMatch string `protobuf:"bytes,1,opt,name=string_match,json=stringMatch,proto3,oneof"`
 }
 
 type HttpGenericBodyMatch_GenericTextMatch_BinaryMatch struct {
+	// Sequence of bytes to be located in HTTP body.
 	BinaryMatch []byte `protobuf:"bytes,2,opt,name=binary_match,json=binaryMatch,proto3,oneof"`
 }
 

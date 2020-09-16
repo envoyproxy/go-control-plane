@@ -32,24 +32,56 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#next-free-field: 13]
 type TcpProxy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The prefix to use when emitting :ref:`statistics
+	// <config_network_filters_tcp_proxy_stats>`.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to ClusterSpecifier:
 	//	*TcpProxy_Cluster
 	//	*TcpProxy_WeightedClusters
-	ClusterSpecifier      isTcpProxy_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
-	MetadataMatch         *v4alpha.Metadata           `protobuf:"bytes,9,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
-	IdleTimeout           *duration.Duration          `protobuf:"bytes,8,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
-	DownstreamIdleTimeout *duration.Duration          `protobuf:"bytes,3,opt,name=downstream_idle_timeout,json=downstreamIdleTimeout,proto3" json:"downstream_idle_timeout,omitempty"`
-	UpstreamIdleTimeout   *duration.Duration          `protobuf:"bytes,4,opt,name=upstream_idle_timeout,json=upstreamIdleTimeout,proto3" json:"upstream_idle_timeout,omitempty"`
-	AccessLog             []*v4alpha1.AccessLog       `protobuf:"bytes,5,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
-	MaxConnectAttempts    *wrappers.UInt32Value       `protobuf:"bytes,7,opt,name=max_connect_attempts,json=maxConnectAttempts,proto3" json:"max_connect_attempts,omitempty"`
-	HashPolicy            []*v3.HashPolicy            `protobuf:"bytes,11,rep,name=hash_policy,json=hashPolicy,proto3" json:"hash_policy,omitempty"`
-	TunnelingConfig       *TcpProxy_TunnelingConfig   `protobuf:"bytes,12,opt,name=tunneling_config,json=tunnelingConfig,proto3" json:"tunneling_config,omitempty"`
+	ClusterSpecifier isTcpProxy_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
+	// Optional endpoint metadata match criteria. Only endpoints in the upstream
+	// cluster with metadata matching that set in metadata_match will be
+	// considered. The filter name should be specified as *envoy.lb*.
+	MetadataMatch *v4alpha.Metadata `protobuf:"bytes,9,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
+	// The idle timeout for connections managed by the TCP proxy filter. The idle timeout
+	// is defined as the period in which there are no bytes sent or received on either
+	// the upstream or downstream connection. If not set, the default idle timeout is 1 hour. If set
+	// to 0s, the timeout will be disabled.
+	//
+	// .. warning::
+	//   Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP
+	//   FIN packets, etc.
+	IdleTimeout *duration.Duration `protobuf:"bytes,8,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
+	// [#not-implemented-hide:] The idle timeout for connections managed by the TCP proxy
+	// filter. The idle timeout is defined as the period in which there is no
+	// active traffic. If not set, there is no idle timeout. When the idle timeout
+	// is reached the connection will be closed. The distinction between
+	// downstream_idle_timeout/upstream_idle_timeout provides a means to set
+	// timeout based on the last byte sent on the downstream/upstream connection.
+	DownstreamIdleTimeout *duration.Duration `protobuf:"bytes,3,opt,name=downstream_idle_timeout,json=downstreamIdleTimeout,proto3" json:"downstream_idle_timeout,omitempty"`
+	// [#not-implemented-hide:]
+	UpstreamIdleTimeout *duration.Duration `protobuf:"bytes,4,opt,name=upstream_idle_timeout,json=upstreamIdleTimeout,proto3" json:"upstream_idle_timeout,omitempty"`
+	// Configuration for :ref:`access logs <arch_overview_access_logs>`
+	// emitted by the this tcp_proxy.
+	AccessLog []*v4alpha1.AccessLog `protobuf:"bytes,5,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// The maximum number of unsuccessful connection attempts that will be made before
+	// giving up. If the parameter is not specified, 1 connection attempt will be made.
+	MaxConnectAttempts *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=max_connect_attempts,json=maxConnectAttempts,proto3" json:"max_connect_attempts,omitempty"`
+	// Optional configuration for TCP proxy hash policy. If hash_policy is not set, the hash-based
+	// load balancing algorithms will select a host randomly. Currently the number of hash policies is
+	// limited to 1.
+	HashPolicy []*v3.HashPolicy `protobuf:"bytes,11,rep,name=hash_policy,json=hashPolicy,proto3" json:"hash_policy,omitempty"`
+	// [#not-implemented-hide:] feature in progress
+	// If set, this configures tunneling, e.g. configuration options to tunnel multiple TCP
+	// payloads over a shared HTTP/2 tunnel. If this message is absent, the payload
+	// will be proxied upstream as per usual.
+	TunnelingConfig *TcpProxy_TunnelingConfig `protobuf:"bytes,12,opt,name=tunneling_config,json=tunnelingConfig,proto3" json:"tunneling_config,omitempty"`
 }
 
 func (x *TcpProxy) Reset() {
@@ -173,10 +205,14 @@ type isTcpProxy_ClusterSpecifier interface {
 }
 
 type TcpProxy_Cluster struct {
+	// The upstream cluster to connect to.
 	Cluster string `protobuf:"bytes,2,opt,name=cluster,proto3,oneof"`
 }
 
 type TcpProxy_WeightedClusters struct {
+	// Multiple upstream clusters can be specified for a given route. The
+	// request is routed to one of the upstream clusters based on weights
+	// assigned to each cluster.
 	WeightedClusters *TcpProxy_WeightedCluster `protobuf:"bytes,10,opt,name=weighted_clusters,json=weightedClusters,proto3,oneof"`
 }
 
@@ -184,11 +220,15 @@ func (*TcpProxy_Cluster) isTcpProxy_ClusterSpecifier() {}
 
 func (*TcpProxy_WeightedClusters) isTcpProxy_ClusterSpecifier() {}
 
+// Allows for specification of multiple upstream clusters along with weights
+// that indicate the percentage of traffic to be forwarded to each cluster.
+// The router selects an upstream cluster based on these weights.
 type TcpProxy_WeightedCluster struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Specifies one or more upstream clusters associated with the route.
 	Clusters []*TcpProxy_WeightedCluster_ClusterWeight `protobuf:"bytes,1,rep,name=clusters,proto3" json:"clusters,omitempty"`
 }
 
@@ -231,11 +271,15 @@ func (x *TcpProxy_WeightedCluster) GetClusters() []*TcpProxy_WeightedCluster_Clu
 	return nil
 }
 
+// Configuration for tunneling TCP over other transports or application layers.
+// Currently, only HTTP/2 is supported. When other options exist, HTTP/2 will
+// remain the default.
 type TcpProxy_TunnelingConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The hostname to send in the synthesized CONNECT headers to the upstream proxy.
 	Hostname string `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
 }
 
@@ -283,8 +327,18 @@ type TcpProxy_WeightedCluster_ClusterWeight struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name          string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Weight        uint32            `protobuf:"varint,2,opt,name=weight,proto3" json:"weight,omitempty"`
+	// Name of the upstream cluster.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// When a request matches the route, the choice of an upstream cluster is
+	// determined by its weight. The sum of weights across all entries in the
+	// clusters array determines the total weight.
+	Weight uint32 `protobuf:"varint,2,opt,name=weight,proto3" json:"weight,omitempty"`
+	// Optional endpoint metadata match criteria used by the subset load balancer. Only endpoints
+	// in the upstream cluster with metadata matching what is set in this field will be considered
+	// for load balancing. Note that this will be merged with what's provided in
+	// :ref:`TcpProxy.metadata_match
+	// <envoy_api_field_extensions.filters.network.tcp_proxy.v4alpha.TcpProxy.metadata_match>`, with values
+	// here taking precedence. The filter name should be specified as *envoy.lb*.
 	MetadataMatch *v4alpha.Metadata `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 }
 

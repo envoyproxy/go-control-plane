@@ -33,7 +33,11 @@ type Filter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name        string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the filter to instantiate. The name must match a
+	// :ref:`supported filter <config_network_filters>`.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Filter specific configuration which depends on the filter being
+	// instantiated. See the supported filters for further documentation.
 	TypedConfig *any.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 

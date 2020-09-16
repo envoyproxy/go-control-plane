@@ -29,11 +29,21 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// The tracing configuration specifies settings for an HTTP tracer provider used by Envoy.
+//
+// Envoy may support other tracers in the future, but right now the HTTP tracer is the only one
+// supported.
+//
+// .. attention::
+//
+//   Use of this message type has been deprecated in favor of direct use of
+//   :ref:`Tracing.Http <envoy_api_msg_config.trace.v4alpha.Tracing.Http>`.
 type Tracing struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Provides configuration for the HTTP tracer.
 	Http *Tracing_Http `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty"`
 }
 
@@ -76,12 +86,37 @@ func (x *Tracing) GetHttp() *Tracing_Http {
 	return nil
 }
 
+// Configuration for an HTTP tracer provider used by Envoy.
+//
+// The configuration is defined by the
+// :ref:`HttpConnectionManager.Tracing <envoy_api_msg_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing>`
+// :ref:`provider <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.Tracing.provider>`
+// field.
 type Tracing_Http struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The name of the HTTP trace driver to instantiate. The name must match a
+	// supported HTTP trace driver. Built-in trace drivers:
+	//
+	// - *envoy.tracers.lightstep*
+	// - *envoy.tracers.zipkin*
+	// - *envoy.tracers.dynamic_ot*
+	// - *envoy.tracers.datadog*
+	// - *envoy.tracers.opencensus*
+	// - *envoy.tracers.xray*
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Trace driver specific configuration which depends on the driver being instantiated.
+	// See the trace drivers for examples:
+	//
+	// - :ref:`LightstepConfig <envoy_api_msg_extensions.tracers.lightstep.v4alpha.LightstepConfig>`
+	// - :ref:`ZipkinConfig <envoy_api_msg_extensions.tracers.zipkin.v4alpha.ZipkinConfig>`
+	// - :ref:`DynamicOtConfig <envoy_api_msg_extensions.tracers.dynamic_ot.v4alpha.DynamicOtConfig>`
+	// - :ref:`DatadogConfig <envoy_api_msg_extensions.tracers.datadog.v4alpha.DatadogConfig>`
+	// - :ref:`OpenCensusConfig <envoy_api_msg_extensions.tracers.opencensus.v4alpha.OpenCensusConfig>`
+	// - :ref:`AWS X-Ray <envoy_api_msg_extensions.tracers.xray.v4alpha.XRayConfig>`
+	//
 	// Types that are assignable to ConfigType:
 	//	*Tracing_Http_TypedConfig
 	ConfigType isTracing_Http_ConfigType `protobuf_oneof:"config_type"`

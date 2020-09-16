@@ -26,6 +26,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// A connection pool which forwards downstream HTTP as HTTP to upstream.
+// [#extension: envoy.upstreams.http.http]
 type HttpConnectionPoolProto struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -37,8 +37,12 @@ type OAuth2Credentials struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ClientId    string                   `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	// The client_id to be used in the authorize calls. This value will be URL encoded when sent to the OAuth server.
+	ClientId string `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	// The secret used to retrieve the access token. This value will be URL encoded when sent to the OAuth server.
 	TokenSecret *v4alpha.SdsSecretConfig `protobuf:"bytes,2,opt,name=token_secret,json=tokenSecret,proto3" json:"token_secret,omitempty"`
+	// Configures how the secret token should be created.
+	//
 	// Types that are assignable to TokenFormation:
 	//	*OAuth2Credentials_HmacSecret
 	TokenFormation isOAuth2Credentials_TokenFormation `protobuf_oneof:"token_formation"`
@@ -109,24 +113,40 @@ type isOAuth2Credentials_TokenFormation interface {
 }
 
 type OAuth2Credentials_HmacSecret struct {
+	// If present, the secret token will be a HMAC using the provided secret.
 	HmacSecret *v4alpha.SdsSecretConfig `protobuf:"bytes,3,opt,name=hmac_secret,json=hmacSecret,proto3,oneof"`
 }
 
 func (*OAuth2Credentials_HmacSecret) isOAuth2Credentials_TokenFormation() {}
 
+// OAuth config
+//
+// [#next-free-field: 9]
 type OAuth2Config struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	TokenEndpoint         *v4alpha1.HttpUri         `protobuf:"bytes,1,opt,name=token_endpoint,json=tokenEndpoint,proto3" json:"token_endpoint,omitempty"`
-	AuthorizationEndpoint string                    `protobuf:"bytes,2,opt,name=authorization_endpoint,json=authorizationEndpoint,proto3" json:"authorization_endpoint,omitempty"`
-	Credentials           *OAuth2Credentials        `protobuf:"bytes,3,opt,name=credentials,proto3" json:"credentials,omitempty"`
-	RedirectUri           string                    `protobuf:"bytes,4,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
-	RedirectPathMatcher   *v4alpha2.PathMatcher     `protobuf:"bytes,5,opt,name=redirect_path_matcher,json=redirectPathMatcher,proto3" json:"redirect_path_matcher,omitempty"`
-	SignoutPath           *v4alpha2.PathMatcher     `protobuf:"bytes,6,opt,name=signout_path,json=signoutPath,proto3" json:"signout_path,omitempty"`
-	ForwardBearerToken    bool                      `protobuf:"varint,7,opt,name=forward_bearer_token,json=forwardBearerToken,proto3" json:"forward_bearer_token,omitempty"`
-	PassThroughMatcher    []*v4alpha3.HeaderMatcher `protobuf:"bytes,8,rep,name=pass_through_matcher,json=passThroughMatcher,proto3" json:"pass_through_matcher,omitempty"`
+	// Endpoint on the authorization server to retrieve the access token from.
+	TokenEndpoint *v4alpha1.HttpUri `protobuf:"bytes,1,opt,name=token_endpoint,json=tokenEndpoint,proto3" json:"token_endpoint,omitempty"`
+	// The endpoint redirect to for authorization in response to unauthorized requests.
+	AuthorizationEndpoint string `protobuf:"bytes,2,opt,name=authorization_endpoint,json=authorizationEndpoint,proto3" json:"authorization_endpoint,omitempty"`
+	// Credentials used for OAuth.
+	Credentials *OAuth2Credentials `protobuf:"bytes,3,opt,name=credentials,proto3" json:"credentials,omitempty"`
+	// The redirect URI passed to the authorization endpoint. Supports header formatting
+	// tokens. For more information, including details on header value syntax, see the
+	// documentation on :ref:`custom request headers <config_http_conn_man_headers_custom_request_headers>`.
+	//
+	// This URI should not contain any query parameters.
+	RedirectUri string `protobuf:"bytes,4,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"`
+	// Matching criteria used to determine whether a path appears to be the result of a redirect from the authorization server.
+	RedirectPathMatcher *v4alpha2.PathMatcher `protobuf:"bytes,5,opt,name=redirect_path_matcher,json=redirectPathMatcher,proto3" json:"redirect_path_matcher,omitempty"`
+	// The path to sign a user out, clearing their credential cookies.
+	SignoutPath *v4alpha2.PathMatcher `protobuf:"bytes,6,opt,name=signout_path,json=signoutPath,proto3" json:"signout_path,omitempty"`
+	// Forward the OAuth token as a Bearer to upstream web service.
+	ForwardBearerToken bool `protobuf:"varint,7,opt,name=forward_bearer_token,json=forwardBearerToken,proto3" json:"forward_bearer_token,omitempty"`
+	// Any request that matches any of the provided matchers will be passed through without OAuth validation.
+	PassThroughMatcher []*v4alpha3.HeaderMatcher `protobuf:"bytes,8,rep,name=pass_through_matcher,json=passThroughMatcher,proto3" json:"pass_through_matcher,omitempty"`
 }
 
 func (x *OAuth2Config) Reset() {
@@ -217,11 +237,13 @@ func (x *OAuth2Config) GetPassThroughMatcher() []*v4alpha3.HeaderMatcher {
 	return nil
 }
 
+// Filter config.
 type OAuth2 struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Leave this empty to disable OAuth2 for a specific route, using per filter config.
 	Config *OAuth2Config `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
 }
 

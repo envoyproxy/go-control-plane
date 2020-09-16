@@ -32,8 +32,12 @@ type MySQLProxy struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The human readable prefix to use when emitting :ref:`statistics
+	// <config_network_filters_mysql_proxy_stats>`.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
-	AccessLog  string `protobuf:"bytes,2,opt,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
+	// [#not-implemented-hide:] The optional path to use for writing MySQL access logs.
+	// If the access log field is empty, access logs will not be written.
+	AccessLog string `protobuf:"bytes,2,opt,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
 }
 
 func (x *MySQLProxy) Reset() {

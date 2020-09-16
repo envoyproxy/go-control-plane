@@ -28,16 +28,34 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// External Authorization filter calls out to an external service over the
+// gRPC Authorization API defined by
+// :ref:`CheckRequest <envoy_api_msg_service.auth.v3.CheckRequest>`.
+// A failed check will cause this filter to close the TCP connection.
+// [#next-free-field: 6]
 type ExtAuthz struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StatPrefix             string          `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
-	GrpcService            *v3.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
-	FailureModeAllow       bool            `protobuf:"varint,3,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
-	IncludePeerCertificate bool            `protobuf:"varint,4,opt,name=include_peer_certificate,json=includePeerCertificate,proto3" json:"include_peer_certificate,omitempty"`
-	TransportApiVersion    v3.ApiVersion   `protobuf:"varint,5,opt,name=transport_api_version,json=transportApiVersion,proto3,enum=envoy.config.core.v3.ApiVersion" json:"transport_api_version,omitempty"`
+	// The prefix to use when emitting statistics.
+	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	// The external authorization gRPC service configuration.
+	// The default timeout is set to 200ms by this filter.
+	GrpcService *v3.GrpcService `protobuf:"bytes,2,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
+	// The filter's behaviour in case the external authorization service does
+	// not respond back. When it is set to true, Envoy will also allow traffic in case of
+	// communication failure between authorization service and the proxy.
+	// Defaults to false.
+	FailureModeAllow bool `protobuf:"varint,3,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
+	// Specifies if the peer certificate is sent to the external service.
+	//
+	// When this field is true, Envoy will include the peer X.509 certificate, if available, in the
+	// :ref:`certificate<envoy_api_field_service.auth.v3.AttributeContext.Peer.certificate>`.
+	IncludePeerCertificate bool `protobuf:"varint,4,opt,name=include_peer_certificate,json=includePeerCertificate,proto3" json:"include_peer_certificate,omitempty"`
+	// API version for ext_authz transport protocol. This describes the ext_authz gRPC endpoint and
+	// version of Check{Request,Response} used on the wire.
+	TransportApiVersion v3.ApiVersion `protobuf:"varint,5,opt,name=transport_api_version,json=transportApiVersion,proto3,enum=envoy.config.core.v3.ApiVersion" json:"transport_api_version,omitempty"`
 }
 
 func (x *ExtAuthz) Reset() {

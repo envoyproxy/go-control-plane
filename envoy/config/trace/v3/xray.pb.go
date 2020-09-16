@@ -34,10 +34,20 @@ type XRayConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	DaemonEndpoint       *v3.SocketAddress         `protobuf:"bytes,1,opt,name=daemon_endpoint,json=daemonEndpoint,proto3" json:"daemon_endpoint,omitempty"`
-	SegmentName          string                    `protobuf:"bytes,2,opt,name=segment_name,json=segmentName,proto3" json:"segment_name,omitempty"`
-	SamplingRuleManifest *v3.DataSource            `protobuf:"bytes,3,opt,name=sampling_rule_manifest,json=samplingRuleManifest,proto3" json:"sampling_rule_manifest,omitempty"`
-	SegmentFields        *XRayConfig_SegmentFields `protobuf:"bytes,4,opt,name=segment_fields,json=segmentFields,proto3" json:"segment_fields,omitempty"`
+	// The UDP endpoint of the X-Ray Daemon where the spans will be sent.
+	// If this value is not set, the default value of 127.0.0.1:2000 will be used.
+	DaemonEndpoint *v3.SocketAddress `protobuf:"bytes,1,opt,name=daemon_endpoint,json=daemonEndpoint,proto3" json:"daemon_endpoint,omitempty"`
+	// The name of the X-Ray segment.
+	SegmentName string `protobuf:"bytes,2,opt,name=segment_name,json=segmentName,proto3" json:"segment_name,omitempty"`
+	// The location of a local custom sampling rules JSON file.
+	// For an example of the sampling rules see:
+	// `X-Ray SDK documentation
+	// <https://docs.aws.amazon.com/xray/latest/devguide/xray-sdk-go-configuration.html#xray-sdk-go-configuration-sampling>`_
+	SamplingRuleManifest *v3.DataSource `protobuf:"bytes,3,opt,name=sampling_rule_manifest,json=samplingRuleManifest,proto3" json:"sampling_rule_manifest,omitempty"`
+	// Optional custom fields to be added to each trace segment.
+	// see: `X-Ray Segment Document documentation
+	// <https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html>`__
+	SegmentFields *XRayConfig_SegmentFields `protobuf:"bytes,4,opt,name=segment_fields,json=segmentFields,proto3" json:"segment_fields,omitempty"`
 }
 
 func (x *XRayConfig) Reset() {
@@ -105,8 +115,11 @@ type XRayConfig_SegmentFields struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Origin string          `protobuf:"bytes,1,opt,name=origin,proto3" json:"origin,omitempty"`
-	Aws    *_struct.Struct `protobuf:"bytes,2,opt,name=aws,proto3" json:"aws,omitempty"`
+	// The type of AWS resource, e.g. "AWS::AppMesh::Proxy".
+	Origin string `protobuf:"bytes,1,opt,name=origin,proto3" json:"origin,omitempty"`
+	// AWS resource metadata dictionary.
+	// See: `X-Ray Segment Document documentation <https://docs.aws.amazon.com/xray/latest/devguide/xray-api-segmentdocuments.html#api-segmentdocuments-aws>`__
+	Aws *_struct.Struct `protobuf:"bytes,2,opt,name=aws,proto3" json:"aws,omitempty"`
 }
 
 func (x *XRayConfig_SegmentFields) Reset() {

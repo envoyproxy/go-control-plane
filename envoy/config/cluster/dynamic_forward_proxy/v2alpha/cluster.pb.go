@@ -28,11 +28,17 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Configuration for the dynamic forward proxy cluster. See the :ref:`architecture overview
+// <arch_overview_http_dynamic_forward_proxy>` for more information.
+// [#extension: envoy.clusters.dynamic_forward_proxy]
 type ClusterConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The DNS cache configuration that the cluster will attach to. Note this configuration must
+	// match that of associated :ref:`dynamic forward proxy HTTP filter configuration
+	// <envoy_api_field_config.filter.http.dynamic_forward_proxy.v2alpha.FilterConfig.dns_cache_config>`.
 	DnsCacheConfig *v2alpha.DnsCacheConfig `protobuf:"bytes,1,opt,name=dns_cache_config,json=dnsCacheConfig,proto3" json:"dns_cache_config,omitempty"`
 }
 

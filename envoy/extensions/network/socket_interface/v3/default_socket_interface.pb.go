@@ -26,6 +26,8 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Configuration for default socket interface that relies on OS dependent syscall to create
+// sockets.
 type DefaultSocketInterface struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

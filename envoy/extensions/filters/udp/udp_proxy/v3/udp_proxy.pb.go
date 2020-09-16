@@ -28,18 +28,40 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Configuration for the UDP proxy filter.
+// [#next-free-field: 6]
 type UdpProxyConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The stat prefix used when emitting UDP proxy filter stats.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to RouteSpecifier:
 	//	*UdpProxyConfig_Cluster
-	RouteSpecifier   isUdpProxyConfig_RouteSpecifier `protobuf_oneof:"route_specifier"`
-	IdleTimeout      *duration.Duration              `protobuf:"bytes,3,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
-	UseOriginalSrcIp bool                            `protobuf:"varint,4,opt,name=use_original_src_ip,json=useOriginalSrcIp,proto3" json:"use_original_src_ip,omitempty"`
-	HashPolicies     []*UdpProxyConfig_HashPolicy    `protobuf:"bytes,5,rep,name=hash_policies,json=hashPolicies,proto3" json:"hash_policies,omitempty"`
+	RouteSpecifier isUdpProxyConfig_RouteSpecifier `protobuf_oneof:"route_specifier"`
+	// The idle timeout for sessions. Idle is defined as no datagrams between received or sent by
+	// the session. The default if not specified is 1 minute.
+	IdleTimeout *duration.Duration `protobuf:"bytes,3,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
+	// Use the remote downstream IP address as the sender IP address when sending packets to upstream hosts.
+	// This option requires Envoy to be run with the *CAP_NET_ADMIN* capability on Linux.
+	// And the IPv6 stack must be enabled on Linux kernel.
+	// This option does not preserve the remote downstream port.
+	// If this option is enabled, the IP address of sent datagrams will be changed to the remote downstream IP address.
+	// This means that Envoy will not receive packets that are sent by upstream hosts because the upstream hosts
+	// will send the packets with the remote downstream IP address as the destination. All packets will be routed
+	// to the remote downstream directly if there are route rules on the upstream host side.
+	// There are two options to return the packets back to the remote downstream.
+	// The first one is to use DSR (Direct Server Return).
+	// The other one is to configure routing rules on the upstream hosts to forward
+	// all packets back to Envoy and configure iptables rules on the host running Envoy to
+	// forward all packets from upstream hosts to the Envoy process so that Envoy can forward the packets to the downstream.
+	// If the platform does not support this option, Envoy will raise a configuration error.
+	UseOriginalSrcIp bool `protobuf:"varint,4,opt,name=use_original_src_ip,json=useOriginalSrcIp,proto3" json:"use_original_src_ip,omitempty"`
+	// Optional configuration for UDP proxy hash policies. If hash_policies is not set, the hash-based
+	// load balancing algorithms will select a host randomly. Currently the number of hash policies is
+	// limited to 1.
+	HashPolicies []*UdpProxyConfig_HashPolicy `protobuf:"bytes,5,rep,name=hash_policies,json=hashPolicies,proto3" json:"hash_policies,omitempty"`
 }
 
 func (x *UdpProxyConfig) Reset() {
@@ -121,11 +143,14 @@ type isUdpProxyConfig_RouteSpecifier interface {
 }
 
 type UdpProxyConfig_Cluster struct {
+	// The upstream cluster to connect to.
 	Cluster string `protobuf:"bytes,2,opt,name=cluster,proto3,oneof"`
 }
 
 func (*UdpProxyConfig_Cluster) isUdpProxyConfig_RouteSpecifier() {}
 
+// Specifies the UDP hash policy.
+// The packets can be routed by hash policy.
 type UdpProxyConfig_HashPolicy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -187,6 +212,7 @@ type isUdpProxyConfig_HashPolicy_PolicySpecifier interface {
 }
 
 type UdpProxyConfig_HashPolicy_SourceIp struct {
+	// The source IP will be used to compute the hash used by hash-based load balancing algorithms.
 	SourceIp bool `protobuf:"varint,1,opt,name=source_ip,json=sourceIp,proto3,oneof"`
 }
 

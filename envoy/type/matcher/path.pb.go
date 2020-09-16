@@ -27,6 +27,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Specifies the way to match a path on HTTP request.
 type PathMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -88,6 +89,9 @@ type isPathMatcher_Rule interface {
 }
 
 type PathMatcher_Path struct {
+	// The `path` must match the URL path portion of the :path header. The query and fragment
+	// string (if present) are removed in the URL path portion.
+	// For example, the path */data* will match the *:path* header */data#fragment?param=value*.
 	Path *StringMatcher `protobuf:"bytes,1,opt,name=path,proto3,oneof"`
 }
 

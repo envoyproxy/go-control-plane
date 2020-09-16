@@ -28,6 +28,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Configuration for Downstream QUIC transport socket. This provides Google's implementation of Google QUIC and IETF QUIC to Envoy.
 type QuicDownstreamTransport struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -75,6 +76,7 @@ func (x *QuicDownstreamTransport) GetDownstreamTlsContext() *v3.DownstreamTlsCon
 	return nil
 }
 
+// Configuration for Upstream QUIC transport socket. This provides Google's implementation of Google QUIC and IETF QUIC to Envoy.
 type QuicUpstreamTransport struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -76,8 +76,11 @@ type StreamMetricsMessage struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Identifier   *StreamMetricsMessage_Identifier `protobuf:"bytes,1,opt,name=identifier,proto3" json:"identifier,omitempty"`
-	EnvoyMetrics []*_go.MetricFamily              `protobuf:"bytes,2,rep,name=envoy_metrics,json=envoyMetrics,proto3" json:"envoy_metrics,omitempty"`
+	// Identifier data effectively is a structured metadata. As a performance optimization this will
+	// only be sent in the first message on the stream.
+	Identifier *StreamMetricsMessage_Identifier `protobuf:"bytes,1,opt,name=identifier,proto3" json:"identifier,omitempty"`
+	// A list of metric entries
+	EnvoyMetrics []*_go.MetricFamily `protobuf:"bytes,2,rep,name=envoy_metrics,json=envoyMetrics,proto3" json:"envoy_metrics,omitempty"`
 }
 
 func (x *StreamMetricsMessage) Reset() {
@@ -131,6 +134,7 @@ type StreamMetricsMessage_Identifier struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The node sending metrics over the stream.
 	Node *v4alpha.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
 }
 
@@ -345,6 +349,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MetricsServiceClient interface {
+	// Envoy will connect and send StreamMetricsMessage messages forever. It does not expect any
+	// response to be sent as nothing would be done in the case of failure.
 	StreamMetrics(ctx context.Context, opts ...grpc.CallOption) (MetricsService_StreamMetricsClient, error)
 }
 
@@ -392,6 +398,8 @@ func (x *metricsServiceStreamMetricsClient) CloseAndRecv() (*StreamMetricsRespon
 
 // MetricsServiceServer is the server API for MetricsService service.
 type MetricsServiceServer interface {
+	// Envoy will connect and send StreamMetricsMessage messages forever. It does not expect any
+	// response to be sent as nothing would be done in the case of failure.
 	StreamMetrics(MetricsService_StreamMetricsServer) error
 }
 

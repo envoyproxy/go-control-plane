@@ -40,6 +40,7 @@ type CheckRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// The request attributes.
 	Attributes *AttributeContext `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
 }
 
@@ -82,14 +83,21 @@ func (x *CheckRequest) GetAttributes() *AttributeContext {
 	return nil
 }
 
+// HTTP attributes for a denied response.
 type DeniedHttpResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Status  *v3.HttpStatus           `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// This field allows the authorization service to send a HTTP response status
+	// code to the downstream client other than 403 (Forbidden).
+	Status *v3.HttpStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// This field allows the authorization service to send HTTP response headers
+	// to the downstream client.
 	Headers []*v31.HeaderValueOption `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
-	Body    string                   `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
+	// This field allows the authorization service to send a response body data
+	// to the downstream client.
+	Body string `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
 }
 
 func (x *DeniedHttpResponse) Reset() {
@@ -145,12 +153,24 @@ func (x *DeniedHttpResponse) GetBody() string {
 	return ""
 }
 
+// HTTP attributes for an OK response.
 type OkHttpResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// HTTP entity headers in addition to the original request headers. This allows the authorization
+	// service to append, to add or to override headers from the original request before
+	// dispatching it to the upstream. By setting `append` field to `true` in the `HeaderValueOption`,
+	// the filter will append the correspondent header value to the matched request header. Note that
+	// by Leaving `append` as false, the filter will either add a new header, or override an existing
+	// one if there is a match.
 	Headers []*v31.HeaderValueOption `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
+	// This field has been deprecated in favor of :ref:`CheckResponse.dynamic_metadata
+	// <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`. Until it is removed,
+	// setting this field overrides :ref:`CheckResponse.dynamic_metadata
+	// <envoy_v3_api_field_service.auth.v3.CheckResponse.dynamic_metadata>`.
+	//
 	// Deprecated: Do not use.
 	DynamicMetadata *_struct.Struct `protobuf:"bytes,3,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
 }
@@ -202,17 +222,29 @@ func (x *OkHttpResponse) GetDynamicMetadata() *_struct.Struct {
 	return nil
 }
 
+// Intended for gRPC and Network Authorization servers `only`.
 type CheckResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Status `OK` allows the request. Any other status indicates the request should be denied.
 	Status *status.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// An message that contains HTTP response attributes. This message is
+	// used when the authorization service needs to send custom responses to the
+	// downstream client or, to modify/add request headers being dispatched to the upstream.
+	//
 	// Types that are assignable to HttpResponse:
 	//	*CheckResponse_DeniedResponse
 	//	*CheckResponse_OkResponse
-	HttpResponse    isCheckResponse_HttpResponse `protobuf_oneof:"http_response"`
-	DynamicMetadata *_struct.Struct              `protobuf:"bytes,4,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
+	HttpResponse isCheckResponse_HttpResponse `protobuf_oneof:"http_response"`
+	// Optional response metadata that will be emitted as dynamic metadata to be consumed by the next
+	// filter. This metadata lives in a namespace specified by the canonical name of extension filter
+	// that requires it:
+	//
+	// - :ref:`envoy.filters.http.ext_authz <config_http_filters_ext_authz_dynamic_metadata>` for HTTP filter.
+	// - :ref:`envoy.filters.network.ext_authz <config_network_filters_ext_authz_dynamic_metadata>` for network filter.
+	DynamicMetadata *_struct.Struct `protobuf:"bytes,4,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
 }
 
 func (x *CheckResponse) Reset() {
@@ -287,10 +319,12 @@ type isCheckResponse_HttpResponse interface {
 }
 
 type CheckResponse_DeniedResponse struct {
+	// Supplies http attributes for a denied response.
 	DeniedResponse *DeniedHttpResponse `protobuf:"bytes,2,opt,name=denied_response,json=deniedResponse,proto3,oneof"`
 }
 
 type CheckResponse_OkResponse struct {
+	// Supplies http attributes for an ok response.
 	OkResponse *OkHttpResponse `protobuf:"bytes,3,opt,name=ok_response,json=okResponse,proto3,oneof"`
 }
 
@@ -527,6 +561,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AuthorizationClient interface {
+	// Performs authorization check based on the attributes associated with the
+	// incoming request, and returns status `OK` or not `OK`.
 	Check(ctx context.Context, in *CheckRequest, opts ...grpc.CallOption) (*CheckResponse, error)
 }
 
@@ -549,6 +585,8 @@ func (c *authorizationClient) Check(ctx context.Context, in *CheckRequest, opts 
 
 // AuthorizationServer is the server API for Authorization service.
 type AuthorizationServer interface {
+	// Performs authorization check based on the attributes associated with the
+	// incoming request, and returns status `OK` or not `OK`.
 	Check(context.Context, *CheckRequest) (*CheckResponse, error)
 }
 

@@ -27,14 +27,18 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#next-major-version: MetadataMatcher should use StructMatcher]
 type MetadataMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Filter string                         `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
-	Path   []*MetadataMatcher_PathSegment `protobuf:"bytes,2,rep,name=path,proto3" json:"path,omitempty"`
-	Value  *ValueMatcher                  `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	// The filter name to retrieve the Struct from the Metadata.
+	Filter string `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
+	// The path to retrieve the Value from the Struct.
+	Path []*MetadataMatcher_PathSegment `protobuf:"bytes,2,rep,name=path,proto3" json:"path,omitempty"`
+	// The MetadataMatcher is matched if the value retrieved by path is matched to this value.
+	Value *ValueMatcher `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (x *MetadataMatcher) Reset() {
@@ -90,6 +94,9 @@ func (x *MetadataMatcher) GetValue() *ValueMatcher {
 	return nil
 }
 
+// Specifies the segment in a path to retrieve value from Metadata.
+// Note: Currently it's not supported to retrieve a value from a list in Metadata. This means that
+// if the segment key refers to a list, it has to be the last segment in a path.
 type MetadataMatcher_PathSegment struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -151,6 +158,7 @@ type isMetadataMatcher_PathSegment_Segment interface {
 }
 
 type MetadataMatcher_PathSegment_Key struct {
+	// If specified, use the key to retrieve the value in a Struct.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3,oneof"`
 }
 

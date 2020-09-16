@@ -27,13 +27,20 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// gRPC reverse bridge filter configuration
 type FilterConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ContentType        string `protobuf:"bytes,1,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
-	WithholdGrpcFrames bool   `protobuf:"varint,2,opt,name=withhold_grpc_frames,json=withholdGrpcFrames,proto3" json:"withhold_grpc_frames,omitempty"`
+	// The content-type to pass to the upstream when the gRPC bridge filter is applied.
+	// The filter will also validate that the upstream responds with the same content type.
+	ContentType string `protobuf:"bytes,1,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	// If true, Envoy will assume that the upstream doesn't understand gRPC frames and
+	// strip the gRPC frame from the request, and add it back in to the response. This will
+	// hide the gRPC semantics from the upstream, allowing it to receive and respond with a
+	// simple binary encoded protobuf.
+	WithholdGrpcFrames bool `protobuf:"varint,2,opt,name=withhold_grpc_frames,json=withholdGrpcFrames,proto3" json:"withhold_grpc_frames,omitempty"`
 }
 
 func (x *FilterConfig) Reset() {
@@ -82,11 +89,14 @@ func (x *FilterConfig) GetWithholdGrpcFrames() bool {
 	return false
 }
 
+// gRPC reverse bridge filter configuration per virtualhost/route/weighted-cluster level.
 type FilterConfigPerRoute struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// If true, disables gRPC reverse bridge filter for this particular vhost or route.
+	// If disabled is specified in multiple per-filter-configs, the most specific one will be used.
 	Disabled bool `protobuf:"varint,1,opt,name=disabled,proto3" json:"disabled,omitempty"`
 }
 

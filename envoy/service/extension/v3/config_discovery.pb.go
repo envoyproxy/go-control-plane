@@ -33,6 +33,9 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#not-implemented-hide:] Not configuration. Workaround c++ protobuf issue
+// with importing services: https://github.com/google/protobuf/issues/4221 and
+// protoxform to upgrade the file.
 type EcdsDummy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

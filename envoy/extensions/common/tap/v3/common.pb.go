@@ -30,6 +30,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// Common configuration for all tap extensions.
 type CommonExtensionConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -107,14 +108,18 @@ type isCommonExtensionConfig_ConfigType interface {
 }
 
 type CommonExtensionConfig_AdminConfig struct {
+	// If specified, the tap filter will be configured via an admin handler.
 	AdminConfig *AdminConfig `protobuf:"bytes,1,opt,name=admin_config,json=adminConfig,proto3,oneof"`
 }
 
 type CommonExtensionConfig_StaticConfig struct {
+	// If specified, the tap filter will be configured via a static configuration that cannot be
+	// changed.
 	StaticConfig *v3.TapConfig `protobuf:"bytes,2,opt,name=static_config,json=staticConfig,proto3,oneof"`
 }
 
 type CommonExtensionConfig_TapdsConfig struct {
+	// [#not-implemented-hide:] Configuration to use for TapDS updates for the filter.
 	TapdsConfig *CommonExtensionConfig_TapDSConfig `protobuf:"bytes,3,opt,name=tapds_config,json=tapdsConfig,proto3,oneof"`
 }
 
@@ -124,11 +129,15 @@ func (*CommonExtensionConfig_StaticConfig) isCommonExtensionConfig_ConfigType() 
 
 func (*CommonExtensionConfig_TapdsConfig) isCommonExtensionConfig_ConfigType() {}
 
+// Configuration for the admin handler. See :ref:`here <config_http_filters_tap_admin_handler>` for
+// more information.
 type AdminConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Opaque configuration ID. When requests are made to the admin handler, the passed opaque ID is
+	// matched to the configured filter opaque ID to determine which filter to configure.
 	ConfigId string `protobuf:"bytes,1,opt,name=config_id,json=configId,proto3" json:"config_id,omitempty"`
 }
 
@@ -171,13 +180,18 @@ func (x *AdminConfig) GetConfigId() string {
 	return ""
 }
 
+// [#not-implemented-hide:]
 type CommonExtensionConfig_TapDSConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	ConfigSource       *v31.ConfigSource   `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
-	Name               string              `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Configuration for the source of TapDS updates for this Cluster.
+	ConfigSource *v31.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
+	// Tap config to request from XDS server.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Resource locator for TAP. This is mutually exclusive to *name*.
+	// [#not-implemented-hide:]
 	TapResourceLocator *v1.ResourceLocator `protobuf:"bytes,3,opt,name=tap_resource_locator,json=tapResourceLocator,proto3" json:"tap_resource_locator,omitempty"`
 }
 

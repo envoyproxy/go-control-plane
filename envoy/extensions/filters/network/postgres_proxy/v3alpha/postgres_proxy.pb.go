@@ -33,7 +33,12 @@ type PostgresProxy struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	StatPrefix       string              `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	// The human readable prefix to use when emitting :ref:`statistics
+	// <config_network_filters_postgres_proxy_stats>`.
+	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
+	// Controls whether SQL statements received in Frontend Query messages
+	// are parsed. Parsing is required to produce Postgres proxy filter
+	// metadata. Defaults to true.
 	EnableSqlParsing *wrappers.BoolValue `protobuf:"bytes,2,opt,name=enable_sql_parsing,json=enableSqlParsing,proto3" json:"enable_sql_parsing,omitempty"`
 }
 

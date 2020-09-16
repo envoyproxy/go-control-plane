@@ -26,6 +26,9 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// An internal redirect predicate that rejects redirect targets that are pointing
+// to a route that has been followed by a previous redirect from the current route.
+// [#extension: envoy.internal_redirect_predicates.previous_routes]
 type PreviousRoutesConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
