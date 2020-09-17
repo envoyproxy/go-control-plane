@@ -1936,11 +1936,22 @@ func (m *Cluster_PrefetchPolicy) Validate() error {
 		return nil
 	}
 
-	if wrapper := m.GetPrefetchRatio(); wrapper != nil {
+	if wrapper := m.GetPerUpstreamPrefetchRatio(); wrapper != nil {
 
 		if val := wrapper.GetValue(); val < 1 || val > 3 {
 			return Cluster_PrefetchPolicyValidationError{
-				field:  "PrefetchRatio",
+				field:  "PerUpstreamPrefetchRatio",
+				reason: "value must be inside range [1, 3]",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetPredictivePrefetchRatio(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 1 || val > 3 {
+			return Cluster_PrefetchPolicyValidationError{
+				field:  "PredictivePrefetchRatio",
 				reason: "value must be inside range [1, 3]",
 			}
 		}
