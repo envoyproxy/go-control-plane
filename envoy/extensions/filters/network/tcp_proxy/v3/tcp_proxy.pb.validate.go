@@ -148,6 +148,27 @@ func (m *TcpProxy) Validate() error {
 		}
 	}
 
+	if d := m.GetMaxDownstreamConnectionDuration(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return TcpProxyValidationError{
+				field:  "MaxDownstreamConnectionDuration",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+		if dur < gte {
+			return TcpProxyValidationError{
+				field:  "MaxDownstreamConnectionDuration",
+				reason: "value must be greater than or equal to 1ms",
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedDeprecatedV1()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TcpProxyValidationError{
