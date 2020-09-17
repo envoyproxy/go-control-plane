@@ -228,6 +228,10 @@ func (m *CommandLineOptions) Validate() error {
 
 	// no validation rules for EnableFineGrainLogging
 
+	// no validation rules for SocketPath
+
+	// no validation rules for SocketMode
+
 	return nil
 }
 
