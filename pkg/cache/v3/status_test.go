@@ -55,8 +55,4 @@ func TestNewStatusInfo(t *testing.T) {
 	if got := info.GetLastDeltaWatchRequestTime(); !got.IsZero() {
 		t.Errorf("GetLastDeltaWatchRequestTime() => got %v, want zero time", got)
 	}
-
-	if got := info.GetDeltaState(); len(got) != 0 {
-		t.Errorf("GetDeltaState() => got %v, want zero length for state per type", len(got))
-	}
 }

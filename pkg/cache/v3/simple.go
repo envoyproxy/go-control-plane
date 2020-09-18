@@ -61,6 +61,19 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
+// StreamVersion is a structure to pass through version data to the snapshot cache
+// that watches can use to intelligently determine the state of the current system
+type StreamVersion interface {
+	// GetVersionMap returns a hash map of the currently applied resources
+	GetVersionMap() map[string]DeltaVersionInfo
+
+	// GetSystemVersion returns the current system version within an incremental stream
+	GetSystemVersion() string
+
+	// GetStreamNonce will return the current nonce within a given incremental stream (used within watch creation)
+	GetStreamNonce() string
+}
+
 type snapshotCache struct {
 	log log.Logger
 
@@ -113,6 +126,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 	// update the existing entry
 	cache.snapshots[node] = snapshot
+	snapshotVMap := snapshot.GetVersionMap()
 
 	// trigger existing watches for which version changed
 	if info, ok := cache.status[node]; ok {
@@ -130,9 +144,32 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			}
 		}
 
+		// process our delta watches
 		for id, watch := range info.deltaWatches {
-			resources := snapshot.GetResources(watch.Request.GetTypeUrl())
-			// perform state modification here and build our version map for the server
+			// Build our response i.e. only send back things that have changed after we compare version hashes
+			res := make(map[string]types.Resource)
+			typ := watch.Request.GetTypeUrl()
+
+			watchVersions := watch.VersionMap
+			snapshotVersions := snapshotVMap[typ]
+			versionsToSend := make(map[string]DeltaVersionInfo, 0)
+
+			// proccesing function for updating versions and adding resource to send
+			process := func(alias string) {
+				resource := snapshot.GetResource(alias, typ)
+				res[alias] = resource
+				v, _ := HashResource(resource)
+				versionsToSend[alias] = DeltaVersionInfo{
+					Version: v,
+					Alias:   alias,
+				}
+			}
+
+			// Right now we're just diffing versions
+			// TODO: cache should check to see if any resources have been dumped (unsubscribed)
+			// ^ could we push this to the server? Then we can modify the watch request as needed meaning
+			// track previous subscriptions as well as remove resources that have been unsubscribed
+			// Should we also build a version map that isn't off the snapshot but rather resources being sent through?
 
 			if len(watch.Request.ResourceNamesSubscribe) == 0 && len(watch.Request.ResourceNamesUnsubscribe) == 0 {
 				if cache.log != nil {

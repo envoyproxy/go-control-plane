@@ -3,6 +3,7 @@ package cache_test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -14,7 +15,23 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func TestSnapshotCacheDelta(t *testing.T) {
+type mockStreamState struct {
+	SystemVersion    string
+	Nonce            string
+	ResourceVersions map[string]cache.DeltaVersionInfo
+}
+
+func (s mockStreamState) GetVersionMap() map[string]cache.DeltaVersionInfo {
+	return s.ResourceVersions
+}
+func (s mockStreamState) GetStreamNonce() string {
+	return s.Nonce
+}
+func (s mockStreamState) GetSystemVersion() string {
+	return s.SystemVersion
+}
+
+func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	watches := make(map[string]chan cache.DeltaResponse)
 
@@ -25,30 +42,26 @@ func TestSnapshotCacheDelta(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		})
+		}, mockStreamState{ResourceVersions: nil, SystemVersion: ""})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
+	vm := make(map[string]map[string]cache.DeltaVersionInfo)
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				// if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
-				// 	t.Errorf("get resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
-				// }
-				res, err := out.GetDeltaDiscoveryResponse()
-				if err != nil {
-					t.Fatal(err)
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
-				t.Log(res)
 				vMap, err := out.GetDeltaVersionMap()
 				if err != nil {
 					t.Fatal(err)
 				}
-				t.Log(vMap)
+				vm[typ] = vMap
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}
@@ -62,145 +75,50 @@ func TestSnapshotCacheDelta(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		})
-	}
-}
-
-// func TestSnapshotCacheDeltaWatch(t *testing.T) {
-// 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
-// 	watches := make(map[string]chan cache.DeltaResponse)
-
-// 	for _, typ := range testTypes {
-// 		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
-// 			Node: &core.Node{
-// 				Id: "node",
-// 			},
-// 			TypeUrl:                typ,
-// 			ResourceNamesSubscribe: names[typ],
-// 		})
-// 	}
-
-// 	if err := c.SetSnapshot(key, snapshot); err != nil {
-// 		t.Fatal(err)
-// 	}
-
-// 	for _, typ := range testTypes {
-// 		t.Run(typ, func(t *testing.T) {
-// 			select {
-// 			case out := <-watches[typ]:
-// 				// if v, _ := out.GetSystemVersion(); v != version {
-// 				// 	t.Errorf("got version %q, want %q", v, version)
-// 				// }
-// 				// if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
-// 				// 	t.Errorf("get resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
-// 				// }
-// 			case <-time.After(time.Second):
-// 				t.Fatal("failed to receive snapshot response")
-// 			}
-// 		})
-// 	}
-
-// 	// open new watches with the latest version
-// 	for _, typ := range testTypes {
-// 		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
-// 			Node: &core.Node{
-// 				Id: "node",
-// 			},
-// 			TypeUrl:                typ,
-// 			ResourceNamesSubscribe: names[typ],
-// 		})
-// 	}
-
-// 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-// 		t.Errorf("watches should be created for the latest version: %d", count)
-// 	}
-
-// 	// set partially-versioned snapshot
-// 	snapshot2 := snapshot
-// 	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
-// 	if err := c.SetSnapshot(key, snapshot2); err != nil {
-// 		t.Fatal(err)
-// 	}
-
-// 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
-// 		t.Errorf("watches should be preserved for all but one: %d", count)
-// 	}
-
-// 	// validate response for endpoints
-// 	select {
-// 	case out := <-watches[rsrc.EndpointType]:
-// 		// if v, _ := out.GetSystemVersion(); v != version2 {
-// 		// 	t.Errorf("got version %q, want %q", v, version2)
-// 		// }
-// 		// res, err := out.GetDeltaDiscoveryResponse()
-// 		// if err != nil {
-// 		// 	t.Fatal("failed to retrieve DeltaDiscoveryResponse")
-// 		// }
-
-// 		// fmt.Println(res)
-// 		// if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
-// 		// 	t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
-// 		// }
-// 	case <-time.After(time.Second * 5):
-// 		t.Fatal("failed to receive snapshot response")
-// 	}
-
-// 	// test an unsubscribe scenario
-// 	// Assume we got a request from the grpc server to unsubscribe from a resource so we can initiate a request
-// 	watches[testTypes[0]], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
-// 		Node: &core.Node{
-// 			Id: "node",
-// 		},
-// 		TypeUrl:                  testTypes[0],
-// 		ResourceNamesUnsubscribe: []string{clusterName},
-// 	})
-
-// 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-// 		t.Errorf("watches should be preserved for all but one %d", count)
-// 	}
-// }
-
-func TestCheckState(t *testing.T) {
-	deltaState := map[string][]string{
-		rsrc.EndpointType: {clusterName},
-		rsrc.ClusterType:  {clusterName},
-		rsrc.RouteType:    {routeName},
-		rsrc.ListenerType: {listenerName},
-		rsrc.RuntimeType:  nil,
-	}
-	subscribed := map[string][]string{
-		rsrc.EndpointType: {clusterName, "clusterDelta2"},
-		rsrc.ClusterType:  {clusterName},
-		rsrc.RouteType:    {routeName},
-		rsrc.ListenerType: {listenerName},
-		rsrc.RuntimeType:  nil,
+		}, mockStreamState{ResourceVersions: vm[typ], SystemVersion: "x"})
 	}
 
-	mb := make(map[string][]string, len(deltaState))
-	diff := make(map[string][]string, 0)
-
-	for key, value := range deltaState {
-		mb[key] = value
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
+		t.Errorf("watches should be created for the latest version %d", count)
 	}
 
-	// Check our diff map to see what has changed
-	// Even is an underlying resource has changed we need to update the diff
-	for key, value := range subscribed {
-		t.Log(key)
-		if _, found := mb[key]; !found {
-			t.Log("Found a new key, adding to diff")
-			diff[key] = value
-		} else if resources, found := mb[key]; found && (len(resources) != len(value)) {
-			t.Log("Found a new resource to an existing key, modifying resource map")
-			diff[key] = value
-		} else {
-			t.Log("Found no changes")
+	// set partially-versioned snapshot
+	snapshot2 := snapshot
+	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	if err := c.SetSnapshot(key, snapshot2); err != nil {
+		t.Fatal(err)
+	}
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
+		t.Errorf("watches should be preserved for all but one: %d", count)
+	}
+
+	// validate response for endpoints
+	select {
+	case out := <-watches[testTypes[0]]:
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
+			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
+		vMap, err := out.GetDeltaVersionMap()
+		if err != nil {
+			t.Fatal(err)
+		}
+		vm[testTypes[0]] = vMap
+	case <-time.After(time.Second):
+		t.Fatal("failed to receive snapshot response")
 	}
 
-	if len(diff) == 0 {
-		t.Fatalf("Expected diff greater than 0")
-	}
+	// test an unsubscribe scenario
+	// Assume we got a request from the grpc server to unsubscribe from a resource so we can initiate a request
+	// watches[testTypes[0]], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+	// 	Node: &core.Node{
+	// 		Id: "node",
+	// 	},
+	// 	TypeUrl:                  testTypes[0],
+	// 	ResourceNamesUnsubscribe: []string{clusterName},
+	// }, vm[testTypes[0]])
+	// if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
+	// 	t.Errorf("watches should be preserved for all but one %d", count)
+	// }
 }
 
 func TestConcurrentSetDeltaWatch(t *testing.T) {
@@ -226,7 +144,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					})
+					}, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
 				}
 			})
 		}(i)
@@ -242,7 +160,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		})
+		}, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
 
 		// Cancel the watch
 		cancel()

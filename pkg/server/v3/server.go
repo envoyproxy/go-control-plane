@@ -21,8 +21,13 @@ package server
 import (
 	"context"
 
+	"github.com/envoyproxy/go-control-plane/pkg/log"
+
+	"github.com/envoyproxy/go-control-plane/pkg/server/callbacks/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -50,13 +55,7 @@ type Server interface {
 
 	rest.Server
 	sotw.Server
-}
-
-// Callbacks is a collection of callbacks inserted into the server operation.
-// The callbacks are invoked synchronously.
-type Callbacks interface {
-	rest.Callbacks
-	sotw.Callbacks
+	delta.Server
 }
 
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
@@ -71,7 +70,7 @@ type CallbackFuncs struct {
 	FetchResponseFunc       func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
-var _ Callbacks = CallbackFuncs{}
+var _ callbacks.Callbacks = CallbackFuncs{}
 
 // OnStreamOpen invokes StreamOpenFunc.
 func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL string) error {
@@ -137,20 +136,24 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
-	return NewServerAdvanced(rest.NewServer(config, callbacks), sotw.NewServer(ctx, config, callbacks))
+func NewServer(ctx context.Context, config cache.Cache, callbacks callbacks.Callbacks, log log.Logger) Server {
+	return NewServerAdvanced(rest.NewServer(config, callbacks),
+		sotw.NewServer(ctx, config, callbacks),
+		delta.NewServer(ctx, config, callbacks, log),
+	)
 }
 
-func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server) Server {
-	return &server{rest: restServer, sotw: sotwServer}
+func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server, deltaServer delta.Server) Server {
+	return &server{rest: restServer, sotw: sotwServer, delta: deltaServer}
 }
 
 type server struct {
-	rest rest.Server
-	sotw sotw.Server
+	rest  rest.Server
+	sotw  sotw.Server
+	delta delta.Server
 }
 
-func (s *server) StreamHandler(stream sotw.Stream, typeURL string) error {
+func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 	return s.sotw.StreamHandler(stream, typeURL)
 }
 
@@ -235,30 +238,34 @@ func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryReque
 	return s.Fetch(ctx, req)
 }
 
+func (s *server) DeltaStreamHandler(stream stream.DeltaStream, typeURL string) error {
+	return s.delta.DeltaStreamHandler(stream, typeURL)
+}
+
 func (s *server) DeltaAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
-	return s.deltaHandler(stream, resource.AnyType)
+	return s.DeltaStreamHandler(stream, resource.AnyType)
 }
 
 func (s *server) DeltaEndpoints(stream endpointservice.EndpointDiscoveryService_DeltaEndpointsServer) error {
-	return s.deltaHandler(stream, resource.EndpointType)
+	return s.DeltaStreamHandler(stream, resource.EndpointType)
 }
 
 func (s *server) DeltaClusters(stream clusterservice.ClusterDiscoveryService_DeltaClustersServer) error {
-	return s.deltaHandler(stream, resource.ClusterType)
+	return s.DeltaStreamHandler(stream, resource.ClusterType)
 }
 
 func (s *server) DeltaRoutes(stream routeservice.RouteDiscoveryService_DeltaRoutesServer) error {
-	return s.deltaHandler(stream, resource.RouteType)
+	return s.DeltaStreamHandler(stream, resource.RouteType)
 }
 
 func (s *server) DeltaListeners(stream listenerservice.ListenerDiscoveryService_DeltaListenersServer) error {
-	return s.deltaHandler(stream, resource.ListenerType)
+	return s.DeltaStreamHandler(stream, resource.ListenerType)
 }
 
 func (s *server) DeltaSecrets(stream secretservice.SecretDiscoveryService_DeltaSecretsServer) error {
-	return s.deltaHandler(stream, resource.SecretType)
+	return s.DeltaStreamHandler(stream, resource.SecretType)
 }
 
 func (s *server) DeltaRuntime(stream runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
-	return s.deltaHandler(stream, resource.RuntimeType)
+	return s.DeltaStreamHandler(stream, resource.RuntimeType)
 }

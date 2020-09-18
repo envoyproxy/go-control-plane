@@ -17,10 +17,7 @@ package cache
 
 import (
 	"crypto/sha256"
-	"encoding/binary"
 	"encoding/hex"
-	"math/rand"
-	"time"
 
 	"github.com/golang/protobuf/proto"
 
@@ -173,18 +170,4 @@ func HashResource(resource types.Resource) (string, error) {
 	buffer.Reset()
 
 	return hex.EncodeToString(hasher.Sum(nil)), nil
-}
-
-// RandomHash will take a list of resources and create a SHA256 hash sum out of the marshaled bytes
-func RandomHash() string {
-	// Use current time in nanoseconds
-	source := rand.NewSource(time.Now().UnixNano())
-
-	b := make([]byte, 32)
-	binary.LittleEndian.PutUint64(b[0:], rand.New(source).Uint64())
-
-	hasher := sha256.New()
-	hasher.Write(b)
-
-	return hex.EncodeToString(hasher.Sum(nil))
 }

@@ -21,7 +21,6 @@ import (
 	"strconv"
 	"sync/atomic"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -29,45 +28,26 @@ import (
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/callbacks/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 )
 
 type Server interface {
-	StreamHandler(stream Stream, typeURL string) error
-}
-
-type Callbacks interface {
-	// OnStreamOpen is called once an xDS stream is open with a stream ID and the type URL (or "" for ADS).
-	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
-	OnStreamOpen(context.Context, int64, string) error
-	// OnStreamClosed is called immediately prior to closing an xDS stream with a stream ID.
-	OnStreamClosed(int64)
-	// OnStreamRequest is called once a request is received on a stream.
-	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
-	OnStreamRequest(int64, *discovery.DiscoveryRequest) error
-	// OnStreamResponse is called immediately prior to sending a response on a stream.
-	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamHandler(stream stream.Stream, typeURL string) error
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks) Server {
+func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks callbacks.Callbacks) Server {
 	return &server{cache: config, callbacks: callbacks, ctx: ctx}
 }
 
 type server struct {
 	cache     cache.ConfigWatcher
-	callbacks Callbacks
+	callbacks callbacks.Callbacks
 	ctx       context.Context
 
 	// streamCount for counting bi-di streams
 	streamCount int64
-}
-
-// Generic RPC stream.
-type Stream interface {
-	grpc.ServerStream
-
-	Send(*discovery.DiscoveryResponse) error
-	Recv() (*discovery.DiscoveryRequest, error)
 }
 
 // watches for all xDS resource types
@@ -143,7 +123,7 @@ func (values *watches) Cancel() {
 }
 
 // process handles a bi-di stream request
-func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
@@ -178,11 +158,11 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		if s.callbacks != nil {
 			s.callbacks.OnStreamResponse(streamID, resp.GetRequest(), out)
 		}
-		return out.Nonce, stream.Send(out)
+		return out.Nonce, str.Send(out)
 	}
 
 	if s.callbacks != nil {
-		if err := s.callbacks.OnStreamOpen(stream.Context(), streamID, defaultTypeURL); err != nil {
+		if err := s.callbacks.OnStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
 			return err
 		}
 	}
@@ -391,13 +371,13 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 }
 
 // StreamHandler converts a blocking read call to channels and initiates stream processing
-func (s *server) StreamHandler(stream Stream, typeURL string) error {
+func (s *server) StreamHandler(str stream.Stream, typeURL string) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *discovery.DiscoveryRequest)
 	reqStop := int32(0)
 	go func() {
 		for {
-			req, err := stream.Recv()
+			req, err := str.Recv()
 			if atomic.LoadInt32(&reqStop) != 0 {
 				return
 			}
@@ -409,7 +389,7 @@ func (s *server) StreamHandler(stream Stream, typeURL string) error {
 		}
 	}()
 
-	err := s.process(stream, reqCh, typeURL)
+	err := s.process(str, reqCh, typeURL)
 
 	// prevents writing to a closed channel if send failed on blocked recv
 	// TODO(kuat) figure out how to unblock recv through gRPC API

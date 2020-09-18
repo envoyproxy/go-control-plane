@@ -19,29 +19,23 @@ package rest
 import (
 	"context"
 	"errors"
+
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/callbacks/v3"
 )
 
 type Server interface {
 	Fetch(context.Context, *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error)
 }
 
-type Callbacks interface {
-	// OnFetchRequest is called for each Fetch request. Returning an error will end processing of the
-	// request and respond with an error.
-	OnFetchRequest(context.Context, *discovery.DiscoveryRequest) error
-	// OnFetchResponse is called immediately prior to sending a response.
-	OnFetchResponse(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-}
-
-func NewServer(config cache.ConfigFetcher, callbacks Callbacks) Server {
+func NewServer(config cache.ConfigFetcher, callbacks callbacks.Callbacks) Server {
 	return &server{cache: config, callbacks: callbacks}
 }
 
 type server struct {
 	cache     cache.ConfigFetcher
-	callbacks Callbacks
+	callbacks callbacks.Callbacks
 }
 
 func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {

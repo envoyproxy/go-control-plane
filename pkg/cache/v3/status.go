@@ -58,9 +58,6 @@ type StatusInfo interface {
 
 	// GetLastDeltaWatchRequestTime returns the timestamp of the last delta discovery watch request.
 	GetLastDeltaWatchRequestTime() time.Time
-
-	// GetDeltaState returns the current resource subscription state of a particular node
-	GetDeltaState() map[string]Resources
 }
 
 type statusInfo struct {
@@ -73,10 +70,6 @@ type statusInfo struct {
 	// deltaWatches are indexed channels for the delta response watches and the original requests
 	deltaWatches map[int64]DeltaResponseWatch
 
-	// deltaState is the list of resources used for diffing when the server needs to send out updates for subcribed resources
-	// this list should be used to keep track of node state
-	deltaState deltaState
-
 	// the timestamp of the last watch request
 	lastWatchRequestTime time.Time
 
@@ -86,11 +79,6 @@ type statusInfo struct {
 	// mutex to protect the status fields.
 	// should not acquire mutex of the parent cache after acquiring this mutex.
 	mu sync.RWMutex
-}
-
-type deltaState struct {
-	state         map[string]Resources
-	SystemVersion string
 }
 
 // ResponseWatch is a watch record keeping both the request and an open channel for the response.
@@ -109,6 +97,9 @@ type DeltaResponseWatch struct {
 
 	// Response is the channel to push the delta responses to
 	Response chan DeltaResponse
+
+	// VersionMap for the stream
+	VersionMap map[string]DeltaVersionInfo
 }
 
 // newStatusInfo initializes a status info data structure.
@@ -117,10 +108,6 @@ func newStatusInfo(node *core.Node) *statusInfo {
 		node:         node,
 		watches:      make(map[int64]ResponseWatch),
 		deltaWatches: make(map[int64]DeltaResponseWatch),
-		deltaState: deltaState{
-			state:         make(map[string]Resources),
-			SystemVersion: "",
-		},
 	}
 	return &out
 }
@@ -155,14 +142,9 @@ func (info *statusInfo) GetLastDeltaWatchRequestTime() time.Time {
 	return info.lastDeltaWatchRequestTime
 }
 
-func (info *statusInfo) GetDeltaState() map[string]Resources {
+// GetDeltaVersionMap will pull the version map out of a specific watch
+func (info *statusInfo) GetDeltaVersionMap(watchID int64) map[string]DeltaVersionInfo {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
-	return info.deltaState.state
-}
-
-func (info *statusInfo) GetDeltaStateSystemVersion() string {
-	info.mu.RLock()
-	defer info.mu.RUnlock()
-	return info.deltaState.SystemVersion
+	return info.deltaWatches[watchID].VersionMap
 }

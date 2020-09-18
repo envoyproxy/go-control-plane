@@ -48,6 +48,7 @@ func (group) ID(node *core.Node) string {
 var (
 	version  = "x"
 	version2 = "y"
+	version3 = "z"
 
 	snapshot = cache.NewSnapshot(version,
 		[]types.Resource{testEndpoint},
