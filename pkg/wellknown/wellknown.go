@@ -32,7 +32,7 @@ const (
 	// GRPCWeb HTTP filter
 	GRPCWeb = "envoy.filters.http.grpc_web"
 	// Gzip HTTP filter
-	Gzip = "envoy.filters.http.gzip"
+	Gzip = "envoy.filters.http.compressor"
 	// IPTagging HTTP filter
 	IPTagging = "envoy.filters.http.ip_tagging"
 	// HTTPRateLimit filter
