@@ -70,6 +70,6 @@ func main() {
 	// Run the xDS server
 	ctx := context.Background()
 	cb := &testv3.Callbacks{Debug: l.Debug}
-	srv := serverv3.NewServer(ctx, cache, cb)
+	srv := serverv3.NewServer(ctx, cache, cb, example.Logger{})
 	example.RunServer(ctx, srv, port)
 }

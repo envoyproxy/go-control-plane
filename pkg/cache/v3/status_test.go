@@ -48,4 +48,11 @@ func TestNewStatusInfo(t *testing.T) {
 		t.Errorf("GetLastWatchRequestTime() => got %v, want zero time", got)
 	}
 
+	if got := info.GetNumDeltaWatches(); got != 0 {
+		t.Errorf("GetNumDeltaWatches() => got %d, want 0", got)
+	}
+
+	if got := info.GetLastDeltaWatchRequestTime(); !got.IsZero() {
+		t.Errorf("GetLastDeltaWatchRequestTime() => got %v, want zero time", got)
+	}
 }

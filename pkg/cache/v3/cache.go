@@ -22,12 +22,16 @@ import (
 	"sync/atomic"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/golang/protobuf/ptypes/any"
 )
 
 // Request is an alias for the discovery request type.
 type Request = discovery.DiscoveryRequest
+
+// DeltaRequest is an alias for the delta discovery request type.
+type DeltaRequest = discovery.DeltaDiscoveryRequest
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
@@ -46,6 +50,17 @@ type ConfigWatcher interface {
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
 	CreateWatch(*Request) (value chan Response, cancel func())
+
+	// CreateDeltaWatch returns a new open incremental xDS watch.
+	//
+	// Value channel produces requested resources, or spontaneous updates in accordance
+	// with the incremental xDS specification. If the channel is closed
+	// prior to cancellation of the watch, an unrecoverable error has occurred in the producer,
+	// and the consumer should close the corresponding stream.
+	//
+	// Cancel is an optional function to release resources in the producer. If
+	// provided, the consumer may call this function multiple times.
+	CreateDeltaWatch(*DeltaRequest, StreamVersion) (value chan DeltaResponse, cancel func())
 }
 
 // ConfigFetcher fetches configuration resources from cache
@@ -72,6 +87,30 @@ type Response interface {
 	GetVersion() (string, error)
 }
 
+// DeltaResponse is a wrapper around Envoy's DeltaDiscoveryResponse
+type DeltaResponse interface {
+	// Get the constructed DeltaDiscoveryResponse
+	GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error)
+
+	// Get te original Request for the Response.
+	GetDeltaRequest() *discovery.DeltaDiscoveryRequest
+
+	// Get the version in the Response.
+	GetSystemVersion() (string, error)
+
+	// Get the version map of the internal cache
+	GetDeltaVersionMap() (map[string]DeltaVersionInfo, error)
+}
+
+// DeltaVersionInfo maps together the alias of an objet to its correct version hash
+type DeltaVersionInfo struct {
+	// Alias name for the resource
+	Alias string
+
+	// Version for the resource (typically a hash)
+	Version string
+}
+
 // RawResponse is a pre-serialized xDS response containing the raw resources to
 // be included in the final Discovery Response.
 type RawResponse struct {
@@ -89,7 +128,30 @@ type RawResponse struct {
 	marshaledResponse atomic.Value
 }
 
+// RawDeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
+type RawDeltaResponse struct {
+	// Request is the original request.
+	DeltaRequest *discovery.DeltaDiscoveryRequest
+
+	// System Version Info
+	SystemVersionInfo string
+
+	// Resources to be included in the response.
+	Resources []types.Resource
+
+	// RemovedResources is a list of unsubscribed aliases to be included in the response
+	RemovedResources []string
+
+	// VersionMap is a list of versions applied internally to the cache grouped by type
+	// map["resourceType"]map["alias"]{alias: alias, version: hash}
+	VersionMap map[string]DeltaVersionInfo
+
+	// Marshaled Resources to be included in the response.
+	marshaledResponse atomic.Value
+}
+
 var _ Response = &RawResponse{}
+var _ DeltaResponse = &RawDeltaResponse{}
 
 // PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
 type PassthroughResponse struct {
@@ -100,7 +162,20 @@ type PassthroughResponse struct {
 	DiscoveryResponse *discovery.DiscoveryResponse
 }
 
+// DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
+type DeltaPassthroughResponse struct {
+	// Request is the original request
+	DeltaRequest *discovery.DeltaDiscoveryRequest
+
+	// VersionMap is a list of version applied internally to the cache
+	VersionMap map[string]DeltaVersionInfo
+
+	// This discovery response that needs to be sent as is, without any marshalling transformations
+	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
+}
+
 var _ Response = &PassthroughResponse{}
+var _ DeltaResponse = &DeltaPassthroughResponse{}
 
 // GetDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
 // This is necessary because the marshalled response does not change across the calls.
@@ -136,9 +211,57 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 	return marshaledResponse.(*discovery.DiscoveryResponse), nil
 }
 
+// GetDeltaDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
+// This is necessary because the marshalled response does not change across the calls.
+// This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
+func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
+	marshaledResponse := r.marshaledResponse.Load()
+
+	if marshaledResponse == nil {
+		marshaledResources := make([]*discovery.Resource, len(r.Resources))
+
+		for i, resource := range r.Resources {
+
+			marshaledResource, err := MarshalResource(resource)
+			if err != nil {
+				return nil, err
+			}
+			version, err := HashResource(resource)
+			if err != nil {
+				panic(err)
+			}
+
+			name := GetResourceName(resource)
+			marshaledResources[i] = &discovery.Resource{
+				Name:    name,
+				Aliases: []string{name},
+				Resource: &any.Any{
+					TypeUrl: r.DeltaRequest.TypeUrl,
+					Value:   marshaledResource,
+				},
+				Version: version,
+			}
+		}
+
+		marshaledResponse = &discovery.DeltaDiscoveryResponse{
+			Resources:        marshaledResources,
+			RemovedResources: r.RemovedResources,
+			TypeUrl:          r.DeltaRequest.TypeUrl,
+		}
+		r.marshaledResponse.Store(marshaledResponse)
+	}
+
+	return marshaledResponse.(*discovery.DeltaDiscoveryResponse), nil
+}
+
 // GetRequest returns the original Discovery Request.
 func (r *RawResponse) GetRequest() *discovery.DiscoveryRequest {
 	return r.Request
+}
+
+// GetDeltaRequest returns the original DeltaRequest
+func (r *RawDeltaResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
+	return r.DeltaRequest
 }
 
 // GetVersion returns the response version.
@@ -146,14 +269,37 @@ func (r *RawResponse) GetVersion() (string, error) {
 	return r.Version, nil
 }
 
+// GetSystemVersion returns the raw SystemVersion
+func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
+	return r.SystemVersionInfo, nil
+}
+
+// GetDeltaVersionMap returns the delta version map built internally by the cache for the state of a snapshot
+func (r *RawDeltaResponse) GetDeltaVersionMap() (map[string]DeltaVersionInfo, error) {
+	if r.VersionMap != nil {
+		return r.VersionMap, nil
+	}
+	return nil, fmt.Errorf("missing delta version map")
+}
+
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
 func (r *PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	return r.DiscoveryResponse, nil
 }
 
+// GetDeltaDiscoveryResponse returns the final passthrough Delta Discovery Response.
+func (r *DeltaPassthroughResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
+	return r.DeltaDiscoveryResponse, nil
+}
+
 // GetRequest returns the original Discovery Request
 func (r *PassthroughResponse) GetRequest() *discovery.DiscoveryRequest {
 	return r.Request
+}
+
+// GetDeltaRequest returns the original Delta Discovery Request
+func (r *DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
+	return r.DeltaRequest
 }
 
 // GetVersion returns the response version.
@@ -162,4 +308,20 @@ func (r *PassthroughResponse) GetVersion() (string, error) {
 		return r.DiscoveryResponse.VersionInfo, nil
 	}
 	return "", fmt.Errorf("DiscoveryResponse is nil")
+}
+
+// GetSystemVersion returns the response version.
+func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
+	if r.DeltaDiscoveryResponse != nil {
+		return r.DeltaDiscoveryResponse.SystemVersionInfo, nil
+	}
+	return "", fmt.Errorf("DeltaDiscoveryResponse is nil")
+}
+
+// GetDeltaVersionMap ...
+func (r *DeltaPassthroughResponse) GetDeltaVersionMap() (map[string]DeltaVersionInfo, error) {
+	if r.VersionMap != nil {
+		return r.VersionMap, nil
+	}
+	return nil, fmt.Errorf("missing delta version map")
 }
