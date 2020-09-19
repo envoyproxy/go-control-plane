@@ -46,6 +46,11 @@ func (mux *MuxCache) CreateWatch(request *Request) (chan Response, func()) {
 	return cache.CreateWatch(request)
 }
 
+// TODO: implement CreateDeltaWatch for mux cache
+func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, v StreamVersion) (chan DeltaResponse, func()) {
+	return nil, nil
+}
+
 func (mux *MuxCache) Fetch(ctx context.Context, request *Request) (Response, error) {
 	return nil, errors.New("not implemented")
 }

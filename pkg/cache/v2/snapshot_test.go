@@ -60,4 +60,32 @@ func TestSnapshotGetters(t *testing.T) {
 	if out := snapshot.GetVersion("not a type"); out != "" {
 		t.Errorf("got non-empty version for unknown type: %#v", out)
 	}
+	if out := snapshot.GetSubscribedResources(nil, "not a type"); out != nil {
+		t.Errorf("got non-empty resources for unknown type: %#v", out)
+	}
+}
+
+func TestSnapshotVersionMap(t *testing.T) {
+	if err := snapshot.Consistent(); err != nil {
+		t.Errorf("got inconsistent snapshot for %#v", snapshot)
+	}
+	snap := cache.NewSnapshot(version, []types.Resource{testEndpoint, resource.MakeEndpoint("missing", 8080)}, []types.Resource{testCluster}, []types.Resource{testListener}, nil, nil, nil)
+	if snap.Consistent() == nil {
+		t.Errorf("got consistent snapshot %#v", snap)
+	}
+
+	vMap := snap.GetVersionMap()
+	if vMap == nil {
+		t.Errorf("got nil version map %#v", vMap)
+	}
+
+	vInfo := vMap[rsrc.EndpointType]
+	for _, v := range vInfo {
+		if v.Alias == "" {
+			t.Errorf("expected alias name, received: %s", v.Alias)
+		}
+		if v.Version == "" {
+			t.Errorf("expected version hash, recieved: %s", v.Version)
+		}
+	}
 }

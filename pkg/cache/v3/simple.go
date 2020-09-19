@@ -61,6 +61,19 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
+// StreamVersion is a structure to pass through version data to the snapshot cache
+// that watches can use to intelligently determine the state of the current system
+type StreamVersion interface {
+	// GetVersionMap returns a hash map of the currently applied resources
+	GetVersionMap() map[string]DeltaVersionInfo
+
+	// GetSystemVersion returns the current system version within an incremental stream
+	GetSystemVersion() string
+
+	// GetStreamNonce will return the current nonce within a given incremental stream (used within watch creation)
+	GetStreamNonce() string
+}
+
 type snapshotCache struct {
 	log log.Logger
 
@@ -78,6 +91,9 @@ type snapshotCache struct {
 
 	// watchCount is an atomic counter incremented for each watch
 	watchCount int64
+
+	// deltaWatchCount is an atomic counter incremented for each delta watch opened
+	deltaWatchCount int64
 
 	mu sync.RWMutex
 }
@@ -110,6 +126,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 	// update the existing entry
 	cache.snapshots[node] = snapshot
+	snapshotVMap := snapshot.GetVersionMap()
 
 	// trigger existing watches for which version changed
 	if info, ok := cache.status[node]; ok {
@@ -124,6 +141,79 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 				// discard the watch
 				delete(info.watches, id)
+			}
+		}
+
+		// process our delta watches
+		for id, watch := range info.deltaWatches {
+			// Build our response i.e. only send back things that have changed after we compare version hashes
+			res := make(map[string]types.Resource)
+			typ := watch.Request.GetTypeUrl()
+
+			watchVersions := watch.VersionMap
+			snapshotVersions := snapshotVMap[typ]
+			versionsToSend := make(map[string]DeltaVersionInfo, 0)
+
+			// proccesing function for updating versions and adding resource to send
+			process := func(alias string) {
+				resource := snapshot.GetResource(alias, typ)
+				res[alias] = resource
+				v, _ := HashResource(resource)
+				versionsToSend[alias] = DeltaVersionInfo{
+					Version: v,
+					Alias:   alias,
+				}
+			}
+
+			// Right now we're just diffing versions
+			// TODO: cache should check to see if any resources have been dumped (unsubscribed)
+			// ^ could we push this to the server? Then we can modify the watch request as needed meaning
+			// track previous subscriptions as well as remove resources that have been unsubscribed
+			// Should we also build a version map that isn't off the snapshot but rather resources being sent through?
+
+			if len(watch.Request.ResourceNamesSubscribe) == 0 && len(watch.Request.ResourceNamesUnsubscribe) == 0 {
+				if cache.log != nil {
+					cache.log.Debugf("assuming delta wildcard mode, no resource subscriptions or unsubscriptions provided")
+					cache.log.Debugf("respond open delta watch %d with new version %v", id, watch.VersionMap)
+				}
+
+				for alias, newV := range snapshotVersions {
+					oldV, ok := watchVersions[alias]
+					// cache.log.Debugf("%s comparing versions for alias: %s", typ, alias)
+					if !ok || newV.Version != oldV.Version {
+						// cache.log.Debugf("%s found new version of resource: %s", typ, alias)
+						process(alias)
+					}
+				}
+			} else {
+				if cache.log != nil {
+					cache.log.Debugf("respond open delta watch %d with new version %v", id, watch.VersionMap)
+				}
+				for _, alias := range watch.Request.GetResourceNamesSubscribe() {
+					oldV, ok := watchVersions[alias]
+					if !ok {
+						if cache.log != nil {
+							// cache.log.Debugf("%s couldn't find previous version for %s", typ, alias)
+						}
+						process(alias)
+					}
+					if oldV.Version != snapshotVersions[alias].Version {
+						if cache.log != nil {
+							// cache.log.Debugf("%s found new version of resource %s, updating...", typ, alias)
+							process(alias)
+						}
+					}
+				}
+			}
+
+			// respond to the watch only if new resources have been changed, otherwise leave an open watch
+			if len(res) > 0 {
+				cache.respondDelta(watch.Request, watch.Response, versionsToSend, res, nil)
+				delete(info.deltaWatches, id)
+			} else {
+				if cache.log != nil {
+					cache.log.Debugf("response length for watch was 0... not responding")
+				}
 			}
 		}
 		info.mu.Unlock()

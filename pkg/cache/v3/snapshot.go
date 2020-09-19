@@ -31,6 +31,20 @@ type Resources struct {
 	Items map[string]types.Resource
 }
 
+// DeltaResources is a versioned group of resources which also contains individual resource versions per the incremental xDS protocol
+type DeltaResources struct {
+	// Version information
+	SystemVersion string
+
+	// Items in the group indexed by name
+	Items resourceItems
+}
+
+type resourceItems struct {
+	Version string
+	Items   map[string]types.Resource
+}
+
 // IndexResourcesByName creates a map from the resource name to the resource.
 func IndexResourcesByName(items []types.Resource) map[string]types.Resource {
 	indexed := make(map[string]types.Resource, len(items))
@@ -112,6 +126,54 @@ func (s *Snapshot) GetResources(typeURL string) map[string]types.Resource {
 	return s.Resources[typ].Items
 }
 
+// GetSubscribedResources selects requested snapshot resources by type and alias.
+// This function is used for Incremental/Delta xDS and follows the subscribed resource model.
+func (s *Snapshot) GetSubscribedResources(aliases []string, typeURL string) map[string]types.Resource {
+	if s == nil {
+		return nil
+	}
+
+	t := GetResponseType(typeURL)
+	if t == types.UnknownType {
+		return nil
+	}
+
+	subscribed := make(map[string]types.Resource, len(aliases))
+	r := s.Resources[t].Items
+
+	// TODO:
+	// This right now is O(n^2) which is not performant. Will need to revisit
+	for _, item := range r {
+		for _, alias := range aliases {
+			if GetResourceName(item) == alias {
+				subscribed[alias] = item
+			}
+		}
+	}
+
+	return subscribed
+}
+
+// GetResource will return a single resource by alias within a given resource group
+func (s *Snapshot) GetResource(alias string, typeURL string) types.Resource {
+	if s == nil {
+		return nil
+	}
+
+	t := GetResponseType(typeURL)
+	if t == types.UnknownType {
+		return nil
+	}
+
+	for key, item := range s.Resources[t].Items {
+		if alias == key {
+			return item
+		}
+	}
+
+	return nil
+}
+
 // GetVersion returns the version for a resource type.
 func (s *Snapshot) GetVersion(typeURL string) string {
 	if s == nil {
@@ -122,4 +184,43 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 		return ""
 	}
 	return s.Resources[typ].Version
+}
+
+// GetVersionMap will build a verison map off the current state of a snapshot
+func (s *Snapshot) GetVersionMap() map[string]map[string]DeltaVersionInfo {
+	if s == nil {
+		return nil
+	}
+
+	versionMap := initializeVMap()
+	for i := 0; i < int(types.UnknownType); i++ {
+		typeURL := GetResponseTypeURL(types.ResponseType(i))
+		resources := s.GetResources(typeURL)
+		for _, resource := range resources {
+			// hash our verison in here and build the version map
+			v, err := HashResource(resource)
+			if err != nil {
+				panic(err)
+			}
+			alias := GetResourceName(resource)
+			versionMap[typeURL][alias] = DeltaVersionInfo{
+				Alias:   GetResourceName(resource),
+				Version: v,
+			}
+		}
+	}
+
+	return versionMap
+}
+
+func initializeVMap() map[string]map[string]DeltaVersionInfo {
+	versionMap := make(map[string]map[string]DeltaVersionInfo, types.UnknownType)
+
+	for i := 0; i < int(types.UnknownType); i++ {
+		versionMap[GetResponseTypeURL(
+			types.ResponseType(i),
+		)] = make(map[string]DeltaVersionInfo, 0)
+	}
+
+	return versionMap
 }
