@@ -513,6 +513,8 @@ func TestDeltaResponseHandlers(t *testing.T) {
 					err = s.DeltaSecrets(resp)
 				case rsrc.RuntimeType:
 					err = s.DeltaRuntime(resp)
+				case opaqueType:
+					err = s.DeltaAggregatedResources(resp)
 				}
 
 				if err != nil {

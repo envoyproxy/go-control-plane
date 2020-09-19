@@ -101,6 +101,7 @@ func (values *watches) Init() {
 	values.deltaNonces = make(map[string]string)
 	values.deltaTerminations = make(map[string]chan struct{})
 	values.deltaStreamStates = initStreamState()
+	values.deltaCancellations = make(map[string]func())
 	values.mu = &sync.RWMutex{}
 }
 
