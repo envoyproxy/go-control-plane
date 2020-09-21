@@ -89,3 +89,28 @@ func TestSnapshotVersionMap(t *testing.T) {
 		}
 	}
 }
+
+func TestSnapshotVersionMapNil(t *testing.T) {
+	var nilsnap *cache.Snapshot
+	if out := nilsnap.GetResources(rsrc.EndpointType); out != nil {
+		t.Errorf("got non-empty resources for nil snapshot: %#v", out)
+	}
+	if out := nilsnap.Consistent(); out == nil {
+		t.Errorf("nil snapshot should be consistent")
+	}
+
+	vMap := nilsnap.GetVersionMap()
+	if vMap != nil {
+		t.Errorf("got non-empty version map")
+	}
+
+	snap := cache.NewSnapshot("", nil, nil, nil, nil, nil, nil)
+	if err := snap.Consistent(); err != nil {
+		t.Errorf("got inconsistent snapshot %#v", snap)
+	}
+
+	v := snap.GetVersionMap()
+	if v == nil {
+		t.Errorf("got a nil version map")
+	}
+}

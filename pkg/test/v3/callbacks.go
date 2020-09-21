@@ -43,6 +43,21 @@ func (cb *Callbacks) OnStreamClosed(id int64) {
 	}
 }
 
+// OnDeltaStreamOpen ...
+func (cb *Callbacks) OnDeltaStreamOpen(_ context.Context, id int64, typ string) error {
+	if cb.Debug {
+		log.Printf("delta stream %d open for %s\n", id, typ)
+	}
+	return nil
+}
+
+// OnDeltaStreamClosed ...
+func (cb *Callbacks) OnDeltaStreamClosed(id int64) {
+	if cb.Debug {
+		log.Printf("delta stream %d closed\n", id)
+	}
+}
+
 // OnStreamRequest ...
 func (cb *Callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error {
 	cb.mu.Lock()
