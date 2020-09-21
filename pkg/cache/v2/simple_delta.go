@@ -63,7 +63,6 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVer
 		}
 	}
 
-	// This logic is going to need to change to compare individual resource versions,
 	// if we detect a change in resource version from the previous snapshot then we should create a new watch accordingly
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	if !exists || versionChange {
@@ -130,18 +129,5 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersi
 		Resources:        filtered,
 		VersionMap:       versionMap,
 		RemovedResources: unsubscribed,
-	}
-}
-
-// Unscrubscribe will remove resources from the tracked list in the management server when received from a client
-func (cache *snapshotCache) unsubscribe(resources []string, deltaState map[string]Resources) {
-	// here we need to search and remove from the current subscribed list in the snapshot
-	for _, items := range deltaState {
-		for i := 0; i < len(resources); i++ {
-			if cache.log != nil {
-				cache.log.Debugf("unsubscribing from resource: %s", resources[i])
-			}
-			delete(items.Items, resources[i])
-		}
 	}
 }

@@ -151,7 +151,7 @@ func (values *watches) Cancel() {
 }
 
 func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
-	// increment stream countå
+	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
 	// unique nonce generator for req-resp pairs per xDS stream; the server
@@ -341,6 +341,13 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				req.TypeUrl = defaultTypeURL
 			}
 
+			// Handle our unsubscribe scenario (remove the tracked resources from the current state of the stream)
+			if u := req.GetResourceNamesUnsubscribe(); len(u) > 0 {
+				values.mu.Lock()
+				s.unsubscribe(u, values.deltaStreamStates[req.GetTypeUrl()].GetVersionMap())
+				values.mu.Unlock()
+			}
+
 			if s.callbacks != nil {
 				if err := s.callbacks.OnStreamDeltaRequest(streamID, req); err != nil {
 					return err
@@ -491,4 +498,14 @@ func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) erro
 	atomic.StoreInt32(&reqStop, 1)
 
 	return err
+}
+
+func (s *server) unsubscribe(resources []string, sv map[string]cache.DeltaVersionInfo) {
+	// here we need to search and remove from the current subscribed list in the snapshot
+	for _, resource := range resources {
+		if s.log != nil {
+			s.log.Debugf("unsubscribing from resource: %s", resource)
+		}
+		delete(sv, resource)
+	}
 }
