@@ -27,18 +27,31 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/server/callbacks/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
+// Server is defined to implement the specific stream handler type
 type Server interface {
 	DeltaStreamHandler(stream stream.DeltaStream, typeURL string) error
 }
 
+type Callbacks interface {
+	// OnDeltaStreamOpen is called once an incremental xDS stream is open with a stream ID and the type URL (or "" for ADS).
+	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
+	OnDeltaStreamOpen(context.Context, int64, string) error
+	// OnDeltaStreamClosed is called immediately prior to closing an xDS stream with a stream ID.
+	OnDeltaStreamClosed(int64)
+	// OnStreamDeltaRequest is called once a request is received on a stream.
+	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
+	OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error
+	// OnStreamDelatResponse is called immediately prior to sending a response on a stream.
+	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
+}
+
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks callbacks.Callbacks, log log.Logger) Server {
+func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks, log log.Logger) Server {
 	return &server{
 		cache:     config,
 		callbacks: callbacks,
@@ -49,7 +62,7 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks callba
 
 type server struct {
 	cache     cache.ConfigWatcher
-	callbacks callbacks.Callbacks
+	callbacks Callbacks
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -165,7 +178,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	defer func() {
 		values.Cancel()
 		if s.callbacks != nil {
-			s.callbacks.OnStreamClosed(streamID)
+			s.callbacks.OnDeltaStreamClosed(streamID)
 		}
 	}()
 
@@ -209,7 +222,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	}
 
 	if s.callbacks != nil {
-		if err := s.callbacks.OnStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
+		if err := s.callbacks.OnDeltaStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
 			return err
 		}
 	}

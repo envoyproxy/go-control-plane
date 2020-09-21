@@ -22,7 +22,6 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 
-	"github.com/envoyproxy/go-control-plane/pkg/server/callbacks/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v2"
@@ -57,10 +56,20 @@ type Server interface {
 	delta.Server
 }
 
+// Callbacks is a collection of callbacks inserted into the server operation.
+// The callbacks are invoked synchronously.
+type Callbacks interface {
+	rest.Callbacks
+	sotw.Callbacks
+	delta.Callbacks
+}
+
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
 type CallbackFuncs struct {
 	StreamOpenFunc          func(context.Context, int64, string) error
 	StreamClosedFunc        func(int64)
+	DeltaStreamOpenFunc     func(context.Context, int64, string) error
+	DeltaStreamClosedFunc   func(int64)
 	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
 	StreamResponseFunc      func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
@@ -69,7 +78,7 @@ type CallbackFuncs struct {
 	FetchResponseFunc       func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
-var _ callbacks.Callbacks = CallbackFuncs{}
+var _ Callbacks = CallbackFuncs{}
 
 // OnStreamOpen invokes StreamOpenFunc.
 func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL string) error {
@@ -84,6 +93,22 @@ func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL
 func (c CallbackFuncs) OnStreamClosed(streamID int64) {
 	if c.StreamClosedFunc != nil {
 		c.StreamClosedFunc(streamID)
+	}
+}
+
+// OnStreamOpen invokes StreamOpenFunc.
+func (c CallbackFuncs) OnDeltaStreamOpen(ctx context.Context, streamID int64, typeURL string) error {
+	if c.StreamOpenFunc != nil {
+		return c.DeltaStreamOpenFunc(ctx, streamID, typeURL)
+	}
+
+	return nil
+}
+
+// OnStreamClosed invokes StreamClosedFunc.
+func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64) {
+	if c.StreamClosedFunc != nil {
+		c.DeltaStreamClosedFunc(streamID)
 	}
 }
 
@@ -135,7 +160,7 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks callbacks.Callbacks, log log.Logger) Server {
+func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks, log log.Logger) Server {
 	return NewServerAdvanced(rest.NewServer(config, callbacks),
 		sotw.NewServer(ctx, config, callbacks),
 		delta.NewServer(ctx, config, callbacks, log),
