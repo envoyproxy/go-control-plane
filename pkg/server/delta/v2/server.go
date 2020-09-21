@@ -317,7 +317,9 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			// Log out our error detail from envoy if we get one but don't do anything crazy here yet
 			if req.ErrorDetail != nil {
-				s.log.Errorf("received error from envoy: %s", req.ErrorDetail.String())
+				if s.log != nil {
+					s.log.Errorf("received error from envoy: %s", req.ErrorDetail.String())
+				}
 			}
 
 			// node field in discovery request is delta-compressed
