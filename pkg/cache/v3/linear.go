@@ -165,11 +165,9 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	return nil
 }
 
-func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) {
-	value := make(chan Response, 1)
+func (cache *LinearCache) CreateWatch(request *Request, value chan Response) (func(), error) {
 	if request.TypeUrl != cache.typeURL {
-		close(value)
-		return value, nil
+		return nil, errors.New("invalid type url")
 	}
 	// If the version is not up to date, check whether any requested resource has
 	// been updated between the last version and the current version. This avoids the problem
@@ -205,16 +203,16 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 	}
 	if stale {
 		cache.respond(value, staleResources)
-		return value, nil
+		return nil, nil
 	}
 	// Create open watches since versions are up to date.
 	if len(request.ResourceNames) == 0 {
 		cache.watchAll[value] = struct{}{}
-		return value, func() {
+		return func() {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
 			delete(cache.watchAll, value)
-		}
+		}, nil
 	}
 	for _, name := range request.ResourceNames {
 		set, exists := cache.watches[name]
@@ -224,7 +222,7 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 		}
 		set[value] = struct{}{}
 	}
-	return value, func() {
+	return func() {
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
 		for _, name := range request.ResourceNames {
@@ -236,7 +234,7 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 				delete(cache.watches, name)
 			}
 		}
-	}
+	}, nil
 }
 
 func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response, error) {
