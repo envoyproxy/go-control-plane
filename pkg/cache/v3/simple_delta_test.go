@@ -106,19 +106,6 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
 	}
-
-	// test an unsubscribe scenario
-	// Assume we got a request from the grpc server to unsubscribe from a resource so we can initiate a request
-	// watches[testTypes[0]], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
-	// 	Node: &core.Node{
-	// 		Id: "node",
-	// 	},
-	// 	TypeUrl:                  testTypes[0],
-	// 	ResourceNamesUnsubscribe: []string{clusterName},
-	// }, vm[testTypes[0]])
-	// if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-	// 	t.Errorf("watches should be preserved for all but one %d", count)
-	// }
 }
 
 func TestConcurrentSetDeltaWatch(t *testing.T) {
