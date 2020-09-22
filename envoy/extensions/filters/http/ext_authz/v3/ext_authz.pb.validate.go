@@ -204,6 +204,8 @@ func (m *BufferSettings) Validate() error {
 
 	// no validation rules for AllowPartialMessage
 
+	// no validation rules for PackAsBytes
+
 	return nil
 }
 
