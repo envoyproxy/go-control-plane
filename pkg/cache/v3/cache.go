@@ -38,14 +38,14 @@ type ConfigWatcher interface {
 	// CreateWatch returns a new open watch from a non-empty request.
 	// An individual consumer normally issues a single open watch by each type URL.
 	//
-	// Value channel produces requested resources, once they are available.  If
-	// the channel is closed prior to cancellation of the watch, an unrecoverable
-	// error has occurred in the producer, and the consumer should close the
+	// Once the requested resources are available, they should be pushed into responses channel.
+	// If there are any failures - the error should be returned and the consumer should close the
 	// corresponding stream.
+	// Cache implementation should not close responses channel.
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(*Request, chan Response) (cancel func(), err error)
+	CreateWatch(request *Request, responses chan<- Response) (cancel func(), err error)
 }
 
 // ConfigFetcher fetches configuration resources from cache
