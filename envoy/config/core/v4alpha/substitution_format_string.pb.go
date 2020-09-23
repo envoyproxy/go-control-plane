@@ -49,7 +49,8 @@ type SubstitutionFormatString struct {
 	// If this field is not set then ``text/plain`` is used for *text_format* and
 	// ``application/json`` is used for *json_format*.
 	//
-	// .. code-block::
+	// .. validated-code-block:: yaml
+	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
 	//   content_type: "text/html; charset=UTF-8"
 	//
@@ -131,15 +132,18 @@ type SubstitutionFormatString_TextFormat struct {
 	// Specify a format with command operators to form a text string.
 	// Its details is described in :ref:`format string<config_access_log_format_strings>`.
 	//
-	// .. code-block::
+	// For example, setting ``text_format`` like below,
 	//
-	//   text_format: %LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=$REQ(:path)%
+	// .. validated-code-block:: yaml
+	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
-	// The following plain text will be created:
+	//   text_format: "%LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=%REQ(:path)%\n"
 	//
-	// .. code-block::
+	// generates plain text similar to:
 	//
-	//   upstream connect error:204:path=/foo
+	// .. code-block:: text
+	//
+	//   upstream connect error:503:path=/foo
 	//
 	TextFormat string `protobuf:"bytes,1,opt,name=text_format,json=textFormat,proto3,oneof"`
 }
@@ -151,11 +155,12 @@ type SubstitutionFormatString_JsonFormat struct {
 	// Nested JSON objects may be produced by some command operators (e.g. FILTER_STATE or DYNAMIC_METADATA).
 	// See the documentation for a specific command operator for details.
 	//
-	// .. code-block::
+	// .. validated-code-block:: yaml
+	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
-	//  json_format:
-	//    status: %RESPONSE_CODE%
-	//    message: %LOCAL_REPLY_BODY%
+	//   json_format:
+	//     status: "%RESPONSE_CODE%"
+	//     message: "%LOCAL_REPLY_BODY%"
 	//
 	// The following JSON object would be created:
 	//
