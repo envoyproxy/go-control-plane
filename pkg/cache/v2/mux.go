@@ -34,7 +34,7 @@ type MuxCache struct {
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request *Request, value chan Response) (func(), error) {
+func (mux *MuxCache) CreateWatch(request *Request, value chan<- Response) (func(), error) {
 	key := mux.Classify(*request)
 	cache, exists := mux.Caches[key]
 	if !exists {

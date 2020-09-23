@@ -24,7 +24,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
-type watches = map[chan Response]struct{}
+type watches = map[chan<- Response]struct{}
 
 // LinearCache supports collectons of opaque resources. This cache has a
 // single collection indexed by resource names and manages resource versions
@@ -90,7 +90,7 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	return out
 }
 
-func (cache *LinearCache) respond(value chan Response, staleResources []string) {
+func (cache *LinearCache) respond(value chan<- Response, staleResources []string) {
 	var resources []types.Resource
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
@@ -116,7 +116,7 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 
 func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	// de-duplicate watches that need to be responded
-	notifyList := make(map[chan Response][]string)
+	notifyList := make(map[chan<- Response][]string)
 	for name := range modified {
 		for watch := range cache.watches[name] {
 			notifyList[watch] = append(notifyList[watch], name)
@@ -164,7 +164,7 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	return nil
 }
 
-func (cache *LinearCache) CreateWatch(request *Request, value chan Response) (func(), error) {
+func (cache *LinearCache) CreateWatch(request *Request, value chan<- Response) (func(), error) {
 	if request.TypeUrl != cache.typeURL {
 		return nil, errors.New("invalid type url")
 	}
