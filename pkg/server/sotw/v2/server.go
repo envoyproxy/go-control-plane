@@ -108,7 +108,6 @@ var errorResponse = &cache.RawResponse{}
 
 // Cancel all watches
 func (values *watches) Cancel() {
-	close(values.responses)
 	for _, cancel := range values.cancellations {
 		if cancel != nil {
 			cancel()
