@@ -173,7 +173,7 @@ func superset(names map[string]bool, resources map[string]types.Resource) error 
 }
 
 // CreateWatch returns a watch for an xDS request.
-func (cache *snapshotCache) CreateWatch(request *Request, value chan<- Response) (func(), error) {
+func (cache *snapshotCache) CreateWatch(request *Request, value chan<- Response) func() {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.Lock()
@@ -203,13 +203,13 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan<- Response)
 		info.mu.Lock()
 		info.watches[watchID] = ResponseWatch{Request: request, Response: value}
 		info.mu.Unlock()
-		return cache.cancelWatch(nodeID, watchID), nil
+		return cache.cancelWatch(nodeID, watchID)
 	}
 
 	// otherwise, the watch may be responded immediately
 	cache.respond(request, value, snapshot.GetResources(request.TypeUrl), version)
 
-	return nil, nil
+	return nil
 }
 
 func (cache *snapshotCache) nextWatchID() int64 {

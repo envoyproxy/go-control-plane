@@ -35,11 +35,12 @@ type MuxCache struct {
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request *Request, value chan<- Response) (func(), error) {
+func (mux *MuxCache) CreateWatch(request *Request, value chan<- Response) func() {
 	key := mux.Classify(*request)
 	cache, exists := mux.Caches[key]
 	if !exists {
-		return nil, errors.New("invalid type url")
+		value <- nil
+		return nil
 	}
 	return cache.CreateWatch(request, value)
 }

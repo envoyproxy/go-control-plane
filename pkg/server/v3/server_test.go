@@ -37,21 +37,24 @@ import (
 type mockConfigWatcher struct {
 	counts    map[string]int
 	responses map[string][]cache.Response
+	failWatch bool
 	watches   int
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan<- cache.Response) (func(), error) {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan<- cache.Response) func() {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
+	} else if config.failWatch {
+		out <- nil
 	} else {
 		config.watches += 1
 		return func() {
 			config.watches -= 1
-		}, nil
+		}
 	}
-	return nil, nil
+	return nil
 }
 
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
@@ -415,6 +418,30 @@ func TestFetch(t *testing.T) {
 	}
 	if want := 6; responseCount != want {
 		t.Errorf("unexpected number of fetch responses: got %d, want %d", responseCount, want)
+	}
+}
+
+func TestWatchClosed(t *testing.T) {
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.failWatch = true
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+
+			// make a request
+			resp := makeMockStream(t)
+			resp.recv <- &discovery.DiscoveryRequest{
+				Node:    node,
+				TypeUrl: typ,
+			}
+
+			// check that response fails since watch gets closed
+			if err := s.StreamAggregatedResources(resp); err == nil {
+				t.Error("Stream() => got no error, want watch failed")
+			}
+
+			close(resp.recv)
+		})
 	}
 }
 
