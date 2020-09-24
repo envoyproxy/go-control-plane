@@ -61,6 +61,11 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
+type ttlHandle struct {
+	ttl    time.Duration
+	cancel func()
+}
+
 type snapshotCache struct {
 	log log.Logger
 
@@ -78,6 +83,8 @@ type snapshotCache struct {
 
 	// watchCount is an atomic counter incremented for each watch
 	watchCount int64
+
+	ttls map[string]map[int]ttlHandle
 
 	mu sync.RWMutex
 }
@@ -100,6 +107,7 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache 
 		snapshots: make(map[string]Snapshot),
 		status:    make(map[string]*statusInfo),
 		hash:      hash,
+		ttls:      make(map[string]map[int]ttlHandle),
 	}
 }
 
@@ -111,6 +119,75 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	// update the existing entry
 	cache.snapshots[node] = snapshot
 
+	if _, ok := cache.ttls[node]; !ok {
+		cache.ttls[node] = make(map[int]ttlHandle)
+	}
+
+	for typeUrl, resource := range snapshot.Resources {
+		ttl, ok := cache.ttls[node][typeUrl]
+		// No TTL configured and no existing TTL, nothing to do.
+		if !ok && resource.Ttl == nil {
+			continue
+		}
+		// Exisiting TTL matches new TTL, nothing to do.
+		if ok && resource.Ttl != nil && *resource.Ttl == ttl.ttl {
+			continue
+		}
+
+		// No TTL, nothing to do.
+		if resource.Ttl == nil {
+			continue
+		}
+
+		// Clean up the old goroutine, then spin up a new one with the new TTL.
+		if ok {
+			ttl.cancel()
+		}
+
+		ctx, cancel := context.WithCancel(context.Background())
+		cache.ttls[node][typeUrl] = ttlHandle{ttl: *resource.Ttl, cancel: cancel}
+		go func(ttl time.Duration, typeUrl types.ResponseType) {
+			// By default we heartbeat TTL'd resources at 1/3 of the TTL duration. This is somewhat arbitrary but is meant to reduce the likelihood for a race between the
+			// heartbeat being sent and the client removing the resource due to hitting the TTL.
+			// TODO(snowp): We probably would want to add some safety guards here: a 100ms TTL on a lot of resources would cause a lot of stress on the server, both through
+			// lock contention on the cache and gRPC serialization related costs.
+			ticker := time.NewTicker(ttl / 3)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-ticker.C:
+					cache.mu.Lock()
+
+					// Trigger heartbeat updates for all watches for this particular resource.
+					if info, ok := cache.status[node]; ok {
+						info.mu.Lock()
+						for id, watch := range info.watches {
+							// This goroutine is only responsible for triggering updates for a specific type.
+							if GetResponseType(watch.Request.TypeUrl) != typeUrl {
+								continue
+							}
+
+							snapshot := cache.snapshots[node]
+							// Respond with the current version regardless of whether the version has changed.
+							version := snapshot.GetVersion(watch.Request.TypeUrl)
+							resources, ttl := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+							if cache.log != nil {
+								cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
+							}
+							cache.respond(watch.Request, watch.Response, resources, version, ttl)
+
+							// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
+							delete(info.watches, id)
+						}
+						info.mu.Unlock()
+					}
+					cache.mu.Unlock()
+				}
+			}
+		}(*resource.Ttl, types.ResponseType(typeUrl))
+	}
+
 	// trigger existing watches for which version changed
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
@@ -120,7 +197,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 				if cache.log != nil {
 					cache.log.Debugf("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
 				}
-				cache.respond(watch.Request, watch.Response, snapshot.GetResources(watch.Request.TypeUrl), version)
+				resources, ttl := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+				cache.respond(watch.Request, watch.Response, resources, version, ttl)
 
 				// discard the watch
 				delete(info.watches, id)
@@ -210,7 +288,8 @@ func (cache *snapshotCache) CreateWatch(request *Request) (chan Response, func()
 	}
 
 	// otherwise, the watch may be responded immediately
-	cache.respond(request, value, snapshot.GetResources(request.TypeUrl), version)
+	resources, ttl := snapshot.GetResourcesAndTtl(request.TypeUrl)
+	cache.respond(request, value, resources, version, ttl)
 
 	return value, nil
 }
@@ -235,7 +314,7 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
 // TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
-func (cache *snapshotCache) respond(request *Request, value chan Response, resources map[string]types.Resource, version string) {
+func (cache *snapshotCache) respond(request *Request, value chan Response, resources map[string]types.Resource, version string, ttl *time.Duration) {
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
@@ -251,10 +330,10 @@ func (cache *snapshotCache) respond(request *Request, value chan Response, resou
 			request.TypeUrl, request.ResourceNames, request.VersionInfo, version)
 	}
 
-	value <- createResponse(request, resources, version)
+	value <- createResponse(request, resources, version, ttl)
 }
 
-func createResponse(request *Request, resources map[string]types.Resource, version string) Response {
+func createResponse(request *Request, resources map[string]types.Resource, version string, ttl *time.Duration) Response {
 	filtered := make([]types.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
@@ -277,6 +356,7 @@ func createResponse(request *Request, resources map[string]types.Resource, versi
 		Request:   request,
 		Version:   version,
 		Resources: filtered,
+		Ttl:       ttl,
 	}
 }
 
@@ -299,8 +379,8 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request *Request) (Respon
 			return nil, &types.SkipFetchError{}
 		}
 
-		resources := snapshot.GetResources(request.TypeUrl)
-		out := createResponse(request, resources, version)
+		resources, ttl := snapshot.GetResourcesAndTtl(request.TypeUrl)
+		out := createResponse(request, resources, version, ttl)
 		return out, nil
 	}
 

@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"sync/atomic"
+	"time"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -84,6 +85,9 @@ type RawResponse struct {
 
 	// Resources to be included in the response.
 	Resources []types.Resource
+
+	// The TTL to attach to this response.
+	Ttl *time.Duration
 
 	// marshaledResponse holds an atomic reference to the serialized discovery response.
 	marshaledResponse atomic.Value

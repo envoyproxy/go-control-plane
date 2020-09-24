@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -55,6 +56,16 @@ var (
 		[]types.Resource{testRuntime},
 		[]types.Resource{testSecret[0]})
 
+	ttl = time.Second
+
+	snapshotWithTtl = cache.NewSnapshotWithTtls(version,
+		cache.ResourceWithTtl{Resources: []types.Resource{testEndpoint}, Ttl: &ttl},
+		cache.ResourceWithTtl{Resources: []types.Resource{testCluster}},
+		cache.ResourceWithTtl{Resources: []types.Resource{testRoute}},
+		cache.ResourceWithTtl{Resources: []types.Resource{testListener}},
+		cache.ResourceWithTtl{Resources: []types.Resource{testRuntime}},
+		cache.ResourceWithTtl{Resources: []types.Resource{testSecret[0]}})
+
 	names = map[string][]string{
 		rsrc.EndpointType: {clusterName},
 		rsrc.ClusterType:  nil,
@@ -82,6 +93,100 @@ func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format
 func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
 func TestSnapshotCache(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+
+	if _, err := c.GetSnapshot(key); err == nil {
+		t.Errorf("unexpected snapshot found for key %q", key)
+	}
+
+	if err := c.SetSnapshot(key, snapshotWithTtl); err != nil {
+		t.Fatal(err)
+	}
+
+	snap, err := c.GetSnapshot(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(snap, snapshotWithTtl) {
+		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTtl, snap)
+	}
+
+	// try to get endpoints with incorrect list of names
+	// should not receive response
+	value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}})
+	select {
+	case out := <-value:
+		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
+	case <-time.After(time.Second / 4):
+	}
+
+	// All the resources should respond immediately when version is not up to date.
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+			select {
+			case out := <-value:
+				if gotVersion, _ := out.GetVersion(); gotVersion != version {
+					t.Errorf("got version %q, want %q", gotVersion, version)
+				}
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResources(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
+				}
+			case <-time.After(time.Second):
+				t.Fatal("failed to receive snapshot response")
+			}
+		})
+	}
+
+	// Once everything is up to date, only the TTL'd resource should send out updates.
+	wg := sync.WaitGroup{}
+	updatesByType := map[string]int{}
+	for _, typ := range testTypes {
+		wg.Add(1)
+		go func(typ string) {
+			defer wg.Done()
+
+			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
+
+			end := time.After(5 * time.Second)
+			for {
+				select {
+				case out := <-value:
+					if gotVersion, _ := out.GetVersion(); gotVersion != version {
+						t.Errorf("got version %q, want %q", gotVersion, version)
+					}
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResources(typ)) {
+						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
+					}
+
+					if *out.(*cache.RawResponse).Ttl != ttl {
+						t.Errorf("expected to see updates with TTL set to 1 second, got %v", out.(*cache.RawResponse).Ttl)
+					}
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResources(typ)) {
+						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
+					}
+
+					updatesByType[typ]++
+					value, _ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
+				case <-end:
+					return
+				}
+			}
+		}(typ)
+	}
+
+	wg.Wait()
+
+	if len(updatesByType) != 1 {
+		t.Errorf("expected to only receive updates for TTL'd type, got %v", updatesByType)
+	}
+	// Avoid an exact match on number of triggers to avoid this being flaky.
+	if updatesByType[rsrc.EndpointType] < 2 {
+		t.Errorf("expected at least two TTL updates for endpoints, got %d", updatesByType[rsrc.EndpointType])
+	}
+}
+
+func TestSnapshotCacheTtl(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 
 	if _, err := c.GetSnapshot(key); err == nil {
