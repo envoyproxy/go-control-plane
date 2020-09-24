@@ -31,6 +31,69 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+type DownstreamTlsContext_OcspStaplePolicy int32
+
+const (
+	// OCSP responses are optional. If an OCSP response is absent
+	// or expired, the associated certificate will be used for
+	// connections without an OCSP staple.
+	DownstreamTlsContext_LENIENT_STAPLING DownstreamTlsContext_OcspStaplePolicy = 0
+	// OCSP responses are optional. If an OCSP response is absent,
+	// the associated certificate will be used without an
+	// OCSP staple. If a response is provided but is expired,
+	// the associated certificate will not be used for
+	// subsequent connections. If no suitable certificate is found,
+	// the connection is rejected.
+	DownstreamTlsContext_STRICT_STAPLING DownstreamTlsContext_OcspStaplePolicy = 1
+	// OCSP responses are required. Configuration will fail if
+	// a certificate is provided without an OCSP response. If a
+	// response expires, the associated certificate will not be
+	// used connections. If no suitable certificate is found, the
+	// connection is rejected.
+	DownstreamTlsContext_MUST_STAPLE DownstreamTlsContext_OcspStaplePolicy = 2
+)
+
+// Enum value maps for DownstreamTlsContext_OcspStaplePolicy.
+var (
+	DownstreamTlsContext_OcspStaplePolicy_name = map[int32]string{
+		0: "LENIENT_STAPLING",
+		1: "STRICT_STAPLING",
+		2: "MUST_STAPLE",
+	}
+	DownstreamTlsContext_OcspStaplePolicy_value = map[string]int32{
+		"LENIENT_STAPLING": 0,
+		"STRICT_STAPLING":  1,
+		"MUST_STAPLE":      2,
+	}
+)
+
+func (x DownstreamTlsContext_OcspStaplePolicy) Enum() *DownstreamTlsContext_OcspStaplePolicy {
+	p := new(DownstreamTlsContext_OcspStaplePolicy)
+	*p = x
+	return p
+}
+
+func (x DownstreamTlsContext_OcspStaplePolicy) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DownstreamTlsContext_OcspStaplePolicy) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_enumTypes[0].Descriptor()
+}
+
+func (DownstreamTlsContext_OcspStaplePolicy) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_enumTypes[0]
+}
+
+func (x DownstreamTlsContext_OcspStaplePolicy) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DownstreamTlsContext_OcspStaplePolicy.Descriptor instead.
+func (DownstreamTlsContext_OcspStaplePolicy) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_rawDescGZIP(), []int{1, 0}
+}
+
 type UpstreamTlsContext struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -119,7 +182,7 @@ func (x *UpstreamTlsContext) GetMaxSessionKeys() *wrappers.UInt32Value {
 	return nil
 }
 
-// [#next-free-field: 8]
+// [#next-free-field: 9]
 type DownstreamTlsContext struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -143,6 +206,10 @@ type DownstreamTlsContext struct {
 	// <https://tools.ietf.org/html/rfc5077#section-5.6>`
 	// only seconds could be specified (fractional seconds are going to be ignored).
 	SessionTimeout *duration.Duration `protobuf:"bytes,6,opt,name=session_timeout,json=sessionTimeout,proto3" json:"session_timeout,omitempty"`
+	// Config for whether to use certificates if they do not have
+	// an accompanying OCSP response or if the response expires at runtime.
+	// Defaults to LENIENT_STAPLING
+	OcspStaplePolicy DownstreamTlsContext_OcspStaplePolicy `protobuf:"varint,8,opt,name=ocsp_staple_policy,json=ocspStaplePolicy,proto3,enum=envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext_OcspStaplePolicy" json:"ocsp_staple_policy,omitempty"`
 }
 
 func (x *DownstreamTlsContext) Reset() {
@@ -231,6 +298,13 @@ func (x *DownstreamTlsContext) GetSessionTimeout() *duration.Duration {
 		return x.SessionTimeout
 	}
 	return nil
+}
+
+func (x *DownstreamTlsContext) GetOcspStaplePolicy() DownstreamTlsContext_OcspStaplePolicy {
+	if x != nil {
+		return x.OcspStaplePolicy
+	}
+	return DownstreamTlsContext_LENIENT_STAPLING
 }
 
 type isDownstreamTlsContext_SessionTicketKeysType interface {
@@ -815,7 +889,7 @@ var file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_rawDesc = []by
 	0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x74, 0x72, 0x61, 0x6e, 0x73,
 	0x70, 0x6f, 0x72, 0x74, 0x5f, 0x73, 0x6f, 0x63, 0x6b, 0x65, 0x74, 0x73, 0x2e, 0x74, 0x6c, 0x73,
 	0x2e, 0x76, 0x33, 0x2e, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x6c, 0x73, 0x43,
-	0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x22, 0xb6, 0x06, 0x0a, 0x14, 0x44, 0x6f, 0x77, 0x6e, 0x73,
+	0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x22, 0x96, 0x08, 0x0a, 0x14, 0x44, 0x6f, 0x77, 0x6e, 0x73,
 	0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x6c, 0x73, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x12,
 	0x6e, 0x0a, 0x12, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x5f, 0x74, 0x6c, 0x73, 0x5f, 0x63, 0x6f,
 	0x6e, 0x74, 0x65, 0x78, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x40, 0x2e, 0x65, 0x6e,
@@ -860,7 +934,21 @@ var file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_rawDesc = []by
 	0x19, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
 	0x66, 0x2e, 0x44, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x10, 0xfa, 0x42, 0x0d, 0xaa,
 	0x01, 0x0a, 0x1a, 0x06, 0x08, 0x80, 0x80, 0x80, 0x80, 0x10, 0x32, 0x00, 0x52, 0x0e, 0x73, 0x65,
-	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x3a, 0x45, 0x9a, 0xc5,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x12, 0x8d, 0x01, 0x0a,
+	0x12, 0x6f, 0x63, 0x73, 0x70, 0x5f, 0x73, 0x74, 0x61, 0x70, 0x6c, 0x65, 0x5f, 0x70, 0x6f, 0x6c,
+	0x69, 0x63, 0x79, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x55, 0x2e, 0x65, 0x6e, 0x76, 0x6f,
+	0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x74, 0x72, 0x61,
+	0x6e, 0x73, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x73, 0x6f, 0x63, 0x6b, 0x65, 0x74, 0x73, 0x2e, 0x74,
+	0x6c, 0x73, 0x2e, 0x76, 0x34, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x2e, 0x44, 0x6f, 0x77, 0x6e, 0x73,
+	0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x6c, 0x73, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x78, 0x74, 0x2e,
+	0x4f, 0x63, 0x73, 0x70, 0x53, 0x74, 0x61, 0x70, 0x6c, 0x65, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79,
+	0x42, 0x08, 0xfa, 0x42, 0x05, 0x82, 0x01, 0x02, 0x10, 0x01, 0x52, 0x10, 0x6f, 0x63, 0x73, 0x70,
+	0x53, 0x74, 0x61, 0x70, 0x6c, 0x65, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x22, 0x4e, 0x0a, 0x10,
+	0x4f, 0x63, 0x73, 0x70, 0x53, 0x74, 0x61, 0x70, 0x6c, 0x65, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79,
+	0x12, 0x14, 0x0a, 0x10, 0x4c, 0x45, 0x4e, 0x49, 0x45, 0x4e, 0x54, 0x5f, 0x53, 0x54, 0x41, 0x50,
+	0x4c, 0x49, 0x4e, 0x47, 0x10, 0x00, 0x12, 0x13, 0x0a, 0x0f, 0x53, 0x54, 0x52, 0x49, 0x43, 0x54,
+	0x5f, 0x53, 0x54, 0x41, 0x50, 0x4c, 0x49, 0x4e, 0x47, 0x10, 0x01, 0x12, 0x0f, 0x0a, 0x0b, 0x4d,
+	0x55, 0x53, 0x54, 0x5f, 0x53, 0x54, 0x41, 0x50, 0x4c, 0x45, 0x10, 0x02, 0x3a, 0x45, 0x9a, 0xc5,
 	0x88, 0x1e, 0x40, 0x0a, 0x3e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e,
 	0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x70, 0x6f, 0x72, 0x74, 0x5f,
 	0x73, 0x6f, 0x63, 0x6b, 0x65, 0x74, 0x73, 0x2e, 0x74, 0x6c, 0x73, 0x2e, 0x76, 0x33, 0x2e, 0x44,
@@ -1081,54 +1169,57 @@ func file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_rawDescGZIP()
 	return file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_rawDescData
 }
 
+var file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_goTypes = []interface{}{
-	(*UpstreamTlsContext)(nil),                                    // 0: envoy.extensions.transport_sockets.tls.v4alpha.UpstreamTlsContext
-	(*DownstreamTlsContext)(nil),                                  // 1: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext
-	(*CommonTlsContext)(nil),                                      // 2: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext
-	(*CommonTlsContext_CertificateProvider)(nil),                  // 3: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
-	(*CommonTlsContext_CertificateProviderInstance)(nil),          // 4: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
-	(*CommonTlsContext_CombinedCertificateValidationContext)(nil), // 5: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext
-	(*wrappers.UInt32Value)(nil),                                  // 6: google.protobuf.UInt32Value
-	(*wrappers.BoolValue)(nil),                                    // 7: google.protobuf.BoolValue
-	(*TlsSessionTicketKeys)(nil),                                  // 8: envoy.extensions.transport_sockets.tls.v4alpha.TlsSessionTicketKeys
-	(*SdsSecretConfig)(nil),                                       // 9: envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
-	(*duration.Duration)(nil),                                     // 10: google.protobuf.Duration
-	(*TlsParameters)(nil),                                         // 11: envoy.extensions.transport_sockets.tls.v4alpha.TlsParameters
-	(*TlsCertificate)(nil),                                        // 12: envoy.extensions.transport_sockets.tls.v4alpha.TlsCertificate
-	(*CertificateValidationContext)(nil),                          // 13: envoy.extensions.transport_sockets.tls.v4alpha.CertificateValidationContext
-	(*v4alpha.TypedExtensionConfig)(nil),                          // 14: envoy.config.core.v4alpha.TypedExtensionConfig
+	(DownstreamTlsContext_OcspStaplePolicy)(0),                    // 0: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.OcspStaplePolicy
+	(*UpstreamTlsContext)(nil),                                    // 1: envoy.extensions.transport_sockets.tls.v4alpha.UpstreamTlsContext
+	(*DownstreamTlsContext)(nil),                                  // 2: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext
+	(*CommonTlsContext)(nil),                                      // 3: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext
+	(*CommonTlsContext_CertificateProvider)(nil),                  // 4: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
+	(*CommonTlsContext_CertificateProviderInstance)(nil),          // 5: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
+	(*CommonTlsContext_CombinedCertificateValidationContext)(nil), // 6: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext
+	(*wrappers.UInt32Value)(nil),                                  // 7: google.protobuf.UInt32Value
+	(*wrappers.BoolValue)(nil),                                    // 8: google.protobuf.BoolValue
+	(*TlsSessionTicketKeys)(nil),                                  // 9: envoy.extensions.transport_sockets.tls.v4alpha.TlsSessionTicketKeys
+	(*SdsSecretConfig)(nil),                                       // 10: envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
+	(*duration.Duration)(nil),                                     // 11: google.protobuf.Duration
+	(*TlsParameters)(nil),                                         // 12: envoy.extensions.transport_sockets.tls.v4alpha.TlsParameters
+	(*TlsCertificate)(nil),                                        // 13: envoy.extensions.transport_sockets.tls.v4alpha.TlsCertificate
+	(*CertificateValidationContext)(nil),                          // 14: envoy.extensions.transport_sockets.tls.v4alpha.CertificateValidationContext
+	(*v4alpha.TypedExtensionConfig)(nil),                          // 15: envoy.config.core.v4alpha.TypedExtensionConfig
 }
 var file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_depIdxs = []int32{
-	2,  // 0: envoy.extensions.transport_sockets.tls.v4alpha.UpstreamTlsContext.common_tls_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext
-	6,  // 1: envoy.extensions.transport_sockets.tls.v4alpha.UpstreamTlsContext.max_session_keys:type_name -> google.protobuf.UInt32Value
-	2,  // 2: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.common_tls_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext
-	7,  // 3: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.require_client_certificate:type_name -> google.protobuf.BoolValue
-	7,  // 4: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.require_sni:type_name -> google.protobuf.BoolValue
-	8,  // 5: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_ticket_keys:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.TlsSessionTicketKeys
-	9,  // 6: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_ticket_keys_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
-	10, // 7: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_timeout:type_name -> google.protobuf.Duration
-	11, // 8: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_params:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.TlsParameters
-	12, // 9: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificates:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.TlsCertificate
-	9,  // 10: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificate_sds_secret_configs:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
-	3,  // 11: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificate_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
-	4,  // 12: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificate_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
-	13, // 13: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CertificateValidationContext
-	9,  // 14: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
-	5,  // 15: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.combined_validation_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext
-	3,  // 16: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
-	4,  // 17: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
-	14, // 18: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.custom_handshaker:type_name -> envoy.config.core.v4alpha.TypedExtensionConfig
-	14, // 19: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider.typed_config:type_name -> envoy.config.core.v4alpha.TypedExtensionConfig
-	13, // 20: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.default_validation_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CertificateValidationContext
-	9,  // 21: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.validation_context_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
-	3,  // 22: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
-	4,  // 23: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
-	24, // [24:24] is the sub-list for method output_type
-	24, // [24:24] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	3,  // 0: envoy.extensions.transport_sockets.tls.v4alpha.UpstreamTlsContext.common_tls_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext
+	7,  // 1: envoy.extensions.transport_sockets.tls.v4alpha.UpstreamTlsContext.max_session_keys:type_name -> google.protobuf.UInt32Value
+	3,  // 2: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.common_tls_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext
+	8,  // 3: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.require_client_certificate:type_name -> google.protobuf.BoolValue
+	8,  // 4: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.require_sni:type_name -> google.protobuf.BoolValue
+	9,  // 5: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_ticket_keys:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.TlsSessionTicketKeys
+	10, // 6: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_ticket_keys_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
+	11, // 7: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.session_timeout:type_name -> google.protobuf.Duration
+	0,  // 8: envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.ocsp_staple_policy:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext.OcspStaplePolicy
+	12, // 9: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_params:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.TlsParameters
+	13, // 10: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificates:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.TlsCertificate
+	10, // 11: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificate_sds_secret_configs:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
+	4,  // 12: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificate_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
+	5,  // 13: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.tls_certificate_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
+	14, // 14: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CertificateValidationContext
+	10, // 15: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
+	6,  // 16: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.combined_validation_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext
+	4,  // 17: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
+	5,  // 18: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.validation_context_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
+	15, // 19: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.custom_handshaker:type_name -> envoy.config.core.v4alpha.TypedExtensionConfig
+	15, // 20: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider.typed_config:type_name -> envoy.config.core.v4alpha.TypedExtensionConfig
+	14, // 21: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.default_validation_context:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CertificateValidationContext
+	10, // 22: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.validation_context_sds_secret_config:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.SdsSecretConfig
+	4,  // 23: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProvider
+	5,  // 24: envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CombinedCertificateValidationContext.validation_context_certificate_provider_instance:type_name -> envoy.extensions.transport_sockets.tls.v4alpha.CommonTlsContext.CertificateProviderInstance
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_init() }
@@ -1237,13 +1328,14 @@ func file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_rawDesc,
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_goTypes,
 		DependencyIndexes: file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_depIdxs,
+		EnumInfos:         file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_enumTypes,
 		MessageInfos:      file_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto_msgTypes,
 	}.Build()
 	File_envoy_extensions_transport_sockets_tls_v4alpha_tls_proto = out.File

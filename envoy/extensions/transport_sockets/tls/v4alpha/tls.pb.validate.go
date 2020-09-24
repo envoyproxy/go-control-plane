@@ -192,6 +192,13 @@ func (m *DownstreamTlsContext) Validate() error {
 
 	}
 
+	if _, ok := DownstreamTlsContext_OcspStaplePolicy_name[int32(m.GetOcspStaplePolicy())]; !ok {
+		return DownstreamTlsContextValidationError{
+			field:  "OcspStaplePolicy",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	switch m.SessionTicketKeysType.(type) {
 
 	case *DownstreamTlsContext_SessionTicketKeys:

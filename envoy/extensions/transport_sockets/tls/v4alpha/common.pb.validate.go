@@ -481,16 +481,6 @@ func (m *CertificateValidationContext) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetRequireOcspStaple()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CertificateValidationContextValidationError{
-				field:  "RequireOcspStaple",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if v, ok := interface{}(m.GetRequireSignedCertificateTimestamp()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CertificateValidationContextValidationError{
