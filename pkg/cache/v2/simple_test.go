@@ -91,7 +91,7 @@ func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format
 func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
 func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
-func TestSnapshotCache(t *testing.T) {
+func TestSnapshotCacheWithTtl(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 
 	if _, err := c.GetSnapshot(key); err == nil {
@@ -185,7 +185,7 @@ func TestSnapshotCache(t *testing.T) {
 	}
 }
 
-func TestSnapshotCacheTtl(t *testing.T) {
+func TestSnapshotCache(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 
 	if _, err := c.GetSnapshot(key); err == nil {
