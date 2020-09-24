@@ -169,6 +169,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			return nil
 		// config watcher can send the requested resources types in any order
 		case resp := <-values.responses:
+			if resp == nil {
+				return status.Errorf(codes.Unavailable, "watch failed")
+			}
 			typeUrl := resp.GetRequest().TypeUrl
 			nonce, err := send(resp, typeUrl)
 			if err != nil {
@@ -216,11 +219,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 				if cancel, seen := values.cancellations[typeUrl]; seen && cancel != nil {
 					cancel()
 				}
-				var err error
-				values.cancellations[typeUrl], err = s.cache.CreateWatch(req, values.responses)
-				if err != nil {
-					return status.Errorf(codes.Unavailable, err.Error())
-				}
+				values.cancellations[typeUrl] = s.cache.CreateWatch(req, values.responses)
 			}
 		}
 	}

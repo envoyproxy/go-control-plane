@@ -235,7 +235,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 					if cancel != nil {
 						cancel()
 					}
-					cancel, _ = c.CreateWatch(&discovery.DiscoveryRequest{
+					cancel = c.CreateWatch(&discovery.DiscoveryRequest{
 						Node:    &core.Node{Id: id},
 						TypeUrl: rsrc.EndpointType,
 					}, value)
@@ -249,7 +249,7 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	for _, typ := range testTypes {
 		value := make(chan cache.Response, 1)
-		cancel, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+		cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
 		cancel()
 	}
 	// should be status info for the node

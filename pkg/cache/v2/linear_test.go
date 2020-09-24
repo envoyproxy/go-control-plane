@@ -86,9 +86,14 @@ func TestLinearCornerCases(t *testing.T) {
 	}
 	// create an incorrect type URL request
 	w := make(chan Response, 1)
-	_, err = c.CreateWatch(&Request{TypeUrl: "test"}, w)
-	if err == nil {
-		t.Error("should return error")
+	c.CreateWatch(&Request{TypeUrl: "test"}, w)
+	select {
+	case resp := <-w:
+		if resp != nil {
+			t.Error("should return nil")
+		}
+	default:
+		t.Error("channel should contain response")
 	}
 }
 
@@ -182,14 +187,14 @@ func TestLinearCancel(t *testing.T) {
 
 	// cancel watch-all
 	w := make(chan Response, 1)
-	cancel, _ := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w)
+	cancel := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 	cancel()
 	checkWatchCount(t, c, "a", 0)
 
 	// cancel watch for "a"
-	cancel, _ = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, w)
+	cancel = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 	cancel()
@@ -199,10 +204,10 @@ func TestLinearCancel(t *testing.T) {
 	w2 := make(chan Response, 1)
 	w3 := make(chan Response, 1)
 	w4 := make(chan Response, 1)
-	cancel, _ = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, w)
-	cancel2, _ := c.CreateWatch(&Request{ResourceNames: []string{"b"}, TypeUrl: testType, VersionInfo: "1"}, w2)
-	cancel3, _ := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w3)
-	cancel4, _ := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w4)
+	cancel = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, w)
+	cancel2 := c.CreateWatch(&Request{ResourceNames: []string{"b"}, TypeUrl: testType, VersionInfo: "1"}, w2)
+	cancel3 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w3)
+	cancel4 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w4)
 	mustBlock(t, w)
 	mustBlock(t, w2)
 	mustBlock(t, w3)
