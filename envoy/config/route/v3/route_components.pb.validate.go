@@ -3565,20 +3565,20 @@ func (m *RouteAction_MaxStreamDuration) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetGrpcMaxTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetGrpcTimeoutHeaderMax()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteAction_MaxStreamDurationValidationError{
-				field:  "GrpcMaxTimeout",
+				field:  "GrpcTimeoutHeaderMax",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetGrpcTimeoutOffset()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetGrpcTimeoutHeaderOffset()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteAction_MaxStreamDurationValidationError{
-				field:  "GrpcTimeoutOffset",
+				field:  "GrpcTimeoutHeaderOffset",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
