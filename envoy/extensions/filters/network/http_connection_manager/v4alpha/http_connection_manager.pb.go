@@ -1378,9 +1378,6 @@ type HttpFilter struct {
 	// select an extension if the type of the configuration proto is not
 	// sufficient. It also serves as a resource name in ExtensionConfigDS.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Filter specific configuration which depends on the filter being instantiated. See the supported
-	// filters for further documentation.
-	//
 	// Types that are assignable to ConfigType:
 	//	*HttpFilter_TypedConfig
 	//	*HttpFilter_ConfigDiscovery
@@ -1452,12 +1449,14 @@ type isHttpFilter_ConfigType interface {
 }
 
 type HttpFilter_TypedConfig struct {
+	// Filter specific configuration which depends on the filter being instantiated. See the supported
+	// filters for further documentation.
 	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 type HttpFilter_ConfigDiscovery struct {
 	// Configuration source specifier for an extension configuration discovery service.
-	// In case of a failure and without the default configuration, the HTTP listener responds with 500.
+	// In case of a failure and without the default configuration, the HTTP listener responds with code 500.
 	// Extension configs delivered through this mechanism are not expected to require warming (see https://github.com/envoyproxy/envoy/issues/12061).
 	ConfigDiscovery *v4alpha.ExtensionConfigSource `protobuf:"bytes,5,opt,name=config_discovery,json=configDiscovery,proto3,oneof"`
 }
