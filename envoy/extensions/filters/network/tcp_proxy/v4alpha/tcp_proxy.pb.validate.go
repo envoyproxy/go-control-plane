@@ -43,10 +43,10 @@ func (m *TcpProxy) Validate() error {
 		return nil
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
+	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
 		return TcpProxyValidationError{
 			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -348,10 +348,10 @@ func (m *TcpProxy_TunnelingConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetHostname()) < 1 {
+	if utf8.RuneCountInString(m.GetHostname()) < 1 {
 		return TcpProxy_TunnelingConfigValidationError{
 			field:  "Hostname",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -422,10 +422,10 @@ func (m *TcpProxy_WeightedCluster_ClusterWeight) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return TcpProxy_WeightedCluster_ClusterWeightValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

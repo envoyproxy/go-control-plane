@@ -44,17 +44,17 @@ func (m *DatadogConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCollectorCluster()) < 1 {
+	if utf8.RuneCountInString(m.GetCollectorCluster()) < 1 {
 		return DatadogConfigValidationError{
 			field:  "CollectorCluster",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if len(m.GetServiceName()) < 1 {
+	if utf8.RuneCountInString(m.GetServiceName()) < 1 {
 		return DatadogConfigValidationError{
 			field:  "ServiceName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

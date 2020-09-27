@@ -123,10 +123,10 @@ func (m *PrivateKeyProvider) Validate() error {
 		return nil
 	}
 
-	if len(m.GetProviderName()) < 1 {
+	if utf8.RuneCountInString(m.GetProviderName()) < 1 {
 		return PrivateKeyProviderValidationError{
 			field:  "ProviderName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -445,10 +445,17 @@ func (m *CertificateValidationContext) Validate() error {
 	for idx, item := range m.GetVerifyCertificateSpki() {
 		_, _ = idx, item
 
-		if len(item) != 44 {
+		if utf8.RuneCountInString(item) < 44 {
 			return CertificateValidationContextValidationError{
 				field:  fmt.Sprintf("VerifyCertificateSpki[%v]", idx),
-				reason: "value length must be 44 bytes",
+				reason: "value length must be at least 44 runes",
+			}
+		}
+
+		if len(item) > 44 {
+			return CertificateValidationContextValidationError{
+				field:  fmt.Sprintf("VerifyCertificateSpki[%v]", idx),
+				reason: "value length must be at most 44 bytes",
 			}
 		}
 
@@ -457,10 +464,17 @@ func (m *CertificateValidationContext) Validate() error {
 	for idx, item := range m.GetVerifyCertificateHash() {
 		_, _ = idx, item
 
-		if l := len(item); l < 64 || l > 95 {
+		if utf8.RuneCountInString(item) < 64 {
 			return CertificateValidationContextValidationError{
 				field:  fmt.Sprintf("VerifyCertificateHash[%v]", idx),
-				reason: "value length must be between 64 and 95 bytes, inclusive",
+				reason: "value length must be at least 64 runes",
+			}
+		}
+
+		if len(item) > 95 {
+			return CertificateValidationContextValidationError{
+				field:  fmt.Sprintf("VerifyCertificateHash[%v]", idx),
+				reason: "value length must be at most 95 bytes",
 			}
 		}
 

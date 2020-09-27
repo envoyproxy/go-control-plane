@@ -44,17 +44,17 @@ func (m *ZipkinConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCollectorCluster()) < 1 {
+	if utf8.RuneCountInString(m.GetCollectorCluster()) < 1 {
 		return ZipkinConfigValidationError{
 			field:  "CollectorCluster",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if len(m.GetCollectorEndpoint()) < 1 {
+	if utf8.RuneCountInString(m.GetCollectorEndpoint()) < 1 {
 		return ZipkinConfigValidationError{
 			field:  "CollectorEndpoint",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

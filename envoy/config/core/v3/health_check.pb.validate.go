@@ -425,10 +425,10 @@ func (m *HealthCheck_Payload) Validate() error {
 
 	case *HealthCheck_Payload_Text:
 
-		if len(m.GetText()) < 1 {
+		if utf8.RuneCountInString(m.GetText()) < 1 {
 			return HealthCheck_PayloadValidationError{
 				field:  "Text",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -517,10 +517,10 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		}
 	}
 
-	if len(m.GetPath()) < 1 {
+	if utf8.RuneCountInString(m.GetPath()) < 1 {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "Path",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -936,10 +936,10 @@ func (m *HealthCheck_CustomHealthCheck) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return HealthCheck_CustomHealthCheckValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

@@ -168,17 +168,24 @@ func (m *GrpcService_EnvoyGrpc) Validate() error {
 		return nil
 	}
 
-	if len(m.GetClusterName()) < 1 {
+	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
 		return GrpcService_EnvoyGrpcValidationError{
 			field:  "ClusterName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if l := len(m.GetAuthority()); l < 0 || l > 16384 {
+	if utf8.RuneCountInString(m.GetAuthority()) < 0 {
 		return GrpcService_EnvoyGrpcValidationError{
 			field:  "Authority",
-			reason: "value length must be between 0 and 16384 bytes, inclusive",
+			reason: "value length must be at least 0 runes",
+		}
+	}
+
+	if len(m.GetAuthority()) > 16384 {
+		return GrpcService_EnvoyGrpcValidationError{
+			field:  "Authority",
+			reason: "value length must be at most 16384 bytes",
 		}
 	}
 
@@ -258,10 +265,10 @@ func (m *GrpcService_GoogleGrpc) Validate() error {
 		return nil
 	}
 
-	if len(m.GetTargetUri()) < 1 {
+	if utf8.RuneCountInString(m.GetTargetUri()) < 1 {
 		return GrpcService_GoogleGrpcValidationError{
 			field:  "TargetUri",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -290,10 +297,10 @@ func (m *GrpcService_GoogleGrpc) Validate() error {
 
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
+	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
 		return GrpcService_GoogleGrpcValidationError{
 			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1191,17 +1198,17 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_StsService) Validate() error {
 
 	// no validation rules for RequestedTokenType
 
-	if len(m.GetSubjectTokenPath()) < 1 {
+	if utf8.RuneCountInString(m.GetSubjectTokenPath()) < 1 {
 		return GrpcService_GoogleGrpc_CallCredentials_StsServiceValidationError{
 			field:  "SubjectTokenPath",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if len(m.GetSubjectTokenType()) < 1 {
+	if utf8.RuneCountInString(m.GetSubjectTokenType()) < 1 {
 		return GrpcService_GoogleGrpc_CallCredentials_StsServiceValidationError{
 			field:  "SubjectTokenType",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

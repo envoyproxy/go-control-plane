@@ -505,10 +505,10 @@ func (m *RuntimeUInt32) Validate() error {
 
 	// no validation rules for DefaultValue
 
-	if len(m.GetRuntimeKey()) < 1 {
+	if utf8.RuneCountInString(m.GetRuntimeKey()) < 1 {
 		return RuntimeUInt32ValidationError{
 			field:  "RuntimeKey",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -579,10 +579,10 @@ func (m *RuntimeDouble) Validate() error {
 
 	// no validation rules for DefaultValue
 
-	if len(m.GetRuntimeKey()) < 1 {
+	if utf8.RuneCountInString(m.GetRuntimeKey()) < 1 {
 		return RuntimeDoubleValidationError{
 			field:  "RuntimeKey",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -668,10 +668,10 @@ func (m *RuntimeFeatureFlag) Validate() error {
 		}
 	}
 
-	if len(m.GetRuntimeKey()) < 1 {
+	if utf8.RuneCountInString(m.GetRuntimeKey()) < 1 {
 		return RuntimeFeatureFlagValidationError{
 			field:  "RuntimeKey",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -742,10 +742,17 @@ func (m *HeaderValue) Validate() error {
 		return nil
 	}
 
-	if l := len(m.GetKey()); l < 1 || l > 16384 {
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
 		return HeaderValueValidationError{
 			field:  "Key",
-			reason: "value length must be between 1 and 16384 bytes, inclusive",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if len(m.GetKey()) > 16384 {
+		return HeaderValueValidationError{
+			field:  "Key",
+			reason: "value length must be at most 16384 bytes",
 		}
 	}
 
@@ -1015,10 +1022,10 @@ func (m *DataSource) Validate() error {
 
 	case *DataSource_Filename:
 
-		if len(m.GetFilename()) < 1 {
+		if utf8.RuneCountInString(m.GetFilename()) < 1 {
 			return DataSourceValidationError{
 				field:  "Filename",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -1033,10 +1040,10 @@ func (m *DataSource) Validate() error {
 
 	case *DataSource_InlineString:
 
-		if len(m.GetInlineString()) < 1 {
+		if utf8.RuneCountInString(m.GetInlineString()) < 1 {
 			return DataSourceValidationError{
 				field:  "InlineString",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -1215,10 +1222,10 @@ func (m *RemoteDataSource) Validate() error {
 		}
 	}
 
-	if len(m.GetSha256()) < 1 {
+	if utf8.RuneCountInString(m.GetSha256()) < 1 {
 		return RemoteDataSourceValidationError{
 			field:  "Sha256",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1396,10 +1403,10 @@ func (m *TransportSocket) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return TransportSocketValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

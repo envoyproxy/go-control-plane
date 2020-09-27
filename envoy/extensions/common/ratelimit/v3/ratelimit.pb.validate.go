@@ -147,17 +147,17 @@ func (m *RateLimitDescriptor_Entry) Validate() error {
 		return nil
 	}
 
-	if len(m.GetKey()) < 1 {
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
 		return RateLimitDescriptor_EntryValidationError{
 			field:  "Key",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if len(m.GetValue()) < 1 {
+	if utf8.RuneCountInString(m.GetValue()) < 1 {
 		return RateLimitDescriptor_EntryValidationError{
 			field:  "Value",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

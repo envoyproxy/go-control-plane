@@ -51,10 +51,10 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
+	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
 		return HttpConnectionManagerValidationError{
 			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -856,10 +856,10 @@ func (m *ScopedRoutes) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return ScopedRoutesValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1076,10 +1076,10 @@ func (m *HttpFilter) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return HttpFilterValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1848,10 +1848,10 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor) Vali
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractorValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -1954,17 +1954,17 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvEle
 		return nil
 	}
 
-	if len(m.GetSeparator()) < 1 {
+	if utf8.RuneCountInString(m.GetSeparator()) < 1 {
 		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElementValidationError{
 			field:  "Separator",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if len(m.GetKey()) < 1 {
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
 		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElementValidationError{
 			field:  "Key",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

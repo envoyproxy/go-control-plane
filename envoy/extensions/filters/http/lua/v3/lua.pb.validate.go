@@ -43,10 +43,10 @@ func (m *Lua) Validate() error {
 		return nil
 	}
 
-	if len(m.GetInlineCode()) < 1 {
+	if utf8.RuneCountInString(m.GetInlineCode()) < 1 {
 		return LuaValidationError{
 			field:  "InlineCode",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

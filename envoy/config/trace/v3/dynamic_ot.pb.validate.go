@@ -44,10 +44,10 @@ func (m *DynamicOtConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetLibrary()) < 1 {
+	if utf8.RuneCountInString(m.GetLibrary()) < 1 {
 		return DynamicOtConfigValidationError{
 			field:  "Library",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
