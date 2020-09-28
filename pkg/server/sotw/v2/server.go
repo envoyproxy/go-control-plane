@@ -48,34 +48,15 @@ type Callbacks interface {
 	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
-type Opt func(*server)
-
-func WithResponseBuffer(bufferSize int) Opt {
-	return func(s *server) {
-		s.bufferSize = bufferSize
-	}
-}
-
-func WithCallbacks(callbacks Callbacks) Opt {
-	return func(s *server) {
-		s.callbacks = callbacks
-	}
-}
-
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.ConfigWatcher, opts ...Opt) Server {
-	s := &server{cache: config, ctx: ctx, bufferSize: 16}
-	for _, opt := range opts {
-		opt(s)
-	}
-	return s
+func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks) Server {
+	return &server{cache: config, callbacks: callbacks, ctx: ctx}
 }
 
 type server struct {
-	cache      cache.ConfigWatcher
-	callbacks  Callbacks
-	ctx        context.Context
-	bufferSize int
+	cache     cache.ConfigWatcher
+	callbacks Callbacks
+	ctx       context.Context
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -126,7 +107,11 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 
 	// a collection of stack allocated watches per request type
 	var values watches
-	values.Init(s.bufferSize)
+	bufferSize := 1
+	if defaultTypeURL == resource.AnyType {
+		bufferSize = 8
+	}
+	values.Init(bufferSize)
 	defer func() {
 		values.Cancel()
 		if s.callbacks != nil {
