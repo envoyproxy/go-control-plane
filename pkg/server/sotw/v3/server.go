@@ -49,34 +49,15 @@ type Callbacks interface {
 	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
-type Opt func(*server)
-
-func WithResponseBuffer(bufferSize int) Opt {
-	return func(s *server) {
-		s.bufferSize = bufferSize
-	}
-}
-
-func WithCallbacks(callbacks Callbacks) Opt {
-	return func(s *server) {
-		s.callbacks = callbacks
-	}
-}
-
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.ConfigWatcher, opts ...Opt) Server {
-	s := &server{cache: config, ctx: ctx, bufferSize: 16}
-	for _, opt := range opts {
-		opt(s)
-	}
-	return s
+func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks) Server {
+	return &server{cache: config, callbacks: callbacks, ctx: ctx}
 }
 
 type server struct {
-	cache      cache.ConfigWatcher
-	callbacks  Callbacks
-	ctx        context.Context
-	bufferSize int
+	cache     cache.ConfigWatcher
+	callbacks Callbacks
+	ctx       context.Context
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -127,7 +108,11 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 
 	// a collection of stack allocated watches per request type
 	var values watches
-	values.Init(s.bufferSize)
+	bufferSize := 1
+	if defaultTypeURL == resource.AnyType {
+		bufferSize = 8
+	}
+	values.Init(bufferSize)
 	defer func() {
 		values.Cancel()
 		if s.callbacks != nil {
@@ -136,7 +121,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 	}()
 
 	// sends a response by serializing to protobuf Any
-	send := func(resp cache.Response, typeURL string) (string, error) {
+	send := func(resp cache.Response) (string, error) {
 		if resp == nil {
 			return "", errors.New("missing response")
 		}
@@ -155,6 +140,30 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		return out.Nonce, stream.Send(out)
 	}
 
+	process := func(resp cache.Response) error {
+		nonce, err := send(resp)
+		if err != nil {
+			return err
+		}
+		typeUrl := resp.GetRequest().TypeUrl
+		values.nonces[typeUrl] = nonce
+		values.cancellations[typeUrl] = nil
+		return nil
+	}
+
+	processAll := func() error {
+		for {
+			select {
+			case resp := <-values.responses:
+				if err := process(resp); err != nil {
+					return err
+				}
+			default:
+				return nil
+			}
+		}
+	}
+
 	if s.callbacks != nil {
 		if err := s.callbacks.OnStreamOpen(stream.Context(), streamID, defaultTypeURL); err != nil {
 			return err
@@ -170,16 +179,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			return nil
 		// config watcher can send the requested resources types in any order
 		case resp := <-values.responses:
-			if resp == nil {
-				return status.Errorf(codes.Unavailable, "watch failed")
-			}
-			typeUrl := resp.GetRequest().TypeUrl
-			nonce, err := send(resp, typeUrl)
-			if err != nil {
+			if err := process(resp); err != nil {
 				return err
 			}
-			values.nonces[typeUrl] = nonce
-
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -219,6 +221,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !seen || responseNonce == nonce {
 				if cancel, seen := values.cancellations[typeUrl]; seen && cancel != nil {
 					cancel()
+					if err := processAll(); err != nil {
+						return err
+					}
 				}
 				values.cancellations[typeUrl] = s.cache.CreateWatch(req, values.responses)
 			}
