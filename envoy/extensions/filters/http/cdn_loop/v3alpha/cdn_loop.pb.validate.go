@@ -44,10 +44,10 @@ func (m *CdnLoopConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCdnId()) < 1 {
+	if utf8.RuneCountInString(m.GetCdnId()) < 1 {
 		return CdnLoopConfigValidationError{
 			field:  "CdnId",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
