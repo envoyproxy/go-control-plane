@@ -135,7 +135,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 	}()
 
 	// sends a response by serializing to protobuf Any
-	send := func(resp cache.Response, typeURL string) (string, error) {
+	send := func(resp cache.Response) (string, error) {
 		if resp == nil {
 			return "", errors.New("missing response")
 		}
@@ -154,6 +154,30 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		return out.Nonce, stream.Send(out)
 	}
 
+	process := func(resp cache.Response) error {
+		nonce, err := send(resp)
+		if err != nil {
+			return err
+		}
+		typeUrl := resp.GetRequest().TypeUrl
+		values.nonces[typeUrl] = nonce
+		values.cancellations[typeUrl] = nil
+		return nil
+	}
+
+	processAll := func() error {
+		for {
+			select {
+			case resp := <-values.responses:
+				if err := process(resp); err != nil {
+					return err
+				}
+			default:
+				return nil
+			}
+		}
+	}
+
 	if s.callbacks != nil {
 		if err := s.callbacks.OnStreamOpen(stream.Context(), streamID, defaultTypeURL); err != nil {
 			return err
@@ -169,16 +193,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			return nil
 		// config watcher can send the requested resources types in any order
 		case resp := <-values.responses:
-			if resp == nil {
-				return status.Errorf(codes.Unavailable, "watch failed")
-			}
-			typeUrl := resp.GetRequest().TypeUrl
-			nonce, err := send(resp, typeUrl)
-			if err != nil {
+			if err := process(resp); err != nil {
 				return err
 			}
-			values.nonces[typeUrl] = nonce
-
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -218,6 +235,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !seen || responseNonce == nonce {
 				if cancel, seen := values.cancellations[typeUrl]; seen && cancel != nil {
 					cancel()
+					if err := processAll(); err != nil {
+						return err
+					}
 				}
 				values.cancellations[typeUrl] = s.cache.CreateWatch(req, values.responses)
 			}
