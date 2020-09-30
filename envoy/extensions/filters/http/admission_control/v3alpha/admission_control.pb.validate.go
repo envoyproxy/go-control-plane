@@ -64,10 +64,20 @@ func (m *AdmissionControl) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAggressionCoefficient()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetAggression()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AdmissionControlValidationError{
-				field:  "AggressionCoefficient",
+				field:  "Aggression",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetSrThreshold()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdmissionControlValidationError{
+				field:  "SrThreshold",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
