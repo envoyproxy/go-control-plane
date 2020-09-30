@@ -217,6 +217,9 @@ type Bootstrap struct {
 	// when :ref:`dns_resolvers <envoy_api_field_config.cluster.v3.Cluster.dns_resolvers>` and
 	// :ref:`use_tcp_for_dns_lookups <envoy_api_field_config.cluster.v3.Cluster.use_tcp_for_dns_lookups>` are
 	// specified.
+	// Setting this value causes failure if the
+	// ``envoy.restart_features.use_apple_api_for_dns_lookups`` runtime value is true during
+	// server startup. Apple' API only uses UDP for DNS resolution.
 	UseTcpForDnsLookups bool `protobuf:"varint,20,opt,name=use_tcp_for_dns_lookups,json=useTcpForDnsLookups,proto3" json:"use_tcp_for_dns_lookups,omitempty"`
 	// Specifies optional bootstrap extensions to be instantiated at startup time.
 	// Each item contains extension specific configuration.

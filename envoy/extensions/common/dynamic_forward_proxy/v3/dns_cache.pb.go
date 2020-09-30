@@ -145,6 +145,9 @@ type DnsCacheConfig struct {
 	DnsCacheCircuitBreaker *DnsCacheCircuitBreakers `protobuf:"bytes,7,opt,name=dns_cache_circuit_breaker,json=dnsCacheCircuitBreaker,proto3" json:"dns_cache_circuit_breaker,omitempty"`
 	// [#next-major-version: Reconcile DNS options in a single message.]
 	// Always use TCP queries instead of UDP queries for DNS lookups.
+	// Setting this value causes failure if the
+	// ``envoy.restart_features.use_apple_api_for_dns_lookups`` runtime value is true during
+	// server startup. Apple' API only uses UDP for DNS resolution.
 	UseTcpForDnsLookups bool `protobuf:"varint,8,opt,name=use_tcp_for_dns_lookups,json=useTcpForDnsLookups,proto3" json:"use_tcp_for_dns_lookups,omitempty"`
 }
 

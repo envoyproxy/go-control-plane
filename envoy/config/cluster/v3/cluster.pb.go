@@ -690,9 +690,15 @@ type Cluster struct {
 	// :ref:`STRICT_DNS<envoy_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
 	// and :ref:`LOGICAL_DNS<envoy_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`
 	// this setting is ignored.
+	// Setting this value causes failure if the
+	// ``envoy.restart_features.use_apple_api_for_dns_lookups`` runtime value is true during
+	// server startup. Apple's API only allows overriding DNS resolvers via system settings.
 	DnsResolvers []*v31.Address `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers,proto3" json:"dns_resolvers,omitempty"`
 	// [#next-major-version: Reconcile DNS options in a single message.]
 	// Always use TCP queries instead of UDP queries for DNS lookups.
+	// Setting this value causes failure if the
+	// ``envoy.restart_features.use_apple_api_for_dns_lookups`` runtime value is true during
+	// server startup. Apple' API only uses UDP for DNS resolution.
 	UseTcpForDnsLookups bool `protobuf:"varint,45,opt,name=use_tcp_for_dns_lookups,json=useTcpForDnsLookups,proto3" json:"use_tcp_for_dns_lookups,omitempty"`
 	// If specified, outlier detection will be enabled for this upstream cluster.
 	// Each of the configuration values can be overridden via
