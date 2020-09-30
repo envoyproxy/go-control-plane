@@ -100,6 +100,8 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for IncludePeerCertificate
 
+	// no validation rules for StatPrefix
+
 	// no validation rules for HiddenEnvoyDeprecatedUseAlpha
 
 	switch m.Services.(type) {

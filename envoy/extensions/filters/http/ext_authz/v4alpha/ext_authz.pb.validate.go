@@ -100,6 +100,8 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for IncludePeerCertificate
 
+	// no validation rules for StatPrefix
+
 	switch m.Services.(type) {
 
 	case *ExtAuthz_GrpcService:
