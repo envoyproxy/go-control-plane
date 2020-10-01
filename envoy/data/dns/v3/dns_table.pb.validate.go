@@ -470,7 +470,19 @@ func (m *DnsTable_DnsService) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ServiceName
+	if utf8.RuneCountInString(m.GetServiceName()) < 1 {
+		return DnsTable_DnsServiceValidationError{
+			field:  "ServiceName",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if !_DnsTable_DnsService_ServiceName_Pattern.MatchString(m.GetServiceName()) {
+		return DnsTable_DnsServiceValidationError{
+			field:  "ServiceName",
+			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+		}
+	}
 
 	if v, ok := interface{}(m.GetProtocol()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -583,6 +595,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DnsTable_DnsServiceValidationError{}
+
+var _DnsTable_DnsService_ServiceName_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
 
 // Validate checks the field values on DnsTable_DnsServiceList with the rules
 // defined in the proto definition for this message. If any rules are
