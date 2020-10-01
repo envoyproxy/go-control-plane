@@ -12,7 +12,7 @@
 ### Changed
 
 - Envoy APIs are at 241358e0ac7716fac24ae6c19c7dcea67357e70e
-- split `server` packages into `sotw` and `rest`
+- split `server` package into `sotw` and `rest`
 
 ## Release v0.9.6
 
