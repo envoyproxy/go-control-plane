@@ -1,5 +1,19 @@
 # Changelog
 
+## Release v0.9.7
+
+### Added
+
+- secrets to the cache snapshots
+- linearly versioned cache for a single type resources
+- version prefix to the linear cache
+- support for arbitrary type URLs in xDS server
+
+### Changed
+
+- Envoy APIs are at 241358e0ac7716fac24ae6c19c7dcea67357e70e
+- split `server` package into `sotw` and `rest`
+
 ## Release v0.9.6
 
 ### Added
