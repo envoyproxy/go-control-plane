@@ -1259,20 +1259,20 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMaxGrpcTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedMaxGrpcTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
-				field:  "MaxGrpcTimeout",
+				field:  "HiddenEnvoyDeprecatedMaxGrpcTimeout",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetGrpcTimeoutOffset()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedGrpcTimeoutOffset()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
-				field:  "GrpcTimeoutOffset",
+				field:  "HiddenEnvoyDeprecatedGrpcTimeoutOffset",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
