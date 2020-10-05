@@ -93,7 +93,8 @@ type DeniedHttpResponse struct {
 	// code to the downstream client other than 403 (Forbidden).
 	Status *v3.HttpStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// This field allows the authorization service to send HTTP response headers
-	// to the downstream client.
+	// to the downstream client. Note that the `append` field in `HeaderValueOption` defaults to
+	// false when used in this message.
 	Headers []*v4alpha.HeaderValueOption `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
 	// This field allows the authorization service to send a response body data
 	// to the downstream client.
@@ -162,9 +163,10 @@ type OkHttpResponse struct {
 
 	// HTTP entity headers in addition to the original request headers. This allows the authorization
 	// service to append, to add or to override headers from the original request before
-	// dispatching it to the upstream. By setting `append` field to `true` in the `HeaderValueOption`,
-	// the filter will append the correspondent header value to the matched request header. Note that
-	// by Leaving `append` as false, the filter will either add a new header, or override an existing
+	// dispatching it to the upstream. Note that the `append` field in `HeaderValueOption` defaults to
+	// false when used in this message. By setting the `append` field to `true`,
+	// the filter will append the correspondent header value to the matched request header.
+	// By leaving `append` as false, the filter will either add a new header, or override an existing
 	// one if there is a match.
 	Headers []*v4alpha.HeaderValueOption `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
 	// HTTP entity headers to remove from the original request before dispatching
