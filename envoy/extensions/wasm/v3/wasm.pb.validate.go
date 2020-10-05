@@ -45,10 +45,10 @@ func (m *VmConfig) Validate() error {
 
 	// no validation rules for VmId
 
-	if len(m.GetRuntime()) < 1 {
+	if utf8.RuneCountInString(m.GetRuntime()) < 1 {
 		return VmConfigValidationError{
 			field:  "Runtime",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

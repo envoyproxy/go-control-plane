@@ -43,17 +43,17 @@ func (m *RateLimit) Validate() error {
 		return nil
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
+	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
 		return RateLimitValidationError{
 			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if len(m.GetDomain()) < 1 {
+	if utf8.RuneCountInString(m.GetDomain()) < 1 {
 		return RateLimitValidationError{
 			field:  "Domain",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

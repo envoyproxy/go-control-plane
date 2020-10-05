@@ -436,7 +436,7 @@ type TagSpecifier_Regex struct {
 	//
 	//   {
 	//     "tag_name": "envoy.cluster_name",
-	//     "regex": "^cluster\.((.+?)\.)"
+	//     "regex": "^cluster\\.((.+?)\\.)"
 	//   }
 	//
 	// Note that the regex will remove ``foo_cluster.`` making the tag extracted
@@ -453,11 +453,11 @@ type TagSpecifier_Regex struct {
 	//   [
 	//     {
 	//       "tag_name": "envoy.http_user_agent",
-	//       "regex": "^http(?=\.).*?\.user_agent\.((.+?)\.)\w+?$"
+	//       "regex": "^http(?=\\.).*?\\.user_agent\\.((.+?)\\.)\\w+?$"
 	//     },
 	//     {
 	//       "tag_name": "envoy.http_conn_manager_prefix",
-	//       "regex": "^http\.((.*?)\.)"
+	//       "regex": "^http\\.((.*?)\\.)"
 	//     }
 	//   ]
 	//

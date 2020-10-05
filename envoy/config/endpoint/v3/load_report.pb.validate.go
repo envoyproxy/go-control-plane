@@ -344,10 +344,10 @@ func (m *ClusterStats) Validate() error {
 		return nil
 	}
 
-	if len(m.GetClusterName()) < 1 {
+	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
 		return ClusterStatsValidationError{
 			field:  "ClusterName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -467,10 +467,10 @@ func (m *ClusterStats_DroppedRequests) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCategory()) < 1 {
+	if utf8.RuneCountInString(m.GetCategory()) < 1 {
 		return ClusterStats_DroppedRequestsValidationError{
 			field:  "Category",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

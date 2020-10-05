@@ -354,10 +354,10 @@ func (m *RouteAction) Validate() error {
 
 	case *RouteAction_Cluster:
 
-		if len(m.GetCluster()) < 1 {
+		if utf8.RuneCountInString(m.GetCluster()) < 1 {
 			return RouteActionValidationError{
 				field:  "Cluster",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -375,10 +375,10 @@ func (m *RouteAction) Validate() error {
 
 	case *RouteAction_ClusterHeader:
 
-		if len(m.GetClusterHeader()) < 1 {
+		if utf8.RuneCountInString(m.GetClusterHeader()) < 1 {
 			return RouteActionValidationError{
 				field:  "ClusterHeader",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -551,10 +551,10 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return WeightedCluster_ClusterWeightValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

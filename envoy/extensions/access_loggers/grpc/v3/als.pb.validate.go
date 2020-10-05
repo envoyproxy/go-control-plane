@@ -216,10 +216,10 @@ func (m *CommonGrpcAccessLogConfig) Validate() error {
 		return nil
 	}
 
-	if len(m.GetLogName()) < 1 {
+	if utf8.RuneCountInString(m.GetLogName()) < 1 {
 		return CommonGrpcAccessLogConfigValidationError{
 			field:  "LogName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

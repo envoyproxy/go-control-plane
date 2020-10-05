@@ -43,10 +43,10 @@ func (m *Alts) Validate() error {
 		return nil
 	}
 
-	if len(m.GetHandshakerService()) < 1 {
+	if utf8.RuneCountInString(m.GetHandshakerService()) < 1 {
 		return AltsValidationError{
 			field:  "HandshakerService",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

@@ -61,10 +61,10 @@ func (m *HealthCheckEvent) Validate() error {
 		}
 	}
 
-	if len(m.GetClusterName()) < 1 {
+	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
 		return HealthCheckEventValidationError{
 			field:  "ClusterName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

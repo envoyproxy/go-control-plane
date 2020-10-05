@@ -48,10 +48,10 @@ func (m *VirtualHost) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return VirtualHostValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -151,10 +151,10 @@ func (m *VirtualHost) Validate() error {
 	for idx, item := range m.GetRequestHeadersToRemove() {
 		_, _ = idx, item
 
-		if len(item) < 1 {
+		if utf8.RuneCountInString(item) < 1 {
 			return VirtualHostValidationError{
 				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -192,10 +192,10 @@ func (m *VirtualHost) Validate() error {
 	for idx, item := range m.GetResponseHeadersToRemove() {
 		_, _ = idx, item
 
-		if len(item) < 1 {
+		if utf8.RuneCountInString(item) < 1 {
 			return VirtualHostValidationError{
 				field:  fmt.Sprintf("ResponseHeadersToRemove[%v]", idx),
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -505,10 +505,10 @@ func (m *Route) Validate() error {
 	for idx, item := range m.GetRequestHeadersToRemove() {
 		_, _ = idx, item
 
-		if len(item) < 1 {
+		if utf8.RuneCountInString(item) < 1 {
 			return RouteValidationError{
 				field:  fmt.Sprintf("RequestHeadersToRemove[%v]", idx),
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -546,10 +546,10 @@ func (m *Route) Validate() error {
 	for idx, item := range m.GetResponseHeadersToRemove() {
 		_, _ = idx, item
 
-		if len(item) < 1 {
+		if utf8.RuneCountInString(item) < 1 {
 			return RouteValidationError{
 				field:  fmt.Sprintf("ResponseHeadersToRemove[%v]", idx),
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -1259,20 +1259,20 @@ func (m *RouteAction) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMaxGrpcTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedMaxGrpcTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
-				field:  "MaxGrpcTimeout",
+				field:  "HiddenEnvoyDeprecatedMaxGrpcTimeout",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetGrpcTimeoutOffset()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedGrpcTimeoutOffset()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
-				field:  "GrpcTimeoutOffset",
+				field:  "HiddenEnvoyDeprecatedGrpcTimeoutOffset",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -1340,19 +1340,19 @@ func (m *RouteAction) Validate() error {
 
 	case *RouteAction_Cluster:
 
-		if len(m.GetCluster()) < 1 {
+		if utf8.RuneCountInString(m.GetCluster()) < 1 {
 			return RouteActionValidationError{
 				field:  "Cluster",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
 	case *RouteAction_ClusterHeader:
 
-		if len(m.GetClusterHeader()) < 1 {
+		if utf8.RuneCountInString(m.GetClusterHeader()) < 1 {
 			return RouteActionValidationError{
 				field:  "ClusterHeader",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -1958,10 +1958,10 @@ func (m *Decorator) Validate() error {
 		return nil
 	}
 
-	if len(m.GetOperation()) < 1 {
+	if utf8.RuneCountInString(m.GetOperation()) < 1 {
 		return DecoratorValidationError{
 			field:  "Operation",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -2164,10 +2164,10 @@ func (m *VirtualCluster) Validate() error {
 
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return VirtualClusterValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -2345,10 +2345,10 @@ func (m *HeaderMatcher) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return HeaderMatcherValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -2395,28 +2395,28 @@ func (m *HeaderMatcher) Validate() error {
 
 	case *HeaderMatcher_PrefixMatch:
 
-		if len(m.GetPrefixMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetPrefixMatch()) < 1 {
 			return HeaderMatcherValidationError{
 				field:  "PrefixMatch",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
 	case *HeaderMatcher_SuffixMatch:
 
-		if len(m.GetSuffixMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetSuffixMatch()) < 1 {
 			return HeaderMatcherValidationError{
 				field:  "SuffixMatch",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
 	case *HeaderMatcher_ContainsMatch:
 
-		if len(m.GetContainsMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetContainsMatch()) < 1 {
 			return HeaderMatcherValidationError{
 				field:  "ContainsMatch",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -2489,10 +2489,17 @@ func (m *QueryParameterMatcher) Validate() error {
 		return nil
 	}
 
-	if l := len(m.GetName()); l < 1 || l > 1024 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return QueryParameterMatcherValidationError{
 			field:  "Name",
-			reason: "value length must be between 1 and 1024 bytes, inclusive",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if len(m.GetName()) > 1024 {
+		return QueryParameterMatcherValidationError{
+			field:  "Name",
+			reason: "value length must be at most 1024 bytes",
 		}
 	}
 
@@ -2690,10 +2697,10 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return WeightedCluster_ClusterWeightValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -3097,10 +3104,10 @@ func (m *RouteAction_RequestMirrorPolicy) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCluster()) < 1 {
+	if utf8.RuneCountInString(m.GetCluster()) < 1 {
 		return RouteAction_RequestMirrorPolicyValidationError{
 			field:  "Cluster",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -3437,20 +3444,20 @@ func (m *RouteAction_MaxStreamDuration) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetGrpcMaxTimeout()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetGrpcTimeoutHeaderMax()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteAction_MaxStreamDurationValidationError{
-				field:  "GrpcMaxTimeout",
+				field:  "GrpcTimeoutHeaderMax",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetGrpcTimeoutOffset()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetGrpcTimeoutHeaderOffset()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RouteAction_MaxStreamDurationValidationError{
-				field:  "GrpcTimeoutOffset",
+				field:  "GrpcTimeoutHeaderOffset",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -3525,10 +3532,10 @@ func (m *RouteAction_HashPolicy_Header) Validate() error {
 		return nil
 	}
 
-	if len(m.GetHeaderName()) < 1 {
+	if utf8.RuneCountInString(m.GetHeaderName()) < 1 {
 		return RouteAction_HashPolicy_HeaderValidationError{
 			field:  "HeaderName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -3619,10 +3626,10 @@ func (m *RouteAction_HashPolicy_Cookie) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return RouteAction_HashPolicy_CookieValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -3776,10 +3783,10 @@ func (m *RouteAction_HashPolicy_QueryParameter) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return RouteAction_HashPolicy_QueryParameterValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -3851,10 +3858,10 @@ func (m *RouteAction_HashPolicy_FilterState) Validate() error {
 		return nil
 	}
 
-	if len(m.GetKey()) < 1 {
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
 		return RouteAction_HashPolicy_FilterStateValidationError{
 			field:  "Key",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -4004,10 +4011,10 @@ func (m *RetryPolicy_RetryPriority) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return RetryPolicy_RetryPriorityValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -4094,10 +4101,10 @@ func (m *RetryPolicy_RetryHostPredicate) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return RetryPolicy_RetryHostPredicateValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -4301,10 +4308,10 @@ func (m *RetryPolicy_ResetHeader) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return RetryPolicy_ResetHeaderValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -4886,10 +4893,10 @@ func (m *RateLimit_Action_RequestHeaders) Validate() error {
 		return nil
 	}
 
-	if len(m.GetHeaderName()) < 1 {
+	if utf8.RuneCountInString(m.GetHeaderName()) < 1 {
 		return RateLimit_Action_RequestHeadersValidationError{
 			field:  "HeaderName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -4900,10 +4907,10 @@ func (m *RateLimit_Action_RequestHeaders) Validate() error {
 		}
 	}
 
-	if len(m.GetDescriptorKey()) < 1 {
+	if utf8.RuneCountInString(m.GetDescriptorKey()) < 1 {
 		return RateLimit_Action_RequestHeadersValidationError{
 			field:  "DescriptorKey",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -5047,10 +5054,10 @@ func (m *RateLimit_Action_GenericKey) Validate() error {
 		return nil
 	}
 
-	if len(m.GetDescriptorValue()) < 1 {
+	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
 		return RateLimit_Action_GenericKeyValidationError{
 			field:  "DescriptorValue",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -5124,10 +5131,10 @@ func (m *RateLimit_Action_HeaderValueMatch) Validate() error {
 		return nil
 	}
 
-	if len(m.GetDescriptorValue()) < 1 {
+	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
 		return RateLimit_Action_HeaderValueMatchValidationError{
 			field:  "DescriptorValue",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -5231,10 +5238,10 @@ func (m *RateLimit_Action_DynamicMetaData) Validate() error {
 		return nil
 	}
 
-	if len(m.GetDescriptorKey()) < 1 {
+	if utf8.RuneCountInString(m.GetDescriptorKey()) < 1 {
 		return RateLimit_Action_DynamicMetaDataValidationError{
 			field:  "DescriptorKey",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

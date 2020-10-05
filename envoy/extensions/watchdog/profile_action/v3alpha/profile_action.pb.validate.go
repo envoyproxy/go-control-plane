@@ -54,10 +54,10 @@ func (m *ProfileActionConfig) Validate() error {
 		}
 	}
 
-	if len(m.GetProfilePath()) < 1 {
+	if utf8.RuneCountInString(m.GetProfilePath()) < 1 {
 		return ProfileActionConfigValidationError{
 			field:  "ProfilePath",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

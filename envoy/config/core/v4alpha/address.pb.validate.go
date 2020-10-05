@@ -43,10 +43,10 @@ func (m *Pipe) Validate() error {
 		return nil
 	}
 
-	if len(m.GetPath()) < 1 {
+	if utf8.RuneCountInString(m.GetPath()) < 1 {
 		return PipeValidationError{
 			field:  "Path",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -209,10 +209,10 @@ func (m *SocketAddress) Validate() error {
 		}
 	}
 
-	if len(m.GetAddress()) < 1 {
+	if utf8.RuneCountInString(m.GetAddress()) < 1 {
 		return SocketAddressValidationError{
 			field:  "Address",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -617,10 +617,10 @@ func (m *CidrRange) Validate() error {
 		return nil
 	}
 
-	if len(m.GetAddressPrefix()) < 1 {
+	if utf8.RuneCountInString(m.GetAddressPrefix()) < 1 {
 		return CidrRangeValidationError{
 			field:  "AddressPrefix",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

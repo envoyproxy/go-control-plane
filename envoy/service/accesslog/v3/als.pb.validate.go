@@ -239,10 +239,10 @@ func (m *StreamAccessLogsMessage_Identifier) Validate() error {
 		}
 	}
 
-	if len(m.GetLogName()) < 1 {
+	if utf8.RuneCountInString(m.GetLogName()) < 1 {
 		return StreamAccessLogsMessage_IdentifierValidationError{
 			field:  "LogName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

@@ -100,6 +100,8 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for IncludePeerCertificate
 
+	// no validation rules for StatPrefix
+
 	// no validation rules for HiddenEnvoyDeprecatedUseAlpha
 
 	switch m.Services.(type) {
@@ -203,6 +205,8 @@ func (m *BufferSettings) Validate() error {
 	}
 
 	// no validation rules for AllowPartialMessage
+
+	// no validation rules for PackAsBytes
 
 	return nil
 }

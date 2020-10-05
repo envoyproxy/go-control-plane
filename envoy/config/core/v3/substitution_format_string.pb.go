@@ -49,7 +49,8 @@ type SubstitutionFormatString struct {
 	// If this field is not set then ``text/plain`` is used for *text_format* and
 	// ``application/json`` is used for *json_format*.
 	//
-	// .. code-block::
+	// .. validated-code-block:: yaml
+	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
 	//   content_type: "text/html; charset=UTF-8"
 	//
@@ -131,15 +132,18 @@ type SubstitutionFormatString_TextFormat struct {
 	// Specify a format with command operators to form a text string.
 	// Its details is described in :ref:`format string<config_access_log_format_strings>`.
 	//
-	// .. code-block::
+	// For example, setting ``text_format`` like below,
 	//
-	//   text_format: %LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=$REQ(:path)%
+	// .. validated-code-block:: yaml
+	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
-	// The following plain text will be created:
+	//   text_format: "%LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=%REQ(:path)%\n"
 	//
-	// .. code-block::
+	// generates plain text similar to:
 	//
-	//   upstream connect error:204:path=/foo
+	// .. code-block:: text
+	//
+	//   upstream connect error:503:path=/foo
 	//
 	TextFormat string `protobuf:"bytes,1,opt,name=text_format,json=textFormat,proto3,oneof"`
 }
@@ -151,11 +155,12 @@ type SubstitutionFormatString_JsonFormat struct {
 	// Nested JSON objects may be produced by some command operators (e.g. FILTER_STATE or DYNAMIC_METADATA).
 	// See the documentation for a specific command operator for details.
 	//
-	// .. code-block::
+	// .. validated-code-block:: yaml
+	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
-	//  json_format:
-	//    status: %RESPONSE_CODE%
-	//    message: %LOCAL_REPLY_BODY%
+	//   json_format:
+	//     status: "%RESPONSE_CODE%"
+	//     message: "%LOCAL_REPLY_BODY%"
 	//
 	// The following JSON object would be created:
 	//
@@ -189,7 +194,7 @@ var file_envoy_config_core_v3_substitution_format_string_proto_rawDesc = []byte{
 	0x6f, 0x74, 0x6f, 0x22, 0xea, 0x01, 0x0a, 0x18, 0x53, 0x75, 0x62, 0x73, 0x74, 0x69, 0x74, 0x75,
 	0x74, 0x69, 0x6f, 0x6e, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67,
 	0x12, 0x2a, 0x0a, 0x0b, 0x74, 0x65, 0x78, 0x74, 0x5f, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x07, 0xfa, 0x42, 0x04, 0x72, 0x02, 0x20, 0x01, 0x48, 0x00,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x07, 0xfa, 0x42, 0x04, 0x72, 0x02, 0x10, 0x01, 0x48, 0x00,
 	0x52, 0x0a, 0x74, 0x65, 0x78, 0x74, 0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12, 0x44, 0x0a, 0x0b,
 	0x6a, 0x73, 0x6f, 0x6e, 0x5f, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x17, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,

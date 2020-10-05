@@ -166,6 +166,16 @@ func (m *ClusterStatus) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetCircuitBreakers()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterStatusValidationError{
+				field:  "CircuitBreakers",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

@@ -345,6 +345,8 @@ func (m *AttributeContext_HttpRequest) Validate() error {
 
 	// no validation rules for Body
 
+	// no validation rules for RawBody
+
 	return nil
 }
 
