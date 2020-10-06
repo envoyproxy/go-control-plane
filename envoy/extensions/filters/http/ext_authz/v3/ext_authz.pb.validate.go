@@ -664,6 +664,8 @@ func (m *CheckSettings) Validate() error {
 
 	// no validation rules for ContextExtensions
 
+	// no validation rules for DisableRequestBodyBuffering
+
 	return nil
 }
 
