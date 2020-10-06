@@ -88,6 +88,16 @@ func (m *ExtAuthz) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetFilterEnabledMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtAuthzValidationError{
+				field:  "FilterEnabledMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetDenyAtDisable()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtAuthzValidationError{
