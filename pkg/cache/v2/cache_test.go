@@ -65,3 +65,54 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 	assert.Equal(t, r.Name, resourceName)
 	assert.Equal(t, discoveryResponse, dr)
 }
+
+// BENCHMARKS =====================================================================================================
+
+func BenchmarkResponseGetDiscoveryResponse(b *testing.B) {
+	routes := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+	resp := cache.RawResponse{
+		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
+		Version:   "v",
+		Resources: routes,
+	}
+
+	discoveryResponse, err := resp.GetDiscoveryResponse()
+	assert.Nil(b, err)
+	assert.Equal(b, discoveryResponse.VersionInfo, resp.Version)
+	assert.Equal(b, len(discoveryResponse.Resources), 1)
+
+	cachedResponse, err := resp.GetDiscoveryResponse()
+	assert.Nil(b, err)
+	assert.Same(b, discoveryResponse, cachedResponse)
+
+	r := &route.RouteConfiguration{}
+	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0], r)
+	assert.Nil(b, err)
+	assert.Equal(b, r.Name, resourceName)
+}
+
+func BenchmarkPassthroughResponseGetDiscoveryResponse(b *testing.B) {
+	routes := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+	rsrc, err := ptypes.MarshalAny(routes[0])
+	assert.Nil(b, err)
+	dr := &discovery.DiscoveryResponse{
+		TypeUrl:     resource.RouteType,
+		Resources:   []*any.Any{rsrc},
+		VersionInfo: "v",
+	}
+	resp := cache.PassthroughResponse{
+		Request:           &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
+		DiscoveryResponse: dr,
+	}
+
+	discoveryResponse, err := resp.GetDiscoveryResponse()
+	assert.Nil(b, err)
+	assert.Equal(b, discoveryResponse.VersionInfo, resp.DiscoveryResponse.VersionInfo)
+	assert.Equal(b, len(discoveryResponse.Resources), 1)
+
+	r := &route.RouteConfiguration{}
+	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0], r)
+	assert.Nil(b, err)
+	assert.Equal(b, r.Name, resourceName)
+	assert.Equal(b, discoveryResponse, dr)
+}
