@@ -355,3 +355,39 @@ func BenchmarkSnapshotCacheFetch(b *testing.B) {
 		b.Errorf("latest version: response is not nil %v", resp)
 	}
 }
+
+func BenchmarkSnapshotClear(b *testing.B) {
+	c := cache.NewSnapshotCache(true, group{}, nil)
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		b.Fatal(err)
+	}
+	c.ClearSnapshot(key)
+	if empty := c.GetStatusInfo(key); empty != nil {
+		b.Errorf("cache should be cleared")
+	}
+	if keys := c.GetStatusKeys(); len(keys) != 0 {
+		b.Errorf("keys should be empty")
+	}
+}
+
+func BenchmarkSnapshotCacheWatchCancel(b *testing.B) {
+	c := cache.NewSnapshotCache(true, group{}, nil)
+	for _, typ := range testTypes {
+		_, cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+		cancel()
+	}
+	// should be status info for the node
+	if keys := c.GetStatusKeys(); len(keys) == 0 {
+		b.Error("got 0, want status info for the node")
+	}
+
+	for _, typ := range testTypes {
+		if count := c.GetStatusInfo(key).GetNumWatches(); count > 0 {
+			b.Errorf("watches should be released for %s", typ)
+		}
+	}
+
+	if empty := c.GetStatusInfo("missing"); empty != nil {
+		b.Errorf("should not return a status for unknown key: got %#v", empty)
+	}
+}
