@@ -27,9 +27,9 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-// [[#not-implemented-hide:]
 // Custom configuration for an :ref:`AccessLog <envoy_api_msg_config.accesslog.v3.AccessLog>`
-// that calls into a WASM VM.
+// that calls into a WASM VM. Configures the built-in *envoy.access_loggers.wasm*
+// AccessLog.
 type WasmAccessLog struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
