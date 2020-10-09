@@ -630,3 +630,211 @@ func TestCallbackError(t *testing.T) {
 		})
 	}
 }
+
+// BENCHMARKS =====================================================================================================
+
+func BenchmarkResponseHandlers(b *testing.B) {
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			config := makeMockConfigWatcher()
+			config.responses = makeResponses()
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+
+			// make a request
+			resp := makeMockStream(&testing.T{})
+			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
+			go func() {
+				var err error
+				switch typ {
+				case rsrc.EndpointType:
+					err = s.StreamEndpoints(resp)
+				case rsrc.ClusterType:
+					err = s.StreamClusters(resp)
+				case rsrc.RouteType:
+					err = s.StreamRoutes(resp)
+				case rsrc.ListenerType:
+					err = s.StreamListeners(resp)
+				case rsrc.SecretType:
+					err = s.StreamSecrets(resp)
+				case rsrc.RuntimeType:
+					err = s.StreamRuntime(resp)
+				case opaqueType:
+					err = s.StreamAggregatedResources(resp)
+				}
+				if err != nil {
+					b.Errorf("Stream() => got %v, want no error", err)
+				}
+			}()
+
+			// check a response
+			select {
+			case <-resp.sent:
+				close(resp.recv)
+				if want := map[string]int{typ: 1}; !reflect.DeepEqual(want, config.counts) {
+					b.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}
+			case <-time.After(1 * time.Second):
+				b.Fatalf("got no response")
+			}
+		})
+	}
+}
+
+func BenchmarkAggregatedHandlers(b *testing.B) {
+	config := makeMockConfigWatcher()
+	config.responses = makeResponses()
+	resp := makeMockStream(&testing.T{})
+
+	resp.recv <- &discovery.DiscoveryRequest{
+		Node:    node,
+		TypeUrl: rsrc.ListenerType,
+	}
+	// Delta compress node
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl: rsrc.ClusterType,
+	}
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.EndpointType,
+		ResourceNames: []string{clusterName},
+	}
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.RouteType,
+		ResourceNames: []string{routeName},
+	}
+
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	go func() {
+		if err := s.StreamAggregatedResources(resp); err != nil {
+			b.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+		}
+	}()
+
+	count := 0
+	for {
+		select {
+		case <-resp.sent:
+			count++
+			if count >= 4 {
+				close(resp.recv)
+				if want := map[string]int{
+					rsrc.EndpointType: 1,
+					rsrc.ClusterType:  1,
+					rsrc.RouteType:    1,
+					rsrc.ListenerType: 1,
+				}; !reflect.DeepEqual(want, config.counts) {
+					b.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}
+
+				// got all messages
+				return
+			}
+		case <-time.After(1 * time.Second):
+			b.Fatalf("got %d messages on the stream, not 4", count)
+		}
+	}
+}
+
+func BenchmarkFetch(b *testing.B) {
+	config := makeMockConfigWatcher()
+	config.responses = makeResponses()
+
+	requestCount := 0
+	responseCount := 0
+	callbackError := false
+
+	cb := server.CallbackFuncs{
+		StreamOpenFunc: func(ctx context.Context, i int64, s string) error {
+			if callbackError {
+				return errors.New("stream open error")
+			}
+			return nil
+		},
+		FetchRequestFunc: func(ctx context.Context, request *discovery.DiscoveryRequest) error {
+			if callbackError {
+				return errors.New("fetch request error")
+			}
+			requestCount++
+			return nil
+		},
+		FetchResponseFunc: func(request *discovery.DiscoveryRequest, response *discovery.DiscoveryResponse) {
+			responseCount++
+		},
+	}
+
+	s := server.NewServer(context.Background(), config, cb)
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		b.Errorf("unexpected empty or error for endpoints: %v", err)
+	}
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		b.Errorf("unexpected empty or error for clusters: %v", err)
+	}
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		b.Errorf("unexpected empty or error for routes: %v", err)
+	}
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		b.Errorf("unexpected empty or error for listeners: %v", err)
+	}
+	if out, err := s.FetchSecrets(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		b.Errorf("unexpected empty or error for listeners: %v", err)
+	}
+	if out, err := s.FetchRuntime(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		b.Errorf("unexpected empty or error for listeners: %v", err)
+	}
+
+	// try again and expect empty results
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		b.Errorf("expected empty or error for endpoints: %v", err)
+	}
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		b.Errorf("expected empty or error for clusters: %v", err)
+	}
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		b.Errorf("expected empty or error for routes: %v", err)
+	}
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		b.Errorf("expected empty or error for listeners: %v", err)
+	}
+
+	// try empty requests: not valid in a real gRPC server
+	if out, err := s.FetchEndpoints(context.Background(), nil); out != nil {
+		b.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchClusters(context.Background(), nil); out != nil {
+		b.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchRoutes(context.Background(), nil); out != nil {
+		b.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchListeners(context.Background(), nil); out != nil {
+		b.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchSecrets(context.Background(), nil); out != nil {
+		b.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchRuntime(context.Background(), nil); out != nil {
+		b.Errorf("expected empty on empty request: %v", err)
+	}
+
+	// send error from callback
+	callbackError = true
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		b.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		b.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		b.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		b.Errorf("expected empty or error due to callback error")
+	}
+
+	// verify fetch callbacks
+	if want := 10; requestCount != want {
+		b.Errorf("unexpected number of fetch requests: got %d, want %d", requestCount, want)
+	}
+	if want := 6; responseCount != want {
+		b.Errorf("unexpected number of fetch responses: got %d, want %d", responseCount, want)
+	}
+}
