@@ -47,9 +47,11 @@ type GrpcService struct {
 	// The timeout for the gRPC request. This is the timeout for a specific
 	// request.
 	Timeout *duration.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	// Additional metadata to include in streams initiated to the GrpcService.
-	// This can be used for scenarios in which additional ad hoc authorization
-	// headers (e.g. ``x-foo-bar: baz-key``) are to be injected.
+	// Additional metadata to include in streams initiated to the GrpcService. This can be used for
+	// scenarios in which additional ad hoc authorization headers (e.g. ``x-foo-bar: baz-key``) are to
+	// be injected. For more information, including details on header value syntax, see the
+	// documentation on :ref:`custom request headers
+	// <config_http_conn_man_headers_custom_request_headers>`.
 	InitialMetadata []*HeaderValue `protobuf:"bytes,5,rep,name=initial_metadata,json=initialMetadata,proto3" json:"initial_metadata,omitempty"`
 }
 
