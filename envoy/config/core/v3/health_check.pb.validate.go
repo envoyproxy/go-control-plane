@@ -201,6 +201,27 @@ func (m *HealthCheck) Validate() error {
 
 	}
 
+	if d := m.GetNoTrafficHealthyInterval(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return HealthCheckValidationError{
+				field:  "NoTrafficHealthyInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return HealthCheckValidationError{
+				field:  "NoTrafficHealthyInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
+	}
+
 	if d := m.GetUnhealthyInterval(); d != nil {
 		dur, err := ptypes.Duration(d)
 		if err != nil {
