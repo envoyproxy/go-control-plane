@@ -1885,6 +1885,10 @@ type RouteAction_ClusterHeader struct {
 	//
 	//   Internally, Envoy always uses the HTTP/2 *:authority* header to represent the HTTP/1
 	//   *Host* header. Thus, if attempting to match on *Host*, match on *:authority* instead.
+	//
+	// .. note::
+	//
+	//   If the header appears multiple times only the first value is used.
 	ClusterHeader string `protobuf:"bytes,2,opt,name=cluster_header,json=clusterHeader,proto3,oneof"`
 }
 
@@ -1931,6 +1935,10 @@ type RouteAction_HostRewriteHeader struct {
 	//
 	//   Pay attention to the potential security implications of using this option. Provided header
 	//   must come from trusted source.
+	//
+	// .. note::
+	//
+	//   If the header appears multiple times only the first value is used.
 	HostRewriteHeader string `protobuf:"bytes,29,opt,name=host_rewrite_header,json=hostRewriteHeader,proto3,oneof"`
 }
 
@@ -4559,7 +4567,13 @@ type RetryPolicy_ResetHeader struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name   string                        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The name of the reset header.
+	//
+	// .. note::
+	//
+	//   If the header appears multiple times only the first value is used.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The format of the reset header.
 	Format RetryPolicy_ResetHeaderFormat `protobuf:"varint,2,opt,name=format,proto3,enum=envoy.config.route.v3.RetryPolicy_ResetHeaderFormat" json:"format,omitempty"`
 }
 

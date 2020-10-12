@@ -2021,6 +2021,10 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The name of the header field to extract the value from.
+	//
+	// .. note::
+	//
+	//   If the header appears multiple times only the first value is used.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The element separator (e.g., ';' separates 'a;b;c;d').
 	// Default: empty string. This causes the entirety of the header field to be extracted.

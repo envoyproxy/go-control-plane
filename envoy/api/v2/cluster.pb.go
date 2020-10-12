@@ -1841,6 +1841,10 @@ type Cluster_OriginalDstLbConfig struct {
 	//   This header isn't sanitized by default, so enabling this feature allows HTTP clients to
 	//   route traffic to arbitrary hosts and/or ports, which may have serious security
 	//   consequences.
+	//
+	// .. note::
+	//
+	//   If the header appears multiple times only the first value is used.
 	UseHttpHeader bool `protobuf:"varint,1,opt,name=use_http_header,json=useHttpHeader,proto3" json:"use_http_header,omitempty"`
 }
 

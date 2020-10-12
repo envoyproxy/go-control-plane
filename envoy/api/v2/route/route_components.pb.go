@@ -1820,6 +1820,10 @@ type RouteAction_ClusterHeader struct {
 	//
 	//   Internally, Envoy always uses the HTTP/2 *:authority* header to represent the HTTP/1
 	//   *Host* header. Thus, if attempting to match on *Host*, match on *:authority* instead.
+	//
+	// .. note::
+	//
+	//   If the header appears multiple times only the first value is used.
 	ClusterHeader string `protobuf:"bytes,2,opt,name=cluster_header,json=clusterHeader,proto3,oneof"`
 }
 
@@ -1866,6 +1870,10 @@ type RouteAction_AutoHostRewriteHeader struct {
 	//
 	//   Pay attention to the potential security implications of using this option. Provided header
 	//   must come from trusted source.
+	//
+	// .. note::
+	//
+	//   If the header appears multiple times only the first value is used.
 	AutoHostRewriteHeader string `protobuf:"bytes,29,opt,name=auto_host_rewrite_header,json=autoHostRewriteHeader,proto3,oneof"`
 }
 
