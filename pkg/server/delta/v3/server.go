@@ -439,6 +439,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				}
 				values.mu.RUnlock()
 			default:
+				s.log.Debugf("ADS call was made inside the server handler...")
 				typeURL := req.TypeUrl
 				responseNonce, seen := values.deltaNonces[typeURL]
 				if !seen || responseNonce == nonce {

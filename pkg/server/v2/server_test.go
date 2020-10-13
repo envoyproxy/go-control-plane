@@ -793,6 +793,62 @@ func TestAggregatedHandlers(t *testing.T) {
 	}
 }
 
+func TestDeltaAggregatedHandlers(t *testing.T) {
+	config := makeMockConfigWatcher()
+	config.deltaResponses = makeDeltaResponses()
+	resp := makeMockDeltaStream(t)
+
+	resp.recv <- &discovery.DeltaDiscoveryRequest{
+		Node:    node,
+		TypeUrl: rsrc.ListenerType,
+	}
+	// Delta compress node
+	resp.recv <- &discovery.DeltaDiscoveryRequest{
+		Node:    node,
+		TypeUrl: rsrc.ClusterType,
+	}
+	resp.recv <- &discovery.DeltaDiscoveryRequest{
+		Node:                   node,
+		TypeUrl:                rsrc.EndpointType,
+		ResourceNamesSubscribe: []string{clusterName},
+	}
+	resp.recv <- &discovery.DeltaDiscoveryRequest{
+		TypeUrl:                rsrc.RouteType,
+		ResourceNamesSubscribe: []string{routeName},
+	}
+
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
+	go func() {
+		if err := s.DeltaAggregatedResources(resp); err != nil {
+			t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
+		}
+	}()
+
+	count := 0
+	for {
+		select {
+		case <-resp.sent:
+			count++
+			if count >= 4 {
+				close(resp.recv)
+				if want := map[string]int{
+					rsrc.EndpointType: 1,
+					rsrc.ClusterType:  1,
+					rsrc.RouteType:    1,
+					rsrc.ListenerType: 1,
+				}; !reflect.DeepEqual(want, config.counts) {
+					t.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}
+
+				// got all messages
+				return
+			}
+		case <-time.After(1 * time.Second):
+			t.Fatalf("got %d messages on the stream, not 4", count)
+		}
+	}
+}
+
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
@@ -800,6 +856,16 @@ func TestAggregateRequestType(t *testing.T) {
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
 		t.Error("StreamAggregatedResources() => got nil, want an error")
+	}
+}
+
+func TestDeltaAggregateRequestType(t *testing.T) {
+	config := makeMockConfigWatcher()
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
+	resp := makeMockDeltaStream(t)
+	resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node}
+	if err := s.DeltaAggregatedResources(resp); err == nil {
+		t.Error("DeltaAggregatedResources() => got nil, want an error")
 	}
 }
 
