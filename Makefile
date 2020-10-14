@@ -16,6 +16,10 @@ build:
 test:
 	@go test ./pkg/...
 
+.PHONY: benchmark
+benchmark:
+	@go test ./pkg/... -bench=.
+
 .PHONY: cover
 cover:
 	@build/coverage.sh
