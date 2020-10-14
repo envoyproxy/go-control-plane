@@ -26,6 +26,10 @@ clean:
 test:
 	@go test -race -v -timeout 30s -count=1 -parallel 100 ./pkg/...
 
+.PHONY: benchmark
+benchmark:
+	@go test ./pkg/... -bench=.
+
 .PHONY: cover
 cover:
 	@build/coverage.sh
