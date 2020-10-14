@@ -102,6 +102,8 @@ func (m *RateLimit) Validate() error {
 		}
 	}
 
+	// no validation rules for DisableXEnvoyRatelimitedHeader
+
 	return nil
 }
 
