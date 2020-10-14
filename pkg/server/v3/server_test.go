@@ -821,7 +821,7 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 	go func() {
 		if err := s.DeltaAggregatedResources(resp); err != nil {
-			t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+			t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
 		}
 	}()
 

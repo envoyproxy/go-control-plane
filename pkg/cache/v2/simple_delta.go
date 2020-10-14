@@ -105,6 +105,15 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 }
 
 func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
+	if cache.ads && len(request.ResourceNamesSubscribe) != 0 {
+		if err := superset(nameSet(request.ResourceNamesSubscribe), resources); err != nil {
+			if cache.log != nil {
+				cache.log.Debugf("Delta ADS mode: not responding to request %v", err)
+			}
+			return
+		}
+	}
+
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
 			request.GetNode().GetId(), request.TypeUrl, versionMap)
@@ -119,8 +128,17 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersi
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
 	// on separate streams since requests do not share their response versions.
-	for _, resource := range resources {
-		filtered = append(filtered, resource)
+	if len(request.ResourceNamesSubscribe) != 0 {
+		set := nameSet(request.ResourceNamesSubscribe)
+		for name, resource := range resources {
+			if set[name] {
+				filtered = append(filtered, resource)
+			}
+		}
+	} else {
+		for _, resource := range resources {
+			filtered = append(filtered, resource)
+		}
 	}
 
 	// send through our version map

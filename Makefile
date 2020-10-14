@@ -51,7 +51,7 @@ examples:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.ads.tls integration.ads.v3 integration.xds integration.xds.delta integration.xds.v3 integration.rest integration.rest.v3 integration.xds.mux.v3
+.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.ads.tls integration.ads.delta integration.ads.delta.v3 integration.ads.v3 integration.xds integration.xds.delta integration.xds.v3 integration.rest integration.rest.v3 integration.xds.mux.v3
 
 $(BINDIR)/upstream:
 	@go build -race -o $@ internal/upstream/main.go
@@ -60,7 +60,7 @@ $(BINDIR)/test:
 	@echo "Building test binary"
 	@go build -race -a -tags netgo -ldflags '-w -extldflags "-static"' -o $@ pkg/test/main/main.go
 
-integration: integration.xds integration.xds.delta integration.xds.delta.v3 integration.xds.v3 integration.ads integration.ads.tls integration.ads.v3 integration.rest integration.rest.v3
+integration: integration.xds integration.xds.delta integration.xds.delta.v3 integration.xds.v3 integration.ads integration.ads.tls integration.ads.v3 integration.ads.delta integration.ads.delta.v3 integration.rest integration.rest.v3
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh
@@ -70,6 +70,12 @@ integration.ads.tls: $(BINDIR)/test $(BINDIR)/upstream
 
 integration.ads.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads SUFFIX=v3 build/integration.sh
+
+integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
+	env XDS=ads-delta build/integration.sh
+
+integration.ads.delta.v3: $(BINDIR)/test $(BINDIR)/upstream
+	env XDS=ads-delta SUFFIX=v3 build/integration.sh
 
 integration.xds: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=xds build/integration.sh

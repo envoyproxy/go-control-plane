@@ -96,7 +96,7 @@ func init() {
 
 	// Tell Envoy to request configurations from the control plane using
 	// this protocol
-	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management protocol to test (ADS, xDS, REST, DELTA)")
+	flag.StringVar(&mode, "xds", resourcev2.Ads, "Management protocol to test (ADS, xDS, REST, DELTA, ADS-DELTA)")
 
 	// Tell Envoy to use this Node ID
 	flag.StringVar(&nodeID, "nodeID", "test-id", "Node ID")
@@ -150,8 +150,8 @@ func main() {
 	cbv2 := &testv2.Callbacks{Signal: signal, Debug: debug}
 	cbv3 := &testv3.Callbacks{Signal: signal, Debug: debug}
 
-	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads, cachev2.IDHash{}, logger{})
-	configv3 := cachev3.NewSnapshotCache(mode == resourcev2.Ads, cachev3.IDHash{}, logger{})
+	configv2 := cachev2.NewSnapshotCache(mode == resourcev2.Ads || mode == resourcev2.AdsDelta, cachev2.IDHash{}, logger{})
+	configv3 := cachev3.NewSnapshotCache(mode == resourcev3.Ads || mode == resourcev3.AdsDelta, cachev3.IDHash{}, logger{})
 	srv2 := serverv2.NewServer(context.Background(), configv2, cbv2, logger{})
 
 	// mux integration
@@ -332,6 +332,7 @@ func callEcho() (int, int) {
 		if out == nil {
 			ok++
 		} else {
+			log.Println(out)
 			failed++
 		}
 		if ok+failed == total {

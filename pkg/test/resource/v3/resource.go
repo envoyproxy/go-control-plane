@@ -61,6 +61,9 @@ const (
 
 	// Delta mode for resources: individual delta xDS services (Envoy only supports CDS currently)
 	Delta = "delta"
+
+	// AdsDelta mode for resources: one aggregrated incremental xDS service
+	AdsDelta = "ads-delta"
 )
 
 var (
@@ -176,6 +179,10 @@ func configSource(mode string) *core.ConfigSource {
 					},
 				}},
 			},
+		}
+	case AdsDelta:
+		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
+			Ads: &core.AggregatedConfigSource{},
 		}
 	}
 	return source
@@ -308,7 +315,7 @@ func MakeRuntime(runtimeName string) *runtime.Runtime {
 
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
-	// Xds indicates snapshot mode: ads, xds, rest, or deleta
+	// Xds indicates snapshot mode: ads, xds, rest, delta, or ads-delta
 	Xds string
 	// Version for the snapshot.
 	Version string
