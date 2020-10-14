@@ -129,17 +129,8 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersi
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
 	// on separate streams since requests do not share their response versions.
-	if len(request.ResourceNamesSubscribe) != 0 {
-		set := nameSet(request.ResourceNamesSubscribe)
-		for name, resource := range resources {
-			if set[name] {
-				filtered = append(filtered, resource)
-			}
-		}
-	} else {
-		for _, resource := range resources {
-			filtered = append(filtered, resource)
-		}
+	for _, resource := range resources {
+		filtered = append(filtered, resource)
 	}
 
 	// send through our version map
