@@ -132,7 +132,13 @@ func (m *SdsSecretConfig) Validate() error {
 	switch m.NameSpecifier.(type) {
 
 	case *SdsSecretConfig_Name:
-		// no validation rules for Name
+
+		if utf8.RuneCountInString(m.GetName()) < 1 {
+			return SdsSecretConfigValidationError{
+				field:  "Name",
+				reason: "value length must be at least 1 runes",
+			}
+		}
 
 	case *SdsSecretConfig_SdsResourceLocator:
 
