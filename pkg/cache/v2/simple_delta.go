@@ -105,15 +105,6 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 }
 
 func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
-	if cache.ads && len(request.ResourceNamesSubscribe) != 0 {
-		if err := superset(nameSet(request.ResourceNamesSubscribe), resources); err != nil {
-			if cache.log != nil {
-				cache.log.Debugf("Delta ADS mode: not responding to request %v", err)
-			}
-			return
-		}
-	}
-
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
 			request.GetNode().GetId(), request.TypeUrl, versionMap)
