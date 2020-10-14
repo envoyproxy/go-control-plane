@@ -75,7 +75,7 @@ type ResponseWatch struct {
 	Request *Request
 
 	// Response is the channel to push responses to.
-	Response chan Response
+	Response chan<- Response
 }
 
 // newStatusInfo initializes a status info data structure.
