@@ -27,8 +27,8 @@ import (
 	alf "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	endpointv2 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
+	endpointv3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	listenerv2 "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
@@ -66,13 +66,13 @@ var (
 )
 
 // MakeEndpoint creates a localhost endpoint on a given port.
-func MakeEndpoint(clusterName string, port uint32) *endpoint.ClusterLoadAssignment {
-	return &endpoint.ClusterLoadAssignment{
+func MakeEndpoint(clusterName string, port uint32) *endpointv2.ClusterLoadAssignment {
+	return &endpointv2.ClusterLoadAssignment{
 		ClusterName: clusterName,
-		Endpoints: []*endpointv2.LocalityLbEndpoints{{
-			LbEndpoints: []*endpointv2.LbEndpoint{{
-				HostIdentifier: &endpointv2.LbEndpoint_Endpoint{
-					Endpoint: &endpointv2.Endpoint{
+		Endpoints: []*endpointv3.LocalityLbEndpoints{{
+			LbEndpoints: []*endpointv3.LbEndpoint{{
+				HostIdentifier: &endpointv3.LbEndpoint_Endpoint{
+					Endpoint: &endpointv3.Endpoint{
 						Address: &core.Address{
 							Address: &core.Address_SocketAddress{
 								SocketAddress: &core.SocketAddress{
