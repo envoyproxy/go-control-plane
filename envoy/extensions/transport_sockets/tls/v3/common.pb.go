@@ -628,8 +628,8 @@ type CertificateValidationContext struct {
 	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_spki>` are specified,
 	// a hash matching value from either of the lists will result in the certificate being accepted.
 	VerifyCertificateHash []string `protobuf:"bytes,2,rep,name=verify_certificate_hash,json=verifyCertificateHash,proto3" json:"verify_certificate_hash,omitempty"`
-	// An optional list of Subject Alternative name matchers. Envoy will verify that the
-	// Subject Alternative Name of the presented certificate matches one of the specified matches.
+	// An optional list of Subject Alternative name matchers. If specified, Envoy will verify that the
+	// Subject Alternative Name of the presented certificate matches one of the specified matchers.
 	//
 	// When a certificate has wildcard DNS SAN entries, to match a specific client, it should be
 	// configured with exact match type in the :ref:`string matcher <envoy_api_msg_type.matcher.v3.StringMatcher>`.

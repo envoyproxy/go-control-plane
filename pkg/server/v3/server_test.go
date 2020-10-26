@@ -48,21 +48,25 @@ type mockConfigWatcher struct {
 	counts         map[string]int
 	responses      map[string][]cache.Response
 	deltaResponses map[string][]cache.DeltaResponse
-	closeWatch     bool
+	failWatch      bool
 	watches        int
 	deltaWatches   int
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan<- cache.Response) func() {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
-	out := make(chan cache.Response, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
-	} else if config.closeWatch {
-		close(out)
+	} else if config.failWatch {
+		out <- nil
+	} else {
+		config.watches += 1
+		return func() {
+			config.watches -= 1
+		}
 	}
-	return out, func() {}
+	return nil
 }
 
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
@@ -109,7 +113,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			VersionMap:        vs.GetVersionMap(),
 		}
 
-	} else if config.closeWatch {
+	} else if config.failWatch {
 		fmt.Printf("No resources... closing watch\n")
 		close(out)
 	} else {
@@ -648,7 +652,7 @@ func TestWatchClosed(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
-			config.closeWatch = true
+			config.failWatch = true
 			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 
 			// make a request
