@@ -54,10 +54,11 @@ type ServerOption func(*server)
 // NewServer creates handlers from a config watcher and callbacks.
 func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks, opts ...ServerOption) Server {
 	out := &server{
-		cache:      config,
-		callbacks:  callbacks,
-		ctx:        ctx,
-		bufferSize: 8,
+		cache:         config,
+		callbacks:     callbacks,
+		ctx:           ctx,
+		xdsBufferSize: 1,
+		muxBufferSize: 8,
 	}
 	for _, opt := range opts {
 		opt(out)
@@ -70,15 +71,25 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callba
 // on ADS to prevent dead locks between cache write and server read.
 func WithADSBufferSize(size int) ServerOption {
 	return func(s *server) {
-		s.bufferSize = size
+		s.muxBufferSize = size
+	}
+}
+
+// WithXDSBufferSize changes the size of the response channel for each xDS handler
+// from the default 1. This buffer must be increased to support deferred cancellations
+// for caches that can emit responses after cancel is called.
+func WithXDSBufferSize(size int) ServerOption {
+	return func(s *server) {
+		s.xdsBufferSize = size
 	}
 }
 
 type server struct {
-	cache      cache.ConfigWatcher
-	callbacks  Callbacks
-	ctx        context.Context
-	bufferSize int
+	cache         cache.ConfigWatcher
+	callbacks     Callbacks
+	ctx           context.Context
+	xdsBufferSize int
+	muxBufferSize int
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -126,9 +137,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 
 	// a collection of stack allocated watches per request type
 	var values watches
-	bufferSize := 1
+	bufferSize := s.xdsBufferSize
 	if defaultTypeURL == resource.AnyType {
-		bufferSize = s.bufferSize
+		bufferSize = s.muxBufferSize
 	}
 	values.Init(bufferSize)
 	defer func() {
