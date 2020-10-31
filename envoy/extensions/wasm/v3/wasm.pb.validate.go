@@ -45,10 +45,10 @@ func (m *VmConfig) Validate() error {
 
 	// no validation rules for VmId
 
-	if len(m.GetRuntime()) < 1 {
+	if utf8.RuneCountInString(m.GetRuntime()) < 1 {
 		return VmConfigValidationError{
 			field:  "Runtime",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -157,14 +157,14 @@ func (m *PluginConfig) Validate() error {
 
 	// no validation rules for FailOpen
 
-	switch m.VmConfig.(type) {
+	switch m.Vm.(type) {
 
-	case *PluginConfig_InlineVmConfig:
+	case *PluginConfig_VmConfig:
 
-		if v, ok := interface{}(m.GetInlineVmConfig()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetVmConfig()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return PluginConfigValidationError{
-					field:  "InlineVmConfig",
+					field:  "VmConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

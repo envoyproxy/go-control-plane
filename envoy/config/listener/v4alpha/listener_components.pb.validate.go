@@ -43,10 +43,10 @@ func (m *Filter) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return FilterValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -325,6 +325,16 @@ func (m *FilterChain) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTransportSocketConnectTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FilterChainValidationError{
+				field:  "TransportSocketConnectTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for Name
 
 	if v, ok := interface{}(m.GetOnDemandConfiguration()).(interface{ Validate() error }); ok {
@@ -537,10 +547,10 @@ func (m *ListenerFilter) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return ListenerFilterValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

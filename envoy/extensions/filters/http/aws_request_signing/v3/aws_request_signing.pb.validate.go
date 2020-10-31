@@ -44,17 +44,17 @@ func (m *AwsRequestSigning) Validate() error {
 		return nil
 	}
 
-	if len(m.GetServiceName()) < 1 {
+	if utf8.RuneCountInString(m.GetServiceName()) < 1 {
 		return AwsRequestSigningValidationError{
 			field:  "ServiceName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
-	if len(m.GetRegion()) < 1 {
+	if utf8.RuneCountInString(m.GetRegion()) < 1 {
 		return AwsRequestSigningValidationError{
 			field:  "Region",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

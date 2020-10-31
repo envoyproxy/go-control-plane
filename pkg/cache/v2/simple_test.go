@@ -206,7 +206,8 @@ func TestSnapshotCache(t *testing.T) {
 
 	// try to get endpoints with incorrect list of names
 	// should not receive response
-	value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}})
+	value := make(chan cache.Response, 1)
+	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}}, value)
 	select {
 	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -215,7 +216,8 @@ func TestSnapshotCache(t *testing.T) {
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
-			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+			value := make(chan cache.Response, 1)
+			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
 			select {
 			case out := <-value:
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
@@ -266,7 +268,8 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	watches := make(map[string]chan cache.Response)
 	for _, typ := range testTypes {
-		watches[typ], _ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+		watches[typ] = make(chan cache.Response, 1)
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, watches[typ])
 	}
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
@@ -289,7 +292,8 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// open new watches with the latest version
 	for _, typ := range testTypes {
-		watches[typ], _ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
+		watches[typ] = make(chan cache.Response, 1)
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, watches[typ])
 	}
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
@@ -327,6 +331,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 				t.Parallel()
 				id := fmt.Sprintf("%d", i%2)
 				var cancel func()
+				value := make(chan cache.Response, 1)
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
@@ -335,10 +340,10 @@ func TestConcurrentSetWatch(t *testing.T) {
 					if cancel != nil {
 						cancel()
 					}
-					_, cancel = c.CreateWatch(&discovery.DiscoveryRequest{
+					cancel = c.CreateWatch(&discovery.DiscoveryRequest{
 						Node:    &core.Node{Id: id},
 						TypeUrl: rsrc.EndpointType,
-					})
+					}, value)
 				}
 			})
 		}(i)
@@ -348,7 +353,8 @@ func TestConcurrentSetWatch(t *testing.T) {
 func TestSnapshotCacheWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	for _, typ := range testTypes {
-		_, cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+		value := make(chan cache.Response, 1)
+		cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
 		cancel()
 	}
 	// should be status info for the node

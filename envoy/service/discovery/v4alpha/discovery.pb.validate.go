@@ -472,6 +472,16 @@ func (m *Resource) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTtl()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResourceValidationError{
+				field:  "Ttl",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.NameSpecifier.(type) {
 
 	case *Resource_Name:

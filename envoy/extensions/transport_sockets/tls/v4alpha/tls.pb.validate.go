@@ -192,6 +192,13 @@ func (m *DownstreamTlsContext) Validate() error {
 
 	}
 
+	if _, ok := DownstreamTlsContext_OcspStaplePolicy_name[int32(m.GetOcspStaplePolicy())]; !ok {
+		return DownstreamTlsContextValidationError{
+			field:  "OcspStaplePolicy",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	switch m.SessionTicketKeysType.(type) {
 
 	case *DownstreamTlsContext_SessionTicketKeys:
@@ -496,10 +503,10 @@ func (m *CommonTlsContext_CertificateProvider) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return CommonTlsContext_CertificateProviderValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

@@ -44,10 +44,10 @@ func (m *ClusterLoadAssignment) Validate() error {
 		return nil
 	}
 
-	if len(m.GetClusterName()) < 1 {
+	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
 		return ClusterLoadAssignmentValidationError{
 			field:  "ClusterName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -277,10 +277,10 @@ func (m *ClusterLoadAssignment_Policy_DropOverload) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCategory()) < 1 {
+	if utf8.RuneCountInString(m.GetCategory()) < 1 {
 		return ClusterLoadAssignment_Policy_DropOverloadValidationError{
 			field:  "Category",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

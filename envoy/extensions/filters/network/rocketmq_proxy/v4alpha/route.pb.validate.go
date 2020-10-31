@@ -322,10 +322,10 @@ func (m *RouteAction) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCluster()) < 1 {
+	if utf8.RuneCountInString(m.GetCluster()) < 1 {
 		return RouteActionValidationError{
 			field:  "Cluster",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

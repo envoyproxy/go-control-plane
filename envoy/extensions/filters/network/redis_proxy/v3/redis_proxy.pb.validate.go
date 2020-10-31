@@ -43,10 +43,10 @@ func (m *RedisProxy) Validate() error {
 		return nil
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
+	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
 		return RedisProxyValidationError{
 			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -584,10 +584,10 @@ func (m *RedisProxy_PrefixRoutes_Route) Validate() error {
 
 	// no validation rules for RemovePrefix
 
-	if len(m.GetCluster()) < 1 {
+	if utf8.RuneCountInString(m.GetCluster()) < 1 {
 		return RedisProxy_PrefixRoutes_RouteValidationError{
 			field:  "Cluster",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -675,10 +675,10 @@ func (m *RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy) Validate() error {
 		return nil
 	}
 
-	if len(m.GetCluster()) < 1 {
+	if utf8.RuneCountInString(m.GetCluster()) < 1 {
 		return RedisProxy_PrefixRoutes_Route_RequestMirrorPolicyValidationError{
 			field:  "Cluster",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

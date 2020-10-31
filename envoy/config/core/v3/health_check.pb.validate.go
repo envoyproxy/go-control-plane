@@ -201,6 +201,27 @@ func (m *HealthCheck) Validate() error {
 
 	}
 
+	if d := m.GetNoTrafficHealthyInterval(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return HealthCheckValidationError{
+				field:  "NoTrafficHealthyInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return HealthCheckValidationError{
+				field:  "NoTrafficHealthyInterval",
+				reason: "value must be greater than 0s",
+			}
+		}
+
+	}
+
 	if d := m.GetUnhealthyInterval(); d != nil {
 		dur, err := ptypes.Duration(d)
 		if err != nil {
@@ -425,10 +446,10 @@ func (m *HealthCheck_Payload) Validate() error {
 
 	case *HealthCheck_Payload_Text:
 
-		if len(m.GetText()) < 1 {
+		if utf8.RuneCountInString(m.GetText()) < 1 {
 			return HealthCheck_PayloadValidationError{
 				field:  "Text",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 
@@ -517,10 +538,10 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 		}
 	}
 
-	if len(m.GetPath()) < 1 {
+	if utf8.RuneCountInString(m.GetPath()) < 1 {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "Path",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -936,10 +957,10 @@ func (m *HealthCheck_CustomHealthCheck) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return HealthCheck_CustomHealthCheckValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

@@ -44,10 +44,10 @@ func (m *JwtProvider) Validate() error {
 		return nil
 	}
 
-	if len(m.GetIssuer()) < 1 {
+	if utf8.RuneCountInString(m.GetIssuer()) < 1 {
 		return JwtProviderValidationError{
 			field:  "Issuer",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -261,10 +261,10 @@ func (m *JwtHeader) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return JwtHeaderValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -822,10 +822,10 @@ func (m *FilterStateRule) Validate() error {
 		return nil
 	}
 
-	if len(m.GetName()) < 1 {
+	if utf8.RuneCountInString(m.GetName()) < 1 {
 		return FilterStateRuleValidationError{
 			field:  "Name",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

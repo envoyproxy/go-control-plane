@@ -126,10 +126,10 @@ func (m *ProxyProtocol_KeyValuePair) Validate() error {
 
 	// no validation rules for MetadataNamespace
 
-	if len(m.GetKey()) < 1 {
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
 		return ProxyProtocol_KeyValuePairValidationError{
 			field:  "Key",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

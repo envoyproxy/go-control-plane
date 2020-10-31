@@ -44,10 +44,10 @@ func (m *OAuth2Credentials) Validate() error {
 		return nil
 	}
 
-	if len(m.GetClientId()) < 1 {
+	if utf8.RuneCountInString(m.GetClientId()) < 1 {
 		return OAuth2CredentialsValidationError{
 			field:  "ClientId",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -174,10 +174,10 @@ func (m *OAuth2Config) Validate() error {
 		}
 	}
 
-	if len(m.GetAuthorizationEndpoint()) < 1 {
+	if utf8.RuneCountInString(m.GetAuthorizationEndpoint()) < 1 {
 		return OAuth2ConfigValidationError{
 			field:  "AuthorizationEndpoint",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -198,10 +198,10 @@ func (m *OAuth2Config) Validate() error {
 		}
 	}
 
-	if len(m.GetRedirectUri()) < 1 {
+	if utf8.RuneCountInString(m.GetRedirectUri()) < 1 {
 		return OAuth2ConfigValidationError{
 			field:  "RedirectUri",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 

@@ -52,10 +52,10 @@ func (m *SubstitutionFormatString) Validate() error {
 
 	case *SubstitutionFormatString_TextFormat:
 
-		if len(m.GetTextFormat()) < 1 {
+		if utf8.RuneCountInString(m.GetTextFormat()) < 1 {
 			return SubstitutionFormatStringValidationError{
 				field:  "TextFormat",
-				reason: "value length must be at least 1 bytes",
+				reason: "value length must be at least 1 runes",
 			}
 		}
 

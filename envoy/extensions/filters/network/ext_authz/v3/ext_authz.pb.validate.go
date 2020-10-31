@@ -47,10 +47,10 @@ func (m *ExtAuthz) Validate() error {
 		return nil
 	}
 
-	if len(m.GetStatPrefix()) < 1 {
+	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
 		return ExtAuthzValidationError{
 			field:  "StatPrefix",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
@@ -72,6 +72,16 @@ func (m *ExtAuthz) Validate() error {
 		return ExtAuthzValidationError{
 			field:  "TransportApiVersion",
 			reason: "value must be one of the defined enum values",
+		}
+	}
+
+	if v, ok := interface{}(m.GetFilterEnabledMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtAuthzValidationError{
+				field:  "FilterEnabledMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
 	}
 

@@ -43,10 +43,10 @@ func (m *TapRequest) Validate() error {
 		return nil
 	}
 
-	if len(m.GetConfigId()) < 1 {
+	if utf8.RuneCountInString(m.GetConfigId()) < 1 {
 		return TapRequestValidationError{
 			field:  "ConfigId",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 	}
 
