@@ -588,7 +588,7 @@ type Resource struct {
 	// light-weight "heartbeat" updates to keep a resource with a TTL alive.
 	//
 	// The TTL feature is meant to support configurations that should be removed in the event of
-	// a management server // failure. For example, the feature may be used for fault injection
+	// a management server failure. For example, the feature may be used for fault injection
 	// testing where the fault injection should be terminated in the event that Envoy loses contact
 	// with the management server.
 	Ttl *duration.Duration `protobuf:"bytes,6,opt,name=ttl,proto3" json:"ttl,omitempty"`
