@@ -204,7 +204,7 @@ func makeResponses() map[string][]cache.Response {
 		rsrc.RuntimeType: {
 			&cache.RawResponse{
 				Version:   "6",
-				Resources: []types.ResourceWithTtl{{Resource :runtime}},
+				Resources: []types.ResourceWithTtl{{Resource: runtime}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},

@@ -103,7 +103,7 @@ func (cache *LinearCache) respond(value chan<- Response, staleResources []string
 		for _, name := range staleResources {
 			resource := cache.resources[name]
 			if resource != nil {
-			resources = append(resources, types.ResourceWithTtl{Resource: resource})
+				resources = append(resources, types.ResourceWithTtl{Resource: resource})
 			}
 		}
 	}

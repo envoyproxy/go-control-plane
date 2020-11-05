@@ -21,8 +21,8 @@ import (
 	"sync/atomic"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v2"
 	"github.com/golang/protobuf/ptypes/any"
 )
 

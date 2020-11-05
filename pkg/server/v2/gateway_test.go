@@ -45,7 +45,7 @@ func TestGateway(t *testing.T) {
 		resource.ClusterType: {
 			&cache.RawResponse{
 				Version:   "2",
-				Resources: []types.ResourceWithTtl{{Resource : cluster}},
+				Resources: []types.ResourceWithTtl{{Resource: cluster}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
 			},
 		},

@@ -61,7 +61,7 @@ func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resource
 // Consistency is important for the convergence as different resource types
 // from the snapshot may be delivered to the proxy in arbitrary order.
 type Snapshot struct {
-	Resources [types.UnknownType]Resources
+	Resources         [types.UnknownType]Resources
 	HeartbeatInterval *time.Duration
 }
 
