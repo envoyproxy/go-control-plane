@@ -1,12 +1,21 @@
 package types
 
 import (
+	"time"
+
 	"github.com/golang/protobuf/proto"
 )
 
 // Resource is the base interface for the xDS payload.
 type Resource interface {
 	proto.Message
+}
+
+// ResourceWithTtl is a Resource with an optional TTL.
+type ResourceWithTtl struct {
+	Resource Resource
+
+	Ttl *time.Duration
 }
 
 // MarshaledResource is an alias for the serialized binary array.

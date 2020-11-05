@@ -19,9 +19,9 @@ import (
 	"context"
 	"fmt"
 	"sync/atomic"
-	"time"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/golang/protobuf/ptypes/any"
 )
@@ -83,10 +83,9 @@ type RawResponse struct {
 	Version string
 
 	// Resources to be included in the response.
-	Resources []types.Resource
+	Resources []types.ResourceWithTtl
 
-	// The TTL to attach to this response.
-	Ttl *time.Duration
+	Heartbeat bool
 
 	// marshaledResponse holds an atomic reference to the serialized discovery response.
 	marshaledResponse atomic.Value
@@ -117,7 +116,11 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 		marshaledResources := make([]*any.Any, len(r.Resources))
 
 		for i, resource := range r.Resources {
-			marshaledResource, err := MarshalResource(resource)
+			maybeTtldResource, err := ttl.MaybeCreateTtlResource(resource, GetResourceName(resource.Resource), r.Heartbeat)
+			if err != nil {
+				return nil, err
+			}
+			marshaledResource, err := MarshalResource(maybeTtldResource)
 			if err != nil {
 				return nil, err
 			}

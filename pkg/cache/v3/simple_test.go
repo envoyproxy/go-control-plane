@@ -56,15 +56,16 @@ var (
 		[]types.Resource{testRuntime},
 		[]types.Resource{testSecret[0]})
 
-	ttl = time.Second
+	ttl       = 2 * time.Second
+	heartbeat = time.Second
 
 	snapshotWithTtl = cache.NewSnapshotWithTtls(version,
-		cache.ResourceWithTtl{Resources: []types.Resource{testEndpoint}, Ttl: &ttl},
-		cache.ResourceWithTtl{Resources: []types.Resource{testCluster}},
-		cache.ResourceWithTtl{Resources: []types.Resource{testRoute}},
-		cache.ResourceWithTtl{Resources: []types.Resource{testListener}},
-		cache.ResourceWithTtl{Resources: []types.Resource{testRuntime}},
-		cache.ResourceWithTtl{Resources: []types.Resource{testSecret[0]}})
+		[]types.ResourceWithTtl{{Resource: testEndpoint, Ttl: &ttl}},
+		[]types.ResourceWithTtl{{Resource: testCluster}},
+		[]types.ResourceWithTtl{{Resource: testRoute}},
+		[]types.ResourceWithTtl{{Resource: testListener}},
+		[]types.ResourceWithTtl{{Resource: testRuntime}},
+		[]types.ResourceWithTtl{{Resource: testSecret[0]}}, &heartbeat)
 
 	names = map[string][]string{
 		rsrc.EndpointType: {clusterName},
@@ -92,7 +93,7 @@ func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format
 func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
 func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
-func TestSnapshotCache(t *testing.T) {
+func TestSnapshotCacheWithTtl(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 
 	if _, err := c.GetSnapshot(key); err == nil {
@@ -111,30 +112,27 @@ func TestSnapshotCache(t *testing.T) {
 		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTtl, snap)
 	}
 
-	// try to get endpoints with incorrect list of names
-	// should not receive response
-	value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}})
-	select {
-	case out := <-value:
-		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
-	case <-time.After(time.Second / 4):
-	}
-
 	// All the resources should respond immediately when version is not up to date.
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
-			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
-			select {
-			case out := <-value:
-				if gotVersion, _ := out.GetVersion(); gotVersion != version {
-					t.Errorf("got version %q, want %q", gotVersion, version)
+			value := make(chan cache.Response)
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			go func(ch chan cache.Response, typeUrl string) {
+				defer wg.Done()
+				select {
+				case out := <-ch:
+					if gotVersion, _ := out.GetVersion(); gotVersion != version {
+						t.Errorf("got version %q, want %q", gotVersion, version)
+					}
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typeUrl)) {
+						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResourcesAndTtl(typeUrl))
+					}
+				case <-time.After(2 * time.Second):
+					t.Errorf("failed to receive snapshot response")
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResources(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
-				}
-			case <-time.After(time.Second):
-				t.Fatal("failed to receive snapshot response")
-			}
+			}(value, typ)
+			_ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
 		})
 	}
 
@@ -146,29 +144,28 @@ func TestSnapshotCache(t *testing.T) {
 		go func(typ string) {
 			defer wg.Done()
 
-			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
-
-			end := time.After(5 * time.Second)
+			end := time.After(10 * time.Second)
 			for {
+				value := make(chan cache.Response)
+				cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, value)
+
+				fmt.Printf("creating test watch for type %v\n", typ)
 				select {
 				case out := <-value:
 					if gotVersion, _ := out.GetVersion(); gotVersion != version {
 						t.Errorf("got version %q, want %q", gotVersion, version)
 					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResources(typ)) {
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
 						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
 					}
 
-					if *out.(*cache.RawResponse).Ttl != ttl {
-						t.Errorf("expected to see updates with TTL set to 1 second, got %v", out.(*cache.RawResponse).Ttl)
-					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResources(typ)) {
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
 						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
 					}
 
 					updatesByType[typ]++
-					value, _ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
 				case <-end:
+					cancel()
 					return
 				}
 			}
@@ -186,7 +183,7 @@ func TestSnapshotCache(t *testing.T) {
 	}
 }
 
-func TestSnapshotCacheTtl(t *testing.T) {
+func TestSnapshotCache(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 
 	if _, err := c.GetSnapshot(key); err == nil {
@@ -224,8 +221,8 @@ func TestSnapshotCacheTtl(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
 					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResources(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResources(typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTtl(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTtl(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -282,8 +279,8 @@ func TestSnapshotCacheWatch(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
 					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResources(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResources(typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTtl(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTtl(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")

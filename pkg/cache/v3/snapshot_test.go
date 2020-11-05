@@ -26,7 +26,7 @@ import (
 
 func TestSnapshotConsistent(t *testing.T) {
 	if err := snapshot.Consistent(); err != nil {
-		t.Errorf("got inconsistent snapshot for %#v", snapshot)
+		t.Errorf("got inconsistent snapshot for %#v: %v", snapshot, err)
 	}
 	if snap := cache.NewSnapshot(version, []types.Resource{testEndpoint}, nil, nil, nil, nil, nil); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)

@@ -18,7 +18,7 @@ const (
 )
 
 func TestResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+	routes := []types.ResourceWithTtl{{Resource: &route.RouteConfiguration{Name: resourceName}}}
 	resp := cache.RawResponse{
 		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",
