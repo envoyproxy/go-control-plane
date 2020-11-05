@@ -144,12 +144,11 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 		go func(typ string) {
 			defer wg.Done()
 
-			end := time.After(10 * time.Second)
+			end := time.After(5 * time.Second)
 			for {
 				value := make(chan cache.Response)
 				cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, value)
 
-				fmt.Printf("creating test watch for type %v\n", typ)
 				select {
 				case out := <-value:
 					if gotVersion, _ := out.GetVersion(); gotVersion != version {
