@@ -337,6 +337,16 @@ func (m *FilterChain) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTransportSocketConnectTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FilterChainValidationError{
+				field:  "TransportSocketConnectTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for Name
 
 	if v, ok := interface{}(m.GetOnDemandConfiguration()).(interface{ Validate() error }); ok {
