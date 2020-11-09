@@ -180,7 +180,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 									return
 								default:
 								}
-								cache.respond(watch.Request, response, resourcesWithTtl, version, true)
+								cache.respond(request, response, resourcesWithTtl, version, true)
 							}(watch.Request, watch.Response)
 
 							// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
