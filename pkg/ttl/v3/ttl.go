@@ -4,6 +4,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/golang/protobuf/ptypes/any"
 )
 
 func MaybeCreateTtlResource(resource types.ResourceWithTtl, name string, heartbeat bool) (types.Resource, error) {
@@ -25,4 +26,14 @@ func MaybeCreateTtlResource(resource types.ResourceWithTtl, name string, heartbe
 	}
 
 	return resource.Resource, nil
+}
+
+func IsTTLResource(resource *any.Any) bool {
+	wrappedResource := &discovery.Resource{}
+	err := ptypes.UnmarshalAny(resource, wrappedResource)
+	if err != nil {
+		return false
+	}
+
+	return wrappedResource.Resource == nil
 }
