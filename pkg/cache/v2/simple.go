@@ -109,6 +109,50 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache 
 	}
 }
 
+func (cache *snapshotCache) sendHeartbeats(ctx context.Context, wg *sync.WaitGroup, node string) {
+	snapshot := cache.snapshots[node]
+	if info, ok := cache.status[node]; ok {
+		info.mu.Lock()
+		for id, watch := range info.watches {
+			// Respond with the current version regardless of whether the version has changed.
+			version := snapshot.GetVersion(watch.Request.TypeUrl)
+			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+
+			// TODO(snowp): Construct this once per type instead of once per watch.
+			resourcesWithTtl := map[string]types.ResourceWithTtl{}
+			for k, v := range resources {
+				if v.Ttl != nil {
+					resourcesWithTtl[k] = v
+				}
+			}
+
+			if len(resourcesWithTtl) == 0 {
+				continue
+			}
+			if cache.log != nil {
+				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
+			}
+
+			wg.Add(1)
+			// Spawn a goroutine here so that we can give up the lock before issuing responses. This prevents lock contention if the
+			// response channels aren't ready to receive the response.
+			go func(request *Request, response chan<- Response) {
+				defer wg.Done()
+				select {
+				case <-ctx.Done():
+					return
+				default:
+				}
+				cache.respond(request, response, resourcesWithTtl, version, true)
+			}(watch.Request, watch.Response)
+
+			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
+			delete(info.watches, id)
+		}
+		info.mu.Unlock()
+	}
+}
+
 // SetSnapshotCache updates a snapshot for a node.
 func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	cache.mu.Lock()
@@ -130,11 +174,11 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 		go func(heartbeatInterval time.Duration) {
 			ticker := time.NewTicker(heartbeatInterval)
 			for {
-				fmt.Println("heartbeat running!")
 				select {
 				case <-heartBeatCtx.Done():
 					return
 				case <-ticker.C:
+					wg := &sync.WaitGroup{}
 					cache.mu.Lock()
 
 					// It's possible for this goroutine to be canceled while we're waiting to grab the lock. In this case
@@ -142,51 +186,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 					// goroutine will have been created.
 					select {
 					case <-heartBeatCtx.Done():
-						return
 					default:
-					}
-
-					wg := sync.WaitGroup{}
-					snapshot := cache.snapshots[node]
-					if info, ok := cache.status[node]; ok {
-						info.mu.Lock()
-						for id, watch := range info.watches {
-							// Respond with the current version regardless of whether the version has changed.
-							version := snapshot.GetVersion(watch.Request.TypeUrl)
-							resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
-
-							// TODO(snowp): Construct this once per type instead of once per watch.
-							resourcesWithTtl := map[string]types.ResourceWithTtl{}
-							for k, v := range resources {
-								if v.Ttl != nil {
-									resourcesWithTtl[k] = v
-								}
-							}
-
-							if len(resourcesWithTtl) == 0 {
-								continue
-							}
-							if cache.log != nil {
-								cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
-							}
-
-							wg.Add(1)
-							// Spawn a goroutine here so that we can give up the lock before issuing responses. This prevents lock contention if the
-							// response channels aren't ready to receive the response.
-							go func(request *Request, response chan<- Response) {
-								defer wg.Done()
-								select {
-								case <-heartBeatCtx.Done():
-									return
-								default:
-								}
-								cache.respond(request, response, resourcesWithTtl, version, true)
-							}(watch.Request, watch.Response)
-
-							// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
-							delete(info.watches, id)
-						}
-						info.mu.Unlock()
+						cache.sendHeartbeats(heartBeatCtx, wg, node)
 					}
 					cache.mu.Unlock()
 
