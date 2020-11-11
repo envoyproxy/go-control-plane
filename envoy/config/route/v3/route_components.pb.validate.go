@@ -3466,6 +3466,13 @@ func (m *RouteAction_UpgradeConfig) Validate() error {
 		return nil
 	}
 
+	if utf8.RuneCountInString(m.GetUpgradeType()) < 1 {
+		return RouteAction_UpgradeConfigValidationError{
+			field:  "UpgradeType",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
 	if !_RouteAction_UpgradeConfig_UpgradeType_Pattern.MatchString(m.GetUpgradeType()) {
 		return RouteAction_UpgradeConfigValidationError{
 			field:  "UpgradeType",
