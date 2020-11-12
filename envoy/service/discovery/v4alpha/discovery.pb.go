@@ -561,7 +561,7 @@ func (x *DeltaDiscoveryResponse) GetNonce() string {
 	return ""
 }
 
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type Resource struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -592,6 +592,9 @@ type Resource struct {
 	// testing where the fault injection should be terminated in the event that Envoy loses contact
 	// with the management server.
 	Ttl *duration.Duration `protobuf:"bytes,6,opt,name=ttl,proto3" json:"ttl,omitempty"`
+	// Cache control properties for the resource.
+	// [#not-implemented-hide:]
+	CacheControl *Resource_CacheControl `protobuf:"bytes,7,opt,name=cache_control,json=cacheControl,proto3" json:"cache_control,omitempty"`
 }
 
 func (x *Resource) Reset() {
@@ -675,6 +678,13 @@ func (x *Resource) GetTtl() *duration.Duration {
 	return nil
 }
 
+func (x *Resource) GetCacheControl() *Resource_CacheControl {
+	if x != nil {
+		return x.CacheControl
+	}
+	return nil
+}
+
 type isResource_NameSpecifier interface {
 	isResource_NameSpecifier()
 }
@@ -692,6 +702,58 @@ type Resource_UdpaResourceName struct {
 func (*Resource_Name) isResource_NameSpecifier() {}
 
 func (*Resource_UdpaResourceName) isResource_NameSpecifier() {}
+
+// Cache control properties for the resource.
+// [#not-implemented-hide:]
+type Resource_CacheControl struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// If true, xDS proxies may not cache this resource.
+	// Note that this does not apply to clients other than xDS proxies, which must cache resources
+	// for their own use, regardless of the value of this field.
+	DoNotCache bool `protobuf:"varint,1,opt,name=do_not_cache,json=doNotCache,proto3" json:"do_not_cache,omitempty"`
+}
+
+func (x *Resource_CacheControl) Reset() {
+	*x = Resource_CacheControl{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_service_discovery_v4alpha_discovery_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Resource_CacheControl) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Resource_CacheControl) ProtoMessage() {}
+
+func (x *Resource_CacheControl) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_service_discovery_v4alpha_discovery_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Resource_CacheControl.ProtoReflect.Descriptor instead.
+func (*Resource_CacheControl) Descriptor() ([]byte, []int) {
+	return file_envoy_service_discovery_v4alpha_discovery_proto_rawDescGZIP(), []int{4, 0}
+}
+
+func (x *Resource_CacheControl) GetDoNotCache() bool {
+	if x != nil {
+		return x.DoNotCache
+	}
+	return false
+}
 
 var File_envoy_service_discovery_v4alpha_discovery_proto protoreflect.FileDescriptor
 
@@ -829,7 +891,7 @@ var file_envoy_service_discovery_v4alpha_discovery_proto_rawDesc = []byte{
 	0x3a, 0x38, 0x9a, 0xc5, 0x88, 0x1e, 0x33, 0x0a, 0x31, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73,
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x79,
 	0x2e, 0x76, 0x33, 0x2e, 0x44, 0x65, 0x6c, 0x74, 0x61, 0x44, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65,
-	0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xbd, 0x02, 0x0a, 0x08, 0x52,
+	0x72, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x85, 0x04, 0x0a, 0x08, 0x52,
 	0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x14, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
 	0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x4a, 0x0a,
 	0x12, 0x75, 0x64, 0x70, 0x61, 0x5f, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x6e,
@@ -845,16 +907,29 @@ var file_envoy_service_discovery_v4alpha_discovery_proto_rawDesc = []byte{
 	0x66, 0x2e, 0x41, 0x6e, 0x79, 0x52, 0x08, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12,
 	0x2b, 0x0a, 0x03, 0x74, 0x74, 0x6c, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x67,
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x44,
-	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x03, 0x74, 0x74, 0x6c, 0x3a, 0x2a, 0x9a, 0xc5,
-	0x88, 0x1e, 0x25, 0x0a, 0x23, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2e, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x79, 0x2e, 0x76, 0x33, 0x2e,
-	0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x42, 0x10, 0x0a, 0x0e, 0x6e, 0x61, 0x6d, 0x65,
-	0x5f, 0x73, 0x70, 0x65, 0x63, 0x69, 0x66, 0x69, 0x65, 0x72, 0x42, 0x49, 0x0a, 0x2d, 0x69, 0x6f,
-	0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f,
-	0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76,
-	0x65, 0x72, 0x79, 0x2e, 0x76, 0x34, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x42, 0x0e, 0x44, 0x69, 0x73,
-	0x63, 0x6f, 0x76, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8,
-	0xd1, 0x06, 0x02, 0x10, 0x03, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x03, 0x74, 0x74, 0x6c, 0x12, 0x5b, 0x0a, 0x0d,
+	0x63, 0x61, 0x63, 0x68, 0x65, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x18, 0x07, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x36, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x2e, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x79, 0x2e, 0x76, 0x34,
+	0x61, 0x6c, 0x70, 0x68, 0x61, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x43,
+	0x61, 0x63, 0x68, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x52, 0x0c, 0x63, 0x61, 0x63,
+	0x68, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x1a, 0x69, 0x0a, 0x0c, 0x43, 0x61, 0x63,
+	0x68, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x12, 0x20, 0x0a, 0x0c, 0x64, 0x6f, 0x5f,
+	0x6e, 0x6f, 0x74, 0x5f, 0x63, 0x61, 0x63, 0x68, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x0a, 0x64, 0x6f, 0x4e, 0x6f, 0x74, 0x43, 0x61, 0x63, 0x68, 0x65, 0x3a, 0x37, 0x9a, 0xc5, 0x88,
+	0x1e, 0x32, 0x0a, 0x30, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x2e, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x79, 0x2e, 0x76, 0x33, 0x2e, 0x52,
+	0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x43, 0x6f, 0x6e,
+	0x74, 0x72, 0x6f, 0x6c, 0x3a, 0x2a, 0x9a, 0xc5, 0x88, 0x1e, 0x25, 0x0a, 0x23, 0x65, 0x6e, 0x76,
+	0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x64, 0x69, 0x73, 0x63, 0x6f,
+	0x76, 0x65, 0x72, 0x79, 0x2e, 0x76, 0x33, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x42, 0x10, 0x0a, 0x0e, 0x6e, 0x61, 0x6d, 0x65, 0x5f, 0x73, 0x70, 0x65, 0x63, 0x69, 0x66, 0x69,
+	0x65, 0x72, 0x42, 0x49, 0x0a, 0x2d, 0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72,
+	0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x2e, 0x64, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x79, 0x2e, 0x76, 0x34, 0x61, 0x6c,
+	0x70, 0x68, 0x61, 0x42, 0x0e, 0x44, 0x69, 0x73, 0x63, 0x6f, 0x76, 0x65, 0x72, 0x79, 0x50, 0x72,
+	0x6f, 0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x03, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -869,7 +944,7 @@ func file_envoy_service_discovery_v4alpha_discovery_proto_rawDescGZIP() []byte {
 	return file_envoy_service_discovery_v4alpha_discovery_proto_rawDescData
 }
 
-var file_envoy_service_discovery_v4alpha_discovery_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_envoy_service_discovery_v4alpha_discovery_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_envoy_service_discovery_v4alpha_discovery_proto_goTypes = []interface{}{
 	(*DiscoveryRequest)(nil),       // 0: envoy.service.discovery.v4alpha.DiscoveryRequest
 	(*DiscoveryResponse)(nil),      // 1: envoy.service.discovery.v4alpha.DiscoveryResponse
@@ -877,34 +952,36 @@ var file_envoy_service_discovery_v4alpha_discovery_proto_goTypes = []interface{}
 	(*DeltaDiscoveryResponse)(nil), // 3: envoy.service.discovery.v4alpha.DeltaDiscoveryResponse
 	(*Resource)(nil),               // 4: envoy.service.discovery.v4alpha.Resource
 	nil,                            // 5: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.InitialResourceVersionsEntry
-	(*v4alpha.Node)(nil),           // 6: envoy.config.core.v4alpha.Node
-	(*status.Status)(nil),          // 7: google.rpc.Status
-	(*any.Any)(nil),                // 8: google.protobuf.Any
-	(*v4alpha.ControlPlane)(nil),   // 9: envoy.config.core.v4alpha.ControlPlane
-	(*v1.ResourceLocator)(nil),     // 10: udpa.core.v1.ResourceLocator
-	(*v1.ResourceName)(nil),        // 11: udpa.core.v1.ResourceName
-	(*duration.Duration)(nil),      // 12: google.protobuf.Duration
+	(*Resource_CacheControl)(nil),  // 6: envoy.service.discovery.v4alpha.Resource.CacheControl
+	(*v4alpha.Node)(nil),           // 7: envoy.config.core.v4alpha.Node
+	(*status.Status)(nil),          // 8: google.rpc.Status
+	(*any.Any)(nil),                // 9: google.protobuf.Any
+	(*v4alpha.ControlPlane)(nil),   // 10: envoy.config.core.v4alpha.ControlPlane
+	(*v1.ResourceLocator)(nil),     // 11: udpa.core.v1.ResourceLocator
+	(*v1.ResourceName)(nil),        // 12: udpa.core.v1.ResourceName
+	(*duration.Duration)(nil),      // 13: google.protobuf.Duration
 }
 var file_envoy_service_discovery_v4alpha_discovery_proto_depIdxs = []int32{
-	6,  // 0: envoy.service.discovery.v4alpha.DiscoveryRequest.node:type_name -> envoy.config.core.v4alpha.Node
-	7,  // 1: envoy.service.discovery.v4alpha.DiscoveryRequest.error_detail:type_name -> google.rpc.Status
-	8,  // 2: envoy.service.discovery.v4alpha.DiscoveryResponse.resources:type_name -> google.protobuf.Any
-	9,  // 3: envoy.service.discovery.v4alpha.DiscoveryResponse.control_plane:type_name -> envoy.config.core.v4alpha.ControlPlane
-	6,  // 4: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.node:type_name -> envoy.config.core.v4alpha.Node
-	10, // 5: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.udpa_resources_subscribe:type_name -> udpa.core.v1.ResourceLocator
-	10, // 6: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.udpa_resources_unsubscribe:type_name -> udpa.core.v1.ResourceLocator
+	7,  // 0: envoy.service.discovery.v4alpha.DiscoveryRequest.node:type_name -> envoy.config.core.v4alpha.Node
+	8,  // 1: envoy.service.discovery.v4alpha.DiscoveryRequest.error_detail:type_name -> google.rpc.Status
+	9,  // 2: envoy.service.discovery.v4alpha.DiscoveryResponse.resources:type_name -> google.protobuf.Any
+	10, // 3: envoy.service.discovery.v4alpha.DiscoveryResponse.control_plane:type_name -> envoy.config.core.v4alpha.ControlPlane
+	7,  // 4: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.node:type_name -> envoy.config.core.v4alpha.Node
+	11, // 5: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.udpa_resources_subscribe:type_name -> udpa.core.v1.ResourceLocator
+	11, // 6: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.udpa_resources_unsubscribe:type_name -> udpa.core.v1.ResourceLocator
 	5,  // 7: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.initial_resource_versions:type_name -> envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.InitialResourceVersionsEntry
-	7,  // 8: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.error_detail:type_name -> google.rpc.Status
+	8,  // 8: envoy.service.discovery.v4alpha.DeltaDiscoveryRequest.error_detail:type_name -> google.rpc.Status
 	4,  // 9: envoy.service.discovery.v4alpha.DeltaDiscoveryResponse.resources:type_name -> envoy.service.discovery.v4alpha.Resource
-	11, // 10: envoy.service.discovery.v4alpha.DeltaDiscoveryResponse.udpa_removed_resources:type_name -> udpa.core.v1.ResourceName
-	11, // 11: envoy.service.discovery.v4alpha.Resource.udpa_resource_name:type_name -> udpa.core.v1.ResourceName
-	8,  // 12: envoy.service.discovery.v4alpha.Resource.resource:type_name -> google.protobuf.Any
-	12, // 13: envoy.service.discovery.v4alpha.Resource.ttl:type_name -> google.protobuf.Duration
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	12, // 10: envoy.service.discovery.v4alpha.DeltaDiscoveryResponse.udpa_removed_resources:type_name -> udpa.core.v1.ResourceName
+	12, // 11: envoy.service.discovery.v4alpha.Resource.udpa_resource_name:type_name -> udpa.core.v1.ResourceName
+	9,  // 12: envoy.service.discovery.v4alpha.Resource.resource:type_name -> google.protobuf.Any
+	13, // 13: envoy.service.discovery.v4alpha.Resource.ttl:type_name -> google.protobuf.Duration
+	6,  // 14: envoy.service.discovery.v4alpha.Resource.cache_control:type_name -> envoy.service.discovery.v4alpha.Resource.CacheControl
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_envoy_service_discovery_v4alpha_discovery_proto_init() }
@@ -973,6 +1050,18 @@ func file_envoy_service_discovery_v4alpha_discovery_proto_init() {
 				return nil
 			}
 		}
+		file_envoy_service_discovery_v4alpha_discovery_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Resource_CacheControl); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_envoy_service_discovery_v4alpha_discovery_proto_msgTypes[4].OneofWrappers = []interface{}{
 		(*Resource_Name)(nil),
@@ -984,7 +1073,7 @@ func file_envoy_service_discovery_v4alpha_discovery_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_service_discovery_v4alpha_discovery_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
