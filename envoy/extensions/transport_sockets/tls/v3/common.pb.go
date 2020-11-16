@@ -395,7 +395,8 @@ type TlsCertificate struct {
 	// default the parent directories of the filesystem paths in
 	// *certificate_chain* and *private_key* are watched if this field is not
 	// specified. This only applies when a *TlsCertificate* is delivered by SDS
-	// with references to filesystem paths.
+	// with references to filesystem paths. See the :ref:`SDS key rotation
+	// <sds_key_rotation>` documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,7,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
 	// BoringSSL private key method provider. This is an alternative to :ref:`private_key
 	// <envoy_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` field. This can't be
@@ -606,7 +607,8 @@ type CertificateValidationContext struct {
 	// default the parent directory of the filesystem path in *trusted_ca* is
 	// watched if this field is not specified. This only applies when a
 	// *CertificateValidationContext* is delivered by SDS with references to
-	// filesystem paths.
+	// filesystem paths. See the :ref:`SDS key rotation <sds_key_rotation>`
+	// documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,11,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
 	// An optional list of base64-encoded SHA-256 hashes. If specified, Envoy will verify that the
 	// SHA-256 of the DER-encoded Subject Public Key Information (SPKI) of the presented certificate
