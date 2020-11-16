@@ -77,6 +77,8 @@ func (m *JwtProvider) Validate() error {
 
 	// no validation rules for PayloadInMetadata
 
+	// no validation rules for ClockSkewSeconds
+
 	switch m.JwksSourceSpecifier.(type) {
 
 	case *JwtProvider_RemoteJwks:
