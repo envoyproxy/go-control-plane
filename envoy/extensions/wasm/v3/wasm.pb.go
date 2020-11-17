@@ -42,7 +42,29 @@ type VmConfig struct {
 	// reduce memory utilization and make sharing of data easier which may have security implications.
 	// See ref: "TODO: add ref" for details.
 	VmId string `protobuf:"bytes,1,opt,name=vm_id,json=vmId,proto3" json:"vm_id,omitempty"`
-	// The Wasm runtime type (either "v8" or "null" for code compiled into Envoy).
+	// The Wasm runtime type.
+	// Available Wasm runtime types are registered as extensions. The following runtimes are included
+	// in Envoy code base:
+	//
+	// .. _extension_envoy.wasm.runtime.null:
+	//
+	// **envoy.wasm.runtime.null**: Null sandbox, the Wasm module must be compiled and linked into the
+	// Envoy binary. The registered name is given in the *code* field as *inline_string*.
+	//
+	// .. _extension_envoy.wasm.runtime.v8:
+	//
+	// **envoy.wasm.runtime.v8**: `V8 <https://v8.dev/>`_-based WebAssembly runtime.
+	//
+	// .. _extension_envoy.wasm.runtime.wavm:
+	//
+	// **envoy.wasm.runtime.wavm**: `WAVM <https://wavm.github.io/>`_-based WebAssembly runtime.
+	// This runtime is not enabled in the official build.
+	//
+	// .. _extension_envoy.wasm.runtime.wasmtime:
+	//
+	// **envoy.wasm.runtime.wasmtime**: `Wasmtime <https://wasmtime.dev/>`_-based WebAssembly runtime.
+	// This runtime is not enabled in the official build.
+	//
 	Runtime string `protobuf:"bytes,2,opt,name=runtime,proto3" json:"runtime,omitempty"`
 	// The Wasm code that Envoy will execute.
 	Code *v3.AsyncDataSource `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
