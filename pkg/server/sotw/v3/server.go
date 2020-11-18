@@ -49,15 +49,48 @@ type Callbacks interface {
 	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
+// Options for modifying the behavior of the server.
+type ServerOption func(*server)
+
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks) Server {
-	return &server{cache: config, callbacks: callbacks, ctx: ctx}
+func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks, opts ...ServerOption) Server {
+	out := &server{
+		cache:         config,
+		callbacks:     callbacks,
+		ctx:           ctx,
+		xdsBufferSize: 1,
+		muxBufferSize: 8,
+	}
+	for _, opt := range opts {
+		opt(out)
+	}
+	return out
+}
+
+// WithADSBufferSize changes the size of the response channel for ADS handlers
+// from the default 8. The size must be at least the number of different types
+// on ADS to prevent dead locks between cache write and server read.
+func WithADSBufferSize(size int) ServerOption {
+	return func(s *server) {
+		s.muxBufferSize = size
+	}
+}
+
+// WithXDSBufferSize changes the size of the response channel for each xDS handler
+// from the default 1. This buffer must be increased to support deferred cancellations
+// for caches that can emit responses after cancel is called.
+func WithXDSBufferSize(size int) ServerOption {
+	return func(s *server) {
+		s.xdsBufferSize = size
+	}
 }
 
 type server struct {
-	cache     cache.ConfigWatcher
-	callbacks Callbacks
-	ctx       context.Context
+	cache         cache.ConfigWatcher
+	callbacks     Callbacks
+	ctx           context.Context
+	xdsBufferSize int
+	muxBufferSize int
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -85,9 +118,6 @@ func (values *watches) Init(bufferSize int) {
 	values.nonces = make(map[string]string)
 }
 
-// Token response value used to signal a watch failure in muxed watches.
-var errorResponse = &cache.RawResponse{}
-
 // Cancel all watches
 func (values *watches) Cancel() {
 	for _, cancel := range values.cancellations {
@@ -108,9 +138,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 
 	// a collection of stack allocated watches per request type
 	var values watches
-	bufferSize := 1
+	bufferSize := s.xdsBufferSize
 	if defaultTypeURL == resource.AnyType {
-		bufferSize = 8
+		bufferSize = s.muxBufferSize
 	}
 	values.Init(bufferSize)
 	defer func() {
@@ -221,6 +251,8 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !seen || responseNonce == nonce {
 				if cancel, seen := values.cancellations[typeUrl]; seen && cancel != nil {
 					cancel()
+					// Some responses may have made it to the channel prior to cancel,
+					// hence drain it to avoid channel buffer overrun.
 					if err := processAll(); err != nil {
 						return err
 					}

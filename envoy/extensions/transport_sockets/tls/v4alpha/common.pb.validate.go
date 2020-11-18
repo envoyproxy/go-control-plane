@@ -233,6 +233,16 @@ func (m *TlsCertificate) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetWatchedDirectory()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TlsCertificateValidationError{
+				field:  "WatchedDirectory",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetPrivateKeyProvider()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TlsCertificateValidationError{
@@ -436,6 +446,16 @@ func (m *CertificateValidationContext) Validate() error {
 		if err := v.Validate(); err != nil {
 			return CertificateValidationContextValidationError{
 				field:  "TrustedCa",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetWatchedDirectory()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CertificateValidationContextValidationError{
+				field:  "WatchedDirectory",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -69,6 +69,13 @@ func (m *GrpcJsonTranscoder) Validate() error {
 
 	// no validation rules for ConvertGrpcStatus
 
+	if _, ok := GrpcJsonTranscoder_UrlUnescapeSpec_name[int32(m.GetUrlUnescapeSpec())]; !ok {
+		return GrpcJsonTranscoderValidationError{
+			field:  "UrlUnescapeSpec",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	switch m.DescriptorSet.(type) {
 
 	case *GrpcJsonTranscoder_ProtoDescriptor:

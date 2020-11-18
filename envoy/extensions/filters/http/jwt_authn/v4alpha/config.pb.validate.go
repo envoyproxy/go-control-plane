@@ -77,6 +77,8 @@ func (m *JwtProvider) Validate() error {
 
 	// no validation rules for PayloadInMetadata
 
+	// no validation rules for ClockSkewSeconds
+
 	switch m.JwksSourceSpecifier.(type) {
 
 	case *JwtProvider_RemoteJwks:
@@ -747,14 +749,29 @@ func (m *RequirementRule) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRequires()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RequirementRuleValidationError{
-				field:  "Requires",
-				reason: "embedded message failed validation",
-				cause:  err,
+	switch m.RequirementType.(type) {
+
+	case *RequirementRule_Requires:
+
+		if v, ok := interface{}(m.GetRequires()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RequirementRuleValidationError{
+					field:  "Requires",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
+	case *RequirementRule_RequirementName:
+
+		if utf8.RuneCountInString(m.GetRequirementName()) < 1 {
+			return RequirementRuleValidationError{
+				field:  "RequirementName",
+				reason: "value length must be at least 1 runes",
+			}
+		}
+
 	}
 
 	return nil
@@ -955,6 +972,23 @@ func (m *JwtAuthentication) Validate() error {
 
 	// no validation rules for BypassCorsPreflight
 
+	for key, val := range m.GetRequirementMap() {
+		_ = val
+
+		// no validation rules for RequirementMap[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return JwtAuthenticationValidationError{
+					field:  fmt.Sprintf("RequirementMap[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -1013,3 +1047,96 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = JwtAuthenticationValidationError{}
+
+// Validate checks the field values on PerRouteConfig with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *PerRouteConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.RequirementSpecifier.(type) {
+
+	case *PerRouteConfig_Disabled:
+
+		if m.GetDisabled() != true {
+			return PerRouteConfigValidationError{
+				field:  "Disabled",
+				reason: "value must equal true",
+			}
+		}
+
+	case *PerRouteConfig_RequirementName:
+
+		if utf8.RuneCountInString(m.GetRequirementName()) < 1 {
+			return PerRouteConfigValidationError{
+				field:  "RequirementName",
+				reason: "value length must be at least 1 runes",
+			}
+		}
+
+	default:
+		return PerRouteConfigValidationError{
+			field:  "RequirementSpecifier",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// PerRouteConfigValidationError is the validation error returned by
+// PerRouteConfig.Validate if the designated constraints aren't met.
+type PerRouteConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PerRouteConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PerRouteConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PerRouteConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PerRouteConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PerRouteConfigValidationError) ErrorName() string { return "PerRouteConfigValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PerRouteConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPerRouteConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PerRouteConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PerRouteConfigValidationError{}

@@ -1093,6 +1093,78 @@ var _ interface {
 	ErrorName() string
 } = HeaderMapValidationError{}
 
+// Validate checks the field values on WatchedDirectory with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *WatchedDirectory) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetPath()) < 1 {
+		return WatchedDirectoryValidationError{
+			field:  "Path",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	return nil
+}
+
+// WatchedDirectoryValidationError is the validation error returned by
+// WatchedDirectory.Validate if the designated constraints aren't met.
+type WatchedDirectoryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WatchedDirectoryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WatchedDirectoryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WatchedDirectoryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WatchedDirectoryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WatchedDirectoryValidationError) ErrorName() string { return "WatchedDirectoryValidationError" }
+
+// Error satisfies the builtin error interface
+func (e WatchedDirectoryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWatchedDirectory.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WatchedDirectoryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WatchedDirectoryValidationError{}
+
 // Validate checks the field values on DataSource with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *DataSource) Validate() error {
