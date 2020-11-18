@@ -85,6 +85,7 @@ type snapshotCache struct {
 	// hash is the hashing function for Envoy nodes
 	hash NodeHash
 
+	// heartbeatRoutines keeps track of the active heartbeat goroutines
 	heartbeatRoutines map[string]heartbeatHandle
 
 	mu sync.RWMutex
