@@ -119,7 +119,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 		marshaledResources := make([]*any.Any, len(r.Resources))
 
 		for i, resource := range r.Resources {
-			maybeTtldResource, err := ttl.MaybeCreateTtlResource(resource, GetResourceName(resource.Resource), r.Heartbeat)
+			maybeTtldResource, err := ttl.MaybeCreateTtlResourceIfSupported(resource, GetResourceName(resource.Resource), r.Heartbeat)
 			if err != nil {
 				return nil, err
 			}

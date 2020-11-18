@@ -5,7 +5,10 @@ import (
 	"github.com/golang/protobuf/ptypes/any"
 )
 
-func MaybeCreateTtlResource(resource types.ResourceWithTtl, name string, heartbeat bool) (types.Resource, error) {
+// Helper functions for interacting with TTL resources for xDS V2. Since TTL resources are not supported for V2, these are
+// essentially noops.
+
+func MaybeCreateTtlResourceIfSupported(resource types.ResourceWithTtl, name string, heartbeat bool) (types.Resource, error) {
 	return resource.Resource, nil
 }
 
