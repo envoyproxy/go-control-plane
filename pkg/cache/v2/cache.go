@@ -85,6 +85,9 @@ type RawResponse struct {
 	// Resources to be included in the response.
 	Resources []types.ResourceWithTtl
 
+	// Whether this is a heartbeat response. For xDS versions that support TTL, this
+	// will be converted into a response that doesn't contain the actual resource protobuf.
+	// This allows for more lightweight updates that server only to update the TTL timer.
 	Heartbeat bool
 
 	// marshaledResponse holds an atomic reference to the serialized discovery response.
