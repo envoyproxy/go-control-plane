@@ -187,6 +187,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 					// goroutine will have been created.
 					select {
 					case <-heartBeatCtx.Done():
+						cache.mu.Unlock()
+						return
 					default:
 						cache.sendHeartbeats(heartBeatCtx, wg, node)
 					}
