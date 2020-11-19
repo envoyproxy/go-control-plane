@@ -1,5 +1,11 @@
 # Changelog
 
+## Release v0.9.8
+
+### Changed
+
+- Interface between the server and the cache has been changed to support explicit ordering by the cache.
+
 ## Release v0.9.7
 
 ### Added

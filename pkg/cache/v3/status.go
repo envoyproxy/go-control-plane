@@ -96,7 +96,7 @@ type DeltaResponseWatch struct {
 	Request *DeltaRequest
 
 	// Response is the channel to push the delta responses to
-	Response chan DeltaResponse
+	Response chan<- DeltaResponse
 
 	// VersionMap for the stream
 	VersionMap map[string]DeltaVersionInfo

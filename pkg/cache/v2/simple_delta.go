@@ -23,7 +23,7 @@ import (
 )
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVersion) (chan DeltaResponse, func()) {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, value chan<- DeltaResponse, sv StreamVersion) func() {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 	aliases := request.GetResourceNamesSubscribe()
@@ -44,9 +44,6 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVer
 	info.mu.Lock()
 	info.lastDeltaWatchRequestTime = time.Now()
 	info.mu.Unlock()
-
-	// allocate capacity 1 to allow one-time non-blocking use
-	value := make(chan DeltaResponse, 1)
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
@@ -76,14 +73,14 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVer
 		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: sv.GetVersionMap()}
 		info.mu.Unlock()
 
-		return value, cache.cancelDeltaWatch(nodeID, watchID)
+		return cache.cancelDeltaWatch(nodeID, watchID)
 	}
 
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
 	// we do want to respond with the full resource version map though
 	cache.respondDelta(request, value, vMap[t], snapshot.GetResources(t), nil)
-	return value, nil
+	return nil
 }
 
 func (cache *snapshotCache) nextDeltaWatchID() int64 {
@@ -104,7 +101,7 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan<- DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
 			request.GetNode().GetId(), request.TypeUrl, versionMap)

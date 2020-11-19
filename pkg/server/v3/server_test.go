@@ -78,11 +78,8 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.Disco
 	return nil, errors.New("missing")
 }
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, vs cache.StreamVersion) (chan cache.DeltaResponse, func()) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, out chan<- cache.DeltaResponse, vs cache.StreamVersion) func() {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
-
-	// Create our out watch channel to return with a buffer of one
-	out := make(chan cache.DeltaResponse, 1)
 
 	if len(config.deltaResponses[req.TypeUrl]) > 0 {
 		res := config.deltaResponses[req.TypeUrl][0]
@@ -118,13 +115,13 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		close(out)
 	} else {
 		config.deltaWatches += 1
-		return out, func() {
+		return func() {
 			close(out)
 			config.deltaWatches -= 1
 		}
 	}
 
-	return out, nil
+	return nil
 }
 
 func makeMockConfigWatcher() *mockConfigWatcher {

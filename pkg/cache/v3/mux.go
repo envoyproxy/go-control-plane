@@ -46,8 +46,8 @@ func (mux *MuxCache) CreateWatch(request *Request, value chan<- Response) func()
 }
 
 // TODO: implement CreateDeltaWatch for mux cache
-func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, v StreamVersion) (chan DeltaResponse, func()) {
-	return nil, nil
+func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, value chan<- DeltaResponse, v StreamVersion) func() {
+	return nil
 }
 
 func (mux *MuxCache) Fetch(ctx context.Context, request *Request) (Response, error) {

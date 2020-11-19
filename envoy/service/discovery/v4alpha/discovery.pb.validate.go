@@ -482,6 +482,16 @@ func (m *Resource) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetCacheControl()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResourceValidationError{
+				field:  "CacheControl",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.NameSpecifier.(type) {
 
 	case *Resource_Name:
@@ -557,3 +567,72 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ResourceValidationError{}
+
+// Validate checks the field values on Resource_CacheControl with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *Resource_CacheControl) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for DoNotCache
+
+	return nil
+}
+
+// Resource_CacheControlValidationError is the validation error returned by
+// Resource_CacheControl.Validate if the designated constraints aren't met.
+type Resource_CacheControlValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Resource_CacheControlValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Resource_CacheControlValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Resource_CacheControlValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Resource_CacheControlValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Resource_CacheControlValidationError) ErrorName() string {
+	return "Resource_CacheControlValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Resource_CacheControlValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResource_CacheControl.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Resource_CacheControlValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Resource_CacheControlValidationError{}
