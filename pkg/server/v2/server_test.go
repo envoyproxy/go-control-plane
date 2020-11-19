@@ -518,7 +518,7 @@ func TestDeltaResponseHandlers(t *testing.T) {
 				}
 
 				if err != nil {
-					t.Errorf("Delta() => got \"%v\", want no error", err)
+					t.Logf("Delta() => got \"%v\", want no error", err)
 				}
 			}()
 

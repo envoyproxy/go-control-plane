@@ -284,15 +284,13 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			// node field in discovery request is delta-compressed
 			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
-			var nonce string
 			if req.Node != nil {
 				node = req.Node
-				nonce = req.GetResponseNonce()
 			} else {
 				req.Node = node
-				// If we have no nonce, i.e. this is the first request on a delta stream, set one
-				nonce = strconv.FormatInt(streamNonce, 10)
 			}
+
+			var nonce = req.GetResponseNonce()
 
 			// type URL is required for ADS but is implicit for xDS
 			if defaultTypeURL == resource.AnyType {
@@ -337,7 +335,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				}
 				values.mu.RUnlock()
 			}
-
 		}
 	}
 }
@@ -357,7 +354,6 @@ func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) erro
 				close(reqCh)
 				return
 			}
-
 			reqCh <- req
 		}
 	}()
