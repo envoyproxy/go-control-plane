@@ -32,6 +32,7 @@ import (
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
+	"github.com/stretchr/testify/assert"
 )
 
 type mockConfigWatcher struct {
@@ -44,17 +45,16 @@ type mockConfigWatcher struct {
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan<- cache.Response) func() {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	if len(config.responses[req.TypeUrl]) > 0 {
-		out <- config.responses[req.TypeUrl][0]
-		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
+		for _, r := range config.responses[req.TypeUrl] {
+			out <- r
+		}
 	} else if config.failWatch {
 		out <- nil
-	} else {
-		config.watches += 1
-		return func() {
-			config.watches -= 1
-		}
 	}
-	return nil
+	config.watches += 1
+	return func() {
+		config.watches -= 1
+	}
 }
 
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
@@ -598,6 +598,82 @@ func TestCancellations(t *testing.T) {
 	if config.watches != 0 {
 		t.Errorf("Expect all watches cancelled, got %q", config.watches)
 	}
+}
+
+func TestDraining(t *testing.T) {
+	config := makeMockConfigWatcher()
+	config.responses = make(map[string][]cache.Response)
+	resp := makeMockStream(t)
+	testTypes = []string{
+		rsrc.ListenerType,
+		rsrc.ListenerType,
+	}
+	resource := []types.Resource{listener}
+	req := &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType}
+	// CreateWatch sends these responses immediately
+	config.responses[rsrc.ListenerType] = []cache.Response{
+		&cache.RawResponse{Request: req, Version: "1", Resources: resource},
+		&cache.RawResponse{Request: req, Version: "2", Resources: resource},
+		&cache.RawResponse{Request: req, Version: "3", Resources: resource},
+	}
+	cycle := make(chan struct{})
+	go func() {
+		// Send one request and wait for response received
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:    node,
+			TypeUrl: rsrc.ListenerType,
+		}
+		<-cycle
+		// Send another request and wait for the rest of responses to drain
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			TypeUrl:       rsrc.ListenerType,
+			ResponseNonce: "1",
+		}
+		<-cycle
+		// xds protocol always sends an ack for each received response
+		// Send those requests
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			TypeUrl:       rsrc.ListenerType,
+			ResponseNonce: "2",
+		}
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			TypeUrl:       rsrc.ListenerType,
+			ResponseNonce: "3",
+		}
+	}()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	s := server.NewServer(ctx, config, server.CallbackFuncs{})
+	go func() {
+		// receive the first response for the first request
+		r := <-resp.sent
+		assert.Equal(t, "1", r.Nonce)
+		cycle <- struct{}{}
+
+		// receive two drained responses for second request
+		r = <-resp.sent
+		assert.Equal(t, "2", r.Nonce)
+		r = <-resp.sent
+		assert.Equal(t, "3", r.Nonce)
+		// watch count should be 1.
+		assert.Equal(t, 1, config.watches)
+		cycle <- struct{}{}
+
+		// for the next 2 acks, ignore one and send the latest nonce out
+		r = <-resp.sent
+		assert.Equal(t, "4", r.Nonce)
+		// watch count should again be 1
+		assert.Equal(t, 1, config.watches)
+		cancel()
+	}()
+	if err := s.StreamAggregatedResources(resp); err != nil {
+		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+	}
+
+	assert.Equal(t, 0, config.watches)
 }
 
 func TestOpaqueRequestsChannelMuxing(t *testing.T) {
