@@ -176,7 +176,6 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		}
 		typeUrl := resp.GetRequest().TypeUrl
 		values.nonces[typeUrl] = nonce
-		values.cancellations[typeUrl] = nil
 		return nil
 	}
 
