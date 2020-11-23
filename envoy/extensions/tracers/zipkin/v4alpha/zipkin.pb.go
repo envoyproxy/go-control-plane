@@ -102,9 +102,7 @@ type ZipkinConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The cluster manager cluster that hosts the Zipkin collectors. Note that the
-	// Zipkin cluster must be defined in the :ref:`Bootstrap static cluster
-	// resources <envoy_api_field_config.bootstrap.v4alpha.Bootstrap.StaticResources.clusters>`.
+	// The cluster manager cluster that hosts the Zipkin collectors.
 	CollectorCluster string `protobuf:"bytes,1,opt,name=collector_cluster,json=collectorCluster,proto3" json:"collector_cluster,omitempty"`
 	// The API endpoint of the Zipkin service where the spans will be sent. When
 	// using a standard Zipkin installation, the API endpoint is typically
