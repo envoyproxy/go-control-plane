@@ -119,7 +119,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 		marshaledResources := make([]*any.Any, len(r.Resources))
 
 		for i, resource := range r.Resources {
-			maybeTtldResource, resourceName, err := ttl.MaybeCreateTtlResourceIfSupported(resource, GetResourceName(resource.Resource), r.Request.TypeUrl, r.Heartbeat)
+			maybeTtldResource, resourceType, err := ttl.MaybeCreateTtlResourceIfSupported(resource, GetResourceName(resource.Resource), r.Request.TypeUrl, r.Heartbeat)
 			if err != nil {
 				return nil, err
 			}
@@ -128,7 +128,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 				return nil, err
 			}
 			marshaledResources[i] = &any.Any{
-				TypeUrl: resourceName,
+				TypeUrl: resourceType,
 				Value:   marshaledResource,
 			}
 		}

@@ -128,7 +128,6 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 			if err != nil {
 				return nil, err
 			}
-
 			marshaledResources[i] = &any.Any{
 				TypeUrl: resourceType,
 				Value:   marshaledResource,
