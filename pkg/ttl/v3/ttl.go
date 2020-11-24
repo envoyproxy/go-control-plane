@@ -3,15 +3,18 @@ package ttl
 import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
 )
+
+var deltaResourceTypeURL = "type.googleapis.com/" + proto.MessageName(&discovery.Resource{})
 
 // Helper functions for interacting with TTL resources for xDS V3. A resource will be wrapped in a discovery.Resource in order
 // to allow specifying a TTL. If the resource is meant to be a heartbeat response, only the resource name and TTL will be set
 // to avoid having to send the entire resource down.
 
-func MaybeCreateTtlResourceIfSupported(resource types.ResourceWithTtl, name string, heartbeat bool) (types.Resource, error) {
+func MaybeCreateTtlResourceIfSupported(resource types.ResourceWithTtl, name string, resourceTypeUrl string, heartbeat bool) (types.Resource, string, error) {
 	if resource.Ttl != nil {
 		wrappedResource := &discovery.Resource{
 			Name: name,
@@ -21,15 +24,16 @@ func MaybeCreateTtlResourceIfSupported(resource types.ResourceWithTtl, name stri
 		if !heartbeat {
 			any, err := ptypes.MarshalAny(resource.Resource)
 			if err != nil {
-				return nil, err
+				return nil, "", err
 			}
+			any.TypeUrl = resourceTypeUrl
 			wrappedResource.Resource = any
 		}
 
-		return wrappedResource, nil
+		return wrappedResource, deltaResourceTypeURL, nil
 	}
 
-	return resource.Resource, nil
+	return resource.Resource, resourceTypeUrl, nil
 }
 
 func IsTTLResource(resource *any.Any) bool {
