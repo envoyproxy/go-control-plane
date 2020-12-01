@@ -278,7 +278,11 @@ func (s *server) StreamHandler(stream Stream, typeURL string) error {
 				close(reqCh)
 				return
 			}
-			reqCh <- req
+			select {
+			case reqCh <- req:
+			case <-s.ctx.Done():
+				return
+			}
 		}
 	}()
 
