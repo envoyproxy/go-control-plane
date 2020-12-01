@@ -267,20 +267,17 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 func (s *server) StreamHandler(stream Stream, typeURL string) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *discovery.DiscoveryRequest)
-	reqStop := int32(0)
+	reqStop := make(chan struct{})
 	go func() {
 		for {
 			req, err := stream.Recv()
-			if atomic.LoadInt32(&reqStop) != 0 {
-				return
-			}
 			if err != nil {
 				close(reqCh)
 				return
 			}
 			select {
 			case reqCh <- req:
-			case <-s.ctx.Done():
+			case <-reqStop:
 				return
 			}
 		}
@@ -290,7 +287,7 @@ func (s *server) StreamHandler(stream Stream, typeURL string) error {
 
 	// prevents writing to a closed channel if send failed on blocked recv
 	// TODO(kuat) figure out how to unblock recv through gRPC API
-	atomic.StoreInt32(&reqStop, 1)
+	close(reqStop)
 
 	return err
 }
