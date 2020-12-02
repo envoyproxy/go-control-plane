@@ -149,11 +149,6 @@ func (values *watches) Cancel() {
 	}
 }
 
-// Enumerated receiver channels for well-known types. This is needed because
-// Golang does not support dynamic range in select{}.
-type typeChannels struct {
-}
-
 // process handles a bi-di stream request
 func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
