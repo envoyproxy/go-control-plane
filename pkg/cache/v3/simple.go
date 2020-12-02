@@ -138,18 +138,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, wg *sync.WaitGro
 				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
 			}
 
-			wg.Add(1)
-			// Spawn a goroutine here so that we can give up the lock before issuing responses. This prevents lock contention if the
-			// response channels aren't ready to receive the response.
-			go func(request *Request, response chan<- Response) {
-				defer wg.Done()
-				select {
-				case <-ctx.Done():
-					return
-				default:
-				}
-				cache.respond(request, response, resourcesWithTtl, version, true)
-			}(watch.Request, watch.Response)
+			cache.respond(watch.Request, watch.Response, resourcesWithTtl, version, true)
 
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
