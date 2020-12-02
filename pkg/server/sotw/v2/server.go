@@ -54,12 +54,13 @@ type ServerOption func(*server)
 // NewServer creates handlers from a config watcher and callbacks.
 func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks, opts ...ServerOption) Server {
 	out := &server{
-		cache:         config,
-		callbacks:     callbacks,
-		ctx:           ctx,
-		xdsBufferSize: 1,
-		muxBufferSize: 8,
-		unordered:     true,
+		cache:            config,
+		callbacks:        callbacks,
+		ctx:              ctx,
+		xdsBufferSize:    1,
+		muxBufferSize:    8,
+		unordered:        true,
+		cancelOnResponse: false,
 	}
 	for _, opt := range opts {
 		opt(out)
@@ -97,13 +98,22 @@ func WithOrdered() ServerOption {
 	}
 }
 
+// WithCancelOnResponse calls cancel() even if a response is received.
+func WithCancelOnResponse() ServerOption {
+	return func(s *server) {
+		s.cancelOnResponse = true
+	}
+}
+
 type server struct {
 	cache         cache.ConfigWatcher
 	callbacks     Callbacks
 	ctx           context.Context
 	xdsBufferSize int
 	muxBufferSize int
-	unordered     bool
+
+	unordered        bool
+	cancelOnResponse bool
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -198,7 +208,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		}
 		typeUrl := resp.GetRequest().TypeUrl
 		values.nonces[typeUrl] = nonce
-		values.cancellations[typeUrl] = nil
+		if !s.cancelOnResponse {
+			values.cancellations[typeUrl] = nil
+		}
 		return nil
 	}
 
