@@ -40,11 +40,14 @@ type ConfigWatcher interface {
 	//
 	// Once the requested resources are available, they should be pushed into
 	// responses channel. If there are any failures - nil should be written into
-	// the responses channel and the server should close the corresponding
+	// the responses channel and the server will close the corresponding
 	// stream. Cache implementation should not close the responses channel.
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
+	//
+	// Server expects at most one response for a watch. If cancel is called, the
+	// server may expect no response because of channel size limits.
 	CreateWatch(request *Request, responses chan<- Response) (cancel func())
 }
 

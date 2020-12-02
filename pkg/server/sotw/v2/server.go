@@ -59,6 +59,7 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callba
 		ctx:           ctx,
 		xdsBufferSize: 1,
 		muxBufferSize: 8,
+		unordered:     true,
 	}
 	for _, opt := range opts {
 		opt(out)
@@ -84,12 +85,25 @@ func WithXDSBufferSize(size int) ServerOption {
 	}
 }
 
+// WithOrdered enables reuse of the channel between watches which preserves the
+// ordering of responses in the server stream. Because of sharing, there is a
+// risk of a blocked channel if watch is responded twice (e.g. if cancellation
+// is asynchronous).
+// The default is to create a new channel of size 1 for all well-known type
+// watches.
+func WithOrdered() ServerOption {
+	return func(s *server) {
+		s.unordered = false
+	}
+}
+
 type server struct {
 	cache         cache.ConfigWatcher
 	callbacks     Callbacks
 	ctx           context.Context
 	xdsBufferSize int
 	muxBufferSize int
+	unordered     bool
 
 	// streamCount for counting bi-di streams
 	streamCount int64
@@ -108,6 +122,14 @@ type watches struct {
 	responses     chan cache.Response
 	cancellations map[string]func()
 	nonces        map[string]string
+
+	// Per-type channels for unordered watches
+	endpoints chan cache.Response
+	clusters  chan cache.Response
+	routes    chan cache.Response
+	listeners chan cache.Response
+	secrets   chan cache.Response
+	runtimes  chan cache.Response
 }
 
 // Initialize all watches
@@ -124,6 +146,11 @@ func (values *watches) Cancel() {
 			cancel()
 		}
 	}
+}
+
+// Enumerated receiver channels for well-known types. This is needed because
+// Golang does not support dynamic range in select{}.
+type typeChannels struct {
 }
 
 // process handles a bi-di stream request
@@ -211,6 +238,32 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if err := process(resp); err != nil {
 				return err
 			}
+		// legacy per-type watch channels
+		case resp := <-values.endpoints:
+			if err := process(resp); err != nil {
+				return err
+			}
+		case resp := <-values.clusters:
+			if err := process(resp); err != nil {
+				return err
+			}
+		case resp := <-values.routes:
+			if err := process(resp); err != nil {
+				return err
+			}
+		case resp := <-values.listeners:
+			if err := process(resp); err != nil {
+				return err
+			}
+		case resp := <-values.secrets:
+			if err := process(resp); err != nil {
+				return err
+			}
+		case resp := <-values.runtimes:
+			if err := process(resp); err != nil {
+				return err
+			}
+
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -256,7 +309,30 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						return err
 					}
 				}
-				values.cancellations[typeUrl] = s.cache.CreateWatch(req, values.responses)
+				value := values.responses
+				if s.unordered {
+					switch typeUrl {
+					case resource.EndpointType:
+						values.endpoints = make(chan cache.Response, 1)
+						value = values.endpoints
+					case resource.ClusterType:
+						values.clusters = make(chan cache.Response, 1)
+						value = values.clusters
+					case resource.RouteType:
+						values.routes = make(chan cache.Response, 1)
+						value = values.routes
+					case resource.ListenerType:
+						values.listeners = make(chan cache.Response, 1)
+						value = values.listeners
+					case resource.SecretType:
+						values.secrets = make(chan cache.Response, 1)
+						value = values.secrets
+					case resource.RuntimeType:
+						values.runtimes = make(chan cache.Response, 1)
+						value = values.runtimes
+					}
+				}
+				values.cancellations[typeUrl] = s.cache.CreateWatch(req, value)
 			}
 		}
 	}
