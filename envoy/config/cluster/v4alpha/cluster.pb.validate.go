@@ -244,40 +244,40 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetUpstreamHttpProtocolOptions()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedUpstreamHttpProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
-				field:  "UpstreamHttpProtocolOptions",
+				field:  "HiddenEnvoyDeprecatedUpstreamHttpProtocolOptions",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetCommonHttpProtocolOptions()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedCommonHttpProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
-				field:  "CommonHttpProtocolOptions",
+				field:  "HiddenEnvoyDeprecatedCommonHttpProtocolOptions",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetHttpProtocolOptions()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedHttpProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
-				field:  "HttpProtocolOptions",
+				field:  "HiddenEnvoyDeprecatedHttpProtocolOptions",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetHttp2ProtocolOptions()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedHttp2ProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
-				field:  "Http2ProtocolOptions",
+				field:  "HiddenEnvoyDeprecatedHttp2ProtocolOptions",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -439,7 +439,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	// no validation rules for ProtocolSelection
+	// no validation rules for HiddenEnvoyDeprecatedProtocolSelection
 
 	if v, ok := interface{}(m.GetUpstreamConnectionOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
