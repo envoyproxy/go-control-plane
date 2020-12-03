@@ -13,5 +13,6 @@ func MaybeCreateTtlResourceIfSupported(resource types.ResourceWithTtl, name stri
 }
 
 func IsTTLResource(resource *any.Any) bool {
+	// This is just used in test; pretend like all resources have a TTL in V2 for testing purposes.
 	return true
 }

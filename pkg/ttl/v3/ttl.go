@@ -37,6 +37,7 @@ func MaybeCreateTtlResourceIfSupported(resource types.ResourceWithTtl, name stri
 }
 
 func IsTTLResource(resource *any.Any) bool {
+	// This is only done in test, so no need to worry about the overhead of the marshalling.
 	wrappedResource := &discovery.Resource{}
 	err := ptypes.UnmarshalAny(resource, wrappedResource)
 	if err != nil {
