@@ -453,10 +453,9 @@ type ConfigSource struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Authorities that this config source may be used for. An authority specified
-	// in a *xds.core.v3.ResourceLocator* is resolved to a *ConfigSource* prior
-	// to configuration fetch. This field provides the association between
-	// authority name and configuration source.
+	// Authorities that this config source may be used for. An authority specified in a xdstp:// URL
+	// is resolved to a *ConfigSource* prior to configuration fetch. This field provides the
+	// association between authority name and configuration source.
 	// [#not-implemented-hide:]
 	Authorities []*v3.Authority `protobuf:"bytes,7,rep,name=authorities,proto3" json:"authorities,omitempty"`
 	// Types that are assignable to ConfigSourceSpecifier:

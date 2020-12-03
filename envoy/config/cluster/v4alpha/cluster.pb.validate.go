@@ -1166,24 +1166,7 @@ func (m *Cluster_EdsClusterConfig) Validate() error {
 		}
 	}
 
-	switch m.NameSpecifier.(type) {
-
-	case *Cluster_EdsClusterConfig_ServiceName:
-		// no validation rules for ServiceName
-
-	case *Cluster_EdsClusterConfig_EdsResourceLocator:
-
-		if v, ok := interface{}(m.GetEdsResourceLocator()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return Cluster_EdsClusterConfigValidationError{
-					field:  "EdsResourceLocator",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
+	// no validation rules for ServiceName
 
 	return nil
 }
