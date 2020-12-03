@@ -103,7 +103,11 @@ type snapshotCache struct {
 //
 // Logger is optional.
 func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache {
-	return &snapshotCache{
+	return newSnapshotCache(ads, hash, logger)
+}
+
+func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *snapshotCache {
+	cache := &snapshotCache{
 		log:               logger,
 		ads:               ads,
 		snapshots:         make(map[string]Snapshot),
@@ -111,9 +115,48 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache 
 		hash:              hash,
 		heartbeatRoutines: make(map[string]heartbeatHandle),
 	}
+
+	return cache
 }
 
-func (cache *snapshotCache) sendHeartbeats(ctx context.Context, wg *sync.WaitGroup, node string) {
+// NewSnapshotCacheWithHeartbeating initializes a simple cache that sends periodic heartbeat
+// responses for resources with a TTL.
+//
+// ADS flag forces a delay in responding to streaming requests until all
+// resources are explicitly named in the request. This avoids the problem of a
+// partial request over a single stream for a subset of resources which would
+// require generating a fresh version for acknowledgement. ADS flag requires
+// snapshot consistency. For non-ADS case (and fetch), multiple partial
+// requests are sent across multiple streams and re-using the snapshot version
+// is OK.
+//
+// Logger is optional.
+//
+// The context provides a way to cancel the heartbeating routine, while the heartbeatInterval
+// parameter controls how often heartbeating occurs.
+func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHash, logger log.Logger, heartbeatInterval time.Duration) SnapshotCache {
+	cache := newSnapshotCache(ads, hash, logger)
+	go func() {
+		t := time.NewTicker(heartbeatInterval)
+
+		for {
+			select {
+			case <-t.C:
+				cache.mu.Lock()
+				for node := range cache.status {
+					// TODO(snowp): Omit heartbeats if a real response has been sent recently.
+					cache.sendHeartbeats(ctx, node)
+				}
+				cache.mu.Unlock()
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return cache
+}
+
+func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 	snapshot := cache.snapshots[node]
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
@@ -158,39 +201,6 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	// No heartbeat configured and no existing heartbeat, nothing to do.
 	if ok {
 		handle.cancel()
-	}
-
-	if snapshot.HeartbeatInterval != nil {
-		heartBeatCtx, cancel := context.WithCancel(context.Background())
-		cache.heartbeatRoutines[node] = heartbeatHandle{cancel: cancel}
-
-		go func(heartbeatInterval time.Duration) {
-			ticker := time.NewTicker(heartbeatInterval)
-			for {
-				select {
-				case <-heartBeatCtx.Done():
-					return
-				case <-ticker.C:
-					wg := &sync.WaitGroup{}
-					cache.mu.Lock()
-
-					// It's possible for this goroutine to be canceled while we're waiting to grab the lock. In this case
-					// we want to avoid sending a heartbeat here and just end. If heartbeats should continue the another
-					// goroutine will have been created.
-					select {
-					case <-heartBeatCtx.Done():
-						cache.mu.Unlock()
-						return
-					default:
-						cache.sendHeartbeats(heartBeatCtx, wg, node)
-					}
-					cache.mu.Unlock()
-
-					// Block until we've finished sending all the heartbeats.
-					wg.Wait()
-				}
-			}
-		}(*snapshot.HeartbeatInterval)
 	}
 
 	// trigger existing watches for which version changed

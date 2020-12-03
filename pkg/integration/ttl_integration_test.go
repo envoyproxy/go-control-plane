@@ -30,10 +30,11 @@ func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format
 
 func TestTtlResponse(t *testing.T) {
 
-	snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, logger{t: t})
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+
+	snapshotCache := cache.NewSnapshotCacheWithHeartbeating(ctx, false, cache.IDHash{}, logger{t: t}, time.Second)
+
 	server := server.NewServer(ctx, snapshotCache, nil)
 
 	grpcServer := grpc.NewServer()
@@ -68,7 +69,7 @@ func TestTtlResponse(t *testing.T) {
 	err = snapshotCache.SetSnapshot("test", cache.NewSnapshotWithTtls("1", []types.ResourceWithTtl{{
 		Resource: cla,
 		Ttl:      &oneSecond,
-	}}, nil, nil, nil, nil, nil, &oneSecond))
+	}}, nil, nil, nil, nil, nil))
 	assert.NoError(t, err)
 
 	timeout := time.NewTimer(5 * time.Second)

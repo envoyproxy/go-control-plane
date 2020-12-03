@@ -65,7 +65,7 @@ var (
 		[]types.ResourceWithTtl{{Resource: testRoute}},
 		[]types.ResourceWithTtl{{Resource: testListener}},
 		[]types.ResourceWithTtl{{Resource: testRuntime}},
-		[]types.ResourceWithTtl{{Resource: testSecret[0]}}, &heartbeat)
+		[]types.ResourceWithTtl{{Resource: testSecret[0]}})
 
 	names = map[string][]string{
 		rsrc.EndpointType: {clusterName},
@@ -94,7 +94,9 @@ func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format
 func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
 func TestSnapshotCacheWithTtl(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	c := cache.NewSnapshotCacheWithHeartbeating(ctx, true, group{}, logger{t: t}, time.Second)
 
 	if _, err := c.GetSnapshot(key); err == nil {
 		t.Errorf("unexpected snapshot found for key %q", key)
@@ -146,7 +148,7 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 
 			end := time.After(5 * time.Second)
 			for {
-				value := make(chan cache.Response)
+				value := make(chan cache.Response, 1)
 				cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, value)
 
 				select {

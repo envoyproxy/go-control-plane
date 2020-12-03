@@ -62,8 +62,7 @@ func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resource
 // Consistency is important for the convergence as different resource types
 // from the snapshot may be delivered to the proxy in arbitrary order.
 type Snapshot struct {
-	Resources         [types.UnknownType]Resources
-	HeartbeatInterval *time.Duration
+	Resources [types.UnknownType]Resources
 }
 
 // NewSnapshot creates a snapshot from response types and a version.
@@ -95,8 +94,7 @@ func NewSnapshotWithTtls(version string,
 	routes []types.ResourceWithTtl,
 	listeners []types.ResourceWithTtl,
 	runtimes []types.ResourceWithTtl,
-	secrets []types.ResourceWithTtl,
-	heartbeatInterval *time.Duration) Snapshot {
+	secrets []types.ResourceWithTtl) Snapshot {
 	out := Snapshot{}
 	out.Resources[types.Endpoint] = NewResourcesWithTtl(version, endpoints)
 	out.Resources[types.Cluster] = NewResourcesWithTtl(version, clusters)
@@ -104,7 +102,6 @@ func NewSnapshotWithTtls(version string,
 	out.Resources[types.Listener] = NewResourcesWithTtl(version, listeners)
 	out.Resources[types.Runtime] = NewResourcesWithTtl(version, runtimes)
 	out.Resources[types.Secret] = NewResourcesWithTtl(version, secrets)
-	out.HeartbeatInterval = heartbeatInterval
 	return out
 }
 
