@@ -24,7 +24,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
-type watches = map[chan<- Response]struct{}
+type watches = map[chan Response]struct{}
 
 // LinearCache supports collectons of opaque resources. This cache has a
 // single collection indexed by resource names and manages resource versions
@@ -90,7 +90,7 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	return out
 }
 
-func (cache *LinearCache) respond(value chan<- Response, staleResources []string) {
+func (cache *LinearCache) respond(value chan Response, staleResources []string) {
 	var resources []types.Resource
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
@@ -116,7 +116,7 @@ func (cache *LinearCache) respond(value chan<- Response, staleResources []string
 
 func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	// de-duplicate watches that need to be responded
-	notifyList := make(map[chan<- Response][]string)
+	notifyList := make(map[chan Response][]string)
 	for name := range modified {
 		for watch := range cache.watches[name] {
 			notifyList[watch] = append(notifyList[watch], name)
@@ -164,10 +164,11 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	return nil
 }
 
-func (cache *LinearCache) CreateWatch(request *Request, value chan<- Response) func() {
+func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) {
+	value := make(chan Response, 1)
 	if request.TypeUrl != cache.typeURL {
-		value <- nil
-		return nil
+		close(value)
+		return value, nil
 	}
 	// If the version is not up to date, check whether any requested resource has
 	// been updated between the last version and the current version. This avoids the problem
@@ -203,12 +204,12 @@ func (cache *LinearCache) CreateWatch(request *Request, value chan<- Response) f
 	}
 	if stale {
 		cache.respond(value, staleResources)
-		return nil
+		return value, nil
 	}
 	// Create open watches since versions are up to date.
 	if len(request.ResourceNames) == 0 {
 		cache.watchAll[value] = struct{}{}
-		return func() {
+		return value, func() {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
 			delete(cache.watchAll, value)
@@ -222,7 +223,7 @@ func (cache *LinearCache) CreateWatch(request *Request, value chan<- Response) f
 		}
 		set[value] = struct{}{}
 	}
-	return func() {
+	return value, func() {
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
 		for _, name := range request.ResourceNames {
