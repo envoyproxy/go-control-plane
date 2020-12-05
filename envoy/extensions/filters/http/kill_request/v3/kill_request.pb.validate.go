@@ -54,6 +54,8 @@ func (m *KillRequest) Validate() error {
 		}
 	}
 
+	// no validation rules for KillRequestHeader
+
 	return nil
 }
 
