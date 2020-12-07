@@ -233,6 +233,21 @@ func (m *Bootstrap) Validate() error {
 
 	}
 
+	for idx, item := range m.GetFatalActions() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BootstrapValidationError{
+					field:  fmt.Sprintf("FatalActions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	for idx, item := range m.GetConfigSources() {
 		_, _ = idx, item
 
@@ -768,6 +783,81 @@ var _ interface {
 	ErrorName() string
 } = WatchdogValidationError{}
 
+// Validate checks the field values on FatalAction with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *FatalAction) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return FatalActionValidationError{
+				field:  "Config",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// FatalActionValidationError is the validation error returned by
+// FatalAction.Validate if the designated constraints aren't met.
+type FatalActionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FatalActionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FatalActionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FatalActionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FatalActionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FatalActionValidationError) ErrorName() string { return "FatalActionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FatalActionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFatalAction.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FatalActionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FatalActionValidationError{}
+
 // Validate checks the field values on Runtime with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Runtime) Validate() error {
@@ -1188,15 +1278,7 @@ func (m *Bootstrap_DynamicResources) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLdsResourcesLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Bootstrap_DynamicResourcesValidationError{
-				field:  "LdsResourcesLocator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for LdsResourcesLocator
 
 	if v, ok := interface{}(m.GetCdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1208,15 +1290,7 @@ func (m *Bootstrap_DynamicResources) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCdsResourcesLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Bootstrap_DynamicResourcesValidationError{
-				field:  "CdsResourcesLocator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for CdsResourcesLocator
 
 	if v, ok := interface{}(m.GetAdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1600,16 +1674,6 @@ func (m *RuntimeLayer_RtdsLayer) Validate() error {
 	}
 
 	// no validation rules for Name
-
-	if v, ok := interface{}(m.GetRtdsResourceLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return RuntimeLayer_RtdsLayerValidationError{
-				field:  "RtdsResourceLocator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
 
 	if v, ok := interface{}(m.GetRtdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

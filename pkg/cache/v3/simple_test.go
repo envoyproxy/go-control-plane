@@ -114,32 +114,30 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTtl, snap)
 	}
 
+	wg := sync.WaitGroup{}
 	// All the resources should respond immediately when version is not up to date.
 	for _, typ := range testTypes {
+		wg.Add(1)
 		t.Run(typ, func(t *testing.T) {
-			value := make(chan cache.Response)
-			wg := sync.WaitGroup{}
-			wg.Add(1)
-			go func(ch chan cache.Response, typeUrl string) {
-				defer wg.Done()
-				select {
-				case out := <-ch:
-					if gotVersion, _ := out.GetVersion(); gotVersion != version {
-						t.Errorf("got version %q, want %q", gotVersion, version)
-					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typeUrl)) {
-						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResourcesAndTtl(typeUrl))
-					}
-				case <-time.After(2 * time.Second):
-					t.Errorf("failed to receive snapshot response")
+			defer wg.Done()
+			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+			select {
+			case out := <-value:
+				if gotVersion, _ := out.GetVersion(); gotVersion != version {
+					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-			}(value, typ)
-			_ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResourcesAndTtl(typ))
+				}
+			case <-time.After(2 * time.Second):
+				t.Errorf("failed to receive snapshot response")
+			}
 		})
 	}
+	wg.Wait()
 
 	// Once everything is up to date, only the TTL'd resource should send out updates.
-	wg := sync.WaitGroup{}
+	wg = sync.WaitGroup{}
 	updatesByType := map[string]int{}
 	for _, typ := range testTypes {
 		wg.Add(1)
@@ -148,8 +146,7 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 
 			end := time.After(5 * time.Second)
 			for {
-				value := make(chan cache.Response, 1)
-				cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, value)
+				value, cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
 
 				select {
 				case out := <-value:
@@ -205,8 +202,7 @@ func TestSnapshotCache(t *testing.T) {
 
 	// try to get endpoints with incorrect list of names
 	// should not receive response
-	value := make(chan cache.Response, 1)
-	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}}, value)
+	value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}})
 	select {
 	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -215,8 +211,7 @@ func TestSnapshotCache(t *testing.T) {
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
-			value := make(chan cache.Response, 1)
-			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 			select {
 			case out := <-value:
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
@@ -267,8 +262,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	watches := make(map[string]chan cache.Response)
 	for _, typ := range testTypes {
-		watches[typ] = make(chan cache.Response, 1)
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, watches[typ])
+		watches[typ], _ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 	}
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
@@ -291,8 +285,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// open new watches with the latest version
 	for _, typ := range testTypes {
-		watches[typ] = make(chan cache.Response, 1)
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, watches[typ])
+		watches[typ], _ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
 	}
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
@@ -330,7 +323,6 @@ func TestConcurrentSetWatch(t *testing.T) {
 				t.Parallel()
 				id := fmt.Sprintf("%d", i%2)
 				var cancel func()
-				value := make(chan cache.Response, 1)
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
@@ -339,10 +331,10 @@ func TestConcurrentSetWatch(t *testing.T) {
 					if cancel != nil {
 						cancel()
 					}
-					cancel = c.CreateWatch(&discovery.DiscoveryRequest{
+					_, cancel = c.CreateWatch(&discovery.DiscoveryRequest{
 						Node:    &core.Node{Id: id},
 						TypeUrl: rsrc.EndpointType,
-					}, value)
+					})
 				}
 			})
 		}(i)
@@ -352,8 +344,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 func TestSnapshotCacheWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	for _, typ := range testTypes {
-		value := make(chan cache.Response, 1)
-		cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+		_, cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 		cancel()
 	}
 	// should be status info for the node

@@ -34,26 +34,29 @@ import (
 )
 
 type mockConfigWatcher struct {
-	counts    map[string]int
-	responses map[string][]cache.Response
-	failWatch bool
-	watches   int
+	counts     map[string]int
+	responses  map[string][]cache.Response
+	closeWatch bool
+	watches    int
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan<- cache.Response) func() {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+	out := make(chan cache.Response, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
-	} else if config.failWatch {
-		out <- nil
+	} else if config.closeWatch {
+		close(out)
 	} else {
 		config.watches += 1
-		return func() {
+		return out, func() {
+			// it is ok to close the channel after cancellation and not wait for it to be garbage collected
+			close(out)
 			config.watches -= 1
 		}
 	}
-	return nil
+	return out, nil
 }
 
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
@@ -424,7 +427,7 @@ func TestWatchClosed(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
-			config.failWatch = true
+			config.closeWatch = true
 			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 
 			// make a request

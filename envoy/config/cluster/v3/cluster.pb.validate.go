@@ -1210,16 +1210,6 @@ func (m *Cluster_EdsClusterConfig) Validate() error {
 
 	// no validation rules for ServiceName
 
-	if v, ok := interface{}(m.GetEdsResourceLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Cluster_EdsClusterConfigValidationError{
-				field:  "EdsResourceLocator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	return nil
 }
 
