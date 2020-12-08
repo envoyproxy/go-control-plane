@@ -74,12 +74,12 @@ func NewSnapshot(version string,
 
 // SnapshotResources contains the resources to construct a snapshot from.
 type SnapshotResources struct {
-	Endpoints       []types.Resource
-	Clusters        []types.Resource
-	Routes          []types.Resource
-	Listeners       []types.Resource
-	Runtimes        []types.Resource
-	Secrets         []types.Resource
+	Endpoints        []types.Resource
+	Clusters         []types.Resource
+	Routes           []types.Resource
+	Listeners        []types.Resource
+	Runtimes         []types.Resource
+	Secrets          []types.Resource
 	ExtensionConfigs []types.Resource
 }
 

@@ -10,14 +10,14 @@ import (
 
 // Resource types in xDS v3.
 const (
-	apiTypePrefix = "type.googleapis.com/"
-	EndpointType  = apiTypePrefix + "envoy.config.endpoint.v3.ClusterLoadAssignment"
-	ClusterType   = apiTypePrefix + "envoy.config.cluster.v3.Cluster"
-	RouteType     = apiTypePrefix + "envoy.config.route.v3.RouteConfiguration"
-	ListenerType  = apiTypePrefix + "envoy.config.listener.v3.Listener"
-	SecretType    = apiTypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
+	apiTypePrefix       = "type.googleapis.com/"
+	EndpointType        = apiTypePrefix + "envoy.config.endpoint.v3.ClusterLoadAssignment"
+	ClusterType         = apiTypePrefix + "envoy.config.cluster.v3.Cluster"
+	RouteType           = apiTypePrefix + "envoy.config.route.v3.RouteConfiguration"
+	ListenerType        = apiTypePrefix + "envoy.config.listener.v3.Listener"
+	SecretType          = apiTypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
 	ExtensionConfigType = apiTypePrefix + "envoy.config.core.v3.TypedExtensionConfig"
-	RuntimeType   = apiTypePrefix + "envoy.service.runtime.v3.Runtime"
+	RuntimeType         = apiTypePrefix + "envoy.service.runtime.v3.Runtime"
 
 	// AnyType is used only by ADS
 	AnyType = ""
@@ -25,12 +25,12 @@ const (
 
 // Fetch urls in xDS v3.
 const (
-	FetchEndpoints = "/v3/discovery:endpoints"
-	FetchClusters  = "/v3/discovery:clusters"
-	FetchListeners = "/v3/discovery:listeners"
-	FetchRoutes    = "/v3/discovery:routes"
-	FetchSecrets   = "/v3/discovery:secrets"
-	FetchRuntimes  = "/v3/discovery:runtime"
+	FetchEndpoints        = "/v3/discovery:endpoints"
+	FetchClusters         = "/v3/discovery:clusters"
+	FetchListeners        = "/v3/discovery:listeners"
+	FetchRoutes           = "/v3/discovery:routes"
+	FetchSecrets          = "/v3/discovery:secrets"
+	FetchRuntimes         = "/v3/discovery:runtime"
 	FetchExtensionConfigs = "/v3/discovery:extension_configs"
 )
 

@@ -27,12 +27,12 @@ const (
 
 // Fetch urls in xDS v2.
 const (
-	FetchEndpoints = "/v2/discovery:endpoints"
-	FetchClusters  = "/v2/discovery:clusters"
-	FetchListeners = "/v2/discovery:listeners"
-	FetchRoutes    = "/v2/discovery:routes"
-	FetchSecrets   = "/v2/discovery:secrets"
-	FetchRuntimes  = "/v2/discovery:runtime"
+	FetchEndpoints        = "/v2/discovery:endpoints"
+	FetchClusters         = "/v2/discovery:clusters"
+	FetchListeners        = "/v2/discovery:listeners"
+	FetchRoutes           = "/v2/discovery:routes"
+	FetchSecrets          = "/v2/discovery:secrets"
+	FetchRuntimes         = "/v2/discovery:runtime"
 	FetchExtensionConfigs = "/v3/discovery:extension_configs"
 )
 
