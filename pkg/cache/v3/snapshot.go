@@ -63,13 +63,37 @@ func NewSnapshot(version string,
 	listeners []types.Resource,
 	runtimes []types.Resource,
 	secrets []types.Resource) Snapshot {
+	return NewSnapshotWithResources(version, SnapshotResources{
+		Endpoints: endpoints,
+		Clusters:  clusters,
+		Routes:    routes,
+		Listeners: listeners,
+		Runtimes:  runtimes,
+		Secrets:   secrets,
+	})
+}
+
+// SnapshotResources contains the resources to construct a snapshot from.
+type SnapshotResources struct {
+	Endpoints        []types.Resource
+	Clusters         []types.Resource
+	Routes           []types.Resource
+	Listeners        []types.Resource
+	Runtimes         []types.Resource
+	Secrets          []types.Resource
+	ExtensionConfigs []types.Resource
+}
+
+// NewSnapshotWithResources creates a snapshot from response types and a version.
+func NewSnapshotWithResources(version string, resources SnapshotResources) Snapshot {
 	out := Snapshot{}
-	out.Resources[types.Endpoint] = NewResources(version, endpoints)
-	out.Resources[types.Cluster] = NewResources(version, clusters)
-	out.Resources[types.Route] = NewResources(version, routes)
-	out.Resources[types.Listener] = NewResources(version, listeners)
-	out.Resources[types.Runtime] = NewResources(version, runtimes)
-	out.Resources[types.Secret] = NewResources(version, secrets)
+	out.Resources[types.Endpoint] = NewResources(version, resources.Endpoints)
+	out.Resources[types.Cluster] = NewResources(version, resources.Clusters)
+	out.Resources[types.Route] = NewResources(version, resources.Routes)
+	out.Resources[types.Listener] = NewResources(version, resources.Listeners)
+	out.Resources[types.Runtime] = NewResources(version, resources.Runtimes)
+	out.Resources[types.Secret] = NewResources(version, resources.Secrets)
+	out.Resources[types.ExtensionConfig] = NewResources(version, resources.ExtensionConfigs)
 	return out
 }
 

@@ -24,6 +24,7 @@ import (
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
@@ -62,6 +63,9 @@ func GetResourceName(res types.Resource) string {
 	case *auth.Secret:
 		return v.GetName()
 	case *runtime.Runtime:
+		return v.GetName()
+	case *core.TypedExtensionConfig:
+		// This is a V3 proto, but this is the easiest workaround for the fact that there is no V2 proto.
 		return v.GetName()
 	default:
 		return ""
