@@ -1,10 +1,12 @@
 # Changelog
 
-## Release v0.9.8
+## Release v0.9.7
 
 ### Changed
 
-- Interface between the server and the cache has been changed to support explicit ordering by the cache.
+- Envoy APIs are at 1d44c27ff7d4ebdfbfd9a6acbcecf9631b107e30
+- server: exit receiver go routine when context is done
+- cache: align struct fields
 
 ## Release v0.9.7
 

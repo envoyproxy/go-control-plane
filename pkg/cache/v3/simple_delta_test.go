@@ -36,14 +36,13 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	watches := make(map[string]chan cache.DeltaResponse)
 
 	for _, typ := range testTypes {
-		watches[typ] = make(chan cache.DeltaResponse, 1)
-		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: "node",
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, watches[typ], mockStreamState{ResourceVersions: nil, SystemVersion: ""})
+		}, mockStreamState{ResourceVersions: nil, SystemVersion: ""})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -70,14 +69,13 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	for _, typ := range testTypes {
-		watches[typ] = make(chan cache.DeltaResponse, 1)
-		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: "node",
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, watches[typ], mockStreamState{ResourceVersions: vm[typ], SystemVersion: "x"})
+		}, mockStreamState{ResourceVersions: vm[typ], SystemVersion: "x"})
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -119,7 +117,6 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 				t.Parallel()
 				id := fmt.Sprintf("%d", i%2)
 				var cancel func()
-				value := make(chan cache.DeltaResponse, 1)
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
@@ -128,13 +125,13 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 					if cancel != nil {
 						cancel()
 					}
-					c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+					_, cancel = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 						Node: &core.Node{
 							Id: id,
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, value, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
+					}, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
 				}
 			})
 		}(i)
@@ -144,14 +141,13 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	for _, typ := range testTypes {
-		value := make(chan cache.DeltaResponse, 1)
-		cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+		_, cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: key,
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, value, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
+		}, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
 
 		// Cancel the watch
 		cancel()

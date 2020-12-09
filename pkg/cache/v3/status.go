@@ -87,7 +87,7 @@ type ResponseWatch struct {
 	Request *Request
 
 	// Response is the channel to push responses to.
-	Response chan<- Response
+	Response chan Response
 }
 
 // DeltaResponseWatch is a watch record keeping both the delta request and an open channel for the delta response.
@@ -96,7 +96,7 @@ type DeltaResponseWatch struct {
 	Request *DeltaRequest
 
 	// Response is the channel to push the delta responses to
-	Response chan<- DeltaResponse
+	Response chan DeltaResponse
 
 	// VersionMap for the stream
 	VersionMap map[string]DeltaVersionInfo

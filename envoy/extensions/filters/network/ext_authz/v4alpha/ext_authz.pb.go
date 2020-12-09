@@ -126,7 +126,7 @@ func (x *ExtAuthz) GetTransportApiVersion() v4alpha.ApiVersion {
 	if x != nil {
 		return x.TransportApiVersion
 	}
-	return v4alpha.ApiVersion_AUTO
+	return v4alpha.ApiVersion_hidden_envoy_deprecated_AUTO
 }
 
 func (x *ExtAuthz) GetFilterEnabledMetadata() *v4alpha1.MetadataMatcher {

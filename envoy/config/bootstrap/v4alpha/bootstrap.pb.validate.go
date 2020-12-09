@@ -1268,15 +1268,7 @@ func (m *Bootstrap_DynamicResources) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetLdsResourcesLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Bootstrap_DynamicResourcesValidationError{
-				field:  "LdsResourcesLocator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for LdsResourcesLocator
 
 	if v, ok := interface{}(m.GetCdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1288,15 +1280,7 @@ func (m *Bootstrap_DynamicResources) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetCdsResourcesLocator()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return Bootstrap_DynamicResourcesValidationError{
-				field:  "CdsResourcesLocator",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
+	// no validation rules for CdsResourcesLocator
 
 	if v, ok := interface{}(m.GetAdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -1679,6 +1663,8 @@ func (m *RuntimeLayer_RtdsLayer) Validate() error {
 		return nil
 	}
 
+	// no validation rules for Name
+
 	if v, ok := interface{}(m.GetRtdsConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RuntimeLayer_RtdsLayerValidationError{
@@ -1687,25 +1673,6 @@ func (m *RuntimeLayer_RtdsLayer) Validate() error {
 				cause:  err,
 			}
 		}
-	}
-
-	switch m.NameSpecifier.(type) {
-
-	case *RuntimeLayer_RtdsLayer_Name:
-		// no validation rules for Name
-
-	case *RuntimeLayer_RtdsLayer_RtdsResourceLocator:
-
-		if v, ok := interface{}(m.GetRtdsResourceLocator()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return RuntimeLayer_RtdsLayerValidationError{
-					field:  "RtdsResourceLocator",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	return nil

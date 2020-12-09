@@ -90,6 +90,8 @@ func (m *ThriftProxy) Validate() error {
 
 	}
 
+	// no validation rules for PayloadPassthrough
+
 	return nil
 }
 

@@ -47,25 +47,28 @@ type mockConfigWatcher struct {
 	counts         map[string]int
 	responses      map[string][]cache.Response
 	deltaResponses map[string][]cache.DeltaResponse
-	failWatch      bool
+	closeWatch     bool
 	watches        int
 	deltaWatches   int
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan<- cache.Response) func() {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+	out := make(chan cache.Response, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
-	} else if config.failWatch {
-		out <- nil
+	} else if config.closeWatch {
+		close(out)
 	} else {
 		config.watches += 1
-		return func() {
+		return out, func() {
+			// it is ok to close the channel after cancellation and not wait for it to be garbage collected
+			close(out)
 			config.watches -= 1
 		}
 	}
-	return nil
+	return out, nil
 }
 
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
@@ -77,8 +80,11 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.Disco
 	return nil, errors.New("missing")
 }
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, out chan<- cache.DeltaResponse, vs cache.StreamVersion) func() {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, vs cache.StreamVersion) (chan cache.DeltaResponse, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+
+	// Create our out watch channel to return with a buffer of one
+	out := make(chan cache.DeltaResponse, 1)
 
 	if len(config.deltaResponses[req.TypeUrl]) > 0 {
 		res := config.deltaResponses[req.TypeUrl][0]
@@ -109,18 +115,18 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			VersionMap:        vs.GetVersionMap(),
 		}
 
-	} else if config.failWatch {
+	} else if config.closeWatch {
 		fmt.Printf("No resources... closing watch\n")
 		close(out)
 	} else {
 		config.deltaWatches += 1
-		return func() {
+		return out, func() {
 			close(out)
 			config.deltaWatches -= 1
 		}
 	}
 
-	return nil
+	return out, nil
 }
 
 func makeMockConfigWatcher() *mockConfigWatcher {
@@ -518,7 +524,7 @@ func TestDeltaResponseHandlers(t *testing.T) {
 				}
 
 				if err != nil {
-					t.Logf("Delta() => got \"%v\", want no error", err)
+					t.Errorf("Delta() => got \"%v\", want no error", err)
 				}
 			}()
 
@@ -648,7 +654,7 @@ func TestWatchClosed(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
-			config.failWatch = true
+			config.closeWatch = true
 			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, logger{t})
 
 			// make a request
