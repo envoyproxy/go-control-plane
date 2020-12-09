@@ -209,7 +209,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 			// respond to the watch only if new resources have been changed, otherwise leave an open watch
 			if len(res) > 0 {
-				cache.respondDelta(watch.Request, watch.Response, versionsToSend, res, nil)
+				cache.respondDelta(watch.Request, watch.Response, versionsToSend, res)
 				delete(info.deltaWatches, id)
 			} else {
 				if cache.log != nil {

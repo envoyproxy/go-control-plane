@@ -81,7 +81,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVer
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
 	// we do want to respond with the full resource version map though
-	cache.respondDelta(request, value, vMap[t], snapshot.GetResources(t), nil)
+	cache.respondDelta(request, value, vMap[t], snapshot.GetResources(t))
 	return value, nil
 }
 
@@ -103,16 +103,16 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource) {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
 			request.GetNode().GetId(), request.TypeUrl, versionMap)
 	}
 
-	value <- createDeltaResponse(request, versionMap, resources, unsubscribed)
+	value <- createDeltaResponse(request, versionMap, resources)
 }
 
-func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) DeltaResponse {
+func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource) DeltaResponse {
 	filtered := make([]types.Resource, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
@@ -124,9 +124,8 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersi
 
 	// send through our version map
 	return &RawDeltaResponse{
-		DeltaRequest:     request,
-		Resources:        filtered,
-		VersionMap:       versionMap,
-		RemovedResources: unsubscribed,
+		DeltaRequest: request,
+		Resources:    filtered,
+		VersionMap:   versionMap,
 	}
 }
