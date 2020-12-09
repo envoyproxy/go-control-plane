@@ -1,6 +1,6 @@
 # Changelog
 
-## Release v0.9.7
+## Release v0.9.8
 
 ### Changed
 
