@@ -31,5 +31,6 @@ const (
 	Listener
 	Secret
 	Runtime
+	ExtensionConfig
 	UnknownType // token to count the total number of supported types
 )
