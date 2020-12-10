@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.9.8
+
+### Changed
+
+- Envoy APIs are at 1d44c27ff7d4ebdfbfd9a6acbcecf9631b107e30
+- server: exit receiver go routine when context is done
+- cache: align struct fields
+
 ## Release v0.9.7
 
 ### Added

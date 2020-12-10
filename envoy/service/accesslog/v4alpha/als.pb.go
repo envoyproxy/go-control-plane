@@ -175,7 +175,7 @@ type StreamAccessLogsMessage_Identifier struct {
 	// The node sending the access log messages over the stream.
 	Node *v4alpha.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
 	// The friendly name of the log configured in :ref:`CommonGrpcAccessLogConfig
-	// <envoy_api_msg_extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfig>`.
+	// <envoy_api_msg_extensions.access_loggers.grpc.v4alpha.CommonGrpcAccessLogConfig>`.
 	LogName string `protobuf:"bytes,2,opt,name=log_name,json=logName,proto3" json:"log_name,omitempty"`
 }
 

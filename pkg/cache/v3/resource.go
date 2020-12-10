@@ -19,6 +19,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
@@ -63,6 +64,9 @@ func GetResourceName(res types.Resource) string {
 	case *auth.Secret:
 		return v.GetName()
 	case *runtime.Runtime:
+		return v.GetName()
+	case *core.TypedExtensionConfig:
+		// This is a V3 proto, but this is the easiest workaround for the fact that there is no V2 proto.
 		return v.GetName()
 	default:
 		return ""

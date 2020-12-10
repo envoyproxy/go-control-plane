@@ -93,7 +93,7 @@ func (x *MetricsServiceConfig) GetTransportApiVersion() v4alpha.ApiVersion {
 	if x != nil {
 		return x.TransportApiVersion
 	}
-	return v4alpha.ApiVersion_AUTO
+	return v4alpha.ApiVersion_hidden_envoy_deprecated_AUTO
 }
 
 func (x *MetricsServiceConfig) GetReportCountersAsDeltas() *wrappers.BoolValue {
