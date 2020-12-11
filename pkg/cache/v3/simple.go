@@ -86,9 +86,6 @@ type snapshotCache struct {
 	// hash is the hashing function for Envoy nodes
 	hash NodeHash
 
-	// heartbeatRoutines keeps track of the active heartbeat goroutines
-	heartbeatRoutines map[string]heartbeatHandle
-
 	mu sync.RWMutex
 }
 
@@ -109,12 +106,11 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache 
 
 func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *snapshotCache {
 	cache := &snapshotCache{
-		log:               logger,
-		ads:               ads,
-		snapshots:         make(map[string]Snapshot),
-		status:            make(map[string]*statusInfo),
-		hash:              hash,
-		heartbeatRoutines: make(map[string]heartbeatHandle),
+		log:       logger,
+		ads:       ads,
+		snapshots: make(map[string]Snapshot),
+		status:    make(map[string]*statusInfo),
+		hash:      hash,
 	}
 
 	return cache
@@ -197,12 +193,6 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 	// update the existing entry
 	cache.snapshots[node] = snapshot
-
-	handle, ok := cache.heartbeatRoutines[node]
-	// No heartbeat configured and no existing heartbeat, nothing to do.
-	if ok {
-		handle.cancel()
-	}
 
 	// trigger existing watches for which version changed
 	if info, ok := cache.status[node]; ok {
