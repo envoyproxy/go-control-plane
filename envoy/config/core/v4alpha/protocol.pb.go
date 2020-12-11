@@ -210,6 +210,10 @@ type HttpProtocolOptions struct {
 	// .. warning::
 	//   Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP
 	//   FIN packets, etc.
+	//
+	// If the :ref:`overload action <config_overload_manager_overload_actions>` "envoy.overload_actions.reduce_timeouts"
+	// is configured, this timeout is scaled for downstream connections according to the value for
+	// :ref:`HTTP_DOWNSTREAM_CONNECTION_IDLE <envoy_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_CONNECTION_IDLE>`.
 	IdleTimeout *duration.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// The maximum duration of a connection. The duration is defined as a period since a connection
 	// was established. If not set, there is no max duration. When max_connection_duration is reached

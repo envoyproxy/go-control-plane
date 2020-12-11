@@ -1543,7 +1543,7 @@ type RouteAction struct {
 	//
 	// If the :ref:`overload action <config_overload_manager_overload_actions>` "envoy.overload_actions.reduce_timeouts"
 	// is configured, this timeout is scaled according to the value for
-	// :ref:`HTTP_DOWNSTREAM_CONNECTION_IDLE <envoy_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_CONNECTION_IDLE>`.
+	// :ref:`HTTP_DOWNSTREAM_STREAM_IDLE <envoy_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_STREAM_IDLE>`.
 	IdleTimeout *duration.Duration `protobuf:"bytes,24,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// Indicates that the route has a retry policy. Note that if this is set,
 	// it'll take precedence over the virtual host level retry policy entirely
