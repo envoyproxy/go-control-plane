@@ -57,6 +57,7 @@ const _ = proto.ProtoPackageIsVersion4
 //       http_uri:
 //         uri: https://example.com/.well-known/jwks.json
 //         cluster: example_jwks_cluster
+//         timeout: 1s
 //       cache_duration:
 //         seconds: 300
 //
@@ -290,6 +291,7 @@ type JwtProvider_RemoteJwks struct {
 	//      http_uri:
 	//        uri: https://www.googleapis.com/oauth2/v1/certs
 	//        cluster: jwt.www.googleapis.com|443
+	//        timeout: 1s
 	//      cache_duration:
 	//        seconds: 300
 	//
@@ -334,6 +336,7 @@ type RemoteJwks struct {
 	//    http_uri:
 	//      uri: https://www.googleapis.com/oauth2/v1/certs
 	//      cluster: jwt.www.googleapis.com|443
+	//      timeout: 1s
 	//
 	HttpUri *v4alpha.HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
 	// Duration after which the cached JWKS should be expired. If not specified, default cache
@@ -1030,6 +1033,7 @@ func (x *FilterStateRule) GetRequires() map[string]*JwtRequirement {
 //          http_uri:
 //            uri: https://example.com/.well-known/jwks.json
 //            cluster: example_jwks_cluster
+//            timeout: 1s
 //      provider2:
 //        issuer: issuer2
 //        local_jwks:
@@ -1075,6 +1079,7 @@ type JwtAuthentication struct {
 	//          http_uri:
 	//            uri: https://example.com/.well-known/jwks.json
 	//            cluster: example_jwks_cluster
+	//            timeout: 1s
 	//      provider2:
 	//        issuer: provider2
 	//        local_jwks:
