@@ -37,7 +37,6 @@ const _ = proto.ProtoPackageIsVersion4
 // might repeat several times until the final OnMatch (or no match) is decided.
 //
 // This API is a work in progress.
-// [#not-implemented-hide:]
 type Matcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
