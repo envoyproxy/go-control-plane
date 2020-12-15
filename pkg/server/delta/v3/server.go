@@ -19,11 +19,11 @@ import (
 	"context"
 	"errors"
 	"strconv"
-	"sync"
 	"sync/atomic"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
@@ -73,8 +73,6 @@ type server struct {
 
 // watches for all xDS resource types
 type watches struct {
-	mu *sync.RWMutex
-
 	deltaEndpoints chan cache.DeltaResponse
 	deltaClusters  chan cache.DeltaResponse
 	deltaRoutes    chan cache.DeltaResponse
@@ -111,10 +109,20 @@ func (values *watches) Init() {
 	values.deltaNonces = make(map[string]string)
 	values.deltaTerminations = make(map[string]chan struct{})
 	values.deltaCancellations = make(map[string]func())
-	values.mu = &sync.RWMutex{}
+	values.deltaResourceVersions = initResourceVersions()
 }
 
 var deltaErrorResponse = &cache.RawDeltaResponse{}
+
+func initResourceVersions() map[string]map[string]string {
+	m := make(map[string]map[string]string, 6)
+
+	for i := 0; i < int(types.UnknownType); i++ {
+		m[cache.GetResponseTypeURL(types.ResponseType(i))] = make(map[string]string, 0)
+	}
+
+	return m
+}
 
 // Cancel all watches
 func (values *watches) Cancel() {
