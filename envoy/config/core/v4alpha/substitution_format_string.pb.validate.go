@@ -50,14 +50,8 @@ func (m *SubstitutionFormatString) Validate() error {
 
 	switch m.Format.(type) {
 
-	case *SubstitutionFormatString_TextFormat:
-
-		if utf8.RuneCountInString(m.GetTextFormat()) < 1 {
-			return SubstitutionFormatStringValidationError{
-				field:  "TextFormat",
-				reason: "value length must be at least 1 runes",
-			}
-		}
+	case *SubstitutionFormatString_HiddenEnvoyDeprecatedTextFormat:
+		// no validation rules for HiddenEnvoyDeprecatedTextFormat
 
 	case *SubstitutionFormatString_JsonFormat:
 
@@ -72,6 +66,18 @@ func (m *SubstitutionFormatString) Validate() error {
 			if err := v.Validate(); err != nil {
 				return SubstitutionFormatStringValidationError{
 					field:  "JsonFormat",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *SubstitutionFormatString_TextFormatSource:
+
+		if v, ok := interface{}(m.GetTextFormatSource()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SubstitutionFormatStringValidationError{
+					field:  "TextFormatSource",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
