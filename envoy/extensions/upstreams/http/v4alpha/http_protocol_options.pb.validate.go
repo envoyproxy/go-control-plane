@@ -90,6 +90,12 @@ func (m *HttpProtocolOptions) Validate() error {
 			}
 		}
 
+	default:
+		return HttpProtocolOptionsValidationError{
+			field:  "UpstreamProtocolOptions",
+			reason: "value is required",
+		}
+
 	}
 
 	return nil
@@ -183,6 +189,12 @@ func (m *HttpProtocolOptions_ExplicitHttpConfig) Validate() error {
 					cause:  err,
 				}
 			}
+		}
+
+	default:
+		return HttpProtocolOptions_ExplicitHttpConfigValidationError{
+			field:  "ProtocolConfig",
+			reason: "value is required",
 		}
 
 	}
