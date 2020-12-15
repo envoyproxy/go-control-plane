@@ -45,19 +45,27 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versionMap m
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
-	snapshotVersion := snapshot.GetVersion(t)
+	var resp *RawDeltaResponse
+	if exists {
+		resp = cache.respondDelta(request, value, versionMap, snapshot.GetResources(t))
+	}
 
-	// if there is no change in resource version from the previous snapshot then we should create a new watch accordingly
-	// if all requested versions are up-to-date or missing a response, leave an open watch
-	if !exists || !cache.respondDelta(request, value, versionMap, snapshot.GetResources(t)) {
+	// if resp is nil this means that either there is no change in resource version from the previous snapshot
+	// or the requested resource doesn't exist in the snapshot
+	// in both cases we should create a new watch accordingly
+	if resp != nil {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
-				t, versionMap, nodeID, snapshotVersion)
+				t, versionMap, nodeID, snapshot.GetVersion(t))
+		}
+		newVersionMap, err := resp.GetDeltaVersionMap()
+		if err != nil && cache.log != nil {
+			cache.log.Errorf("Error while getting delta version map")
 		}
 
 		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: versionMap}
+		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: newVersionMap}
 		info.mu.Unlock()
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
@@ -84,7 +92,7 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]string, resources map[string]types.Resource) bool {
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]string, resources map[string]types.Resource) *RawDeltaResponse {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
 			request.GetNode().GetId(), request.TypeUrl, versionMap)
@@ -95,13 +103,14 @@ func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan Delta
 		if cache.log != nil {
 			cache.log.Errorf("Error creating delta response: %v", err)
 		}
-		return false
+		return nil
 	}
+	// One send response if there were some actual updates
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		value <- resp
-		return true
+		return resp
 	}
-	return false
+	return nil
 }
 
 func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, resources map[string]types.Resource) (*RawDeltaResponse, error) {
