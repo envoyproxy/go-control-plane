@@ -112,10 +112,12 @@ func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan Delta
 		}
 		return
 	}
-	value <- resp
+	if len(resp.Resources) > 0 || len(RemovedResources) > 0 {
+		value <- resp
+	}
 }
 
-func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, resources map[string]types.Resource) (DeltaResponse, error) {
+func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, resources map[string]types.Resource) (*RawDeltaResponse, error) {
 	newVersionMap := make(map[string]string)
 	filtered := make([]types.Resource, 0)
 	toRemove := make([]string, 0)
@@ -149,8 +151,9 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, re
 
 	// send through our version map
 	return &RawDeltaResponse{
-		DeltaRequest: request,
-		Resources:    filtered,
-		VersionMap:   newVersionMap,
+		DeltaRequest:     request,
+		Resources:        filtered,
+		RemovedResources: toDelete,
+		VersionMap:       newVersionMap,
 	}, nil
 }
