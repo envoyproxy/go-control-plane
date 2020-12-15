@@ -47,7 +47,7 @@ func (mux *MuxCache) CreateWatch(request *Request) (chan Response, func()) {
 }
 
 // TODO: implement CreateDeltaWatch for linear cache
-func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, v StreamVersion) (chan DeltaResponse, func()) {
+func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, versionMap map[string]string) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 

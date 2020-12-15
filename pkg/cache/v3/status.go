@@ -99,7 +99,7 @@ type DeltaResponseWatch struct {
 	Response chan DeltaResponse
 
 	// VersionMap for the stream
-	VersionMap map[string]DeltaVersionInfo
+	VersionMap map[string]string
 }
 
 // newStatusInfo initializes a status info data structure.
@@ -143,7 +143,7 @@ func (info *statusInfo) GetLastDeltaWatchRequestTime() time.Time {
 }
 
 // GetDeltaVersionMap will pull the version map out of a specific watch
-func (info *statusInfo) GetDeltaVersionMap(watchID int64) map[string]DeltaVersionInfo {
+func (info *statusInfo) GetDeltaVersionMap(watchID int64) map[string]string {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.deltaWatches[watchID].VersionMap

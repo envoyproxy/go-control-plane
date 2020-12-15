@@ -16,7 +16,6 @@
 package cache
 
 import (
-	"errors"
 	"sync/atomic"
 	"time"
 
@@ -24,13 +23,9 @@ import (
 )
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVersion) (chan DeltaResponse, func()) {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versionMap map[string]string) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
-	aliases := request.GetResourceNamesSubscribe()
-	if sv == nil {
-		panic(errors.New("StreamVersion cannot be nil when creating a delta watch"))
-	}
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -55,25 +50,25 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVer
 
 	// Compare our requested versions with the existing snapshot
 	var versionChange bool
-	for alias, version := range vMap[t] {
-		for a, v := range sv.GetVersionMap() {
-			if a == alias && v == version {
-				versionChange = true
-			}
+	for resorce, version := range versionMap {
+		v, ok := vMap[t][resorce]
+		if !ok || v != version {
+			versionChange = true
+			break
 		}
 	}
 
-	// if we detect a change in resource version from the previous snapshot then we should create a new watch accordingly
-	// if the requested version is up-to-date or missing a response, leave an open watch
-	if !exists || versionChange {
+	// if there is no change in resource version from the previous snapshot then we should create a new watch accordingly
+	// if all requested versions are up-to-date or missing a response, leave an open watch
+	if !exists || !versionChange {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
-				t, aliases, nodeID, snapshotVersion)
+				t, versionMap, nodeID, snapshotVersion)
 		}
 
 		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: sv.GetVersionMap()}
+		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: versionMap}
 		info.mu.Unlock()
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
@@ -82,7 +77,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVer
 	// otherwise, the watch may be responded to immediately with the subscribed resources
 	// we don't want to ask for all the resources by type here
 	// we do want to respond with the full resource version map though
-	cache.respondDelta(request, value, vMap[t], snapshot.GetResources(t), nil)
+	cache.respondDelta(request, value, vMap[t], snapshot.GetResources(t))
 	return value, nil
 }
 
@@ -104,30 +99,58 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]string, resources map[string]types.Resource) {
 	if cache.log != nil {
 		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
 			request.GetNode().GetId(), request.TypeUrl, versionMap)
 	}
 
-	value <- createDeltaResponse(request, versionMap, resources, unsubscribed)
+	resp, err := createDeltaResponse(request, versionMap, resources)
+	if err != nil {
+		if cache.log != nil {
+			cache.log.Errorf("Error creating delta response: %v", err)
+		}
+		return
+	}
+	value <- resp
 }
 
-func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) DeltaResponse {
-	filtered := make([]types.Resource, 0, len(resources))
-
-	// Reply only with the requested resources. Envoy may ask each resource
-	// individually in a separate stream. It is ok to reply with the same version
-	// on separate streams since requests do not share their response versions.
-	for _, resource := range resources {
-		filtered = append(filtered, resource)
+func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, resources map[string]types.Resource) (DeltaResponse, error) {
+	newVersionMap := make(map[string]string)
+	filtered := make([]types.Resource, 0)
+	toRemove := make([]string, 0)
+	if len(versionMap) == 0 {
+		for resourceName, resource := range resources {
+			var err error
+			newVersionMap[resourceName], err = HashResource(resource)
+			if err != nil {
+				return nil, err
+			}
+			filtered = append(filtered, resource)
+		}
+	} else {
+		// Reply only with the requested resources. Envoy may ask each resource
+		// individually in a separate stream. It is ok to reply with the same version
+		// on separate streams since requests do not share their response versions.
+		for resourceName, oldVersion := range versionMap {
+			if r, ok := resources[resourceName]; ok {
+				newVersion, err := HashResource(r)
+				if err != nil {
+					return nil, err
+				}
+				if oldVersion != newVersion {
+					filtered = append(filtered, r)
+				}
+			} else {
+				toRemove = append(toRemove, resourceName)
+			}
+		}
 	}
 
 	// send through our version map
 	return &RawDeltaResponse{
-		DeltaRequest:     request,
-		Resources:        filtered,
-		VersionMap:       versionMap,
-		RemovedResources: unsubscribed,
-	}
+		DeltaRequest: request,
+		Resources:    filtered,
+		VersionMap:   newVersionMap,
+	}, nil
 }
