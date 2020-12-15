@@ -59,13 +59,9 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versionMap m
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
 				t, versionMap, nodeID, snapshot.GetVersion(t))
 		}
-		newVersionMap, err := resp.GetDeltaVersionMap()
-		if err != nil && cache.log != nil {
-			cache.log.Errorf("Error while getting delta version map")
-		}
 
 		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: newVersionMap}
+		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: resp.GetDeltaVersionMap()}
 		info.mu.Unlock()
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
@@ -93,11 +89,6 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 }
 
 func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]string, resources map[string]types.Resource) *RawDeltaResponse {
-	if cache.log != nil {
-		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
-			request.GetNode().GetId(), request.TypeUrl, versionMap)
-	}
-
 	resp, err := createDeltaResponse(request, versionMap, resources)
 	if err != nil {
 		if cache.log != nil {
@@ -108,7 +99,8 @@ func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan Delta
 	// One send response if there were some actual updates
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if cache.log != nil {
-			cache.log.Debugf("Changes detected, sending delata response:\n   old Version Map: %v\n    response: %v\n", versionMap, resp)
+			cache.log.Debugf("node: %s, sending delta response:\n---> old Version Map: %v\n---> new resources: %v\n---> removed resources",
+				request.GetNode().GetId(), versionMap, resp.Resources, resp.RemovedResources)
 		}
 		value <- resp
 		return resp

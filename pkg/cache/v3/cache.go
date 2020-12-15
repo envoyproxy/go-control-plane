@@ -98,7 +98,7 @@ type DeltaResponse interface {
 	GetSystemVersion() (string, error)
 
 	// Get the version map of the internal cache
-	GetDeltaVersionMap() (map[string]string, error)
+	GetDeltaVersionMap() map[string]string
 }
 
 // RawResponse is a pre-serialized xDS response containing the raw resources to
@@ -264,11 +264,9 @@ func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 }
 
 // GetDeltaVersionMap returns the delta version map built internally by the cache for the state of a snapshot
-func (r *RawDeltaResponse) GetDeltaVersionMap() (map[string]string, error) {
-	if r.VersionMap != nil {
-		return r.VersionMap, nil
-	}
-	return nil, fmt.Errorf("missing delta version map")
+func (r *RawDeltaResponse) GetDeltaVersionMap() map[string]string {
+	return r.VersionMap
+
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
@@ -308,9 +306,6 @@ func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 }
 
 // GetDeltaVersionMap ...
-func (r *DeltaPassthroughResponse) GetDeltaVersionMap() (map[string]string, error) {
-	if r.VersionMap != nil {
-		return r.VersionMap, nil
-	}
-	return nil, fmt.Errorf("missing delta version map")
+func (r *DeltaPassthroughResponse) GetDeltaVersionMap() map[string]string {
+	return r.VersionMap
 }

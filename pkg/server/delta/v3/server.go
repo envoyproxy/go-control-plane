@@ -174,14 +174,14 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	}()
 
 	// sends a response by serializing to protobuf Any
-	send := func(resp cache.DeltaResponse, typeURL string) (string, map[string]string, error) {
+	send := func(resp cache.DeltaResponse, typeURL string) (string, error) {
 		if resp == nil {
-			return "", nil, errors.New("missing response")
+			return "", errors.New("missing response")
 		}
 
 		out, err := resp.GetDeltaDiscoveryResponse()
 		if err != nil {
-			return "", nil, err
+			return "", err
 		}
 
 		// increment nonce
@@ -190,12 +190,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		if s.callbacks != nil {
 			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), out)
 		}
-		versionMap, err := resp.GetDeltaVersionMap()
-		if err != nil {
-			return "", nil, err
-		}
 
-		return out.Nonce, versionMap, str.Send(out)
+		return out.Nonce, str.Send(out)
 	}
 
 	if s.callbacks != nil {
@@ -220,74 +216,77 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if !more {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
-			nonce, versionMap, err := send(resp, resource.EndpointType)
+			nonce, err := send(resp, resource.EndpointType)
 			if err != nil {
 				return err
 			}
 			values.deltaEndpointNonce = nonce
-			values.deltaResourceVersions[resource.EndpointType] = versionMap
+			values.deltaResourceVersions[resource.EndpointType] = resp.GetDeltaVersionMap()
+			if s.log != nil {
+				s.log.Debugf("Updated endpoint version map")
+			}
 		case resp, more := <-values.deltaClusters:
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
-			nonce, versionMap, err := send(resp, resource.ClusterType)
+			nonce, err := send(resp, resource.ClusterType)
 			if err != nil {
 				return err
 			}
 			values.deltaClusterNonce = nonce
-			values.deltaResourceVersions[resource.ClusterType] = versionMap
+			values.deltaResourceVersions[resource.ClusterType] = resp.GetDeltaVersionMap()
 		case resp, more := <-values.deltaRoutes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
-			nonce, versionMap, err := send(resp, resource.RouteType)
+			nonce, err := send(resp, resource.RouteType)
 			if err != nil {
 				return err
 			}
 			values.deltaRouteNonce = nonce
-			values.deltaResourceVersions[resource.RouteType] = versionMap
+			values.deltaResourceVersions[resource.RouteType] = resp.GetDeltaVersionMap()
 		case resp, more := <-values.deltaListeners:
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
-			nonce, versionMap, err := send(resp, resource.ListenerType)
+			nonce, err := send(resp, resource.ListenerType)
 			if err != nil {
 				return err
 			}
 			values.deltaListenerNonce = nonce
-			values.deltaResourceVersions[resource.ListenerType] = versionMap
+			values.deltaResourceVersions[resource.ListenerType] = resp.GetDeltaVersionMap()
 		case resp, more := <-values.deltaSecrets:
 			if !more {
 				return status.Errorf(codes.Unavailable, "secrets watch failed")
 			}
-			nonce, versionMap, err := send(resp, resource.SecretType)
+			nonce, err := send(resp, resource.SecretType)
 			if err != nil {
 				return err
 			}
 			values.deltaSecretNonce = nonce
-			values.deltaResourceVersions[resource.SecretType] = versionMap
+			values.deltaResourceVersions[resource.SecretType] = resp.GetDeltaVersionMap()
 		case resp, more := <-values.deltaRuntimes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "runtimes watch failed")
 			}
-			nonce, versionMap, err := send(resp, resource.RuntimeType)
+			nonce, err := send(resp, resource.RuntimeType)
 			if err != nil {
 				return err
 			}
 			values.deltaRuntimeNonce = nonce
-			values.deltaResourceVersions[resource.RuntimeType] = versionMap
+			values.deltaResourceVersions[resource.RuntimeType] = resp.GetDeltaVersionMap()
 		case resp, more := <-values.deltaResponses:
 			if more {
 				if resp == deltaErrorResponse {
 					return status.Errorf(codes.Unavailable, "delta resource watch failed")
 				}
 				typeURL := resp.GetDeltaRequest().TypeUrl
-				nonce, versionMap, err := send(resp, typeURL)
+				nonce, err := send(resp, typeURL)
 				if err != nil {
 					return err
 				}
 				values.deltaNonces[typeURL] = nonce
-				values.deltaResourceVersions[typeURL] = versionMap
+				values.deltaResourceVersions[typeURL] = resp.GetDeltaVersionMap()
 			}
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -296,6 +295,10 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 			if req == nil {
 				return status.Errorf(codes.Unavailable, "empty request")
+			}
+
+			if s.log != nil {
+				s.log.Debugf("Recieved delta request %v", req)
 			}
 
 			// Log out our error detail from envoy if we get one but don't do anything crazy here yet
