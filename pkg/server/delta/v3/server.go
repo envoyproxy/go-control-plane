@@ -328,7 +328,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			versionMap := values.deltaResourceVersions[req.GetTypeUrl()]
 			if u := req.GetResourceNamesSubscribe(); len(u) > 0 {
-				s.unsubscribe(u, versionMap)
+				s.subscribe(u, versionMap)
 			}
 			for r, v := range req.InitialResourceVersions {
 				versionMap[r] = v
@@ -351,42 +351,42 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 					if values.deltaEndpointCancel != nil {
 						values.deltaEndpointCancel()
 					}
-					values.deltaEndpoints, values.deltaEndpointCancel = s.cache.CreateDeltaWatch(req, values.deltaResourceVersions[req.GetTypeUrl()])
+					values.deltaEndpoints, values.deltaEndpointCancel = s.cache.CreateDeltaWatch(req, versionMap)
 				}
 			case req.TypeUrl == resource.ClusterType:
 				if values.deltaClusterNonce == "" || values.deltaClusterNonce == nonce {
 					if values.deltaClusterCancel != nil {
 						values.deltaClusterCancel()
 					}
-					values.deltaClusters, values.deltaClusterCancel = s.cache.CreateDeltaWatch(req, values.deltaResourceVersions[req.GetTypeUrl()])
+					values.deltaClusters, values.deltaClusterCancel = s.cache.CreateDeltaWatch(req, versionMap)
 				}
 			case req.TypeUrl == resource.RouteType:
 				if values.deltaRouteNonce == "" || values.deltaRouteNonce == nonce {
 					if values.deltaRouteCancel != nil {
 						values.deltaRouteCancel()
 					}
-					values.deltaRoutes, values.deltaRouteCancel = s.cache.CreateDeltaWatch(req, values.deltaResourceVersions[req.GetTypeUrl()])
+					values.deltaRoutes, values.deltaRouteCancel = s.cache.CreateDeltaWatch(req, versionMap)
 				}
 			case req.TypeUrl == resource.ListenerType:
 				if values.deltaListenerNonce == "" || values.deltaListenerNonce == nonce {
 					if values.deltaListenerCancel != nil {
 						values.deltaListenerCancel()
 					}
-					values.deltaListeners, values.deltaListenerCancel = s.cache.CreateDeltaWatch(req, values.deltaResourceVersions[req.GetTypeUrl()])
+					values.deltaListeners, values.deltaListenerCancel = s.cache.CreateDeltaWatch(req, versionMap)
 				}
 			case req.TypeUrl == resource.SecretType:
 				if values.deltaSecretNonce == "" || values.deltaSecretNonce == nonce {
 					if values.deltaSecretCancel != nil {
 						values.deltaSecretCancel()
 					}
-					values.deltaSecrets, values.deltaSecretCancel = s.cache.CreateDeltaWatch(req, values.deltaResourceVersions[req.GetTypeUrl()])
+					values.deltaSecrets, values.deltaSecretCancel = s.cache.CreateDeltaWatch(req, versionMap)
 				}
 			case req.TypeUrl == resource.RuntimeType:
 				if values.deltaRuntimeNonce == "" || values.deltaRuntimeNonce == nonce {
 					if values.deltaRuntimeCancel != nil {
 						values.deltaRuntimeCancel()
 					}
-					values.deltaRuntimes, values.deltaRuntimeCancel = s.cache.CreateDeltaWatch(req, values.deltaResourceVersions[req.GetTypeUrl()])
+					values.deltaRuntimes, values.deltaRuntimeCancel = s.cache.CreateDeltaWatch(req, versionMap)
 				}
 			default:
 				typeURL := req.TypeUrl
@@ -402,7 +402,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 					}
 
 					var watch chan cache.DeltaResponse
-					watch, values.deltaCancellations[typeURL] = s.cache.CreateDeltaWatch(req, values.deltaResourceVersions[typeURL])
+					watch, values.deltaCancellations[typeURL] = s.cache.CreateDeltaWatch(req, versionMap)
 
 					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
 					terminate := make(chan struct{})
