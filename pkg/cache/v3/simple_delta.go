@@ -131,7 +131,11 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, re
 				}
 				newVersionMap[resourceName] = newVersion
 			} else {
-				toRemove = append(toRemove, resourceName)
+				// if oldVersion == "" this means that the resourse was already removed or desn't yet exist on the client
+				// no need to remove it once again
+				if oldVersion != "" {
+					toRemove = append(toRemove, resourceName)
+				}
 				// the resource has gone but we keep watching for it so we detect an update if the resource is back
 				newVersionMap[resourceName] = ""
 			}
