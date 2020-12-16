@@ -216,6 +216,10 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 				marshaledResources = append(marshaledResources, &discovery.Resource{
 					Name:    name,
 					Aliases: []string{name},
+					Resource: &any.Any{
+						TypeUrl: r.DeltaRequest.TypeUrl,
+						Value:   nil,
+					},
 					Version: "",
 				})
 				continue
