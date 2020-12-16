@@ -105,17 +105,9 @@ func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan Delta
 
 func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, resources map[string]types.Resource) (*RawDeltaResponse, error) {
 	newVersionMap := make(map[string]string)
-	filtered := make([]types.Resource, 0)
-	toRemove := make([]string, 0)
+	filtered := make(map[string]types.Resource, 0)
 	if len(versionMap) == 0 {
-		for resourceName, resource := range resources {
-			var err error
-			newVersionMap[resourceName], err = HashResource(resource)
-			if err != nil {
-				return nil, err
-			}
-			filtered = append(filtered, resource)
-		}
+		filtered = resources
 	} else {
 		// Reply only with the requested resources. Envoy may ask each resource
 		// individually in a separate stream. It is ok to reply with the same version
@@ -127,20 +119,20 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, re
 					return nil, err
 				}
 				if oldVersion != newVersion {
-					filtered = append(filtered, r)
-					newVersionMap[resourceName] = newVersion
+					filtered[resourceName] = r
 				}
+				newVersionMap[resourceName] = newVersion
 			} else {
-				toRemove = append(toRemove, resourceName)
+				newVersionMap[resourceName] = ""
+				filtered[resourceName] = nil
 			}
 		}
 	}
 
 	// send through our version map
 	return &RawDeltaResponse{
-		DeltaRequest:     request,
-		Resources:        filtered,
-		RemovedResources: toRemove,
-		VersionMap:       newVersionMap,
+		DeltaRequest: request,
+		Resources:    filtered,
+		VersionMap:   newVersionMap,
 	}, nil
 }
