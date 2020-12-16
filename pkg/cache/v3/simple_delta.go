@@ -128,6 +128,7 @@ func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, re
 				}
 				if oldVersion != newVersion {
 					filtered = append(filtered, r)
+					newVersionMap[resourceName] = newVersion
 				}
 			} else {
 				toRemove = append(toRemove, resourceName)
