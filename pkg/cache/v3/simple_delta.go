@@ -45,15 +45,10 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versionMap m
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
-	var resp *RawDeltaResponse
-	if exists {
-		resp = cache.respondDelta(request, value, versionMap, snapshot.GetResources(t))
-	}
 
-	// if resp is nil this means that either there is no change in resource version from the previous snapshot
-	// or the requested resource doesn't exist in the snapshot
-	// in both cases we should create a new watch accordingly
-	if resp != nil {
+	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
+	// create a new watch accordingly
+	if !exists || cache.respondDelta(request, value, versionMap, snapshot.GetResources(t)) == nil {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
@@ -61,7 +56,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versionMap m
 		}
 
 		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: resp.GetDeltaVersionMap()}
+		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: versionMap}
 		info.mu.Unlock()
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
