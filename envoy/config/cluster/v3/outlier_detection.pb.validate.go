@@ -267,6 +267,27 @@ func (m *OutlierDetection) Validate() error {
 		}
 	}
 
+	if d := m.GetMaxEjectionTime(); d != nil {
+		dur, err := ptypes.Duration(d)
+		if err != nil {
+			return OutlierDetectionValidationError{
+				field:  "MaxEjectionTime",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return OutlierDetectionValidationError{
+				field:  "MaxEjectionTime",
+				reason: "value must be greater than 0s",
+			}
+		}
+
+	}
+
 	return nil
 }
 
