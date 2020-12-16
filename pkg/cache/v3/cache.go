@@ -127,7 +127,7 @@ type RawDeltaResponse struct {
 	SystemVersionInfo string
 
 	// Resources to be included in the response.
-	Resources map[string]types.Resource
+	Resources []types.Resource
 
 	// RemovedResources is a list of unsubscribed aliases to be included in the response
 	RemovedResources []string
@@ -207,23 +207,9 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 	marshaledResponse := r.marshaledResponse.Load()
 
 	if marshaledResponse == nil {
-		marshaledResources := make([]*discovery.Resource, 0, len(r.Resources))
+		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
-		for name, resource := range r.Resources {
-			// this indicates that requested resource doesn't exist
-			// https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#id2
-			if resource == nil {
-				marshaledResources = append(marshaledResources, &discovery.Resource{
-					Name:    name,
-					Aliases: []string{name},
-					Resource: &any.Any{
-						TypeUrl: r.DeltaRequest.TypeUrl,
-						Value:   nil,
-					},
-					Version: "",
-				})
-				continue
-			}
+		for i, resource := range r.Resources {
 
 			marshaledResource, err := MarshalResource(resource)
 			if err != nil {
@@ -234,7 +220,8 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 				panic(err)
 			}
 
-			marshaledResources = append(marshaledResources, &discovery.Resource{
+			name := GetResourceName(resource)
+			marshaledResources[i] = &discovery.Resource{
 				Name:    name,
 				Aliases: []string{name},
 				Resource: &any.Any{
@@ -242,7 +229,7 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 					Value:   marshaledResource,
 				},
 				Version: version,
-			})
+			}
 		}
 
 		marshaledResponse = &discovery.DeltaDiscoveryResponse{
