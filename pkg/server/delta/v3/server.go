@@ -222,9 +222,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 			values.deltaEndpointNonce = nonce
 			values.deltaResourceVersions[resource.EndpointType] = resp.GetDeltaVersionMap()
-			if s.log != nil {
-				s.log.Debugf("Updated endpoint version map %v", values.deltaResourceVersions[resource.EndpointType])
-			}
 		case resp, more := <-values.deltaClusters:
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
@@ -335,10 +332,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			// Handle our unsubscribe scenario (remove the tracked resources from the current state of the stream)
 			if u := req.GetResourceNamesUnsubscribe(); len(u) > 0 {
 				s.unsubscribe(u, versionMap)
-			}
-
-			if s.log != nil {
-				s.log.Debugf("Recieved delta request %v, versionMap: %v", req, versionMap)
 			}
 
 			if s.callbacks != nil {

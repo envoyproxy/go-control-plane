@@ -94,8 +94,8 @@ func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan Delta
 	// One send response if there were some actual updates
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if cache.log != nil {
-			cache.log.Debugf("node: %s, sending delta response:\n---> old Version Map: %v\n---> new resources: %v\n---> removed resources",
-				request.GetNode().GetId(), versionMap, resp.Resources, resp.RemovedResources)
+			cache.log.Debugf("node: %s, sending delta response:\n---> old Version Map: %v\n---> new resources: %v\n---> new Version Map: %v\n---> removed resources",
+				request.GetNode().GetId(), versionMap, resp.Resources, resp.VersionMap, resp.RemovedResources)
 		}
 		value <- resp
 		return resp
