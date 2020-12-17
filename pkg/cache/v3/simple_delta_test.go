@@ -41,10 +41,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
 					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
-				vMap, err := out.GetDeltaVersionMap()
-				if err != nil {
-					t.Fatal(err)
-				}
+				vMap := out.GetDeltaVersionMap()
 				vm[typ] = vMap
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -82,10 +79,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
 			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
-		vMap, err := out.GetDeltaVersionMap()
-		if err != nil {
-			t.Fatal(err)
-		}
+		vMap := out.GetDeltaVersionMap()
 		vm[testTypes[0]] = vMap
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
