@@ -2,6 +2,9 @@
 
 ## Release v0.9.8
 
+### Added
+- Support for setting TTL on resources and configuring resource heartbeating
+
 ### Changed
 
 - Envoy APIs are at 1d44c27ff7d4ebdfbfd9a6acbcecf9631b107e30

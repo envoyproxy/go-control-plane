@@ -61,9 +61,6 @@ func TestSnapshotGetters(t *testing.T) {
 	if out := snapshot.GetVersion("not a type"); out != "" {
 		t.Errorf("got non-empty version for unknown type: %#v", out)
 	}
-	if out := snapshot.GetSubscribedResources(nil, "not a type"); out != nil {
-		t.Errorf("got non-empty resources for unknown type: %#v", out)
-	}
 }
 
 func TestSnapshotVersionMap(t *testing.T) {
