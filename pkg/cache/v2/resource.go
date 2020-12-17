@@ -86,13 +86,13 @@ func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources map[string]types.Resource) map[string]bool {
+func GetResourceReferences(resources map[string]types.ResourceWithTtl) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
-		if res == nil {
+		if res.Resource == nil {
 			continue
 		}
-		switch v := res.(type) {
+		switch v := res.Resource.(type) {
 		case *endpoint.ClusterLoadAssignment:
 			// no dependencies
 		case *cluster.Cluster:

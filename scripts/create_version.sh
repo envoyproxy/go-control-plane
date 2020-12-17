@@ -34,6 +34,7 @@ MODULES=(   'clusterservice "github.com/envoyproxy/go-control-plane/envoy/api/v2
             '"github.com/envoyproxy/go-control-plane/pkg/server/v2":"github.com/envoyproxy/go-control-plane/pkg/server/v3"'
             '"github.com/envoyproxy/go-control-plane/pkg/server/rest/v2":"github.com/envoyproxy/go-control-plane/pkg/server/rest/v3"'
             '"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v2":"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"'
+            'ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v2":ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v3"'
 )
 
 workdir="$(dirname "$0")"

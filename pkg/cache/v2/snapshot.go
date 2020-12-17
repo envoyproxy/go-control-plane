@@ -17,6 +17,7 @@ package cache
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
@@ -27,20 +28,29 @@ type Resources struct {
 	Version string
 
 	// Items in the group indexed by name.
-	Items map[string]types.Resource
+	Items map[string]types.ResourceWithTtl
 }
 
 // IndexResourcesByName creates a map from the resource name to the resource.
-func IndexResourcesByName(items []types.Resource) map[string]types.Resource {
-	indexed := make(map[string]types.Resource, len(items))
+func IndexResourcesByName(items []types.ResourceWithTtl) map[string]types.ResourceWithTtl {
+	indexed := make(map[string]types.ResourceWithTtl)
 	for _, item := range items {
-		indexed[GetResourceName(item)] = item
+		indexed[GetResourceName(item.Resource)] = item
 	}
 	return indexed
 }
 
 // NewResources creates a new resource group.
 func NewResources(version string, items []types.Resource) Resources {
+	itemsWithTtl := []types.ResourceWithTtl{}
+	for _, item := range items {
+		itemsWithTtl = append(itemsWithTtl, types.ResourceWithTtl{Resource: item})
+	}
+	return NewResourcesWithTtl(version, itemsWithTtl)
+}
+
+// NewResources creates a new resource group.
+func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resources {
 	return Resources{
 		Version: version,
 		Items:   IndexResourcesByName(items),
@@ -96,6 +106,28 @@ func NewSnapshotWithResources(version string, resources SnapshotResources) Snaps
 	return out
 }
 
+type ResourceWithTtl struct {
+	Resources []types.Resource
+	Ttl       *time.Duration
+}
+
+func NewSnapshotWithTtls(version string,
+	endpoints []types.ResourceWithTtl,
+	clusters []types.ResourceWithTtl,
+	routes []types.ResourceWithTtl,
+	listeners []types.ResourceWithTtl,
+	runtimes []types.ResourceWithTtl,
+	secrets []types.ResourceWithTtl) Snapshot {
+	out := Snapshot{}
+	out.Resources[types.Endpoint] = NewResourcesWithTtl(version, endpoints)
+	out.Resources[types.Cluster] = NewResourcesWithTtl(version, clusters)
+	out.Resources[types.Route] = NewResourcesWithTtl(version, routes)
+	out.Resources[types.Listener] = NewResourcesWithTtl(version, listeners)
+	out.Resources[types.Runtime] = NewResourcesWithTtl(version, runtimes)
+	out.Resources[types.Secret] = NewResourcesWithTtl(version, secrets)
+	return out
+}
+
 // Consistent check verifies that the dependent resources are exactly listed in the
 // snapshot:
 // - all EDS resources are listed by name in CDS resources
@@ -123,8 +155,24 @@ func (s *Snapshot) Consistent() error {
 	return superset(routes, s.Resources[types.Route].Items)
 }
 
-// GetResources selects snapshot resources by type.
+// GetResources selects snapshot resources by type, returning the map of resources.
 func (s *Snapshot) GetResources(typeURL string) map[string]types.Resource {
+	resources := s.GetResourcesAndTtl(typeURL)
+	if resources == nil {
+		return nil
+	}
+
+	withoutTtl := make(map[string]types.Resource, len(resources))
+
+	for k, v := range resources {
+		withoutTtl[k] = v.Resource
+	}
+
+	return withoutTtl
+}
+
+// GetResourcesAndTtl selects snapshot resources by type, returning the map of resources and the associated TTL.
+func (s *Snapshot) GetResourcesAndTtl(typeURL string) map[string]types.ResourceWithTtl {
 	if s == nil {
 		return nil
 	}
