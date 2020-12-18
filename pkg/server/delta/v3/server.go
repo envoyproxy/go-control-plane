@@ -19,6 +19,7 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"sync"
 	"sync/atomic"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -73,6 +74,8 @@ type server struct {
 
 // watches for all xDS resource types
 type watches struct {
+	mu *sync.RWMutex
+
 	deltaEndpoints chan cache.DeltaResponse
 	deltaClusters  chan cache.DeltaResponse
 	deltaRoutes    chan cache.DeltaResponse
@@ -94,12 +97,14 @@ type watches struct {
 	deltaSecretNonce   string
 	deltaRuntimeNonce  string
 
+	// Organize stream state by resource type
+	deltaStreamStates map[string]stream.StreamState
+
 	// Opaque resources share a muxed channel. Nonces and watch cancellations are indexed by type URL.
-	deltaResponses        chan cache.DeltaResponse
-	deltaCancellations    map[string]func()
-	deltaNonces           map[string]string
-	deltaTerminations     map[string]chan struct{}
-	deltaResourceVersions map[string]map[string]string
+	deltaResponses     chan cache.DeltaResponse
+	deltaCancellations map[string]func()
+	deltaNonces        map[string]string
+	deltaTerminations  map[string]chan struct{}
 }
 
 // Initialize all watches
@@ -109,16 +114,19 @@ func (values *watches) Init() {
 	values.deltaNonces = make(map[string]string)
 	values.deltaTerminations = make(map[string]chan struct{})
 	values.deltaCancellations = make(map[string]func())
-	values.deltaResourceVersions = initResourceVersions()
+	values.deltaStreamStates = initStreamState()
+	values.mu = &sync.RWMutex{}
 }
 
 var deltaErrorResponse = &cache.RawDeltaResponse{}
 
-func initResourceVersions() map[string]map[string]string {
-	m := make(map[string]map[string]string, 6)
+func initStreamState() map[string]stream.StreamState {
+	m := make(map[string]stream.StreamState, 6)
 
 	for i := 0; i < int(types.UnknownType); i++ {
-		m[cache.GetResponseTypeURL(types.ResponseType(i))] = make(map[string]string, 0)
+		m[cache.GetResponseTypeURL(types.ResponseType(i))] = stream.StreamState{
+			ResourceVersions: make(map[string]string, 0),
+		}
 	}
 
 	return m
@@ -202,6 +210,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 	// node may only be set on the first discovery request
 	var node = &core.Node{}
+	wasFirstRequestWildcard := map[string]bool{}
 
 	for {
 		select {
@@ -220,8 +229,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
+			values.mu.Lock()
 			values.deltaEndpointNonce = nonce
-			values.deltaResourceVersions[resource.EndpointType] = resp.GetDeltaVersionMap()
+			state := values.deltaStreamStates[resource.EndpointType]
+			state.ResourceVersions = resp.GetDeltaVersionMap()
+			values.deltaStreamStates[resource.EndpointType] = state
+			values.mu.Unlock()
 		case resp, more := <-values.deltaClusters:
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
@@ -230,8 +243,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
+			values.mu.Lock()
 			values.deltaClusterNonce = nonce
-			values.deltaResourceVersions[resource.ClusterType] = resp.GetDeltaVersionMap()
+			state := values.deltaStreamStates[resource.ClusterType]
+			state.ResourceVersions = resp.GetDeltaVersionMap()
+			values.deltaStreamStates[resource.ClusterType] = state
+			values.mu.Unlock()
 		case resp, more := <-values.deltaRoutes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
@@ -240,8 +257,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
+			values.mu.Lock()
 			values.deltaRouteNonce = nonce
-			values.deltaResourceVersions[resource.RouteType] = resp.GetDeltaVersionMap()
+			state := values.deltaStreamStates[resource.RouteType]
+			state.ResourceVersions = resp.GetDeltaVersionMap()
+			values.deltaStreamStates[resource.RouteType] = state
+			values.mu.Unlock()
 		case resp, more := <-values.deltaListeners:
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
@@ -250,8 +271,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
+			values.mu.Lock()
 			values.deltaListenerNonce = nonce
-			values.deltaResourceVersions[resource.ListenerType] = resp.GetDeltaVersionMap()
+			state := values.deltaStreamStates[resource.ListenerType]
+			state.ResourceVersions = resp.GetDeltaVersionMap()
+			values.deltaStreamStates[resource.ListenerType] = state
+			values.mu.Unlock()
 		case resp, more := <-values.deltaSecrets:
 			if !more {
 				return status.Errorf(codes.Unavailable, "secrets watch failed")
@@ -260,8 +285,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
+			values.mu.Lock()
 			values.deltaSecretNonce = nonce
-			values.deltaResourceVersions[resource.SecretType] = resp.GetDeltaVersionMap()
+			state := values.deltaStreamStates[resource.SecretType]
+			state.ResourceVersions = resp.GetDeltaVersionMap()
+			values.deltaStreamStates[resource.SecretType] = state
+			values.mu.Unlock()
 		case resp, more := <-values.deltaRuntimes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "runtimes watch failed")
@@ -270,8 +299,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
+			values.mu.Lock()
 			values.deltaRuntimeNonce = nonce
-			values.deltaResourceVersions[resource.RuntimeType] = resp.GetDeltaVersionMap()
+			state := values.deltaStreamStates[resource.RuntimeType]
+			state.ResourceVersions = resp.GetDeltaVersionMap()
+			values.deltaStreamStates[resource.RuntimeType] = state
+			values.mu.Unlock()
 		case resp, more := <-values.deltaResponses:
 			if more {
 				if resp == deltaErrorResponse {
@@ -282,8 +315,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				if err != nil {
 					return err
 				}
+				values.mu.Lock()
 				values.deltaNonces[typeURL] = nonce
-				values.deltaResourceVersions[typeURL] = resp.GetDeltaVersionMap()
+				state := values.deltaStreamStates[typeURL]
+				state.ResourceVersions = resp.GetDeltaVersionMap()
+				values.deltaStreamStates[typeURL] = state
+				values.mu.Unlock()
 			}
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -322,16 +359,25 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				req.TypeUrl = defaultTypeURL
 			}
 
-			versionMap := values.deltaResourceVersions[req.GetTypeUrl()]
+			state := values.deltaStreamStates[req.GetTypeUrl()]
+			// We are in the wildcard mode if the first request of a particular type has empty subscription list
+			wildcard, found := wasFirstRequestWildcard[req.TypeUrl]
+			if !found { //this is the first request of a particular type
+				state.IsWildcard = len(req.GetResourceNamesSubscribe()) == 0
+				wasFirstRequestWildcard[req.TypeUrl] = state.IsWildcard
+			} else {
+				state.IsWildcard = wildcard
+			}
+
 			if u := req.GetResourceNamesSubscribe(); len(u) > 0 {
-				s.subscribe(u, versionMap)
+				s.subscribe(u, state.ResourceVersions)
 			}
 			for r, v := range req.InitialResourceVersions {
-				versionMap[r] = v
+				state.ResourceVersions[r] = v
 			}
 			// Handle our unsubscribe scenario (remove the tracked resources from the current state of the stream)
 			if u := req.GetResourceNamesUnsubscribe(); len(u) > 0 {
-				s.unsubscribe(u, versionMap)
+				s.unsubscribe(u, state.ResourceVersions)
 			}
 
 			if s.callbacks != nil {
@@ -347,42 +393,42 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 					if values.deltaEndpointCancel != nil {
 						values.deltaEndpointCancel()
 					}
-					values.deltaEndpoints, values.deltaEndpointCancel = s.cache.CreateDeltaWatch(req, versionMap)
+					values.deltaEndpoints, values.deltaEndpointCancel = s.cache.CreateDeltaWatch(req, &state)
 				}
 			case req.TypeUrl == resource.ClusterType:
 				if values.deltaClusterNonce == "" || values.deltaClusterNonce == nonce {
 					if values.deltaClusterCancel != nil {
 						values.deltaClusterCancel()
 					}
-					values.deltaClusters, values.deltaClusterCancel = s.cache.CreateDeltaWatch(req, versionMap)
+					values.deltaClusters, values.deltaClusterCancel = s.cache.CreateDeltaWatch(req, &state)
 				}
 			case req.TypeUrl == resource.RouteType:
 				if values.deltaRouteNonce == "" || values.deltaRouteNonce == nonce {
 					if values.deltaRouteCancel != nil {
 						values.deltaRouteCancel()
 					}
-					values.deltaRoutes, values.deltaRouteCancel = s.cache.CreateDeltaWatch(req, versionMap)
+					values.deltaRoutes, values.deltaRouteCancel = s.cache.CreateDeltaWatch(req, &state)
 				}
 			case req.TypeUrl == resource.ListenerType:
 				if values.deltaListenerNonce == "" || values.deltaListenerNonce == nonce {
 					if values.deltaListenerCancel != nil {
 						values.deltaListenerCancel()
 					}
-					values.deltaListeners, values.deltaListenerCancel = s.cache.CreateDeltaWatch(req, versionMap)
+					values.deltaListeners, values.deltaListenerCancel = s.cache.CreateDeltaWatch(req, &state)
 				}
 			case req.TypeUrl == resource.SecretType:
 				if values.deltaSecretNonce == "" || values.deltaSecretNonce == nonce {
 					if values.deltaSecretCancel != nil {
 						values.deltaSecretCancel()
 					}
-					values.deltaSecrets, values.deltaSecretCancel = s.cache.CreateDeltaWatch(req, versionMap)
+					values.deltaSecrets, values.deltaSecretCancel = s.cache.CreateDeltaWatch(req, &state)
 				}
 			case req.TypeUrl == resource.RuntimeType:
 				if values.deltaRuntimeNonce == "" || values.deltaRuntimeNonce == nonce {
 					if values.deltaRuntimeCancel != nil {
 						values.deltaRuntimeCancel()
 					}
-					values.deltaRuntimes, values.deltaRuntimeCancel = s.cache.CreateDeltaWatch(req, versionMap)
+					values.deltaRuntimes, values.deltaRuntimeCancel = s.cache.CreateDeltaWatch(req, &state)
 				}
 			default:
 				typeURL := req.TypeUrl
@@ -398,7 +444,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 					}
 
 					var watch chan cache.DeltaResponse
-					watch, values.deltaCancellations[typeURL] = s.cache.CreateDeltaWatch(req, versionMap)
+					watch, values.deltaCancellations[typeURL] = s.cache.CreateDeltaWatch(req, &state)
 
 					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
 					terminate := make(chan struct{})

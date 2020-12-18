@@ -20,3 +20,13 @@ type DeltaStream interface {
 	Send(*discovery.DeltaDiscoveryResponse) error
 	Recv() (*discovery.DeltaDiscoveryRequest, error)
 }
+
+// StreamState will keep track of resource state on a stream
+type StreamState struct {
+	// Indicates whether
+	IsWildcard bool
+
+	// ResourceVersions contain a hash of the resource as a version map
+	// this field stores the last state sent to the client
+	ResourceVersions map[string]string
+}

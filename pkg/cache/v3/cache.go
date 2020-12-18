@@ -24,6 +24,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v3"
 	"github.com/golang/protobuf/ptypes/any"
 )
@@ -60,7 +61,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, map[string]string) (value chan DeltaResponse, cancel func())
+	CreateDeltaWatch(*DeltaRequest, *stream.StreamState) (value chan DeltaResponse, cancel func())
 }
 
 // ConfigFetcher fetches configuration resources from cache
@@ -243,9 +244,10 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 		}
 
 		marshaledResponse = &discovery.DeltaDiscoveryResponse{
-			Resources:        marshaledResources,
-			RemovedResources: r.RemovedResources,
-			TypeUrl:          r.DeltaRequest.TypeUrl,
+			Resources:         marshaledResources,
+			RemovedResources:  r.RemovedResources,
+			TypeUrl:           r.DeltaRequest.TypeUrl,
+			SystemVersionInfo: r.SystemVersionInfo,
 		}
 		r.marshaledResponse.Store(marshaledResponse)
 	}

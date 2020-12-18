@@ -31,6 +31,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -81,7 +82,7 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.Disco
 	return nil, errors.New("missing")
 }
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, versionMap map[string]string) (chan cache.DeltaResponse, func()) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, st *stream.StreamState) (chan cache.DeltaResponse, func()) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 
 	// Create our out watch channel to return with a buffer of one
@@ -113,7 +114,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			DeltaRequest:      req,
 			Resources:         subscribed,
 			SystemVersionInfo: "",
-			VersionMap:        versionMap,
+			VersionMap:        st.ResourceVersions,
 		}
 
 	} else if config.closeWatch {

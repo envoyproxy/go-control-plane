@@ -20,10 +20,11 @@ import (
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versionMap map[string]string) (chan DeltaResponse, func()) {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 
@@ -48,15 +49,15 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versionMap m
 
 	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
 	// create a new watch accordingly
-	if !exists || cache.respondDelta(request, value, versionMap, snapshot.GetResources(t)) == nil {
+	if !exists || cache.respondDelta(request, value, st, snapshot.GetResources(t)) == nil {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
-				t, versionMap, nodeID, snapshot.GetVersion(t))
+				t, st.ResourceVersions, nodeID, snapshot.GetVersion(t))
 		}
 
 		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: versionMap}
+		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: st}
 		info.mu.Unlock()
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
@@ -83,8 +84,8 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]string, resources map[string]types.Resource) *RawDeltaResponse {
-	resp, err := createDeltaResponse(request, versionMap, resources)
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.StreamState, resources map[string]types.Resource) *RawDeltaResponse {
+	resp, err := createDeltaResponse(request, st, resources)
 	if err != nil {
 		if cache.log != nil {
 			cache.log.Errorf("Error creating delta response: %v", err)
@@ -94,8 +95,8 @@ func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan Delta
 	// One send response if there were some actual updates
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if cache.log != nil {
-			cache.log.Debugf("node: %s, sending delta response:\n---> old Version Map: %v\n---> new resources: %v\n---> new Version Map: %v\n---> removed resources",
-				request.GetNode().GetId(), versionMap, resp.Resources, resp.VersionMap, resp.RemovedResources)
+			cache.log.Debugf("node: %s, sending delta response:\n---> old Version Map: %v\n---> new resources: %v\n---> new Version Map: %v\n---> removed resources %v\n---> is wildcard: %t",
+				request.GetNode().GetId(), st.ResourceVersions, resp.Resources, resp.VersionMap, resp.RemovedResources, st.IsWildcard)
 		}
 		value <- resp
 		return resp
@@ -103,24 +104,28 @@ func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan Delta
 	return nil
 }
 
-func createDeltaResponse(request *DeltaRequest, versionMap map[string]string, resources map[string]types.Resource) (*RawDeltaResponse, error) {
+func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resources map[string]types.Resource) (*RawDeltaResponse, error) {
 	newVersionMap := make(map[string]string)
 	filtered := make([]types.Resource, 0)
 	toRemove := make([]string, 0)
-	if len(versionMap) == 0 {
+	if st.IsWildcard {
 		for resourceName, resource := range resources {
-			var err error
-			newVersionMap[resourceName], err = HashResource(resource)
+			newVersion, err := HashResource(resource)
 			if err != nil {
 				return nil, err
 			}
-			filtered = append(filtered, resource)
+			newVersionMap[resourceName] = newVersion
+			oldVersion, found := st.ResourceVersions[resourceName]
+
+			if !found || oldVersion != newVersion {
+				filtered = append(filtered, resource)
+			}
 		}
 	} else {
 		// Reply only with the requested resources. Envoy may ask each resource
 		// individually in a separate stream. It is ok to reply with the same version
 		// on separate streams since requests do not share their response versions.
-		for resourceName, oldVersion := range versionMap {
+		for resourceName, oldVersion := range st.ResourceVersions {
 			if r, ok := resources[resourceName]; ok {
 				newVersion, err := HashResource(r)
 				if err != nil {
