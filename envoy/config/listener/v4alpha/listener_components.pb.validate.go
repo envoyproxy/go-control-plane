@@ -295,10 +295,10 @@ func (m *FilterChain) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetUseProxyProto()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedUseProxyProto()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return FilterChainValidationError{
-				field:  "UseProxyProto",
+				field:  "HiddenEnvoyDeprecatedUseProxyProto",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
