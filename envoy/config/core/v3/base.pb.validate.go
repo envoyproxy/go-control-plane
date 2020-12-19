@@ -1184,22 +1184,10 @@ func (m *DataSource) Validate() error {
 		}
 
 	case *DataSource_InlineBytes:
-
-		if len(m.GetInlineBytes()) < 1 {
-			return DataSourceValidationError{
-				field:  "InlineBytes",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
+		// no validation rules for InlineBytes
 
 	case *DataSource_InlineString:
-
-		if utf8.RuneCountInString(m.GetInlineString()) < 1 {
-			return DataSourceValidationError{
-				field:  "InlineString",
-				reason: "value length must be at least 1 runes",
-			}
-		}
+		// no validation rules for InlineString
 
 	default:
 		return DataSourceValidationError{
