@@ -124,7 +124,7 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 	} else {
 		// Reply only with the requested resources. Envoy may ask each resource
 		// individually in a separate stream. It is ok to reply with the same version
-		// on separate streams since requests do not share their response versions.
+		// on separate streams since requests do not share their response states.
 		for resourceName, oldVersion := range st.ResourceVersions {
 			if r, ok := resources[resourceName]; ok {
 				newVersion, err := HashResource(r)

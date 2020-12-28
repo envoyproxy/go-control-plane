@@ -23,6 +23,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v2"
 	"github.com/golang/protobuf/ptypes/any"
 )
@@ -59,7 +60,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, StreamVersion) (value chan DeltaResponse, cancel func())
+	CreateDeltaWatch(*DeltaRequest, *stream.StreamState) (value chan DeltaResponse, cancel func())
 }
 
 // ConfigFetcher fetches configuration resources from cache
@@ -98,16 +99,7 @@ type DeltaResponse interface {
 	GetSystemVersion() (string, error)
 
 	// Get the version map of the internal cache
-	GetDeltaVersionMap() (map[string]DeltaVersionInfo, error)
-}
-
-// DeltaVersionInfo maps together the alias of an objet to its correct version hash
-type DeltaVersionInfo struct {
-	// Alias name for the resource
-	Alias string
-
-	// Version for the resource (typically a hash)
-	Version string
+	GetDeltaVersionMap() map[string]string
 }
 
 // RawResponse is a pre-serialized xDS response containing the raw resources to
@@ -146,9 +138,8 @@ type RawDeltaResponse struct {
 	// RemovedResources is a list of unsubscribed aliases to be included in the response
 	RemovedResources []string
 
-	// VersionMap is a list of versions applied internally to the cache grouped by type
-	// map["resourceType"]map["alias"]{alias: alias, version: hash}
-	VersionMap map[string]DeltaVersionInfo
+	// VersionMap is a list of versions applied internally to the cache grouped by resource name
+	VersionMap map[string]string
 
 	// Marshaled Resources to be included in the response.
 	marshaledResponse atomic.Value
@@ -172,7 +163,7 @@ type DeltaPassthroughResponse struct {
 	DeltaRequest *discovery.DeltaDiscoveryRequest
 
 	// VersionMap is a list of version applied internally to the cache
-	VersionMap map[string]DeltaVersionInfo
+	VersionMap map[string]string
 
 	// This discovery response that needs to be sent as is, without any marshalling transformations
 	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
@@ -252,9 +243,10 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 		}
 
 		marshaledResponse = &discovery.DeltaDiscoveryResponse{
-			Resources:        marshaledResources,
-			RemovedResources: r.RemovedResources,
-			TypeUrl:          r.DeltaRequest.TypeUrl,
+			Resources:         marshaledResources,
+			RemovedResources:  r.RemovedResources,
+			TypeUrl:           r.DeltaRequest.TypeUrl,
+			SystemVersionInfo: r.SystemVersionInfo,
 		}
 		r.marshaledResponse.Store(marshaledResponse)
 	}
@@ -283,11 +275,9 @@ func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 }
 
 // GetDeltaVersionMap returns the delta version map built internally by the cache for the state of a snapshot
-func (r *RawDeltaResponse) GetDeltaVersionMap() (map[string]DeltaVersionInfo, error) {
-	if r.VersionMap != nil {
-		return r.VersionMap, nil
-	}
-	return nil, fmt.Errorf("missing delta version map")
+func (r *RawDeltaResponse) GetDeltaVersionMap() map[string]string {
+	return r.VersionMap
+
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
@@ -327,9 +317,6 @@ func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 }
 
 // GetDeltaVersionMap ...
-func (r *DeltaPassthroughResponse) GetDeltaVersionMap() (map[string]DeltaVersionInfo, error) {
-	if r.VersionMap != nil {
-		return r.VersionMap, nil
-	}
-	return nil, fmt.Errorf("missing delta version map")
+func (r *DeltaPassthroughResponse) GetDeltaVersionMap() map[string]string {
+	return r.VersionMap
 }

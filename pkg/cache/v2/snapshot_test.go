@@ -78,11 +78,8 @@ func TestSnapshotVersionMap(t *testing.T) {
 
 	vInfo := vMap[rsrc.EndpointType]
 	for _, v := range vInfo {
-		if v.Alias == "" {
-			t.Errorf("expected alias name, received: %s", v.Alias)
-		}
-		if v.Version == "" {
-			t.Errorf("expected version hash, recieved: %s", v.Version)
+		if v == "" {
+			t.Errorf("expected version hash, recieved: %s", v)
 		}
 	}
 }

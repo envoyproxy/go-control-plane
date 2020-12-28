@@ -211,7 +211,6 @@ func main() {
 		log.Println("timeout waiting for the first request")
 		os.Exit(1)
 	}
-	time.Sleep(10 * time.Second)
 	log.Printf("initial snapshot %+v\n", snapshotsv2)
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 

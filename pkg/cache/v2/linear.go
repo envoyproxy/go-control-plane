@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 )
 
 type watches = map[chan Response]struct{}
@@ -145,7 +146,7 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	cache.resources[name] = res
 
 	// TODO: batch watch closures to prevent rapid updates
-	cache.notifyAll(map[string]struct{}{name: struct{}{}})
+	cache.notifyAll(map[string]struct{}{name: {}})
 
 	return nil
 }
@@ -160,7 +161,7 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	delete(cache.resources, name)
 
 	// TODO: batch watch closures to prevent rapid updates
-	cache.notifyAll(map[string]struct{}{name: struct{}{}})
+	cache.notifyAll(map[string]struct{}{name: {}})
 	return nil
 }
 
@@ -239,7 +240,7 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 }
 
 // TODO: implement CreateDeltaWatch for linear cache
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, v StreamVersion) (chan DeltaResponse, func()) {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sv *stream.StreamState) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 
