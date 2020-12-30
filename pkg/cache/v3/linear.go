@@ -177,6 +177,33 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	return nil
 }
 
+// SetResources sets resources map in a single atomic operation
+func (cache *LinearCache) SetResources(resources map[string]types.Resource) error {
+	if resources == nil {
+		return errors.New("nil resources")
+	}
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	cache.version += 1
+	modified := map[string]struct{}{}
+	for r := range cache.resources {
+		modified[r] = struct{}{}
+		if _, ok := resources[r]; !ok {
+			delete(cache.versionVector, r)
+		}
+	}
+	for r := range resources {
+		modified[r] = struct{}{}
+		cache.versionVector[r] = cache.version
+	}
+	cache.resources = resources
+
+	cache.notifyAll(modified)
+
+	return nil
+}
+
 // DeleteResource removes a resource in the collection.
 func (cache *LinearCache) DeleteResource(name string) error {
 	cache.mu.Lock()
