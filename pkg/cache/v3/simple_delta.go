@@ -16,21 +16,17 @@
 package cache
 
 import (
-	"errors"
 	"sync/atomic"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // CreateDeltaWatch returns a watch for a delta xDS request.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVersion) (chan DeltaResponse, func()) {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
-	aliases := request.GetResourceNamesSubscribe()
-	if sv == nil {
-		panic(errors.New("StreamVersion cannot be nil when creating a delta watch"))
-	}
 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -50,39 +46,23 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sv StreamVer
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
-	snapshotVersion := snapshot.GetVersion(t)
-	vMap := snapshot.GetVersionMap()
 
-	// Compare our requested versions with the existing snapshot
-	var versionChange bool
-	for alias, version := range vMap[t] {
-		for a, v := range sv.GetVersionMap() {
-			if a == alias && v == version {
-				versionChange = true
-			}
-		}
-	}
-
-	// if we detect a change in resource version from the previous snapshot then we should create a new watch accordingly
-	// if the requested version is up-to-date or missing a response, leave an open watch
-	if !exists || versionChange {
+	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
+	// create a new watch accordingly
+	if !exists || cache.respondDelta(request, value, st, snapshot.GetResources(t)) == nil {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
-				t, aliases, nodeID, snapshotVersion)
+				t, st.ResourceVersions, nodeID, snapshot.GetVersion(t))
 		}
 
 		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, VersionMap: sv.GetVersionMap()}
+		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: st}
 		info.mu.Unlock()
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
 	}
 
-	// otherwise, the watch may be responded to immediately with the subscribed resources
-	// we don't want to ask for all the resources by type here
-	// we do want to respond with the full resource version map though
-	cache.respondDelta(request, value, vMap[t], snapshot.GetResources(t), nil)
 	return value, nil
 }
 
@@ -104,30 +84,74 @@ func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func(
 	}
 }
 
-func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) {
-	if cache.log != nil {
-		cache.log.Debugf("node: %s sending delta response %s with resource versions: %v",
-			request.GetNode().GetId(), request.TypeUrl, versionMap)
+func (cache *snapshotCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.StreamState, resources map[string]types.Resource) *RawDeltaResponse {
+	resp, err := createDeltaResponse(request, st, resources)
+	if err != nil {
+		if cache.log != nil {
+			cache.log.Errorf("Error creating delta response: %v", err)
+		}
+		return nil
 	}
-
-	value <- createDeltaResponse(request, versionMap, resources, unsubscribed)
+	// One send response if there were some actual updates
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
+		if cache.log != nil {
+			cache.log.Debugf("node: %s, sending delta response:\n---> old Version Map: %v\n---> new resources: %v\n---> new Version Map: %v\n---> removed resources %v\n---> is wildcard: %t",
+				request.GetNode().GetId(), st.ResourceVersions, resp.Resources, resp.VersionMap, resp.RemovedResources, st.IsWildcard)
+		}
+		value <- resp
+		return resp
+	}
+	return nil
 }
 
-func createDeltaResponse(request *DeltaRequest, versionMap map[string]DeltaVersionInfo, resources map[string]types.Resource, unsubscribed []string) DeltaResponse {
-	filtered := make([]types.Resource, 0, len(resources))
+func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resources map[string]types.Resource) (*RawDeltaResponse, error) {
+	newVersionMap := make(map[string]string)
+	filtered := make([]types.Resource, 0)
+	toRemove := make([]string, 0)
+	if st.IsWildcard {
+		for resourceName, resource := range resources {
+			newVersion, err := HashResource(resource)
+			if err != nil {
+				return nil, err
+			}
+			newVersionMap[resourceName] = newVersion
+			oldVersion, found := st.ResourceVersions[resourceName]
 
-	// Reply only with the requested resources. Envoy may ask each resource
-	// individually in a separate stream. It is ok to reply with the same version
-	// on separate streams since requests do not share their response versions.
-	for _, resource := range resources {
-		filtered = append(filtered, resource)
+			if !found || oldVersion != newVersion {
+				filtered = append(filtered, resource)
+			}
+		}
+	} else {
+		// Reply only with the requested resources. Envoy may ask each resource
+		// individually in a separate stream. It is ok to reply with the same version
+		// on separate streams since requests do not share their response states.
+		for resourceName, oldVersion := range st.ResourceVersions {
+			if r, ok := resources[resourceName]; ok {
+				newVersion, err := HashResource(r)
+				if err != nil {
+					return nil, err
+				}
+				if oldVersion != newVersion {
+					filtered = append(filtered, r)
+				}
+				newVersionMap[resourceName] = newVersion
+			} else {
+				// if oldVersion == "" this means that the resourse was already removed or desn't yet exist on the client
+				// no need to remove it once again
+				if oldVersion != "" {
+					toRemove = append(toRemove, resourceName)
+				}
+				// the resource has gone but we keep watching for it so we detect an update if the resource is back
+				newVersionMap[resourceName] = ""
+			}
+		}
 	}
 
 	// send through our version map
 	return &RawDeltaResponse{
 		DeltaRequest:     request,
 		Resources:        filtered,
-		VersionMap:       versionMap,
-		RemovedResources: unsubscribed,
-	}
+		RemovedResources: toRemove,
+		VersionMap:       newVersionMap,
+	}, nil
 }

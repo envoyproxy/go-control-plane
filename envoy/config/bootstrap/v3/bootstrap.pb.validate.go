@@ -302,6 +302,19 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
+	switch m.StatsFlush.(type) {
+
+	case *Bootstrap_StatsFlushOnAdmin:
+
+		if m.GetStatsFlushOnAdmin() != true {
+			return BootstrapValidationError{
+				field:  "StatsFlushOnAdmin",
+				reason: "value must equal true",
+			}
+		}
+
+	}
+
 	return nil
 }
 

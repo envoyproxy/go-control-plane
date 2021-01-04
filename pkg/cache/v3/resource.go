@@ -22,6 +22,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
@@ -86,6 +87,9 @@ func GetResourceName(res types.Resource) string {
 		return v.GetName()
 	case *runtime.Runtime:
 		return v.GetName()
+	case *core.TypedExtensionConfig:
+		// This is a V3 proto, but this is the easiest workaround for the fact that there is no V2 proto.
+		return v.GetName()
 	default:
 		return ""
 	}
@@ -105,13 +109,13 @@ func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources map[string]types.Resource) map[string]bool {
+func GetResourceReferences(resources map[string]types.ResourceWithTtl) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
-		if res == nil {
+		if res.Resource == nil {
 			continue
 		}
-		switch v := res.(type) {
+		switch v := res.Resource.(type) {
 		case *endpoint.ClusterLoadAssignment:
 			// no dependencies
 		case *cluster.Cluster:

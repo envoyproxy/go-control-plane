@@ -61,9 +61,6 @@ func TestSnapshotGetters(t *testing.T) {
 	if out := snapshot.GetVersion("not a type"); out != "" {
 		t.Errorf("got non-empty version for unknown type: %#v", out)
 	}
-	if out := snapshot.GetSubscribedResources(nil, "not a type"); out != nil {
-		t.Errorf("got non-empty resources for unknown type: %#v", out)
-	}
 }
 
 func TestSnapshotVersionMap(t *testing.T) {
@@ -82,11 +79,8 @@ func TestSnapshotVersionMap(t *testing.T) {
 
 	vInfo := vMap[rsrc.EndpointType]
 	for _, v := range vInfo {
-		if v.Alias == "" {
-			t.Errorf("expected alias name, received: %s", v.Alias)
-		}
-		if v.Version == "" {
-			t.Errorf("expected version hash, recieved: %s", v.Version)
+		if v == "" {
+			t.Errorf("expected version hash, recieved: %s", v)
 		}
 	}
 }

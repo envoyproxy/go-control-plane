@@ -23,6 +23,7 @@ import (
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 type watches = map[chan Response]struct{}
@@ -92,19 +93,19 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 }
 
 func (cache *LinearCache) respond(value chan Response, staleResources []string) {
-	var resources []types.Resource
+	var resources []types.ResourceWithTtl
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
-		resources = make([]types.Resource, 0, len(cache.resources))
+		resources = make([]types.ResourceWithTtl, 0, len(cache.resources))
 		for _, resource := range cache.resources {
-			resources = append(resources, resource)
+			resources = append(resources, types.ResourceWithTtl{Resource: resource})
 		}
 	} else {
-		resources = make([]types.Resource, 0, len(staleResources))
+		resources = make([]types.ResourceWithTtl, 0, len(staleResources))
 		for _, name := range staleResources {
 			resource := cache.resources[name]
 			if resource != nil {
-				resources = append(resources, resource)
+				resources = append(resources, types.ResourceWithTtl{Resource: resource})
 			}
 		}
 	}
@@ -240,7 +241,7 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 }
 
 // TODO: implement CreateDeltaWatch for linear cache
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, v StreamVersion) (chan DeltaResponse, func()) {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sv *stream.StreamState) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 

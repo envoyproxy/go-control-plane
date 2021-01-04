@@ -11,24 +11,9 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
-
-type mockStreamState struct {
-	SystemVersion    string
-	Nonce            string
-	ResourceVersions map[string]cache.DeltaVersionInfo
-}
-
-func (s mockStreamState) GetVersionMap() map[string]cache.DeltaVersionInfo {
-	return s.ResourceVersions
-}
-func (s mockStreamState) GetStreamNonce() string {
-	return s.Nonce
-}
-func (s mockStreamState) GetSystemVersion() string {
-	return s.SystemVersion
-}
 
 func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
@@ -41,25 +26,22 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, mockStreamState{ResourceVersions: nil, SystemVersion: ""})
+		}, &stream.StreamState{true, nil})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
-	vm := make(map[string]map[string]cache.DeltaVersionInfo)
+	vm := make(map[string]map[string]string)
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+				if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
 					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
-				vMap, err := out.GetDeltaVersionMap()
-				if err != nil {
-					t.Fatal(err)
-				}
+				vMap := out.GetDeltaVersionMap()
 				vm[typ] = vMap
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -74,7 +56,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, mockStreamState{ResourceVersions: vm[typ], SystemVersion: "x"})
+		}, &stream.StreamState{false, vm[typ]})
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -94,13 +76,10 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// validate response for endpoints
 	select {
 	case out := <-watches[testTypes[0]]:
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
-			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
+		if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType)) {
+			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.GetResources(rsrc.EndpointType))
 		}
-		vMap, err := out.GetDeltaVersionMap()
-		if err != nil {
-			t.Fatal(err)
-		}
+		vMap := out.GetDeltaVersionMap()
 		vm[testTypes[0]] = vMap
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
@@ -130,7 +109,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
+					}, &stream.StreamState{true, nil})
 				}
 			})
 		}(i)
@@ -146,7 +125,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, mockStreamState{ResourceVersions: nil, SystemVersion: "x"})
+		}, &stream.StreamState{true, nil})
 
 		// Cancel the watch
 		cancel()

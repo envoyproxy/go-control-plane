@@ -120,28 +120,6 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
-	if d := m.GetStatsFlushInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
-		if err != nil {
-			return BootstrapValidationError{
-				field:  "StatsFlushInterval",
-				reason: "value is not a valid duration",
-				cause:  err,
-			}
-		}
-
-		lt := time.Duration(300*time.Second + 0*time.Nanosecond)
-		gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
-
-		if dur < gte || dur >= lt {
-			return BootstrapValidationError{
-				field:  "StatsFlushInterval",
-				reason: "value must be inside range [1ms, 5m0s)",
-			}
-		}
-
-	}
-
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedWatchdog()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return BootstrapValidationError{
@@ -287,6 +265,43 @@ func (m *Bootstrap) Validate() error {
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
+			}
+		}
+
+	}
+
+	switch m.StatsFlush.(type) {
+
+	case *Bootstrap_StatsFlushInterval:
+
+		if d := m.GetStatsFlushInterval(); d != nil {
+			dur, err := ptypes.Duration(d)
+			if err != nil {
+				return BootstrapValidationError{
+					field:  "StatsFlushInterval",
+					reason: "value is not a valid duration",
+					cause:  err,
+				}
+			}
+
+			lt := time.Duration(300*time.Second + 0*time.Nanosecond)
+			gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+			if dur < gte || dur >= lt {
+				return BootstrapValidationError{
+					field:  "StatsFlushInterval",
+					reason: "value must be inside range [1ms, 5m0s)",
+				}
+			}
+
+		}
+
+	case *Bootstrap_StatsFlushOnAdmin:
+
+		if m.GetStatsFlushOnAdmin() != true {
+			return BootstrapValidationError{
+				field:  "StatsFlushOnAdmin",
+				reason: "value must equal true",
 			}
 		}
 

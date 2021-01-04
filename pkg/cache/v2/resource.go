@@ -25,6 +25,7 @@ import (
 	listener "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	route "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	auth "github.com/envoyproxy/go-control-plane/envoy/api/v2/auth"
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/config/filter/network/http_connection_manager/v2"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -85,6 +86,9 @@ func GetResourceName(res types.Resource) string {
 		return v.GetName()
 	case *runtime.Runtime:
 		return v.GetName()
+	case *core.TypedExtensionConfig:
+		// This is a V3 proto, but this is the easiest workaround for the fact that there is no V2 proto.
+		return v.GetName()
 	default:
 		return ""
 	}
@@ -104,13 +108,13 @@ func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources map[string]types.Resource) map[string]bool {
+func GetResourceReferences(resources map[string]types.ResourceWithTtl) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
-		if res == nil {
+		if res.Resource == nil {
 			continue
 		}
-		switch v := res.(type) {
+		switch v := res.Resource.(type) {
 		case *endpoint.ClusterLoadAssignment:
 			// no dependencies
 		case *cluster.Cluster:

@@ -60,17 +60,8 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
-// StreamVersion is a structure to pass through version data to the snapshot cache
-// that watches can use to intelligently determine the state of the current system
-type StreamVersion interface {
-	// GetVersionMap returns a hash map of the currently applied resources
-	GetVersionMap() map[string]DeltaVersionInfo
-
-	// GetSystemVersion returns the current system version within an incremental stream
-	GetSystemVersion() string
-
-	// GetStreamNonce will return the current nonce within a given incremental stream (used within watch creation)
-	GetStreamNonce() string
+type heartbeatHandle struct {
+	cancel func()
 }
 
 type snapshotCache struct {
@@ -111,12 +102,88 @@ type snapshotCache struct {
 //
 // Logger is optional.
 func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache {
-	return &snapshotCache{
+	return newSnapshotCache(ads, hash, logger)
+}
+
+func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *snapshotCache {
+	cache := &snapshotCache{
 		log:       logger,
 		ads:       ads,
 		snapshots: make(map[string]Snapshot),
 		status:    make(map[string]*statusInfo),
 		hash:      hash,
+	}
+
+	return cache
+}
+
+// NewSnapshotCacheWithHeartbeating initializes a simple cache that sends periodic heartbeat
+// responses for resources with a TTL.
+//
+// ADS flag forces a delay in responding to streaming requests until all
+// resources are explicitly named in the request. This avoids the problem of a
+// partial request over a single stream for a subset of resources which would
+// require generating a fresh version for acknowledgement. ADS flag requires
+// snapshot consistency. For non-ADS case (and fetch), multiple partial
+// requests are sent across multiple streams and re-using the snapshot version
+// is OK.
+//
+// Logger is optional.
+//
+// The context provides a way to cancel the heartbeating routine, while the heartbeatInterval
+// parameter controls how often heartbeating occurs.
+func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHash, logger log.Logger, heartbeatInterval time.Duration) SnapshotCache {
+	cache := newSnapshotCache(ads, hash, logger)
+	go func() {
+		t := time.NewTicker(heartbeatInterval)
+
+		for {
+			select {
+			case <-t.C:
+				cache.mu.Lock()
+				for node := range cache.status {
+					// TODO(snowp): Omit heartbeats if a real response has been sent recently.
+					cache.sendHeartbeats(ctx, node)
+				}
+				cache.mu.Unlock()
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return cache
+}
+
+func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
+	snapshot := cache.snapshots[node]
+	if info, ok := cache.status[node]; ok {
+		info.mu.Lock()
+		for id, watch := range info.watches {
+			// Respond with the current version regardless of whether the version has changed.
+			version := snapshot.GetVersion(watch.Request.TypeUrl)
+			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+
+			// TODO(snowp): Construct this once per type instead of once per watch.
+			resourcesWithTtl := map[string]types.ResourceWithTtl{}
+			for k, v := range resources {
+				if v.Ttl != nil {
+					resourcesWithTtl[k] = v
+				}
+			}
+
+			if len(resourcesWithTtl) == 0 {
+				continue
+			}
+			if cache.log != nil {
+				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
+			}
+
+			cache.respond(watch.Request, watch.Response, resourcesWithTtl, version, true)
+
+			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
+			delete(info.watches, id)
+		}
+		info.mu.Unlock()
 	}
 }
 
@@ -127,7 +194,6 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 	// update the existing entry
 	cache.snapshots[node] = snapshot
-	snapshotVMap := snapshot.GetVersionMap()
 
 	// trigger existing watches for which version changed
 	if info, ok := cache.status[node]; ok {
@@ -138,7 +204,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 				if cache.log != nil {
 					cache.log.Debugf("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
 				}
-				cache.respond(watch.Request, watch.Response, snapshot.GetResources(watch.Request.TypeUrl), version)
+				resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+				cache.respond(watch.Request, watch.Response, resources, version, false)
 
 				// discard the watch
 				delete(info.watches, id)
@@ -147,74 +214,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 		// process our delta watches
 		for id, watch := range info.deltaWatches {
-			// Build our response i.e. only send back things that have changed after we compare version hashes
-			res := make(map[string]types.Resource)
-			typ := watch.Request.GetTypeUrl()
-
-			watchVersions := watch.VersionMap
-			snapshotVersions := snapshotVMap[typ]
-			versionsToSend := make(map[string]DeltaVersionInfo, 0)
-
-			// proccesing function for updating versions and adding resource to send
-			process := func(alias string) {
-				resource := snapshot.GetResource(alias, typ)
-				res[alias] = resource
-				v, _ := HashResource(resource)
-				versionsToSend[alias] = DeltaVersionInfo{
-					Version: v,
-					Alias:   alias,
-				}
-			}
-
-			// Right now we're just diffing versions
-			// TODO: cache should check to see if any resources have been dumped (unsubscribed)
-			// ^ could we push this to the server? Then we can modify the watch request as needed meaning
-			// track previous subscriptions as well as remove resources that have been unsubscribed
-			// Should we also build a version map that isn't off the snapshot but rather resources being sent through?
-
-			if len(watch.Request.ResourceNamesSubscribe) == 0 && len(watch.Request.ResourceNamesUnsubscribe) == 0 {
-				if cache.log != nil {
-					cache.log.Debugf("assuming delta wildcard mode, no resource subscriptions or unsubscriptions provided")
-					cache.log.Debugf("respond open delta watch %d with new version %v", id, watch.VersionMap)
-				}
-
-				for alias, newV := range snapshotVersions {
-					oldV, ok := watchVersions[alias]
-					// cache.log.Debugf("%s comparing versions for alias: %s", typ, alias)
-					if !ok || newV.Version != oldV.Version {
-						// cache.log.Debugf("%s found new version of resource: %s", typ, alias)
-						process(alias)
-					}
-				}
-			} else {
-				if cache.log != nil {
-					cache.log.Debugf("respond open delta watch %d with new version %v", id, watch.VersionMap)
-				}
-				for _, alias := range watch.Request.GetResourceNamesSubscribe() {
-					oldV, ok := watchVersions[alias]
-					if !ok {
-						if cache.log != nil {
-							// cache.log.Debugf("%s couldn't find previous version for %s", typ, alias)
-						}
-						process(alias)
-					}
-					if oldV.Version != snapshotVersions[alias].Version {
-						if cache.log != nil {
-							// cache.log.Debugf("%s found new version of resource %s, updating...", typ, alias)
-							process(alias)
-						}
-					}
-				}
-			}
-
-			// respond to the watch only if new resources have been changed, otherwise leave an open watch
-			if len(res) > 0 {
-				cache.respondDelta(watch.Request, watch.Response, versionsToSend, res)
+			if cache.respondDelta(watch.Request, watch.Response, watch.StreamState, snapshot.GetResources(watch.Request.TypeUrl)) != nil {
 				delete(info.deltaWatches, id)
-			} else {
-				if cache.log != nil {
-					cache.log.Debugf("response length for watch was 0... not responding")
-				}
 			}
 		}
 		info.mu.Unlock()
@@ -254,7 +255,7 @@ func nameSet(names []string) map[string]bool {
 }
 
 // superset checks that all resources are listed in the names set.
-func superset(names map[string]bool, resources map[string]types.Resource) error {
+func superset(names map[string]bool, resources map[string]types.ResourceWithTtl) error {
 	for resourceName := range resources {
 		if _, exists := names[resourceName]; !exists {
 			return fmt.Errorf("%q not listed", resourceName)
@@ -301,7 +302,8 @@ func (cache *snapshotCache) CreateWatch(request *Request) (chan Response, func()
 	}
 
 	// otherwise, the watch may be responded immediately
-	cache.respond(request, value, snapshot.GetResources(request.TypeUrl), version)
+	resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
+	cache.respond(request, value, resources, version, false)
 
 	return value, nil
 }
@@ -326,7 +328,7 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
 // TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
-func (cache *snapshotCache) respond(request *Request, value chan Response, resources map[string]types.Resource, version string) {
+func (cache *snapshotCache) respond(request *Request, value chan Response, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) {
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
@@ -342,11 +344,11 @@ func (cache *snapshotCache) respond(request *Request, value chan Response, resou
 			request.TypeUrl, request.ResourceNames, request.VersionInfo, version)
 	}
 
-	value <- createResponse(request, resources, version)
+	value <- createResponse(request, resources, version, heartbeat)
 }
 
-func createResponse(request *Request, resources map[string]types.Resource, version string) Response {
-	filtered := make([]types.Resource, 0, len(resources))
+func createResponse(request *Request, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) Response {
+	filtered := make([]types.ResourceWithTtl, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
@@ -368,6 +370,7 @@ func createResponse(request *Request, resources map[string]types.Resource, versi
 		Request:   request,
 		Version:   version,
 		Resources: filtered,
+		Heartbeat: heartbeat,
 	}
 }
 
@@ -390,8 +393,8 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request *Request) (Respon
 			return nil, &types.SkipFetchError{}
 		}
 
-		resources := snapshot.GetResources(request.TypeUrl)
-		out := createResponse(request, resources, version)
+		resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
+		out := createResponse(request, resources, version, false)
 		return out, nil
 	}
 
