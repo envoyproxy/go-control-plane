@@ -400,6 +400,13 @@ func (m *HttpConnectionManager) Validate() error {
 
 	}
 
+	switch m.StripPortMode.(type) {
+
+	case *HttpConnectionManager_StripAnyHostPort:
+		// no validation rules for StripAnyHostPort
+
+	}
+
 	return nil
 }
 

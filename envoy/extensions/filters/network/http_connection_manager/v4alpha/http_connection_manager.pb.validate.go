@@ -332,8 +332,6 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
-	// no validation rules for StripMatchingHostPort
-
 	if v, ok := interface{}(m.GetStreamErrorOnInvalidHttpMessage()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManagerValidationError{
@@ -387,6 +385,16 @@ func (m *HttpConnectionManager) Validate() error {
 			field:  "RouteSpecifier",
 			reason: "value is required",
 		}
+
+	}
+
+	switch m.StripPortMode.(type) {
+
+	case *HttpConnectionManager_StripMatchingHostPort:
+		// no validation rules for StripMatchingHostPort
+
+	case *HttpConnectionManager_StripAnyHostPort:
+		// no validation rules for StripAnyHostPort
 
 	}
 
