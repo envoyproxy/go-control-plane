@@ -44,12 +44,7 @@ func (m *JwtProvider) Validate() error {
 		return nil
 	}
 
-	if utf8.RuneCountInString(m.GetIssuer()) < 1 {
-		return JwtProviderValidationError{
-			field:  "Issuer",
-			reason: "value length must be at least 1 runes",
-		}
-	}
+	// no validation rules for Issuer
 
 	// no validation rules for Forward
 
