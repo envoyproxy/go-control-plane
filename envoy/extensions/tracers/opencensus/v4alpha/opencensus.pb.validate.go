@@ -69,9 +69,9 @@ func (m *OpenCensusConfig) Validate() error {
 		}
 	}
 
-	// no validation rules for ZipkinExporterEnabled
+	// no validation rules for HiddenEnvoyDeprecatedZipkinExporterEnabled
 
-	// no validation rules for ZipkinUrl
+	// no validation rules for HiddenEnvoyDeprecatedZipkinUrl
 
 	// no validation rules for OcagentExporterEnabled
 
