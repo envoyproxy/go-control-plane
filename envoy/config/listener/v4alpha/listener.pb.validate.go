@@ -200,10 +200,10 @@ func (m *Listener) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDeprecatedV1()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedDeprecatedV1()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ListenerValidationError{
-				field:  "DeprecatedV1",
+				field:  "HiddenEnvoyDeprecatedDeprecatedV1",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -347,6 +347,16 @@ func (m *Listener) Validate() error {
 		if err := v.Validate(); err != nil {
 			return ListenerValidationError{
 				field:  "TcpBacklogSize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetBindToPort()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListenerValidationError{
+				field:  "BindToPort",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
