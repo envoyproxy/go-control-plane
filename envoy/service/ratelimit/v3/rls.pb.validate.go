@@ -174,6 +174,16 @@ func (m *RateLimitResponse) Validate() error {
 
 	// no validation rules for RawBody
 
+	if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitResponseValidationError{
+				field:  "DynamicMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
