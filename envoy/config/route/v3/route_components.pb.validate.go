@@ -4775,6 +4775,18 @@ func (m *RateLimit_Action) Validate() error {
 			}
 		}
 
+	case *RateLimit_Action_Extension:
+
+		if v, ok := interface{}(m.GetExtension()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimit_ActionValidationError{
+					field:  "Extension",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return RateLimit_ActionValidationError{
 			field:  "ActionSpecifier",
