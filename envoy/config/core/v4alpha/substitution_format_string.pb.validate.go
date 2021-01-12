@@ -45,6 +45,21 @@ func (m *SubstitutionFormatString) Validate() error {
 
 	// no validation rules for ContentType
 
+	for idx, item := range m.GetFormatters() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SubstitutionFormatStringValidationError{
+					field:  fmt.Sprintf("Formatters[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.Format.(type) {
 
 	case *SubstitutionFormatString_HiddenEnvoyDeprecatedTextFormat:
