@@ -337,3 +337,9 @@ func (cache *LinearCache) NumWatches(name string) int {
 	defer cache.mu.Unlock()
 	return len(cache.watches[name]) + len(cache.watchAll)
 }
+
+func (cache *LinearCache) NumDeltaWatches() int {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+	return len(cache.deltaWatches)
+}
