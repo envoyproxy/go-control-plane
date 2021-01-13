@@ -33,9 +33,6 @@ var (
 	_ = ptypes.DynamicAny{}
 )
 
-// define the regex for a UUID once up-front
-var _base_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-
 // Validate checks the field values on Locality with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Locality) Validate() error {
@@ -1184,22 +1181,10 @@ func (m *DataSource) Validate() error {
 		}
 
 	case *DataSource_InlineBytes:
-
-		if len(m.GetInlineBytes()) < 1 {
-			return DataSourceValidationError{
-				field:  "InlineBytes",
-				reason: "value length must be at least 1 bytes",
-			}
-		}
+		// no validation rules for InlineBytes
 
 	case *DataSource_InlineString:
-
-		if utf8.RuneCountInString(m.GetInlineString()) < 1 {
-			return DataSourceValidationError{
-				field:  "InlineString",
-				reason: "value length must be at least 1 runes",
-			}
-		}
+		// no validation rules for InlineString
 
 	default:
 		return DataSourceValidationError{
