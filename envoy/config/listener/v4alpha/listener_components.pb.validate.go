@@ -61,6 +61,18 @@ func (m *Filter) Validate() error {
 			}
 		}
 
+	case *Filter_ConfigDiscovery:
+
+		if v, ok := interface{}(m.GetConfigDiscovery()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FilterValidationError{
+					field:  "ConfigDiscovery",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
