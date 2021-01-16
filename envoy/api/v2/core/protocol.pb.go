@@ -439,7 +439,7 @@ type Http2ProtocolOptions struct {
 	// Still under implementation. DO NOT USE.
 	//
 	// Allows metadata. See [metadata
-	// docs](https://github.com/envoyproxy/envoy/blob/master/source/docs/h2_metadata.md) for more
+	// docs](https://github.com/envoyproxy/envoy/blob/main/source/docs/h2_metadata.md) for more
 	// information.
 	AllowMetadata bool `protobuf:"varint,6,opt,name=allow_metadata,json=allowMetadata,proto3" json:"allow_metadata,omitempty"`
 	// Limit the number of pending outbound downstream frames of all types (frames that are waiting to
