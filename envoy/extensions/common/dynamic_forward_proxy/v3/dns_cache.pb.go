@@ -140,8 +140,7 @@ type DnsCacheConfig struct {
 	// not specified, the failure refresh rate defaults to the dns_refresh_rate.
 	DnsFailureRefreshRate *v3.Cluster_RefreshRate `protobuf:"bytes,6,opt,name=dns_failure_refresh_rate,json=dnsFailureRefreshRate,proto3" json:"dns_failure_refresh_rate,omitempty"`
 	// The config of circuit breakers for resolver. It provides a configurable threshold.
-	// If `envoy.reloadable_features.enable_dns_cache_circuit_breakers` is enabled,
-	// envoy will use dns cache circuit breakers with default settings even if this value is not set.
+	// Envoy will use dns cache circuit breakers with default settings even if this value is not set.
 	DnsCacheCircuitBreaker *DnsCacheCircuitBreakers `protobuf:"bytes,7,opt,name=dns_cache_circuit_breaker,json=dnsCacheCircuitBreaker,proto3" json:"dns_cache_circuit_breaker,omitempty"`
 	// [#next-major-version: Reconcile DNS options in a single message.]
 	// Always use TCP queries instead of UDP queries for DNS lookups.
