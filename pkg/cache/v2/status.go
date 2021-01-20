@@ -19,6 +19,7 @@ import (
 	"time"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 )
 
 // NodeHash computes string identifiers for Envoy nodes.
@@ -49,8 +50,14 @@ type StatusInfo interface {
 	// GetNumWatches returns the number of open watches.
 	GetNumWatches() int
 
+	// GetNumDeltaWatches returns the number of open delta watches.
+	GetNumDeltaWatches() int
+
 	// GetLastWatchRequestTime returns the timestamp of the last discovery watch request.
 	GetLastWatchRequestTime() time.Time
+
+	// GetLastDeltaWatchRequestTime returns the timestamp of the last delta discovery watch request.
+	GetLastDeltaWatchRequestTime() time.Time
 }
 
 type statusInfo struct {
@@ -60,8 +67,14 @@ type statusInfo struct {
 	// watches are indexed channels for the response watches and the original requests.
 	watches map[int64]ResponseWatch
 
+	// deltaWatches are indexed channels for the delta response watches and the original requests
+	deltaWatches map[int64]DeltaResponseWatch
+
 	// the timestamp of the last watch request
 	lastWatchRequestTime time.Time
+
+	// the timestamp of the last delta watch request
+	lastDeltaWatchRequestTime time.Time
 
 	// mutex to protect the status fields.
 	// should not acquire mutex of the parent cache after acquiring this mutex.
@@ -77,11 +90,24 @@ type ResponseWatch struct {
 	Response chan Response
 }
 
+// DeltaResponseWatch is a watch record keeping both the delta request and an open channel for the delta response.
+type DeltaResponseWatch struct {
+	// Request is the original delta request for the watch
+	Request *DeltaRequest
+
+	// Response is the channel to push the delta responses to
+	Response chan DeltaResponse
+
+	// VersionMap for the stream
+	StreamState *stream.StreamState
+}
+
 // newStatusInfo initializes a status info data structure.
 func newStatusInfo(node *core.Node) *statusInfo {
 	out := statusInfo{
-		node:    node,
-		watches: make(map[int64]ResponseWatch),
+		node:         node,
+		watches:      make(map[int64]ResponseWatch),
+		deltaWatches: make(map[int64]DeltaResponseWatch),
 	}
 	return &out
 }
@@ -98,8 +124,27 @@ func (info *statusInfo) GetNumWatches() int {
 	return len(info.watches)
 }
 
+func (info *statusInfo) GetNumDeltaWatches() int {
+	info.mu.RLock()
+	defer info.mu.RUnlock()
+	return len(info.deltaWatches)
+}
+
 func (info *statusInfo) GetLastWatchRequestTime() time.Time {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.lastWatchRequestTime
+}
+
+func (info *statusInfo) GetLastDeltaWatchRequestTime() time.Time {
+	info.mu.RLock()
+	defer info.mu.RUnlock()
+	return info.lastDeltaWatchRequestTime
+}
+
+// GetDeltaVersionMap will pull the version map out of a specific watch
+func (info *statusInfo) GetDeltaStreamState(watchID int64) *stream.StreamState {
+	info.mu.RLock()
+	defer info.mu.RUnlock()
+	return info.deltaWatches[watchID].StreamState
 }

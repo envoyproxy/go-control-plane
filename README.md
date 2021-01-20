@@ -8,7 +8,6 @@ This repository contains a Go-based implementation of an API server that
 implements the discovery service APIs defined in
 [data-plane-api](https://github.com/envoyproxy/data-plane-api).
 
-
 ## Scope
 
 Due to the variety of platforms out there, there is no single
@@ -60,8 +59,7 @@ in the same environment as the circle ci. This makes sure to produce a consisten
 
 1. Take a look at the [example server](internal/example/README.md).
 
-
-## XDS API versioning
+## xDS API Versioning
 
 The Envoy xDS APIs follow a well defined [versioning scheme](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/versioning).
 Due to lack of generics and function overloading in golang, creating a new version unfortunately involves code duplication.

@@ -32,11 +32,34 @@ type Resources struct {
 	Items map[string]types.ResourceWithTtl
 }
 
+// DeltaResources is a versioned group of resources which also contains individual resource versions per the incremental xDS protocol
+type DeltaResources struct {
+	// Version information
+	SystemVersion string
+
+	// Items in the group indexed by name
+	Items resourceItems
+}
+
+type resourceItems struct {
+	Version string
+	Items   map[string]types.Resource
+}
+
 // IndexResourcesByName creates a map from the resource name to the resource.
 func IndexResourcesByName(items []types.ResourceWithTtl) map[string]types.ResourceWithTtl {
 	indexed := make(map[string]types.ResourceWithTtl)
 	for _, item := range items {
 		indexed[GetResourceName(item.Resource)] = item
+	}
+	return indexed
+}
+
+// IndexRawResourcesByName creates a map from the resource name to the resource.
+func IndexRawResourcesByName(items []types.Resource) map[string]types.Resource {
+	indexed := make(map[string]types.Resource)
+	for _, item := range items {
+		indexed[GetResourceName(item)] = item
 	}
 	return indexed
 }
@@ -194,4 +217,40 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 		return ""
 	}
 	return s.Resources[typ].Version
+}
+
+// GetVersionMap will build a verison map off the current state of a snapshot
+func (s *Snapshot) GetVersionMap() map[string]map[string]string {
+	if s == nil {
+		return nil
+	}
+
+	versionMap := initializeVMap()
+	for i := 0; i < int(types.UnknownType); i++ {
+		typeURL := GetResponseTypeURL(types.ResponseType(i))
+		resources := s.GetResources(typeURL)
+		for _, resource := range resources {
+			// hash our verison in here and build the version map
+			v, err := HashResource(resource)
+			if err != nil {
+				panic(err)
+			}
+			alias := GetResourceName(resource)
+			versionMap[typeURL][alias] = v
+		}
+	}
+
+	return versionMap
+}
+
+func initializeVMap() map[string]map[string]string {
+	versionMap := make(map[string]map[string]string, types.UnknownType)
+
+	for i := 0; i < int(types.UnknownType); i++ {
+		versionMap[GetResponseTypeURL(
+			types.ResponseType(i),
+		)] = make(map[string]string, 0)
+	}
+
+	return versionMap
 }

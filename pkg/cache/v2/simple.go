@@ -71,6 +71,8 @@ type snapshotCache struct {
 	// 32-bit machines.
 	watchCount int64
 
+	deltaWatchCount int64
+
 	log log.Logger
 
 	// ads flag to hold responses until all resources are named
@@ -207,6 +209,16 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 				// discard the watch
 				delete(info.watches, id)
+			}
+		}
+
+		// process our delta watches
+		for id, watch := range info.deltaWatches {
+			if respondDelta(watch.Request, watch.Response, watch.StreamState,
+				snapshot.GetResources(watch.Request.TypeUrl),
+				snapshot.GetVersion(watch.Request.TypeUrl), cache.log) != nil {
+
+				delete(info.deltaWatches, id)
 			}
 		}
 		info.mu.Unlock()

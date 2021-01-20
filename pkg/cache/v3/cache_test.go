@@ -68,6 +68,59 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 	assert.Equal(t, discoveryResponse, dr)
 }
 
+func TestResponseGetDeltaDiscoveryResponse(t *testing.T) {
+	r := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+
+	resp := cache.RawDeltaResponse{
+		DeltaRequest: &discovery.DeltaDiscoveryRequest{TypeUrl: resource.RouteType},
+		Resources:    r,
+	}
+
+	discoveryResponse, err := resp.GetDeltaDiscoveryResponse()
+	assert.Nil(t, err)
+	assert.Equal(t, discoveryResponse.SystemVersionInfo, resp.SystemVersionInfo)
+	assert.Equal(t, len(discoveryResponse.Resources), 1)
+
+	cachedResponse, err := resp.GetDeltaDiscoveryResponse()
+	assert.Nil(t, err)
+	assert.Same(t, discoveryResponse, cachedResponse)
+
+	route := &route.RouteConfiguration{}
+	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0].GetResource(), route)
+	assert.Nil(t, err)
+	assert.Equal(t, route.Name, resourceName)
+}
+
+func TestDeltaPassthroughResponseGetDiscoveryResponse(t *testing.T) {
+	routes := []types.Resource{&route.RouteConfiguration{Name: resourceName}}
+	rsrc, err := ptypes.MarshalAny(routes[0])
+	assert.Nil(t, err)
+	dr := &discovery.DeltaDiscoveryResponse{
+		TypeUrl: resource.RouteType,
+		Resources: []*discovery.Resource{{
+			Name:     resourceName,
+			Aliases:  []string{resourceName},
+			Resource: rsrc,
+		}},
+		SystemVersionInfo: "v0",
+	}
+
+	resp := cache.DeltaPassthroughResponse{
+		DeltaRequest:           &discovery.DeltaDiscoveryRequest{TypeUrl: resource.RouteType},
+		DeltaDiscoveryResponse: dr,
+	}
+
+	discoveryResponse, err := resp.GetDeltaDiscoveryResponse()
+	assert.Nil(t, err)
+	assert.Equal(t, discoveryResponse.SystemVersionInfo, resp.DeltaDiscoveryResponse.SystemVersionInfo)
+	assert.Equal(t, len(discoveryResponse.Resources), 1)
+
+	r := &route.RouteConfiguration{}
+	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0].GetResource(), r)
+	assert.Nil(t, err)
+	assert.Equal(t, r.Name, resourceName)
+	assert.Equal(t, discoveryResponse, dr)
+}
 func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
 	routes := []types.ResourceWithTtl{{Resource: &route.RouteConfiguration{Name: resourceName}}}
 	resp := cache.RawResponse{

@@ -133,15 +133,7 @@ func (m *PerXdsConfig) Validate() error {
 		return nil
 	}
 
-	switch m.StatusConfig.(type) {
-
-	case *PerXdsConfig_Status:
-		// no validation rules for Status
-
-	case *PerXdsConfig_ClientStatus:
-		// no validation rules for ClientStatus
-
-	}
+	// no validation rules for Status
 
 	switch m.PerXdsConfig.(type) {
 

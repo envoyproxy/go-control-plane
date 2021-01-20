@@ -29,10 +29,11 @@ import (
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 )
 
 type Server interface {
-	StreamHandler(stream Stream, typeURL string) error
+	StreamHandler(stream stream.Stream, typeURL string) error
 }
 
 type Callbacks interface {
@@ -391,7 +392,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 }
 
 // StreamHandler converts a blocking read call to channels and initiates stream processing
-func (s *server) StreamHandler(stream Stream, typeURL string) error {
+func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *discovery.DiscoveryRequest)
 	reqStop := int32(0)

@@ -35,7 +35,7 @@ func TestTtlResponse(t *testing.T) {
 
 	snapshotCache := cache.NewSnapshotCacheWithHeartbeating(ctx, false, cache.IDHash{}, logger{t: t}, time.Second)
 
-	server := server.NewServer(ctx, snapshotCache, nil)
+	server := server.NewServer(ctx, snapshotCache, nil, nil)
 
 	grpcServer := grpc.NewServer()
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
