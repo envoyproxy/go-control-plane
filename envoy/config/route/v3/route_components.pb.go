@@ -2831,6 +2831,7 @@ func (x *VirtualCluster) GetHiddenEnvoyDeprecatedMethod() v3.RequestMethod {
 }
 
 // Global rate limiting :ref:`architecture overview <arch_overview_global_rate_limit>`.
+// Also applies to Local rate limiting :ref:`using descriptors <config_http_filters_local_rate_limit_descriptors>`.
 type RateLimit struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

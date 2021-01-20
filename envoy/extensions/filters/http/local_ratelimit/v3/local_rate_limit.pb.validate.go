@@ -110,6 +110,28 @@ func (m *LocalRateLimit) Validate() error {
 
 	}
 
+	for idx, item := range m.GetDescriptors() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LocalRateLimitValidationError{
+					field:  fmt.Sprintf("Descriptors[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if m.GetStage() > 10 {
+		return LocalRateLimitValidationError{
+			field:  "Stage",
+			reason: "value must be less than or equal to 10",
+		}
+	}
+
 	return nil
 }
 

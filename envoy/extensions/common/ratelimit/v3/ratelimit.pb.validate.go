@@ -136,6 +136,112 @@ var _ interface {
 	ErrorName() string
 } = RateLimitDescriptorValidationError{}
 
+// Validate checks the field values on LocalRateLimitDescriptor with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *LocalRateLimitDescriptor) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetEntries()) < 1 {
+		return LocalRateLimitDescriptorValidationError{
+			field:  "Entries",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetEntries() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LocalRateLimitDescriptorValidationError{
+					field:  fmt.Sprintf("Entries[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if m.GetTokenBucket() == nil {
+		return LocalRateLimitDescriptorValidationError{
+			field:  "TokenBucket",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetTokenBucket()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LocalRateLimitDescriptorValidationError{
+				field:  "TokenBucket",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// LocalRateLimitDescriptorValidationError is the validation error returned by
+// LocalRateLimitDescriptor.Validate if the designated constraints aren't met.
+type LocalRateLimitDescriptorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LocalRateLimitDescriptorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LocalRateLimitDescriptorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LocalRateLimitDescriptorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LocalRateLimitDescriptorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LocalRateLimitDescriptorValidationError) ErrorName() string {
+	return "LocalRateLimitDescriptorValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e LocalRateLimitDescriptorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLocalRateLimitDescriptor.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LocalRateLimitDescriptorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LocalRateLimitDescriptorValidationError{}
+
 // Validate checks the field values on RateLimitDescriptor_Entry with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

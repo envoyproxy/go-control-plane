@@ -877,7 +877,6 @@ type Cluster struct {
 	UpstreamConfig *v32.TypedExtensionConfig `protobuf:"bytes,48,opt,name=upstream_config,json=upstreamConfig,proto3" json:"upstream_config,omitempty"`
 	// Configuration to track optional cluster stats.
 	TrackClusterStats *TrackClusterStats `protobuf:"bytes,49,opt,name=track_cluster_stats,json=trackClusterStats,proto3" json:"track_cluster_stats,omitempty"`
-	// [#not-implemented-hide:]
 	// Preconnect configuration for this cluster.
 	PreconnectPolicy *Cluster_PreconnectPolicy `protobuf:"bytes,50,opt,name=preconnect_policy,json=preconnectPolicy,proto3" json:"preconnect_policy,omitempty"`
 	// If `connection_pool_per_downstream_connection` is true, the cluster will use a separate
@@ -2413,7 +2412,6 @@ func (x *Cluster_RefreshRate) GetMaxInterval() *duration.Duration {
 	return nil
 }
 
-// [#not-implemented-hide:]
 type Cluster_PreconnectPolicy struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2421,7 +2419,7 @@ type Cluster_PreconnectPolicy struct {
 
 	// Indicates how many streams (rounded up) can be anticipated per-upstream for each
 	// incoming stream. This is useful for high-QPS or latency-sensitive services. Preconnecting
-	// will only be done if the upstream is healthy.
+	// will only be done if the upstream is healthy and the cluster has traffic.
 	//
 	// For example if this is 2, for an incoming HTTP/1.1 stream, 2 connections will be
 	// established, one for the new incoming stream, and one for a presumed follow-up stream. For
@@ -2439,8 +2437,7 @@ type Cluster_PreconnectPolicy struct {
 	//
 	// If this value is not set, or set explicitly to one, Envoy will fetch as many connections
 	// as needed to serve streams in flight. This means in steady state if a connection is torn down,
-	// a subsequent streams will pay an upstream-rtt latency penalty waiting for streams to be
-	// preconnected.
+	// a subsequent streams will pay an upstream-rtt latency penalty waiting for a new connection.
 	//
 	// This is limited somewhat arbitrarily to 3 because preconnecting too aggressively can
 	// harm latency more than the preconnecting helps.
@@ -2448,15 +2445,16 @@ type Cluster_PreconnectPolicy struct {
 	// Indicates how many many streams (rounded up) can be anticipated across a cluster for each
 	// stream, useful for low QPS services. This is currently supported for a subset of
 	// deterministic non-hash-based load-balancing algorithms (weighted round robin, random).
-	// Unlike per_upstream_preconnect_ratio this preconnects across the upstream instances in a
+	// Unlike *per_upstream_preconnect_ratio* this preconnects across the upstream instances in a
 	// cluster, doing best effort predictions of what upstream would be picked next and
 	// pre-establishing a connection.
+	//
+	// Preconnecting will be limited to one preconnect per configured upstream in the cluster and will
+	// only be done if there are healthy upstreams and the cluster has traffic.
 	//
 	// For example if preconnecting is set to 2 for a round robin HTTP/2 cluster, on the first
 	// incoming stream, 2 connections will be preconnected - one to the first upstream for this
 	// cluster, one to the second on the assumption there will be a follow-up stream.
-	//
-	// Preconnecting will be limited to one preconnect per configured upstream in the cluster.
 	//
 	// If this value is not set, or set explicitly to one, Envoy will fetch as many connections
 	// as needed to serve streams in flight, so during warm up and in steady state if a connection
@@ -2464,8 +2462,8 @@ type Cluster_PreconnectPolicy struct {
 	// connection establishment.
 	//
 	// If both this and preconnect_ratio are set, Envoy will make sure both predicted needs are met,
-	// basically preconnecting max(predictive-preconnect, per-upstream-preconnect), for each upstream.
-	// TODO(alyssawilk) per LB docs and LB overview docs when unhiding.
+	// basically preconnecting max(predictive-preconnect, per-upstream-preconnect), for each
+	// upstream.
 	PredictivePreconnectRatio *wrappers.DoubleValue `protobuf:"bytes,2,opt,name=predictive_preconnect_ratio,json=predictivePreconnectRatio,proto3" json:"predictive_preconnect_ratio,omitempty"`
 }
 
