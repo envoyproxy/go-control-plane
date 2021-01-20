@@ -56,10 +56,7 @@ type ExtAuthz struct {
 	// Note that errors can be *always* tracked in the :ref:`stats
 	// <config_http_filters_ext_authz_stats>`.
 	FailureModeAllow bool `protobuf:"varint,2,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
-	// Sets the package version the gRPC service should use. This is particularly
-	// useful when transitioning from alpha to release versions assuming that both definitions are
-	// semantically compatible. Deprecation note: This field is deprecated and should only be used for
-	// version upgrade. See release notes for more details.
+	// [#not-implemented-hide: Support for this field has been removed.]
 	//
 	// Deprecated: Do not use.
 	UseAlpha bool `protobuf:"varint,4,opt,name=use_alpha,json=useAlpha,proto3" json:"use_alpha,omitempty"`

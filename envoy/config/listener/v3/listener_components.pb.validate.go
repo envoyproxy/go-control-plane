@@ -33,9 +33,6 @@ var (
 	_ = ptypes.DynamicAny{}
 )
 
-// define the regex for a UUID once up-front
-var _listener_components_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-
 // Validate checks the field values on Filter with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Filter) Validate() error {
@@ -58,6 +55,18 @@ func (m *Filter) Validate() error {
 			if err := v.Validate(); err != nil {
 				return FilterValidationError{
 					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Filter_ConfigDiscovery:
+
+		if v, ok := interface{}(m.GetConfigDiscovery()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FilterValidationError{
+					field:  "ConfigDiscovery",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

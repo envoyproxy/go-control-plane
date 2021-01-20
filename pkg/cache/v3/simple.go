@@ -215,7 +215,10 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 		// process our delta watches
 		for id, watch := range info.deltaWatches {
-			if cache.respondDelta(watch.Request, watch.Response, watch.StreamState, snapshot.GetResources(watch.Request.TypeUrl)) != nil {
+			if respondDelta(watch.Request, watch.Response, watch.StreamState,
+				snapshot.GetResources(watch.Request.TypeUrl),
+				snapshot.GetVersion(watch.Request.TypeUrl), cache.log) != nil {
+
 				delete(info.deltaWatches, id)
 			}
 		}
