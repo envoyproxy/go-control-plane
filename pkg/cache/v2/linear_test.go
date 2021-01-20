@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	endpointservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
@@ -305,7 +305,7 @@ func TestLinearDeltaBasic(t *testing.T) {
 	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
 	mustBlockDelta(t, w)
 	checkDeltaWatchCount(t, c, 1)
-	a := &api.ClusterLoadAssignment{ClusterName: "a"}
+	a := &endpointservice.ClusterLoadAssignment{ClusterName: "a"}
 	hash, _ := HashResource(a)
 	c.UpdateResource("a", a)
 	checkDeltaWatchCount(t, c, 0)
@@ -314,10 +314,10 @@ func TestLinearDeltaBasic(t *testing.T) {
 
 func TestLinearDeltaExistingResources(t *testing.T) {
 	c := NewLinearCache(testType)
-	a := &api.ClusterLoadAssignment{ClusterName: "a"}
+	a := &endpointservice.ClusterLoadAssignment{ClusterName: "a"}
 	hashA, _ := HashResource(a)
 	c.UpdateResource("a", a)
-	b := &api.ClusterLoadAssignment{ClusterName: "b"}
+	b := &endpointservice.ClusterLoadAssignment{ClusterName: "b"}
 	hashB, _ := HashResource(b)
 	c.UpdateResource("b", b)
 
@@ -334,10 +334,10 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 
 func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	c := NewLinearCache(testType)
-	a := &api.ClusterLoadAssignment{ClusterName: "a"}
+	a := &endpointservice.ClusterLoadAssignment{ClusterName: "a"}
 	hashA, _ := HashResource(a)
 	c.UpdateResource("a", a)
-	b := &api.ClusterLoadAssignment{ClusterName: "b"}
+	b := &endpointservice.ClusterLoadAssignment{ClusterName: "b"}
 	hashB, _ := HashResource(b)
 	c.UpdateResource("b", b)
 
@@ -350,7 +350,7 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
 	mustBlockDelta(t, w)
 	checkDeltaWatchCount(t, c, 1)
-	b = &api.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: 10}}} // new version of b
+	b = &endpointservice.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: 10}}} // new version of b
 	hashB, _ = HashResource(b)
 	c.UpdateResource("b", b)
 	checkDeltaWatchCount(t, c, 0)
