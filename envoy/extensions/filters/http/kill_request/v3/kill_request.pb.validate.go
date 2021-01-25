@@ -51,7 +51,12 @@ func (m *KillRequest) Validate() error {
 		}
 	}
 
-	// no validation rules for KillRequestHeader
+	if !_KillRequest_KillRequestHeader_Pattern.MatchString(m.GetKillRequestHeader()) {
+		return KillRequestValidationError{
+			field:  "KillRequestHeader",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	return nil
 }
@@ -109,3 +114,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = KillRequestValidationError{}
+
+var _KillRequest_KillRequestHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
