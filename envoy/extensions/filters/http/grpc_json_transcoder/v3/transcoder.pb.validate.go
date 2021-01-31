@@ -66,6 +66,8 @@ func (m *GrpcJsonTranscoder) Validate() error {
 		}
 	}
 
+	// no validation rules for StrictHttpRequestValidation
+
 	switch m.DescriptorSet.(type) {
 
 	case *GrpcJsonTranscoder_ProtoDescriptor:
