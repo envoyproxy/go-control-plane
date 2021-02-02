@@ -160,6 +160,16 @@ func (m *RouteConfiguration) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetMaxDirectResponseBodySizeBytes()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteConfigurationValidationError{
+				field:  "MaxDirectResponseBodySizeBytes",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
