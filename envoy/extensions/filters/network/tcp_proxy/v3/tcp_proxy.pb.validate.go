@@ -362,6 +362,30 @@ func (m *TcpProxy_TunnelingConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for UsePost
+
+	if len(m.GetHeadersToAdd()) > 1000 {
+		return TcpProxy_TunnelingConfigValidationError{
+			field:  "HeadersToAdd",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetHeadersToAdd() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TcpProxy_TunnelingConfigValidationError{
+					field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 

@@ -3959,6 +3959,8 @@ func (m *RouteAction_UpgradeConfig_ConnectConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for AllowPost
+
 	return nil
 }
 
