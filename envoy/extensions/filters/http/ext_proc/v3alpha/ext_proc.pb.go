@@ -46,7 +46,6 @@ type ExternalProcessor struct {
 	// With this parameter set to true, however, then if the gRPC stream is prematurely closed
 	// or could not be opened, processing continues without error.
 	FailureModeAllow bool `protobuf:"varint,2,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies default options for how HTTP headers, trailers, and bodies are
 	// sent. See ProcessingMode for details.
 	ProcessingMode *ProcessingMode `protobuf:"bytes,3,opt,name=processing_mode,json=processingMode,proto3" json:"processing_mode,omitempty"`
