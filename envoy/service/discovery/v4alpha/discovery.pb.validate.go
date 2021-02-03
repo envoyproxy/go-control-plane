@@ -346,6 +346,16 @@ func (m *DeltaDiscoveryResponse) Validate() error {
 
 	// no validation rules for Nonce
 
+	if v, ok := interface{}(m.GetControlPlane()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeltaDiscoveryResponseValidationError{
+				field:  "ControlPlane",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
