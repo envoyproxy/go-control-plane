@@ -1132,6 +1132,8 @@ func (m *ListenersConfigDump_DynamicListener) Validate() error {
 		}
 	}
 
+	// no validation rules for ClientStatus
+
 	return nil
 }
 
@@ -1320,6 +1322,8 @@ func (m *ClustersConfigDump_DynamicCluster) Validate() error {
 		}
 	}
 
+	// no validation rules for ClientStatus
+
 	return nil
 }
 
@@ -1507,6 +1511,8 @@ func (m *RoutesConfigDump_DynamicRouteConfig) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for ClientStatus
 
 	return nil
 }
@@ -1717,6 +1723,8 @@ func (m *ScopedRoutesConfigDump_DynamicScopedRouteConfigs) Validate() error {
 		}
 	}
 
+	// no validation rules for ClientStatus
+
 	return nil
 }
 
@@ -1825,6 +1833,8 @@ func (m *SecretsConfigDump_DynamicSecret) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for ClientStatus
 
 	return nil
 }
@@ -2103,6 +2113,8 @@ func (m *EndpointsConfigDump_DynamicEndpointConfig) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for ClientStatus
 
 	return nil
 }
