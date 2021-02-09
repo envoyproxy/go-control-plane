@@ -801,6 +801,73 @@ var _ interface {
 	ErrorName() string
 } = GrpcProtocolOptionsValidationError{}
 
+// Validate checks the field values on Http3ProtocolOptions with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *Http3ProtocolOptions) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// Http3ProtocolOptionsValidationError is the validation error returned by
+// Http3ProtocolOptions.Validate if the designated constraints aren't met.
+type Http3ProtocolOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Http3ProtocolOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Http3ProtocolOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Http3ProtocolOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Http3ProtocolOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Http3ProtocolOptionsValidationError) ErrorName() string {
+	return "Http3ProtocolOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Http3ProtocolOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttp3ProtocolOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Http3ProtocolOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Http3ProtocolOptionsValidationError{}
+
 // Validate checks the field values on Http1ProtocolOptions_HeaderKeyFormat
 // with the rules defined in the proto definition for this message. If any
 // rules are violated, an error is returned.

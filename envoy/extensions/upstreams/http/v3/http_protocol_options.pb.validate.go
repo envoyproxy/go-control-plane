@@ -200,6 +200,18 @@ func (m *HttpProtocolOptions_ExplicitHttpConfig) Validate() error {
 			}
 		}
 
+	case *HttpProtocolOptions_ExplicitHttpConfig_Http3ProtocolOptions:
+
+		if v, ok := interface{}(m.GetHttp3ProtocolOptions()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpProtocolOptions_ExplicitHttpConfigValidationError{
+					field:  "Http3ProtocolOptions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return HttpProtocolOptions_ExplicitHttpConfigValidationError{
 			field:  "ProtocolConfig",
@@ -290,6 +302,16 @@ func (m *HttpProtocolOptions_UseDownstreamHttpConfig) Validate() error {
 		if err := v.Validate(); err != nil {
 			return HttpProtocolOptions_UseDownstreamHttpConfigValidationError{
 				field:  "Http2ProtocolOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetHttp3ProtocolOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpProtocolOptions_UseDownstreamHttpConfigValidationError{
+				field:  "Http3ProtocolOptions",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
