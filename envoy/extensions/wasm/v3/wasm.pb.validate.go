@@ -33,6 +33,158 @@ var (
 	_ = ptypes.DynamicAny{}
 )
 
+// Validate checks the field values on CapabilityRestrictionConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CapabilityRestrictionConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for key, val := range m.GetAllowedCapabilities() {
+		_ = val
+
+		// no validation rules for AllowedCapabilities[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CapabilityRestrictionConfigValidationError{
+					field:  fmt.Sprintf("AllowedCapabilities[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// CapabilityRestrictionConfigValidationError is the validation error returned
+// by CapabilityRestrictionConfig.Validate if the designated constraints
+// aren't met.
+type CapabilityRestrictionConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CapabilityRestrictionConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CapabilityRestrictionConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CapabilityRestrictionConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CapabilityRestrictionConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CapabilityRestrictionConfigValidationError) ErrorName() string {
+	return "CapabilityRestrictionConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CapabilityRestrictionConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCapabilityRestrictionConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CapabilityRestrictionConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CapabilityRestrictionConfigValidationError{}
+
+// Validate checks the field values on SanitizationConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SanitizationConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// SanitizationConfigValidationError is the validation error returned by
+// SanitizationConfig.Validate if the designated constraints aren't met.
+type SanitizationConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SanitizationConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SanitizationConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SanitizationConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SanitizationConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SanitizationConfigValidationError) ErrorName() string {
+	return "SanitizationConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SanitizationConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSanitizationConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SanitizationConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SanitizationConfigValidationError{}
+
 // Validate checks the field values on VmConfig with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *VmConfig) Validate() error {
@@ -153,6 +305,16 @@ func (m *PluginConfig) Validate() error {
 	}
 
 	// no validation rules for FailOpen
+
+	if v, ok := interface{}(m.GetCapabilityRestrictionConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PluginConfigValidationError{
+				field:  "CapabilityRestrictionConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	switch m.Vm.(type) {
 
