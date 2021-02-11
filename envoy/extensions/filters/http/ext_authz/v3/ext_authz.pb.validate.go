@@ -499,6 +499,16 @@ func (m *AuthorizationResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetAllowedClientHeadersOnSuccess()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AuthorizationResponseValidationError{
+				field:  "AllowedClientHeadersOnSuccess",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

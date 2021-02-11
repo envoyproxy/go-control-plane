@@ -93,7 +93,7 @@ type DeniedHttpResponse struct {
 	// code to the downstream client other than 403 (Forbidden).
 	Status *v3.HttpStatus `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// This field allows the authorization service to send HTTP response headers
-	// to the downstream client. Note that the `append` field in `HeaderValueOption` defaults to
+	// to the downstream client. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>` defaults to
 	// false when used in this message.
 	Headers []*v31.HeaderValueOption `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
 	// This field allows the authorization service to send a response body data
@@ -155,7 +155,7 @@ func (x *DeniedHttpResponse) GetBody() string {
 }
 
 // HTTP attributes for an OK response.
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type OkHttpResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -163,7 +163,7 @@ type OkHttpResponse struct {
 
 	// HTTP entity headers in addition to the original request headers. This allows the authorization
 	// service to append, to add or to override headers from the original request before
-	// dispatching it to the upstream. Note that the `append` field in `HeaderValueOption` defaults to
+	// dispatching it to the upstream. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>` defaults to
 	// false when used in this message. By setting the `append` field to `true`,
 	// the filter will append the correspondent header value to the matched request header.
 	// By leaving `append` as false, the filter will either add a new header, or override an existing
@@ -192,6 +192,10 @@ type OkHttpResponse struct {
 	//
 	// Deprecated: Do not use.
 	DynamicMetadata *_struct.Struct `protobuf:"bytes,3,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
+	// This field allows the authorization service to send HTTP response headers
+	// to the downstream client on success. Note that the :ref:`append field in HeaderValueOption <envoy_v3_api_field_config.core.v3.HeaderValueOption.append>`
+	// defaults to false when used in this message.
+	ResponseHeadersToAdd []*v31.HeaderValueOption `protobuf:"bytes,6,rep,name=response_headers_to_add,json=responseHeadersToAdd,proto3" json:"response_headers_to_add,omitempty"`
 }
 
 func (x *OkHttpResponse) Reset() {
@@ -244,6 +248,13 @@ func (x *OkHttpResponse) GetHeadersToRemove() []string {
 func (x *OkHttpResponse) GetDynamicMetadata() *_struct.Struct {
 	if x != nil {
 		return x.DynamicMetadata
+	}
+	return nil
+}
+
+func (x *OkHttpResponse) GetResponseHeadersToAdd() []*v31.HeaderValueOption {
+	if x != nil {
+		return x.ResponseHeadersToAdd
 	}
 	return nil
 }
@@ -403,7 +414,7 @@ var file_envoy_service_auth_v3_external_auth_proto_rawDesc = []byte{
 	0x04, 0x62, 0x6f, 0x64, 0x79, 0x3a, 0x2f, 0x9a, 0xc5, 0x88, 0x1e, 0x2a, 0x0a, 0x28, 0x65, 0x6e,
 	0x76, 0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x61, 0x75, 0x74, 0x68,
 	0x2e, 0x76, 0x32, 0x2e, 0x44, 0x65, 0x6e, 0x69, 0x65, 0x64, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xf4, 0x01, 0x0a, 0x0e, 0x4f, 0x6b, 0x48, 0x74, 0x74,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xd4, 0x02, 0x0a, 0x0e, 0x4f, 0x6b, 0x48, 0x74, 0x74,
 	0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x07, 0x68, 0x65, 0x61,
 	0x64, 0x65, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x65, 0x6e, 0x76,
 	0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76,
@@ -416,6 +427,12 @@ var file_envoy_service_auth_v3_external_auth_proto_rawDesc = []byte{
 	0x28, 0x0b, 0x32, 0x17, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x53, 0x74, 0x72, 0x75, 0x63, 0x74, 0x42, 0x02, 0x18, 0x01, 0x52,
 	0x0f, 0x64, 0x79, 0x6e, 0x61, 0x6d, 0x69, 0x63, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0x12, 0x5e, 0x0a, 0x17, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x5f, 0x68, 0x65, 0x61,
+	0x64, 0x65, 0x72, 0x73, 0x5f, 0x74, 0x6f, 0x5f, 0x61, 0x64, 0x64, 0x18, 0x06, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x27, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x33, 0x2e, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x14, 0x72, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x54, 0x6f, 0x41, 0x64, 0x64,
 	0x3a, 0x2b, 0x9a, 0xc5, 0x88, 0x1e, 0x26, 0x0a, 0x24, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73,
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x61, 0x75, 0x74, 0x68, 0x2e, 0x76, 0x32, 0x2e, 0x4f,
 	0x6b, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xdc, 0x02,
@@ -485,17 +502,18 @@ var file_envoy_service_auth_v3_external_auth_proto_depIdxs = []int32{
 	6,  // 2: envoy.service.auth.v3.DeniedHttpResponse.headers:type_name -> envoy.config.core.v3.HeaderValueOption
 	6,  // 3: envoy.service.auth.v3.OkHttpResponse.headers:type_name -> envoy.config.core.v3.HeaderValueOption
 	7,  // 4: envoy.service.auth.v3.OkHttpResponse.dynamic_metadata:type_name -> google.protobuf.Struct
-	8,  // 5: envoy.service.auth.v3.CheckResponse.status:type_name -> google.rpc.Status
-	1,  // 6: envoy.service.auth.v3.CheckResponse.denied_response:type_name -> envoy.service.auth.v3.DeniedHttpResponse
-	2,  // 7: envoy.service.auth.v3.CheckResponse.ok_response:type_name -> envoy.service.auth.v3.OkHttpResponse
-	7,  // 8: envoy.service.auth.v3.CheckResponse.dynamic_metadata:type_name -> google.protobuf.Struct
-	0,  // 9: envoy.service.auth.v3.Authorization.Check:input_type -> envoy.service.auth.v3.CheckRequest
-	3,  // 10: envoy.service.auth.v3.Authorization.Check:output_type -> envoy.service.auth.v3.CheckResponse
-	10, // [10:11] is the sub-list for method output_type
-	9,  // [9:10] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	6,  // 5: envoy.service.auth.v3.OkHttpResponse.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	8,  // 6: envoy.service.auth.v3.CheckResponse.status:type_name -> google.rpc.Status
+	1,  // 7: envoy.service.auth.v3.CheckResponse.denied_response:type_name -> envoy.service.auth.v3.DeniedHttpResponse
+	2,  // 8: envoy.service.auth.v3.CheckResponse.ok_response:type_name -> envoy.service.auth.v3.OkHttpResponse
+	7,  // 9: envoy.service.auth.v3.CheckResponse.dynamic_metadata:type_name -> google.protobuf.Struct
+	0,  // 10: envoy.service.auth.v3.Authorization.Check:input_type -> envoy.service.auth.v3.CheckRequest
+	3,  // 11: envoy.service.auth.v3.Authorization.Check:output_type -> envoy.service.auth.v3.CheckResponse
+	11, // [11:12] is the sub-list for method output_type
+	10, // [10:11] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_envoy_service_auth_v3_external_auth_proto_init() }
