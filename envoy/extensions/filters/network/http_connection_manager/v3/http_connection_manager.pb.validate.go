@@ -1098,6 +1098,8 @@ func (m *HttpFilter) Validate() error {
 		}
 	}
 
+	// no validation rules for IsOptional
+
 	switch m.ConfigType.(type) {
 
 	case *HttpFilter_TypedConfig:
