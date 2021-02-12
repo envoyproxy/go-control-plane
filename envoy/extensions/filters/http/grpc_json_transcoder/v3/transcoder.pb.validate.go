@@ -66,7 +66,15 @@ func (m *GrpcJsonTranscoder) Validate() error {
 		}
 	}
 
-	// no validation rules for StrictHttpRequestValidation
+	if v, ok := interface{}(m.GetRequestValidationOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GrpcJsonTranscoderValidationError{
+				field:  "RequestValidationOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	switch m.DescriptorSet.(type) {
 
@@ -218,3 +226,75 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GrpcJsonTranscoder_PrintOptionsValidationError{}
+
+// Validate checks the field values on
+// GrpcJsonTranscoder_RequestValidationOptions with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *GrpcJsonTranscoder_RequestValidationOptions) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for RejectUnknownMethod
+
+	// no validation rules for RejectUnknownQueryParameters
+
+	return nil
+}
+
+// GrpcJsonTranscoder_RequestValidationOptionsValidationError is the validation
+// error returned by GrpcJsonTranscoder_RequestValidationOptions.Validate if
+// the designated constraints aren't met.
+type GrpcJsonTranscoder_RequestValidationOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GrpcJsonTranscoder_RequestValidationOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GrpcJsonTranscoder_RequestValidationOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GrpcJsonTranscoder_RequestValidationOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GrpcJsonTranscoder_RequestValidationOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GrpcJsonTranscoder_RequestValidationOptionsValidationError) ErrorName() string {
+	return "GrpcJsonTranscoder_RequestValidationOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GrpcJsonTranscoder_RequestValidationOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGrpcJsonTranscoder_RequestValidationOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GrpcJsonTranscoder_RequestValidationOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GrpcJsonTranscoder_RequestValidationOptionsValidationError{}
