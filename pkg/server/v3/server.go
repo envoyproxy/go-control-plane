@@ -28,6 +28,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
+	extensionservice "github.com/envoyproxy/go-control-plane/envoy/service/extension/v3"
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
@@ -45,6 +46,7 @@ type Server interface {
 	discoverygrpc.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
 	runtimeservice.RuntimeDiscoveryServiceServer
+	extensionservice.ExtensionConfigDiscoveryServiceServer
 
 	rest.Server
 	sotw.Server
@@ -163,6 +165,10 @@ func (s *server) StreamRuntime(stream runtimeservice.RuntimeDiscoveryService_Str
 	return s.StreamHandler(stream, resource.RuntimeType)
 }
 
+func (s *server) StreamExtension(stream extensionservice.ExtensionConfigDiscoveryService_StreamExtensionConfigsServer) error {
+	return s.StreamHandler(stream, resource.ExtensionConfigType)
+}
+
 // Fetch is the universal fetch method.
 func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
 	return s.rest.Fetch(ctx, req)
@@ -216,6 +222,14 @@ func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryReque
 	return s.Fetch(ctx, req)
 }
 
+func (s *server) FetchExtension(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.Unavailable, "empty request")
+	}
+	req.TypeUrl = resource.ExtensionConfigType
+	return s.Fetch(ctx, req)
+}
+
 func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return errors.New("not implemented")
 }
@@ -241,5 +255,9 @@ func (s *server) DeltaSecrets(_ secretservice.SecretDiscoveryService_DeltaSecret
 }
 
 func (s *server) DeltaRuntime(_ runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
+	return errors.New("not implemented")
+}
+
+func (s *server) DeltaExtension(_ extensionservice.ExtensionConfigDiscoveryService_DeltaExtensionConfigsServer) error {
 	return errors.New("not implemented")
 }
