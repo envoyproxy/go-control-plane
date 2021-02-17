@@ -49,6 +49,7 @@ type StatsSink struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Stats sink specific configuration which depends on the sink being instantiated. See
 	// :ref:`StatsdSink <envoy_api_msg_config.metrics.v4alpha.StatsdSink>` for an example.
+	// [#extension-category: envoy.stats_sinks]
 	//
 	// Types that are assignable to ConfigType:
 	//	*StatsSink_TypedConfig

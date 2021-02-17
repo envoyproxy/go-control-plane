@@ -109,6 +109,7 @@ type ResourceMonitor struct {
 	//   <envoy_api_msg_config.resource_monitor.injected_resource.v2alpha.InjectedResourceConfig>`
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Configuration for the resource monitor being instantiated.
+	// [#extension-category: envoy.resource_monitors]
 	//
 	// Types that are assignable to ConfigType:
 	//	*ResourceMonitor_TypedConfig

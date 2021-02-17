@@ -893,6 +893,7 @@ type HealthCheck_CustomHealthCheck struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A custom health checker specific configuration which depends on the custom health checker
 	// being instantiated. See :api:`envoy/config/health_checker` for reference.
+	// [#extension-category: envoy.health_checkers]
 	//
 	// Types that are assignable to ConfigType:
 	//	*HealthCheck_CustomHealthCheck_TypedConfig

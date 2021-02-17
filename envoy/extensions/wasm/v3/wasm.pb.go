@@ -172,6 +172,7 @@ type VmConfig struct {
 	// (proxy_on_start). `google.protobuf.Struct` is serialized as JSON before
 	// passing it to the plugin. `google.protobuf.BytesValue` and
 	// `google.protobuf.StringValue` are passed directly without the wrapper.
+	// [#extension-category: envoy.wasm.runtime]
 	Configuration *any.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
 	// Allow the wasm file to include pre-compiled code on VMs which support it.
 	// Warning: this should only be enable for trusted sources as the precompiled code is not

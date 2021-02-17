@@ -199,6 +199,7 @@ type AccessLog struct {
 	//    <envoy_api_msg_extensions.access_loggers.grpc.v4alpha.HttpGrpcAccessLogConfig>`
 	// #. "envoy.access_loggers.tcp_grpc": :ref:`TcpGrpcAccessLogConfig
 	//    <envoy_api_msg_extensions.access_loggers.grpc.v4alpha.TcpGrpcAccessLogConfig>`
+	// [#extension-category: envoy.access_loggers]
 	//
 	// Types that are assignable to ConfigType:
 	//	*AccessLog_TypedConfig

@@ -70,6 +70,7 @@ type Compressor struct {
 	// :ref:`envoy.compression.gzip.compressor<envoy_api_msg_extensions.compression.gzip.compressor.v3.Gzip>`
 	// is included in Envoy.
 	// This field is ignored if used in the context of the gzip http-filter, but is mandatory otherwise.
+	// [#extension-category: envoy.compression.compressor]
 	CompressorLibrary *v3.TypedExtensionConfig `protobuf:"bytes,6,opt,name=compressor_library,json=compressorLibrary,proto3" json:"compressor_library,omitempty"`
 	// Configuration for request compression. Compression is disabled by default if left empty.
 	RequestDirectionConfig *Compressor_RequestDirectionConfig `protobuf:"bytes,7,opt,name=request_direction_config,json=requestDirectionConfig,proto3" json:"request_direction_config,omitempty"`

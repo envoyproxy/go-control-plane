@@ -116,6 +116,7 @@ type Tracing_Http struct {
 	// - :ref:`DatadogConfig <envoy_api_msg_config.trace.v3.DatadogConfig>`
 	// - :ref:`OpenCensusConfig <envoy_api_msg_config.trace.v3.OpenCensusConfig>`
 	// - :ref:`AWS X-Ray <envoy_api_msg_config.trace.v3.XRayConfig>`
+	// [#extension-category: envoy.tracers]
 	//
 	// Types that are assignable to ConfigType:
 	//	*Tracing_Http_TypedConfig

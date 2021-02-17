@@ -30,6 +30,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+// [#extension: envoy.filters.http.cache.simple_http_cache]
 type CacheConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

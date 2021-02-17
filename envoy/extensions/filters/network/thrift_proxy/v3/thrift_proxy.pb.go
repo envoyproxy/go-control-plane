@@ -172,6 +172,7 @@ type ThriftProxy struct {
 	// Thrift proxy. Order matters as the filters are processed sequentially. For backwards
 	// compatibility, if no thrift_filters are specified, a default Thrift router filter
 	// (`envoy.filters.thrift.router`) is used.
+	// [#extension-category: envoy.thrift_proxy.filters]
 	ThriftFilters []*ThriftFilter `protobuf:"bytes,5,rep,name=thrift_filters,json=thriftFilters,proto3" json:"thrift_filters,omitempty"`
 	// If set to true, Envoy will try to skip decode data after metadata in the Thrift message.
 	// This mode will only work if the upstream and downstream protocols are the same and the transport

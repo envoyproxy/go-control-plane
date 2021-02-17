@@ -3177,6 +3177,7 @@ type InternalRedirectPolicy struct {
 	// Specifies a list of predicates that are queried when an upstream response is deemed
 	// to trigger an internal redirect by all other criteria. Any predicate in the list can reject
 	// the redirect, causing the response to be proxied to downstream.
+	// [#extension-category: envoy.internal_redirect_predicates]
 	Predicates []*v4alpha.TypedExtensionConfig `protobuf:"bytes,3,rep,name=predicates,proto3" json:"predicates,omitempty"`
 	// Allow internal redirect to follow a target URI with a different scheme than the value of
 	// x-forwarded-proto. The default is false.
@@ -4343,6 +4344,8 @@ type RetryPolicy_RetryPriority struct {
 	unknownFields protoimpl.UnknownFields
 
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// [#extension-category: envoy.retry_priorities]
+	//
 	// Types that are assignable to ConfigType:
 	//	*RetryPolicy_RetryPriority_TypedConfig
 	ConfigType isRetryPolicy_RetryPriority_ConfigType `protobuf_oneof:"config_type"`
@@ -4417,6 +4420,8 @@ type RetryPolicy_RetryHostPredicate struct {
 	unknownFields protoimpl.UnknownFields
 
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// [#extension-category: envoy.retry_host_predicates]
+	//
 	// Types that are assignable to ConfigType:
 	//	*RetryPolicy_RetryHostPredicate_TypedConfig
 	ConfigType isRetryPolicy_RetryHostPredicate_ConfigType `protobuf_oneof:"config_type"`
@@ -4887,6 +4892,7 @@ type RateLimit_Action_Metadata struct {
 
 type RateLimit_Action_Extension struct {
 	// Rate limit descriptor extension. See the rate limit descriptor extensions documentation.
+	// [#extension-category: envoy.rate_limit_descriptors]
 	Extension *v4alpha.TypedExtensionConfig `protobuf:"bytes,9,opt,name=extension,proto3,oneof"`
 }
 

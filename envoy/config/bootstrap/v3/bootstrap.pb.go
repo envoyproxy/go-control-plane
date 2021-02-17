@@ -177,6 +177,7 @@ type Bootstrap struct {
 	Watchdog *Watchdog `protobuf:"bytes,8,opt,name=watchdog,proto3" json:"watchdog,omitempty"`
 	// Optional watchdogs configuration.
 	// This is used for specifying different watchdogs for the different subsystems.
+	// [#extension-category: envoy.guarddog_actions]
 	Watchdogs *Watchdogs `protobuf:"bytes,27,opt,name=watchdogs,proto3" json:"watchdogs,omitempty"`
 	// Configuration for an external tracing provider.
 	//
@@ -226,6 +227,7 @@ type Bootstrap struct {
 	UseTcpForDnsLookups bool `protobuf:"varint,20,opt,name=use_tcp_for_dns_lookups,json=useTcpForDnsLookups,proto3" json:"use_tcp_for_dns_lookups,omitempty"`
 	// Specifies optional bootstrap extensions to be instantiated at startup time.
 	// Each item contains extension specific configuration.
+	// [#extension-category: envoy.bootstrap]
 	BootstrapExtensions []*v3.TypedExtensionConfig `protobuf:"bytes,21,rep,name=bootstrap_extensions,json=bootstrapExtensions,proto3" json:"bootstrap_extensions,omitempty"`
 	// Specifies optional extensions instantiated at startup time and
 	// invoked during crash time on the request that caused the crash.

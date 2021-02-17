@@ -93,6 +93,8 @@ type Filter struct {
 	// The name of the filter to instantiate. The name must match a
 	// :ref:`supported filter <config_network_filters>`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// [#extension-category: envoy.filters.network]
+	//
 	// Types that are assignable to ConfigType:
 	//	*Filter_TypedConfig
 	//	*Filter_ConfigDiscovery
@@ -702,9 +704,11 @@ type ListenerFilter struct {
 
 	// The name of the filter to instantiate. The name must match a
 	// :ref:`supported filter <config_listener_filters>`.
+	// [#extension-category: envoy.transport_sockets.downstream]
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Filter specific configuration which depends on the filter being instantiated.
 	// See the supported filters for further documentation.
+	// [#extension-category: envoy.filters.listener]
 	//
 	// Types that are assignable to ConfigType:
 	//	*ListenerFilter_TypedConfig

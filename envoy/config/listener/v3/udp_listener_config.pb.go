@@ -39,6 +39,7 @@ type UdpListenerConfig struct {
 	UdpListenerName string `protobuf:"bytes,1,opt,name=udp_listener_name,json=udpListenerName,proto3" json:"udp_listener_name,omitempty"`
 	// Used to create a specific listener factory. To some factory, e.g.
 	// "raw_udp_listener", config is not needed.
+	// [#extension-category: envoy.filters.udp_listener]
 	//
 	// Types that are assignable to ConfigType:
 	//	*UdpListenerConfig_TypedConfig

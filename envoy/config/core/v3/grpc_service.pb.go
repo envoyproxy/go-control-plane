@@ -876,6 +876,8 @@ type GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin struct
 	unknownFields protoimpl.UnknownFields
 
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// [#extension-category: envoy.grpc_credentials]
+	//
 	// Types that are assignable to ConfigType:
 	//	*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_TypedConfig
 	//	*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_HiddenEnvoyDeprecatedConfig

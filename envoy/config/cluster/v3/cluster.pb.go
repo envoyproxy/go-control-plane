@@ -874,6 +874,7 @@ type Cluster struct {
 	// If users desire custom connection pool or upstream behavior, for example terminating
 	// CONNECT only if a custom filter indicates it is appropriate, the custom factories
 	// can be registered and configured here.
+	// [#extension-category: envoy.upstreams]
 	UpstreamConfig *v32.TypedExtensionConfig `protobuf:"bytes,48,opt,name=upstream_config,json=upstreamConfig,proto3" json:"upstream_config,omitempty"`
 	// Configuration to track optional cluster stats.
 	TrackClusterStats *TrackClusterStats `protobuf:"bytes,49,opt,name=track_cluster_stats,json=trackClusterStats,proto3" json:"track_cluster_stats,omitempty"`
@@ -1592,6 +1593,7 @@ type Cluster_TransportSocketMatch struct {
 	// against the values specified in this field.
 	Match *_struct.Struct `protobuf:"bytes,2,opt,name=match,proto3" json:"match,omitempty"`
 	// The configuration of the transport socket.
+	// [#extension-category: envoy.transport_sockets.upstream]
 	TransportSocket *v32.TransportSocket `protobuf:"bytes,3,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
 }
 
@@ -1658,6 +1660,7 @@ type Cluster_CustomClusterType struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Cluster specific configuration which depends on the cluster being instantiated.
 	// See the supported cluster for further documentation.
+	// [#extension-category: envoy.clusters]
 	TypedConfig *any.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 

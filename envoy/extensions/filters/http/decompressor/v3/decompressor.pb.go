@@ -37,6 +37,7 @@ type Decompressor struct {
 	// A decompressor library to use for both request and response decompression. Currently only
 	// :ref:`envoy.compression.gzip.compressor<envoy_api_msg_extensions.compression.gzip.decompressor.v3.Gzip>`
 	// is included in Envoy.
+	// [#extension-category: envoy.compression.decompressor]
 	DecompressorLibrary *v3.TypedExtensionConfig `protobuf:"bytes,1,opt,name=decompressor_library,json=decompressorLibrary,proto3" json:"decompressor_library,omitempty"`
 	// Configuration for request decompression. Decompression is enabled by default if left empty.
 	RequestDirectionConfig *Decompressor_RequestDirectionConfig `protobuf:"bytes,2,opt,name=request_direction_config,json=requestDirectionConfig,proto3" json:"request_direction_config,omitempty"`
