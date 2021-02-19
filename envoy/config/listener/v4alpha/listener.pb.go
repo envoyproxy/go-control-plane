@@ -238,6 +238,8 @@ type Listener struct {
 	// To set the queue length on macOS, set the net.inet.tcp.fastopen_backlog kernel parameter.
 	TcpFastOpenQueueLength *wrappers.UInt32Value `protobuf:"bytes,12,opt,name=tcp_fast_open_queue_length,json=tcpFastOpenQueueLength,proto3" json:"tcp_fast_open_queue_length,omitempty"`
 	// Specifies the intended direction of the traffic relative to the local Envoy.
+	// This property is required on Windows for listeners using the original destination filter,
+	// see :ref:`Original Destination <config_listener_filters_original_dst>`.
 	TrafficDirection v4alpha.TrafficDirection `protobuf:"varint,16,opt,name=traffic_direction,json=trafficDirection,proto3,enum=envoy.config.core.v4alpha.TrafficDirection" json:"traffic_direction,omitempty"`
 	// If the protocol in the listener socket address in :ref:`protocol
 	// <envoy_api_field_config.core.v4alpha.SocketAddress.protocol>` is :ref:`UDP
