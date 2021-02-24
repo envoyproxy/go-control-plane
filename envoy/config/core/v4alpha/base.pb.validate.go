@@ -291,6 +291,23 @@ func (m *Node) Validate() error {
 		}
 	}
 
+	for key, val := range m.GetDynamicParameters() {
+		_ = val
+
+		// no validation rules for DynamicParameters[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeValidationError{
+					field:  fmt.Sprintf("DynamicParameters[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if v, ok := interface{}(m.GetLocality()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return NodeValidationError{
