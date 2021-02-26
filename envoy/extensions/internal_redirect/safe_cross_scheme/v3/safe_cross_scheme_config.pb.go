@@ -31,8 +31,7 @@ const _ = proto.ProtoPackageIsVersion4
 // redirect and b) safe cross scheme redirect, which means if the downstream
 // scheme is HTTPS, both HTTPS and HTTP redirect targets are allowed, but if the
 // downstream scheme is HTTP, only HTTP redirect targets are allowed.
-// [#extension:
-// envoy.internal_redirect_predicates.safe_cross_scheme]
+// [#extension: envoy.internal_redirect_predicates.safe_cross_scheme]
 type SafeCrossSchemeConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

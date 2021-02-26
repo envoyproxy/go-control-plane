@@ -95,8 +95,6 @@ type Filter struct {
 	// The name of the filter to instantiate. The name must match a
 	// :ref:`supported filter <config_network_filters>`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// [#extension-category: envoy.filters.network]
-	//
 	// Types that are assignable to ConfigType:
 	//	*Filter_TypedConfig
 	//	*Filter_ConfigDiscovery
@@ -179,6 +177,7 @@ type isFilter_ConfigType interface {
 type Filter_TypedConfig struct {
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.
+	// [#extension-category: envoy.filters.network]
 	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
@@ -453,6 +452,7 @@ type FilterChain struct {
 	// :ref:`DownstreamTlsContext <envoy_api_msg_extensions.transport_sockets.tls.v3.DownstreamTlsContext>` in the `typed_config`.
 	// If no transport socket configuration is specified, new connections
 	// will be set up with plaintext.
+	// [#extension-category: envoy.transport_sockets.downstream]
 	TransportSocket *v3.TransportSocket `protobuf:"bytes,6,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
 	// If present and nonzero, the amount of time to allow incoming connections to complete any
 	// transport socket negotiations. If this expires before the transport reports connection
@@ -732,12 +732,7 @@ type ListenerFilter struct {
 
 	// The name of the filter to instantiate. The name must match a
 	// :ref:`supported filter <config_listener_filters>`.
-	// [#extension-category: envoy.transport_sockets.downstream]
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Filter specific configuration which depends on the filter being instantiated.
-	// See the supported filters for further documentation.
-	// [#extension-category: envoy.filters.listener]
-	//
 	// Types that are assignable to ConfigType:
 	//	*ListenerFilter_TypedConfig
 	//	*ListenerFilter_HiddenEnvoyDeprecatedConfig
@@ -821,6 +816,9 @@ type isListenerFilter_ConfigType interface {
 }
 
 type ListenerFilter_TypedConfig struct {
+	// Filter specific configuration which depends on the filter being
+	// instantiated. See the supported filters for further documentation.
+	// [#extension-category: envoy.filters.listener]
 	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
