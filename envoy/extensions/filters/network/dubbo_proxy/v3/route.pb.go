@@ -38,7 +38,15 @@ type RouteConfiguration struct {
 
 	// The name of the route configuration. Reserved for future use in asynchronous route discovery.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The interface name of the service.
+	// The interface name of the service. Wildcard interface are supported in the suffix or prefix form.
+	// e.g. ``*.methods.add`` will match ``com.dev.methods.add``, ``com.prod.methods.add``, etc.
+	// ``com.dev.methods.*`` will match ``com.dev.methods.add``, ``com.dev.methods.update``, etc.
+	// Special wildcard ``*`` matching any interface.
+	//
+	// .. note::
+	//
+	//  The wildcard will not match the empty string.
+	//  e.g. ``*.methods.add`` will match ``com.dev.methods.add`` but not ``.methods.add``.
 	Interface string `protobuf:"bytes,2,opt,name=interface,proto3" json:"interface,omitempty"`
 	// Which group does the interface belong to.
 	Group string `protobuf:"bytes,3,opt,name=group,proto3" json:"group,omitempty"`
