@@ -89,6 +89,16 @@ func (m *ThriftProxy) Validate() error {
 
 	// no validation rules for PayloadPassthrough
 
+	if v, ok := interface{}(m.GetMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ThriftProxyValidationError{
+				field:  "MaxRequestsPerConnection",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
