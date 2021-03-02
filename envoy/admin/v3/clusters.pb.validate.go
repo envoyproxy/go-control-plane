@@ -173,6 +173,8 @@ func (m *ClusterStatus) Validate() error {
 		}
 	}
 
+	// no validation rules for ObservabilityName
+
 	return nil
 }
 

@@ -139,7 +139,7 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	// no validation rules for AltStatName
+	// no validation rules for ObservabilityName
 
 	if v, ok := interface{}(m.GetEdsClusterConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
