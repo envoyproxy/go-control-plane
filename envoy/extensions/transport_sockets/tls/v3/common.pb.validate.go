@@ -553,6 +553,16 @@ func (m *CertificateValidationContext) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetCustomValidatorConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CertificateValidationContextValidationError{
+				field:  "CustomValidatorConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
