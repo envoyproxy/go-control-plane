@@ -58,6 +58,13 @@ func (m *KillRequest) Validate() error {
 		}
 	}
 
+	if _, ok := KillRequest_Direction_name[int32(m.GetDirection())]; !ok {
+		return KillRequestValidationError{
+			field:  "Direction",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	return nil
 }
 
