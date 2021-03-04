@@ -707,12 +707,7 @@ type CertificateValidationContext struct {
 	// If specified, all validation is done by the specified validator,
 	// and the behavior of all other validation settings is defined by the specified validator (and may be entirely ignored, unused, and unvalidated).
 	// Refer to the documentation for the specified validator. If you do not want a custom validation algorithm, do not set this field.
-	// The following names are available here:
-	//
-	// .. _extension_envoy.tls.cert_validator.spiffe:
-	//
-	// **envoy.tls.cert_validator.spiffe**: `SPIFFE <https://github.com/spiffe/spiffe>`_ certificate validator.
-	// Please refer to :ref:`envoy.extensions.transport_sockets.tls.v3.SPIFFECertValidatorConfig <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.SPIFFECertValidatorConfig>` for more information.
+	// [#extension-category: envoy.tls.cert_validator]
 	CustomValidatorConfig *v3.TypedExtensionConfig `protobuf:"bytes,12,opt,name=custom_validator_config,json=customValidatorConfig,proto3" json:"custom_validator_config,omitempty"`
 	// Deprecated: Do not use.
 	HiddenEnvoyDeprecatedVerifySubjectAltName []string `protobuf:"bytes,4,rep,name=hidden_envoy_deprecated_verify_subject_alt_name,json=hiddenEnvoyDeprecatedVerifySubjectAltName,proto3" json:"hidden_envoy_deprecated_verify_subject_alt_name,omitempty"`
