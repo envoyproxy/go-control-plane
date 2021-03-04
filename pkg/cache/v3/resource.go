@@ -46,6 +46,8 @@ func GetResponseType(typeURL string) types.ResponseType {
 		return types.Secret
 	case resource.RuntimeType:
 		return types.Runtime
+	case resource.ExtensionConfigType:
+		return types.ExtensionConfig
 	}
 	return types.UnknownType
 }
