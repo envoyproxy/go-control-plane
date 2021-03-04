@@ -71,14 +71,16 @@ func NewSnapshot(version string,
 	routes []types.Resource,
 	listeners []types.Resource,
 	runtimes []types.Resource,
-	secrets []types.Resource) Snapshot {
+	secrets []types.Resource,
+	extensionconfig []types.Resource) Snapshot {
 	return NewSnapshotWithResources(version, SnapshotResources{
-		Endpoints: endpoints,
-		Clusters:  clusters,
-		Routes:    routes,
-		Listeners: listeners,
-		Runtimes:  runtimes,
-		Secrets:   secrets,
+		Endpoints:        endpoints,
+		Clusters:         clusters,
+		Routes:           routes,
+		Listeners:        listeners,
+		Runtimes:         runtimes,
+		Secrets:          secrets,
+		ExtensionConfigs: extensionconfig,
 	})
 }
 
@@ -117,7 +119,8 @@ func NewSnapshotWithTtls(version string,
 	routes []types.ResourceWithTtl,
 	listeners []types.ResourceWithTtl,
 	runtimes []types.ResourceWithTtl,
-	secrets []types.ResourceWithTtl) Snapshot {
+	secrets []types.ResourceWithTtl,
+	extensionconfig []types.ResourceWithTtl) Snapshot {
 	out := Snapshot{}
 	out.Resources[types.Endpoint] = NewResourcesWithTtl(version, endpoints)
 	out.Resources[types.Cluster] = NewResourcesWithTtl(version, clusters)
@@ -125,6 +128,7 @@ func NewSnapshotWithTtls(version string,
 	out.Resources[types.Listener] = NewResourcesWithTtl(version, listeners)
 	out.Resources[types.Runtime] = NewResourcesWithTtl(version, runtimes)
 	out.Resources[types.Secret] = NewResourcesWithTtl(version, secrets)
+	out.Resources[types.ExtensionConfig] = NewResourcesWithTtl(version, extensionconfig)
 	return out
 }
 
