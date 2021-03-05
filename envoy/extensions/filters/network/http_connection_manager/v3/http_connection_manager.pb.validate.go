@@ -341,6 +341,16 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetPathNormalizationOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "PathNormalizationOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManagerValidationError{
@@ -1674,6 +1684,98 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HttpConnectionManager_UpgradeConfigValidationError{}
+
+// Validate checks the field values on
+// HttpConnectionManager_PathNormalizationOptions with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *HttpConnectionManager_PathNormalizationOptions) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetForwardingTransformation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManager_PathNormalizationOptionsValidationError{
+				field:  "ForwardingTransformation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetHttpFilterTransformation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManager_PathNormalizationOptionsValidationError{
+				field:  "HttpFilterTransformation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// HttpConnectionManager_PathNormalizationOptionsValidationError is the
+// validation error returned by
+// HttpConnectionManager_PathNormalizationOptions.Validate if the designated
+// constraints aren't met.
+type HttpConnectionManager_PathNormalizationOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpConnectionManager_PathNormalizationOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpConnectionManager_PathNormalizationOptionsValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e HttpConnectionManager_PathNormalizationOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpConnectionManager_PathNormalizationOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpConnectionManager_PathNormalizationOptionsValidationError) ErrorName() string {
+	return "HttpConnectionManager_PathNormalizationOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpConnectionManager_PathNormalizationOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpConnectionManager_PathNormalizationOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpConnectionManager_PathNormalizationOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpConnectionManager_PathNormalizationOptionsValidationError{}
 
 // Validate checks the field values on ScopedRoutes_ScopeKeyBuilder with the
 // rules defined in the proto definition for this message. If any rules are
