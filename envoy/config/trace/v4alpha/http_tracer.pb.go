@@ -97,24 +97,10 @@ type Tracing_Http struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The name of the HTTP trace driver to instantiate. The name must match a
-	// supported HTTP trace driver. Built-in trace drivers:
-	//
-	// - *envoy.tracers.lightstep*
-	// - *envoy.tracers.zipkin*
-	// - *envoy.tracers.dynamic_ot*
-	// - *envoy.tracers.datadog*
-	// - *envoy.tracers.opencensus*
-	// - *envoy.tracers.xray*
+	// supported HTTP trace driver.
+	// See the :ref:`extensions listed in typed_config below <extension_category_envoy.tracers>` for the default list of the HTTP trace driver.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Trace driver specific configuration which depends on the driver being instantiated.
-	// See the trace drivers for examples:
-	//
-	// - :ref:`LightstepConfig <envoy_api_msg_extensions.tracers.lightstep.v4alpha.LightstepConfig>`
-	// - :ref:`ZipkinConfig <envoy_api_msg_extensions.tracers.zipkin.v4alpha.ZipkinConfig>`
-	// - :ref:`DynamicOtConfig <envoy_api_msg_extensions.tracers.dynamic_ot.v4alpha.DynamicOtConfig>`
-	// - :ref:`DatadogConfig <envoy_api_msg_extensions.tracers.datadog.v4alpha.DatadogConfig>`
-	// - :ref:`OpenCensusConfig <envoy_api_msg_extensions.tracers.opencensus.v4alpha.OpenCensusConfig>`
-	// - :ref:`AWS X-Ray <envoy_api_msg_extensions.tracers.xray.v4alpha.XRayConfig>`
+	// Trace driver specific configuration which must be set according to the driver being instantiated.
 	// [#extension-category: envoy.tracers]
 	//
 	// Types that are assignable to ConfigType:

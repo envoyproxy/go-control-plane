@@ -38,13 +38,8 @@ type StatsSink struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The name of the stats sink to instantiate. The name must match a supported
-	// stats sink. The built-in stats sinks are:
-	//
-	// * :ref:`envoy.stat_sinks.statsd <envoy_api_msg_config.metrics.v4alpha.StatsdSink>`
-	// * :ref:`envoy.stat_sinks.dog_statsd <envoy_api_msg_config.metrics.v4alpha.DogStatsdSink>`
-	// * :ref:`envoy.stat_sinks.metrics_service <envoy_api_msg_config.metrics.v4alpha.MetricsServiceConfig>`
-	// * :ref:`envoy.stat_sinks.hystrix <envoy_api_msg_config.metrics.v4alpha.HystrixSink>`
-	//
+	// stats sink.
+	// See the :ref:`extensions listed in typed_config below <extension_category_envoy.stats_sinks>` for the default list of available stats sink.
 	// Sinks optionally support tagged/multiple dimensional metrics.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Stats sink specific configuration which depends on the sink being instantiated. See

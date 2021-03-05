@@ -182,24 +182,13 @@ type AccessLog struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The name of the access log implementation to instantiate. The name must
-	// match a statically registered access log. Current built-in loggers include:
-	//
-	// #. "envoy.access_loggers.file"
-	// #. "envoy.access_loggers.http_grpc"
-	// #. "envoy.access_loggers.tcp_grpc"
+	// The name of the access log extension to instantiate.
+	// The name must match one of the compiled in loggers.
+	// See the :ref:`extensions listed in typed_config below <extension_category_envoy.access_loggers>` for the default list of available loggers.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Filter which is used to determine if the access log needs to be written.
 	Filter *AccessLogFilter `protobuf:"bytes,2,opt,name=filter,proto3" json:"filter,omitempty"`
-	// Custom configuration that depends on the access log being instantiated.
-	// Built-in configurations include:
-	//
-	// #. "envoy.access_loggers.file": :ref:`FileAccessLog
-	//    <envoy_api_msg_extensions.access_loggers.file.v3.FileAccessLog>`
-	// #. "envoy.access_loggers.http_grpc": :ref:`HttpGrpcAccessLogConfig
-	//    <envoy_api_msg_extensions.access_loggers.grpc.v3.HttpGrpcAccessLogConfig>`
-	// #. "envoy.access_loggers.tcp_grpc": :ref:`TcpGrpcAccessLogConfig
-	//    <envoy_api_msg_extensions.access_loggers.grpc.v3.TcpGrpcAccessLogConfig>`
+	// Custom configuration that must be set according to the access logger extension being instantiated.
 	// [#extension-category: envoy.access_loggers]
 	//
 	// Types that are assignable to ConfigType:
