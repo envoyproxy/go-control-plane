@@ -60,6 +60,8 @@ func (m *RBAC) Validate() error {
 		}
 	}
 
+	// no validation rules for ShadowRulesStatPrefix
+
 	return nil
 }
 
