@@ -942,6 +942,7 @@ type Matcher_MatcherList_Predicate_SinglePredicate_ValueMatch struct {
 
 type Matcher_MatcherList_Predicate_SinglePredicate_CustomMatch struct {
 	// Extension for custom matching logic.
+	// [#extension-category: envoy.matching.input_matchers]
 	CustomMatch *v31.TypedExtensionConfig `protobuf:"bytes,3,opt,name=custom_match,json=customMatch,proto3,oneof"`
 }
 
