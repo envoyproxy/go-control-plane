@@ -225,6 +225,16 @@ func (m *VmConfig) Validate() error {
 
 	// no validation rules for NackOnCodeCacheMiss
 
+	if v, ok := interface{}(m.GetEnvironmentVariables()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VmConfigValidationError{
+				field:  "EnvironmentVariables",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -281,6 +291,75 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = VmConfigValidationError{}
+
+// Validate checks the field values on EnvironmentVariables with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EnvironmentVariables) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for KeyValues
+
+	return nil
+}
+
+// EnvironmentVariablesValidationError is the validation error returned by
+// EnvironmentVariables.Validate if the designated constraints aren't met.
+type EnvironmentVariablesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnvironmentVariablesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnvironmentVariablesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnvironmentVariablesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnvironmentVariablesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnvironmentVariablesValidationError) ErrorName() string {
+	return "EnvironmentVariablesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EnvironmentVariablesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnvironmentVariables.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnvironmentVariablesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnvironmentVariablesValidationError{}
 
 // Validate checks the field values on PluginConfig with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
