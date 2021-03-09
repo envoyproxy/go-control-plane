@@ -521,6 +521,10 @@ type Http2ProtocolOptions struct {
 	// For upstream connections, this also limits how many streams Envoy will initiate concurrently
 	// on a single connection. If the limit is reached, Envoy may queue requests or establish
 	// additional connections (as allowed per circuit breaker limits).
+	//
+	// This acts as an upper bound: Envoy will lower the max concurrent streams allowed on a given
+	// connection based on upstream settings. Config dumps will reflect the configured upper bound,
+	// not the per-connection negotiated limits.
 	MaxConcurrentStreams *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
 	// `Initial stream-level flow-control window
 	// <https://httpwg.org/specs/rfc7540.html#rfc.section.6.9.2>`_ size. Valid values range from 65535
