@@ -324,9 +324,7 @@ type AttributeContext_HttpRequest struct {
 	Path string `protobuf:"bytes,4,opt,name=path,proto3" json:"path,omitempty"`
 	// The HTTP request `Host` or 'Authority` header value.
 	Host string `protobuf:"bytes,5,opt,name=host,proto3" json:"host,omitempty"`
-	// The HTTP URL scheme, such as `http` and `https`. This is set for HTTP/2
-	// requests only. For HTTP/1.1, use "x-forwarded-for" header value to lookup
-	// the scheme of the request.
+	// The HTTP URL scheme, such as `http` and `https`.
 	Scheme string `protobuf:"bytes,6,opt,name=scheme,proto3" json:"scheme,omitempty"`
 	// This field is always empty, and exists for compatibility reasons. The HTTP URL query is
 	// included in `path` field.
