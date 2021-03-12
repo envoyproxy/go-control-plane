@@ -41,7 +41,12 @@ func (m *HttpRequestHeaderMatchInput) Validate() error {
 		return nil
 	}
 
-	// no validation rules for HeaderName
+	if !_HttpRequestHeaderMatchInput_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+		return HttpRequestHeaderMatchInputValidationError{
+			field:  "HeaderName",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	return nil
 }
@@ -103,6 +108,85 @@ var _ interface {
 	ErrorName() string
 } = HttpRequestHeaderMatchInputValidationError{}
 
+var _HttpRequestHeaderMatchInput_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on HttpRequestTrailerMatchInput with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HttpRequestTrailerMatchInput) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if !_HttpRequestTrailerMatchInput_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+		return HttpRequestTrailerMatchInputValidationError{
+			field:  "HeaderName",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
+	return nil
+}
+
+// HttpRequestTrailerMatchInputValidationError is the validation error returned
+// by HttpRequestTrailerMatchInput.Validate if the designated constraints
+// aren't met.
+type HttpRequestTrailerMatchInputValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpRequestTrailerMatchInputValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpRequestTrailerMatchInputValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HttpRequestTrailerMatchInputValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpRequestTrailerMatchInputValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpRequestTrailerMatchInputValidationError) ErrorName() string {
+	return "HttpRequestTrailerMatchInputValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpRequestTrailerMatchInputValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpRequestTrailerMatchInput.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpRequestTrailerMatchInputValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpRequestTrailerMatchInputValidationError{}
+
+var _HttpRequestTrailerMatchInput_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
 // Validate checks the field values on HttpResponseHeaderMatchInput with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -111,7 +195,12 @@ func (m *HttpResponseHeaderMatchInput) Validate() error {
 		return nil
 	}
 
-	// no validation rules for HeaderName
+	if !_HttpResponseHeaderMatchInput_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+		return HttpResponseHeaderMatchInputValidationError{
+			field:  "HeaderName",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	return nil
 }
@@ -172,3 +261,82 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = HttpResponseHeaderMatchInputValidationError{}
+
+var _HttpResponseHeaderMatchInput_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on HttpResponseTrailerMatchInput with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *HttpResponseTrailerMatchInput) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if !_HttpResponseTrailerMatchInput_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+		return HttpResponseTrailerMatchInputValidationError{
+			field:  "HeaderName",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
+	return nil
+}
+
+// HttpResponseTrailerMatchInputValidationError is the validation error
+// returned by HttpResponseTrailerMatchInput.Validate if the designated
+// constraints aren't met.
+type HttpResponseTrailerMatchInputValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpResponseTrailerMatchInputValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpResponseTrailerMatchInputValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HttpResponseTrailerMatchInputValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpResponseTrailerMatchInputValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpResponseTrailerMatchInputValidationError) ErrorName() string {
+	return "HttpResponseTrailerMatchInputValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpResponseTrailerMatchInputValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpResponseTrailerMatchInput.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpResponseTrailerMatchInputValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpResponseTrailerMatchInputValidationError{}
+
+var _HttpResponseTrailerMatchInput_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")

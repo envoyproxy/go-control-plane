@@ -8,6 +8,7 @@ package envoy_type_matcher_v3
 
 import (
 	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -79,6 +80,59 @@ func (x *HttpRequestHeaderMatchInput) GetHeaderName() string {
 	return ""
 }
 
+// Match input indicates that matching should be done on a specific request trailer.
+// The resulting input string will be all headers for the given key joined by a comma,
+// e.g. if the request contains two 'foo' headers with value 'bar' and 'baz', the input
+// string will be 'bar,baz'.
+// [#comment:TODO(snowp): Link to unified matching docs.]
+type HttpRequestTrailerMatchInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The request trailer to match on.
+	HeaderName string `protobuf:"bytes,1,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
+}
+
+func (x *HttpRequestTrailerMatchInput) Reset() {
+	*x = HttpRequestTrailerMatchInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HttpRequestTrailerMatchInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HttpRequestTrailerMatchInput) ProtoMessage() {}
+
+func (x *HttpRequestTrailerMatchInput) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HttpRequestTrailerMatchInput.ProtoReflect.Descriptor instead.
+func (*HttpRequestTrailerMatchInput) Descriptor() ([]byte, []int) {
+	return file_envoy_type_matcher_v3_http_inputs_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *HttpRequestTrailerMatchInput) GetHeaderName() string {
+	if x != nil {
+		return x.HeaderName
+	}
+	return ""
+}
+
 // Match input indicating that matching should be done on a specific response header.
 // The resulting input string will be all headers for the given key joined by a comma,
 // e.g. if the response contains two 'foo' headers with value 'bar' and 'baz', the input
@@ -96,7 +150,7 @@ type HttpResponseHeaderMatchInput struct {
 func (x *HttpResponseHeaderMatchInput) Reset() {
 	*x = HttpResponseHeaderMatchInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[1]
+		mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -109,7 +163,7 @@ func (x *HttpResponseHeaderMatchInput) String() string {
 func (*HttpResponseHeaderMatchInput) ProtoMessage() {}
 
 func (x *HttpResponseHeaderMatchInput) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[1]
+	mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -122,10 +176,63 @@ func (x *HttpResponseHeaderMatchInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HttpResponseHeaderMatchInput.ProtoReflect.Descriptor instead.
 func (*HttpResponseHeaderMatchInput) Descriptor() ([]byte, []int) {
-	return file_envoy_type_matcher_v3_http_inputs_proto_rawDescGZIP(), []int{1}
+	return file_envoy_type_matcher_v3_http_inputs_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *HttpResponseHeaderMatchInput) GetHeaderName() string {
+	if x != nil {
+		return x.HeaderName
+	}
+	return ""
+}
+
+// Match input indicates that matching should be done on a specific response trailer.
+// The resulting input string will be all headers for the given key joined by a comma,
+// e.g. if the request contains two 'foo' headers with value 'bar' and 'baz', the input
+// string will be 'bar,baz'.
+// [#comment:TODO(snowp): Link to unified matching docs.]
+type HttpResponseTrailerMatchInput struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The response trailer to match on.
+	HeaderName string `protobuf:"bytes,1,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
+}
+
+func (x *HttpResponseTrailerMatchInput) Reset() {
+	*x = HttpResponseTrailerMatchInput{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HttpResponseTrailerMatchInput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HttpResponseTrailerMatchInput) ProtoMessage() {}
+
+func (x *HttpResponseTrailerMatchInput) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HttpResponseTrailerMatchInput.ProtoReflect.Descriptor instead.
+func (*HttpResponseTrailerMatchInput) Descriptor() ([]byte, []int) {
+	return file_envoy_type_matcher_v3_http_inputs_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *HttpResponseTrailerMatchInput) GetHeaderName() string {
 	if x != nil {
 		return x.HeaderName
 	}
@@ -140,15 +247,28 @@ var file_envoy_type_matcher_v3_http_inputs_proto_rawDesc = []byte{
 	0x75, 0x74, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x15, 0x65, 0x6e, 0x76, 0x6f, 0x79,
 	0x2e, 0x74, 0x79, 0x70, 0x65, 0x2e, 0x6d, 0x61, 0x74, 0x63, 0x68, 0x65, 0x72, 0x2e, 0x76, 0x33,
 	0x1a, 0x1d, 0x75, 0x64, 0x70, 0x61, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x73, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
-	0x3e, 0x0a, 0x1b, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x48, 0x65,
-	0x61, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x1f,
-	0x0a, 0x0b, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0a, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22,
-	0x3f, 0x0a, 0x1c, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48,
-	0x65, 0x61, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12,
-	0x1f, 0x0a, 0x0b, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65,
+	0x6e, 0x73, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
+	0x17, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61,
+	0x74, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x4b, 0x0a, 0x1b, 0x48, 0x74, 0x74, 0x70,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x74,
+	0x63, 0x68, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x2c, 0x0a, 0x0b, 0x68, 0x65, 0x61, 0x64, 0x65,
+	0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0b, 0xfa, 0x42,
+	0x08, 0x72, 0x06, 0xc0, 0x01, 0x01, 0xc8, 0x01, 0x00, 0x52, 0x0a, 0x68, 0x65, 0x61, 0x64, 0x65,
+	0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x4c, 0x0a, 0x1c, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x54, 0x72, 0x61, 0x69, 0x6c, 0x65, 0x72, 0x4d, 0x61, 0x74, 0x63, 0x68,
+	0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x2c, 0x0a, 0x0b, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x5f,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0b, 0xfa, 0x42, 0x08, 0x72,
+	0x06, 0xc0, 0x01, 0x01, 0xc8, 0x01, 0x00, 0x52, 0x0a, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4e,
+	0x61, 0x6d, 0x65, 0x22, 0x4c, 0x0a, 0x1c, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x49, 0x6e,
+	0x70, 0x75, 0x74, 0x12, 0x2c, 0x0a, 0x0b, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x5f, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0b, 0xfa, 0x42, 0x08, 0x72, 0x06, 0xc0,
+	0x01, 0x01, 0xc8, 0x01, 0x00, 0x52, 0x0a, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d,
+	0x65, 0x22, 0x4d, 0x0a, 0x1d, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x54, 0x72, 0x61, 0x69, 0x6c, 0x65, 0x72, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x49, 0x6e, 0x70,
+	0x75, 0x74, 0x12, 0x2c, 0x0a, 0x0b, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0b, 0xfa, 0x42, 0x08, 0x72, 0x06, 0xc0, 0x01,
+	0x01, 0xc8, 0x01, 0x00, 0x52, 0x0a, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65,
 	0x42, 0x40, 0x0a, 0x23, 0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78,
 	0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x74, 0x79, 0x70, 0x65, 0x2e, 0x6d, 0x61, 0x74,
 	0x63, 0x68, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x42, 0x0f, 0x48, 0x74, 0x74, 0x70, 0x49, 0x6e, 0x70,
@@ -168,10 +288,12 @@ func file_envoy_type_matcher_v3_http_inputs_proto_rawDescGZIP() []byte {
 	return file_envoy_type_matcher_v3_http_inputs_proto_rawDescData
 }
 
-var file_envoy_type_matcher_v3_http_inputs_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_envoy_type_matcher_v3_http_inputs_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_envoy_type_matcher_v3_http_inputs_proto_goTypes = []interface{}{
-	(*HttpRequestHeaderMatchInput)(nil),  // 0: envoy.type.matcher.v3.HttpRequestHeaderMatchInput
-	(*HttpResponseHeaderMatchInput)(nil), // 1: envoy.type.matcher.v3.HttpResponseHeaderMatchInput
+	(*HttpRequestHeaderMatchInput)(nil),   // 0: envoy.type.matcher.v3.HttpRequestHeaderMatchInput
+	(*HttpRequestTrailerMatchInput)(nil),  // 1: envoy.type.matcher.v3.HttpRequestTrailerMatchInput
+	(*HttpResponseHeaderMatchInput)(nil),  // 2: envoy.type.matcher.v3.HttpResponseHeaderMatchInput
+	(*HttpResponseTrailerMatchInput)(nil), // 3: envoy.type.matcher.v3.HttpResponseTrailerMatchInput
 }
 var file_envoy_type_matcher_v3_http_inputs_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -200,7 +322,31 @@ func file_envoy_type_matcher_v3_http_inputs_proto_init() {
 			}
 		}
 		file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HttpRequestTrailerMatchInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*HttpResponseHeaderMatchInput); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_envoy_type_matcher_v3_http_inputs_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HttpResponseTrailerMatchInput); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -218,7 +364,7 @@ func file_envoy_type_matcher_v3_http_inputs_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_type_matcher_v3_http_inputs_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
