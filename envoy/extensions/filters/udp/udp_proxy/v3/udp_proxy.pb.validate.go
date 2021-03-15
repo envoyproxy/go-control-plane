@@ -82,6 +82,17 @@ func (m *UdpProxyConfig) Validate() error {
 
 	}
 
+	if wrapper := m.GetMaxUpstreamRxDatagramSize(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val <= 0 || val >= 65536 {
+			return UdpProxyConfigValidationError{
+				field:  "MaxUpstreamRxDatagramSize",
+				reason: "value must be inside range (0, 65536)",
+			}
+		}
+
+	}
+
 	switch m.RouteSpecifier.(type) {
 
 	case *UdpProxyConfig_Cluster:

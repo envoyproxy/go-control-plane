@@ -29,8 +29,7 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-// Configuration specific to the QUIC protocol.
-// Next id: 5
+// Configuration specific to the UDP QUIC listener.
 type QuicProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -41,22 +41,35 @@ func (m *UdpListenerConfig) Validate() error {
 		return nil
 	}
 
-	// no validation rules for UdpListenerName
+	if v, ok := interface{}(m.GetListenerConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UdpListenerConfigValidationError{
+				field:  "ListenerConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	switch m.ConfigType.(type) {
+	if wrapper := m.GetMaxDownstreamRxDatagramSize(); wrapper != nil {
 
-	case *UdpListenerConfig_TypedConfig:
-
-		if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return UdpListenerConfigValidationError{
-					field:  "TypedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+		if val := wrapper.GetValue(); val <= 0 || val >= 65536 {
+			return UdpListenerConfigValidationError{
+				field:  "MaxDownstreamRxDatagramSize",
+				reason: "value must be inside range (0, 65536)",
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetWriterConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UdpListenerConfigValidationError{
+				field:  "WriterConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil

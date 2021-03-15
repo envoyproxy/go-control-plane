@@ -818,7 +818,7 @@ type isListenerFilter_ConfigType interface {
 type ListenerFilter_TypedConfig struct {
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.
-	// [#extension-category: envoy.filters.listener]
+	// [#extension-category: envoy.filters.listener,envoy.filters.udp_listener]
 	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
