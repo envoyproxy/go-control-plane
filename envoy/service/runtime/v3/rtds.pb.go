@@ -8,7 +8,7 @@ package envoy_service_runtime_v3
 
 import (
 	context "context"
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"

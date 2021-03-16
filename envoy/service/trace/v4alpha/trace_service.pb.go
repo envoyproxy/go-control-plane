@@ -9,7 +9,7 @@ package envoy_service_trace_v4alpha
 import (
 	context "context"
 	v1 "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	v4alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v4alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"

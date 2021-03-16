@@ -7,8 +7,8 @@
 package envoy_config_listener_v3
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
-	v3 "github.com/cncf/udpa/go/xds/core/v3"
+	_ "github.com/cncf/xds/go/udpa/annotations"
+	v3 "github.com/cncf/xds/go/xds/core/v3"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"

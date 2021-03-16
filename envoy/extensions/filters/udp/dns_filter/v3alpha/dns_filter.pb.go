@@ -7,7 +7,7 @@
 package envoy_extensions_filters_udp_dns_filter_v3alpha
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/data/dns/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"

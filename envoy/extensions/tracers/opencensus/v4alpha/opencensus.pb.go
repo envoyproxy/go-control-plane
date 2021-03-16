@@ -8,7 +8,7 @@ package envoy_extensions_tracers_opencensus_v4alpha
 
 import (
 	v1 "github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1"
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	v4alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v4alpha"
 	proto "github.com/golang/protobuf/proto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

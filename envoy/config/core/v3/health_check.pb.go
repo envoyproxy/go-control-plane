@@ -7,7 +7,7 @@
 package envoy_config_core_v3
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"

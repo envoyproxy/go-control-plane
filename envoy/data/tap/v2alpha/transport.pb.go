@@ -7,7 +7,7 @@
 package envoy_data_tap_v2alpha
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"

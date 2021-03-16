@@ -7,7 +7,7 @@
 package envoy_extensions_filters_network_http_connection_manager_v3
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"

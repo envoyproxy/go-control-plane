@@ -7,7 +7,7 @@
 package envoy_config_bootstrap_v4alpha
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	v4alpha4 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v4alpha"
 	v4alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v4alpha"
 	v4alpha3 "github.com/envoyproxy/go-control-plane/envoy/config/listener/v4alpha"

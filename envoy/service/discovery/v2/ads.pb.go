@@ -8,7 +8,7 @@ package envoy_service_discovery_v2
 
 import (
 	context "context"
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"

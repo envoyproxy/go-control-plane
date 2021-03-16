@@ -7,7 +7,7 @@
 package envoy_extensions_filters_http_header_to_metadata_v4alpha
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	v4alpha "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v4alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"

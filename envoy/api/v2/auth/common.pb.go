@@ -7,7 +7,7 @@
 package envoy_api_v2_auth
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	matcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"

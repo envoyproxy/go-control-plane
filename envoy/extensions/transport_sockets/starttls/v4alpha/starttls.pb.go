@@ -7,7 +7,7 @@
 package envoy_extensions_transport_sockets_starttls_v4alpha
 
 import (
-	_ "github.com/cncf/udpa/go/udpa/annotations"
+	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/raw_buffer/v3"
 	v4alpha "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v4alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
