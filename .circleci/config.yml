@@ -9,6 +9,7 @@ jobs:
       - run: make create_version
       - run: make check_version_dirty
       - run: make build
+      - run: make bin/example
       - run: make examples
       - run: make test
       - run: make integration
