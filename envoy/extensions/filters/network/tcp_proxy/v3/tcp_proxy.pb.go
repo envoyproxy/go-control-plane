@@ -77,10 +77,8 @@ type TcpProxy struct {
 	// load balancing algorithms will select a host randomly. Currently the number of hash policies is
 	// limited to 1.
 	HashPolicy []*v32.HashPolicy `protobuf:"bytes,11,rep,name=hash_policy,json=hashPolicy,proto3" json:"hash_policy,omitempty"`
-	// [#not-implemented-hide:] feature in progress
-	// If set, this configures tunneling, e.g. configuration options to tunnel multiple TCP
-	// payloads over a shared HTTP/2 tunnel. If this message is absent, the payload
-	// will be proxied upstream as per usual.
+	// If set, this configures tunneling, e.g. configuration options to tunnel TCP payload over
+	// HTTP CONNECT. If this message is absent, the payload will be proxied upstream as per usual.
 	TunnelingConfig *TcpProxy_TunnelingConfig `protobuf:"bytes,12,opt,name=tunneling_config,json=tunnelingConfig,proto3" json:"tunneling_config,omitempty"`
 	// The maximum duration of a connection. The duration is defined as the period since a connection
 	// was established. If not set, there is no max duration. When max_downstream_connection_duration
@@ -293,8 +291,8 @@ func (x *TcpProxy_WeightedCluster) GetClusters() []*TcpProxy_WeightedCluster_Clu
 }
 
 // Configuration for tunneling TCP over other transports or application layers.
-// Currently, only HTTP/2 is supported. When other options exist, HTTP/2 will
-// remain the default.
+// Tunneling is supported over both HTTP/1.1 and HTTP/2. Upstream protocol is
+// determined by the cluster configuration.
 type TcpProxy_TunnelingConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -303,7 +301,7 @@ type TcpProxy_TunnelingConfig struct {
 	// The hostname to send in the synthesized CONNECT headers to the upstream proxy.
 	Hostname string `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
 	// Use POST method instead of CONNECT method to tunnel the TCP stream.
-	// The 'protocol: bytestream' header is also NOT set to comply with the HTTP spec.
+	// The 'protocol: bytestream' header is also NOT set for HTTP/2 to comply with the spec.
 	//
 	// The upstream proxy is expected to convert POST payload as raw TCP.
 	UsePost bool `protobuf:"varint,2,opt,name=use_post,json=usePost,proto3" json:"use_post,omitempty"`
