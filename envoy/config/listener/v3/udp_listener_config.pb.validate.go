@@ -51,15 +51,14 @@ func (m *UdpListenerConfig) Validate() error {
 		}
 	}
 
-	if wrapper := m.GetMaxDownstreamRxDatagramSize(); wrapper != nil {
-
-		if val := wrapper.GetValue(); val <= 0 || val >= 65536 {
+	if v, ok := interface{}(m.GetDownstreamSocketConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return UdpListenerConfigValidationError{
-				field:  "MaxDownstreamRxDatagramSize",
-				reason: "value must be inside range (0, 65536)",
+				field:  "DownstreamSocketConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	if v, ok := interface{}(m.GetWriterConfig()).(interface{ Validate() error }); ok {

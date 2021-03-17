@@ -82,15 +82,14 @@ func (m *UdpProxyConfig) Validate() error {
 
 	}
 
-	if wrapper := m.GetMaxUpstreamRxDatagramSize(); wrapper != nil {
-
-		if val := wrapper.GetValue(); val <= 0 || val >= 65536 {
+	if v, ok := interface{}(m.GetUpstreamSocketConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return UdpProxyConfigValidationError{
-				field:  "MaxUpstreamRxDatagramSize",
-				reason: "value must be inside range (0, 65536)",
+				field:  "UpstreamSocketConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
 	}
 
 	switch m.RouteSpecifier.(type) {
