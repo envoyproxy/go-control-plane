@@ -41,10 +41,10 @@ func (m *QuicProtocolOptions) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMaxConcurrentStreams()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetQuicProtocolOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return QuicProtocolOptionsValidationError{
-				field:  "MaxConcurrentStreams",
+				field:  "QuicProtocolOptions",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
