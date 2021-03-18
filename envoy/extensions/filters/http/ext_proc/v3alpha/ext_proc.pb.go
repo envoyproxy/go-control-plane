@@ -70,13 +70,13 @@ type ExternalProcessor struct {
 	// See the :ref:`attribute documentation <arch_overview_attributes>`
 	// for the list of supported attributes and their types.
 	ResponseAttributes []string `protobuf:"bytes,6,rep,name=response_attributes,json=responseAttributes,proto3" json:"response_attributes,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies the timeout for each individual message sent on the stream and
 	// when the filter is running in synchronous mode. Whenever
 	// the proxy sends a message on the stream that requires a response, it will
 	// reset this timer, and will stop processing and return an error (subject
-	// to the processing mode) if the timer expires. There is no timeout when
-	// the filter is running in asynchronous mode. Default is 200 ms.
+	// to the processing mode) if the timer expires before a matching response.
+	// is received. There is no timeout when the filter is running in asynchronous
+	// mode. Default is 200 milliseconds.
 	MessageTimeout *duration.Duration `protobuf:"bytes,7,opt,name=message_timeout,json=messageTimeout,proto3" json:"message_timeout,omitempty"`
 	// [#not-implemented-hide:]
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
