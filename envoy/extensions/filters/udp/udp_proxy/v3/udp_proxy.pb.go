@@ -64,7 +64,9 @@ type UdpProxyConfig struct {
 	// load balancing algorithms will select a host randomly. Currently the number of hash policies is
 	// limited to 1.
 	HashPolicies []*UdpProxyConfig_HashPolicy `protobuf:"bytes,5,rep,name=hash_policies,json=hashPolicies,proto3" json:"hash_policies,omitempty"`
-	// UDP socket configuration for upstream sockets.
+	// UDP socket configuration for upstream sockets. The default for
+	// :ref:`prefer_gro <envoy_v3_api_field_config.core.v3.UdpSocketConfig.prefer_gro>` is true for upstream
+	// sockets as the assumption is datagrams will be received from a single source.
 	UpstreamSocketConfig *v3.UdpSocketConfig `protobuf:"bytes,6,opt,name=upstream_socket_config,json=upstreamSocketConfig,proto3" json:"upstream_socket_config,omitempty"`
 }
 

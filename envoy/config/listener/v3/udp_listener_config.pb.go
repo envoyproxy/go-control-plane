@@ -43,7 +43,10 @@ type UdpListenerConfig struct {
 	// [#not-implemented-hide:]
 	// [#comment:TODO(#12829): Remove this as an extension point.]
 	ListenerConfig *v3.TypedExtensionConfig `protobuf:"bytes,4,opt,name=listener_config,json=listenerConfig,proto3" json:"listener_config,omitempty"`
-	// UDP socket configuration for the listener.
+	// UDP socket configuration for the listener. The default for
+	// :ref:`prefer_gro <envoy_v3_api_field_config.core.v3.UdpSocketConfig.prefer_gro>` is false for
+	// listener sockets. If receiving a large amount of datagrams from a small number of sources, it
+	// may be worthwhile to enable this option after performance testing.
 	DownstreamSocketConfig *v3.UdpSocketConfig `protobuf:"bytes,5,opt,name=downstream_socket_config,json=downstreamSocketConfig,proto3" json:"downstream_socket_config,omitempty"`
 	// If the protocol in the listener socket address in :ref:`protocol
 	// <envoy_api_field_config.core.v3.SocketAddress.protocol>` is :ref:`UDP
