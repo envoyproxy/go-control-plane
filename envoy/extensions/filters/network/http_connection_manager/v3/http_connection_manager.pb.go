@@ -1519,6 +1519,10 @@ type isHttpFilter_ConfigType interface {
 type HttpFilter_TypedConfig struct {
 	// Filter specific configuration which depends on the filter being instantiated. See the supported
 	// filters for further documentation.
+	//
+	// To support configuring a :ref:`match tree <arch_overview_matching_api>`, use an
+	// :ref:`ExtensionWithMatcher <envoy_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
+	// with the desired HTTP filter.
 	// [#extension-category: envoy.filters.http]
 	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
@@ -1527,6 +1531,11 @@ type HttpFilter_ConfigDiscovery struct {
 	// Configuration source specifier for an extension configuration discovery service.
 	// In case of a failure and without the default configuration, the HTTP listener responds with code 500.
 	// Extension configs delivered through this mechanism are not expected to require warming (see https://github.com/envoyproxy/envoy/issues/12061).
+	//
+	// To support configuring a :ref:`match tree <arch_overview_matching_api>`, use an
+	// :ref:`ExtensionWithMatcher <envoy_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
+	// with the desired HTTP filter. This works for both the default filter configuration as well
+	// as for filters provided via the API.
 	ConfigDiscovery *v3.ExtensionConfigSource `protobuf:"bytes,5,opt,name=config_discovery,json=configDiscovery,proto3,oneof"`
 }
 
