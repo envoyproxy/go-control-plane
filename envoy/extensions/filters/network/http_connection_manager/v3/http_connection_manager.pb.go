@@ -291,7 +291,6 @@ type HttpConnectionManager struct {
 	// A list of individual HTTP filters that make up the filter chain for
 	// requests made to the connection manager. :ref:`Order matters <arch_overview_http_filters_ordering>`
 	// as the filters are processed sequentially as request events happen.
-	// [#extension-category: envoy.filters.http]
 	HttpFilters []*HttpFilter `protobuf:"bytes,5,rep,name=http_filters,json=httpFilters,proto3" json:"http_filters,omitempty"`
 	// Whether the connection manager manipulates the :ref:`config_http_conn_man_headers_user-agent`
 	// and :ref:`config_http_conn_man_headers_downstream-service-cluster` headers. See the linked
@@ -1520,6 +1519,7 @@ type isHttpFilter_ConfigType interface {
 type HttpFilter_TypedConfig struct {
 	// Filter specific configuration which depends on the filter being instantiated. See the supported
 	// filters for further documentation.
+	// [#extension-category: envoy.filters.http]
 	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
