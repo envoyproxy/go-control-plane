@@ -245,7 +245,12 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for SkipXffAppend
 
-	// no validation rules for Via
+	if !_HttpConnectionManager_Via_Pattern.MatchString(m.GetVia()) {
+		return HttpConnectionManagerValidationError{
+			field:  "Via",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
 
 	if v, ok := interface{}(m.GetGenerateRequestId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -474,6 +479,8 @@ var _ interface {
 } = HttpConnectionManagerValidationError{}
 
 var _HttpConnectionManager_ServerName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _HttpConnectionManager_Via_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on LocalReplyConfig with the rules defined
 // in the proto definition for this message. If any rules are violated, an
