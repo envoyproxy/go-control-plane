@@ -1044,6 +1044,8 @@ func (m *ScopedRds) Validate() error {
 		}
 	}
 
+	// no validation rules for SrdsResourcesLocator
+
 	return nil
 }
 
