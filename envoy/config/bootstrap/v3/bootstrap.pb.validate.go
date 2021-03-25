@@ -376,6 +376,21 @@ func (m *Admin) Validate() error {
 		return nil
 	}
 
+	for idx, item := range m.GetAccessLog() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AdminValidationError{
+					field:  fmt.Sprintf("AccessLog[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	// no validation rules for AccessLogPath
 
 	// no validation rules for ProfilePath
