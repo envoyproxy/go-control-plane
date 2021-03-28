@@ -977,6 +977,18 @@ func (m *Http1ProtocolOptions_HeaderKeyFormat) Validate() error {
 			}
 		}
 
+	case *Http1ProtocolOptions_HeaderKeyFormat_StatefulFormatter:
+
+		if v, ok := interface{}(m.GetStatefulFormatter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return Http1ProtocolOptions_HeaderKeyFormatValidationError{
+					field:  "StatefulFormatter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return Http1ProtocolOptions_HeaderKeyFormatValidationError{
 			field:  "HeaderFormat",
