@@ -62,3 +62,50 @@ func TestSnapshotGetters(t *testing.T) {
 		t.Errorf("got non-empty version for unknown type: %#v", out)
 	}
 }
+
+func TestSnapshotVersionMap(t *testing.T) {
+	if err := snapshot.Consistent(); err != nil {
+		t.Errorf("got inconsistent snapshot for %#v", snapshot)
+	}
+	snap := cache.NewSnapshot(version, []types.Resource{testEndpoint, resource.MakeEndpoint("missing", 8080)}, []types.Resource{testCluster}, []types.Resource{testListener}, nil, nil, nil)
+	if snap.Consistent() == nil {
+		t.Errorf("got consistent snapshot %#v", snap)
+	}
+
+	vMap := snap.GetVersionMap()
+	if vMap == nil {
+		t.Errorf("got nil version map %#v", vMap)
+	}
+
+	vInfo := vMap[rsrc.EndpointType]
+	for _, v := range vInfo {
+		if v == "" {
+			t.Errorf("expected version hash, recieved: %s", v)
+		}
+	}
+}
+
+func TestSnapshotVersionMapNil(t *testing.T) {
+	var nilsnap *cache.Snapshot
+	if out := nilsnap.GetResources(rsrc.EndpointType); out != nil {
+		t.Errorf("got non-empty resources for nil snapshot: %#v", out)
+	}
+	if out := nilsnap.Consistent(); out == nil {
+		t.Errorf("nil snapshot should be consistent")
+	}
+
+	vMap := nilsnap.GetVersionMap()
+	if vMap != nil {
+		t.Errorf("got non-empty version map")
+	}
+
+	snap := cache.NewSnapshot("", nil, nil, nil, nil, nil, nil)
+	if err := snap.Consistent(); err != nil {
+		t.Errorf("got inconsistent snapshot %#v", snap)
+	}
+
+	v := snap.GetVersionMap()
+	if v == nil {
+		t.Errorf("got a nil version map")
+	}
+}

@@ -46,6 +46,7 @@ func (group) ID(node *core.Node) string {
 var (
 	version  = "x"
 	version2 = "y"
+	version3 = "z"
 
 	snapshot = cache.NewSnapshot(version,
 		[]types.Resource{testEndpoint},
@@ -53,7 +54,8 @@ var (
 		[]types.Resource{testRoute},
 		[]types.Resource{testListener},
 		[]types.Resource{testRuntime},
-		[]types.Resource{testSecret[0]})
+		[]types.Resource{testSecret[0]},
+	)
 
 	ttl       = 2 * time.Second
 	heartbeat = time.Second
@@ -68,9 +70,9 @@ var (
 
 	names = map[string][]string{
 		rsrc.EndpointType: {clusterName},
-		rsrc.ClusterType:  nil,
+		rsrc.ClusterType:  {clusterName},
 		rsrc.RouteType:    {routeName},
-		rsrc.ListenerType: nil,
+		rsrc.ListenerType: {listenerName},
 		rsrc.RuntimeType:  nil,
 	}
 
@@ -286,6 +288,9 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version})
 	}
+
+	t.Logf("%+v\n", c.GetStatusInfo(key))
+
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
 	}

@@ -8,6 +8,7 @@ DIRS=(  "pkg/cache"
         "pkg/server"
         "pkg/server/rest"
         "pkg/server/sotw"
+        "pkg/server/stream"
         "pkg/test/resource"
         "pkg/test"
 )

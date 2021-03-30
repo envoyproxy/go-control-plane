@@ -29,15 +29,18 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
 )
 
 type mockConfigWatcher struct {
-	counts     map[string]int
-	responses  map[string][]cache.Response
-	closeWatch bool
-	watches    int
+	counts         map[string]int
+	responses      map[string][]cache.Response
+	deltaResponses map[string][]cache.DeltaResponse
+	closeWatch     bool
+	watches        int
+	deltaWatches   int
 }
 
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
@@ -66,6 +69,55 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.Disco
 		return out, nil
 	}
 	return nil, errors.New("missing")
+}
+
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, st *stream.StreamState) (chan cache.DeltaResponse, func()) {
+	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+
+	// Create our out watch channel to return with a buffer of one
+	out := make(chan cache.DeltaResponse, 1)
+
+	if len(config.deltaResponses[req.TypeUrl]) > 0 {
+		res := config.deltaResponses[req.TypeUrl][0]
+		var subscribed []types.Resource
+
+		// Only return back the subscribed resources to our request type
+		r, _ := res.GetDeltaDiscoveryResponse()
+		if len(req.GetResourceNamesSubscribe()) != 0 {
+			for _, resource := range r.Resources {
+				for _, alias := range req.GetResourceNamesSubscribe() {
+					if resource.GetName() == alias {
+						subscribed = append(subscribed, resource)
+					}
+				}
+			}
+		} else {
+			// We do this to handle the wildcard situation (just return all for testing)
+			for _, resource := range r.Resources {
+				subscribed = append(subscribed, resource)
+			}
+		}
+
+		// We should only send back subscribed resources here
+		out <- &cache.RawDeltaResponse{
+			DeltaRequest:      req,
+			Resources:         subscribed,
+			SystemVersionInfo: "",
+			VersionMap:        st.ResourceVersions,
+		}
+
+	} else if config.closeWatch {
+		fmt.Printf("No resources... closing watch\n")
+		close(out)
+	} else {
+		config.deltaWatches += 1
+		return out, func() {
+			close(out)
+			config.deltaWatches -= 1
+		}
+	}
+
+	return out, nil
 }
 
 func makeMockConfigWatcher() *mockConfigWatcher {
@@ -217,6 +269,61 @@ func makeResponses() map[string][]cache.Response {
 				Version:   "7",
 				Resources: []types.ResourceWithTtl{{Resource: opaque}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
+			},
+		},
+	}
+}
+
+func makeDeltaResponses() map[string][]cache.DeltaResponse {
+	return map[string][]cache.DeltaResponse{
+		rsrc.EndpointType: {
+			&cache.RawDeltaResponse{
+				Resources:         []types.Resource{endpoint},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.EndpointType},
+				SystemVersionInfo: "1",
+			},
+		},
+		rsrc.ClusterType: {
+			&cache.RawDeltaResponse{
+				Resources:         []types.Resource{cluster},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ClusterType},
+				SystemVersionInfo: "2",
+			},
+		},
+		rsrc.RouteType: {
+			&cache.RawDeltaResponse{
+				Resources:         []types.Resource{route},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RouteType},
+				SystemVersionInfo: "3",
+			},
+		},
+		rsrc.ListenerType: {
+			&cache.RawDeltaResponse{
+				Resources:         []types.Resource{listener},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
+				SystemVersionInfo: "4",
+			},
+		},
+		rsrc.SecretType: {
+			&cache.RawDeltaResponse{
+				SystemVersionInfo: "5",
+				Resources:         []types.Resource{secret},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.SecretType},
+			},
+		},
+		rsrc.RuntimeType: {
+			&cache.RawDeltaResponse{
+				SystemVersionInfo: "6",
+				Resources:         []types.Resource{runtime},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RuntimeType},
+			},
+		},
+		// Pass-through type (xDS does not exist for this type)
+		opaqueType: {
+			&cache.RawDeltaResponse{
+				SystemVersionInfo: "7",
+				Resources:         []types.Resource{opaque},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: opaqueType},
 			},
 		},
 	}

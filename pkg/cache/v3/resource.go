@@ -16,6 +16,9 @@
 package cache
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+
 	"github.com/golang/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
@@ -46,10 +49,27 @@ func GetResponseType(typeURL string) types.ResponseType {
 		return types.Secret
 	case resource.RuntimeType:
 		return types.Runtime
-	case resource.ExtensionConfigType:
-		return types.ExtensionConfig
 	}
 	return types.UnknownType
+}
+
+// GetResponseTypeURL returns the type url for a valid enum
+func GetResponseTypeURL(responseType types.ResponseType) string {
+	switch responseType {
+	case types.Endpoint:
+		return resource.EndpointType
+	case types.Cluster:
+		return resource.ClusterType
+	case types.Route:
+		return resource.RouteType
+	case types.Listener:
+		return resource.ListenerType
+	case types.Secret:
+		return resource.SecretType
+	case types.Runtime:
+		return resource.RuntimeType
+	}
+	return resource.AnyType
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.
@@ -138,4 +158,20 @@ func GetResourceReferences(resources map[string]types.ResourceWithTtl) map[strin
 		}
 	}
 	return out
+}
+
+// HashResource will take a resource and create a SHA256 hash sum out of the marshaled bytes
+func HashResource(resource types.Resource) (string, error) {
+	hasher := sha256.New()
+	buffer := proto.NewBuffer(nil)
+	buffer.SetDeterministic(true)
+
+	err := buffer.Marshal(resource)
+	if err != nil {
+		return "", err
+	}
+	hasher.Write(buffer.Bytes())
+	buffer.Reset()
+
+	return hex.EncodeToString(hasher.Sum(nil)), nil
 }
