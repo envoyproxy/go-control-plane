@@ -864,6 +864,7 @@ type Matcher_MatcherList_Predicate_SinglePredicate struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Protocol-specific specification of input field to match on.
+	// [#extension-category: envoy.matching.common_inputs]
 	Input *v31.TypedExtensionConfig `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// Types that are assignable to Matcher:
 	//	*Matcher_MatcherList_Predicate_SinglePredicate_ValueMatch
