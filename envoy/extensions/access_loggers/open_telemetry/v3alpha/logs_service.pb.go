@@ -11,9 +11,9 @@ import (
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/grpc/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	proto "github.com/golang/protobuf/proto"
+	v1 "go.opentelemetry.io/proto/otlp/common/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	logs "logs"
 	reflect "reflect"
 	sync "sync"
 )
@@ -49,10 +49,10 @@ type OpenTelemetryAccessLogConfig struct {
 	//
 	// See 'body' in the LogResource proto for more details.
 	// Example: ``body { string_value: "%PROTOCOL%" }``.
-	Body *logs.AnyValue `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
+	Body *v1.AnyValue `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
 	// See 'attributes' in the LogResource proto for more details.
 	// Example: ``attributes { values { key: "user_agent" value { string_value: "%REQ(USER-AGENT)%" } } }``.
-	Attributes *logs.KeyValueList `protobuf:"bytes,3,opt,name=attributes,proto3" json:"attributes,omitempty"`
+	Attributes *v1.KeyValueList `protobuf:"bytes,3,opt,name=attributes,proto3" json:"attributes,omitempty"`
 }
 
 func (x *OpenTelemetryAccessLogConfig) Reset() {
@@ -94,14 +94,14 @@ func (x *OpenTelemetryAccessLogConfig) GetCommonConfig() *v3.CommonGrpcAccessLog
 	return nil
 }
 
-func (x *OpenTelemetryAccessLogConfig) GetBody() *logs.AnyValue {
+func (x *OpenTelemetryAccessLogConfig) GetBody() *v1.AnyValue {
 	if x != nil {
 		return x.Body
 	}
 	return nil
 }
 
-func (x *OpenTelemetryAccessLogConfig) GetAttributes() *logs.KeyValueList {
+func (x *OpenTelemetryAccessLogConfig) GetAttributes() *v1.KeyValueList {
 	if x != nil {
 		return x.Attributes
 	}
@@ -172,8 +172,8 @@ var file_envoy_extensions_access_loggers_open_telemetry_v3alpha_logs_service_pro
 var file_envoy_extensions_access_loggers_open_telemetry_v3alpha_logs_service_proto_goTypes = []interface{}{
 	(*OpenTelemetryAccessLogConfig)(nil), // 0: envoy.extensions.access_loggers.open_telemetry.v3alpha.OpenTelemetryAccessLogConfig
 	(*v3.CommonGrpcAccessLogConfig)(nil), // 1: envoy.extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfig
-	(*logs.AnyValue)(nil),                // 2: opentelemetry.proto.common.v1.AnyValue
-	(*logs.KeyValueList)(nil),            // 3: opentelemetry.proto.common.v1.KeyValueList
+	(*v1.AnyValue)(nil),                  // 2: opentelemetry.proto.common.v1.AnyValue
+	(*v1.KeyValueList)(nil),              // 3: opentelemetry.proto.common.v1.KeyValueList
 }
 var file_envoy_extensions_access_loggers_open_telemetry_v3alpha_logs_service_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.access_loggers.open_telemetry.v3alpha.OpenTelemetryAccessLogConfig.common_config:type_name -> envoy.extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfig
