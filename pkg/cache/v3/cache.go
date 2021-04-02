@@ -18,6 +18,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync/atomic"
 
@@ -93,8 +94,8 @@ type DeltaResponse interface {
 	// Get the constructed DeltaDiscoveryResponse
 	GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error)
 
-	// Get the latest DeltaRequest for the DeltaResponse.
-	// Delta's requesting mechanism
+	// Get the request that created the watch that we're now responding to. This is provided to allow the caller to correlate the
+	// response with a request. Generally this will be the latest request seen on the stream for the specific type.
 	GetDeltaRequest() *discovery.DeltaDiscoveryRequest
 
 	// Get the version in the DeltaResponse. This field is generally used for debugging purposes as noted by the Envoy documentation.
@@ -102,7 +103,7 @@ type DeltaResponse interface {
 
 	// Get the version map of the internal cache.
 	// The version map consists of updated version mappings after this response is applied
-	NextVersionMap() map[string]string
+	GetNextVersionMap() map[string]string
 }
 
 // RawResponse is a pre-serialized xDS response containing the raw resources to
@@ -132,17 +133,17 @@ type RawDeltaResponse struct {
 	// Request is the latest delta request on the stream.
 	DeltaRequest *discovery.DeltaDiscoveryRequest
 
-	// SystemVersionInfo is present for holding the current applied response version but generally used debugging purposes only.
+	// SystemVersionInfo holds the currently applied response system version and should be used for debugging purposes only.
 	SystemVersionInfo string
 
 	// Resources to be included in the response.
 	Resources []types.Resource
 
-	// RemovedResources is a list of resource aliases which should be dropped by the client consuming.
+	// RemovedResources is a list of resource aliases which should be dropped by the consuming client.
 	RemovedResources []string
 
-	// VersionMap is a map of versions applied internally to the cache grouped by resource name.
-	VersionMap map[string]string
+	// NextVersionMap consists of updated version mappings after this response is applied
+	NextVersionMap map[string]string
 
 	// Marshaled Resources to be included in the response.
 	marshaledResponse atomic.Value
@@ -165,8 +166,8 @@ type DeltaPassthroughResponse struct {
 	// Request is the latest delta request on the stream
 	DeltaRequest *discovery.DeltaDiscoveryRequest
 
-	// VersionMap is a map of versions applied internally to the cache
-	VersionMap map[string]string
+	// NextVersionMap consists of updated version mappings after this response is applied
+	NextVersionMap map[string]string
 
 	// This discovery response that needs to be sent as is, without any marshalling transformations
 	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
@@ -228,9 +229,9 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 			if err != nil {
 				return nil, err
 			}
-			version, err := HashResource(marshaledResource)
-			if err != nil {
-				return nil, err
+			version := HashResource(marshaledResource)
+			if version == "" {
+				return nil, errors.New("failed to create a resource hash")
 			}
 
 			name := GetResourceName(resource)
@@ -276,9 +277,9 @@ func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 	return r.SystemVersionInfo, nil
 }
 
-// NextVersionMap returns the delta version map built internally by the cache for the state of a snapshot
-func (r *RawDeltaResponse) NextVersionMap() map[string]string {
-	return r.VersionMap
+// NextVersionMap returns the version map which consists of updated version mappings after this response is applied
+func (r *RawDeltaResponse) GetNextVersionMap() map[string]string {
+	return r.NextVersionMap
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
@@ -318,6 +319,6 @@ func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 }
 
 // NextVersionMap returns the version map from a DeltaPassthroughResponse
-func (r *DeltaPassthroughResponse) NextVersionMap() map[string]string {
-	return r.VersionMap
+func (r *DeltaPassthroughResponse) GetNextVersionMap() map[string]string {
+	return r.NextVersionMap
 }

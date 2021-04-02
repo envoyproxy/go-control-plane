@@ -144,9 +144,9 @@ func GetResourceReferences(resources map[string]types.ResourceWithTtl) map[strin
 }
 
 // HashResource will take a resource and create a SHA256 hash sum out of the marshaled bytes
-func HashResource(resource []byte) (string, error) {
+func HashResource(resource []byte) string {
 	hasher := sha256.New()
 	hasher.Write(resource)
 
-	return hex.EncodeToString(hasher.Sum(nil)), nil
+	return hex.EncodeToString(hasher.Sum(nil))
 }
