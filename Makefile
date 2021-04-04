@@ -22,9 +22,9 @@ test:
 cover:
 	@build/coverage.sh
 
-.PHONY: format
-format:
-	@goimports -local $(PKG) -w -l pkg
+.PHONY: check_format
+check_format:
+	@gofmt -l $(shell go list -f '{{.Dir}}' ./...) | tee /dev/stderr | read && echo "Files failed gofmt" && exit 1 || true
 
 .PHONY: create_version
 create_version:
