@@ -213,6 +213,8 @@ func TestLinearCancel(t *testing.T) {
 	checkWatchCount(t, c, "b", 0)
 }
 
+// TODO(mattklein123): This test requires GOMAXPROCS or -parallel >= 100. This should be
+// rewritten to not require that. This is not the case in the GH actions environment.
 func TestLinearConcurrentSetWatch(t *testing.T) {
 	c := NewLinearCache(testType)
 	n := 50

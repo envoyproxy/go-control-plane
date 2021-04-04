@@ -4,6 +4,7 @@
 *.iml
 *.bak
 .vagrant
+examples/dyplomat/dyplomat
 
 # Eclipse artifacts
 /.project
