@@ -16,6 +16,9 @@
 package cache
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+
 	"github.com/golang/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
@@ -138,4 +141,12 @@ func GetResourceReferences(resources map[string]types.ResourceWithTtl) map[strin
 		}
 	}
 	return out
+}
+
+// HashResource will take a resource and create a SHA256 hash sum out of the marshaled bytes
+func HashResource(resource []byte) string {
+	hasher := sha256.New()
+	hasher.Write(resource)
+
+	return hex.EncodeToString(hasher.Sum(nil))
 }

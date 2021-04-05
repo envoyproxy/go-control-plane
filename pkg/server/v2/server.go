@@ -17,9 +17,11 @@ package server
 
 import (
 	"context"
-	"errors"
+
+	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -47,6 +49,7 @@ type Server interface {
 
 	rest.Server
 	sotw.Server
+	delta.Server
 }
 
 // Callbacks is a collection of callbacks inserted into the server operation.
@@ -54,16 +57,21 @@ type Server interface {
 type Callbacks interface {
 	rest.Callbacks
 	sotw.Callbacks
+	delta.Callbacks
 }
 
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
 type CallbackFuncs struct {
-	StreamOpenFunc     func(context.Context, int64, string) error
-	StreamClosedFunc   func(int64)
-	StreamRequestFunc  func(int64, *discovery.DiscoveryRequest) error
-	StreamResponseFunc func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-	FetchRequestFunc   func(context.Context, *discovery.DiscoveryRequest) error
-	FetchResponseFunc  func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamOpenFunc          func(context.Context, int64, string) error
+	StreamClosedFunc        func(int64)
+	DeltaStreamOpenFunc     func(context.Context, int64, string) error
+	DeltaStreamClosedFunc   func(int64)
+	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
+	StreamResponseFunc      func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
+	StreamDeltaResponseFunc func(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
+	FetchRequestFunc        func(context.Context, *discovery.DiscoveryRequest) error
+	FetchResponseFunc       func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
 var _ Callbacks = CallbackFuncs{}
@@ -84,6 +92,22 @@ func (c CallbackFuncs) OnStreamClosed(streamID int64) {
 	}
 }
 
+// OnDeltaStreamOpen invokes DeltaStreamOpenFunc.
+func (c CallbackFuncs) OnDeltaStreamOpen(ctx context.Context, streamID int64, typeURL string) error {
+	if c.StreamOpenFunc != nil {
+		return c.DeltaStreamOpenFunc(ctx, streamID, typeURL)
+	}
+
+	return nil
+}
+
+// OnDeltaStreamClosed invokes DeltaStreamClosedFunc.
+func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64) {
+	if c.StreamClosedFunc != nil {
+		c.DeltaStreamClosedFunc(streamID)
+	}
+}
+
 // OnStreamRequest invokes StreamRequestFunc.
 func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryRequest) error {
 	if c.StreamRequestFunc != nil {
@@ -97,6 +121,22 @@ func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryR
 func (c CallbackFuncs) OnStreamResponse(streamID int64, req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
 	if c.StreamResponseFunc != nil {
 		c.StreamResponseFunc(streamID, req, resp)
+	}
+}
+
+// OnStreamDeltaRequest invokes StreamDeltaResponseFunc
+func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discovery.DeltaDiscoveryRequest) error {
+	if c.StreamDeltaRequestFunc != nil {
+		return c.StreamDeltaRequestFunc(streamID, req)
+	}
+
+	return nil
+}
+
+// OnStreamDeltaResponse invokes StreamDeltaResponseFunc.
+func (c CallbackFuncs) OnStreamDeltaResponse(streamID int64, req *discovery.DeltaDiscoveryRequest, resp *discovery.DeltaDiscoveryResponse) {
+	if c.StreamDeltaResponseFunc != nil {
+		c.StreamDeltaResponseFunc(streamID, req, resp)
 	}
 }
 
@@ -118,16 +158,20 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 
 // NewServer creates handlers from a config watcher and callbacks.
 func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
-	return NewServerAdvanced(rest.NewServer(config, callbacks), sotw.NewServer(ctx, config, callbacks))
+	return NewServerAdvanced(rest.NewServer(config, callbacks),
+		sotw.NewServer(ctx, config, callbacks),
+		delta.NewServer(ctx, config, callbacks),
+	)
 }
 
-func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server) Server {
-	return &server{rest: restServer, sotw: sotwServer}
+func NewServerAdvanced(restServer rest.Server, sotwServer sotw.Server, deltaServer delta.Server) Server {
+	return &server{rest: restServer, sotw: sotwServer, delta: deltaServer}
 }
 
 type server struct {
-	rest rest.Server
-	sotw sotw.Server
+	rest  rest.Server
+	sotw  sotw.Server
+	delta delta.Server
 }
 
 func (s *server) StreamHandler(stream sotw.Stream, typeURL string) error {
@@ -215,30 +259,34 @@ func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryReque
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) DeltaAggregatedResources(_ discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaStreamHandler(stream stream.DeltaStream, typeURL string) error {
+	return s.delta.DeltaStreamHandler(stream, typeURL)
 }
 
-func (s *server) DeltaEndpoints(_ endpointservice.EndpointDiscoveryService_DeltaEndpointsServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+	return s.DeltaStreamHandler(stream, resource.AnyType)
 }
 
-func (s *server) DeltaClusters(_ clusterservice.ClusterDiscoveryService_DeltaClustersServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaEndpoints(stream endpointservice.EndpointDiscoveryService_DeltaEndpointsServer) error {
+	return s.DeltaStreamHandler(stream, resource.EndpointType)
 }
 
-func (s *server) DeltaRoutes(_ routeservice.RouteDiscoveryService_DeltaRoutesServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaClusters(stream clusterservice.ClusterDiscoveryService_DeltaClustersServer) error {
+	return s.DeltaStreamHandler(stream, resource.ClusterType)
 }
 
-func (s *server) DeltaListeners(_ listenerservice.ListenerDiscoveryService_DeltaListenersServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaRoutes(stream routeservice.RouteDiscoveryService_DeltaRoutesServer) error {
+	return s.DeltaStreamHandler(stream, resource.RouteType)
 }
 
-func (s *server) DeltaSecrets(_ secretservice.SecretDiscoveryService_DeltaSecretsServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaListeners(stream listenerservice.ListenerDiscoveryService_DeltaListenersServer) error {
+	return s.DeltaStreamHandler(stream, resource.ListenerType)
 }
 
-func (s *server) DeltaRuntime(_ runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
-	return errors.New("not implemented")
+func (s *server) DeltaSecrets(stream secretservice.SecretDiscoveryService_DeltaSecretsServer) error {
+	return s.DeltaStreamHandler(stream, resource.SecretType)
+}
+
+func (s *server) DeltaRuntime(stream runtimeservice.RuntimeDiscoveryService_DeltaRuntimeServer) error {
+	return s.DeltaStreamHandler(stream, resource.RuntimeType)
 }

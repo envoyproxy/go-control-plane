@@ -24,6 +24,7 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // SnapshotCache is a snapshot-based cache that maintains a single versioned
@@ -364,6 +365,10 @@ func createResponse(request *Request, resources map[string]types.ResourceWithTtl
 		Resources: filtered,
 		Heartbeat: heartbeat,
 	}
+}
+
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
+	return nil, nil
 }
 
 // Fetch implements the cache fetch function.
