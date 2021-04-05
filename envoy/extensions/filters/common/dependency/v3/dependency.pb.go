@@ -211,6 +211,107 @@ func (x *FilterDependencies) GetEncodeProvided() []*Dependency {
 	return nil
 }
 
+// Matching requirements for a filter. For a match tree to be used with a filter, the match
+// requirements must be satisfied.
+//
+// This protobuf is provided by the filter implementation as a way to communicate the matching
+// requirements to the filter factories, allowing for config rejection if the requirements are
+// not satisfied.
+type MatchingRequirements struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	DataInputAllowList *MatchingRequirements_DataInputAllowList `protobuf:"bytes,1,opt,name=data_input_allow_list,json=dataInputAllowList,proto3" json:"data_input_allow_list,omitempty"`
+}
+
+func (x *MatchingRequirements) Reset() {
+	*x = MatchingRequirements{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MatchingRequirements) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MatchingRequirements) ProtoMessage() {}
+
+func (x *MatchingRequirements) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MatchingRequirements.ProtoReflect.Descriptor instead.
+func (*MatchingRequirements) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_common_dependency_v3_dependency_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *MatchingRequirements) GetDataInputAllowList() *MatchingRequirements_DataInputAllowList {
+	if x != nil {
+		return x.DataInputAllowList
+	}
+	return nil
+}
+
+type MatchingRequirements_DataInputAllowList struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// An explicit list of data inputs that are allowed to be used with this filter.
+	TypeUrl []string `protobuf:"bytes,1,rep,name=type_url,json=typeUrl,proto3" json:"type_url,omitempty"`
+}
+
+func (x *MatchingRequirements_DataInputAllowList) Reset() {
+	*x = MatchingRequirements_DataInputAllowList{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MatchingRequirements_DataInputAllowList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MatchingRequirements_DataInputAllowList) ProtoMessage() {}
+
+func (x *MatchingRequirements_DataInputAllowList) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MatchingRequirements_DataInputAllowList.ProtoReflect.Descriptor instead.
+func (*MatchingRequirements_DataInputAllowList) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_common_dependency_v3_dependency_proto_rawDescGZIP(), []int{2, 0}
+}
+
+func (x *MatchingRequirements_DataInputAllowList) GetTypeUrl() []string {
+	if x != nil {
+		return x.TypeUrl
+	}
+	return nil
+}
+
 var File_envoy_extensions_filters_common_dependency_v3_dependency_proto protoreflect.FileDescriptor
 
 var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_rawDesc = []byte{
@@ -264,13 +365,26 @@ var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_rawDesc 
 	0x72, 0x73, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x64, 0x65, 0x70, 0x65, 0x6e, 0x64,
 	0x65, 0x6e, 0x63, 0x79, 0x2e, 0x76, 0x33, 0x2e, 0x44, 0x65, 0x70, 0x65, 0x6e, 0x64, 0x65, 0x6e,
 	0x63, 0x79, 0x52, 0x0e, 0x65, 0x6e, 0x63, 0x6f, 0x64, 0x65, 0x50, 0x72, 0x6f, 0x76, 0x69, 0x64,
-	0x65, 0x64, 0x42, 0x58, 0x0a, 0x3b, 0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72,
-	0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73,
-	0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x63, 0x6f, 0x6d,
-	0x6d, 0x6f, 0x6e, 0x2e, 0x64, 0x65, 0x70, 0x65, 0x6e, 0x64, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x76,
-	0x33, 0x42, 0x0f, 0x44, 0x65, 0x70, 0x65, 0x6e, 0x64, 0x65, 0x6e, 0x63, 0x79, 0x50, 0x72, 0x6f,
-	0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x65, 0x64, 0x22, 0xd3, 0x01, 0x0a, 0x14, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x69, 0x6e, 0x67, 0x52,
+	0x65, 0x71, 0x75, 0x69, 0x72, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x89, 0x01, 0x0a, 0x15,
+	0x64, 0x61, 0x74, 0x61, 0x5f, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5f, 0x61, 0x6c, 0x6c, 0x6f, 0x77,
+	0x5f, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x56, 0x2e, 0x65, 0x6e,
+	0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66,
+	0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x64, 0x65,
+	0x70, 0x65, 0x6e, 0x64, 0x65, 0x6e, 0x63, 0x79, 0x2e, 0x76, 0x33, 0x2e, 0x4d, 0x61, 0x74, 0x63,
+	0x68, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x69, 0x72, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x73,
+	0x2e, 0x44, 0x61, 0x74, 0x61, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x4c,
+	0x69, 0x73, 0x74, 0x52, 0x12, 0x64, 0x61, 0x74, 0x61, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6c,
+	0x6c, 0x6f, 0x77, 0x4c, 0x69, 0x73, 0x74, 0x1a, 0x2f, 0x0a, 0x12, 0x44, 0x61, 0x74, 0x61, 0x49,
+	0x6e, 0x70, 0x75, 0x74, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x19, 0x0a,
+	0x08, 0x74, 0x79, 0x70, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x07, 0x74, 0x79, 0x70, 0x65, 0x55, 0x72, 0x6c, 0x42, 0x58, 0x0a, 0x3b, 0x69, 0x6f, 0x2e, 0x65,
+	0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e,
+	0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65,
+	0x72, 0x73, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e, 0x64, 0x65, 0x70, 0x65, 0x6e, 0x64,
+	0x65, 0x6e, 0x63, 0x79, 0x2e, 0x76, 0x33, 0x42, 0x0f, 0x44, 0x65, 0x70, 0x65, 0x6e, 0x64, 0x65,
+	0x6e, 0x63, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02,
+	0x10, 0x02, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -286,11 +400,13 @@ func file_envoy_extensions_filters_common_dependency_v3_dependency_proto_rawDesc
 }
 
 var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_goTypes = []interface{}{
-	(Dependency_DependencyType)(0), // 0: envoy.extensions.filters.common.dependency.v3.Dependency.DependencyType
-	(*Dependency)(nil),             // 1: envoy.extensions.filters.common.dependency.v3.Dependency
-	(*FilterDependencies)(nil),     // 2: envoy.extensions.filters.common.dependency.v3.FilterDependencies
+	(Dependency_DependencyType)(0),                  // 0: envoy.extensions.filters.common.dependency.v3.Dependency.DependencyType
+	(*Dependency)(nil),                              // 1: envoy.extensions.filters.common.dependency.v3.Dependency
+	(*FilterDependencies)(nil),                      // 2: envoy.extensions.filters.common.dependency.v3.FilterDependencies
+	(*MatchingRequirements)(nil),                    // 3: envoy.extensions.filters.common.dependency.v3.MatchingRequirements
+	(*MatchingRequirements_DataInputAllowList)(nil), // 4: envoy.extensions.filters.common.dependency.v3.MatchingRequirements.DataInputAllowList
 }
 var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_depIdxs = []int32{
 	0, // 0: envoy.extensions.filters.common.dependency.v3.Dependency.type:type_name -> envoy.extensions.filters.common.dependency.v3.Dependency.DependencyType
@@ -298,11 +414,12 @@ var file_envoy_extensions_filters_common_dependency_v3_dependency_proto_depIdxs 
 	1, // 2: envoy.extensions.filters.common.dependency.v3.FilterDependencies.decode_provided:type_name -> envoy.extensions.filters.common.dependency.v3.Dependency
 	1, // 3: envoy.extensions.filters.common.dependency.v3.FilterDependencies.encode_required:type_name -> envoy.extensions.filters.common.dependency.v3.Dependency
 	1, // 4: envoy.extensions.filters.common.dependency.v3.FilterDependencies.encode_provided:type_name -> envoy.extensions.filters.common.dependency.v3.Dependency
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // 5: envoy.extensions.filters.common.dependency.v3.MatchingRequirements.data_input_allow_list:type_name -> envoy.extensions.filters.common.dependency.v3.MatchingRequirements.DataInputAllowList
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_common_dependency_v3_dependency_proto_init() }
@@ -335,6 +452,30 @@ func file_envoy_extensions_filters_common_dependency_v3_dependency_proto_init() 
 				return nil
 			}
 		}
+		file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MatchingRequirements); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_envoy_extensions_filters_common_dependency_v3_dependency_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MatchingRequirements_DataInputAllowList); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -342,7 +483,7 @@ func file_envoy_extensions_filters_common_dependency_v3_dependency_proto_init() 
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_extensions_filters_common_dependency_v3_dependency_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
