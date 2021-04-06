@@ -4,16 +4,17 @@
 # Variables
 #------------------------------------------------------------------------------
 
-SHELL 	:= /bin/bash
-BINDIR	:= bin
+SHELL		:= /bin/bash
+BINDIR		:= bin
 PKG 		:= github.com/envoyproxy/go-control-plane
+GOIMPORTS 	?= goimports
 
 .PHONY: build
 build:
 	@go build ./pkg/... ./envoy/...
 
 # TODO(mattklein123): See the note in TestLinearConcurrentSetWatch() for why we set -parallel here
-# This should be removed.
+# This should be
 .PHONY: test
 test:
 	@go test -race -v -timeout 30s -parallel 100 ./pkg/...
@@ -22,9 +23,13 @@ test:
 cover:
 	@build/coverage.sh
 
+.PHONY: format
+format:
+	$(GOIMPORTS) -local $(PKG) -w -l pkg
+
 .PHONY: check_format
 check_format:
-	@gofmt -l $(shell go list -f '{{.Dir}}' ./...) | tee /dev/stderr | read && echo "Files failed gofmt" && exit 1 || true
+	GOIMPORTS=$(GOIMPORTS) PKG=$(PKG) ./build/check_format.sh
 
 .PHONY: create_version
 create_version:

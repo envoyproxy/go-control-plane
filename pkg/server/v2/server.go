@@ -18,12 +18,13 @@ package server
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
