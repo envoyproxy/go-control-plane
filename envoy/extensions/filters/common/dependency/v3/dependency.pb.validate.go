@@ -232,3 +232,148 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = FilterDependenciesValidationError{}
+
+// Validate checks the field values on MatchingRequirements with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MatchingRequirements) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDataInputAllowList()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MatchingRequirementsValidationError{
+				field:  "DataInputAllowList",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// MatchingRequirementsValidationError is the validation error returned by
+// MatchingRequirements.Validate if the designated constraints aren't met.
+type MatchingRequirementsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MatchingRequirementsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MatchingRequirementsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MatchingRequirementsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MatchingRequirementsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MatchingRequirementsValidationError) ErrorName() string {
+	return "MatchingRequirementsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MatchingRequirementsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMatchingRequirements.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MatchingRequirementsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MatchingRequirementsValidationError{}
+
+// Validate checks the field values on MatchingRequirements_DataInputAllowList
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *MatchingRequirements_DataInputAllowList) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// MatchingRequirements_DataInputAllowListValidationError is the validation
+// error returned by MatchingRequirements_DataInputAllowList.Validate if the
+// designated constraints aren't met.
+type MatchingRequirements_DataInputAllowListValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MatchingRequirements_DataInputAllowListValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MatchingRequirements_DataInputAllowListValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MatchingRequirements_DataInputAllowListValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MatchingRequirements_DataInputAllowListValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MatchingRequirements_DataInputAllowListValidationError) ErrorName() string {
+	return "MatchingRequirements_DataInputAllowListValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MatchingRequirements_DataInputAllowListValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMatchingRequirements_DataInputAllowList.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MatchingRequirements_DataInputAllowListValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MatchingRequirements_DataInputAllowListValidationError{}
