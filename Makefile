@@ -7,7 +7,6 @@
 SHELL		:= /bin/bash
 BINDIR		:= bin
 PKG 		:= github.com/envoyproxy/go-control-plane
-GOIMPORTS 	?= goimports
 
 .PHONY: build
 build:
@@ -25,11 +24,7 @@ cover:
 
 .PHONY: format
 format:
-	$(GOIMPORTS) -local $(PKG) -w -l pkg
-
-.PHONY: check_format
-check_format:
-	GOIMPORTS=$(GOIMPORTS) PKG=$(PKG) ./build/check_format.sh
+	@goimports -local $(PKG) -w -l pkg
 
 .PHONY: create_version
 create_version:
