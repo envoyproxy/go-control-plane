@@ -54,6 +54,25 @@ func GetResponseType(typeURL string) types.ResponseType {
 	return types.UnknownType
 }
 
+// GetResponseTypeURL returns the type url for a valid enum
+func GetResponseTypeURL(responseType types.ResponseType) string {
+	switch responseType {
+	case types.Endpoint:
+		return resource.EndpointType
+	case types.Cluster:
+		return resource.ClusterType
+	case types.Route:
+		return resource.RouteType
+	case types.Listener:
+		return resource.ListenerType
+	case types.Secret:
+		return resource.SecretType
+	case types.Runtime:
+		return resource.RuntimeType
+	}
+	return resource.AnyType
+}
+
 // GetResourceName returns the resource name for a valid xDS response type.
 func GetResourceName(res types.Resource) string {
 	switch v := res.(type) {
