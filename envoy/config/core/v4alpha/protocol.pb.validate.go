@@ -896,6 +896,16 @@ func (m *Http3ProtocolOptions) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetOverrideStreamErrorOnInvalidHttpMessage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Http3ProtocolOptionsValidationError{
+				field:  "OverrideStreamErrorOnInvalidHttpMessage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
