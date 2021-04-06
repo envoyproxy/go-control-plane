@@ -4,8 +4,8 @@
 # Variables
 #------------------------------------------------------------------------------
 
-SHELL		:= /bin/bash
-BINDIR		:= bin
+SHELL 	:= /bin/bash
+BINDIR	:= bin
 PKG 		:= github.com/envoyproxy/go-control-plane
 
 .PHONY: build
