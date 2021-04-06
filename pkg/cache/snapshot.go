@@ -219,19 +219,21 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 	return s.Resources[typ].Version
 }
 
-// GetVersionMap will build a verison map off the current state of a snapshot
+// GetVersionMap will construct a verison map off the current state of a snapshot
 func (s *Snapshot) GetVersionMap() (map[string]map[string]string, error) {
 	if s == nil {
 		return nil, fmt.Errorf("missing snapshot")
 	}
 
+	// We need to initialize the map before we process anything since it is nested
 	versionMap := initializeVMap()
 	for i := 0; i < int(types.UnknownType); i++ {
 		typeURL := GetResponseTypeURL(types.ResponseType(i))
 		resources := s.GetResources(typeURL)
-		for _, resource := range resources {
+
+		for _, r := range resources {
 			// hash our verison in here and build the version map
-			marshaledResource, err := MarshalResource(resource)
+			marshaledResource, err := MarshalResource(r)
 			if err != nil {
 				return nil, fmt.Errorf("failed to marshal resource: %v", err)
 			}
@@ -239,21 +241,20 @@ func (s *Snapshot) GetVersionMap() (map[string]map[string]string, error) {
 			if v != "" {
 				return nil, fmt.Errorf("failed to build resource version from hash: %v", err)
 			}
-			alias := GetResourceName(resource)
-			versionMap[typeURL][alias] = v
+
+			versionMap[typeURL][GetResourceName(r)] = v
 		}
 	}
 
 	return versionMap, nil
 }
 
+// initializeVMap will build a nested map structure to hold all our version information
 func initializeVMap() map[string]map[string]string {
 	versionMap := make(map[string]map[string]string, types.UnknownType)
 
 	for i := 0; i < int(types.UnknownType); i++ {
-		versionMap[GetResponseTypeURL(
-			types.ResponseType(i),
-		)] = make(map[string]string, 0)
+		versionMap[GetResponseTypeURL(types.ResponseType(i))] = make(map[string]string)
 	}
 
 	return versionMap

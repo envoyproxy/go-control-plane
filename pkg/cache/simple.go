@@ -402,9 +402,9 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
 
-	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
-	// create a new watch accordingly
-	if !exists || respondDelta(request, value, st, snapshot.GetResources(t), snapshot.GetVersion(t), cache.log) == nil {
+	// if respondDelta returns nil, there is no change in any nested resource version against the previous snapshot
+	// if that is the case we want to trigger new watches
+	if !exists || (respondDelta(request, value, st, snapshot.GetResources(t), snapshot.GetVersion(t), cache.log) == nil) {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
@@ -425,7 +425,7 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
-// cancellation function for cleaning stale watches
+// cancellation function for cleaning stale delta watches
 func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func() {
 	return func() {
 		// uses the cache mutex

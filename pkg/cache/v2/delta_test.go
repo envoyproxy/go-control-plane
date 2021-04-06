@@ -26,7 +26,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{true, nil})
+		}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -56,7 +56,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{false, vm[typ]})
+		}, &stream.StreamState{IsWildcard: false, ResourceVersions: vm[typ]})
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -103,13 +103,15 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 					if cancel != nil {
 						cancel()
 					}
+
 					_, cancel = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 						Node: &core.Node{
 							Id: id,
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, &stream.StreamState{true, nil})
+					}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
+					defer cancel()
 				}
 			})
 		}(i)
@@ -125,7 +127,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{true, nil})
+		}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
 
 		// Cancel the watch
 		cancel()

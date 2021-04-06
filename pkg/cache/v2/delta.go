@@ -22,6 +22,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 )
 
+// Respond to a delta watch with the provided snapshot value
 func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.StreamState, resources map[string]types.Resource, systemVersion string, log log.Logger) *RawDeltaResponse {
 	resp, err := createDeltaResponse(request, st, resources, systemVersion)
 	if err != nil {
@@ -30,7 +31,8 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.St
 		}
 		return nil
 	}
-	// One send response if there were some actual updates
+
+	// Only send a response if there were changes
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if log != nil {
 			log.Debugf("node: %s, sending delta response:\n---> old Version Map: %v\n---> new resources: %v\n---> new Version Map: %v\n---> removed resources %v\n---> is wildcard: %t",
@@ -46,8 +48,10 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 	nextVersionMap := make(map[string]string)
 	filtered := make([]types.Resource, 0)
 	toRemove := make([]string, 0)
+
+	// Wildcard can happen through CDS/LDS. If this is done we want to track all resources as well as track them in the version map
 	if st.IsWildcard {
-		for resourceName, resource := range resources {
+		for name, resource := range resources {
 			// hash our verison in here and build the version map
 			marshaledResource, err := MarshalResource(resource)
 			if err != nil {
@@ -57,10 +61,11 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 			if nextVersion != "" {
 				return nil, fmt.Errorf("failed to build resource version from hash: %v", err)
 			}
-			nextVersionMap[resourceName] = nextVersion
-			oldVersion, found := st.ResourceVersions[resourceName]
 
-			if !found || oldVersion != nextVersion {
+			nextVersionMap[name] = nextVersion
+			prevVersion, found := st.ResourceVersions[name]
+
+			if !found || (prevVersion != nextVersion) {
 				filtered = append(filtered, resource)
 			}
 		}
@@ -68,8 +73,8 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 		// Reply only with the requested resources. Envoy may ask each resource
 		// individually in a separate stream. It is ok to reply with the same version
 		// on separate streams since requests do not share their response states.
-		for resourceName, oldVersion := range st.ResourceVersions {
-			if r, ok := resources[resourceName]; ok {
+		for name, prevVersion := range st.ResourceVersions {
+			if r, ok := resources[name]; ok {
 				marshaledResource, err := MarshalResource(r)
 				if err != nil {
 					return nil, fmt.Errorf("failed to marshal resource: %v", err)
@@ -78,18 +83,19 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 				if nextVersion != "" {
 					return nil, fmt.Errorf("failed to build resource version from hash: %v", err)
 				}
-				if oldVersion != nextVersion {
+				if prevVersion != nextVersion {
 					filtered = append(filtered, r)
 				}
-				nextVersionMap[resourceName] = nextVersion
+				nextVersionMap[name] = nextVersion
 			} else {
-				// if oldVersion == "" this means that the resourse was already removed or desn't yet exist on the client
-				// no need to remove it once again
-				if oldVersion != "" {
-					toRemove = append(toRemove, resourceName)
+				// if prevVersion == "" this means that the resourse was already removed or doesn't yet exist on the client.
+				if prevVersion != "" {
+					toRemove = append(toRemove, name)
 				}
-				// the resource has gone but we keep watching for it so we detect an update if the resource is back
-				nextVersionMap[resourceName] = ""
+
+				// the resource is gone but we keep tracking it in the
+				// version map so we can detect an update if the resource comes back
+				nextVersionMap[name] = ""
 			}
 		}
 	}
