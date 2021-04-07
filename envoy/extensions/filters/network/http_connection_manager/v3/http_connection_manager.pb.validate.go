@@ -120,6 +120,16 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetHttp3ProtocolOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "Http3ProtocolOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if !_HttpConnectionManager_ServerName_Pattern.MatchString(m.GetServerName()) {
 		return HttpConnectionManagerValidationError{
 			field:  "ServerName",
