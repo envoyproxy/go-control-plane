@@ -13,7 +13,7 @@ build:
 	@go build ./pkg/... ./envoy/...
 
 # TODO(mattklein123): See the note in TestLinearConcurrentSetWatch() for why we set -parallel here
-# This should be
+# This should be removed.
 .PHONY: test
 test:
 	@go test -race -v -timeout 30s -parallel 100 ./pkg/...
