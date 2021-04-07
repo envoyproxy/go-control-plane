@@ -20,7 +20,6 @@ import (
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
-	v2route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
@@ -63,7 +62,7 @@ func TestValidate(t *testing.T) {
 
 	invalidRoute := &route.RouteConfiguration{
 		Name: "test",
-		VirtualHosts: []*v2route.VirtualHost{{
+		VirtualHosts: []*route.VirtualHost{{
 			Name:    "test",
 			Domains: []string{},
 		}},

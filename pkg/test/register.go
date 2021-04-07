@@ -34,7 +34,7 @@ func RegisterAccessLogServer(grpcServer *grpc.Server, als *AccessLogService) {
 	accessloggrpc.RegisterAccessLogServiceServer(grpcServer, als)
 }
 
-// RegisterServer registers with v2 services.
+// RegisterServer registers with v3 services.
 func RegisterServer(grpcServer *grpc.Server, server server.Server) {
 	// register services
 	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
