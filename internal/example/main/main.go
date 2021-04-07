@@ -18,11 +18,10 @@ import (
 	"flag"
 	"os"
 
-	cachev3 "github.com/envoyproxy/go-control-plane/pkg/cache/v3"
-	serverv3 "github.com/envoyproxy/go-control-plane/pkg/server/v3"
-	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
-
 	"github.com/envoyproxy/go-control-plane/internal/example"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
+	"github.com/envoyproxy/go-control-plane/pkg/server"
+	"github.com/envoyproxy/go-control-plane/pkg/test"
 )
 
 var (
@@ -51,7 +50,7 @@ func main() {
 	flag.Parse()
 
 	// Create a cache
-	cache := cachev3.NewSnapshotCache(false, cachev3.IDHash{}, l)
+	cache := cache.NewSnapshotCache(false, cache.IDHash{}, l)
 
 	// Create the snapshot that we'll serve to Envoy
 	snapshot := example.GenerateSnapshot()
@@ -69,7 +68,7 @@ func main() {
 
 	// Run the xDS server
 	ctx := context.Background()
-	cb := &testv3.Callbacks{Debug: l.Debug}
-	srv := serverv3.NewServer(ctx, cache, cb)
+	cb := &test.Callbacks{Debug: l.Debug}
+	srv := server.NewServer(ctx, cache, cb)
 	example.RunServer(ctx, srv, port)
 }

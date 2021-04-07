@@ -1,4 +1,4 @@
-// Copyright 2020 Envoyproxy Authors
+// Copyright 2018 Envoyproxy Authors
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -11,16 +11,14 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-package example
+
+// Package test contains test utilities
+package test
 
 import (
-	"context"
-	"fmt"
-	"log"
-	"net"
-
 	"google.golang.org/grpc"
 
+	accessloggrpc "github.com/envoyproxy/go-control-plane/envoy/service/accesslog/v3"
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
@@ -31,11 +29,13 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server"
 )
 
-const (
-	grpcMaxConcurrentStreams = 1000000
-)
+// RegisterAccessLogServer starts an accessloggrpc service.
+func RegisterAccessLogServer(grpcServer *grpc.Server, als *AccessLogService) {
+	accessloggrpc.RegisterAccessLogServiceServer(grpcServer, als)
+}
 
-func registerServer(grpcServer *grpc.Server, server server.Server) {
+// RegisterServer registers with v3 services.
+func RegisterServer(grpcServer *grpc.Server, server server.Server) {
 	// register services
 	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
@@ -44,27 +44,4 @@ func registerServer(grpcServer *grpc.Server, server server.Server) {
 	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 	secretservice.RegisterSecretDiscoveryServiceServer(grpcServer, server)
 	runtimeservice.RegisterRuntimeDiscoveryServiceServer(grpcServer, server)
-}
-
-// RunServer starts an xDS server at the given port.
-func RunServer(ctx context.Context, srv server.Server, port uint) {
-	// gRPC golang library sets a very small upper bound for the number gRPC/h2
-	// streams over a single TCP connection. If a proxy multiplexes requests over
-	// a single connection to the management server, then it might lead to
-	// availability problems.
-	var grpcOptions []grpc.ServerOption
-	grpcOptions = append(grpcOptions, grpc.MaxConcurrentStreams(grpcMaxConcurrentStreams))
-	grpcServer := grpc.NewServer(grpcOptions...)
-
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	registerServer(grpcServer, srv)
-
-	log.Printf("management server listening on %d\n", port)
-	if err = grpcServer.Serve(lis); err != nil {
-		log.Println(err)
-	}
 }
