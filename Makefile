@@ -26,14 +26,6 @@ cover:
 format:
 	@goimports -local $(PKG) -w -l pkg
 
-.PHONY: create_version
-create_version:
-	./scripts/create_version.sh
-
-.PHONY: check_version_dirty
-check_version_dirty:
-	./scripts/check_version_dirty.sh
-
 .PHONY: examples
 examples:
 	@pushd examples/dyplomat && go build ./... && popd
@@ -41,7 +33,7 @@ examples:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.ads.v3 integration.xds integration.xds.v3 integration.rest integration.rest.v3 integration.ads.tls integration.xds.mux.v3
+.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.xds integration.rest integration.xds.mux
 
 $(BINDIR)/upstream:
 	@go build -race -o $@ internal/upstream/main.go
@@ -49,30 +41,18 @@ $(BINDIR)/upstream:
 $(BINDIR)/test:
 	@go build -race -o $@ pkg/test/main/main.go
 
-integration: integration.xds integration.xds.v3 integration.ads integration.ads.v3 integration.rest integration.rest.v3 integration.ads.tls
+integration: integration.xds integration.ads integration.rest integration.xds.mux
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=ads build/integration.sh
-
-integration.ads.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads SUFFIX=v3 build/integration.sh
 
 integration.xds: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds build/integration.sh
-
-integration.xds.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=xds SUFFIX=v3 build/integration.sh
 
 integration.rest: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=rest build/integration.sh
-
-integration.rest.v3: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=rest SUFFIX=v3 build/integration.sh
 
-integration.ads.tls: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=ads build/integration.sh -tls
-
-integration.xds.mux.v3: $(BINDIR)/test $(BINDIR)/upstream
+integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=xds SUFFIX=v3 build/integration.sh -mux
 
 #--------------------------------------
