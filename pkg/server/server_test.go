@@ -239,9 +239,9 @@ func TestServerShutdown(t *testing.T) {
 			// make a request
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
-			go func() {
+			go func(rType string) {
 				var err error
-				switch typ {
+				switch rType {
 				case rsrc.EndpointType:
 					err = s.StreamEndpoints(resp)
 				case rsrc.ClusterType:
@@ -261,7 +261,7 @@ func TestServerShutdown(t *testing.T) {
 					t.Errorf("Stream() => got %v, want no error", err)
 				}
 				shutdown <- true
-			}()
+			}(typ)
 
 			go func() {
 				defer cancel()
@@ -286,9 +286,9 @@ func TestResponseHandlers(t *testing.T) {
 			// make a request
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
-			go func() {
+			go func(rType string) {
 				var err error
-				switch typ {
+				switch rType {
 				case rsrc.EndpointType:
 					err = s.StreamEndpoints(resp)
 				case rsrc.ClusterType:
@@ -307,7 +307,7 @@ func TestResponseHandlers(t *testing.T) {
 				if err != nil {
 					t.Errorf("Stream() => got %v, want no error", err)
 				}
-			}()
+			}(typ)
 
 			// check a response
 			select {
