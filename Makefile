@@ -44,16 +44,16 @@ $(BINDIR)/test:
 integration: integration.xds integration.ads integration.rest integration.xds.mux
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=ads SUFFIX=v3 build/integration.sh
+	env XDS=ads build/integration.sh
 
 integration.xds: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds SUFFIX=v3 build/integration.sh
+	env XDS=xds build/integration.sh
 
 integration.rest: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=rest SUFFIX=v3 build/integration.sh
+	env XDS=rest build/integration.sh
 
 integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds SUFFIX=v3 build/integration.sh -mux
+	env XDS=xds build/integration.sh -mux
 
 #--------------------------------------
 #-- example xDS control plane server

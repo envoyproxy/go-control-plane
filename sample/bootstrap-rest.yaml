@@ -7,14 +7,18 @@ admin:
       port_value: 19000
 dynamic_resources:
   cds_config:
+    resource_api_version: V3
     api_config_source:
       api_type: REST
+      transport_api_version: V3
       refresh_delay: {nanos: 500000000} # 1/2s
       cluster_names:
       - xds_cluster
   lds_config:
+    resource_api_version: V3
     api_config_source:
       api_type: REST
+      transport_api_version: V3
       refresh_delay: {nanos: 500000000} # 1/2s
       cluster_names:
       - xds_cluster
@@ -39,8 +43,10 @@ layered_runtime:
     - name: runtime-0
       rtds_layer:
         rtds_config:
+          resource_api_version: V3
           api_config_source:
             api_type: REST
+            transport_api_version: V3
             refresh_delay: {nanos: 500000000} # 1/2s
             cluster_names:
             - xds_cluster
