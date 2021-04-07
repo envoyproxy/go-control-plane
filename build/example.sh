@@ -12,7 +12,7 @@ set -o pipefail
 ENVOY=${ENVOY:-/usr/local/bin/envoy}
 
 # Start envoy: important to keep drain time short
-(${ENVOY} -c sample/bootstrap-xdsv3.yaml --drain-time-s 1 -l debug)&
+(${ENVOY} -c sample/bootstrap-xds.yaml --drain-time-s 1 -l debug)&
 ENVOY_PID=$!
 
 function cleanup() {
