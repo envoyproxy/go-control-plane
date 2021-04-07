@@ -43,19 +43,13 @@ feedback, we might decided to revisit this aspect at a later point in time.
 
 ## Quick start
 
-It's recommended to run the command with script `./build/run_docker.sh` as it executes the command
-in the same environment as the circle ci. This makes sure to produce a consistent set of generated files.
+It's recommended to run the tests with `make docker_tests` as it executes the tests
+in the same environment as CI. This makes sure to produce a consistent set of generated files.
 
-1. Setup existing build:
-
-    ```sh
-    ./build/run_docker.sh make build test
-    ```
-
-1. Run [integration test](pkg/test/main/README.md) against the latest Envoy binary:
+1. Build and run tests:
 
     ```sh
-    ./build/run_docker.sh make integration
+    make docker_tests
     ```
 
 1. Take a look at the [example server](internal/example/README.md).

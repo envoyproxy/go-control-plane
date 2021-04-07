@@ -12,9 +12,11 @@ PKG 		:= github.com/envoyproxy/go-control-plane
 build:
 	@go build ./pkg/... ./envoy/...
 
+# TODO(mattklein123): See the note in TestLinearConcurrentSetWatch() for why we set -parallel here
+# This should be removed.
 .PHONY: test
 test:
-	@go test ./pkg/...
+	@go test -race -v -timeout 30s -parallel 100 ./pkg/...
 
 .PHONY: cover
 cover:
@@ -83,3 +85,8 @@ $(BINDIR)/example:
 
 example: $(BINDIR)/example
 	@build/example.sh
+
+.PHONY: docker_tests
+docker_tests:
+	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
+	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_ci.sh

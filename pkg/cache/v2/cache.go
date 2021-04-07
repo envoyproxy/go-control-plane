@@ -23,10 +23,11 @@ import (
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 
+	"github.com/golang/protobuf/ptypes/any"
+
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
 	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v2"
-	"github.com/golang/protobuf/ptypes/any"
 )
 
 // Request is an alias for the discovery request type.
