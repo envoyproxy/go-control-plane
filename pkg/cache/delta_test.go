@@ -8,11 +8,11 @@ import (
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/api/v2"
 	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v2"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
 )
 
 func TestSnapshotCacheDeltaWatch(t *testing.T) {

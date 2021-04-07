@@ -19,7 +19,7 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v2"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
 )
 
 // Respond to a delta watch with the provided snapshot value
