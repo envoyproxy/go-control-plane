@@ -14,10 +14,10 @@ import (
 	envoy_config_endpoint_v3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	envoy_service_discovery_v3 "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/server"
 )
 
 type logger struct {
