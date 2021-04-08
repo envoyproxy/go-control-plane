@@ -21,10 +21,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/envoyproxy/go-control-plane/pkg/server/delta"
-	"github.com/envoyproxy/go-control-plane/pkg/server/rest"
-	"github.com/envoyproxy/go-control-plane/pkg/server/sotw"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
+	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -34,8 +34,8 @@ import (
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
 	runtimeservice "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/secret/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
 // Server is a collection of handlers for streaming discovery requests.

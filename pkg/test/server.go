@@ -10,7 +10,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	server "github.com/envoyproxy/go-control-plane/pkg/server"
+	server "github.com/envoyproxy/go-control-plane/pkg/server/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/test/v3"
 
 	gcplogger "github.com/envoyproxy/go-control-plane/pkg/log"
 )
@@ -29,14 +30,14 @@ type HTTPGateway struct {
 }
 
 // RunAccessLogServer starts an accesslog server.
-func RunAccessLogServer(ctx context.Context, als *AccessLogService, alsPort uint) {
+func RunAccessLogServer(ctx context.Context, als *test.AccessLogService, alsPort uint) {
 	grpcServer := grpc.NewServer()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", alsPort))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	RegisterAccessLogServer(grpcServer, als)
+	test.RegisterAccessLogServer(grpcServer, als)
 	log.Printf("access log server listening on %d\n", alsPort)
 
 	go func() {
@@ -64,7 +65,7 @@ func RunManagementServer(ctx context.Context, srv server.Server, port uint) {
 		log.Fatal(err)
 	}
 
-	RegisterServer(grpcServer, srv)
+	test.RegisterServer(grpcServer, srv)
 
 	log.Printf("management server listening on %d\n", port)
 	go func() {

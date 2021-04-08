@@ -23,7 +23,7 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // SnapshotCache is a snapshot-based cache that maintains a single versioned

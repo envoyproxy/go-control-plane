@@ -18,7 +18,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // MuxCache multiplexes across several caches using a classification function.
