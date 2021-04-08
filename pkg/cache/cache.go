@@ -138,13 +138,18 @@ type RawDeltaResponse struct {
 	SystemVersionInfo string
 
 	// Resources to be included in the response.
-	Resources []types.Resource
+	Resources []types.ResourceWithTtl
 
 	// RemovedResources is a list of resource aliases which should be dropped by the consuming client.
 	RemovedResources []string
 
 	// NextVersionMap consists of updated version mappings after this response is applied
 	NextVersionMap map[string]string
+
+	// Whether this is a heartbeat response. For xDS versions that support TTL, this
+	// will be converted into a response that doesn't contain the actual resource protobuf.
+	// This allows for more lightweight updates that server only to update the TTL timer.
+	Heartbeat bool
 
 	// Marshaled Resources to be included in the response.
 	marshaledResponse atomic.Value
@@ -225,8 +230,12 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
 		for i, resource := range r.Resources {
-
-			marshaledResource, err := MarshalResource(resource)
+			name := GetResourceName(resource.Resource)
+			maybeTtldResource, resourceType, err := ttl.MaybeCreateTtlResourceIfSupported(resource, name, r.DeltaRequest.TypeUrl, r.Heartbeat)
+			if err != nil {
+				return nil, err
+			}
+			marshaledResource, err := MarshalResource(maybeTtldResource)
 			if err != nil {
 				return nil, err
 			}
@@ -234,12 +243,10 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 			if version == "" {
 				return nil, errors.New("failed to create a resource hash")
 			}
-
-			name := GetResourceName(resource)
 			marshaledResources[i] = &discovery.Resource{
 				Name: name,
 				Resource: &any.Any{
-					TypeUrl: r.DeltaRequest.TypeUrl,
+					TypeUrl: resourceType,
 					Value:   marshaledResource,
 				},
 				Version: version,

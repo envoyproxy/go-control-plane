@@ -66,12 +66,11 @@ type heartbeatHandle struct {
 }
 
 type snapshotCache struct {
-	// watchCount is an atomic counter incremented for each watch. This needs to
-	// be the first field in the struct to guarantee that it is 64-bit aligned,
+	// watchCount and deltaWatchCount are atomic counters incremented for each watch respectively. They need to
+	// be the first fields in the struct to guarantee 64-bit alignment,
 	// which is a requirement for atomic operations on 64-bit operands to work on
 	// 32-bit machines.
-	watchCount int64
-
+	watchCount      int64
 	deltaWatchCount int64
 
 	log log.Logger
@@ -184,6 +183,34 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
 		}
+
+		// process to our delta watches
+		for id, watch := range info.deltaWatches {
+			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+
+			resourcesWithTtl := map[string]types.ResourceWithTtl{}
+			for k, v := range resources {
+				if v.Ttl != nil {
+					resourcesWithTtl[k] = v
+				}
+			}
+			if len(resourcesWithTtl) == 0 {
+				continue
+			}
+
+			res := respondDelta(
+				watch.Request,
+				watch.Response,
+				watch.StreamState,
+				snapshot.GetResourcesAndTtl(watch.Request.TypeUrl),
+				snapshot.GetVersion(watch.Request.TypeUrl),
+				true,
+				cache.log,
+			)
+			if res != nil {
+				delete(info.deltaWatches, id)
+			}
+		}
 		info.mu.Unlock()
 	}
 }
@@ -215,10 +242,16 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 		// process our delta watches
 		for id, watch := range info.deltaWatches {
-			if respondDelta(watch.Request, watch.Response, watch.StreamState,
-				snapshot.GetResources(watch.Request.TypeUrl),
-				snapshot.GetVersion(watch.Request.TypeUrl), cache.log) != nil {
-
+			res := respondDelta(
+				watch.Request,
+				watch.Response,
+				watch.StreamState,
+				snapshot.GetResourcesAndTtl(watch.Request.TypeUrl),
+				snapshot.GetVersion(watch.Request.TypeUrl),
+				false,
+				cache.log,
+			)
+			if res != nil {
 				delete(info.deltaWatches, id)
 			}
 		}
@@ -393,9 +426,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 	}
 
 	// update last watch request times
-	info.mu.Lock()
-	info.lastDeltaWatchRequestTime = time.Now()
-	info.mu.Unlock()
+	info.SetLastDeltaWatchRequestTime(time.Now())
 
 	value := make(chan DeltaResponse, 1)
 
@@ -404,16 +435,14 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 
 	// if respondDelta returns nil, there is no change in any nested resource version against the previous snapshot
 	// if that is the case we want to trigger new watches
-	if !exists || (respondDelta(request, value, st, snapshot.GetResources(t), snapshot.GetVersion(t), cache.log) == nil) {
+	if !exists || (respondDelta(request, value, st, snapshot.GetResourcesAndTtl(t), snapshot.GetVersion(t), false, cache.log) == nil) {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
 				t, st.ResourceVersions, nodeID, snapshot.GetVersion(t))
 		}
 
-		info.mu.Lock()
-		info.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: st}
-		info.mu.Unlock()
+		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: st})
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
 	}

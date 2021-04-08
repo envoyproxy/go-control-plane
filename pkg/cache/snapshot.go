@@ -43,7 +43,7 @@ type DeltaResources struct {
 // resourceItems contain the lower level versioned resource map
 type resourceItems struct {
 	Version string
-	Items   map[string]types.Resource
+	Items   map[string]types.ResourceWithTtl
 }
 
 // IndexResourcesByName creates a map from the resource name to the resource.
@@ -51,15 +51,6 @@ func IndexResourcesByName(items []types.ResourceWithTtl) map[string]types.Resour
 	indexed := make(map[string]types.ResourceWithTtl)
 	for _, item := range items {
 		indexed[GetResourceName(item.Resource)] = item
-	}
-	return indexed
-}
-
-// IndexRawResourcesByName creates a map from the resource name to the resource.
-func IndexRawResourcesByName(items []types.Resource) map[string]types.Resource {
-	indexed := make(map[string]types.Resource)
-	for _, item := range items {
-		indexed[GetResourceName(item)] = item
 	}
 	return indexed
 }
@@ -226,23 +217,30 @@ func (s *Snapshot) GetVersionMap() (map[string]map[string]string, error) {
 	}
 
 	// We need to initialize the map before we process anything since it is nested
-	versionMap := initializeVMap()
-	for i := 0; i < int(types.UnknownType); i++ {
-		typeURL := GetResponseTypeURL(types.ResponseType(i))
-		resources := s.GetResources(typeURL)
+	versionMap, err := initializeVMap(s)
+	if err != nil {
+		return nil, err
+	}
 
-		for _, r := range resources {
+	for i, resources := range s.Resources {
+		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
+		if err != nil {
+			return nil, err
+		}
+
+		for _, r := range resources.Items {
 			// hash our verison in here and build the version map
-			marshaledResource, err := MarshalResource(r)
+			marshaledResource, err := MarshalResource(r.Resource)
 			if err != nil {
-				return nil, fmt.Errorf("failed to marshal resource: %v", err)
+				return nil, err
 			}
+
 			v := HashResource(marshaledResource)
 			if v != "" {
 				return nil, fmt.Errorf("failed to build resource version from hash: %v", err)
 			}
 
-			versionMap[typeURL][GetResourceName(r)] = v
+			versionMap[typeURL][GetResourceName(r.Resource)] = v
 		}
 	}
 
@@ -250,12 +248,19 @@ func (s *Snapshot) GetVersionMap() (map[string]map[string]string, error) {
 }
 
 // initializeVMap will build a nested map structure to hold all our version information
-func initializeVMap() map[string]map[string]string {
+func initializeVMap(s *Snapshot) (map[string]map[string]string, error) {
 	versionMap := make(map[string]map[string]string, types.UnknownType)
 
-	for i := 0; i < int(types.UnknownType); i++ {
-		versionMap[GetResponseTypeURL(types.ResponseType(i))] = make(map[string]string)
+	for i := 0; i < len(s.Resources); i++ {
+		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
+		if err != nil {
+			return nil, err
+		}
+		versionMap[typeURL] = make(map[string]string)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return versionMap
+	return versionMap, nil
 }
