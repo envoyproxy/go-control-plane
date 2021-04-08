@@ -20,7 +20,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
-	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl"
 )
 
 // Respond to a delta watch with the provided snapshot value
@@ -54,13 +53,14 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 	if st.IsWildcard {
 		for name, r := range resources {
 			// hash our verison in here and build the version map
-			nextVersion, err := createVersionFromTtlResource(r, name, request.TypeUrl, heartbeating)
+			nextVersion, err := createVersionFromTtlResource(r)
 			if err != nil {
 				return nil, err
 			}
 			nextVersionMap[name] = nextVersion
 			prevVersion, found := st.ResourceVersions[name]
-
+			fmt.Println(name + prevVersion)
+			fmt.Println(name + nextVersion)
 			if !found || (prevVersion != nextVersion) {
 				filtered = append(filtered, r)
 			}
@@ -71,7 +71,7 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 		// on separate streams since requests do not share their response states.
 		for name, prevVersion := range st.ResourceVersions {
 			if r, ok := resources[name]; ok {
-				nextVersion, err := createVersionFromTtlResource(r, name, request.TypeUrl, heartbeating)
+				nextVersion, err := createVersionFromTtlResource(r)
 				if err != nil {
 					return nil, err
 				}
@@ -102,12 +102,8 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 	}, nil
 }
 
-func createVersionFromTtlResource(resource types.ResourceWithTtl, name, typeURL string, heartbeating bool) (string, error) {
-	maybeTtldResource, _, err := ttl.MaybeCreateTtlResourceIfSupported(resource, name, typeURL, heartbeating)
-	if err != nil {
-		return "", err
-	}
-	marshaledResource, err := MarshalResource(maybeTtldResource)
+func createVersionFromTtlResource(resource types.ResourceWithTtl) (string, error) {
+	marshaledResource, err := MarshalResource(resource.Resource)
 	if err != nil {
 		return "", err
 	}

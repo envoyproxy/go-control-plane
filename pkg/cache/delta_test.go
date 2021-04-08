@@ -18,7 +18,6 @@ import (
 )
 
 func TestSnapshotCacheWithDeltaTtl(t *testing.T) {
-	t.Skip()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	c := cache.NewSnapshotCacheWithHeartbeating(ctx, true, group{}, logger{t: t}, time.Second)
@@ -40,6 +39,7 @@ func TestSnapshotCacheWithDeltaTtl(t *testing.T) {
 	}
 
 	wg := sync.WaitGroup{}
+	vm := make(map[string]map[string]string)
 	// All the resources should respond immediately when version is not up to date.
 	for _, typ := range testTypes {
 		wg.Add(1)
@@ -58,6 +58,8 @@ func TestSnapshotCacheWithDeltaTtl(t *testing.T) {
 				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshotWithTtl.GetResourcesAndTtl(typ))
 				}
+				vMap := out.GetNextVersionMap()
+				vm[typ] = vMap
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
 			}
@@ -67,7 +69,6 @@ func TestSnapshotCacheWithDeltaTtl(t *testing.T) {
 
 	// Once everything is up to date, only the TTL'd resource should send out updates.
 	wg = sync.WaitGroup{}
-	mu := sync.Mutex{}
 	updatesByType := map[string]int{}
 	for _, typ := range testTypes {
 		wg.Add(1)
@@ -82,7 +83,7 @@ func TestSnapshotCacheWithDeltaTtl(t *testing.T) {
 					},
 					TypeUrl:                typ,
 					ResourceNamesSubscribe: names[typ],
-				}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
+				}, &stream.StreamState{IsWildcard: true, ResourceVersions: vm[typ]})
 
 				select {
 				case out := <-value:
@@ -93,14 +94,12 @@ func TestSnapshotCacheWithDeltaTtl(t *testing.T) {
 					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
 						t.Errorf("get resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshotWithTtl.GetResources(typ))
 					}
+					vMap := out.GetNextVersionMap()
+					vm[typ] = vMap
 
-					mu.Lock()
 					updatesByType[typ]++
-					mu.Unlock()
 				case <-end:
-					if cancel != nil {
-						cancel()
-					}
+					cancel()
 					return
 				}
 			}
@@ -214,9 +213,6 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
 					}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
-					if cancel != nil {
-						defer cancel()
-					}
 				}
 			})
 		}(i)

@@ -202,7 +202,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 				watch.Request,
 				watch.Response,
 				watch.StreamState,
-				snapshot.GetResourcesAndTtl(watch.Request.TypeUrl),
+				resourcesWithTtl,
 				snapshot.GetVersion(watch.Request.TypeUrl),
 				true,
 				cache.log,
