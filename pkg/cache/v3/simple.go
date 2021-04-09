@@ -183,34 +183,6 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
 		}
-
-		// process to our delta watches
-		for id, watch := range info.deltaWatches {
-			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
-
-			resourcesWithTtl := map[string]types.ResourceWithTtl{}
-			for k, v := range resources {
-				if v.Ttl != nil {
-					resourcesWithTtl[k] = v
-				}
-			}
-			if len(resourcesWithTtl) == 0 {
-				continue
-			}
-
-			res := respondDelta(
-				watch.Request,
-				watch.Response,
-				watch.StreamState,
-				resourcesWithTtl,
-				snapshot.GetVersion(watch.Request.TypeUrl),
-				true,
-				cache.log,
-			)
-			if res != nil {
-				delete(info.deltaWatches, id)
-			}
-		}
 		info.mu.Unlock()
 	}
 }
@@ -240,15 +212,21 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			}
 		}
 
+		// this should always pass since we initialize on snapshot creation
+		if snapshot.VersionMap != nil {
+			err := snapshot.ConstructVersionMap()
+			if err != nil {
+				return err
+			}
+		}
+
 		// process our delta watches
 		for id, watch := range info.deltaWatches {
 			res := respondDelta(
 				watch.Request,
 				watch.Response,
 				watch.StreamState,
-				snapshot.GetResourcesAndTtl(watch.Request.TypeUrl),
-				snapshot.GetVersion(watch.Request.TypeUrl),
-				false,
+				snapshot,
 				cache.log,
 			)
 			if res != nil {
@@ -435,7 +413,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 
 	// if respondDelta returns nil, there is no change in any nested resource version against the previous snapshot
 	// if that is the case we want to trigger new watches
-	if !exists || (respondDelta(request, value, st, snapshot.GetResourcesAndTtl(t), snapshot.GetVersion(t), false, cache.log) == nil) {
+	if !exists || (respondDelta(request, value, st, snapshot, cache.log) == nil) {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,

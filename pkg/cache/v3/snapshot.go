@@ -55,6 +55,15 @@ func IndexResourcesByName(items []types.ResourceWithTtl) map[string]types.Resour
 	return indexed
 }
 
+// IndexRawResourcesByName creates a map from the resource name to the resource.
+func IndexRawResourcesByName(items []types.Resource) map[string]types.Resource {
+	indexed := make(map[string]types.Resource)
+	for _, item := range items {
+		indexed[GetResourceName(item)] = item
+	}
+	return indexed
+}
+
 // NewResources creates a new resource group.
 func NewResources(version string, items []types.Resource) Resources {
 	itemsWithTtl := []types.ResourceWithTtl{}
@@ -77,6 +86,9 @@ func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resource
 // from the snapshot may be delivered to the proxy in arbitrary order.
 type Snapshot struct {
 	Resources [types.UnknownType]Resources
+
+	// VersionMap holds the current hash map of all resources in the snapshot. This is only used in delta xDS
+	VersionMap map[string]map[string]string
 }
 
 // NewSnapshot creates a snapshot from response types and a version.
@@ -118,6 +130,11 @@ func NewSnapshotWithResources(version string, resources SnapshotResources) Snaps
 	out.Resources[types.Runtime] = NewResources(version, resources.Runtimes)
 	out.Resources[types.Secret] = NewResources(version, resources.Secrets)
 	out.Resources[types.ExtensionConfig] = NewResources(version, resources.ExtensionConfigs)
+
+	// Initialize the snapshot version map here
+	v, _ := initializeVMap(&out)
+	out.VersionMap = v
+
 	return out
 }
 
@@ -210,41 +227,38 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 	return s.Resources[typ].Version
 }
 
-// GetVersionMap will construct a verison map off the current state of a snapshot
-func (s *Snapshot) GetVersionMap() (map[string]map[string]string, error) {
-	if s == nil {
-		return nil, fmt.Errorf("missing snapshot")
-	}
+// GetVersionMap will return the internal version map of the currently applied snapshot.
+func (s *Snapshot) GetVersionMap() map[string]map[string]string {
+	return s.VersionMap
+}
 
-	// We need to initialize the map before we process anything since it is nested
-	versionMap, err := initializeVMap(s)
-	if err != nil {
-		return nil, err
+// ConstructVersionMap will construct a verison map off the current state of a snapshot
+func (s *Snapshot) ConstructVersionMap() error {
+	if s == nil {
+		return fmt.Errorf("missing snapshot")
 	}
 
 	for i, resources := range s.Resources {
 		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		for _, r := range resources.Items {
 			// hash our verison in here and build the version map
 			marshaledResource, err := MarshalResource(r.Resource)
 			if err != nil {
-				return nil, err
+				return err
 			}
-
 			v := HashResource(marshaledResource)
-			if v != "" {
-				return nil, fmt.Errorf("failed to build resource version from hash: %v", err)
+			if v == "" {
+				return fmt.Errorf("failed to build resource version: %v", err)
 			}
-
-			versionMap[typeURL][GetResourceName(r.Resource)] = v
+			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v
 		}
 	}
 
-	return versionMap, nil
+	return nil
 }
 
 // initializeVMap will build a nested map structure to hold all our version information
@@ -257,9 +271,6 @@ func initializeVMap(s *Snapshot) (map[string]map[string]string, error) {
 			return nil, err
 		}
 		versionMap[typeURL] = make(map[string]string)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return versionMap, nil

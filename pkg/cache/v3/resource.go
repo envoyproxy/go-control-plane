@@ -70,6 +70,8 @@ func GetResponseTypeURL(responseType types.ResponseType) (string, error) {
 		return resource.SecretType, nil
 	case types.Runtime:
 		return resource.RuntimeType, nil
+	case types.ExtensionConfig:
+		return resource.ExtensionConfigType, nil
 	}
 
 	return "", fmt.Errorf("couldn't map response type to known resource type")

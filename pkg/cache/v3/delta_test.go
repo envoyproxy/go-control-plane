@@ -1,121 +1,19 @@
 package cache_test
 
 import (
-	"context"
 	"fmt"
 	"reflect"
-	"sync"
 	"testing"
 	"time"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
-
-func TestSnapshotCacheWithDeltaTtl(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	c := cache.NewSnapshotCacheWithHeartbeating(ctx, true, group{}, logger{t: t}, time.Second)
-
-	if _, err := c.GetSnapshot(key); err == nil {
-		t.Errorf("unexpected snapshot found for key %q", key)
-	}
-
-	if err := c.SetSnapshot(key, snapshotWithTtl); err != nil {
-		t.Fatal(err)
-	}
-
-	snap, err := c.GetSnapshot(key)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !reflect.DeepEqual(snap, snapshotWithTtl) {
-		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTtl, snap)
-	}
-
-	wg := sync.WaitGroup{}
-	vm := make(map[string]map[string]string)
-	// All the resources should respond immediately when version is not up to date.
-	for _, typ := range testTypes {
-		wg.Add(1)
-		t.Run(typ, func(t *testing.T) {
-			defer wg.Done()
-			value, _ := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
-				Node: &core.Node{
-					Id: "node",
-				},
-				TypeUrl:                typ,
-				ResourceNamesSubscribe: names[typ],
-			}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
-
-			select {
-			case out := <-value:
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshotWithTtl.GetResourcesAndTtl(typ))
-				}
-				vMap := out.GetNextVersionMap()
-				vm[typ] = vMap
-			case <-time.After(2 * time.Second):
-				t.Errorf("failed to receive snapshot response")
-			}
-		})
-	}
-	wg.Wait()
-
-	// Once everything is up to date, only the TTL'd resource should send out updates.
-	wg = sync.WaitGroup{}
-	updatesByType := map[string]int{}
-	for _, typ := range testTypes {
-		wg.Add(1)
-		go func(typ string) {
-			defer wg.Done()
-
-			end := time.After(5 * time.Second)
-			for {
-				value, cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
-					Node: &core.Node{
-						Id: "node",
-					},
-					TypeUrl:                typ,
-					ResourceNamesSubscribe: names[typ],
-				}, &stream.StreamState{IsWildcard: true, ResourceVersions: vm[typ]})
-
-				select {
-				case out := <-value:
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-						t.Errorf("get resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshotWithTtl.GetResources(typ))
-					}
-
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-						t.Errorf("get resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshotWithTtl.GetResources(typ))
-					}
-					vMap := out.GetNextVersionMap()
-					vm[typ] = vMap
-
-					updatesByType[typ]++
-				case <-end:
-					cancel()
-					return
-				}
-			}
-		}(typ)
-	}
-
-	wg.Wait()
-
-	if len(updatesByType) != 1 {
-		t.Errorf("expected to only receive updates for TTL'd type, got %v", updatesByType)
-	}
-	// Avoid an exact match on number of triggers to avoid this being flaky.
-	if updatesByType[rsrc.EndpointType] < 2 {
-		t.Errorf("expected at least two TTL updates for endpoints, got %d", updatesByType[rsrc.EndpointType])
-	}
-}
 
 func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
@@ -140,8 +38,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResourcesAndTtl(typ)) {
-					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResourcesAndTtl(typ))
+				if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
 				vMap := out.GetNextVersionMap()
 				vm[typ] = vMap
@@ -178,8 +76,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// validate response for endpoints
 	select {
 	case out := <-watches[testTypes[0]]:
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResourcesAndTtl(rsrc.EndpointType)) {
-			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.GetResourcesAndTtl(rsrc.EndpointType))
+		if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType)) {
+			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.GetResources(rsrc.EndpointType))
 		}
 		vMap := out.GetNextVersionMap()
 		vm[testTypes[0]] = vMap

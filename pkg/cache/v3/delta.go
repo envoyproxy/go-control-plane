@@ -19,12 +19,12 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // Respond to a delta watch with the provided snapshot value
-func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.StreamState, resources map[string]types.ResourceWithTtl, systemVersion string, heartbeating bool, log log.Logger) *RawDeltaResponse {
-	resp, err := createDeltaResponse(request, st, resources, systemVersion, heartbeating)
+func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.StreamState, snapshot Snapshot, log log.Logger) *RawDeltaResponse {
+	resp, err := createDeltaResponse(request, st, snapshot)
 	if err != nil {
 		if log != nil {
 			log.Errorf("Error creating delta response: %v", err)
@@ -44,24 +44,27 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.St
 	return nil
 }
 
-func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resources map[string]types.ResourceWithTtl, systemVersion string, heartbeating bool) (*RawDeltaResponse, error) {
+// snapshot.GetResources(watch.Request.TypeUrl),
+// snapshot.GetVersion(watch.Request.TypeUrl),
+
+func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, snapshot Snapshot) (*RawDeltaResponse, error) {
+	resources := snapshot.GetResources((request.TypeUrl))
+
+	// variables to build our response with
 	nextVersionMap := make(map[string]string)
-	filtered := make([]types.ResourceWithTtl, 0, len(resources))
+	filtered := make([]types.Resource, 0, len(resources))
 	toRemove := make([]string, 0)
 
 	// Wildcard can happen through CDS/LDS. If this is done we want to track all resources as well as track them in the version map
 	if st.IsWildcard {
 		for name, r := range resources {
-			// hash our verison in here and build the version map
-			nextVersion, err := createVersionFromTtlResource(r)
-			if err != nil {
-				return nil, err
-			}
-			nextVersionMap[name] = nextVersion
+			// Since we've already precomputed the version hashes of the new snapshot,
+			// we can just set it here to be used for comparison later
+			version := snapshot.GetVersionMap()[request.TypeUrl][name]
+			fmt.Println("new version " + version)
+			nextVersionMap[name] = version
 			prevVersion, found := st.ResourceVersions[name]
-			fmt.Println(name + prevVersion)
-			fmt.Println(name + nextVersion)
-			if !found || (prevVersion != nextVersion) {
+			if !found || (prevVersion != nextVersionMap[name]) {
 				filtered = append(filtered, r)
 			}
 		}
@@ -71,10 +74,7 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 		// on separate streams since requests do not share their response states.
 		for name, prevVersion := range st.ResourceVersions {
 			if r, ok := resources[name]; ok {
-				nextVersion, err := createVersionFromTtlResource(r)
-				if err != nil {
-					return nil, err
-				}
+				nextVersion := snapshot.GetVersionMap()[request.TypeUrl][name]
 				if prevVersion != nextVersion {
 					filtered = append(filtered, r)
 				}
@@ -98,18 +98,6 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, resource
 		Resources:         filtered,
 		RemovedResources:  toRemove,
 		NextVersionMap:    nextVersionMap,
-		SystemVersionInfo: systemVersion,
+		SystemVersionInfo: snapshot.GetVersion(request.TypeUrl),
 	}, nil
-}
-
-func createVersionFromTtlResource(resource types.ResourceWithTtl) (string, error) {
-	marshaledResource, err := MarshalResource(resource.Resource)
-	if err != nil {
-		return "", err
-	}
-	nextVersion := HashResource(marshaledResource)
-	if nextVersion == "" {
-		return "", fmt.Errorf("failed to build resource version from hash: %v", err)
-	}
-	return nextVersion, nil
 }
