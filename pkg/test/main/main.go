@@ -26,10 +26,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
-	"github.com/envoyproxy/go-control-plane/pkg/server"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
+	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
 )
 
 var (
@@ -141,7 +142,7 @@ func main() {
 
 	// create a cache
 	signal := make(chan struct{})
-	cb := &test.Callbacks{Signal: signal, Debug: debug}
+	cb := &testv3.Callbacks{Signal: signal, Debug: debug}
 
 	// mux integration
 	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
@@ -163,7 +164,7 @@ func main() {
 		}
 	}
 	srv := server.NewServer(context.Background(), configCache, cb)
-	als := &test.AccessLogService{}
+	als := &testv3.AccessLogService{}
 
 	// create a test snapshot
 	snapshots := resource.TestSnapshot{

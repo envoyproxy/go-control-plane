@@ -26,12 +26,12 @@ import (
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource"
-	"github.com/envoyproxy/go-control-plane/pkg/server"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream"
-	"github.com/envoyproxy/go-control-plane/pkg/test/resource"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
 type mockConfigWatcher struct {
@@ -239,9 +239,9 @@ func TestServerShutdown(t *testing.T) {
 			// make a request
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
-			go func() {
+			go func(rType string) {
 				var err error
-				switch typ {
+				switch rType {
 				case rsrc.EndpointType:
 					err = s.StreamEndpoints(resp)
 				case rsrc.ClusterType:
@@ -261,7 +261,7 @@ func TestServerShutdown(t *testing.T) {
 					t.Errorf("Stream() => got %v, want no error", err)
 				}
 				shutdown <- true
-			}()
+			}(typ)
 
 			go func() {
 				defer cancel()
@@ -286,9 +286,9 @@ func TestResponseHandlers(t *testing.T) {
 			// make a request
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
-			go func() {
+			go func(rType string) {
 				var err error
-				switch typ {
+				switch rType {
 				case rsrc.EndpointType:
 					err = s.StreamEndpoints(resp)
 				case rsrc.ClusterType:
@@ -307,7 +307,7 @@ func TestResponseHandlers(t *testing.T) {
 				if err != nil {
 					t.Errorf("Stream() => got %v, want no error", err)
 				}
-			}()
+			}(typ)
 
 			// check a response
 			select {
