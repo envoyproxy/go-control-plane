@@ -26,8 +26,7 @@ type StreamState struct {
 	// Indicates whether the original DeltaRequest was a wildcard LDS/RDS request.
 	IsWildcard bool
 
-	// ResourceVersions contain a hash of the resource as the value of the map.
-	// The name is the version key.
+	// ResourceVersions contains a hash of the resource as the value and the resource name as the key.
 	// This field stores the last state sent to the client.
 	ResourceVersions map[string]string
 }

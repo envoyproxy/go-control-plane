@@ -15,14 +15,12 @@
 package cache
 
 import (
-	"fmt"
-
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-// Respond to a delta watch with the provided snapshot value
+// Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
 func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.StreamState, snapshot Snapshot, log log.Logger) *RawDeltaResponse {
 	resp, err := createDeltaResponse(request, st, snapshot)
 	if err != nil {
@@ -44,9 +42,6 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.St
 	return nil
 }
 
-// snapshot.GetResources(watch.Request.TypeUrl),
-// snapshot.GetVersion(watch.Request.TypeUrl),
-
 func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, snapshot Snapshot) (*RawDeltaResponse, error) {
 	resources := snapshot.GetResources((request.TypeUrl))
 
@@ -55,13 +50,12 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, snapshot
 	filtered := make([]types.Resource, 0, len(resources))
 	toRemove := make([]string, 0)
 
-	// Wildcard can happen through CDS/LDS. If this is done we want to track all resources as well as track them in the version map
+	// Wildcard requests originate from CDS or LDS. If detect one, we want to track all resources as well as track them in the version map
 	if st.IsWildcard {
 		for name, r := range resources {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
 			version := snapshot.GetVersionMap()[request.TypeUrl][name]
-			fmt.Println("new version " + version)
 			nextVersionMap[name] = version
 			prevVersion, found := st.ResourceVersions[name]
 			if !found || (prevVersion != nextVersionMap[name]) {
@@ -80,19 +74,15 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, snapshot
 				}
 				nextVersionMap[name] = nextVersion
 			} else {
-				// if prevVersion == "" this means that the resourse was already removed or doesn't yet exist on the client.
 				if prevVersion != "" {
 					toRemove = append(toRemove, name)
 				}
 
-				// the resource is gone but we keep tracking it in the
-				// version map so we can detect an update if the resource comes back
-				nextVersionMap[name] = ""
+				delete(nextVersionMap, name)
 			}
 		}
 	}
 
-	// send through our version map
 	return &RawDeltaResponse{
 		DeltaRequest:      request,
 		Resources:         filtered,

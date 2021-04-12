@@ -212,8 +212,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			}
 		}
 
-		// this should always pass since we initialize on snapshot creation
-		if snapshot.VersionMap != nil {
+		// We only calculate version hashes when using delta. We don't want to do this when using SOTW.
+		if len(info.deltaWatches) > 0 {
 			err := snapshot.ConstructVersionMap()
 			if err != nil {
 				return err
@@ -229,6 +229,8 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 				snapshot,
 				cache.log,
 			)
+			// If we detect a nil response here, that means there has been no state change
+			// so we don't want to respond or remove any existing resource watches
 			if res != nil {
 				delete(info.deltaWatches, id)
 			}
@@ -403,7 +405,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 		cache.status[nodeID] = info
 	}
 
-	// update last watch request times
+	// update last watch request time
 	info.SetLastDeltaWatchRequestTime(time.Now())
 
 	value := make(chan DeltaResponse, 1)
@@ -411,8 +413,8 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
 
-	// if respondDelta returns nil, there is no change in any nested resource version against the previous snapshot
-	// if that is the case we want to trigger new watches
+	// if respondDelta returns nil, there is no change in any resource version against the previous snapshot
+	// if that is the case we want to trigger new watch immediately
 	if !exists || (respondDelta(request, value, st, snapshot, cache.log) == nil) {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
@@ -435,7 +437,6 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 // cancellation function for cleaning stale delta watches
 func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func() {
 	return func() {
-		// uses the cache mutex
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
 		if info, ok := cache.status[nodeID]; ok {

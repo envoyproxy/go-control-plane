@@ -131,10 +131,6 @@ func NewSnapshotWithResources(version string, resources SnapshotResources) Snaps
 	out.Resources[types.Secret] = NewResources(version, resources.Secrets)
 	out.Resources[types.ExtensionConfig] = NewResources(version, resources.ExtensionConfigs)
 
-	// Initialize the snapshot version map here
-	v, _ := initializeVMap(&out)
-	out.VersionMap = v
-
 	return out
 }
 
@@ -232,11 +228,18 @@ func (s *Snapshot) GetVersionMap() map[string]map[string]string {
 	return s.VersionMap
 }
 
-// ConstructVersionMap will construct a verison map off the current state of a snapshot
+// ConstructVersionMap will construct a version map based on the current state of a snapshot
 func (s *Snapshot) ConstructVersionMap() error {
 	if s == nil {
 		return fmt.Errorf("missing snapshot")
 	}
+
+	// Initialize the snapshot version map so we don't try and set on a nil map
+	v, err := initializeVMap(s)
+	if err != nil {
+		return fmt.Errorf("failed to initialize verison map: %v", err)
+	}
+	s.VersionMap = v
 
 	for i, resources := range s.Resources {
 		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
