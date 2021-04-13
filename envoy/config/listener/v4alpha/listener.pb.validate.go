@@ -145,6 +145,8 @@ func (m *Listener) Validate() error {
 		}
 	}
 
+	// no validation rules for StatPrefix
+
 	for idx, item := range m.GetFilterChains() {
 		_, _ = idx, item
 
