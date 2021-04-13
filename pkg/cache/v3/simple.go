@@ -413,9 +413,21 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
 
-	// if respondDelta returns nil, there is no change in any resource version against the previous snapshot
-	// if that is the case we want to trigger new watch immediately
-	if !exists || (respondDelta(request, value, st, snapshot, cache.log) == nil) {
+	// There are three different cases that leads to a delayed watch trigger:
+	// - no snapshot exists for the requested nodeID
+	// - a snapshot exists, but we failed to initialize its version map
+	// - we attempted to issue a response, but the caller is already up to date
+	delayedResponse := !exists
+	if exists {
+		err := snapshot.ConstructVersionMap()
+		if err != nil {
+			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
+			delayedResponse = true
+		}
+		delayedResponse = respondDelta(request, value, st, snapshot, cache.log) == nil
+	}
+
+	if delayedResponse {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,

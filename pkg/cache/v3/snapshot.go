@@ -234,17 +234,20 @@ func (s *Snapshot) ConstructVersionMap() error {
 		return fmt.Errorf("missing snapshot")
 	}
 
-	// Initialize the snapshot version map so we don't try and set on a nil map
-	v, err := initializeVMap(s)
-	if err != nil {
-		return fmt.Errorf("failed to initialize verison map: %v", err)
+	// The snapshot resources never change, so no need to ever rebuild.
+	if s.VersionMap != nil {
+		return nil
 	}
-	s.VersionMap = v
+
+	s.VersionMap = make(map[string]map[string]string)
 
 	for i, resources := range s.Resources {
 		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
 		if err != nil {
 			return err
+		}
+		if _, ok := s.VersionMap[typeURL]; !ok {
+			s.VersionMap[typeURL] = make(map[string]string)
 		}
 
 		for _, r := range resources.Items {
@@ -257,24 +260,10 @@ func (s *Snapshot) ConstructVersionMap() error {
 			if v == "" {
 				return fmt.Errorf("failed to build resource version: %v", err)
 			}
+
 			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v
 		}
 	}
 
 	return nil
-}
-
-// initializeVMap will build a nested map structure to hold all our version information
-func initializeVMap(s *Snapshot) (map[string]map[string]string, error) {
-	versionMap := make(map[string]map[string]string, types.UnknownType)
-
-	for i := 0; i < len(s.Resources); i++ {
-		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
-		if err != nil {
-			return nil, err
-		}
-		versionMap[typeURL] = make(map[string]string)
-	}
-
-	return versionMap, nil
 }

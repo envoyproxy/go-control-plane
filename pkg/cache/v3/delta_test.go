@@ -60,7 +60,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-		t.Errorf("watches should be created for the latest version %d", count)
+		t.Errorf("watches should be created for the latest version, saw %d watches expected %d", count, len(testTypes))
 	}
 
 	// set partially-versioned snapshot
