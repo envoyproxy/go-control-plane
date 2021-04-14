@@ -212,7 +212,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			}
 		}
 
-		// We only calculate version hashes when using delta. We don't want to do this when using SOTW.
+		// We only calculate version hashes when using delta. We don't want to do this when using SOTW so we can avoid unecessary computational cost if not using delta.
 		if len(info.deltaWatches) > 0 {
 			err := snapshot.ConstructVersionMap()
 			if err != nil {

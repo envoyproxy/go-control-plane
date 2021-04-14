@@ -70,7 +70,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		t.Fatal(err)
 	}
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
-		t.Errorf("watches should be preserved for all but one: %d", count)
+		t.Errorf("watches should be preserved for all but one, got: %d open watches instead of the expected %d open watches", count, len(testTypes)-1)
 	}
 
 	// validate response for endpoints
@@ -131,18 +131,18 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 		// Cancel the watch
 		cancel()
 	}
-	// should be status info for the node
+	// c.GetStatusKeys() should return at least 1 because we register a node ID with the above watch creations
 	if keys := c.GetStatusKeys(); len(keys) == 0 {
-		t.Error("got 0, want status info for the node")
+		t.Errorf("expected to see a status info registered for watch, saw %d entries", len(keys))
 	}
 
 	for _, typ := range testTypes {
-		if count := c.GetStatusInfo(key).GetNumWatches(); count > 0 {
+		if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count > 0 {
 			t.Errorf("watches should be released for %s", typ)
 		}
 	}
 
-	if empty := c.GetStatusInfo("missing"); empty != nil {
-		t.Errorf("should not return a status for unknown key: got %#v", empty)
+	if s := c.GetStatusInfo("missing"); s != nil {
+		t.Errorf("should not return a status for unknown key: got %#v", s)
 	}
 }

@@ -87,7 +87,10 @@ func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resource
 type Snapshot struct {
 	Resources [types.UnknownType]Resources
 
-	// VersionMap holds the current hash map of all resources in the snapshot. This is only used in delta xDS
+	// VersionMap holds the current hash map of all resources in the snapshot.
+	// This field should remain nil until it is used, at which point should be
+	// instantiated by setting a snapshot while, or creating delta xDS resource watches.
+	// VersionMap is only to be used with delta xDS.
 	VersionMap map[string]map[string]string
 }
 

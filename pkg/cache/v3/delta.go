@@ -42,20 +42,20 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, st *stream.St
 	return nil
 }
 
-func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, snapshot Snapshot) (*RawDeltaResponse, error) {
-	resources := snapshot.GetResources((request.TypeUrl))
+func createDeltaResponse(req *DeltaRequest, st *stream.StreamState, snapshot Snapshot) (*RawDeltaResponse, error) {
+	resources := snapshot.GetResources((req.TypeUrl))
 
 	// variables to build our response with
 	nextVersionMap := make(map[string]string)
 	filtered := make([]types.Resource, 0, len(resources))
 	toRemove := make([]string, 0)
 
-	// Wildcard requests originate from CDS or LDS. If detect one, we want to track all resources as well as track them in the version map
+	// If we are handling a wildcard request, we want to respond with all resources
 	if st.IsWildcard {
 		for name, r := range resources {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
-			version := snapshot.GetVersionMap()[request.TypeUrl][name]
+			version := snapshot.GetVersionMap()[req.TypeUrl][name]
 			nextVersionMap[name] = version
 			prevVersion, found := st.ResourceVersions[name]
 			if !found || (prevVersion != nextVersionMap[name]) {
@@ -63,31 +63,31 @@ func createDeltaResponse(request *DeltaRequest, st *stream.StreamState, snapshot
 			}
 		}
 	} else {
-		// Reply only with the requested resources. Envoy may ask each resource
-		// individually in a separate stream. It is ok to reply with the same version
-		// on separate streams since requests do not share their response states.
+		// Reply only with the requested resources
 		for name, prevVersion := range st.ResourceVersions {
 			if r, ok := resources[name]; ok {
-				nextVersion := snapshot.GetVersionMap()[request.TypeUrl][name]
+				nextVersion := snapshot.GetVersionMap()[req.TypeUrl][name]
 				if prevVersion != nextVersion {
 					filtered = append(filtered, r)
 				}
 				nextVersionMap[name] = nextVersion
-			} else {
-				if prevVersion != "" {
-					toRemove = append(toRemove, name)
-				}
-
-				delete(nextVersionMap, name)
 			}
 		}
 	}
 
+	// Compute resources for removal regardless of the request type
+	for name := range st.ResourceVersions {
+		if _, ok := resources[name]; !ok {
+			toRemove = append(toRemove, name)
+			delete(nextVersionMap, name)
+		}
+	}
+
 	return &RawDeltaResponse{
-		DeltaRequest:      request,
+		DeltaRequest:      req,
 		Resources:         filtered,
 		RemovedResources:  toRemove,
 		NextVersionMap:    nextVersionMap,
-		SystemVersionInfo: snapshot.GetVersion(request.TypeUrl),
+		SystemVersionInfo: snapshot.GetVersion(req.TypeUrl),
 	}, nil
 }
