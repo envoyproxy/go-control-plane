@@ -1198,7 +1198,7 @@ type RouteMatch_ConnectMatcher_ struct {
 	// where Extended CONNECT requests may have a path, the path matchers will work if
 	// there is a path present.
 	// Note that CONNECT support is currently considered alpha in Envoy.
-	// [#comment:TODO(htuch): Replace the above comment with an alpha tag.
+	// [#comment: TODO(htuch): Replace the above comment with an alpha tag.]
 	ConnectMatcher *RouteMatch_ConnectMatcher `protobuf:"bytes,12,opt,name=connect_matcher,json=connectMatcher,proto3,oneof"`
 }
 
@@ -3849,7 +3849,7 @@ type RouteAction_UpgradeConfig struct {
 	// Configuration for sending data upstream as a raw data payload. This is used for
 	// CONNECT requests, when forwarding CONNECT payload as raw TCP.
 	// Note that CONNECT support is currently considered alpha in Envoy.
-	// [#comment:TODO(htuch): Replace the above comment with an alpha tag.
+	// [#comment: TODO(htuch): Replace the above comment with an alpha tag.]
 	ConnectConfig *RouteAction_UpgradeConfig_ConnectConfig `protobuf:"bytes,3,opt,name=connect_config,json=connectConfig,proto3" json:"connect_config,omitempty"`
 }
 

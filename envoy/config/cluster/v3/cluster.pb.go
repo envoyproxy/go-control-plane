@@ -645,7 +645,7 @@ type Cluster struct {
 	// in the :ref:`http_protocol_options <envoy_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>` message.
 	// upstream_http_protocol_options can be set via the cluster's
 	// :ref:`extension_protocol_options<envoy_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`.
-	// See ref:`upstream_http_protocol_options
+	// See :ref:`upstream_http_protocol_options
 	// <envoy_api_field_extensions.upstreams.http.v3.HttpProtocolOptions.upstream_http_protocol_options>`
 	// for example usage.
 	//
@@ -658,7 +658,7 @@ type Cluster struct {
 	// in the :ref:`http_protocol_options <envoy_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>` message.
 	// common_http_protocol_options can be set via the cluster's
 	// :ref:`extension_protocol_options<envoy_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`.
-	// See ref:`upstream_http_protocol_options
+	// See :ref:`upstream_http_protocol_options
 	// <envoy_api_field_extensions.upstreams.http.v3.HttpProtocolOptions.upstream_http_protocol_options>`
 	// for example usage.
 	//
@@ -669,7 +669,7 @@ type Cluster struct {
 	// :ref:`http_protocol_options <envoy_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>` message.
 	// http_protocol_options can be set via the cluster's
 	// :ref:`extension_protocol_options<envoy_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`.
-	// See ref:`upstream_http_protocol_options
+	// See :ref:`upstream_http_protocol_options
 	// <envoy_api_field_extensions.upstreams.http.v3.HttpProtocolOptions.upstream_http_protocol_options>`
 	// for example usage.
 	//
@@ -685,7 +685,7 @@ type Cluster struct {
 	// :ref:`http_protocol_options <envoy_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>`
 	// message. http2_protocol_options can be set via the cluster's
 	// :ref:`extension_protocol_options<envoy_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`.
-	// See ref:`upstream_http_protocol_options
+	// See :ref:`upstream_http_protocol_options
 	// <envoy_api_field_extensions.upstreams.http.v3.HttpProtocolOptions.upstream_http_protocol_options>`
 	// for example usage.
 	//

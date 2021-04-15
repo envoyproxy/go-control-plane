@@ -140,7 +140,7 @@ type VmConfig struct {
 	// VM plugin) to determine which VM will be used for the plugin. All plugins which use the same
 	// *vm_id* and code will use the same VM. May be left blank. Sharing a VM between plugins can
 	// reduce memory utilization and make sharing of data easier which may have security implications.
-	// See ref: "TODO: add ref" for details.
+	// [#comment: TODO: add ref for details.]
 	VmId string `protobuf:"bytes,1,opt,name=vm_id,json=vmId,proto3" json:"vm_id,omitempty"`
 	// The Wasm runtime type.
 	// Available Wasm runtime types are registered as extensions. The following runtimes are included

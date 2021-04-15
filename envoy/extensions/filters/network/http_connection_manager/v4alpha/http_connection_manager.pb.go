@@ -1953,7 +1953,7 @@ func (x *HttpConnectionManager_UpgradeConfig) GetEnabled() *wrappers.BoolValue {
 	return nil
 }
 
-// [#not-implemented-hide] Transformations that apply to path headers. Transformations are applied
+// [#not-implemented-hide:] Transformations that apply to path headers. Transformations are applied
 // before any processing of requests by HTTP filters, routing, and matching. Only the normalized
 // path will be visible internally if a transformation is enabled. Any path rewrites that the
 // router performs (e.g. :ref:`regex_rewrite
@@ -1967,7 +1967,7 @@ type HttpConnectionManager_PathNormalizationOptions struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [#not-implemented-hide] Normalization applies internally before any processing of requests by
+	// [#not-implemented-hide:] Normalization applies internally before any processing of requests by
 	// HTTP filters, routing, and matching *and* will affect the forwarded *:path* header. Defaults
 	// to :ref:`NormalizePathRFC3986
 	// <envoy_api_msg_type.http.v3.PathTransformation.Operation.NormalizePathRFC3986>`. When not
@@ -1976,7 +1976,7 @@ type HttpConnectionManager_PathNormalizationOptions struct {
 	// Envoy will respond with 400 to paths that are malformed (e.g. for paths that fail RFC 3986
 	// normalization due to disallowed characters.)
 	ForwardingTransformation *v32.PathTransformation `protobuf:"bytes,1,opt,name=forwarding_transformation,json=forwardingTransformation,proto3" json:"forwarding_transformation,omitempty"`
-	// [#not-implemented-hide] Normalization only applies internally before any processing of
+	// [#not-implemented-hide:] Normalization only applies internally before any processing of
 	// requests by HTTP filters, routing, and matching. These will be applied after full
 	// transformation is applied. The *:path* header before this transformation will be restored in
 	// the router filter and sent upstream unless it was mutated by a filter. Defaults to no
