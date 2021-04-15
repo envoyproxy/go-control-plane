@@ -86,6 +86,80 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 }
 
+func TestDeltaRemoveResources(t *testing.T) {
+	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	watches := make(map[string]chan cache.DeltaResponse)
+
+	for _, typ := range testTypes {
+		// We don't specify any resource name subscriptions here because we want to make sure we test wildcard
+		// functionality. This means we should receive all resources back without requesting a subscription by name.
+		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+			Node: &core.Node{
+				Id: "node",
+			},
+			TypeUrl: typ,
+		}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
+	}
+
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		t.Fatal(err)
+	}
+
+	versionMap := make(map[string]map[string]string)
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			select {
+			case out := <-watches[typ]:
+				if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
+				}
+				nextVersionMap := out.GetNextVersionMap()
+				versionMap[typ] = nextVersionMap
+			case <-time.After(time.Second):
+				t.Fatal("failed to receive a snapshot response")
+			}
+		})
+	}
+
+	// We want to continue to do wildcard requests here so we can later
+	// test the removal of certain resources from a partial snapshot
+	for _, typ := range testTypes {
+		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+			Node: &core.Node{
+				Id: "node",
+			},
+			TypeUrl: typ,
+		}, &stream.StreamState{IsWildcard: true, ResourceVersions: versionMap[typ]})
+	}
+
+	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
+		t.Errorf("watches should be created for the latest version, saw %d watches expected %d", count, len(testTypes))
+	}
+
+	// set a partially versioned snapshot with no endpoints
+	snapshot2 := snapshot
+	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{})
+	if err := c.SetSnapshot(key, snapshot2); err != nil {
+		t.Fatal(err)
+	}
+
+	// validate response for endpoints
+	select {
+	case out := <-watches[testTypes[0]]:
+		if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType)) {
+			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.GetResources(rsrc.EndpointType))
+		}
+		nextVersionMap := out.GetNextVersionMap()
+
+		// make sure the version maps are different since we no longer are tracking any endpoint resources
+		if reflect.DeepEqual(versionMap[testTypes[0]], nextVersionMap) {
+			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an emtpy map", nextVersionMap)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("failed to receive snapshot response")
+	}
+}
+
 func TestConcurrentSetDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	for i := 0; i < 50; i++ {

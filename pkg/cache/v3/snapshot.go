@@ -89,7 +89,7 @@ type Snapshot struct {
 
 	// VersionMap holds the current hash map of all resources in the snapshot.
 	// This field should remain nil until it is used, at which point should be
-	// instantiated by setting a snapshot while, or creating delta xDS resource watches.
+	// instantiated by calling ConstructVersionMap().
 	// VersionMap is only to be used with delta xDS.
 	VersionMap map[string]map[string]string
 }
