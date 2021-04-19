@@ -58,6 +58,12 @@ type StatusInfo interface {
 
 	// GetLastDeltaWatchRequestTime returns the timestamp of the last delta discovery watch request.
 	GetLastDeltaWatchRequestTime() time.Time
+
+	// SetLastDeltaWatchRequestTime will set the current time of the last delta discovery watch request
+	SetLastDeltaWatchRequestTime(time.Time)
+
+	// SetDeltaResponseWatch will set the provided delta response watch to the associate watch ID
+	SetDeltaResponseWatch(int64, DeltaResponseWatch)
 }
 
 type statusInfo struct {
@@ -147,4 +153,16 @@ func (info *statusInfo) GetDeltaStreamState(watchID int64) *stream.StreamState {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.deltaWatches[watchID].StreamState
+}
+
+func (info *statusInfo) SetLastDeltaWatchRequestTime(t time.Time) {
+	info.mu.Lock()
+	defer info.mu.Unlock()
+	info.lastDeltaWatchRequestTime = t
+}
+
+func (info *statusInfo) SetDeltaResponseWatch(id int64, drw DeltaResponseWatch) {
+	info.mu.Lock()
+	defer info.mu.Unlock()
+	info.deltaWatches[id] = drw
 }

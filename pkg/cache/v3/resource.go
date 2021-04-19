@@ -17,6 +17,7 @@ package cache
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 
 	"github.com/golang/protobuf/proto"
 
@@ -52,6 +53,28 @@ func GetResponseType(typeURL string) types.ResponseType {
 		return types.ExtensionConfig
 	}
 	return types.UnknownType
+}
+
+// GetResponseTypeURL returns the type url for a valid enum
+func GetResponseTypeURL(responseType types.ResponseType) (string, error) {
+	switch responseType {
+	case types.Endpoint:
+		return resource.EndpointType, nil
+	case types.Cluster:
+		return resource.ClusterType, nil
+	case types.Route:
+		return resource.RouteType, nil
+	case types.Listener:
+		return resource.ListenerType, nil
+	case types.Secret:
+		return resource.SecretType, nil
+	case types.Runtime:
+		return resource.RuntimeType, nil
+	case types.ExtensionConfig:
+		return resource.ExtensionConfigType, nil
+	}
+
+	return "", fmt.Errorf("couldn't map response type to known resource type")
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.

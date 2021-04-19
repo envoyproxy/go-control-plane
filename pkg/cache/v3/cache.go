@@ -53,6 +53,7 @@ type ConfigWatcher interface {
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
 	CreateWatch(*Request) (value chan Response, cancel func())
+
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	//
 	// Value channel produces requested resources, or spontaneous updates in accordance
@@ -224,7 +225,7 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
 		for i, resource := range r.Resources {
-
+			name := GetResourceName(resource)
 			marshaledResource, err := MarshalResource(resource)
 			if err != nil {
 				return nil, err
@@ -233,8 +234,6 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 			if version == "" {
 				return nil, errors.New("failed to create a resource hash")
 			}
-
-			name := GetResourceName(resource)
 			marshaledResources[i] = &discovery.Resource{
 				Name: name,
 				Resource: &any.Any{

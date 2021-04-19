@@ -66,11 +66,12 @@ type heartbeatHandle struct {
 }
 
 type snapshotCache struct {
-	// watchCount is an atomic counter incremented for each watch. This needs to
-	// be the first field in the struct to guarantee that it is 64-bit aligned,
+	// watchCount and deltaWatchCount are atomic counters incremented for each watch respectively. They need to
+	// be the first fields in the struct to guarantee 64-bit alignment,
 	// which is a requirement for atomic operations on 64-bit operands to work on
 	// 32-bit machines.
-	watchCount int64
+	watchCount      int64
+	deltaWatchCount int64
 
 	log log.Logger
 
@@ -208,6 +209,30 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 				// discard the watch
 				delete(info.watches, id)
+			}
+		}
+
+		// We only calculate version hashes when using delta. We don't want to do this when using SOTW so we can avoid unecessary computational cost if not using delta.
+		if len(info.deltaWatches) > 0 {
+			err := snapshot.ConstructVersionMap()
+			if err != nil {
+				return err
+			}
+		}
+
+		// process our delta watches
+		for id, watch := range info.deltaWatches {
+			res := respondDelta(
+				watch.Request,
+				watch.Response,
+				watch.StreamState,
+				snapshot,
+				cache.log,
+			)
+			// If we detect a nil response here, that means there has been no state change
+			// so we don't want to respond or remove any existing resource watches
+			if res != nil {
+				delete(info.deltaWatches, id)
 			}
 		}
 		info.mu.Unlock()
@@ -366,8 +391,72 @@ func createResponse(request *Request, resources map[string]types.ResourceWithTtl
 	}
 }
 
+// CreateDeltaWatch returns a watch for a delta xDS request which implements the Simple SnapshotCache.
 func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
-	return nil, nil
+	nodeID := cache.hash.ID(request.Node)
+	t := request.GetTypeUrl()
+
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	info, ok := cache.status[nodeID]
+	if !ok {
+		info = newStatusInfo(request.Node)
+		cache.status[nodeID] = info
+	}
+
+	// update last watch request time
+	info.SetLastDeltaWatchRequestTime(time.Now())
+
+	value := make(chan DeltaResponse, 1)
+
+	// find the current cache snapshot for the provided node
+	snapshot, exists := cache.snapshots[nodeID]
+
+	// There are three different cases that leads to a delayed watch trigger:
+	// - no snapshot exists for the requested nodeID
+	// - a snapshot exists, but we failed to initialize its version map
+	// - we attempted to issue a response, but the caller is already up to date
+	delayedResponse := !exists
+	if exists {
+		err := snapshot.ConstructVersionMap()
+		if err != nil {
+			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
+			delayedResponse = true
+		}
+		delayedResponse = respondDelta(request, value, st, snapshot, cache.log) == nil
+	}
+
+	if delayedResponse {
+		watchID := cache.nextDeltaWatchID()
+		if cache.log != nil {
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
+				t, st.ResourceVersions, nodeID, snapshot.GetVersion(t))
+		}
+
+		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: st})
+
+		return value, cache.cancelDeltaWatch(nodeID, watchID)
+	}
+
+	return value, nil
+}
+
+func (cache *snapshotCache) nextDeltaWatchID() int64 {
+	return atomic.AddInt64(&cache.deltaWatchCount, 1)
+}
+
+// cancellation function for cleaning stale delta watches
+func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func() {
+	return func() {
+		cache.mu.Lock()
+		defer cache.mu.Unlock()
+		if info, ok := cache.status[nodeID]; ok {
+			info.mu.Lock()
+			delete(info.deltaWatches, watchID)
+			info.mu.Unlock()
+		}
+	}
 }
 
 // Fetch implements the cache fetch function.
