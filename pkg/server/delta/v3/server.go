@@ -16,6 +16,8 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Server is a wrapper interface which is meant to hold the proper stream handler for each xDS protocol.
@@ -316,7 +318,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				state.ResourceVersions = make(map[string]string)
 			}
 
-			// We are in the wildcard mode if the first request of a particular type has empty subscription list
+			// We are in the wildcard mode if the first request of a particular type has an empty subscription list
 			var found bool
 			if state.IsWildcard, found = isWildcard[req.TypeUrl]; !found {
 				state.IsWildcard = len(req.GetResourceNamesSubscribe()) == 0
