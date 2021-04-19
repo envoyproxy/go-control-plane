@@ -79,7 +79,6 @@ func createDeltaResponse(req *DeltaRequest, st *stream.StreamState, snapshot Sna
 	for name := range st.ResourceVersions {
 		if _, ok := resources[name]; !ok {
 			toRemove = append(toRemove, name)
-			delete(nextVersionMap, name)
 		}
 	}
 

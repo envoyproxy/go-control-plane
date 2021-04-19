@@ -19,6 +19,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	watches := make(map[string]chan cache.DeltaResponse)
 
+	// Make our initial request as a wildcard to get all resources and make sure the wildcard requesting works as intended
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
@@ -49,6 +50,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		})
 	}
 
+	// On re-request we want to use non-wildcard so we can verify the logic path of not requesting
+	// all resources as well as individual resource removals
 	for _, typ := range testTypes {
 		watches[typ], _ = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
