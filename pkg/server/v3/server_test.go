@@ -665,6 +665,29 @@ func TestWatchClosed(t *testing.T) {
 	}
 }
 
+func TestDeltaWatchClosed(t *testing.T) {
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.closeWatch = true
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+
+			resp := makeMockDeltaStream(t)
+			resp.recv <- &discovery.DeltaDiscoveryRequest{
+				Node:    node,
+				TypeUrl: typ,
+			}
+
+			// check that response fails since watch gets closed
+			if err := s.DeltaAggregatedResources(resp); err == nil {
+				t.Error("DeltaAggregatedResources() => got no error, want watch failed")
+			}
+
+			close(resp.recv)
+		})
+	}
+}
+
 func TestSendError(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
@@ -683,6 +706,31 @@ func TestSendError(t *testing.T) {
 			// check that response fails since send returns error
 			if err := s.StreamAggregatedResources(resp); err == nil {
 				t.Error("Stream() => got no error, want send error")
+			}
+
+			close(resp.recv)
+		})
+	}
+}
+
+func TestSendDeltaError(t *testing.T) {
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.deltaResponses = makeDeltaResponses()
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+
+			// make a request
+			resp := makeMockDeltaStream(t)
+			resp.sendError = true
+			resp.recv <- &discovery.DeltaDiscoveryRequest{
+				Node:    node,
+				TypeUrl: typ,
+			}
+
+			// check that response fails since send returns error
+			if err := s.DeltaAggregatedResources(resp); err == nil {
+				t.Error("DeltaAggregatedResources() => got no error, want send error")
 			}
 
 			close(resp.recv)

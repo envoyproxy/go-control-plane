@@ -7,14 +7,15 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // Server is a wrapper interface which is meant to hold the proper stream handler for each xDS protocol.
@@ -86,23 +87,11 @@ func (values *watches) Init() {
 	values.deltaNonces = make(map[string]string)
 	values.deltaTerminations = make(map[string]chan struct{})
 	values.deltaCancellations = make(map[string]func())
-	values.deltaStreamStates = initStreamState()
+	values.deltaStreamStates = make(map[string]stream.StreamState, int(types.UnknownType))
 	values.mu = &sync.RWMutex{}
 }
 
 var deltaErrorResponse = &cache.RawDeltaResponse{}
-
-func initStreamState() map[string]stream.StreamState {
-	m := make(map[string]stream.StreamState, 6)
-
-	for i := 0; i < int(types.UnknownType); i++ {
-		m[cache.GetResponseTypeURL(types.ResponseType(i))] = stream.StreamState{
-			ResourceVersions: make(map[string]string, 0),
-		}
-	}
-
-	return m
-}
 
 // Cancel all watches
 func (values *watches) Cancel() {
@@ -183,6 +172,19 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		return out.Nonce, str.Send(out)
 	}
 
+	// setState updates the currently known state of resources in the server
+	setState := func(res cache.DeltaResponse, typeURL string) {
+		values.mu.Lock()
+		defer values.mu.Unlock()
+
+		state := values.deltaStreamStates[typeURL]
+		if state.ResourceVersions == nil {
+			state.ResourceVersions = make(map[string]string)
+		}
+		state.ResourceVersions = res.GetNextVersionMap()
+		values.deltaStreamStates[typeURL] = state
+	}
+
 	if s.callbacks != nil {
 		if err := s.callbacks.OnDeltaStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
 			return err
@@ -191,7 +193,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 	// node may only be set on the first discovery request
 	var node = &core.Node{}
-	wasFirstRequestWildcard := map[string]bool{}
+	isWildcard := map[string]bool{}
 
 	for {
 		select {
@@ -206,12 +208,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
-			values.mu.Lock()
 			values.deltaEndpointNonce = nonce
-			state := values.deltaStreamStates[resource.EndpointType]
-			state.ResourceVersions = resp.GetNextVersionMap()
-			values.deltaStreamStates[resource.EndpointType] = state
-			values.mu.Unlock()
+			setState(resp, resource.EndpointType)
 		case resp, more := <-values.deltaClusters:
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
@@ -220,12 +218,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
-			values.mu.Lock()
 			values.deltaClusterNonce = nonce
-			state := values.deltaStreamStates[resource.ClusterType]
-			state.ResourceVersions = resp.GetNextVersionMap()
-			values.deltaStreamStates[resource.ClusterType] = state
-			values.mu.Unlock()
+			setState(resp, resource.ClusterType)
 		case resp, more := <-values.deltaRoutes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
@@ -234,12 +228,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
-			values.mu.Lock()
 			values.deltaRouteNonce = nonce
-			state := values.deltaStreamStates[resource.RouteType]
-			state.ResourceVersions = resp.GetNextVersionMap()
-			values.deltaStreamStates[resource.RouteType] = state
-			values.mu.Unlock()
+			setState(resp, resource.RouteType)
 		case resp, more := <-values.deltaListeners:
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
@@ -248,12 +238,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
-			values.mu.Lock()
 			values.deltaListenerNonce = nonce
-			state := values.deltaStreamStates[resource.ListenerType]
-			state.ResourceVersions = resp.GetNextVersionMap()
-			values.deltaStreamStates[resource.ListenerType] = state
-			values.mu.Unlock()
+			setState(resp, resource.ListenerType)
 		case resp, more := <-values.deltaSecrets:
 			if !more {
 				return status.Errorf(codes.Unavailable, "secrets watch failed")
@@ -262,12 +248,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
-			values.mu.Lock()
 			values.deltaSecretNonce = nonce
-			state := values.deltaStreamStates[resource.SecretType]
-			state.ResourceVersions = resp.GetNextVersionMap()
-			values.deltaStreamStates[resource.SecretType] = state
-			values.mu.Unlock()
+			setState(resp, resource.SecretType)
 		case resp, more := <-values.deltaRuntimes:
 			if !more {
 				return status.Errorf(codes.Unavailable, "runtimes watch failed")
@@ -276,12 +258,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if err != nil {
 				return err
 			}
-			values.mu.Lock()
 			values.deltaRuntimeNonce = nonce
-			state := values.deltaStreamStates[resource.RuntimeType]
-			state.ResourceVersions = resp.GetNextVersionMap()
-			values.deltaStreamStates[resource.RuntimeType] = state
-			values.mu.Unlock()
+			setState(resp, resource.RuntimeType)
 		case resp, more := <-values.deltaResponses:
 			if more {
 				if resp == deltaErrorResponse {
@@ -292,12 +270,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				if err != nil {
 					return err
 				}
-				values.mu.Lock()
 				values.deltaNonces[typeURL] = nonce
-				state := values.deltaStreamStates[typeURL]
-				state.ResourceVersions = resp.GetNextVersionMap()
-				values.deltaStreamStates[typeURL] = state
-				values.mu.Unlock()
+				setState(resp, typeURL)
 			}
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -308,9 +282,10 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				return status.Errorf(codes.Unavailable, "empty request")
 			}
 
-			// Log out our error detail from envoy if we get one but don't do anything crazy here yet
+			// Log out our error detail from  envoyif we get one but don't do anything crazy here yet
 			// TODO: embed a logger in the server so we can be a bit more verbose when needed
 			if req.ErrorDetail != nil {
+				return status.Errorf(codes.Code(req.ErrorDetail.GetCode()), "received error from xDS client: %s", req.ErrorDetail.GetMessage())
 			}
 
 			// node field in discovery request is delta-compressed
@@ -335,24 +310,27 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 
 			state := values.deltaStreamStates[req.GetTypeUrl()]
-			// We are in the wildcard mode if the first request of a particular type has empty subscription list
-			wildcard, found := wasFirstRequestWildcard[req.TypeUrl]
-			if !found { //this is the first request of a particular type
-				state.IsWildcard = len(req.GetResourceNamesSubscribe()) == 0
-				wasFirstRequestWildcard[req.TypeUrl] = state.IsWildcard
-			} else {
-				state.IsWildcard = wildcard
+			// If this is empty we can assume this is the first time state
+			// is being set on this stream for this resource type
+			if state.ResourceVersions == nil {
+				state.ResourceVersions = make(map[string]string)
 			}
 
-			if u := req.GetResourceNamesSubscribe(); len(u) > 0 {
-				s.subscribe(u, state.ResourceVersions)
+			// We are in the wildcard mode if the first request of a particular type has empty subscription list
+			var found bool
+			if state.IsWildcard, found = isWildcard[req.TypeUrl]; !found {
+				state.IsWildcard = len(req.GetResourceNamesSubscribe()) == 0
+				isWildcard[req.TypeUrl] = state.IsWildcard
+			}
+
+			if sub := req.GetResourceNamesSubscribe(); len(sub) > 0 {
+				s.subscribe(sub, state.ResourceVersions)
 			}
 			for r, v := range req.InitialResourceVersions {
 				state.ResourceVersions[r] = v
 			}
-			// Handle our unsubscribe scenario (remove the tracked resources from the current state of the stream)
-			if u := req.GetResourceNamesUnsubscribe(); len(u) > 0 {
-				s.unsubscribe(u, state.ResourceVersions)
+			if unsub := req.GetResourceNamesUnsubscribe(); len(unsub) > 0 {
+				s.unsubscribe(unsub, state.ResourceVersions)
 			}
 
 			if s.callbacks != nil {
@@ -476,14 +454,17 @@ func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) erro
 	return err
 }
 
+// When we subscribe, we just want to make the cache know we are subscribing to a resource.
+// Providing a name with an empty version is enough to make that happen.
 func (s *server) subscribe(resources []string, sv map[string]string) {
 	for _, resource := range resources {
 		sv[resource] = ""
 	}
 }
 
+// When we unsubscribe, we need to search and remove from the current subscribed list in the servers state
+// so when we send that down to the cache, it knows to no longer track that resource
 func (s *server) unsubscribe(resources []string, sv map[string]string) {
-	// here we need to search and remove from the current subscribed list in the snapshot
 	for _, resource := range resources {
 		delete(sv, resource)
 	}
