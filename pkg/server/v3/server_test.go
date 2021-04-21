@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -36,11 +37,14 @@ import (
 
 type mockConfigWatcher struct {
 	counts         map[string]int
+	deltaCounts    map[string]int
 	responses      map[string][]cache.Response
 	deltaResponses map[string][]cache.DeltaResponse
 	closeWatch     bool
 	watches        int
 	deltaWatches   int
+
+	mu *sync.RWMutex
 }
 
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
@@ -63,7 +67,7 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (c
 }
 
 func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, st *stream.StreamState) (chan cache.DeltaResponse, func()) {
-	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
 
 	// Create our out watch channel to return with a buffer of one
 	out := make(chan cache.DeltaResponse, 1)
@@ -98,7 +102,6 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		}
 
 	} else if config.closeWatch {
-		fmt.Printf("No resources... closing watch\n")
 		close(out)
 	} else {
 		config.deltaWatches += 1
@@ -122,7 +125,9 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.Disco
 
 func makeMockConfigWatcher() *mockConfigWatcher {
 	return &mockConfigWatcher{
-		counts: make(map[string]int),
+		counts:      make(map[string]int),
+		deltaCounts: make(map[string]int),
+		mu:          &sync.RWMutex{},
 	}
 }
 
@@ -522,8 +527,8 @@ func TestDeltaResponseHandlers(t *testing.T) {
 			select {
 			case res := <-resp.sent:
 				close(resp.recv)
-				if want := map[string]int{typ: 1}; !reflect.DeepEqual(want, config.counts) {
-					t.Errorf("watch counts => got %v, want %v", config.counts, want)
+				if want := map[string]int{typ: 1}; !reflect.DeepEqual(want, config.deltaCounts) {
+					t.Errorf("watch counts => got %v, want %v", config.deltaCounts, want)
 				}
 
 				if v := res.GetSystemVersionInfo(); v != "" {
@@ -882,8 +887,8 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 					rsrc.ClusterType:  1,
 					rsrc.RouteType:    1,
 					rsrc.ListenerType: 1,
-				}; !reflect.DeepEqual(want, config.counts) {
-					t.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}; !reflect.DeepEqual(want, config.deltaCounts) {
+					t.Errorf("watch counts => got %v, want %v", config.deltaCounts, want)
 				}
 
 				// got all messages
