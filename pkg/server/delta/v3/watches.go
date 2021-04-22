@@ -1,8 +1,6 @@
 package delta
 
 import (
-	"sync"
-
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
@@ -10,8 +8,6 @@ import (
 
 // watches for all delta xDS resource types
 type watches struct {
-	mu *sync.RWMutex
-
 	deltaResponses     map[string]watch
 	deltaCancellations map[string]func()
 	deltaNonces        map[string]string
@@ -31,8 +27,8 @@ type watch struct {
 	nonce     string
 }
 
-// NewWatches creates and initializes watches.
-func NewWatches() watches {
+// newWatches creates and initializes watches.
+func newWatches() watches {
 	dr := make(map[string]watch, 7)
 	for i := 0; i < 6; i++ {
 		typ, err := cache.GetResponseTypeURL(types.ResponseType(i))
@@ -47,13 +43,12 @@ func NewWatches() watches {
 
 	// deltaMuxedResponses needs a buffer to release go-routines populating it
 	return watches{
-		deltaMuxedResponses: make(chan cache.DeltaResponse, 6),
 		deltaResponses:      dr,
+		deltaMuxedResponses: make(chan cache.DeltaResponse, 6),
 		deltaNonces:         make(map[string]string),
 		deltaTerminations:   make(map[string]chan struct{}),
 		deltaCancellations:  make(map[string]func()),
 		deltaStreamStates:   make(map[string]stream.StreamState, int(types.UnknownType)),
-		mu:                  &sync.RWMutex{},
 	}
 }
 

@@ -3,7 +3,6 @@ package delta
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"sync/atomic"
 
@@ -58,12 +57,12 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callba
 func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
-	// unique nonce generator for req-resp pairs per xDS stream; the server
-	// ignores stale nonces. nonce is only modified within send() function.
+	// streamNonce holds a unique nonce for req-resp pairs per xDS stream. The server
+	// ignores stale nonces and nonce is only modified within send() function.
 	var streamNonce int64
 
 	// a collection of stack allocated watches per request type
-	watches := NewWatches()
+	watches := newWatches()
 
 	defer func() {
 		watches.Cancel()
@@ -94,17 +93,10 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 	// Processes a response and updates the current server state
 	process := func(resp cache.DeltaResponse, more bool) error {
-		if resp == nil {
-			return errors.New("missing response")
-		}
-
-		typ := resp.GetDeltaRequest().GetTypeUrl()
-
 		if more {
-			watches.mu.Lock()
-			defer watches.mu.Unlock()
+			typ := resp.GetDeltaRequest().GetTypeUrl()
 
-			if resp == deltaErrorResponse {
+			if isErr := isDeltaErrorResponse(resp); isErr {
 				return status.Errorf(codes.Unavailable, typ+" watch failed")
 			}
 
@@ -130,9 +122,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	}
 
 	rerequest := func(typ, nonce string, req *discovery.DeltaDiscoveryRequest, state *stream.StreamState) {
-		watches.mu.Lock()
-		defer watches.mu.Unlock()
-
 		watch := watches.deltaResponses[typ]
 		if watch.nonce == "" || watch.nonce == nonce {
 			if watch.cancel != nil {
@@ -151,7 +140,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		}
 	}
 
-	// node may only be set on the first discovery request
 	var node = &core.Node{}
 	isWildcard := map[string]bool{}
 
@@ -203,20 +191,25 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				return status.Errorf(codes.Unavailable, "empty request")
 			}
 
-			// Log out our error from envoy if we get one, don't do anything crazy here yet
-			// TODO: embed a logger in the server so we can be more verbose when needed
-			if req.ErrorDetail != nil {
-				fmt.Printf("received error from xDS client: %s", req.ErrorDetail.GetMessage())
+			if s.callbacks != nil {
+				if err := s.callbacks.OnStreamDeltaRequest(streamID, req); err != nil {
+					return err
+				}
 			}
 
-			// node field in discovery request is delta-compressed
-			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
+			// TODO: potentially do something with this error detail?
+			if req.ErrorDetail != nil {
+			}
+
+			// we verify nonce only if nonce is not initialized
 			var nonce string
+			// the node information may only be set on the first incoming delta discovery request
 			if req.Node != nil {
 				node = req.Node
 				nonce = req.GetResponseNonce()
 			} else {
 				req.Node = node
+
 				// If we have no nonce, i.e. this is the first request on a delta stream, set one
 				nonce = strconv.FormatInt(streamNonce, 10)
 			}
@@ -230,11 +223,13 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				req.TypeUrl = defaultTypeURL
 			}
 
-			state := watches.deltaStreamStates[req.GetTypeUrl()]
-			// If this is empty we can assume this is the first time state
-			// is being set on this stream for this resource type
-			if state.ResourceVersions == nil {
+			var state stream.StreamState
+			// Initialize the state map if we haven't already.
+			// This means that we're handling the first request for this type on the stream.
+			if s, ok := watches.deltaStreamStates[req.GetTypeUrl()]; !ok {
 				state.ResourceVersions = make(map[string]string)
+			} else {
+				state = s
 			}
 
 			// We are in the wildcard mode if the first request of a particular type has an empty subscription list
@@ -244,21 +239,16 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				isWildcard[req.TypeUrl] = state.IsWildcard
 			}
 
-			if sub := req.GetResourceNamesSubscribe(); len(sub) > 0 {
-				s.subscribe(sub, state.ResourceVersions)
-			}
-			for r, v := range req.InitialResourceVersions {
-				state.ResourceVersions[r] = v
-			}
-			if unsub := req.GetResourceNamesUnsubscribe(); len(unsub) > 0 {
-				s.unsubscribe(unsub, state.ResourceVersions)
-			}
-
-			if s.callbacks != nil {
-				if err := s.callbacks.OnStreamDeltaRequest(streamID, req); err != nil {
-					return err
+			s.subscribe(req.GetResourceNamesSubscribe(), state.ResourceVersions)
+			// We assume this is the first request on the stream
+			if streamNonce == 0 {
+				for r, v := range req.InitialResourceVersions {
+					state.ResourceVersions[r] = v
 				}
+			} else if streamNonce > 0 && len(req.InitialResourceVersions) > 0 {
+				return status.Errorf(codes.InvalidArgument, "InitialResourceVersions can only be set on initial stream request")
 			}
+			s.unsubscribe(req.GetResourceNamesUnsubscribe(), state.ResourceVersions)
 
 			// cancel existing watches to (re-)request a newer version
 			for typ := range watches.deltaResponses {
@@ -315,27 +305,26 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) error {
 	// a channel for receiving incoming delta requests
 	reqCh := make(chan *discovery.DeltaDiscoveryRequest)
-	reqStop := int32(0)
 
 	go func() {
 		for {
-			req, err := str.Recv()
-			if atomic.LoadInt32(&reqStop) != 0 {
-				return
-			}
-			if err != nil {
+			select {
+			case <-str.Context().Done():
 				close(reqCh)
 				return
-			}
+			default:
+				req, err := str.Recv()
+				if err != nil {
+					close(reqCh)
+					return
+				}
 
-			reqCh <- req
+				reqCh <- req
+			}
 		}
 	}()
 
-	err := s.processDelta(str, reqCh, typeURL)
-	atomic.StoreInt32(&reqStop, 1)
-
-	return err
+	return s.processDelta(str, reqCh, typeURL)
 }
 
 // When we subscribe, we just want to make the cache know we are subscribing to a resource.
@@ -346,10 +335,18 @@ func (s *server) subscribe(resources []string, sv map[string]string) {
 	}
 }
 
-// When we unsubscribe, we need to search and remove from the current subscribed list in the servers state
-// so when we send that down to the cache, it knows to no longer track that resource
+// Unsubscriptions remove resources from the stream state to
+// indicate to the cache that we don't care about the resource anymore
 func (s *server) unsubscribe(resources []string, sv map[string]string) {
 	for _, resource := range resources {
 		delete(sv, resource)
 	}
+}
+
+func isDeltaErrorResponse(resp cache.DeltaResponse) bool {
+	if resp == deltaErrorResponse {
+		return true
+	}
+
+	return false
 }
