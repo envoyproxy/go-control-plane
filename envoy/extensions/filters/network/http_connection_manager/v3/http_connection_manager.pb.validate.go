@@ -146,10 +146,10 @@ func (m *HttpConnectionManager) Validate() error {
 
 	if wrapper := m.GetMaxRequestHeadersKb(); wrapper != nil {
 
-		if val := wrapper.GetValue(); val <= 0 || val > 96 {
+		if val := wrapper.GetValue(); val <= 0 || val > 8192 {
 			return HttpConnectionManagerValidationError{
 				field:  "MaxRequestHeadersKb",
-				reason: "value must be inside range (0, 96]",
+				reason: "value must be inside range (0, 8192]",
 			}
 		}
 
