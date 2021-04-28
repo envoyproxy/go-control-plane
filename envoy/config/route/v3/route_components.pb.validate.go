@@ -665,6 +665,18 @@ func (m *Route) Validate() error {
 			}
 		}
 
+	case *Route_NonForwardingAction:
+
+		if v, ok := interface{}(m.GetNonForwardingAction()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteValidationError{
+					field:  "NonForwardingAction",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return RouteValidationError{
 			field:  "Action",
@@ -2038,6 +2050,73 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DirectResponseActionValidationError{}
+
+// Validate checks the field values on NonForwardingAction with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *NonForwardingAction) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// NonForwardingActionValidationError is the validation error returned by
+// NonForwardingAction.Validate if the designated constraints aren't met.
+type NonForwardingActionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e NonForwardingActionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e NonForwardingActionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e NonForwardingActionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e NonForwardingActionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e NonForwardingActionValidationError) ErrorName() string {
+	return "NonForwardingActionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e NonForwardingActionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sNonForwardingAction.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = NonForwardingActionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = NonForwardingActionValidationError{}
 
 // Validate checks the field values on Decorator with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
