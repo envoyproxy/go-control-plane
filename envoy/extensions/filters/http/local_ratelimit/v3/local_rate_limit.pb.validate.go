@@ -88,6 +88,28 @@ func (m *LocalRateLimit) Validate() error {
 		}
 	}
 
+	if len(m.GetRequestHeadersToAddWhenNotEnforced()) > 10 {
+		return LocalRateLimitValidationError{
+			field:  "RequestHeadersToAddWhenNotEnforced",
+			reason: "value must contain no more than 10 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetRequestHeadersToAddWhenNotEnforced() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LocalRateLimitValidationError{
+					field:  fmt.Sprintf("RequestHeadersToAddWhenNotEnforced[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(m.GetResponseHeadersToAdd()) > 10 {
 		return LocalRateLimitValidationError{
 			field:  "ResponseHeadersToAdd",
