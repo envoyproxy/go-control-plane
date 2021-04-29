@@ -42,6 +42,7 @@ const (
 	// request or response, and then continue processing the filter
 	// stream as normal. This is the default.
 	CommonResponse_CONTINUE CommonResponse_ResponseStatus = 0
+	// [#not-implemented-hide:]
 	// Replace the request or response with the contents
 	// of this message. If header_mutation is set, apply it to the
 	// headers. If body_mutation is set and contains a body, then add that
@@ -101,12 +102,16 @@ type ProcessingRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Specify whether the filter that sent this request is running in synchronous
-	// or asynchronous mode. If false, then the server must either respond
-	// with exactly one ProcessingResponse message or close the stream.
-	// If true, however, then the server must not respond with
-	// an additional message, although it may still close the stream.
-	// The choice of synchronous or asynchronous mode can be chosen in the
-	// filter configuration.
+	// or asynchronous mode. The choice of synchronous or asynchronous mode
+	// can be set in the filter configuration, and defaults to false.
+	//
+	// * A value of "false" indicates that the server must respond
+	//   to this message by either sending back a matching ProcessingResponse message,
+	//   or by closing the stream.
+	// * A value of "true" indicates that the server must not respond to this
+	//   message, although it may still close the stream to indicate that no more messages
+	//   are needed.
+	//
 	AsyncMode bool `protobuf:"varint,1,opt,name=async_mode,json=asyncMode,proto3" json:"async_mode,omitempty"`
 	// Each request message will include one of the following sub-messages. Which
 	// ones are set for a particular HTTP request/response depend on the
@@ -216,39 +221,51 @@ type isProcessingRequest_Request interface {
 
 type ProcessingRequest_RequestHeaders struct {
 	// Information about the HTTP request headers, as well as peer info and additional
-	// properties. If "response_required" is set, the server must send back a
+	// properties. Unless "async_mode" is true, the server must send back a
 	// HeaderResponse message, an ImmediateResponse message, or close the stream.
 	RequestHeaders *HttpHeaders `protobuf:"bytes,2,opt,name=request_headers,json=requestHeaders,proto3,oneof"`
 }
 
 type ProcessingRequest_ResponseHeaders struct {
 	// Information about the HTTP response headers, as well as peer info and additional
-	// properties. If "response_required" is set, the server must send back a
+	// properties. Unless "async_mode" is true, the server must send back a
 	// HeaderResponse message or close the stream.
 	ResponseHeaders *HttpHeaders `protobuf:"bytes,3,opt,name=response_headers,json=responseHeaders,proto3,oneof"`
 }
 
 type ProcessingRequest_RequestBody struct {
-	// A chunk of the HTTP request body. If "response_required" is set, the server must send back
+	// A chunk of the HTTP request body. Unless "async_mode" is true, the server must send back
 	// a BodyResponse message, an ImmediateResponse message, or close the stream.
 	RequestBody *HttpBody `protobuf:"bytes,4,opt,name=request_body,json=requestBody,proto3,oneof"`
 }
 
 type ProcessingRequest_ResponseBody struct {
-	// A chunk of the HTTP request body. If "response_required" is set, the server must send back
+	// A chunk of the HTTP request body. Unless "async_mode" is true, the server must send back
 	// a BodyResponse message or close the stream.
 	ResponseBody *HttpBody `protobuf:"bytes,5,opt,name=response_body,json=responseBody,proto3,oneof"`
 }
 
 type ProcessingRequest_RequestTrailers struct {
-	// The HTTP trailers for the request path. If "response_required" is set, the server
+	// The HTTP trailers for the request path. Unless "async_mode" is true, the server
 	// must send back a TrailerResponse message or close the stream.
+	//
+	// This message is only sent if the trailers processing mode is set to "SEND".
+	// If there are no trailers on the original downstream request, then this message
+	// will only be sent (with empty trailers waiting to be populated) if the
+	// processing mode is set before the request headers are sent, such as
+	// in the filter configuration.
 	RequestTrailers *HttpTrailers `protobuf:"bytes,6,opt,name=request_trailers,json=requestTrailers,proto3,oneof"`
 }
 
 type ProcessingRequest_ResponseTrailers struct {
-	// The HTTP trailers for the response path. If "response_required" is set, the server
+	// The HTTP trailers for the response path. Unless "async_mode" is true, the server
 	// must send back a TrailerResponse message or close the stream.
+	//
+	// This message is only sent if the trailers processing mode is set to "SEND".
+	// If there are no trailers on the original downstream request, then this message
+	// will only be sent (with empty trailers waiting to be populated) if the
+	// processing mode is set before the request headers are sent, such as
+	// in the filter configuration.
 	ResponseTrailers *HttpTrailers `protobuf:"bytes,7,opt,name=response_trailers,json=responseTrailers,proto3,oneof"`
 }
 
@@ -281,6 +298,7 @@ type ProcessingResponse struct {
 	//	*ProcessingResponse_ResponseTrailers
 	//	*ProcessingResponse_ImmediateResponse
 	Response isProcessingResponse_Response `protobuf_oneof:"response"`
+	// [#not-implemented-hide:]
 	// Optional metadata that will be emitted as dynamic metadata to be consumed by the next
 	// filter. This metadata will be placed in the namespace "envoy.filters.http.ext_proc".
 	DynamicMetadata *_struct.Struct `protobuf:"bytes,8,opt,name=dynamic_metadata,json=dynamicMetadata,proto3" json:"dynamic_metadata,omitempty"`
@@ -468,6 +486,7 @@ type HttpHeaders struct {
 	// The HTTP request headers. All header keys will be
 	// lower-cased, because HTTP header keys are case-insensitive.
 	Headers *v3.HeaderMap `protobuf:"bytes,1,opt,name=headers,proto3" json:"headers,omitempty"`
+	// [#not-implemented-hide:]
 	// The values of properties selected by the "request_attributes"
 	// or "response_attributes" list in the configuration. Each entry
 	// in the list is populated
@@ -792,21 +811,20 @@ type CommonResponse struct {
 	// handle the rest of the HTTP filter chain.
 	Status CommonResponse_ResponseStatus `protobuf:"varint,1,opt,name=status,proto3,enum=envoy.service.ext_proc.v3alpha.CommonResponse_ResponseStatus" json:"status,omitempty"`
 	// Instructions on how to manipulate the headers. When responding to an
-	// HttpBody request, header mutations will only take effect if the
-	// headers were not already sent further on the filter chain, which
-	// happens only if the current processing mode for the body is BUFFERED
-	// or BUFFERED_PARTIAL.
+	// HttpBody request, header mutations will only take effect if
+	// the current processing mode for the body is BUFFERED.
 	HeaderMutation *HeaderMutation `protobuf:"bytes,2,opt,name=header_mutation,json=headerMutation,proto3" json:"header_mutation,omitempty"`
 	// Replace the body of the last message sent to the remote server on this
 	// stream. If responding to an HttpBody request, simply replace or clear
-	// the body chunk that was sent with that request. If responding to an
-	// HttpHeaders request, then a new body may be added to the request if this
-	// message is returned along with the CONTINUE_AND_REPLACE status.
+	// the body chunk that was sent with that request. Body mutations only take
+	// effect in response to "body" messages and are ignored otherwise.
 	BodyMutation *BodyMutation `protobuf:"bytes,3,opt,name=body_mutation,json=bodyMutation,proto3" json:"body_mutation,omitempty"`
+	// [#not-implemented-hide:]
 	// Add new trailers to the message. This may be used when responding to either a
 	// HttpHeaders or HttpBody message, but only if this message is returned
 	// along with the CONTINUE_AND_REPLACE status.
 	Trailers *v3.HeaderMap `protobuf:"bytes,4,opt,name=trailers,proto3" json:"trailers,omitempty"`
+	// [#not-implemented-hide:]
 	// Clear the route cache for the current request.
 	// This is necessary if the remote server
 	// modified headers that are used to calculate the route.
