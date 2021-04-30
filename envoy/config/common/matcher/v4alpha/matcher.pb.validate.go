@@ -868,6 +868,18 @@ func (m *Matcher_MatcherList_Predicate) Validate() error {
 			}
 		}
 
+	case *Matcher_MatcherList_Predicate_NotMatcher:
+
+		if v, ok := interface{}(m.GetNotMatcher()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return Matcher_MatcherList_PredicateValidationError{
+					field:  "NotMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return Matcher_MatcherList_PredicateValidationError{
 			field:  "MatchType",
