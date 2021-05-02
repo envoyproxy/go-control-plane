@@ -30,13 +30,14 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-// [#extension: envoy.filters.http.cache.simple_http_cache]
+// [#extension: envoy.filters.http.cache]
 type CacheConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Config specific to the cache storage implementation.
+	// [#extension-category: envoy.filters.http.cache]
 	TypedConfig *any.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 	// List of matching rules that defines allowed *Vary* headers.
 	//
