@@ -91,36 +91,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		return out.Nonce, str.Send(out)
 	}
 
-	// Processes a response and updates the current server state
-	process := func(resp cache.DeltaResponse, more bool) error {
-		if more {
-			typ := resp.GetDeltaRequest().GetTypeUrl()
-
-			if isErr := resp == deltaErrorResponse; isErr {
-				return status.Errorf(codes.Unavailable, typ+" watch failed")
-			}
-
-			nonce, err := send(resp)
-			if err != nil {
-				return err
-			}
-
-			watch := watches.deltaResponses[typ]
-			watch.nonce = nonce
-			watches.deltaResponses[typ] = watch
-
-			state := watches.deltaStreamStates[typ]
-			if state.ResourceVersions == nil {
-				state.ResourceVersions = make(map[string]string)
-			}
-
-			state.ResourceVersions = resp.GetNextVersionMap()
-			watches.deltaStreamStates[typ] = state
-		}
-
-		return nil
-	}
-
 	if s.callbacks != nil {
 		if err := s.callbacks.OnDeltaStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
 			return err
@@ -134,40 +104,30 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		select {
 		case <-s.ctx.Done():
 			return nil
-		case resp, more := <-watches.deltaResponses[resource.EndpointType].responses:
-			err := process(resp, more)
-			if err != nil {
-				return err
-			}
-		case resp, more := <-watches.deltaResponses[resource.ClusterType].responses:
-			err := process(resp, more)
-			if err != nil {
-				return err
-			}
-		case resp, more := <-watches.deltaResponses[resource.RouteType].responses:
-			err := process(resp, more)
-			if err != nil {
-				return err
-			}
-		case resp, more := <-watches.deltaResponses[resource.ListenerType].responses:
-			err := process(resp, more)
-			if err != nil {
-				return err
-			}
-		case resp, more := <-watches.deltaResponses[resource.SecretType].responses:
-			err := process(resp, more)
-			if err != nil {
-				return err
-			}
-		case resp, more := <-watches.deltaResponses[resource.RuntimeType].responses:
-			err := process(resp, more)
-			if err != nil {
-				return err
-			}
 		case resp, more := <-watches.deltaMuxedResponses:
-			err := process(resp, more)
-			if err != nil {
-				return err
+			if more {
+				typ := resp.GetDeltaRequest().GetTypeUrl()
+
+				if isErr := resp == deltaErrorResponse; isErr {
+					return status.Errorf(codes.Unavailable, typ+" watch failed")
+				}
+
+				nonce, err := send(resp)
+				if err != nil {
+					return err
+				}
+
+				watch := watches.deltaResponses[typ]
+				watch.nonce = nonce
+				watches.deltaResponses[typ] = watch
+
+				state := watches.deltaStreamStates[typ]
+				if state.ResourceVersions == nil {
+					state.ResourceVersions = make(map[string]string)
+				}
+
+				state.ResourceVersions = resp.GetNextVersionMap()
+				watches.deltaStreamStates[typ] = state
 			}
 		case req, more := <-reqCh:
 			// input stream ended or errored out
