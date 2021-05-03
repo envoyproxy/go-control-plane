@@ -118,6 +118,28 @@ func (m *QuicProtocolOptions) Validate() error {
 		}
 	}
 
+	if wrapper := m.GetInitialStreamWindowSize(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 1 || val > 16777216 {
+			return QuicProtocolOptionsValidationError{
+				field:  "InitialStreamWindowSize",
+				reason: "value must be inside range [1, 16777216]",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetInitialConnectionWindowSize(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 1 || val > 25165824 {
+			return QuicProtocolOptionsValidationError{
+				field:  "InitialConnectionWindowSize",
+				reason: "value must be inside range [1, 25165824]",
+			}
+		}
+
+	}
+
 	return nil
 }
 
