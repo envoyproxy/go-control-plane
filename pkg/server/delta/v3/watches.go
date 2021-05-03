@@ -27,22 +27,10 @@ type watch struct {
 
 // newWatches creates and initializes watches.
 func newWatches() watches {
-	dr := make(map[string]watch, int(types.UnknownType))
-	for i := 0; i < int(types.UnknownType); i++ {
-		typ, err := cache.GetResponseTypeURL(types.ResponseType(i))
-		if err != nil {
-			panic(err)
-		}
-
-		dr[typ] = watch{
-			responses: make(chan cache.DeltaResponse),
-		}
-	}
-
 	// deltaMuxedResponses needs a buffer to release go-routines populating it
 	return watches{
-		deltaResponses:      dr,
-		deltaMuxedResponses: make(chan cache.DeltaResponse, 6),
+		deltaResponses:      make(map[string]watch, int(types.UnknownType)),
+		deltaMuxedResponses: make(chan cache.DeltaResponse, int(types.UnknownType)),
 		deltaTerminations:   make(map[string]chan struct{}),
 		deltaStreamStates:   make(map[string]stream.StreamState, int(types.UnknownType)),
 	}

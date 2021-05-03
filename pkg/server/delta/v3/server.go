@@ -205,7 +205,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				if watch.cancel != nil {
 					watch.cancel()
 				}
-
 				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, &state)
 
 				// a go-routine. Golang does not allow selecting over a dynamic set of channels.
@@ -220,7 +219,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 							// Check again if the watch is cancelled.
 							select {
 							case <-terminate: // do nothing
-							// TODO: it might be worth logging something here to provide notice of a termination
 							default:
 								// We cannot close the responses channel since it can be closed twice.
 								// Instead we send a fake error response.
