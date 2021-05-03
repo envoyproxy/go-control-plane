@@ -29,8 +29,8 @@ type watch struct {
 
 // newWatches creates and initializes watches.
 func newWatches() watches {
-	dr := make(map[string]watch, 7)
-	for i := 0; i < 6; i++ {
+	dr := make(map[string]watch, int(types.UnknownType))
+	for i := 0; i < int(types.UnknownType); i++ {
 		typ, err := cache.GetResponseTypeURL(types.ResponseType(i))
 		if err != nil {
 			panic(err)

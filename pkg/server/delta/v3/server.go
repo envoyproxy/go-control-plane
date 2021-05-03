@@ -96,7 +96,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		if more {
 			typ := resp.GetDeltaRequest().GetTypeUrl()
 
-			if isErr := isDeltaErrorResponse(resp); isErr {
+			if isErr := resp == deltaErrorResponse; isErr {
 				return status.Errorf(codes.Unavailable, typ+" watch failed")
 			}
 
@@ -197,10 +197,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				}
 			}
 
-			// TODO: potentially do something with this error detail?
-			if req.ErrorDetail != nil {
-			}
-
 			// we verify nonce only if nonce is not initialized
 			var nonce string
 			// the node information may only be set on the first incoming delta discovery request
@@ -252,7 +248,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			// cancel existing watches to (re-)request a newer version
 			for typ := range watches.deltaResponses {
-				// If we've found our type, we go ahead and initiate the createWatch cycle
+				// If we've found our type, we go ahead and initiate the createDeltaWatch cycle
 				if typ == req.TypeUrl {
 					rerequest(typ, nonce, req, &state)
 					continue
@@ -341,12 +337,4 @@ func (s *server) unsubscribe(resources []string, sv map[string]string) {
 	for _, resource := range resources {
 		delete(sv, resource)
 	}
-}
-
-func isDeltaErrorResponse(resp cache.DeltaResponse) bool {
-	if resp == deltaErrorResponse {
-		return true
-	}
-
-	return false
 }

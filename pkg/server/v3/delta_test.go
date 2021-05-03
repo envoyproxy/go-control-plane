@@ -231,9 +231,10 @@ func TestDeltaResponseHandlersWildcard(t *testing.T) {
 			select {
 			case res := <-resp.sent:
 				close(resp.recv)
-				// We should only have one watch per resource type open
-				if config.deltaCounts[typ] != 1 {
-					t.Errorf("watch counts for typ: %s => got %v, want 1", typ, config.deltaCounts[typ])
+
+				// We should only have 7 watch channels initialized since that is the base map length
+				if config.deltaCounts[typ] != 7 {
+					t.Errorf("watch counts for typ: %s => got %v, want 7", typ, config.deltaCounts[typ])
 				}
 
 				if v := res.GetSystemVersionInfo(); v != "" {
@@ -289,11 +290,11 @@ func TestDeltaResponseHandlers(t *testing.T) {
 			select {
 			case res := <-resp.sent:
 				close(resp.recv)
-				// We should only have one watch per resource type open
-				if config.deltaCounts[typ] != 1 {
-					t.Errorf("watch counts for typ: %s => got %v, want 1", typ, config.deltaCounts[typ])
-				}
 
+				// We should only have 7 watch channels initialized since that is the base map length
+				if config.deltaCounts[typ] != 7 {
+					t.Errorf("watch counts for typ: %s => got %v, want 7", typ, config.deltaCounts[typ])
+				}
 				if v := res.GetSystemVersionInfo(); v != "" {
 					t.Errorf("expected emtpy version on initial request, got %s", v)
 				}
@@ -390,10 +391,10 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 			if count >= 4 {
 				close(resp.recv)
 				if want := map[string]int{
-					rsrc.EndpointType: 1,
-					rsrc.ClusterType:  1,
-					rsrc.RouteType:    1,
-					rsrc.ListenerType: 1,
+					rsrc.EndpointType: 7,
+					rsrc.ClusterType:  7,
+					rsrc.RouteType:    7,
+					rsrc.ListenerType: 7,
 				}; !reflect.DeepEqual(want, config.deltaCounts) {
 					t.Errorf("watch counts => got %v, want %v", config.deltaCounts, want)
 				}
