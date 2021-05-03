@@ -8,10 +8,8 @@ import (
 
 // watches for all delta xDS resource types
 type watches struct {
-	deltaResponses     map[string]watch
-	deltaCancellations map[string]func()
-	deltaNonces        map[string]string
-	deltaTerminations  map[string]chan struct{}
+	deltaResponses    map[string]watch
+	deltaTerminations map[string]chan struct{}
 
 	// Organize stream state by resource type
 	deltaStreamStates map[string]stream.StreamState
@@ -45,9 +43,7 @@ func newWatches() watches {
 	return watches{
 		deltaResponses:      dr,
 		deltaMuxedResponses: make(chan cache.DeltaResponse, 6),
-		deltaNonces:         make(map[string]string),
 		deltaTerminations:   make(map[string]chan struct{}),
-		deltaCancellations:  make(map[string]func()),
 		deltaStreamStates:   make(map[string]stream.StreamState, int(types.UnknownType)),
 	}
 }
@@ -57,12 +53,6 @@ func (w *watches) Cancel() {
 	for _, watch := range w.deltaResponses {
 		if watch.cancel != nil {
 			watch.cancel()
-		}
-	}
-
-	for _, cancel := range w.deltaCancellations {
-		if cancel != nil {
-			cancel()
 		}
 	}
 

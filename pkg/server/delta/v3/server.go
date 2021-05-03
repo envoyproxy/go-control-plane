@@ -121,19 +121,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		return nil
 	}
 
-	rerequest := func(typ, nonce string, req *discovery.DeltaDiscoveryRequest, state *stream.StreamState) {
-		watch := watches.deltaResponses[typ]
-		if watch.nonce == "" || watch.nonce == nonce {
-			if watch.cancel != nil {
-				if cancel := watch.cancel; cancel != nil {
-					cancel()
-				}
-			}
-			watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, state)
-			watches.deltaResponses[typ] = watch
-		}
-	}
-
 	if s.callbacks != nil {
 		if err := s.callbacks.OnDeltaStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
 			return err
@@ -219,10 +206,11 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				req.TypeUrl = defaultTypeURL
 			}
 
+			typeURL := req.GetTypeUrl()
 			var state stream.StreamState
 			// Initialize the state map if we haven't already.
 			// This means that we're handling the first request for this type on the stream.
-			if s, ok := watches.deltaStreamStates[req.GetTypeUrl()]; !ok {
+			if s, ok := watches.deltaStreamStates[typeURL]; !ok {
 				state.ResourceVersions = make(map[string]string)
 			} else {
 				state = s
@@ -230,9 +218,9 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			// We are in the wildcard mode if the first request of a particular type has an empty subscription list
 			var found bool
-			if state.IsWildcard, found = isWildcard[req.TypeUrl]; !found {
+			if state.IsWildcard, found = isWildcard[typeURL]; !found {
 				state.IsWildcard = len(req.GetResourceNamesSubscribe()) == 0
-				isWildcard[req.TypeUrl] = state.IsWildcard
+				isWildcard[typeURL] = state.IsWildcard
 			}
 
 			s.subscribe(req.GetResourceNamesSubscribe(), state.ResourceVersions)
@@ -246,53 +234,44 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), state.ResourceVersions)
 
-			// cancel existing watches to (re-)request a newer version
-			for typ := range watches.deltaResponses {
-				// If we've found our type, we go ahead and initiate the createDeltaWatch cycle
-				if typ == req.TypeUrl {
-					rerequest(typ, nonce, req, &state)
-					continue
+			// cancel existing watch to (re-)request a newer version
+			watch, seen := watches.deltaResponses[typeURL]
+			if !seen || watch.nonce == nonce {
+				// We must signal goroutine termination to prevent a race between the cancel closing the watch
+				// and the producer closing the watch.`	`
+				if terminate, exists := watches.deltaTerminations[typeURL]; exists {
+					close(terminate)
+				}
+				if watch.cancel != nil {
+					watch.cancel()
 				}
 
-				typeURL := req.TypeUrl
-				responseNonce, seen := watches.deltaNonces[typeURL]
-				if !seen || responseNonce == nonce {
-					// We must signal goroutine termination to prevent a race between the cancel closing the watch
-					// and the producer closing the watch.
-					if terminate, exists := watches.deltaTerminations[typeURL]; exists {
-						close(terminate)
-					}
-					if cancel, seen := watches.deltaCancellations[typeURL]; seen && cancel != nil {
-						cancel()
-					}
+				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, &state)
 
-					var watch chan cache.DeltaResponse
-					watch, watches.deltaCancellations[typeURL] = s.cache.CreateDeltaWatch(req, &state)
-
-					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
-					terminate := make(chan struct{})
-					watches.deltaTerminations[typeURL] = terminate
-					go func() {
-						select {
-						case resp, more := <-watch:
-							if more {
-								watches.deltaMuxedResponses <- resp
-							} else {
-								// Check again if the watch is cancelled.
-								select {
-								case <-terminate: // do nothing
-								default:
-									// We cannot close the responses channel since it can be closed twice.
-									// Instead we send a fake error response.
-									watches.deltaMuxedResponses <- deltaErrorResponse
-								}
+				// a go-routine. Golang does not allow selecting over a dynamic set of channels.
+				terminate := make(chan struct{})
+				watches.deltaTerminations[typeURL] = terminate
+				go func() {
+					select {
+					case resp, more := <-watch.responses:
+						if more {
+							watches.deltaMuxedResponses <- resp
+						} else {
+							// Check again if the watch is cancelled.
+							select {
+							case <-terminate: // do nothing
+							// TODO: it might be worth logging something here to provide notice of a termination
+							default:
+								// We cannot close the responses channel since it can be closed twice.
+								// Instead we send a fake error response.
+								watches.deltaMuxedResponses <- deltaErrorResponse
 							}
-							break
-						case <-terminate:
-							break
 						}
-					}()
-				}
+						break
+					case <-terminate:
+						break
+					}
+				}()
 			}
 		}
 	}

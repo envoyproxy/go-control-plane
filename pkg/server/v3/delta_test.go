@@ -233,8 +233,8 @@ func TestDeltaResponseHandlersWildcard(t *testing.T) {
 				close(resp.recv)
 
 				// We should only have 7 watch channels initialized since that is the base map length
-				if config.deltaCounts[typ] != 7 {
-					t.Errorf("watch counts for typ: %s => got %v, want 7", typ, config.deltaCounts[typ])
+				if config.deltaCounts[typ] != 1 {
+					t.Errorf("watch counts for typ: %s => got %v, want 1", typ, config.deltaCounts[typ])
 				}
 
 				if v := res.GetSystemVersionInfo(); v != "" {
@@ -292,8 +292,8 @@ func TestDeltaResponseHandlers(t *testing.T) {
 				close(resp.recv)
 
 				// We should only have 7 watch channels initialized since that is the base map length
-				if config.deltaCounts[typ] != 7 {
-					t.Errorf("watch counts for typ: %s => got %v, want 7", typ, config.deltaCounts[typ])
+				if config.deltaCounts[typ] != 1 {
+					t.Errorf("watch counts for typ: %s => got %v, want 1", typ, config.deltaCounts[typ])
 				}
 				if v := res.GetSystemVersionInfo(); v != "" {
 					t.Errorf("expected emtpy version on initial request, got %s", v)
@@ -375,6 +375,10 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 		TypeUrl:                rsrc.RouteType,
 		ResourceNamesSubscribe: []string{routeName},
 	}
+	resp.recv <- &discovery.DeltaDiscoveryRequest{
+		TypeUrl:                rsrc.SecretType,
+		ResourceNamesSubscribe: []string{secretName},
+	}
 
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	go func() {
@@ -388,13 +392,14 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 		select {
 		case <-resp.sent:
 			count++
-			if count >= 4 {
+			if count >= 5 {
 				close(resp.recv)
 				if want := map[string]int{
-					rsrc.EndpointType: 7,
-					rsrc.ClusterType:  7,
-					rsrc.RouteType:    7,
-					rsrc.ListenerType: 7,
+					rsrc.EndpointType: 1,
+					rsrc.ClusterType:  1,
+					rsrc.RouteType:    1,
+					rsrc.ListenerType: 1,
+					rsrc.SecretType:   1,
 				}; !reflect.DeepEqual(want, config.deltaCounts) {
 					t.Errorf("watch counts => got %v, want %v", config.deltaCounts, want)
 				}
@@ -402,7 +407,7 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 				return
 			}
 		case <-time.After(1 * time.Second):
-			t.Fatalf("got %d messages on the stream, not 4", count)
+			t.Fatalf("got %d messages on the stream, not 5", count)
 		}
 	}
 }
