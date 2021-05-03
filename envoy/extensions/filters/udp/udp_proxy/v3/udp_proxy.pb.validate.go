@@ -187,6 +187,15 @@ func (m *UdpProxyConfig_HashPolicy) Validate() error {
 			}
 		}
 
+	case *UdpProxyConfig_HashPolicy_Key:
+
+		if utf8.RuneCountInString(m.GetKey()) < 1 {
+			return UdpProxyConfig_HashPolicyValidationError{
+				field:  "Key",
+				reason: "value length must be at least 1 runes",
+			}
+		}
+
 	default:
 		return UdpProxyConfig_HashPolicyValidationError{
 			field:  "PolicySpecifier",
