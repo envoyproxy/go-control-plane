@@ -219,6 +219,8 @@ func (m *HTTPFault) Validate() error {
 
 	// no validation rules for AbortGrpcStatusRuntime
 
+	// no validation rules for DisableDownstreamClusterStats
+
 	return nil
 }
 
