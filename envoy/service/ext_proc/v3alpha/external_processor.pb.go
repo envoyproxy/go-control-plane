@@ -824,7 +824,6 @@ type CommonResponse struct {
 	// HttpHeaders or HttpBody message, but only if this message is returned
 	// along with the CONTINUE_AND_REPLACE status.
 	Trailers *v3.HeaderMap `protobuf:"bytes,4,opt,name=trailers,proto3" json:"trailers,omitempty"`
-	// [#not-implemented-hide:]
 	// Clear the route cache for the current request.
 	// This is necessary if the remote server
 	// modified headers that are used to calculate the route.
