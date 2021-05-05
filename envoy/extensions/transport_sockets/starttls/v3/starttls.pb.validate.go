@@ -124,3 +124,97 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = StartTlsConfigValidationError{}
+
+// Validate checks the field values on UpstreamStartTlsConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpstreamStartTlsConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetCleartextSocketConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpstreamStartTlsConfigValidationError{
+				field:  "CleartextSocketConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.GetTlsSocketConfig() == nil {
+		return UpstreamStartTlsConfigValidationError{
+			field:  "TlsSocketConfig",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetTlsSocketConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpstreamStartTlsConfigValidationError{
+				field:  "TlsSocketConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpstreamStartTlsConfigValidationError is the validation error returned by
+// UpstreamStartTlsConfig.Validate if the designated constraints aren't met.
+type UpstreamStartTlsConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpstreamStartTlsConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpstreamStartTlsConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpstreamStartTlsConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpstreamStartTlsConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpstreamStartTlsConfigValidationError) ErrorName() string {
+	return "UpstreamStartTlsConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpstreamStartTlsConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpstreamStartTlsConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpstreamStartTlsConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpstreamStartTlsConfigValidationError{}
