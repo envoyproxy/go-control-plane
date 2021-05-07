@@ -191,7 +191,7 @@ func (*HttpProtocolOptions_UseDownstreamProtocolConfig) isHttpProtocolOptions_Up
 func (*HttpProtocolOptions_AutoConfig) isHttpProtocolOptions_UpstreamProtocolOptions() {}
 
 // If this is used, the cluster will only operate on one of the possible upstream protocols.
-// Note that HTTP/2 should generally be used for upstream clusters doing gRPC.
+// Note that HTTP/2 or above should generally be used for upstream gRPC clusters.
 type HttpProtocolOptions_ExplicitHttpConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -277,7 +277,9 @@ type HttpProtocolOptions_ExplicitHttpConfig_Http2ProtocolOptions struct {
 }
 
 type HttpProtocolOptions_ExplicitHttpConfig_Http3ProtocolOptions struct {
-	// [#not-implemented-hide:]
+	// .. warning::
+	//   QUIC support is currently alpha and should be used with caution. Please
+	//   see :ref:`here <arch_overview_http3>` for details.
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,3,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3,oneof"`
 }
 
@@ -299,7 +301,9 @@ type HttpProtocolOptions_UseDownstreamHttpConfig struct {
 
 	HttpProtocolOptions  *v3.Http1ProtocolOptions `protobuf:"bytes,1,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
 	Http2ProtocolOptions *v3.Http2ProtocolOptions `protobuf:"bytes,2,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
-	// [#not-implemented-hide:]
+	// .. warning::
+	//   QUIC support is currently alpha and should be used with caution. Please
+	//   see :ref:`here <arch_overview_http3>` for details.
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,3,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
 }
 
@@ -372,11 +376,17 @@ type HttpProtocolOptions_AutoHttpConfig struct {
 
 	HttpProtocolOptions  *v3.Http1ProtocolOptions `protobuf:"bytes,1,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
 	Http2ProtocolOptions *v3.Http2ProtocolOptions `protobuf:"bytes,2,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
-	// [#not-implemented-hide:]
 	// Unlike HTTP/1 and HTTP/2, HTTP/3 will not be configured unless it is
-	// present. If HTTP/3 is present, attempts to connect will first be made
-	// via HTTP/3, and if the HTTP/3 connection fails, TCP (HTTP/1 or HTTP/2
-	// based on ALPN) will be used instead.
+	// present, and (soon) only if there is an indication of server side
+	// support.
+	// See :ref:`here <arch_overview_http3_upstream>` for more information on
+	// when HTTP/3 will be used, and when Envoy will fail over to TCP.
+	//
+	// .. warning::
+	//   QUIC support is currently alpha and should be used with caution. Please
+	//   see :ref:`here <arch_overview_http3>` for details.
+	//   AutoHttpConfig config is undergoing especially rapid change and as it
+	//   is alpha is not guaranteed to be API-stable.
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,3,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
 }
 

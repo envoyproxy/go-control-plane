@@ -930,8 +930,6 @@ func (x *GrpcProtocolOptions) GetHttp2ProtocolOptions() *Http2ProtocolOptions {
 	return nil
 }
 
-// [#not-implemented-hide:]
-//
 // A message which allows using HTTP/3.
 type Http3ProtocolOptions struct {
 	state         protoimpl.MessageState

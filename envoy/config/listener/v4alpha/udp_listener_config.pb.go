@@ -40,8 +40,10 @@ type UdpListenerConfig struct {
 	DownstreamSocketConfig *v4alpha.UdpSocketConfig `protobuf:"bytes,5,opt,name=downstream_socket_config,json=downstreamSocketConfig,proto3" json:"downstream_socket_config,omitempty"`
 	// Configuration for QUIC protocol. If empty, QUIC will not be enabled on this listener. Set
 	// to the default object to enable QUIC without modifying any additional options.
-	// [#not-implemented-hide:]
-	// [#comment:Unhide when QUIC alpha is announced with other docs.]
+	//
+	// .. warning::
+	//   QUIC support is currently alpha and should be used with caution. Please
+	//   see :ref:`here <arch_overview_http3>` for details.
 	QuicOptions *QuicProtocolOptions `protobuf:"bytes,7,opt,name=quic_options,json=quicOptions,proto3" json:"quic_options,omitempty"`
 }
 
