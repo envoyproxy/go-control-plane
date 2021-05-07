@@ -14,7 +14,7 @@ type watches struct {
 	// Organize stream state by resource type
 	deltaStreamStates map[string]stream.StreamState
 
-	// Opaque resources share a muxed channel. Nonces and watch cancellations are indexed by type URL.
+	// Opaque resources share a muxed channel
 	deltaMuxedResponses chan cache.DeltaResponse
 }
 

@@ -77,18 +77,18 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			return "", errors.New("missing response")
 		}
 
-		out, err := resp.GetDeltaDiscoveryResponse()
+		response, err := resp.GetDeltaDiscoveryResponse()
 		if err != nil {
 			return "", err
 		}
 
 		streamNonce = streamNonce + 1
-		out.Nonce = strconv.FormatInt(streamNonce, 10)
+		response.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
-			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), out)
+			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), response)
 		}
 
-		return out.Nonce, str.Send(out)
+		return response.Nonce, str.Send(response)
 	}
 
 	if s.callbacks != nil {
@@ -105,30 +105,28 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		case <-s.ctx.Done():
 			return nil
 		case resp, more := <-watches.deltaMuxedResponses:
-			if more {
-				typ := resp.GetDeltaRequest().GetTypeUrl()
-
-				if isErr := resp == deltaErrorResponse; isErr {
-					return status.Errorf(codes.Unavailable, typ+" watch failed")
-				}
-
-				nonce, err := send(resp)
-				if err != nil {
-					return err
-				}
-
-				watch := watches.deltaResponses[typ]
-				watch.nonce = nonce
-				watches.deltaResponses[typ] = watch
-
-				state := watches.deltaStreamStates[typ]
-				if state.ResourceVersions == nil {
-					state.ResourceVersions = make(map[string]string)
-				}
-
-				state.ResourceVersions = resp.GetNextVersionMap()
-				watches.deltaStreamStates[typ] = state
+			if !more {
+				break
 			}
+
+			typ := resp.GetDeltaRequest().GetTypeUrl()
+			if resp == deltaErrorResponse {
+				return status.Errorf(codes.Unavailable, typ+" watch failed")
+			}
+
+			nonce, err := send(resp)
+			if err != nil {
+				return err
+			}
+
+			watch := watches.deltaResponses[typ]
+			watch.nonce = nonce
+
+			state := watches.deltaStreamStates[typ]
+			state.ResourceVersions = resp.GetNextVersionMap()
+
+			watches.deltaResponses[typ] = watch
+			watches.deltaStreamStates[typ] = state
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -144,9 +142,9 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				}
 			}
 
-			// we verify nonce only if nonce is not initialized
 			var nonce string
-			// the node information may only be set on the first incoming delta discovery request
+			// The node information might only be set on the first incoming delta discovery request, so store it here so we can
+			// reset it on subsequent requests that omit it.
 			if req.Node != nil {
 				node = req.Node
 				nonce = req.GetResponseNonce()
@@ -157,7 +155,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				nonce = strconv.FormatInt(streamNonce, 10)
 			}
 
-			// type URL is required for ADS but is implicit for xDS
+			// type URL is required for ADS but is implicit for any other xDS stream
 			if defaultTypeURL == resource.AnyType {
 				if req.TypeUrl == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
@@ -167,36 +165,38 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 
 			typeURL := req.GetTypeUrl()
-			var state stream.StreamState
-			// Initialize the state map if we haven't already.
-			// This means that we're handling the first request for this type on the stream.
-			if s, ok := watches.deltaStreamStates[typeURL]; !ok {
+			state, ok := watches.deltaStreamStates[typeURL]
+			if !ok {
+				// Initialize the state map if we haven't already.
+				// This means that we're handling the first request for this type on the stream
 				state.ResourceVersions = make(map[string]string)
-			} else {
-				state = s
 			}
 
-			// We are in the wildcard mode if the first request of a particular type has an empty subscription list
-			var found bool
-			if state.IsWildcard, found = isWildcard[typeURL]; !found {
+			_, ok = isWildcard[typeURL]
+			if !ok {
+				// We are in the wildcard mode if the first request of a particular type has an empty subscription list
 				state.IsWildcard = len(req.GetResourceNamesSubscribe()) == 0
 				isWildcard[typeURL] = state.IsWildcard
 			}
 
-			s.subscribe(req.GetResourceNamesSubscribe(), state.ResourceVersions)
-			// We assume this is the first request on the stream
-			if streamNonce == 0 {
+			// Check if this is the first request on the stream for a type
+			if first := state.IsFirst[typeURL]; first {
 				for r, v := range req.InitialResourceVersions {
 					state.ResourceVersions[r] = v
 				}
-			} else if streamNonce > 0 && len(req.InitialResourceVersions) > 0 {
+				// We've processed our initial resource versions (which can only happen on the first request on a stream)
+				// so now we mark false.
+				state.IsFirst[typeURL] = false
+			} else if !first && len(req.InitialResourceVersions) > 0 {
 				return status.Errorf(codes.InvalidArgument, "InitialResourceVersions can only be set on initial stream request")
 			}
+			s.subscribe(req.GetResourceNamesSubscribe(), state.ResourceVersions)
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), state.ResourceVersions)
 
 			// cancel existing watch to (re-)request a newer version
-			watch, seen := watches.deltaResponses[typeURL]
-			if !seen || watch.nonce == nonce {
+			watch, ok := watches.deltaResponses[typeURL]
+			// we verify nonce only if nonce is not initialized
+			if !ok || watch.nonce == nonce {
 				// We must signal goroutine termination to prevent a race between the cancel closing the watch
 				// and the producer closing the watch.`	`
 				if terminate, exists := watches.deltaTerminations[typeURL]; exists {
@@ -207,7 +207,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				}
 				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, &state)
 
-				// a go-routine. Golang does not allow selecting over a dynamic set of channels.
+				// Go does not allow for selecting over a dynamic set of channels
+				// so we introduce a termination chan to handle cancelling any watches.
 				terminate := make(chan struct{})
 				watches.deltaTerminations[typeURL] = terminate
 				go func() {
@@ -239,6 +240,7 @@ func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) erro
 	// a channel for receiving incoming delta requests
 	reqCh := make(chan *discovery.DeltaDiscoveryRequest)
 
+	// we need to concurrently handle incoming requests since we kick off processDelta as a return
 	go func() {
 		for {
 			select {

@@ -48,9 +48,13 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 				for _, resource := range r.Resources {
 					for _, alias := range req.GetResourceNamesSubscribe() {
 						if name := resource.GetName(); name == alias {
-							marshaledResource, _ := cache.MarshalResource(resource)
-							oldV := versionMap[name]
-							if v := cache.HashResource(marshaledResource); v != oldV {
+							marshaledResource, err := cache.MarshalResource(resource)
+							if err != nil {
+								panic(err)
+							}
+
+							oldVersion := versionMap[name]
+							if v := cache.HashResource(marshaledResource); v != oldVersion {
 								versionMap[name] = v
 							}
 							subscribed = append(subscribed, resource)
@@ -94,20 +98,20 @@ func (stream *mockDeltaStream) Context() context.Context {
 }
 
 func (stream *mockDeltaStream) Send(resp *discovery.DeltaDiscoveryResponse) error {
-	// check that nonce is monotonically incrementing
+	// Check that nonce is incremented by one
 	stream.nonce = stream.nonce + 1
 	if resp.Nonce != fmt.Sprintf("%d", stream.nonce) {
 		stream.t.Errorf("Nonce => got %q, want %d", resp.Nonce, stream.nonce)
 	}
-	// check resources are non-empty
+	// Check that resources are non-empty
 	if len(resp.Resources) == 0 {
 		stream.t.Error("Resources => got none, want non-empty")
 	}
-	// check that type URL matches in resources
 	if resp.TypeUrl == "" {
 		stream.t.Error("TypeUrl => got none, want non-empty")
 	}
 
+	// Check that the per resource TypeURL is correctly set.
 	for _, res := range resp.Resources {
 		if res.Resource.TypeUrl != resp.TypeUrl {
 			stream.t.Errorf("TypeUrl => got %q, want %q", res.Resource.TypeUrl, resp.TypeUrl)
@@ -182,7 +186,7 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
-		// Pass-through type (xDS does not exist for this type)
+		// Pass-through type (types without explicit handling)
 		opaqueType: {
 			&cache.RawDeltaResponse{
 				SystemVersionInfo: "7",
@@ -191,6 +195,28 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 			},
 		},
 	}
+}
+
+func process(typ string, resp *mockDeltaStream, s server.Server) error {
+	var err error
+	switch typ {
+	case rsrc.EndpointType:
+		err = s.DeltaEndpoints(resp)
+	case rsrc.ClusterType:
+		err = s.DeltaClusters(resp)
+	case rsrc.RouteType:
+		err = s.DeltaRoutes(resp)
+	case rsrc.ListenerType:
+		err = s.DeltaListeners(resp)
+	case rsrc.SecretType:
+		err = s.DeltaSecrets(resp)
+	case rsrc.RuntimeType:
+		err = s.DeltaRuntime(resp)
+	case opaqueType:
+		err = s.DeltaAggregatedResources(resp)
+	}
+
+	return err
 }
 
 func TestDeltaResponseHandlersWildcard(t *testing.T) {
@@ -205,24 +231,7 @@ func TestDeltaResponseHandlersWildcard(t *testing.T) {
 			resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: typ}
 
 			go func() {
-				var err error
-				switch typ {
-				case rsrc.EndpointType:
-					err = s.DeltaEndpoints(resp)
-				case rsrc.ClusterType:
-					err = s.DeltaClusters(resp)
-				case rsrc.RouteType:
-					err = s.DeltaRoutes(resp)
-				case rsrc.ListenerType:
-					err = s.DeltaListeners(resp)
-				case rsrc.SecretType:
-					err = s.DeltaSecrets(resp)
-				case rsrc.RuntimeType:
-					err = s.DeltaRuntime(resp)
-				case opaqueType:
-					err = s.DeltaAggregatedResources(resp)
-				}
-
+				err := process(typ, resp, s)
 				if err != nil {
 					t.Errorf("Delta() => got \"%v\", want no error", err)
 				}
@@ -232,7 +241,6 @@ func TestDeltaResponseHandlersWildcard(t *testing.T) {
 			case res := <-resp.sent:
 				close(resp.recv)
 
-				// We should only have 7 watch channels initialized since that is the base map length
 				if config.deltaCounts[typ] != 1 {
 					t.Errorf("watch counts for typ: %s => got %v, want 1", typ, config.deltaCounts[typ])
 				}
@@ -264,24 +272,7 @@ func TestDeltaResponseHandlers(t *testing.T) {
 			resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: typ, ResourceNamesSubscribe: []string{res.Resources[0].Name}}
 
 			go func() {
-				var err error
-				switch typ {
-				case rsrc.EndpointType:
-					err = s.DeltaEndpoints(resp)
-				case rsrc.ClusterType:
-					err = s.DeltaClusters(resp)
-				case rsrc.RouteType:
-					err = s.DeltaRoutes(resp)
-				case rsrc.ListenerType:
-					err = s.DeltaListeners(resp)
-				case rsrc.SecretType:
-					err = s.DeltaSecrets(resp)
-				case rsrc.RuntimeType:
-					err = s.DeltaRuntime(resp)
-				case opaqueType:
-					err = s.DeltaAggregatedResources(resp)
-				}
-
+				err := process(typ, resp, s)
 				if err != nil {
 					t.Errorf("Delta() => got \"%v\", want no error", err)
 				}
@@ -335,7 +326,7 @@ func TestSendDeltaError(t *testing.T) {
 			config.deltaResponses = makeDeltaResponses()
 			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 
-			// make a request
+			// make a request with an error
 			resp := makeMockDeltaStream(t)
 			resp.sendError = true
 			resp.recv <- &discovery.DeltaDiscoveryRequest{
@@ -343,7 +334,7 @@ func TestSendDeltaError(t *testing.T) {
 				TypeUrl: typ,
 			}
 
-			// check that response fails since send returns error
+			// check that response fails since we expect an error to come through
 			if err := s.DeltaAggregatedResources(resp); err == nil {
 				t.Error("DeltaAggregatedResources() => got no error, want send error")
 			}
@@ -394,13 +385,8 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 			count++
 			if count >= 5 {
 				close(resp.recv)
-				if want := map[string]int{
-					rsrc.EndpointType: 1,
-					rsrc.ClusterType:  1,
-					rsrc.RouteType:    1,
-					rsrc.ListenerType: 1,
-					rsrc.SecretType:   1,
-				}; !reflect.DeepEqual(want, config.deltaCounts) {
+				want := map[string]int{rsrc.EndpointType: 1, rsrc.ClusterType: 1, rsrc.RouteType: 1, rsrc.ListenerType: 1, rsrc.SecretType: 1}
+				if !reflect.DeepEqual(want, config.deltaCounts) {
 					t.Errorf("watch counts => got %v, want %v", config.deltaCounts, want)
 				}
 
