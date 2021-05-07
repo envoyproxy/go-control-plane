@@ -28,7 +28,6 @@ import (
 
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
@@ -44,7 +43,7 @@ type Server interface {
 	clusterservice.ClusterDiscoveryServiceServer
 	routeservice.RouteDiscoveryServiceServer
 	listenerservice.ListenerDiscoveryServiceServer
-	discoverygrpc.AggregatedDiscoveryServiceServer
+	discovery.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
 	runtimeservice.RuntimeDiscoveryServiceServer
 
@@ -179,7 +178,7 @@ func (s *server) StreamHandler(stream sotw.Stream, typeURL string) error {
 	return s.sotw.StreamHandler(stream, typeURL)
 }
 
-func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
+func (s *server) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
 	return s.StreamHandler(stream, resource.AnyType)
 }
 
@@ -264,7 +263,7 @@ func (s *server) DeltaStreamHandler(stream stream.DeltaStream, typeURL string) e
 	return s.delta.DeltaStreamHandler(stream, typeURL)
 }
 
-func (s *server) DeltaAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+func (s *server) DeltaAggregatedResources(stream discovery.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return s.DeltaStreamHandler(stream, resource.AnyType)
 }
 

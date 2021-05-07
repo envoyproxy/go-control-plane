@@ -40,7 +40,7 @@ func (mux *MuxCache) CreateWatch(request *Request) (chan Response, func()) {
 	key := mux.Classify(*request)
 	cache, exists := mux.Caches[key]
 	if !exists {
-		value := make(chan Response, 0)
+		value := make(chan Response)
 		close(value)
 		return value, nil
 	}
