@@ -288,6 +288,35 @@ func MakeRuntime(runtimeName string) *runtime.Runtime {
 	}
 }
 
+// MakeExtensionConfig creates a extension config for a cluster.
+func MakeExtensionConfig(mode string, extensionConfigName string, route string) *core.TypedExtensionConfig {
+	rdsSource := configSource(mode)
+
+	// HTTP filter configuration
+	manager := &hcm.HttpConnectionManager{
+		CodecType:  hcm.HttpConnectionManager_AUTO,
+		StatPrefix: "http",
+		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
+			Rds: &hcm.Rds{
+				ConfigSource:    rdsSource,
+				RouteConfigName: route,
+			},
+		},
+		HttpFilters: []*hcm.HttpFilter{{
+			Name: wellknown.Router,
+		}},
+	}
+	pbst, err := ptypes.MarshalAny(manager)
+	if err != nil {
+		panic(err)
+	}
+
+	return &core.TypedExtensionConfig{
+		Name:        extensionConfigName,
+		TypedConfig: pbst,
+	}
+}
+
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
 	// Xds indicates snapshot mode: ads, xds, or rest

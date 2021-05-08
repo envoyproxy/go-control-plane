@@ -141,11 +141,12 @@ func makeMockStream(t *testing.T) *mockStream {
 }
 
 const (
-	clusterName  = "cluster0"
-	routeName    = "route0"
-	listenerName = "listener0"
-	secretName   = "secret0"
-	runtimeName  = "runtime0"
+	clusterName         = "cluster0"
+	routeName           = "route0"
+	listenerName        = "listener0"
+	secretName          = "secret0"
+	runtimeName         = "runtime0"
+	extensionConfigName = "extensionConfig0"
 )
 
 var (
@@ -153,21 +154,23 @@ var (
 		Id:      "test-id",
 		Cluster: "test-cluster",
 	}
-	endpoint   = resource.MakeEndpoint(clusterName, 8080)
-	cluster    = resource.MakeCluster(resource.Ads, clusterName)
-	route      = resource.MakeRoute(routeName, clusterName)
-	listener   = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	secret     = resource.MakeSecrets(secretName, "test")[0]
-	runtime    = resource.MakeRuntime(runtimeName)
-	opaque     = &core.Address{}
-	opaqueType = "unknown-type"
-	testTypes  = []string{
+	endpoint        = resource.MakeEndpoint(clusterName, 8080)
+	cluster         = resource.MakeCluster(resource.Ads, clusterName)
+	route           = resource.MakeRoute(routeName, clusterName)
+	listener        = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	secret          = resource.MakeSecrets(secretName, "test")[0]
+	runtime         = resource.MakeRuntime(runtimeName)
+	extensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
+	opaque          = &core.Address{}
+	opaqueType      = "unknown-type"
+	testTypes       = []string{
 		rsrc.EndpointType,
 		rsrc.ClusterType,
 		rsrc.RouteType,
 		rsrc.ListenerType,
 		rsrc.SecretType,
 		rsrc.RuntimeType,
+		rsrc.ExtensionConfigType,
 		opaqueType,
 	}
 )
@@ -216,10 +219,17 @@ func makeResponses() map[string][]cache.Response {
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
+		rsrc.ExtensionConfigType: {
+			&cache.RawResponse{
+				Version:   "7",
+				Resources: []types.ResourceWithTtl{{Resource: extensionConfig}},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
+			},
+		},
 		// Pass-through type (xDS does not exist for this type)
 		opaqueType: {
 			&cache.RawResponse{
-				Version:   "7",
+				Version:   "8",
 				Resources: []types.ResourceWithTtl{{Resource: opaque}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
 			},
@@ -254,6 +264,8 @@ func TestServerShutdown(t *testing.T) {
 					err = s.StreamSecrets(resp)
 				case rsrc.RuntimeType:
 					err = s.StreamRuntime(resp)
+				case rsrc.ExtensionConfigType:
+					err = s.StreamExtensionConfigs(resp)
 				case opaqueType:
 					err = s.StreamAggregatedResources(resp)
 				}
@@ -301,6 +313,8 @@ func TestResponseHandlers(t *testing.T) {
 					err = s.StreamSecrets(resp)
 				case rsrc.RuntimeType:
 					err = s.StreamRuntime(resp)
+				case rsrc.ExtensionConfigType:
+					err = s.StreamExtensionConfigs(resp)
 				case opaqueType:
 					err = s.StreamAggregatedResources(resp)
 				}
@@ -364,10 +378,13 @@ func TestFetch(t *testing.T) {
 		t.Errorf("unexpected empty or error for listeners: %v", err)
 	}
 	if out, err := s.FetchSecrets(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
-		t.Errorf("unexpected empty or error for listeners: %v", err)
+		t.Errorf("unexpected empty or error for secrets: %v", err)
 	}
 	if out, err := s.FetchRuntime(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
-		t.Errorf("unexpected empty or error for listeners: %v", err)
+		t.Errorf("unexpected empty or error for runtime: %v", err)
+	}
+	if out, err := s.FetchExtensionConfigs(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for extensionConfigs: %v", err)
 	}
 
 	// try again and expect empty results
@@ -403,6 +420,9 @@ func TestFetch(t *testing.T) {
 	if out, err := s.FetchRuntime(context.Background(), nil); out != nil {
 		t.Errorf("expected empty on empty request: %v", err)
 	}
+	if out, err := s.FetchExtensionConfigs(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
 
 	// send error from callback
 	callbackError = true
@@ -420,10 +440,10 @@ func TestFetch(t *testing.T) {
 	}
 
 	// verify fetch callbacks
-	if want := 10; requestCount != want {
+	if want := 11; requestCount != want {
 		t.Errorf("unexpected number of fetch requests: got %d, want %d", requestCount, want)
 	}
-	if want := 6; responseCount != want {
+	if want := 7; responseCount != want {
 		t.Errorf("unexpected number of fetch responses: got %d, want %d", responseCount, want)
 	}
 }
