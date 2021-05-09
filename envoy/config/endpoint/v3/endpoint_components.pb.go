@@ -41,7 +41,7 @@ type Endpoint struct {
 	//
 	//   The form of host address depends on the given cluster type. For STATIC or EDS,
 	//   it is expected to be a direct IP address (or something resolvable by the
-	//   specified :ref:`resolver <envoy_api_field_config.core.v3.SocketAddress.resolver_name>`
+	//   specified :ref:`resolver <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>`
 	//   in the Address). For LOGICAL or STRICT DNS, it is expected to be hostname,
 	//   and will be resolved via DNS.
 	Address *v3.Address `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
@@ -56,7 +56,7 @@ type Endpoint struct {
 	// The hostname associated with this endpoint. This hostname is not used for routing or address
 	// resolution. If provided, it will be associated with the endpoint, and can be used for features
 	// that require a hostname, like
-	// :ref:`auto_host_rewrite <envoy_api_field_config.route.v3.RouteAction.auto_host_rewrite>`.
+	// :ref:`auto_host_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.auto_host_rewrite>`.
 	Hostname string `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
 }
 
@@ -133,7 +133,7 @@ type LbEndpoint struct {
 	// name should be specified as *envoy.lb*. An example boolean key-value pair
 	// is *canary*, providing the optional canary status of the upstream host.
 	// This may be matched against in a route's
-	// :ref:`RouteAction <envoy_api_msg_config.route.v3.RouteAction>` metadata_match field
+	// :ref:`RouteAction <envoy_v3_api_msg_config.route.v3.RouteAction>` metadata_match field
 	// to subset the endpoints considered in cluster load balancing.
 	Metadata *v3.Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// The optional load balancing weight of the upstream host; at least 1.
@@ -365,8 +365,8 @@ type Endpoint_HealthCheckConfig struct {
 	// to have different health check address port.
 	PortValue uint32 `protobuf:"varint,1,opt,name=port_value,json=portValue,proto3" json:"port_value,omitempty"`
 	// By default, the host header for L7 health checks is controlled by cluster level configuration
-	// (see: :ref:`host <envoy_api_field_config.core.v3.HealthCheck.HttpHealthCheck.host>` and
-	// :ref:`authority <envoy_api_field_config.core.v3.HealthCheck.GrpcHealthCheck.authority>`). Setting this
+	// (see: :ref:`host <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.host>` and
+	// :ref:`authority <envoy_v3_api_field_config.core.v3.HealthCheck.GrpcHealthCheck.authority>`). Setting this
 	// to a non-empty value allows overriding the cluster level configuration for a specific
 	// endpoint.
 	Hostname string `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`

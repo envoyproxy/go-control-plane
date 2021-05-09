@@ -207,10 +207,10 @@ type SocketBufferedTrace struct {
 	// Sequence of observed events.
 	Events []*SocketEvent `protobuf:"bytes,3,rep,name=events,proto3" json:"events,omitempty"`
 	// Set to true if read events were truncated due to the :ref:`max_buffered_rx_bytes
-	// <envoy_api_field_config.tap.v3.OutputConfig.max_buffered_rx_bytes>` setting.
+	// <envoy_v3_api_field_config.tap.v3.OutputConfig.max_buffered_rx_bytes>` setting.
 	ReadTruncated bool `protobuf:"varint,4,opt,name=read_truncated,json=readTruncated,proto3" json:"read_truncated,omitempty"`
 	// Set to true if write events were truncated due to the :ref:`max_buffered_tx_bytes
-	// <envoy_api_field_config.tap.v3.OutputConfig.max_buffered_tx_bytes>` setting.
+	// <envoy_v3_api_field_config.tap.v3.OutputConfig.max_buffered_tx_bytes>` setting.
 	WriteTruncated bool `protobuf:"varint,5,opt,name=write_truncated,json=writeTruncated,proto3" json:"write_truncated,omitempty"`
 }
 

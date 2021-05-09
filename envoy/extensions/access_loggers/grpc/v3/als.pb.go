@@ -31,9 +31,9 @@ const (
 const _ = proto.ProtoPackageIsVersion4
 
 // Configuration for the built-in *envoy.access_loggers.http_grpc*
-// :ref:`AccessLog <envoy_api_msg_config.accesslog.v3.AccessLog>`. This configuration will
+// :ref:`AccessLog <envoy_v3_api_msg_config.accesslog.v3.AccessLog>`. This configuration will
 // populate :ref:`StreamAccessLogsMessage.http_logs
-// <envoy_api_field_service.accesslog.v3.StreamAccessLogsMessage.http_logs>`.
+// <envoy_v3_api_field_service.accesslog.v3.StreamAccessLogsMessage.http_logs>`.
 // [#extension: envoy.access_loggers.http_grpc]
 type HttpGrpcAccessLogConfig struct {
 	state         protoimpl.MessageState
@@ -42,13 +42,13 @@ type HttpGrpcAccessLogConfig struct {
 
 	CommonConfig *CommonGrpcAccessLogConfig `protobuf:"bytes,1,opt,name=common_config,json=commonConfig,proto3" json:"common_config,omitempty"`
 	// Additional request headers to log in :ref:`HTTPRequestProperties.request_headers
-	// <envoy_api_field_data.accesslog.v3.HTTPRequestProperties.request_headers>`.
+	// <envoy_v3_api_field_data.accesslog.v3.HTTPRequestProperties.request_headers>`.
 	AdditionalRequestHeadersToLog []string `protobuf:"bytes,2,rep,name=additional_request_headers_to_log,json=additionalRequestHeadersToLog,proto3" json:"additional_request_headers_to_log,omitempty"`
 	// Additional response headers to log in :ref:`HTTPResponseProperties.response_headers
-	// <envoy_api_field_data.accesslog.v3.HTTPResponseProperties.response_headers>`.
+	// <envoy_v3_api_field_data.accesslog.v3.HTTPResponseProperties.response_headers>`.
 	AdditionalResponseHeadersToLog []string `protobuf:"bytes,3,rep,name=additional_response_headers_to_log,json=additionalResponseHeadersToLog,proto3" json:"additional_response_headers_to_log,omitempty"`
 	// Additional response trailers to log in :ref:`HTTPResponseProperties.response_trailers
-	// <envoy_api_field_data.accesslog.v3.HTTPResponseProperties.response_trailers>`.
+	// <envoy_v3_api_field_data.accesslog.v3.HTTPResponseProperties.response_trailers>`.
 	AdditionalResponseTrailersToLog []string `protobuf:"bytes,4,rep,name=additional_response_trailers_to_log,json=additionalResponseTrailersToLog,proto3" json:"additional_response_trailers_to_log,omitempty"`
 }
 
@@ -170,7 +170,7 @@ type CommonGrpcAccessLogConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The friendly name of the access log to be returned in :ref:`StreamAccessLogsMessage.Identifier
-	// <envoy_api_msg_service.accesslog.v3.StreamAccessLogsMessage.Identifier>`. This allows the
+	// <envoy_v3_api_msg_service.accesslog.v3.StreamAccessLogsMessage.Identifier>`. This allows the
 	// access log server to differentiate between different access logs coming from the same Envoy.
 	LogName string `protobuf:"bytes,1,opt,name=log_name,json=logName,proto3" json:"log_name,omitempty"`
 	// The gRPC service for the access log service.
@@ -187,7 +187,7 @@ type CommonGrpcAccessLogConfig struct {
 	// to zero effectively disables the batching. Defaults to 16384.
 	BufferSizeBytes *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=buffer_size_bytes,json=bufferSizeBytes,proto3" json:"buffer_size_bytes,omitempty"`
 	// Additional filter state objects to log in :ref:`filter_state_objects
-	// <envoy_api_field_data.accesslog.v3.AccessLogCommon.filter_state_objects>`.
+	// <envoy_v3_api_field_data.accesslog.v3.AccessLogCommon.filter_state_objects>`.
 	// Logger will call `FilterState::Object::serializeAsProto` to serialize the filter state object.
 	FilterStateObjectsToLog []string `protobuf:"bytes,5,rep,name=filter_state_objects_to_log,json=filterStateObjectsToLog,proto3" json:"filter_state_objects_to_log,omitempty"`
 }

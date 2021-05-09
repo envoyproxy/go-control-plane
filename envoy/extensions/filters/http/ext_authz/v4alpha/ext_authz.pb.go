@@ -80,7 +80,7 @@ type ExtAuthz struct {
 	// ext_authz service as an opaque *protobuf::Struct*.
 	//
 	// For example, if the *jwt_authn* filter is used and :ref:`payload_in_metadata
-	// <envoy_api_field_extensions.filters.http.jwt_authn.v4alpha.JwtProvider.payload_in_metadata>` is set,
+	// <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>` is set,
 	// then the following will pass the jwt payload to the authorization server.
 	//
 	// .. code-block:: yaml
@@ -91,7 +91,7 @@ type ExtAuthz struct {
 	MetadataContextNamespaces []string `protobuf:"bytes,8,rep,name=metadata_context_namespaces,json=metadataContextNamespaces,proto3" json:"metadata_context_namespaces,omitempty"`
 	// Specifies if the filter is enabled.
 	//
-	// If :ref:`runtime_key <envoy_api_field_config.core.v4alpha.RuntimeFractionalPercent.runtime_key>` is specified,
+	// If :ref:`runtime_key <envoy_v3_api_field_config.core.v3.RuntimeFractionalPercent.runtime_key>` is specified,
 	// Envoy will lookup the runtime key to get the percentage of requests to filter.
 	//
 	// If this field is not specified, the filter will be enabled for all requests.
@@ -100,7 +100,7 @@ type ExtAuthz struct {
 	// If this field is not specified, the filter will be enabled for all requests.
 	FilterEnabledMetadata *v4alpha1.MetadataMatcher `protobuf:"bytes,14,opt,name=filter_enabled_metadata,json=filterEnabledMetadata,proto3" json:"filter_enabled_metadata,omitempty"`
 	// Specifies whether to deny the requests, when the filter is disabled.
-	// If :ref:`runtime_key <envoy_api_field_config.core.v4alpha.RuntimeFeatureFlag.runtime_key>` is specified,
+	// If :ref:`runtime_key <envoy_v3_api_field_config.core.v3.RuntimeFeatureFlag.runtime_key>` is specified,
 	// Envoy will lookup the runtime key to determine whether to deny request for
 	// filter protected path at filter disabling. If filter is disabled in
 	// typed_per_filter_config for the path, requests will not be denied.
@@ -110,7 +110,7 @@ type ExtAuthz struct {
 	// Specifies if the peer certificate is sent to the external service.
 	//
 	// When this field is true, Envoy will include the peer X.509 certificate, if available, in the
-	// :ref:`certificate<envoy_api_field_service.auth.v4alpha.AttributeContext.Peer.certificate>`.
+	// :ref:`certificate<envoy_v3_api_field_service.auth.v3.AttributeContext.Peer.certificate>`.
 	IncludePeerCertificate bool `protobuf:"varint,10,opt,name=include_peer_certificate,json=includePeerCertificate,proto3" json:"include_peer_certificate,omitempty"`
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
 	// emitted statistics between configured *ext_authz* filters in an HTTP filter chain. For example:
@@ -287,7 +287,7 @@ type BufferSettings struct {
 	// Sets the maximum size of a message body that the filter will hold in memory. Envoy will return
 	// *HTTP 413* and will *not* initiate the authorization process when buffer reaches the number
 	// set in this field. Note that this setting will have precedence over :ref:`failure_mode_allow
-	// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.ExtAuthz.failure_mode_allow>`.
+	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.failure_mode_allow>`.
 	MaxRequestBytes uint32 `protobuf:"varint,1,opt,name=max_request_bytes,json=maxRequestBytes,proto3" json:"max_request_bytes,omitempty"`
 	// When this field is true, Envoy will buffer the message until *max_request_bytes* is reached.
 	// The authorization request will be dispatched and no 413 HTTP error will be returned by the
@@ -362,24 +362,24 @@ func (x *BufferSettings) GetPackAsBytes() bool {
 //
 // *On authorization request*, a list of allowed request headers may be supplied. See
 // :ref:`allowed_headers
-// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.AuthorizationRequest.allowed_headers>`
+// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.AuthorizationRequest.allowed_headers>`
 // for details. Additional headers metadata may be added to the authorization request. See
 // :ref:`headers_to_add
-// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.AuthorizationRequest.headers_to_add>` for
+// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.AuthorizationRequest.headers_to_add>` for
 // details.
 //
 // On authorization response status HTTP 200 OK, the filter will allow traffic to the upstream and
 // additional headers metadata may be added to the original client request. See
 // :ref:`allowed_upstream_headers
-// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.AuthorizationResponse.allowed_upstream_headers>`
+// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_upstream_headers>`
 // for details. Additionally, the filter may add additional headers to the client's response. See
 // :ref:`allowed_client_headers_on_success
-// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.AuthorizationResponse.allowed_client_headers_on_success>`
+// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_client_headers_on_success>`
 // for details.
 //
 // On other authorization response statuses, the filter will not allow traffic. Additional headers
 // metadata as well as body may be added to the client's response. See :ref:`allowed_client_headers
-// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.AuthorizationResponse.allowed_client_headers>`
+// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_client_headers>`
 // for details.
 // [#next-free-field: 9]
 type HttpService struct {
@@ -463,7 +463,7 @@ type AuthorizationRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Authorization request will include the client request headers that have a correspondent match
-	// in the :ref:`list <envoy_api_msg_type.matcher.v4alpha.ListStringMatcher>`. Note that in addition to the
+	// in the :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`. Note that in addition to the
 	// user's supplied matchers:
 	//
 	// 1. *Host*, *Method*, *Path* and *Content-Length* are automatically included to the list.
@@ -471,7 +471,7 @@ type AuthorizationRequest struct {
 	// 2. *Content-Length* will be set to 0 and the request to the authorization service will not have
 	// a message body. However, the authorization request can include the buffered client request body
 	// (controlled by :ref:`with_request_body
-	// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.ExtAuthz.with_request_body>` setting),
+	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.with_request_body>` setting),
 	// consequently the value of *Content-Length* of the authorization request reflects the size of
 	// its payload size.
 	//
@@ -532,21 +532,21 @@ type AuthorizationResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// When this :ref:`list <envoy_api_msg_type.matcher.v4alpha.ListStringMatcher>` is set, authorization
+	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the original client request.
 	// Note that coexistent headers will be overridden.
 	AllowedUpstreamHeaders *v4alpha1.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_upstream_headers,json=allowedUpstreamHeaders,proto3" json:"allowed_upstream_headers,omitempty"`
-	// When this :ref:`list <envoy_api_msg_type.matcher.v4alpha.ListStringMatcher>` is set, authorization
+	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the client's response. Note
 	// that coexistent headers will be appended.
 	AllowedUpstreamHeadersToAppend *v4alpha1.ListStringMatcher `protobuf:"bytes,3,opt,name=allowed_upstream_headers_to_append,json=allowedUpstreamHeadersToAppend,proto3" json:"allowed_upstream_headers_to_append,omitempty"`
-	// When this :ref:`list <envoy_api_msg_type.matcher.v4alpha.ListStringMatcher>`. is set, authorization
+	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`. is set, authorization
 	// response headers that have a correspondent match will be added to the client's response. Note
 	// that when this list is *not* set, all the authorization response headers, except *Authority
 	// (Host)* will be in the response to the client. When a header is included in this list, *Path*,
 	// *Status*, *Content-Length*, *WWWAuthenticate* and *Location* are automatically added.
 	AllowedClientHeaders *v4alpha1.ListStringMatcher `protobuf:"bytes,2,opt,name=allowed_client_headers,json=allowedClientHeaders,proto3" json:"allowed_client_headers,omitempty"`
-	// When this :ref:`list <envoy_api_msg_type.matcher.v4alpha.ListStringMatcher>`. is set, authorization
+	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`. is set, authorization
 	// response headers that have a correspondent match will be added to the client's response when
 	// the authorization response itself is successful, i.e. not failed or denied. When this list is
 	// *not* set, no additional headers will be added to the client's response on success.
@@ -704,7 +704,7 @@ type CheckSettings struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Context extensions to set on the CheckRequest's
-	// :ref:`AttributeContext.context_extensions<envoy_api_field_service.auth.v4alpha.AttributeContext.context_extensions>`
+	// :ref:`AttributeContext.context_extensions<envoy_v3_api_field_service.auth.v3.AttributeContext.context_extensions>`
 	//
 	// You can use this to provide extra context for the external authorization server on specific
 	// virtual hosts/routes. For example, adding a context extension on the virtual host level can
@@ -717,10 +717,10 @@ type CheckSettings struct {
 	// .. note::
 	//
 	//   These settings are only applied to a filter configured with a
-	//   :ref:`grpc_service<envoy_api_field_extensions.filters.http.ext_authz.v4alpha.ExtAuthz.grpc_service>`.
+	//   :ref:`grpc_service<envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.grpc_service>`.
 	ContextExtensions map[string]string `protobuf:"bytes,1,rep,name=context_extensions,json=contextExtensions,proto3" json:"context_extensions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// When set to true, disable the configured :ref:`with_request_body
-	// <envoy_api_field_extensions.filters.http.ext_authz.v4alpha.ExtAuthz.with_request_body>` for a route.
+	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.with_request_body>` for a route.
 	DisableRequestBodyBuffering bool `protobuf:"varint,2,opt,name=disable_request_body_buffering,json=disableRequestBodyBuffering,proto3" json:"disable_request_body_buffering,omitempty"`
 }
 

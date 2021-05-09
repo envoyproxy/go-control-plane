@@ -296,7 +296,7 @@ type HttpConnectionManager struct {
 	AddUserAgent *wrappers.BoolValue `protobuf:"bytes,6,opt,name=add_user_agent,json=addUserAgent,proto3" json:"add_user_agent,omitempty"`
 	// Presence of the object defines whether the connection manager
 	// emits :ref:`tracing <arch_overview_tracing>` data to the :ref:`configured tracing provider
-	// <envoy_api_msg_config.trace.v4alpha.Tracing>`.
+	// <envoy_v3_api_msg_config.trace.v3.Tracing>`.
 	Tracing *HttpConnectionManager_Tracing `protobuf:"bytes,7,opt,name=tracing,proto3" json:"tracing,omitempty"`
 	// Additional settings for HTTP requests handled by the connection manager. These will be
 	// applicable to both HTTP1 and HTTP2 requests.
@@ -327,10 +327,10 @@ type HttpConnectionManager struct {
 	//
 	// This idle timeout applies to new streams and is overridable by the
 	// :ref:`route-level idle_timeout
-	// <envoy_api_field_config.route.v4alpha.RouteAction.idle_timeout>`. Even on a stream in
+	// <envoy_v3_api_field_config.route.v3.RouteAction.idle_timeout>`. Even on a stream in
 	// which the override applies, prior to receipt of the initial request
 	// headers, the :ref:`stream_idle_timeout
-	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.stream_idle_timeout>`
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.stream_idle_timeout>`
 	// applies. Each time an encode/decode event for headers or data is processed
 	// for the stream, the timer will be reset. If the timeout fires, the stream
 	// is terminated with a 408 Request Timeout error code if no upstream response
@@ -343,12 +343,12 @@ type HttpConnectionManager struct {
 	// data has been proxied within available flow control windows. If the timeout is hit in this
 	// case, the :ref:`tx_flush_timeout <config_http_conn_man_stats_per_codec>` counter will be
 	// incremented. Note that :ref:`max_stream_duration
-	// <envoy_api_field_config.core.v4alpha.HttpProtocolOptions.max_stream_duration>` does not apply to
+	// <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_stream_duration>` does not apply to
 	// this corner case.
 	//
 	// If the :ref:`overload action <config_overload_manager_overload_actions>` "envoy.overload_actions.reduce_timeouts"
 	// is configured, this timeout is scaled according to the value for
-	// :ref:`HTTP_DOWNSTREAM_STREAM_IDLE <envoy_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_STREAM_IDLE>`.
+	// :ref:`HTTP_DOWNSTREAM_STREAM_IDLE <envoy_v3_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_STREAM_IDLE>`.
 	//
 	// Note that it is possible to idle timeout even if the wire traffic for a stream is non-idle, due
 	// to the granularity of events presented to the connection manager. For example, while receiving
@@ -435,7 +435,7 @@ type HttpConnectionManager struct {
 	// :ref:`config_http_conn_man_headers_x-forwarded-for` HTTP header. This may be used in
 	// conjunction with HTTP filters that explicitly manipulate XFF after the HTTP connection manager
 	// has mutated the request headers. While :ref:`use_remote_address
-	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.use_remote_address>`
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
 	// will also suppress XFF addition, it has consequences for logging and other
 	// Envoy uses of the remote address, so *skip_xff_append* should be used
 	// when only an elision of XFF addition is intended.
@@ -461,7 +461,7 @@ type HttpConnectionManager struct {
 	// header.
 	ForwardClientCertDetails HttpConnectionManager_ForwardClientCertDetails `protobuf:"varint,16,opt,name=forward_client_cert_details,json=forwardClientCertDetails,proto3,enum=envoy.extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager_ForwardClientCertDetails" json:"forward_client_cert_details,omitempty"`
 	// This field is valid only when :ref:`forward_client_cert_details
-	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.forward_client_cert_details>`
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.forward_client_cert_details>`
 	// is APPEND_FORWARD or SANITIZE_SET and the client connection is mTLS. It specifies the fields in
 	// the client certificate to be forwarded. Note that in the
 	// :ref:`config_http_conn_man_headers_x-forwarded-client-cert` header, *Hash* is always set, and
@@ -475,7 +475,7 @@ type HttpConnectionManager struct {
 	Proxy_100Continue bool `protobuf:"varint,18,opt,name=proxy_100_continue,json=proxy100Continue,proto3" json:"proxy_100_continue,omitempty"`
 	// If
 	// :ref:`use_remote_address
-	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.use_remote_address>`
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
 	// is true and represent_ipv4_remote_address_as_ipv4_mapped_ipv6 is true and the remote address is
 	// an IPv4 address, the address will be mapped to IPv6 before it is appended to *x-forwarded-for*.
 	// This is useful for testing compatibility of upstream services that parse the header value. For
@@ -554,7 +554,7 @@ type HttpConnectionManager struct {
 	// whether transformations affect the forwarded *:path* header. RFC 3986 path
 	// normalization is enabled by default and the default policy is that the
 	// normalized header will be forwarded. See :ref:`PathNormalizationOptions
-	// <envoy_api_msg_extensions.filters.network.http_connection_manager.v3.PathNormalizationOptions>`
+	// <envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.PathNormalizationOptions>`
 	// for details.
 	PathNormalizationOptions *HttpConnectionManager_PathNormalizationOptions `protobuf:"bytes,43,opt,name=path_normalization_options,json=pathNormalizationOptions,proto3" json:"path_normalization_options,omitempty"`
 }
@@ -932,12 +932,12 @@ type isHttpConnectionManager_StripPortMode interface {
 
 type HttpConnectionManager_StripMatchingHostPort struct {
 	// Determines if the port part should be removed from host/authority header before any processing
-	// of request by HTTP filters or routing. The port would be removed only if it is equal to the :ref:`listener's<envoy_api_field_config.listener.v4alpha.Listener.address>`
+	// of request by HTTP filters or routing. The port would be removed only if it is equal to the :ref:`listener's<envoy_v3_api_field_config.listener.v3.Listener.address>`
 	// local port. This affects the upstream host header unless the method is
 	// CONNECT in which case if no filter adds a port the original port will be restored before headers are
 	// sent upstream.
 	// Without setting this option, incoming requests with host `example:443` will not match against
-	// route with :ref:`domains<envoy_api_field_config.route.v4alpha.VirtualHost.domains>` match set to `example`. Defaults to `false`. Note that port removal is not part
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to `example`. Defaults to `false`. Note that port removal is not part
 	// of `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
 	// Only one of `strip_matching_host_port` or `strip_any_host_port` can be set.
 	StripMatchingHostPort bool `protobuf:"varint,39,opt,name=strip_matching_host_port,json=stripMatchingHostPort,proto3,oneof"`
@@ -949,7 +949,7 @@ type HttpConnectionManager_StripAnyHostPort struct {
 	// This affects the upstream host header unless the method is CONNECT in
 	// which case if no filter adds a port the original port will be restored before headers are sent upstream.
 	// Without setting this option, incoming requests with host `example:443` will not match against
-	// route with :ref:`domains<envoy_api_field_config.route.v4alpha.VirtualHost.domains>` match set to `example`. Defaults to `false`. Note that port removal is not part
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to `example`. Defaults to `false`. Note that port removal is not part
 	// of `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
 	// Only one of `strip_matching_host_port` or `strip_any_host_port` can be set.
 	StripAnyHostPort bool `protobuf:"varint,42,opt,name=strip_any_host_port,json=stripAnyHostPort,proto3,oneof"`
@@ -1354,7 +1354,7 @@ type ScopedRoutes_ScopedRouteConfigurationsList struct {
 	// The set of routing scopes corresponding to the HCM. A scope is assigned to a request by
 	// matching a key constructed from the request's attributes according to the algorithm specified
 	// by the
-	// :ref:`ScopeKeyBuilder<envoy_api_msg_extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder>`
+	// :ref:`ScopeKeyBuilder<envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.ScopedRoutes.ScopeKeyBuilder>`
 	// in this message.
 	ScopedRouteConfigurationsList *ScopedRouteConfigurationsList `protobuf:"bytes,4,opt,name=scoped_route_configurations_list,json=scopedRouteConfigurationsList,proto3,oneof"`
 }
@@ -1363,7 +1363,7 @@ type ScopedRoutes_ScopedRds struct {
 	// The set of routing scopes associated with the HCM will be dynamically loaded via the SRDS
 	// API. A scope is assigned to a request by matching a key constructed from the request's
 	// attributes according to the algorithm specified by the
-	// :ref:`ScopeKeyBuilder<envoy_api_msg_extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.ScopeKeyBuilder>`
+	// :ref:`ScopeKeyBuilder<envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.ScopedRoutes.ScopeKeyBuilder>`
 	// in this message.
 	ScopedRds *ScopedRds `protobuf:"bytes,5,opt,name=scoped_rds,json=scopedRds,proto3,oneof"`
 }
@@ -1527,7 +1527,7 @@ type HttpFilter_TypedConfig struct {
 	// filters for further documentation.
 	//
 	// To support configuring a :ref:`match tree <arch_overview_matching_api>`, use an
-	// :ref:`ExtensionWithMatcher <envoy_api_msg_extensions.common.matching.v4alpha.ExtensionWithMatcher>`
+	// :ref:`ExtensionWithMatcher <envoy_v3_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
 	// with the desired HTTP filter.
 	// [#extension-category: envoy.filters.http]
 	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
@@ -1539,7 +1539,7 @@ type HttpFilter_ConfigDiscovery struct {
 	// Extension configs delivered through this mechanism are not expected to require warming (see https://github.com/envoyproxy/envoy/issues/12061).
 	//
 	// To support configuring a :ref:`match tree <arch_overview_matching_api>`, use an
-	// :ref:`ExtensionWithMatcher <envoy_api_msg_extensions.common.matching.v4alpha.ExtensionWithMatcher>`
+	// :ref:`ExtensionWithMatcher <envoy_v3_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
 	// with the desired HTTP filter. This works for both the default filter configuration as well
 	// as for filters provided via the API.
 	ConfigDiscovery *v4alpha.ExtensionConfigSource `protobuf:"bytes,5,opt,name=config_discovery,json=configDiscovery,proto3,oneof"`
@@ -1896,7 +1896,7 @@ type HttpConnectionManager_UpgradeConfig struct {
 	Filters []*HttpFilter `protobuf:"bytes,2,rep,name=filters,proto3" json:"filters,omitempty"`
 	// Determines if upgrades are enabled or disabled by default. Defaults to true.
 	// This can be overridden on a per-route basis with :ref:`cluster
-	// <envoy_api_field_config.route.v4alpha.RouteAction.upgrade_configs>` as documented in the
+	// <envoy_v3_api_field_config.route.v3.RouteAction.upgrade_configs>` as documented in the
 	// :ref:`upgrade documentation <arch_overview_upgrades>`.
 	Enabled *wrappers.BoolValue `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
 }
@@ -1958,8 +1958,8 @@ func (x *HttpConnectionManager_UpgradeConfig) GetEnabled() *wrappers.BoolValue {
 // before any processing of requests by HTTP filters, routing, and matching. Only the normalized
 // path will be visible internally if a transformation is enabled. Any path rewrites that the
 // router performs (e.g. :ref:`regex_rewrite
-// <envoy_api_field_config.route.v4alpha.RouteAction.regex_rewrite>` or :ref:`prefix_rewrite
-// <envoy_api_field_config.route.v4alpha.RouteAction.prefix_rewrite>`) will apply to the *:path* header
+// <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>` or :ref:`prefix_rewrite
+// <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`) will apply to the *:path* header
 // destined for the upstream.
 //
 // Note: access logging and tracing will show the original *:path* header.
@@ -1971,7 +1971,7 @@ type HttpConnectionManager_PathNormalizationOptions struct {
 	// [#not-implemented-hide:] Normalization applies internally before any processing of requests by
 	// HTTP filters, routing, and matching *and* will affect the forwarded *:path* header. Defaults
 	// to :ref:`NormalizePathRFC3986
-	// <envoy_api_msg_type.http.v3.PathTransformation.Operation.NormalizePathRFC3986>`. When not
+	// <envoy_v3_api_msg_type.http.v3.PathTransformation.Operation.NormalizePathRFC3986>`. When not
 	// specified, this value may be overridden by the runtime variable
 	// :ref:`http_connection_manager.normalize_path<config_http_conn_man_runtime_normalize_path>`.
 	// Envoy will respond with 400 to paths that are malformed (e.g. for paths that fail RFC 3986
@@ -2036,21 +2036,21 @@ func (x *HttpConnectionManager_PathNormalizationOptions) GetHttpFilterTransforma
 }
 
 // Specifies the mechanism for constructing "scope keys" based on HTTP request attributes. These
-// keys are matched against a set of :ref:`Key<envoy_api_msg_config.route.v4alpha.ScopedRouteConfiguration.Key>`
-// objects assembled from :ref:`ScopedRouteConfiguration<envoy_api_msg_config.route.v4alpha.ScopedRouteConfiguration>`
+// keys are matched against a set of :ref:`Key<envoy_v3_api_msg_config.route.v3.ScopedRouteConfiguration.Key>`
+// objects assembled from :ref:`ScopedRouteConfiguration<envoy_v3_api_msg_config.route.v3.ScopedRouteConfiguration>`
 // messages distributed via SRDS (the Scoped Route Discovery Service) or assigned statically via
-// :ref:`scoped_route_configurations_list<envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.ScopedRoutes.scoped_route_configurations_list>`.
+// :ref:`scoped_route_configurations_list<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.ScopedRoutes.scoped_route_configurations_list>`.
 //
 // Upon receiving a request's headers, the Router will build a key using the algorithm specified
 // by this message. This key will be used to look up the routing table (i.e., the
-// :ref:`RouteConfiguration<envoy_api_msg_config.route.v4alpha.RouteConfiguration>`) to use for the request.
+// :ref:`RouteConfiguration<envoy_v3_api_msg_config.route.v3.RouteConfiguration>`) to use for the request.
 type ScopedRoutes_ScopeKeyBuilder struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// The final(built) scope key consists of the ordered union of these fragments, which are compared in order with the
-	// fragments of a :ref:`ScopedRouteConfiguration<envoy_api_msg_config.route.v4alpha.ScopedRouteConfiguration>`.
+	// fragments of a :ref:`ScopedRouteConfiguration<envoy_v3_api_msg_config.route.v3.ScopedRouteConfiguration>`.
 	// A missing fragment during comparison will make the key invalid, i.e., the computed key doesn't match any key.
 	Fragments []*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder `protobuf:"bytes,1,rep,name=fragments,proto3" json:"fragments,omitempty"`
 }

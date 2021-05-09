@@ -33,21 +33,21 @@ const (
 const _ = proto.ProtoPackageIsVersion4
 
 // Output format. All output is in the form of one or more :ref:`TraceWrapper
-// <envoy_api_msg_data.tap.v3.TraceWrapper>` messages. This enumeration indicates
+// <envoy_v3_api_msg_data.tap.v3.TraceWrapper>` messages. This enumeration indicates
 // how those messages are written. Note that not all sinks support all output formats. See
 // individual sink documentation for more information.
 type OutputSink_Format int32
 
 const (
-	// Each message will be written as JSON. Any :ref:`body <envoy_api_msg_data.tap.v3.Body>`
+	// Each message will be written as JSON. Any :ref:`body <envoy_v3_api_msg_data.tap.v3.Body>`
 	// data will be present in the :ref:`as_bytes
-	// <envoy_api_field_data.tap.v3.Body.as_bytes>` field. This means that body data will be
+	// <envoy_v3_api_field_data.tap.v3.Body.as_bytes>` field. This means that body data will be
 	// base64 encoded as per the `proto3 JSON mappings
 	// <https://developers.google.com/protocol-buffers/docs/proto3#json>`_.
 	OutputSink_JSON_BODY_AS_BYTES OutputSink_Format = 0
-	// Each message will be written as JSON. Any :ref:`body <envoy_api_msg_data.tap.v3.Body>`
+	// Each message will be written as JSON. Any :ref:`body <envoy_v3_api_msg_data.tap.v3.Body>`
 	// data will be present in the :ref:`as_string
-	// <envoy_api_field_data.tap.v3.Body.as_string>` field. This means that body data will be
+	// <envoy_v3_api_field_data.tap.v3.Body.as_string>` field. This means that body data will be
 	// string encoded as per the `proto3 JSON mappings
 	// <https://developers.google.com/protocol-buffers/docs/proto3#json>`_. This format type is
 	// useful when it is known that that body is human readable (e.g., JSON over HTTP) and the
@@ -121,17 +121,17 @@ type TapConfig struct {
 
 	// The match configuration. If the configuration matches the data source being tapped, a tap will
 	// occur, with the result written to the configured output.
-	// Exactly one of :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` and
-	// :ref:`match_config <envoy_api_field_config.tap.v4alpha.TapConfig.match_config>` must be set. If both
-	// are set, the :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` will be used.
+	// Exactly one of :ref:`match <envoy_v3_api_field_config.tap.v3.TapConfig.match>` and
+	// :ref:`match_config <envoy_v3_api_field_config.tap.v3.TapConfig.match_config>` must be set. If both
+	// are set, the :ref:`match <envoy_v3_api_field_config.tap.v3.TapConfig.match>` will be used.
 	//
 	// Deprecated: Do not use.
 	HiddenEnvoyDeprecatedMatchConfig *MatchPredicate `protobuf:"bytes,1,opt,name=hidden_envoy_deprecated_match_config,json=hiddenEnvoyDeprecatedMatchConfig,proto3" json:"hidden_envoy_deprecated_match_config,omitempty"`
 	// The match configuration. If the configuration matches the data source being tapped, a tap will
 	// occur, with the result written to the configured output.
-	// Exactly one of :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` and
-	// :ref:`match_config <envoy_api_field_config.tap.v4alpha.TapConfig.match_config>` must be set. If both
-	// are set, the :ref:`match <envoy_api_field_config.tap.v4alpha.TapConfig.match>` will be used.
+	// Exactly one of :ref:`match <envoy_v3_api_field_config.tap.v3.TapConfig.match>` and
+	// :ref:`match_config <envoy_v3_api_field_config.tap.v3.TapConfig.match_config>` must be set. If both
+	// are set, the :ref:`match <envoy_v3_api_field_config.tap.v3.TapConfig.match>` will be used.
 	Match *v4alpha.MatchPredicate `protobuf:"bytes,4,opt,name=match,proto3" json:"match,omitempty"`
 	// The tap output configuration. If a match configuration matches a data source being tapped,
 	// a tap will occur and the data will be written to the configured output.
@@ -143,7 +143,7 @@ type TapConfig struct {
 	// .. note::
 	//
 	//   This field defaults to 100/:ref:`HUNDRED
-	//   <envoy_api_enum_type.v3.FractionalPercent.DenominatorType>`.
+	//   <envoy_v3_api_enum_type.v3.FractionalPercent.DenominatorType>`.
 	TapEnabled *v4alpha1.RuntimeFractionalPercent `protobuf:"bytes,3,opt,name=tap_enabled,json=tapEnabled,proto3" json:"tap_enabled,omitempty"`
 }
 
@@ -542,17 +542,17 @@ type OutputConfig struct {
 	Sinks []*OutputSink `protobuf:"bytes,1,rep,name=sinks,proto3" json:"sinks,omitempty"`
 	// For buffered tapping, the maximum amount of received body that will be buffered prior to
 	// truncation. If truncation occurs, the :ref:`truncated
-	// <envoy_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
+	// <envoy_v3_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
 	// default is 1KiB.
 	MaxBufferedRxBytes *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_buffered_rx_bytes,json=maxBufferedRxBytes,proto3" json:"max_buffered_rx_bytes,omitempty"`
 	// For buffered tapping, the maximum amount of transmitted body that will be buffered prior to
 	// truncation. If truncation occurs, the :ref:`truncated
-	// <envoy_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
+	// <envoy_v3_api_field_data.tap.v3.Body.truncated>` field will be set. If not specified, the
 	// default is 1KiB.
 	MaxBufferedTxBytes *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=max_buffered_tx_bytes,json=maxBufferedTxBytes,proto3" json:"max_buffered_tx_bytes,omitempty"`
 	// Indicates whether taps produce a single buffered message per tap, or multiple streamed
 	// messages per tap in the emitted :ref:`TraceWrapper
-	// <envoy_api_msg_data.tap.v3.TraceWrapper>` messages. Note that streamed tapping does not
+	// <envoy_v3_api_msg_data.tap.v3.TraceWrapper>` messages. Note that streamed tapping does not
 	// mean that no buffering takes place. Buffering may be required if data is processed before a
 	// match can be determined. See the HTTP tap filter :ref:`streaming
 	// <config_http_filters_tap_streaming>` documentation for more information.

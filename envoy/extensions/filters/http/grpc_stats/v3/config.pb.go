@@ -43,9 +43,9 @@ type FilterConfig struct {
 	PerMethodStatSpecifier isFilterConfig_PerMethodStatSpecifier `protobuf_oneof:"per_method_stat_specifier"`
 	// If true, the filter will gather a histogram for the request time of the upstream.
 	// It works with :ref:`stats_for_all_methods
-	// <envoy_api_field_extensions.filters.http.grpc_stats.v3.FilterConfig.stats_for_all_methods>`
+	// <envoy_v3_api_field_extensions.filters.http.grpc_stats.v3.FilterConfig.stats_for_all_methods>`
 	// and :ref:`individual_method_stats_allowlist
-	// <envoy_api_field_extensions.filters.http.grpc_stats.v3.FilterConfig.individual_method_stats_allowlist>` the same way
+	// <envoy_v3_api_field_extensions.filters.http.grpc_stats.v3.FilterConfig.individual_method_stats_allowlist>` the same way
 	// request_message_count and response_message_count works.
 	EnableUpstreamStats bool `protobuf:"varint,4,opt,name=enable_upstream_stats,json=enableUpstreamStats,proto3" json:"enable_upstream_stats,omitempty"`
 }

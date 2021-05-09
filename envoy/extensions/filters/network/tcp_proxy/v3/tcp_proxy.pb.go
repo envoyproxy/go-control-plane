@@ -429,7 +429,7 @@ type TcpProxy_WeightedCluster_ClusterWeight struct {
 	// in the upstream cluster with metadata matching what is set in this field will be considered
 	// for load balancing. Note that this will be merged with what's provided in
 	// :ref:`TcpProxy.metadata_match
-	// <envoy_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.metadata_match>`, with values
+	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.metadata_match>`, with values
 	// here taking precedence. The filter name should be specified as *envoy.lb*.
 	MetadataMatch *v3.Metadata `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 }

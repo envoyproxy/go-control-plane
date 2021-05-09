@@ -30,7 +30,7 @@ const _ = proto.ProtoPackageIsVersion4
 
 // HttpProtocolOptions specifies Http upstream protocol options. This object
 // is used in
-// :ref:`typed_extension_protocol_options<envoy_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
+// :ref:`typed_extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
 // keyed by the name `envoy.extensions.upstreams.http.v3.HttpProtocolOptions`.
 //
 // This controls what protocol(s) should be used for upstream and how said protocol(s) are configured.

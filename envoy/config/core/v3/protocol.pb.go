@@ -286,7 +286,7 @@ type HttpProtocolOptions struct {
 	// idle timeout is reached the connection will be closed. If the connection is an HTTP/2
 	// downstream connection a drain sequence will occur prior to closing the connection, see
 	// :ref:`drain_timeout
-	// <envoy_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
 	// Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.
 	// If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.
 	//
@@ -296,13 +296,13 @@ type HttpProtocolOptions struct {
 	//
 	// If the :ref:`overload action <config_overload_manager_overload_actions>` "envoy.overload_actions.reduce_timeouts"
 	// is configured, this timeout is scaled for downstream connections according to the value for
-	// :ref:`HTTP_DOWNSTREAM_CONNECTION_IDLE <envoy_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_CONNECTION_IDLE>`.
+	// :ref:`HTTP_DOWNSTREAM_CONNECTION_IDLE <envoy_v3_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_CONNECTION_IDLE>`.
 	IdleTimeout *duration.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// The maximum duration of a connection. The duration is defined as a period since a connection
 	// was established. If not set, there is no max duration. When max_connection_duration is reached
 	// the connection will be closed. Drain sequence will occur prior to closing the connection if
 	// if's applicable. See :ref:`drain_timeout
-	// <envoy_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
 	// Note: not implemented for upstream connections.
 	MaxConnectionDuration *duration.Duration `protobuf:"bytes,3,opt,name=max_connection_duration,json=maxConnectionDuration,proto3" json:"max_connection_duration,omitempty"`
 	// The maximum number of headers. If unconfigured, the default

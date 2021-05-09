@@ -43,7 +43,7 @@ type StatsSink struct {
 	// Sinks optionally support tagged/multiple dimensional metrics.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Stats sink specific configuration which depends on the sink being instantiated. See
-	// :ref:`StatsdSink <envoy_api_msg_config.metrics.v4alpha.StatsdSink>` for an example.
+	// :ref:`StatsdSink <envoy_v3_api_msg_config.metrics.v3.StatsdSink>` for an example.
 	// [#extension-category: envoy.stats_sinks]
 	//
 	// Types that are assignable to ConfigType:
@@ -122,12 +122,12 @@ type StatsConfig struct {
 
 	// Each stat name is iteratively processed through these tag specifiers.
 	// When a tag is matched, the first capture group is removed from the name so
-	// later :ref:`TagSpecifiers <envoy_api_msg_config.metrics.v4alpha.TagSpecifier>` cannot match that
+	// later :ref:`TagSpecifiers <envoy_v3_api_msg_config.metrics.v3.TagSpecifier>` cannot match that
 	// same portion of the match.
 	StatsTags []*TagSpecifier `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags,proto3" json:"stats_tags,omitempty"`
 	// Use all default tag regexes specified in Envoy. These can be combined with
 	// custom tags specified in :ref:`stats_tags
-	// <envoy_api_field_config.metrics.v4alpha.StatsConfig.stats_tags>`. They will be processed before
+	// <envoy_v3_api_field_config.metrics.v3.StatsConfig.stats_tags>`. They will be processed before
 	// the custom tags.
 	//
 	// .. note::
@@ -353,9 +353,9 @@ type TagSpecifier struct {
 	// sink. Envoy has a set of default names and regexes to extract dynamic
 	// portions of existing stats, which can be found in :repo:`well_known_names.h
 	// <source/common/config/well_known_names.h>` in the Envoy repository. If a :ref:`tag_name
-	// <envoy_api_field_config.metrics.v4alpha.TagSpecifier.tag_name>` is provided in the config and
-	// neither :ref:`regex <envoy_api_field_config.metrics.v4alpha.TagSpecifier.regex>` or
-	// :ref:`fixed_value <envoy_api_field_config.metrics.v4alpha.TagSpecifier.fixed_value>` were specified,
+	// <envoy_v3_api_field_config.metrics.v3.TagSpecifier.tag_name>` is provided in the config and
+	// neither :ref:`regex <envoy_v3_api_field_config.metrics.v3.TagSpecifier.regex>` or
+	// :ref:`fixed_value <envoy_v3_api_field_config.metrics.v3.TagSpecifier.fixed_value>` were specified,
 	// Envoy will attempt to find that name in its set of defaults and use the accompanying regex.
 	//
 	// .. note::
@@ -685,7 +685,7 @@ func (*StatsdSink_TcpClusterName) isStatsdSink_StatsdSpecifier() {}
 // Stats configuration proto schema for built-in *envoy.stat_sinks.dog_statsd* sink.
 // The sink emits stats with `DogStatsD <https://docs.datadoghq.com/guides/dogstatsd/>`_
 // compatible tags. Tags are configurable via :ref:`StatsConfig
-// <envoy_api_msg_config.metrics.v4alpha.StatsConfig>`.
+// <envoy_v3_api_msg_config.metrics.v3.StatsConfig>`.
 // [#extension: envoy.stat_sinks.dog_statsd]
 type DogStatsdSink struct {
 	state         protoimpl.MessageState
@@ -696,7 +696,7 @@ type DogStatsdSink struct {
 	//	*DogStatsdSink_Address
 	DogStatsdSpecifier isDogStatsdSink_DogStatsdSpecifier `protobuf_oneof:"dog_statsd_specifier"`
 	// Optional custom metric name prefix. See :ref:`StatsdSink's prefix field
-	// <envoy_api_field_config.metrics.v4alpha.StatsdSink.prefix>` for more details.
+	// <envoy_v3_api_field_config.metrics.v3.StatsdSink.prefix>` for more details.
 	Prefix string `protobuf:"bytes,3,opt,name=prefix,proto3" json:"prefix,omitempty"`
 	// Optional max datagram size to use when sending UDP messages. By default Envoy
 	// will emit one metric per datagram. By specifying a max-size larger than a single

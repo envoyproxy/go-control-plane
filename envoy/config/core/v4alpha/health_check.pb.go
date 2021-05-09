@@ -202,7 +202,7 @@ type HealthCheck struct {
 	// This allows overriding the cluster TLS settings, just for health check connections.
 	TlsOptions *HealthCheck_TlsOptions `protobuf:"bytes,21,opt,name=tls_options,json=tlsOptions,proto3" json:"tls_options,omitempty"`
 	// Optional key/value pairs that will be used to match a transport socket from those specified in the cluster's
-	// :ref:`tranport socket matches <envoy_api_field_config.cluster.v4alpha.Cluster.transport_socket_matches>`.
+	// :ref:`tranport socket matches <envoy_v3_api_field_config.cluster.v3.Cluster.transport_socket_matches>`.
 	// For example, the following match criteria
 	//
 	// .. code-block:: yaml
@@ -210,7 +210,7 @@ type HealthCheck struct {
 	//  transport_socket_match_criteria:
 	//    useMTLS: true
 	//
-	// Will match the following :ref:`cluster socket match <envoy_api_msg_config.cluster.v4alpha.Cluster.TransportSocketMatch>`
+	// Will match the following :ref:`cluster socket match <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>`
 	//
 	// .. code-block:: yaml
 	//
@@ -223,13 +223,13 @@ type HealthCheck struct {
 	//      config: { ... } # tls socket configuration
 	//
 	// If this field is set, then for health checks it will supersede an entry of *envoy.transport_socket* in the
-	// :ref:`LbEndpoint.Metadata <envoy_api_field_config.endpoint.v3.LbEndpoint.metadata>`.
+	// :ref:`LbEndpoint.Metadata <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>`.
 	// This allows using different transport socket capabilities for health checking versus proxying to the
 	// endpoint.
 	//
 	// If the key/values pairs specified do not match any
-	// :ref:`transport socket matches <envoy_api_field_config.cluster.v4alpha.Cluster.transport_socket_matches>`,
-	// the cluster's :ref:`transport socket <envoy_api_field_config.cluster.v4alpha.Cluster.transport_socket>`
+	// :ref:`transport socket matches <envoy_v3_api_field_config.cluster.v3.Cluster.transport_socket_matches>`,
+	// the cluster's :ref:`transport socket <envoy_v3_api_field_config.cluster.v3.Cluster.transport_socket>`
 	// will be used for health check socket configuration.
 	TransportSocketMatchCriteria *_struct.Struct `protobuf:"bytes,23,opt,name=transport_socket_match_criteria,json=transportSocketMatchCriteria,proto3" json:"transport_socket_match_criteria,omitempty"`
 }
@@ -558,7 +558,7 @@ type HealthCheck_HttpHealthCheck struct {
 	// The value of the host header in the HTTP health check request. If
 	// left empty (default value), the name of the cluster this health check is associated
 	// with will be used. The host header can be customized for a specific endpoint by setting the
-	// :ref:`hostname <envoy_api_field_config.endpoint.v3.Endpoint.HealthCheckConfig.hostname>` field.
+	// :ref:`hostname <envoy_v3_api_field_config.endpoint.v3.Endpoint.HealthCheckConfig.hostname>` field.
 	Host string `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
 	// Specifies the HTTP path that will be requested during health checking. For example
 	// */healthcheck*.
@@ -577,14 +577,14 @@ type HealthCheck_HttpHealthCheck struct {
 	RequestHeadersToRemove []string `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove,proto3" json:"request_headers_to_remove,omitempty"`
 	// Specifies a list of HTTP response statuses considered healthy. If provided, replaces default
 	// 200-only policy - 200 must be included explicitly as needed. Ranges follow half-open
-	// semantics of :ref:`Int64Range <envoy_api_msg_type.v3.Int64Range>`. The start and end of each
+	// semantics of :ref:`Int64Range <envoy_v3_api_msg_type.v3.Int64Range>`. The start and end of each
 	// range are required. Only statuses in the range [100, 600) are allowed.
 	ExpectedStatuses []*v3.Int64Range `protobuf:"bytes,9,rep,name=expected_statuses,json=expectedStatuses,proto3" json:"expected_statuses,omitempty"`
 	// Use specified application protocol for health checks.
 	CodecClientType v3.CodecClientType `protobuf:"varint,10,opt,name=codec_client_type,json=codecClientType,proto3,enum=envoy.type.v3.CodecClientType" json:"codec_client_type,omitempty"`
 	// An optional service name parameter which is used to validate the identity of
 	// the health checked cluster using a :ref:`StringMatcher
-	// <envoy_api_msg_type.matcher.v4alpha.StringMatcher>`. See the :ref:`architecture overview
+	// <envoy_v3_api_msg_type.matcher.v3.StringMatcher>`. See the :ref:`architecture overview
 	// <arch_overview_health_checking_identity>` for more information.
 	ServiceNameMatcher *v4alpha.StringMatcher `protobuf:"bytes,11,opt,name=service_name_matcher,json=serviceNameMatcher,proto3" json:"service_name_matcher,omitempty"`
 }
@@ -812,7 +812,7 @@ type HealthCheck_GrpcHealthCheck struct {
 	// The value of the :authority header in the gRPC health check request. If
 	// left empty (default value), the name of the cluster this health check is associated
 	// with will be used. The authority header can be customized for a specific endpoint by setting
-	// the :ref:`hostname <envoy_api_field_config.endpoint.v3.Endpoint.HealthCheckConfig.hostname>` field.
+	// the :ref:`hostname <envoy_v3_api_field_config.endpoint.v3.Endpoint.HealthCheckConfig.hostname>` field.
 	Authority string `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
 }
 
@@ -953,7 +953,7 @@ type HealthCheck_TlsOptions struct {
 
 	// Specifies the ALPN protocols for health check connections. This is useful if the
 	// corresponding upstream is using ALPN-based :ref:`FilterChainMatch
-	// <envoy_api_msg_config.listener.v4alpha.FilterChainMatch>` along with different protocols for health checks
+	// <envoy_v3_api_msg_config.listener.v3.FilterChainMatch>` along with different protocols for health checks
 	// versus data connections. If empty, no ALPN protocols will be set on health check connections.
 	AlpnProtocols []string `protobuf:"bytes,1,rep,name=alpn_protocols,json=alpnProtocols,proto3" json:"alpn_protocols,omitempty"`
 }

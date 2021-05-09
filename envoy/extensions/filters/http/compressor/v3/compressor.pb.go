@@ -68,7 +68,7 @@ type Compressor struct {
 	// Deprecated: Do not use.
 	RuntimeEnabled *v3.RuntimeFeatureFlag `protobuf:"bytes,5,opt,name=runtime_enabled,json=runtimeEnabled,proto3" json:"runtime_enabled,omitempty"`
 	// A compressor library to use for compression. Currently only
-	// :ref:`envoy.compression.gzip.compressor<envoy_api_msg_extensions.compression.gzip.compressor.v3.Gzip>`
+	// :ref:`envoy.compression.gzip.compressor<envoy_v3_api_msg_extensions.compression.gzip.compressor.v3.Gzip>`
 	// is included in Envoy.
 	// This field is ignored if used in the context of the gzip http-filter, but is mandatory otherwise.
 	// [#extension-category: envoy.compression.compressor]

@@ -33,9 +33,9 @@ const _ = proto.ProtoPackageIsVersion4
 // incoming request.
 //
 // This is intended to be used with
-// :ref:`ExtensionWithMatcher <envoy_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
+// :ref:`ExtensionWithMatcher <envoy_v3_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
 // where a match tree is specified that indicates (via
-// :ref:`ExecuteFilterAction <envoy_api_msg_extensions.filters.http.composite.v3.ExecuteFilterAction>`)
+// :ref:`ExecuteFilterAction <envoy_v3_api_msg_extensions.filters.http.composite.v3.ExecuteFilterAction>`)
 // which filter configuration to create and delegate to.
 //
 type Composite struct {

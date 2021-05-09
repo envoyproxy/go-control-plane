@@ -103,7 +103,7 @@ type LoadStatsResponse struct {
 	Clusters []string `protobuf:"bytes,1,rep,name=clusters,proto3" json:"clusters,omitempty"`
 	// If true, the client should send all clusters it knows about.
 	// Only clients that advertise the "envoy.lrs.supports_send_all_clusters" capability in their
-	// :ref:`client_features<envoy_api_field_config.core.v3.Node.client_features>` field will honor this field.
+	// :ref:`client_features<envoy_v3_api_field_config.core.v3.Node.client_features>` field will honor this field.
 	SendAllClusters bool `protobuf:"varint,4,opt,name=send_all_clusters,json=sendAllClusters,proto3" json:"send_all_clusters,omitempty"`
 	// The minimum interval of time to collect stats over. This is only a minimum for two reasons:
 	//

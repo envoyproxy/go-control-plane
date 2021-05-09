@@ -110,11 +110,11 @@ type ConfigDump struct {
 	// The following configurations are currently supported and will be dumped in the order given
 	// below:
 	//
-	// * *bootstrap*: :ref:`BootstrapConfigDump <envoy_api_msg_admin.v3.BootstrapConfigDump>`
-	// * *clusters*: :ref:`ClustersConfigDump <envoy_api_msg_admin.v3.ClustersConfigDump>`
-	// * *endpoints*:  :ref:`EndpointsConfigDump <envoy_api_msg_admin.v3.EndpointsConfigDump>`
-	// * *listeners*: :ref:`ListenersConfigDump <envoy_api_msg_admin.v3.ListenersConfigDump>`
-	// * *routes*:  :ref:`RoutesConfigDump <envoy_api_msg_admin.v3.RoutesConfigDump>`
+	// * *bootstrap*: :ref:`BootstrapConfigDump <envoy_v3_api_msg_admin.v3.BootstrapConfigDump>`
+	// * *clusters*: :ref:`ClustersConfigDump <envoy_v3_api_msg_admin.v3.ClustersConfigDump>`
+	// * *endpoints*:  :ref:`EndpointsConfigDump <envoy_v3_api_msg_admin.v3.EndpointsConfigDump>`
+	// * *listeners*: :ref:`ListenersConfigDump <envoy_v3_api_msg_admin.v3.ListenersConfigDump>`
+	// * *routes*:  :ref:`RoutesConfigDump <envoy_v3_api_msg_admin.v3.RoutesConfigDump>`
 	//
 	// EDS Configuration will only be dumped by using parameter `?include_eds`
 	//
@@ -310,7 +310,7 @@ type ListenersConfigDump struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// This is the :ref:`version_info <envoy_api_field_service.discovery.v3.DiscoveryResponse.version_info>` in the
+	// This is the :ref:`version_info <envoy_v3_api_field_service.discovery.v3.DiscoveryResponse.version_info>` in the
 	// last processed LDS discovery response. If there are only static bootstrap listeners, this field
 	// will be "".
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
@@ -381,7 +381,7 @@ type ClustersConfigDump struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// This is the :ref:`version_info <envoy_api_field_service.discovery.v3.DiscoveryResponse.version_info>` in the
+	// This is the :ref:`version_info <envoy_v3_api_field_service.discovery.v3.DiscoveryResponse.version_info>` in the
 	// last processed CDS discovery response. If there are only static bootstrap clusters, this field
 	// will be "".
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
@@ -773,7 +773,7 @@ type ListenersConfigDump_DynamicListenerState struct {
 	unknownFields protoimpl.UnknownFields
 
 	// This is the per-resource version information. This version is currently taken from the
-	// :ref:`version_info <envoy_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time
+	// :ref:`version_info <envoy_v3_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time
 	// that the listener was loaded. In the future, discrete per-listener versions may be supported
 	// by the API.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
@@ -1008,7 +1008,7 @@ type ClustersConfigDump_DynamicCluster struct {
 	unknownFields protoimpl.UnknownFields
 
 	// This is the per-resource version information. This version is currently taken from the
-	// :ref:`version_info <envoy_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time
+	// :ref:`version_info <envoy_v3_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time
 	// that the cluster was loaded. In the future, discrete per-cluster versions may be supported by
 	// the API.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
@@ -1158,7 +1158,7 @@ type RoutesConfigDump_DynamicRouteConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// This is the per-resource version information. This version is currently taken from the
-	// :ref:`version_info <envoy_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time that
+	// :ref:`version_info <envoy_v3_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time that
 	// the route configuration was loaded.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The route config.
@@ -1318,7 +1318,7 @@ type ScopedRoutesConfigDump_DynamicScopedRouteConfigs struct {
 	// The name assigned to the scoped route configurations.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// This is the per-resource version information. This version is currently taken from the
-	// :ref:`version_info <envoy_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time that
+	// :ref:`version_info <envoy_v3_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time that
 	// the scoped routes configuration was loaded.
 	VersionInfo string `protobuf:"bytes,2,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The scoped route configurations.
@@ -1645,7 +1645,7 @@ type EndpointsConfigDump_DynamicEndpointConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// [#not-implemented-hide:] This is the per-resource version information. This version is currently taken from the
-	// :ref:`version_info <envoy_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time that
+	// :ref:`version_info <envoy_v3_api_field_service.discovery.v3.DiscoveryResponse.version_info>` field at the time that
 	// the endpoint configuration was loaded.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The endpoint config.

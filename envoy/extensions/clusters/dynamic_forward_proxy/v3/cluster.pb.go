@@ -38,11 +38,11 @@ type ClusterConfig struct {
 
 	// The DNS cache configuration that the cluster will attach to. Note this configuration must
 	// match that of associated :ref:`dynamic forward proxy HTTP filter configuration
-	// <envoy_api_field_extensions.filters.http.dynamic_forward_proxy.v3.FilterConfig.dns_cache_config>`.
+	// <envoy_v3_api_field_extensions.filters.http.dynamic_forward_proxy.v3.FilterConfig.dns_cache_config>`.
 	DnsCacheConfig *v3.DnsCacheConfig `protobuf:"bytes,1,opt,name=dns_cache_config,json=dnsCacheConfig,proto3" json:"dns_cache_config,omitempty"`
 	// If true allow the cluster configuration to disable the auto_sni and auto_san_validation options
 	// in the :ref:`cluster's upstream_http_protocol_options
-	// <envoy_api_field_config.cluster.v3.Cluster.upstream_http_protocol_options>`
+	// <envoy_v3_api_field_config.cluster.v3.Cluster.upstream_http_protocol_options>`
 	AllowInsecureClusterOptions bool `protobuf:"varint,2,opt,name=allow_insecure_cluster_options,json=allowInsecureClusterOptions,proto3" json:"allow_insecure_cluster_options,omitempty"`
 }
 

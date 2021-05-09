@@ -49,8 +49,8 @@ type StreamEventsRequest struct {
 	//
 	// The following events are supported:
 	//
-	// * :ref:`HealthCheckEvent <envoy_api_msg_data.core.v3.HealthCheckEvent>`
-	// * :ref:`OutlierDetectionEvent <envoy_api_msg_data.cluster.v3.OutlierDetectionEvent>`
+	// * :ref:`HealthCheckEvent <envoy_v3_api_msg_data.core.v3.HealthCheckEvent>`
+	// * :ref:`OutlierDetectionEvent <envoy_v3_api_msg_data.cluster.v3.OutlierDetectionEvent>`
 	Events []*any.Any `protobuf:"bytes,2,rep,name=events,proto3" json:"events,omitempty"`
 }
 

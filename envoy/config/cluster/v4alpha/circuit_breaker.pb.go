@@ -37,10 +37,10 @@ type CircuitBreakers struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// If multiple :ref:`Thresholds<envoy_api_msg_config.cluster.v4alpha.CircuitBreakers.Thresholds>`
-	// are defined with the same :ref:`RoutingPriority<envoy_api_enum_config.core.v4alpha.RoutingPriority>`,
+	// If multiple :ref:`Thresholds<envoy_v3_api_msg_config.cluster.v3.CircuitBreakers.Thresholds>`
+	// are defined with the same :ref:`RoutingPriority<envoy_v3_api_enum_config.core.v3.RoutingPriority>`,
 	// the first one in the list is used. If no Thresholds is defined for a given
-	// :ref:`RoutingPriority<envoy_api_enum_config.core.v4alpha.RoutingPriority>`, the default values
+	// :ref:`RoutingPriority<envoy_v3_api_enum_config.core.v3.RoutingPriority>`, the default values
 	// are used.
 	Thresholds []*CircuitBreakers_Thresholds `protobuf:"bytes,1,rep,name=thresholds,proto3" json:"thresholds,omitempty"`
 }
@@ -85,14 +85,14 @@ func (x *CircuitBreakers) GetThresholds() []*CircuitBreakers_Thresholds {
 }
 
 // A Thresholds defines CircuitBreaker settings for a
-// :ref:`RoutingPriority<envoy_api_enum_config.core.v4alpha.RoutingPriority>`.
+// :ref:`RoutingPriority<envoy_v3_api_enum_config.core.v3.RoutingPriority>`.
 // [#next-free-field: 9]
 type CircuitBreakers_Thresholds struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The :ref:`RoutingPriority<envoy_api_enum_config.core.v4alpha.RoutingPriority>`
+	// The :ref:`RoutingPriority<envoy_v3_api_enum_config.core.v3.RoutingPriority>`
 	// the specified CircuitBreaker settings apply to.
 	Priority v4alpha.RoutingPriority `protobuf:"varint,1,opt,name=priority,proto3,enum=envoy.config.core.v4alpha.RoutingPriority" json:"priority,omitempty"`
 	// The maximum number of connections that Envoy will make to the upstream

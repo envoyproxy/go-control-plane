@@ -39,9 +39,9 @@ type Body struct {
 	BodyType isBody_BodyType `protobuf_oneof:"body_type"`
 	// Specifies whether body data has been truncated to fit within the specified
 	// :ref:`max_buffered_rx_bytes
-	// <envoy_api_field_config.tap.v3.OutputConfig.max_buffered_rx_bytes>` and
+	// <envoy_v3_api_field_config.tap.v3.OutputConfig.max_buffered_rx_bytes>` and
 	// :ref:`max_buffered_tx_bytes
-	// <envoy_api_field_config.tap.v3.OutputConfig.max_buffered_tx_bytes>` settings.
+	// <envoy_v3_api_field_config.tap.v3.OutputConfig.max_buffered_tx_bytes>` settings.
 	Truncated bool `protobuf:"varint,3,opt,name=truncated,proto3" json:"truncated,omitempty"`
 }
 
@@ -117,7 +117,7 @@ type Body_AsBytes struct {
 
 type Body_AsString struct {
 	// Body data as string. This field is only used when the :ref:`JSON_BODY_AS_STRING
-	// <envoy_api_enum_value_config.tap.v3.OutputSink.Format.JSON_BODY_AS_STRING>` sink
+	// <envoy_v3_api_enum_value_config.tap.v3.OutputSink.Format.JSON_BODY_AS_STRING>` sink
 	// format type is selected. See the documentation for that option for why this is useful.
 	AsString string `protobuf:"bytes,2,opt,name=as_string,json=asString,proto3,oneof"`
 }

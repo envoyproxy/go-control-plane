@@ -216,11 +216,11 @@ type Locality struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Region this :ref:`zone <envoy_api_field_config.core.v4alpha.Locality.zone>` belongs to.
+	// Region this :ref:`zone <envoy_v3_api_field_config.core.v3.Locality.zone>` belongs to.
 	Region string `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
 	// Defines the local service zone where Envoy is running. Though optional, it
 	// should be set if discovery service routing is used and the discovery
-	// service exposes :ref:`zone data <envoy_api_field_config.endpoint.v3.LocalityLbEndpoints.locality>`,
+	// service exposes :ref:`zone data <envoy_v3_api_field_config.endpoint.v3.LocalityLbEndpoints.locality>`,
 	// either in this message or via :option:`--service-zone`. The meaning of zone
 	// is context dependent, e.g. `Availability Zone (AZ)
 	// <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html>`_
@@ -461,10 +461,10 @@ type Node struct {
 	// optional, it should be set if any of the following features are used:
 	// :ref:`statsd <arch_overview_statistics>`, :ref:`health check cluster
 	// verification
-	// <envoy_api_field_config.core.v4alpha.HealthCheck.HttpHealthCheck.service_name_matcher>`,
-	// :ref:`runtime override directory <envoy_api_msg_config.bootstrap.v4alpha.Runtime>`,
+	// <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.service_name_matcher>`,
+	// :ref:`runtime override directory <envoy_v3_api_msg_config.bootstrap.v3.Runtime>`,
 	// :ref:`user agent addition
-	// <envoy_api_field_extensions.filters.network.http_connection_manager.v4alpha.HttpConnectionManager.add_user_agent>`,
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.add_user_agent>`,
 	// :ref:`HTTP global rate limiting <config_http_filters_rate_limit>`,
 	// :ref:`CDS <config_cluster_manager_cds>`, and :ref:`HTTP tracing
 	// <arch_overview_tracing>`, either in this message or via
@@ -1269,7 +1269,7 @@ type RetryPolicy struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Specifies parameters that control :ref:`retry backoff strategy <envoy_api_msg_config.core.v4alpha.BackoffStrategy>`.
+	// Specifies parameters that control :ref:`retry backoff strategy <envoy_v3_api_msg_config.core.v3.BackoffStrategy>`.
 	// This parameter is optional, in which case the default base interval is 1000 milliseconds. The
 	// default maximum interval is 10 times the base interval.
 	RetryBackOff *BackoffStrategy `protobuf:"bytes,1,opt,name=retry_back_off,json=retryBackOff,proto3" json:"retry_back_off,omitempty"`
@@ -1475,7 +1475,7 @@ func (*AsyncDataSource_Local) isAsyncDataSource_Specifier() {}
 func (*AsyncDataSource_Remote) isAsyncDataSource_Specifier() {}
 
 // Configuration for transport socket in :ref:`listeners <config_listeners>` and
-// :ref:`clusters <envoy_api_msg_config.cluster.v4alpha.Cluster>`. If the configuration is
+// :ref:`clusters <envoy_v3_api_msg_config.cluster.v3.Cluster>`. If the configuration is
 // empty, a default transport socket implementation and configuration will be
 // chosen based on the platform and existence of tls_context.
 type TransportSocket struct {
@@ -1563,7 +1563,7 @@ func (*TransportSocket_TypedConfig) isTransportSocket_ConfigType() {}
 // .. note::
 //
 //   Parsing of the runtime key's data is implemented such that it may be represented as a
-//   :ref:`FractionalPercent <envoy_api_msg_type.v3.FractionalPercent>` proto represented as JSON/YAML
+//   :ref:`FractionalPercent <envoy_v3_api_msg_type.v3.FractionalPercent>` proto represented as JSON/YAML
 //   and may also be represented as an integer with the assumption that the value is an integral
 //   percentage out of 100. For instance, a runtime key lookup returning the value "42" would parse
 //   as a `FractionalPercent` whose numerator is 42 and denominator is HUNDRED.

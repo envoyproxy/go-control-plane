@@ -42,7 +42,7 @@ type FilterConfig struct {
 	// The DNS cache configuration that the filter will attach to. Note this
 	// configuration must match that of associated :ref:`dynamic forward proxy
 	// cluster configuration
-	// <envoy_api_field_extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig.dns_cache_config>`.
+	// <envoy_v3_api_field_extensions.clusters.dynamic_forward_proxy.v3.ClusterConfig.dns_cache_config>`.
 	DnsCacheConfig *v3.DnsCacheConfig `protobuf:"bytes,1,opt,name=dns_cache_config,json=dnsCacheConfig,proto3" json:"dns_cache_config,omitempty"`
 	// Types that are assignable to PortSpecifier:
 	//	*FilterConfig_PortValue

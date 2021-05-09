@@ -348,7 +348,7 @@ type HealthCheckAddHealthy struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Whether this addition is the result of the first ever health check on a host, in which case
-	// the configured :ref:`healthy threshold <envoy_api_field_config.core.v3.HealthCheck.healthy_threshold>`
+	// the configured :ref:`healthy threshold <envoy_v3_api_field_config.core.v3.HealthCheck.healthy_threshold>`
 	// is bypassed and the host is immediately added.
 	FirstCheck bool `protobuf:"varint,1,opt,name=first_check,json=firstCheck,proto3" json:"first_check,omitempty"`
 }

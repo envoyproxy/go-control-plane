@@ -101,7 +101,7 @@ const (
 	CertificateValidationContext_VERIFY_TRUST_CHAIN CertificateValidationContext_TrustChainVerification = 0
 	// Connections where the certificate fails verification will be permitted.
 	// For HTTP connections, the result of certificate verification can be used in route matching. (
-	// see :ref:`validated <envoy_api_field_config.route.v3.RouteMatch.TlsContextMatchOptions.validated>` ).
+	// see :ref:`validated <envoy_v3_api_field_config.route.v3.RouteMatch.TlsContextMatchOptions.validated>` ).
 	CertificateValidationContext_ACCEPT_UNTRUSTED CertificateValidationContext_TrustChainVerification = 1
 )
 
@@ -400,11 +400,11 @@ type TlsCertificate struct {
 	// <sds_key_rotation>` documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,7,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
 	// BoringSSL private key method provider. This is an alternative to :ref:`private_key
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` field. This can't be
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` field. This can't be
 	// marked as ``oneof`` due to API compatibility reasons. Setting both :ref:`private_key
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` and
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` and
 	// :ref:`private_key_provider
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key_provider>` fields will result in an
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key_provider>` fields will result in an
 	// error.
 	PrivateKeyProvider *PrivateKeyProvider `protobuf:"bytes,6,opt,name=private_key_provider,json=privateKeyProvider,proto3" json:"private_key_provider,omitempty"`
 	// The password to decrypt the TLS private key. If this field is not set, it is assumed that the
@@ -509,7 +509,7 @@ type TlsSessionTicketKeys struct {
 	// All keys are candidates for decrypting received tickets. This allows for easy rotation of keys
 	// by, for example, putting the new key first, and the previous key second.
 	//
-	// If :ref:`session_ticket_keys <envoy_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.session_ticket_keys>`
+	// If :ref:`session_ticket_keys <envoy_v3_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.session_ticket_keys>`
 	// is not specified, the TLS library will still support resuming sessions via tickets, but it will
 	// use an internally-generated and managed key, so sessions cannot be resumed across hot restarts
 	// or on different hosts.
@@ -580,13 +580,13 @@ type CertificateValidationContext struct {
 	// for listeners). If not specified and a peer certificate is presented it will not be
 	// verified. By default, a client certificate is optional, unless one of the additional
 	// options (:ref:`require_client_certificate
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.require_client_certificate>`,
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.DownstreamTlsContext.require_client_certificate>`,
 	// :ref:`verify_certificate_spki
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_spki>`,
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_spki>`,
 	// :ref:`verify_certificate_hash
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>`, or
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>`, or
 	// :ref:`match_subject_alt_names
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.match_subject_alt_names>`) is also
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.match_subject_alt_names>`) is also
 	// specified.
 	//
 	// It can optionally contain certificate revocation lists, in which case Envoy will verify
@@ -630,15 +630,15 @@ type CertificateValidationContext struct {
 	//
 	// When both:
 	// :ref:`verify_certificate_hash
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>` and
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>` and
 	// :ref:`verify_certificate_spki
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_spki>` are specified,
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_spki>` are specified,
 	// a hash matching value from either of the lists will result in the certificate being accepted.
 	//
 	// .. attention::
 	//
 	//   This option is preferred over :ref:`verify_certificate_hash
-	//   <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>`,
+	//   <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>`,
 	//   because SPKI is tied to a private key, so it doesn't change when the certificate
 	//   is renewed using the same private key.
 	VerifyCertificateSpki []string `protobuf:"bytes,3,rep,name=verify_certificate_spki,json=verifyCertificateSpki,proto3" json:"verify_certificate_spki,omitempty"`
@@ -664,16 +664,16 @@ type CertificateValidationContext struct {
 	//
 	// When both:
 	// :ref:`verify_certificate_hash
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>` and
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>` and
 	// :ref:`verify_certificate_spki
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_spki>` are specified,
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_spki>` are specified,
 	// a hash matching value from either of the lists will result in the certificate being accepted.
 	VerifyCertificateHash []string `protobuf:"bytes,2,rep,name=verify_certificate_hash,json=verifyCertificateHash,proto3" json:"verify_certificate_hash,omitempty"`
 	// An optional list of Subject Alternative name matchers. If specified, Envoy will verify that the
 	// Subject Alternative Name of the presented certificate matches one of the specified matchers.
 	//
 	// When a certificate has wildcard DNS SAN entries, to match a specific client, it should be
-	// configured with exact match type in the :ref:`string matcher <envoy_api_msg_type.matcher.v3.StringMatcher>`.
+	// configured with exact match type in the :ref:`string matcher <envoy_v3_api_msg_type.matcher.v3.StringMatcher>`.
 	// For example if the certificate has "\*.example.com" as DNS SAN entry, to allow only "api.example.com",
 	// it should be configured as shown below.
 	//
@@ -686,7 +686,7 @@ type CertificateValidationContext struct {
 	//
 	//   Subject Alternative Names are easily spoofable and verifying only them is insecure,
 	//   therefore this option must be used together with :ref:`trusted_ca
-	//   <envoy_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`.
+	//   <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`.
 	MatchSubjectAltNames []*v31.StringMatcher `protobuf:"bytes,9,rep,name=match_subject_alt_names,json=matchSubjectAltNames,proto3" json:"match_subject_alt_names,omitempty"`
 	// [#not-implemented-hide:] Must present signed certificate time-stamp.
 	RequireSignedCertificateTimestamp *wrappers.BoolValue `protobuf:"bytes,6,opt,name=require_signed_certificate_timestamp,json=requireSignedCertificateTimestamp,proto3" json:"require_signed_certificate_timestamp,omitempty"`

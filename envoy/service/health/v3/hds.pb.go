@@ -568,9 +568,9 @@ type ClusterHealthCheck struct {
 	ClusterName       string               `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
 	HealthChecks      []*v3.HealthCheck    `protobuf:"bytes,2,rep,name=health_checks,json=healthChecks,proto3" json:"health_checks,omitempty"`
 	LocalityEndpoints []*LocalityEndpoints `protobuf:"bytes,3,rep,name=locality_endpoints,json=localityEndpoints,proto3" json:"locality_endpoints,omitempty"`
-	// Optional map that gets filtered by :ref:`health_checks.transport_socket_match_criteria <envoy_api_field_config.core.v3.HealthCheck.transport_socket_match_criteria>`
+	// Optional map that gets filtered by :ref:`health_checks.transport_socket_match_criteria <envoy_v3_api_field_config.core.v3.HealthCheck.transport_socket_match_criteria>`
 	// on connection when health checking. For more details, see
-	// :ref:`config.cluster.v3.Cluster.transport_socket_matches <envoy_api_field_config.cluster.v3.Cluster.transport_socket_matches>`.
+	// :ref:`config.cluster.v3.Cluster.transport_socket_matches <envoy_v3_api_field_config.cluster.v3.Cluster.transport_socket_matches>`.
 	TransportSocketMatches []*v32.Cluster_TransportSocketMatch `protobuf:"bytes,4,rep,name=transport_socket_matches,json=transportSocketMatches,proto3" json:"transport_socket_matches,omitempty"`
 }
 

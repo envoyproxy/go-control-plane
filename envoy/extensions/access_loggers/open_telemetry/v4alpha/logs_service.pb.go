@@ -30,7 +30,7 @@ const (
 const _ = proto.ProtoPackageIsVersion4
 
 // Configuration for the built-in *envoy.access_loggers.open_telemetry*
-// :ref:`AccessLog <envoy_api_msg_config.accesslog.v4alpha.AccessLog>`. This configuration will
+// :ref:`AccessLog <envoy_v3_api_msg_config.accesslog.v3.AccessLog>`. This configuration will
 // populate `opentelemetry.proto.collector.v1.logs.ExportLogsServiceRequest.resource_logs <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/collector/logs/v1/logs_service.proto>`_.
 // OpenTelemetry `Resource <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/resource/v1/resource.proto>`_
 // attributes are filled with Envoy node info. In addition, the request start time is set in the

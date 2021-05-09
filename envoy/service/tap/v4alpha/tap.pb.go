@@ -150,7 +150,7 @@ type StreamTapsRequest_Identifier struct {
 	// The node sending taps over the stream.
 	Node *v4alpha.Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
 	// The opaque identifier that was set in the :ref:`output config
-	// <envoy_api_field_config.tap.v4alpha.StreamingGrpcSink.tap_id>`.
+	// <envoy_v3_api_field_config.tap.v3.StreamingGrpcSink.tap_id>`.
 	TapId string `protobuf:"bytes,2,opt,name=tap_id,json=tapId,proto3" json:"tap_id,omitempty"`
 }
 

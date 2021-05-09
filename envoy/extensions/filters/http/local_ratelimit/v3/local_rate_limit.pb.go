@@ -60,7 +60,7 @@ type LocalRateLimit struct {
 	//
 	// .. note::
 	//   In the current implementation the token bucket's :ref:`fill_interval
-	//   <envoy_api_field_type.v3.TokenBucket.fill_interval>` must be >= 50ms to avoid too aggressive
+	//   <envoy_v3_api_field_type.v3.TokenBucket.fill_interval>` must be >= 50ms to avoid too aggressive
 	//   refills.
 	TokenBucket *v3.TokenBucket `protobuf:"bytes,3,opt,name=token_bucket,json=tokenBucket,proto3" json:"token_bucket,omitempty"`
 	// If set, this will enable -- but not necessarily enforce -- the rate limit for the given
@@ -89,8 +89,8 @@ type LocalRateLimit struct {
 	// .. note::
 	//
 	//   In the current implementation the descriptor's token bucket :ref:`fill_interval
-	//   <envoy_api_field_type.v3.TokenBucket.fill_interval>` must be a multiple
-	//   global :ref:`token bucket's<envoy_api_field_extensions.filters.http.local_ratelimit.v3.LocalRateLimit.token_bucket>` fill interval.
+	//   <envoy_v3_api_field_type.v3.TokenBucket.fill_interval>` must be a multiple
+	//   global :ref:`token bucket's<envoy_v3_api_field_extensions.filters.http.local_ratelimit.v3.LocalRateLimit.token_bucket>` fill interval.
 	//
 	//   The descriptors must match verbatim for rate limiting to apply. There is no partial
 	//   match by a subset of descriptor entries in the current implementation.

@@ -152,8 +152,8 @@ type Listener struct {
 	// `listener.<stat_prefix>.`.
 	StatPrefix string `protobuf:"bytes,28,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// A list of filter chains to consider for this listener. The
-	// :ref:`FilterChain <envoy_api_msg_config.listener.v3.FilterChain>` with the most specific
-	// :ref:`FilterChainMatch <envoy_api_msg_config.listener.v3.FilterChainMatch>` criteria is used on a
+	// :ref:`FilterChain <envoy_v3_api_msg_config.listener.v3.FilterChain>` with the most specific
+	// :ref:`FilterChainMatch <envoy_v3_api_msg_config.listener.v3.FilterChainMatch>` criteria is used on a
 	// connection.
 	//
 	// Example using SNI for filter chain selection can be found in the
@@ -181,12 +181,12 @@ type Listener struct {
 	DrainType Listener_DrainType `protobuf:"varint,8,opt,name=drain_type,json=drainType,proto3,enum=envoy.config.listener.v3.Listener_DrainType" json:"drain_type,omitempty"`
 	// Listener filters have the opportunity to manipulate and augment the connection metadata that
 	// is used in connection filter chain matching, for example. These filters are run before any in
-	// :ref:`filter_chains <envoy_api_field_config.listener.v3.Listener.filter_chains>`. Order matters as the
+	// :ref:`filter_chains <envoy_v3_api_field_config.listener.v3.Listener.filter_chains>`. Order matters as the
 	// filters are processed sequentially right after a socket has been accepted by the listener, and
 	// before a connection is created.
 	// UDP Listener filters can be specified when the protocol in the listener socket address in
-	// :ref:`protocol <envoy_api_field_config.core.v3.SocketAddress.protocol>` is :ref:`UDP
-	// <envoy_api_enum_value_config.core.v3.SocketAddress.Protocol.UDP>`.
+	// :ref:`protocol <envoy_v3_api_field_config.core.v3.SocketAddress.protocol>` is :ref:`UDP
+	// <envoy_v3_api_enum_value_config.core.v3.SocketAddress.Protocol.UDP>`.
 	// UDP listeners currently support a single filter.
 	ListenerFilters []*ListenerFilter `protobuf:"bytes,9,rep,name=listener_filters,json=listenerFilters,proto3" json:"listener_filters,omitempty"`
 	// The timeout to wait for all listener filters to complete operation. If the timeout is reached,
@@ -207,7 +207,7 @@ type Listener struct {
 	// *iptables* *TPROXY* target, in which case the original source and destination addresses and
 	// ports are preserved on accepted connections. This flag should be used in combination with
 	// :ref:`an original_dst <config_listener_filters_original_dst>` :ref:`listener filter
-	// <envoy_api_field_config.listener.v3.Listener.listener_filters>` to mark the connections' local addresses as
+	// <envoy_v3_api_field_config.listener.v3.Listener.listener_filters>` to mark the connections' local addresses as
 	// "restored." This can be used to hand off each redirected connection to another listener
 	// associated with the connection's destination address. Direct connections to the socket without
 	// using *TPROXY* cannot be distinguished from connections redirected using *TPROXY* and are
@@ -247,13 +247,13 @@ type Listener struct {
 	// see :ref:`Original Destination <config_listener_filters_original_dst>`.
 	TrafficDirection v31.TrafficDirection `protobuf:"varint,16,opt,name=traffic_direction,json=trafficDirection,proto3,enum=envoy.config.core.v3.TrafficDirection" json:"traffic_direction,omitempty"`
 	// If the protocol in the listener socket address in :ref:`protocol
-	// <envoy_api_field_config.core.v3.SocketAddress.protocol>` is :ref:`UDP
-	// <envoy_api_enum_value_config.core.v3.SocketAddress.Protocol.UDP>`, this field specifies UDP
+	// <envoy_v3_api_field_config.core.v3.SocketAddress.protocol>` is :ref:`UDP
+	// <envoy_v3_api_enum_value_config.core.v3.SocketAddress.Protocol.UDP>`, this field specifies UDP
 	// listener specific configuration.
 	UdpListenerConfig *UdpListenerConfig `protobuf:"bytes,18,opt,name=udp_listener_config,json=udpListenerConfig,proto3" json:"udp_listener_config,omitempty"`
 	// Used to represent an API listener, which is used in non-proxy clients. The type of API
 	// exposed to the non-proxy application depends on the type of API listener.
-	// When this field is set, no other field except for :ref:`name<envoy_api_field_config.listener.v3.Listener.name>`
+	// When this field is set, no other field except for :ref:`name<envoy_v3_api_field_config.listener.v3.Listener.name>`
 	// should be set.
 	//
 	// .. note::
@@ -273,8 +273,8 @@ type Listener struct {
 	// worker threads.
 	//
 	// In the scenario that the listener X redirects all the connections to the listeners Y1 and Y2
-	// by setting :ref:`use_original_dst <envoy_api_field_config.listener.v3.Listener.use_original_dst>` in X
-	// and :ref:`bind_to_port <envoy_api_field_config.listener.v3.Listener.bind_to_port>` to false in Y1 and Y2,
+	// by setting :ref:`use_original_dst <envoy_v3_api_field_config.listener.v3.Listener.use_original_dst>` in X
+	// and :ref:`bind_to_port <envoy_v3_api_field_config.listener.v3.Listener.bind_to_port>` to false in Y1 and Y2,
 	// it is recommended to disable the balance config in listener X to avoid the cost of balancing, and
 	// enable the balance config in Y1 and Y2 to balance the connections among the workers.
 	ConnectionBalanceConfig *Listener_ConnectionBalanceConfig `protobuf:"bytes,20,opt,name=connection_balance_config,json=connectionBalanceConfig,proto3" json:"connection_balance_config,omitempty"`
@@ -297,7 +297,7 @@ type Listener struct {
 	TcpBacklogSize *wrappers.UInt32Value `protobuf:"bytes,24,opt,name=tcp_backlog_size,json=tcpBacklogSize,proto3" json:"tcp_backlog_size,omitempty"`
 	// Whether the listener should bind to the port. A listener that doesn't
 	// bind can only receive connections redirected from other listeners that set
-	// :ref:`use_original_dst <envoy_api_field_config.listener.v3.Listener.use_original_dst>`
+	// :ref:`use_original_dst <envoy_v3_api_field_config.listener.v3.Listener.use_original_dst>`
 	// to true. Default is true.
 	BindToPort *wrappers.BoolValue `protobuf:"bytes,26,opt,name=bind_to_port,json=bindToPort,proto3" json:"bind_to_port,omitempty"`
 	// The exclusive listener type and the corresponding config.
@@ -540,16 +540,16 @@ type Listener_InternalListener struct {
 	// Used to represent an internal listener which does not listen on OSI L4 address but can be used by the
 	// :ref:`envoy cluster <envoy_v3_api_msg_config.cluster.v3.Cluster>` to create a user space connection to.
 	// The internal listener acts as a tcp listener. It supports listener filters and network filter chains.
-	// The internal listener require :ref:`address <envoy_api_field_config.listener.v3.Listener.address>` has
+	// The internal listener require :ref:`address <envoy_v3_api_field_config.listener.v3.Listener.address>` has
 	// field `envoy_internal_address`.
 	//
 	// There are some limitations are derived from the implementation. The known limitations include
 	//
-	// * :ref:`ConnectionBalanceConfig <envoy_api_msg_config.listener.v3.Listener.ConnectionBalanceConfig>` is not
+	// * :ref:`ConnectionBalanceConfig <envoy_v3_api_msg_config.listener.v3.Listener.ConnectionBalanceConfig>` is not
 	//   allowed because both cluster connection and listener connection must be owned by the same dispatcher.
-	// * :ref:`tcp_backlog_size <envoy_api_field_config.listener.v3.Listener.tcp_backlog_size>`
-	// * :ref:`freebind <envoy_api_field_config.listener.v3.Listener.freebind>`
-	// * :ref:`transparent <envoy_api_field_config.listener.v3.Listener.transparent>`
+	// * :ref:`tcp_backlog_size <envoy_v3_api_field_config.listener.v3.Listener.tcp_backlog_size>`
+	// * :ref:`freebind <envoy_v3_api_field_config.listener.v3.Listener.freebind>`
+	// * :ref:`transparent <envoy_v3_api_field_config.listener.v3.Listener.transparent>`
 	// [#not-implemented-hide:]
 	InternalListener *Listener_InternalListenerConfig `protobuf:"bytes,27,opt,name=internal_listener,json=internalListener,proto3,oneof"`
 }
@@ -567,7 +567,7 @@ type Listener_DeprecatedV1 struct {
 	// set use_original_dst parameter to true. Default is true.
 	//
 	// This is deprecated. Use :ref:`Listener.bind_to_port
-	// <envoy_api_field_config.listener.v3.Listener.bind_to_port>`
+	// <envoy_v3_api_field_config.listener.v3.Listener.bind_to_port>`
 	BindToPort *wrappers.BoolValue `protobuf:"bytes,1,opt,name=bind_to_port,json=bindToPort,proto3" json:"bind_to_port,omitempty"`
 }
 

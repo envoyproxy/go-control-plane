@@ -432,7 +432,7 @@ type FilterChain struct {
 	Metadata *v4alpha.Metadata `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Optional custom transport socket implementation to use for downstream connections.
 	// To setup TLS, set a transport socket with name `tls` and
-	// :ref:`DownstreamTlsContext <envoy_api_msg_extensions.transport_sockets.tls.v4alpha.DownstreamTlsContext>` in the `typed_config`.
+	// :ref:`DownstreamTlsContext <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.DownstreamTlsContext>` in the `typed_config`.
 	// If no transport socket configuration is specified, new connections
 	// will be set up with plaintext.
 	// [#extension-category: envoy.transport_sockets.downstream]
@@ -710,7 +710,7 @@ type ListenerFilter struct {
 	//	*ListenerFilter_TypedConfig
 	ConfigType isListenerFilter_ConfigType `protobuf_oneof:"config_type"`
 	// Optional match predicate used to disable the filter. The filter is enabled when this field is empty.
-	// See :ref:`ListenerFilterChainMatchPredicate <envoy_api_msg_config.listener.v4alpha.ListenerFilterChainMatchPredicate>`
+	// See :ref:`ListenerFilterChainMatchPredicate <envoy_v3_api_msg_config.listener.v3.ListenerFilterChainMatchPredicate>`
 	// for further examples.
 	FilterDisabled *ListenerFilterChainMatchPredicate `protobuf:"bytes,4,opt,name=filter_disabled,json=filterDisabled,proto3" json:"filter_disabled,omitempty"`
 }

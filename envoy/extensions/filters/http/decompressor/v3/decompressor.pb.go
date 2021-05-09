@@ -35,7 +35,7 @@ type Decompressor struct {
 	unknownFields protoimpl.UnknownFields
 
 	// A decompressor library to use for both request and response decompression. Currently only
-	// :ref:`envoy.compression.gzip.compressor<envoy_api_msg_extensions.compression.gzip.decompressor.v3.Gzip>`
+	// :ref:`envoy.compression.gzip.compressor<envoy_v3_api_msg_extensions.compression.gzip.decompressor.v3.Gzip>`
 	// is included in Envoy.
 	// [#extension-category: envoy.compression.decompressor]
 	DecompressorLibrary *v3.TypedExtensionConfig `protobuf:"bytes,1,opt,name=decompressor_library,json=decompressorLibrary,proto3" json:"decompressor_library,omitempty"`

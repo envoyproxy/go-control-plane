@@ -35,7 +35,7 @@ type AllowListedRoutesConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The list of routes that's allowed as redirect target by this predicate,
-	// identified by the route's :ref:`name <envoy_api_field_config.route.v3.Route.route>`.
+	// identified by the route's :ref:`name <envoy_v3_api_field_config.route.v3.Route.route>`.
 	// Empty route names are not allowed.
 	AllowedRouteNames []string `protobuf:"bytes,1,rep,name=allowed_route_names,json=allowedRouteNames,proto3" json:"allowed_route_names,omitempty"`
 }

@@ -39,7 +39,7 @@ type RateLimit struct {
 	Domain string `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
 	// Specifies the rate limit configuration stage. Each configured rate limit filter performs a
 	// rate limit check using descriptors configured in the
-	// :ref:`envoy_api_msg_extensions.filters.network.thrift_proxy.v3.RouteAction` for the request.
+	// :ref:`envoy_v3_api_msg_extensions.filters.network.thrift_proxy.v3.RouteAction` for the request.
 	// Only those entries with a matching stage number are used for a given filter. If not set, the
 	// default stage number is 0.
 	//

@@ -152,7 +152,7 @@ type Bootstrap struct {
 	// within the server.
 	ClusterManager *ClusterManager `protobuf:"bytes,4,opt,name=cluster_manager,json=clusterManager,proto3" json:"cluster_manager,omitempty"`
 	// Health discovery service config option.
-	// (:ref:`core.ApiConfigSource <envoy_api_msg_config.core.v3.ApiConfigSource>`)
+	// (:ref:`core.ApiConfigSource <envoy_v3_api_msg_config.core.v3.ApiConfigSource>`)
 	HdsConfig *v3.ApiConfigSource `protobuf:"bytes,14,opt,name=hds_config,json=hdsConfig,proto3" json:"hds_config,omitempty"`
 	// Optional file system path to search for startup flag files.
 	FlagsPath string `protobuf:"bytes,5,opt,name=flags_path,json=flagsPath,proto3" json:"flags_path,omitempty"`
@@ -184,7 +184,7 @@ type Bootstrap struct {
 	//
 	// .. attention::
 	//  This field has been deprecated in favor of :ref:`HttpConnectionManager.Tracing.provider
-	//  <envoy_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.provider>`.
+	//  <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.provider>`.
 	//
 	// Deprecated: Do not use.
 	Tracing *v32.Tracing `protobuf:"bytes,9,opt,name=tracing,proto3" json:"tracing,omitempty"`
@@ -199,7 +199,7 @@ type Bootstrap struct {
 	// Enable :ref:`stats for event dispatcher <operations_performance>`, defaults to false.
 	// Note that this records a value for each iteration of the event loop on every thread. This
 	// should normally be minimal overhead, but when using
-	// :ref:`statsd <envoy_api_msg_config.metrics.v3.StatsdSink>`, it will send each observed value
+	// :ref:`statsd <envoy_v3_api_msg_config.metrics.v3.StatsdSink>`, it will send each observed value
 	// over the wire individually because the statsd protocol doesn't have any way to represent a
 	// histogram summary. Be aware that this can be a very large volume of data.
 	EnableDispatcherStats bool `protobuf:"varint,16,opt,name=enable_dispatcher_stats,json=enableDispatcherStats,proto3" json:"enable_dispatcher_stats,omitempty"`
@@ -215,12 +215,12 @@ type Bootstrap struct {
 	HeaderPrefix string `protobuf:"bytes,18,opt,name=header_prefix,json=headerPrefix,proto3" json:"header_prefix,omitempty"`
 	// Optional proxy version which will be used to set the value of :ref:`server.version statistic
 	// <server_statistics>` if specified. Envoy will not process this value, it will be sent as is to
-	// :ref:`stats sinks <envoy_api_msg_config.metrics.v3.StatsSink>`.
+	// :ref:`stats sinks <envoy_v3_api_msg_config.metrics.v3.StatsSink>`.
 	StatsServerVersionOverride *wrappers.UInt64Value `protobuf:"bytes,19,opt,name=stats_server_version_override,json=statsServerVersionOverride,proto3" json:"stats_server_version_override,omitempty"`
 	// Always use TCP queries instead of UDP queries for DNS lookups.
 	// This may be overridden on a per-cluster basis in cds_config,
-	// when :ref:`dns_resolvers <envoy_api_field_config.cluster.v3.Cluster.dns_resolvers>` and
-	// :ref:`use_tcp_for_dns_lookups <envoy_api_field_config.cluster.v3.Cluster.use_tcp_for_dns_lookups>` are
+	// when :ref:`dns_resolvers <envoy_v3_api_field_config.cluster.v3.Cluster.dns_resolvers>` and
+	// :ref:`use_tcp_for_dns_lookups <envoy_v3_api_field_config.cluster.v3.Cluster.use_tcp_for_dns_lookups>` are
 	// specified.
 	// Setting this value causes failure if the
 	// ``envoy.restart_features.use_apple_api_for_dns_lookups`` runtime value is true during
@@ -260,7 +260,7 @@ type Bootstrap struct {
 	DefaultSocketInterface string `protobuf:"bytes,24,opt,name=default_socket_interface,json=defaultSocketInterface,proto3" json:"default_socket_interface,omitempty"`
 	// Global map of CertificateProvider instances. These instances are referred to by name in the
 	// :ref:`CommonTlsContext.CertificateProviderInstance.instance_name
-	// <envoy_api_field_extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstance.instance_name>`
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CommonTlsContext.CertificateProviderInstance.instance_name>`
 	// field.
 	// [#not-implemented-hide:]
 	CertificateProviderInstances map[string]*v3.TypedExtensionConfig `protobuf:"bytes,25,rep,name=certificate_provider_instances,json=certificateProviderInstances,proto3" json:"certificate_provider_instances,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
@@ -532,7 +532,7 @@ type Admin struct {
 	AccessLog []*v34.AccessLog `protobuf:"bytes,5,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
 	// The path to write the access log for the administration server. If no
 	// access log is desired specify ‘/dev/null’. This is only required if
-	// :ref:`address <envoy_api_field_config.bootstrap.v3.Admin.address>` is set.
+	// :ref:`address <envoy_v3_api_field_config.bootstrap.v3.Admin.address>` is set.
 	// Deprecated in favor of *access_log* which offers more options.
 	//
 	// Deprecated: Do not use.
@@ -626,9 +626,9 @@ type ClusterManager struct {
 	// this configuration). In order to enable :ref:`zone aware routing
 	// <arch_overview_load_balancing_zone_aware_routing>` this option must be set.
 	// If *local_cluster_name* is defined then :ref:`clusters
-	// <envoy_api_msg_config.cluster.v3.Cluster>` must be defined in the :ref:`Bootstrap
+	// <envoy_v3_api_msg_config.cluster.v3.Cluster>` must be defined in the :ref:`Bootstrap
 	// static cluster resources
-	// <envoy_api_field_config.bootstrap.v3.Bootstrap.StaticResources.clusters>`. This is unrelated to
+	// <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.StaticResources.clusters>`. This is unrelated to
 	// the :option:`--service-cluster` option which does not `affect zone aware
 	// routing <https://github.com/envoyproxy/envoy/issues/774>`_.
 	LocalClusterName string `protobuf:"bytes,1,opt,name=local_cluster_name,json=localClusterName,proto3" json:"local_cluster_name,omitempty"`
@@ -639,8 +639,8 @@ type ClusterManager struct {
 	UpstreamBindConfig *v3.BindConfig `protobuf:"bytes,3,opt,name=upstream_bind_config,json=upstreamBindConfig,proto3" json:"upstream_bind_config,omitempty"`
 	// A management server endpoint to stream load stats to via
 	// *StreamLoadStats*. This must have :ref:`api_type
-	// <envoy_api_field_config.core.v3.ApiConfigSource.api_type>` :ref:`GRPC
-	// <envoy_api_enum_value_config.core.v3.ApiConfigSource.ApiType.GRPC>`.
+	// <envoy_v3_api_field_config.core.v3.ApiConfigSource.api_type>` :ref:`GRPC
+	// <envoy_v3_api_enum_value_config.core.v3.ApiConfigSource.ApiType.GRPC>`.
 	LoadStatsConfig *v3.ApiConfigSource `protobuf:"bytes,4,opt,name=load_stats_config,json=loadStatsConfig,proto3" json:"load_stats_config,omitempty"`
 }
 
@@ -1210,18 +1210,18 @@ type Bootstrap_StaticResources struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Static :ref:`Listeners <envoy_api_msg_config.listener.v3.Listener>`. These listeners are
+	// Static :ref:`Listeners <envoy_v3_api_msg_config.listener.v3.Listener>`. These listeners are
 	// available regardless of LDS configuration.
 	Listeners []*v36.Listener `protobuf:"bytes,1,rep,name=listeners,proto3" json:"listeners,omitempty"`
 	// If a network based configuration source is specified for :ref:`cds_config
-	// <envoy_api_field_config.bootstrap.v3.Bootstrap.DynamicResources.cds_config>`, it's necessary
+	// <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.DynamicResources.cds_config>`, it's necessary
 	// to have some initial cluster definitions available to allow Envoy to know
 	// how to speak to the management server. These cluster definitions may not
 	// use :ref:`EDS <arch_overview_dynamic_config_eds>` (i.e. they should be static
 	// IP or DNS-based).
 	Clusters []*v37.Cluster `protobuf:"bytes,2,rep,name=clusters,proto3" json:"clusters,omitempty"`
 	// These static secrets can be used by :ref:`SdsSecretConfig
-	// <envoy_api_msg_extensions.transport_sockets.tls.v3.SdsSecretConfig>`
+	// <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.SdsSecretConfig>`
 	Secrets []*v38.Secret `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
 }
 
@@ -1284,13 +1284,13 @@ type Bootstrap_DynamicResources struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// All :ref:`Listeners <envoy_api_msg_config.listener.v3.Listener>` are provided by a single
+	// All :ref:`Listeners <envoy_v3_api_msg_config.listener.v3.Listener>` are provided by a single
 	// :ref:`LDS <arch_overview_dynamic_config_lds>` configuration source.
 	LdsConfig *v3.ConfigSource `protobuf:"bytes,1,opt,name=lds_config,json=ldsConfig,proto3" json:"lds_config,omitempty"`
 	// xdstp:// resource locator for listener collection.
 	// [#not-implemented-hide:]
 	LdsResourcesLocator string `protobuf:"bytes,5,opt,name=lds_resources_locator,json=ldsResourcesLocator,proto3" json:"lds_resources_locator,omitempty"`
-	// All post-bootstrap :ref:`Cluster <envoy_api_msg_config.cluster.v3.Cluster>` definitions are
+	// All post-bootstrap :ref:`Cluster <envoy_v3_api_msg_config.cluster.v3.Cluster>` definitions are
 	// provided by a single :ref:`CDS <arch_overview_dynamic_config_cds>`
 	// configuration source.
 	CdsConfig *v3.ConfigSource `protobuf:"bytes,2,opt,name=cds_config,json=cdsConfig,proto3" json:"cds_config,omitempty"`
@@ -1299,10 +1299,10 @@ type Bootstrap_DynamicResources struct {
 	CdsResourcesLocator string `protobuf:"bytes,6,opt,name=cds_resources_locator,json=cdsResourcesLocator,proto3" json:"cds_resources_locator,omitempty"`
 	// A single :ref:`ADS <config_overview_ads>` source may be optionally
 	// specified. This must have :ref:`api_type
-	// <envoy_api_field_config.core.v3.ApiConfigSource.api_type>` :ref:`GRPC
-	// <envoy_api_enum_value_config.core.v3.ApiConfigSource.ApiType.GRPC>`. Only
-	// :ref:`ConfigSources <envoy_api_msg_config.core.v3.ConfigSource>` that have
-	// the :ref:`ads <envoy_api_field_config.core.v3.ConfigSource.ads>` field set will be
+	// <envoy_v3_api_field_config.core.v3.ApiConfigSource.api_type>` :ref:`GRPC
+	// <envoy_v3_api_enum_value_config.core.v3.ApiConfigSource.ApiType.GRPC>`. Only
+	// :ref:`ConfigSources <envoy_v3_api_msg_config.core.v3.ConfigSource>` that have
+	// the :ref:`ads <envoy_v3_api_field_config.core.v3.ConfigSource.ads>` field set will be
 	// streamed on the ADS channel.
 	AdsConfig *v3.ApiConfigSource `protobuf:"bytes,3,opt,name=ads_config,json=adsConfig,proto3" json:"ads_config,omitempty"`
 }

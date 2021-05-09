@@ -92,10 +92,10 @@ type ClusterStatus struct {
 	AddedViaApi bool `protobuf:"varint,2,opt,name=added_via_api,json=addedViaApi,proto3" json:"added_via_api,omitempty"`
 	// The success rate threshold used in the last interval.
 	// If
-	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
 	// is *false*, all errors: externally and locally generated were used to calculate the threshold.
 	// If
-	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
 	// is *true*, only externally generated errors were used to calculate the threshold.
 	// The threshold is used to eject hosts based on their success rate. See
 	// :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for details.
@@ -113,7 +113,7 @@ type ClusterStatus struct {
 	// The success rate threshold used in the last interval when only locally originated failures were
 	// taken into account and externally originated errors were treated as success.
 	// This field should be interpreted only when
-	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
 	// is *true*. The threshold is used to eject hosts based on their success rate.
 	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
 	// details.
@@ -228,10 +228,10 @@ type HostStatus struct {
 	HealthStatus *HostHealthStatus `protobuf:"bytes,3,opt,name=health_status,json=healthStatus,proto3" json:"health_status,omitempty"`
 	// Request success rate for this host over the last calculated interval.
 	// If
-	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
 	// is *false*, all errors: externally and locally generated were used in success rate
 	// calculation. If
-	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
 	// is *true*, only externally generated errors were used in success rate calculation.
 	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
 	// details.
@@ -250,7 +250,7 @@ type HostStatus struct {
 	// interval when only locally originated errors are taken into account and externally originated
 	// errors were treated as success.
 	// This field should be interpreted only when
-	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
+	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
 	// is *true*.
 	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
 	// details.

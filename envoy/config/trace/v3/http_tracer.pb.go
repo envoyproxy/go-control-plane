@@ -38,7 +38,7 @@ const _ = proto.ProtoPackageIsVersion4
 // .. attention::
 //
 //   Use of this message type has been deprecated in favor of direct use of
-//   :ref:`Tracing.Http <envoy_api_msg_config.trace.v3.Tracing.Http>`.
+//   :ref:`Tracing.Http <envoy_v3_api_msg_config.trace.v3.Tracing.Http>`.
 type Tracing struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -90,8 +90,8 @@ func (x *Tracing) GetHttp() *Tracing_Http {
 // Configuration for an HTTP tracer provider used by Envoy.
 //
 // The configuration is defined by the
-// :ref:`HttpConnectionManager.Tracing <envoy_api_msg_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing>`
-// :ref:`provider <envoy_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.provider>`
+// :ref:`HttpConnectionManager.Tracing <envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing>`
+// :ref:`provider <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.provider>`
 // field.
 type Tracing_Http struct {
 	state         protoimpl.MessageState

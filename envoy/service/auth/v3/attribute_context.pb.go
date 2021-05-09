@@ -343,7 +343,7 @@ type AttributeContext_HttpRequest struct {
 	Body string `protobuf:"bytes,11,opt,name=body,proto3" json:"body,omitempty"`
 	// The HTTP request body in bytes. This is used instead of
 	// :ref:`body <envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.body>` when
-	// :ref:`pack_as_bytes <envoy_api_field_extensions.filters.http.ext_authz.v3.BufferSettings.pack_as_bytes>`
+	// :ref:`pack_as_bytes <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.BufferSettings.pack_as_bytes>`
 	// is set to true.
 	RawBody []byte `protobuf:"bytes,12,opt,name=raw_body,json=rawBody,proto3" json:"raw_body,omitempty"`
 }

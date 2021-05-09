@@ -47,9 +47,9 @@ type ClusterLoadAssignment struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Name of the cluster. This will be the :ref:`service_name
-	// <envoy_api_field_config.cluster.v3.Cluster.EdsClusterConfig.service_name>` value if specified
+	// <envoy_v3_api_field_config.cluster.v3.Cluster.EdsClusterConfig.service_name>` value if specified
 	// in the cluster :ref:`EdsClusterConfig
-	// <envoy_api_msg_config.cluster.v3.Cluster.EdsClusterConfig>`.
+	// <envoy_v3_api_msg_config.cluster.v3.Cluster.EdsClusterConfig>`.
 	ClusterName string `protobuf:"bytes,1,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
 	// List of endpoints to load balance to.
 	Endpoints []*LocalityLbEndpoints `protobuf:"bytes,2,rep,name=endpoints,proto3" json:"endpoints,omitempty"`

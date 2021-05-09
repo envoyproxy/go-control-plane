@@ -31,7 +31,7 @@ const (
 const _ = proto.ProtoPackageIsVersion4
 
 // These are stats Envoy reports to the management server at a frequency defined by
-// :ref:`LoadStatsResponse.load_reporting_interval<envoy_api_field_service.load_stats.v3.LoadStatsResponse.load_reporting_interval>`.
+// :ref:`LoadStatsResponse.load_reporting_interval<envoy_v3_api_field_service.load_stats.v3.LoadStatsResponse.load_reporting_interval>`.
 // Stats per upstream region/zone and optionally per subzone.
 // [#next-free-field: 9]
 type UpstreamLocalityStats struct {
@@ -58,7 +58,7 @@ type UpstreamLocalityStats struct {
 	LoadMetricStats []*EndpointLoadMetricStats `protobuf:"bytes,5,rep,name=load_metric_stats,json=loadMetricStats,proto3" json:"load_metric_stats,omitempty"`
 	// Endpoint granularity stats information for this locality. This information
 	// is populated if the Server requests it by setting
-	// :ref:`LoadStatsResponse.report_endpoint_granularity<envoy_api_field_service.load_stats.v3.LoadStatsResponse.report_endpoint_granularity>`.
+	// :ref:`LoadStatsResponse.report_endpoint_granularity<envoy_v3_api_field_service.load_stats.v3.LoadStatsResponse.report_endpoint_granularity>`.
 	UpstreamEndpointStats []*UpstreamEndpointStats `protobuf:"bytes,7,rep,name=upstream_endpoint_stats,json=upstreamEndpointStats,proto3" json:"upstream_endpoint_stats,omitempty"`
 	// [#not-implemented-hide:] The priority of the endpoint group these metrics
 	// were collected from.
@@ -339,7 +339,7 @@ func (x *EndpointLoadMetricStats) GetTotalMetricValue() float64 {
 }
 
 // Per cluster load stats. Envoy reports these stats a management server in a
-// :ref:`LoadStatsRequest<envoy_api_msg_service.load_stats.v3.LoadStatsRequest>`
+// :ref:`LoadStatsRequest<envoy_v3_api_msg_service.load_stats.v3.LoadStatsRequest>`
 // Next ID: 7
 // [#next-free-field: 7]
 type ClusterStats struct {

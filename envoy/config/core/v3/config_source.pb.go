@@ -292,7 +292,7 @@ func (x *ApiConfigSource) GetSetNodeOnFirstMessageOnly() bool {
 }
 
 // Aggregated Discovery Service (ADS) options. This is currently empty, but when
-// set in :ref:`ConfigSource <envoy_api_msg_config.core.v3.ConfigSource>` can be used to
+// set in :ref:`ConfigSource <envoy_v3_api_msg_config.core.v3.ConfigSource>` can be used to
 // specify that ADS is to be used.
 type AggregatedConfigSource struct {
 	state         protoimpl.MessageState
@@ -334,7 +334,7 @@ func (*AggregatedConfigSource) Descriptor() ([]byte, []int) {
 
 // [#not-implemented-hide:]
 // Self-referencing config source options. This is currently empty, but when
-// set in :ref:`ConfigSource <envoy_api_msg_config.core.v3.ConfigSource>` can be used to
+// set in :ref:`ConfigSource <envoy_v3_api_msg_config.core.v3.ConfigSource>` can be used to
 // specify that other data can be obtained from the same server.
 type SelfConfigSource struct {
 	state         protoimpl.MessageState
@@ -447,7 +447,7 @@ func (x *RateLimitSettings) GetFillRate() *wrappers.DoubleValue {
 
 // Configuration for :ref:`listeners <config_listeners>`, :ref:`clusters
 // <config_cluster_manager>`, :ref:`routes
-// <envoy_api_msg_config.route.v3.RouteConfiguration>`, :ref:`endpoints
+// <envoy_v3_api_msg_config.route.v3.RouteConfiguration>`, :ref:`endpoints
 // <arch_overview_service_discovery>` etc. may either be sourced from the
 // filesystem or from an xDS API source. Filesystem configs are watched with
 // inotify for updates.
@@ -576,7 +576,7 @@ type isConfigSource_ConfigSourceSpecifier interface {
 
 type ConfigSource_Path struct {
 	// Path on the filesystem to source and watch for configuration updates.
-	// When sourcing configuration for :ref:`secret <envoy_api_msg_extensions.transport_sockets.tls.v3.Secret>`,
+	// When sourcing configuration for :ref:`secret <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.Secret>`,
 	// the certificate and key files are also watched for updates.
 	//
 	// .. note::
@@ -606,7 +606,7 @@ type ConfigSource_Self struct {
 	// [#not-implemented-hide:]
 	// When set, the client will access the resources from the same server it got the
 	// ConfigSource from, although not necessarily from the same stream. This is similar to the
-	// :ref:`ads<envoy_api_field.ConfigSource.ads>` field, except that the client may use a
+	// :ref:`ads<envoy_v3_api_field.ConfigSource.ads>` field, except that the client may use a
 	// different stream to the same server. As a result, this field can be used for things
 	// like LRS that cannot be sent on an ADS stream. It can also be used to link from (e.g.)
 	// LDS to RDS on the same server without requiring the management server to know its name
