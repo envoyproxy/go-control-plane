@@ -1,13 +1,15 @@
 package ttl
 
 import (
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
+	"google.golang.org/protobuf/reflect/protoreflect"
+
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
-var deltaResourceTypeURL = string(discovery.Resource.ProtoReflect(&discovery.Resource{}).Descriptor().FullName())
+var deltaResourceTypeURL = "type.googleapis.com/" + protoreflect.MessageDescriptor.FullName(&discovery.Resource{})
 
 // Helper functions for interacting with TTL resources for xDS V3. A resource will be wrapped in a discovery.Resource in order
 // to allow specifying a TTL. If the resource is meant to be a heartbeat response, only the resource name and TTL will be set
