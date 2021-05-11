@@ -54,6 +54,9 @@ const (
 
 	// Rest mode for resources: polling using Fetch
 	Rest = "rest"
+
+	// Delta mode for resources: individual delta xDS services
+	Delta = "delta"
 )
 
 var (
@@ -156,6 +159,19 @@ func configSource(mode string) *core.ConfigSource {
 				TransportApiVersion: resource.DefaultAPIVersion,
 				ClusterNames:        []string{XdsCluster},
 				RefreshDelay:        ptypes.DurationProto(RefreshDelay),
+			},
+		}
+	case Delta:
+		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &core.ApiConfigSource{
+				TransportApiVersion:       resource.DefaultAPIVersion,
+				ApiType:                   core.ApiConfigSource_DELTA_GRPC,
+				SetNodeOnFirstMessageOnly: true,
+				GrpcServices: []*core.GrpcService{{
+					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+						EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
+					},
+				}},
 			},
 		}
 	}
@@ -290,7 +306,7 @@ func MakeRuntime(runtimeName string) *runtime.Runtime {
 
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
-	// Xds indicates snapshot mode: ads, xds, or rest
+	// Xds indicates snapshot mode: ads, xds, rest, or delta
 	Xds string
 	// Version for the snapshot.
 	Version string

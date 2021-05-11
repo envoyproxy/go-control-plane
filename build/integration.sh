@@ -10,7 +10,7 @@ set -o pipefail
 
 MESSAGE=$'Hi, there!\n'
 
-# Management server type. Valid values are "ads", "xds", "rest"
+# Management server type. Valid values are "ads", "xds", "rest", or "delta"
 XDS=${XDS:-ads}
 
 # Number of RTDS layers.
