@@ -12,11 +12,19 @@ PKG 		:= github.com/envoyproxy/go-control-plane
 build:
 	@go build ./pkg/... ./envoy/...
 
+.PHONY: clean
+clean:
+	@echo "--> cleaning compiled objects and binaries"
+	@go clean -tags netgo -i ./...
+	@go mod tidy
+	@rm -rf $(BINDIR)
+	@rm -rf *.log
+
 # TODO(mattklein123): See the note in TestLinearConcurrentSetWatch() for why we set -parallel here
 # This should be removed.
 .PHONY: test
 test:
-	@go test -race -v -timeout 30s -parallel 100 ./pkg/...
+	@go test -race -v -timeout 30s -count=1 -parallel 100 ./pkg/...
 
 .PHONY: cover
 cover:
@@ -33,15 +41,16 @@ examples:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.xds integration.rest integration.xds.mux
+.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.xds integration.rest integration.xds.mux integration.xds.delta
 
 $(BINDIR)/upstream:
 	@go build -race -o $@ internal/upstream/main.go
 
 $(BINDIR)/test:
+	@echo "Building test binary"
 	@go build -race -o $@ pkg/test/main/main.go
 
-integration: integration.xds integration.ads integration.rest integration.xds.mux
+integration: integration.xds integration.ads integration.rest integration.xds.mux integration.xds.delta
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh
@@ -54,6 +63,9 @@ integration.rest: $(BINDIR)/test $(BINDIR)/upstream
 
 integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=xds build/integration.sh -mux
+
+integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
+	env XDS=delta build/integration.sh
 
 #--------------------------------------
 #-- example xDS control plane server
