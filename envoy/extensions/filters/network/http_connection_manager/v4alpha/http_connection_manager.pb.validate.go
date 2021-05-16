@@ -241,7 +241,22 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
-	// no validation rules for XffNumTrustedHops
+	// no validation rules for HiddenEnvoyDeprecatedXffNumTrustedHops
+
+	for idx, item := range m.GetOriginalIpDetectionExtensions() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpConnectionManagerValidationError{
+					field:  fmt.Sprintf("OriginalIpDetectionExtensions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if v, ok := interface{}(m.GetInternalAddressConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
