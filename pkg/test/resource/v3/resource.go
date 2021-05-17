@@ -57,6 +57,9 @@ const (
 
 	// Delta mode for resources: individual delta xDS services
 	Delta = "delta"
+
+	// Delta Ads mode for resource: one aggregated delta xDS service
+	DeltaAds = "delta-ads"
 )
 
 var (
@@ -136,6 +139,10 @@ func configSource(mode string) *core.ConfigSource {
 	source.ResourceApiVersion = resource.DefaultAPIVersion
 	switch mode {
 	case Ads:
+		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
+			Ads: &core.AggregatedConfigSource{},
+		}
+	case DeltaAds:
 		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
 			Ads: &core.AggregatedConfigSource{},
 		}

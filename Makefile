@@ -41,7 +41,7 @@ examples:
 #-----------------
 #-- integration
 #-----------------
-.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.xds integration.rest integration.xds.mux integration.xds.delta
+.PHONY: $(BINDIR)/test $(BINDIR)/upstream integration integration.ads integration.xds integration.rest integration.xds.mux integration.xds.delta integration.ads.delta
 
 $(BINDIR)/upstream:
 	@go build -race -o $@ internal/upstream/main.go
@@ -50,7 +50,7 @@ $(BINDIR)/test:
 	@echo "Building test binary"
 	@go build -race -o $@ pkg/test/main/main.go
 
-integration: integration.xds integration.ads integration.rest integration.xds.mux integration.xds.delta
+integration: integration.xds integration.ads integration.rest integration.xds.mux integration.xds.delta integration.ads.delta
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=ads build/integration.sh
@@ -66,6 +66,9 @@ integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
 
 integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=delta build/integration.sh
+
+integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
+	env XDS=delta-ads build/integration.sh
 
 #--------------------------------------
 #-- example xDS control plane server

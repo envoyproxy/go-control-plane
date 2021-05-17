@@ -33,7 +33,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		versionMap := st.ResourceVersions
 
 		r, _ := res.GetDeltaDiscoveryResponse()
-		if st.IsWildcard {
+		if st.IsWildcard[r.TypeUrl] {
 			for _, resource := range r.Resources {
 				name := resource.GetName()
 				marshaledResource, _ := cache.MarshalResource(resource)

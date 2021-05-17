@@ -27,7 +27,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
+		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: nil})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -59,7 +59,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{IsWildcard: false, ResourceVersions: vm[typ]})
+		}, &stream.StreamState{IsWildcard: map[string]bool{typ: false}, ResourceVersions: vm[typ]})
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -101,7 +101,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
+		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: nil})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -132,7 +132,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, &stream.StreamState{IsWildcard: true, ResourceVersions: versionMap[typ]})
+		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: versionMap[typ]})
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -187,7 +187,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
+					}, &stream.StreamState{IsWildcard: map[string]bool{rsrc.EndpointType: true}, ResourceVersions: nil})
 				}
 			})
 		}(i)
@@ -203,7 +203,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{IsWildcard: true, ResourceVersions: nil})
+		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: nil})
 
 		// Cancel the watch
 		cancel()

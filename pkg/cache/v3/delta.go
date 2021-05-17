@@ -51,20 +51,20 @@ func createDeltaResponse(req *DeltaRequest, st *stream.StreamState, snapshot Sna
 	toRemove := make([]string, 0)
 
 	// If we are handling a wildcard request, we want to respond with all resources
-	if st.IsWildcard {
+	if st.IsWildcard[req.TypeUrl] {
 		for name, r := range resources {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
 			version := snapshot.GetVersionMap()[req.TypeUrl][name]
 			nextVersionMap[name] = version
-			prevVersion, found := st.ResourceVersions[name]
+			prevVersion, found := st.GetResourceVersions()[name]
 			if !found || (prevVersion != nextVersionMap[name]) {
 				filtered = append(filtered, r)
 			}
 		}
 	} else {
 		// Reply only with the requested resources
-		for name, prevVersion := range st.ResourceVersions {
+		for name, prevVersion := range st.GetResourceVersions() {
 			if r, ok := resources[name]; ok {
 				nextVersion := snapshot.GetVersionMap()[req.TypeUrl][name]
 				if prevVersion != nextVersion {
@@ -76,7 +76,7 @@ func createDeltaResponse(req *DeltaRequest, st *stream.StreamState, snapshot Sna
 	}
 
 	// Compute resources for removal regardless of the request type
-	for name := range st.ResourceVersions {
+	for name := range st.GetResourceVersions() {
 		if _, ok := resources[name]; !ok {
 			toRemove = append(toRemove, name)
 		}

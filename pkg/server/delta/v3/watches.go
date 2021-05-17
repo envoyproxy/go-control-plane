@@ -12,7 +12,7 @@ type watches struct {
 	deltaTerminations map[string]chan struct{}
 
 	// Organize stream state by resource type
-	deltaStreamStates map[string]stream.StreamState
+	deltaStreamStates map[string]*stream.StreamState
 
 	// Opaque resources share a muxed channel
 	deltaMuxedResponses chan cache.DeltaResponse
@@ -32,7 +32,7 @@ func newWatches() watches {
 		deltaResponses:      make(map[string]watch, int(types.UnknownType)),
 		deltaMuxedResponses: make(chan cache.DeltaResponse, int(types.UnknownType)),
 		deltaTerminations:   make(map[string]chan struct{}),
-		deltaStreamStates:   make(map[string]stream.StreamState, int(types.UnknownType)),
+		deltaStreamStates:   make(map[string]*stream.StreamState, int(types.UnknownType)),
 	}
 }
 
