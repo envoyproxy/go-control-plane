@@ -450,6 +450,23 @@ func (m *Metadata) Validate() error {
 
 	}
 
+	for key, val := range m.GetTypedFilterMetadata() {
+		_ = val
+
+		// no validation rules for TypedFilterMetadata[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MetadataValidationError{
+					field:  fmt.Sprintf("TypedFilterMetadata[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
