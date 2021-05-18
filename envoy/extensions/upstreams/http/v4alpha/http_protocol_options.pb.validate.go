@@ -416,6 +416,16 @@ func (m *HttpProtocolOptions_AutoHttpConfig) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetAlternateProtocolsCacheOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpProtocolOptions_AutoHttpConfigValidationError{
+				field:  "AlternateProtocolsCacheOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
