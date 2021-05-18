@@ -11,7 +11,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
@@ -27,14 +26,14 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: nil})
+		}, make(map[string]string))
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
-	vm := make(map[string]map[string]string)
+	versionMap := make(map[string]map[string]string)
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {
@@ -43,7 +42,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
 				vMap := out.GetNextVersionMap()
-				vm[typ] = vMap
+				versionMap[typ] = vMap
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}
@@ -59,7 +58,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{IsWildcard: map[string]bool{typ: false}, ResourceVersions: vm[typ]})
+		}, versionMap[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -83,7 +82,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.GetResources(rsrc.EndpointType))
 		}
 		vMap := out.GetNextVersionMap()
-		vm[testTypes[0]] = vMap
+		versionMap[testTypes[0]] = vMap
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
 	}
@@ -101,7 +100,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: nil})
+		}, make(map[string]string))
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -132,7 +131,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: versionMap[typ]})
+		}, versionMap[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -187,7 +186,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, &stream.StreamState{IsWildcard: map[string]bool{rsrc.EndpointType: true}, ResourceVersions: nil})
+					}, make(map[string]string))
 				}
 			})
 		}(i)
@@ -203,7 +202,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, &stream.StreamState{IsWildcard: map[string]bool{typ: true}, ResourceVersions: nil})
+		}, make(map[string]string))
 
 		// Cancel the watch
 		cancel()

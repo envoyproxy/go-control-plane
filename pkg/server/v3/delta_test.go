@@ -14,11 +14,10 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 )
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, st *stream.StreamState) (chan cache.DeltaResponse, func()) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, versions map[string]string) (chan cache.DeltaResponse, func()) {
 	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
 
 	// Create our out watch channel to return with a buffer of one
@@ -29,18 +28,12 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		// In subscribed, we only want to send back what's changed if we detect changes
 		var subscribed []types.Resource
 
-		// Here we set our current version map to what the stream state says it is
-		versionMap := st.ResourceVersions
-
 		r, _ := res.GetDeltaDiscoveryResponse()
-		if st.IsWildcard[r.TypeUrl] {
+		if len(versions) == 0 {
 			for _, resource := range r.Resources {
 				name := resource.GetName()
 				marshaledResource, _ := cache.MarshalResource(resource)
-				oldV := versionMap[name]
-				if v := cache.HashResource(marshaledResource); v != oldV {
-					versionMap[name] = v
-				}
+				versions[name] = cache.HashResource(marshaledResource)
 				subscribed = append(subscribed, resource)
 			}
 		} else {
@@ -53,9 +46,9 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 								panic(err)
 							}
 
-							oldVersion := versionMap[name]
+							oldVersion := versions[name]
 							if v := cache.HashResource(marshaledResource); v != oldVersion {
-								versionMap[name] = v
+								versions[name] = v
 							}
 							subscribed = append(subscribed, resource)
 						}
@@ -68,7 +61,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			DeltaRequest:      req,
 			Resources:         subscribed,
 			SystemVersionInfo: "",
-			NextVersionMap:    versionMap,
+			NextVersionMap:    versions,
 		}
 	} else if config.closeWatch {
 		close(out)

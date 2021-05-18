@@ -26,7 +26,6 @@ import (
 	"github.com/golang/protobuf/ptypes/any"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v3"
 )
 
@@ -63,7 +62,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, *stream.StreamState) (value chan DeltaResponse, cancel func())
+	CreateDeltaWatch(*DeltaRequest, map[string]string) (value chan DeltaResponse, cancel func())
 }
 
 // ConfigFetcher fetches configuration resources from cache

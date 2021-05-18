@@ -98,7 +98,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	}
 
 	var node = &core.Node{}
-
 	for {
 		select {
 		case <-s.ctx.Done():
@@ -166,25 +165,15 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			typeURL := req.GetTypeUrl()
 			state, ok := watches.deltaStreamStates[typeURL]
 			if !ok {
-				// Initialize the state map if we haven't already.
+				// Initialize the state if we haven't already.
 				state = stream.NewStreamState()
-				// We are in the wildcard mode if the first request of a particular type has an empty subscription list
-				state.IsWildcard[typeURL] = len(req.GetResourceNamesSubscribe()) == 0
-
-				// This means that we're handling the first request for this type on the stream
-				watches.deltaStreamStates[typeURL] = state
-			}
-
-			// Check if this is the first request on the stream for a type
-			if first := state.IsFirst[typeURL]; first {
+				// Since there was no previous state, we know we're handling the first request of this type on this stream
 				for r, v := range req.InitialResourceVersions {
 					state.ResourceVersions[r] = v
 				}
-				// We've processed our initial resource versions (which can only happen on the first request on a stream)
-				// so now we mark false.
-				state.IsFirst[typeURL] = false
-			} else if !first && len(req.InitialResourceVersions) > 0 {
-				return status.Errorf(codes.InvalidArgument, "InitialResourceVersions can only be set on initial stream request")
+
+				// We are in the wildcard mode if the first request of a particular type has an empty subscription list
+				state.IsWildcard = len(req.GetResourceNamesSubscribe()) == 0
 			}
 			s.subscribe(req.GetResourceNamesSubscribe(), state.GetResourceVersions())
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), state.GetResourceVersions())
@@ -201,7 +190,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				if watch.cancel != nil {
 					watch.cancel()
 				}
-				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, state)
+				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, state.GetResourceVersions())
 
 				// Go does not allow for selecting over a dynamic set of channels
 				// so we introduce a termination chan to handle cancelling any watches.
