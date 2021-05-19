@@ -23,6 +23,7 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // SnapshotCache is a snapshot-based cache that maintains a single versioned
@@ -224,7 +225,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			res := respondDelta(
 				watch.Request,
 				watch.Response,
-				watch.VersionState,
+				watch.StreamState,
 				snapshot,
 				cache.log,
 			)
@@ -391,7 +392,7 @@ func createResponse(request *Request, resources map[string]types.ResourceWithTtl
 }
 
 // CreateDeltaWatch returns a watch for a delta xDS request which implements the Simple SnapshotCache.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versions map[string]string) (chan DeltaResponse, func()) {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 
@@ -423,17 +424,17 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, versions map
 			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
 			delayedResponse = true
 		}
-		delayedResponse = respondDelta(request, value, versions, snapshot, cache.log) == nil
+		delayedResponse = respondDelta(request, value, state, snapshot, cache.log) == nil
 	}
 
 	if delayedResponse {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
-				t, versions, nodeID, snapshot.GetVersion(t))
+				t, state.ResourceVersions, nodeID, snapshot.GetVersion(t))
 		}
 
-		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, VersionState: versions})
+		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
 	}

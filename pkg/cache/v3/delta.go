@@ -17,11 +17,12 @@ package cache
 import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
-func respondDelta(request *DeltaRequest, value chan DeltaResponse, versions map[string]string, snapshot Snapshot, log log.Logger) *RawDeltaResponse {
-	resp, err := createDeltaResponse(request, versions, snapshot)
+func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, snapshot Snapshot, log log.Logger) *RawDeltaResponse {
+	resp, err := createDeltaResponse(request, state, snapshot, log)
 	if err != nil {
 		if log != nil {
 			log.Errorf("Error creating delta response: %v", err)
@@ -33,7 +34,7 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, versions map[
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if log != nil {
 			log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
-				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, versions == nil)
+				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
 		}
 		value <- resp
 		return resp
@@ -41,7 +42,7 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, versions map[
 	return nil
 }
 
-func createDeltaResponse(req *DeltaRequest, versions map[string]string, snapshot Snapshot) (*RawDeltaResponse, error) {
+func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
 	resources := snapshot.GetResources((req.TypeUrl))
 
 	// variables to build our response with
@@ -50,20 +51,21 @@ func createDeltaResponse(req *DeltaRequest, versions map[string]string, snapshot
 	toRemove := make([]string, 0)
 
 	// If we are handling a wildcard request, we want to respond with all resources
-	if len(versions) == 0 {
+	switch {
+	case state.IsWildcard():
 		for name, r := range resources {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
 			version := snapshot.GetVersionMap()[req.TypeUrl][name]
 			nextVersionMap[name] = version
-			prevVersion, found := versions[name]
+			prevVersion, found := state.ResourceVersions[name]
 			if !found || (prevVersion != nextVersionMap[name]) {
 				filtered = append(filtered, r)
 			}
 		}
-	} else {
+	default:
 		// Reply only with the requested resources
-		for name, prevVersion := range versions {
+		for name, prevVersion := range state.ResourceVersions {
 			if r, ok := resources[name]; ok {
 				nextVersion := snapshot.GetVersionMap()[req.TypeUrl][name]
 				if prevVersion != nextVersion {
@@ -75,7 +77,7 @@ func createDeltaResponse(req *DeltaRequest, versions map[string]string, snapshot
 	}
 
 	// Compute resources for removal regardless of the request type
-	for name := range versions {
+	for name := range state.ResourceVersions {
 		if _, ok := resources[name]; !ok {
 			toRemove = append(toRemove, name)
 		}
