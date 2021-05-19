@@ -173,6 +173,9 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 					state.ResourceVersions[r] = v
 				}
 				state.Wildcard = len(req.GetResourceNamesSubscribe()) == 0
+
+				// This means that we're handling the first request for this type on the stream
+				watches.deltaStreamStates[typeURL] = state
 			}
 			// versionMap := state.GetResourceVersions()
 
