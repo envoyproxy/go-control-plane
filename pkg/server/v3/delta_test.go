@@ -14,10 +14,11 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 )
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, versions map[string]string) (chan cache.DeltaResponse, func()) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state stream.StreamState) (chan cache.DeltaResponse, func()) {
 	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
 
 	// Create our out watch channel to return with a buffer of one
@@ -29,11 +30,11 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		var subscribed []types.Resource
 
 		r, _ := res.GetDeltaDiscoveryResponse()
-		if len(versions) == 0 {
+		if state.IsWildcard() {
 			for _, resource := range r.Resources {
 				name := resource.GetName()
 				marshaledResource, _ := cache.MarshalResource(resource)
-				versions[name] = cache.HashResource(marshaledResource)
+				state.ResourceVersions[name] = cache.HashResource(marshaledResource)
 				subscribed = append(subscribed, resource)
 			}
 		} else {
@@ -46,9 +47,9 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 								panic(err)
 							}
 
-							oldVersion := versions[name]
+							oldVersion := state.ResourceVersions[name]
 							if v := cache.HashResource(marshaledResource); v != oldVersion {
-								versions[name] = v
+								state.ResourceVersions[name] = v
 							}
 							subscribed = append(subscribed, resource)
 						}
@@ -61,7 +62,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			DeltaRequest:      req,
 			Resources:         subscribed,
 			SystemVersionInfo: "",
-			NextVersionMap:    versions,
+			NextVersionMap:    state.ResourceVersions,
 		}
 	} else if config.closeWatch {
 		close(out)

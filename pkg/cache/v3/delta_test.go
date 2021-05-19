@@ -11,6 +11,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
@@ -26,7 +27,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, make(map[string]string))
+		}, stream.StreamState{ResourceVersions: nil, Wildcard: true})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -58,7 +59,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, versionMap[typ])
+		}, stream.StreamState{ResourceVersions: versionMap[typ]})
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -100,7 +101,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, make(map[string]string))
+		}, stream.StreamState{ResourceVersions: make(map[string]string), Wildcard: true})
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -131,7 +132,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, versionMap[typ])
+		}, stream.StreamState{ResourceVersions: versionMap[typ], Wildcard: true})
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -186,7 +187,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, make(map[string]string))
+					}, stream.NewStreamState())
 				}
 			})
 		}(i)
@@ -202,7 +203,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, make(map[string]string))
+		}, stream.NewStreamState())
 
 		// Cancel the watch
 		cancel()

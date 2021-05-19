@@ -167,15 +167,14 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if !ok {
 				// Initialize the state if we haven't already.
 				state = stream.NewStreamState()
+
 				// Since there was no previous state, we know we're handling the first request of this type on this stream
 				for r, v := range req.InitialResourceVersions {
 					state.ResourceVersions[r] = v
 				}
+				state.Wildcard = len(req.GetResourceNamesSubscribe()) == 0
 			}
-			versionMap := state.GetResourceVersions()
-
-			s.subscribe(req.GetResourceNamesSubscribe(), versionMap)
-			s.unsubscribe(req.GetResourceNamesUnsubscribe(), versionMap)
+			// versionMap := state.GetResourceVersions()
 
 			// cancel existing watch to (re-)request a newer version
 			watch, ok := watches.deltaResponses[typeURL]
@@ -189,7 +188,11 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				if watch.cancel != nil {
 					watch.cancel()
 				}
-				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, versionMap)
+
+				s.subscribe(req.GetResourceNamesSubscribe(), state.ResourceVersions)
+				s.unsubscribe(req.GetResourceNamesUnsubscribe(), state.ResourceVersions)
+
+				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, state)
 
 				// Go does not allow for selecting over a dynamic set of channels
 				// so we introduce a termination chan to handle cancelling any watches.
@@ -200,7 +203,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 					case resp, more := <-watch.responses:
 						if more {
 							watches.deltaMuxedResponses <- resp
-							state.SetResourceVersions(resp.GetNextVersionMap())
 						} else {
 							// Check again if the watch is cancelled.
 							select {

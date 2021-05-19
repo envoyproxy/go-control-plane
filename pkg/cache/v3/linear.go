@@ -22,6 +22,7 @@ import (
 	"sync"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 type watches = map[chan Response]struct{}
@@ -238,7 +239,7 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 	}
 }
 
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, versions map[string]string) (chan DeltaResponse, func()) {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 

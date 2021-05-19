@@ -17,6 +17,8 @@ package cache
 import (
 	"context"
 	"errors"
+
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // MuxCache multiplexes across several caches using a classification function.
@@ -45,7 +47,7 @@ func (mux *MuxCache) CreateWatch(request *Request) (chan Response, func()) {
 	return cache.CreateWatch(request)
 }
 
-func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, versions map[string]string) (chan DeltaResponse, func()) {
+func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 

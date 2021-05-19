@@ -23,6 +23,8 @@ type DeltaStream interface {
 
 // StreamState will keep track of resource state on a stream
 type StreamState struct {
+	Wildcard bool
+
 	// ResourceVersions contains a hash of the resource as the value and the resource name as the key.
 	// This field stores the last state sent to the client.
 	ResourceVersions map[string]string
@@ -39,14 +41,15 @@ func NewStreamState() StreamState {
 // We do this because maps are reference types in Go, and if we pass around the ResourceVersions map into the cache
 // the state can be mutated across multiple threads creating a datarace.
 func (s StreamState) GetResourceVersions() map[string]string {
-	versions := make(map[string]string, len(s.ResourceVersions))
-	for key, val := range s.ResourceVersions {
-		versions[key] = val
-	}
-
-	return versions
+	return s.ResourceVersions
 }
 
+// SetResourceVersions sets a new list of ResourceVersions in the StreamState
 func (s StreamState) SetResourceVersions(versions map[string]string) {
 	s.ResourceVersions = versions
+}
+
+// IsWildcard returns whether the current state of a stream is in wildcard mode or not
+func (s StreamState) IsWildcard() bool {
+	return s.Wildcard
 }
