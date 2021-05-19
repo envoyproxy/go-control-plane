@@ -176,8 +176,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			// cancel existing watch to (re-)request a newer version
 			watch, ok := watches.deltaResponses[typeURL]
-			// we verify nonce only if nonce is not initialized
-			if !ok || watch.nonce == req.ResponseNonce {
+			if !ok {
 				// We must signal goroutine termination to prevent a race between the cancel closing the watch
 				// and the producer closing the watch.`	`
 				if terminate, exists := watches.deltaTerminations[typeURL]; exists {
