@@ -140,17 +140,12 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				}
 			}
 
-			var nonce string
 			// The node information might only be set on the first incoming delta discovery request, so store it here so we can
 			// reset it on subsequent requests that omit it.
 			if req.Node != nil {
 				node = req.Node
-				nonce = req.GetResponseNonce()
 			} else {
 				req.Node = node
-
-				// If we have no nonce, i.e. this is the first request on a delta stream, set one
-				nonce = strconv.FormatInt(streamNonce, 10)
 			}
 
 			// type URL is required for ADS but is implicit for any other xDS stream
@@ -182,7 +177,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			// cancel existing watch to (re-)request a newer version
 			watch, ok := watches.deltaResponses[typeURL]
 			// we verify nonce only if nonce is not initialized
-			if !ok || watch.nonce == nonce {
+			if !ok || watch.nonce == req.ResponseNonce {
 				// We must signal goroutine termination to prevent a race between the cancel closing the watch
 				// and the producer closing the watch.`	`
 				if terminate, exists := watches.deltaTerminations[typeURL]; exists {
