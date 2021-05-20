@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
 	"google.golang.org/grpc"
+
+	"github.com/stretchr/testify/assert"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -30,7 +31,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		var subscribed []types.Resource
 
 		r, _ := res.GetDeltaDiscoveryResponse()
-		if state.IsWildcard() {
+		if state.Wildcard {
 			for _, resource := range r.Resources {
 				name := resource.GetName()
 				marshaledResource, _ := cache.MarshalResource(resource)
@@ -38,7 +39,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 				subscribed = append(subscribed, resource)
 			}
 		} else {
-			if len(req.GetResourceNamesSubscribe()) > 0 {
+			if len(state.ResourceVersions) > 0 {
 				for _, resource := range r.Resources {
 					for _, alias := range req.GetResourceNamesSubscribe() {
 						if name := resource.GetName(); name == alias {
@@ -226,22 +227,15 @@ func TestDeltaResponseHandlersWildcard(t *testing.T) {
 
 			go func() {
 				err := process(typ, resp, s)
-				if err != nil {
-					t.Errorf("Delta() => got \"%v\", want no error", err)
-				}
+				assert.NoError(t, err)
 			}()
 
 			select {
 			case res := <-resp.sent:
 				close(resp.recv)
 
-				if config.deltaCounts[typ] != 1 {
-					t.Errorf("watch counts for typ: %s => got %v, want 1", typ, config.deltaCounts[typ])
-				}
-
-				if v := res.GetSystemVersionInfo(); v != "" {
-					t.Errorf("expected emtpy version on initial request, got %s", v)
-				}
+				assert.Equal(t, 1, config.deltaCounts[typ])
+				assert.Empty(t, res.GetSystemVersionInfo())
 			case <-time.After(1 * time.Second):
 				t.Fatalf("got no response")
 			}
@@ -262,27 +256,20 @@ func TestDeltaResponseHandlers(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			// We only subscribe to one resource to see if we get the appropriate number of responses back
+			// We only subscribe to one resource to see if we get the appropriate number of resources back
 			resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: typ, ResourceNamesSubscribe: []string{res.Resources[0].Name}}
 
 			go func() {
 				err := process(typ, resp, s)
-				if err != nil {
-					t.Errorf("Delta() => got \"%v\", want no error", err)
-				}
+				assert.NoError(t, err)
 			}()
 
 			select {
 			case res := <-resp.sent:
 				close(resp.recv)
 
-				// We should only have 7 watch channels initialized since that is the base map length
-				if config.deltaCounts[typ] != 1 {
-					t.Errorf("watch counts for typ: %s => got %v, want 1", typ, config.deltaCounts[typ])
-				}
-				if v := res.GetSystemVersionInfo(); v != "" {
-					t.Errorf("expected emtpy version on initial request, got %s", v)
-				}
+				assert.Equal(t, 1, config.deltaCounts[typ])
+				assert.Empty(t, res.GetSystemVersionInfo())
 			case <-time.After(1 * time.Second):
 				t.Fatalf("got no response")
 			}
@@ -304,9 +291,8 @@ func TestDeltaWatchClosed(t *testing.T) {
 			}
 
 			// Verify that the response fails when the watch is closed
-			if err := s.DeltaAggregatedResources(resp); err == nil {
-				t.Error("DeltaAggregatedResources() => got no error, want watch failed")
-			}
+			err := s.DeltaAggregatedResources(resp)
+			assert.Error(t, err)
 
 			close(resp.recv)
 		})
@@ -329,9 +315,8 @@ func TestSendDeltaError(t *testing.T) {
 			}
 
 			// check that response fails since we expect an error to come through
-			if err := s.DeltaAggregatedResources(resp); err == nil {
-				t.Error("DeltaAggregatedResources() => got no error, want send error")
-			}
+			err := s.DeltaAggregatedResources(resp)
+			assert.Error(t, err)
 
 			close(resp.recv)
 		})
@@ -343,33 +328,38 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 	config.deltaResponses = makeDeltaResponses()
 	resp := makeMockDeltaStream(t)
 
-	resp.recv <- &discovery.DeltaDiscoveryRequest{
-		Node:    node,
-		TypeUrl: rsrc.ListenerType,
+	reqs := []*discovery.DeltaDiscoveryRequest{
+		{
+			Node:    node,
+			TypeUrl: rsrc.ListenerType,
+		},
+		{
+			Node:    node,
+			TypeUrl: rsrc.ClusterType,
+		},
+		{
+			Node:                   node,
+			TypeUrl:                rsrc.EndpointType,
+			ResourceNamesSubscribe: []string{clusterName},
+		},
+		{
+			TypeUrl:                rsrc.RouteType,
+			ResourceNamesSubscribe: []string{routeName},
+		},
+		{
+			TypeUrl:                rsrc.SecretType,
+			ResourceNamesSubscribe: []string{secretName},
+		},
 	}
-	resp.recv <- &discovery.DeltaDiscoveryRequest{
-		Node:    node,
-		TypeUrl: rsrc.ClusterType,
-	}
-	resp.recv <- &discovery.DeltaDiscoveryRequest{
-		Node:                   node,
-		TypeUrl:                rsrc.EndpointType,
-		ResourceNamesSubscribe: []string{clusterName},
-	}
-	resp.recv <- &discovery.DeltaDiscoveryRequest{
-		TypeUrl:                rsrc.RouteType,
-		ResourceNamesSubscribe: []string{routeName},
-	}
-	resp.recv <- &discovery.DeltaDiscoveryRequest{
-		TypeUrl:                rsrc.SecretType,
-		ResourceNamesSubscribe: []string{secretName},
+
+	for _, r := range reqs {
+		resp.recv <- r
 	}
 
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	go func() {
-		if err := s.DeltaAggregatedResources(resp); err != nil {
-			t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
-		}
+		err := s.DeltaAggregatedResources(resp)
+		assert.NoError(t, err)
 	}()
 
 	count := 0
@@ -377,13 +367,13 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 		select {
 		case <-resp.sent:
 			count++
-			if count >= 5 {
+			if count >= len(reqs) {
 				close(resp.recv)
-				want := map[string]int{rsrc.EndpointType: 1, rsrc.ClusterType: 1, rsrc.RouteType: 1, rsrc.ListenerType: 1, rsrc.SecretType: 1}
-				if !reflect.DeepEqual(want, config.deltaCounts) {
-					t.Errorf("watch counts => got %v, want %v", config.deltaCounts, want)
-				}
-
+				assert.Equal(
+					t,
+					map[string]int{rsrc.EndpointType: 1, rsrc.ClusterType: 1, rsrc.RouteType: 1, rsrc.ListenerType: 1, rsrc.SecretType: 1},
+					config.deltaCounts,
+				)
 				return
 			}
 		case <-time.After(1 * time.Second):

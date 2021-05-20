@@ -148,8 +148,8 @@ func (info *statusInfo) GetLastDeltaWatchRequestTime() time.Time {
 	return info.lastDeltaWatchRequestTime
 }
 
-// GetDeltaStraemState will pull the stream state with the version map out of a specific watch
-func (info *statusInfo) GetDeltaStraemState(watchID int64) stream.StreamState {
+// GetDeltaStreamState will pull the stream state with the version map out of a specific watch
+func (info *statusInfo) GetDeltaStreamState(watchID int64) stream.StreamState {
 	info.mu.RLock()
 	defer info.mu.RUnlock()
 	return info.deltaWatches[watchID].StreamState

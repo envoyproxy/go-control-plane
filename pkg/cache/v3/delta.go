@@ -34,7 +34,7 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if log != nil {
 			log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
-				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
+				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.Wildcard)
 		}
 		value <- resp
 		return resp
@@ -52,7 +52,7 @@ func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot S
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
-	case state.IsWildcard():
+	case state.Wildcard:
 		for name, r := range resources {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later

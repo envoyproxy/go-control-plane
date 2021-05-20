@@ -58,7 +58,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
 	// streamNonce holds a unique nonce for req-resp pairs per xDS stream. The server
-	// ignores stale nonces and nonce is only modified within send() function.
+	// TODO: we no longer ignore stale nonces so we'll need to handle that case
 	var streamNonce int64
 
 	// a collection of stack allocated watches per request type
@@ -117,14 +117,13 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				return err
 			}
 
-			watch := watches.deltaResponses[typ]
+			watch := watches.deltaWatches[typ]
 			watch.nonce = nonce
 
-			state := watches.deltaStreamStates[typ]
+			state := watch.GetState()
 			state.ResourceVersions = resp.GetNextVersionMap()
 
-			watches.deltaResponses[typ] = watch
-			watches.deltaStreamStates[typ] = state
+			watches.deltaWatches[typ] = watch
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -158,33 +157,26 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 
 			typeURL := req.GetTypeUrl()
-			state, ok := watches.deltaStreamStates[typeURL]
-			if !ok {
-				// Initialize the state if we haven't already.
-				state = stream.NewStreamState()
-
-				// Since there was no previous state, we know we're handling the first request of this type on this stream
-				for r, v := range req.InitialResourceVersions {
-					state.ResourceVersions[r] = v
-				}
-				state.Wildcard = len(req.GetResourceNamesSubscribe()) == 0
-
-				// This means that we're handling the first request for this type on the stream
-				watches.deltaStreamStates[typeURL] = state
-			}
-			// versionMap := state.GetResourceVersions()
 
 			// cancel existing watch to (re-)request a newer version
-			watch, ok := watches.deltaResponses[typeURL]
+			watch, ok := watches.deltaWatches[typeURL]
 			if !ok {
+				// Check state for the stream, if we don't have one then initialize
+				state := watches.deltaWatches[typeURL].state
+				if state.ResourceVersions == nil {
+					// Initialize the state if we haven't already.
+					state = stream.NewStreamState()
+
+					// Since there was no previous state, we know we're handling the first request of this type on this stream
+					for r, v := range req.InitialResourceVersions {
+						state.ResourceVersions[r] = v
+					}
+					state.Wildcard = len(req.GetResourceNamesSubscribe()) == 0
+				}
+
 				// We must signal goroutine termination to prevent a race between the cancel closing the watch
-				// and the producer closing the watch.`	`
-				if terminate, exists := watches.deltaTerminations[typeURL]; exists {
-					close(terminate)
-				}
-				if watch.cancel != nil {
-					watch.cancel()
-				}
+				// and the producer closing the watch.
+				watch.Cancel()
 
 				s.subscribe(req.GetResourceNamesSubscribe(), state.ResourceVersions)
 				s.unsubscribe(req.GetResourceNamesUnsubscribe(), state.ResourceVersions)
@@ -194,7 +186,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				// Go does not allow for selecting over a dynamic set of channels
 				// so we introduce a termination chan to handle cancelling any watches.
 				terminate := make(chan struct{})
-				watches.deltaTerminations[typeURL] = terminate
+				watch.termination = terminate
 				go func() {
 					select {
 					case resp, more := <-watch.responses:
