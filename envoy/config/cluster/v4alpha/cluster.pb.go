@@ -601,6 +601,7 @@ type Cluster struct {
 	// Configuration to use for EDS updates for the Cluster.
 	EdsClusterConfig *Cluster_EdsClusterConfig `protobuf:"bytes,3,opt,name=eds_cluster_config,json=edsClusterConfig,proto3" json:"eds_cluster_config,omitempty"`
 	// The timeout for new network connections to hosts in the cluster.
+	// If not set, a default value of 5s will be used.
 	ConnectTimeout *duration.Duration `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout,proto3" json:"connect_timeout,omitempty"`
 	// Soft limit on size of the cluster’s connections read and write buffers. If
 	// unspecified, an implementation defined default is applied (1MiB).
