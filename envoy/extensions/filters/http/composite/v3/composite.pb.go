@@ -38,6 +38,7 @@ const _ = proto.ProtoPackageIsVersion4
 // :ref:`ExecuteFilterAction <envoy_v3_api_msg_extensions.filters.http.composite.v3.ExecuteFilterAction>`)
 // which filter configuration to create and delegate to.
 //
+// [#alpha:]
 type Composite struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

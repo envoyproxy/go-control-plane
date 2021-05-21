@@ -32,6 +32,8 @@ const _ = proto.ProtoPackageIsVersion4
 // Wrapper around an existing extension that provides an associated matcher. This allows
 // decorating an existing extension with a matcher, which can be used to match against
 // relevant protocol data.
+//
+// [#alpha:]
 type ExtensionWithMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
