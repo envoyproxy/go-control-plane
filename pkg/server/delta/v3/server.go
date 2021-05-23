@@ -57,8 +57,7 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callba
 func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
-	// streamNonce holds a unique nonce for req-resp pairs per xDS stream. The server
-	// TODO: we no longer ignore stale nonces so we'll need to handle that case
+	// streamNonce holds a unique nonce for req-resp pairs per xDS stream.
 	var streamNonce int64
 
 	// a collection of stack allocated watches per request type
@@ -120,9 +119,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			watch := watches.deltaWatches[typ]
 			watch.nonce = nonce
 
-			state := watch.GetState()
-			state.ResourceVersions = resp.GetNextVersionMap()
-
+			watch.state.ResourceVersions = resp.GetNextVersionMap()
 			watches.deltaWatches[typ] = watch
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -165,13 +162,9 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				state := watches.deltaWatches[typeURL].state
 				if state.ResourceVersions == nil {
 					// Initialize the state if we haven't already.
-					state = stream.NewStreamState()
-
 					// Since there was no previous state, we know we're handling the first request of this type on this stream
-					for r, v := range req.InitialResourceVersions {
-						state.ResourceVersions[r] = v
-					}
-					state.Wildcard = len(req.GetResourceNamesSubscribe()) == 0
+					// so we set the initial resource versions if we have any, and also signal if this stream will be wildcard
+					state = stream.NewStreamState(len(req.GetResourceNamesSubscribe()) == 0, req.GetInitialResourceVersions())
 				}
 
 				// We must signal goroutine termination to prevent a race between the cancel closing the watch

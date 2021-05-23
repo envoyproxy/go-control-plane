@@ -32,8 +32,9 @@ type StreamState struct {
 }
 
 // NewStreamState initializes a stream state.
-func NewStreamState() StreamState {
+func NewStreamState(wildcard bool, initialResourceVersions map[string]string) StreamState {
 	return StreamState{
-		ResourceVersions: make(map[string]string),
+		Wildcard:         wildcard,
+		ResourceVersions: initialResourceVersions,
 	}
 }

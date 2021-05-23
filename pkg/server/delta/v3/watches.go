@@ -45,11 +45,6 @@ type watch struct {
 	state stream.StreamState
 }
 
-// GetState returns the current state of the watch
-func (w *watch) GetState() stream.StreamState {
-	return w.state
-}
-
 // Cancel calls terminate and cancel
 func (w *watch) Cancel() {
 	if w.cancel != nil {
