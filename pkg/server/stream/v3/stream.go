@@ -33,8 +33,14 @@ type StreamState struct {
 
 // NewStreamState initializes a stream state.
 func NewStreamState(wildcard bool, initialResourceVersions map[string]string) StreamState {
-	return StreamState{
+	state := StreamState{
 		Wildcard:         wildcard,
 		ResourceVersions: initialResourceVersions,
 	}
+
+	if initialResourceVersions == nil {
+		state.ResourceVersions = make(map[string]string)
+	}
+
+	return state
 }

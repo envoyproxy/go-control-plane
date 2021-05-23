@@ -187,7 +187,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, stream.NewStreamState())
+					}, stream.NewStreamState(false, make(map[string]string)))
 				}
 			})
 		}(i)
@@ -203,7 +203,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.NewStreamState())
+		}, stream.NewStreamState(false, make(map[string]string)))
 
 		// Cancel the watch
 		cancel()
