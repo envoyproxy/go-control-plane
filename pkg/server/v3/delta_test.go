@@ -29,32 +29,30 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		res := config.deltaResponses[req.TypeUrl][0]
 		// In subscribed, we only want to send back what's changed if we detect changes
 		var subscribed []types.Resource
-
 		r, _ := res.GetDeltaDiscoveryResponse()
-		if state.Wildcard {
+
+		switch {
+		case state.Wildcard:
 			for _, resource := range r.Resources {
 				name := resource.GetName()
-				marshaledResource, _ := cache.MarshalResource(resource)
-				state.ResourceVersions[name] = cache.HashResource(marshaledResource)
-				subscribed = append(subscribed, resource)
-			}
-		} else {
-			if len(state.ResourceVersions) > 0 {
-				for _, resource := range r.Resources {
-					for _, alias := range req.GetResourceNamesSubscribe() {
-						if name := resource.GetName(); name == alias {
-							marshaledResource, err := cache.MarshalResource(resource)
-							if err != nil {
-								panic(err)
-							}
+				res, _ := cache.MarshalResource(resource)
 
-							oldVersion := state.ResourceVersions[name]
-							if v := cache.HashResource(marshaledResource); v != oldVersion {
-								state.ResourceVersions[name] = v
-							}
-							subscribed = append(subscribed, resource)
-						}
+				nextVersion := cache.HashResource(res)
+				prevVersion, found := state.ResourceVersions[name]
+				if !found || (prevVersion != nextVersion) {
+					state.ResourceVersions[name] = nextVersion
+					subscribed = append(subscribed, resource)
+				}
+			}
+		default:
+			for _, resource := range r.Resources {
+				res, _ := cache.MarshalResource(resource)
+				nextVersion := cache.HashResource(res)
+				for _, prevVersion := range state.ResourceVersions {
+					if prevVersion != nextVersion {
+						subscribed = append(subscribed, resource)
 					}
+					state.ResourceVersions[resource.GetName()] = nextVersion
 				}
 			}
 		}
