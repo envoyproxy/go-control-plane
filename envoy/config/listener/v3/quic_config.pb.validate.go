@@ -81,6 +81,17 @@ func (m *QuicProtocolOptions) Validate() error {
 		}
 	}
 
+	if wrapper := m.GetPacketsToReadToConnectionCountRatio(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
+			return QuicProtocolOptionsValidationError{
+				field:  "PacketsToReadToConnectionCountRatio",
+				reason: "value must be greater than or equal to 1",
+			}
+		}
+
+	}
+
 	return nil
 }
 
