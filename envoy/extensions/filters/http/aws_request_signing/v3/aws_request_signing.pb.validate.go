@@ -57,6 +57,8 @@ func (m *AwsRequestSigning) Validate() error {
 
 	// no validation rules for HostRewrite
 
+	// no validation rules for UseUnsignedPayload
+
 	return nil
 }
 

@@ -93,7 +93,6 @@ func GetResourceName(res types.Resource) string {
 	case *runtime.Runtime:
 		return v.GetName()
 	case *core.TypedExtensionConfig:
-		// This is a V3 proto, but this is the easiest workaround for the fact that there is no V2 proto.
 		return v.GetName()
 	default:
 		return ""
