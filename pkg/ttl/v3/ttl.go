@@ -31,7 +31,7 @@ func MaybeCreateTtlResourceIfSupported(resource types.ResourceWithTtl, name stri
 			wrappedResource.Resource = any
 		}
 
-		return wrappedResource, deltaResourceTypeURL, nil
+		return wrappedResource, string(deltaResourceTypeURL), nil
 	}
 
 	return resource.Resource, resourceTypeUrl, nil
