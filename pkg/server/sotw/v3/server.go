@@ -18,7 +18,6 @@ package sotw
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"sync/atomic"
 
@@ -221,12 +220,9 @@ func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 			}
 			select {
 			case reqCh <- req:
-				fmt.Println("received request")
 			case <-stream.Context().Done():
-				fmt.Println("recieved done signal from stream")
 				return
 			case <-s.ctx.Done():
-				fmt.Println("received done signal from server")
 				return
 			}
 		}

@@ -547,7 +547,6 @@ func TestCancellations(t *testing.T) {
 			TypeUrl: typ,
 		}
 	}
-	t.Logf("closing request channel")
 	close(resp.recv)
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	err := s.StreamAggregatedResources(resp)
