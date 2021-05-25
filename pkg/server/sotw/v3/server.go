@@ -18,7 +18,6 @@ package sotw
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"sync/atomic"
 
@@ -171,10 +170,9 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 			typeURL := req.GetTypeUrl()
 
 			// cancel existing watches to (re-)request a newer version
-			nonce := req.GetResponseNonce()
 			watch, ok := watches.watches[typeURL]
 			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
-			if !ok || watch.nonce == nonce {
+			if !ok || watch.nonce == req.GetResponseNonce() {
 				watch.Cancel()
 
 				watch.responses, watch.cancel = s.cache.CreateWatch(req)
@@ -183,6 +181,7 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 				// so we introduce a termination chan to handle cancelling any watches.
 				terminate := make(chan struct{})
 				watch.termination = terminate
+				watches.watches[typeURL] = watch
 				go func() {
 					select {
 					case resp, more := <-watch.responses:
@@ -221,12 +220,9 @@ func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 			}
 			select {
 			case reqCh <- req:
-				fmt.Println("received request")
 			case <-stream.Context().Done():
-				fmt.Println("recieved done signal from stream")
 				return
 			case <-s.ctx.Done():
-				fmt.Println("received done signal from server")
 				return
 			}
 		}
