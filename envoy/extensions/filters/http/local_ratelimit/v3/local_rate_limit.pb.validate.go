@@ -154,6 +154,8 @@ func (m *LocalRateLimit) Validate() error {
 		}
 	}
 
+	// no validation rules for LocalRateLimitPerDownstreamConnection
+
 	return nil
 }
 
