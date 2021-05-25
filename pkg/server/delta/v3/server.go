@@ -176,6 +176,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				// so we introduce a termination chan to handle cancelling any watches.
 				terminate := make(chan struct{})
 				watch.termination = terminate
+				watches.deltaWatches[typeURL] = watch
 				go func() {
 					select {
 					case resp, more := <-watch.responses:
