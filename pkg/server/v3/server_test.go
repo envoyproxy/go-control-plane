@@ -24,6 +24,8 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/stretchr/testify/assert"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -583,9 +585,8 @@ func TestAggregateRequestType(t *testing.T) {
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
-	if err := s.StreamAggregatedResources(resp); err == nil {
-		t.Error("StreamAggregatedResources() => got nil, want an error")
-	}
+	err := s.StreamAggregatedResources(resp)
+	assert.Error(t, err)
 }
 
 func TestCancellations(t *testing.T) {
@@ -599,12 +600,9 @@ func TestCancellations(t *testing.T) {
 	}
 	close(resp.recv)
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
-	if err := s.StreamAggregatedResources(resp); err != nil {
-		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
-	}
-	if config.watches != 0 {
-		t.Errorf("Expect all watches cancelled, got %q", config.watches)
-	}
+	err := s.StreamAggregatedResources(resp)
+	assert.NoError(t, err)
+	assert.True(t, config.watches == 0)
 }
 
 func TestOpaqueRequestsChannelMuxing(t *testing.T) {
@@ -620,12 +618,9 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 	}
 	close(resp.recv)
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
-	if err := s.StreamAggregatedResources(resp); err != nil {
-		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
-	}
-	if config.watches != 0 {
-		t.Errorf("Expect all watches cancelled, got %q", config.watches)
-	}
+	err := s.StreamAggregatedResources(resp)
+	assert.NoError(t, err)
+	assert.True(t, config.watches == 0)
 }
 
 func TestCallbackError(t *testing.T) {
@@ -648,9 +643,8 @@ func TestCallbackError(t *testing.T) {
 			}
 
 			// check that response fails since stream open returns error
-			if err := s.StreamAggregatedResources(resp); err == nil {
-				t.Error("Stream() => got no error, want error")
-			}
+			err := s.StreamAggregatedResources(resp)
+			assert.Error(t, err)
 
 			close(resp.recv)
 		})
