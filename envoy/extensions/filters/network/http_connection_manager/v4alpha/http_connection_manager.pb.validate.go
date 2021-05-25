@@ -381,6 +381,8 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
+	// no validation rules for StripTrailingHostDot
+
 	switch m.RouteSpecifier.(type) {
 
 	case *HttpConnectionManager_Rds:
