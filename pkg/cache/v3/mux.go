@@ -47,7 +47,7 @@ func (mux *MuxCache) CreateWatch(request *Request) (chan Response, func()) {
 	return cache.CreateWatch(request)
 }
 
-func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
+func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 
