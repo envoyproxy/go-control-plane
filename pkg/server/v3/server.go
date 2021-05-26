@@ -95,7 +95,7 @@ func (c CallbackFuncs) OnStreamClosed(streamID int64) {
 
 // OnDeltaStreamOpen invokes DeltaStreamOpenFunc.
 func (c CallbackFuncs) OnDeltaStreamOpen(ctx context.Context, streamID int64, typeURL string) error {
-	if c.StreamOpenFunc != nil {
+	if c.DeltaStreamOpenFunc != nil {
 		return c.DeltaStreamOpenFunc(ctx, streamID, typeURL)
 	}
 
@@ -104,7 +104,7 @@ func (c CallbackFuncs) OnDeltaStreamOpen(ctx context.Context, streamID int64, ty
 
 // OnDeltaStreamClosed invokes DeltaStreamClosedFunc.
 func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64) {
-	if c.StreamClosedFunc != nil {
+	if c.DeltaStreamClosedFunc != nil {
 		c.DeltaStreamClosedFunc(streamID)
 	}
 }

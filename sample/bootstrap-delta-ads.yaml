@@ -36,17 +36,3 @@ static_resources:
                 port_value: 18000
     http2_protocol_options: {}
     name: xds_cluster
-layered_runtime:
-  layers:
-    - name: runtime-0
-      rtds_layer:
-        rtds_config:
-          resource_api_version: V3
-          ads: {}
-        name: runtime-0
-    - name: runtime-1
-      rtds_layer:
-        rtds_config:
-          resource_api_version: V3
-          ads: {}
-        name: runtime-1
