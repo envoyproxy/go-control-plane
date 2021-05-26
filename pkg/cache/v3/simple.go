@@ -392,7 +392,7 @@ func createResponse(request *Request, resources map[string]types.ResourceWithTtl
 }
 
 // CreateDeltaWatch returns a watch for a delta xDS request which implements the Simple SnapshotCache.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 
@@ -424,17 +424,17 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, st *stream.S
 			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
 			delayedResponse = true
 		}
-		delayedResponse = respondDelta(request, value, st, snapshot, cache.log) == nil
+		delayedResponse = respondDelta(request, value, state, snapshot, cache.log) == nil
 	}
 
 	if delayedResponse {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
-				t, st.ResourceVersions, nodeID, snapshot.GetVersion(t))
+				t, state.ResourceVersions, nodeID, snapshot.GetVersion(t))
 		}
 
-		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: st})
+		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})
 
 		return value, cache.cancelDeltaWatch(nodeID, watchID)
 	}

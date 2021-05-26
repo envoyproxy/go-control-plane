@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -29,16 +30,20 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
 type mockConfigWatcher struct {
-	counts     map[string]int
-	responses  map[string][]cache.Response
-	closeWatch bool
-	watches    int
+	counts         map[string]int
+	deltaCounts    map[string]int
+	responses      map[string][]cache.Response
+	deltaResponses map[string][]cache.DeltaResponse
+	closeWatch     bool
+	watches        int
+	deltaWatches   int
+
+	mu *sync.RWMutex
 }
 
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
@@ -60,10 +65,6 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (c
 	return out, nil
 }
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, st *stream.StreamState) (chan cache.DeltaResponse, func()) {
-	return nil, nil
-}
-
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out := config.responses[req.TypeUrl][0]
@@ -75,7 +76,9 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.Disco
 
 func makeMockConfigWatcher() *mockConfigWatcher {
 	return &mockConfigWatcher{
-		counts: make(map[string]int),
+		counts:      make(map[string]int),
+		deltaCounts: make(map[string]int),
+		mu:          &sync.RWMutex{},
 	}
 }
 
