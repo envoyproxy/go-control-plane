@@ -414,9 +414,8 @@ func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
 	resp := makeMockDeltaStream(t)
 	for i := 0; i < 10; i++ {
 		resp.recv <- &discovery.DeltaDiscoveryRequest{
-			Node:    node,
-			TypeUrl: fmt.Sprintf("%s%d", opaqueType, i%2),
-			// each subsequent request is assumed to supercede the previous request
+			Node:                   node,
+			TypeUrl:                fmt.Sprintf("%s%d", opaqueType, i%2),
 			ResourceNamesSubscribe: []string{fmt.Sprintf("%d", i)},
 		}
 	}
