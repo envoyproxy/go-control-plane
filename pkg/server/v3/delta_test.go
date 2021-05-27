@@ -379,3 +379,81 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 		}
 	}
 }
+
+func TestDeltaAggregateRequestType(t *testing.T) {
+	config := makeMockConfigWatcher()
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	resp := makeMockDeltaStream(t)
+	resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node}
+	if err := s.DeltaAggregatedResources(resp); err == nil {
+		t.Error("DeltaAggregatedResources() => got nil, want an error")
+	}
+}
+
+func TestDeltaCancellations(t *testing.T) {
+	config := makeMockConfigWatcher()
+	resp := makeMockDeltaStream(t)
+	for _, typ := range testTypes {
+		resp.recv <- &discovery.DeltaDiscoveryRequest{
+			Node:    node,
+			TypeUrl: typ,
+		}
+	}
+	close(resp.recv)
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	if err := s.DeltaAggregatedResources(resp); err != nil {
+		t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
+	}
+	if config.watches != 0 {
+		t.Errorf("Expect all watches cancelled, got %q", config.watches)
+	}
+}
+
+func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
+	config := makeMockConfigWatcher()
+	resp := makeMockDeltaStream(t)
+	for i := 0; i < 10; i++ {
+		resp.recv <- &discovery.DeltaDiscoveryRequest{
+			Node:                   node,
+			TypeUrl:                fmt.Sprintf("%s%d", opaqueType, i%2),
+			ResourceNamesSubscribe: []string{fmt.Sprintf("%d", i)},
+		}
+	}
+	close(resp.recv)
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	if err := s.DeltaAggregatedResources(resp); err != nil {
+		t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
+	}
+	if config.watches != 0 {
+		t.Errorf("Expect all watches cancelled, got %q", config.watches)
+	}
+}
+
+func TestDeltaCallbackError(t *testing.T) {
+	for _, typ := range testTypes {
+		t.Run(typ, func(t *testing.T) {
+			config := makeMockConfigWatcher()
+			config.deltaResponses = makeDeltaResponses()
+
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{
+				DeltaStreamOpenFunc: func(ctx context.Context, i int64, s string) error {
+					return errors.New("stream open error")
+				},
+			})
+
+			// make a request
+			resp := makeMockDeltaStream(t)
+			resp.recv <- &discovery.DeltaDiscoveryRequest{
+				Node:    node,
+				TypeUrl: typ,
+			}
+
+			// check that response fails since stream open returns error
+			if err := s.DeltaAggregatedResources(resp); err == nil {
+				t.Error("Stream() => got no error, want error")
+			}
+
+			close(resp.recv)
+		})
+	}
+}
