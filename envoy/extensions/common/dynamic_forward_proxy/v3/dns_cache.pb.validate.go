@@ -211,6 +211,16 @@ func (m *DnsCacheConfig) Validate() error {
 
 	// no validation rules for UseTcpForDnsLookups
 
+	if v, ok := interface{}(m.GetDnsResolver()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DnsCacheConfigValidationError{
+				field:  "DnsResolver",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
