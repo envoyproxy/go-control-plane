@@ -3067,8 +3067,8 @@ type HeaderMatcher_RangeMatch struct {
 }
 
 type HeaderMatcher_PresentMatch struct {
-	// If specified, header match will be performed based on whether the header is in the
-	// request.
+	// If specified as true, header match will be performed based on whether the header is in the
+	// request. If specified as false, header match will be performed based on whether the header is absent.
 	PresentMatch bool `protobuf:"varint,7,opt,name=present_match,json=presentMatch,proto3,oneof"`
 }
 
