@@ -33,42 +33,24 @@ var (
 	_ = ptypes.DynamicAny{}
 )
 
-// Validate checks the field values on DnsResolver with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *DnsResolver) Validate() error {
+// Validate checks the field values on DnsResolverOptions with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DnsResolverOptions) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	if len(m.GetResolvers()) < 1 {
-		return DnsResolverValidationError{
-			field:  "Resolvers",
-			reason: "value must contain at least 1 item(s)",
-		}
-	}
+	// no validation rules for UseTcpForDnsLookups
 
-	for idx, item := range m.GetResolvers() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return DnsResolverValidationError{
-					field:  fmt.Sprintf("Resolvers[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
+	// no validation rules for NoDefaultSearchDomain
 
 	return nil
 }
 
-// DnsResolverValidationError is the validation error returned by
-// DnsResolver.Validate if the designated constraints aren't met.
-type DnsResolverValidationError struct {
+// DnsResolverOptionsValidationError is the validation error returned by
+// DnsResolverOptions.Validate if the designated constraints aren't met.
+type DnsResolverOptionsValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -76,22 +58,24 @@ type DnsResolverValidationError struct {
 }
 
 // Field function returns field value.
-func (e DnsResolverValidationError) Field() string { return e.field }
+func (e DnsResolverOptionsValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e DnsResolverValidationError) Reason() string { return e.reason }
+func (e DnsResolverOptionsValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e DnsResolverValidationError) Cause() error { return e.cause }
+func (e DnsResolverOptionsValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e DnsResolverValidationError) Key() bool { return e.key }
+func (e DnsResolverOptionsValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e DnsResolverValidationError) ErrorName() string { return "DnsResolverValidationError" }
+func (e DnsResolverOptionsValidationError) ErrorName() string {
+	return "DnsResolverOptionsValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e DnsResolverValidationError) Error() string {
+func (e DnsResolverOptionsValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -103,14 +87,14 @@ func (e DnsResolverValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sDnsResolver.%s: %s%s",
+		"invalid %sDnsResolverOptions.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = DnsResolverValidationError{}
+var _ error = DnsResolverOptionsValidationError{}
 
 var _ interface {
 	Field() string
@@ -118,4 +102,103 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = DnsResolverValidationError{}
+} = DnsResolverOptionsValidationError{}
+
+// Validate checks the field values on DnsResolutionConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DnsResolutionConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetResolvers()) < 1 {
+		return DnsResolutionConfigValidationError{
+			field:  "Resolvers",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetResolvers() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return DnsResolutionConfigValidationError{
+					field:  fmt.Sprintf("Resolvers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetDnsResolverOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DnsResolutionConfigValidationError{
+				field:  "DnsResolverOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DnsResolutionConfigValidationError is the validation error returned by
+// DnsResolutionConfig.Validate if the designated constraints aren't met.
+type DnsResolutionConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DnsResolutionConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DnsResolutionConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DnsResolutionConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DnsResolutionConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DnsResolutionConfigValidationError) ErrorName() string {
+	return "DnsResolutionConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DnsResolutionConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDnsResolutionConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DnsResolutionConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DnsResolutionConfigValidationError{}
