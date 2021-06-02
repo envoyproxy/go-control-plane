@@ -338,13 +338,13 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
-	for idx, item := range m.GetDnsResolvers() {
+	for idx, item := range m.GetHiddenEnvoyDeprecatedDnsResolvers() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ClusterValidationError{
-					field:  fmt.Sprintf("DnsResolvers[%v]", idx),
+					field:  fmt.Sprintf("HiddenEnvoyDeprecatedDnsResolvers[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -353,7 +353,17 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	// no validation rules for UseTcpForDnsLookups
+	// no validation rules for HiddenEnvoyDeprecatedUseTcpForDnsLookups
+
+	if v, ok := interface{}(m.GetDnsResolutionConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "DnsResolutionConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if v, ok := interface{}(m.GetOutlierDetection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

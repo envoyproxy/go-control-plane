@@ -215,6 +215,16 @@ func (m *Bootstrap) Validate() error {
 
 	// no validation rules for UseTcpForDnsLookups
 
+	if v, ok := interface{}(m.GetDnsResolutionConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BootstrapValidationError{
+				field:  "DnsResolutionConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetBootstrapExtensions() {
 		_, _ = idx, item
 
