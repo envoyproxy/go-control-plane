@@ -27,7 +27,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
 	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
@@ -37,13 +37,13 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
-// Server is a collection of handlers for streaming discovery requests.
+// Server is a collection of handlers for streaming discoverygrpc requests.
 type Server interface {
 	endpointservice.EndpointDiscoveryServiceServer
 	clusterservice.ClusterDiscoveryServiceServer
 	routeservice.RouteDiscoveryServiceServer
 	listenerservice.ListenerDiscoveryServiceServer
-	discovery.AggregatedDiscoveryServiceServer
+	discoverygrpc.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
 	runtimeservice.RuntimeDiscoveryServiceServer
 
@@ -66,12 +66,12 @@ type CallbackFuncs struct {
 	StreamClosedFunc        func(int64)
 	DeltaStreamOpenFunc     func(context.Context, int64, string) error
 	DeltaStreamClosedFunc   func(int64)
-	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
-	StreamResponseFunc      func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
-	StreamDeltaResponseFunc func(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
-	FetchRequestFunc        func(context.Context, *discovery.DiscoveryRequest) error
-	FetchResponseFunc       func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamRequestFunc       func(int64, *discoverygrpc.DiscoveryRequest) error
+	StreamResponseFunc      func(int64, *discoverygrpc.DiscoveryRequest, *discoverygrpc.DiscoveryResponse)
+	StreamDeltaRequestFunc  func(int64, *discoverygrpc.DeltaDiscoveryRequest) error
+	StreamDeltaResponseFunc func(int64, *discoverygrpc.DeltaDiscoveryRequest, *discoverygrpc.DeltaDiscoveryResponse)
+	FetchRequestFunc        func(context.Context, *discoverygrpc.DiscoveryRequest) error
+	FetchResponseFunc       func(*discoverygrpc.DiscoveryRequest, *discoverygrpc.DiscoveryResponse)
 }
 
 var _ Callbacks = CallbackFuncs{}
@@ -109,7 +109,7 @@ func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64) {
 }
 
 // OnStreamRequest invokes StreamRequestFunc.
-func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryRequest) error {
+func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discoverygrpc.DiscoveryRequest) error {
 	if c.StreamRequestFunc != nil {
 		return c.StreamRequestFunc(streamID, req)
 	}
@@ -118,14 +118,14 @@ func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryR
 }
 
 // OnStreamResponse invokes StreamResponseFunc.
-func (c CallbackFuncs) OnStreamResponse(streamID int64, req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
+func (c CallbackFuncs) OnStreamResponse(streamID int64, req *discoverygrpc.DiscoveryRequest, resp *discoverygrpc.DiscoveryResponse) {
 	if c.StreamResponseFunc != nil {
 		c.StreamResponseFunc(streamID, req, resp)
 	}
 }
 
 // OnStreamDeltaRequest invokes StreamDeltaResponseFunc
-func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discovery.DeltaDiscoveryRequest) error {
+func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discoverygrpc.DeltaDiscoveryRequest) error {
 	if c.StreamDeltaRequestFunc != nil {
 		return c.StreamDeltaRequestFunc(streamID, req)
 	}
@@ -134,14 +134,14 @@ func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discovery.Delta
 }
 
 // OnStreamDeltaResponse invokes StreamDeltaResponseFunc.
-func (c CallbackFuncs) OnStreamDeltaResponse(streamID int64, req *discovery.DeltaDiscoveryRequest, resp *discovery.DeltaDiscoveryResponse) {
+func (c CallbackFuncs) OnStreamDeltaResponse(streamID int64, req *discoverygrpc.DeltaDiscoveryRequest, resp *discoverygrpc.DeltaDiscoveryResponse) {
 	if c.StreamDeltaResponseFunc != nil {
 		c.StreamDeltaResponseFunc(streamID, req, resp)
 	}
 }
 
 // OnFetchRequest invokes FetchRequestFunc.
-func (c CallbackFuncs) OnFetchRequest(ctx context.Context, req *discovery.DiscoveryRequest) error {
+func (c CallbackFuncs) OnFetchRequest(ctx context.Context, req *discoverygrpc.DiscoveryRequest) error {
 	if c.FetchRequestFunc != nil {
 		return c.FetchRequestFunc(ctx, req)
 	}
@@ -150,7 +150,7 @@ func (c CallbackFuncs) OnFetchRequest(ctx context.Context, req *discovery.Discov
 }
 
 // OnFetchResponse invoked FetchResponseFunc.
-func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
+func (c CallbackFuncs) OnFetchResponse(req *discoverygrpc.DiscoveryRequest, resp *discoverygrpc.DiscoveryResponse) {
 	if c.FetchResponseFunc != nil {
 		c.FetchResponseFunc(req, resp)
 	}
@@ -178,7 +178,7 @@ func (s *server) StreamHandler(stream sotw.Stream, typeURL string) error {
 	return s.sotw.StreamHandler(stream, typeURL)
 }
 
-func (s *server) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
+func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
 	return s.StreamHandler(stream, resource.AnyType)
 }
 
@@ -207,11 +207,11 @@ func (s *server) StreamRuntime(stream runtimeservice.RuntimeDiscoveryService_Str
 }
 
 // Fetch is the universal fetch method.
-func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+func (s *server) Fetch(ctx context.Context, req *discoverygrpc.DiscoveryRequest) (*discoverygrpc.DiscoveryResponse, error) {
 	return s.rest.Fetch(ctx, req)
 }
 
-func (s *server) FetchEndpoints(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+func (s *server) FetchEndpoints(ctx context.Context, req *discoverygrpc.DiscoveryRequest) (*discoverygrpc.DiscoveryResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
@@ -219,7 +219,7 @@ func (s *server) FetchEndpoints(ctx context.Context, req *discovery.DiscoveryReq
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) FetchClusters(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+func (s *server) FetchClusters(ctx context.Context, req *discoverygrpc.DiscoveryRequest) (*discoverygrpc.DiscoveryResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
@@ -227,7 +227,7 @@ func (s *server) FetchClusters(ctx context.Context, req *discovery.DiscoveryRequ
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) FetchRoutes(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+func (s *server) FetchRoutes(ctx context.Context, req *discoverygrpc.DiscoveryRequest) (*discoverygrpc.DiscoveryResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
@@ -235,7 +235,7 @@ func (s *server) FetchRoutes(ctx context.Context, req *discovery.DiscoveryReques
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) FetchListeners(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+func (s *server) FetchListeners(ctx context.Context, req *discoverygrpc.DiscoveryRequest) (*discoverygrpc.DiscoveryResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
@@ -243,7 +243,7 @@ func (s *server) FetchListeners(ctx context.Context, req *discovery.DiscoveryReq
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) FetchSecrets(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+func (s *server) FetchSecrets(ctx context.Context, req *discoverygrpc.DiscoveryRequest) (*discoverygrpc.DiscoveryResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
@@ -251,7 +251,7 @@ func (s *server) FetchSecrets(ctx context.Context, req *discovery.DiscoveryReque
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) FetchRuntime(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+func (s *server) FetchRuntime(ctx context.Context, req *discoverygrpc.DiscoveryRequest) (*discoverygrpc.DiscoveryResponse, error) {
 	if req == nil {
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
@@ -263,7 +263,7 @@ func (s *server) DeltaStreamHandler(stream stream.DeltaStream, typeURL string) e
 	return s.delta.DeltaStreamHandler(stream, typeURL)
 }
 
-func (s *server) DeltaAggregatedResources(stream discovery.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+func (s *server) DeltaAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return s.DeltaStreamHandler(stream, resource.AnyType)
 }
 
