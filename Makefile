@@ -28,7 +28,7 @@ test:
 
 .PHONY: benchmark
 benchmark:
-	@go test ./pkg/... -bench=.
+	@go test ./pkg/... -count=1 -benchmem -bench=.
 
 .PHONY: cover
 cover:

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 
@@ -455,5 +456,97 @@ func TestDeltaCallbackError(t *testing.T) {
 
 			close(resp.recv)
 		})
+	}
+}
+
+// BENCHMARKS =====================================================================================================
+
+func BenchmarkDeltaResponseHandlers(b *testing.B) {
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				config := makeMockConfigWatcher()
+				config.deltaResponses = makeDeltaResponses()
+				s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+
+				resp := makeMockDeltaStream(&testing.T{})
+				// This is a wildcard request since we don't specify a list of resource subscriptions
+				res, err := config.deltaResponses[typ][0].GetDeltaDiscoveryResponse()
+				if err != nil {
+					b.Error(err)
+				}
+				// We only subscribe to one resource to see if we get the appropriate number of resources back
+				resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: typ, ResourceNamesSubscribe: []string{res.Resources[0].Name}}
+
+				go func() {
+					err := process(typ, resp, s)
+					assert.NoError(&testing.T{}, err)
+				}()
+
+				select {
+				case res := <-resp.sent:
+					close(resp.recv)
+
+					assert.Equal(&testing.T{}, 1, config.deltaCounts[typ])
+					assert.Empty(&testing.T{}, res.GetSystemVersionInfo())
+				case <-time.After(1 * time.Second):
+					b.Fatalf("got no response")
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkDeltaAggregatedHandlers(b *testing.B) {
+	config := makeMockConfigWatcher()
+	config.responses = makeResponses()
+	resp := makeMockStream(&testing.T{})
+
+	resp.recv <- &discovery.DiscoveryRequest{
+		Node:    node,
+		TypeUrl: rsrc.ListenerType,
+	}
+	// Delta compress node
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl: rsrc.ClusterType,
+	}
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.EndpointType,
+		ResourceNames: []string{clusterName},
+	}
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.RouteType,
+		ResourceNames: []string{routeName},
+	}
+
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	go func() {
+		if err := s.StreamAggregatedResources(resp); err != nil {
+			b.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+		}
+	}()
+
+	count := 0
+	for {
+		select {
+		case <-resp.sent:
+			count++
+			if count >= 4 {
+				close(resp.recv)
+				if want := map[string]int{
+					rsrc.EndpointType: 1,
+					rsrc.ClusterType:  1,
+					rsrc.RouteType:    1,
+					rsrc.ListenerType: 1,
+				}; !reflect.DeepEqual(want, config.counts) {
+					b.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}
+
+				// got all messages
+				return
+			}
+		case <-time.After(1 * time.Second):
+			b.Fatalf("got %d messages on the stream, not 4", count)
+		}
 	}
 }
