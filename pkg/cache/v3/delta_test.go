@@ -223,3 +223,30 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 		t.Errorf("should not return a status for unknown key: got %#v", s)
 	}
 }
+
+func BenchmarkDeltaSnapshotCache(b *testing.B) {
+	c := cache.NewSnapshotCache(false, group{}, logger{t: &testing.T{}})
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		b.Fatal(err)
+	}
+
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				value, _ := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+					Node: &core.Node{
+						Id: "node",
+					},
+					TypeUrl: rsrc.EndpointType,
+				}, stream.StreamState{ResourceVersions: make(map[string]string), Wildcard: true})
+
+				select {
+				case <-value:
+					// NO-OP since we don't want to eat extra cycles in the benchmark
+				case <-time.After(time.Second):
+					b.Error("failed to receive a snapshot response")
+				}
+			}
+		})
+	}
+}
