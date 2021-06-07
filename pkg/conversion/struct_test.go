@@ -36,10 +36,10 @@ func TestConversion(t *testing.T) {
 		t.Fatalf("unexpected error %v", err)
 	}
 	pbst := map[string]*pstruct.Value{
-		"version_info": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "test"}},
-		"node": &pstruct.Value{Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
+		"version_info": {Kind: &pstruct.Value_StringValue{StringValue: "test"}},
+		"node": {Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
 			Fields: map[string]*pstruct.Value{
-				"id": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
+				"id": {Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
 			},
 		}}},
 	}
@@ -68,7 +68,7 @@ func TestConversion(t *testing.T) {
 // BENCHMARKS =====================================================================================================
 
 func BenchmarkConversion(b *testing.B) {
-	pb := &v2.DiscoveryRequest{
+	pb := &discovery.DiscoveryRequest{
 		VersionInfo: "test",
 		Node:        &core.Node{Id: "proxy"},
 	}
@@ -77,10 +77,10 @@ func BenchmarkConversion(b *testing.B) {
 		b.Fatalf("unexpected error %v", err)
 	}
 	pbst := map[string]*pstruct.Value{
-		"version_info": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "test"}},
-		"node": &pstruct.Value{Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
+		"version_info": {Kind: &pstruct.Value_StringValue{StringValue: "test"}},
+		"node": {Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
 			Fields: map[string]*pstruct.Value{
-				"id": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
+				"id": {Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
 			},
 		}}},
 	}
@@ -88,7 +88,7 @@ func BenchmarkConversion(b *testing.B) {
 		b.Errorf("MessageToStruct(%v) => got %v, want %v", pb, st.Fields, pbst)
 	}
 
-	out := &v2.DiscoveryRequest{}
+	out := &discovery.DiscoveryRequest{}
 	err = conversion.StructToMessage(st, out)
 	if err != nil {
 		b.Fatalf("unexpected error %v", err)
@@ -101,7 +101,7 @@ func BenchmarkConversion(b *testing.B) {
 		b.Error("MessageToStruct(nil) => got no error")
 	}
 
-	if err = conversion.StructToMessage(nil, &v2.DiscoveryRequest{}); err == nil {
+	if err = conversion.StructToMessage(nil, &discovery.DiscoveryRequest{}); err == nil {
 		b.Error("StructToMessage(nil) => got no error")
 	}
 }

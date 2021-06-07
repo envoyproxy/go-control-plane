@@ -380,7 +380,7 @@ func TestSnapshotClear(t *testing.T) {
 // BENCHMARKS =====================================================================================================
 
 func BenchmarkSnapshotCache(b *testing.B) {
-	c := cache.NewSnapshotCache(true, group{}, nil)
+	c := cache.NewSnapshotCache(true, group{}, logger{t: &testing.T{}})
 
 	if _, err := c.GetSnapshot(key); err == nil {
 		b.Errorf("unexpected snapshot found for key %q", key)
@@ -409,17 +409,19 @@ func BenchmarkSnapshotCache(b *testing.B) {
 
 	for _, typ := range testTypes {
 		b.Run(typ, func(b *testing.B) {
-			value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
-			select {
-			case out := <-value:
-				if gotVersion, _ := out.GetVersion(); gotVersion != version {
-					b.Errorf("got version %q, want %q", gotVersion, version)
+			for n := 0; n < b.N; n++ {
+				value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+				select {
+				case out := <-value:
+					if gotVersion, _ := out.GetVersion(); gotVersion != version {
+						b.Errorf("got version %q, want %q", gotVersion, version)
+					}
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTtl(typ)) {
+						b.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTtl(typ))
+					}
+				case <-time.After(time.Second):
+					b.Fatal("failed to receive snapshot response")
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResources(typ)) {
-					b.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResources(typ))
-				}
-			case <-time.After(time.Second):
-				b.Fatal("failed to receive snapshot response")
 			}
 		})
 	}
@@ -427,18 +429,21 @@ func BenchmarkSnapshotCache(b *testing.B) {
 
 func BenchmarkSnapshotCacheFetch(b *testing.B) {
 	c := cache.NewSnapshotCache(true, group{}, nil)
+
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		b.Fatal(err)
 	}
 
 	for _, typ := range testTypes {
 		b.Run(typ, func(b *testing.B) {
-			resp, err := c.Fetch(context.Background(), &discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
-			if err != nil || resp == nil {
-				b.Fatal("unexpected error or null response")
-			}
-			if gotVersion, _ := resp.GetVersion(); gotVersion != version {
-				b.Errorf("got version %q, want %q", gotVersion, version)
+			for n := 0; n < b.N; n++ {
+				resp, err := c.Fetch(context.Background(), &discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+				if err != nil || resp == nil {
+					b.Fatal("unexpected error or null response")
+				}
+				if gotVersion, _ := resp.GetVersion(); gotVersion != version {
+					b.Errorf("got version %q, want %q", gotVersion, version)
+				}
 			}
 		})
 	}
@@ -454,40 +459,5 @@ func BenchmarkSnapshotCacheFetch(b *testing.B) {
 		&discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, VersionInfo: version}); resp != nil || err == nil {
 		b.Errorf("latest version: response is not nil %v", resp)
 	}
-}
 
-func BenchmarkSnapshotClear(b *testing.B) {
-	c := cache.NewSnapshotCache(true, group{}, nil)
-	if err := c.SetSnapshot(key, snapshot); err != nil {
-		b.Fatal(err)
-	}
-	c.ClearSnapshot(key)
-	if empty := c.GetStatusInfo(key); empty != nil {
-		b.Errorf("cache should be cleared")
-	}
-	if keys := c.GetStatusKeys(); len(keys) != 0 {
-		b.Errorf("keys should be empty")
-	}
-}
-
-func BenchmarkSnapshotCacheWatchCancel(b *testing.B) {
-	c := cache.NewSnapshotCache(true, group{}, nil)
-	for _, typ := range testTypes {
-		_, cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
-		cancel()
-	}
-	// should be status info for the node
-	if keys := c.GetStatusKeys(); len(keys) == 0 {
-		b.Error("got 0, want status info for the node")
-	}
-
-	for _, typ := range testTypes {
-		if count := c.GetStatusInfo(key).GetNumWatches(); count > 0 {
-			b.Errorf("watches should be released for %s", typ)
-		}
-	}
-
-	if empty := c.GetStatusInfo("missing"); empty != nil {
-		b.Errorf("should not return a status for unknown key: got %#v", empty)
-	}
 }
