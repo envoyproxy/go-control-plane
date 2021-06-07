@@ -381,30 +381,8 @@ func TestSnapshotClear(t *testing.T) {
 
 func BenchmarkSnapshotCache(b *testing.B) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: &testing.T{}})
-
-	if _, err := c.GetSnapshot(key); err == nil {
-		b.Errorf("unexpected snapshot found for key %q", key)
-	}
-
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		b.Fatal(err)
-	}
-
-	snap, err := c.GetSnapshot(key)
-	if err != nil {
-		b.Fatal(err)
-	}
-	if !reflect.DeepEqual(snap, snapshot) {
-		b.Errorf("expect snapshot: %v, got: %v", snapshot, snap)
-	}
-
-	// try to get endpoints with incorrect list of names
-	// should not receive response
-	value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}})
-	select {
-	case out := <-value:
-		b.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
-	case <-time.After(time.Second / 4):
 	}
 
 	for _, typ := range testTypes {
@@ -412,13 +390,8 @@ func BenchmarkSnapshotCache(b *testing.B) {
 			for n := 0; n < b.N; n++ {
 				value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
 				select {
-				case out := <-value:
-					if gotVersion, _ := out.GetVersion(); gotVersion != version {
-						b.Errorf("got version %q, want %q", gotVersion, version)
-					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTtl(typ)) {
-						b.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTtl(typ))
-					}
+				case <-value:
+					// NO-OP since we don't want to eat extra cycles in the benchmark
 				case <-time.After(time.Second):
 					b.Fatal("failed to receive snapshot response")
 				}
@@ -441,23 +414,7 @@ func BenchmarkSnapshotCacheFetch(b *testing.B) {
 				if err != nil || resp == nil {
 					b.Fatal("unexpected error or null response")
 				}
-				if gotVersion, _ := resp.GetVersion(); gotVersion != version {
-					b.Errorf("got version %q, want %q", gotVersion, version)
-				}
 			}
 		})
 	}
-
-	// no response for missing snapshot
-	if resp, err := c.Fetch(context.Background(),
-		&discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, Node: &core.Node{Id: "oof"}}); resp != nil || err == nil {
-		b.Errorf("missing snapshot: response is not nil %v", resp)
-	}
-
-	// no response for latest version
-	if resp, err := c.Fetch(context.Background(),
-		&discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, VersionInfo: version}); resp != nil || err == nil {
-		b.Errorf("latest version: response is not nil %v", resp)
-	}
-
 }

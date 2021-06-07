@@ -68,40 +68,20 @@ func TestConversion(t *testing.T) {
 // BENCHMARKS =====================================================================================================
 
 func BenchmarkConversion(b *testing.B) {
-	pb := &discovery.DiscoveryRequest{
-		VersionInfo: "test",
-		Node:        &core.Node{Id: "proxy"},
-	}
-	st, err := conversion.MessageToStruct(pb)
-	if err != nil {
-		b.Fatalf("unexpected error %v", err)
-	}
-	pbst := map[string]*pstruct.Value{
-		"version_info": {Kind: &pstruct.Value_StringValue{StringValue: "test"}},
-		"node": {Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
-			Fields: map[string]*pstruct.Value{
-				"id": {Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
-			},
-		}}},
-	}
-	if !cmp.Equal(st.Fields, pbst, cmp.Comparer(proto.Equal)) {
-		b.Errorf("MessageToStruct(%v) => got %v, want %v", pb, st.Fields, pbst)
-	}
+	for n := 0; n < b.N; n++ {
+		pb := &discovery.DiscoveryRequest{
+			VersionInfo: "test",
+			Node:        &core.Node{Id: "proxy"},
+		}
+		st, err := conversion.MessageToStruct(pb)
+		if err != nil {
+			b.Fatalf("unexpected error %v", err)
+		}
 
-	out := &discovery.DiscoveryRequest{}
-	err = conversion.StructToMessage(st, out)
-	if err != nil {
-		b.Fatalf("unexpected error %v", err)
-	}
-	if !cmp.Equal(pb, out, cmp.Comparer(proto.Equal)) {
-		b.Errorf("StructToMessage(%v) => got %v, want %v", st, out, pb)
-	}
-
-	if _, err = conversion.MessageToStruct(nil); err == nil {
-		b.Error("MessageToStruct(nil) => got no error")
-	}
-
-	if err = conversion.StructToMessage(nil, &discovery.DiscoveryRequest{}); err == nil {
-		b.Error("StructToMessage(nil) => got no error")
+		out := &discovery.DiscoveryRequest{}
+		err = conversion.StructToMessage(st, out)
+		if err != nil {
+			b.Fatalf("unexpected error %v", err)
+		}
 	}
 }
