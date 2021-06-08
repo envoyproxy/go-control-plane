@@ -97,7 +97,6 @@ type watches struct {
 	responses     chan cache.Response
 	cancellations map[string]func()
 	nonces        map[string]string
-	terminations  map[string]chan struct{}
 }
 
 // Initialize all watches
@@ -106,7 +105,6 @@ func (values *watches) Init() {
 	values.responses = make(chan cache.Response, 5)
 	values.cancellations = make(map[string]func())
 	values.nonces = make(map[string]string)
-	values.terminations = make(map[string]chan struct{})
 }
 
 // Token response value used to signal a watch failure in muxed watches.
@@ -136,9 +134,6 @@ func (values *watches) Cancel() {
 		if cancel != nil {
 			cancel()
 		}
-	}
-	for _, terminate := range values.terminations {
-		close(terminate)
 	}
 }
 
@@ -309,81 +304,57 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					if values.endpointCancel != nil {
 						values.endpointCancel()
 					}
-					values.endpoints, values.endpointCancel = s.cache.CreateWatch(req)
+					values.endpoints = make(chan cache.Response, 1)
+					values.endpointCancel = s.cache.CreateWatch(req, values.endpoints)
 				}
 			case req.TypeUrl == resource.ClusterType:
 				if values.clusterNonce == "" || values.clusterNonce == nonce {
 					if values.clusterCancel != nil {
 						values.clusterCancel()
 					}
-					values.clusters, values.clusterCancel = s.cache.CreateWatch(req)
+					values.clusters = make(chan cache.Response, 1)
+					values.clusterCancel = s.cache.CreateWatch(req, values.clusters)
 				}
 			case req.TypeUrl == resource.RouteType:
 				if values.routeNonce == "" || values.routeNonce == nonce {
 					if values.routeCancel != nil {
 						values.routeCancel()
 					}
-					values.routes, values.routeCancel = s.cache.CreateWatch(req)
+					values.routes = make(chan cache.Response, 1)
+					values.routeCancel = s.cache.CreateWatch(req, values.routes)
 				}
 			case req.TypeUrl == resource.ListenerType:
 				if values.listenerNonce == "" || values.listenerNonce == nonce {
 					if values.listenerCancel != nil {
 						values.listenerCancel()
 					}
-					values.listeners, values.listenerCancel = s.cache.CreateWatch(req)
+					values.listeners = make(chan cache.Response, 1)
+					values.listenerCancel = s.cache.CreateWatch(req, values.listeners)
 				}
 			case req.TypeUrl == resource.SecretType:
 				if values.secretNonce == "" || values.secretNonce == nonce {
 					if values.secretCancel != nil {
 						values.secretCancel()
 					}
-					values.secrets, values.secretCancel = s.cache.CreateWatch(req)
+					values.secrets = make(chan cache.Response, 1)
+					values.secretCancel = s.cache.CreateWatch(req, values.secrets)
 				}
 			case req.TypeUrl == resource.RuntimeType:
 				if values.runtimeNonce == "" || values.runtimeNonce == nonce {
 					if values.runtimeCancel != nil {
 						values.runtimeCancel()
 					}
-					values.runtimes, values.runtimeCancel = s.cache.CreateWatch(req)
+					values.runtimes = make(chan cache.Response, 1)
+					values.runtimeCancel = s.cache.CreateWatch(req, values.runtimes)
 				}
 			default:
 				typeUrl := req.TypeUrl
 				responseNonce, seen := values.nonces[typeUrl]
 				if !seen || responseNonce == nonce {
-					// We must signal goroutine termination to prevent a race between the cancel closing the watch
-					// and the producer closing the watch.
-					if terminate, exists := values.terminations[typeUrl]; exists {
-						close(terminate)
-					}
 					if cancel, seen := values.cancellations[typeUrl]; seen && cancel != nil {
 						cancel()
 					}
-					var watch chan cache.Response
-					watch, values.cancellations[typeUrl] = s.cache.CreateWatch(req)
-					// Muxing watches across multiple type URLs onto a single channel requires spawning
-					// a go-routine. Golang does not allow selecting over a dynamic set of channels.
-					terminate := make(chan struct{})
-					values.terminations[typeUrl] = terminate
-					go func() {
-						select {
-						case resp, more := <-watch:
-							if more {
-								values.responses <- resp
-							} else {
-								// Check again if the watch is cancelled.
-								select {
-								case <-terminate: // do nothing
-								default:
-									// We cannot close the responses channel since it can be closed twice.
-									// Instead we send a fake error response.
-									values.responses <- errorResponse
-								}
-							}
-							break
-						case <-terminate:
-							break
-						}
-					}()
+					values.cancellations[typeUrl] = s.cache.CreateWatch(req, values.responses)
 				}
 			}
 		}
