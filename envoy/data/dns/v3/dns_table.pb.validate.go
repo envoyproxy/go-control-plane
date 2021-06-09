@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on DnsTable with the rules defined in the
@@ -492,7 +492,7 @@ func (m *DnsTable_DnsService) Validate() error {
 	}
 
 	if d := m.GetTtl(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return DnsTable_DnsServiceValidationError{
 				field:  "Ttl",
@@ -821,7 +821,7 @@ func (m *DnsTable_DnsVirtualDomain) Validate() error {
 	}
 
 	if d := m.GetAnswerTtl(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return DnsTable_DnsVirtualDomainValidationError{
 				field:  "AnswerTtl",

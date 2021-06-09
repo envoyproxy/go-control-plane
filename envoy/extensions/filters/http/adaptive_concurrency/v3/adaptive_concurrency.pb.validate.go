@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on GradientControllerConfig with the rules
@@ -278,7 +278,7 @@ func (m *GradientControllerConfig_ConcurrencyLimitCalculationParams) Validate() 
 	}
 
 	if d := m.GetConcurrencyUpdateInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return GradientControllerConfig_ConcurrencyLimitCalculationParamsValidationError{
 				field:  "ConcurrencyUpdateInterval",
@@ -384,7 +384,7 @@ func (m *GradientControllerConfig_MinimumRTTCalculationParams) Validate() error 
 	}
 
 	if d := m.GetInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return GradientControllerConfig_MinimumRTTCalculationParamsValidationError{
 				field:  "Interval",
