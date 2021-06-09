@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	_type "github.com/envoyproxy/go-control-plane/envoy/type"
 )
@@ -32,7 +32,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 
 	_ = _type.CodecClientType(0)
 )
@@ -53,7 +53,7 @@ func (m *HealthCheck) Validate() error {
 	}
 
 	if d := m.GetTimeout(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return HealthCheckValidationError{
 				field:  "Timeout",
@@ -81,7 +81,7 @@ func (m *HealthCheck) Validate() error {
 	}
 
 	if d := m.GetInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return HealthCheckValidationError{
 				field:  "Interval",
@@ -178,7 +178,7 @@ func (m *HealthCheck) Validate() error {
 	}
 
 	if d := m.GetNoTrafficInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return HealthCheckValidationError{
 				field:  "NoTrafficInterval",
@@ -199,7 +199,7 @@ func (m *HealthCheck) Validate() error {
 	}
 
 	if d := m.GetUnhealthyInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return HealthCheckValidationError{
 				field:  "UnhealthyInterval",
@@ -220,7 +220,7 @@ func (m *HealthCheck) Validate() error {
 	}
 
 	if d := m.GetUnhealthyEdgeInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return HealthCheckValidationError{
 				field:  "UnhealthyEdgeInterval",
@@ -241,7 +241,7 @@ func (m *HealthCheck) Validate() error {
 	}
 
 	if d := m.GetHealthyEdgeInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return HealthCheckValidationError{
 				field:  "HealthyEdgeInterval",
