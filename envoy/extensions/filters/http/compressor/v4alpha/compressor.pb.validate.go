@@ -64,6 +64,13 @@ func (m *Compressor) Validate() error {
 		}
 	}
 
+	if m.GetCompressorLibrary() == nil {
+		return CompressorValidationError{
+			field:  "CompressorLibrary",
+			reason: "value is required",
+		}
+	}
+
 	if v, ok := interface{}(m.GetCompressorLibrary()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CompressorValidationError{
