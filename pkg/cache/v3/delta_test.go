@@ -269,7 +269,7 @@ func BenchmarkSnapshotCacheLockContention(b *testing.B) {
 					defer wg.Done()
 
 					for n := 0; n < b.N; n++ {
-						value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+						value, _ := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{TypeUrl: typ, ResourceNamesSubscribe: names[typ]}, stream.NewStreamState(true, nil))
 
 						select {
 						case <-value:
