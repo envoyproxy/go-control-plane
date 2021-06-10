@@ -580,13 +580,6 @@ func (m *KeepaliveSettings) Validate() error {
 		return nil
 	}
 
-	if m.GetInterval() == nil {
-		return KeepaliveSettingsValidationError{
-			field:  "Interval",
-			reason: "value is required",
-		}
-	}
-
 	if d := m.GetInterval(); d != nil {
 		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
@@ -644,6 +637,27 @@ func (m *KeepaliveSettings) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	if d := m.GetConnectionIdleInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			return KeepaliveSettingsValidationError{
+				field:  "ConnectionIdleInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+		if dur < gte {
+			return KeepaliveSettingsValidationError{
+				field:  "ConnectionIdleInterval",
+				reason: "value must be greater than or equal to 1ms",
+			}
+		}
+
 	}
 
 	return nil
