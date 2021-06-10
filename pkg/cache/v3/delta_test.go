@@ -3,6 +3,7 @@ package cache_test
 import (
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -247,6 +248,41 @@ func BenchmarkDeltaSnapshotCache(b *testing.B) {
 					b.Error("failed to receive a snapshot response")
 				}
 			}
+		})
+	}
+}
+
+func BenchmarkSnapshotCacheLockContention(b *testing.B) {
+	c := cache.NewSnapshotCache(true, group{}, nil)
+
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		b.Fatal(err)
+	}
+
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			var wg sync.WaitGroup
+
+			wg.Add(len(testTypes))
+			for i := 0; i < len(testTypes); i++ {
+				go func() {
+					defer wg.Done()
+
+					for n := 0; n < b.N; n++ {
+						value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+
+						select {
+						case <-value:
+							// NO-OP since we don't want to eat the extra cycles in the benchmark
+						case <-time.After(time.Second):
+							b.Error("failed to receive snapshot response")
+						}
+					}
+				}()
+			}
+
+			// Hold the benchmark until all go routines have finished processing
+			wg.Wait()
 		})
 	}
 }
