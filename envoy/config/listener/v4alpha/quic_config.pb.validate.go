@@ -92,6 +92,26 @@ func (m *QuicProtocolOptions) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetCryptoStreamConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuicProtocolOptionsValidationError{
+				field:  "CryptoStreamConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetProofSourceConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuicProtocolOptionsValidationError{
+				field:  "ProofSourceConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
