@@ -81,6 +81,26 @@ func (m *AdmissionControl) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetRpsThreshold()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdmissionControlValidationError{
+				field:  "RpsThreshold",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMaxRejectionProbability()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdmissionControlValidationError{
+				field:  "MaxRejectionProbability",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.EvaluationCriteria.(type) {
 
 	case *AdmissionControl_SuccessCriteria_:
