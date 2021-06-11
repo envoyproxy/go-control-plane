@@ -83,6 +83,8 @@ func (m *Router) Validate() error {
 
 	// no validation rules for RespectExpectedRqTimeout
 
+	// no validation rules for SuppressGrpcRequestFailureCodeStats
+
 	return nil
 }
 
