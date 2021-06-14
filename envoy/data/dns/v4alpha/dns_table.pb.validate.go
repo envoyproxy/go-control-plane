@@ -62,13 +62,13 @@ func (m *DnsTable) Validate() error {
 
 	}
 
-	for idx, item := range m.GetKnownSuffixes() {
+	for idx, item := range m.GetHiddenEnvoyDeprecatedKnownSuffixes() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return DnsTableValidationError{
-					field:  fmt.Sprintf("KnownSuffixes[%v]", idx),
+					field:  fmt.Sprintf("HiddenEnvoyDeprecatedKnownSuffixes[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
