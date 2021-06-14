@@ -60,6 +60,7 @@ type SubstitutionFormatString struct {
 	ContentType string `protobuf:"bytes,4,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	// Specifies a collection of Formatter plugins that can be called from the access log configuration.
 	// See the formatters extensions documentation for details.
+	// [#extension-category: envoy.formatter]
 	Formatters []*TypedExtensionConfig `protobuf:"bytes,6,rep,name=formatters,proto3" json:"formatters,omitempty"`
 }
 
