@@ -15,7 +15,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
+
+	v3 "github.com/envoyproxy/go-control-plane/envoy/admin/v3"
 )
 
 // ensure the imports are used
@@ -30,7 +32,9 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
+
+	_ = v3.ClientResourceStatus(0)
 )
 
 // Validate checks the field values on ClientStatusRequest with the rules
@@ -291,6 +295,21 @@ func (m *ClientConfig) Validate() error {
 
 	}
 
+	for idx, item := range m.GetGenericXdsConfigs() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClientConfigValidationError{
+					field:  fmt.Sprintf("GenericXdsConfigs[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -429,3 +448,113 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ClientStatusResponseValidationError{}
+
+// Validate checks the field values on ClientConfig_GenericXdsConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ClientConfig_GenericXdsConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for TypeUrl
+
+	// no validation rules for Name
+
+	// no validation rules for VersionInfo
+
+	if v, ok := interface{}(m.GetXdsConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientConfig_GenericXdsConfigValidationError{
+				field:  "XdsConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetLastUpdated()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientConfig_GenericXdsConfigValidationError{
+				field:  "LastUpdated",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for ConfigStatus
+
+	// no validation rules for ClientStatus
+
+	if v, ok := interface{}(m.GetErrorState()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClientConfig_GenericXdsConfigValidationError{
+				field:  "ErrorState",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for IsStaticResource
+
+	return nil
+}
+
+// ClientConfig_GenericXdsConfigValidationError is the validation error
+// returned by ClientConfig_GenericXdsConfig.Validate if the designated
+// constraints aren't met.
+type ClientConfig_GenericXdsConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClientConfig_GenericXdsConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClientConfig_GenericXdsConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClientConfig_GenericXdsConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClientConfig_GenericXdsConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClientConfig_GenericXdsConfigValidationError) ErrorName() string {
+	return "ClientConfig_GenericXdsConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClientConfig_GenericXdsConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClientConfig_GenericXdsConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClientConfig_GenericXdsConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClientConfig_GenericXdsConfigValidationError{}

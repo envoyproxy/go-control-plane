@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on AdmissionControl with the rules defined
@@ -75,6 +75,26 @@ func (m *AdmissionControl) Validate() error {
 		if err := v.Validate(); err != nil {
 			return AdmissionControlValidationError{
 				field:  "SrThreshold",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetRpsThreshold()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdmissionControlValidationError{
+				field:  "RpsThreshold",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMaxRejectionProbability()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdmissionControlValidationError{
+				field:  "MaxRejectionProbability",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on JwtProvider with the rules defined in
@@ -191,6 +191,16 @@ func (m *RemoteJwks) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetAsyncFetch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RemoteJwksValidationError{
+				field:  "AsyncFetch",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -247,6 +257,73 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RemoteJwksValidationError{}
+
+// Validate checks the field values on JwksAsyncFetch with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *JwksAsyncFetch) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for FastListener
+
+	return nil
+}
+
+// JwksAsyncFetchValidationError is the validation error returned by
+// JwksAsyncFetch.Validate if the designated constraints aren't met.
+type JwksAsyncFetchValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e JwksAsyncFetchValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e JwksAsyncFetchValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e JwksAsyncFetchValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e JwksAsyncFetchValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e JwksAsyncFetchValidationError) ErrorName() string { return "JwksAsyncFetchValidationError" }
+
+// Error satisfies the builtin error interface
+func (e JwksAsyncFetchValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sJwksAsyncFetch.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = JwksAsyncFetchValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = JwksAsyncFetchValidationError{}
 
 // Validate checks the field values on JwtHeader with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
