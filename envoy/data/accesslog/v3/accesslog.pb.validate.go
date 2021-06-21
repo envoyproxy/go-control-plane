@@ -615,6 +615,8 @@ func (m *ResponseFlags) Validate() error {
 
 	// no validation rules for NoClusterFound
 
+	// no validation rules for OverloadManager
+
 	return nil
 }
 
