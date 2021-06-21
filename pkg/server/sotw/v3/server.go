@@ -175,7 +175,8 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 			if !ok || watch.nonce == req.GetResponseNonce() {
 				watch.Cancel()
 
-				watch.responses, watch.cancel = s.cache.CreateWatch(req)
+				watch.responses = make(chan cache.Response, 1)
+				watch.cancel = s.cache.CreateWatch(req, watch.responses)
 
 				watches.watches[typeURL] = watch
 				go func() {
