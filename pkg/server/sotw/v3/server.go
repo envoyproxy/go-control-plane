@@ -177,30 +177,15 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 
 				watch.responses, watch.cancel = s.cache.CreateWatch(req)
 
-				// Go does not allow for selecting over a dynamic set of channels
-				// so we introduce a termination chan to handle cancelling any watches.
-				terminate := make(chan struct{})
-				watch.termination = terminate
 				watches.watches[typeURL] = watch
 				go func() {
-					select {
-					case resp, more := <-watch.responses:
-						if more {
-							watches.muxedResponses <- resp
-						} else {
-							// Check again if the watch is cancelled.
-							select {
-							case <-terminate: // do nothing
-							default:
-								// We cannot close the responses channel since it can be closed twice.
-								// Instead we send a fake error response.
-								watches.muxedResponses <- errorResponse
-							}
-						}
-						break
-					case <-terminate:
-						break
+					resp, more := <-watch.responses
+					if !more {
+						watches.muxedResponses <- errorResponse
+						return
 					}
+
+					watches.muxedResponses <- resp
 				}()
 			}
 		}

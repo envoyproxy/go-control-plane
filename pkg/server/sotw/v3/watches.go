@@ -34,21 +34,11 @@ type watch struct {
 	responses chan cache.Response
 	cancel    func()
 	nonce     string
-
-	termination chan struct{}
 }
 
 // Cancel calls terminate and cancel
 func (w *watch) Cancel() {
 	if w.cancel != nil {
 		w.cancel()
-	}
-
-	w.terminate()
-}
-
-func (w *watch) terminate() {
-	if w.termination != nil {
-		close(w.termination)
 	}
 }
