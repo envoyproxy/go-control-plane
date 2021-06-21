@@ -47,10 +47,7 @@ type ConfigWatcher interface {
 	// CreateWatch returns a new open watch from a non-empty request.
 	// An individual consumer normally issues a single open watch by each type URL.
 	//
-	// Value channel produces requested resources, once they are available.  If
-	// the channel is closed prior to cancellation of the watch, an unrecoverable
-	// error has occurred in the producer, and the consumer should close the
-	// corresponding stream.
+	// Value channel produces requested resources, once they are available.
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
@@ -59,9 +56,7 @@ type ConfigWatcher interface {
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	//
 	// Value channel produces requested resources, or spontaneous updates in accordance
-	// with the incremental xDS specification. If the channel is closed
-	// prior to cancellation of the watch, an unrecoverable error has occurred in the producer,
-	// and the consumer should close the corresponding stream.
+	// with the incremental xDS specification.
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.

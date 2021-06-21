@@ -180,8 +180,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 						watches.deltaMuxedResponses <- resp
 					}
 				}()
-			} else {
-				watch.Cancel()
 			}
 		}
 	}
