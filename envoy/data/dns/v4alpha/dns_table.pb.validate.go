@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on DnsTable with the rules defined in the
@@ -62,13 +62,13 @@ func (m *DnsTable) Validate() error {
 
 	}
 
-	for idx, item := range m.GetKnownSuffixes() {
+	for idx, item := range m.GetHiddenEnvoyDeprecatedKnownSuffixes() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return DnsTableValidationError{
-					field:  fmt.Sprintf("KnownSuffixes[%v]", idx),
+					field:  fmt.Sprintf("HiddenEnvoyDeprecatedKnownSuffixes[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -492,7 +492,7 @@ func (m *DnsTable_DnsService) Validate() error {
 	}
 
 	if d := m.GetTtl(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return DnsTable_DnsServiceValidationError{
 				field:  "Ttl",
@@ -821,7 +821,7 @@ func (m *DnsTable_DnsVirtualDomain) Validate() error {
 	}
 
 	if d := m.GetAnswerTtl(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return DnsTable_DnsVirtualDomainValidationError{
 				field:  "AnswerTtl",

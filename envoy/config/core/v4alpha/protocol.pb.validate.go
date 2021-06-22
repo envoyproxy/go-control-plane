@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on TcpProtocolOptions with the rules
@@ -580,15 +580,8 @@ func (m *KeepaliveSettings) Validate() error {
 		return nil
 	}
 
-	if m.GetInterval() == nil {
-		return KeepaliveSettingsValidationError{
-			field:  "Interval",
-			reason: "value is required",
-		}
-	}
-
 	if d := m.GetInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return KeepaliveSettingsValidationError{
 				field:  "Interval",
@@ -616,7 +609,7 @@ func (m *KeepaliveSettings) Validate() error {
 	}
 
 	if d := m.GetTimeout(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return KeepaliveSettingsValidationError{
 				field:  "Timeout",
@@ -644,6 +637,27 @@ func (m *KeepaliveSettings) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	if d := m.GetConnectionIdleInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			return KeepaliveSettingsValidationError{
+				field:  "ConnectionIdleInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+		if dur < gte {
+			return KeepaliveSettingsValidationError{
+				field:  "ConnectionIdleInterval",
+				reason: "value must be greater than or equal to 1ms",
+			}
+		}
+
 	}
 
 	return nil

@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on UpstreamTlsContext with the rules
@@ -168,7 +168,7 @@ func (m *DownstreamTlsContext) Validate() error {
 	}
 
 	if d := m.GetSessionTimeout(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return DownstreamTlsContextValidationError{
 				field:  "SessionTimeout",
@@ -319,10 +319,10 @@ func (m *CommonTlsContext) Validate() error {
 
 	}
 
-	if len(m.GetTlsCertificateSdsSecretConfigs()) > 1 {
+	if len(m.GetTlsCertificateSdsSecretConfigs()) > 2 {
 		return CommonTlsContextValidationError{
 			field:  "TlsCertificateSdsSecretConfigs",
-			reason: "value must contain no more than 1 item(s)",
+			reason: "value must contain no more than 2 item(s)",
 		}
 	}
 
