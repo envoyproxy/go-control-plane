@@ -1534,14 +1534,15 @@ func (m *Cluster_MaglevLbConfig) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTableSize()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetTableSize(); wrapper != nil {
+
+		if wrapper.GetValue() > 5000011 {
 			return Cluster_MaglevLbConfigValidationError{
 				field:  "TableSize",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be less than or equal to 5000011",
 			}
 		}
+
 	}
 
 	return nil
