@@ -165,9 +165,9 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	return nil
 }
 
-// SetResources replaces current resources with a new set of resources
-// This function is useful for use cases when DiscoveryRequest#resourceNames is empty.
-// This way watches that follow all resources are triggered only once regardless of how many resources are changed.
+// SetResources replaces current resources with a new set of resources.
+// This function is useful for wildcard xDS subscriptions.
+// This way watches that are subscribed to all resources are triggered only once regardless of how many resources are changed.
 func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -175,6 +175,7 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	cache.version += 1
 
 	modified := map[string]struct{}{}
+	// Collect deleted resource names.
 	for name := range cache.resources {
 		if _, found := resources[name]; !found {
 			delete(cache.versionVector, name)
@@ -183,9 +184,11 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	}
 
 	cache.resources = resources
+
+	// Collect changed resource names.
+	// We assume all resources passed to SetResources are changed.
+	// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
 	for name := range resources {
-		// We assume all resources passed to SetResources are changed.
-		// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
 		cache.versionVector[name] = cache.version
 		modified[name] = struct{}{}
 	}
