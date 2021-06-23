@@ -23,7 +23,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -42,6 +44,7 @@ var (
 	upstreamMessage string
 	basePort        uint
 	alsPort         uint
+	pprofPort       uint
 
 	delay    time.Duration
 	requests int
@@ -84,6 +87,9 @@ func init() {
 
 	// The control plane accesslog server port (currently unused)
 	flag.UintVar(&alsPort, "als", 18090, "Control plane accesslog server port")
+
+	// The pprof server port for viewing statistics and metrics
+	flag.UintVar(&pprofPort, "pprof", 6060, "Port for pprof server to listen on")
 
 	//
 	// These parameters control Envoy configuration
@@ -137,6 +143,8 @@ func init() {
 
 // main returns code 1 if any of the batches failed to pass all requests
 func main() {
+	runtime.SetBlockProfileRate(1)
+
 	flag.Parse()
 	ctx := context.Background()
 

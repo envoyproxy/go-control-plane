@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 
 	"google.golang.org/grpc"
 
@@ -115,4 +116,23 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	if _, err = resp.Write(bytes); err != nil && h.Log != nil {
 		h.Log.Errorf("gateway error: %v", err)
 	}
+}
+
+// RunPprofServer will start a google/pprof server for collecting stats
+func RunPprofServer(ctx context.Context, port uint) {
+	log.Printf("pprof listening HTTP/1.1 on %d\n", port)
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", port),
+		Handler: nil,
+	}
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
+	<-ctx.Done()
+
+	// Cleanup our gateway if we receive a shutdown
+	server.Shutdown(ctx)
 }

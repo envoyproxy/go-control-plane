@@ -12,6 +12,9 @@ PKG 		:= github.com/envoyproxy/go-control-plane
 build:
 	@go build ./pkg/... ./envoy/...
 
+.PHONY: artifacts
+artifacts:  $(BINDIR)/test $(BINDIR)/upstream
+
 .PHONY: clean
 clean:
 	@echo "--> cleaning compiled objects and binaries"
@@ -70,6 +73,7 @@ integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
 integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=delta-ads build/integration.sh
 
+
 #--------------------------------------
 #-- example xDS control plane server
 #--------------------------------------
@@ -85,3 +89,7 @@ example: $(BINDIR)/example
 docker_tests:
 	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
 	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_ci.sh
+
+docker_benchmarks:
+	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
+	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_benchmarks.sh
