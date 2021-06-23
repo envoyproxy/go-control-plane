@@ -368,7 +368,8 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					if values.extensionConfigCancel != nil {
 						values.extensionConfigCancel()
 					}
-					values.extensionConfigs, values.extensionConfigCancel = s.cache.CreateWatch(req)
+					values.extensionConfigs = make(chan cache.Response, 1)
+					values.extensionConfigCancel = s.cache.CreateWatch(req, values.extensionConfigs)
 				}
 			default:
 				typeUrl := req.TypeUrl
