@@ -23,11 +23,13 @@ import (
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 
+	"github.com/golang/protobuf/proto"
+
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
-	ttl "github.com/envoyproxy/go-control-plane/pkg/ttl/v3"
 )
 
 // Request is an alias for the discovery request type.
@@ -52,7 +54,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(*Request) (value chan Response, cancel func())
+	CreateWatch(*Request, chan Response) (cancel func())
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	//
@@ -63,7 +65,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, *stream.StreamState) (value chan DeltaResponse, cancel func())
+	CreateDeltaWatch(*DeltaRequest, stream.StreamState) (value chan DeltaResponse, cancel func())
 }
 
 // ConfigFetcher fetches configuration resources from cache
@@ -189,7 +191,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 		marshaledResources := make([]*any.Any, len(r.Resources))
 
 		for i, resource := range r.Resources {
-			maybeTtldResource, resourceType, err := ttl.MaybeCreateTtlResourceIfSupported(resource, GetResourceName(resource.Resource), r.Request.TypeUrl, r.Heartbeat)
+			maybeTtldResource, resourceType, err := r.maybeCreateTtlResource(resource)
 			if err != nil {
 				return nil, err
 			}
@@ -279,6 +281,30 @@ func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 // NextVersionMap returns the version map which consists of updated version mappings after this response is applied
 func (r *RawDeltaResponse) GetNextVersionMap() map[string]string {
 	return r.NextVersionMap
+}
+
+var deltaResourceTypeURL = "type.googleapis.com/" + proto.MessageName(&discovery.Resource{})
+
+func (r *RawResponse) maybeCreateTtlResource(resource types.ResourceWithTtl) (types.Resource, string, error) {
+	if resource.Ttl != nil {
+		wrappedResource := &discovery.Resource{
+			Name: GetResourceName(resource.Resource),
+			Ttl:  ptypes.DurationProto(*resource.Ttl),
+		}
+
+		if !r.Heartbeat {
+			any, err := ptypes.MarshalAny(resource.Resource)
+			if err != nil {
+				return nil, "", err
+			}
+			any.TypeUrl = r.Request.TypeUrl
+			wrappedResource.Resource = any
+		}
+
+		return wrappedResource, deltaResourceTypeURL, nil
+	}
+
+	return resource.Resource, r.Request.TypeUrl, nil
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.

@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on HttpConnectionManager with the rules
@@ -176,7 +176,7 @@ func (m *HttpConnectionManager) Validate() error {
 	}
 
 	if d := m.GetRequestHeadersTimeout(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return HttpConnectionManagerValidationError{
 				field:  "RequestHeadersTimeout",
@@ -242,6 +242,21 @@ func (m *HttpConnectionManager) Validate() error {
 	}
 
 	// no validation rules for XffNumTrustedHops
+
+	for idx, item := range m.GetOriginalIpDetectionExtensions() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpConnectionManagerValidationError{
+					field:  fmt.Sprintf("OriginalIpDetectionExtensions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	if v, ok := interface{}(m.GetInternalAddressConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -324,6 +339,8 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for MergeSlashes
 
+	// no validation rules for PathWithEscapedSlashesAction
+
 	if v, ok := interface{}(m.GetRequestIdExtension()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return HttpConnectionManagerValidationError{
@@ -365,6 +382,8 @@ func (m *HttpConnectionManager) Validate() error {
 			}
 		}
 	}
+
+	// no validation rules for StripTrailingHostDot
 
 	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

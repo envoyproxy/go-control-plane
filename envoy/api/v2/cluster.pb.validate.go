@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on Cluster with the rules defined in the
@@ -75,7 +75,7 @@ func (m *Cluster) Validate() error {
 	}
 
 	if d := m.GetConnectTimeout(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return ClusterValidationError{
 				field:  "ConnectTimeout",
@@ -257,7 +257,7 @@ func (m *Cluster) Validate() error {
 	}
 
 	if d := m.GetDnsRefreshRate(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return ClusterValidationError{
 				field:  "DnsRefreshRate",
@@ -324,7 +324,7 @@ func (m *Cluster) Validate() error {
 	}
 
 	if d := m.GetCleanupInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return ClusterValidationError{
 				field:  "CleanupInterval",
@@ -1560,7 +1560,7 @@ func (m *Cluster_RefreshRate) Validate() error {
 	}
 
 	if d := m.GetBaseInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return Cluster_RefreshRateValidationError{
 				field:  "BaseInterval",
@@ -1581,7 +1581,7 @@ func (m *Cluster_RefreshRate) Validate() error {
 	}
 
 	if d := m.GetMaxInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return Cluster_RefreshRateValidationError{
 				field:  "MaxInterval",

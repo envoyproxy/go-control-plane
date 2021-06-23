@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -29,39 +30,34 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
 type mockConfigWatcher struct {
-	counts     map[string]int
-	responses  map[string][]cache.Response
-	closeWatch bool
-	watches    int
+	counts         map[string]int
+	deltaCounts    map[string]int
+	responses      map[string][]cache.Response
+	deltaResponses map[string][]cache.DeltaResponse
+	closeWatch     bool
+	watches        int
+	deltaWatches   int
+
+	mu *sync.RWMutex
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest) (chan cache.Response, func()) {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan cache.Response) func() {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
-	out := make(chan cache.Response, 1)
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
-	} else if config.closeWatch {
-		close(out)
 	} else {
 		config.watches += 1
-		return out, func() {
-			// it is ok to close the channel after cancellation and not wait for it to be garbage collected
-			close(out)
+		return func() {
 			config.watches -= 1
 		}
 	}
-	return out, nil
-}
-
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, st *stream.StreamState) (chan cache.DeltaResponse, func()) {
-	return nil, nil
+	return nil
 }
 
 func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
@@ -75,7 +71,9 @@ func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.Disco
 
 func makeMockConfigWatcher() *mockConfigWatcher {
 	return &mockConfigWatcher{
-		counts: make(map[string]int),
+		counts:      make(map[string]int),
+		deltaCounts: make(map[string]int),
+		mu:          &sync.RWMutex{},
 	}
 }
 
@@ -445,30 +443,6 @@ func TestFetch(t *testing.T) {
 	}
 	if want := 7; responseCount != want {
 		t.Errorf("unexpected number of fetch responses: got %d, want %d", responseCount, want)
-	}
-}
-
-func TestWatchClosed(t *testing.T) {
-	for _, typ := range testTypes {
-		t.Run(typ, func(t *testing.T) {
-			config := makeMockConfigWatcher()
-			config.closeWatch = true
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
-
-			// make a request
-			resp := makeMockStream(t)
-			resp.recv <- &discovery.DiscoveryRequest{
-				Node:    node,
-				TypeUrl: typ,
-			}
-
-			// check that response fails since watch gets closed
-			if err := s.StreamAggregatedResources(resp); err == nil {
-				t.Error("Stream() => got no error, want watch failed")
-			}
-
-			close(resp.recv)
-		})
 	}
 }
 

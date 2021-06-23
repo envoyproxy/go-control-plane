@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on BackoffStrategy with the rules defined
@@ -49,7 +49,7 @@ func (m *BackoffStrategy) Validate() error {
 	}
 
 	if d := m.GetBaseInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return BackoffStrategyValidationError{
 				field:  "BaseInterval",
@@ -70,7 +70,7 @@ func (m *BackoffStrategy) Validate() error {
 	}
 
 	if d := m.GetMaxInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return BackoffStrategyValidationError{
 				field:  "MaxInterval",
