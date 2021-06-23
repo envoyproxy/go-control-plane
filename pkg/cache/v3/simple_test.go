@@ -388,7 +388,8 @@ func BenchmarkSnapshotCache(b *testing.B) {
 	for _, typ := range testTypes {
 		b.Run(typ, func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				value, _ := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+				value := make(chan cache.Response, 1)
+				c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
 				select {
 				case <-value:
 					// NO-OP since we don't want to eat extra cycles in the benchmark
