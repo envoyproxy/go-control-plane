@@ -3100,6 +3100,19 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 
 	}
 
+	switch m.HostRewriteSpecifier.(type) {
+
+	case *WeightedCluster_ClusterWeight_HostRewriteLiteral:
+
+		if !_WeightedCluster_ClusterWeight_HostRewriteLiteral_Pattern.MatchString(m.GetHostRewriteLiteral()) {
+			return WeightedCluster_ClusterWeightValidationError{
+				field:  "HostRewriteLiteral",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -3163,6 +3176,8 @@ var _ interface {
 var _WeightedCluster_ClusterWeight_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _WeightedCluster_ClusterWeight_ResponseHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _WeightedCluster_ClusterWeight_HostRewriteLiteral_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on RouteMatch_GrpcRouteMatchOptions with
 // the rules defined in the proto definition for this message. If any rules
