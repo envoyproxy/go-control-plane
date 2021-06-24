@@ -3,6 +3,7 @@ package cache_test
 import (
 	"fmt"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
@@ -221,5 +222,67 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 
 	if s := c.GetStatusInfo("missing"); s != nil {
 		t.Errorf("should not return a status for unknown key: got %#v", s)
+	}
+}
+
+func BenchmarkDeltaSnapshotCache(b *testing.B) {
+	c := cache.NewSnapshotCache(false, group{}, logger{t: &testing.T{}})
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		b.Fatal(err)
+	}
+
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				value, _ := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+					Node: &core.Node{
+						Id: "node",
+					},
+					TypeUrl: rsrc.EndpointType,
+				}, stream.StreamState{ResourceVersions: make(map[string]string), Wildcard: true})
+
+				select {
+				case <-value:
+					// NO-OP since we don't want to eat extra cycles in the benchmark
+				case <-time.After(time.Second):
+					b.Error("failed to receive a snapshot response")
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkSnapshotCacheLockContention(b *testing.B) {
+	c := cache.NewSnapshotCache(true, group{}, nil)
+
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		b.Fatal(err)
+	}
+
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			var wg sync.WaitGroup
+
+			wg.Add(len(testTypes))
+			for i := 0; i < len(testTypes); i++ {
+				go func() {
+					defer wg.Done()
+
+					for n := 0; n < b.N; n++ {
+						value, _ := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{TypeUrl: typ, ResourceNamesSubscribe: names[typ]}, stream.NewStreamState(true, nil))
+
+						select {
+						case <-value:
+							// NO-OP since we don't want to eat the extra cycles in the benchmark
+						case <-time.After(time.Second):
+							b.Error("failed to receive snapshot response")
+						}
+					}
+				}()
+			}
+
+			// Hold the benchmark until all go routines have finished processing
+			wg.Wait()
+		})
 	}
 }

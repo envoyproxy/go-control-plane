@@ -77,13 +77,18 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 }
 
 type mockDeltaStream struct {
-	t         *testing.T
+	t         Errors
 	ctx       context.Context
 	recv      chan *discovery.DeltaDiscoveryRequest
 	sent      chan *discovery.DeltaDiscoveryResponse
 	nonce     int
 	sendError bool
 	grpc.ServerStream
+}
+
+type Errors interface {
+	Error(...interface{})
+	Errorf(string, ...interface{})
 }
 
 func (stream *mockDeltaStream) Context() context.Context {
@@ -126,9 +131,9 @@ func (stream *mockDeltaStream) Recv() (*discovery.DeltaDiscoveryRequest, error) 
 	return req, nil
 }
 
-func makeMockDeltaStream(t *testing.T) *mockDeltaStream {
+func makeMockDeltaStream(e Errors) *mockDeltaStream {
 	return &mockDeltaStream{
-		t:    t,
+		t:    e,
 		ctx:  context.Background(),
 		sent: make(chan *discovery.DeltaDiscoveryResponse, 10),
 		recv: make(chan *discovery.DeltaDiscoveryRequest, 10),
@@ -249,7 +254,7 @@ func TestDeltaResponseHandlers(t *testing.T) {
 			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 
 			resp := makeMockDeltaStream(t)
-			// This is a wildcard request since we don't specify a list of resource subscriptions
+			// This is not a wildcard request since we specify a list of resource subscriptions
 			res, err := config.deltaResponses[typ][0].GetDeltaDiscoveryResponse()
 			if err != nil {
 				t.Error(err)
@@ -455,5 +460,97 @@ func TestDeltaCallbackError(t *testing.T) {
 
 			close(resp.recv)
 		})
+	}
+}
+
+// BENCHMARKS =====================================================================================================
+
+// This benchmark currently measures computational needs of processing a single request/response cycle in delta wildcard mode
+// with extra overhead of a processing go-routine. Future iterations may want to remove the need of the go routine overhead
+// so as to not skew the benchmark metrics
+func BenchmarkDeltaResponseHandlers(b *testing.B) {
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			config := makeMockConfigWatcher()
+			config.deltaResponses = makeDeltaResponses()
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+
+			for n := 0; n < b.N; n++ {
+				resp := makeMockDeltaStream(b)
+				// make a wildcard request
+				resp.recv <- &discovery.DeltaDiscoveryRequest{Node: node, TypeUrl: typ, ResourceNamesSubscribe: []string{}}
+				go func() {
+					err := process(typ, resp, s)
+					if err != nil {
+						b.Error(err)
+					}
+				}()
+
+				select {
+				case <-resp.sent:
+					close(resp.recv)
+				case <-time.After(1 * time.Second):
+					b.Fatalf("got no response")
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkDeltaAggregatedHandlers(b *testing.B) {
+	config := makeMockConfigWatcher()
+	config.deltaResponses = makeDeltaResponses()
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	reqs := []*discovery.DeltaDiscoveryRequest{
+		{
+			Node:    node,
+			TypeUrl: rsrc.ListenerType,
+		},
+		{
+			Node:    node,
+			TypeUrl: rsrc.ClusterType,
+		},
+		{
+			Node:                   node,
+			TypeUrl:                rsrc.EndpointType,
+			ResourceNamesSubscribe: []string{clusterName},
+		},
+		{
+			TypeUrl:                rsrc.RouteType,
+			ResourceNamesSubscribe: []string{routeName},
+		},
+		{
+			TypeUrl:                rsrc.SecretType,
+			ResourceNamesSubscribe: []string{secretName},
+		},
+	}
+
+	for n := 0; n < b.N; n++ {
+		resp := makeMockDeltaStream(b)
+
+		for _, r := range reqs {
+			resp.recv <- r
+		}
+
+		go func() {
+			err := s.DeltaAggregatedResources(resp)
+			if err != nil {
+				b.Error(err)
+			}
+		}()
+
+		count := 0
+		for {
+			select {
+			case <-resp.sent:
+				count++
+				if count >= len(reqs) {
+					close(resp.recv)
+					return
+				}
+			case <-time.After(1 * time.Second):
+				b.Fatalf("got %d messages on the stream, not 5", count)
+			}
+		}
 	}
 }

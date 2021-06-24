@@ -85,6 +85,7 @@ var (
 
 type logger struct {
 	t *testing.T
+	b *testing.B
 }
 
 func (log logger) Debugf(format string, args ...interface{}) { log.t.Logf(format, args...) }
@@ -381,5 +382,81 @@ func TestSnapshotClear(t *testing.T) {
 	}
 	if keys := c.GetStatusKeys(); len(keys) != 0 {
 		t.Errorf("keys should be empty")
+	}
+}
+
+// BENCHMARKS =====================================================================================================
+
+func BenchmarkSnapshotCache(b *testing.B) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: &testing.T{}})
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		b.Fatal(err)
+	}
+
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			value := make(chan cache.Response, 1)
+			for n := 0; n < b.N; n++ {
+				c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+				select {
+				case <-value:
+					// NO-OP since we don't want to eat extra cycles in the benchmark
+				case <-time.After(time.Second):
+					b.Fatal("failed to receive snapshot response")
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkLoadedSnapshotCache(b *testing.B) {
+	// perform b.N repititions of
+	//   create a watch for every test type
+	//   wait until every watch reports
+	b.Run("loaded", func(b *testing.B) {
+		for n := 0; n < b.N; n++ {
+			c := cache.NewSnapshotCache(true, group{}, logger{t: &testing.T{}})
+			if err := c.SetSnapshot(key, snapshot); err != nil {
+				b.Fatal(err)
+			}
+
+			var counter int
+			value := make(chan cache.Response, len(testTypes))
+			for _, typ := range testTypes {
+				c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+			}
+		SELECT_LOOP:
+			for {
+				select {
+				case <-value:
+					counter += 1
+					if counter == len(testTypes) {
+						break SELECT_LOOP
+					}
+				case <-time.After(time.Second):
+					b.Fatalf("timed out after %d of %d snapshot responses", counter, len(testTypes))
+				}
+			}
+		}
+	})
+
+}
+
+func BenchmarkSnapshotCacheFetch(b *testing.B) {
+	c := cache.NewSnapshotCache(true, group{}, nil)
+
+	if err := c.SetSnapshot(key, snapshot); err != nil {
+		b.Fatal(err)
+	}
+
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			for n := 0; n < b.N; n++ {
+				resp, err := c.Fetch(context.Background(), &discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]})
+				if err != nil || resp == nil {
+					b.Fatal("unexpected error or null response")
+				}
+			}
+		})
 	}
 }

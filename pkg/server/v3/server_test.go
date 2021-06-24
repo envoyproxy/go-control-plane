@@ -630,3 +630,100 @@ func TestCallbackError(t *testing.T) {
 		})
 	}
 }
+
+// BENCHMARKS =====================================================================================================
+
+func BenchmarkResponseHandlers(b *testing.B) {
+	for _, typ := range testTypes {
+		b.Run(typ, func(b *testing.B) {
+			config := makeMockConfigWatcher()
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+
+			for n := 0; n < b.N; n++ {
+				// SOTW benchmarks fails if we don't set the responses inside the bench loop, not sure why
+				config.responses = makeResponses()
+				resp := makeMockStream(&testing.T{})
+
+				// make a request
+				resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
+				go func() {
+					var err error
+					switch typ {
+					case rsrc.EndpointType:
+						err = s.StreamEndpoints(resp)
+					case rsrc.ClusterType:
+						err = s.StreamClusters(resp)
+					case rsrc.RouteType:
+						err = s.StreamRoutes(resp)
+					case rsrc.ListenerType:
+						err = s.StreamListeners(resp)
+					case rsrc.SecretType:
+						err = s.StreamSecrets(resp)
+					case rsrc.RuntimeType:
+						err = s.StreamRuntime(resp)
+					case opaqueType:
+						err = s.StreamAggregatedResources(resp)
+					}
+					if err != nil {
+						b.Errorf("Stream() => got %v, want no error", err)
+					}
+				}()
+
+				b.Logf("TYP: %s \n \n %+v", typ, config.responses)
+
+				// check a response
+				select {
+				case <-resp.sent:
+					close(resp.recv)
+				case <-time.After(1 * time.Second):
+					b.Fatalf("got no response")
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkAggregatedHandlers(b *testing.B) {
+	config := makeMockConfigWatcher()
+	config.responses = makeResponses()
+	for n := 0; n < b.N; n++ {
+		resp := makeMockStream(&testing.T{})
+
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:    node,
+			TypeUrl: rsrc.ListenerType,
+		}
+		resp.recv <- &discovery.DiscoveryRequest{
+			TypeUrl: rsrc.ClusterType,
+		}
+		resp.recv <- &discovery.DiscoveryRequest{
+			TypeUrl:       rsrc.EndpointType,
+			ResourceNames: []string{clusterName},
+		}
+		resp.recv <- &discovery.DiscoveryRequest{
+			TypeUrl:       rsrc.RouteType,
+			ResourceNames: []string{routeName},
+		}
+
+		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+		go func() {
+			if err := s.StreamAggregatedResources(resp); err != nil {
+				b.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+			}
+		}()
+
+		count := 0
+		for {
+			select {
+			case <-resp.sent:
+				count++
+				if count >= 4 {
+					close(resp.recv)
+					return
+				}
+			case <-time.After(1 * time.Second):
+				b.Fatalf("got %d messages on the stream, not 4", count)
+			}
+		}
+	}
+}
