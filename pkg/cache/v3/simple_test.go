@@ -434,7 +434,7 @@ func BenchmarkLoadedSnapshotCache(b *testing.B) {
 						break SELECT_LOOP
 					}
 				case <-time.After(time.Second):
-					b.Fatalf("timed out after %d of %d snapshot responses", counter)
+					b.Fatalf("timed out after %d of %d snapshot responses", counter, len(testTypes))
 				}
 			}
 		}
