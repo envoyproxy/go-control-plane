@@ -410,21 +410,22 @@ func BenchmarkSnapshotCache(b *testing.B) {
 }
 
 func BenchmarkLoadedSnapshotCache(b *testing.B) {
-	// perform b.N repititions of
-	//   create a watch for every test type
-	//   wait until every watch reports
+	// perform b.N repititions of CreateWatch for every test type
+	// and wait until every watch reports
 	b.Run("loaded", func(b *testing.B) {
+		c := cache.NewSnapshotCache(true, group{}, logger{t: &testing.T{}})
+		value := make(chan cache.Response, len(testTypes))
+
 		for n := 0; n < b.N; n++ {
-			c := cache.NewSnapshotCache(true, group{}, logger{t: &testing.T{}})
 			if err := c.SetSnapshot(key, snapshot); err != nil {
 				b.Fatal(err)
 			}
 
 			var counter int
-			value := make(chan cache.Response, len(testTypes))
 			for _, typ := range testTypes {
 				c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
 			}
+
 		SELECT_LOOP:
 			for {
 				select {
@@ -439,7 +440,6 @@ func BenchmarkLoadedSnapshotCache(b *testing.B) {
 			}
 		}
 	})
-
 }
 
 func BenchmarkSnapshotCacheFetch(b *testing.B) {
