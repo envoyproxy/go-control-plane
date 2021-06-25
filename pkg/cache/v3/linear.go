@@ -48,7 +48,7 @@ type LinearCache struct {
 	versionPrefix string
 	// Versions for each resource by name.
 	versionVector map[string]uint64
-	mu            sync.Mutex
+	mu            sync.RWMutex
 }
 
 var _ Cache = &LinearCache{}
@@ -165,6 +165,44 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	return nil
 }
 
+// SetResources replaces current resources with a new set of resources.
+// This function is useful for wildcard xDS subscriptions.
+// This way watches that are subscribed to all resources are triggered only once regardless of how many resources are changed.
+func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	cache.version += 1
+
+	modified := map[string]struct{}{}
+	// Collect deleted resource names.
+	for name := range cache.resources {
+		if _, found := resources[name]; !found {
+			delete(cache.versionVector, name)
+			modified[name] = struct{}{}
+		}
+	}
+
+	cache.resources = resources
+
+	// Collect changed resource names.
+	// We assume all resources passed to SetResources are changed.
+	// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
+	for name := range resources {
+		cache.versionVector[name] = cache.version
+		modified[name] = struct{}{}
+	}
+
+	cache.notifyAll(modified)
+}
+
+// GetResources returns current resources stored in the cache
+func (cache *LinearCache) GetResources() map[string]types.Resource {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+	return cache.resources
+}
+
 func (cache *LinearCache) CreateWatch(request *Request, value chan Response) func() {
 	if request.TypeUrl != cache.typeURL {
 		value <- nil
@@ -248,7 +286,7 @@ func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response
 
 // Number of active watches for a resource name.
 func (cache *LinearCache) NumWatches(name string) int {
-	cache.mu.Lock()
-	defer cache.mu.Unlock()
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
 	return len(cache.watches[name]) + len(cache.watchAll)
 }

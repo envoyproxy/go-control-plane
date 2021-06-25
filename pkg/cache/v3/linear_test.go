@@ -16,6 +16,7 @@ package cache
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
@@ -132,6 +133,66 @@ func TestLinearBasic(t *testing.T) {
 	verifyResponse(t, w, "3", 1)
 	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, w)
 	verifyResponse(t, w, "3", 2)
+}
+
+func TestLinearSetResources(t *testing.T) {
+	c := NewLinearCache(testType)
+
+	// Create new resources
+	w1 := make(chan Response, 1)
+	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, w1)
+	mustBlock(t, w1)
+	w2 := make(chan Response, 1)
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, w2)
+	mustBlock(t, w2)
+	c.SetResources(map[string]types.Resource{
+		"a": testResource("a"),
+		"b": testResource("b"),
+	})
+	verifyResponse(t, w1, "1", 1)
+	verifyResponse(t, w2, "1", 2) // the version was only incremented once for all resources
+
+	// Add another element and update the first, response should be different
+	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, w1)
+	mustBlock(t, w1)
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w2)
+	mustBlock(t, w2)
+	c.SetResources(map[string]types.Resource{
+		"a": testResource("aa"),
+		"b": testResource("b"),
+		"c": testResource("c"),
+	})
+	verifyResponse(t, w1, "2", 1)
+	verifyResponse(t, w2, "2", 3)
+
+	// Delete resource
+	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "2"}, w1)
+	mustBlock(t, w1)
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "2"}, w2)
+	mustBlock(t, w2)
+	c.SetResources(map[string]types.Resource{
+		"b": testResource("b"),
+		"c": testResource("c"),
+	})
+	verifyResponse(t, w1, "", 0) // removing a resource from the set triggers existing watches for deleted resources
+	verifyResponse(t, w2, "3", 2)
+}
+
+func TestLinearGetResources(t *testing.T) {
+	c := NewLinearCache(testType)
+
+	expectedResources := map[string]types.Resource{
+		"a": testResource("a"),
+		"b": testResource("b"),
+	}
+
+	c.SetResources(expectedResources)
+
+	resources := c.GetResources()
+
+	if !reflect.DeepEqual(expectedResources, resources) {
+		t.Errorf("resources are not equal. got: %v want: %v", resources, expectedResources)
+	}
 }
 
 func TestLinearVersionPrefix(t *testing.T) {
