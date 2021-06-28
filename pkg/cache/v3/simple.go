@@ -61,10 +61,6 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
-type heartbeatHandle struct {
-	cancel func()
-}
-
 type snapshotCache struct {
 	// watchCount and deltaWatchCount are atomic counters incremented for each watch respectively. They need to
 	// be the first fields in the struct to guarantee 64-bit alignment,
@@ -212,7 +208,9 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			}
 		}
 
-		// We only calculate version hashes when using delta. We don't want to do this when using SOTW so we can avoid unecessary computational cost if not using delta.
+		// We only calculate version hashes when using delta. We don't
+		// want to do this when using SOTW so we can avoid unnecessary
+		// computational cost if not using delta.
 		if len(info.deltaWatches) > 0 {
 			err := snapshot.ConstructVersionMap()
 			if err != nil {

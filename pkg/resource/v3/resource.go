@@ -43,7 +43,7 @@ func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManage
 
 	// use typed config if available
 	if typedConfig := filter.GetTypedConfig(); typedConfig != nil {
-		ptypes.UnmarshalAny(typedConfig, config)
+		_ = ptypes.UnmarshalAny(typedConfig, config)
 	}
 	return config
 }

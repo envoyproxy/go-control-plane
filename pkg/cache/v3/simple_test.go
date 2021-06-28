@@ -22,6 +22,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -55,10 +57,9 @@ var (
 		[]types.Resource{testRuntime},
 		[]types.Resource{testSecret[0]})
 
-	ttl       = 2 * time.Second
-	heartbeat = time.Second
+	ttl = 2 * time.Second
 
-	snapshotWithTtl = cache.NewSnapshotWithTtls(version,
+	snapshotWithTTL = cache.NewSnapshotWithTtls(version,
 		[]types.ResourceWithTtl{{Resource: testEndpoint, Ttl: &ttl}},
 		[]types.ResourceWithTtl{{Resource: testCluster}},
 		[]types.ResourceWithTtl{{Resource: testRoute}},
@@ -101,16 +102,14 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 		t.Errorf("unexpected snapshot found for key %q", key)
 	}
 
-	if err := c.SetSnapshot(key, snapshotWithTtl); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(key, snapshotWithTTL))
 
 	snap, err := c.GetSnapshot(key)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(snap, snapshotWithTtl) {
-		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTtl, snap)
+	if !reflect.DeepEqual(snap, snapshotWithTTL) {
+		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTTL, snap)
 	}
 
 	wg := sync.WaitGroup{}
@@ -126,8 +125,8 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
 					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResourcesAndTtl(typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTtl(typ))
 				}
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
@@ -154,12 +153,12 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 					if gotVersion, _ := out.GetVersion(); gotVersion != version {
 						t.Errorf("got version %q, want %q", gotVersion, version)
 					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
 					updatesByType[typ]++
@@ -189,9 +188,7 @@ func TestSnapshotCache(t *testing.T) {
 		t.Errorf("unexpected snapshot found for key %q", key)
 	}
 
-	if err := c.SetSnapshot(key, snapshot); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(key, snapshot))
 
 	snap, err := c.GetSnapshot(key)
 	if err != nil {
@@ -232,9 +229,7 @@ func TestSnapshotCache(t *testing.T) {
 
 func TestSnapshotCacheFetch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
-	if err := c.SetSnapshot(key, snapshot); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(key, snapshot))
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
@@ -332,7 +327,9 @@ func TestConcurrentSetWatch(t *testing.T) {
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					c.SetSnapshot(id, snap)
+					if err := c.SetSnapshot(id, snap); err != nil {
+						t.Fatalf("failed to set snapshot %q: %s", id, err)
+					}
 				} else {
 					if cancel != nil {
 						cancel()

@@ -577,7 +577,7 @@ func TestCancellations(t *testing.T) {
 		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
 	}
 	if config.watches != 0 {
-		t.Errorf("Expect all watches cancelled, got %q", config.watches)
+		t.Errorf("Expect all watches canceled, got %q", config.watches)
 	}
 }
 
@@ -598,7 +598,7 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
 	}
 	if config.watches != 0 {
-		t.Errorf("Expect all watches cancelled, got %q", config.watches)
+		t.Errorf("Expect all watches canceled, got %q", config.watches)
 	}
 }
 

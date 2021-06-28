@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -156,7 +158,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
 		if reflect.DeepEqual(versionMap[testTypes[0]], nextVersionMap) {
-			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an emtpy map", nextVersionMap)
+			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an empty map", nextVersionMap)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
@@ -175,7 +177,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					c.SetSnapshot(id, snap)
+					require.NoError(t, c.SetSnapshot(id, snap))
 				} else {
 					if cancel != nil {
 						cancel()

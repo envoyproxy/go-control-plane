@@ -173,7 +173,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, watch.state)
 
 				// Go does not allow for selecting over a dynamic set of channels
-				// so we introduce a termination chan to handle cancelling any watches.
+				// so we introduce a termination chan to handle canceling any watches.
 				terminate := make(chan struct{})
 				watch.termination = terminate
 				watches.deltaWatches[typeURL] = watch
@@ -183,7 +183,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 						if more {
 							watches.deltaMuxedResponses <- resp
 						} else {
-							// Check again if the watch is cancelled.
+							// Check again if the watch is canceled.
 							select {
 							case <-terminate: // do nothing
 							default:

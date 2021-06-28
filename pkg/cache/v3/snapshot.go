@@ -254,7 +254,7 @@ func (s *Snapshot) ConstructVersionMap() error {
 		}
 
 		for _, r := range resources.Items {
-			// hash our verison in here and build the version map
+			// hash our version in here and build the version map
 			marshaledResource, err := MarshalResource(r.Resource)
 			if err != nil {
 				return err

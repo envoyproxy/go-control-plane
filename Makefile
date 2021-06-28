@@ -45,7 +45,7 @@ lint:
 		--volume $$(pwd):/src \
 		--workdir /src \
 		golangci/golangci-lint:v1.41.1 \
-	golangci-lint run -v
+	golangci-lint run
 
 #-----------------
 #-- integration

@@ -27,7 +27,7 @@ import (
 
 type watches = map[chan Response]struct{}
 
-// LinearCache supports collectons of opaque resources. This cache has a
+// LinearCache supports collections of opaque resources. This cache has a
 // single collection indexed by resource names and manages resource versions
 // internally. It implements the cache interface for a single type URL and
 // should be combined with other caches via type URL muxing. It can be used to

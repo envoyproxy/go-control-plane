@@ -40,7 +40,7 @@ type DeltaRequest = discovery.DeltaDiscoveryRequest
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
-// the responses when they are ready. The watch can be cancelled by the
+// the responses when they are ready. The watch can be canceled by the
 // consumer, in effect terminating the watch for the request.
 // ConfigWatcher implementation must be thread-safe.
 type ConfigWatcher interface {
@@ -155,16 +155,16 @@ type RawDeltaResponse struct {
 var _ Response = &RawResponse{}
 var _ DeltaResponse = &RawDeltaResponse{}
 
-// PassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
+// PassthroughResponse is a pre constructed xDS response that need not go through marshaling transformations.
 type PassthroughResponse struct {
 	// Request is the original request.
 	Request *discovery.DiscoveryRequest
 
-	// The discovery response that needs to be sent as is, without any marshalling transformations.
+	// The discovery response that needs to be sent as is, without any marshaling transformations.
 	DiscoveryResponse *discovery.DiscoveryResponse
 }
 
-// DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
+// DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshaling transformations.
 type DeltaPassthroughResponse struct {
 	// Request is the latest delta request on the stream
 	DeltaRequest *discovery.DeltaDiscoveryRequest
@@ -172,16 +172,16 @@ type DeltaPassthroughResponse struct {
 	// NextVersionMap consists of updated version mappings after this response is applied
 	NextVersionMap map[string]string
 
-	// This discovery response that needs to be sent as is, without any marshalling transformations
+	// This discovery response that needs to be sent as is, without any marshaling transformations
 	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
 }
 
 var _ Response = &PassthroughResponse{}
 var _ DeltaResponse = &DeltaPassthroughResponse{}
 
-// GetDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
-// This is necessary because the marshalled response does not change across the calls.
-// This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
+// GetDiscoveryResponse performs the marshaling the first time its called and uses the cached response subsequently.
+// This is necessary because the marshaled response does not change across the calls.
+// This caching behavior is important in high throughput scenarios because grpc marshaling has a cost and it drives the cpu utilization under load.
 func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 
 	marshaledResponse := r.marshaledResponse.Load()
@@ -217,9 +217,9 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 	return marshaledResponse.(*discovery.DiscoveryResponse), nil
 }
 
-// GetDeltaDiscoveryResponse performs the marshalling the first time its called and uses the cached response subsequently.
-// We can do this because the marshalled response does not change across the calls.
-// This caching behavior is important in high throughput scenarios because grpc marshalling has a cost and it drives the cpu utilization under load.
+// GetDeltaDiscoveryResponse performs the marshaling the first time its called and uses the cached response subsequently.
+// We can do this because the marshaled response does not change across the calls.
+// This caching behavior is important in high throughput scenarios because grpc marshaling has a cost and it drives the cpu utilization under load.
 func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
 	marshaledResponse := r.marshaledResponse.Load()
 
