@@ -180,24 +180,23 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
 				t.Parallel()
 				id := fmt.Sprintf("%d", i%2)
-				var cancel func()
 				responses := make(chan cache.DeltaResponse, 1)
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					c.SetSnapshot(context.Background(), key, snap)
-				} else {
-					if cancel != nil {
-						cancel()
+					if err := c.SetSnapshot(context.Background(), key, snap); err != nil {
+						t.Fatalf("snapshot failed: %s", err)
 					}
-
-					cancel = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+				} else {
+					cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 						Node: &core.Node{
 							Id: id,
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
 					}, stream.NewStreamState(false, make(map[string]string)), responses)
+
+					defer cancel()
 				}
 			})
 		}(i)

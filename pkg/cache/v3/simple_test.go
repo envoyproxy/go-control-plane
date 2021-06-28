@@ -58,10 +58,9 @@ var (
 		[]types.Resource{testSecret[0]},
 		[]types.Resource{testExtensionConfig})
 
-	ttl       = 2 * time.Second
-	heartbeat = time.Second
+	ttl = 2 * time.Second
 
-	snapshotWithTtl = cache.NewSnapshotWithTtls(version,
+	snapshotWithTTL = cache.NewSnapshotWithTtls(version,
 		[]types.ResourceWithTtl{{Resource: testEndpoint, Ttl: &ttl}},
 		[]types.ResourceWithTtl{{Resource: testCluster}},
 		[]types.ResourceWithTtl{{Resource: testRoute}},
@@ -104,7 +103,7 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 		t.Errorf("unexpected snapshot found for key %q", key)
 	}
 
-	if err := c.SetSnapshot(context.Background(), key, snapshotWithTtl); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshotWithTTL); err != nil {
 		t.Fatal(err)
 	}
 
@@ -112,8 +111,8 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(snap, snapshotWithTtl) {
-		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTtl, snap)
+	if !reflect.DeepEqual(snap, snapshotWithTTL) {
+		t.Errorf("expect snapshot: %v, got: %v", snapshotWithTTL, snap)
 	}
 
 	wg := sync.WaitGroup{}
@@ -129,8 +128,8 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
 					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResourcesAndTtl(typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTtl(typ))
 				}
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
@@ -157,12 +156,12 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 					if gotVersion, _ := out.GetVersion(); gotVersion != version {
 						t.Errorf("got version %q, want %q", gotVersion, version)
 					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTtl.GetResourcesAndTtl(typ)) {
-						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTtl.GetResources(typ))
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
 					updatesByType[typ]++
@@ -326,27 +325,25 @@ func TestSnapshotCacheWatch(t *testing.T) {
 func TestConcurrentSetWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	for i := 0; i < 50; i++ {
-		func(i int) {
-			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
-				t.Parallel()
-				id := fmt.Sprintf("%d", i%2)
-				var cancel func()
-				value := make(chan cache.Response, 1)
-				if i < 25 {
-					snap := cache.Snapshot{}
-					snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					c.SetSnapshot(context.Background(), key, snap)
-				} else {
-					if cancel != nil {
-						cancel()
-					}
-					cancel = c.CreateWatch(&discovery.DiscoveryRequest{
-						Node:    &core.Node{Id: id},
-						TypeUrl: rsrc.EndpointType,
-					}, value)
+		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
+			t.Parallel()
+			id := fmt.Sprintf("%d", i%2)
+			value := make(chan cache.Response, 1)
+			if i < 25 {
+				snap := cache.Snapshot{}
+				snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+				if err := c.SetSnapshot(context.Background(), id, snap); err != nil {
+					t.Fatalf("failed to set snapshot %q: %s", id, err)
 				}
-			})
-		}(i)
+			} else {
+				cancel := c.CreateWatch(&discovery.DiscoveryRequest{
+					Node:    &core.Node{Id: id},
+					TypeUrl: rsrc.EndpointType,
+				}, value)
+
+				defer cancel()
+			}
+		})
 	}
 }
 

@@ -61,10 +61,6 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
-type heartbeatHandle struct {
-	cancel func()
-}
-
 type snapshotCache struct {
 	// watchCount and deltaWatchCount are atomic counters incremented for each watch respectively. They need to
 	// be the first fields in the struct to guarantee 64-bit alignment,
@@ -164,14 +160,14 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
 
 			// TODO(snowp): Construct this once per type instead of once per watch.
-			resourcesWithTtl := map[string]types.ResourceWithTtl{}
+			resourcesWithTTL := map[string]types.ResourceWithTtl{}
 			for k, v := range resources {
 				if v.Ttl != nil {
-					resourcesWithTtl[k] = v
+					resourcesWithTTL[k] = v
 				}
 			}
 
-			if len(resourcesWithTtl) == 0 {
+			if len(resourcesWithTTL) == 0 {
 				continue
 			}
 			if cache.log != nil {
@@ -216,7 +212,9 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 			}
 		}
 
-		// We only calculate version hashes when using delta. We don't want to do this when using SOTW so we can avoid unecessary computational cost if not using delta.
+		// We only calculate version hashes when using delta. We don't
+		// want to do this when using SOTW so we can avoid unnecessary
+		// computational cost if not using delta.
 		if len(info.deltaWatches) > 0 {
 			err := snapshot.ConstructVersionMap()
 			if err != nil {
@@ -430,7 +428,6 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		err := snapshot.ConstructVersionMap()
 		if err != nil {
 			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
-			delayedResponse = true
 		}
 		response, err := respondDelta(context.Background(), request, value, state, snapshot, cache.log)
 		if err != nil {
