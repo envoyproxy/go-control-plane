@@ -179,10 +179,17 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
+		rsrc.ExtensionConfigType: {
+			&cache.RawDeltaResponse{
+				SystemVersionInfo: "7",
+				Resources:         []types.Resource{extensionConfig},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
+			},
+		},
 		// Pass-through type (types without explicit handling)
 		opaqueType: {
 			&cache.RawDeltaResponse{
-				SystemVersionInfo: "7",
+				SystemVersionInfo: "8",
 				Resources:         []types.Resource{opaque},
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: opaqueType},
 			},
@@ -205,6 +212,8 @@ func process(typ string, resp *mockDeltaStream, s server.Server) error {
 		err = s.DeltaSecrets(resp)
 	case rsrc.RuntimeType:
 		err = s.DeltaRuntime(resp)
+	case rsrc.ExtensionConfigType:
+		err = s.DeltaExtensionConfigs(resp)
 	case opaqueType:
 		err = s.DeltaAggregatedResources(resp)
 	}
