@@ -449,7 +449,7 @@ type FilterChain struct {
 	// [#not-implemented-hide:] filter chain metadata.
 	Metadata *v3.Metadata `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Optional custom transport socket implementation to use for downstream connections.
-	// To setup TLS, set a transport socket with name `tls` and
+	// To setup TLS, set a transport socket with name `envoy.transport_sockets.tls` and
 	// :ref:`DownstreamTlsContext <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.DownstreamTlsContext>` in the `typed_config`.
 	// If no transport socket configuration is specified, new connections
 	// will be set up with plaintext.

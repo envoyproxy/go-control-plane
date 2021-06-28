@@ -796,7 +796,7 @@ type Cluster struct {
 	// Common configuration for all load balancer implementations.
 	CommonLbConfig *Cluster_CommonLbConfig `protobuf:"bytes,27,opt,name=common_lb_config,json=commonLbConfig,proto3" json:"common_lb_config,omitempty"`
 	// Optional custom transport socket implementation to use for upstream connections.
-	// To setup TLS, set a transport socket with name `tls` and
+	// To setup TLS, set a transport socket with name `envoy.transport_sockets.tls` and
 	// :ref:`UpstreamTlsContexts <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.UpstreamTlsContext>` in the `typed_config`.
 	// If no transport socket configuration is specified, new connections
 	// will be set up with plaintext.
