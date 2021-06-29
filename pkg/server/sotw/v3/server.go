@@ -72,26 +72,29 @@ type Stream interface {
 
 // watches for all xDS resource types
 type watches struct {
-	endpoints chan cache.Response
-	clusters  chan cache.Response
-	routes    chan cache.Response
-	listeners chan cache.Response
-	secrets   chan cache.Response
-	runtimes  chan cache.Response
+	endpoints        chan cache.Response
+	clusters         chan cache.Response
+	routes           chan cache.Response
+	listeners        chan cache.Response
+	secrets          chan cache.Response
+	runtimes         chan cache.Response
+	extensionConfigs chan cache.Response
 
-	endpointCancel func()
-	clusterCancel  func()
-	routeCancel    func()
-	listenerCancel func()
-	secretCancel   func()
-	runtimeCancel  func()
+	endpointCancel        func()
+	clusterCancel         func()
+	routeCancel           func()
+	listenerCancel        func()
+	secretCancel          func()
+	runtimeCancel         func()
+	extensionConfigCancel func()
 
-	endpointNonce string
-	clusterNonce  string
-	routeNonce    string
-	listenerNonce string
-	secretNonce   string
-	runtimeNonce  string
+	endpointNonce        string
+	clusterNonce         string
+	routeNonce           string
+	listenerNonce        string
+	secretNonce          string
+	runtimeNonce         string
+	extensionConfigNonce string
 
 	// Opaque resources share a muxed channel. Nonces and watch cancellations are indexed by type URL.
 	responses     chan cache.Response
@@ -129,6 +132,9 @@ func (values *watches) Cancel() {
 	}
 	if values.runtimeCancel != nil {
 		values.runtimeCancel()
+	}
+	if values.extensionConfigCancel != nil {
+		values.extensionConfigCancel()
 	}
 	for _, cancel := range values.cancellations {
 		if cancel != nil {
@@ -250,6 +256,16 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			}
 			values.runtimeNonce = nonce
 
+		case resp, more := <-values.extensionConfigs:
+			if !more {
+				return status.Errorf(codes.Unavailable, "extensionConfigs watch failed")
+			}
+			nonce, err := send(resp, resource.ExtensionConfigType)
+			if err != nil {
+				return err
+			}
+			values.extensionConfigNonce = nonce
+
 		case resp, more := <-values.responses:
 			if more {
 				if resp == errorResponse {
@@ -346,6 +362,14 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					}
 					values.runtimes = make(chan cache.Response, 1)
 					values.runtimeCancel = s.cache.CreateWatch(req, values.runtimes)
+				}
+			case req.TypeUrl == resource.ExtensionConfigType:
+				if values.extensionConfigNonce == "" || values.extensionConfigNonce == nonce {
+					if values.extensionConfigCancel != nil {
+						values.extensionConfigCancel()
+					}
+					values.extensionConfigs = make(chan cache.Response, 1)
+					values.extensionConfigCancel = s.cache.CreateWatch(req, values.extensionConfigs)
 				}
 			default:
 				typeUrl := req.TypeUrl
