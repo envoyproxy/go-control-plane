@@ -1463,6 +1463,9 @@ func (m *RouteAction) Validate() error {
 			}
 		}
 
+	case *RouteAction_ClusterSpecifierPlugin:
+		// no validation rules for ClusterSpecifierPlugin
+
 	default:
 		return RouteActionValidationError{
 			field:  "ClusterSpecifier",
