@@ -29,7 +29,7 @@ const (
 	FetchClusters         = "/v3/discovery:clusters"
 	FetchListeners        = "/v3/discovery:listeners"
 	FetchRoutes           = "/v3/discovery:routes"
-	FetchSecrets          = "/v3/discovery:secrets"
+	FetchSecrets          = "/v3/discovery:secrets" //nolint:gosec
 	FetchRuntimes         = "/v3/discovery:runtime"
 	FetchExtensionConfigs = "/v3/discovery:extension_configs"
 )

@@ -318,29 +318,25 @@ func TestSnapshotCacheWatch(t *testing.T) {
 func TestConcurrentSetWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	for i := 0; i < 50; i++ {
-		func(i int) {
-			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
-				t.Parallel()
-				id := fmt.Sprintf("%d", i%2)
-				var cancel func()
-				value := make(chan cache.Response, 1)
-				if i < 25 {
-					snap := cache.Snapshot{}
-					snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					if err := c.SetSnapshot(id, snap); err != nil {
-						t.Fatalf("failed to set snapshot %q: %s", id, err)
-					}
-				} else {
-					if cancel != nil {
-						cancel()
-					}
-					cancel = c.CreateWatch(&discovery.DiscoveryRequest{
-						Node:    &core.Node{Id: id},
-						TypeUrl: rsrc.EndpointType,
-					}, value)
+		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
+			t.Parallel()
+			id := fmt.Sprintf("%d", i%2)
+			value := make(chan cache.Response, 1)
+			if i < 25 {
+				snap := cache.Snapshot{}
+				snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+				if err := c.SetSnapshot(id, snap); err != nil {
+					t.Fatalf("failed to set snapshot %q: %s", id, err)
 				}
-			})
-		}(i)
+			} else {
+				cancel := c.CreateWatch(&discovery.DiscoveryRequest{
+					Node:    &core.Node{Id: id},
+					TypeUrl: rsrc.EndpointType,
+				}, value)
+
+				defer cancel()
+			}
+		})
 	}
 }
 

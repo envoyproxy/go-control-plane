@@ -66,15 +66,15 @@ func IndexRawResourcesByName(items []types.Resource) map[string]types.Resource {
 
 // NewResources creates a new resource group.
 func NewResources(version string, items []types.Resource) Resources {
-	itemsWithTtl := []types.ResourceWithTtl{}
+	itemsWithTTL := []types.ResourceWithTtl{}
 	for _, item := range items {
-		itemsWithTtl = append(itemsWithTtl, types.ResourceWithTtl{Resource: item})
+		itemsWithTTL = append(itemsWithTTL, types.ResourceWithTtl{Resource: item})
 	}
-	return NewResourcesWithTtl(version, itemsWithTtl)
+	return NewResourcesWithTtl(version, itemsWithTTL)
 }
 
 // NewResources creates a new resource group.
-func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resources {
+func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resources { // nolint:golint,revive
 	return Resources{
 		Version: version,
 		Items:   IndexResourcesByName(items),
@@ -137,9 +137,9 @@ func NewSnapshotWithResources(version string, resources SnapshotResources) Snaps
 	return out
 }
 
-type ResourceWithTtl struct {
+type ResourceWithTtl struct { // nolint:golint,revive
 	Resources []types.Resource
-	Ttl       *time.Duration
+	Ttl       *time.Duration // nolint:golint,revive
 }
 
 func NewSnapshotWithTtls(version string,
@@ -193,17 +193,17 @@ func (s *Snapshot) GetResources(typeURL string) map[string]types.Resource {
 		return nil
 	}
 
-	withoutTtl := make(map[string]types.Resource, len(resources))
+	withoutTTL := make(map[string]types.Resource, len(resources))
 
 	for k, v := range resources {
-		withoutTtl[k] = v.Resource
+		withoutTTL[k] = v.Resource
 	}
 
-	return withoutTtl
+	return withoutTTL
 }
 
 // GetResourcesAndTtl selects snapshot resources by type, returning the map of resources and the associated TTL.
-func (s *Snapshot) GetResourcesAndTtl(typeURL string) map[string]types.ResourceWithTtl {
+func (s *Snapshot) GetResourcesAndTtl(typeURL string) map[string]types.ResourceWithTtl { // nolint:golint,revive
 	if s == nil {
 		return nil
 	}

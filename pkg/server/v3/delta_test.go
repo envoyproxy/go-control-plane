@@ -66,10 +66,10 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 	} else if config.closeWatch {
 		close(out)
 	} else {
-		config.deltaWatches += 1
+		config.deltaWatches++
 		return out, func() {
 			close(out)
-			config.deltaWatches -= 1
+			config.deltaWatches--
 		}
 	}
 

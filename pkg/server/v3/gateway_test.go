@@ -100,7 +100,7 @@ func TestGateway(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp, code, err := gtw.ServeHTTP(req)
+		resp, code, _ := gtw.ServeHTTP(req)
 		if resp != nil {
 			t.Errorf("handler returned wrong response")
 		}
@@ -114,7 +114,7 @@ func TestGateway(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp, code, err := gtw.ServeHTTP(req)
+		resp, code, _ := gtw.ServeHTTP(req)
 		if resp == nil {
 			t.Errorf("handler returned wrong response")
 		}

@@ -12,10 +12,10 @@ type Resource interface {
 }
 
 // ResourceWithTtl is a Resource with an optional TTL.
-type ResourceWithTtl struct {
+type ResourceWithTtl struct { // nolint:golint,revive
 	Resource Resource
 
-	Ttl *time.Duration
+	Ttl *time.Duration // nolint:golint,revive
 }
 
 // MarshaledResource is an alias for the serialized binary array.

@@ -169,30 +169,26 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	for i := 0; i < 50; i++ {
 		version := fmt.Sprintf("v%d", i)
-		func(i int) {
-			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
-				t.Parallel()
-				id := fmt.Sprintf("%d", i%2)
-				var cancel func()
-				if i < 25 {
-					snap := cache.Snapshot{}
-					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					require.NoError(t, c.SetSnapshot(id, snap))
-				} else {
-					if cancel != nil {
-						cancel()
-					}
 
-					_, cancel = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
-						Node: &core.Node{
-							Id: id,
-						},
-						TypeUrl:                rsrc.EndpointType,
-						ResourceNamesSubscribe: []string{clusterName},
-					}, stream.NewStreamState(false, make(map[string]string)))
-				}
-			})
-		}(i)
+		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
+			t.Parallel()
+			id := fmt.Sprintf("%d", i%2)
+			if i < 25 {
+				snap := cache.Snapshot{}
+				snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+				require.NoError(t, c.SetSnapshot(id, snap))
+			} else {
+				_, cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+					Node: &core.Node{
+						Id: id,
+					},
+					TypeUrl:                rsrc.EndpointType,
+					ResourceNamesSubscribe: []string{clusterName},
+				}, stream.NewStreamState(false, make(map[string]string)))
+
+				defer cancel()
+			}
+		})
 	}
 }
 

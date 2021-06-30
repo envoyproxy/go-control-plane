@@ -22,7 +22,7 @@ type DeltaStream interface {
 }
 
 // StreamState will keep track of resource state per type on a stream.
-type StreamState struct {
+type StreamState struct { // nolint:golint,revive
 	// Indicates whether the original DeltaRequest was a wildcard LDS/RDS request.
 	Wildcard bool
 

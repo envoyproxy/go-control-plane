@@ -157,7 +157,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 	}()
 
 	// sends a response by serializing to protobuf Any
-	send := func(resp cache.Response, typeURL string) (string, error) {
+	send := func(resp cache.Response) (string, error) {
 		if resp == nil {
 			return "", errors.New("missing response")
 		}
@@ -194,7 +194,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
-			nonce, err := send(resp, resource.EndpointType)
+			nonce, err := send(resp)
 			if err != nil {
 				return err
 			}
@@ -204,7 +204,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
-			nonce, err := send(resp, resource.ClusterType)
+			nonce, err := send(resp)
 			if err != nil {
 				return err
 			}
@@ -214,7 +214,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
-			nonce, err := send(resp, resource.RouteType)
+			nonce, err := send(resp)
 			if err != nil {
 				return err
 			}
@@ -224,7 +224,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
-			nonce, err := send(resp, resource.ListenerType)
+			nonce, err := send(resp)
 			if err != nil {
 				return err
 			}
@@ -234,7 +234,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "secrets watch failed")
 			}
-			nonce, err := send(resp, resource.SecretType)
+			nonce, err := send(resp)
 			if err != nil {
 				return err
 			}
@@ -244,7 +244,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "runtimes watch failed")
 			}
-			nonce, err := send(resp, resource.RuntimeType)
+			nonce, err := send(resp)
 			if err != nil {
 				return err
 			}
@@ -255,12 +255,12 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 				if resp == errorResponse {
 					return status.Errorf(codes.Unavailable, "resource watch failed")
 				}
-				typeUrl := resp.GetRequest().TypeUrl
-				nonce, err := send(resp, typeUrl)
+				typeURL := resp.GetRequest().TypeUrl
+				nonce, err := send(resp)
 				if err != nil {
 					return err
 				}
-				values.nonces[typeUrl] = nonce
+				values.nonces[typeURL] = nonce
 			}
 
 		case req, more := <-reqCh:
@@ -348,13 +348,13 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					values.runtimeCancel = s.cache.CreateWatch(req, values.runtimes)
 				}
 			default:
-				typeUrl := req.TypeUrl
-				responseNonce, seen := values.nonces[typeUrl]
+				typeURL := req.TypeUrl
+				responseNonce, seen := values.nonces[typeURL]
 				if !seen || responseNonce == nonce {
-					if cancel, seen := values.cancellations[typeUrl]; seen && cancel != nil {
+					if cancel, seen := values.cancellations[typeURL]; seen && cancel != nil {
 						cancel()
 					}
-					values.cancellations[typeUrl] = s.cache.CreateWatch(req, values.responses)
+					values.cancellations[typeURL] = s.cache.CreateWatch(req, values.responses)
 				}
 			}
 		}

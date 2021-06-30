@@ -42,7 +42,7 @@ type LinearCache struct {
 	watches map[string]watches
 	// Set of watches for all resources in the collection
 	watchAll watches
-	// Continously incremented version
+	// Continuously incremented version.
 	version uint64
 	// Version prefix to be sent to the clients
 	versionPrefix string
@@ -141,7 +141,7 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 	cache.versionVector[name] = cache.version
 	cache.resources[name] = res
 
@@ -156,7 +156,7 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 	delete(cache.versionVector, name)
 	delete(cache.resources, name)
 
@@ -172,7 +172,7 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 
 	modified := map[string]struct{}{}
 	// Collect deleted resource names.

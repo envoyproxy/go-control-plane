@@ -52,9 +52,9 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, ou
 		out <- config.responses[req.TypeUrl][0]
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
 	} else {
-		config.watches += 1
+		config.watches++
 		return func() {
-			config.watches -= 1
+			config.watches--
 		}
 	}
 	return nil

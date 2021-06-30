@@ -37,6 +37,16 @@ type MuxCache struct {
 var _ Cache = &MuxCache{}
 
 func (mux *MuxCache) CreateWatch(request *Request, value chan Response) func() {
+	// Passing a Request by value to Classify triggers a govet copylocks
+	// error. This is because protobuf messages specifically embed
+	// a Mutex in order to trigger this check (i.e. not for actually
+	// locking fields).
+	//
+	// So in this specific case, it happens to be safe to copy the
+	// lock. Fixing this would require adding a new API to classify
+	// requests, and deprecating Classify.
+	//
+	// nolint:govet
 	key := mux.Classify(*request)
 	cache, exists := mux.Caches[key]
 	if !exists {
@@ -46,7 +56,7 @@ func (mux *MuxCache) CreateWatch(request *Request, value chan Response) func() {
 	return cache.CreateWatch(request, value)
 }
 
-func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
+func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
 	return nil, nil
 }
 

@@ -191,7 +191,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 		marshaledResources := make([]*any.Any, len(r.Resources))
 
 		for i, resource := range r.Resources {
-			maybeTtldResource, resourceType, err := r.maybeCreateTtlResource(resource)
+			maybeTtldResource, resourceType, err := r.maybeCreateTTLResource(resource)
 			if err != nil {
 				return nil, err
 			}
@@ -285,7 +285,7 @@ func (r *RawDeltaResponse) GetNextVersionMap() map[string]string {
 
 var deltaResourceTypeURL = "type.googleapis.com/" + proto.MessageName(&discovery.Resource{})
 
-func (r *RawResponse) maybeCreateTtlResource(resource types.ResourceWithTtl) (types.Resource, string, error) {
+func (r *RawResponse) maybeCreateTTLResource(resource types.ResourceWithTtl) (types.Resource, string, error) {
 	if resource.Ttl != nil {
 		wrappedResource := &discovery.Resource{
 			Name: GetResourceName(resource.Resource),

@@ -22,13 +22,7 @@ import (
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
 func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, snapshot Snapshot, log log.Logger) *RawDeltaResponse {
-	resp, err := createDeltaResponse(request, state, snapshot, log)
-	if err != nil {
-		if log != nil {
-			log.Errorf("Error creating delta response: %v", err)
-		}
-		return nil
-	}
+	resp := createDeltaResponse(request, state, snapshot, log)
 
 	// Only send a response if there were changes
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
@@ -42,7 +36,7 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.
 	return nil
 }
 
-func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
+func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot Snapshot, _ log.Logger) *RawDeltaResponse {
 	resources := snapshot.GetResources((req.TypeUrl))
 
 	// variables to build our response with
@@ -89,5 +83,5 @@ func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot S
 		RemovedResources:  toRemove,
 		NextVersionMap:    nextVersionMap,
 		SystemVersionInfo: snapshot.GetVersion(req.TypeUrl),
-	}, nil
+	}
 }
