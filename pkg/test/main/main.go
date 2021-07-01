@@ -152,7 +152,6 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	pprof_enabled = true
 	if pprof_enabled {
 		// turn on the block profiler
 		log.Println("turn on pprof block profiler")
