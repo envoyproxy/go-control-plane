@@ -15,13 +15,16 @@
 package cache
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
 
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 
+	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 const (
@@ -56,10 +59,56 @@ func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	}
 }
 
+type resourceInfo struct {
+	name    string
+	version string
+}
+
+func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []resourceInfo) {
+	t.Helper()
+	r := <-ch
+	if r.GetDeltaRequest().TypeUrl != testType {
+		t.Errorf("unexpected empty request type URL: %q", r.GetDeltaRequest().TypeUrl)
+	}
+	out, err := r.GetDeltaDiscoveryResponse()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Resources) != len(resources) {
+		t.Errorf("unexpected number of responses: got %d, want %d", len(out.Resources), len(resources))
+	}
+	for _, r := range resources {
+		found := false
+		for _, r1 := range out.Resources {
+			if r1.Name == r.name && r1.Version == r.version {
+				found = true
+				break
+			} else if r1.Name == r.name {
+				t.Errorf("unexpected version for resource %q: got %q, want %q", r.name, r1.Version, r.version)
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("resource with name %q not found in response", r.name)
+		}
+	}
+	if out.TypeUrl != testType {
+		t.Errorf("unexpected type URL: %q", out.TypeUrl)
+	}
+}
+
 func checkWatchCount(t *testing.T, c *LinearCache, name string, count int) {
 	t.Helper()
 	if i := c.NumWatches(name); i != count {
 		t.Errorf("unexpected number of watches for %q: got %d, want %d", name, i, count)
+	}
+}
+
+func checkDeltaWatchCount(t *testing.T, c *LinearCache, count int) {
+	t.Helper()
+	if i := c.NumDeltaWatches(); i != count {
+		t.Errorf("unexpected number of delta watches: got %d, want %d", i, count)
 	}
 }
 
@@ -69,6 +118,26 @@ func mustBlock(t *testing.T, w <-chan Response) {
 		t.Error("watch must block")
 	default:
 	}
+}
+
+func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
+	select {
+	case <-w:
+		t.Error("watch must block")
+	default:
+	}
+}
+
+func hashResource(t *testing.T, resource types.Resource) string {
+	marshaledResource, err := MarshalResource(resource)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v := HashResource(marshaledResource)
+	if v == "" {
+		t.Fatal(errors.New("failed to build resource version"))
+	}
+	return v
 }
 
 func TestLinearInitialResources(t *testing.T) {
@@ -317,4 +386,63 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 			})
 		}(i)
 	}
+}
+
+func TestLinearDeltaWildcard(t *testing.T) {
+	c := NewLinearCache(testType)
+	state := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
+	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	mustBlockDelta(t, w)
+	checkDeltaWatchCount(t, c, 1)
+
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hash := hashResource(t, a)
+	c.UpdateResource("a", a)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hash}})
+}
+
+func TestLinearDeltaExistingResources(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"b": "", "c": ""}} // watching b and c - not interested in a
+	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}})
+
+	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
+	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}})
+}
+
+func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": hashB}}
+	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}) // b is up to date and shouldn't be returned
+
+	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
+	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	mustBlockDelta(t, w)
+	checkDeltaWatchCount(t, c, 1)
+	b = &endpoint.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: 10}}} // new version of b
+	hashB = hashResource(t, b)
+	c.UpdateResource("b", b)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}})
 }

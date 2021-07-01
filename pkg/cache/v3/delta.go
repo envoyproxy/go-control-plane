@@ -20,8 +20,16 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
+type ResourceContainer interface {
+	GetResources(typeURL string) map[string]types.Resource
+
+	GetVersionMap() map[string]map[string]string
+
+	GetVersion(typeURL string) string
+}
+
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
-func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, snapshot Snapshot, log log.Logger) *RawDeltaResponse {
+func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, snapshot ResourceContainer, log log.Logger) *RawDeltaResponse {
 	resp, err := createDeltaResponse(request, state, snapshot, log)
 	if err != nil {
 		if log != nil {
@@ -42,7 +50,7 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.
 	return nil
 }
 
-func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
+func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot ResourceContainer, log log.Logger) (*RawDeltaResponse, error) {
 	resources := snapshot.GetResources((req.TypeUrl))
 
 	// variables to build our response with

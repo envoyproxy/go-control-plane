@@ -226,7 +226,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 				watch.Request,
 				watch.Response,
 				watch.StreamState,
-				snapshot,
+				&snapshot,
 				cache.log,
 			)
 			// If we detect a nil response here, that means there has been no state change
@@ -421,7 +421,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
 			delayedResponse = true
 		}
-		delayedResponse = respondDelta(request, value, state, snapshot, cache.log) == nil
+		delayedResponse = respondDelta(request, value, state, &snapshot, cache.log) == nil
 	}
 
 	if delayedResponse {
