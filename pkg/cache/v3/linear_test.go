@@ -64,7 +64,7 @@ type resourceInfo struct {
 	version string
 }
 
-func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []resourceInfo) {
+func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []resourceInfo, deleted []string) {
 	t.Helper()
 	r := <-ch
 	if r.GetDeltaRequest().TypeUrl != testType {
@@ -95,6 +95,21 @@ func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []reso
 	}
 	if out.TypeUrl != testType {
 		t.Errorf("unexpected type URL: %q", out.TypeUrl)
+	}
+	if len(out.RemovedResources) != len(deleted) {
+		t.Errorf("unexpected number of removed resurces: got %d, want %d", len(out.RemovedResources), len(deleted))
+	}
+	for _, r := range deleted {
+		found := false
+		for _, rr := range out.RemovedResources {
+			if r == rr {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected resource %s to be deleted", r)
+		}
 	}
 }
 
@@ -390,16 +405,20 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 
 func TestLinearDeltaWildcard(t *testing.T) {
 	c := NewLinearCache(testType)
-	state := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
-	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
-	mustBlockDelta(t, w)
-	checkDeltaWatchCount(t, c, 1)
+	state1 := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
+	w1, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state1)
+	mustBlockDelta(t, w1)
+	state2 := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
+	w2, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state2)
+	mustBlockDelta(t, w1)
+	checkDeltaWatchCount(t, c, 2)
 
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hash := hashResource(t, a)
 	c.UpdateResource("a", a)
 	checkDeltaWatchCount(t, c, 0)
-	verifyDeltaResponse(t, w, []resourceInfo{{"a", hash}})
+	verifyDeltaResponse(t, w1, []resourceInfo{{"a", hash}}, nil)
+	verifyDeltaResponse(t, w2, []resourceInfo{{"a", hash}}, nil)
 }
 
 func TestLinearDeltaExistingResources(t *testing.T) {
@@ -414,12 +433,12 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"b": "", "c": ""}} // watching b and c - not interested in a
 	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
 	checkDeltaWatchCount(t, c, 0)
-	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}})
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, []string{"c"})
 
 	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
 	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
 	checkDeltaWatchCount(t, c, 0)
-	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}})
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
 }
 
 func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
@@ -434,7 +453,7 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": hashB}}
 	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
 	checkDeltaWatchCount(t, c, 0)
-	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}) // b is up to date and shouldn't be returned
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil) // b is up to date and shouldn't be returned
 
 	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
 	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
@@ -444,5 +463,59 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	hashB = hashResource(t, b)
 	c.UpdateResource("b", b)
 	checkDeltaWatchCount(t, c, 0)
-	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}})
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, nil)
+}
+
+func TestLinearDeltaResourceUpdate(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
+	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
+
+	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
+	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	mustBlockDelta(t, w)
+	checkDeltaWatchCount(t, c, 1)
+
+	a = &endpoint.ClusterLoadAssignment{ClusterName: "a", Endpoints: []*endpoint.LocalityLbEndpoints{ //resource update
+		{Priority: 10},
+	}}
+	hashA = hashResource(t, a)
+	c.UpdateResource("a", a)
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil)
+}
+
+func TestLinearDeltaResourceDelete(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
+	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
+
+	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
+	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	mustBlockDelta(t, w)
+	checkDeltaWatchCount(t, c, 1)
+
+	a = &endpoint.ClusterLoadAssignment{ClusterName: "a", Endpoints: []*endpoint.LocalityLbEndpoints{ //resource update
+		{Priority: 10},
+	}}
+	hashA = hashResource(t, a)
+	c.SetResources(map[string]types.Resource{"a": a})
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, []string{"b"})
 }

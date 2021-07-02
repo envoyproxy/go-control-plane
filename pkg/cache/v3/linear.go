@@ -363,6 +363,11 @@ func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {
 
 		cache.versionMap[GetResourceName(r)] = v
 	}
+	for name := range modified {
+		if r, ok := cache.resources[name]; !ok {
+			delete(cache.versionMap, GetResourceName(r))
+		}
+	}
 	return nil
 }
 
