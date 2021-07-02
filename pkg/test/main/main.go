@@ -59,7 +59,7 @@ var (
 
 	nodeID string
 
-	pprof_enabled bool
+	pprofEnabled bool
 )
 
 func init() {
@@ -143,7 +143,7 @@ func init() {
 	//
 
 	// Enable use of the pprof profiler
-	flag.BoolVar(&pprof_enabled, "pprof", false, "Enable use of the pprof profiler")
+	flag.BoolVar(&pprofEnabled, "pprof", false, "Enable use of the pprof profiler")
 
 }
 
@@ -152,7 +152,7 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	if pprof_enabled {
+	if pprofEnabled {
 		// turn on the block profiler
 		log.Println("turn on pprof block profiler")
 		runtime.SetBlockProfileRate(1)
@@ -274,8 +274,7 @@ func main() {
 		}
 	}
 
-	if pprof_enabled {
-
+	if pprofEnabled {
 		for _, prof := range []string{"block", "goroutine", "mutex"} {
 			p := pprof.Lookup(prof)
 			filePath := fmt.Sprintf("%s_profile_%s.pb.gz", prof, mode)

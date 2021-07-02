@@ -48,5 +48,7 @@ it on with the command line option `--pprof`. There is an environment variable
 
     (export PPROF=true; make integration.xds)
 
-The test will then write files of the form `block_profile_xds.pb.gz`. 
+The test will then write files of the form `block_profile_xds.pb.gz`. The files
+get written to the root of the project, in the same place as the envoy logs.
+
 You can use `go tool pprof bin/test <file name>` to analyze the profile data. 
