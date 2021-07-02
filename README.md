@@ -1,6 +1,6 @@
 # control-plane
 
-[![CircleCI](https://circleci.com/gh/envoyproxy/go-control-plane.svg?style=svg)](https://circleci.com/gh/envoyproxy/go-control-plane)
+![example workflow](https://github.com/envoyproxy/go-control-plane/actions/workflows/ci.yaml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
 [![GoDoc](https://godoc.org/github.com/envoyproxy/go-control-plane?status.svg)](https://godoc.org/github.com/envoyproxy/go-control-plane)
 
@@ -63,7 +63,7 @@ The Envoy xDS APIs follow a well defined [versioning scheme](https://www.envoypr
 
 `V2` control-plane code has been removed and will no longer be supported. For previous conversations on support for various xDS versions, see here: 
 - [here](https://docs.google.com/document/d/1ZkHpz6DwEUmAlG0kb2Mgu4iaeQC2Bbb0egMbECoNNKY/edit?ts=5e602993#heading=h.15nsmgmjaaml) 
-- [here](https://envoyproxy.slack.com/archives/C7LDJTM6Z/p1582925082005300),
+- [here](https://envoyproxy.slack.com/archives/C7LDJTM6Z/p1582925082005300)
 
 *Note*: It is recommended to use a previous SHA if there is still a need for `V2`.
 
