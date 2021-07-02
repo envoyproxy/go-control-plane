@@ -162,42 +162,42 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				// Since there was no previous state, we know we're handling the first request of this type
 				// so we set the initial resource versions if we have any, and also signal if this stream is in wildcard mode.
 				watch.state = stream.NewStreamState(len(req.GetResourceNamesSubscribe()) == 0, req.GetInitialResourceVersions())
-
+			} else {
 				// We must signal goroutine termination to prevent a race between the cancel closing the watch
 				// and the producer closing the watch.
 				watch.Cancel()
-
-				s.subscribe(req.GetResourceNamesSubscribe(), watch.state.ResourceVersions)
-				s.unsubscribe(req.GetResourceNamesUnsubscribe(), watch.state.ResourceVersions)
-
-				watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, watch.state)
-
-				// Go does not allow for selecting over a dynamic set of channels
-				// so we introduce a termination chan to handle cancelling any watches.
-				terminate := make(chan struct{})
-				watch.termination = terminate
-				watches.deltaWatches[typeURL] = watch
-				go func() {
-					select {
-					case resp, more := <-watch.responses:
-						if more {
-							watches.deltaMuxedResponses <- resp
-						} else {
-							// Check again if the watch is cancelled.
-							select {
-							case <-terminate: // do nothing
-							default:
-								// We cannot close the responses channel since it can be closed twice.
-								// Instead we send a fake error response.
-								watches.deltaMuxedResponses <- deltaErrorResponse
-							}
-						}
-						break
-					case <-terminate:
-						break
-					}
-				}()
 			}
+
+			s.subscribe(req.GetResourceNamesSubscribe(), watch.state.ResourceVersions)
+			s.unsubscribe(req.GetResourceNamesUnsubscribe(), watch.state.ResourceVersions)
+
+			watch.responses, watch.cancel = s.cache.CreateDeltaWatch(req, watch.state)
+
+			// Go does not allow for selecting over a dynamic set of channels
+			// so we introduce a termination chan to handle cancelling any watches.
+			terminate := make(chan struct{})
+			watch.termination = terminate
+			watches.deltaWatches[typeURL] = watch
+			go func() {
+				select {
+				case resp, more := <-watch.responses:
+					if more {
+						watches.deltaMuxedResponses <- resp
+					} else {
+						// Check again if the watch is cancelled.
+						select {
+						case <-terminate: // do nothing
+						default:
+							// We cannot close the responses channel since it can be closed twice.
+							// Instead we send a fake error response.
+							watches.deltaMuxedResponses <- deltaErrorResponse
+						}
+					}
+					break
+				case <-terminate:
+					break
+				}
+			}()
 		}
 	}
 }
