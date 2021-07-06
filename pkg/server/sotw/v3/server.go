@@ -143,14 +143,47 @@ func (values *watches) Cancel() {
 	}
 }
 
-// process handles a bi-di stream request
-func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
-	// increment stream count
-	streamID := atomic.AddInt64(&s.streamCount, 1)
+type streamWrapper struct {
+	stream    Stream
+	id        int64
+	callbacks Callbacks
 
 	// unique nonce generator for req-resp pairs per xDS stream; the server
 	// ignores stale nonces. nonce is only modified within send() function.
-	var streamNonce int64
+	nonce int64
+}
+
+func (sw *streamWrapper) nextNonce() string {
+	// increment nonce
+	sw.nonce += 1
+	return strconv.FormatInt(sw.nonce, 10)
+}
+
+// sends a response by serializing to protobuf Any
+func (sw *streamWrapper) send(resp cache.Response) (string, error) {
+	if resp == nil {
+		return "", errors.New("missing response")
+	}
+
+	out, err := resp.GetDiscoveryResponse()
+	if err != nil {
+		return "", err
+	}
+
+	out.Nonce = sw.nextNonce()
+	if sw.callbacks != nil {
+		sw.callbacks.OnStreamResponse(sw.id, resp.GetRequest(), out)
+	}
+	return out.Nonce, sw.stream.Send(out)
+}
+
+// process handles a bi-di stream request
+func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+	sw := streamWrapper{
+		stream:    stream,
+		id:        atomic.AddInt64(&s.streamCount, 1), // increment stream count
+		callbacks: s.callbacks,
+	}
 
 	// a collection of stack allocated watches per request type
 	var values watches
@@ -158,32 +191,12 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 	defer func() {
 		values.Cancel()
 		if s.callbacks != nil {
-			s.callbacks.OnStreamClosed(streamID)
+			s.callbacks.OnStreamClosed(sw.id)
 		}
 	}()
 
-	// sends a response by serializing to protobuf Any
-	send := func(resp cache.Response, typeURL string) (string, error) {
-		if resp == nil {
-			return "", errors.New("missing response")
-		}
-
-		out, err := resp.GetDiscoveryResponse()
-		if err != nil {
-			return "", err
-		}
-
-		// increment nonce
-		streamNonce = streamNonce + 1
-		out.Nonce = strconv.FormatInt(streamNonce, 10)
-		if s.callbacks != nil {
-			s.callbacks.OnStreamResponse(streamID, resp.GetRequest(), out)
-		}
-		return out.Nonce, stream.Send(out)
-	}
-
 	if s.callbacks != nil {
-		if err := s.callbacks.OnStreamOpen(stream.Context(), streamID, defaultTypeURL); err != nil {
+		if err := s.callbacks.OnStreamOpen(stream.Context(), sw.id, defaultTypeURL); err != nil {
 			return err
 		}
 	}
@@ -200,7 +213,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "endpoints watch failed")
 			}
-			nonce, err := send(resp, resource.EndpointType)
+			nonce, err := sw.send(resp)
 			if err != nil {
 				return err
 			}
@@ -210,7 +223,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "clusters watch failed")
 			}
-			nonce, err := send(resp, resource.ClusterType)
+			nonce, err := sw.send(resp)
 			if err != nil {
 				return err
 			}
@@ -220,7 +233,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "routes watch failed")
 			}
-			nonce, err := send(resp, resource.RouteType)
+			nonce, err := sw.send(resp)
 			if err != nil {
 				return err
 			}
@@ -230,7 +243,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "listeners watch failed")
 			}
-			nonce, err := send(resp, resource.ListenerType)
+			nonce, err := sw.send(resp)
 			if err != nil {
 				return err
 			}
@@ -240,7 +253,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "secrets watch failed")
 			}
-			nonce, err := send(resp, resource.SecretType)
+			nonce, err := sw.send(resp)
 			if err != nil {
 				return err
 			}
@@ -250,7 +263,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "runtimes watch failed")
 			}
-			nonce, err := send(resp, resource.RuntimeType)
+			nonce, err := sw.send(resp)
 			if err != nil {
 				return err
 			}
@@ -260,7 +273,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			if !more {
 				return status.Errorf(codes.Unavailable, "extensionConfigs watch failed")
 			}
-			nonce, err := send(resp, resource.ExtensionConfigType)
+			nonce, err := sw.send(resp)
 			if err != nil {
 				return err
 			}
@@ -272,7 +285,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					return status.Errorf(codes.Unavailable, "resource watch failed")
 				}
 				typeUrl := resp.GetRequest().TypeUrl
-				nonce, err := send(resp, typeUrl)
+				nonce, err := sw.send(resp)
 				if err != nil {
 					return err
 				}
@@ -308,7 +321,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			}
 
 			if s.callbacks != nil {
-				if err := s.callbacks.OnStreamRequest(streamID, req); err != nil {
+				if err := s.callbacks.OnStreamRequest(sw.id, req); err != nil {
 					return err
 				}
 			}
