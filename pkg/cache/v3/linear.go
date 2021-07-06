@@ -276,8 +276,8 @@ func (cache *LinearCache) CreateWatch(request *Request, value chan Response) fun
 	}
 }
 
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
-	return nil, nil
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
+	return nil
 }
 
 func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response, error) {
