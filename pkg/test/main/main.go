@@ -153,21 +153,12 @@ func main() {
 	ctx := context.Background()
 
 	if pprofEnabled {
-		// turn on the block profiler
-		log.Println("turn on pprof block profiler")
 		runtime.SetBlockProfileRate(1)
-		if pprof.Lookup("block") == nil {
-			pprof.NewProfile("block")
-		}
-
-		log.Println("turn on pprof goroutine profiler")
-		if pprof.Lookup("goroutine") == nil {
-			pprof.NewProfile("goroutine")
-		}
-
-		log.Println("turn on pprof mutex profiler")
-		if pprof.Lookup("mutex") == nil {
-			pprof.NewProfile("mutex")
+		for _, prof := range []string{"block", "goroutine", "mutex"} {
+			log.Printf("turn on pprof %s profiler", prof)
+			if pprof.Lookup(prof) == nil {
+				pprof.NewProfile(prof)
+			}
 		}
 	}
 
