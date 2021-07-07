@@ -24,6 +24,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -56,6 +58,8 @@ var (
 	mux           bool
 
 	nodeID string
+
+	pprofEnabled bool
 )
 
 func init() {
@@ -133,12 +137,30 @@ func init() {
 
 	// Enable a muxed cache with partial snapshots
 	flag.BoolVar(&mux, "mux", false, "Enable muxed linear cache for EDS")
+
+	//
+	// These parameters control the the use of the pprof profiler
+	//
+
+	// Enable use of the pprof profiler
+	flag.BoolVar(&pprofEnabled, "pprof", false, "Enable use of the pprof profiler")
+
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+
+	if pprofEnabled {
+		runtime.SetBlockProfileRate(1)
+		for _, prof := range []string{"block", "goroutine", "mutex"} {
+			log.Printf("turn on pprof %s profiler", prof)
+			if pprof.Lookup(prof) == nil {
+				pprof.NewProfile(prof)
+			}
+		}
+	}
 
 	// create a cache
 	signal := make(chan struct{})
@@ -240,6 +262,20 @@ func main() {
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
 			os.Exit(1)
+		}
+	}
+
+	if pprofEnabled {
+		for _, prof := range []string{"block", "goroutine", "mutex"} {
+			p := pprof.Lookup(prof)
+			filePath := fmt.Sprintf("%s_profile_%s.pb.gz", prof, mode)
+			log.Printf("storing %s profile for %s in %s", prof, mode, filePath)
+			f, err := os.Create(filePath)
+			if err != nil {
+				log.Fatalf("could not create %s profile %s: %s", prof, filePath, err)
+			}
+			p.WriteTo(f, 1)
+			f.Close()
 		}
 	}
 
