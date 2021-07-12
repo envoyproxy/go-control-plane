@@ -82,6 +82,8 @@ func (m *ExtAuthz) Validate() error {
 		}
 	}
 
+	// no validation rules for BootstrapMetadataLabelsKey
+
 	return nil
 }
 
