@@ -144,6 +144,16 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetSchemeHeaderTransformation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "SchemeHeaderTransformation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if wrapper := m.GetMaxRequestHeadersKb(); wrapper != nil {
 
 		if val := wrapper.GetValue(); val <= 0 || val > 8192 {

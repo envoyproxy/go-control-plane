@@ -67,6 +67,8 @@ func (m *JwtProvider) Validate() error {
 		}
 	}
 
+	// no validation rules for PadForwardPayloadHeader
+
 	// no validation rules for PayloadInMetadata
 
 	// no validation rules for ClockSkewSeconds

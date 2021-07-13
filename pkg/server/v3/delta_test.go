@@ -19,11 +19,8 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 )
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state stream.StreamState) (chan cache.DeltaResponse, func()) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state stream.StreamState, out chan cache.DeltaResponse) func() {
 	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
-
-	// Create our out watch channel to return with a buffer of one
-	out := make(chan cache.DeltaResponse, 1)
 
 	if len(config.deltaResponses[req.TypeUrl]) > 0 {
 		res := config.deltaResponses[req.TypeUrl][0]
@@ -63,17 +60,14 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			SystemVersionInfo: "",
 			NextVersionMap:    state.ResourceVersions,
 		}
-	} else if config.closeWatch {
-		close(out)
 	} else {
 		config.deltaWatches += 1
-		return out, func() {
-			close(out)
+		return func() {
 			config.deltaWatches -= 1
 		}
 	}
 
-	return out, nil
+	return nil
 }
 
 type mockDeltaStream struct {
@@ -280,28 +274,6 @@ func TestDeltaResponseHandlers(t *testing.T) {
 			case <-time.After(1 * time.Second):
 				t.Fatalf("got no response")
 			}
-		})
-	}
-}
-
-func TestDeltaWatchClosed(t *testing.T) {
-	for _, typ := range testTypes {
-		t.Run(typ, func(t *testing.T) {
-			config := makeMockConfigWatcher()
-			config.closeWatch = true
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
-
-			resp := makeMockDeltaStream(t)
-			resp.recv <- &discovery.DeltaDiscoveryRequest{
-				Node:    node,
-				TypeUrl: typ,
-			}
-
-			// Verify that the response fails when the watch is closed
-			err := s.DeltaAggregatedResources(resp)
-			assert.Error(t, err)
-
-			close(resp.recv)
 		})
 	}
 }

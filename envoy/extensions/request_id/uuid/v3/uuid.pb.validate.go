@@ -51,6 +51,16 @@ func (m *UuidRequestIdConfig) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetUseRequestIdForTraceSampling()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UuidRequestIdConfigValidationError{
+				field:  "UseRequestIdForTraceSampling",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

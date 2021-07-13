@@ -1077,6 +1077,74 @@ func (x *Http3ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wra
 	return nil
 }
 
+// A message to control transformations to the :scheme header
+type SchemeHeaderTransformation struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Transformation:
+	//	*SchemeHeaderTransformation_SchemeToOverwrite
+	Transformation isSchemeHeaderTransformation_Transformation `protobuf_oneof:"transformation"`
+}
+
+func (x *SchemeHeaderTransformation) Reset() {
+	*x = SchemeHeaderTransformation{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SchemeHeaderTransformation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SchemeHeaderTransformation) ProtoMessage() {}
+
+func (x *SchemeHeaderTransformation) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SchemeHeaderTransformation.ProtoReflect.Descriptor instead.
+func (*SchemeHeaderTransformation) Descriptor() ([]byte, []int) {
+	return file_envoy_config_core_v4alpha_protocol_proto_rawDescGZIP(), []int{10}
+}
+
+func (m *SchemeHeaderTransformation) GetTransformation() isSchemeHeaderTransformation_Transformation {
+	if m != nil {
+		return m.Transformation
+	}
+	return nil
+}
+
+func (x *SchemeHeaderTransformation) GetSchemeToOverwrite() string {
+	if x, ok := x.GetTransformation().(*SchemeHeaderTransformation_SchemeToOverwrite); ok {
+		return x.SchemeToOverwrite
+	}
+	return ""
+}
+
+type isSchemeHeaderTransformation_Transformation interface {
+	isSchemeHeaderTransformation_Transformation()
+}
+
+type SchemeHeaderTransformation_SchemeToOverwrite struct {
+	// Overwrite any Scheme header with the contents of this string.
+	SchemeToOverwrite string `protobuf:"bytes,1,opt,name=scheme_to_overwrite,json=schemeToOverwrite,proto3,oneof"`
+}
+
+func (*SchemeHeaderTransformation_SchemeToOverwrite) isSchemeHeaderTransformation_Transformation() {}
+
 // [#next-free-field: 9]
 type Http1ProtocolOptions_HeaderKeyFormat struct {
 	state         protoimpl.MessageState
@@ -1092,7 +1160,7 @@ type Http1ProtocolOptions_HeaderKeyFormat struct {
 func (x *Http1ProtocolOptions_HeaderKeyFormat) Reset() {
 	*x = Http1ProtocolOptions_HeaderKeyFormat{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[10]
+		mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1105,7 +1173,7 @@ func (x *Http1ProtocolOptions_HeaderKeyFormat) String() string {
 func (*Http1ProtocolOptions_HeaderKeyFormat) ProtoMessage() {}
 
 func (x *Http1ProtocolOptions_HeaderKeyFormat) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[10]
+	mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1177,7 +1245,7 @@ type Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords struct {
 func (x *Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords) Reset() {
 	*x = Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[11]
+		mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1190,7 +1258,7 @@ func (x *Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords) String() string {
 func (*Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords) ProtoMessage() {}
 
 func (x *Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[11]
+	mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1222,7 +1290,7 @@ type Http2ProtocolOptions_SettingsParameter struct {
 func (x *Http2ProtocolOptions_SettingsParameter) Reset() {
 	*x = Http2ProtocolOptions_SettingsParameter{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[12]
+		mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1235,7 +1303,7 @@ func (x *Http2ProtocolOptions_SettingsParameter) String() string {
 func (*Http2ProtocolOptions_SettingsParameter) ProtoMessage() {}
 
 func (x *Http2ProtocolOptions_SettingsParameter) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[12]
+	mi := &file_envoy_config_core_v4alpha_protocol_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1608,12 +1676,23 @@ var file_envoy_config_core_v4alpha_protocol_proto_rawDesc = []byte{
 	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x3a, 0x30, 0x9a, 0xc5, 0x88, 0x1e, 0x2b, 0x0a, 0x29, 0x65,
 	0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65,
 	0x2e, 0x76, 0x33, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x33, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
-	0x6c, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x42, 0x42, 0x0a, 0x27, 0x69, 0x6f, 0x2e, 0x65,
-	0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e,
-	0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x34, 0x61, 0x6c,
-	0x70, 0x68, 0x61, 0x42, 0x0d, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x50, 0x72, 0x6f,
-	0x74, 0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x03, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x6c, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0xac, 0x01, 0x0a, 0x1a, 0x53, 0x63, 0x68,
+	0x65, 0x6d, 0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x6f,
+	0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x44, 0x0a, 0x13, 0x73, 0x63, 0x68, 0x65, 0x6d,
+	0x65, 0x5f, 0x74, 0x6f, 0x5f, 0x6f, 0x76, 0x65, 0x72, 0x77, 0x72, 0x69, 0x74, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x42, 0x12, 0xfa, 0x42, 0x0f, 0x72, 0x0d, 0x52, 0x04, 0x68, 0x74, 0x74,
+	0x70, 0x52, 0x05, 0x68, 0x74, 0x74, 0x70, 0x73, 0x48, 0x00, 0x52, 0x11, 0x73, 0x63, 0x68, 0x65,
+	0x6d, 0x65, 0x54, 0x6f, 0x4f, 0x76, 0x65, 0x72, 0x77, 0x72, 0x69, 0x74, 0x65, 0x3a, 0x36, 0x9a,
+	0xc5, 0x88, 0x1e, 0x31, 0x0a, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x33, 0x2e, 0x53, 0x63, 0x68, 0x65, 0x6d,
+	0x65, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x6f, 0x72, 0x6d,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x10, 0x0a, 0x0e, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x6f,
+	0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x42, 0x0a, 0x27, 0x69, 0x6f, 0x2e, 0x65, 0x6e,
+	0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63,
+	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x34, 0x61, 0x6c, 0x70,
+	0x68, 0x61, 0x42, 0x0d, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x03, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1629,7 +1708,7 @@ func file_envoy_config_core_v4alpha_protocol_proto_rawDescGZIP() []byte {
 }
 
 var file_envoy_config_core_v4alpha_protocol_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_config_core_v4alpha_protocol_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_envoy_config_core_v4alpha_protocol_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_envoy_config_core_v4alpha_protocol_proto_goTypes = []interface{}{
 	(HttpProtocolOptions_HeadersWithUnderscoresAction)(0),        // 0: envoy.config.core.v4alpha.HttpProtocolOptions.HeadersWithUnderscoresAction
 	(*TcpProtocolOptions)(nil),                                   // 1: envoy.config.core.v4alpha.TcpProtocolOptions
@@ -1642,51 +1721,52 @@ var file_envoy_config_core_v4alpha_protocol_proto_goTypes = []interface{}{
 	(*Http2ProtocolOptions)(nil),                                 // 8: envoy.config.core.v4alpha.Http2ProtocolOptions
 	(*GrpcProtocolOptions)(nil),                                  // 9: envoy.config.core.v4alpha.GrpcProtocolOptions
 	(*Http3ProtocolOptions)(nil),                                 // 10: envoy.config.core.v4alpha.Http3ProtocolOptions
-	(*Http1ProtocolOptions_HeaderKeyFormat)(nil),                 // 11: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat
-	(*Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords)(nil), // 12: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
-	(*Http2ProtocolOptions_SettingsParameter)(nil),               // 13: envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter
-	(*wrappers.UInt32Value)(nil),                                 // 14: google.protobuf.UInt32Value
-	(*duration.Duration)(nil),                                    // 15: google.protobuf.Duration
-	(*wrappers.BoolValue)(nil),                                   // 16: google.protobuf.BoolValue
-	(*v3.Percent)(nil),                                           // 17: envoy.type.v3.Percent
-	(*TypedExtensionConfig)(nil),                                 // 18: envoy.config.core.v4alpha.TypedExtensionConfig
+	(*SchemeHeaderTransformation)(nil),                           // 11: envoy.config.core.v4alpha.SchemeHeaderTransformation
+	(*Http1ProtocolOptions_HeaderKeyFormat)(nil),                 // 12: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat
+	(*Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords)(nil), // 13: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
+	(*Http2ProtocolOptions_SettingsParameter)(nil),               // 14: envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter
+	(*wrappers.UInt32Value)(nil),                                 // 15: google.protobuf.UInt32Value
+	(*duration.Duration)(nil),                                    // 16: google.protobuf.Duration
+	(*wrappers.BoolValue)(nil),                                   // 17: google.protobuf.BoolValue
+	(*v3.Percent)(nil),                                           // 18: envoy.type.v3.Percent
+	(*TypedExtensionConfig)(nil),                                 // 19: envoy.config.core.v4alpha.TypedExtensionConfig
 }
 var file_envoy_config_core_v4alpha_protocol_proto_depIdxs = []int32{
-	14, // 0: envoy.config.core.v4alpha.QuicProtocolOptions.max_concurrent_streams:type_name -> google.protobuf.UInt32Value
-	14, // 1: envoy.config.core.v4alpha.QuicProtocolOptions.initial_stream_window_size:type_name -> google.protobuf.UInt32Value
-	14, // 2: envoy.config.core.v4alpha.QuicProtocolOptions.initial_connection_window_size:type_name -> google.protobuf.UInt32Value
-	14, // 3: envoy.config.core.v4alpha.AlternateProtocolsCacheOptions.max_entries:type_name -> google.protobuf.UInt32Value
-	15, // 4: envoy.config.core.v4alpha.HttpProtocolOptions.idle_timeout:type_name -> google.protobuf.Duration
-	15, // 5: envoy.config.core.v4alpha.HttpProtocolOptions.max_connection_duration:type_name -> google.protobuf.Duration
-	14, // 6: envoy.config.core.v4alpha.HttpProtocolOptions.max_headers_count:type_name -> google.protobuf.UInt32Value
-	15, // 7: envoy.config.core.v4alpha.HttpProtocolOptions.max_stream_duration:type_name -> google.protobuf.Duration
+	15, // 0: envoy.config.core.v4alpha.QuicProtocolOptions.max_concurrent_streams:type_name -> google.protobuf.UInt32Value
+	15, // 1: envoy.config.core.v4alpha.QuicProtocolOptions.initial_stream_window_size:type_name -> google.protobuf.UInt32Value
+	15, // 2: envoy.config.core.v4alpha.QuicProtocolOptions.initial_connection_window_size:type_name -> google.protobuf.UInt32Value
+	15, // 3: envoy.config.core.v4alpha.AlternateProtocolsCacheOptions.max_entries:type_name -> google.protobuf.UInt32Value
+	16, // 4: envoy.config.core.v4alpha.HttpProtocolOptions.idle_timeout:type_name -> google.protobuf.Duration
+	16, // 5: envoy.config.core.v4alpha.HttpProtocolOptions.max_connection_duration:type_name -> google.protobuf.Duration
+	15, // 6: envoy.config.core.v4alpha.HttpProtocolOptions.max_headers_count:type_name -> google.protobuf.UInt32Value
+	16, // 7: envoy.config.core.v4alpha.HttpProtocolOptions.max_stream_duration:type_name -> google.protobuf.Duration
 	0,  // 8: envoy.config.core.v4alpha.HttpProtocolOptions.headers_with_underscores_action:type_name -> envoy.config.core.v4alpha.HttpProtocolOptions.HeadersWithUnderscoresAction
-	16, // 9: envoy.config.core.v4alpha.Http1ProtocolOptions.allow_absolute_url:type_name -> google.protobuf.BoolValue
-	11, // 10: envoy.config.core.v4alpha.Http1ProtocolOptions.header_key_format:type_name -> envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat
-	16, // 11: envoy.config.core.v4alpha.Http1ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	15, // 12: envoy.config.core.v4alpha.KeepaliveSettings.interval:type_name -> google.protobuf.Duration
-	15, // 13: envoy.config.core.v4alpha.KeepaliveSettings.timeout:type_name -> google.protobuf.Duration
-	17, // 14: envoy.config.core.v4alpha.KeepaliveSettings.interval_jitter:type_name -> envoy.type.v3.Percent
-	15, // 15: envoy.config.core.v4alpha.KeepaliveSettings.connection_idle_interval:type_name -> google.protobuf.Duration
-	14, // 16: envoy.config.core.v4alpha.Http2ProtocolOptions.hpack_table_size:type_name -> google.protobuf.UInt32Value
-	14, // 17: envoy.config.core.v4alpha.Http2ProtocolOptions.max_concurrent_streams:type_name -> google.protobuf.UInt32Value
-	14, // 18: envoy.config.core.v4alpha.Http2ProtocolOptions.initial_stream_window_size:type_name -> google.protobuf.UInt32Value
-	14, // 19: envoy.config.core.v4alpha.Http2ProtocolOptions.initial_connection_window_size:type_name -> google.protobuf.UInt32Value
-	14, // 20: envoy.config.core.v4alpha.Http2ProtocolOptions.max_outbound_frames:type_name -> google.protobuf.UInt32Value
-	14, // 21: envoy.config.core.v4alpha.Http2ProtocolOptions.max_outbound_control_frames:type_name -> google.protobuf.UInt32Value
-	14, // 22: envoy.config.core.v4alpha.Http2ProtocolOptions.max_consecutive_inbound_frames_with_empty_payload:type_name -> google.protobuf.UInt32Value
-	14, // 23: envoy.config.core.v4alpha.Http2ProtocolOptions.max_inbound_priority_frames_per_stream:type_name -> google.protobuf.UInt32Value
-	14, // 24: envoy.config.core.v4alpha.Http2ProtocolOptions.max_inbound_window_update_frames_per_data_frame_sent:type_name -> google.protobuf.UInt32Value
-	16, // 25: envoy.config.core.v4alpha.Http2ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	13, // 26: envoy.config.core.v4alpha.Http2ProtocolOptions.custom_settings_parameters:type_name -> envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter
+	17, // 9: envoy.config.core.v4alpha.Http1ProtocolOptions.allow_absolute_url:type_name -> google.protobuf.BoolValue
+	12, // 10: envoy.config.core.v4alpha.Http1ProtocolOptions.header_key_format:type_name -> envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat
+	17, // 11: envoy.config.core.v4alpha.Http1ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	16, // 12: envoy.config.core.v4alpha.KeepaliveSettings.interval:type_name -> google.protobuf.Duration
+	16, // 13: envoy.config.core.v4alpha.KeepaliveSettings.timeout:type_name -> google.protobuf.Duration
+	18, // 14: envoy.config.core.v4alpha.KeepaliveSettings.interval_jitter:type_name -> envoy.type.v3.Percent
+	16, // 15: envoy.config.core.v4alpha.KeepaliveSettings.connection_idle_interval:type_name -> google.protobuf.Duration
+	15, // 16: envoy.config.core.v4alpha.Http2ProtocolOptions.hpack_table_size:type_name -> google.protobuf.UInt32Value
+	15, // 17: envoy.config.core.v4alpha.Http2ProtocolOptions.max_concurrent_streams:type_name -> google.protobuf.UInt32Value
+	15, // 18: envoy.config.core.v4alpha.Http2ProtocolOptions.initial_stream_window_size:type_name -> google.protobuf.UInt32Value
+	15, // 19: envoy.config.core.v4alpha.Http2ProtocolOptions.initial_connection_window_size:type_name -> google.protobuf.UInt32Value
+	15, // 20: envoy.config.core.v4alpha.Http2ProtocolOptions.max_outbound_frames:type_name -> google.protobuf.UInt32Value
+	15, // 21: envoy.config.core.v4alpha.Http2ProtocolOptions.max_outbound_control_frames:type_name -> google.protobuf.UInt32Value
+	15, // 22: envoy.config.core.v4alpha.Http2ProtocolOptions.max_consecutive_inbound_frames_with_empty_payload:type_name -> google.protobuf.UInt32Value
+	15, // 23: envoy.config.core.v4alpha.Http2ProtocolOptions.max_inbound_priority_frames_per_stream:type_name -> google.protobuf.UInt32Value
+	15, // 24: envoy.config.core.v4alpha.Http2ProtocolOptions.max_inbound_window_update_frames_per_data_frame_sent:type_name -> google.protobuf.UInt32Value
+	17, // 25: envoy.config.core.v4alpha.Http2ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	14, // 26: envoy.config.core.v4alpha.Http2ProtocolOptions.custom_settings_parameters:type_name -> envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter
 	7,  // 27: envoy.config.core.v4alpha.Http2ProtocolOptions.connection_keepalive:type_name -> envoy.config.core.v4alpha.KeepaliveSettings
 	8,  // 28: envoy.config.core.v4alpha.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v4alpha.Http2ProtocolOptions
 	2,  // 29: envoy.config.core.v4alpha.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v4alpha.QuicProtocolOptions
-	16, // 30: envoy.config.core.v4alpha.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	12, // 31: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
-	18, // 32: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v4alpha.TypedExtensionConfig
-	14, // 33: envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
-	14, // 34: envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
+	17, // 30: envoy.config.core.v4alpha.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	13, // 31: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
+	19, // 32: envoy.config.core.v4alpha.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v4alpha.TypedExtensionConfig
+	15, // 33: envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
+	15, // 34: envoy.config.core.v4alpha.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
 	35, // [35:35] is the sub-list for method output_type
 	35, // [35:35] is the sub-list for method input_type
 	35, // [35:35] is the sub-list for extension type_name
@@ -1822,7 +1902,7 @@ func file_envoy_config_core_v4alpha_protocol_proto_init() {
 			}
 		}
 		file_envoy_config_core_v4alpha_protocol_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Http1ProtocolOptions_HeaderKeyFormat); i {
+			switch v := v.(*SchemeHeaderTransformation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1834,7 +1914,7 @@ func file_envoy_config_core_v4alpha_protocol_proto_init() {
 			}
 		}
 		file_envoy_config_core_v4alpha_protocol_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords); i {
+			switch v := v.(*Http1ProtocolOptions_HeaderKeyFormat); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1846,6 +1926,18 @@ func file_envoy_config_core_v4alpha_protocol_proto_init() {
 			}
 		}
 		file_envoy_config_core_v4alpha_protocol_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_envoy_config_core_v4alpha_protocol_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Http2ProtocolOptions_SettingsParameter); i {
 			case 0:
 				return &v.state
@@ -1859,6 +1951,9 @@ func file_envoy_config_core_v4alpha_protocol_proto_init() {
 		}
 	}
 	file_envoy_config_core_v4alpha_protocol_proto_msgTypes[10].OneofWrappers = []interface{}{
+		(*SchemeHeaderTransformation_SchemeToOverwrite)(nil),
+	}
+	file_envoy_config_core_v4alpha_protocol_proto_msgTypes[11].OneofWrappers = []interface{}{
 		(*Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords_)(nil),
 		(*Http1ProtocolOptions_HeaderKeyFormat_StatefulFormatter)(nil),
 	}
@@ -1868,7 +1963,7 @@ func file_envoy_config_core_v4alpha_protocol_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_config_core_v4alpha_protocol_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   13,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
