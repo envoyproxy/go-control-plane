@@ -28,6 +28,7 @@ const (
 const _ = proto.ProtoPackageIsVersion4
 
 // Configuration for ALTS transport socket. This provides Google's ALTS protocol to Envoy.
+// Store the peer identity in dynamic metadata, namespace is "envoy.transport_socket.peer_information", key is "peer_identity".
 // https://cloud.google.com/security/encryption-in-transit/application-layer-transport-security/
 type Alts struct {
 	state         protoimpl.MessageState
