@@ -365,6 +365,16 @@ func (m *Cluster) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTypedDnsResolverConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "TypedDnsResolverConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetWaitForWarmOnInit()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
