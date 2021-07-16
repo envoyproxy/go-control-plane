@@ -18,10 +18,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"reflect"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
 
 	"google.golang.org/grpc"
 
@@ -44,6 +49,42 @@ type mockConfigWatcher struct {
 	deltaWatches   int
 
 	mu *sync.RWMutex
+}
+
+var xdsOption sotw.ProcessMethod
+var xdsOptions = map[sotw.ProcessMethod]string{
+	sotw.ProcessDefault:      "default",
+	sotw.ProcessXds:          "xds",
+	sotw.ProcessOrderedAds:   "ordered",
+	sotw.ProcessUnorderedAds: "unordered",
+}
+
+var adsOption sotw.ProcessMethod
+var adsOptions = map[sotw.ProcessMethod]string{
+	sotw.ProcessDefault:      "default",
+	sotw.ProcessOrderedAds:   "ordered",
+	sotw.ProcessUnorderedAds: "unordered",
+}
+
+func NewServer(ctx context.Context, config cache.Cache, callbacks server.Callbacks) server.Server {
+	return server.NewServerAdvanced(rest.NewServer(config, callbacks),
+		sotw.NewServer(ctx, config, callbacks, sotw.WithCustomProcessMethods(xdsOption, adsOption)),
+		delta.NewServer(ctx, config, callbacks),
+	)
+}
+
+func TestMain(m *testing.M) {
+	for xds, xdsName := range xdsOptions {
+		for ads, adsName := range adsOptions {
+			xdsOption = xds
+			adsOption = ads
+			fmt.Printf("Testing xds: %s, ads: %s\n", xdsName, adsName)
+			code := m.Run()
+			if code != 0 {
+				os.Exit(code)
+			}
+		}
+	}
 }
 
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan cache.Response) func() {
@@ -242,7 +283,7 @@ func TestServerShutdown(t *testing.T) {
 			config.responses = makeResponses()
 			shutdown := make(chan bool)
 			ctx, cancel := context.WithCancel(context.Background())
-			s := server.NewServer(ctx, config, server.CallbackFuncs{})
+			s := NewServer(ctx, config, server.CallbackFuncs{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -291,7 +332,7 @@ func TestResponseHandlers(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := NewServer(context.Background(), config, server.CallbackFuncs{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -362,7 +403,7 @@ func TestFetch(t *testing.T) {
 		},
 	}
 
-	s := server.NewServer(context.Background(), config, cb)
+	s := NewServer(context.Background(), config, cb)
 	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for endpoints: %v", err)
 	}
@@ -451,7 +492,7 @@ func TestSendError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := NewServer(context.Background(), config, server.CallbackFuncs{})
 
 			// make a request
 			resp := makeMockStream(t)
@@ -476,7 +517,7 @@ func TestStaleNonce(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := NewServer(context.Background(), config, server.CallbackFuncs{})
 
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{
@@ -540,7 +581,7 @@ func TestAggregatedHandlers(t *testing.T) {
 		ResourceNames: []string{routeName},
 	}
 
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := NewServer(context.Background(), config, server.CallbackFuncs{})
 	go func() {
 		if err := s.StreamAggregatedResources(resp); err != nil {
 			t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
@@ -574,7 +615,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := NewServer(context.Background(), config, server.CallbackFuncs{})
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	if err := s.StreamAggregatedResources(resp); err == nil {
@@ -592,7 +633,7 @@ func TestCancellations(t *testing.T) {
 		}
 	}
 	close(resp.recv)
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := NewServer(context.Background(), config, server.CallbackFuncs{})
 	if err := s.StreamAggregatedResources(resp); err != nil {
 		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
 	}
@@ -613,7 +654,7 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 		}
 	}
 	close(resp.recv)
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := NewServer(context.Background(), config, server.CallbackFuncs{})
 	if err := s.StreamAggregatedResources(resp); err != nil {
 		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
 	}
@@ -628,7 +669,7 @@ func TestCallbackError(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
 
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{
+			s := NewServer(context.Background(), config, server.CallbackFuncs{
 				StreamOpenFunc: func(ctx context.Context, i int64, s string) error {
 					return errors.New("stream open error")
 				},
