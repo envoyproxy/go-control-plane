@@ -221,10 +221,10 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
-				field:  "MaxRequestsPerConnection",
+				field:  "HiddenEnvoyDeprecatedMaxRequestsPerConnection",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
