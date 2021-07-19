@@ -36,10 +36,10 @@ func TestConversion(t *testing.T) {
 		t.Fatalf("unexpected error %v", err)
 	}
 	pbst := map[string]*pstruct.Value{
-		"version_info": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "test"}},
-		"node": &pstruct.Value{Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
+		"version_info": {Kind: &pstruct.Value_StringValue{StringValue: "test"}},
+		"node": {Kind: &pstruct.Value_StructValue{StructValue: &pstruct.Struct{
 			Fields: map[string]*pstruct.Value{
-				"id": &pstruct.Value{Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
+				"id": {Kind: &pstruct.Value_StringValue{StringValue: "proxy"}},
 			},
 		}}},
 	}
@@ -62,5 +62,27 @@ func TestConversion(t *testing.T) {
 
 	if err = conversion.StructToMessage(nil, &discovery.DiscoveryRequest{}); err == nil {
 		t.Error("StructToMessage(nil) => got no error")
+	}
+}
+
+// BENCHMARKS =====================================================================================================
+
+func BenchmarkConversion(b *testing.B) {
+	pb := &discovery.DiscoveryRequest{
+		VersionInfo: "test",
+		Node:        &core.Node{Id: "proxy"},
+	}
+
+	for n := 0; n < b.N; n++ {
+		st, err := conversion.MessageToStruct(pb)
+		if err != nil {
+			b.Fatalf("unexpected error %v", err)
+		}
+
+		out := &discovery.DiscoveryRequest{}
+		err = conversion.StructToMessage(st, out)
+		if err != nil {
+			b.Fatalf("unexpected error %v", err)
+		}
 	}
 }
