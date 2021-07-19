@@ -111,7 +111,7 @@ func RunManagementGateway(ctx context.Context, srv server.Server, port uint, lg 
 	<-ctx.Done()
 
 	// Cleanup our gateway if we receive a shutdown
-	server.Shutdown(ctx)
+	_ = server.Shutdown(ctx)
 }
 
 func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {

@@ -61,10 +61,6 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
-type heartbeatHandle struct {
-	cancel func()
-}
-
 type snapshotCache struct {
 	// watchCount and deltaWatchCount are atomic counters incremented for each watch respectively. They need to
 	// be the first fields in the struct to guarantee 64-bit alignment,
@@ -154,7 +150,7 @@ func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHa
 	return cache
 }
 
-func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
+func (cache *snapshotCache) sendHeartbeats(_ context.Context, node string) {
 	snapshot := cache.snapshots[node]
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
@@ -164,21 +160,21 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
 
 			// TODO(snowp): Construct this once per type instead of once per watch.
-			resourcesWithTtl := map[string]types.ResourceWithTtl{}
+			resourcesWithTTL := map[string]types.ResourceWithTtl{}
 			for k, v := range resources {
 				if v.Ttl != nil {
-					resourcesWithTtl[k] = v
+					resourcesWithTTL[k] = v
 				}
 			}
 
-			if len(resourcesWithTtl) == 0 {
+			if len(resourcesWithTTL) == 0 {
 				continue
 			}
 			if cache.log != nil {
 				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
 			}
 
-			cache.respond(watch.Request, watch.Response, resourcesWithTtl, version, true)
+			cache.respond(watch.Request, watch.Response, resourcesWithTTL, version, true)
 
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
@@ -212,7 +208,9 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 			}
 		}
 
-		// We only calculate version hashes when using delta. We don't want to do this when using SOTW so we can avoid unecessary computational cost if not using delta.
+		// We only calculate version hashes when using delta. We don't
+		// want to do this when using SOTW so we can avoid unnecessary
+		// computational cost if not using delta.
 		if len(info.deltaWatches) > 0 {
 			err := snapshot.ConstructVersionMap()
 			if err != nil {
@@ -417,7 +415,6 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		err := snapshot.ConstructVersionMap()
 		if err != nil {
 			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
-			delayedResponse = true
 		}
 		delayedResponse = respondDelta(request, value, state, snapshot, cache.log) == nil
 	}

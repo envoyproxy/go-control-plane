@@ -38,6 +38,15 @@ format:
 examples:
 	@pushd examples/dyplomat && go build ./... && popd
 
+.PHONY: lint
+lint:
+	docker run \
+		--rm \
+		--volume $$(pwd):/src \
+		--workdir /src \
+		golangci/golangci-lint:v1.41.1 \
+	golangci-lint run
+
 #-----------------
 #-- integration
 #-----------------

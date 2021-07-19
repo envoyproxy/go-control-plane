@@ -25,12 +25,8 @@ import (
 )
 
 var (
-	l example.Logger
-
-	port     uint
-	basePort uint
-	mode     string
-
+	l      example.Logger
+	port   uint
 	nodeID string
 )
 

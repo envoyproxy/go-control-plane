@@ -19,6 +19,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -112,7 +114,7 @@ func TestLinearBasic(t *testing.T) {
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 2)
 	checkWatchCount(t, c, "b", 1)
-	c.UpdateResource("a", testResource("a"))
+	require.NoError(t, c.UpdateResource("a", testResource("a")))
 	checkWatchCount(t, c, "a", 0)
 	checkWatchCount(t, c, "b", 0)
 	verifyResponse(t, w1, "1", 1)
@@ -127,8 +129,8 @@ func TestLinearBasic(t *testing.T) {
 	verifyResponse(t, w, "1", 1)
 
 	// Add another element and update the first, response should be different
-	c.UpdateResource("b", testResource("b"))
-	c.UpdateResource("a", testResource("aa"))
+	require.NoError(t, c.UpdateResource("b", testResource("b")))
+	require.NoError(t, c.UpdateResource("a", testResource("aa")))
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, w)
 	verifyResponse(t, w, "3", 1)
 	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, w)
@@ -202,7 +204,7 @@ func TestLinearVersionPrefix(t *testing.T) {
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, w)
 	verifyResponse(t, w, "instance1-0", 0)
 
-	c.UpdateResource("a", testResource("a"))
+	require.NoError(t, c.UpdateResource("a", testResource("a")))
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, w)
 	verifyResponse(t, w, "instance1-1", 1)
 
@@ -217,13 +219,13 @@ func TestLinearDeletion(t *testing.T) {
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
-	c.DeleteResource("a")
+	require.NoError(t, c.DeleteResource("a"))
 	verifyResponse(t, w, "1", 0)
 	checkWatchCount(t, c, "a", 0)
 	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, w)
 	verifyResponse(t, w, "1", 1)
 	checkWatchCount(t, c, "b", 0)
-	c.DeleteResource("b")
+	require.NoError(t, c.DeleteResource("b"))
 	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, w)
 	verifyResponse(t, w, "2", 0)
 	checkWatchCount(t, c, "b", 0)
@@ -237,7 +239,7 @@ func TestLinearWatchTwo(t *testing.T) {
 	w1 := make(chan Response, 1)
 	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, w1)
 	mustBlock(t, w1)
-	c.UpdateResource("a", testResource("aa"))
+	require.NoError(t, c.UpdateResource("a", testResource("aa")))
 	// should only get the modified resource
 	verifyResponse(t, w, "1", 1)
 	verifyResponse(t, w1, "1", 2)
@@ -245,7 +247,7 @@ func TestLinearWatchTwo(t *testing.T) {
 
 func TestLinearCancel(t *testing.T) {
 	c := NewLinearCache(testType)
-	c.UpdateResource("a", testResource("a"))
+	require.NoError(t, c.UpdateResource("a", testResource("a")))
 
 	// cancel watch-all
 	w := make(chan Response, 1)
@@ -300,7 +302,7 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 				id := fmt.Sprintf("%d", i)
 				if i%2 == 0 {
 					t.Logf("update resource %q", id)
-					c.UpdateResource(id, testResource(id))
+					require.NoError(t, c.UpdateResource(id, testResource(id)))
 				} else {
 					id2 := fmt.Sprintf("%d", i-1)
 					t.Logf("request resources %q and %q", id, id2)
