@@ -408,6 +408,16 @@ func (m *HttpProtocolOptions) Validate() error {
 
 	// no validation rules for HeadersWithUnderscoresAction
 
+	if v, ok := interface{}(m.GetMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpProtocolOptionsValidationError{
+				field:  "MaxRequestsPerConnection",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

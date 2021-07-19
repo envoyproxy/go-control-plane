@@ -575,7 +575,7 @@ func (x *FilterChain) GetOnDemandConfiguration() *FilterChain_OnDemandConfigurat
 //    rules:
 //      - destination_port_range:
 //          start: 3306
-//          end: 3306
+//          end: 3307
 //      - destination_port_range:
 //          start: 15000
 //          end: 15001

@@ -2599,6 +2599,18 @@ func (m *HeaderMatcher) Validate() error {
 			}
 		}
 
+	case *HeaderMatcher_StringMatch:
+
+		if v, ok := interface{}(m.GetStringMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HeaderMatcherValidationError{
+					field:  "StringMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *HeaderMatcher_HiddenEnvoyDeprecatedRegexMatch:
 
 		if len(m.GetHiddenEnvoyDeprecatedRegexMatch()) > 1024 {

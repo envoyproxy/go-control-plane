@@ -2454,15 +2454,15 @@ func (m *HeaderMatcher) Validate() error {
 
 	switch m.HeaderMatchSpecifier.(type) {
 
-	case *HeaderMatcher_ExactMatch:
-		// no validation rules for ExactMatch
+	case *HeaderMatcher_HiddenEnvoyDeprecatedExactMatch:
+		// no validation rules for HiddenEnvoyDeprecatedExactMatch
 
-	case *HeaderMatcher_SafeRegexMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedSafeRegexMatch:
 
-		if v, ok := interface{}(m.GetSafeRegexMatch()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedSafeRegexMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return HeaderMatcherValidationError{
-					field:  "SafeRegexMatch",
+					field:  "HiddenEnvoyDeprecatedSafeRegexMatch",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2484,30 +2484,42 @@ func (m *HeaderMatcher) Validate() error {
 	case *HeaderMatcher_PresentMatch:
 		// no validation rules for PresentMatch
 
-	case *HeaderMatcher_PrefixMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedPrefixMatch:
 
-		if utf8.RuneCountInString(m.GetPrefixMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetHiddenEnvoyDeprecatedPrefixMatch()) < 1 {
 			return HeaderMatcherValidationError{
-				field:  "PrefixMatch",
+				field:  "HiddenEnvoyDeprecatedPrefixMatch",
 				reason: "value length must be at least 1 runes",
 			}
 		}
 
-	case *HeaderMatcher_SuffixMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedSuffixMatch:
 
-		if utf8.RuneCountInString(m.GetSuffixMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetHiddenEnvoyDeprecatedSuffixMatch()) < 1 {
 			return HeaderMatcherValidationError{
-				field:  "SuffixMatch",
+				field:  "HiddenEnvoyDeprecatedSuffixMatch",
 				reason: "value length must be at least 1 runes",
 			}
 		}
 
-	case *HeaderMatcher_ContainsMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedContainsMatch:
 
-		if utf8.RuneCountInString(m.GetContainsMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetHiddenEnvoyDeprecatedContainsMatch()) < 1 {
 			return HeaderMatcherValidationError{
-				field:  "ContainsMatch",
+				field:  "HiddenEnvoyDeprecatedContainsMatch",
 				reason: "value length must be at least 1 runes",
+			}
+		}
+
+	case *HeaderMatcher_StringMatch:
+
+		if v, ok := interface{}(m.GetStringMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HeaderMatcherValidationError{
+					field:  "StringMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 

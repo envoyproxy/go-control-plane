@@ -124,7 +124,10 @@ func (RBAC_Action) EnumDescriptor() ([]byte, []int) {
 //       permissions:
 //           - and_rules:
 //               rules:
-//                 - header: { name: ":method", exact_match: "GET" }
+//                 - header:
+//                     name: ":method"
+//                     string_match:
+//                       exact: "GET"
 //                 - url_path:
 //                     path: { prefix: "/products" }
 //                 - or_rules:
