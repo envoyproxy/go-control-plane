@@ -162,25 +162,23 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				// Since there was no previous state, we know we're handling the first request of this type
 				// so we set the initial resource versions if we have any, and also signal if this stream is in wildcard mode.
 				watch.state = stream.NewStreamState(len(req.GetResourceNamesSubscribe()) == 0, req.GetInitialResourceVersions())
-				watch.responses = make(chan cache.DeltaResponse, 1)
-
-				// We must signal goroutine termination to prevent a race between the cancel closing the watch
-				// and the producer closing the watch.
+			} else {
 				watch.Cancel()
-
-				s.subscribe(req.GetResourceNamesSubscribe(), watch.state.ResourceVersions)
-				s.unsubscribe(req.GetResourceNamesUnsubscribe(), watch.state.ResourceVersions)
-
-				watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
-				watches.deltaWatches[typeURL] = watch
-
-				go func() {
-					resp, more := <-watch.responses
-					if more {
-						watches.deltaMuxedResponses <- resp
-					}
-				}()
 			}
+
+			s.subscribe(req.GetResourceNamesSubscribe(), watch.state.ResourceVersions)
+			s.unsubscribe(req.GetResourceNamesUnsubscribe(), watch.state.ResourceVersions)
+
+			watch.responses = make(chan cache.DeltaResponse, 1)
+			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
+			watches.deltaWatches[typeURL] = watch
+
+			go func() {
+				resp, more := <-watch.responses
+				if more {
+					watches.deltaMuxedResponses <- resp
+				}
+			}()
 		}
 	}
 }
