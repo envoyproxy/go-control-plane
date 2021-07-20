@@ -46,4 +46,5 @@ func (w *watch) Cancel() {
 	if w.cancel != nil {
 		w.cancel()
 	}
+	close(w.responses)
 }

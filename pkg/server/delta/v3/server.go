@@ -163,8 +163,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				// so we set the initial resource versions if we have any, and also signal if this stream is in wildcard mode.
 				watch.state = stream.NewStreamState(len(req.GetResourceNamesSubscribe()) == 0, req.GetInitialResourceVersions())
 			} else {
-				// We must signal goroutine termination to prevent a race between the cancel closing the watch
-				// and the producer closing the watch.
 				watch.Cancel()
 			}
 
