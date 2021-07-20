@@ -320,6 +320,16 @@ func (m *Listener) Validate() error {
 
 	// no validation rules for ReusePort
 
+	if v, ok := interface{}(m.GetEnableReusePort()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListenerValidationError{
+				field:  "EnableReusePort",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetAccessLog() {
 		_, _ = idx, item
 
