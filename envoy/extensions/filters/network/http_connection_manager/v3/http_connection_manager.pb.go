@@ -1771,6 +1771,7 @@ func (x *RequestIDExtension) GetTypedConfig() *any.Any {
 
 // [#protodoc-title: Envoy Mobile HTTP connection manager]
 // HTTP connection manager for use in Envoy mobile.
+// [#extension: envoy.filters.network.envoy_mobile_http_connection_manager]
 type EnvoyMobileHttpConnectionManager struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
