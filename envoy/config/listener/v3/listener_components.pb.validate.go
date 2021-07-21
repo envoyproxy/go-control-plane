@@ -190,6 +190,21 @@ func (m *FilterChainMatch) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetDirectSourcePrefixRanges() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FilterChainMatchValidationError{
+					field:  fmt.Sprintf("DirectSourcePrefixRanges[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if _, ok := FilterChainMatch_ConnectionSourceType_name[int32(m.GetSourceType())]; !ok {
 		return FilterChainMatchValidationError{
 			field:  "SourceType",

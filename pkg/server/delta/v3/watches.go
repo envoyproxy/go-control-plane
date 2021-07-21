@@ -29,8 +29,6 @@ func (w *watches) Cancel() {
 		if watch.cancel != nil {
 			watch.cancel()
 		}
-
-		watch.terminate()
 	}
 }
 
@@ -40,8 +38,6 @@ type watch struct {
 	cancel    func()
 	nonce     string
 
-	termination chan struct{}
-
 	state stream.StreamState
 }
 
@@ -50,14 +46,5 @@ func (w *watch) Cancel() {
 	if w.cancel != nil {
 		w.cancel()
 	}
-
-	if w.termination != nil {
-		close(w.termination)
-	}
-}
-
-func (w *watch) terminate() {
-	if w.termination != nil {
-		close(w.termination)
-	}
+	close(w.responses)
 }

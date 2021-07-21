@@ -323,10 +323,9 @@ func (cache *LinearCache) CreateWatch(request *Request, value chan Response) fun
 	}
 }
 
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState) (chan DeltaResponse, func()) {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
-	value := make(chan DeltaResponse, 1)
 
 	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
 	// create a new watch accordingly
@@ -339,10 +338,10 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 
 		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: state}
 
-		return value, cache.cancelDeltaWatch(watchID)
+		return cache.cancelDeltaWatch(watchID)
 	}
 
-	return value, nil
+	return nil
 }
 
 func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {

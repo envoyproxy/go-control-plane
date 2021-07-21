@@ -221,6 +221,16 @@ func (m *DnsCacheConfig) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTypedDnsResolverConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DnsCacheConfigValidationError{
+				field:  "TypedDnsResolverConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetPreresolveHostnames() {
 		_, _ = idx, item
 
@@ -231,6 +241,27 @@ func (m *DnsCacheConfig) Validate() error {
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
+			}
+		}
+
+	}
+
+	if d := m.GetDnsQueryTimeout(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			return DnsCacheConfigValidationError{
+				field:  "DnsQueryTimeout",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+		if dur <= gt {
+			return DnsCacheConfigValidationError{
+				field:  "DnsQueryTimeout",
+				reason: "value must be greater than 0s",
 			}
 		}
 

@@ -109,7 +109,7 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for StatPrefix
 
-	// no validation rules for HiddenEnvoyDeprecatedUseAlpha
+	// no validation rules for BootstrapMetadataLabelsKey
 
 	switch m.Services.(type) {
 

@@ -225,6 +225,16 @@ func (m *Bootstrap) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTypedDnsResolverConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BootstrapValidationError{
+				field:  "TypedDnsResolverConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetBootstrapExtensions() {
 		_, _ = idx, item
 

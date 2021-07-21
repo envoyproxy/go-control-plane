@@ -67,6 +67,8 @@ func (m *JwtProvider) Validate() error {
 		}
 	}
 
+	// no validation rules for PadForwardPayloadHeader
+
 	// no validation rules for PayloadInMetadata
 
 	// no validation rules for ClockSkewSeconds
@@ -195,6 +197,16 @@ func (m *RemoteJwks) Validate() error {
 		if err := v.Validate(); err != nil {
 			return RemoteJwksValidationError{
 				field:  "AsyncFetch",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetRetryPolicy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RemoteJwksValidationError{
+				field:  "RetryPolicy",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

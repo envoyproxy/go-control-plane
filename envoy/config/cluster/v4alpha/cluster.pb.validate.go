@@ -221,10 +221,10 @@ func (m *Cluster) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
-				field:  "MaxRequestsPerConnection",
+				field:  "HiddenEnvoyDeprecatedMaxRequestsPerConnection",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -359,6 +359,26 @@ func (m *Cluster) Validate() error {
 		if err := v.Validate(); err != nil {
 			return ClusterValidationError{
 				field:  "DnsResolutionConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetTypedDnsResolverConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "TypedDnsResolverConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetWaitForWarmOnInit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterValidationError{
+				field:  "WaitForWarmOnInit",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

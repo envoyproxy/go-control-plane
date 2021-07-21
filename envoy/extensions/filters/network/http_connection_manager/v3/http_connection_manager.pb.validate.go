@@ -144,6 +144,16 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetSchemeHeaderTransformation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "SchemeHeaderTransformation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if wrapper := m.GetMaxRequestHeadersKb(); wrapper != nil {
 
 		if val := wrapper.GetValue(); val <= 0 || val > 8192 {
@@ -1321,6 +1331,84 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RequestIDExtensionValidationError{}
+
+// Validate checks the field values on EnvoyMobileHttpConnectionManager with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *EnvoyMobileHttpConnectionManager) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return EnvoyMobileHttpConnectionManagerValidationError{
+				field:  "Config",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// EnvoyMobileHttpConnectionManagerValidationError is the validation error
+// returned by EnvoyMobileHttpConnectionManager.Validate if the designated
+// constraints aren't met.
+type EnvoyMobileHttpConnectionManagerValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnvoyMobileHttpConnectionManagerValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnvoyMobileHttpConnectionManagerValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnvoyMobileHttpConnectionManagerValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnvoyMobileHttpConnectionManagerValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnvoyMobileHttpConnectionManagerValidationError) ErrorName() string {
+	return "EnvoyMobileHttpConnectionManagerValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EnvoyMobileHttpConnectionManagerValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnvoyMobileHttpConnectionManager.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnvoyMobileHttpConnectionManagerValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnvoyMobileHttpConnectionManagerValidationError{}
 
 // Validate checks the field values on HttpConnectionManager_Tracing with the
 // rules defined in the proto definition for this message. If any rules are

@@ -406,10 +406,12 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 func TestLinearDeltaWildcard(t *testing.T) {
 	c := NewLinearCache(testType)
 	state1 := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
-	w1, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state1)
+	w1 := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state1, w1)
 	mustBlockDelta(t, w1)
 	state2 := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
-	w2, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state2)
+	w2 := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state2, w2)
 	mustBlockDelta(t, w1)
 	checkDeltaWatchCount(t, c, 2)
 
@@ -431,12 +433,14 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 	c.UpdateResource("b", b)
 
 	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"b": "", "c": ""}} // watching b and c - not interested in a
-	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, []string{"c"})
 
 	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
-	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
 }
@@ -451,12 +455,14 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	c.UpdateResource("b", b)
 
 	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": hashB}}
-	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil) // b is up to date and shouldn't be returned
 
 	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
-	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
 	checkDeltaWatchCount(t, c, 1)
 	b = &endpoint.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: 10}}} // new version of b
@@ -476,12 +482,14 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	c.UpdateResource("b", b)
 
 	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
-	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
 
 	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
-	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
 	checkDeltaWatchCount(t, c, 1)
 
@@ -503,12 +511,14 @@ func TestLinearDeltaResourceDelete(t *testing.T) {
 	c.UpdateResource("b", b)
 
 	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
-	w, _ := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
 
 	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
-	w, _ = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state)
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
 	checkDeltaWatchCount(t, c, 1)
 

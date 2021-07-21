@@ -97,20 +97,6 @@ func (m *Gzip) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedContentLength()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GzipValidationError{
-				field:  "HiddenEnvoyDeprecatedContentLength",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for HiddenEnvoyDeprecatedDisableOnEtagHeader
-
-	// no validation rules for HiddenEnvoyDeprecatedRemoveAcceptEncodingHeader
-
 	return nil
 }
 
