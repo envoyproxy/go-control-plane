@@ -111,8 +111,6 @@ func (m *ExtAuthz) Validate() error {
 
 	// no validation rules for BootstrapMetadataLabelsKey
 
-	// no validation rules for HiddenEnvoyDeprecatedUseAlpha
-
 	switch m.Services.(type) {
 
 	case *ExtAuthz_GrpcService:
