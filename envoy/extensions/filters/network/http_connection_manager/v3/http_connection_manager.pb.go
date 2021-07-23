@@ -515,6 +515,7 @@ type HttpConnectionManager struct {
 	// .. code-block:: yaml
 	//
 	//    original_ip_detection_extensions:
+	//    - name: envoy.http.original_ip_detection.xff
 	//      typed_config:
 	//        "@type": type.googleapis.com/envoy.extensions.http.original_ip_detection.xff.v3.XffConfig
 	//        xff_num_trusted_hops: 1
