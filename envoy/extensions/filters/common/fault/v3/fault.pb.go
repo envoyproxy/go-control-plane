@@ -75,7 +75,7 @@ func (FaultDelay_FaultDelayType) EnumDescriptor() ([]byte, []int) {
 }
 
 // Delay specification is used to inject latency into the
-// HTTP/gRPC/Mongo/Redis operation or delay proxying of TCP connections.
+// HTTP/Mongo operation.
 // [#next-free-field: 6]
 type FaultDelay struct {
 	state         protoimpl.MessageState
@@ -167,10 +167,9 @@ type isFaultDelay_FaultDelaySecifier interface {
 type FaultDelay_FixedDelay struct {
 	// Add a fixed delay before forwarding the operation upstream. See
 	// https://developers.google.com/protocol-buffers/docs/proto3#json for
-	// the JSON/YAML Duration mapping. For HTTP/Mongo/Redis, the specified
-	// delay will be injected before a new request/operation. For TCP
-	// connections, the proxying of the connection upstream will be delayed
-	// for the specified period. This is required if type is FIXED.
+	// the JSON/YAML Duration mapping. For HTTP/Mongo, the specified
+	// delay will be injected before a new request/operation.
+	// This is required if type is FIXED.
 	FixedDelay *duration.Duration `protobuf:"bytes,3,opt,name=fixed_delay,json=fixedDelay,proto3,oneof"`
 }
 
