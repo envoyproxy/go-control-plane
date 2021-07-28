@@ -67,9 +67,9 @@ func TestTTLResponse(t *testing.T) {
 
 	oneSecond := time.Second
 	cla := &envoy_config_endpoint_v3.ClusterLoadAssignment{ClusterName: "resource"}
-	err = snapshotCache.SetSnapshot(context.Background(), "test", cache.NewSnapshotWithTtls("1", []types.ResourceWithTtl{{
+	err = snapshotCache.SetSnapshot(context.Background(), "test", cache.NewSnapshotWithTtls("1", []types.ResourceWithTTL{{
 		Resource: cla,
-		Ttl:      &oneSecond,
+		TTL:      &oneSecond,
 	}}, nil, nil, nil, nil, nil))
 	assert.NoError(t, err)
 

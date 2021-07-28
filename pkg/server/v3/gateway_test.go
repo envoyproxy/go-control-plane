@@ -44,21 +44,21 @@ func TestGateway(t *testing.T) {
 		resource.ClusterType: {
 			&cache.RawResponse{
 				Version:   "2",
-				Resources: []types.ResourceWithTtl{{Resource: cluster}},
+				Resources: []types.ResourceWithTTL{{Resource: cluster}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: resource.ClusterType},
 			},
 		},
 		resource.RouteType: {
 			&cache.RawResponse{
 				Version:   "3",
-				Resources: []types.ResourceWithTtl{{Resource: route}},
+				Resources: []types.ResourceWithTTL{{Resource: route}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 			},
 		},
 		resource.ListenerType: {
 			&cache.RawResponse{
 				Version:   "4",
-				Resources: []types.ResourceWithTtl{{Resource: listener}},
+				Resources: []types.ResourceWithTTL{{Resource: listener}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: resource.ListenerType},
 			},
 		},
@@ -100,7 +100,10 @@ func TestGateway(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp, code, _ := gtw.ServeHTTP(req)
+		resp, code, err := gtw.ServeHTTP(req)
+		if err == nil {
+			t.Errorf("ServeHTTP succeeded, but should have failed")
+		}
 		if resp != nil {
 			t.Errorf("handler returned wrong response")
 		}
@@ -114,7 +117,10 @@ func TestGateway(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		resp, code, _ := gtw.ServeHTTP(req)
+		resp, code, err := gtw.ServeHTTP(req)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if resp == nil {
 			t.Errorf("handler returned wrong response")
 		}

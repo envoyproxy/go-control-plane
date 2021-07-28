@@ -61,12 +61,12 @@ var (
 	ttl = 2 * time.Second
 
 	snapshotWithTTL = cache.NewSnapshotWithTtls(version,
-		[]types.ResourceWithTtl{{Resource: testEndpoint, Ttl: &ttl}},
-		[]types.ResourceWithTtl{{Resource: testCluster}},
-		[]types.ResourceWithTtl{{Resource: testRoute}},
-		[]types.ResourceWithTtl{{Resource: testListener}},
-		[]types.ResourceWithTtl{{Resource: testRuntime}},
-		[]types.ResourceWithTtl{{Resource: testSecret[0]}})
+		[]types.ResourceWithTTL{{Resource: testEndpoint, TTL: &ttl}},
+		[]types.ResourceWithTTL{{Resource: testCluster}},
+		[]types.ResourceWithTTL{{Resource: testRoute}},
+		[]types.ResourceWithTTL{{Resource: testListener}},
+		[]types.ResourceWithTTL{{Resource: testRuntime}},
+		[]types.ResourceWithTTL{{Resource: testSecret[0]}})
 
 	names = map[string][]string{
 		rsrc.EndpointType: {clusterName},

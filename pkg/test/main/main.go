@@ -176,7 +176,7 @@ func main() {
 	eds := cache.NewLinearCache(typeURL)
 	if mux {
 		configCache = &cache.MuxCache{
-			Classify: func(req cache.Request) string { // nolint:govet
+			Classify: func(req *cache.Request) string {
 				if req.TypeUrl == typeURL {
 					return "eds"
 				}
@@ -315,9 +315,13 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			defer func() { _ = req.Body.Close() }()
 			body, err := ioutil.ReadAll(req.Body)
 			if err != nil {
+				req.Body.Close()
+				ch <- err
+				return
+			}
+			if err := req.Body.Close(); err != nil {
 				ch <- err
 				return
 			}

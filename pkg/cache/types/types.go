@@ -11,11 +11,10 @@ type Resource interface {
 	proto.Message
 }
 
-// ResourceWithTtl is a Resource with an optional TTL.
-type ResourceWithTtl struct { // nolint:golint,revive
+// ResourceWithTTL is a Resource with an optional TTL.
+type ResourceWithTTL struct {
 	Resource Resource
-
-	Ttl *time.Duration // nolint:golint,revive
+	TTL      *time.Duration
 }
 
 // MarshaledResource is an alias for the serialized binary array.

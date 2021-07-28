@@ -177,49 +177,49 @@ func makeResponses() map[string][]cache.Response {
 		rsrc.EndpointType: {
 			&cache.RawResponse{
 				Version:   "1",
-				Resources: []types.ResourceWithTtl{{Resource: endpoint}},
+				Resources: []types.ResourceWithTTL{{Resource: endpoint}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
 			},
 		},
 		rsrc.ClusterType: {
 			&cache.RawResponse{
 				Version:   "2",
-				Resources: []types.ResourceWithTtl{{Resource: cluster}},
+				Resources: []types.ResourceWithTTL{{Resource: cluster}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
 			},
 		},
 		rsrc.RouteType: {
 			&cache.RawResponse{
 				Version:   "3",
-				Resources: []types.ResourceWithTtl{{Resource: route}},
+				Resources: []types.ResourceWithTTL{{Resource: route}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
 			},
 		},
 		rsrc.ListenerType: {
 			&cache.RawResponse{
 				Version:   "4",
-				Resources: []types.ResourceWithTtl{{Resource: listener}},
+				Resources: []types.ResourceWithTTL{{Resource: listener}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 			},
 		},
 		rsrc.SecretType: {
 			&cache.RawResponse{
 				Version:   "5",
-				Resources: []types.ResourceWithTtl{{Resource: secret}},
+				Resources: []types.ResourceWithTTL{{Resource: secret}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
 			},
 		},
 		rsrc.RuntimeType: {
 			&cache.RawResponse{
 				Version:   "6",
-				Resources: []types.ResourceWithTtl{{Resource: runtime}},
+				Resources: []types.ResourceWithTTL{{Resource: runtime}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
 		rsrc.ExtensionConfigType: {
 			&cache.RawResponse{
 				Version:   "7",
-				Resources: []types.ResourceWithTtl{{Resource: extensionConfig}},
+				Resources: []types.ResourceWithTTL{{Resource: extensionConfig}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
 			},
 		},
@@ -227,7 +227,7 @@ func makeResponses() map[string][]cache.Response {
 		opaqueType: {
 			&cache.RawResponse{
 				Version:   "8",
-				Resources: []types.ResourceWithTtl{{Resource: opaque}},
+				Resources: []types.ResourceWithTTL{{Resource: opaque}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
 			},
 		},

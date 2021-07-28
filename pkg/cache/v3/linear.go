@@ -92,19 +92,19 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 }
 
 func (cache *LinearCache) respond(value chan Response, staleResources []string) {
-	var resources []types.ResourceWithTtl
+	var resources []types.ResourceWithTTL
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
-		resources = make([]types.ResourceWithTtl, 0, len(cache.resources))
+		resources = make([]types.ResourceWithTTL, 0, len(cache.resources))
 		for _, resource := range cache.resources {
-			resources = append(resources, types.ResourceWithTtl{Resource: resource})
+			resources = append(resources, types.ResourceWithTTL{Resource: resource})
 		}
 	} else {
-		resources = make([]types.ResourceWithTtl, 0, len(staleResources))
+		resources = make([]types.ResourceWithTTL, 0, len(staleResources))
 		for _, name := range staleResources {
 			resource := cache.resources[name]
 			if resource != nil {
-				resources = append(resources, types.ResourceWithTtl{Resource: resource})
+				resources = append(resources, types.ResourceWithTTL{Resource: resource})
 			}
 		}
 	}

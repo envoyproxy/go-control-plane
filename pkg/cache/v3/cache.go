@@ -121,7 +121,7 @@ type RawResponse struct {
 	Version string
 
 	// Resources to be included in the response.
-	Resources []types.ResourceWithTtl
+	Resources []types.ResourceWithTTL
 
 	// Whether this is a heartbeat response. For xDS versions that support TTL, this
 	// will be converted into a response that doesn't contain the actual resource protobuf.
@@ -306,11 +306,11 @@ func (r *RawDeltaResponse) GetContext() context.Context {
 
 var deltaResourceTypeURL = "type.googleapis.com/" + proto.MessageName(&discovery.Resource{})
 
-func (r *RawResponse) maybeCreateTTLResource(resource types.ResourceWithTtl) (types.Resource, string, error) {
-	if resource.Ttl != nil {
+func (r *RawResponse) maybeCreateTTLResource(resource types.ResourceWithTTL) (types.Resource, string, error) {
+	if resource.TTL != nil {
 		wrappedResource := &discovery.Resource{
 			Name: GetResourceName(resource.Resource),
-			Ttl:  ptypes.DurationProto(*resource.Ttl),
+			Ttl:  ptypes.DurationProto(*resource.TTL),
 		}
 
 		if !r.Heartbeat {
