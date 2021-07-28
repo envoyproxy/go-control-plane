@@ -277,7 +277,7 @@ func (x *UpstreamHttpProtocolOptions) GetAutoSanValidation() bool {
 
 // Configures the alternate protocols cache which tracks alternate protocols that can be used to
 // make an HTTP connection to an origin server. See https://tools.ietf.org/html/rfc7838 for
-// HTTP Alternate Services and https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-04
+// HTTP Alternative Services and https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-04
 // for the "HTTPS" DNS resource record.
 type AlternateProtocolsCacheOptions struct {
 	state         protoimpl.MessageState
