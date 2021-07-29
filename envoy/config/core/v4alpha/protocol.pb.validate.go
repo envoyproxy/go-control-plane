@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on TcpProtocolOptions with the rules
@@ -408,6 +408,16 @@ func (m *HttpProtocolOptions) Validate() error {
 
 	// no validation rules for HeadersWithUnderscoresAction
 
+	if v, ok := interface{}(m.GetMaxRequestsPerConnection()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpProtocolOptionsValidationError{
+				field:  "MaxRequestsPerConnection",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -580,15 +590,8 @@ func (m *KeepaliveSettings) Validate() error {
 		return nil
 	}
 
-	if m.GetInterval() == nil {
-		return KeepaliveSettingsValidationError{
-			field:  "Interval",
-			reason: "value is required",
-		}
-	}
-
 	if d := m.GetInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return KeepaliveSettingsValidationError{
 				field:  "Interval",
@@ -616,7 +619,7 @@ func (m *KeepaliveSettings) Validate() error {
 	}
 
 	if d := m.GetTimeout(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return KeepaliveSettingsValidationError{
 				field:  "Timeout",
@@ -644,6 +647,27 @@ func (m *KeepaliveSettings) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	if d := m.GetConnectionIdleInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			return KeepaliveSettingsValidationError{
+				field:  "ConnectionIdleInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+		if dur < gte {
+			return KeepaliveSettingsValidationError{
+				field:  "ConnectionIdleInterval",
+				reason: "value must be greater than or equal to 1ms",
+			}
+		}
+
 	}
 
 	return nil
@@ -1072,6 +1096,91 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Http3ProtocolOptionsValidationError{}
+
+// Validate checks the field values on SchemeHeaderTransformation with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SchemeHeaderTransformation) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Transformation.(type) {
+
+	case *SchemeHeaderTransformation_SchemeToOverwrite:
+
+		if _, ok := _SchemeHeaderTransformation_SchemeToOverwrite_InLookup[m.GetSchemeToOverwrite()]; !ok {
+			return SchemeHeaderTransformationValidationError{
+				field:  "SchemeToOverwrite",
+				reason: "value must be in list [http https]",
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// SchemeHeaderTransformationValidationError is the validation error returned
+// by SchemeHeaderTransformation.Validate if the designated constraints aren't met.
+type SchemeHeaderTransformationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SchemeHeaderTransformationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SchemeHeaderTransformationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SchemeHeaderTransformationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SchemeHeaderTransformationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SchemeHeaderTransformationValidationError) ErrorName() string {
+	return "SchemeHeaderTransformationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SchemeHeaderTransformationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSchemeHeaderTransformation.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SchemeHeaderTransformationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SchemeHeaderTransformationValidationError{}
+
+var _SchemeHeaderTransformation_SchemeToOverwrite_InLookup = map[string]struct{}{
+	"http":  {},
+	"https": {},
+}
 
 // Validate checks the field values on Http1ProtocolOptions_HeaderKeyFormat
 // with the rules defined in the proto definition for this message. If any

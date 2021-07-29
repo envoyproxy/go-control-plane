@@ -89,9 +89,9 @@ func (RBAC_Action) EnumDescriptor() ([]byte, []int) {
 }
 
 // Role Based Access Control (RBAC) provides service-level and method-level access control for a
-// service. RBAC policies are additive. The policies are examined in order. Requests are allowed
-// or denied based on the `action` and whether a matching policy is found. For instance, if the
-// action is ALLOW and a matching policy is found the request should be allowed.
+// service. Requests are allowed or denied based on the `action` and whether a matching policy is
+// found. For instance, if the action is ALLOW and a matching policy is found the request should be
+// allowed.
 //
 // RBAC can also be used to make access logging decisions by communicating with access loggers
 // through dynamic metadata. When the action is LOG and at least one policy matches, the
@@ -124,7 +124,10 @@ func (RBAC_Action) EnumDescriptor() ([]byte, []int) {
 //       permissions:
 //           - and_rules:
 //               rules:
-//                 - header: { name: ":method", exact_match: "GET" }
+//                 - header:
+//                     name: ":method"
+//                     string_match:
+//                       exact: "GET"
 //                 - url_path:
 //                     path: { prefix: "/products" }
 //                 - or_rules:
@@ -155,6 +158,7 @@ type RBAC struct {
 	//
 	Action RBAC_Action `protobuf:"varint,1,opt,name=action,proto3,enum=envoy.config.rbac.v4alpha.RBAC_Action" json:"action,omitempty"`
 	// Maps from policy name to policy. A match occurs when at least one policy matches the request.
+	// The policies are evaluated in lexicographic order of the policy name.
 	Policies map[string]*Policy `protobuf:"bytes,2,rep,name=policies,proto3" json:"policies,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 

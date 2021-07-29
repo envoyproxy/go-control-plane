@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on RouteConfiguration with the rules
@@ -170,6 +170,21 @@ func (m *RouteConfiguration) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetClusterSpecifierPlugins() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteConfigurationValidationError{
+					field:  fmt.Sprintf("ClusterSpecifierPlugins[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -234,6 +249,83 @@ var _RouteConfiguration_InternalOnlyHeaders_Pattern = regexp.MustCompile("^[^\x0
 var _RouteConfiguration_ResponseHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _RouteConfiguration_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on ClusterSpecifierPlugin with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ClusterSpecifierPlugin) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetExtension()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterSpecifierPluginValidationError{
+				field:  "Extension",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ClusterSpecifierPluginValidationError is the validation error returned by
+// ClusterSpecifierPlugin.Validate if the designated constraints aren't met.
+type ClusterSpecifierPluginValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClusterSpecifierPluginValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClusterSpecifierPluginValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClusterSpecifierPluginValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClusterSpecifierPluginValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClusterSpecifierPluginValidationError) ErrorName() string {
+	return "ClusterSpecifierPluginValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClusterSpecifierPluginValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClusterSpecifierPlugin.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClusterSpecifierPluginValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClusterSpecifierPluginValidationError{}
 
 // Validate checks the field values on Vhds with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.

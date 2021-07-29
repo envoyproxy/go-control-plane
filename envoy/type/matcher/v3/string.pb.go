@@ -43,8 +43,8 @@ type StringMatcher struct {
 	//	*StringMatcher_Contains
 	//	*StringMatcher_HiddenEnvoyDeprecatedRegex
 	MatchPattern isStringMatcher_MatchPattern `protobuf_oneof:"match_pattern"`
-	// If true, indicates the exact/prefix/suffix matching should be case insensitive. This has no
-	// effect for the safe_regex match.
+	// If true, indicates the exact/prefix/suffix/contains matching should be case insensitive. This
+	// has no effect for the safe_regex match.
 	// For example, the matcher *data* will match both input string *Data* and *data* if set to true.
 	IgnoreCase bool `protobuf:"varint,6,opt,name=ignore_case,json=ignoreCase,proto3" json:"ignore_case,omitempty"`
 }

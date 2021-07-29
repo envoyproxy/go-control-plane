@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 )
@@ -32,7 +32,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 
 	_ = v3.TrafficDirection(0)
 )
@@ -319,6 +319,16 @@ func (m *Listener) Validate() error {
 	}
 
 	// no validation rules for ReusePort
+
+	if v, ok := interface{}(m.GetEnableReusePort()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListenerValidationError{
+				field:  "EnableReusePort",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	for idx, item := range m.GetAccessLog() {
 		_, _ = idx, item

@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	v4alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v4alpha"
 )
@@ -32,7 +32,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 
 	_ = v4alpha.RoutingPriority(0)
 )
@@ -1384,6 +1384,9 @@ func (m *RouteAction) Validate() error {
 			}
 		}
 
+	case *RouteAction_ClusterSpecifierPlugin:
+		// no validation rules for ClusterSpecifierPlugin
+
 	default:
 		return RouteActionValidationError{
 			field:  "ClusterSpecifier",
@@ -2451,15 +2454,15 @@ func (m *HeaderMatcher) Validate() error {
 
 	switch m.HeaderMatchSpecifier.(type) {
 
-	case *HeaderMatcher_ExactMatch:
-		// no validation rules for ExactMatch
+	case *HeaderMatcher_HiddenEnvoyDeprecatedExactMatch:
+		// no validation rules for HiddenEnvoyDeprecatedExactMatch
 
-	case *HeaderMatcher_SafeRegexMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedSafeRegexMatch:
 
-		if v, ok := interface{}(m.GetSafeRegexMatch()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedSafeRegexMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return HeaderMatcherValidationError{
-					field:  "SafeRegexMatch",
+					field:  "HiddenEnvoyDeprecatedSafeRegexMatch",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2481,30 +2484,42 @@ func (m *HeaderMatcher) Validate() error {
 	case *HeaderMatcher_PresentMatch:
 		// no validation rules for PresentMatch
 
-	case *HeaderMatcher_PrefixMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedPrefixMatch:
 
-		if utf8.RuneCountInString(m.GetPrefixMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetHiddenEnvoyDeprecatedPrefixMatch()) < 1 {
 			return HeaderMatcherValidationError{
-				field:  "PrefixMatch",
+				field:  "HiddenEnvoyDeprecatedPrefixMatch",
 				reason: "value length must be at least 1 runes",
 			}
 		}
 
-	case *HeaderMatcher_SuffixMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedSuffixMatch:
 
-		if utf8.RuneCountInString(m.GetSuffixMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetHiddenEnvoyDeprecatedSuffixMatch()) < 1 {
 			return HeaderMatcherValidationError{
-				field:  "SuffixMatch",
+				field:  "HiddenEnvoyDeprecatedSuffixMatch",
 				reason: "value length must be at least 1 runes",
 			}
 		}
 
-	case *HeaderMatcher_ContainsMatch:
+	case *HeaderMatcher_HiddenEnvoyDeprecatedContainsMatch:
 
-		if utf8.RuneCountInString(m.GetContainsMatch()) < 1 {
+		if utf8.RuneCountInString(m.GetHiddenEnvoyDeprecatedContainsMatch()) < 1 {
 			return HeaderMatcherValidationError{
-				field:  "ContainsMatch",
+				field:  "HiddenEnvoyDeprecatedContainsMatch",
 				reason: "value length must be at least 1 runes",
+			}
+		}
+
+	case *HeaderMatcher_StringMatch:
+
+		if v, ok := interface{}(m.GetStringMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HeaderMatcherValidationError{
+					field:  "StringMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
 
@@ -2974,6 +2989,19 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 
 	}
 
+	switch m.HostRewriteSpecifier.(type) {
+
+	case *WeightedCluster_ClusterWeight_HostRewriteLiteral:
+
+		if !_WeightedCluster_ClusterWeight_HostRewriteLiteral_Pattern.MatchString(m.GetHostRewriteLiteral()) {
+			return WeightedCluster_ClusterWeightValidationError{
+				field:  "HostRewriteLiteral",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -3037,6 +3065,8 @@ var _ interface {
 var _WeightedCluster_ClusterWeight_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _WeightedCluster_ClusterWeight_ResponseHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _WeightedCluster_ClusterWeight_HostRewriteLiteral_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on RouteMatch_GrpcRouteMatchOptions with
 // the rules defined in the proto definition for this message. If any rules
@@ -4374,7 +4404,7 @@ func (m *RetryPolicy_RetryBackOff) Validate() error {
 	}
 
 	if d := m.GetBaseInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return RetryPolicy_RetryBackOffValidationError{
 				field:  "BaseInterval",
@@ -4395,7 +4425,7 @@ func (m *RetryPolicy_RetryBackOff) Validate() error {
 	}
 
 	if d := m.GetMaxInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return RetryPolicy_RetryBackOffValidationError{
 				field:  "MaxInterval",
@@ -4595,7 +4625,7 @@ func (m *RetryPolicy_RateLimitedRetryBackOff) Validate() error {
 	}
 
 	if d := m.GetMaxInterval(); d != nil {
-		dur, err := ptypes.Duration(d)
+		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
 			return RetryPolicy_RateLimitedRetryBackOffValidationError{
 				field:  "MaxInterval",

@@ -35,6 +35,7 @@ type RBAC struct {
 
 	// Specify the RBAC rules to be applied globally.
 	// If absent, no enforcing RBAC policy will be applied.
+	// If present and empty, DENY.
 	Rules *v3.RBAC `protobuf:"bytes,1,opt,name=rules,proto3" json:"rules,omitempty"`
 	// Shadow rules are not enforced by the filter (i.e., returning a 403)
 	// but will emit stats and logs and can be used for rule testing.

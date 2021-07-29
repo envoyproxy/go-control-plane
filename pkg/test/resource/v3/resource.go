@@ -54,6 +54,12 @@ const (
 
 	// Rest mode for resources: polling using Fetch
 	Rest = "rest"
+
+	// Delta mode for resources: individual delta xDS services
+	Delta = "delta"
+
+	// Delta Ads mode for resource: one aggregated delta xDS service
+	DeltaAds = "delta-ads"
 )
 
 var (
@@ -136,6 +142,10 @@ func configSource(mode string) *core.ConfigSource {
 		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
 			Ads: &core.AggregatedConfigSource{},
 		}
+	case DeltaAds:
+		source.ConfigSourceSpecifier = &core.ConfigSource_Ads{
+			Ads: &core.AggregatedConfigSource{},
+		}
 	case Xds:
 		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
 			ApiConfigSource: &core.ApiConfigSource{
@@ -156,6 +166,19 @@ func configSource(mode string) *core.ConfigSource {
 				TransportApiVersion: resource.DefaultAPIVersion,
 				ClusterNames:        []string{XdsCluster},
 				RefreshDelay:        ptypes.DurationProto(RefreshDelay),
+			},
+		}
+	case Delta:
+		source.ConfigSourceSpecifier = &core.ConfigSource_ApiConfigSource{
+			ApiConfigSource: &core.ApiConfigSource{
+				TransportApiVersion:       resource.DefaultAPIVersion,
+				ApiType:                   core.ApiConfigSource_DELTA_GRPC,
+				SetNodeOnFirstMessageOnly: true,
+				GrpcServices: []*core.GrpcService{{
+					TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
+						EnvoyGrpc: &core.GrpcService_EnvoyGrpc{ClusterName: XdsCluster},
+					},
+				}},
 			},
 		}
 	}
@@ -288,9 +311,38 @@ func MakeRuntime(runtimeName string) *runtime.Runtime {
 	}
 }
 
+// MakeExtensionConfig creates a extension config for a cluster.
+func MakeExtensionConfig(mode string, extensionConfigName string, route string) *core.TypedExtensionConfig {
+	rdsSource := configSource(mode)
+
+	// HTTP filter configuration
+	manager := &hcm.HttpConnectionManager{
+		CodecType:  hcm.HttpConnectionManager_AUTO,
+		StatPrefix: "http",
+		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
+			Rds: &hcm.Rds{
+				ConfigSource:    rdsSource,
+				RouteConfigName: route,
+			},
+		},
+		HttpFilters: []*hcm.HttpFilter{{
+			Name: wellknown.Router,
+		}},
+	}
+	pbst, err := ptypes.MarshalAny(manager)
+	if err != nil {
+		panic(err)
+	}
+
+	return &core.TypedExtensionConfig{
+		Name:        extensionConfigName,
+		TypedConfig: pbst,
+	}
+}
+
 // TestSnapshot holds parameters for a synthetic snapshot.
 type TestSnapshot struct {
-	// Xds indicates snapshot mode: ads, xds, or rest
+	// Xds indicates snapshot mode: ads, xds, rest, or delta
 	Xds string
 	// Version for the snapshot.
 	Version string

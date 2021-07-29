@@ -24,6 +24,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
+	"runtime/pprof"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -58,6 +60,8 @@ var (
 	extensionNum  int
 
 	nodeID string
+
+	pprofEnabled bool
 )
 
 func init() {
@@ -93,7 +97,7 @@ func init() {
 
 	// Tell Envoy to request configurations from the control plane using
 	// this protocol
-	flag.StringVar(&mode, "xds", resource.Ads, "Management protocol to test (ADS, xDS, REST)")
+	flag.StringVar(&mode, "xds", resource.Ads, "Management protocol to test (ADS, xDS, REST, DELTA, DELTA-ADS)")
 
 	// Tell Envoy to use this Node ID
 	flag.StringVar(&nodeID, "nodeID", "test-id", "Node ID")
@@ -140,12 +144,29 @@ func init() {
 	flag.StringVar(&extension, "e", "fault", "Name of Extension Config")
 	// Number of Extension
 	flag.IntVar(&extensionNum, "eNum", 1, "Number of Extension")
+	//
+	// These parameters control the the use of the pprof profiler
+	//
+
+	// Enable use of the pprof profiler
+	flag.BoolVar(&pprofEnabled, "pprof", false, "Enable use of the pprof profiler")
+
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+
+	if pprofEnabled {
+		runtime.SetBlockProfileRate(1)
+		for _, prof := range []string{"block", "goroutine", "mutex"} {
+			log.Printf("turn on pprof %s profiler", prof)
+			if pprof.Lookup(prof) == nil {
+				pprof.NewProfile(prof)
+			}
+		}
+	}
 
 	// create a cache
 	signal := make(chan struct{})
@@ -249,6 +270,20 @@ func main() {
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
 			os.Exit(1)
+		}
+	}
+
+	if pprofEnabled {
+		for _, prof := range []string{"block", "goroutine", "mutex"} {
+			p := pprof.Lookup(prof)
+			filePath := fmt.Sprintf("%s_profile_%s.pb.gz", prof, mode)
+			log.Printf("storing %s profile for %s in %s", prof, mode, filePath)
+			f, err := os.Create(filePath)
+			if err != nil {
+				log.Fatalf("could not create %s profile %s: %s", prof, filePath, err)
+			}
+			p.WriteTo(f, 1)
+			f.Close()
 		}
 	}
 

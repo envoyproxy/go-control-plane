@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	v4alpha "github.com/envoyproxy/go-control-plane/envoy/config/core/v4alpha"
 )
@@ -32,7 +32,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 
 	_ = v4alpha.ApiVersion(0)
 )
@@ -108,6 +108,8 @@ func (m *ExtAuthz) Validate() error {
 	// no validation rules for IncludePeerCertificate
 
 	// no validation rules for StatPrefix
+
+	// no validation rules for BootstrapMetadataLabelsKey
 
 	switch m.Services.(type) {
 

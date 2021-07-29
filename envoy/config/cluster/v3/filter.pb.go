@@ -34,7 +34,8 @@ type Filter struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The name of the filter to instantiate. The name must match a
-	// :ref:`supported filter <config_network_filters>`.
+	// supported upstream filter. Note that Envoy's :ref:`downstream network
+	// filters <config_network_filters>` are not valid upstream filters.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.

@@ -36,19 +36,18 @@ type MuxCache struct {
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request *Request) (chan Response, func()) {
+func (mux *MuxCache) CreateWatch(request *Request, value chan Response) func() {
 	key := mux.Classify(*request)
 	cache, exists := mux.Caches[key]
 	if !exists {
-		value := make(chan Response, 0)
-		close(value)
-		return value, nil
+		value <- nil
+		return nil
 	}
-	return cache.CreateWatch(request)
+	return cache.CreateWatch(request, value)
 }
 
-func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
-	return nil, nil
+func (cache *MuxCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
+	return nil
 }
 
 func (mux *MuxCache) Fetch(ctx context.Context, request *Request) (Response, error) {

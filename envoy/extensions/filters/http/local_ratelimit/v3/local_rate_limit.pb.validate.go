@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,7 +30,7 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // Validate checks the field values on LocalRateLimit with the rules defined in
@@ -153,6 +153,8 @@ func (m *LocalRateLimit) Validate() error {
 			reason: "value must be less than or equal to 10",
 		}
 	}
+
+	// no validation rules for LocalRateLimitPerDownstreamConnection
 
 	return nil
 }
