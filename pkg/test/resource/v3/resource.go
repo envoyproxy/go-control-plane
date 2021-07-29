@@ -361,6 +361,8 @@ type TestSnapshot struct {
 	NumRuntimes int
 	// TLS enables SDS-enabled TLS mode on all listeners
 	TLS bool
+	// NumExtension is the total number of Extension Config
+	NumExtension int
 }
 
 // Generate produces a snapshot from the parameters.
@@ -435,6 +437,13 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		}
 	}
 
+	extensions := make([]types.Resource, ts.NumExtension)
+	for i := 0; i < ts.NumExtension; i++ {
+		routeName := fmt.Sprintf("route-%s-%d", ts.Version, i)
+		extensionConfigName := fmt.Sprintf("extensionConfig-%d", i)
+		extensions[i] = MakeExtensionConfig(Ads, extensionConfigName, routeName)
+	}
+
 	out := cache.NewSnapshot(
 		ts.Version,
 		endpoints,
@@ -443,6 +452,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		listeners,
 		runtimes,
 		secrets,
+		extensions,
 	)
 
 	return out

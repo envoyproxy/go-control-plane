@@ -53,7 +53,8 @@ var (
 		[]types.Resource{testRoute},
 		[]types.Resource{testListener},
 		[]types.Resource{testRuntime},
-		[]types.Resource{testSecret[0]})
+		[]types.Resource{testSecret[0]},
+		[]types.Resource{testExtensionConfig})
 
 	ttl       = 2 * time.Second
 	heartbeat = time.Second
