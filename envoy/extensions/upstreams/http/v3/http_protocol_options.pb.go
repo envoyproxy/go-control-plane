@@ -294,6 +294,9 @@ func (*HttpProtocolOptions_ExplicitHttpConfig_Http3ProtocolOptions) isHttpProtoc
 
 // If this is used, the cluster can use either of the configured protocols, and
 // will use whichever protocol was used by the downstream connection.
+//
+// If HTTP/3 is configured for downstream and not configured for upstream,
+// HTTP/3 requests will fail over to HTTP/2.
 type HttpProtocolOptions_UseDownstreamHttpConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
