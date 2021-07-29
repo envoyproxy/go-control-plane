@@ -70,7 +70,7 @@ type CallbackFuncs struct {
 	DeltaStreamOpenFunc     func(context.Context, int64, string) error
 	DeltaStreamClosedFunc   func(int64)
 	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
-	StreamResponseFunc      func(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamResponseFunc      func(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
 	StreamDeltaResponseFunc func(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
 	FetchRequestFunc        func(context.Context, *discovery.DiscoveryRequest) error
@@ -121,9 +121,9 @@ func (c CallbackFuncs) OnStreamRequest(streamID int64, req *discovery.DiscoveryR
 }
 
 // OnStreamResponse invokes StreamResponseFunc.
-func (c CallbackFuncs) OnStreamResponse(streamID int64, req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
+func (c CallbackFuncs) OnStreamResponse(ctx context.Context, streamID int64, req *discovery.DiscoveryRequest, resp *discovery.DiscoveryResponse) {
 	if c.StreamResponseFunc != nil {
-		c.StreamResponseFunc(streamID, req, resp)
+		c.StreamResponseFunc(ctx, streamID, req, resp)
 	}
 }
 

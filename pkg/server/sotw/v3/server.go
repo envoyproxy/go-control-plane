@@ -45,7 +45,7 @@ type Callbacks interface {
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnStreamRequest(int64, *discovery.DiscoveryRequest) error
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
-	OnStreamResponse(int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	OnStreamResponse(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
@@ -177,7 +177,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
-			s.callbacks.OnStreamResponse(streamID, resp.GetRequest(), out)
+			s.callbacks.OnStreamResponse(resp.GetContext(), streamID, resp.GetRequest(), out)
 		}
 		return out.Nonce, stream.Send(out)
 	}

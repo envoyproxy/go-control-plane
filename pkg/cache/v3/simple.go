@@ -46,7 +46,7 @@ type SnapshotCache interface {
 	//
 	// This method will cause the server to respond to all open watches, for which
 	// the version differs from the snapshot version.
-	SetSnapshot(node string, snapshot Snapshot) error
+	SetSnapshot(ctx context.Context, node string, snapshot Snapshot) error
 
 	// GetSnapshots gets the snapshot for a node.
 	GetSnapshot(node string) (Snapshot, error)
@@ -143,7 +143,7 @@ func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHa
 				cache.mu.Lock()
 				for node := range cache.status {
 					// TODO(snowp): Omit heartbeats if a real response has been sent recently.
-					cache.sendHeartbeats(ctx, node)
+					cache.sendHeartbeats(node)
 				}
 				cache.mu.Unlock()
 			case <-ctx.Done():
@@ -154,7 +154,7 @@ func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHa
 	return cache
 }
 
-func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
+func (cache *snapshotCache) sendHeartbeats(node string) {
 	snapshot := cache.snapshots[node]
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
@@ -178,7 +178,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
 			}
 
-			cache.respond(watch.Request, watch.Response, resourcesWithTtl, version, true)
+			cache.respond(context.Background(), watch.Request, watch.Response, resourcesWithTtl, version, true)
 
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
@@ -187,8 +187,8 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 	}
 }
 
-// SetSnapshotCache updates a snapshot for a node.
-func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
+// SetSnapshotCacheContext updates a snapshot for a node.
+func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapshot Snapshot) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -198,6 +198,7 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 	// trigger existing watches for which version changed
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
+		defer info.mu.Unlock()
 		for id, watch := range info.watches {
 			version := snapshot.GetVersion(watch.Request.TypeUrl)
 			if version != watch.Request.VersionInfo {
@@ -205,7 +206,10 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 					cache.log.Debugf("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
 				}
 				resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
-				cache.respond(watch.Request, watch.Response, resources, version, false)
+				err := cache.respond(ctx, watch.Request, watch.Response, resources, version, false)
+				if err != nil {
+					return err
+				}
 
 				// discard the watch
 				delete(info.watches, id)
@@ -222,20 +226,23 @@ func (cache *snapshotCache) SetSnapshot(node string, snapshot Snapshot) error {
 
 		// process our delta watches
 		for id, watch := range info.deltaWatches {
-			res := respondDelta(
+			res, err := respondDelta(
+				ctx,
 				watch.Request,
 				watch.Response,
 				watch.StreamState,
 				snapshot,
 				cache.log,
 			)
+			if err != nil {
+				return err
+			}
 			// If we detect a nil response here, that means there has been no state change
 			// so we don't want to respond or remove any existing resource watches
 			if res != nil {
 				delete(info.deltaWatches, id)
 			}
 		}
-		info.mu.Unlock()
 	}
 
 	return nil
@@ -317,7 +324,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) f
 
 	// otherwise, the watch may be responded immediately
 	resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
-	cache.respond(request, value, resources, version, false)
+	cache.respond(context.Background(), request, value, resources, version, false)
 
 	return nil
 }
@@ -342,7 +349,7 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
 // TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
-func (cache *snapshotCache) respond(request *Request, value chan Response, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) {
+func (cache *snapshotCache) respond(ctx context.Context, request *Request, value chan Response, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) error {
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
@@ -350,7 +357,7 @@ func (cache *snapshotCache) respond(request *Request, value chan Response, resou
 			if cache.log != nil {
 				cache.log.Warnf("ADS mode: not responding to request: %v", err)
 			}
-			return
+			return nil
 		}
 	}
 	if cache.log != nil {
@@ -358,10 +365,15 @@ func (cache *snapshotCache) respond(request *Request, value chan Response, resou
 			request.TypeUrl, request.ResourceNames, request.VersionInfo, version)
 	}
 
-	value <- createResponse(request, resources, version, heartbeat)
+	select {
+	case value <- createResponse(ctx, request, resources, version, heartbeat):
+		return nil
+	case <-ctx.Done():
+		return context.Canceled
+	}
 }
 
-func createResponse(request *Request, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) Response {
+func createResponse(ctx context.Context, request *Request, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) Response {
 	filtered := make([]types.ResourceWithTtl, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
@@ -385,6 +397,7 @@ func createResponse(request *Request, resources map[string]types.ResourceWithTtl
 		Version:   version,
 		Resources: filtered,
 		Heartbeat: heartbeat,
+		Ctx:       ctx,
 	}
 }
 
@@ -419,7 +432,13 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
 			delayedResponse = true
 		}
-		delayedResponse = respondDelta(request, value, state, snapshot, cache.log) == nil
+		response, err := respondDelta(context.Background(), request, value, state, snapshot, cache.log)
+		if err != nil {
+			cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
+			delayedResponse = true
+		}
+
+		delayedResponse = response == nil
 	}
 
 	if delayedResponse {
@@ -474,7 +493,7 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request *Request) (Respon
 		}
 
 		resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
-		out := createResponse(request, resources, version, false)
+		out := createResponse(ctx, request, resources, version, false)
 		return out, nil
 	}
 
