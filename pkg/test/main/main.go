@@ -54,6 +54,8 @@ var (
 	runtimes      int
 	tls           bool
 	mux           bool
+	extension     string
+	extensionNum  int
 
 	nodeID string
 )
@@ -133,6 +135,11 @@ func init() {
 
 	// Enable a muxed cache with partial snapshots
 	flag.BoolVar(&mux, "mux", false, "Enable muxed linear cache for EDS")
+
+	// Name of Extension Config
+	flag.StringVar(&extension, "e", "fault", "Name of Extension Config")
+	// Number of Extension
+	flag.IntVar(&extensionNum, "eNum", 1, "Number of Extension")
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
@@ -176,6 +183,8 @@ func main() {
 		NumTCPListeners:  tcpListeners,
 		TLS:              tls,
 		NumRuntimes:      runtimes,
+		ExtensionName:    extension,
+		NumExtension:     extensionNum,
 	}
 
 	// start the xDS server
