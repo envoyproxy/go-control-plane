@@ -28,7 +28,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.StreamState{ResourceVersions: nil, Wildcard: true}, watches[typ])
+		}, stream.NewStreamState(true, nil), watches[typ])
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
@@ -61,7 +61,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.StreamState{ResourceVersions: versionMap[typ]}, watches[typ])
+		}, stream.NewStreamState(false, versionMap[typ]), watches[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -94,9 +94,12 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 func TestDeltaRemoveResources(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	watches := make(map[string]chan cache.DeltaResponse)
+	streams := make(map[string]*stream.StreamState)
 
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
+		state := stream.NewStreamState(true, make(map[string]string))
+		streams[typ] = &state
 		// We don't specify any resource name subscriptions here because we want to make sure we test wildcard
 		// functionality. This means we should receive all resources back without requesting a subscription by name.
 		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
@@ -104,14 +107,13 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, stream.StreamState{ResourceVersions: make(map[string]string), Wildcard: true}, watches[typ])
+		}, *streams[typ], watches[typ])
 	}
 
 	if err := c.SetSnapshot(key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
-	versionMap := make(map[string]map[string]string)
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {
@@ -120,7 +122,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
 				nextVersionMap := out.GetNextVersionMap()
-				versionMap[typ] = nextVersionMap
+				streams[typ].SetResourceVersions(nextVersionMap)
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive a snapshot response")
 			}
@@ -136,7 +138,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, stream.StreamState{ResourceVersions: versionMap[typ], Wildcard: true}, watches[typ])
+		}, *streams[typ], watches[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -159,7 +161,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 		nextVersionMap := out.GetNextVersionMap()
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
-		if reflect.DeepEqual(versionMap[testTypes[0]], nextVersionMap) {
+		if reflect.DeepEqual(streams[testTypes[0]].GetResourceVersions(), nextVersionMap) {
 			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an emtpy map", nextVersionMap)
 		}
 	case <-time.After(time.Second):

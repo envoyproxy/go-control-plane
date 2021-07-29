@@ -31,10 +31,13 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.
 	}
 
 	// Only send a response if there were changes
-	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 ||
+		// we want to respond immediatly for the first wildcard request in a stream, even if the response is empty
+		// otherwise, envoy won't complete initialization
+		(state.IsWildcard() && state.IsFresh()) {
 		if log != nil {
 			log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
-				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.Wildcard)
+				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
 		}
 		value <- resp
 		return resp
@@ -52,20 +55,20 @@ func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot S
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
-	case state.Wildcard:
+	case state.IsWildcard():
 		for name, r := range resources {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
 			version := snapshot.GetVersionMap()[req.TypeUrl][name]
 			nextVersionMap[name] = version
-			prevVersion, found := state.ResourceVersions[name]
+			prevVersion, found := state.GetResourceVersions()[name]
 			if !found || (prevVersion != nextVersionMap[name]) {
 				filtered = append(filtered, r)
 			}
 		}
 	default:
 		// Reply only with the requested resources
-		for name, prevVersion := range state.ResourceVersions {
+		for name, prevVersion := range state.GetResourceVersions() {
 			if r, ok := resources[name]; ok {
 				nextVersion := snapshot.GetVersionMap()[req.TypeUrl][name]
 				if prevVersion != nextVersion {
@@ -77,7 +80,7 @@ func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot S
 	}
 
 	// Compute resources for removal regardless of the request type
-	for name := range state.ResourceVersions {
+	for name := range state.GetResourceVersions() {
 		if _, ok := resources[name]; !ok {
 			toRemove = append(toRemove, name)
 		}
