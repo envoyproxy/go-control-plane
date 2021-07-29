@@ -79,7 +79,6 @@ $(BINDIR)/example:
 	@go build -race -o $@ internal/example/main/main.go
 
 example: $(BINDIR)/example
-	@build/example.sh
 
 .PHONY: docker_tests
 docker_tests:
