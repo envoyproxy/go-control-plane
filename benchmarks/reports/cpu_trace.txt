@@ -1,0 +1,227 @@
+File: test
+Type: cpu
+Time: Jul 29, 2021 at 6:40pm (UTC)
+Duration: 8.44s, Total samples = 380ms ( 4.50%)
+-----------+-------------------------------------------------------
+      10ms   runtime.madvise
+             runtime.sysUnused
+             runtime.(*pageAlloc).scavengeRangeLocked
+             runtime.(*pageAlloc).scavengeOne
+             runtime.(*pageAlloc).scavenge
+             runtime.bgscavenge.func2
+             runtime.systemstack
+             runtime.bgscavenge
+-----------+-------------------------------------------------------
+      10ms   runtime.futex
+             runtime.futexwakeup
+             runtime.notewakeup
+             runtime.startm
+             runtime.wakep
+             runtime.resetspinning
+             runtime.schedule
+             runtime.park_m
+             runtime.mcall
+-----------+-------------------------------------------------------
+      40ms   __tsan::MetaMap::GetAndLock
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   __tsan::MetaMap::GetAndLock
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   runtime.(*gcWork).putFast (inline)
+             runtime.greyobject
+             runtime.scanobject
+             runtime.gcDrain
+             runtime.gcBgMarkWorker.func2
+             runtime.systemstack
+             runtime.gcBgMarkWorker
+-----------+-------------------------------------------------------
+      10ms   runtime.getMCache (inline)
+             runtime.mallocgc
+             runtime.slicebytetostring
+             google.golang.org/protobuf/encoding/protowire.ConsumeString (inline)
+             google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+             google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+             google.golang.org/protobuf/internal/impl.consumeMessageInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+             google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+             google.golang.org/protobuf/proto.UnmarshalOptions.UnmarshalState (inline)
+             github.com/golang/protobuf/proto.UnmarshalMerge
+             github.com/golang/protobuf/proto.Unmarshal
+             google.golang.org/grpc/encoding/proto.codec.Unmarshal
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3.(*clusterDiscoveryServiceStreamClustersServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+      10ms   runtime.futex
+             runtime.futexwakeup
+             runtime.unlock2
+             runtime.unlockWithRank (inline)
+             runtime.unlock (inline)
+             runtime.getitab
+             runtime.convI2I
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+      10ms   runtime.nanotime (inline)
+             runtime.checkTimers
+             runtime.schedule
+             runtime.park_m
+             runtime.mcall
+-----------+-------------------------------------------------------
+      10ms   __tsan::MemoryRangeSet
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   __tsan_func_enter
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   runtime.newproc1
+             runtime.newproc.func1
+             runtime.systemstack
+             runtime.newproc
+             net.(*netFD).connect
+             net.(*netFD).dial
+             net.socket
+             net.internetSocket
+             net.(*sysDialer).doDialTCP
+             net.(*sysDialer).dialTCP
+             net.(*sysDialer).dialSingle
+             net.(*sysDialer).dialSerial
+             net.(*Dialer).DialContext
+             net/http.(*Transport).dial
+             net/http.(*Transport).dialConn
+             net/http.(*Transport).dialConnFor
+-----------+-------------------------------------------------------
+      10ms   runtime.nextFreeFast (inline)
+             runtime.mallocgc
+             runtime.newobject
+             net/http.setRequestCancel
+             net/http.send
+             net/http.(*Client).send
+             net/http.(*Client).do
+             net/http.(*Client).Do (inline)
+             net/http.(*Client).Get
+             main.callEcho.func1
+-----------+-------------------------------------------------------
+      10ms   __sanitizer::internal_munmap
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   __tsan::VarSizeStackTrace::VarSizeStackTrace
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   runtime.write1
+             runtime.write (inline)
+             runtime.netpollBreak
+             runtime.wakeNetPoller
+             runtime.addtimer
+             time.startTimer
+             time.AfterFunc
+             context.WithDeadline
+             net/http.setRequestCancel
+             net/http.send
+             net/http.(*Client).send
+             net/http.(*Client).do
+             net/http.(*Client).Do (inline)
+             net/http.(*Client).Get
+             main.callEcho.func1
+-----------+-------------------------------------------------------
+      10ms   __tsan_func_exit
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   __tsan::MemoryAccessRange
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   syscall.Syscall
+             syscall.write
+             syscall.Write
+             internal/poll.ignoringEINTRIO (inline)
+             internal/poll.(*FD).Write
+             os.(*File).write (inline)
+             os.(*File).Write
+             log.(*Logger).Output
+             log.Printf
+             main.(*logger).Debugf
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+      10ms   __tsan_read
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   __tsan::ThreadClock::ReleaseStore
+             runtime._System
+-----------+-------------------------------------------------------
+      30ms   __sanitizer::internal_memset
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   runtime.nanotime (inline)
+             runtime.findrunnable
+             runtime.schedule
+             runtime.park_m
+             runtime.mcall
+-----------+-------------------------------------------------------
+      10ms   __tsan_read
+             runtime._System
+-----------+-------------------------------------------------------
+      20ms   __sanitizer::internal_madvise
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   __tsan_func_enter
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   __sanitizer::internal_sched_yield
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   runtime.gcDrain
+             runtime.gcBgMarkWorker.func2
+             runtime.systemstack
+             runtime.gcBgMarkWorker
+-----------+-------------------------------------------------------
+      10ms   __tsan::MemoryAccessRange
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   runtime.futex
+             runtime.futexwakeup
+             runtime.notewakeup
+             runtime.entersyscall_sysmon
+             runtime.systemstack
+             runtime.reentersyscall
+             runtime.entersyscall
+             syscall.Syscall
+             syscall.read
+             syscall.Read
+             internal/poll.ignoringEINTRIO (inline)
+             internal/poll.(*FD).Read
+             net.(*netFD).Read
+             net.(*conn).Read
+             net/http.(*persistConn).Read
+             bufio.(*Reader).fill
+             bufio.(*Reader).Peek
+             net/http.(*persistConn).readLoop
+-----------+-------------------------------------------------------
+      10ms   __tsan_read
+             runtime._System
+-----------+-------------------------------------------------------
+      10ms   runtime.nanotime (inline)
+             runtime.checkTimers
+             runtime.findrunnable
+             runtime.schedule
+             runtime.goexit0
+             runtime.mcall
+-----------+-------------------------------------------------------
+      10ms   __tsan_go_atomic64_load
+             runtime._System
+-----------+-------------------------------------------------------

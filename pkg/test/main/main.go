@@ -24,15 +24,23 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"runtime"
-	"runtime/pprof"
 	"time"
+
+	"github.com/pkg/profile"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 	testv3 "github.com/envoyproxy/go-control-plane/pkg/test/v3"
+)
+
+const (
+	PPROF_CPU int = iota
+	PPROF_HEAP
+	PPROF_MUTEX
+	PPROF_BLOCK
+	PPROF_GOROUTINE
 )
 
 var (
@@ -59,11 +67,11 @@ var (
 
 	nodeID string
 
-	pprofEnabled bool
+	pprofMode int
 )
 
 func init() {
-	flag.BoolVar(&debug, "debug", false, "Use debug logging")
+	flag.BoolVar(&debug, "debug", false, "Use debug logging and enable pprof")
 
 	//
 	// These parameters control the ports that the integration test
@@ -142,8 +150,8 @@ func init() {
 	// These parameters control the the use of the pprof profiler
 	//
 
-	// Enable use of the pprof profiler
-	flag.BoolVar(&pprofEnabled, "pprof", false, "Enable use of the pprof profiler")
+	// Pprof mode for which profiling method to use
+	flag.IntVar(&pprofMode, "pprofMode", 0, "Mode for pprof to run in: 0 -> CPU,1 -> heap, 2 -> mutex, 3 -> block, 4 -> goroutines")
 
 }
 
@@ -152,13 +160,18 @@ func main() {
 	flag.Parse()
 	ctx := context.Background()
 
-	if pprofEnabled {
-		runtime.SetBlockProfileRate(1)
-		for _, prof := range []string{"block", "goroutine", "mutex"} {
-			log.Printf("turn on pprof %s profiler", prof)
-			if pprof.Lookup(prof) == nil {
-				pprof.NewProfile(prof)
-			}
+	if debug {
+		switch pprofMode {
+		case PPROF_CPU:
+			defer profile.Start(profile.CPUProfile, profile.ProfilePath("."), profile.NoShutdownHook).Stop()
+		case PPROF_HEAP:
+			defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+		case PPROF_MUTEX:
+			defer profile.Start(profile.MutexProfile, profile.ProfilePath(".")).Stop()
+		case PPROF_BLOCK:
+			defer profile.Start(profile.BlockProfile, profile.ProfilePath(".")).Stop()
+		case PPROF_GOROUTINE:
+			defer profile.Start(profile.GoroutineProfile, profile.ProfilePath(".")).Stop()
 		}
 	}
 
@@ -262,20 +275,6 @@ func main() {
 		if !pass {
 			log.Printf("failed all requests in a run %d\n", i)
 			os.Exit(1)
-		}
-	}
-
-	if pprofEnabled {
-		for _, prof := range []string{"block", "goroutine", "mutex"} {
-			p := pprof.Lookup(prof)
-			filePath := fmt.Sprintf("%s_profile_%s.pb.gz", prof, mode)
-			log.Printf("storing %s profile for %s in %s", prof, mode, filePath)
-			f, err := os.Create(filePath)
-			if err != nil {
-				log.Fatalf("could not create %s profile %s: %s", prof, filePath, err)
-			}
-			p.WriteTo(f, 1)
-			f.Close()
 		}
 	}
 

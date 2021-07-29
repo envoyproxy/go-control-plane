@@ -1,0 +1,214 @@
+File: test
+Type: delay
+Time: Jul 29, 2021 at 6:41pm (UTC)
+Showing nodes accounting for 7.90ms, 100% of 7.90ms total
+Dropped 2 nodes (cum <= 0.04ms)
+----------------------------------------------------------+-------------
+      flat  flat%   sum%        cum   cum%   calls calls% + context 	 	 
+----------------------------------------------------------+-------------
+                                            3.39ms 42.90% |   sync.(*Once).doSlow
+                                            2.72ms 34.48% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+                                            1.65ms 20.87% |   sync.(*RWMutex).Unlock
+                                            0.14ms  1.76% |   log.(*Logger).Output
+    7.90ms   100%   100%     7.90ms   100%                | sync.(*Mutex).Unlock
+----------------------------------------------------------+-------------
+                                            0.05ms   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%     0.05ms  0.64%                | github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+                                            0.05ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters
+----------------------------------------------------------+-------------
+                                            2.02ms   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%     2.02ms 25.58%                | github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+                                            2.02ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+----------------------------------------------------------+-------------
+                                            1.73ms   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%     1.73ms 21.86%                | github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+                                            1.73ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+         0     0%   100%     2.72ms 34.48%                | github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+                                            2.72ms   100% |   github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+----------------------------------------------------------+-------------
+                                            1.65ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+         0     0%   100%     1.65ms 20.87%                | github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+                                            1.65ms   100% |   sync.(*RWMutex).Unlock
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+         0     0%   100%     2.72ms 34.48%                | github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+                                            2.72ms   100% |   github.com/golang/protobuf/proto.(*Buffer).Marshal (inline)
+----------------------------------------------------------+-------------
+                                            4.51ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler
+         0     0%   100%     4.51ms 57.10%                | github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+                                            4.51ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+----------------------------------------------------------+-------------
+                                            4.51ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+         0     0%   100%     4.51ms 57.10%                | github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+                                            2.72ms 60.39% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+                                            1.65ms 36.54% |   github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+                                            0.14ms  3.07% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func1
+----------------------------------------------------------+-------------
+                                            0.14ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+         0     0%   100%     0.14ms  1.76%                | github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func1
+                                            0.14ms   100% |   github.com/envoyproxy/go-control-plane/pkg/test/v3.(*Callbacks).OnStreamClosed
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+         0     0%   100%     2.72ms 34.48%                | github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+                                            2.72ms   100% |   github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+----------------------------------------------------------+-------------
+                                            0.05ms   100% |   github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+         0     0%   100%     0.05ms  0.64%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters
+                                            0.05ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+                                            2.02ms 75.00% |   github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+         0     0%   100%     2.69ms 34.11%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+                                            2.69ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+                                            2.69ms 59.74% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints (inline)
+                                            1.73ms 38.29% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes (inline)
+                                            0.05ms  1.12% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters (inline)
+                                            0.04ms  0.85% |   google.golang.org/grpc.(*Server).processStreamingRPC (inline)
+         0     0%   100%     4.51ms 57.10%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler
+                                            4.51ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+----------------------------------------------------------+-------------
+                                            1.73ms   100% |   github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+         0     0%   100%     1.73ms 21.86%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+                                            1.73ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+         0     0%   100%     3.39ms 42.90%                | github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer
+                                            3.39ms   100% |   net.Listen
+----------------------------------------------------------+-------------
+                                            0.14ms   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func1
+         0     0%   100%     0.14ms  1.76%                | github.com/envoyproxy/go-control-plane/pkg/test/v3.(*Callbacks).OnStreamClosed
+                                            0.14ms   100% |   log.Printf
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource (inline)
+         0     0%   100%     2.72ms 34.48%                | github.com/golang/protobuf/proto.(*Buffer).Marshal
+                                            2.72ms   100% |   github.com/golang/protobuf/proto.marshalAppend
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   github.com/golang/protobuf/proto.(*Buffer).Marshal
+         0     0%   100%     2.72ms 34.48%                | github.com/golang/protobuf/proto.marshalAppend
+                                            2.72ms   100% |   google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+----------------------------------------------------------+-------------
+                                            3.59ms 93.53% |   google.golang.org/grpc.(*Server).serveStreams.func1.2
+         0     0%   100%     3.84ms 48.57%                | google.golang.org/grpc.(*Server).handleStream
+                                            3.84ms   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+----------------------------------------------------------+-------------
+                                            3.84ms   100% |   google.golang.org/grpc.(*Server).handleStream
+         0     0%   100%     3.84ms 48.57%                | google.golang.org/grpc.(*Server).processStreamingRPC
+                                            2.02ms 52.67% |   github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+                                            1.73ms 45.01% |   github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+                                            0.05ms  1.31% |   github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+                                            0.04ms  1.00% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+         0     0%   100%     3.59ms 45.43%                | google.golang.org/grpc.(*Server).serveStreams.func1.2
+                                            3.59ms   100% |   google.golang.org/grpc.(*Server).handleStream
+----------------------------------------------------------+-------------
+                                            2.08ms 76.24% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+                                            0.65ms 23.76% |   google.golang.org/protobuf/internal/impl.(*messageState).ProtoMethods
+         0     0%   100%     2.72ms 34.48%                | google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+                                            2.72ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+         0     0%   100%     2.72ms 34.48%                | google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+                                            2.72ms   100% |   sync.(*Mutex).Unlock
+----------------------------------------------------------+-------------
+                                            1.49ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+         0     0%   100%     1.49ms 18.87%                | google.golang.org/protobuf/internal/impl.(*MessageInfo).initOneofFieldCoders.func3
+                                            1.49ms   100% |   google.golang.org/protobuf/internal/impl.sizeMessageInfo
+----------------------------------------------------------+-------------
+                                            2.08ms   100% |   google.golang.org/protobuf/proto.MarshalOptions.marshal
+         0     0%   100%     2.08ms 26.29%                | google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+----------------------------------------------------------+-------------
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+                                            1.66ms 79.75% |   google.golang.org/protobuf/internal/impl.sizeMessageInfo
+         0     0%   100%     2.08ms 26.29%                | google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+----------------------------------------------------------+-------------
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+         0     0%   100%     2.08ms 26.29%                | google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+                                            1.49ms 71.77% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).initOneofFieldCoders.func3
+                                            1.09ms 52.37% |   google.golang.org/protobuf/internal/impl.sizeMessageInfo
+----------------------------------------------------------+-------------
+                                            0.65ms   100% |   google.golang.org/protobuf/proto.protoMethods
+         0     0%   100%     0.65ms  8.19%                | google.golang.org/protobuf/internal/impl.(*messageState).ProtoMethods
+                                            0.65ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+----------------------------------------------------------+-------------
+                                            1.49ms 89.99% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).initOneofFieldCoders.func3
+                                            1.09ms 65.67% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+         0     0%   100%     1.66ms 20.96%                | google.golang.org/protobuf/internal/impl.sizeMessageInfo
+                                            1.66ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+----------------------------------------------------------+-------------
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+         0     0%   100%     2.08ms 26.29%                | google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+                                            2.08ms   100% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   github.com/golang/protobuf/proto.marshalAppend
+         0     0%   100%     2.72ms 34.48%                | google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+                                            2.72ms   100% |   google.golang.org/protobuf/proto.MarshalOptions.marshal
+----------------------------------------------------------+-------------
+                                            2.72ms   100% |   google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+         0     0%   100%     2.72ms 34.48%                | google.golang.org/protobuf/proto.MarshalOptions.marshal
+                                            2.08ms 76.24% |   google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+                                            0.65ms 23.76% |   google.golang.org/protobuf/proto.protoMethods (inline)
+----------------------------------------------------------+-------------
+                                            0.65ms   100% |   google.golang.org/protobuf/proto.MarshalOptions.marshal (inline)
+         0     0%   100%     0.65ms  8.19%                | google.golang.org/protobuf/proto.protoMethods
+                                            0.65ms   100% |   google.golang.org/protobuf/internal/impl.(*messageState).ProtoMethods
+----------------------------------------------------------+-------------
+                                            0.14ms   100% |   log.Printf
+         0     0%   100%     0.14ms  1.76%                | log.(*Logger).Output
+                                            0.14ms   100% |   sync.(*Mutex).Unlock
+----------------------------------------------------------+-------------
+                                            0.14ms   100% |   github.com/envoyproxy/go-control-plane/pkg/test/v3.(*Callbacks).OnStreamClosed
+         0     0%   100%     0.14ms  1.76%                | log.Printf
+                                            0.14ms   100% |   log.(*Logger).Output
+----------------------------------------------------------+-------------
+                                            3.39ms   100% |   net.Listen
+         0     0%   100%     3.39ms 42.90%                | net.(*ListenConfig).Listen
+                                            3.39ms   100% |   net.(*sysListener).listenTCP
+----------------------------------------------------------+-------------
+                                            3.39ms   100% |   net.(*ListenConfig).Listen
+         0     0%   100%     3.39ms 42.90%                | net.(*sysListener).listenTCP
+                                            3.39ms   100% |   net.internetSocket
+----------------------------------------------------------+-------------
+                                            3.39ms   100% |   github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer
+         0     0%   100%     3.39ms 42.90%                | net.Listen
+                                            3.39ms   100% |   net.(*ListenConfig).Listen
+----------------------------------------------------------+-------------
+                                            0.06ms   100% |   net.internetSocket
+         0     0%   100%     0.06ms  0.81%                | net.favoriteAddrFamily
+                                            0.06ms   100% |   net.supportsIPv4map (inline)
+----------------------------------------------------------+-------------
+                                            3.39ms   100% |   net.(*sysListener).listenTCP
+         0     0%   100%     3.39ms 42.90%                | net.internetSocket
+                                            3.32ms 98.11% |   net.socket
+                                            0.06ms  1.89% |   net.favoriteAddrFamily
+----------------------------------------------------------+-------------
+                                            3.32ms   100% |   net.socket
+         0     0%   100%     3.32ms 42.09%                | net.listenerBacklog
+                                            3.32ms   100% |   sync.(*Once).Do
+----------------------------------------------------------+-------------
+                                            3.32ms   100% |   net.internetSocket
+         0     0%   100%     3.32ms 42.09%                | net.socket
+                                            3.32ms   100% |   net.listenerBacklog
+----------------------------------------------------------+-------------
+                                            0.06ms   100% |   net.favoriteAddrFamily (inline)
+         0     0%   100%     0.06ms  0.81%                | net.supportsIPv4map
+                                            0.06ms   100% |   sync.(*Once).Do
+----------------------------------------------------------+-------------
+                                            3.32ms 98.11% |   net.listenerBacklog
+                                            0.06ms  1.89% |   net.supportsIPv4map
+         0     0%   100%     3.39ms 42.90%                | sync.(*Once).Do
+                                            3.39ms   100% |   sync.(*Once).doSlow
+----------------------------------------------------------+-------------
+                                            3.39ms   100% |   sync.(*Once).Do
+         0     0%   100%     3.39ms 42.90%                | sync.(*Once).doSlow
+                                            3.39ms   100% |   sync.(*Mutex).Unlock
+----------------------------------------------------------+-------------
+                                            1.65ms   100% |   github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+         0     0%   100%     1.65ms 20.87%                | sync.(*RWMutex).Unlock
+                                            1.65ms   100% |   sync.(*Mutex).Unlock
+----------------------------------------------------------+-------------

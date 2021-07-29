@@ -1,0 +1,518 @@
+File: test
+Type: delay
+Time: Jul 29, 2021 at 6:41pm (UTC)
+-----------+-------------------------------------------------------
+    87.70s   runtime.selectgo
+             net/http.(*persistConn).writeLoop
+-----------+-------------------------------------------------------
+    29.61s   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*controlBuffer).get
+             google.golang.org/grpc/internal/transport.(*loopyWriter).run
+             google.golang.org/grpc/internal/transport.newHTTP2Server.func2
+-----------+-------------------------------------------------------
+    22.34s   runtime.selectgo
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+    22.31s   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3.(*endpointDiscoveryServiceStreamEndpointsServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+    15.29s   runtime.selectgo
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+    15.29s   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3.(*routeDiscoveryServiceStreamRoutesServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+     7.52s   runtime.selectgo
+             main.main
+             runtime.main
+-----------+-------------------------------------------------------
+     5.59s   runtime.selectgo
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRuntime
+             github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3._RuntimeDiscoveryService_StreamRuntime_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+     5.59s   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3.(*runtimeDiscoveryServiceStreamRuntimeServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+     5.56s   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3.(*clusterDiscoveryServiceStreamClustersServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+     5.55s   runtime.selectgo
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters
+             github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+     5.48s   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/listener/v3.(*listenerDiscoveryServiceStreamListenersServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+     5.47s   runtime.selectgo
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamListeners
+             github.com/envoyproxy/go-control-plane/envoy/service/listener/v3._ListenerDiscoveryService_StreamListeners_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+     1.65s   runtime.selectgo
+             net/http.(*persistConn).roundTrip
+             net/http.(*Transport).roundTrip
+             net/http.(*Transport).RoundTrip
+             net/http.send
+             net/http.(*Client).send
+             net/http.(*Client).do
+             net/http.(*Client).Do (inline)
+             net/http.(*Client).Get
+             main.callEcho.func1
+-----------+-------------------------------------------------------
+  556.95ms   runtime.chanrecv1
+             main.callEcho
+             main.main
+             runtime.main
+-----------+-------------------------------------------------------
+  129.39ms   runtime.selectgo
+             net/http.(*Transport).getConn
+             net/http.(*Transport).roundTrip
+             net/http.(*Transport).RoundTrip
+             net/http.send
+             net/http.(*Client).send
+             net/http.(*Client).do
+             net/http.(*Client).Do (inline)
+             net/http.(*Client).Get
+             main.callEcho.func1
+-----------+-------------------------------------------------------
+   63.97ms   runtime.selectgo
+             main.main
+             runtime.main
+-----------+-------------------------------------------------------
+   28.87ms   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3.(*endpointDiscoveryServiceStreamEndpointsServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+    3.23ms   runtime.selectgo
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3.(*routeDiscoveryServiceStreamRoutesServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+    3.05ms   runtime.chanrecv1
+             net/http.(*persistConn).readLoop.func4
+             net/http.(*bodyEOFSignal).condfn (inline)
+             net/http.(*bodyEOFSignal).Read
+             net/http.(*cancelTimerBody).Read
+             io.ReadAll
+             io/ioutil.ReadAll (inline)
+             main.callEcho.func1
+-----------+-------------------------------------------------------
+    2.08ms   runtime.selectgo
+             net/http.(*persistConn).readLoop
+-----------+-------------------------------------------------------
+    1.93ms   runtime.chanrecv1
+             net.(*netFD).connect.func1
+             net.(*netFD).connect
+             net.(*netFD).dial
+             net.socket
+             net.internetSocket
+             net.(*sysDialer).doDialTCP
+             net.(*sysDialer).dialTCP
+             net.(*sysDialer).dialSingle
+             net.(*sysDialer).dialSerial
+             net.(*Dialer).DialContext
+             net/http.(*Transport).dial
+             net/http.(*Transport).dialConn
+             net/http.(*Transport).dialConnFor
+-----------+-------------------------------------------------------
+  474.85us   sync.(*Mutex).Lock
+             sync.(*RWMutex).Lock
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  454.86us   sync.(*Mutex).Lock
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).initOneofFieldCoders.func3
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+             google.golang.org/protobuf/proto.MarshalOptions.marshal
+             google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+             github.com/golang/protobuf/proto.marshalAppend
+             github.com/golang/protobuf/proto.(*Buffer).Marshal (inline)
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  429.47us   sync.(*Mutex).Lock
+             sync.(*RWMutex).Lock
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  400.15us   sync.(*Mutex).Lock
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+             google.golang.org/protobuf/proto.MarshalOptions.marshal
+             google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+             github.com/golang/protobuf/proto.marshalAppend
+             github.com/golang/protobuf/proto.(*Buffer).Marshal (inline)
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  182.76us   sync.(*Mutex).Lock
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+             google.golang.org/protobuf/proto.MarshalOptions.marshal
+             google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+             github.com/golang/protobuf/proto.marshalAppend
+             github.com/golang/protobuf/proto.(*Buffer).Marshal (inline)
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  165.66us   sync.(*Mutex).Lock
+             sync.(*RWMutex).Lock
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).cancelWatch.func1
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters
+             github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  154.98us   sync.(*Mutex).Lock
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.sizeMessageSliceInfo
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+             google.golang.org/protobuf/proto.MarshalOptions.marshal
+             google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+             github.com/golang/protobuf/proto.marshalAppend
+             github.com/golang/protobuf/proto.(*Buffer).Marshal (inline)
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  139.81us   sync.(*Mutex).Lock
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+             google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+             google.golang.org/protobuf/internal/impl.(*messageState).ProtoMethods
+             google.golang.org/protobuf/proto.protoMethods (inline)
+             google.golang.org/protobuf/proto.MarshalOptions.marshal
+             google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+             github.com/golang/protobuf/proto.marshalAppend
+             github.com/golang/protobuf/proto.(*Buffer).Marshal (inline)
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  124.89us   sync.(*Mutex).Lock
+             log.(*Logger).Output
+             log.Printf
+             github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer
+-----------+-------------------------------------------------------
+  118.31us   sync.(*Mutex).Lock
+             sync.(*RWMutex).Lock
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).cancelWatch.func1
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamListeners
+             github.com/envoyproxy/go-control-plane/envoy/service/listener/v3._ListenerDiscoveryService_StreamListeners_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+  111.64us   runtime.selectgo
+             net.(*netFD).connect.func2
+-----------+-------------------------------------------------------
+  107.40us   runtime.chansend1
+             runtime.ensureSigM.func1
+-----------+-------------------------------------------------------
+   75.41us   sync.(*Mutex).Lock
+             log.(*Logger).Output
+             log.Printf
+             main.logger.Debugf
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+   67.33us   sync.(*Mutex).Lock
+             sync.(*RWMutex).Lock
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).cancelWatch.func1
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+   51.67us   sync.(*Mutex).Lock
+             google.golang.org/grpc/internal/transport.(*recvBuffer).load
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).readAdditional
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+             google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+             google.golang.org/grpc/internal/transport.(*transportReader).Read
+             io.ReadAtLeast
+             io.ReadFull (inline)
+             google.golang.org/grpc/internal/transport.(*Stream).Read
+             google.golang.org/grpc.(*parser).recvMsg
+             google.golang.org/grpc.recvAndDecompress
+             google.golang.org/grpc.recv
+             google.golang.org/grpc.(*serverStream).RecvMsg
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3.(*endpointDiscoveryServiceStreamEndpointsServer).Recv
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+-----------+-------------------------------------------------------
+   48.29us   runtime.chanrecv1
+             net.(*netFD).connect.func1
+             net.(*netFD).connect
+             net.(*netFD).dial
+             net.socket
+             net.internetSocket
+             net.(*sysDialer).doDialTCP
+             net.(*sysDialer).dialTCP
+             net.(*sysDialer).dialSingle
+             net.(*sysDialer).dialSerial
+             net.(*Dialer).DialContext
+             net/http.(*Transport).dial
+             net/http.(*Transport).dialConn
+             net/http.(*Transport).dialConnFor
+-----------+-------------------------------------------------------
+   47.92us   sync.(*Mutex).Lock
+             log.(*Logger).Output
+             log.Printf
+             github.com/envoyproxy/go-control-plane/pkg/test/v3.(*Callbacks).OnStreamOpen
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+   45.74us   sync.(*Mutex).Lock
+             log.(*Logger).Output
+             log.Printf
+             github.com/envoyproxy/go-control-plane/pkg/test/v3.(*Callbacks).OnStreamClosed
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func1
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+             github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------
+   18.78us   runtime.chansend1
+             runtime.sigenable
+             os/signal.signal_enable
+             os/signal.enableSignal (inline)
+             os/signal.Notify.func1
+             os/signal.Notify
+             github.com/pkg/profile.Start.func10
+-----------+-------------------------------------------------------
+   12.37us   sync.(*Mutex).Lock
+             sync.(*RWMutex).Lock
+             github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).cancelWatch.func1
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+             github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+             github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+             github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+             google.golang.org/grpc.(*Server).processStreamingRPC
+             google.golang.org/grpc.(*Server).handleStream
+             google.golang.org/grpc.(*Server).serveStreams.func1.2
+-----------+-------------------------------------------------------

@@ -1,0 +1,95 @@
+File: test
+Type: inuse_space
+Time: Jul 29, 2021 at 6:41pm (UTC)
+Showing nodes accounting for 1409.42kB, 97.00% of 1453.03kB total
+Dropped 42 nodes (cum <= 7.26kB)
+      flat  flat%   sum%        cum   cum%
+  539.01kB 37.10% 37.10%   539.01kB 37.10%  google.golang.org/protobuf/internal/strs.(*Builder).AppendFullName
+  241.72kB 16.64% 53.73%   990.69kB 68.18%  google.golang.org/protobuf/internal/filedesc.(*Message).unmarshalFull
+  156.98kB 10.80% 64.53%   156.98kB 10.80%  google.golang.org/protobuf/internal/strs.(*Builder).MakeString (inline)
+   97.29kB  6.70% 71.23%    97.29kB  6.70%  reflect.New
+   56.90kB  3.92% 75.15%    56.90kB  3.92%  google.golang.org/protobuf/internal/impl.fieldInfoForMessage
+   56.26kB  3.87% 79.02%    56.26kB  3.87%  google.golang.org/protobuf/encoding/protowire.ConsumeString (inline)
+   53.16kB  3.66% 82.68%    53.16kB  3.66%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeStructInfo
+   48.81kB  3.36% 86.04%    52.83kB  3.64%  google.golang.org/protobuf/internal/impl.fieldInfoForScalar
+   44.30kB  3.05% 89.08%    44.30kB  3.05%  google.golang.org/protobuf/internal/filedesc.(*Builder).optionsUnmarshaler
+   21.36kB  1.47% 90.55%   701.52kB 48.28%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeCoderMethods
+   20.39kB  1.40% 91.96%    20.39kB  1.40%  google.golang.org/protobuf/internal/impl.fieldInfoForOneof
+   16.28kB  1.12% 93.08%    20.31kB  1.40%  google.golang.org/protobuf/internal/impl.fieldInfoForList
+   16.05kB  1.10% 94.18%    16.05kB  1.10%  google.golang.org/protobuf/internal/filedesc.appendOptions (inline)
+   12.23kB  0.84% 95.02%    12.23kB  0.84%  google.golang.org/protobuf/internal/filedesc.(*Fields).lazyInit.func1
+    8.42kB  0.58% 95.60%  1014.64kB 69.83%  google.golang.org/protobuf/internal/filedesc.(*File).unmarshalFull
+    8.17kB  0.56% 96.17%   103.90kB  7.15%  google.golang.org/protobuf/internal/filedesc.(*Enum).unmarshalFull
+    8.09kB  0.56% 96.72%   517.34kB 35.60%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeKnownFieldsFunc
+    4.01kB  0.28% 97.00%     8.01kB  0.55%  sync.(*Map).Store
+         0     0% 97.00%    32.30kB  2.22%  github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3.(*clusterDiscoveryServiceStreamClustersServer).Recv
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+         0     0% 97.00%    69.72kB  4.80%  github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3.(*endpointDiscoveryServiceStreamEndpointsServer).Recv
+         0     0% 97.00%    36.38kB  2.50%  github.com/envoyproxy/go-control-plane/envoy/service/route/v3.(*routeDiscoveryServiceStreamRoutesServer).Recv
+         0     0% 97.00%   207.67kB 14.29%  github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3.(*runtimeDiscoveryServiceStreamRuntimeServer).Recv
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*RawResponse).GetDiscoveryResponse
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/pkg/cache/v3.MarshalResource
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+         0     0% 97.00%   346.07kB 23.82%  github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process.func2
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters
+         0     0% 97.00%   358.37kB 24.66%  github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+         0     0% 97.00%   722.19kB 49.70%  github.com/envoyproxy/go-control-plane/pkg/test/resource/v3.MakeHTTPListener
+         0     0% 97.00%   722.19kB 49.70%  github.com/envoyproxy/go-control-plane/pkg/test/resource/v3.TestSnapshot.Generate
+         0     0% 97.00%   358.37kB 24.66%  github.com/golang/protobuf/proto.(*Buffer).Marshal (inline)
+         0     0% 97.00%   722.19kB 49.70%  github.com/golang/protobuf/proto.Marshal (inline)
+         0     0% 97.00%   350.10kB 24.09%  github.com/golang/protobuf/proto.Unmarshal
+         0     0% 97.00%   350.10kB 24.09%  github.com/golang/protobuf/proto.UnmarshalMerge
+         0     0% 97.00%  1080.56kB 74.37%  github.com/golang/protobuf/proto.marshalAppend
+         0     0% 97.00%   722.19kB 49.70%  github.com/golang/protobuf/ptypes.MarshalAny
+         0     0% 97.00%   230.37kB 15.85%  google.golang.org/grpc.(*Server).handleStream
+         0     0% 97.00%   230.37kB 15.85%  google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0% 97.00%   222.33kB 15.30%  google.golang.org/grpc.(*Server).serveStreams.func1.2
+         0     0% 97.00%   350.10kB 24.09%  google.golang.org/grpc.(*serverStream).RecvMsg
+         0     0% 97.00%   350.10kB 24.09%  google.golang.org/grpc.recv
+         0     0% 97.00%   350.10kB 24.09%  google.golang.org/grpc/encoding/proto.codec.Unmarshal
+         0     0% 97.00%    95.72kB  6.59%  google.golang.org/protobuf/internal/filedesc.(*EnumValue).unmarshalFull
+         0     0% 97.00%   620.92kB 42.73%  google.golang.org/protobuf/internal/filedesc.(*Field).unmarshalFull
+         0     0% 97.00%    12.23kB  0.84%  google.golang.org/protobuf/internal/filedesc.(*Fields).ByNumber
+         0     0% 97.00%    12.23kB  0.84%  google.golang.org/protobuf/internal/filedesc.(*Fields).lazyInit
+         0     0% 97.00%  1014.64kB 69.83%  google.golang.org/protobuf/internal/filedesc.(*File).lazyInit
+         0     0% 97.00%  1014.64kB 69.83%  google.golang.org/protobuf/internal/filedesc.(*File).lazyInitOnce
+         0     0% 97.00%  1014.64kB 69.83%  google.golang.org/protobuf/internal/filedesc.(*File).lazyRawInit
+         0     0% 97.00%   350.62kB 24.13%  google.golang.org/protobuf/internal/filedesc.(*Message).Fields
+         0     0% 97.00%   664.02kB 45.70%  google.golang.org/protobuf/internal/filedesc.(*Message).RequiredNumbers
+         0     0% 97.00%  1014.64kB 69.83%  google.golang.org/protobuf/internal/filedesc.(*Message).lazyInit (inline)
+         0     0% 97.00%   539.01kB 37.10%  google.golang.org/protobuf/internal/filedesc.appendFullName
+         0     0% 97.00%    96.25kB  6.62%  google.golang.org/protobuf/internal/filedesc.makeFullName
+         0     0% 97.00%  1272.02kB 87.54%  google.golang.org/protobuf/internal/impl.(*MessageInfo).init
+         0     0% 97.00%  1272.02kB 87.54%  google.golang.org/protobuf/internal/impl.(*MessageInfo).initOnce
+         0     0% 97.00%    20.63kB  1.42%  google.golang.org/protobuf/internal/impl.(*MessageInfo).initOneofFieldCoders.func1
+         0     0% 97.00%     8.51kB  0.59%  google.golang.org/protobuf/internal/impl.(*MessageInfo).initOneofFieldCoders.func3
+         0     0% 97.00%   517.34kB 35.60%  google.golang.org/protobuf/internal/impl.(*MessageInfo).makeReflectFuncs
+         0     0% 97.00%    29.35kB  2.02%  google.golang.org/protobuf/internal/impl.(*MessageInfo).size
+         0     0% 97.00%    29.35kB  2.02%  google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointer
+         0     0% 97.00%    29.35kB  2.02%  google.golang.org/protobuf/internal/impl.(*MessageInfo).sizePointerSlow
+         0     0% 97.00%   195.63kB 13.46%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0% 97.00%   195.63kB 13.46%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0% 97.00%  1205.67kB 82.98%  google.golang.org/protobuf/internal/impl.(*messageState).ProtoMethods
+         0     0% 97.00%     8.12kB  0.56%  google.golang.org/protobuf/internal/impl.NewConverter
+         0     0% 97.00%    16.18kB  1.11%  google.golang.org/protobuf/internal/impl.consumeMapOfMessage
+         0     0% 97.00%   195.63kB 13.46%  google.golang.org/protobuf/internal/impl.consumeMessageInfo
+         0     0% 97.00%   158.67kB 10.92%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+         0     0% 97.00%    56.26kB  3.87%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+         0     0% 97.00%    16.18kB  1.11%  google.golang.org/protobuf/internal/impl.encoderFuncsForMap.func3
+         0     0% 97.00%   676.13kB 46.53%  google.golang.org/protobuf/internal/impl.fieldCoder
+         0     0% 97.00%   336.34kB 23.15%  google.golang.org/protobuf/internal/impl.makeMessageFieldCoder
+         0     0% 97.00%   339.79kB 23.39%  google.golang.org/protobuf/internal/impl.makeMessageSliceFieldCoder
+         0     0% 97.00%   676.13kB 46.53%  google.golang.org/protobuf/internal/impl.needsInitCheck
+         0     0% 97.00%   676.13kB 46.53%  google.golang.org/protobuf/internal/impl.needsInitCheckLocked
+         0     0% 97.00%    29.35kB  2.02%  google.golang.org/protobuf/internal/impl.sizeMessageInfo
+         0     0% 97.00%  1080.56kB 74.37%  google.golang.org/protobuf/proto.MarshalOptions.MarshalAppend
+         0     0% 97.00%  1080.56kB 74.37%  google.golang.org/protobuf/proto.MarshalOptions.marshal
+         0     0% 97.00%   350.10kB 24.09%  google.golang.org/protobuf/proto.UnmarshalOptions.UnmarshalState (inline)
+         0     0% 97.00%   350.10kB 24.09%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0% 97.00%  1205.67kB 82.98%  google.golang.org/protobuf/proto.protoMethods (inline)
+         0     0% 97.00%   722.19kB 49.70%  main.main
+         0     0% 97.00%   727.65kB 50.08%  runtime.main
+         0     0% 97.00%    12.23kB  0.84%  sync.(*Once).Do
+         0     0% 97.00%    12.23kB  0.84%  sync.(*Once).doSlow

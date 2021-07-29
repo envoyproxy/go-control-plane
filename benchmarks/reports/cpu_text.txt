@@ -1,0 +1,133 @@
+File: test
+Type: cpu
+Time: Jul 29, 2021 at 6:40pm (UTC)
+Duration: 8.44s, Total samples = 380ms ( 4.50%)
+Showing nodes accounting for 380ms, 100% of 380ms total
+      flat  flat%   sum%        cum   cum%
+      50ms 13.16% 13.16%       50ms 13.16%  __tsan::MetaMap::GetAndLock
+      30ms  7.89% 21.05%       30ms  7.89%  __sanitizer::internal_memset
+      30ms  7.89% 28.95%       30ms  7.89%  __tsan_read
+      30ms  7.89% 36.84%       30ms  7.89%  runtime.futex
+      30ms  7.89% 44.74%       30ms  7.89%  runtime.nanotime (inline)
+      20ms  5.26% 50.00%       20ms  5.26%  __sanitizer::internal_madvise
+      20ms  5.26% 55.26%       20ms  5.26%  __tsan::MemoryAccessRange
+      20ms  5.26% 60.53%       20ms  5.26%  __tsan_func_enter
+      10ms  2.63% 63.16%       10ms  2.63%  __sanitizer::internal_munmap
+      10ms  2.63% 65.79%       10ms  2.63%  __sanitizer::internal_sched_yield
+      10ms  2.63% 68.42%       10ms  2.63%  __tsan::MemoryRangeSet
+      10ms  2.63% 71.05%       10ms  2.63%  __tsan::ThreadClock::ReleaseStore
+      10ms  2.63% 73.68%       10ms  2.63%  __tsan::VarSizeStackTrace::VarSizeStackTrace
+      10ms  2.63% 76.32%       10ms  2.63%  __tsan_func_exit
+      10ms  2.63% 78.95%       10ms  2.63%  __tsan_go_atomic64_load
+      10ms  2.63% 81.58%       10ms  2.63%  runtime.(*gcWork).putFast (inline)
+      10ms  2.63% 84.21%       20ms  5.26%  runtime.gcDrain
+      10ms  2.63% 86.84%       10ms  2.63%  runtime.getMCache (inline)
+      10ms  2.63% 89.47%       10ms  2.63%  runtime.madvise
+      10ms  2.63% 92.11%       10ms  2.63%  runtime.newproc1
+      10ms  2.63% 94.74%       10ms  2.63%  runtime.nextFreeFast (inline)
+      10ms  2.63% 97.37%       10ms  2.63%  runtime.write1
+      10ms  2.63%   100%       20ms  5.26%  syscall.Syscall
+         0     0%   100%       10ms  2.63%  bufio.(*Reader).Peek
+         0     0%   100%       10ms  2.63%  bufio.(*Reader).fill
+         0     0%   100%       10ms  2.63%  context.WithDeadline
+         0     0%   100%       10ms  2.63%  github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3.(*clusterDiscoveryServiceStreamClustersServer).Recv
+         0     0%   100%       20ms  5.26%  github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+         0     0%   100%       10ms  2.63%  github.com/envoyproxy/go-control-plane/pkg/cache/v3.(*snapshotCache).CreateWatch
+         0     0%   100%       10ms  2.63%  github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+         0     0%   100%       10ms  2.63%  github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+         0     0%   100%       10ms  2.63%  github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+         0     0%   100%       20ms  5.26%  github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+         0     0%   100%       10ms  2.63%  github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+         0     0%   100%       10ms  2.63%  github.com/golang/protobuf/proto.Unmarshal
+         0     0%   100%       10ms  2.63%  github.com/golang/protobuf/proto.UnmarshalMerge
+         0     0%   100%       20ms  5.26%  google.golang.org/grpc.(*Server).handleStream
+         0     0%   100%       20ms  5.26%  google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%       20ms  5.26%  google.golang.org/grpc.(*Server).serveStreams.func1.2
+         0     0%   100%       10ms  2.63%  google.golang.org/grpc.(*serverStream).RecvMsg
+         0     0%   100%       10ms  2.63%  google.golang.org/grpc.recv
+         0     0%   100%       10ms  2.63%  google.golang.org/grpc/encoding/proto.codec.Unmarshal
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/encoding/protowire.ConsumeString (inline)
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshal
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/internal/impl.(*MessageInfo).unmarshalPointer
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/internal/impl.consumeMessageInfo
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/internal/impl.consumeMessageSliceInfo
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/internal/impl.consumeStringValidateUTF8
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/proto.UnmarshalOptions.UnmarshalState (inline)
+         0     0%   100%       10ms  2.63%  google.golang.org/protobuf/proto.UnmarshalOptions.unmarshal
+         0     0%   100%       10ms  2.63%  internal/poll.(*FD).Read
+         0     0%   100%       10ms  2.63%  internal/poll.(*FD).Write
+         0     0%   100%       20ms  5.26%  internal/poll.ignoringEINTRIO (inline)
+         0     0%   100%       10ms  2.63%  log.(*Logger).Output
+         0     0%   100%       10ms  2.63%  log.Printf
+         0     0%   100%       10ms  2.63%  main.(*logger).Debugf
+         0     0%   100%       20ms  5.26%  main.callEcho.func1
+         0     0%   100%       10ms  2.63%  net.(*Dialer).DialContext
+         0     0%   100%       10ms  2.63%  net.(*conn).Read
+         0     0%   100%       10ms  2.63%  net.(*netFD).Read
+         0     0%   100%       10ms  2.63%  net.(*netFD).connect
+         0     0%   100%       10ms  2.63%  net.(*netFD).dial
+         0     0%   100%       10ms  2.63%  net.(*sysDialer).dialSerial
+         0     0%   100%       10ms  2.63%  net.(*sysDialer).dialSingle
+         0     0%   100%       10ms  2.63%  net.(*sysDialer).dialTCP
+         0     0%   100%       10ms  2.63%  net.(*sysDialer).doDialTCP
+         0     0%   100%       10ms  2.63%  net.internetSocket
+         0     0%   100%       10ms  2.63%  net.socket
+         0     0%   100%       20ms  5.26%  net/http.(*Client).Do (inline)
+         0     0%   100%       20ms  5.26%  net/http.(*Client).Get
+         0     0%   100%       20ms  5.26%  net/http.(*Client).do
+         0     0%   100%       20ms  5.26%  net/http.(*Client).send
+         0     0%   100%       10ms  2.63%  net/http.(*Transport).dial
+         0     0%   100%       10ms  2.63%  net/http.(*Transport).dialConn
+         0     0%   100%       10ms  2.63%  net/http.(*Transport).dialConnFor
+         0     0%   100%       10ms  2.63%  net/http.(*persistConn).Read
+         0     0%   100%       10ms  2.63%  net/http.(*persistConn).readLoop
+         0     0%   100%       20ms  5.26%  net/http.send
+         0     0%   100%       20ms  5.26%  net/http.setRequestCancel
+         0     0%   100%       10ms  2.63%  os.(*File).Write
+         0     0%   100%       10ms  2.63%  os.(*File).write (inline)
+         0     0%   100%       10ms  2.63%  runtime.(*pageAlloc).scavenge
+         0     0%   100%       10ms  2.63%  runtime.(*pageAlloc).scavengeOne
+         0     0%   100%       10ms  2.63%  runtime.(*pageAlloc).scavengeRangeLocked
+         0     0%   100%      240ms 63.16%  runtime._System
+         0     0%   100%       10ms  2.63%  runtime.addtimer
+         0     0%   100%       10ms  2.63%  runtime.bgscavenge
+         0     0%   100%       10ms  2.63%  runtime.bgscavenge.func2
+         0     0%   100%       20ms  5.26%  runtime.checkTimers
+         0     0%   100%       10ms  2.63%  runtime.convI2I
+         0     0%   100%       10ms  2.63%  runtime.entersyscall
+         0     0%   100%       10ms  2.63%  runtime.entersyscall_sysmon
+         0     0%   100%       20ms  5.26%  runtime.findrunnable
+         0     0%   100%       30ms  7.89%  runtime.futexwakeup
+         0     0%   100%       20ms  5.26%  runtime.gcBgMarkWorker
+         0     0%   100%       20ms  5.26%  runtime.gcBgMarkWorker.func2
+         0     0%   100%       10ms  2.63%  runtime.getitab
+         0     0%   100%       10ms  2.63%  runtime.goexit0
+         0     0%   100%       10ms  2.63%  runtime.greyobject
+         0     0%   100%       20ms  5.26%  runtime.mallocgc
+         0     0%   100%       40ms 10.53%  runtime.mcall
+         0     0%   100%       10ms  2.63%  runtime.netpollBreak
+         0     0%   100%       10ms  2.63%  runtime.newobject
+         0     0%   100%       10ms  2.63%  runtime.newproc
+         0     0%   100%       10ms  2.63%  runtime.newproc.func1
+         0     0%   100%       20ms  5.26%  runtime.notewakeup
+         0     0%   100%       30ms  7.89%  runtime.park_m
+         0     0%   100%       10ms  2.63%  runtime.reentersyscall
+         0     0%   100%       10ms  2.63%  runtime.resetspinning
+         0     0%   100%       10ms  2.63%  runtime.scanobject
+         0     0%   100%       40ms 10.53%  runtime.schedule
+         0     0%   100%       10ms  2.63%  runtime.slicebytetostring
+         0     0%   100%       10ms  2.63%  runtime.startm
+         0     0%   100%       10ms  2.63%  runtime.sysUnused
+         0     0%   100%       50ms 13.16%  runtime.systemstack
+         0     0%   100%       10ms  2.63%  runtime.unlock (inline)
+         0     0%   100%       10ms  2.63%  runtime.unlock2
+         0     0%   100%       10ms  2.63%  runtime.unlockWithRank (inline)
+         0     0%   100%       10ms  2.63%  runtime.wakeNetPoller
+         0     0%   100%       10ms  2.63%  runtime.wakep
+         0     0%   100%       10ms  2.63%  runtime.write (inline)
+         0     0%   100%       10ms  2.63%  syscall.Read
+         0     0%   100%       10ms  2.63%  syscall.Write
+         0     0%   100%       10ms  2.63%  syscall.read
+         0     0%   100%       10ms  2.63%  syscall.write
+         0     0%   100%       10ms  2.63%  time.AfterFunc
+         0     0%   100%       10ms  2.63%  time.startTimer

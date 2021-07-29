@@ -1,0 +1,340 @@
+File: test
+Type: goroutine
+Time: Jul 29, 2021 at 6:41pm (UTC)
+Showing nodes accounting for 86, 100% of 86 total
+Showing top 80 nodes out of 83
+----------------------------------------------------------+-------------
+      flat  flat%   sum%        cum   cum%   calls calls% + context 	 	 
+----------------------------------------------------------+-------------
+                                                52 61.90% |   runtime.selectgo
+                                                28 33.33% |   runtime.netpollblock
+                                                 4  4.76% |   runtime.chanrecv
+        84 97.67% 97.67%         84 97.67%                | runtime.gopark
+----------------------------------------------------------+-------------
+                                                 1   100% |   os/signal.signal_recv
+         1  1.16% 98.84%          1  1.16%                | runtime.notetsleepg
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/pkg/profile.Start.func9
+         1  1.16%   100%          1  1.16%                | runtime/pprof.runtime_goroutineProfileWithLabels
+----------------------------------------------------------+-------------
+                                                16   100% |   net/http.(*persistConn).readLoop
+         0     0%   100%         16 18.60%                | bufio.(*Reader).Peek
+                                                16   100% |   bufio.(*Reader).fill
+----------------------------------------------------------+-------------
+                                                 9   100% |   io.ReadAtLeast
+         0     0%   100%          9 10.47%                | bufio.(*Reader).Read
+                                                 9   100% |   net.(*conn).Read
+----------------------------------------------------------+-------------
+                                                16   100% |   bufio.(*Reader).Peek
+         0     0%   100%         16 18.60%                | bufio.(*Reader).fill
+                                                16   100% |   net/http.(*persistConn).Read
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3.(*clusterDiscoveryServiceStreamClustersServer).Recv
+                                                 1   100% |   google.golang.org/grpc.(*serverStream).RecvMsg
+----------------------------------------------------------+-------------
+                                                 1   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters
+----------------------------------------------------------+-------------
+                                                 4   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+         0     0%   100%          4  4.65%                | github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3.(*endpointDiscoveryServiceStreamEndpointsServer).Recv
+                                                 4   100% |   google.golang.org/grpc.(*serverStream).RecvMsg
+----------------------------------------------------------+-------------
+                                                 4   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%          4  4.65%                | github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+                                                 4   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/envoy/service/listener/v3.(*listenerDiscoveryServiceStreamListenersServer).Recv
+                                                 1   100% |   google.golang.org/grpc.(*serverStream).RecvMsg
+----------------------------------------------------------+-------------
+                                                 1   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/envoy/service/listener/v3._ListenerDiscoveryService_StreamListeners_Handler
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamListeners
+----------------------------------------------------------+-------------
+                                                 2   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+         0     0%   100%          2  2.33%                | github.com/envoyproxy/go-control-plane/envoy/service/route/v3.(*routeDiscoveryServiceStreamRoutesServer).Recv
+                                                 2   100% |   google.golang.org/grpc.(*serverStream).RecvMsg
+----------------------------------------------------------+-------------
+                                                 2   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%          2  2.33%                | github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+                                                 2   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3.(*runtimeDiscoveryServiceStreamRuntimeServer).Recv
+                                                 1   100% |   google.golang.org/grpc.(*serverStream).RecvMsg
+----------------------------------------------------------+-------------
+                                                 1   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3._RuntimeDiscoveryService_StreamRuntime_Handler
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRuntime
+----------------------------------------------------------+-------------
+                                                 9   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler
+         0     0%   100%          9 10.47%                | github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+                                                 9   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+----------------------------------------------------------+-------------
+         0     0%   100%          9 10.47%                | github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler.func1
+                                                 4 44.44% |   github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3.(*endpointDiscoveryServiceStreamEndpointsServer).Recv
+                                                 2 22.22% |   github.com/envoyproxy/go-control-plane/envoy/service/route/v3.(*routeDiscoveryServiceStreamRoutesServer).Recv
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3.(*clusterDiscoveryServiceStreamClustersServer).Recv
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/listener/v3.(*listenerDiscoveryServiceStreamListenersServer).Recv
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3.(*runtimeDiscoveryServiceStreamRuntimeServer).Recv
+----------------------------------------------------------+-------------
+                                                 9   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+         0     0%   100%          9 10.47%                | github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+                                                 9   100% |   runtime.selectgo
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+                                                 4   100% |   github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+         0     0%   100%          4  4.65%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints
+                                                 4   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+                                                 4 44.44% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamEndpoints (inline)
+                                                 2 22.22% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes (inline)
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamClusters (inline)
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamListeners (inline)
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRuntime (inline)
+         0     0%   100%          9 10.47%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler
+                                                 9   100% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).StreamHandler
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/envoy/service/listener/v3._ListenerDiscoveryService_StreamListeners_Handler
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamListeners
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+                                                 2   100% |   github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+         0     0%   100%          2  2.33%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRoutes
+                                                 2   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3._RuntimeDiscoveryService_StreamRuntime_Handler
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamRuntime
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/server/v3.(*server).StreamHandler (inline)
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/test.RunAccessLogServer
+                                                 1   100% |   runtime.chanrecv1
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/test.RunAccessLogServer.func1
+                                                 1   100% |   google.golang.org/grpc.(*Server).Serve
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/test.RunManagementGateway
+                                                 1   100% |   runtime.chanrecv1
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/test.RunManagementGateway.func1
+                                                 1   100% |   net/http.(*Server).ListenAndServe
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer
+                                                 1   100% |   runtime.chanrecv1
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer.func1
+                                                 1   100% |   google.golang.org/grpc.(*Server).Serve
+----------------------------------------------------------+-------------
+                                                 1   100% |   main.main
+         0     0%   100%          1  1.16%                | github.com/pkg/profile.(*Profile).Stop
+                                                 1   100% |   github.com/pkg/profile.Start.func9
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | github.com/pkg/profile.Start.func10
+                                                 1   100% |   runtime.chanrecv1
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/pkg/profile.(*Profile).Stop
+         0     0%   100%          1  1.16%                | github.com/pkg/profile.Start.func9
+                                                 1   100% |   runtime/pprof.runtime_goroutineProfileWithLabels
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*http2Server).HandleStreams
+         0     0%   100%          9 10.47%                | golang.org/x/net/http2.(*Framer).ReadFrame
+                                                 9   100% |   golang.org/x/net/http2.readFrameHeader
+----------------------------------------------------------+-------------
+                                                 9   100% |   golang.org/x/net/http2.(*Framer).ReadFrame
+         0     0%   100%          9 10.47%                | golang.org/x/net/http2.readFrameHeader
+                                                 9   100% |   io.ReadFull (inline)
+----------------------------------------------------------+-------------
+                                                 1 50.00% |   github.com/envoyproxy/go-control-plane/pkg/test.RunAccessLogServer.func1
+                                                 1 50.00% |   github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer.func1
+         0     0%   100%          2  2.33%                | google.golang.org/grpc.(*Server).Serve
+                                                 2   100% |   net.(*TCPListener).Accept
+----------------------------------------------------------+-------------
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.(*Server).handleRawConn.func1
+                                                 9   100% |   google.golang.org/grpc.(*Server).serveStreams
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.(*Server).serveStreams.func1.2
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.(*Server).handleStream
+                                                 9   100% |   google.golang.org/grpc.(*Server).processStreamingRPC
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.(*Server).handleStream
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.(*Server).processStreamingRPC
+                                                 4 44.44% |   github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3._EndpointDiscoveryService_StreamEndpoints_Handler
+                                                 2 22.22% |   github.com/envoyproxy/go-control-plane/envoy/service/route/v3._RouteDiscoveryService_StreamRoutes_Handler
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3._ClusterDiscoveryService_StreamClusters_Handler
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/listener/v3._ListenerDiscoveryService_StreamListeners_Handler
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3._RuntimeDiscoveryService_StreamRuntime_Handler
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.(*Server).handleRawConn.func1
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.(*Server).serveStreams
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*http2Server).HandleStreams
+----------------------------------------------------------+-------------
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.(*Server).serveStreams.func1.2
+                                                 9   100% |   google.golang.org/grpc.(*Server).handleStream
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.recvAndDecompress
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.(*parser).recvMsg
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*Stream).Read
+----------------------------------------------------------+-------------
+                                                 4 44.44% |   github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3.(*endpointDiscoveryServiceStreamEndpointsServer).Recv
+                                                 2 22.22% |   github.com/envoyproxy/go-control-plane/envoy/service/route/v3.(*routeDiscoveryServiceStreamRoutesServer).Recv
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3.(*clusterDiscoveryServiceStreamClustersServer).Recv
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/listener/v3.(*listenerDiscoveryServiceStreamListenersServer).Recv
+                                                 1 11.11% |   github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3.(*runtimeDiscoveryServiceStreamRuntimeServer).Recv
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.(*serverStream).RecvMsg
+                                                 9   100% |   google.golang.org/grpc.recv
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.(*serverStream).RecvMsg
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.recv
+                                                 9   100% |   google.golang.org/grpc.recvAndDecompress
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.recv
+         0     0%   100%          9 10.47%                | google.golang.org/grpc.recvAndDecompress
+                                                 9   100% |   google.golang.org/grpc.(*parser).recvMsg
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.(*parser).recvMsg
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*Stream).Read
+                                                 9   100% |   io.ReadFull (inline)
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*loopyWriter).run
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*controlBuffer).get
+                                                 9   100% |   runtime.selectgo
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc.(*Server).serveStreams
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*http2Server).HandleStreams
+                                                 9   100% |   golang.org/x/net/http2.(*Framer).ReadFrame
+----------------------------------------------------------+-------------
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*http2Server).keepalive
+                                                 9   100% |   runtime.selectgo
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc/internal/transport.newHTTP2Server.func2
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*loopyWriter).run
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*controlBuffer).get
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*transportReader).Read
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+----------------------------------------------------------+-------------
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+                                                 9   100% |   runtime.selectgo
+----------------------------------------------------------+-------------
+                                                 9   100% |   io.ReadAtLeast
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.(*transportReader).Read
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*recvBufferReader).Read
+----------------------------------------------------------+-------------
+         0     0%   100%          9 10.47%                | google.golang.org/grpc/internal/transport.newHTTP2Server.func2
+                                                 9   100% |   google.golang.org/grpc/internal/transport.(*loopyWriter).run
+----------------------------------------------------------+-------------
+                                                 3   100% |   net.(*netFD).accept
+         0     0%   100%          3  3.49%                | internal/poll.(*FD).Accept
+                                                 3   100% |   internal/poll.(*pollDesc).waitRead (inline)
+----------------------------------------------------------+-------------
+                                                25   100% |   net.(*netFD).Read
+         0     0%   100%         25 29.07%                | internal/poll.(*FD).Read
+                                                25   100% |   internal/poll.(*pollDesc).waitRead (inline)
+----------------------------------------------------------+-------------
+                                                28   100% |   internal/poll.(*pollDesc).waitRead
+         0     0%   100%         28 32.56%                | internal/poll.(*pollDesc).wait
+                                                28   100% |   internal/poll.runtime_pollWait
+----------------------------------------------------------+-------------
+                                                25 89.29% |   internal/poll.(*FD).Read (inline)
+                                                 3 10.71% |   internal/poll.(*FD).Accept (inline)
+         0     0%   100%         28 32.56%                | internal/poll.(*pollDesc).waitRead
+                                                28   100% |   internal/poll.(*pollDesc).wait
+----------------------------------------------------------+-------------
+                                                28   100% |   internal/poll.(*pollDesc).wait
+         0     0%   100%         28 32.56%                | internal/poll.runtime_pollWait
+                                                28   100% |   runtime.netpollblock
+----------------------------------------------------------+-------------
+                                                18   100% |   io.ReadFull
+         0     0%   100%         18 20.93%                | io.ReadAtLeast
+                                                 9 50.00% |   bufio.(*Reader).Read
+                                                 9 50.00% |   google.golang.org/grpc/internal/transport.(*transportReader).Read
+----------------------------------------------------------+-------------
+                                                 9 50.00% |   golang.org/x/net/http2.readFrameHeader (inline)
+                                                 9 50.00% |   google.golang.org/grpc/internal/transport.(*Stream).Read (inline)
+         0     0%   100%         18 20.93%                | io.ReadFull
+                                                18   100% |   io.ReadAtLeast
+----------------------------------------------------------+-------------
+                                                 1   100% |   runtime.main
+         0     0%   100%          1  1.16%                | main.main
+                                                 1   100% |   github.com/pkg/profile.(*Profile).Stop
+----------------------------------------------------------+-------------
+                                                 2 66.67% |   google.golang.org/grpc.(*Server).Serve
+                                                 1 33.33% |   net/http.(*Server).Serve
+         0     0%   100%          3  3.49%                | net.(*TCPListener).Accept
+                                                 3   100% |   net.(*TCPListener).accept
+----------------------------------------------------------+-------------
+                                                 3   100% |   net.(*TCPListener).Accept
+         0     0%   100%          3  3.49%                | net.(*TCPListener).accept
+                                                 3   100% |   net.(*netFD).accept
+----------------------------------------------------------+-------------
+                                                16 64.00% |   net/http.(*persistConn).Read
+                                                 9 36.00% |   bufio.(*Reader).Read
+         0     0%   100%         25 29.07%                | net.(*conn).Read
+                                                25   100% |   net.(*netFD).Read
+----------------------------------------------------------+-------------
+                                                25   100% |   net.(*conn).Read
+         0     0%   100%         25 29.07%                | net.(*netFD).Read
+                                                25   100% |   internal/poll.(*FD).Read
+----------------------------------------------------------+-------------
+                                                 3   100% |   net.(*TCPListener).accept
+         0     0%   100%          3  3.49%                | net.(*netFD).accept
+                                                 3   100% |   internal/poll.(*FD).Accept
+----------------------------------------------------------+-------------
+                                                 1   100% |   github.com/envoyproxy/go-control-plane/pkg/test.RunManagementGateway.func1
+         0     0%   100%          1  1.16%                | net/http.(*Server).ListenAndServe
+                                                 1   100% |   net/http.(*Server).Serve
+----------------------------------------------------------+-------------
+                                                 1   100% |   net/http.(*Server).ListenAndServe
+         0     0%   100%          1  1.16%                | net/http.(*Server).Serve
+                                                 1   100% |   net.(*TCPListener).Accept
+----------------------------------------------------------+-------------
+                                                16   100% |   bufio.(*Reader).fill
+         0     0%   100%         16 18.60%                | net/http.(*persistConn).Read
+                                                16   100% |   net.(*conn).Read
+----------------------------------------------------------+-------------
+         0     0%   100%         16 18.60%                | net/http.(*persistConn).readLoop
+                                                16   100% |   bufio.(*Reader).Peek
+----------------------------------------------------------+-------------
+         0     0%   100%         16 18.60%                | net/http.(*persistConn).writeLoop
+                                                16   100% |   runtime.selectgo
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | os/signal.loop
+                                                 1   100% |   os/signal.signal_recv
+----------------------------------------------------------+-------------
+                                                 1   100% |   os/signal.loop
+         0     0%   100%          1  1.16%                | os/signal.signal_recv
+                                                 1   100% |   runtime.notetsleepg
+----------------------------------------------------------+-------------
+                                                 4   100% |   runtime.chanrecv1
+         0     0%   100%          4  4.65%                | runtime.chanrecv
+                                                 4   100% |   runtime.gopark
+----------------------------------------------------------+-------------
+                                                 1 25.00% |   github.com/envoyproxy/go-control-plane/pkg/test.RunAccessLogServer
+                                                 1 25.00% |   github.com/envoyproxy/go-control-plane/pkg/test.RunManagementGateway
+                                                 1 25.00% |   github.com/envoyproxy/go-control-plane/pkg/test.RunManagementServer
+                                                 1 25.00% |   github.com/pkg/profile.Start.func10
+         0     0%   100%          4  4.65%                | runtime.chanrecv1
+                                                 4   100% |   runtime.chanrecv
+----------------------------------------------------------+-------------
+         0     0%   100%          1  1.16%                | runtime.main
+                                                 1   100% |   main.main
+----------------------------------------------------------+-------------
+                                                28   100% |   internal/poll.runtime_pollWait
+         0     0%   100%         28 32.56%                | runtime.netpollblock
+                                                28   100% |   runtime.gopark
+----------------------------------------------------------+-------------
+                                                16 30.77% |   net/http.(*persistConn).writeLoop
+                                                 9 17.31% |   github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3.(*server).process
+                                                 9 17.31% |   google.golang.org/grpc/internal/transport.(*controlBuffer).get
+                                                 9 17.31% |   google.golang.org/grpc/internal/transport.(*http2Server).keepalive
+                                                 9 17.31% |   google.golang.org/grpc/internal/transport.(*recvBufferReader).read
+         0     0%   100%         52 60.47%                | runtime.selectgo
+                                                52   100% |   runtime.gopark
+----------------------------------------------------------+-------------

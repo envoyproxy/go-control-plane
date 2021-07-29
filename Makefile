@@ -53,22 +53,30 @@ $(BINDIR)/test:
 integration: integration.xds integration.ads integration.rest integration.xds.mux integration.xds.delta integration.ads.delta
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=ads build/integration.sh
+	env XDS=ads MODE=0 build/integration.sh
 
 integration.xds: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds build/integration.sh
+	env XDS=xds MODE=0 build/integration.sh
 
 integration.rest: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=rest build/integration.sh
+	env XDS=rest MODE=0 build/integration.sh
 
 integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds build/integration.sh -mux
+	env XDS=xds MODE=0 build/integration.sh -mux
 
 integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta build/integration.sh
+	env XDS=delta MODE=0 build/integration.sh
 
 integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta-ads build/integration.sh
+	env XDS=delta-ads MODE=0 build/integration.sh
+
+
+#------------------------------------------------------------------------------
+# Benchmarks utilizing intergration tests
+#------------------------------------------------------------------------------
+.PHONY: benchmark
+benchmark: $(BINDIR)/test $(BINDIR)/upstream
+	env XDS=xds MODE=$(MODE) build/integration.sh
 
 #--------------------------------------
 #-- example xDS control plane server
@@ -85,3 +93,7 @@ example: $(BINDIR)/example
 docker_tests:
 	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
 	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_ci.sh
+
+docker_benchmarks:
+	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
+	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_benchmarks.sh
