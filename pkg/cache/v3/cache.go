@@ -86,7 +86,7 @@ type Response interface {
 	// Get the version in the Response.
 	GetVersion() (string, error)
 
-	// Get the context provided during response creation/
+	// Get the context provided during response creation.
 	GetContext() context.Context
 }
 
@@ -106,7 +106,7 @@ type DeltaResponse interface {
 	// The version map consists of updated version mappings after this response is applied
 	GetNextVersionMap() map[string]string
 
-	// Get the context provided during response creation/
+	// Get the context provided during response creation
 	GetContext() context.Context
 }
 
@@ -128,6 +128,8 @@ type RawResponse struct {
 	// This allows for more lightweight updates that server only to update the TTL timer.
 	Heartbeat bool
 
+	// Context provided at the time of response creation. This allows associating additional
+	// information with a generated response.
 	Ctx context.Context
 
 	// marshaledResponse holds an atomic reference to the serialized discovery response.
@@ -151,6 +153,8 @@ type RawDeltaResponse struct {
 	// NextVersionMap consists of updated version mappings after this response is applied
 	NextVersionMap map[string]string
 
+	// Context provided at the time of response creation. This allows associating additional
+	// information with a generated response.
 	Ctx context.Context
 
 	// Marshaled Resources to be included in the response.
