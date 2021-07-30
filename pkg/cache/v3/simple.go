@@ -143,7 +143,7 @@ func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHa
 				cache.mu.Lock()
 				for node := range cache.status {
 					// TODO(snowp): Omit heartbeats if a real response has been sent recently.
-					cache.sendHeartbeats(node)
+					cache.sendHeartbeats(ctx, node)
 				}
 				cache.mu.Unlock()
 			case <-ctx.Done():
@@ -154,7 +154,7 @@ func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHa
 	return cache
 }
 
-func (cache *snapshotCache) sendHeartbeats(node string) {
+func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 	snapshot := cache.snapshots[node]
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
@@ -178,7 +178,7 @@ func (cache *snapshotCache) sendHeartbeats(node string) {
 				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
 			}
 
-			cache.respond(context.Background(), watch.Request, watch.Response, resourcesWithTtl, version, true)
+			cache.respond(ctx, watch.Request, watch.Response, resourcesWithTtl, version, true)
 
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
