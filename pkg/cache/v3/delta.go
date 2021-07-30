@@ -31,10 +31,9 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.
 	}
 
 	// Only send a response if there were changes
-	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 ||
-		// we want to respond immediatly for the first wildcard request in a stream, even if the response is empty
-		// otherwise, envoy won't complete initialization
-		(state.IsWildcard() && state.IsFresh()) {
+	// We want to respond immediatly for the first wildcard request in a stream, even if the response is empty
+	// otherwise, envoy won't complete initialization
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFresh()) {
 		if log != nil {
 			log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
 				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
