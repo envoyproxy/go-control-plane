@@ -15,19 +15,21 @@
 package cache
 
 import (
+	"context"
+
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
-func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, snapshot Snapshot, log log.Logger) *RawDeltaResponse {
-	resp, err := createDeltaResponse(request, state, snapshot, log)
+func respondDelta(ctx context.Context, request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
+	resp, err := createDeltaResponse(ctx, request, state, snapshot, log)
 	if err != nil {
 		if log != nil {
 			log.Errorf("Error creating delta response: %v", err)
 		}
-		return nil
+		return nil, nil
 	}
 
 	// Only send a response if there were changes
@@ -36,13 +38,17 @@ func respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.
 			log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
 				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.Wildcard)
 		}
-		value <- resp
-		return resp
+		select {
+		case value <- resp:
+			return resp, nil
+		case <-ctx.Done():
+			return resp, context.Canceled
+		}
 	}
-	return nil
+	return nil, nil
 }
 
-func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
+func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
 	resources := snapshot.GetResources((req.TypeUrl))
 
 	// variables to build our response with
@@ -89,5 +95,6 @@ func createDeltaResponse(req *DeltaRequest, state stream.StreamState, snapshot S
 		RemovedResources:  toRemove,
 		NextVersionMap:    nextVersionMap,
 		SystemVersionInfo: snapshot.GetVersion(req.TypeUrl),
+		Ctx:               ctx,
 	}, nil
 }
