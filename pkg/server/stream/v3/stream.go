@@ -31,7 +31,7 @@ type StreamState struct {
 	resourceVersions map[string]string
 
 	// indicates whether the object has beed modified since its creation
-	fresh bool
+	first bool
 }
 
 func (s *StreamState) GetResourceVersions() map[string]string {
@@ -39,12 +39,12 @@ func (s *StreamState) GetResourceVersions() map[string]string {
 }
 
 func (s *StreamState) SetResourceVersions(resourceVersions map[string]string) {
-	s.fresh = false
+	s.first = false
 	s.resourceVersions = resourceVersions
 }
 
-func (s *StreamState) IsFresh() bool {
-	return s.fresh
+func (s *StreamState) IsFirst() bool {
+	return s.first
 }
 
 func (s *StreamState) IsWildcard() bool {
@@ -56,7 +56,7 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 	state := StreamState{
 		wildcard:         wildcard,
 		resourceVersions: initialResourceVersions,
-		fresh:            true,
+		first:            true,
 	}
 
 	if initialResourceVersions == nil {
