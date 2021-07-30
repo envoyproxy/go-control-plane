@@ -445,7 +445,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID,
-				t, state.ResourceVersions, nodeID, snapshot.GetVersion(t))
+				t, state.GetResourceVersions(), nodeID, snapshot.GetVersion(t))
 		}
 
 		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})

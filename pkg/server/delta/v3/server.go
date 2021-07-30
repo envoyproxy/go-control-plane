@@ -119,7 +119,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			watch := watches.deltaWatches[typ]
 			watch.nonce = nonce
 
-			watch.state.ResourceVersions = resp.GetNextVersionMap()
+			watch.state.SetResourceVersions(resp.GetNextVersionMap())
 			watches.deltaWatches[typ] = watch
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -166,8 +166,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				watch.Cancel()
 			}
 
-			s.subscribe(req.GetResourceNamesSubscribe(), watch.state.ResourceVersions)
-			s.unsubscribe(req.GetResourceNamesUnsubscribe(), watch.state.ResourceVersions)
+			s.subscribe(req.GetResourceNamesSubscribe(), watch.state.GetResourceVersions())
+			s.unsubscribe(req.GetResourceNamesUnsubscribe(), watch.state.GetResourceVersions())
 
 			watch.responses = make(chan cache.DeltaResponse, 1)
 			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)

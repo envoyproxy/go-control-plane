@@ -29,15 +29,15 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		r, _ := res.GetDeltaDiscoveryResponse()
 
 		switch {
-		case state.Wildcard:
+		case state.IsWildcard():
 			for _, resource := range r.Resources {
 				name := resource.GetName()
 				res, _ := cache.MarshalResource(resource)
 
 				nextVersion := cache.HashResource(res)
-				prevVersion, found := state.ResourceVersions[name]
+				prevVersion, found := state.GetResourceVersions()[name]
 				if !found || (prevVersion != nextVersion) {
-					state.ResourceVersions[name] = nextVersion
+					state.GetResourceVersions()[name] = nextVersion
 					subscribed = append(subscribed, resource)
 				}
 			}
@@ -45,11 +45,11 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			for _, resource := range r.Resources {
 				res, _ := cache.MarshalResource(resource)
 				nextVersion := cache.HashResource(res)
-				for _, prevVersion := range state.ResourceVersions {
+				for _, prevVersion := range state.GetResourceVersions() {
 					if prevVersion != nextVersion {
 						subscribed = append(subscribed, resource)
 					}
-					state.ResourceVersions[resource.GetName()] = nextVersion
+					state.GetResourceVersions()[resource.GetName()] = nextVersion
 				}
 			}
 		}
@@ -58,7 +58,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			DeltaRequest:      req,
 			Resources:         subscribed,
 			SystemVersionInfo: "",
-			NextVersionMap:    state.ResourceVersions,
+			NextVersionMap:    state.GetResourceVersions(),
 		}
 	} else {
 		config.deltaWatches += 1
