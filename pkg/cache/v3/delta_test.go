@@ -214,7 +214,7 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 		},
 		TypeUrl:                rsrc.EndpointType,
 		ResourceNamesSubscribe: names[rsrc.EndpointType],
-	}, stream.NewStreamState(false, make(map[string]string)), watchCh)
+	}, stream.NewStreamState(false, map[string]string{names[rsrc.EndpointType][0]: ""}), watchCh)
 
 	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
@@ -238,10 +238,9 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 
 	// The channel should get closed due to the watch trigger.
 	select {
-	case response, ok := <-watchTriggeredCh:
+	case response := <-watchTriggeredCh:
 		// Verify that we pass the context through.
 		assert.Equal(t, response.GetContext().Value(testKey{}), "bar")
-		assert.False(t, ok)
 	case <-time.After(time.Second):
 		t.Fatalf("timed out")
 	}
