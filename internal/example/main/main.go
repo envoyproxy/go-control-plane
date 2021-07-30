@@ -49,6 +49,8 @@ func init() {
 func main() {
 	flag.Parse()
 
+	l.Debugf("[databricks-envoy-cp] init")
+
 	// Create a cache
 	cache := cache.NewSnapshotCache(false, cache.IDHash{}, l)
 
