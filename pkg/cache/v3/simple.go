@@ -174,7 +174,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
 			}
 
-			cache.respond(ctx, watch.Request, watch.Response, resourcesWithTTL, version, true)
+			_ = cache.respond(ctx, watch.Request, watch.Response, resourcesWithTTL, version, true)
 
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
@@ -322,7 +322,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) f
 
 	// otherwise, the watch may be responded immediately
 	resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
-	cache.respond(context.Background(), request, value, resources, version, false)
+	_ = cache.respond(context.Background(), request, value, resources, version, false)
 
 	return nil
 }
@@ -432,7 +432,6 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		response, err := respondDelta(context.Background(), request, value, state, snapshot, cache.log)
 		if err != nil {
 			cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
-			delayedResponse = true
 		}
 
 		delayedResponse = response == nil

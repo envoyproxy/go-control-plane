@@ -165,7 +165,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
 		if reflect.DeepEqual(streams[testTypes[0]].GetResourceVersions(), nextVersionMap) {
-			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an emtpy map", nextVersionMap)
+			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an empty map", nextVersionMap)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
