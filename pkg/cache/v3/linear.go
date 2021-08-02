@@ -48,7 +48,7 @@ type LinearCache struct {
 	// together with its current version
 	// version and versionPrefix fields are ignored for delta watches, because we always generate the resource version.
 	deltaWatches map[int64]DeltaResponseWatch
-	// Continously incremented counter used to index delta watches.
+	// Continuously incremented counter used to index delta watches.
 	deltaWatchCount int64
 	// versionMap holds the current hash map of all resources in the cache.
 	// versionMap is only to be used with delta xDS.
@@ -154,7 +154,10 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	}
 	cache.watchAll = make(watches)
 
-	cache.updateVersionMap(modified)
+	err := cache.updateVersionMap(modified)
+	if err != nil {
+		cache.log.Errorf("failed to update version map: %v", err)
+	}
 
 	for id, watch := range cache.deltaWatches {
 		res := cache.respondDelta(watch.Request, watch.Response, watch.StreamState)
@@ -355,7 +358,7 @@ func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {
 		if _, ok := modified[name]; !ok {
 			continue
 		}
-		// hash our verison in here and build the version map
+		// hash our version in here and build the version map
 		marshaledResource, err := MarshalResource(r)
 		if err != nil {
 			return err

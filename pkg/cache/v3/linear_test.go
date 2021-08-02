@@ -20,9 +20,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -34,7 +34,7 @@ const (
 )
 
 func testResource(s string) types.Resource {
-	return &wrappers.StringValue{Value: s}
+	return wrapperspb.String(s)
 }
 
 func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
@@ -419,7 +419,8 @@ func TestLinearDeltaWildcard(t *testing.T) {
 
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hash := hashResource(t, a)
-	c.UpdateResource("a", a)
+	err := c.UpdateResource("a", a)
+	assert.NoError(t, err)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w1, []resourceInfo{{"a", hash}}, nil)
 	verifyDeltaResponse(t, w2, []resourceInfo{{"a", hash}}, nil)
@@ -429,10 +430,12 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 	c := NewLinearCache(testType)
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hashA := hashResource(t, a)
-	c.UpdateResource("a", a)
+	err := c.UpdateResource("a", a)
+	assert.NoError(t, err)
 	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
 	hashB := hashResource(t, b)
-	c.UpdateResource("b", b)
+	err = c.UpdateResource("b", b)
+	assert.NoError(t, err)
 
 	state := stream.NewStreamState(false, map[string]string{"b": "", "c": ""}) // watching b and c - not interested in a
 	w := make(chan DeltaResponse, 1)
@@ -451,10 +454,12 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	c := NewLinearCache(testType)
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hashA := hashResource(t, a)
-	c.UpdateResource("a", a)
+	err := c.UpdateResource("a", a)
+	assert.NoError(t, err)
 	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
 	hashB := hashResource(t, b)
-	c.UpdateResource("b", b)
+	err = c.UpdateResource("b", b)
+	assert.NoError(t, err)
 
 	state := stream.NewStreamState(false, map[string]string{"a": "", "b": hashB})
 	w := make(chan DeltaResponse, 1)
@@ -469,7 +474,8 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	checkDeltaWatchCount(t, c, 1)
 	b = &endpoint.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: 10}}} // new version of b
 	hashB = hashResource(t, b)
-	c.UpdateResource("b", b)
+	err = c.UpdateResource("b", b)
+	assert.NoError(t, err)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, nil)
 }
@@ -478,10 +484,12 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	c := NewLinearCache(testType)
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hashA := hashResource(t, a)
-	c.UpdateResource("a", a)
+	err := c.UpdateResource("a", a)
+	assert.NoError(t, err)
 	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
 	hashB := hashResource(t, b)
-	c.UpdateResource("b", b)
+	err = c.UpdateResource("b", b)
+	assert.NoError(t, err)
 
 	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
 	w := make(chan DeltaResponse, 1)
@@ -499,7 +507,8 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 		{Priority: 10},
 	}}
 	hashA = hashResource(t, a)
-	c.UpdateResource("a", a)
+	err = c.UpdateResource("a", a)
+	assert.NoError(t, err)
 	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil)
 }
 
@@ -507,10 +516,12 @@ func TestLinearDeltaResourceDelete(t *testing.T) {
 	c := NewLinearCache(testType)
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hashA := hashResource(t, a)
-	c.UpdateResource("a", a)
+	err := c.UpdateResource("a", a)
+	assert.NoError(t, err)
 	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
 	hashB := hashResource(t, b)
-	c.UpdateResource("b", b)
+	err = c.UpdateResource("b", b)
+	assert.NoError(t, err)
 
 	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
 	w := make(chan DeltaResponse, 1)
