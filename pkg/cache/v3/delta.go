@@ -24,7 +24,7 @@ import (
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
 func respondDelta(ctx context.Context, request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
-	resp, err := createDeltaResponse(ctx, request, state, snapshot, log)
+	resp, err := createDeltaResponse(ctx, request, state, snapshot)
 	if err != nil {
 		if log != nil {
 			log.Errorf("Error creating delta response: %v", err)
@@ -33,7 +33,7 @@ func respondDelta(ctx context.Context, request *DeltaRequest, value chan DeltaRe
 	}
 
 	// Only send a response if there were changes
-	// We want to respond immediatly for the first wildcard request in a stream, even if the response is empty
+	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
 	// otherwise, envoy won't complete initialization
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFirst()) {
 		if log != nil {
@@ -50,7 +50,8 @@ func respondDelta(ctx context.Context, request *DeltaRequest, value chan DeltaRe
 	return nil, nil
 }
 
-func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, snapshot Snapshot, log log.Logger) (*RawDeltaResponse, error) {
+// nolint:unparam // result 1 (error) is always nil (unparam)
+func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, snapshot Snapshot) (*RawDeltaResponse, error) {
 	resources := snapshot.GetResources((req.TypeUrl))
 
 	// variables to build our response with

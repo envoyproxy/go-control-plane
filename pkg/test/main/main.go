@@ -176,7 +176,7 @@ func main() {
 	eds := cache.NewLinearCache(typeURL)
 	if mux {
 		configCache = &cache.MuxCache{
-			Classify: func(req cache.Request) string {
+			Classify: func(req *cache.Request) string {
 				if req.TypeUrl == typeURL {
 					return "eds"
 				}
@@ -237,7 +237,11 @@ func main() {
 
 		if mux {
 			for name, res := range snapshot.GetResources(typeURL) {
-				eds.UpdateResource(name, res)
+				if err := eds.UpdateResource(name, res); err != nil {
+					log.Printf("update error %q for %+v\n", err, name)
+					os.Exit(1)
+
+				}
 			}
 		}
 
@@ -278,7 +282,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("could not create %s profile %s: %s", prof, filePath, err)
 			}
-			p.WriteTo(f, 1)
+			p.WriteTo(f, 1) // nolint:errcheck
 			f.Close()
 		}
 	}
@@ -299,7 +303,7 @@ func callEcho() (int, int) {
 			client := http.Client{
 				Timeout: 100 * time.Millisecond,
 				Transport: &http.Transport{
-					TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true},
+					TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true}, // nolint:gosec
 				},
 			}
 			proto := "http"
@@ -311,9 +315,13 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			defer req.Body.Close()
 			body, err := ioutil.ReadAll(req.Body)
 			if err != nil {
+				req.Body.Close()
+				ch <- err
+				return
+			}
+			if err := req.Body.Close(); err != nil {
 				ch <- err
 				return
 			}
