@@ -285,7 +285,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
-  
+
 	log.Printf("Test for %s passed!\n", mode)
 }
 
