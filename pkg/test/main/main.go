@@ -64,6 +64,7 @@ var (
 	runtimes      int
 	tls           bool
 	mux           bool
+	extensionNum  int
 
 	nodeID string
 
@@ -146,6 +147,8 @@ func init() {
 	// Enable a muxed cache with partial snapshots
 	flag.BoolVar(&mux, "mux", false, "Enable muxed linear cache for EDS")
 
+	// Number of ExtensionConfig
+	flag.IntVar(&extensionNum, "extension", 1, "Number of Extension")
 	//
 	// These parameters control the the use of the pprof profiler
 	//
@@ -186,7 +189,7 @@ func main() {
 	eds := cache.NewLinearCache(typeURL)
 	if mux {
 		configCache = &cache.MuxCache{
-			Classify: func(req cache.Request) string {
+			Classify: func(req *cache.Request) string {
 				if req.TypeUrl == typeURL {
 					return "eds"
 				}
@@ -211,6 +214,7 @@ func main() {
 		NumTCPListeners:  tcpListeners,
 		TLS:              tls,
 		NumRuntimes:      runtimes,
+		NumExtension:     extensionNum,
 	}
 
 	// start the xDS server
@@ -238,7 +242,7 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshot)
 		}
 
-		err := config.SetSnapshot(nodeID, snapshot)
+		err := config.SetSnapshot(context.Background(), nodeID, snapshot)
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshot)
 			os.Exit(1)
@@ -246,7 +250,11 @@ func main() {
 
 		if mux {
 			for name, res := range snapshot.GetResources(typeURL) {
-				eds.UpdateResource(name, res)
+				if err := eds.UpdateResource(name, res); err != nil {
+					log.Printf("update error %q for %+v\n", err, name)
+					os.Exit(1)
+
+				}
 			}
 		}
 
@@ -277,7 +285,7 @@ func main() {
 			os.Exit(1)
 		}
 	}
-
+  
 	log.Printf("Test for %s passed!\n", mode)
 }
 
@@ -294,7 +302,7 @@ func callEcho() (int, int) {
 			client := http.Client{
 				Timeout: 100 * time.Millisecond,
 				Transport: &http.Transport{
-					TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true},
+					TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true}, // nolint:gosec
 				},
 			}
 			proto := "http"
@@ -306,9 +314,13 @@ func callEcho() (int, int) {
 				ch <- err
 				return
 			}
-			defer req.Body.Close()
 			body, err := ioutil.ReadAll(req.Body)
 			if err != nil {
+				req.Body.Close()
+				ch <- err
+				return
+			}
+			if err := req.Body.Close(); err != nil {
 				ch <- err
 				return
 			}

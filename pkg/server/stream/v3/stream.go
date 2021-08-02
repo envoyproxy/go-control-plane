@@ -22,24 +22,45 @@ type DeltaStream interface {
 }
 
 // StreamState will keep track of resource state per type on a stream.
-type StreamState struct {
+type StreamState struct { // nolint:golint,revive
 	// Indicates whether the original DeltaRequest was a wildcard LDS/RDS request.
-	Wildcard bool
+	wildcard bool
 
 	// ResourceVersions contains a hash of the resource as the value and the resource name as the key.
 	// This field stores the last state sent to the client.
-	ResourceVersions map[string]string
+	resourceVersions map[string]string
+
+	// indicates whether the object has beed modified since its creation
+	first bool
+}
+
+func (s *StreamState) GetResourceVersions() map[string]string {
+	return s.resourceVersions
+}
+
+func (s *StreamState) SetResourceVersions(resourceVersions map[string]string) {
+	s.first = false
+	s.resourceVersions = resourceVersions
+}
+
+func (s *StreamState) IsFirst() bool {
+	return s.first
+}
+
+func (s *StreamState) IsWildcard() bool {
+	return s.wildcard
 }
 
 // NewStreamState initializes a stream state.
 func NewStreamState(wildcard bool, initialResourceVersions map[string]string) StreamState {
 	state := StreamState{
-		Wildcard:         wildcard,
-		ResourceVersions: initialResourceVersions,
+		wildcard:         wildcard,
+		resourceVersions: initialResourceVersions,
+		first:            true,
 	}
 
 	if initialResourceVersions == nil {
-		state.ResourceVersions = make(map[string]string)
+		state.resourceVersions = make(map[string]string)
 	}
 
 	return state

@@ -25,12 +25,8 @@ import (
 )
 
 var (
-	l example.Logger
-
-	port     uint
-	basePort uint
-	mode     string
-
+	l      example.Logger
+	port   uint
 	nodeID string
 )
 
@@ -61,7 +57,7 @@ func main() {
 	l.Debugf("will serve snapshot %+v", snapshot)
 
 	// Add the snapshot to the cache
-	if err := cache.SetSnapshot(nodeID, snapshot); err != nil {
+	if err := cache.SetSnapshot(context.Background(), nodeID, snapshot); err != nil {
 		l.Errorf("snapshot error %q for %+v", err, snapshot)
 		os.Exit(1)
 	}

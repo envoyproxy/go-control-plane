@@ -105,13 +105,15 @@ func RunManagementGateway(ctx context.Context, srv server.Server, port uint, lg 
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
-			log.Println(err)
+			log.Printf("failed to start listening: %s", err)
 		}
 	}()
 	<-ctx.Done()
 
 	// Cleanup our gateway if we receive a shutdown
-	server.Shutdown(ctx)
+	if err := server.Shutdown(ctx); err != nil {
+		log.Printf("failed to shut down: %s", err)
+	}
 }
 
 func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {

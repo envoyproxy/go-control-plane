@@ -29,15 +29,15 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		r, _ := res.GetDeltaDiscoveryResponse()
 
 		switch {
-		case state.Wildcard:
+		case state.IsWildcard():
 			for _, resource := range r.Resources {
 				name := resource.GetName()
 				res, _ := cache.MarshalResource(resource)
 
 				nextVersion := cache.HashResource(res)
-				prevVersion, found := state.ResourceVersions[name]
+				prevVersion, found := state.GetResourceVersions()[name]
 				if !found || (prevVersion != nextVersion) {
-					state.ResourceVersions[name] = nextVersion
+					state.GetResourceVersions()[name] = nextVersion
 					subscribed = append(subscribed, resource)
 				}
 			}
@@ -45,11 +45,11 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			for _, resource := range r.Resources {
 				res, _ := cache.MarshalResource(resource)
 				nextVersion := cache.HashResource(res)
-				for _, prevVersion := range state.ResourceVersions {
+				for _, prevVersion := range state.GetResourceVersions() {
 					if prevVersion != nextVersion {
 						subscribed = append(subscribed, resource)
 					}
-					state.ResourceVersions[resource.GetName()] = nextVersion
+					state.GetResourceVersions()[resource.GetName()] = nextVersion
 				}
 			}
 		}
@@ -58,12 +58,12 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			DeltaRequest:      req,
 			Resources:         subscribed,
 			SystemVersionInfo: "",
-			NextVersionMap:    state.ResourceVersions,
+			NextVersionMap:    state.GetResourceVersions(),
 		}
 	} else {
-		config.deltaWatches += 1
+		config.deltaWatches++
 		return func() {
-			config.deltaWatches -= 1
+			config.deltaWatches--
 		}
 	}
 
@@ -386,7 +386,7 @@ func TestDeltaCancellations(t *testing.T) {
 		t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
 	}
 	if config.watches != 0 {
-		t.Errorf("Expect all watches cancelled, got %q", config.watches)
+		t.Errorf("Expect all watches canceled, got %q", config.watches)
 	}
 }
 
@@ -406,7 +406,7 @@ func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
 		t.Errorf("DeltaAggregatedResources() => got %v, want no error", err)
 	}
 	if config.watches != 0 {
-		t.Errorf("Expect all watches cancelled, got %q", config.watches)
+		t.Errorf("Expect all watches canceled, got %q", config.watches)
 	}
 }
 
