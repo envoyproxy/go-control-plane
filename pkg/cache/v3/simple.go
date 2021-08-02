@@ -427,11 +427,15 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 	if exists {
 		err := snapshot.ConstructVersionMap()
 		if err != nil {
-			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
+			if cache.log != nil {
+				cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
+			}
 		}
 		response, err := respondDelta(context.Background(), request, value, state, snapshot, cache.log)
 		if err != nil {
-			cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
+			if cache.log != nil {
+				cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
+			}
 		}
 
 		delayedResponse = response == nil
