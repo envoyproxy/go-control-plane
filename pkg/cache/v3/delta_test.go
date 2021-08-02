@@ -165,7 +165,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
 		if reflect.DeepEqual(streams[testTypes[0]].GetResourceVersions(), nextVersionMap) {
-			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an emtpy map", nextVersionMap)
+			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an empty map", nextVersionMap)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
@@ -180,24 +180,23 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
 				t.Parallel()
 				id := fmt.Sprintf("%d", i%2)
-				var cancel func()
 				responses := make(chan cache.DeltaResponse, 1)
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					c.SetSnapshot(context.Background(), key, snap)
-				} else {
-					if cancel != nil {
-						cancel()
+					if err := c.SetSnapshot(context.Background(), key, snap); err != nil {
+						t.Fatalf("snapshot failed: %s", err)
 					}
-
-					cancel = c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+				} else {
+					cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 						Node: &core.Node{
 							Id: id,
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
 					}, stream.NewStreamState(false, make(map[string]string)), responses)
+
+					defer cancel()
 				}
 			})
 		}(i)
