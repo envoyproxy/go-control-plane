@@ -273,9 +273,9 @@ func nameSet(names []string) map[string]bool {
 
 // superset checks that all resources are listed in the names set.
 func superset(names map[string]bool, resources map[string]types.ResourceWithTtl) error {
-	for resourceName := range resources {
-		if _, exists := names[resourceName]; !exists {
-			return fmt.Errorf("%q not listed", resourceName)
+	for reqName, _ := range names {
+		if _, exists := resources[reqName]; !exists {
+			return fmt.Errorf("%q not listed", reqName)
 		}
 	}
 	return nil
