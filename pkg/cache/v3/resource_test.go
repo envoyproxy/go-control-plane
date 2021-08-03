@@ -26,21 +26,23 @@ import (
 )
 
 const (
-	clusterName  = "cluster0"
-	routeName    = "route0"
-	listenerName = "listener0"
-	runtimeName  = "runtime0"
-	tlsName      = "secret0"
-	rootName     = "root0"
+	clusterName         = "cluster0"
+	routeName           = "route0"
+	listenerName        = "listener0"
+	runtimeName         = "runtime0"
+	tlsName             = "secret0"
+	rootName            = "root0"
+	extensionConfigName = "extensionConfig0"
 )
 
 var (
-	testEndpoint = resource.MakeEndpoint(clusterName, 8080)
-	testCluster  = resource.MakeCluster(resource.Ads, clusterName)
-	testRoute    = resource.MakeRoute(routeName, clusterName)
-	testListener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	testRuntime  = resource.MakeRuntime(runtimeName)
-	testSecret   = resource.MakeSecrets(tlsName, rootName)
+	testEndpoint        = resource.MakeEndpoint(clusterName, 8080)
+	testCluster         = resource.MakeCluster(resource.Ads, clusterName)
+	testRoute           = resource.MakeRoute(routeName, clusterName)
+	testListener        = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testRuntime         = resource.MakeRuntime(runtimeName)
+	testSecret          = resource.MakeSecrets(tlsName, rootName)
+	testExtensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
 )
 
 func TestValidate(t *testing.T) {
@@ -137,7 +139,7 @@ func TestGetResourceReferences(t *testing.T) {
 		},
 	}
 	for _, cs := range cases {
-		names := cache.GetResourceReferences(cache.IndexResourcesByName([]types.ResourceWithTtl{{Resource: cs.in}}))
+		names := cache.GetResourceReferences(cache.IndexResourcesByName([]types.ResourceWithTTL{{Resource: cs.in}}))
 		if !reflect.DeepEqual(names, cs.out) {
 			t.Errorf("GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
 		}

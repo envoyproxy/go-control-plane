@@ -13,8 +13,11 @@ Below is an example of a simple xDS ready server utilizing the provided Snapshot
 ```go
 import (
     "context"
-    "google.golang.org/grpc"
     "net"
+    "time"
+
+    "google.golang.org/grpc"
+    "google.golang.org/grpc/keepalive"
 
     api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
     discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
@@ -22,10 +25,29 @@ import (
     xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
 )
 
+const (
+    grpcKeepaliveTime        = 30 * time.Second
+    grpcKeepaliveTimeout     = 5 * time.Second
+    grpcKeepaliveMinTime     = 30 * time.Second
+    grpcMaxConcurrentStreams = 1000000
+)
+
 func main() {
     snapshotCache := cache.NewSnapshotCache(false, cache.IDHash{}, nil)
     server := xds.NewServer(context.Background(), snapshotCache, nil)
-    grpcServer := grpc.NewServer()
+    var grpcOptions []grpc.ServerOption
+    grpcOptions = append(grpcOptions,
+        grpc.MaxConcurrentStreams(grpcMaxConcurrentStreams),
+        grpc.KeepaliveParams(keepalive.ServerParameters{
+            Time:    grpcKeepaliveTime,
+            Timeout: grpcKeepaliveTimeout,
+        }),
+        grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
+            MinTime:             grpcKeepaliveMinTime,
+            PermitWithoutStream: true,
+        }),
+    )
+    grpcServer := grpc.NewServer(grpcOptions...)
     lis, _ := net.Listen("tcp", ":8080")
 
     discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)

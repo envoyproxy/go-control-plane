@@ -155,10 +155,12 @@ type TlsParameters struct {
 	TlsMaximumProtocolVersion TlsParameters_TlsProtocol `protobuf:"varint,2,opt,name=tls_maximum_protocol_version,json=tlsMaximumProtocolVersion,proto3,enum=envoy.extensions.transport_sockets.tls.v4alpha.TlsParameters_TlsProtocol" json:"tls_maximum_protocol_version,omitempty"`
 	// If specified, the TLS listener will only support the specified `cipher list
 	// <https://commondatastorage.googleapis.com/chromium-boringssl-docs/ssl.h.html#Cipher-suite-configuration>`_
-	// when negotiating TLS 1.0-1.2 (this setting has no effect when negotiating TLS 1.3). If not
-	// specified, the default list will be used.
+	// when negotiating TLS 1.0-1.2 (this setting has no effect when negotiating TLS 1.3).
 	//
-	// In non-FIPS builds, the default cipher list is:
+	// If not specified, a default list will be used. Defaults are different for server (downstream) and
+	// client (upstream) TLS configurations.
+	//
+	// In non-FIPS builds, the default server cipher list is:
 	//
 	// .. code-block:: none
 	//
@@ -175,7 +177,7 @@ type TlsParameters struct {
 	//   AES256-GCM-SHA384
 	//   AES256-SHA
 	//
-	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default cipher list is:
+	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default server cipher list is:
 	//
 	// .. code-block:: none
 	//
@@ -191,6 +193,24 @@ type TlsParameters struct {
 	//   ECDHE-RSA-AES256-SHA
 	//   AES256-GCM-SHA384
 	//   AES256-SHA
+	//
+	// In non-FIPS builds, the default client cipher list is:
+	//
+	// .. code-block:: none
+	//
+	//   [ECDHE-ECDSA-AES128-GCM-SHA256|ECDHE-ECDSA-CHACHA20-POLY1305]
+	//   [ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]
+	//   ECDHE-ECDSA-AES256-GCM-SHA384
+	//   ECDHE-RSA-AES256-GCM-SHA384
+	//
+	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default client cipher list is:
+	//
+	// .. code-block:: none
+	//
+	//   ECDHE-ECDSA-AES128-GCM-SHA256
+	//   ECDHE-RSA-AES128-GCM-SHA256
+	//   ECDHE-ECDSA-AES256-GCM-SHA384
+	//   ECDHE-RSA-AES256-GCM-SHA384
 	CipherSuites []string `protobuf:"bytes,3,rep,name=cipher_suites,json=cipherSuites,proto3" json:"cipher_suites,omitempty"`
 	// If specified, the TLS connection will only support the specified ECDH
 	// curves. If not specified, the default curves will be used.

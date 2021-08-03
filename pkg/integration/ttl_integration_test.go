@@ -29,7 +29,7 @@ func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format
 func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
 func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
-func TestTtlResponse(t *testing.T) {
+func TestTTLResponse(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -41,11 +41,11 @@ func TestTtlResponse(t *testing.T) {
 	grpcServer := grpc.NewServer()
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
 
-	l, err := net.Listen("tcp", ":9999")
+	l, err := net.Listen("tcp", ":9999") // nolint:gosec
 	assert.NoError(t, err)
 
 	go func() {
-		grpcServer.Serve(l)
+		assert.NoError(t, grpcServer.Serve(l))
 	}()
 	defer grpcServer.Stop()
 
@@ -67,9 +67,9 @@ func TestTtlResponse(t *testing.T) {
 
 	oneSecond := time.Second
 	cla := &envoy_config_endpoint_v3.ClusterLoadAssignment{ClusterName: "resource"}
-	err = snapshotCache.SetSnapshot("test", cache.NewSnapshotWithTtls("1", []types.ResourceWithTtl{{
+	err = snapshotCache.SetSnapshot(context.Background(), "test", cache.NewSnapshotWithTtls("1", []types.ResourceWithTTL{{
 		Resource: cla,
-		Ttl:      &oneSecond,
+		TTL:      &oneSecond,
 	}}, nil, nil, nil, nil, nil))
 	assert.NoError(t, err)
 

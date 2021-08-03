@@ -215,9 +215,12 @@ func (*Filter_HiddenEnvoyDeprecatedConfig) isFilter_ConfigType() {}
 // 3. Server name (e.g. SNI for TLS protocol),
 // 4. Transport protocol.
 // 5. Application protocols (e.g. ALPN for TLS protocol).
-// 6. Source type (e.g. any, local or external network).
-// 7. Source IP address.
-// 8. Source port.
+// 6. Directly connected source IP address (this will only be different from the source IP address
+//    when using a listener filter that overrides the source address, such as the :ref:`Proxy Protocol
+//    listener filter <config_listener_filters_proxy_protocol>`).
+// 7. Source type (e.g. any, local or external network).
+// 8. Source IP address.
+// 9. Source port.
 //
 // For criteria that allow ranges or wildcards, the most specific value in any
 // of the configured filter chains that matches the incoming connection is going
@@ -241,7 +244,7 @@ func (*Filter_HiddenEnvoyDeprecatedConfig) isFilter_ConfigType() {}
 // listed at the end, because that's how we want to list them in the docs.
 //
 // [#comment:TODO(PiotrSikora): Add support for configurable precedence of the rules]
-// [#next-free-field: 13]
+// [#next-free-field: 14]
 type FilterChainMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -259,6 +262,10 @@ type FilterChainMatch struct {
 	AddressSuffix string `protobuf:"bytes,4,opt,name=address_suffix,json=addressSuffix,proto3" json:"address_suffix,omitempty"`
 	// [#not-implemented-hide:]
 	SuffixLen *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=suffix_len,json=suffixLen,proto3" json:"suffix_len,omitempty"`
+	// The criteria is satisfied if the directly connected source IP address of the downstream
+	// connection is contained in at least one of the specified subnets. If the parameter is not
+	// specified or the list is empty, the directly connected source IP address is ignored.
+	DirectSourcePrefixRanges []*v3.CidrRange `protobuf:"bytes,13,rep,name=direct_source_prefix_ranges,json=directSourcePrefixRanges,proto3" json:"direct_source_prefix_ranges,omitempty"`
 	// Specifies the connection source IP match type. Can be any, local or external network.
 	SourceType FilterChainMatch_ConnectionSourceType `protobuf:"varint,12,opt,name=source_type,json=sourceType,proto3,enum=envoy.config.listener.v3.FilterChainMatch_ConnectionSourceType" json:"source_type,omitempty"`
 	// The criteria is satisfied if the source IP address of the downstream
@@ -376,6 +383,13 @@ func (x *FilterChainMatch) GetSuffixLen() *wrappers.UInt32Value {
 	return nil
 }
 
+func (x *FilterChainMatch) GetDirectSourcePrefixRanges() []*v3.CidrRange {
+	if x != nil {
+		return x.DirectSourcePrefixRanges
+	}
+	return nil
+}
+
 func (x *FilterChainMatch) GetSourceType() FilterChainMatch_ConnectionSourceType {
 	if x != nil {
 		return x.SourceType
@@ -449,7 +463,7 @@ type FilterChain struct {
 	// [#not-implemented-hide:] filter chain metadata.
 	Metadata *v3.Metadata `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Optional custom transport socket implementation to use for downstream connections.
-	// To setup TLS, set a transport socket with name `tls` and
+	// To setup TLS, set a transport socket with name `envoy.transport_sockets.tls` and
 	// :ref:`DownstreamTlsContext <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.DownstreamTlsContext>` in the `typed_config`.
 	// If no transport socket configuration is specified, new connections
 	// will be set up with plaintext.
@@ -589,7 +603,7 @@ func (x *FilterChain) GetHiddenEnvoyDeprecatedTlsContext() *v31.DownstreamTlsCon
 //    rules:
 //      - destination_port_range:
 //          start: 3306
-//          end: 3306
+//          end: 3307
 //      - destination_port_range:
 //          start: 15000
 //          end: 15001
@@ -996,7 +1010,7 @@ var file_envoy_config_listener_v3_listener_components_proto_rawDesc = []byte{
 	0x88, 0x1e, 0x1e, 0x0a, 0x1c, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
 	0x32, 0x2e, 0x6c, 0x69, 0x73, 0x74, 0x65, 0x6e, 0x65, 0x72, 0x2e, 0x46, 0x69, 0x6c, 0x74, 0x65,
 	0x72, 0x42, 0x0d, 0x0a, 0x0b, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x5f, 0x74, 0x79, 0x70, 0x65,
-	0x4a, 0x04, 0x08, 0x03, 0x10, 0x04, 0x22, 0x8a, 0x06, 0x0a, 0x10, 0x46, 0x69, 0x6c, 0x74, 0x65,
+	0x4a, 0x04, 0x08, 0x03, 0x10, 0x04, 0x22, 0xea, 0x06, 0x0a, 0x10, 0x46, 0x69, 0x6c, 0x74, 0x65,
 	0x72, 0x43, 0x68, 0x61, 0x69, 0x6e, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x12, 0x54, 0x0a, 0x10, 0x64,
 	0x65, 0x73, 0x74, 0x69, 0x6e, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x70, 0x6f, 0x72, 0x74, 0x18,
 	0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
@@ -1013,7 +1027,13 @@ var file_envoy_config_listener_v3_listener_components_proto_rawDesc = []byte{
 	0x0a, 0x0a, 0x73, 0x75, 0x66, 0x66, 0x69, 0x78, 0x5f, 0x6c, 0x65, 0x6e, 0x18, 0x05, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x55, 0x49, 0x6e, 0x74, 0x33, 0x32, 0x56, 0x61, 0x6c, 0x75, 0x65,
-	0x52, 0x09, 0x73, 0x75, 0x66, 0x66, 0x69, 0x78, 0x4c, 0x65, 0x6e, 0x12, 0x6a, 0x0a, 0x0b, 0x73,
+	0x52, 0x09, 0x73, 0x75, 0x66, 0x66, 0x69, 0x78, 0x4c, 0x65, 0x6e, 0x12, 0x5e, 0x0a, 0x1b, 0x64,
+	0x69, 0x72, 0x65, 0x63, 0x74, 0x5f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x70, 0x72, 0x65,
+	0x66, 0x69, 0x78, 0x5f, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x73, 0x18, 0x0d, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x1f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e,
+	0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x33, 0x2e, 0x43, 0x69, 0x64, 0x72, 0x52, 0x61, 0x6e, 0x67,
+	0x65, 0x52, 0x18, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x50,
+	0x72, 0x65, 0x66, 0x69, 0x78, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x73, 0x12, 0x6a, 0x0a, 0x0b, 0x73,
 	0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x0e,
 	0x32, 0x3f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e,
 	0x6c, 0x69, 0x73, 0x74, 0x65, 0x6e, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x2e, 0x46, 0x69, 0x6c, 0x74,
@@ -1220,30 +1240,31 @@ var file_envoy_config_listener_v3_listener_components_proto_depIdxs = []int32{
 	11, // 3: envoy.config.listener.v3.FilterChainMatch.destination_port:type_name -> google.protobuf.UInt32Value
 	12, // 4: envoy.config.listener.v3.FilterChainMatch.prefix_ranges:type_name -> envoy.config.core.v3.CidrRange
 	11, // 5: envoy.config.listener.v3.FilterChainMatch.suffix_len:type_name -> google.protobuf.UInt32Value
-	0,  // 6: envoy.config.listener.v3.FilterChainMatch.source_type:type_name -> envoy.config.listener.v3.FilterChainMatch.ConnectionSourceType
-	12, // 7: envoy.config.listener.v3.FilterChainMatch.source_prefix_ranges:type_name -> envoy.config.core.v3.CidrRange
-	2,  // 8: envoy.config.listener.v3.FilterChain.filter_chain_match:type_name -> envoy.config.listener.v3.FilterChainMatch
-	1,  // 9: envoy.config.listener.v3.FilterChain.filters:type_name -> envoy.config.listener.v3.Filter
-	13, // 10: envoy.config.listener.v3.FilterChain.use_proxy_proto:type_name -> google.protobuf.BoolValue
-	14, // 11: envoy.config.listener.v3.FilterChain.metadata:type_name -> envoy.config.core.v3.Metadata
-	15, // 12: envoy.config.listener.v3.FilterChain.transport_socket:type_name -> envoy.config.core.v3.TransportSocket
-	16, // 13: envoy.config.listener.v3.FilterChain.transport_socket_connect_timeout:type_name -> google.protobuf.Duration
-	6,  // 14: envoy.config.listener.v3.FilterChain.on_demand_configuration:type_name -> envoy.config.listener.v3.FilterChain.OnDemandConfiguration
-	17, // 15: envoy.config.listener.v3.FilterChain.hidden_envoy_deprecated_tls_context:type_name -> envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
-	7,  // 16: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.or_match:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate.MatchSet
-	7,  // 17: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.and_match:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate.MatchSet
-	4,  // 18: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.not_match:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate
-	18, // 19: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.destination_port_range:type_name -> envoy.type.v3.Int32Range
-	8,  // 20: envoy.config.listener.v3.ListenerFilter.typed_config:type_name -> google.protobuf.Any
-	10, // 21: envoy.config.listener.v3.ListenerFilter.hidden_envoy_deprecated_config:type_name -> google.protobuf.Struct
-	4,  // 22: envoy.config.listener.v3.ListenerFilter.filter_disabled:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate
-	16, // 23: envoy.config.listener.v3.FilterChain.OnDemandConfiguration.rebuild_timeout:type_name -> google.protobuf.Duration
-	4,  // 24: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.MatchSet.rules:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	12, // 6: envoy.config.listener.v3.FilterChainMatch.direct_source_prefix_ranges:type_name -> envoy.config.core.v3.CidrRange
+	0,  // 7: envoy.config.listener.v3.FilterChainMatch.source_type:type_name -> envoy.config.listener.v3.FilterChainMatch.ConnectionSourceType
+	12, // 8: envoy.config.listener.v3.FilterChainMatch.source_prefix_ranges:type_name -> envoy.config.core.v3.CidrRange
+	2,  // 9: envoy.config.listener.v3.FilterChain.filter_chain_match:type_name -> envoy.config.listener.v3.FilterChainMatch
+	1,  // 10: envoy.config.listener.v3.FilterChain.filters:type_name -> envoy.config.listener.v3.Filter
+	13, // 11: envoy.config.listener.v3.FilterChain.use_proxy_proto:type_name -> google.protobuf.BoolValue
+	14, // 12: envoy.config.listener.v3.FilterChain.metadata:type_name -> envoy.config.core.v3.Metadata
+	15, // 13: envoy.config.listener.v3.FilterChain.transport_socket:type_name -> envoy.config.core.v3.TransportSocket
+	16, // 14: envoy.config.listener.v3.FilterChain.transport_socket_connect_timeout:type_name -> google.protobuf.Duration
+	6,  // 15: envoy.config.listener.v3.FilterChain.on_demand_configuration:type_name -> envoy.config.listener.v3.FilterChain.OnDemandConfiguration
+	17, // 16: envoy.config.listener.v3.FilterChain.hidden_envoy_deprecated_tls_context:type_name -> envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+	7,  // 17: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.or_match:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate.MatchSet
+	7,  // 18: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.and_match:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate.MatchSet
+	4,  // 19: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.not_match:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate
+	18, // 20: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.destination_port_range:type_name -> envoy.type.v3.Int32Range
+	8,  // 21: envoy.config.listener.v3.ListenerFilter.typed_config:type_name -> google.protobuf.Any
+	10, // 22: envoy.config.listener.v3.ListenerFilter.hidden_envoy_deprecated_config:type_name -> google.protobuf.Struct
+	4,  // 23: envoy.config.listener.v3.ListenerFilter.filter_disabled:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate
+	16, // 24: envoy.config.listener.v3.FilterChain.OnDemandConfiguration.rebuild_timeout:type_name -> google.protobuf.Duration
+	4,  // 25: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.MatchSet.rules:type_name -> envoy.config.listener.v3.ListenerFilterChainMatchPredicate
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_listener_v3_listener_components_proto_init() }

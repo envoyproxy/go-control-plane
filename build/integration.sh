@@ -10,8 +10,11 @@ set -o pipefail
 
 MESSAGE=$'Hi, there!\n'
 
-# Management server type. Valid values are "ads", "xds", "rest"
+# Management server type. Valid values are "ads", "xds", "rest", "delta", or "delta-ads"
 XDS=${XDS:-ads}
+
+# pprof profiler. True means turn on profiling
+PPROF=${PPROF:-false}
 
 # Number of RTDS layers.
 if [ "$XDS" = "ads" ]; then
@@ -40,4 +43,4 @@ function cleanup() {
 trap cleanup EXIT
 
 # run the test suite (which also contains the control plane)
-bin/test --xds=${XDS} --runtimes=${RUNTIMES} -debug -message="$MESSAGE" "$@"
+bin/test --xds=${XDS} --runtimes=${RUNTIMES} --pprof=${PPROF} -debug -message="$MESSAGE" "$@"

@@ -17,7 +17,6 @@ package cache
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
@@ -28,7 +27,7 @@ type Resources struct {
 	Version string
 
 	// Items in the group indexed by name.
-	Items map[string]types.ResourceWithTtl
+	Items map[string]types.ResourceWithTTL
 }
 
 // DeltaResources is a versioned group of resources which also contains individual resource versions per the incremental xDS protocol
@@ -43,12 +42,12 @@ type DeltaResources struct {
 // resourceItems contain the lower level versioned resource map
 type resourceItems struct {
 	Version string
-	Items   map[string]types.ResourceWithTtl
+	Items   map[string]types.ResourceWithTTL
 }
 
 // IndexResourcesByName creates a map from the resource name to the resource.
-func IndexResourcesByName(items []types.ResourceWithTtl) map[string]types.ResourceWithTtl {
-	indexed := make(map[string]types.ResourceWithTtl)
+func IndexResourcesByName(items []types.ResourceWithTTL) map[string]types.ResourceWithTTL {
+	indexed := make(map[string]types.ResourceWithTTL)
 	for _, item := range items {
 		indexed[GetResourceName(item.Resource)] = item
 	}
@@ -66,15 +65,15 @@ func IndexRawResourcesByName(items []types.Resource) map[string]types.Resource {
 
 // NewResources creates a new resource group.
 func NewResources(version string, items []types.Resource) Resources {
-	itemsWithTtl := []types.ResourceWithTtl{}
+	itemsWithTTL := []types.ResourceWithTTL{}
 	for _, item := range items {
-		itemsWithTtl = append(itemsWithTtl, types.ResourceWithTtl{Resource: item})
+		itemsWithTTL = append(itemsWithTTL, types.ResourceWithTTL{Resource: item})
 	}
-	return NewResourcesWithTtl(version, itemsWithTtl)
+	return NewResourcesWithTtl(version, itemsWithTTL)
 }
 
 // NewResources creates a new resource group.
-func NewResourcesWithTtl(version string, items []types.ResourceWithTtl) Resources {
+func NewResourcesWithTtl(version string, items []types.ResourceWithTTL) Resources { // nolint:golint,revive
 	return Resources{
 		Version: version,
 		Items:   IndexResourcesByName(items),
@@ -101,14 +100,16 @@ func NewSnapshot(version string,
 	routes []types.Resource,
 	listeners []types.Resource,
 	runtimes []types.Resource,
-	secrets []types.Resource) Snapshot {
+	secrets []types.Resource,
+	extensionConfigs []types.Resource) Snapshot {
 	return NewSnapshotWithResources(version, SnapshotResources{
-		Endpoints: endpoints,
-		Clusters:  clusters,
-		Routes:    routes,
-		Listeners: listeners,
-		Runtimes:  runtimes,
-		Secrets:   secrets,
+		Endpoints:        endpoints,
+		Clusters:         clusters,
+		Routes:           routes,
+		Listeners:        listeners,
+		Runtimes:         runtimes,
+		Secrets:          secrets,
+		ExtensionConfigs: extensionConfigs,
 	})
 }
 
@@ -137,18 +138,13 @@ func NewSnapshotWithResources(version string, resources SnapshotResources) Snaps
 	return out
 }
 
-type ResourceWithTtl struct {
-	Resources []types.Resource
-	Ttl       *time.Duration
-}
-
 func NewSnapshotWithTtls(version string,
-	endpoints []types.ResourceWithTtl,
-	clusters []types.ResourceWithTtl,
-	routes []types.ResourceWithTtl,
-	listeners []types.ResourceWithTtl,
-	runtimes []types.ResourceWithTtl,
-	secrets []types.ResourceWithTtl) Snapshot {
+	endpoints []types.ResourceWithTTL,
+	clusters []types.ResourceWithTTL,
+	routes []types.ResourceWithTTL,
+	listeners []types.ResourceWithTTL,
+	runtimes []types.ResourceWithTTL,
+	secrets []types.ResourceWithTTL) Snapshot {
 	out := Snapshot{}
 	out.Resources[types.Endpoint] = NewResourcesWithTtl(version, endpoints)
 	out.Resources[types.Cluster] = NewResourcesWithTtl(version, clusters)
@@ -193,17 +189,17 @@ func (s *Snapshot) GetResources(typeURL string) map[string]types.Resource {
 		return nil
 	}
 
-	withoutTtl := make(map[string]types.Resource, len(resources))
+	withoutTTL := make(map[string]types.Resource, len(resources))
 
 	for k, v := range resources {
-		withoutTtl[k] = v.Resource
+		withoutTTL[k] = v.Resource
 	}
 
-	return withoutTtl
+	return withoutTTL
 }
 
 // GetResourcesAndTtl selects snapshot resources by type, returning the map of resources and the associated TTL.
-func (s *Snapshot) GetResourcesAndTtl(typeURL string) map[string]types.ResourceWithTtl {
+func (s *Snapshot) GetResourcesAndTtl(typeURL string) map[string]types.ResourceWithTTL { // nolint:golint,revive
 	if s == nil {
 		return nil
 	}
@@ -254,7 +250,7 @@ func (s *Snapshot) ConstructVersionMap() error {
 		}
 
 		for _, r := range resources.Items {
-			// hash our verison in here and build the version map
+			// Hash our version in here and build the version map.
 			marshaledResource, err := MarshalResource(r.Resource)
 			if err != nil {
 				return err

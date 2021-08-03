@@ -12,7 +12,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	ttl_helper "github.com/envoyproxy/go-control-plane/pkg/ttl/v3"
 )
 
 const (
@@ -20,7 +19,7 @@ const (
 )
 
 func TestResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []types.ResourceWithTtl{{Resource: &route.RouteConfiguration{Name: resourceName}}}
+	routes := []types.ResourceWithTTL{{Resource: &route.RouteConfiguration{Name: resourceName}}}
 	resp := cache.RawResponse{
 		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",
@@ -69,7 +68,7 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 }
 
 func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []types.ResourceWithTtl{{Resource: &route.RouteConfiguration{Name: resourceName}}}
+	routes := []types.ResourceWithTTL{{Resource: &route.RouteConfiguration{Name: resourceName}}}
 	resp := cache.RawResponse{
 		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",
@@ -81,7 +80,7 @@ func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, discoveryResponse.VersionInfo, resp.Version)
 	assert.Equal(t, len(discoveryResponse.Resources), 1)
-	assert.False(t, ttl_helper.IsTTLResource(discoveryResponse.Resources[0]))
+	assert.False(t, isTTLResource(discoveryResponse.Resources[0]))
 
 	cachedResponse, err := resp.GetDiscoveryResponse()
 	assert.Nil(t, err)
@@ -91,4 +90,14 @@ func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
 	err = ptypes.UnmarshalAny(discoveryResponse.Resources[0], r)
 	assert.Nil(t, err)
 	assert.Equal(t, r.Name, resourceName)
+}
+
+func isTTLResource(resource *any.Any) bool {
+	wrappedResource := &discovery.Resource{}
+	err := ptypes.UnmarshalAny(resource, wrappedResource)
+	if err != nil {
+		return false
+	}
+
+	return wrappedResource.Resource == nil
 }

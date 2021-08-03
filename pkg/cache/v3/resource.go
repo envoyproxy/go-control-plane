@@ -93,7 +93,6 @@ func GetResourceName(res types.Resource) string {
 	case *runtime.Runtime:
 		return v.GetName()
 	case *core.TypedExtensionConfig:
-		// This is a V3 proto, but this is the easiest workaround for the fact that there is no V2 proto.
 		return v.GetName()
 	default:
 		return ""
@@ -114,7 +113,7 @@ func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 
 // GetResourceReferences returns the names for dependent resources (EDS cluster
 // names for CDS, RDS routes names for LDS).
-func GetResourceReferences(resources map[string]types.ResourceWithTtl) map[string]bool {
+func GetResourceReferences(resources map[string]types.ResourceWithTTL) map[string]bool {
 	out := make(map[string]bool)
 	for _, res := range resources {
 		if res.Resource == nil {

@@ -27,7 +27,7 @@ import (
 
 type watches = map[chan Response]struct{}
 
-// LinearCache supports collectons of opaque resources. This cache has a
+// LinearCache supports collections of opaque resources. This cache has a
 // single collection indexed by resource names and manages resource versions
 // internally. It implements the cache interface for a single type URL and
 // should be combined with other caches via type URL muxing. It can be used to
@@ -42,13 +42,13 @@ type LinearCache struct {
 	watches map[string]watches
 	// Set of watches for all resources in the collection
 	watchAll watches
-	// Continously incremented version
+	// Continuously incremented version.
 	version uint64
 	// Version prefix to be sent to the clients
 	versionPrefix string
 	// Versions for each resource by name.
 	versionVector map[string]uint64
-	mu            sync.Mutex
+	mu            sync.RWMutex
 }
 
 var _ Cache = &LinearCache{}
@@ -92,19 +92,19 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 }
 
 func (cache *LinearCache) respond(value chan Response, staleResources []string) {
-	var resources []types.ResourceWithTtl
+	var resources []types.ResourceWithTTL
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
-		resources = make([]types.ResourceWithTtl, 0, len(cache.resources))
+		resources = make([]types.ResourceWithTTL, 0, len(cache.resources))
 		for _, resource := range cache.resources {
-			resources = append(resources, types.ResourceWithTtl{Resource: resource})
+			resources = append(resources, types.ResourceWithTTL{Resource: resource})
 		}
 	} else {
-		resources = make([]types.ResourceWithTtl, 0, len(staleResources))
+		resources = make([]types.ResourceWithTTL, 0, len(staleResources))
 		for _, name := range staleResources {
 			resource := cache.resources[name]
 			if resource != nil {
-				resources = append(resources, types.ResourceWithTtl{Resource: resource})
+				resources = append(resources, types.ResourceWithTTL{Resource: resource})
 			}
 		}
 	}
@@ -141,7 +141,7 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 	cache.versionVector[name] = cache.version
 	cache.resources[name] = res
 
@@ -156,7 +156,7 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 	delete(cache.versionVector, name)
 	delete(cache.resources, name)
 
@@ -165,11 +165,48 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	return nil
 }
 
-func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) {
-	value := make(chan Response, 1)
+// SetResources replaces current resources with a new set of resources.
+// This function is useful for wildcard xDS subscriptions.
+// This way watches that are subscribed to all resources are triggered only once regardless of how many resources are changed.
+func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	cache.version++
+
+	modified := map[string]struct{}{}
+	// Collect deleted resource names.
+	for name := range cache.resources {
+		if _, found := resources[name]; !found {
+			delete(cache.versionVector, name)
+			modified[name] = struct{}{}
+		}
+	}
+
+	cache.resources = resources
+
+	// Collect changed resource names.
+	// We assume all resources passed to SetResources are changed.
+	// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
+	for name := range resources {
+		cache.versionVector[name] = cache.version
+		modified[name] = struct{}{}
+	}
+
+	cache.notifyAll(modified)
+}
+
+// GetResources returns current resources stored in the cache
+func (cache *LinearCache) GetResources() map[string]types.Resource {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+	return cache.resources
+}
+
+func (cache *LinearCache) CreateWatch(request *Request, value chan Response) func() {
 	if request.TypeUrl != cache.typeURL {
-		close(value)
-		return value, nil
+		value <- nil
+		return nil
 	}
 	// If the version is not up to date, check whether any requested resource has
 	// been updated between the last version and the current version. This avoids the problem
@@ -205,12 +242,12 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 	}
 	if stale {
 		cache.respond(value, staleResources)
-		return value, nil
+		return nil
 	}
 	// Create open watches since versions are up to date.
 	if len(request.ResourceNames) == 0 {
 		cache.watchAll[value] = struct{}{}
-		return value, func() {
+		return func() {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
 			delete(cache.watchAll, value)
@@ -224,7 +261,7 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 		}
 		set[value] = struct{}{}
 	}
-	return value, func() {
+	return func() {
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
 		for _, name := range request.ResourceNames {
@@ -239,8 +276,8 @@ func (cache *LinearCache) CreateWatch(request *Request) (chan Response, func()) 
 	}
 }
 
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, st *stream.StreamState) (chan DeltaResponse, func()) {
-	return nil, nil
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
+	return nil
 }
 
 func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response, error) {
@@ -249,7 +286,7 @@ func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response
 
 // Number of active watches for a resource name.
 func (cache *LinearCache) NumWatches(name string) int {
-	cache.mu.Lock()
-	defer cache.mu.Unlock()
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
 	return len(cache.watches[name]) + len(cache.watchAll)
 }
