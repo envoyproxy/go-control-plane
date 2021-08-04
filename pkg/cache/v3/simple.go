@@ -157,7 +157,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 		for id, watch := range info.watches {
 			// Respond with the current version regardless of whether the version has changed.
 			version := snapshot.GetVersion(watch.Request.TypeUrl)
-			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+			resources := snapshot.GetResourcesAndTTL(watch.Request.TypeUrl)
 
 			// TODO(snowp): Construct this once per type instead of once per watch.
 			resourcesWithTTL := map[string]types.ResourceWithTTL{}
@@ -201,7 +201,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 				if cache.log != nil {
 					cache.log.Debugf("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
 				}
-				resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
+				resources := snapshot.GetResourcesAndTTL(watch.Request.TypeUrl)
 				err := cache.respond(ctx, watch.Request, watch.Response, resources, version, false)
 				if err != nil {
 					return err
@@ -321,7 +321,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) f
 	}
 
 	// otherwise, the watch may be responded immediately
-	resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
+	resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
 	_ = cache.respond(context.Background(), request, value, resources, version, false)
 
 	return nil
@@ -492,7 +492,7 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request *Request) (Respon
 			return nil, &types.SkipFetchError{}
 		}
 
-		resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
+		resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
 		out := createResponse(ctx, request, resources, version, false)
 		return out, nil
 	}

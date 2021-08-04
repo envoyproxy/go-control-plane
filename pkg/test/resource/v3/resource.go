@@ -444,16 +444,15 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		extensions[i] = MakeExtensionConfig(Ads, extensionConfigName, routeName)
 	}
 
-	out := cache.NewSnapshot(
-		ts.Version,
-		endpoints,
-		clusters,
-		routes,
-		listeners,
-		runtimes,
-		secrets,
-		extensions,
-	)
+	out := cache.NewSnapshot(ts.Version, map[string][]types.Resource{
+		resource.EndpointType:        endpoints,
+		resource.ClusterType:         clusters,
+		resource.RouteType:           routes,
+		resource.ListenerType:        listeners,
+		resource.RuntimeType:         runtimes,
+		resource.SecretType:          secrets,
+		resource.ExtensionConfigType: extensions,
+	})
 
 	return out
 }
