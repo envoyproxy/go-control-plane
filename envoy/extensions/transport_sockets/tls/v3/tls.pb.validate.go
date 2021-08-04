@@ -341,6 +341,16 @@ func (m *CommonTlsContext) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetTlsCertificateProviderInstance()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonTlsContextValidationError{
+				field:  "TlsCertificateProviderInstance",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetTlsCertificateCertificateProvider()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommonTlsContextValidationError{

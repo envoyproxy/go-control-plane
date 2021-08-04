@@ -341,20 +341,30 @@ func (m *CommonTlsContext) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetTlsCertificateCertificateProvider()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTlsCertificateProviderInstance()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommonTlsContextValidationError{
-				field:  "TlsCertificateCertificateProvider",
+				field:  "TlsCertificateProviderInstance",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetTlsCertificateCertificateProviderInstance()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedTlsCertificateCertificateProvider()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CommonTlsContextValidationError{
-				field:  "TlsCertificateCertificateProviderInstance",
+				field:  "HiddenEnvoyDeprecatedTlsCertificateCertificateProvider",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedTlsCertificateCertificateProviderInstance()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonTlsContextValidationError{
+				field:  "HiddenEnvoyDeprecatedTlsCertificateCertificateProviderInstance",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -409,24 +419,24 @@ func (m *CommonTlsContext) Validate() error {
 			}
 		}
 
-	case *CommonTlsContext_ValidationContextCertificateProvider:
+	case *CommonTlsContext_HiddenEnvoyDeprecatedValidationContextCertificateProvider:
 
-		if v, ok := interface{}(m.GetValidationContextCertificateProvider()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedValidationContextCertificateProvider()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CommonTlsContextValidationError{
-					field:  "ValidationContextCertificateProvider",
+					field:  "HiddenEnvoyDeprecatedValidationContextCertificateProvider",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
 			}
 		}
 
-	case *CommonTlsContext_ValidationContextCertificateProviderInstance:
+	case *CommonTlsContext_HiddenEnvoyDeprecatedValidationContextCertificateProviderInstance:
 
-		if v, ok := interface{}(m.GetValidationContextCertificateProviderInstance()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedValidationContextCertificateProviderInstance()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return CommonTlsContextValidationError{
-					field:  "ValidationContextCertificateProviderInstance",
+					field:  "HiddenEnvoyDeprecatedValidationContextCertificateProviderInstance",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -688,51 +698,41 @@ func (m *CommonTlsContext_CombinedCertificateValidationContext) Validate() error
 		}
 	}
 
-	switch m.DynamicValidationContext.(type) {
+	if m.GetValidationContextSdsSecretConfig() == nil {
+		return CommonTlsContext_CombinedCertificateValidationContextValidationError{
+			field:  "ValidationContextSdsSecretConfig",
+			reason: "value is required",
+		}
+	}
 
-	case *CommonTlsContext_CombinedCertificateValidationContext_ValidationContextSdsSecretConfig:
-
-		if m.GetValidationContextSdsSecretConfig() == nil {
+	if v, ok := interface{}(m.GetValidationContextSdsSecretConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
 			return CommonTlsContext_CombinedCertificateValidationContextValidationError{
 				field:  "ValidationContextSdsSecretConfig",
-				reason: "value is required",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
+	}
 
-		if v, ok := interface{}(m.GetValidationContextSdsSecretConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return CommonTlsContext_CombinedCertificateValidationContextValidationError{
-					field:  "ValidationContextSdsSecretConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedValidationContextCertificateProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonTlsContext_CombinedCertificateValidationContextValidationError{
+				field:  "HiddenEnvoyDeprecatedValidationContextCertificateProvider",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
+	}
 
-	case *CommonTlsContext_CombinedCertificateValidationContext_ValidationContextCertificateProvider:
-
-		if v, ok := interface{}(m.GetValidationContextCertificateProvider()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return CommonTlsContext_CombinedCertificateValidationContextValidationError{
-					field:  "ValidationContextCertificateProvider",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
+	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedValidationContextCertificateProviderInstance()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonTlsContext_CombinedCertificateValidationContextValidationError{
+				field:  "HiddenEnvoyDeprecatedValidationContextCertificateProviderInstance",
+				reason: "embedded message failed validation",
+				cause:  err,
 			}
 		}
-
-	case *CommonTlsContext_CombinedCertificateValidationContext_ValidationContextCertificateProviderInstance:
-
-		if v, ok := interface{}(m.GetValidationContextCertificateProviderInstance()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return CommonTlsContext_CombinedCertificateValidationContextValidationError{
-					field:  "ValidationContextCertificateProviderInstance",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	return nil
