@@ -431,22 +431,84 @@ var _ interface {
 	ErrorName() string
 } = TlsSessionTicketKeysValidationError{}
 
+// Validate checks the field values on CertificateProviderPluginInstance with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *CertificateProviderPluginInstance) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for InstanceName
+
+	// no validation rules for CertificateName
+
+	return nil
+}
+
+// CertificateProviderPluginInstanceValidationError is the validation error
+// returned by CertificateProviderPluginInstance.Validate if the designated
+// constraints aren't met.
+type CertificateProviderPluginInstanceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CertificateProviderPluginInstanceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CertificateProviderPluginInstanceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CertificateProviderPluginInstanceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CertificateProviderPluginInstanceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CertificateProviderPluginInstanceValidationError) ErrorName() string {
+	return "CertificateProviderPluginInstanceValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CertificateProviderPluginInstanceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCertificateProviderPluginInstance.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CertificateProviderPluginInstanceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CertificateProviderPluginInstanceValidationError{}
+
 // Validate checks the field values on CertificateValidationContext with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
 func (m *CertificateValidationContext) Validate() error {
 	if m == nil {
 		return nil
-	}
-
-	if v, ok := interface{}(m.GetTrustedCa()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CertificateValidationContextValidationError{
-				field:  "TrustedCa",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
 	}
 
 	if v, ok := interface{}(m.GetWatchedDirectory()).(interface{ Validate() error }); ok {
@@ -549,6 +611,34 @@ func (m *CertificateValidationContext) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	switch m.CaCertSource.(type) {
+
+	case *CertificateValidationContext_TrustedCa:
+
+		if v, ok := interface{}(m.GetTrustedCa()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CertificateValidationContextValidationError{
+					field:  "TrustedCa",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *CertificateValidationContext_CaCertificateProviderInstance:
+
+		if v, ok := interface{}(m.GetCaCertificateProviderInstance()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CertificateValidationContextValidationError{
+					field:  "CaCertificateProviderInstance",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

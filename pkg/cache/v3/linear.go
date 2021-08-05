@@ -29,7 +29,7 @@ import (
 
 type watches = map[chan Response]struct{}
 
-// LinearCache supports collectons of opaque resources. This cache has a
+// LinearCache supports collections of opaque resources. This cache has a
 // single collection indexed by resource names and manages resource versions
 // internally. It implements the cache interface for a single type URL and
 // should be combined with other caches via type URL muxing. It can be used to
@@ -46,14 +46,14 @@ type LinearCache struct {
 	watchAll watches
 	// Set of delta watches. A delta watch always contain the list of subscribed resources
 	// together with its current version
-	// version and versionPrefix fields are ignored for delta watches, because we always generate the resource version
+	// version and versionPrefix fields are ignored for delta watches, because we always generate the resource version.
 	deltaWatches map[int64]DeltaResponseWatch
-	// Continously incremented counter used to index delta watches
+	// Continously incremented counter used to index delta watches.
 	deltaWatchCount int64
 	// versionMap holds the current hash map of all resources in the cache.
 	// versionMap is only to be used with delta xDS.
 	versionMap map[string]string
-	// Continously incremented version
+	// Continuously incremented version.
 	version uint64
 	// Version prefix to be sent to the clients
 	versionPrefix string
@@ -114,19 +114,19 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 }
 
 func (cache *LinearCache) respond(value chan Response, staleResources []string) {
-	var resources []types.ResourceWithTtl
+	var resources []types.ResourceWithTTL
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
-		resources = make([]types.ResourceWithTtl, 0, len(cache.resources))
+		resources = make([]types.ResourceWithTTL, 0, len(cache.resources))
 		for _, resource := range cache.resources {
-			resources = append(resources, types.ResourceWithTtl{Resource: resource})
+			resources = append(resources, types.ResourceWithTTL{Resource: resource})
 		}
 	} else {
-		resources = make([]types.ResourceWithTtl, 0, len(staleResources))
+		resources = make([]types.ResourceWithTTL, 0, len(staleResources))
 		for _, name := range staleResources {
 			resource := cache.resources[name]
 			if resource != nil {
-				resources = append(resources, types.ResourceWithTtl{Resource: resource})
+				resources = append(resources, types.ResourceWithTTL{Resource: resource})
 			}
 		}
 	}
@@ -172,7 +172,7 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 	cache.versionVector[name] = cache.version
 	cache.resources[name] = res
 
@@ -187,7 +187,7 @@ func (cache *LinearCache) DeleteResource(name string) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 	delete(cache.versionVector, name)
 	delete(cache.resources, name)
 
@@ -203,7 +203,7 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	cache.version += 1
+	cache.version++
 
 	modified := map[string]struct{}{}
 	// Collect deleted resource names.

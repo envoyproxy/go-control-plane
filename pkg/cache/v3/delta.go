@@ -53,7 +53,7 @@ func respondDeltaSnapshot(ctx context.Context, request *DeltaRequest, value chan
 	resp := createDeltaResponse(ctx, request, state, snapshot, log)
 
 	// Only send a response if there were changes
-	// We want to respond immediatly for the first wildcard request in a stream, even if the response is empty
+	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
 	// otherwise, envoy won't complete initialization
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFirst()) {
 		if log != nil {

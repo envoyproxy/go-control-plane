@@ -61,10 +61,6 @@ type SnapshotCache interface {
 	GetStatusKeys() []string
 }
 
-type heartbeatHandle struct {
-	cancel func()
-}
-
 type snapshotCache struct {
 	// watchCount and deltaWatchCount are atomic counters incremented for each watch respectively. They need to
 	// be the first fields in the struct to guarantee 64-bit alignment,
@@ -164,21 +160,21 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			resources := snapshot.GetResourcesAndTtl(watch.Request.TypeUrl)
 
 			// TODO(snowp): Construct this once per type instead of once per watch.
-			resourcesWithTtl := map[string]types.ResourceWithTtl{}
+			resourcesWithTTL := map[string]types.ResourceWithTTL{}
 			for k, v := range resources {
-				if v.Ttl != nil {
-					resourcesWithTtl[k] = v
+				if v.TTL != nil {
+					resourcesWithTTL[k] = v
 				}
 			}
 
-			if len(resourcesWithTtl) == 0 {
+			if len(resourcesWithTTL) == 0 {
 				continue
 			}
 			if cache.log != nil {
 				cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.ResourceNames, version)
 			}
 
-			cache.respond(ctx, watch.Request, watch.Response, resourcesWithTtl, version, true)
+			_ = cache.respond(ctx, watch.Request, watch.Response, resourcesWithTTL, version, true)
 
 			// The watch must be deleted and we must rely on the client to ack this response to create a new watch.
 			delete(info.watches, id)
@@ -216,7 +212,9 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 			}
 		}
 
-		// We only calculate version hashes when using delta. We don't want to do this when using SOTW so we can avoid unecessary computational cost if not using delta.
+		// We only calculate version hashes when using delta. We don't
+		// want to do this when using SOTW so we can avoid unnecessary
+		// computational cost if not using delta.
 		if len(info.deltaWatches) > 0 {
 			err := snapshot.ConstructVersionMap()
 			if err != nil {
@@ -279,7 +277,7 @@ func nameSet(names []string) map[string]bool {
 }
 
 // superset checks that all resources are listed in the names set.
-func superset(names map[string]bool, resources map[string]types.ResourceWithTtl) error {
+func superset(names map[string]bool, resources map[string]types.ResourceWithTTL) error {
 	for resourceName := range resources {
 		if _, exists := names[resourceName]; !exists {
 			return fmt.Errorf("%q not listed", resourceName)
@@ -324,7 +322,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) f
 
 	// otherwise, the watch may be responded immediately
 	resources := snapshot.GetResourcesAndTtl(request.TypeUrl)
-	cache.respond(context.Background(), request, value, resources, version, false)
+	_ = cache.respond(context.Background(), request, value, resources, version, false)
 
 	return nil
 }
@@ -349,7 +347,7 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
 // TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
-func (cache *snapshotCache) respond(ctx context.Context, request *Request, value chan Response, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) error {
+func (cache *snapshotCache) respond(ctx context.Context, request *Request, value chan Response, resources map[string]types.ResourceWithTTL, version string, heartbeat bool) error {
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
@@ -373,8 +371,8 @@ func (cache *snapshotCache) respond(ctx context.Context, request *Request, value
 	}
 }
 
-func createResponse(ctx context.Context, request *Request, resources map[string]types.ResourceWithTtl, version string, heartbeat bool) Response {
-	filtered := make([]types.ResourceWithTtl, 0, len(resources))
+func createResponse(ctx context.Context, request *Request, resources map[string]types.ResourceWithTTL, version string, heartbeat bool) Response {
+	filtered := make([]types.ResourceWithTTL, 0, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
@@ -429,13 +427,15 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 	if exists {
 		err := snapshot.ConstructVersionMap()
 		if err != nil {
-			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
-			delayedResponse = true
+			if cache.log != nil {
+				cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
+			}
 		}
 		response, err := respondDeltaSnapshot(context.Background(), request, value, state, &snapshot, cache.log)
 		if err != nil {
-			cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
-			delayedResponse = true
+			if cache.log != nil {
+				cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
+			}
 		}
 
 		delayedResponse = response == nil
