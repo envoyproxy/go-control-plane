@@ -1,10 +1,13 @@
 package cache_test
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -28,10 +31,10 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.StreamState{ResourceVersions: nil, Wildcard: true}, watches[typ])
+		}, stream.NewStreamState(true, nil), watches[typ])
 	}
 
-	if err := c.SetSnapshot(key, snapshot); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
@@ -61,7 +64,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.StreamState{ResourceVersions: versionMap[typ]}, watches[typ])
+		}, stream.NewStreamState(false, versionMap[typ]), watches[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -71,7 +74,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// set partially-versioned snapshot
 	snapshot2 := snapshot
 	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
-	if err := c.SetSnapshot(key, snapshot2); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
@@ -94,9 +97,12 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 func TestDeltaRemoveResources(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	watches := make(map[string]chan cache.DeltaResponse)
+	streams := make(map[string]*stream.StreamState)
 
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
+		state := stream.NewStreamState(true, make(map[string]string))
+		streams[typ] = &state
 		// We don't specify any resource name subscriptions here because we want to make sure we test wildcard
 		// functionality. This means we should receive all resources back without requesting a subscription by name.
 		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
@@ -104,14 +110,13 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, stream.StreamState{ResourceVersions: make(map[string]string), Wildcard: true}, watches[typ])
+		}, *streams[typ], watches[typ])
 	}
 
-	if err := c.SetSnapshot(key, snapshot); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
-	versionMap := make(map[string]map[string]string)
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {
@@ -120,7 +125,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
 				}
 				nextVersionMap := out.GetNextVersionMap()
-				versionMap[typ] = nextVersionMap
+				streams[typ].SetResourceVersions(nextVersionMap)
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive a snapshot response")
 			}
@@ -136,7 +141,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, stream.StreamState{ResourceVersions: versionMap[typ], Wildcard: true}, watches[typ])
+		}, *streams[typ], watches[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -146,7 +151,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 	// set a partially versioned snapshot with no endpoints
 	snapshot2 := snapshot
 	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{})
-	if err := c.SetSnapshot(key, snapshot2); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
 
@@ -159,7 +164,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 		nextVersionMap := out.GetNextVersionMap()
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
-		if reflect.DeepEqual(versionMap[testTypes[0]], nextVersionMap) {
+		if reflect.DeepEqual(streams[testTypes[0]].GetResourceVersions(), nextVersionMap) {
 			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an emtpy map", nextVersionMap)
 		}
 	case <-time.After(time.Second):
@@ -180,7 +185,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					c.SetSnapshot(id, snap)
+					c.SetSnapshot(context.Background(), key, snap)
 				} else {
 					if cancel != nil {
 						cancel()
@@ -196,6 +201,51 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 				}
 			})
 		}(i)
+	}
+}
+
+type testKey struct{}
+
+func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+
+	// Create a non-buffered channel that will block sends.
+	watchCh := make(chan cache.DeltaResponse)
+	c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
+		Node: &core.Node{
+			Id: key,
+		},
+		TypeUrl:                rsrc.EndpointType,
+		ResourceNamesSubscribe: names[rsrc.EndpointType],
+	}, stream.NewStreamState(false, map[string]string{names[rsrc.EndpointType][0]: ""}), watchCh)
+
+	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+	defer cancel()
+
+	err := c.SetSnapshot(ctx, key, snapshot)
+	assert.EqualError(t, err, context.Canceled.Error())
+
+	// Now reset the snapshot with a consuming channel. This verifies that if setting the snapshot fails,
+	// we can retry by setting the same snapshot. In other words, we keep the watch open even if we failed
+	// to respond to it within the deadline.
+	watchTriggeredCh := make(chan cache.DeltaResponse)
+	go func() {
+		response := <-watchCh
+		watchTriggeredCh <- response
+		close(watchTriggeredCh)
+	}()
+
+	err = c.SetSnapshot(context.WithValue(context.Background(), testKey{}, "bar"), key, snapshot)
+	assert.NoError(t, err)
+
+	// The channel should get closed due to the watch trigger.
+	select {
+	case response := <-watchTriggeredCh:
+		// Verify that we pass the context through.
+		assert.Equal(t, response.GetContext().Value(testKey{}), "bar")
+	case <-time.After(time.Second):
+		t.Fatalf("timed out")
 	}
 }
 

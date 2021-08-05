@@ -65,23 +65,6 @@ type LinearCache struct {
 	mu sync.RWMutex
 }
 
-// This struct exist only because we want to reuse respondDelta function
-type cacheWrapper struct {
-	cache *LinearCache
-}
-
-func (w *cacheWrapper) GetResources(typeURL string) map[string]types.Resource {
-	return w.cache.resources
-}
-
-func (w *cacheWrapper) GetVersionMap() map[string]map[string]string {
-	return map[string]map[string]string{w.cache.typeURL: w.cache.versionMap}
-}
-
-func (w *cacheWrapper) GetVersion(typeURL string) string {
-	return w.cache.getVersion()
-}
-
 var _ Cache = &LinearCache{}
 
 // Options for modifying the behavior of the linear cache.
@@ -174,7 +157,8 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	cache.updateVersionMap(modified)
 
 	for id, watch := range cache.deltaWatches {
-		if respondDelta(watch.Request, watch.Response, watch.StreamState, &cacheWrapper{cache}, cache.log) != nil {
+		res := respondDeltaLinear(watch.Request, watch.Response, watch.StreamState, cache, cache.log)
+		if res != nil {
 			delete(cache.deltaWatches, id)
 		}
 	}
@@ -327,13 +311,15 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
+	response := respondDeltaLinear(request, value, state, cache, cache.log)
+
 	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
 	// create a new watch accordingly
-	if respondDelta(request, value, state, &cacheWrapper{cache}, cache.log) == nil {
+	if response == nil {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
-				cache.typeURL, state.ResourceVersions, cache.getVersion())
+				cache.typeURL, state.GetResourceVersions(), cache.getVersion())
 		}
 
 		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: state}

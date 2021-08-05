@@ -101,14 +101,16 @@ func NewSnapshot(version string,
 	routes []types.Resource,
 	listeners []types.Resource,
 	runtimes []types.Resource,
-	secrets []types.Resource) Snapshot {
+	secrets []types.Resource,
+	extensionConfigs []types.Resource) Snapshot {
 	return NewSnapshotWithResources(version, SnapshotResources{
-		Endpoints: endpoints,
-		Clusters:  clusters,
-		Routes:    routes,
-		Listeners: listeners,
-		Runtimes:  runtimes,
-		Secrets:   secrets,
+		Endpoints:        endpoints,
+		Clusters:         clusters,
+		Routes:           routes,
+		Listeners:        listeners,
+		Runtimes:         runtimes,
+		Secrets:          secrets,
+		ExtensionConfigs: extensionConfigs,
 	})
 }
 

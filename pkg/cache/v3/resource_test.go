@@ -26,21 +26,23 @@ import (
 )
 
 const (
-	clusterName  = "cluster0"
-	routeName    = "route0"
-	listenerName = "listener0"
-	runtimeName  = "runtime0"
-	tlsName      = "secret0"
-	rootName     = "root0"
+	clusterName         = "cluster0"
+	routeName           = "route0"
+	listenerName        = "listener0"
+	runtimeName         = "runtime0"
+	tlsName             = "secret0"
+	rootName            = "root0"
+	extensionConfigName = "extensionConfig0"
 )
 
 var (
-	testEndpoint = resource.MakeEndpoint(clusterName, 8080)
-	testCluster  = resource.MakeCluster(resource.Ads, clusterName)
-	testRoute    = resource.MakeRoute(routeName, clusterName)
-	testListener = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	testRuntime  = resource.MakeRuntime(runtimeName)
-	testSecret   = resource.MakeSecrets(tlsName, rootName)
+	testEndpoint        = resource.MakeEndpoint(clusterName, 8080)
+	testCluster         = resource.MakeCluster(resource.Ads, clusterName)
+	testRoute           = resource.MakeRoute(routeName, clusterName)
+	testListener        = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testRuntime         = resource.MakeRuntime(runtimeName)
+	testSecret          = resource.MakeSecrets(tlsName, rootName)
+	testExtensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
 )
 
 func TestValidate(t *testing.T) {

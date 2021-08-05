@@ -85,6 +85,9 @@ type Response interface {
 
 	// Get the version in the Response.
 	GetVersion() (string, error)
+
+	// Get the context provided during response creation.
+	GetContext() context.Context
 }
 
 // DeltaResponse is a wrapper around Envoy's DeltaDiscoveryResponse
@@ -102,6 +105,9 @@ type DeltaResponse interface {
 	// Get the version map of the internal cache.
 	// The version map consists of updated version mappings after this response is applied
 	GetNextVersionMap() map[string]string
+
+	// Get the context provided during response creation
+	GetContext() context.Context
 }
 
 // RawResponse is a pre-serialized xDS response containing the raw resources to
@@ -121,6 +127,10 @@ type RawResponse struct {
 	// will be converted into a response that doesn't contain the actual resource protobuf.
 	// This allows for more lightweight updates that server only to update the TTL timer.
 	Heartbeat bool
+
+	// Context provided at the time of response creation. This allows associating additional
+	// information with a generated response.
+	Ctx context.Context
 
 	// marshaledResponse holds an atomic reference to the serialized discovery response.
 	marshaledResponse atomic.Value
@@ -143,6 +153,10 @@ type RawDeltaResponse struct {
 	// NextVersionMap consists of updated version mappings after this response is applied
 	NextVersionMap map[string]string
 
+	// Context provided at the time of response creation. This allows associating additional
+	// information with a generated response.
+	Ctx context.Context
+
 	// Marshaled Resources to be included in the response.
 	marshaledResponse atomic.Value
 }
@@ -157,6 +171,8 @@ type PassthroughResponse struct {
 
 	// The discovery response that needs to be sent as is, without any marshalling transformations.
 	DiscoveryResponse *discovery.DiscoveryResponse
+
+	ctx context.Context
 }
 
 // DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshalling transformations.
@@ -169,6 +185,8 @@ type DeltaPassthroughResponse struct {
 
 	// This discovery response that needs to be sent as is, without any marshalling transformations
 	DeltaDiscoveryResponse *discovery.DeltaDiscoveryResponse
+
+	ctx context.Context
 }
 
 var _ Response = &PassthroughResponse{}
@@ -258,6 +276,10 @@ func (r *RawResponse) GetRequest() *discovery.DiscoveryRequest {
 	return r.Request
 }
 
+func (r *RawResponse) GetContext() context.Context {
+	return r.Ctx
+}
+
 // GetDeltaRequest returns the original DeltaRequest
 func (r *RawDeltaResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
 	return r.DeltaRequest
@@ -276,6 +298,10 @@ func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 // NextVersionMap returns the version map which consists of updated version mappings after this response is applied
 func (r *RawDeltaResponse) GetNextVersionMap() map[string]string {
 	return r.NextVersionMap
+}
+
+func (r *RawDeltaResponse) GetContext() context.Context {
+	return r.Ctx
 }
 
 var deltaResourceTypeURL = "type.googleapis.com/" + proto.MessageName(&discovery.Resource{})
@@ -329,6 +355,9 @@ func (r *PassthroughResponse) GetVersion() (string, error) {
 	}
 	return "", fmt.Errorf("DiscoveryResponse is nil")
 }
+func (r *PassthroughResponse) GetContext() context.Context {
+	return r.ctx
+}
 
 // GetSystemVersion returns the response version.
 func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
@@ -341,4 +370,8 @@ func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 // NextVersionMap returns the version map from a DeltaPassthroughResponse
 func (r *DeltaPassthroughResponse) GetNextVersionMap() map[string]string {
 	return r.NextVersionMap
+}
+
+func (r *DeltaPassthroughResponse) GetContext() context.Context {
+	return r.ctx
 }

@@ -56,6 +56,7 @@ var (
 	runtimes      int
 	tls           bool
 	mux           bool
+	extensionNum  int
 
 	nodeID string
 
@@ -138,6 +139,8 @@ func init() {
 	// Enable a muxed cache with partial snapshots
 	flag.BoolVar(&mux, "mux", false, "Enable muxed linear cache for EDS")
 
+	// Number of ExtensionConfig
+	flag.IntVar(&extensionNum, "extension", 1, "Number of Extension")
 	//
 	// These parameters control the the use of the pprof profiler
 	//
@@ -198,6 +201,7 @@ func main() {
 		NumTCPListeners:  tcpListeners,
 		TLS:              tls,
 		NumRuntimes:      runtimes,
+		NumExtension:     extensionNum,
 	}
 
 	// start the xDS server
@@ -225,7 +229,7 @@ func main() {
 			log.Printf("snapshot inconsistency: %+v\n", snapshot)
 		}
 
-		err := config.SetSnapshot(nodeID, snapshot)
+		err := config.SetSnapshot(context.Background(), nodeID, snapshot)
 		if err != nil {
 			log.Printf("snapshot error %q for %+v\n", err, snapshot)
 			os.Exit(1)

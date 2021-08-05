@@ -22,6 +22,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -53,7 +55,8 @@ var (
 		[]types.Resource{testRoute},
 		[]types.Resource{testListener},
 		[]types.Resource{testRuntime},
-		[]types.Resource{testSecret[0]})
+		[]types.Resource{testSecret[0]},
+		[]types.Resource{testExtensionConfig})
 
 	ttl       = 2 * time.Second
 	heartbeat = time.Second
@@ -101,7 +104,7 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 		t.Errorf("unexpected snapshot found for key %q", key)
 	}
 
-	if err := c.SetSnapshot(key, snapshotWithTtl); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshotWithTtl); err != nil {
 		t.Fatal(err)
 	}
 
@@ -189,7 +192,7 @@ func TestSnapshotCache(t *testing.T) {
 		t.Errorf("unexpected snapshot found for key %q", key)
 	}
 
-	if err := c.SetSnapshot(key, snapshot); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
@@ -232,7 +235,7 @@ func TestSnapshotCache(t *testing.T) {
 
 func TestSnapshotCacheFetch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
-	if err := c.SetSnapshot(key, snapshot); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
@@ -268,7 +271,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 		watches[typ] = make(chan cache.Response, 1)
 		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, watches[typ])
 	}
-	if err := c.SetSnapshot(key, snapshot); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 	for _, typ := range testTypes {
@@ -299,7 +302,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	// set partially-versioned snapshot
 	snapshot2 := snapshot
 	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
-	if err := c.SetSnapshot(key, snapshot2); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes)-1 {
@@ -332,7 +335,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 				if i < 25 {
 					snap := cache.Snapshot{}
 					snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					c.SetSnapshot(id, snap)
+					c.SetSnapshot(context.Background(), key, snap)
 				} else {
 					if cancel != nil {
 						cancel()
@@ -370,9 +373,46 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 	}
 }
 
+func TestSnapshotCacheWatchTimeout(t *testing.T) {
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+
+	// Create a non-buffered channel that will block sends.
+	watchCh := make(chan cache.Response)
+	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]}, watchCh)
+
+	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+	defer cancel()
+
+	err := c.SetSnapshot(ctx, key, snapshot)
+	assert.EqualError(t, err, context.Canceled.Error())
+
+	// Now reset the snapshot with a consuming channel. This verifies that if setting the snapshot fails,
+	// we can retry by setting the same snapshot. In other words, we keep the watch open even if we failed
+	// to respond to it within the deadline.
+	watchTriggeredCh := make(chan cache.Response)
+	go func() {
+		response := <-watchCh
+		watchTriggeredCh <- response
+		close(watchTriggeredCh)
+	}()
+
+	err = c.SetSnapshot(context.WithValue(context.Background(), testKey{}, "bar"), key, snapshot)
+	assert.NoError(t, err)
+
+	// The channel should get closed due to the watch trigger.
+	select {
+	case response := <-watchTriggeredCh:
+		// Verify that we pass the context through.
+		assert.Equal(t, response.GetContext().Value(testKey{}), "bar")
+	case <-time.After(time.Second):
+		t.Fatalf("timed out")
+	}
+}
+
 func TestSnapshotClear(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
-	if err := c.SetSnapshot(key, snapshot); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 	c.ClearSnapshot(key)

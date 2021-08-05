@@ -405,11 +405,11 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 
 func TestLinearDeltaWildcard(t *testing.T) {
 	c := NewLinearCache(testType)
-	state1 := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
+	state1 := stream.NewStreamState(true, map[string]string{})
 	w1 := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state1, w1)
 	mustBlockDelta(t, w1)
-	state2 := stream.StreamState{Wildcard: true, ResourceVersions: map[string]string{}}
+	state2 := stream.NewStreamState(true, map[string]string{})
 	w2 := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state2, w2)
 	mustBlockDelta(t, w1)
@@ -432,13 +432,13 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 	hashB := hashResource(t, b)
 	c.UpdateResource("b", b)
 
-	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"b": "", "c": ""}} // watching b and c - not interested in a
+	state := stream.NewStreamState(false, map[string]string{"b": "", "c": ""}) // watching b and c - not interested in a
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, []string{"c"})
 
-	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
+	state = stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
@@ -454,13 +454,13 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	hashB := hashResource(t, b)
 	c.UpdateResource("b", b)
 
-	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": hashB}}
+	state := stream.NewStreamState(false, map[string]string{"a": "", "b": hashB})
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil) // b is up to date and shouldn't be returned
 
-	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
+	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
@@ -481,13 +481,13 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	hashB := hashResource(t, b)
 	c.UpdateResource("b", b)
 
-	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
+	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
 
-	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
+	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
@@ -510,13 +510,13 @@ func TestLinearDeltaResourceDelete(t *testing.T) {
 	hashB := hashResource(t, b)
 	c.UpdateResource("b", b)
 
-	state := stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": "", "b": ""}}
+	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
 
-	state = stream.StreamState{Wildcard: false, ResourceVersions: map[string]string{"a": hashA, "b": hashB}}
+	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
