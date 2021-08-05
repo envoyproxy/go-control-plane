@@ -22,10 +22,10 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-type ResourceContainer interface {
+type resourceContainer interface {
 	GetResources(typeURL string) map[string]types.Resource
 
-	GetVersionMap() map[string]map[string]string
+	GetVersionMap(typeURL string) map[string]string
 
 	GetVersion(typeURL string) string
 }
@@ -40,8 +40,8 @@ func (w *cacheWrapper) GetResources(typeURL string) map[string]types.Resource {
 	return w.cache.resources
 }
 
-func (w *cacheWrapper) GetVersionMap() map[string]map[string]string {
-	return map[string]map[string]string{w.cache.typeURL: w.cache.versionMap}
+func (w *cacheWrapper) GetVersionMap(typeURL string) map[string]string {
+	return w.cache.versionMap
 }
 
 func (w *cacheWrapper) GetVersion(typeURL string) string {
@@ -85,7 +85,7 @@ func respondDeltaLinear(request *DeltaRequest, value chan DeltaResponse, state s
 	return nil
 }
 
-func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, snapshot ResourceContainer, log log.Logger) *RawDeltaResponse {
+func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, snapshot resourceContainer, log log.Logger) *RawDeltaResponse {
 	resources := snapshot.GetResources((req.TypeUrl))
 
 	// variables to build our response with
@@ -99,7 +99,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 		for name, r := range resources {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
-			version := snapshot.GetVersionMap()[req.TypeUrl][name]
+			version := snapshot.GetVersionMap(req.TypeUrl)[name]
 			nextVersionMap[name] = version
 			prevVersion, found := state.GetResourceVersions()[name]
 			if !found || (prevVersion != nextVersionMap[name]) {
@@ -110,7 +110,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 		// Reply only with the requested resources
 		for name, prevVersion := range state.GetResourceVersions() {
 			if r, ok := resources[name]; ok {
-				nextVersion := snapshot.GetVersionMap()[req.TypeUrl][name]
+				nextVersion := snapshot.GetVersionMap(req.TypeUrl)[name]
 				if prevVersion != nextVersion {
 					filtered = append(filtered, r)
 				}

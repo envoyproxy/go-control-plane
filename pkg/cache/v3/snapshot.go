@@ -229,8 +229,8 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 }
 
 // GetVersionMap will return the internal version map of the currently applied snapshot.
-func (s *Snapshot) GetVersionMap() map[string]map[string]string {
-	return s.VersionMap
+func (s *Snapshot) GetVersionMap(typeUrl string) map[string]string {
+	return s.VersionMap[typeUrl]
 }
 
 // ConstructVersionMap will construct a version map based on the current state of a snapshot
