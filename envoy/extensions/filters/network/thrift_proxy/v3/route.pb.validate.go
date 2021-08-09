@@ -347,6 +347,21 @@ func (m *RouteAction) Validate() error {
 
 	// no validation rules for StripServiceName
 
+	for idx, item := range m.GetRequestMirrorPolicies() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteActionValidationError{
+					field:  fmt.Sprintf("RequestMirrorPolicies[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.ClusterSpecifier.(type) {
 
 	case *RouteAction_Cluster:
@@ -539,6 +554,91 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WeightedClusterValidationError{}
+
+// Validate checks the field values on RouteAction_RequestMirrorPolicy with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RouteAction_RequestMirrorPolicy) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetCluster()) < 1 {
+		return RouteAction_RequestMirrorPolicyValidationError{
+			field:  "Cluster",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if v, ok := interface{}(m.GetRuntimeFraction()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteAction_RequestMirrorPolicyValidationError{
+				field:  "RuntimeFraction",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RouteAction_RequestMirrorPolicyValidationError is the validation error
+// returned by RouteAction_RequestMirrorPolicy.Validate if the designated
+// constraints aren't met.
+type RouteAction_RequestMirrorPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RouteAction_RequestMirrorPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RouteAction_RequestMirrorPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RouteAction_RequestMirrorPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RouteAction_RequestMirrorPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RouteAction_RequestMirrorPolicyValidationError) ErrorName() string {
+	return "RouteAction_RequestMirrorPolicyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RouteAction_RequestMirrorPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRouteAction_RequestMirrorPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RouteAction_RequestMirrorPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RouteAction_RequestMirrorPolicyValidationError{}
 
 // Validate checks the field values on WeightedCluster_ClusterWeight with the
 // rules defined in the proto definition for this message. If any rules are
