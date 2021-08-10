@@ -166,7 +166,7 @@ func makeConfigSource() *core.ConfigSource {
 
 func GenerateSnapshot() cache.Snapshot {
 	return cache.NewSnapshot("1",
-		map[string][]types.Resource{
+		map[resource.Type][]types.Resource{
 			resource.ClusterType:  {makeCluster(ClusterName)},
 			resource.RouteType:    {makeRoute(RouteName, ClusterName)},
 			resource.ListenerType: {makeHTTPListener(ListenerName, RouteName)},

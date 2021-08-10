@@ -35,7 +35,7 @@ import (
 )
 
 // GetResponseType returns the enumeration for a valid xDS type URL
-func GetResponseType(typeURL string) types.ResponseType {
+func GetResponseType(typeURL resource.Type) types.ResponseType {
 	switch typeURL {
 	case resource.EndpointType:
 		return types.Endpoint

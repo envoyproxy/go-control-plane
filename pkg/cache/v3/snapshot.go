@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
 // Snapshot is an internally consistent snapshot of xDS resources.
@@ -36,7 +37,7 @@ type Snapshot struct {
 
 // NewSnapshot creates a snapshot from response types and a version.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
-func NewSnapshot(version string, resources map[string][]types.Resource) Snapshot {
+func NewSnapshot(version string, resources map[resource.Type][]types.Resource) Snapshot {
 	out := Snapshot{}
 
 	for typ, resource := range resources {
@@ -51,7 +52,7 @@ func NewSnapshot(version string, resources map[string][]types.Resource) Snapshot
 
 // NewSnapshotWithTTLs creates a snapshot with time to live per resource.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
-func NewSnapshotWithTTLs(version string, resources map[string][]types.ResourceWithTTL) Snapshot {
+func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.ResourceWithTTL) Snapshot {
 	out := Snapshot{}
 
 	for typ, resource := range resources {
@@ -92,7 +93,7 @@ func (s *Snapshot) Consistent() error {
 }
 
 // GetResources selects snapshot resources by type, returning the map of resources.
-func (s *Snapshot) GetResources(typeURL string) map[string]types.Resource {
+func (s *Snapshot) GetResources(typeURL resource.Type) map[string]types.Resource {
 	resources := s.GetResourcesAndTTL(typeURL)
 	if resources == nil {
 		return nil
@@ -107,8 +108,8 @@ func (s *Snapshot) GetResources(typeURL string) map[string]types.Resource {
 	return withoutTTL
 }
 
-// GetResourcesAndTtl selects snapshot resources by type, returning the map of resources and the associated TTL.
-func (s *Snapshot) GetResourcesAndTTL(typeURL string) map[string]types.ResourceWithTTL { // nolint:golint,revive
+// GetResourcesAndTTL selects snapshot resources by type, returning the map of resources and the associated TTL.
+func (s *Snapshot) GetResourcesAndTTL(typeURL resource.Type) map[string]types.ResourceWithTTL {
 	if s == nil {
 		return nil
 	}
@@ -120,7 +121,7 @@ func (s *Snapshot) GetResourcesAndTTL(typeURL string) map[string]types.ResourceW
 }
 
 // GetVersion returns the version for a resource type.
-func (s *Snapshot) GetVersion(typeURL string) string {
+func (s *Snapshot) GetVersion(typeURL resource.Type) string {
 	if s == nil {
 		return ""
 	}

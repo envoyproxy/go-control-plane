@@ -38,8 +38,8 @@ func NewResources(version string, items []types.Resource) Resources {
 	return NewResourcesWithTTL(version, itemsWithTTL)
 }
 
-// NewResources creates a new resource group.
-func NewResourcesWithTTL(version string, items []types.ResourceWithTTL) Resources { // nolint:golint,revive
+// NewResourcesWithTTL creates a new resource group.
+func NewResourcesWithTTL(version string, items []types.ResourceWithTTL) Resources {
 	return Resources{
 		Version: version,
 		Items:   IndexResourcesByName(items),
