@@ -21,6 +21,9 @@ make benchmark MODE=2
 make benchmark MODE=3
 make benchmark MODE=4
 
+mkdir -p benchmarks/reports
+mkdir -p benchmarks/pngs
+
 # generate our consumable pprof profiles
 pprof -text bin/test cpu.pprof > benchmarks/reports/cpu_text.txt
 pprof -tree bin/test cpu.pprof > benchmarks/reports/cpu_tree.txt

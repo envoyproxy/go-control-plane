@@ -20,3 +20,5 @@ examples/dyplomat/dyplomat
 # Benchmarking artifacts
 *.gz
 *.pprof
+/benchmarks/reports
+/benchmarks/pngs

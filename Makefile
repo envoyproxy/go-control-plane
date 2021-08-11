@@ -86,7 +86,7 @@ integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
 #------------------------------------------------------------------------------
 .PHONY: benchmark docker_benchmarks
 benchmark: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds MODE=$(MODE) build/integration.sh
+	env XDS=xds build/integration.sh
 
 docker_benchmarks:
 	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
