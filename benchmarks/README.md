@@ -38,6 +38,16 @@ const (
 ```
 To specifiy the mode, use `MODE` environment variable that corresponds to the output you wish to evaluate.
 
+The output file will be stored at the project root with .pprof extension (e.g. `cpu.pprof`).
+
+Run `pprof` tool like so which will open up a shell. From there, you can run command such as `web` to visualize the result:
+
+```bash
+go tool pprof cpu.pprof 
+(pprof) web
+```
+For more information, run `help`.
+
 ## Running With Docker
 
 To run the benchmarks, we just require the prerequisite of docker and go.

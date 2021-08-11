@@ -14,7 +14,7 @@ MESSAGE=$'Hi, there!\n'
 XDS=${XDS:-ads}
 
 # pprof profiler mode
-MODE=${MODE:0}
+MODE=${MODE:-0}
 
 # Number of RTDS layers.
 if [ "$XDS" = "ads" ]; then

@@ -20,6 +20,8 @@ clean:
 	@rm -rf $(BINDIR)
 	@rm -rf *.log
 	@rm -rf *.pprof
+	@rm -rf benchmarks/reports
+	@rm -rf benchmarks/pngs
 
 # TODO(mattklein123): See the note in TestLinearConcurrentSetWatch() for why we set -parallel here
 # This should be removed.
@@ -63,22 +65,22 @@ $(BINDIR)/test:
 integration: integration.xds integration.ads integration.rest integration.xds.mux integration.xds.delta integration.ads.delta
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=ads MODE=0 build/integration.sh
+	env XDS=ads build/integration.sh
 
 integration.xds: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds MODE=0 build/integration.sh
+	env XDS=xds build/integration.sh
 
 integration.rest: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=rest MODE=0 build/integration.sh
+	env XDS=rest build/integration.sh
 
 integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds MODE=0 build/integration.sh -mux
+	env XDS=xds build/integration.sh -mux
 
 integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta MODE=0 build/integration.sh
+	env XDS=delta build/integration.sh
 
 integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta-ads MODE=0 build/integration.sh
+	env XDS=delta-ads build/integration.sh
 
 
 #------------------------------------------------------------------------------
@@ -86,7 +88,7 @@ integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
 #------------------------------------------------------------------------------
 .PHONY: benchmark docker_benchmarks
 benchmark: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds MODE=$(MODE) build/integration.sh
+	env XDS=xds build/integration.sh
 
 docker_benchmarks:
 	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
