@@ -20,6 +20,8 @@ clean:
 	@rm -rf $(BINDIR)
 	@rm -rf *.log
 	@rm -rf *.pprof
+	@rm -rf benchmarks/reports
+	@rm -rf benchmarks/pngs
 
 # TODO(mattklein123): See the note in TestLinearConcurrentSetWatch() for why we set -parallel here
 # This should be removed.
