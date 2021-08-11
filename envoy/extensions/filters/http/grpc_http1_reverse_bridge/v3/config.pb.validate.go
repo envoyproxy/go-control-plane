@@ -50,6 +50,8 @@ func (m *FilterConfig) Validate() error {
 
 	// no validation rules for WithholdGrpcFrames
 
+	// no validation rules for ResponseSizeHeader
+
 	return nil
 }
 
