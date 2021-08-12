@@ -41,17 +41,20 @@ func (m *ExtensionWithMatcher) Validate() error {
 		return nil
 	}
 
-	if m.GetMatcher() == nil {
-		return ExtensionWithMatcherValidationError{
-			field:  "Matcher",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtensionWithMatcherValidationError{
 				field:  "Matcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetXdsMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtensionWithMatcherValidationError{
+				field:  "XdsMatcher",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

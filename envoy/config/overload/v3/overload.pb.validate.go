@@ -583,6 +583,80 @@ var _ interface {
 	ErrorName() string
 } = OverloadActionValidationError{}
 
+// Validate checks the field values on BufferFactoryConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BufferFactoryConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if val := m.GetMinimumAccountToTrackPowerOfTwo(); val < 10 || val > 56 {
+		return BufferFactoryConfigValidationError{
+			field:  "MinimumAccountToTrackPowerOfTwo",
+			reason: "value must be inside range [10, 56]",
+		}
+	}
+
+	return nil
+}
+
+// BufferFactoryConfigValidationError is the validation error returned by
+// BufferFactoryConfig.Validate if the designated constraints aren't met.
+type BufferFactoryConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BufferFactoryConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BufferFactoryConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BufferFactoryConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BufferFactoryConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BufferFactoryConfigValidationError) ErrorName() string {
+	return "BufferFactoryConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BufferFactoryConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBufferFactoryConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BufferFactoryConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BufferFactoryConfigValidationError{}
+
 // Validate checks the field values on OverloadManager with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -636,6 +710,16 @@ func (m *OverloadManager) Validate() error {
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetBufferFactoryConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OverloadManagerValidationError{
+				field:  "BufferFactoryConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil

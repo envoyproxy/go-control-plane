@@ -251,7 +251,7 @@ func (m *HttpConnectionManager) Validate() error {
 		}
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedXffNumTrustedHops
+	// no validation rules for XffNumTrustedHops
 
 	for idx, item := range m.GetOriginalIpDetectionExtensions() {
 		_, _ = idx, item
