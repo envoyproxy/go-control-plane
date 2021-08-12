@@ -157,11 +157,31 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	cache.updateVersionMap(modified)
 
 	for id, watch := range cache.deltaWatches {
-		res := respondDeltaLinear(watch.Request, watch.Response, watch.StreamState, cache, cache.log)
+		res := cache.respondDelta(watch.Request, watch.Response, watch.StreamState)
 		if res != nil {
 			delete(cache.deltaWatches, id)
 		}
 	}
+}
+
+func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) *RawDeltaResponse {
+	resources := &resourceContainer{
+		resourceMap:   cache.resources,
+		versionMap:    cache.versionMap,
+		systemVersion: cache.getVersion(),
+	}
+	resp := createDeltaResponse(context.Background(), request, state, resources, cache.log)
+
+	// Only send a response if there were changes
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
+		if cache.log != nil {
+			cache.log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
+				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
+		}
+		value <- resp
+		return resp
+	}
+	return nil
 }
 
 // UpdateResource updates a resource in the collection.
@@ -311,7 +331,7 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	response := respondDeltaLinear(request, value, state, cache, cache.log)
+	response := cache.respondDelta(request, value, state)
 
 	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
 	// create a new watch accordingly

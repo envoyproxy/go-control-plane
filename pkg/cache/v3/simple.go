@@ -224,12 +224,11 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 
 		// process our delta watches
 		for id, watch := range info.deltaWatches {
-			res, err := respondDeltaSnapshot(
+			res, err := snapshot.respondDelta(
 				ctx,
 				watch.Request,
 				watch.Response,
 				watch.StreamState,
-				&snapshot,
 				cache.log,
 			)
 			if err != nil {
@@ -431,7 +430,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 				cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
 			}
 		}
-		response, err := respondDeltaSnapshot(context.Background(), request, value, state, &snapshot, cache.log)
+		response, err := snapshot.respondDelta(context.Background(), request, value, state, cache.log)
 		if err != nil {
 			if cache.log != nil {
 				cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
