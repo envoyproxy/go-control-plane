@@ -30,7 +30,7 @@ type resourceContainer struct {
 	systemVersion string
 }
 
-func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, resources *resourceContainer, log log.Logger) *RawDeltaResponse {
+func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, resources *resourceContainer) *RawDeltaResponse {
 	// variables to build our response with
 	nextVersionMap := make(map[string]string)
 	filtered := make([]types.Resource, 0, len(resources.resourceMap))
