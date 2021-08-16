@@ -371,12 +371,12 @@ func (m *LocalityLbEndpoints) Validate() error {
 
 	switch m.LbConfig.(type) {
 
-	case *LocalityLbEndpoints_LbEndpointsList:
+	case *LocalityLbEndpoints_LoadBalancerEndpoints:
 
-		if v, ok := interface{}(m.GetLbEndpointsList()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetLoadBalancerEndpoints()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return LocalityLbEndpointsValidationError{
-					field:  "LbEndpointsList",
+					field:  "LoadBalancerEndpoints",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
