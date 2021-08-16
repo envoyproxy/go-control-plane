@@ -174,7 +174,7 @@ func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaRe
 	// Only send a response if there were changes
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if cache.log != nil {
-			cache.log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
+			cache.log.Debugf("[linear cache] node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
 				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
 		}
 		value <- resp
@@ -337,7 +337,7 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 	if response == nil {
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
+			cache.log.Infof("[linear cache] open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
 				cache.typeURL, state.GetResourceVersions(), cache.getVersion())
 		}
 
