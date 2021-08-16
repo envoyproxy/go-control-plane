@@ -224,12 +224,12 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 
 		// process our delta watches
 		for id, watch := range info.deltaWatches {
-			res, err := snapshot.respondDelta(
+			res, err := cache.respondDelta(
 				ctx,
+				&snapshot,
 				watch.Request,
 				watch.Response,
 				watch.StreamState,
-				cache.log,
 			)
 			if err != nil {
 				return err
@@ -430,7 +430,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 				cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
 			}
 		}
-		response, err := snapshot.respondDelta(context.Background(), request, value, state, cache.log)
+		response, err := cache.respondDelta(context.Background(), &snapshot, request, value, state)
 		if err != nil {
 			if cache.log != nil {
 				cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
@@ -453,6 +453,32 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 	}
 
 	return nil
+}
+
+// Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
+func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot *Snapshot, request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) (*RawDeltaResponse, error) {
+	resp := createDeltaResponse(ctx, request, state, resourceContainer{
+		resourceMap:   snapshot.GetResources(request.TypeUrl),
+		versionMap:    snapshot.GetVersionMap(request.TypeUrl),
+		systemVersion: snapshot.GetVersion(request.TypeUrl),
+	})
+
+	// Only send a response if there were changes
+	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
+	// otherwise, envoy won't complete initialization
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFirst()) {
+		if cache.log != nil {
+			cache.log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
+				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
+		}
+		select {
+		case value <- resp:
+			return resp, nil
+		case <-ctx.Done():
+			return resp, context.Canceled
+		}
+	}
+	return nil, nil
 }
 
 func (cache *snapshotCache) nextDeltaWatchID() int64 {

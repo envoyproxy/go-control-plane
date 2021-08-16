@@ -15,13 +15,10 @@
 package cache
 
 import (
-	"context"
 	"errors"
 	"fmt"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/log"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // Resources is a versioned group of resources.
@@ -268,31 +265,4 @@ func (s *Snapshot) ConstructVersionMap() error {
 	}
 
 	return nil
-}
-
-// Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
-func (s *Snapshot) respondDelta(ctx context.Context, request *DeltaRequest, value chan DeltaResponse, state stream.StreamState, log log.Logger) (*RawDeltaResponse, error) {
-	resources := &resourceContainer{
-		resourceMap:   s.GetResources(request.TypeUrl),
-		versionMap:    s.GetVersionMap(request.TypeUrl),
-		systemVersion: s.GetVersion(request.TypeUrl),
-	}
-	resp := createDeltaResponse(ctx, request, state, resources, log)
-
-	// Only send a response if there were changes
-	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
-	// otherwise, envoy won't complete initialization
-	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFirst()) {
-		if log != nil {
-			log.Debugf("node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
-				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
-		}
-		select {
-		case value <- resp:
-			return resp, nil
-		case <-ctx.Done():
-			return resp, context.Canceled
-		}
-	}
-	return nil, nil
 }

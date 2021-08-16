@@ -165,12 +165,11 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 }
 
 func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) *RawDeltaResponse {
-	resources := &resourceContainer{
+	resp := createDeltaResponse(context.Background(), request, state, resourceContainer{
 		resourceMap:   cache.resources,
 		versionMap:    cache.versionMap,
 		systemVersion: cache.getVersion(),
-	}
-	resp := createDeltaResponse(context.Background(), request, state, resources, cache.log)
+	})
 
 	// Only send a response if there were changes
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
@@ -333,7 +332,7 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 
 	response := cache.respondDelta(request, value, state)
 
-	// if respondDelta returns nil this means that there is no change in any resource version from the previous snapshot
+	// if respondDelta returns nil this means that there is no change in any resource version
 	// create a new watch accordingly
 	if response == nil {
 		watchID := cache.nextDeltaWatchID()
@@ -352,7 +351,7 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 
 func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {
 	for name, r := range cache.resources {
-		//skip recalculating hash for the resoces that weren't modified
+		// skip recalculating hash for the resoces that weren't modified
 		if _, ok := modified[name]; !ok {
 			continue
 		}
