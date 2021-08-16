@@ -15,6 +15,7 @@
 package cache
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -23,7 +24,9 @@ import (
 
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 
+	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 const (
@@ -58,10 +61,71 @@ func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	}
 }
 
+type resourceInfo struct {
+	name    string
+	version string
+}
+
+func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []resourceInfo, deleted []string) {
+	t.Helper()
+	r := <-ch
+	if r.GetDeltaRequest().TypeUrl != testType {
+		t.Errorf("unexpected empty request type URL: %q", r.GetDeltaRequest().TypeUrl)
+	}
+	out, err := r.GetDeltaDiscoveryResponse()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Resources) != len(resources) {
+		t.Errorf("unexpected number of responses: got %d, want %d", len(out.Resources), len(resources))
+	}
+	for _, r := range resources {
+		found := false
+		for _, r1 := range out.Resources {
+			if r1.Name == r.name && r1.Version == r.version {
+				found = true
+				break
+			} else if r1.Name == r.name {
+				t.Errorf("unexpected version for resource %q: got %q, want %q", r.name, r1.Version, r.version)
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("resource with name %q not found in response", r.name)
+		}
+	}
+	if out.TypeUrl != testType {
+		t.Errorf("unexpected type URL: %q", out.TypeUrl)
+	}
+	if len(out.RemovedResources) != len(deleted) {
+		t.Errorf("unexpected number of removed resurces: got %d, want %d", len(out.RemovedResources), len(deleted))
+	}
+	for _, r := range deleted {
+		found := false
+		for _, rr := range out.RemovedResources {
+			if r == rr {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected resource %s to be deleted", r)
+		}
+	}
+}
+
 func checkWatchCount(t *testing.T, c *LinearCache, name string, count int) {
 	t.Helper()
 	if i := c.NumWatches(name); i != count {
 		t.Errorf("unexpected number of watches for %q: got %d, want %d", name, i, count)
+	}
+}
+
+func checkDeltaWatchCount(t *testing.T, c *LinearCache, count int) {
+	t.Helper()
+	if i := c.NumDeltaWatches(); i != count {
+		t.Errorf("unexpected number of delta watches: got %d, want %d", i, count)
 	}
 }
 
@@ -71,6 +135,26 @@ func mustBlock(t *testing.T, w <-chan Response) {
 		t.Error("watch must block")
 	default:
 	}
+}
+
+func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
+	select {
+	case <-w:
+		t.Error("watch must block")
+	default:
+	}
+}
+
+func hashResource(t *testing.T, resource types.Resource) string {
+	marshaledResource, err := MarshalResource(resource)
+	if err != nil {
+		t.Fatal(err)
+	}
+	v := HashResource(marshaledResource)
+	if v == "" {
+		t.Fatal(errors.New("failed to build resource version"))
+	}
+	return v
 }
 
 func TestLinearInitialResources(t *testing.T) {
@@ -319,4 +403,131 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 			})
 		}(i)
 	}
+}
+
+func TestLinearDeltaWildcard(t *testing.T) {
+	c := NewLinearCache(testType)
+	state1 := stream.NewStreamState(true, map[string]string{})
+	w1 := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state1, w1)
+	mustBlockDelta(t, w1)
+	state2 := stream.NewStreamState(true, map[string]string{})
+	w2 := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state2, w2)
+	mustBlockDelta(t, w1)
+	checkDeltaWatchCount(t, c, 2)
+
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hash := hashResource(t, a)
+	c.UpdateResource("a", a)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w1, []resourceInfo{{"a", hash}}, nil)
+	verifyDeltaResponse(t, w2, []resourceInfo{{"a", hash}}, nil)
+}
+
+func TestLinearDeltaExistingResources(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.NewStreamState(false, map[string]string{"b": "", "c": ""}) // watching b and c - not interested in a
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, []string{"c"})
+
+	state = stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
+}
+
+func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.NewStreamState(false, map[string]string{"a": "", "b": hashB})
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil) // b is up to date and shouldn't be returned
+
+	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	mustBlockDelta(t, w)
+	checkDeltaWatchCount(t, c, 1)
+	b = &endpoint.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: 10}}} // new version of b
+	hashB = hashResource(t, b)
+	c.UpdateResource("b", b)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, nil)
+}
+
+func TestLinearDeltaResourceUpdate(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
+
+	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	mustBlockDelta(t, w)
+	checkDeltaWatchCount(t, c, 1)
+
+	a = &endpoint.ClusterLoadAssignment{ClusterName: "a", Endpoints: []*endpoint.LocalityLbEndpoints{ //resource update
+		{Priority: 10},
+	}}
+	hashA = hashResource(t, a)
+	c.UpdateResource("a", a)
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil)
+}
+
+func TestLinearDeltaResourceDelete(t *testing.T) {
+	c := NewLinearCache(testType)
+	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+	hashA := hashResource(t, a)
+	c.UpdateResource("a", a)
+	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+	hashB := hashResource(t, b)
+	c.UpdateResource("b", b)
+
+	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
+	w := make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	checkDeltaWatchCount(t, c, 0)
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
+
+	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
+	w = make(chan DeltaResponse, 1)
+	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
+	mustBlockDelta(t, w)
+	checkDeltaWatchCount(t, c, 1)
+
+	a = &endpoint.ClusterLoadAssignment{ClusterName: "a", Endpoints: []*endpoint.LocalityLbEndpoints{ //resource update
+		{Priority: 10},
+	}}
+	hashA = hashResource(t, a)
+	c.SetResources(map[string]types.Resource{"a": a})
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, []string{"b"})
 }

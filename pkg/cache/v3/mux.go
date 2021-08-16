@@ -29,7 +29,8 @@ import (
 // making sure there is always a matching cache.
 type MuxCache struct {
 	// Classification functions.
-	Classify func(*Request) string
+	Classify      func(*Request) string
+	ClassifyDelta func(*DeltaRequest) string
 	// Muxed caches.
 	Caches map[string]Cache
 }
@@ -47,7 +48,13 @@ func (mux *MuxCache) CreateWatch(request *Request, value chan Response) func() {
 }
 
 func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
-	return nil
+	key := mux.ClassifyDelta(request)
+	cache, exists := mux.Caches[key]
+	if !exists {
+		value <- nil
+		return nil
+	}
+	return cache.CreateDeltaWatch(request, state, value)
 }
 
 func (mux *MuxCache) Fetch(ctx context.Context, request *Request) (Response, error) {

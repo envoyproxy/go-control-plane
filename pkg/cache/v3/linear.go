@@ -20,8 +20,10 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
@@ -42,13 +44,25 @@ type LinearCache struct {
 	watches map[string]watches
 	// Set of watches for all resources in the collection
 	watchAll watches
+	// Set of delta watches. A delta watch always contain the list of subscribed resources
+	// together with its current version
+	// version and versionPrefix fields are ignored for delta watches, because we always generate the resource version.
+	deltaWatches map[int64]DeltaResponseWatch
+	// Continously incremented counter used to index delta watches.
+	deltaWatchCount int64
+	// versionMap holds the current hash map of all resources in the cache.
+	// versionMap is only to be used with delta xDS.
+	versionMap map[string]string
 	// Continuously incremented version.
 	version uint64
 	// Version prefix to be sent to the clients
 	versionPrefix string
 	// Versions for each resource by name.
 	versionVector map[string]uint64
-	mu            sync.RWMutex
+
+	log log.Logger
+
+	mu sync.RWMutex
 }
 
 var _ Cache = &LinearCache{}
@@ -75,6 +89,12 @@ func WithInitialResources(resources map[string]types.Resource) LinearCacheOption
 	}
 }
 
+func WithLogger(log log.Logger) LinearCacheOption {
+	return func(cache *LinearCache) {
+		cache.log = log
+	}
+}
+
 // NewLinearCache creates a new cache. See the comments on the struct definition.
 func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	out := &LinearCache{
@@ -82,6 +102,8 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 		resources:     make(map[string]types.Resource),
 		watches:       make(map[string]watches),
 		watchAll:      make(watches),
+		deltaWatches:  make(map[int64]DeltaResponseWatch),
+		versionMap:    make(map[string]string),
 		version:       0,
 		versionVector: make(map[string]uint64),
 	}
@@ -111,7 +133,7 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 	value <- &RawResponse{
 		Request:   &Request{TypeUrl: cache.typeURL},
 		Resources: resources,
-		Version:   cache.versionPrefix + strconv.FormatUint(cache.version, 10),
+		Version:   cache.getVersion(),
 	}
 }
 
@@ -131,6 +153,34 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 		cache.respond(value, nil)
 	}
 	cache.watchAll = make(watches)
+
+	cache.updateVersionMap(modified)
+
+	for id, watch := range cache.deltaWatches {
+		res := cache.respondDelta(watch.Request, watch.Response, watch.StreamState)
+		if res != nil {
+			delete(cache.deltaWatches, id)
+		}
+	}
+}
+
+func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) *RawDeltaResponse {
+	resp := createDeltaResponse(context.Background(), request, state, resourceContainer{
+		resourceMap:   cache.resources,
+		versionMap:    cache.versionMap,
+		systemVersion: cache.getVersion(),
+	})
+
+	// Only send a response if there were changes
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
+		if cache.log != nil {
+			cache.log.Debugf("[linear cache] node: %s, sending delta response with resources: %v removed resources %v wildcard: %t",
+				request.GetNode().GetId(), resp.Resources, resp.RemovedResources, state.IsWildcard())
+		}
+		value <- resp
+		return resp
+	}
+	return nil
 }
 
 // UpdateResource updates a resource in the collection.
@@ -277,7 +327,69 @@ func (cache *LinearCache) CreateWatch(request *Request, value chan Response) fun
 }
 
 func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	response := cache.respondDelta(request, value, state)
+
+	// if respondDelta returns nil this means that there is no change in any resource version
+	// create a new watch accordingly
+	if response == nil {
+		watchID := cache.nextDeltaWatchID()
+		if cache.log != nil {
+			cache.log.Infof("[linear cache] open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
+				cache.typeURL, state.GetResourceVersions(), cache.getVersion())
+		}
+
+		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: state}
+
+		return cache.cancelDeltaWatch(watchID)
+	}
+
 	return nil
+}
+
+func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {
+	for name, r := range cache.resources {
+		// skip recalculating hash for the resoces that weren't modified
+		if _, ok := modified[name]; !ok {
+			continue
+		}
+		// hash our verison in here and build the version map
+		marshaledResource, err := MarshalResource(r)
+		if err != nil {
+			return err
+		}
+		v := HashResource(marshaledResource)
+		if v == "" {
+			return errors.New("failed to build resource version")
+		}
+
+		cache.versionMap[GetResourceName(r)] = v
+	}
+	for name := range modified {
+		if r, ok := cache.resources[name]; !ok {
+			delete(cache.versionMap, GetResourceName(r))
+		}
+	}
+	return nil
+}
+
+func (cache *LinearCache) getVersion() string {
+	return cache.versionPrefix + strconv.FormatUint(cache.version, 10)
+}
+
+// cancellation function for cleaning stale watches
+func (cache *LinearCache) cancelDeltaWatch(watchID int64) func() {
+	return func() {
+		cache.mu.Lock()
+		defer cache.mu.Unlock()
+		delete(cache.deltaWatches, watchID)
+	}
+}
+
+func (cache *LinearCache) nextDeltaWatchID() int64 {
+	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
 func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response, error) {
@@ -289,4 +401,11 @@ func (cache *LinearCache) NumWatches(name string) int {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
 	return len(cache.watches[name]) + len(cache.watchAll)
+}
+
+// Number of active delta watches.
+func (cache *LinearCache) NumDeltaWatches() int {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+	return len(cache.deltaWatches)
 }
