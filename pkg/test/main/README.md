@@ -37,3 +37,21 @@ eventually converges to use the latest pushed configuration) for each run.
 
 You can run ```bin/test -help``` to get a list of the cli flags that
 the test program accepts.  There are also comments in ```main.go```.
+
+## Running servers without running test scenarios
+
+For purposes such as running load testing or throughput benchmarking, there is
+a flag to just run the servers instead of running test scenarios. This allows a
+user to use all the configurations the test driver accepts which is described in
+the previous section and generate customized requests against it to conduct
+experiments. This can be done via an environment variable to `build/integration.sh`
+or `-sleep` flag to `bin/test`.
+
+e.g.
+```
+SLEEP=30m build/integration.sh
+```
+
+```
+SLEEP=2h make benchmark
+```

@@ -69,6 +69,7 @@ var (
 	nodeID string
 
 	pprofMode int
+	sleep     time.Duration
 )
 
 func init() {
@@ -149,6 +150,7 @@ func init() {
 
 	// Number of ExtensionConfig
 	flag.IntVar(&extensionNum, "extension", 1, "Number of Extension")
+
 	//
 	// These parameters control the the use of the pprof profiler
 	//
@@ -156,6 +158,8 @@ func init() {
 	// Pprof mode for which profiling method to use
 	flag.IntVar(&pprofMode, "pprofMode", 0, "Mode for pprof to run in: 0 -> CPU,1 -> heap, 2 -> mutex, 3 -> block, 4 -> goroutines")
 
+	// Instead of running integration test scenarios, keep servers running for bench marking
+	flag.DurationVar(&sleep, "sleep", 0, "How many minutes to keep servers up instead of running tests")
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
@@ -230,7 +234,21 @@ func main() {
 		log.Println("timeout waiting for the first request")
 		os.Exit(1)
 	}
+
 	log.Printf("initial snapshot %+v\n", snapshots)
+
+	if sleep == 0 {
+		runTest(ctx, snapshots, config, typeURL, eds, als, cb)
+	} else {
+		log.Printf("sleeping for %v\n", sleep)
+		time.Sleep(sleep)
+		log.Println("sleep period is complete")
+	}
+}
+
+func runTest(ctx context.Context, snapshots resource.TestSnapshot, config cache.SnapshotCache,
+	typeURL string, eds *cache.LinearCache, als *testv3.AccessLogService, cb *testv3.Callbacks) {
+
 	log.Printf("executing sequence updates=%d request=%d\n", updates, requests)
 
 	for i := 0; i < updates; i++ {

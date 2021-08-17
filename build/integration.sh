@@ -16,6 +16,8 @@ XDS=${XDS:-ads}
 # pprof profiler mode
 MODE=${MODE:-0}
 
+SLEEP=${SLEEP:-0}
+
 # Number of RTDS layers.
 if [ "$XDS" = "ads" ]; then
   RUNTIMES=2
@@ -43,4 +45,4 @@ function cleanup() {
 trap cleanup EXIT
 
 # run the test suite (which also contains the control plane)
-bin/test --xds=${XDS} --runtimes=${RUNTIMES} --pprofMode=${MODE} -debug -message="$MESSAGE" "$@"
+bin/test --xds=${XDS} --runtimes=${RUNTIMES} --pprofMode=${MODE} -sleep=${SLEEP} -debug -message="$MESSAGE" "$@"
