@@ -444,7 +444,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		extensions[i] = MakeExtensionConfig(Ads, extensionConfigName, routeName)
 	}
 
-	out := cache.NewSnapshot(ts.Version, map[resource.Type][]types.Resource{
+	out, _ := cache.NewSnapshot(ts.Version, map[resource.Type][]types.Resource{
 		resource.EndpointType:        endpoints,
 		resource.ClusterType:         clusters,
 		resource.RouteType:           routes,

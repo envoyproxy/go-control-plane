@@ -49,7 +49,7 @@ var (
 	version  = "x"
 	version2 = "y"
 
-	snapshot = cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+	snapshot, _ = cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.EndpointType:        {testEndpoint},
 		rsrc.ClusterType:         {testCluster},
 		rsrc.RouteType:           {testRoute},
@@ -59,8 +59,8 @@ var (
 		rsrc.ExtensionConfigType: {testExtensionConfig},
 	})
 
-	ttl             = 2 * time.Second
-	snapshotWithTTL = cache.NewSnapshotWithTTLs(version, map[rsrc.Type][]types.ResourceWithTTL{
+	ttl                = 2 * time.Second
+	snapshotWithTTL, _ = cache.NewSnapshotWithTTLs(version, map[rsrc.Type][]types.ResourceWithTTL{
 		rsrc.EndpointType:        {{Resource: testEndpoint, TTL: &ttl}},
 		rsrc.ClusterType:         {{Resource: testCluster}},
 		rsrc.RouteType:           {{Resource: testRoute}},

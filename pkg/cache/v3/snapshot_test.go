@@ -21,6 +21,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSnapshotConsistent(t *testing.T) {
@@ -28,26 +29,26 @@ func TestSnapshotConsistent(t *testing.T) {
 		t.Errorf("got inconsistent snapshot for %#v", snapshot)
 	}
 
-	if snap := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.EndpointType: {testEndpoint},
 	}); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
 
-	if snap := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.EndpointType: {resource.MakeEndpoint("missing", 8080)},
 		rsrc.ClusterType:  {testCluster},
 	}); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
 
-	if snap := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {testListener}},
 	); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
 
-	if snap := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.RouteType:    {resource.MakeRoute("test", clusterName)},
 		rsrc.ListenerType: {testListener},
 	}); snap.Consistent() == nil {
@@ -72,4 +73,14 @@ func TestSnapshotGetters(t *testing.T) {
 	if out := snapshot.GetVersion("not a type"); out != "" {
 		t.Errorf("got non-empty version for unknown type: %#v", out)
 	}
+}
+
+func TestNewSnapshotBadType(t *testing.T) {
+	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+		"random.type": nil,
+	})
+
+	// Should receive an error from an unknown type
+	assert.Error(t, err)
+	assert.Equal(t, cache.Snapshot{}, snap)
 }
