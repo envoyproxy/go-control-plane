@@ -17,11 +17,12 @@ package cache_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSnapshotConsistent(t *testing.T) {
