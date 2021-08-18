@@ -670,7 +670,7 @@ type Cluster struct {
 	// Deprecated: Do not use.
 	CommonHttpProtocolOptions *v32.HttpProtocolOptions `protobuf:"bytes,29,opt,name=common_http_protocol_options,json=commonHttpProtocolOptions,proto3" json:"common_http_protocol_options,omitempty"`
 	// Additional options when handling HTTP1 requests.
-	// This has been deprecated in favor of http_protocol_options fields in the in the
+	// This has been deprecated in favor of http_protocol_options fields in the
 	// :ref:`http_protocol_options <envoy_v3_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>` message.
 	// http_protocol_options can be set via the cluster's
 	// :ref:`extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`.
@@ -686,7 +686,7 @@ type Cluster struct {
 	// supports prior knowledge for upstream connections. Even if TLS is used
 	// with ALPN, `http2_protocol_options` must be specified. As an aside this allows HTTP/2
 	// connections to happen over plain text.
-	// This has been deprecated in favor of http2_protocol_options fields in the in the
+	// This has been deprecated in favor of http2_protocol_options fields in the
 	// :ref:`http_protocol_options <envoy_v3_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>`
 	// message. http2_protocol_options can be set via the cluster's
 	// :ref:`extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`.
