@@ -69,6 +69,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 				// When a resource subscribed to by a client does not exist, the server will send a Resource whose name field
 				// matches the name that the client subscribed to and whose resource field is unset
 				nonExistent = append(nonExistent, name)
+				nextVersionMap[name] = ""
 			}
 		}
 	}
