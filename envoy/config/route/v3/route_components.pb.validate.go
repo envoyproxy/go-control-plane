@@ -923,6 +923,21 @@ func (m *RouteMatch) Validate() error {
 		}
 	}
 
+	for idx, item := range m.GetDynamicMetadata() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteMatchValidationError{
+					field:  fmt.Sprintf("DynamicMetadata[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.PathSpecifier.(type) {
 
 	case *RouteMatch_Prefix:
@@ -2986,10 +3001,12 @@ func (m *WeightedCluster_ClusterWeight) Validate() error {
 		return nil
 	}
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
+	// no validation rules for Name
+
+	if !_WeightedCluster_ClusterWeight_ClusterHeader_Pattern.MatchString(m.GetClusterHeader()) {
 		return WeightedCluster_ClusterWeightValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
+			field:  "ClusterHeader",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 	}
 
@@ -3187,6 +3204,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WeightedCluster_ClusterWeightValidationError{}
+
+var _WeightedCluster_ClusterWeight_ClusterHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _WeightedCluster_ClusterWeight_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
