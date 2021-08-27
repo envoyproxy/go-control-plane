@@ -33,7 +33,6 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 	nextVersionMap := make(map[string]string)
 	filtered := make([]types.Resource, 0, len(resources.resourceMap))
 	toRemove := make([]string, 0)
-	nonExistent := make([]string, 0)
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
@@ -49,7 +48,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 			}
 		}
 
-		// Compute resources for removal only for wildcard requests
+		// Compute resources for removal only for wildcard requests.
 		for name := range state.GetResourceVersions() {
 			if _, ok := resources.resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
@@ -65,22 +64,18 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 				}
 				nextVersionMap[name] = nextVersion
 			} else {
-				// Accordingly to the spec (https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#id2):
-				// When a resource subscribed to by a client does not exist, the server will send a Resource whose name field
-				// matches the name that the client subscribed to and whose resource field is unset
-				nonExistent = append(nonExistent, name)
+				// we keep traking non-existent resources for non-woldcard streams until the client explicitly unsubscribe from them.
 				nextVersionMap[name] = ""
 			}
 		}
 	}
 
 	return &RawDeltaResponse{
-		DeltaRequest:         req,
-		Resources:            filtered,
-		RemovedResources:     toRemove,
-		NonExistentResources: nonExistent,
-		NextVersionMap:       nextVersionMap,
-		SystemVersionInfo:    resources.systemVersion,
-		Ctx:                  ctx,
+		DeltaRequest:      req,
+		Resources:         filtered,
+		RemovedResources:  toRemove,
+		NextVersionMap:    nextVersionMap,
+		SystemVersionInfo: resources.systemVersion,
+		Ctx:               ctx,
 	}
 }

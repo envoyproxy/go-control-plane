@@ -150,9 +150,6 @@ type RawDeltaResponse struct {
 	// RemovedResources is a list of resource aliases which should be dropped by the consuming client.
 	RemovedResources []string
 
-	// NonExistentResources is a list of resource aliases that were explicitly requested by the client but doesn't exist on the server.
-	NonExistentResources []string
-
 	// NextVersionMap consists of updated version mappings after this response is applied
 	NextVersionMap map[string]string
 
@@ -240,9 +237,9 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 	marshaledResponse := r.marshaledResponse.Load()
 
 	if marshaledResponse == nil {
-		marshaledResources := make([]*discovery.Resource, 0, len(r.Resources)+len(r.NonExistentResources))
+		marshaledResources := make([]*discovery.Resource, len(r.Resources))
 
-		for _, resource := range r.Resources {
+		for i, resource := range r.Resources {
 			name := GetResourceName(resource)
 			marshaledResource, err := MarshalResource(resource)
 			if err != nil {
@@ -252,20 +249,14 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 			if version == "" {
 				return nil, errors.New("failed to create a resource hash")
 			}
-			marshaledResources = append(marshaledResources, &discovery.Resource{
+			marshaledResources[i] = &discovery.Resource{
 				Name: name,
 				Resource: &any.Any{
 					TypeUrl: r.DeltaRequest.TypeUrl,
 					Value:   marshaledResource,
 				},
 				Version: version,
-			})
-		}
-
-		for _, name := range r.NonExistentResources {
-			marshaledResources = append(marshaledResources, &discovery.Resource{
-				Name: name,
-			})
+			}
 		}
 
 		marshaledResponse = &discovery.DeltaDiscoveryResponse{
