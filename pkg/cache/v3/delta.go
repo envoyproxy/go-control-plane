@@ -33,6 +33,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 	nextVersionMap := make(map[string]string)
 	filtered := make([]types.Resource, 0, len(resources.resourceMap))
 	toRemove := make([]string, 0)
+	nonExistent := make([]string, 0)
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
@@ -47,6 +48,13 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 				filtered = append(filtered, r)
 			}
 		}
+
+		// Compute resources for removal only for wildcard requests
+		for name := range state.GetResourceVersions() {
+			if _, ok := resources.resourceMap[name]; !ok {
+				toRemove = append(toRemove, name)
+			}
+		}
 	default:
 		// Reply only with the requested resources
 		for name, prevVersion := range state.GetResourceVersions() {
@@ -56,23 +64,22 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 					filtered = append(filtered, r)
 				}
 				nextVersionMap[name] = nextVersion
+			} else {
+				// Accordingly to the spec (https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#id2):
+				// When a resource subscribed to by a client does not exist, the server will send a Resource whose name field
+				// matches the name that the client subscribed to and whose resource field is unset
+				nonExistent = append(nonExistent, name)
 			}
 		}
 	}
 
-	// Compute resources for removal regardless of the request type
-	for name := range state.GetResourceVersions() {
-		if _, ok := resources.resourceMap[name]; !ok {
-			toRemove = append(toRemove, name)
-		}
-	}
-
 	return &RawDeltaResponse{
-		DeltaRequest:      req,
-		Resources:         filtered,
-		RemovedResources:  toRemove,
-		NextVersionMap:    nextVersionMap,
-		SystemVersionInfo: resources.systemVersion,
-		Ctx:               ctx,
+		DeltaRequest:         req,
+		Resources:            filtered,
+		RemovedResources:     toRemove,
+		NonExistentResources: nonExistent,
+		NextVersionMap:       nextVersionMap,
+		SystemVersionInfo:    resources.systemVersion,
+		Ctx:                  ctx,
 	}
 }
