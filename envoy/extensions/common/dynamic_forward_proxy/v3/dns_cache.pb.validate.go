@@ -267,6 +267,16 @@ func (m *DnsCacheConfig) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetKeyValueConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DnsCacheConfigValidationError{
+				field:  "KeyValueConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
