@@ -47,13 +47,6 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 				filtered = append(filtered, r)
 			}
 		}
-
-		// Compute resources for removal only for wildcard requests.
-		for name := range state.GetResourceVersions() {
-			if _, ok := resources.resourceMap[name]; !ok {
-				toRemove = append(toRemove, name)
-			}
-		}
 	default:
 		// Reply only with the requested resources
 		for name, prevVersion := range state.GetResourceVersions() {
@@ -67,6 +60,13 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 				// we keep traking non-existent resources for non-woldcard streams until the client explicitly unsubscribe from them.
 				nextVersionMap[name] = ""
 			}
+		}
+	}
+
+	// Compute resources for removal regardless of the request type
+	for name := range state.GetResourceVersions() {
+		if _, ok := resources.resourceMap[name]; !ok {
+			toRemove = append(toRemove, name)
 		}
 	}
 

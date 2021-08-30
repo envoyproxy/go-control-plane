@@ -438,7 +438,7 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
-	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, []string{})
+	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, []string{"c"})
 
 	state = stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
 	w = make(chan DeltaResponse, 1)
@@ -529,5 +529,5 @@ func TestLinearDeltaResourceDelete(t *testing.T) {
 	}}
 	hashA = hashResource(t, a)
 	c.SetResources(map[string]types.Resource{"a": a})
-	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, []string{})
+	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, []string{"b"})
 }
