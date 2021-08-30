@@ -64,8 +64,10 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 	}
 
 	// Compute resources for removal regardless of the request type
-	for name := range state.GetResourceVersions() {
-		if _, ok := resources.resourceMap[name]; !ok {
+	for name, prevVersion := range state.GetResourceVersions() {
+		// we need prevVersion != "" check to make sure we are only sending the update to the client once (right after it was removed)
+		// if the client decides to keep the subscription for this resource we won't add it to every subsequest response.
+		if _, ok := resources.resourceMap[name]; !ok && prevVersion != "" {
 			toRemove = append(toRemove, name)
 		}
 	}
