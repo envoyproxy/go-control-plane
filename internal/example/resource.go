@@ -165,14 +165,12 @@ func makeConfigSource() *core.ConfigSource {
 }
 
 func GenerateSnapshot() cache.Snapshot {
-	return cache.NewSnapshot(
-		"1",
-		[]types.Resource{}, // endpoints
-		[]types.Resource{makeCluster(ClusterName)},
-		[]types.Resource{makeRoute(RouteName, ClusterName)},
-		[]types.Resource{makeHTTPListener(ListenerName, RouteName)},
-		[]types.Resource{}, // runtimes
-		[]types.Resource{}, // secrets
-		[]types.Resource{}, // extension configs
+	snap, _ := cache.NewSnapshot("1",
+		map[resource.Type][]types.Resource{
+			resource.ClusterType:  {makeCluster(ClusterName)},
+			resource.RouteType:    {makeRoute(RouteName, ClusterName)},
+			resource.ListenerType: {makeHTTPListener(ListenerName, RouteName)},
+		},
 	)
+	return snap
 }

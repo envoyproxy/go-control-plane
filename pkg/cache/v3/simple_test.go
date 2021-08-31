@@ -49,24 +49,26 @@ var (
 	version  = "x"
 	version2 = "y"
 
-	snapshot = cache.NewSnapshot(version,
-		[]types.Resource{testEndpoint},
-		[]types.Resource{testCluster},
-		[]types.Resource{testRoute},
-		[]types.Resource{testListener},
-		[]types.Resource{testRuntime},
-		[]types.Resource{testSecret[0]},
-		[]types.Resource{testExtensionConfig})
+	snapshot, _ = cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+		rsrc.EndpointType:        {testEndpoint},
+		rsrc.ClusterType:         {testCluster},
+		rsrc.RouteType:           {testRoute},
+		rsrc.ListenerType:        {testListener},
+		rsrc.RuntimeType:         {testRuntime},
+		rsrc.SecretType:          {testSecret[0]},
+		rsrc.ExtensionConfigType: {testExtensionConfig},
+	})
 
-	ttl = 2 * time.Second
-
-	snapshotWithTTL = cache.NewSnapshotWithTtls(version,
-		[]types.ResourceWithTTL{{Resource: testEndpoint, TTL: &ttl}},
-		[]types.ResourceWithTTL{{Resource: testCluster}},
-		[]types.ResourceWithTTL{{Resource: testRoute}},
-		[]types.ResourceWithTTL{{Resource: testListener}},
-		[]types.ResourceWithTTL{{Resource: testRuntime}},
-		[]types.ResourceWithTTL{{Resource: testSecret[0]}})
+	ttl                = 2 * time.Second
+	snapshotWithTTL, _ = cache.NewSnapshotWithTTLs(version, map[rsrc.Type][]types.ResourceWithTTL{
+		rsrc.EndpointType:        {{Resource: testEndpoint, TTL: &ttl}},
+		rsrc.ClusterType:         {{Resource: testCluster}},
+		rsrc.RouteType:           {{Resource: testRoute}},
+		rsrc.ListenerType:        {{Resource: testListener}},
+		rsrc.RuntimeType:         {{Resource: testRuntime}},
+		rsrc.SecretType:          {{Resource: testSecret[0]}},
+		rsrc.ExtensionConfigType: {{Resource: testExtensionConfig}},
+	})
 
 	names = map[string][]string{
 		rsrc.EndpointType: {clusterName},
@@ -94,7 +96,7 @@ func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format
 func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
 func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
 
-func TestSnapshotCacheWithTtl(t *testing.T) {
+func TestSnapshotCacheWithTTL(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	c := cache.NewSnapshotCacheWithHeartbeating(ctx, true, group{}, logger{t: t}, time.Second)
@@ -128,8 +130,8 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
 					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTtl(typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTTL(typ))
 				}
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
@@ -156,11 +158,11 @@ func TestSnapshotCacheWithTtl(t *testing.T) {
 					if gotVersion, _ := out.GetVersion(); gotVersion != version {
 						t.Errorf("got version %q, want %q", gotVersion, version)
 					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
 						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTtl(typ)) {
+					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
 						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
@@ -222,8 +224,8 @@ func TestSnapshotCache(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
 					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTtl(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTtl(typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -280,8 +282,8 @@ func TestSnapshotCacheWatch(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
 					t.Errorf("got version %q, want %q", gotVersion, version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTtl(typ)) {
-					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTtl(typ))
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -315,7 +317,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 			t.Errorf("got version %q, want %q", gotVersion, version2)
 		}
 		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
-			t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
+			t.Errorf("got resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")

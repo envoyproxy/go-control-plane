@@ -8,6 +8,9 @@ import (
 	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 )
 
+// Type is an alias to string which we expose to users of the snapshot API which accepts `resource.Type` resource URLs.
+type Type = string
+
 // Resource types in xDS v3.
 const (
 	apiTypePrefix       = "type.googleapis.com/"
