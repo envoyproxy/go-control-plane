@@ -71,6 +71,6 @@ func TestNilLoggerFuncs(t *testing.T) {
 }
 
 func TestDefaultLogger(t *testing.T) {
-	logger := NewDefaultLogger(nil)
+	logger := NewDefaultLogger()
 	assert.NotNil(t, logger)
 }

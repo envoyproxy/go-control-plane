@@ -103,7 +103,7 @@ func NewSnapshotCache(ads bool, hash NodeHash, logger log.Logger) SnapshotCache 
 
 func newSnapshotCache(ads bool, hash NodeHash, logger log.Logger) *snapshotCache {
 	if logger == nil {
-		logger = log.NewDefaultLogger(nil)
+		logger = log.NewDefaultLogger()
 	}
 
 	cache := &snapshotCache{
