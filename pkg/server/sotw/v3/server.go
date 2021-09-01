@@ -102,6 +102,11 @@ type watches struct {
 	nonces        map[string]string
 }
 
+type latestDiscoveryResponse struct {
+	nonce     string
+	resources map[string]struct{}
+}
+
 // Initialize all watches
 func (values *watches) Init() {
 	// muxed channel needs a buffer to release go-routines populating it
@@ -152,6 +157,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
 
+	latestDiscoveryResponses := map[string]latestDiscoveryResponse{}
+	knownResourceNames := map[string]map[string]struct{}{}
+
 	// a collection of stack allocated watches per request type
 	var values watches
 	values.Init()
@@ -176,6 +184,16 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		// increment nonce
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
+
+		lastResponse := latestDiscoveryResponse{
+			nonce:     out.Nonce,
+			resources: make(map[string]struct{}),
+		}
+		for _, r := range resp.(*cache.RawResponse).Resources {
+			lastResponse.resources[cache.GetResourceName(r.Resource)] = struct{}{}
+		}
+		latestDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
+
 		if s.callbacks != nil {
 			s.callbacks.OnStreamResponse(resp.GetContext(), streamID, resp.GetRequest(), out)
 		}
@@ -313,6 +331,12 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 				}
 			}
 
+			if lastResponse, ok := latestDiscoveryResponses[req.TypeUrl]; ok {
+				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
+					knownResourceNames[req.TypeUrl] = lastResponse.resources
+				}
+			}
+
 			// cancel existing watches to (re-)request a newer version
 			switch {
 			case req.TypeUrl == resource.EndpointType:
@@ -321,7 +345,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						values.endpointCancel()
 					}
 					values.endpoints = make(chan cache.Response, 1)
-					values.endpointCancel = s.cache.CreateWatch(req, values.endpoints)
+					values.endpointCancel = s.cache.CreateWatch(req, values.endpoints, knownResourceNames[req.TypeUrl])
 				}
 			case req.TypeUrl == resource.ClusterType:
 				if values.clusterNonce == "" || values.clusterNonce == nonce {
@@ -329,7 +353,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						values.clusterCancel()
 					}
 					values.clusters = make(chan cache.Response, 1)
-					values.clusterCancel = s.cache.CreateWatch(req, values.clusters)
+					values.clusterCancel = s.cache.CreateWatch(req, values.clusters, knownResourceNames[req.TypeUrl])
 				}
 			case req.TypeUrl == resource.RouteType:
 				if values.routeNonce == "" || values.routeNonce == nonce {
@@ -337,7 +361,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						values.routeCancel()
 					}
 					values.routes = make(chan cache.Response, 1)
-					values.routeCancel = s.cache.CreateWatch(req, values.routes)
+					values.routeCancel = s.cache.CreateWatch(req, values.routes, knownResourceNames[req.TypeUrl])
 				}
 			case req.TypeUrl == resource.ListenerType:
 				if values.listenerNonce == "" || values.listenerNonce == nonce {
@@ -345,7 +369,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						values.listenerCancel()
 					}
 					values.listeners = make(chan cache.Response, 1)
-					values.listenerCancel = s.cache.CreateWatch(req, values.listeners)
+					values.listenerCancel = s.cache.CreateWatch(req, values.listeners, knownResourceNames[req.TypeUrl])
 				}
 			case req.TypeUrl == resource.SecretType:
 				if values.secretNonce == "" || values.secretNonce == nonce {
@@ -353,7 +377,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						values.secretCancel()
 					}
 					values.secrets = make(chan cache.Response, 1)
-					values.secretCancel = s.cache.CreateWatch(req, values.secrets)
+					values.secretCancel = s.cache.CreateWatch(req, values.secrets, knownResourceNames[req.TypeUrl])
 				}
 			case req.TypeUrl == resource.RuntimeType:
 				if values.runtimeNonce == "" || values.runtimeNonce == nonce {
@@ -361,7 +385,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						values.runtimeCancel()
 					}
 					values.runtimes = make(chan cache.Response, 1)
-					values.runtimeCancel = s.cache.CreateWatch(req, values.runtimes)
+					values.runtimeCancel = s.cache.CreateWatch(req, values.runtimes, knownResourceNames[req.TypeUrl])
 				}
 			case req.TypeUrl == resource.ExtensionConfigType:
 				if values.extensionConfigNonce == "" || values.extensionConfigNonce == nonce {
@@ -369,7 +393,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 						values.extensionConfigCancel()
 					}
 					values.extensionConfigs = make(chan cache.Response, 1)
-					values.extensionConfigCancel = s.cache.CreateWatch(req, values.extensionConfigs)
+					values.extensionConfigCancel = s.cache.CreateWatch(req, values.extensionConfigs, knownResourceNames[req.TypeUrl])
 				}
 			default:
 				typeURL := req.TypeUrl
@@ -378,7 +402,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					if cancel, seen := values.cancellations[typeURL]; seen && cancel != nil {
 						cancel()
 					}
-					values.cancellations[typeURL] = s.cache.CreateWatch(req, values.responses)
+					values.cancellations[typeURL] = s.cache.CreateWatch(req, values.responses, knownResourceNames[req.TypeUrl])
 				}
 			}
 		}

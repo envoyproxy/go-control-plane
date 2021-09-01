@@ -253,7 +253,7 @@ func (cache *LinearCache) GetResources() map[string]types.Resource {
 	return cache.resources
 }
 
-func (cache *LinearCache) CreateWatch(request *Request, value chan Response) func() {
+func (cache *LinearCache) CreateWatch(request *Request, value chan Response, knownResourceNames map[string]struct{}) func() {
 	if request.TypeUrl != cache.typeURL {
 		value <- nil
 		return nil

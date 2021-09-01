@@ -286,7 +286,7 @@ func superset(names map[string]bool, resources map[string]types.ResourceWithTTL)
 }
 
 // CreateWatch returns a watch for an xDS request.
-func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) func() {
+func (cache *snapshotCache) CreateWatch(request *Request, value chan Response, knownResourceNames map[string]struct{}) func() {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.Lock()
@@ -305,6 +305,39 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) f
 
 	snapshot, exists := cache.snapshots[nodeID]
 	version := snapshot.GetVersion(request.TypeUrl)
+
+	if exists && knownResourceNames != nil {
+		diff := make([]string, len(request.ResourceNames))
+		for _, r := range request.ResourceNames {
+			if _, ok := knownResourceNames[r]; !ok {
+				diff = append(diff, r)
+			}
+		}
+		if cache.log != nil {
+			cache.log.Debugf("nodeID %q requested %s%v and known %v. Diff %v", nodeID,
+				request.TypeUrl, request.ResourceNames, knownResourceNames, diff)
+		}
+		if len(diff) > 0 {
+			found := false
+			if cache.log != nil {
+				cache.log.Debugf("nodeID %q still needs %v", nodeID, diff)
+			}
+
+			resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
+			for _, name := range diff {
+				if _, exists := resources[name]; exists {
+					found = true
+					break
+				}
+			}
+
+			// cache contains resources already, the watch may be responded immediately
+			if found {
+				_ = cache.respond(context.Background(), request, value, resources, version, false)
+				return nil
+			}
+		}
+	}
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	if !exists || request.VersionInfo == version {
