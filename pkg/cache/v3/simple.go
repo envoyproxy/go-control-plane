@@ -307,7 +307,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response, k
 	version := snapshot.GetVersion(request.TypeUrl)
 
 	if exists && knownResourceNames != nil {
-		diff := make([]string, len(request.ResourceNames))
+		diff := []string{}
 		for _, r := range request.ResourceNames {
 			if _, ok := knownResourceNames[r]; !ok {
 				diff = append(diff, r)
