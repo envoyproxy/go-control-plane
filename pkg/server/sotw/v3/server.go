@@ -189,8 +189,8 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 			nonce:     out.Nonce,
 			resources: make(map[string]struct{}),
 		}
-		for _, r := range resp.(*cache.RawResponse).Resources {
-			lastResponse.resources[cache.GetResourceName(r.Resource)] = struct{}{}
+		for _, r := range resp.GetRequest().ResourceNames {
+			lastResponse.resources[r] = struct{}{}
 		}
 		latestDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
