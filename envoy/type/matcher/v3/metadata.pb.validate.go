@@ -87,6 +87,8 @@ func (m *MetadataMatcher) Validate() error {
 		}
 	}
 
+	// no validation rules for Invert
+
 	return nil
 }
 

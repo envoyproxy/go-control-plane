@@ -105,8 +105,7 @@ type ZipkinConfig struct {
 	// The cluster manager cluster that hosts the Zipkin collectors.
 	CollectorCluster string `protobuf:"bytes,1,opt,name=collector_cluster,json=collectorCluster,proto3" json:"collector_cluster,omitempty"`
 	// The API endpoint of the Zipkin service where the spans will be sent. When
-	// using a standard Zipkin installation, the API endpoint is typically
-	// /api/v1/spans, which is the default value.
+	// using a standard Zipkin installation.
 	CollectorEndpoint string `protobuf:"bytes,2,opt,name=collector_endpoint,json=collectorEndpoint,proto3" json:"collector_endpoint,omitempty"`
 	// Determines whether a 128bit trace id will be used when creating a new
 	// trace instance. The default value is false, which will result in a 64 bit trace id being used.
@@ -114,8 +113,7 @@ type ZipkinConfig struct {
 	// Determines whether client and server spans will share the same span context.
 	// The default value is true.
 	SharedSpanContext *wrappers.BoolValue `protobuf:"bytes,4,opt,name=shared_span_context,json=sharedSpanContext,proto3" json:"shared_span_context,omitempty"`
-	// Determines the selected collector endpoint version. By default, the ``HTTP_JSON_V1`` will be
-	// used.
+	// Determines the selected collector endpoint version.
 	CollectorEndpointVersion ZipkinConfig_CollectorEndpointVersion `protobuf:"varint,5,opt,name=collector_endpoint_version,json=collectorEndpointVersion,proto3,enum=envoy.config.trace.v3.ZipkinConfig_CollectorEndpointVersion" json:"collector_endpoint_version,omitempty"`
 	// Optional hostname to use when sending spans to the collector_cluster. Useful for collectors
 	// that require a specific hostname. Defaults to :ref:`collector_cluster <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_cluster>` above.

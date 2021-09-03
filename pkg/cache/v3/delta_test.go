@@ -182,7 +182,10 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 				id := fmt.Sprintf("%d", i%2)
 				responses := make(chan cache.DeltaResponse, 1)
 				if i < 25 {
-					snap := cache.Snapshot{}
+					snap, err := cache.NewSnapshot("", map[rsrc.Type][]types.Resource{})
+					if err != nil {
+						t.Fatal(err)
+					}
 					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
 					if err := c.SetSnapshot(context.Background(), key, snap); err != nil {
 						t.Fatalf("snapshot failed: %s", err)
