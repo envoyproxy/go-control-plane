@@ -39,6 +39,7 @@ ENVOY_PID=$!
 function cleanup() {
   kill ${ENVOY_PID} ${UPSTREAM_PID}
   wait ${ENVOY_PID} ${UPSTREAM_PID} 2> /dev/null || true
+  cat ${ENVOY_LOG}
 }
 trap cleanup EXIT
 
