@@ -512,7 +512,7 @@ type TestSnapshot struct {
 }
 
 // Generate produces a snapshot from the parameters.
-func (ts TestSnapshot) Generate() cache.Snapshot {
+func (ts TestSnapshot) Generate() *cache.Snapshot {
 	clusters := make([]types.Resource, ts.NumClusters)
 	endpoints := make([]types.Resource, ts.NumClusters)
 	for i := 0; i < ts.NumClusters; i++ {
