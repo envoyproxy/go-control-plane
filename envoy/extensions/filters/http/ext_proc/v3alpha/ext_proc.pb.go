@@ -172,7 +172,6 @@ func (x *ExternalProcessor) GetStatPrefix() string {
 	return ""
 }
 
-// [#not-implemented-hide:]
 // Extra settings that may be added to per-route configuration for a
 // virtual host or cluster.
 type ExtProcPerRoute struct {
@@ -250,7 +249,9 @@ type ExtProcPerRoute_Disabled struct {
 }
 
 type ExtProcPerRoute_Overrides struct {
-	// Override aspects of the configuration for this route
+	// Override aspects of the configuration for this route. A set of
+	// overrides in a more specific configuration will override a "disabled"
+	// flag set in a less-specific one.
 	Overrides *ExtProcOverrides `protobuf:"bytes,2,opt,name=overrides,proto3,oneof"`
 }
 
@@ -258,7 +259,6 @@ func (*ExtProcPerRoute_Disabled) isExtProcPerRoute_Override() {}
 
 func (*ExtProcPerRoute_Overrides) isExtProcPerRoute_Override() {}
 
-// [#not-implemented-hide:]
 // Overrides that may be set on a per-route basis
 type ExtProcOverrides struct {
 	state         protoimpl.MessageState
@@ -267,10 +267,13 @@ type ExtProcOverrides struct {
 
 	// Set a different processing mode for this route than the default.
 	ProcessingMode *ProcessingMode `protobuf:"bytes,1,opt,name=processing_mode,json=processingMode,proto3" json:"processing_mode,omitempty"`
+	// [#not-implemented-hide:]
 	// Set a different asynchronous processing option than the default.
 	AsyncMode bool `protobuf:"varint,2,opt,name=async_mode,json=asyncMode,proto3" json:"async_mode,omitempty"`
+	// [#not-implemented-hide:]
 	// Set different optional properties than the default.
 	RequestProperties []string `protobuf:"bytes,3,rep,name=request_properties,json=requestProperties,proto3" json:"request_properties,omitempty"`
+	// [#not-implemented-hide:]
 	// Set different optional properties than the default.
 	ResponseProperties []string `protobuf:"bytes,4,rep,name=response_properties,json=responseProperties,proto3" json:"response_properties,omitempty"`
 }
