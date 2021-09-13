@@ -350,8 +350,6 @@ func (m *Node) Validate() error {
 
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedBuildVersion
-
 	switch m.UserAgentVersionType.(type) {
 
 	case *Node_UserAgentVersion:
@@ -1591,18 +1589,6 @@ func (m *TransportSocket) Validate() error {
 			if err := v.Validate(); err != nil {
 				return TransportSocketValidationError{
 					field:  "TypedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *TransportSocket_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return TransportSocketValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

@@ -66,18 +66,6 @@ func (m *AccessLog) Validate() error {
 			}
 		}
 
-	case *AccessLog_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return AccessLogValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	return nil
@@ -1362,18 +1350,6 @@ func (m *ExtensionFilter) Validate() error {
 			if err := v.Validate(); err != nil {
 				return ExtensionFilterValidationError{
 					field:  "TypedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *ExtensionFilter_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ExtensionFilterValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

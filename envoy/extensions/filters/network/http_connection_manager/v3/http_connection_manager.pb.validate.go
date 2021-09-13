@@ -395,16 +395,6 @@ func (m *HttpConnectionManager) Validate() error {
 
 	// no validation rules for StripTrailingHostDot
 
-	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedIdleTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HttpConnectionManagerValidationError{
-				field:  "HiddenEnvoyDeprecatedIdleTimeout",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	switch m.RouteSpecifier.(type) {
 
 	case *HttpConnectionManager_Rds:
@@ -1184,18 +1174,6 @@ func (m *HttpFilter) Validate() error {
 			}
 		}
 
-	case *HttpFilter_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return HttpFilterValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	return nil
@@ -1482,13 +1460,6 @@ func (m *HttpConnectionManager_Tracing) Validate() error {
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
-		}
-	}
-
-	if _, ok := HttpConnectionManager_Tracing_OperationName_name[int32(m.GetHiddenEnvoyDeprecatedOperationName())]; !ok {
-		return HttpConnectionManager_TracingValidationError{
-			field:  "HiddenEnvoyDeprecatedOperationName",
-			reason: "value must be one of the defined enum values",
 		}
 	}
 

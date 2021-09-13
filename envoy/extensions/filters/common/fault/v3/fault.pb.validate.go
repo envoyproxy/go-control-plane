@@ -50,8 +50,6 @@ func (m *FaultDelay) Validate() error {
 		}
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedType
-
 	switch m.FaultDelaySecifier.(type) {
 
 	case *FaultDelay_FixedDelay:

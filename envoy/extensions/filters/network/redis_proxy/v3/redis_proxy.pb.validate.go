@@ -111,8 +111,6 @@ func (m *RedisProxy) Validate() error {
 		}
 	}
 
-	// no validation rules for HiddenEnvoyDeprecatedCluster
-
 	return nil
 }
 
@@ -401,8 +399,6 @@ func (m *RedisProxy_PrefixRoutes) Validate() error {
 			}
 		}
 	}
-
-	// no validation rules for HiddenEnvoyDeprecatedCatchAllCluster
 
 	return nil
 }

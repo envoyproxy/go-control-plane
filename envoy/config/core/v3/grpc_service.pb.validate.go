@@ -1093,18 +1093,6 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) V
 			}
 		}
 
-	case *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPluginValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	return nil

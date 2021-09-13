@@ -73,18 +73,6 @@ func (m *Filter) Validate() error {
 			}
 		}
 
-	case *Filter_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return FilterValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
 	}
 
 	return nil
@@ -383,16 +371,6 @@ func (m *FilterChain) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedTlsContext()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return FilterChainValidationError{
-				field:  "HiddenEnvoyDeprecatedTlsContext",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	return nil
 }
 
@@ -618,18 +596,6 @@ func (m *ListenerFilter) Validate() error {
 			if err := v.Validate(); err != nil {
 				return ListenerFilterValidationError{
 					field:  "TypedConfig",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *ListenerFilter_HiddenEnvoyDeprecatedConfig:
-
-		if v, ok := interface{}(m.GetHiddenEnvoyDeprecatedConfig()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ListenerFilterValidationError{
-					field:  "HiddenEnvoyDeprecatedConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
