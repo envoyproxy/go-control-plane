@@ -57,8 +57,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 				}
 				nextVersionMap[name] = nextVersion
 			} else {
-				// we track non-existent resources for non-wildcard streams until the client explicitly unsubscribes from them.
-
+				// We track non-existent resources for non-wildcard streams until the client explicitly unsubscribes from them.
 				nextVersionMap[name] = ""
 			}
 		}
