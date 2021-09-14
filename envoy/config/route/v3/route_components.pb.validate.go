@@ -1551,6 +1551,16 @@ func (m *RetryPolicy) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetPerTryIdleTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RetryPolicyValidationError{
+				field:  "PerTryIdleTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetRetryPriority()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RetryPolicyValidationError{
