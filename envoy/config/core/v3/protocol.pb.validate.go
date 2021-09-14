@@ -1038,6 +1038,8 @@ func (m *Http3ProtocolOptions) Validate() error {
 		}
 	}
 
+	// no validation rules for AllowExtendedConnect
+
 	return nil
 }
 
