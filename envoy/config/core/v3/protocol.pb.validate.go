@@ -211,6 +211,17 @@ func (m *UpstreamHttpProtocolOptions) Validate() error {
 
 	// no validation rules for AutoSanValidation
 
+	if m.GetOverrideAutoSniHeader() != "" {
+
+		if !_UpstreamHttpProtocolOptions_OverrideAutoSniHeader_Pattern.MatchString(m.GetOverrideAutoSniHeader()) {
+			return UpstreamHttpProtocolOptionsValidationError{
+				field:  "OverrideAutoSniHeader",
+				reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -270,6 +281,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpstreamHttpProtocolOptionsValidationError{}
+
+var _UpstreamHttpProtocolOptions_OverrideAutoSniHeader_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
 
 // Validate checks the field values on AlternateProtocolsCacheOptions with the
 // rules defined in the proto definition for this message. If any rules are
