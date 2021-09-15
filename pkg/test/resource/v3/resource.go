@@ -43,27 +43,27 @@ import (
 const (
 	localhost = "127.0.0.1"
 
-	// XdsCluster is the cluster name for the control server (used by non-ADS set-up)
+	// XdsCluster is the cluster name for the control server (used by non-ADS set-up).
 	XdsCluster = "xds_cluster"
 
-	// Ads mode for resources: one aggregated xDS service
+	// Ads mode for resources: one aggregated xDS service.
 	Ads = "ads"
 
-	// Xds mode for resources: individual xDS services
+	// Xds mode for resources: individual xDS services.
 	Xds = "xds"
 
-	// Rest mode for resources: polling using Fetch
+	// Rest mode for resources: polling using Fetch.
 	Rest = "rest"
 
-	// Delta mode for resources: individual delta xDS services
+	// Delta mode for resources: individual delta xDS services.
 	Delta = "delta"
 
-	// Delta Ads mode for resource: one aggregated delta xDS service
+	// Delta Ads mode for resource: one aggregated delta xDS service.
 	DeltaAds = "delta-ads"
 )
 
 var (
-	// RefreshDelay for the polling config source
+	// RefreshDelay for the polling config source.
 	RefreshDelay = 500 * time.Millisecond
 )
 
@@ -133,6 +133,28 @@ func MakeRoute(routeName, clusterName string) *route.RouteConfiguration {
 	}
 }
 
+// MakeScopedRoute creates an HTTP scoped route that routes to a given cluster.
+func MakeScopedRoute(scopedRouteName string, routeConfigurationName string, keyFragments []string) *route.ScopedRouteConfiguration {
+
+	k := &route.ScopedRouteConfiguration_Key{}
+
+	for _, key := range keyFragments {
+		fragment := &route.ScopedRouteConfiguration_Key_Fragment{
+			Type: &route.ScopedRouteConfiguration_Key_Fragment_StringKey{
+				StringKey: key,
+			},
+		}
+		k.Fragments = append(k.Fragments, fragment)
+	}
+
+	return &route.ScopedRouteConfiguration{
+		OnDemand:               false,
+		Name:                   scopedRouteName,
+		RouteConfigurationName: routeConfigurationName,
+		Key:                    k,
+	}
+}
+
 // data source configuration
 func configSource(mode string) *core.ConfigSource {
 	source := &core.ConfigSource{}
@@ -185,11 +207,8 @@ func configSource(mode string) *core.ConfigSource {
 	return source
 }
 
-// MakeHTTPListener creates a listener using either ADS or RDS for the route.
-func MakeHTTPListener(mode string, listenerName string, port uint32, route string) *listener.Listener {
-	rdsSource := configSource(mode)
-
-	// access log service configuration
+func buildHttpConnectionManager() *hcm.HttpConnectionManager {
+	// access log service configuration.
 	alsConfig := &als.HttpGrpcAccessLogConfig{
 		CommonConfig: &als.CommonGrpcAccessLogConfig{
 			LogName:             "echo",
@@ -208,16 +227,10 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 		panic(err)
 	}
 
-	// HTTP filter configuration
+	// HTTP filter configuration.
 	manager := &hcm.HttpConnectionManager{
 		CodecType:  hcm.HttpConnectionManager_AUTO,
 		StatPrefix: "http",
-		RouteSpecifier: &hcm.HttpConnectionManager_Rds{
-			Rds: &hcm.Rds{
-				ConfigSource:    rdsSource,
-				RouteConfigName: route,
-			},
-		},
 		HttpFilters: []*hcm.HttpFilter{{
 			Name: wellknown.Router,
 		}},
@@ -228,11 +241,11 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 			},
 		}},
 	}
-	pbst, err := ptypes.MarshalAny(manager)
-	if err != nil {
-		panic(err)
-	}
 
+	return manager
+}
+
+func makeListener(listenerName string, port uint32, filterChains []*listener.FilterChain) *listener.Listener {
 	return &listener.Listener{
 		Name: listenerName,
 		Address: &core.Address{
@@ -246,18 +259,97 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 				},
 			},
 		},
-		FilterChains: []*listener.FilterChain{{
-			Filters: []*listener.Filter{{
-				Name: wellknown.HTTPConnectionManager,
-				ConfigType: &listener.Filter_TypedConfig{
-					TypedConfig: pbst,
-				},
-			}},
-		}},
+		FilterChains: filterChains,
 	}
 }
 
-// MakeTCPListener creates a TCP listener for a cluster.
+func MakeRouteHTTPListener(mode string, listenerName string, port uint32, route string) *listener.Listener {
+	rdsSource := configSource(mode)
+	routeSpecifier := &hcm.HttpConnectionManager_Rds{
+		Rds: &hcm.Rds{
+			ConfigSource:    rdsSource,
+			RouteConfigName: route,
+		},
+	}
+
+	manager := buildHttpConnectionManager()
+	manager.RouteSpecifier = routeSpecifier
+
+	pbst, err := ptypes.MarshalAny(manager)
+	if err != nil {
+		panic(err)
+	}
+
+	filterChains := []*listener.FilterChain{
+		{
+			Filters: []*listener.Filter{
+				{
+					Name: wellknown.HTTPConnectionManager,
+					ConfigType: &listener.Filter_TypedConfig{
+						TypedConfig: pbst,
+					},
+				},
+			},
+		},
+	}
+
+	return makeListener(listenerName, port, filterChains)
+}
+
+// Creates a HTTP listener using Scoped Routes, which extracts the "Host" header field as the key.
+func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32, scopedRouteConfigName string) *listener.Listener {
+	source := configSource(mode)
+	routeSpecifier := &hcm.HttpConnectionManager_ScopedRoutes{
+		ScopedRoutes: &hcm.ScopedRoutes{
+			Name: scopedRouteConfigName,
+			ScopeKeyBuilder: &hcm.ScopedRoutes_ScopeKeyBuilder{
+				Fragments: []*hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder{
+					{
+						Type: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_{
+							HeaderValueExtractor: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor{
+								Name: "Host",
+								ExtractType: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index{
+									Index: 0,
+								},
+							},
+						},
+					},
+				},
+			},
+			RdsConfigSource: source,
+			ConfigSpecifier: &hcm.ScopedRoutes_ScopedRds{
+				ScopedRds: &hcm.ScopedRds{
+					ScopedRdsConfigSource: source,
+				},
+			},
+		},
+	}
+
+	manager := buildHttpConnectionManager()
+	manager.RouteSpecifier = routeSpecifier
+
+	pbst, err := ptypes.MarshalAny(manager)
+	if err != nil {
+		panic(err)
+	}
+
+	filterChains := []*listener.FilterChain{
+		{
+			Filters: []*listener.Filter{
+				{
+					Name: wellknown.HTTPConnectionManager,
+					ConfigType: &listener.Filter_TypedConfig{
+						TypedConfig: pbst,
+					},
+				},
+			},
+		},
+	}
+
+	return makeListener(listenerName, port, filterChains)
+}
+
+// Creates a TCP listener HTTP manager.
 func MakeTCPListener(listenerName string, port uint32, clusterName string) *listener.Listener {
 	// TCP filter configuration
 	config := &tcp.TcpProxy{
@@ -270,28 +362,21 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *list
 	if err != nil {
 		panic(err)
 	}
-	return &listener.Listener{
-		Name: listenerName,
-		Address: &core.Address{
-			Address: &core.Address_SocketAddress{
-				SocketAddress: &core.SocketAddress{
-					Protocol: core.SocketAddress_TCP,
-					Address:  localhost,
-					PortSpecifier: &core.SocketAddress_PortValue{
-						PortValue: port,
+
+	filterChains := []*listener.FilterChain{
+		{
+			Filters: []*listener.Filter{
+				{
+					Name: wellknown.TCPProxy,
+					ConfigType: &listener.Filter_TypedConfig{
+						TypedConfig: pbst,
 					},
 				},
 			},
 		},
-		FilterChains: []*listener.FilterChain{{
-			Filters: []*listener.Filter{{
-				Name: wellknown.TCPProxy,
-				ConfigType: &listener.Filter_TypedConfig{
-					TypedConfig: pbst,
-				},
-			}},
-		}},
 	}
+
+	return makeListener(listenerName, port, filterChains)
 }
 
 // MakeRuntime creates an RTDS layer with some fields.
@@ -376,9 +461,15 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 	}
 
 	routes := make([]types.Resource, ts.NumHTTPListeners)
+	scopedRoutes := make([]types.Resource, ts.NumHTTPListeners)
 	for i := 0; i < ts.NumHTTPListeners; i++ {
-		name := fmt.Sprintf("route-%s-%d", ts.Version, i)
-		routes[i] = MakeRoute(name, cache.GetResourceName(clusters[i%ts.NumClusters]))
+		suffix := fmt.Sprintf("%s-%d", ts.Version, i)
+		routeName := fmt.Sprintf("route-%s", suffix)
+		scopedRouteName := fmt.Sprintf("scopedroute-%s", suffix)
+
+		routes[i] = MakeRoute(routeName, cache.GetResourceName(clusters[i%ts.NumClusters]))
+		port := ts.BasePort + uint32(i)
+		scopedRoutes[i] = MakeScopedRoute(scopedRouteName, routeName, []string{fmt.Sprintf("127.0.0.1:%d", port)})
 	}
 
 	total := ts.NumHTTPListeners + ts.NumTCPListeners
@@ -389,7 +480,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		name := fmt.Sprintf("listener-%d", port)
 		var listener *listener.Listener
 		if i < ts.NumHTTPListeners {
-			listener = MakeHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]))
+			listener = MakeScopedRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(scopedRoutes[i]))
 		} else {
 			listener = MakeTCPListener(name, port, cache.GetResourceName(clusters[i%ts.NumClusters]))
 		}
@@ -448,6 +539,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		resource.EndpointType:        endpoints,
 		resource.ClusterType:         clusters,
 		resource.RouteType:           routes,
+		resource.ScopedRouteType:     scopedRoutes,
 		resource.ListenerType:        listeners,
 		resource.RuntimeType:         runtimes,
 		resource.SecretType:          secrets,

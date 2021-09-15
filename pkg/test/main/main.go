@@ -132,7 +132,7 @@ func init() {
 	flag.IntVar(&requests, "r", 5, "Number of requests between snapshot updates")
 
 	// Test this many HTTP listeners per snapshot
-	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
+	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and SRDS/RDS configs)")
 	// Test this many TCP listeners per snapshot
 	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
 
@@ -226,7 +226,7 @@ func main() {
 
 		snapshot := snapshots.Generate()
 		if err := snapshot.Consistent(); err != nil {
-			log.Printf("snapshot inconsistency: %+v\n", snapshot)
+			log.Printf("snapshot inconsistency: %+v\n%+v\n", snapshot, err)
 		}
 
 		err := config.SetSnapshot(context.Background(), nodeID, snapshot)
