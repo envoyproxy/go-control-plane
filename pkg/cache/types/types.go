@@ -36,6 +36,7 @@ const (
 	Endpoint ResponseType = iota
 	Cluster
 	Route
+	ScopedRoute
 	Listener
 	Secret
 	Runtime

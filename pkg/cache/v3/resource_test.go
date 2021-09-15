@@ -22,12 +22,14 @@ import (
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
 const (
 	clusterName         = "cluster0"
 	routeName           = "route0"
+	scopedRouteName     = "scopedRoute0"
 	listenerName        = "listener0"
 	runtimeName         = "runtime0"
 	tlsName             = "secret0"
@@ -39,7 +41,8 @@ var (
 	testEndpoint        = resource.MakeEndpoint(clusterName, 8080)
 	testCluster         = resource.MakeCluster(resource.Ads, clusterName)
 	testRoute           = resource.MakeRoute(routeName, clusterName)
-	testListener        = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testScopedRoute     = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"1.2.3.4"})
+	testListener        = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
 	testRuntime         = resource.MakeRuntime(runtimeName)
 	testSecret          = resource.MakeSecrets(tlsName, rootName)
 	testExtensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
@@ -53,6 +56,9 @@ func TestValidate(t *testing.T) {
 		t.Error(err)
 	}
 	if err := testRoute.Validate(); err != nil {
+		t.Error(err)
+	}
+	if err := testScopedRoute.Validate(); err != nil {
 		t.Error(err)
 	}
 	if err := testListener.Validate(); err != nil {
@@ -88,6 +94,9 @@ func TestGetResourceName(t *testing.T) {
 	if name := cache.GetResourceName(testRoute); name != routeName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", testRoute, name, routeName)
 	}
+	if name := cache.GetResourceName(testScopedRoute); name != scopedRouteName {
+		t.Errorf("GetResourceName(%v) => got %q, want %q", testScopedRoute, name, scopedRouteName)
+	}
 	if name := cache.GetResourceName(testListener); name != listenerName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", testListener, name, listenerName)
 	}
@@ -102,40 +111,48 @@ func TestGetResourceName(t *testing.T) {
 func TestGetResourceReferences(t *testing.T) {
 	cases := []struct {
 		in  types.Resource
-		out map[string]bool
+		out map[rsrc.Type]map[string]bool
 	}{
 		{
 			in:  nil,
-			out: map[string]bool{},
+			out: map[rsrc.Type]map[string]bool{},
 		},
 		{
 			in:  testCluster,
-			out: map[string]bool{clusterName: true},
+			out: map[rsrc.Type]map[string]bool{rsrc.EndpointType: {clusterName: true}},
 		},
 		{
 			in: &cluster.Cluster{Name: clusterName, ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
 				EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{ServiceName: "test"}},
-			out: map[string]bool{"test": true},
+			out: map[rsrc.Type]map[string]bool{rsrc.EndpointType: {"test": true}},
 		},
 		{
-			in:  resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName),
-			out: map[string]bool{routeName: true},
+			in:  resource.MakeScopedRouteHTTPListener(resource.Xds, listenerName, 80, scopedRouteName),
+			out: map[rsrc.Type]map[string]bool{rsrc.ScopedRouteType: {scopedRouteName: true}},
+		},
+		{
+			in:  resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName),
+			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
 		},
 		{
 			in:  resource.MakeTCPListener(listenerName, 80, clusterName),
-			out: map[string]bool{},
+			out: map[rsrc.Type]map[string]bool{},
 		},
 		{
 			in:  testRoute,
-			out: map[string]bool{},
+			out: map[rsrc.Type]map[string]bool{},
+		},
+		{
+			in:  testScopedRoute,
+			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
 		},
 		{
 			in:  testEndpoint,
-			out: map[string]bool{},
+			out: map[rsrc.Type]map[string]bool{},
 		},
 		{
 			in:  testRuntime,
-			out: map[string]bool{},
+			out: map[rsrc.Type]map[string]bool{},
 		},
 	}
 	for _, cs := range cases {

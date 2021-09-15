@@ -17,6 +17,7 @@ const (
 	EndpointType        = apiTypePrefix + "envoy.config.endpoint.v3.ClusterLoadAssignment"
 	ClusterType         = apiTypePrefix + "envoy.config.cluster.v3.Cluster"
 	RouteType           = apiTypePrefix + "envoy.config.route.v3.RouteConfiguration"
+	ScopedRouteType     = apiTypePrefix + "envoy.config.route.v3.ScopedRouteConfiguration"
 	ListenerType        = apiTypePrefix + "envoy.config.listener.v3.Listener"
 	SecretType          = apiTypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
 	ExtensionConfigType = apiTypePrefix + "envoy.config.core.v3.TypedExtensionConfig"
@@ -32,6 +33,7 @@ const (
 	FetchClusters         = "/v3/discovery:clusters"
 	FetchListeners        = "/v3/discovery:listeners"
 	FetchRoutes           = "/v3/discovery:routes"
+	FetchScopedRoutes     = "/v3/discovery:scoped-routes"
 	FetchSecrets          = "/v3/discovery:secrets" //nolint:gosec
 	FetchRuntimes         = "/v3/discovery:runtime"
 	FetchExtensionConfigs = "/v3/discovery:extension_configs"

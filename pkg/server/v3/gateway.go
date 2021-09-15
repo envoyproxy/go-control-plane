@@ -52,6 +52,8 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 		typeURL = resource.ListenerType
 	case resource.FetchRoutes:
 		typeURL = resource.RouteType
+	case resource.FetchScopedRoutes:
+		typeURL = resource.ScopedRouteType
 	case resource.FetchSecrets:
 		typeURL = resource.SecretType
 	case resource.FetchRuntimes:
