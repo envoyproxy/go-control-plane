@@ -1586,6 +1586,21 @@ func (m *RetryPolicy) Validate() error {
 
 	}
 
+	for idx, item := range m.GetRetryOptionsPredicates() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RetryPolicyValidationError{
+					field:  fmt.Sprintf("RetryOptionsPredicates[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	// no validation rules for HostSelectionRetryMaxAttempts
 
 	if v, ok := interface{}(m.GetRetryBackOff()).(interface{ Validate() error }); ok {
