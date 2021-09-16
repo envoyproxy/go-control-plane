@@ -29,14 +29,11 @@ const _ = proto.ProtoPackageIsVersion4
 
 // Configuration for the alternate protocols cache HTTP filter.
 // [#extension: envoy.filters.http.alternate_protocols_cache]
-// TODO(RyanTheOptimist): Move content from source/docs/http3_upstream.md to
-// docs/root/intro/arch_overview/upstream/connection_pooling.rst when unhiding the proto.
 type FilterConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// [#not-implemented-hide:]
 	// If set, causes the use of the alternate protocols cache, which is responsible for
 	// parsing and caching HTTP Alt-Svc headers. This enables the use of HTTP/3 for upstream
 	// servers that advertise supporting it.

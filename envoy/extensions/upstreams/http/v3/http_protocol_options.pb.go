@@ -391,7 +391,6 @@ type HttpProtocolOptions_AutoHttpConfig struct {
 	//   AutoHttpConfig config is undergoing especially rapid change and as it
 	//   is alpha is not guaranteed to be API-stable.
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,3,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
-	// [#not-implemented-hide:]
 	// The presence of alternate protocols cache options causes the use of the
 	// alternate protocols cache, which is responsible for parsing and caching
 	// HTTP Alt-Svc headers. This enables the use of HTTP/3 for origins that
