@@ -110,6 +110,7 @@ type JwtProvider struct {
 	JwksSourceSpecifier isJwtProvider_JwksSourceSpecifier `protobuf_oneof:"jwks_source_specifier"`
 	// If false, the JWT is removed in the request after a success verification. If true, the JWT is
 	// not removed in the request. Default value is false.
+	// caveat: only works for from_header & has no effect for JWTs extracted through from_params & from_cookies.
 	Forward bool `protobuf:"varint,5,opt,name=forward,proto3" json:"forward,omitempty"`
 	// Two fields below define where to extract the JWT from an HTTP request.
 	//
