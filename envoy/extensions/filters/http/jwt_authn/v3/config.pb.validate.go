@@ -71,6 +71,8 @@ func (m *JwtProvider) Validate() error {
 
 	// no validation rules for PayloadInMetadata
 
+	// no validation rules for HeaderInMetadata
+
 	// no validation rules for ClockSkewSeconds
 
 	if v, ok := interface{}(m.GetJwtCacheConfig()).(interface{ Validate() error }); ok {
