@@ -395,7 +395,9 @@ type HttpProtocolOptions_AutoHttpConfig struct {
 	// alternate protocols cache, which is responsible for parsing and caching
 	// HTTP Alt-Svc headers. This enables the use of HTTP/3 for origins that
 	// advertise supporting it.
-	// TODO(RyanTheOptimist): Make this field required when HTTP/3 is enabled.
+	//
+	// .. note::
+	//   This is required when HTTP/3 is enabled.
 	AlternateProtocolsCacheOptions *v3.AlternateProtocolsCacheOptions `protobuf:"bytes,4,opt,name=alternate_protocols_cache_options,json=alternateProtocolsCacheOptions,proto3" json:"alternate_protocols_cache_options,omitempty"`
 }
 
