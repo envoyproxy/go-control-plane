@@ -46,6 +46,9 @@ const (
 	// XdsCluster is the cluster name for the control server (used by non-ADS set-up)
 	XdsCluster = "xds_cluster"
 
+	// AlsCluster is the clustername for gRPC access log service (ALS)
+	AlsCluster = "als_cluster"
+
 	// Ads mode for resources: one aggregated xDS service
 	Ads = "ads"
 
@@ -197,7 +200,7 @@ func MakeHTTPListener(mode string, listenerName string, port uint32, route strin
 			GrpcService: &core.GrpcService{
 				TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
 					EnvoyGrpc: &core.GrpcService_EnvoyGrpc{
-						ClusterName: XdsCluster,
+						ClusterName: AlsCluster,
 					},
 				},
 			},

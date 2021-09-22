@@ -87,7 +87,7 @@ func init() {
 	// upstream server
 	flag.UintVar(&basePort, "base", 9000, "Envoy Proxy listener port")
 
-	// The control plane accesslog server port (currently unused)
+	// The control plane accesslog server port
 	flag.UintVar(&alsPort, "als", 18090, "Control plane accesslog server port")
 
 	//
