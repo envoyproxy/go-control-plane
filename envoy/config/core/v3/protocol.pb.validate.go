@@ -310,6 +310,16 @@ func (m *AlternateProtocolsCacheOptions) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetKeyValueStoreConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AlternateProtocolsCacheOptionsValidationError{
+				field:  "KeyValueStoreConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
