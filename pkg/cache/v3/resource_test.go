@@ -31,6 +31,7 @@ const (
 	routeName           = "route0"
 	scopedRouteName     = "scopedRoute0"
 	listenerName        = "listener0"
+	scopedListenerName  = "scopedListener0"
 	runtimeName         = "runtime0"
 	tlsName             = "secret0"
 	rootName            = "root0"
@@ -43,6 +44,7 @@ var (
 	testRoute           = resource.MakeRoute(routeName, clusterName)
 	testScopedRoute     = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"1.2.3.4"})
 	testListener        = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testScopedListener  = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80, scopedRouteName)
 	testRuntime         = resource.MakeRuntime(runtimeName)
 	testSecret          = resource.MakeSecrets(tlsName, rootName)
 	testExtensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
@@ -160,5 +162,25 @@ func TestGetResourceReferences(t *testing.T) {
 		if !reflect.DeepEqual(names, cs.out) {
 			t.Errorf("GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
 		}
+	}
+}
+
+func TestGetAllResourceReferencesReturnsExpectedRefs(t *testing.T) {
+	expected := map[rsrc.Type]map[string]bool{
+		rsrc.RouteType:       {routeName: true},
+		rsrc.ScopedRouteType: {scopedRouteName: true},
+		rsrc.EndpointType:    {clusterName: true},
+	}
+
+	resources := [types.UnknownType]cache.Resources{}
+	resources[types.Endpoint] = cache.NewResources("1", []types.Resource{testEndpoint})
+	resources[types.Cluster] = cache.NewResources("1", []types.Resource{testCluster})
+	resources[types.Route] = cache.NewResources("1", []types.Resource{testRoute})
+	resources[types.Listener] = cache.NewResources("1", []types.Resource{testListener, testScopedListener})
+	resources[types.ScopedRoute] = cache.NewResources("1", []types.Resource{testScopedRoute})
+	actual := cache.GetAllResourceReferences(resources)
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("GetAllResourceReferences(%v) => got %v, want %v", resources, actual, expected)
 	}
 }

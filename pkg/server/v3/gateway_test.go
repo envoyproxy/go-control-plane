@@ -58,7 +58,7 @@ func TestGateway(t *testing.T) {
 		resource.ListenerType: {
 			&cache.RawResponse{
 				Version:   "4",
-				Resources: []types.ResourceWithTTL{{Resource: listener}},
+				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: resource.ListenerType},
 			},
 		},

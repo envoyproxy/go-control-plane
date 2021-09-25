@@ -142,6 +142,7 @@ const (
 	routeName           = "route0"
 	scopedRouteName     = "scopedRoute0"
 	listenerName        = "listener0"
+	scopedListenerName  = "scopedListener0"
 	secretName          = "secret0"
 	runtimeName         = "runtime0"
 	extensionConfigName = "extensionConfig0"
@@ -152,17 +153,18 @@ var (
 		Id:      "test-id",
 		Cluster: "test-cluster",
 	}
-	endpoint        = resource.MakeEndpoint(clusterName, 8080)
-	cluster         = resource.MakeCluster(resource.Ads, clusterName)
-	route           = resource.MakeRoute(routeName, clusterName)
-	scopedRoute     = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"127.0.0.1"})
-	listener        = resource.MakeScopedRouteHTTPListener(resource.Ads, listenerName, 80, scopedRouteName)
-	secret          = resource.MakeSecrets(secretName, "test")[0]
-	runtime         = resource.MakeRuntime(runtimeName)
-	extensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
-	opaque          = &core.Address{}
-	opaqueType      = "unknown-type"
-	testTypes       = []string{
+	endpoint           = resource.MakeEndpoint(clusterName, 8080)
+	cluster            = resource.MakeCluster(resource.Ads, clusterName)
+	route              = resource.MakeRoute(routeName, clusterName)
+	scopedRoute        = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"127.0.0.1"})
+	httpListener       = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
+	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80, scopedRouteName)
+	secret             = resource.MakeSecrets(secretName, "test")[0]
+	runtime            = resource.MakeRuntime(runtimeName)
+	extensionConfig    = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
+	opaque             = &core.Address{}
+	opaqueType         = "unknown-type"
+	testTypes          = []string{
 		rsrc.EndpointType,
 		rsrc.ClusterType,
 		rsrc.RouteType,
@@ -208,7 +210,7 @@ func makeResponses() map[string][]cache.Response {
 		rsrc.ListenerType: {
 			&cache.RawResponse{
 				Version:   "5",
-				Resources: []types.ResourceWithTTL{{Resource: listener}},
+				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 			},
 		},

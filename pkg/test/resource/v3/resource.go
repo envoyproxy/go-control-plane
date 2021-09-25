@@ -135,7 +135,6 @@ func MakeRoute(routeName, clusterName string) *route.RouteConfiguration {
 
 // MakeScopedRoute creates an HTTP scoped route that routes to a given cluster.
 func MakeScopedRoute(scopedRouteName string, routeConfigurationName string, keyFragments []string) *route.ScopedRouteConfiguration {
-
 	k := &route.ScopedRouteConfiguration_Key{}
 
 	for _, key := range keyFragments {
@@ -439,6 +438,8 @@ type TestSnapshot struct {
 	NumClusters int
 	// NumHTTPListeners is the total number of HTTP listeners to generate.
 	NumHTTPListeners int
+	// NumScopedHTTPListeners is the total number of scoped route HTTP listeners to generate.
+	NumScopedHTTPListeners int
 	// NumTCPListeners is the total number of TCP listeners to generate.
 	// Listeners are assigned clusters in a round-robin fashion.
 	NumTCPListeners int
@@ -460,29 +461,44 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 		endpoints[i] = MakeEndpoint(name, ts.UpstreamPort)
 	}
 
-	routes := make([]types.Resource, ts.NumHTTPListeners)
-	scopedRoutes := make([]types.Resource, ts.NumHTTPListeners)
-	for i := 0; i < ts.NumHTTPListeners; i++ {
+	totalHTTPListeners := ts.NumHTTPListeners + ts.NumScopedHTTPListeners
+	routes := make([]types.Resource, totalHTTPListeners)
+	scopedRoutes := make([]types.Resource, ts.NumScopedHTTPListeners)
+
+	for i := 0; i < totalHTTPListeners; i++ {
 		suffix := fmt.Sprintf("%s-%d", ts.Version, i)
 		routeName := fmt.Sprintf("route-%s", suffix)
-		scopedRouteName := fmt.Sprintf("scopedroute-%s", suffix)
-
 		routes[i] = MakeRoute(routeName, cache.GetResourceName(clusters[i%ts.NumClusters]))
-		port := ts.BasePort + uint32(i)
-		scopedRoutes[i] = MakeScopedRoute(scopedRouteName, routeName, []string{fmt.Sprintf("127.0.0.1:%d", port)})
+
+		// Scoped Routes.
+		if i >= ts.NumHTTPListeners {
+			scopedRouteName := fmt.Sprintf("scopedroute-%s", suffix)
+			port := ts.BasePort + uint32(i)
+			scopedRoutes[i-ts.NumHTTPListeners] = MakeScopedRoute(scopedRouteName, routeName, []string{fmt.Sprintf("127.0.0.1:%d", port)})
+		}
 	}
 
-	total := ts.NumHTTPListeners + ts.NumTCPListeners
+	numHTTPListeners := ts.NumHTTPListeners
+	numScopedHTTPListeners := ts.NumScopedHTTPListeners
+	numTCPListeners := ts.NumTCPListeners
+	total := numHTTPListeners + numScopedHTTPListeners + numTCPListeners
+
 	listeners := make([]types.Resource, total)
 	for i := 0; i < total; i++ {
 		port := ts.BasePort + uint32(i)
 		// listener name must be same since ports are shared and previous listener is drained
 		name := fmt.Sprintf("listener-%d", port)
 		var listener *listener.Listener
-		if i < ts.NumHTTPListeners {
-			listener = MakeScopedRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(scopedRoutes[i]))
-		} else {
+
+		if numHTTPListeners > 0 {
+			listener = MakeRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]))
+			numHTTPListeners--
+		} else if numScopedHTTPListeners > 0 {
+			listener = MakeScopedRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(scopedRoutes[numScopedHTTPListeners-1]))
+			numScopedHTTPListeners--
+		} else if numTCPListeners > 0 {
 			listener = MakeTCPListener(name, port, cache.GetResourceName(clusters[i%ts.NumClusters]))
+			numTCPListeners--
 		}
 
 		if ts.TLS {

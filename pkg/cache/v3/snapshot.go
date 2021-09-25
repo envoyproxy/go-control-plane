@@ -83,19 +83,13 @@ func (s *Snapshot) Consistent() error {
 		return errors.New("nil snapshot")
 	}
 
-	consolidated := make(map[resource.Type]map[string]bool)
-	// References made by CDS.
-	GetResourceReferencesByReference(s.Resources[types.Cluster].Items, consolidated)
-	// References made by LDS.
-	GetResourceReferencesByReference(s.Resources[types.Listener].Items, consolidated)
-	// References made by SRDS.
-	GetResourceReferencesByReference(s.Resources[types.ScopedRoute].Items, consolidated)
+	referencedResources := GetAllResourceReferences(s.Resources)
 
 	// Loop through each referenced resource.
-	referencedResponseTypes := map[types.ResponseType]bool{
-		types.Endpoint:    true,
-		types.ScopedRoute: true,
-		types.Route:       true,
+	referencedResponseTypes := map[types.ResponseType]struct{}{
+		types.Endpoint:    struct{}{},
+		types.ScopedRoute: struct{}{},
+		types.Route:       struct{}{},
 	}
 
 	for idx, items := range s.Resources {
@@ -109,7 +103,7 @@ func (s *Snapshot) Consistent() error {
 			if err != nil {
 				return err
 			}
-			referenceSet := consolidated[typeURL]
+			referenceSet := referencedResources[typeURL]
 
 			if len(referenceSet) != len(items.Items) {
 				return fmt.Errorf("mismatched reference and resource lengths: len(%v) != %d", referenceSet, len(items.Items))

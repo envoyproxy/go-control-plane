@@ -161,7 +161,7 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 		},
 		rsrc.ListenerType: {
 			&cache.RawDeltaResponse{
-				Resources:         []types.Resource{listener},
+				Resources:         []types.Resource{httpListener, httpScopedListener},
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
 				SystemVersionInfo: "5",
 			},
