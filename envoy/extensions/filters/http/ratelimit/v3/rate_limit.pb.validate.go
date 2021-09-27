@@ -165,6 +165,112 @@ var _RateLimit_RequestType_InLookup = map[string]struct{}{
 	"":         {},
 }
 
+// Validate checks the field values on RateLimitConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *RateLimitConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetStage() > 10 {
+		return RateLimitConfigValidationError{
+			field:  "Stage",
+			reason: "value must be less than or equal to 10",
+		}
+	}
+
+	// no validation rules for DisableKey
+
+	if len(m.GetActions()) < 1 {
+		return RateLimitConfigValidationError{
+			field:  "Actions",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetActions() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfigValidationError{
+					field:  fmt.Sprintf("Actions[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetLimit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitConfigValidationError{
+				field:  "Limit",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RateLimitConfigValidationError is the validation error returned by
+// RateLimitConfig.Validate if the designated constraints aren't met.
+type RateLimitConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfigValidationError) ErrorName() string { return "RateLimitConfigValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfigValidationError{}
+
 // Validate checks the field values on RateLimitPerRoute with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -178,6 +284,28 @@ func (m *RateLimitPerRoute) Validate() error {
 			field:  "VhRateLimits",
 			reason: "value must be one of the defined enum values",
 		}
+	}
+
+	if _, ok := RateLimitPerRoute_OverrideOptions_name[int32(m.GetOverrideOption())]; !ok {
+		return RateLimitPerRouteValidationError{
+			field:  "OverrideOption",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
+	for idx, item := range m.GetRateLimits() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitPerRouteValidationError{
+					field:  fmt.Sprintf("RateLimits[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -238,3 +366,924 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimitPerRouteValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Action with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RateLimitConfig_Action) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.ActionSpecifier.(type) {
+
+	case *RateLimitConfig_Action_SourceCluster_:
+
+		if v, ok := interface{}(m.GetSourceCluster()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "SourceCluster",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *RateLimitConfig_Action_DestinationCluster_:
+
+		if v, ok := interface{}(m.GetDestinationCluster()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "DestinationCluster",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *RateLimitConfig_Action_RequestHeaders_:
+
+		if v, ok := interface{}(m.GetRequestHeaders()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "RequestHeaders",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *RateLimitConfig_Action_RemoteAddress_:
+
+		if v, ok := interface{}(m.GetRemoteAddress()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "RemoteAddress",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *RateLimitConfig_Action_GenericKey_:
+
+		if v, ok := interface{}(m.GetGenericKey()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "GenericKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *RateLimitConfig_Action_HeaderValueMatch_:
+
+		if v, ok := interface{}(m.GetHeaderValueMatch()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "HeaderValueMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *RateLimitConfig_Action_Metadata:
+
+		if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "Metadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *RateLimitConfig_Action_Extension:
+
+		if v, ok := interface{}(m.GetExtension()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_ActionValidationError{
+					field:  "Extension",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		return RateLimitConfig_ActionValidationError{
+			field:  "ActionSpecifier",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// RateLimitConfig_ActionValidationError is the validation error returned by
+// RateLimitConfig_Action.Validate if the designated constraints aren't met.
+type RateLimitConfig_ActionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_ActionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_ActionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_ActionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_ActionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_ActionValidationError) ErrorName() string {
+	return "RateLimitConfig_ActionValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_ActionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_ActionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_ActionValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Override with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RateLimitConfig_Override) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.OverrideSpecifier.(type) {
+
+	case *RateLimitConfig_Override_DynamicMetadata_:
+
+		if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_OverrideValidationError{
+					field:  "DynamicMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	default:
+		return RateLimitConfig_OverrideValidationError{
+			field:  "OverrideSpecifier",
+			reason: "value is required",
+		}
+
+	}
+
+	return nil
+}
+
+// RateLimitConfig_OverrideValidationError is the validation error returned by
+// RateLimitConfig_Override.Validate if the designated constraints aren't met.
+type RateLimitConfig_OverrideValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_OverrideValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_OverrideValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_OverrideValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_OverrideValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_OverrideValidationError) ErrorName() string {
+	return "RateLimitConfig_OverrideValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_OverrideValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Override.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_OverrideValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_OverrideValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Action_SourceCluster
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *RateLimitConfig_Action_SourceCluster) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// RateLimitConfig_Action_SourceClusterValidationError is the validation error
+// returned by RateLimitConfig_Action_SourceCluster.Validate if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_SourceClusterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Action_SourceClusterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Action_SourceClusterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Action_SourceClusterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Action_SourceClusterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Action_SourceClusterValidationError) ErrorName() string {
+	return "RateLimitConfig_Action_SourceClusterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Action_SourceClusterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action_SourceCluster.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Action_SourceClusterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Action_SourceClusterValidationError{}
+
+// Validate checks the field values on
+// RateLimitConfig_Action_DestinationCluster with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *RateLimitConfig_Action_DestinationCluster) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// RateLimitConfig_Action_DestinationClusterValidationError is the validation
+// error returned by RateLimitConfig_Action_DestinationCluster.Validate if the
+// designated constraints aren't met.
+type RateLimitConfig_Action_DestinationClusterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Action_DestinationClusterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Action_DestinationClusterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Action_DestinationClusterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Action_DestinationClusterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Action_DestinationClusterValidationError) ErrorName() string {
+	return "RateLimitConfig_Action_DestinationClusterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Action_DestinationClusterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action_DestinationCluster.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Action_DestinationClusterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Action_DestinationClusterValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Action_RequestHeaders
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *RateLimitConfig_Action_RequestHeaders) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetHeaderName()) < 1 {
+		return RateLimitConfig_Action_RequestHeadersValidationError{
+			field:  "HeaderName",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if !_RateLimitConfig_Action_RequestHeaders_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+		return RateLimitConfig_Action_RequestHeadersValidationError{
+			field:  "HeaderName",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetDescriptorKey()) < 1 {
+		return RateLimitConfig_Action_RequestHeadersValidationError{
+			field:  "DescriptorKey",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	// no validation rules for SkipIfAbsent
+
+	return nil
+}
+
+// RateLimitConfig_Action_RequestHeadersValidationError is the validation error
+// returned by RateLimitConfig_Action_RequestHeaders.Validate if the
+// designated constraints aren't met.
+type RateLimitConfig_Action_RequestHeadersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Action_RequestHeadersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Action_RequestHeadersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Action_RequestHeadersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Action_RequestHeadersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Action_RequestHeadersValidationError) ErrorName() string {
+	return "RateLimitConfig_Action_RequestHeadersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Action_RequestHeadersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action_RequestHeaders.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Action_RequestHeadersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Action_RequestHeadersValidationError{}
+
+var _RateLimitConfig_Action_RequestHeaders_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on RateLimitConfig_Action_RemoteAddress
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *RateLimitConfig_Action_RemoteAddress) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// RateLimitConfig_Action_RemoteAddressValidationError is the validation error
+// returned by RateLimitConfig_Action_RemoteAddress.Validate if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_RemoteAddressValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Action_RemoteAddressValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Action_RemoteAddressValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Action_RemoteAddressValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Action_RemoteAddressValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Action_RemoteAddressValidationError) ErrorName() string {
+	return "RateLimitConfig_Action_RemoteAddressValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Action_RemoteAddressValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action_RemoteAddress.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Action_RemoteAddressValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Action_RemoteAddressValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Action_GenericKey with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *RateLimitConfig_Action_GenericKey) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
+		return RateLimitConfig_Action_GenericKeyValidationError{
+			field:  "DescriptorValue",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	// no validation rules for DescriptorKey
+
+	return nil
+}
+
+// RateLimitConfig_Action_GenericKeyValidationError is the validation error
+// returned by RateLimitConfig_Action_GenericKey.Validate if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_GenericKeyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Action_GenericKeyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Action_GenericKeyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Action_GenericKeyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Action_GenericKeyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Action_GenericKeyValidationError) ErrorName() string {
+	return "RateLimitConfig_Action_GenericKeyValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Action_GenericKeyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action_GenericKey.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Action_GenericKeyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Action_GenericKeyValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Action_HeaderValueMatch
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *RateLimitConfig_Action_HeaderValueMatch) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
+		return RateLimitConfig_Action_HeaderValueMatchValidationError{
+			field:  "DescriptorValue",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	// no validation rules for ExpectMatch
+
+	if len(m.GetHeaders()) < 1 {
+		return RateLimitConfig_Action_HeaderValueMatchValidationError{
+			field:  "Headers",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetHeaders() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitConfig_Action_HeaderValueMatchValidationError{
+					field:  fmt.Sprintf("Headers[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// RateLimitConfig_Action_HeaderValueMatchValidationError is the validation
+// error returned by RateLimitConfig_Action_HeaderValueMatch.Validate if the
+// designated constraints aren't met.
+type RateLimitConfig_Action_HeaderValueMatchValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Action_HeaderValueMatchValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Action_HeaderValueMatchValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Action_HeaderValueMatchValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Action_HeaderValueMatchValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Action_HeaderValueMatchValidationError) ErrorName() string {
+	return "RateLimitConfig_Action_HeaderValueMatchValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Action_HeaderValueMatchValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action_HeaderValueMatch.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Action_HeaderValueMatchValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Action_HeaderValueMatchValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Action_MetaData with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *RateLimitConfig_Action_MetaData) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if utf8.RuneCountInString(m.GetDescriptorKey()) < 1 {
+		return RateLimitConfig_Action_MetaDataValidationError{
+			field:  "DescriptorKey",
+			reason: "value length must be at least 1 runes",
+		}
+	}
+
+	if m.GetMetadataKey() == nil {
+		return RateLimitConfig_Action_MetaDataValidationError{
+			field:  "MetadataKey",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitConfig_Action_MetaDataValidationError{
+				field:  "MetadataKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for DefaultValue
+
+	if _, ok := RateLimitConfig_Action_MetaData_Source_name[int32(m.GetSource())]; !ok {
+		return RateLimitConfig_Action_MetaDataValidationError{
+			field:  "Source",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
+	return nil
+}
+
+// RateLimitConfig_Action_MetaDataValidationError is the validation error
+// returned by RateLimitConfig_Action_MetaData.Validate if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_MetaDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Action_MetaDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Action_MetaDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Action_MetaDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Action_MetaDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Action_MetaDataValidationError) ErrorName() string {
+	return "RateLimitConfig_Action_MetaDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Action_MetaDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Action_MetaData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Action_MetaDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Action_MetaDataValidationError{}
+
+// Validate checks the field values on RateLimitConfig_Override_DynamicMetadata
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *RateLimitConfig_Override_DynamicMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetMetadataKey() == nil {
+		return RateLimitConfig_Override_DynamicMetadataValidationError{
+			field:  "MetadataKey",
+			reason: "value is required",
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitConfig_Override_DynamicMetadataValidationError{
+				field:  "MetadataKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// RateLimitConfig_Override_DynamicMetadataValidationError is the validation
+// error returned by RateLimitConfig_Override_DynamicMetadata.Validate if the
+// designated constraints aren't met.
+type RateLimitConfig_Override_DynamicMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimitConfig_Override_DynamicMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimitConfig_Override_DynamicMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimitConfig_Override_DynamicMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimitConfig_Override_DynamicMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimitConfig_Override_DynamicMetadataValidationError) ErrorName() string {
+	return "RateLimitConfig_Override_DynamicMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimitConfig_Override_DynamicMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimitConfig_Override_DynamicMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimitConfig_Override_DynamicMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimitConfig_Override_DynamicMetadataValidationError{}
