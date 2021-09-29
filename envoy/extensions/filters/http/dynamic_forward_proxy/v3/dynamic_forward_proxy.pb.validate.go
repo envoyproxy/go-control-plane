@@ -58,6 +58,8 @@ func (m *FilterConfig) Validate() error {
 		}
 	}
 
+	// no validation rules for SaveUpstreamAddress
+
 	return nil
 }
 
