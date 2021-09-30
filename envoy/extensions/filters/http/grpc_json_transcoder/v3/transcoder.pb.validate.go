@@ -66,6 +66,8 @@ func (m *GrpcJsonTranscoder) Validate() error {
 		}
 	}
 
+	// no validation rules for QueryParamUnescapePlus
+
 	if v, ok := interface{}(m.GetRequestValidationOptions()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return GrpcJsonTranscoderValidationError{

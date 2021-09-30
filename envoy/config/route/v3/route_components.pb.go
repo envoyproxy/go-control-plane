@@ -1054,6 +1054,14 @@ type RouteMatch struct {
 	// against all the specified query parameters. If the number of specified
 	// query parameters is nonzero, they all must match the *path* header's
 	// query string for a match to occur.
+	//
+	// .. note::
+	//
+	//    If query parameters are used to pass request message fields when
+	//    `grpc_json_transcoder <https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/grpc_json_transcoder_filter>`_
+	//    is used, the transcoded message fields maybe different. The query parameters are
+	//    url encoded, but the message fields are not. For example, if a query
+	//    parameter is "foo%20bar", the message field will be "foo bar".
 	QueryParameters []*QueryParameterMatcher `protobuf:"bytes,7,rep,name=query_parameters,json=queryParameters,proto3" json:"query_parameters,omitempty"`
 	// If specified, only gRPC requests will be matched. The router will check
 	// that the content-type header has a application/grpc or one of the various
