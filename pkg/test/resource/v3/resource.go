@@ -46,7 +46,10 @@ const (
 	// XdsCluster is the cluster name for the control server (used by non-ADS set-up).
 	XdsCluster = "xds_cluster"
 
-	// Ads mode for resources: one aggregated xDS service.
+	// AlsCluster is the clustername for gRPC access log service (ALS)
+	AlsCluster = "als_cluster"
+
+	// Ads mode for resources: one aggregated xDS service
 	Ads = "ads"
 
 	// Xds mode for resources: individual xDS services.
@@ -215,7 +218,7 @@ func buildHttpConnectionManager() *hcm.HttpConnectionManager {
 			GrpcService: &core.GrpcService{
 				TargetSpecifier: &core.GrpcService_EnvoyGrpc_{
 					EnvoyGrpc: &core.GrpcService_EnvoyGrpc{
-						ClusterName: XdsCluster,
+						ClusterName: AlsCluster,
 					},
 				},
 			},

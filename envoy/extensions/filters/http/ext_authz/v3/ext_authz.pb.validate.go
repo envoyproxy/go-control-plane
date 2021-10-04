@@ -509,6 +509,16 @@ func (m *AuthorizationResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetDynamicMetadataFromHeaders()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AuthorizationResponseValidationError{
+				field:  "DynamicMetadataFromHeaders",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

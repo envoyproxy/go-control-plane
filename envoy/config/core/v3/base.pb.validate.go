@@ -984,6 +984,13 @@ func (m *HeaderValueOption) Validate() error {
 		}
 	}
 
+	if _, ok := HeaderValueOption_HeaderAppendAction_name[int32(m.GetAppendAction())]; !ok {
+		return HeaderValueOptionValidationError{
+			field:  "AppendAction",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	return nil
 }
 
