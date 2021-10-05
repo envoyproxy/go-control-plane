@@ -184,6 +184,16 @@ func (m *RateLimitResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetQuota()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitResponseValidationError{
+				field:  "Quota",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -331,6 +341,8 @@ func (m *RateLimitResponse_Quota) Validate() error {
 			reason: "value must be greater than 0",
 		}
 	}
+
+	// no validation rules for Id
 
 	switch m.ExpirationSpecifier.(type) {
 
