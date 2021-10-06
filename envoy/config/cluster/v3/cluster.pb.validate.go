@@ -619,6 +619,18 @@ func (m *Cluster) Validate() error {
 			}
 		}
 
+	case *Cluster_RoundRobinLbConfig_:
+
+		if v, ok := interface{}(m.GetRoundRobinLbConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ClusterValidationError{
+					field:  "RoundRobinLbConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -1350,6 +1362,170 @@ var _ interface {
 	ErrorName() string
 } = Cluster_LbSubsetConfigValidationError{}
 
+// Validate checks the field values on Cluster_SlowStartConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *Cluster_SlowStartConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetSlowStartWindow()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Cluster_SlowStartConfigValidationError{
+				field:  "SlowStartWindow",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetAggression()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Cluster_SlowStartConfigValidationError{
+				field:  "Aggression",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// Cluster_SlowStartConfigValidationError is the validation error returned by
+// Cluster_SlowStartConfig.Validate if the designated constraints aren't met.
+type Cluster_SlowStartConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Cluster_SlowStartConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Cluster_SlowStartConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Cluster_SlowStartConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Cluster_SlowStartConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Cluster_SlowStartConfigValidationError) ErrorName() string {
+	return "Cluster_SlowStartConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Cluster_SlowStartConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCluster_SlowStartConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Cluster_SlowStartConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Cluster_SlowStartConfigValidationError{}
+
+// Validate checks the field values on Cluster_RoundRobinLbConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *Cluster_RoundRobinLbConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetSlowStartConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Cluster_RoundRobinLbConfigValidationError{
+				field:  "SlowStartConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// Cluster_RoundRobinLbConfigValidationError is the validation error returned
+// by Cluster_RoundRobinLbConfig.Validate if the designated constraints aren't met.
+type Cluster_RoundRobinLbConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Cluster_RoundRobinLbConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Cluster_RoundRobinLbConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Cluster_RoundRobinLbConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Cluster_RoundRobinLbConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Cluster_RoundRobinLbConfigValidationError) ErrorName() string {
+	return "Cluster_RoundRobinLbConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Cluster_RoundRobinLbConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCluster_RoundRobinLbConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Cluster_RoundRobinLbConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Cluster_RoundRobinLbConfigValidationError{}
+
 // Validate checks the field values on Cluster_LeastRequestLbConfig with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -1373,6 +1549,16 @@ func (m *Cluster_LeastRequestLbConfig) Validate() error {
 		if err := v.Validate(); err != nil {
 			return Cluster_LeastRequestLbConfigValidationError{
 				field:  "ActiveRequestBias",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetSlowStartConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Cluster_LeastRequestLbConfigValidationError{
+				field:  "SlowStartConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

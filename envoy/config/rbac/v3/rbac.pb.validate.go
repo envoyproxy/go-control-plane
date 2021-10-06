@@ -384,6 +384,18 @@ func (m *Permission) Validate() error {
 			}
 		}
 
+	case *Permission_Matcher:
+
+		if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PermissionValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		return PermissionValidationError{
 			field:  "Rule",
