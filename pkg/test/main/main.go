@@ -49,14 +49,15 @@ var (
 	requests int
 	updates  int
 
-	mode          string
-	clusters      int
-	httpListeners int
-	tcpListeners  int
-	runtimes      int
-	tls           bool
-	mux           bool
-	extensionNum  int
+	mode                string
+	clusters            int
+	httpListeners       int
+	scopedHttpListeners int
+	tcpListeners        int
+	runtimes            int
+	tls                 bool
+	mux                 bool
+	extensionNum        int
 
 	nodeID string
 
@@ -133,6 +134,8 @@ func init() {
 
 	// Test this many HTTP listeners per snapshot
 	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
+	// Test this many scoped HTTP listeners per snapshot
+	flag.IntVar(&scopedHttpListeners, "scopedhttp", 2, "Number of HTTP listeners (and SRDS configs)")
 	// Test this many TCP listeners per snapshot
 	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
 
@@ -193,15 +196,16 @@ func main() {
 
 	// create a test snapshot
 	snapshots := resource.TestSnapshot{
-		Xds:              mode,
-		UpstreamPort:     uint32(upstreamPort),
-		BasePort:         uint32(basePort),
-		NumClusters:      clusters,
-		NumHTTPListeners: httpListeners,
-		NumTCPListeners:  tcpListeners,
-		TLS:              tls,
-		NumRuntimes:      runtimes,
-		NumExtension:     extensionNum,
+		Xds:                    mode,
+		UpstreamPort:           uint32(upstreamPort),
+		BasePort:               uint32(basePort),
+		NumClusters:            clusters,
+		NumHTTPListeners:       httpListeners,
+		NumScopedHTTPListeners: scopedHttpListeners,
+		NumTCPListeners:        tcpListeners,
+		TLS:                    tls,
+		NumRuntimes:            runtimes,
+		NumExtension:           extensionNum,
 	}
 
 	// start the xDS server
@@ -226,7 +230,7 @@ func main() {
 
 		snapshot := snapshots.Generate()
 		if err := snapshot.Consistent(); err != nil {
-			log.Printf("snapshot inconsistency: %+v\n", snapshot)
+			log.Printf("snapshot inconsistency: %+v\n%+v\n", snapshot, err)
 		}
 
 		err := config.SetSnapshot(context.Background(), nodeID, snapshot)
@@ -293,7 +297,7 @@ func main() {
 // callEcho calls upstream echo service on all listener ports and returns an error
 // if any of the listeners returned an error.
 func callEcho() (int, int) {
-	total := httpListeners + tcpListeners
+	total := httpListeners + scopedHttpListeners + tcpListeners
 	ok, failed := 0, 0
 	ch := make(chan error, total)
 

@@ -72,7 +72,8 @@ func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.Res
 // Consistent check verifies that the dependent resources are exactly listed in the
 // snapshot:
 // - all EDS resources are listed by name in CDS resources
-// - all RDS resources are listed by name in LDS resources
+// - all SRDS/RDS resources are listed by name in LDS resources
+// - all RDS resources are listed by name in SRDS resources
 //
 // Note that clusters and listeners are requested without name references, so
 // Envoy will accept the snapshot list of clusters as-is even if it does not match
@@ -81,19 +82,41 @@ func (s *Snapshot) Consistent() error {
 	if s == nil {
 		return errors.New("nil snapshot")
 	}
-	endpoints := GetResourceReferences(s.Resources[types.Cluster].Items)
-	if len(endpoints) != len(s.Resources[types.Endpoint].Items) {
-		return fmt.Errorf("mismatched endpoint reference and resource lengths: %v != %d", endpoints, len(s.Resources[types.Endpoint].Items))
-	}
-	if err := superset(endpoints, s.Resources[types.Endpoint].Items); err != nil {
-		return err
+
+	referencedResources := GetAllResourceReferences(s.Resources)
+
+	// Loop through each referenced resource.
+	referencedResponseTypes := map[types.ResponseType]struct{}{
+		types.Endpoint:    struct{}{},
+		types.ScopedRoute: struct{}{},
+		types.Route:       struct{}{},
 	}
 
-	routes := GetResourceReferences(s.Resources[types.Listener].Items)
-	if len(routes) != len(s.Resources[types.Route].Items) {
-		return fmt.Errorf("mismatched route reference and resource lengths: %v != %d", routes, len(s.Resources[types.Route].Items))
+	for idx, items := range s.Resources {
+
+		// We only want to check resource types that are expected to be referenced by another resource type.
+		// Basically, if the consistency relationship is modeled as a DAG, we only want
+		// to check nodes that are expected to have edges pointing to it.
+		responseType := types.ResponseType(idx)
+		if _, ok := referencedResponseTypes[responseType]; ok {
+			typeURL, err := GetResponseTypeURL(responseType)
+			if err != nil {
+				return err
+			}
+			referenceSet := referencedResources[typeURL]
+
+			if len(referenceSet) != len(items.Items) {
+				return fmt.Errorf("mismatched reference and resource lengths: len(%v) != %d", referenceSet, len(items.Items))
+			}
+
+			// Check superset.
+			if err := superset(referenceSet, items.Items); err != nil {
+				return err
+			}
+		}
 	}
-	return superset(routes, s.Resources[types.Route].Items)
+
+	return nil
 }
 
 // GetResources selects snapshot resources by type, returning the map of resources.

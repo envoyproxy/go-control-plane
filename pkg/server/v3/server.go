@@ -44,6 +44,7 @@ type Server interface {
 	endpointservice.EndpointDiscoveryServiceServer
 	clusterservice.ClusterDiscoveryServiceServer
 	routeservice.RouteDiscoveryServiceServer
+	routeservice.ScopedRoutesDiscoveryServiceServer
 	listenerservice.ListenerDiscoveryServiceServer
 	discoverygrpc.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
@@ -197,6 +198,10 @@ func (s *server) StreamRoutes(stream routeservice.RouteDiscoveryService_StreamRo
 	return s.StreamHandler(stream, resource.RouteType)
 }
 
+func (s *server) StreamScopedRoutes(stream routeservice.ScopedRoutesDiscoveryService_StreamScopedRoutesServer) error {
+	return s.StreamHandler(stream, resource.ScopedRouteType)
+}
+
 func (s *server) StreamListeners(stream listenerservice.ListenerDiscoveryService_StreamListenersServer) error {
 	return s.StreamHandler(stream, resource.ListenerType)
 }
@@ -239,6 +244,14 @@ func (s *server) FetchRoutes(ctx context.Context, req *discovery.DiscoveryReques
 		return nil, status.Errorf(codes.Unavailable, "empty request")
 	}
 	req.TypeUrl = resource.RouteType
+	return s.Fetch(ctx, req)
+}
+
+func (s *server) FetchScopedRoutes(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
+	if req == nil {
+		return nil, status.Errorf(codes.Unavailable, "empty request")
+	}
+	req.TypeUrl = resource.ScopedRouteType
 	return s.Fetch(ctx, req)
 }
 
@@ -292,6 +305,10 @@ func (s *server) DeltaClusters(stream clusterservice.ClusterDiscoveryService_Del
 
 func (s *server) DeltaRoutes(stream routeservice.RouteDiscoveryService_DeltaRoutesServer) error {
 	return s.DeltaStreamHandler(stream, resource.RouteType)
+}
+
+func (s *server) DeltaScopedRoutes(stream routeservice.ScopedRoutesDiscoveryService_DeltaScopedRoutesServer) error {
+	return s.DeltaStreamHandler(stream, resource.ScopedRouteType)
 }
 
 func (s *server) DeltaListeners(stream listenerservice.ListenerDiscoveryService_DeltaListenersServer) error {

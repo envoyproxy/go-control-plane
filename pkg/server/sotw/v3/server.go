@@ -75,6 +75,7 @@ type watches struct {
 	endpoints        chan cache.Response
 	clusters         chan cache.Response
 	routes           chan cache.Response
+	scopedRoutes     chan cache.Response
 	listeners        chan cache.Response
 	secrets          chan cache.Response
 	runtimes         chan cache.Response
@@ -83,6 +84,7 @@ type watches struct {
 	endpointCancel        func()
 	clusterCancel         func()
 	routeCancel           func()
+	scopedRouteCancel     func()
 	listenerCancel        func()
 	secretCancel          func()
 	runtimeCancel         func()
@@ -91,6 +93,7 @@ type watches struct {
 	endpointNonce        string
 	clusterNonce         string
 	routeNonce           string
+	scopedRouteNonce     string
 	listenerNonce        string
 	secretNonce          string
 	runtimeNonce         string
@@ -123,6 +126,9 @@ func (values *watches) Cancel() {
 	}
 	if values.routeCancel != nil {
 		values.routeCancel()
+	}
+	if values.scopedRouteCancel != nil {
+		values.scopedRouteCancel()
 	}
 	if values.listenerCancel != nil {
 		values.listenerCancel()
@@ -225,6 +231,16 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 				return err
 			}
 			values.routeNonce = nonce
+
+		case resp, more := <-values.scopedRoutes:
+			if !more {
+				return status.Errorf(codes.Unavailable, "scopedRoutes watch failed")
+			}
+			nonce, err := send(resp)
+			if err != nil {
+				return err
+			}
+			values.scopedRouteNonce = nonce
 
 		case resp, more := <-values.listeners:
 			if !more {
@@ -338,6 +354,14 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 					}
 					values.routes = make(chan cache.Response, 1)
 					values.routeCancel = s.cache.CreateWatch(req, values.routes)
+				}
+			case req.TypeUrl == resource.ScopedRouteType:
+				if values.scopedRouteNonce == "" || values.scopedRouteNonce == nonce {
+					if values.scopedRouteCancel != nil {
+						values.scopedRouteCancel()
+					}
+					values.scopedRoutes = make(chan cache.Response, 1)
+					values.scopedRouteCancel = s.cache.CreateWatch(req, values.scopedRoutes)
 				}
 			case req.TypeUrl == resource.ListenerType:
 				if values.listenerNonce == "" || values.listenerNonce == nonce {

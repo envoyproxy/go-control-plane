@@ -140,7 +140,9 @@ func makeMockStream(t *testing.T) *mockStream {
 const (
 	clusterName         = "cluster0"
 	routeName           = "route0"
+	scopedRouteName     = "scopedRoute0"
 	listenerName        = "listener0"
+	scopedListenerName  = "scopedListener0"
 	secretName          = "secret0"
 	runtimeName         = "runtime0"
 	extensionConfigName = "extensionConfig0"
@@ -151,19 +153,22 @@ var (
 		Id:      "test-id",
 		Cluster: "test-cluster",
 	}
-	endpoint        = resource.MakeEndpoint(clusterName, 8080)
-	cluster         = resource.MakeCluster(resource.Ads, clusterName)
-	route           = resource.MakeRoute(routeName, clusterName)
-	listener        = resource.MakeHTTPListener(resource.Ads, listenerName, 80, routeName)
-	secret          = resource.MakeSecrets(secretName, "test")[0]
-	runtime         = resource.MakeRuntime(runtimeName)
-	extensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
-	opaque          = &core.Address{}
-	opaqueType      = "unknown-type"
-	testTypes       = []string{
+	endpoint           = resource.MakeEndpoint(clusterName, 8080)
+	cluster            = resource.MakeCluster(resource.Ads, clusterName)
+	route              = resource.MakeRoute(routeName, clusterName)
+	scopedRoute        = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"127.0.0.1"})
+	httpListener       = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
+	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80, scopedRouteName)
+	secret             = resource.MakeSecrets(secretName, "test")[0]
+	runtime            = resource.MakeRuntime(runtimeName)
+	extensionConfig    = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
+	opaque             = &core.Address{}
+	opaqueType         = "unknown-type"
+	testTypes          = []string{
 		rsrc.EndpointType,
 		rsrc.ClusterType,
 		rsrc.RouteType,
+		rsrc.ScopedRouteType,
 		rsrc.ListenerType,
 		rsrc.SecretType,
 		rsrc.RuntimeType,
@@ -195,30 +200,37 @@ func makeResponses() map[string][]cache.Response {
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
 			},
 		},
-		rsrc.ListenerType: {
+		rsrc.ScopedRouteType: {
 			&cache.RawResponse{
 				Version:   "4",
-				Resources: []types.ResourceWithTTL{{Resource: listener}},
+				Resources: []types.ResourceWithTTL{{Resource: scopedRoute}},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ScopedRouteType},
+			},
+		},
+		rsrc.ListenerType: {
+			&cache.RawResponse{
+				Version:   "5",
+				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 			},
 		},
 		rsrc.SecretType: {
 			&cache.RawResponse{
-				Version:   "5",
+				Version:   "6",
 				Resources: []types.ResourceWithTTL{{Resource: secret}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
 			},
 		},
 		rsrc.RuntimeType: {
 			&cache.RawResponse{
-				Version:   "6",
+				Version:   "7",
 				Resources: []types.ResourceWithTTL{{Resource: runtime}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
 		rsrc.ExtensionConfigType: {
 			&cache.RawResponse{
-				Version:   "7",
+				Version:   "8",
 				Resources: []types.ResourceWithTTL{{Resource: extensionConfig}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
 			},
@@ -226,7 +238,7 @@ func makeResponses() map[string][]cache.Response {
 		// Pass-through type (xDS does not exist for this type)
 		opaqueType: {
 			&cache.RawResponse{
-				Version:   "8",
+				Version:   "9",
 				Resources: []types.ResourceWithTTL{{Resource: opaque}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
 			},
@@ -255,6 +267,8 @@ func TestServerShutdown(t *testing.T) {
 					err = s.StreamClusters(resp)
 				case rsrc.RouteType:
 					err = s.StreamRoutes(resp)
+				case rsrc.ScopedRouteType:
+					err = s.StreamScopedRoutes(resp)
 				case rsrc.ListenerType:
 					err = s.StreamListeners(resp)
 				case rsrc.SecretType:
@@ -304,6 +318,8 @@ func TestResponseHandlers(t *testing.T) {
 					err = s.StreamClusters(resp)
 				case rsrc.RouteType:
 					err = s.StreamRoutes(resp)
+				case rsrc.ScopedRouteType:
+					err = s.StreamScopedRoutes(resp)
 				case rsrc.ListenerType:
 					err = s.StreamListeners(resp)
 				case rsrc.SecretType:
@@ -371,6 +387,9 @@ func TestFetch(t *testing.T) {
 	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for routes: %v", err)
 	}
+	if out, err := s.FetchScopedRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for scopedRoutes: %v", err)
+	}
 	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
 		t.Errorf("unexpected empty or error for listeners: %v", err)
 	}
@@ -394,6 +413,9 @@ func TestFetch(t *testing.T) {
 	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
 		t.Errorf("expected empty or error for routes: %v", err)
 	}
+	if out, err := s.FetchScopedRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		t.Errorf("expected empty or error for routes: %v", err)
+	}
 	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
 		t.Errorf("expected empty or error for listeners: %v", err)
 	}
@@ -406,6 +428,9 @@ func TestFetch(t *testing.T) {
 		t.Errorf("expected empty on empty request: %v", err)
 	}
 	if out, err := s.FetchRoutes(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchScopedRoutes(context.Background(), nil); out != nil {
 		t.Errorf("expected empty on empty request: %v", err)
 	}
 	if out, err := s.FetchListeners(context.Background(), nil); out != nil {
@@ -432,15 +457,18 @@ func TestFetch(t *testing.T) {
 	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
 		t.Errorf("expected empty or error due to callback error")
 	}
+	if out, err := s.FetchScopedRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
 	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
 		t.Errorf("expected empty or error due to callback error")
 	}
 
 	// verify fetch callbacks
-	if want := 11; requestCount != want {
+	if want := 13; requestCount != want {
 		t.Errorf("unexpected number of fetch requests: got %d, want %d", requestCount, want)
 	}
-	if want := 7; responseCount != want {
+	if want := 8; responseCount != want {
 		t.Errorf("unexpected number of fetch responses: got %d, want %d", responseCount, want)
 	}
 }
@@ -538,6 +566,10 @@ func TestAggregatedHandlers(t *testing.T) {
 		TypeUrl:       rsrc.RouteType,
 		ResourceNames: []string{routeName},
 	}
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.ScopedRouteType,
+		ResourceNames: []string{scopedRouteName},
+	}
 
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	go func() {
@@ -551,13 +583,14 @@ func TestAggregatedHandlers(t *testing.T) {
 		select {
 		case <-resp.sent:
 			count++
-			if count >= 4 {
+			if count >= 5 {
 				close(resp.recv)
 				if want := map[string]int{
-					rsrc.EndpointType: 1,
-					rsrc.ClusterType:  1,
-					rsrc.RouteType:    1,
-					rsrc.ListenerType: 1,
+					rsrc.EndpointType:    1,
+					rsrc.ClusterType:     1,
+					rsrc.RouteType:       1,
+					rsrc.ScopedRouteType: 1,
+					rsrc.ListenerType:    1,
 				}; !reflect.DeepEqual(want, config.counts) {
 					t.Errorf("watch counts => got %v, want %v", config.counts, want)
 				}
