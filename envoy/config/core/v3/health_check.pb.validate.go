@@ -618,6 +618,21 @@ func (m *HealthCheck_HttpHealthCheck) Validate() error {
 
 	}
 
+	for idx, item := range m.GetRetriableStatuses() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HealthCheck_HttpHealthCheckValidationError{
+					field:  fmt.Sprintf("RetriableStatuses[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if _, ok := v3.CodecClientType_name[int32(m.GetCodecClientType())]; !ok {
 		return HealthCheck_HttpHealthCheckValidationError{
 			field:  "CodecClientType",
