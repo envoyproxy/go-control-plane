@@ -86,6 +86,16 @@ func (m *VirtualHost) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VirtualHostValidationError{
+				field:  "Matcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if _, ok := VirtualHost_TlsRequirementType_name[int32(m.GetRequireTls())]; !ok {
 		return VirtualHostValidationError{
 			field:  "RequireTls",
