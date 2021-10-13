@@ -94,13 +94,12 @@ func RunManagementServer(ctx context.Context, srv server.Server, port uint) {
 }
 
 // RunManagementGateway starts an HTTP gateway to an xDS server.
-func RunManagementGateway(ctx context.Context, srv server.Server, port uint, lg gcplogger.Logger) {
+func RunManagementGateway(ctx context.Context, srv server.Server, port uint) {
 	log.Printf("gateway listening HTTP/1.1 on %d\n", port)
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: &HTTPGateway{
-			Gateway: server.HTTPGateway{Log: lg, Server: srv},
-			Log:     lg,
+			Gateway: server.HTTPGateway{Server: srv},
 		},
 	}
 	go func() {

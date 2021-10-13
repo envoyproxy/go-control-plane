@@ -173,7 +173,8 @@ func main() {
 	cb := &testv3.Callbacks{Signal: signal, Debug: debug}
 
 	// mux integration
-	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, logger{})
+	// nil for logger uses default logger
+	config := cache.NewSnapshotCache(mode == resource.Ads, cache.IDHash{}, nil)
 	var configCache cache.Cache = config
 	typeURL := "type.googleapis.com/envoy.config.endpoint.v3.ClusterLoadAssignment"
 	eds := cache.NewLinearCache(typeURL)
@@ -211,7 +212,7 @@ func main() {
 	// start the xDS server
 	go test.RunAccessLogServer(ctx, als, alsPort)
 	go test.RunManagementServer(ctx, srv, port)
-	go test.RunManagementGateway(ctx, srv, gatewayPort, logger{})
+	go test.RunManagementGateway(ctx, srv, gatewayPort)
 
 	log.Println("waiting for the first request...")
 	select {
@@ -348,26 +349,4 @@ func callEcho() (int, int) {
 			return ok, failed
 		}
 	}
-}
-
-type logger struct{}
-
-func (logger logger) Debugf(format string, args ...interface{}) {
-	if debug {
-		log.Printf(format+"\n", args...)
-	}
-}
-
-func (logger logger) Infof(format string, args ...interface{}) {
-	if debug {
-		log.Printf(format+"\n", args...)
-	}
-}
-
-func (logger logger) Warnf(format string, args ...interface{}) {
-	log.Printf(format+"\n", args...)
-}
-
-func (logger logger) Errorf(format string, args ...interface{}) {
-	log.Printf(format+"\n", args...)
 }
