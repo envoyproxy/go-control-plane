@@ -941,13 +941,6 @@ func (m *ScopedRoutes) Validate() error {
 		}
 	}
 
-	if m.GetRdsConfigSource() == nil {
-		return ScopedRoutesValidationError{
-			field:  "RdsConfigSource",
-			reason: "value is required",
-		}
-	}
-
 	if v, ok := interface{}(m.GetRdsConfigSource()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ScopedRoutesValidationError{

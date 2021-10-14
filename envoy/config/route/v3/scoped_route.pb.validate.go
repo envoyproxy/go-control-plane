@@ -50,10 +50,15 @@ func (m *ScopedRouteConfiguration) Validate() error {
 		}
 	}
 
-	if utf8.RuneCountInString(m.GetRouteConfigurationName()) < 1 {
-		return ScopedRouteConfigurationValidationError{
-			field:  "RouteConfigurationName",
-			reason: "value length must be at least 1 runes",
+	// no validation rules for RouteConfigurationName
+
+	if v, ok := interface{}(m.GetRouteConfiguration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ScopedRouteConfigurationValidationError{
+				field:  "RouteConfiguration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
 		}
 	}
 
