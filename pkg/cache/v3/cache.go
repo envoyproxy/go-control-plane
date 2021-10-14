@@ -48,7 +48,6 @@ type ConfigWatcher interface {
 	// An individual consumer normally issues a single open watch by each type URL.
 	//
 	// The provided channel produces requested resources as responses, once they are available.
-	// The provided map contains resources already known to the caller
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
