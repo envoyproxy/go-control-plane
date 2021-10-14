@@ -133,12 +133,12 @@ func TestMultipleListenersWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 }
 
 func TestSnapshotGetters(t *testing.T) {
-	var nilsnap *cache.Snapshot
+	nilsnap, _ := cache.NewSnapshot("", nil)
 	if out := nilsnap.GetResources(rsrc.EndpointType); out != nil {
 		t.Errorf("got non-empty resources for nil snapshot: %#v", out)
 	}
-	if out := nilsnap.Consistent(); out == nil {
-		t.Errorf("nil snapshot should be inconsistent")
+	if err := nilsnap.Consistent(); err != nil {
+		t.Errorf("nil snapshot should be consistent")
 	}
 	if out := nilsnap.GetVersion(rsrc.EndpointType); out != "" {
 		t.Errorf("got non-empty version for nil snapshot: %#v", out)
@@ -155,8 +155,10 @@ func TestNewSnapshotBadType(t *testing.T) {
 	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		"random.type": nil,
 	})
-
 	// Should receive an error from an unknown type
 	assert.Error(t, err)
-	assert.Equal(t, cache.Snapshot{}, snap)
+
+	nilSnap, err := cache.NewSnapshot("", nil)
+	assert.NoError(t, err)
+	assert.Equal(t, nilSnap, snap)
 }

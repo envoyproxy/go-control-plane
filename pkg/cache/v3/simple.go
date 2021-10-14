@@ -215,9 +215,8 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 			}
 		}
 
-		// We only calculate version hashes when using delta. We don't
-		// want to do this when using SOTW so we can avoid unnecessary
-		// computational cost if not using delta.
+		// We only calculate version hashes when using delta. Theres no need
+		// to do this when using SOTW so we can avoid unnecessary computational cost.
 		if len(info.deltaWatches) > 0 {
 			err := snapshot.ConstructVersionMap()
 			if err != nil {
@@ -229,7 +228,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 		for id, watch := range info.deltaWatches {
 			res, err := cache.respondDelta(
 				ctx,
-				&snapshot,
+				snapshot,
 				watch.Request,
 				watch.Response,
 				watch.StreamState,
@@ -237,6 +236,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 			if err != nil {
 				return err
 			}
+
 			// If we detect a nil response here, that means there has been no state change
 			// so we don't want to respond or remove any existing resource watches
 			if res != nil {
@@ -255,7 +255,7 @@ func (cache *snapshotCache) GetSnapshot(node string) (Snapshot, error) {
 
 	snap, ok := cache.snapshots[node]
 	if !ok {
-		return Snapshot{}, fmt.Errorf("no snapshot found for node %s", node)
+		return nil, fmt.Errorf("no snapshot found for node %s", node)
 	}
 	return snap, nil
 }
@@ -306,8 +306,12 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) f
 	info.lastWatchRequestTime = time.Now()
 	info.mu.Unlock()
 
+	// TODO: what happens if a snapshot doesn't exist?
 	snapshot, exists := cache.snapshots[nodeID]
-	version := snapshot.GetVersion(request.TypeUrl)
+	version := ""
+	if exists {
+		version = snapshot.GetVersion(request.TypeUrl)
+	}
 
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	if !exists || request.VersionInfo == version {
@@ -322,7 +326,10 @@ func (cache *snapshotCache) CreateWatch(request *Request, value chan Response) f
 
 	// otherwise, the watch may be responded immediately
 	resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
-	_ = cache.respond(context.Background(), request, value, resources, version, false)
+	err := cache.respond(context.Background(), request, value, resources, version, false)
+	if err != nil {
+		cache.log.Errorf("failed to respond to watch %d for %s%v from nodeID %q, version %q: %v")
+	}
 
 	return nil
 }
@@ -414,28 +421,32 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
+	systemVersion := ""
+	if exists {
+		systemVersion = snapshot.GetVersion(t)
+	}
 
-	// There are three different cases that leads to a delayed watch trigger:
+	// There are three different cases that lead to a delayed watch trigger:
 	// - no snapshot exists for the requested nodeID
 	// - a snapshot exists, but we failed to initialize its version map
 	// - we attempted to issue a response, but the caller is already up to date
-	delayedResponse := !exists
+	trigger := !exists
 	if exists {
 		err := snapshot.ConstructVersionMap()
 		if err != nil {
 			cache.log.Errorf("failed to compute version for snapshot resources inline, waiting for next snapshot update")
 		}
-		response, err := cache.respondDelta(context.Background(), &snapshot, request, value, state)
+		response, err := cache.respondDelta(context.Background(), snapshot, request, value, state)
 		if err != nil {
 			cache.log.Errorf("failed to respond with delta response, waiting for next snapshot update: %s", err)
 		}
 
-		delayedResponse = response == nil
+		trigger = response == nil
 	}
 
-	if delayedResponse {
+	if trigger {
 		watchID := cache.nextDeltaWatchID()
-		cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID, t, state.GetResourceVersions(), nodeID, snapshot.GetVersion(t))
+		cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID, t, state.GetResourceVersions(), nodeID, systemVersion)
 		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})
 
 		return cache.cancelDeltaWatch(nodeID, watchID)
@@ -445,7 +456,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 }
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
-func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot *Snapshot, request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) (*RawDeltaResponse, error) {
+func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot Snapshot, request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) (*RawDeltaResponse, error) {
 	resp := createDeltaResponse(ctx, request, state, resourceContainer{
 		resourceMap:   snapshot.GetResources(request.TypeUrl),
 		versionMap:    snapshot.GetVersionMap(request.TypeUrl),

@@ -35,8 +35,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 	toRemove := make([]string, 0)
 
 	// If we are handling a wildcard request, we want to respond with all resources
-	switch {
-	case state.IsWildcard():
+	if state.IsWildcard() {
 		for name, r := range resources.resourceMap {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
@@ -47,7 +46,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 				filtered = append(filtered, r)
 			}
 		}
-	default:
+	} else {
 		// Reply only with the requested resources
 		for name, prevVersion := range state.GetResourceVersions() {
 			if r, ok := resources.resourceMap[name]; ok {

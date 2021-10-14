@@ -17,15 +17,49 @@ package cache
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
 // Snapshot is an internally consistent snapshot of xDS resources.
+type Snapshot interface {
+	// GetVersion returns the current version of the resources indicated
+	// by typeURL. The version string that is returned is opaque and should
+	// only be compared for equality. This should strictly be used for SOTW and
+	// is not a valid version identifier for Delta xDS (see ConstructVersionMap).
+	GetVersion(typeURL string) string
+
+	// GetResourcesAndTTL returns all resources of the type indicted by
+	// typeURL, together with their TTL.
+	GetResourcesAndTTL(typeURL string) map[string]types.ResourceWithTTL
+
+	// GetResources returns all resources of the type indicted by
+	// typeURL. This is identical to GetResourcesAndTTL, except that
+	// the TTL is omitted.
+	GetResources(typeURL string) map[string]types.Resource
+
+	// SetResourcesByType sets a grouping of cache resources at the specificed
+	// resource type in a Snapshot.
+	SetResourcesByType(typeURL string, resources Resources) error
+
+	// ConstructVersionMap constructs an internal opaque version string for each resource in a collection.
+	// If this is not done correctly the cache system won't be able to properly diff resources when using Delta xDSs.
+	ConstructVersionMap() error
+
+	// GetVersionMap returns a map of resource name to resource version for
+	// all the resources of type indicated by typeURL.
+	GetVersionMap(typeURL string) map[string]string
+
+	// Consistent checks that the snapshot is internally consistent.and all references resources are listed.
+	Consistent() error
+}
+
+// Snapshot is an internally consistent snapshot of xDS resources.
 // Consistency is important for the convergence as different resource types
 // from the snapshot may be delivered to the proxy in arbitrary order.
-type Snapshot struct {
+type snapshot struct {
 	Resources [types.UnknownType]Resources
 
 	// VersionMap holds the current hash map of all resources in the snapshot.
@@ -33,12 +67,20 @@ type Snapshot struct {
 	// instantiated by calling ConstructVersionMap().
 	// VersionMap is only to be used with delta xDS.
 	VersionMap map[string]map[string]string
+
+	// Lock for multi-thread processing
+	mu sync.RWMutex
 }
 
 // NewSnapshot creates a snapshot from response types and a version.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
 func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (Snapshot, error) {
-	out := Snapshot{}
+	out := &snapshot{}
+
+	// Return a nil snapshot if there are no provided resources.
+	if resources == nil {
+		return out, nil
+	}
 
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
@@ -55,7 +97,12 @@ func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (
 // NewSnapshotWithTTLs creates a snapshot of ResourceWithTTLs.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
 func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.ResourceWithTTL) (Snapshot, error) {
-	out := Snapshot{}
+	out := &snapshot{}
+
+	// Return a nil snapshot if there are no provided resources.
+	if resources == nil {
+		return out, nil
+	}
 
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
@@ -74,22 +121,25 @@ func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.Res
 // - all EDS resources are listed by name in CDS resources
 // - all SRDS/RDS resources are listed by name in LDS resources
 // - all RDS resources are listed by name in SRDS resources
+// - empty resource lists are considered consistent since there are no references
 //
 // Note that clusters and listeners are requested without name references, so
 // Envoy will accept the snapshot list of clusters as-is even if it does not match
 // all references found in xDS.
-func (s *Snapshot) Consistent() error {
+func (s *snapshot) Consistent() error {
 	if s == nil {
 		return errors.New("nil snapshot")
 	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	referencedResources := GetAllResourceReferences(s.Resources)
 
 	// Loop through each referenced resource.
 	referencedResponseTypes := map[types.ResponseType]struct{}{
-		types.Endpoint:    struct{}{},
-		types.ScopedRoute: struct{}{},
-		types.Route:       struct{}{},
+		types.Endpoint:    {},
+		types.ScopedRoute: {},
+		types.Route:       {},
 	}
 
 	for idx, items := range s.Resources {
@@ -120,7 +170,13 @@ func (s *Snapshot) Consistent() error {
 }
 
 // GetResources selects snapshot resources by type, returning the map of resources.
-func (s *Snapshot) GetResources(typeURL resource.Type) map[string]types.Resource {
+func (s *snapshot) GetResources(typeURL resource.Type) map[string]types.Resource {
+	if s == nil {
+		return nil
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	resources := s.GetResourcesAndTTL(typeURL)
 	if resources == nil {
 		return nil
@@ -136,10 +192,13 @@ func (s *Snapshot) GetResources(typeURL resource.Type) map[string]types.Resource
 }
 
 // GetResourcesAndTTL selects snapshot resources by type, returning the map of resources and the associated TTL.
-func (s *Snapshot) GetResourcesAndTTL(typeURL resource.Type) map[string]types.ResourceWithTTL {
+func (s *snapshot) GetResourcesAndTTL(typeURL resource.Type) map[string]types.ResourceWithTTL {
 	if s == nil {
 		return nil
 	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	typ := GetResponseType(typeURL)
 	if typ == types.UnknownType {
 		return nil
@@ -147,11 +206,26 @@ func (s *Snapshot) GetResourcesAndTTL(typeURL resource.Type) map[string]types.Re
 	return s.Resources[typ].Items
 }
 
+// SetResourcesByType sets a grouping of cache resources at the specificed typeURL in a snapshot.
+func (s *snapshot) SetResourcesByType(typeURL resource.Type, resources Resources) error {
+	if s == nil {
+		return errors.New("snapshot can not be nil")
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.Resources[GetResponseType(typeURL)] = resources
+	return nil
+}
+
 // GetVersion returns the version for a resource type.
-func (s *Snapshot) GetVersion(typeURL resource.Type) string {
+func (s *snapshot) GetVersion(typeURL resource.Type) string {
 	if s == nil {
 		return ""
 	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	typ := GetResponseType(typeURL)
 	if typ == types.UnknownType {
 		return ""
@@ -160,20 +234,29 @@ func (s *Snapshot) GetVersion(typeURL resource.Type) string {
 }
 
 // GetVersionMap will return the internal version map of the currently applied snapshot.
-func (s *Snapshot) GetVersionMap(typeUrl string) map[string]string {
-	return s.VersionMap[typeUrl]
+func (s *snapshot) GetVersionMap(typeURL string) map[string]string {
+	if s == nil {
+		return nil
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.VersionMap[typeURL]
 }
 
 // ConstructVersionMap will construct a version map based on the current state of a snapshot
-func (s *Snapshot) ConstructVersionMap() error {
+func (s *snapshot) ConstructVersionMap() error {
 	if s == nil {
 		return fmt.Errorf("missing snapshot")
 	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
+	// TODO: why was this ever in here? It doesn't make sense
 	// The snapshot resources never change, so no need to ever rebuild.
-	if s.VersionMap != nil {
-		return nil
-	}
+	// if s.VersionMap != nil {
+	// 	return nil
+	// }
 
 	s.VersionMap = make(map[string]map[string]string)
 

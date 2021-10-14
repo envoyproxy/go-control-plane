@@ -132,9 +132,9 @@ func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[r
 
 	// We only check resources that we expect to have references to other resources.
 	responseTypesWithReferences := map[types.ResponseType]struct{}{
-		types.Cluster:     struct{}{},
-		types.Listener:    struct{}{},
-		types.ScopedRoute: struct{}{},
+		types.Cluster:     {},
+		types.Listener:    {},
+		types.ScopedRoute: {},
 	}
 
 	for responseType, resourceGroup := range resourceGroups {

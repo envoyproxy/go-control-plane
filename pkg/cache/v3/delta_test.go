@@ -73,10 +73,11 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 
 	// set partially-versioned snapshot
 	snapshot2 := snapshot
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2.SetResourcesByType(rsrc.EndpointType, cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)}))
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
+
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
 		t.Errorf("watches should be preserved for all but one, got: %d open watches instead of the expected %d open watches", count, len(testTypes)-1)
 	}
@@ -150,7 +151,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 	// set a partially versioned snapshot with no endpoints
 	snapshot2 := snapshot
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{})
+	snapshot2.SetResourcesByType(rsrc.EndpointType, cache.NewResources(version2, []types.Resource{}))
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -186,7 +187,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+					snap.SetResourcesByType(rsrc.EndpointType, cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))}))
 					if err := c.SetSnapshot(context.Background(), key, snap); err != nil {
 						t.Fatalf("snapshot failed: %s", err)
 					}
