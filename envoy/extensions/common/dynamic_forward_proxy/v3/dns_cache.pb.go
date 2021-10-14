@@ -106,16 +106,12 @@ type DnsCacheConfig struct {
 	// address and return the one that wins. This same method could potentially also be used for
 	// QUIC to TCP fall back.]
 	DnsLookupFamily v3.Cluster_DnsLookupFamily `protobuf:"varint,2,opt,name=dns_lookup_family,json=dnsLookupFamily,proto3,enum=envoy.config.cluster.v3.Cluster_DnsLookupFamily" json:"dns_lookup_family,omitempty"`
-	// The DNS refresh rate for currently cached DNS hosts. If not specified defaults to 60s.
-	//
-	// .. note:
-	//
-	//  The returned DNS TTL is not currently used to alter the refresh rate. This feature will be
-	//  added in a future change.
-	//
-	// .. note:
+	// The DNS refresh rate for unresolved DNS hosts. If not specified defaults to 60s.
 	//
 	// The refresh rate is rounded to the closest millisecond, and must be at least 1ms.
+	//
+	// Once a host has been resolved, the refresh rate will be the DNS TTL, capped
+	// at a minimum of 5s.
 	DnsRefreshRate *duration.Duration `protobuf:"bytes,3,opt,name=dns_refresh_rate,json=dnsRefreshRate,proto3" json:"dns_refresh_rate,omitempty"`
 	// The TTL for hosts that are unused. Hosts that have not been used in the configured time
 	// interval will be purged. If not specified defaults to 5m.
