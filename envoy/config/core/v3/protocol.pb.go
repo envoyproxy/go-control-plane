@@ -400,11 +400,10 @@ type HttpProtocolOptions struct {
 	IdleTimeout *duration.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// The maximum duration of a connection. The duration is defined as a period since a connection
 	// was established. If not set, there is no max duration. When max_connection_duration is reached
-	// and if there are no active streams, the connection will be closed. If there are any active streams,
-	// the drain sequence will kick-in, and the connection will be force-closed after the drain period.
-	// See :ref:`drain_timeout
+	// and if there are no active streams, the connection will be closed. If the connection is a
+	// downstream connection and there are any active streams, the drain sequence will kick-in,
+	// and the connection will be force-closed after the drain period. See :ref:`drain_timeout
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
-	// Note: This feature is not yet implemented for the upstream connections.
 	MaxConnectionDuration *duration.Duration `protobuf:"bytes,3,opt,name=max_connection_duration,json=maxConnectionDuration,proto3" json:"max_connection_duration,omitempty"`
 	// The maximum number of headers. If unconfigured, the default
 	// maximum number of request headers allowed is 100. Requests that exceed this limit will receive
