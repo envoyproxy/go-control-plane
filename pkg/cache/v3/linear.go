@@ -250,7 +250,14 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 func (cache *LinearCache) GetResources() map[string]types.Resource {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
-	return cache.resources
+
+	// create a copy of our internal storage to avoid data races
+	// involving mutations of our backing map
+	resources := make(map[string]types.Resource, len(cache.resources))
+	for k, v := range cache.resources {
+		resources[k] = v
+	}
+	return resources
 }
 
 func (cache *LinearCache) CreateWatch(request *Request, value chan Response) func() {
