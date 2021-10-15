@@ -140,6 +140,17 @@ func (m *QuicProtocolOptions) Validate() error {
 
 	}
 
+	if wrapper := m.GetNumTimeoutsToTriggerPortMigration(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 0 || val > 1 {
+			return QuicProtocolOptionsValidationError{
+				field:  "NumTimeoutsToTriggerPortMigration",
+				reason: "value must be inside range [0, 1]",
+			}
+		}
+
+	}
+
 	return nil
 }
 
