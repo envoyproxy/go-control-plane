@@ -281,6 +281,16 @@ func (m *DnsFilterConfig_ClientContextConfig) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTypedDnsResolverConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DnsFilterConfig_ClientContextConfigValidationError{
+				field:  "TypedDnsResolverConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if m.GetMaxPendingLookups() < 1 {
 		return DnsFilterConfig_ClientContextConfigValidationError{
 			field:  "MaxPendingLookups",
