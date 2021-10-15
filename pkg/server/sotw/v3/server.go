@@ -18,6 +18,7 @@ package sotw
 import (
 	"context"
 	"errors"
+	"reflect"
 	"strconv"
 	"sync/atomic"
 
@@ -62,11 +63,17 @@ type server struct {
 	streamCount int64
 }
 
-// Token response value used to signal a watch failure in muxed watches.
-var errorResponse = &cache.RawResponse{}
+// Discovery response that is sent over GRPC stream
+// We need to record what resource names are already sent to a client
+// So if the client requests a new name we can respond back
+// regardless current snapshot version (even if it is not changed yet)
+type lastDiscoveryResponse struct {
+	nonce     string
+	resources map[string]struct{}
+}
 
 // process handles a bi-di stream request
-func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
@@ -74,7 +81,7 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
 
-	streamState := streamv3.NewStreamState(false, map[string]string{})
+	streamState := stream.NewStreamState(false, map[string]string{})
 	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
 
 	// a collection of stack allocated watches per request type
@@ -114,11 +121,19 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 		if s.callbacks != nil {
 			s.callbacks.OnStreamResponse(resp.GetContext(), streamID, resp.GetRequest(), out)
 		}
-		return out.Nonce, stream.Send(out)
+		return out.Nonce, str.Send(out)
+	}
+
+	open := func(w *watch, req *discovery.DiscoveryRequest, responder chan cache.Response) {
+		w.cancel = s.cache.CreateWatch(req, streamState, responder)
+		watches.cases[w.index] = reflect.SelectCase{
+			Dir:  reflect.SelectRecv,
+			Chan: reflect.ValueOf(responder),
+		}
 	}
 
 	if s.callbacks != nil {
-		if err := s.callbacks.OnStreamOpen(stream.Context(), streamID, defaultTypeURL); err != nil {
+		if err := s.callbacks.OnStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
 			return err
 		}
 	}
@@ -126,73 +141,27 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 	// node may only be set on the first discovery request
 	var node = &core.Node{}
 
+	// recompute dynamic channels for this stream
+	watches.RecomputeWatches(s.ctx, reqCh)
+
 	for {
-		select {
-		case <-s.ctx.Done():
+		// The list of select cases looks like this:
+		// 0: <- ctx.Done
+		// 1: <- reqCh
+		// 2...: per type watches
+		index, value, ok := reflect.Select(watches.cases)
+		switch index {
+		// ctx.Done() -> if we receive a value here we return as no further computation is needed
+		case 0:
 			return nil
-		// config watcher can send the requested resources types in any order
-		case resp, more := <-watches.muxedResponses:
-			if !more {
-				break
-			}
-
-			typ := resp.GetRequest().GetTypeUrl()
-			if resp == errorResponse {
-				return status.Errorf(codes.Unavailable, typ+" watch failed")
-			}
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-		case resp, more := <-values.runtimes:
-			if !more {
-				return status.Errorf(codes.Unavailable, "runtimes watch failed")
-			}
-			nonce, err := send(resp)
-			if err != nil {
-				return err
-			}
-			values.runtimeNonce = nonce
-
-		case resp, more := <-values.extensionConfigs:
-			if !more {
-				return status.Errorf(codes.Unavailable, "extensionConfigs watch failed")
-			}
-			nonce, err := send(resp)
-			if err != nil {
-				return err
-			}
-			values.extensionConfigNonce = nonce
-
-		case resp, more := <-values.responses:
-			if more {
-				if resp == errorResponse {
-					return status.Errorf(codes.Unavailable, "resource watch failed")
-				}
-				typeURL := resp.GetRequest().TypeUrl
-				nonce, err := send(resp)
-				if err != nil {
-					return err
-				}
-				values.nonces[typeURL] = nonce
-			}
-=======
-			nonce, err := send(resp, typ)
-=======
-			nonce, err := send(resp)
->>>>>>> a31cdfc0 (rebase and fix errors)
-			if err != nil {
-				return err
-			}
->>>>>>> c635a6b7 (dedupe and linearization)
-
-			watch := watches.watches[typ]
-			watch.nonce = nonce
-			watches.watches[typ] = watch
-		case req, more := <-reqCh:
+		// Case 1 handles any request inbound on the stream and handles all initialization as needed
+		case 1:
 			// input stream ended or errored out
-			if !more {
+			if !ok {
 				return nil
 			}
+
+			req := value.Interface().(*discovery.DiscoveryRequest)
 			if req == nil {
 				return status.Errorf(codes.Unavailable, "empty request")
 			}
@@ -203,6 +172,9 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 			} else {
 				req.Node = node
 			}
+
+			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
+			nonce := req.GetResponseNonce()
 
 			// type URL is required for ADS but is implicit for xDS
 			if defaultTypeURL == resource.AnyType {
@@ -219,7 +191,6 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 				}
 			}
 
-<<<<<<< HEAD
 			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
@@ -227,105 +198,38 @@ func (s *server) process(stream stream.Stream, reqCh <-chan *discovery.Discovery
 				}
 			}
 
-			// cancel existing watches to (re-)request a newer version
-			switch {
-			case req.TypeUrl == resource.EndpointType:
-				if values.endpointNonce == "" || values.endpointNonce == nonce {
-					if values.endpointCancel != nil {
-						values.endpointCancel()
-					}
-					values.endpoints = make(chan cache.Response, 1)
-					values.endpointCancel = s.cache.CreateWatch(req, streamState, values.endpoints)
-				}
-			case req.TypeUrl == resource.ClusterType:
-				if values.clusterNonce == "" || values.clusterNonce == nonce {
-					if values.clusterCancel != nil {
-						values.clusterCancel()
-					}
-					values.clusters = make(chan cache.Response, 1)
-					values.clusterCancel = s.cache.CreateWatch(req, streamState, values.clusters)
-				}
-			case req.TypeUrl == resource.RouteType:
-				if values.routeNonce == "" || values.routeNonce == nonce {
-					if values.routeCancel != nil {
-						values.routeCancel()
-					}
-					values.routes = make(chan cache.Response, 1)
-					values.routeCancel = s.cache.CreateWatch(req, streamState, values.routes)
-				}
-			case req.TypeUrl == resource.ScopedRouteType:
-				if values.scopedRouteNonce == "" || values.scopedRouteNonce == nonce {
-					if values.scopedRouteCancel != nil {
-						values.scopedRouteCancel()
-					}
-					values.scopedRoutes = make(chan cache.Response, 1)
-					values.scopedRouteCancel = s.cache.CreateWatch(req, streamState, values.scopedRoutes)
-				}
-			case req.TypeUrl == resource.ListenerType:
-				if values.listenerNonce == "" || values.listenerNonce == nonce {
-					if values.listenerCancel != nil {
-						values.listenerCancel()
-					}
-					values.listeners = make(chan cache.Response, 1)
-					values.listenerCancel = s.cache.CreateWatch(req, streamState, values.listeners)
-				}
-			case req.TypeUrl == resource.SecretType:
-				if values.secretNonce == "" || values.secretNonce == nonce {
-					if values.secretCancel != nil {
-						values.secretCancel()
-					}
-					values.secrets = make(chan cache.Response, 1)
-					values.secretCancel = s.cache.CreateWatch(req, streamState, values.secrets)
-				}
-			case req.TypeUrl == resource.RuntimeType:
-				if values.runtimeNonce == "" || values.runtimeNonce == nonce {
-					if values.runtimeCancel != nil {
-						values.runtimeCancel()
-					}
-					values.runtimes = make(chan cache.Response, 1)
-					values.runtimeCancel = s.cache.CreateWatch(req, streamState, values.runtimes)
-				}
-			case req.TypeUrl == resource.ExtensionConfigType:
-				if values.extensionConfigNonce == "" || values.extensionConfigNonce == nonce {
-					if values.extensionConfigCancel != nil {
-						values.extensionConfigCancel()
-					}
-					values.extensionConfigs = make(chan cache.Response, 1)
-					values.extensionConfigCancel = s.cache.CreateWatch(req, streamState, values.extensionConfigs)
-				}
-			default:
-				typeURL := req.TypeUrl
-				responseNonce, seen := values.nonces[typeURL]
-				if !seen || responseNonce == nonce {
-					if cancel, seen := values.cancellations[typeURL]; seen && cancel != nil {
-						cancel()
-					}
-					values.cancellations[typeURL] = s.cache.CreateWatch(req, streamState, values.responses)
-				}
-=======
 			typeURL := req.GetTypeUrl()
+			responder := make(chan cache.Response, 1)
+			if w, ok := watches.responders[typeURL]; ok {
+				// We've found a pre-existing watch, lets check and update if needed.
+				// If these requirements aren't satisfied, leave an open watch.
+				if w.nonce == "" || w.nonce == nonce {
+					w.Cancel()
 
-			// cancel existing watches to (re-)request a newer version
-			watch, ok := watches.watches[typeURL]
-			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
-			if !ok || watch.nonce == req.GetResponseNonce() {
-				watch.Cancel()
+					open(w, req, responder)
+				}
+			} else {
+				// No pre-existing watch exists, let's create one.
+				// We need to precompute the watches first then open a watch in the cache.
+				watches.responders[typeURL] = &watch{}
+				w = watches.responders[typeURL]
+				watches.RecomputeWatches(s.ctx, reqCh)
 
-				watch.responses = make(chan cache.Response, 1)
-				watch.cancel = s.cache.CreateWatch(req, watch.responses)
-
-				watches.watches[typeURL] = watch
-				go func() {
-					resp, more := <-watch.responses
-					if !more {
-						watches.muxedResponses <- errorResponse
-						return
-					}
-
-					watches.muxedResponses <- resp
-				}()
->>>>>>> c635a6b7 (dedupe and linearization)
+				open(w, req, responder)
 			}
+		default:
+			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
+			if !ok {
+				return status.Errorf(codes.Unavailable, "resource watch failed")
+			}
+
+			res := value.Interface().(cache.Response)
+			nonce, err := send(value.Interface().(cache.Response))
+			if err != nil {
+				return err
+			}
+
+			watches.responders[res.GetRequest().TypeUrl].nonce = nonce
 		}
 	}
 }

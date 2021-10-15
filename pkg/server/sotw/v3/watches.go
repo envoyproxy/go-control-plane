@@ -1,39 +1,70 @@
 package sotw
 
 import (
+	"context"
+	"reflect"
+
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 )
 
 // watches for all xDS resource types
 type watches struct {
-	watches map[string]watch
+	responders map[string]*watch
 
-	// Opaque resources share a muxed channel
-	muxedResponses chan cache.Response
+	// indexes is a list of indexes for each dynamic select case which match to a watch
+	cases []reflect.SelectCase
 }
 
 // newWatches creates and initializes watches.
 func newWatches() watches {
 	// deltaMuxedResponses needs a buffer to release go-routines populating it
 	return watches{
-		watches:        make(map[string]watch, int(types.UnknownType)),
-		muxedResponses: make(chan cache.Response, int(types.UnknownType)),
+		responders: make(map[string]*watch, int(types.UnknownType)),
+		cases:      make([]reflect.SelectCase, 2), // We use 2 for the default computation here: ctx.Done() + reqCh.Recv()
 	}
 }
 
 // Cancel all watches
 func (w *watches) Cancel() {
-	for _, watch := range w.watches {
+	for _, watch := range w.responders {
 		watch.Cancel()
 	}
 }
 
+// recomputeWatches will analyze the currently typed list of the known watches and increase the known list of dynamic channels if needed
+func (w *watches) RecomputeWatches(ctx context.Context, reqCh <-chan *discovery.DiscoveryRequest) {
+	newCases := []reflect.SelectCase{
+		{
+			Dir:  reflect.SelectRecv,
+			Chan: reflect.ValueOf(ctx.Done()),
+		},
+		{
+			Dir:  reflect.SelectRecv,
+			Chan: reflect.ValueOf(reqCh),
+		},
+	}
+
+	index := 2
+	for _, watch := range w.responders {
+		newCases = append(newCases, watch.selectCase)
+		watch.index = index
+		index++
+	}
+
+	w.cases = newCases
+}
+
 // watch contains the necessary modifiables for receiving resource responses
 type watch struct {
-	responses chan cache.Response
-	cancel    func()
-	nonce     string
+	selectCase reflect.SelectCase
+	cancel     func()
+	nonce      string
+
+	// Index is used to track the location of this channel in watches. This allows us
+	// to update the channel used at this slot without recomputing the entire list of select
+	// statements.
+	index int
 }
 
 // Cancel calls terminate and cancel
