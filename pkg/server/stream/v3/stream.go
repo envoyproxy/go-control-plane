@@ -30,7 +30,7 @@ type StreamState struct { // nolint:golint,revive
 	// This field stores the last state sent to the client.
 	resourceVersions map[string]string
 
-	// knownResourceName contains resources names that a client has received previously
+	// knownResourceNames contains resource names that a client has received previously
 	knownResourceNames map[string]map[string]struct{}
 
 	// indicates whether the object has beed modified since its creation

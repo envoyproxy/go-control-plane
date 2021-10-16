@@ -319,23 +319,17 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState *stream.St
 				request.TypeUrl, request.ResourceNames, knownResourceNames, diff)
 		}
 		if len(diff) > 0 {
-			found := false
-			if cache.log != nil {
-				cache.log.Debugf("nodeID %q still needs %v", nodeID, diff)
-			}
-
 			resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
 			for _, name := range diff {
 				if _, exists := resources[name]; exists {
-					found = true
-					break
+					if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
+						if cache.log != nil {
+							cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
+								request.ResourceNames, nodeID, err)
+						}
+					}
+					return nil
 				}
-			}
-
-			// cache contains resources already, the watch may be responded immediately
-			if found {
-				_ = cache.respond(context.Background(), request, value, resources, version, false)
-				return nil
 			}
 		}
 	}
@@ -355,7 +349,12 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState *stream.St
 
 	// otherwise, the watch may be responded immediately
 	resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
-	_ = cache.respond(context.Background(), request, value, resources, version, false)
+	if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
+		if cache.log != nil {
+			cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
+				request.ResourceNames, nodeID, err)
+		}
+	}
 
 	return nil
 }

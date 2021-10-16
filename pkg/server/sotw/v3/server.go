@@ -103,7 +103,11 @@ type watches struct {
 	nonces        map[string]string
 }
 
-type latestDiscoveryResponse struct {
+// Discovery response that is sent over GRPC stream
+// We need to record what resource names are already sent to a client
+// So if the client requests a new name we can respond back
+// regardless current snapshot version (even if it is not changed yet)
+type lastDiscoveryResponse struct {
 	nonce     string
 	resources map[string]struct{}
 }
@@ -159,7 +163,7 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 	var streamNonce int64
 
 	streamState := streamv3.NewStreamState(false, map[string]string{})
-	latestDiscoveryResponses := map[string]latestDiscoveryResponse{}
+	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
 
 	// a collection of stack allocated watches per request type
 	var values watches
@@ -186,14 +190,14 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 
-		lastResponse := latestDiscoveryResponse{
+		lastResponse := lastDiscoveryResponse{
 			nonce:     out.Nonce,
 			resources: make(map[string]struct{}),
 		}
 		for _, r := range resp.GetRequest().ResourceNames {
 			lastResponse.resources[r] = struct{}{}
 		}
-		latestDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
+		lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
 		if s.callbacks != nil {
 			s.callbacks.OnStreamResponse(resp.GetContext(), streamID, resp.GetRequest(), out)
@@ -332,8 +336,9 @@ func (s *server) process(stream Stream, reqCh <-chan *discovery.DiscoveryRequest
 				}
 			}
 
-			if lastResponse, ok := latestDiscoveryResponses[req.TypeUrl]; ok {
+			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
+					// Let's record Resource names that a client has received.
 					streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
 				}
 			}
