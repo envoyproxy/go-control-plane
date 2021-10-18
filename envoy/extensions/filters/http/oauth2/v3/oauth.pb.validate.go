@@ -65,6 +65,16 @@ func (m *OAuth2Credentials) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetCookieNames()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OAuth2CredentialsValidationError{
+				field:  "CookieNames",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.TokenFormation.(type) {
 
 	case *OAuth2Credentials_HmacSecret:
@@ -383,3 +393,110 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = OAuth2ValidationError{}
+
+// Validate checks the field values on OAuth2Credentials_CookieNames with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *OAuth2Credentials_CookieNames) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetBearerToken() != "" {
+
+		if !_OAuth2Credentials_CookieNames_BearerToken_Pattern.MatchString(m.GetBearerToken()) {
+			return OAuth2Credentials_CookieNamesValidationError{
+				field:  "BearerToken",
+				reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+			}
+		}
+
+	}
+
+	if m.GetOauthHmac() != "" {
+
+		if !_OAuth2Credentials_CookieNames_OauthHmac_Pattern.MatchString(m.GetOauthHmac()) {
+			return OAuth2Credentials_CookieNamesValidationError{
+				field:  "OauthHmac",
+				reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+			}
+		}
+
+	}
+
+	if m.GetOauthExpires() != "" {
+
+		if !_OAuth2Credentials_CookieNames_OauthExpires_Pattern.MatchString(m.GetOauthExpires()) {
+			return OAuth2Credentials_CookieNamesValidationError{
+				field:  "OauthExpires",
+				reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// OAuth2Credentials_CookieNamesValidationError is the validation error
+// returned by OAuth2Credentials_CookieNames.Validate if the designated
+// constraints aren't met.
+type OAuth2Credentials_CookieNamesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OAuth2Credentials_CookieNamesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OAuth2Credentials_CookieNamesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OAuth2Credentials_CookieNamesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OAuth2Credentials_CookieNamesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OAuth2Credentials_CookieNamesValidationError) ErrorName() string {
+	return "OAuth2Credentials_CookieNamesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e OAuth2Credentials_CookieNamesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOAuth2Credentials_CookieNames.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OAuth2Credentials_CookieNamesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OAuth2Credentials_CookieNamesValidationError{}
+
+var _OAuth2Credentials_CookieNames_BearerToken_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
+
+var _OAuth2Credentials_CookieNames_OauthHmac_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
+
+var _OAuth2Credentials_CookieNames_OauthExpires_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
