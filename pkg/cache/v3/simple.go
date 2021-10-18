@@ -286,7 +286,7 @@ func superset(names map[string]bool, resources map[string]types.ResourceWithTTL)
 }
 
 // CreateWatch returns a watch for an xDS request.
-func (cache *snapshotCache) CreateWatch(request *Request, streamState *stream.StreamState, value chan Response) func() {
+func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.StreamState, value chan Response) func() {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.Lock()
@@ -306,7 +306,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState *stream.St
 	snapshot, exists := cache.snapshots[nodeID]
 	version := snapshot.GetVersion(request.TypeUrl)
 
-	if exists && streamState != nil {
+	if exists {
 		knownResourceNames := streamState.GetKnownResourceNames(request.TypeUrl)
 		diff := []string{}
 		for _, r := range request.ResourceNames {

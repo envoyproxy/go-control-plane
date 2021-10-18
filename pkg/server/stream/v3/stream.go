@@ -58,6 +58,14 @@ func (s *StreamState) SetKnownResourceNames(url string, names map[string]struct{
 	s.knownResourceNames[url] = names
 }
 
+func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
+	m := map[string]struct{}{}
+	for _, name := range names {
+		m[name] = struct{}{}
+	}
+	s.knownResourceNames[url] = m
+}
+
 func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
 	return s.knownResourceNames[url]
 }
