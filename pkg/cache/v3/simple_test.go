@@ -410,7 +410,7 @@ func TestSnapshotCacheWatchTimeout(t *testing.T) {
 	}
 }
 
-func TestSnapshotCreateWatchWithResourcePrevioslyNotRequested(t *testing.T) {
+func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	clusterName2 := "clusterName2"
 	routeName2 := "routeName2"
 	listenerName2 := "listenerName2"
