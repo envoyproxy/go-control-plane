@@ -323,10 +323,8 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 			for _, name := range diff {
 				if _, exists := resources[name]; exists {
 					if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
-						if cache.log != nil {
-							cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
-								request.ResourceNames, nodeID, err)
-						}
+						cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
+							request.ResourceNames, nodeID, err)
 					}
 					return nil
 				}
@@ -350,10 +348,8 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 	// otherwise, the watch may be responded immediately
 	resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
 	if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
-		if cache.log != nil {
-			cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
-				request.ResourceNames, nodeID, err)
-		}
+		cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
+			request.ResourceNames, nodeID, err)
 	}
 
 	return nil
