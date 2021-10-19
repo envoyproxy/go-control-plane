@@ -187,7 +187,6 @@ type Listener struct {
 	// UDP Listener filters can be specified when the protocol in the listener socket address in
 	// :ref:`protocol <envoy_v3_api_field_config.core.v3.SocketAddress.protocol>` is :ref:`UDP
 	// <envoy_v3_api_enum_value_config.core.v3.SocketAddress.Protocol.UDP>`.
-	// UDP listeners currently support a single filter.
 	ListenerFilters []*ListenerFilter `protobuf:"bytes,9,rep,name=listener_filters,json=listenerFilters,proto3" json:"listener_filters,omitempty"`
 	// The timeout to wait for all listener filters to complete operation. If the timeout is reached,
 	// the accepted socket is closed without a connection being created unless
