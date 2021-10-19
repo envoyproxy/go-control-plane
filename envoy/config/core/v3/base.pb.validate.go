@@ -1299,6 +1299,15 @@ func (m *DataSource) Validate() error {
 	case *DataSource_InlineString:
 		// no validation rules for InlineString
 
+	case *DataSource_EnvironmentVariable:
+
+		if utf8.RuneCountInString(m.GetEnvironmentVariable()) < 1 {
+			return DataSourceValidationError{
+				field:  "EnvironmentVariable",
+				reason: "value length must be at least 1 runes",
+			}
+		}
+
 	default:
 		return DataSourceValidationError{
 			field:  "Specifier",
