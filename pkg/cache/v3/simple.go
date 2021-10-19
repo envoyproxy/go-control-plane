@@ -314,10 +314,10 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 				diff = append(diff, r)
 			}
 		}
-		if cache.log != nil {
-			cache.log.Debugf("nodeID %q requested %s%v and known %v. Diff %v", nodeID,
-				request.TypeUrl, request.ResourceNames, knownResourceNames, diff)
-		}
+
+		cache.log.Debugf("nodeID %q requested %s%v and known %v. Diff %v", nodeID,
+			request.TypeUrl, request.ResourceNames, knownResourceNames, diff)
+
 		if len(diff) > 0 {
 			resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
 			for _, name := range diff {
