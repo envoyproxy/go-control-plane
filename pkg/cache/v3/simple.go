@@ -335,8 +335,8 @@ func (cache *snapshotCache) nextWatchID() int64 {
 func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 	return func() {
 		// uses the cache mutex
-		cache.mu.Lock()
-		defer cache.mu.Unlock()
+		cache.mu.RLock()
+		defer cache.mu.RUnlock()
 		if info, ok := cache.status[nodeID]; ok {
 			info.mu.Lock()
 			delete(info.watches, watchID)
@@ -477,8 +477,8 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 // cancellation function for cleaning stale delta watches
 func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func() {
 	return func() {
-		cache.mu.Lock()
-		defer cache.mu.Unlock()
+		cache.mu.RLock()
+		defer cache.mu.RUnlock()
 		if info, ok := cache.status[nodeID]; ok {
 			info.mu.Lock()
 			delete(info.deltaWatches, watchID)
