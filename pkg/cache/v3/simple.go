@@ -410,7 +410,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 	}
 
 	// update last watch request time
-	info.SetLastDeltaWatchRequestTime(time.Now())
+	info.setLastDeltaWatchRequestTime(time.Now())
 
 	// find the current cache snapshot for the provided node
 	snapshot, exists := cache.snapshots[nodeID]
@@ -436,7 +436,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 	if delayedResponse {
 		watchID := cache.nextDeltaWatchID()
 		cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q, system version %q", watchID, t, state.GetResourceVersions(), nodeID, snapshot.GetVersion(t))
-		info.SetDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})
+		info.setDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})
 
 		return cache.cancelDeltaWatch(nodeID, watchID)
 	}
