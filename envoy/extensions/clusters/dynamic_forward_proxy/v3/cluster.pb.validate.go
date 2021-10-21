@@ -60,6 +60,8 @@ func (m *ClusterConfig) Validate() error {
 
 	// no validation rules for AllowInsecureClusterOptions
 
+	// no validation rules for AllowCoalescedConnections
+
 	return nil
 }
 
