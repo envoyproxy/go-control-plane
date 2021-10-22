@@ -100,6 +100,117 @@ var _ interface {
 	ErrorName() string
 } = TcpProtocolOptionsValidationError{}
 
+// Validate checks the field values on QuicKeepAliveSettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *QuicKeepAliveSettings) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if d := m.GetMaxInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			return QuicKeepAliveSettingsValidationError{
+				field:  "MaxInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		lte := time.Duration(0*time.Second + 0*time.Nanosecond)
+		gte := time.Duration(1*time.Second + 0*time.Nanosecond)
+
+		if dur > lte && dur < gte {
+			return QuicKeepAliveSettingsValidationError{
+				field:  "MaxInterval",
+				reason: "value must be outside range (0s, 1s)",
+			}
+		}
+
+	}
+
+	if d := m.GetInitialInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			return QuicKeepAliveSettingsValidationError{
+				field:  "InitialInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+		}
+
+		lte := time.Duration(0*time.Second + 0*time.Nanosecond)
+		gte := time.Duration(1*time.Second + 0*time.Nanosecond)
+
+		if dur > lte && dur < gte {
+			return QuicKeepAliveSettingsValidationError{
+				field:  "InitialInterval",
+				reason: "value must be outside range (0s, 1s)",
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// QuicKeepAliveSettingsValidationError is the validation error returned by
+// QuicKeepAliveSettings.Validate if the designated constraints aren't met.
+type QuicKeepAliveSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QuicKeepAliveSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e QuicKeepAliveSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e QuicKeepAliveSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QuicKeepAliveSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QuicKeepAliveSettingsValidationError) ErrorName() string {
+	return "QuicKeepAliveSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QuicKeepAliveSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQuicKeepAliveSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QuicKeepAliveSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QuicKeepAliveSettingsValidationError{}
+
 // Validate checks the field values on QuicProtocolOptions with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -149,6 +260,16 @@ func (m *QuicProtocolOptions) Validate() error {
 			}
 		}
 
+	}
+
+	if v, ok := interface{}(m.GetConnectionKeepalive()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuicProtocolOptionsValidationError{
+				field:  "ConnectionKeepalive",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil
