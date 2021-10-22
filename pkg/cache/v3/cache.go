@@ -51,7 +51,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(*Request, chan Response) (cancel func())
+	CreateWatch(*Request, stream.StreamState, chan Response) (cancel func())
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	//

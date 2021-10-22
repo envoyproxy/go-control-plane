@@ -37,14 +37,14 @@ type MuxCache struct {
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request *Request, value chan Response) func() {
+func (mux *MuxCache) CreateWatch(request *Request, state stream.StreamState, value chan Response) func() {
 	key := mux.Classify(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
 		value <- nil
 		return nil
 	}
-	return cache.CreateWatch(request, value)
+	return cache.CreateWatch(request, state, value)
 }
 
 func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
