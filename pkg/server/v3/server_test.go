@@ -30,6 +30,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -45,7 +46,7 @@ type mockConfigWatcher struct {
 	mu *sync.RWMutex
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, out chan cache.Response) func() {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, state stream.StreamState, out chan cache.Response) func() {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]

@@ -260,7 +260,7 @@ func (cache *LinearCache) GetResources() map[string]types.Resource {
 	return resources
 }
 
-func (cache *LinearCache) CreateWatch(request *Request, value chan Response) func() {
+func (cache *LinearCache) CreateWatch(request *Request, streamState stream.StreamState, value chan Response) func() {
 	if request.TypeUrl != cache.typeURL {
 		value <- nil
 		return nil

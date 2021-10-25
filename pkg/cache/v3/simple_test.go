@@ -29,6 +29,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
@@ -119,12 +120,13 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 
 	wg := sync.WaitGroup{}
 	// All the resources should respond immediately when version is not up to date.
+	streamState := stream.NewStreamState(false, map[string]string{})
 	for _, typ := range testTypes {
 		wg.Add(1)
 		t.Run(typ, func(t *testing.T) {
 			defer wg.Done()
 			value := make(chan cache.Response, 1)
-			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, streamState, value)
 			select {
 			case out := <-value:
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
@@ -133,6 +135,8 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTTL(typ))
 				}
+				// Update streamState
+				streamState.SetKnownResourceNamesAsList(typ, out.GetRequest().GetResourceNames())
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
 			}
@@ -151,7 +155,8 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 			end := time.After(5 * time.Second)
 			for {
 				value := make(chan cache.Response, 1)
-				cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, value)
+				cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version},
+					streamState, value)
 
 				select {
 				case out := <-value:
@@ -167,6 +172,8 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 					}
 
 					updatesByType[typ]++
+
+					streamState.SetKnownResourceNamesAsList(typ, out.GetRequest().ResourceNames)
 				case <-end:
 					cancel()
 					return
@@ -208,7 +215,9 @@ func TestSnapshotCache(t *testing.T) {
 	// try to get endpoints with incorrect list of names
 	// should not receive response
 	value := make(chan cache.Response, 1)
-	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}}, value)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}},
+		streamState, value)
 	select {
 	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -218,7 +227,9 @@ func TestSnapshotCache(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			value := make(chan cache.Response, 1)
-			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+			streamState := stream.NewStreamState(false, map[string]string{})
+			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]},
+				streamState, value)
 			select {
 			case out := <-value:
 				if gotVersion, _ := out.GetVersion(); gotVersion != version {
@@ -268,9 +279,10 @@ func TestSnapshotCacheFetch(t *testing.T) {
 func TestSnapshotCacheWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	watches := make(map[string]chan cache.Response)
+	streamState := stream.NewStreamState(false, map[string]string{})
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.Response, 1)
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, watches[typ])
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, streamState, watches[typ])
 	}
 	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
@@ -285,6 +297,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
 				}
+				streamState.SetKnownResourceNamesAsList(typ, out.GetRequest().GetResourceNames())
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}
@@ -294,7 +307,8 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	// open new watches with the latest version
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.Response, 1)
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version}, watches[typ])
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: version},
+			streamState, watches[typ])
 	}
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
@@ -338,10 +352,11 @@ func TestConcurrentSetWatch(t *testing.T) {
 					t.Fatalf("failed to set snapshot %q: %s", id, err)
 				}
 			} else {
+				streamState := stream.NewStreamState(false, map[string]string{})
 				cancel := c.CreateWatch(&discovery.DiscoveryRequest{
 					Node:    &core.Node{Id: id},
 					TypeUrl: rsrc.EndpointType,
-				}, value)
+				}, streamState, value)
 
 				defer cancel()
 			}
@@ -351,9 +366,10 @@ func TestConcurrentSetWatch(t *testing.T) {
 
 func TestSnapshotCacheWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	streamState := stream.NewStreamState(false, map[string]string{})
 	for _, typ := range testTypes {
 		value := make(chan cache.Response, 1)
-		cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, value)
+		cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, streamState, value)
 		cancel()
 	}
 	// should be status info for the node
@@ -377,7 +393,9 @@ func TestSnapshotCacheWatchTimeout(t *testing.T) {
 
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.Response)
-	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]}, watchCh)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]},
+		streamState, watchCh)
 
 	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
@@ -406,6 +424,76 @@ func TestSnapshotCacheWatchTimeout(t *testing.T) {
 		assert.Equal(t, response.GetContext().Value(testKey{}), "bar")
 	case <-time.After(time.Second):
 		t.Fatalf("timed out")
+	}
+}
+
+func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
+	clusterName2 := "clusterName2"
+	routeName2 := "routeName2"
+	listenerName2 := "listenerName2"
+	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+
+	snapshot2, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+		rsrc.EndpointType:        {testEndpoint, resource.MakeEndpoint(clusterName2, 8080)},
+		rsrc.ClusterType:         {testCluster, resource.MakeCluster(resource.Ads, clusterName2)},
+		rsrc.RouteType:           {testRoute, resource.MakeRoute(routeName2, clusterName2)},
+		rsrc.ListenerType:        {testListener, resource.MakeRouteHTTPListener(resource.Ads, listenerName2, 80, routeName2)},
+		rsrc.RuntimeType:         {},
+		rsrc.SecretType:          {},
+		rsrc.ExtensionConfigType: {},
+	})
+	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
+		t.Fatal(err)
+	}
+	watch := make(chan cache.Response)
+
+	// Request resource with name=ClusterName
+	go func() {
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{clusterName}},
+			stream.NewStreamState(false, map[string]string{}), watch)
+	}()
+
+	select {
+	case out := <-watch:
+		if gotVersion, _ := out.GetVersion(); gotVersion != version {
+			t.Errorf("got version %q, want %q", gotVersion, version)
+		}
+		want := map[string]types.ResourceWithTTL{clusterName: snapshot2.Resources[types.Endpoint].Items[clusterName]}
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), want) {
+			t.Errorf("got resources %v, want %v", out.(*cache.RawResponse).Resources, want)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("failed to receive snapshot response")
+	}
+
+	// Request additional resource with name=clusterName2 for same version
+	go func() {
+		state := stream.NewStreamState(false, map[string]string{})
+		state.SetKnownResourceNames(rsrc.EndpointType, map[string]struct{}{clusterName: {}})
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, VersionInfo: version,
+			ResourceNames: []string{clusterName, clusterName2}}, state, watch)
+	}()
+
+	select {
+	case out := <-watch:
+		if gotVersion, _ := out.GetVersion(); gotVersion != version {
+			t.Errorf("got version %q, want %q", gotVersion, version)
+		}
+		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
+			t.Errorf("got resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("failed to receive snapshot response")
+	}
+
+	// Repeat request for with same version and make sure a watch is created
+	state := stream.NewStreamState(false, map[string]string{})
+	state.SetKnownResourceNames(rsrc.EndpointType, map[string]struct{}{clusterName: {}, clusterName2: {}})
+	if cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, VersionInfo: version,
+		ResourceNames: []string{clusterName, clusterName2}}, state, watch); cancel == nil {
+		t.Fatal("Should create a watch")
+	} else {
+		cancel()
 	}
 }
 
