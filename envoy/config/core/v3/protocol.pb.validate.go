@@ -219,14 +219,15 @@ func (m *QuicProtocolOptions) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMaxConcurrentStreams()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
+	if wrapper := m.GetMaxConcurrentStreams(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
 			return QuicProtocolOptionsValidationError{
 				field:  "MaxConcurrentStreams",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than or equal to 1",
 			}
 		}
+
 	}
 
 	if wrapper := m.GetInitialStreamWindowSize(); wrapper != nil {
