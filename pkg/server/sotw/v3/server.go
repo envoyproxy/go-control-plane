@@ -85,7 +85,7 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
 
 	// a collection of stack allocated watches per request type
-	watches := newWatches()
+	watches := newWatches(reqCh)
 
 	defer func() {
 		watches.Cancel()

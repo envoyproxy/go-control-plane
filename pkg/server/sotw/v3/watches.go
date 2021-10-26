@@ -17,8 +17,7 @@ type watches struct {
 }
 
 // newWatches creates and initializes watches.
-func newWatches() watches {
-	// deltaMuxedResponses needs a buffer to release go-routines populating it
+func newWatches(req <-chan *discovery.DiscoveryRequest) watches {
 	return watches{
 		responders: make(map[string]*watch, int(types.UnknownType)),
 		cases:      make([]reflect.SelectCase, 2), // We use 2 for the default computation here: ctx.Done() + reqCh.Recv()
@@ -32,7 +31,7 @@ func (w *watches) Cancel() {
 	}
 }
 
-// recomputeWatches will analyze the currently typed list of the known watches and increase the known list of dynamic channels if needed
+// recomputeWatches rebuilds the known list of dynamic channels if needed
 func (w *watches) RecomputeWatches(ctx context.Context, reqCh <-chan *discovery.DiscoveryRequest) {
 	newCases := []reflect.SelectCase{
 		{
@@ -45,7 +44,7 @@ func (w *watches) RecomputeWatches(ctx context.Context, reqCh <-chan *discovery.
 		},
 	}
 
-	index := 2
+	index := len(newCases)
 	for _, watch := range w.responders {
 		newCases = append(newCases, watch.selectCase)
 		watch.index = index

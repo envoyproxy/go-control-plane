@@ -372,72 +372,92 @@ func TestFetch(t *testing.T) {
 
 	s := server.NewServer(context.Background(), config, cb)
 	out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out == nil || err != nil)
+	assert.NotNil(t, out)
+	assert.NoError(t, err)
 
 	out, err = s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out == nil || err != nil)
+	assert.NotNil(t, out)
+	assert.NoError(t, err)
 
 	out, err = s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out == nil || err != nil)
+	assert.NotNil(t, out)
+	assert.NoError(t, err)
 
 	out, err = s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out == nil || err != nil)
+	assert.NotNil(t, out)
+	assert.NoError(t, err)
 
 	out, err = s.FetchSecrets(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out == nil || err != nil)
+	assert.NotNil(t, out)
+	assert.NoError(t, err)
 
 	out, err = s.FetchRuntime(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out == nil || err != nil)
+	assert.NotNil(t, out)
+	assert.NoError(t, err)
 
 	// try again and expect empty results
 	out, err = s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	// try empty requests: not valid in a real gRPC server
 	out, err = s.FetchEndpoints(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchClusters(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchRoutes(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchListeners(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchSecrets(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchRuntime(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	// send error from callback
 	callbackError = true
 	out, err = s.FetchEndpoints(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchClusters(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchRoutes(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	out, err = s.FetchListeners(context.Background(), nil)
-	assert.False(t, out != nil || err == nil)
+	assert.Nil(t, out)
+	assert.Error(t, err)
 
 	// verify fetch callbacks
-	assert.True(t, requestCount == 10)
-	assert.True(t, responseCount == 6)
+	assert.Equal(t, requestCount, 10)
+	assert.Equal(t, responseCount, 6)
 }
 
 func TestSendError(t *testing.T) {
@@ -591,7 +611,7 @@ func TestCancellations(t *testing.T) {
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	err := s.StreamAggregatedResources(resp)
 	assert.NoError(t, err)
-	assert.True(t, config.watches == 0)
+	assert.Equal(t, config.watches, 0)
 }
 
 func TestOpaqueRequestsChannelMuxing(t *testing.T) {
@@ -609,7 +629,7 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	err := s.StreamAggregatedResources(resp)
 	assert.NoError(t, err)
-	assert.True(t, config.watches == 0)
+	assert.Equal(t, config.watches, 0)
 }
 
 func TestCallbackError(t *testing.T) {
