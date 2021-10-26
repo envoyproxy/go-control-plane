@@ -85,10 +85,10 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
 
 	// a collection of stack allocated watches per request type
-	watches := newWatches(reqCh)
+	watches := newWatches()
 
 	defer func() {
-		watches.Cancel()
+		watches.close()
 		if s.callbacks != nil {
 			s.callbacks.OnStreamClosed(streamID)
 		}
@@ -124,14 +124,6 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		return out.Nonce, str.Send(out)
 	}
 
-	open := func(w *watch, req *discovery.DiscoveryRequest, responder chan cache.Response) {
-		w.cancel = s.cache.CreateWatch(req, streamState, responder)
-		watches.cases[w.index] = reflect.SelectCase{
-			Dir:  reflect.SelectRecv,
-			Chan: reflect.ValueOf(responder),
-		}
-	}
-
 	if s.callbacks != nil {
 		if err := s.callbacks.OnStreamOpen(str.Context(), streamID, defaultTypeURL); err != nil {
 			return err
@@ -142,7 +134,7 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	var node = &core.Node{}
 
 	// recompute dynamic channels for this stream
-	watches.RecomputeWatches(s.ctx, reqCh)
+	watches.recompute(s.ctx, reqCh)
 
 	for {
 		// The list of select cases looks like this:
@@ -204,27 +196,36 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				// We've found a pre-existing watch, lets check and update if needed.
 				// If these requirements aren't satisfied, leave an open watch.
 				if w.nonce == "" || w.nonce == nonce {
-					w.Cancel()
+					w.close()
 
-					open(w, req, responder)
+					watches.addWatch(typeURL, &watch{
+						cancel:   s.cache.CreateWatch(req, streamState, responder),
+						response: responder,
+					})
 				}
 			} else {
 				// No pre-existing watch exists, let's create one.
 				// We need to precompute the watches first then open a watch in the cache.
 				watches.responders[typeURL] = &watch{}
 				w = watches.responders[typeURL]
-				watches.RecomputeWatches(s.ctx, reqCh)
+				watches.recompute(s.ctx, reqCh)
 
-				open(w, req, responder)
+				watches.addWatch(typeURL, &watch{
+					cancel:   s.cache.CreateWatch(req, streamState, responder),
+					response: responder,
+				})
 			}
+
+			// Recompute the dynamic select cases for this stream.
+			watches.recompute(s.ctx, reqCh)
 		default:
 			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
 			if !ok {
-				return status.Errorf(codes.Unavailable, "resource watch failed")
+				return status.Errorf(codes.Unavailable, "resource watch %d -> failed", index)
 			}
 
 			res := value.Interface().(cache.Response)
-			nonce, err := send(value.Interface().(cache.Response))
+			nonce, err := send(res)
 			if err != nil {
 				return err
 			}
