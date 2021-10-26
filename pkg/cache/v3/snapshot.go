@@ -87,9 +87,9 @@ func (s *Snapshot) Consistent() error {
 
 	// Loop through each referenced resource.
 	referencedResponseTypes := map[types.ResponseType]struct{}{
-		types.Endpoint:    struct{}{},
-		types.ScopedRoute: struct{}{},
-		types.Route:       struct{}{},
+		types.Endpoint:    {},
+		types.ScopedRoute: {},
+		types.Route:       {},
 	}
 
 	for idx, items := range s.Resources {
@@ -160,8 +160,8 @@ func (s *Snapshot) GetVersion(typeURL resource.Type) string {
 }
 
 // GetVersionMap will return the internal version map of the currently applied snapshot.
-func (s *Snapshot) GetVersionMap(typeUrl string) map[string]string {
-	return s.VersionMap[typeUrl]
+func (s *Snapshot) GetVersionMap(typeURL string) map[string]string {
+	return s.VersionMap[typeURL]
 }
 
 // ConstructVersionMap will construct a version map based on the current state of a snapshot

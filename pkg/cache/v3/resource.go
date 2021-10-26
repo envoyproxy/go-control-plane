@@ -19,7 +19,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -107,14 +107,7 @@ func GetResourceName(res types.Resource) string {
 
 // MarshalResource converts the Resource to MarshaledResource.
 func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
-	b := proto.NewBuffer(nil)
-	b.SetDeterministic(true)
-	err := b.Marshal(resource)
-	if err != nil {
-		return nil, err
-	}
-
-	return b.Bytes(), nil
+	return proto.MarshalOptions{Deterministic: true}.Marshal(resource)
 }
 
 // GetResourceReferences returns a map of dependent resources keyed by resource type, given a map of resources.
@@ -132,9 +125,9 @@ func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[r
 
 	// We only check resources that we expect to have references to other resources.
 	responseTypesWithReferences := map[types.ResponseType]struct{}{
-		types.Cluster:     struct{}{},
-		types.Listener:    struct{}{},
-		types.ScopedRoute: struct{}{},
+		types.Cluster:     {},
+		types.Listener:    {},
+		types.ScopedRoute: {},
 	}
 
 	for responseType, resourceGroup := range resourceGroups {

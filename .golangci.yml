@@ -6,7 +6,6 @@ linters:
   - bodyclose
   - gofmt
   - goimports
-  - golint
   - gosec
   - misspell
   - revive
@@ -24,14 +23,4 @@ linters-settings:
     local-prefixes: github.com/envoyproxy/go-control-plane
 
 issues:
-  exclude:
-  exclude-rules:
-  - text: "SA1019: package github.com/golang/protobuf/jsonpb is deprecated"
-    linters:
-    - staticcheck
-  - text: "SA1019: package github.com/golang/protobuf/proto is deprecated"
-    linters:
-    - staticcheck
-  - text: "SA1019: proto.MessageName is deprecated"
-    linters:
-    - staticcheck
+  fix: true

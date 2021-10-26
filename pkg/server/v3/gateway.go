@@ -15,13 +15,12 @@
 package server
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"path"
 
-	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -71,7 +70,7 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 
 	// parse as JSON
 	out := &discovery.DiscoveryRequest{}
-	err = jsonpb.UnmarshalString(string(body), out)
+	err = protojson.Unmarshal(body, out)
 	if err != nil {
 		return nil, http.StatusBadRequest, fmt.Errorf("cannot parse JSON body: " + err.Error())
 	}
@@ -88,10 +87,10 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 		return nil, http.StatusInternalServerError, fmt.Errorf("fetch error: " + err.Error())
 	}
 
-	buf := &bytes.Buffer{}
-	if err := (&jsonpb.Marshaler{OrigName: true}).Marshal(buf, res); err != nil {
+	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(res)
+	if err != nil {
 		return nil, http.StatusInternalServerError, fmt.Errorf("marshal error: " + err.Error())
 	}
 
-	return buf.Bytes(), http.StatusOK, nil
+	return b, http.StatusOK, nil
 }

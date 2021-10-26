@@ -1,7 +1,8 @@
 package resource
 
 import (
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
@@ -48,7 +49,7 @@ const DefaultAPIVersion = core.ApiVersion_V3
 func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManager {
 	if typedConfig := filter.GetTypedConfig(); typedConfig != nil {
 		config := &hcm.HttpConnectionManager{}
-		if err := ptypes.UnmarshalAny(typedConfig, config); err == nil {
+		if err := anypb.UnmarshalTo(typedConfig, config, proto.UnmarshalOptions{}); err == nil {
 			return config
 		}
 	}

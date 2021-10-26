@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	envoy_config_core_v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	envoy_config_endpoint_v3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
@@ -122,7 +123,7 @@ func isFullResponseWithTTL(t *testing.T, response *envoy_service_discovery_v3.Di
 	assert.Len(t, response.Resources, 1)
 	r := response.Resources[0]
 	resource := &envoy_service_discovery_v3.Resource{}
-	err := ptypes.UnmarshalAny(r, resource)
+	err := anypb.UnmarshalTo(r, resource, proto.UnmarshalOptions{})
 	assert.NoError(t, err)
 
 	assert.NotNil(t, resource.Ttl)
@@ -135,7 +136,7 @@ func isHeartbeatResponseWithTTL(t *testing.T, response *envoy_service_discovery_
 	assert.Len(t, response.Resources, 1)
 	r := response.Resources[0]
 	resource := &envoy_service_discovery_v3.Resource{}
-	err := ptypes.UnmarshalAny(r, resource)
+	err := anypb.UnmarshalTo(r, resource, proto.UnmarshalOptions{})
 	assert.NoError(t, err)
 
 	assert.NotNil(t, resource.Ttl)
