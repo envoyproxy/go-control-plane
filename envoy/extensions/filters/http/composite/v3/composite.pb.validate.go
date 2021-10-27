@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,17 +32,52 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on Composite with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *Composite) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Composite with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CompositeMultiError, or nil
+// if none found.
+func (m *Composite) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Composite) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return CompositeMultiError(errors)
+	}
 	return nil
 }
+
+// CompositeMultiError is an error wrapping multiple validation errors returned
+// by Composite.ValidateAll() if the designated constraints aren't met.
+type CompositeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CompositeMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CompositeMultiError) AllErrors() []error { return m }
 
 // CompositeValidationError is the validation error returned by
 // Composite.Validate if the designated constraints aren't met.
@@ -99,13 +135,46 @@ var _ interface {
 
 // Validate checks the field values on ExecuteFilterAction with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *ExecuteFilterAction) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExecuteFilterAction with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExecuteFilterActionMultiError, or nil if none found.
+func (m *ExecuteFilterAction) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExecuteFilterAction) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTypedConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExecuteFilterActionValidationError{
+					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExecuteFilterActionValidationError{
+					field:  "TypedConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTypedConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExecuteFilterActionValidationError{
 				field:  "TypedConfig",
@@ -115,8 +184,28 @@ func (m *ExecuteFilterAction) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return ExecuteFilterActionMultiError(errors)
+	}
 	return nil
 }
+
+// ExecuteFilterActionMultiError is an error wrapping multiple validation
+// errors returned by ExecuteFilterAction.ValidateAll() if the designated
+// constraints aren't met.
+type ExecuteFilterActionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExecuteFilterActionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExecuteFilterActionMultiError) AllErrors() []error { return m }
 
 // ExecuteFilterActionValidationError is the validation error returned by
 // ExecuteFilterAction.Validate if the designated constraints aren't met.

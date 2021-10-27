@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,24 +32,62 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on OpenTelemetryAccessLogConfig with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *OpenTelemetryAccessLogConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on OpenTelemetryAccessLogConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// OpenTelemetryAccessLogConfigMultiError, or nil if none found.
+func (m *OpenTelemetryAccessLogConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *OpenTelemetryAccessLogConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if m.GetCommonConfig() == nil {
-		return OpenTelemetryAccessLogConfigValidationError{
+		err := OpenTelemetryAccessLogConfigValidationError{
 			field:  "CommonConfig",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetCommonConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, OpenTelemetryAccessLogConfigValidationError{
+					field:  "CommonConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, OpenTelemetryAccessLogConfigValidationError{
+					field:  "CommonConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return OpenTelemetryAccessLogConfigValidationError{
 				field:  "CommonConfig",
@@ -58,7 +97,26 @@ func (m *OpenTelemetryAccessLogConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetBody()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetBody()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, OpenTelemetryAccessLogConfigValidationError{
+					field:  "Body",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, OpenTelemetryAccessLogConfigValidationError{
+					field:  "Body",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBody()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return OpenTelemetryAccessLogConfigValidationError{
 				field:  "Body",
@@ -68,7 +126,26 @@ func (m *OpenTelemetryAccessLogConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAttributes()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetAttributes()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, OpenTelemetryAccessLogConfigValidationError{
+					field:  "Attributes",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, OpenTelemetryAccessLogConfigValidationError{
+					field:  "Attributes",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAttributes()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return OpenTelemetryAccessLogConfigValidationError{
 				field:  "Attributes",
@@ -78,8 +155,28 @@ func (m *OpenTelemetryAccessLogConfig) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return OpenTelemetryAccessLogConfigMultiError(errors)
+	}
 	return nil
 }
+
+// OpenTelemetryAccessLogConfigMultiError is an error wrapping multiple
+// validation errors returned by OpenTelemetryAccessLogConfig.ValidateAll() if
+// the designated constraints aren't met.
+type OpenTelemetryAccessLogConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m OpenTelemetryAccessLogConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m OpenTelemetryAccessLogConfigMultiError) AllErrors() []error { return m }
 
 // OpenTelemetryAccessLogConfigValidationError is the validation error returned
 // by OpenTelemetryAccessLogConfig.Validate if the designated constraints

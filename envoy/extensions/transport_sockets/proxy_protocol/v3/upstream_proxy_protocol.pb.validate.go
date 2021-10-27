@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,17 +32,51 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on ProxyProtocolUpstreamTransport with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *ProxyProtocolUpstreamTransport) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ProxyProtocolUpstreamTransport with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// ProxyProtocolUpstreamTransportMultiError, or nil if none found.
+func (m *ProxyProtocolUpstreamTransport) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ProxyProtocolUpstreamTransport) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ProxyProtocolUpstreamTransportValidationError{
+					field:  "Config",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ProxyProtocolUpstreamTransportValidationError{
+					field:  "Config",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ProxyProtocolUpstreamTransportValidationError{
 				field:  "Config",
@@ -52,13 +87,36 @@ func (m *ProxyProtocolUpstreamTransport) Validate() error {
 	}
 
 	if m.GetTransportSocket() == nil {
-		return ProxyProtocolUpstreamTransportValidationError{
+		err := ProxyProtocolUpstreamTransportValidationError{
 			field:  "TransportSocket",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetTransportSocket()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetTransportSocket()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ProxyProtocolUpstreamTransportValidationError{
+					field:  "TransportSocket",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ProxyProtocolUpstreamTransportValidationError{
+					field:  "TransportSocket",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTransportSocket()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ProxyProtocolUpstreamTransportValidationError{
 				field:  "TransportSocket",
@@ -68,8 +126,28 @@ func (m *ProxyProtocolUpstreamTransport) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return ProxyProtocolUpstreamTransportMultiError(errors)
+	}
 	return nil
 }
+
+// ProxyProtocolUpstreamTransportMultiError is an error wrapping multiple
+// validation errors returned by ProxyProtocolUpstreamTransport.ValidateAll()
+// if the designated constraints aren't met.
+type ProxyProtocolUpstreamTransportMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ProxyProtocolUpstreamTransportMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ProxyProtocolUpstreamTransportMultiError) AllErrors() []error { return m }
 
 // ProxyProtocolUpstreamTransportValidationError is the validation error
 // returned by ProxyProtocolUpstreamTransport.Validate if the designated

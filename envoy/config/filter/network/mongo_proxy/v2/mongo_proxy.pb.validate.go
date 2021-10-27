@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,25 +32,64 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on MongoProxy with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *MongoProxy) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MongoProxy with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MongoProxyMultiError, or
+// nil if none found.
+func (m *MongoProxy) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MongoProxy) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if len(m.GetStatPrefix()) < 1 {
-		return MongoProxyValidationError{
+		err := MongoProxyValidationError{
 			field:  "StatPrefix",
 			reason: "value length must be at least 1 bytes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for AccessLog
 
-	if v, ok := interface{}(m.GetDelay()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetDelay()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, MongoProxyValidationError{
+					field:  "Delay",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, MongoProxyValidationError{
+					field:  "Delay",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDelay()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return MongoProxyValidationError{
 				field:  "Delay",
@@ -61,8 +101,27 @@ func (m *MongoProxy) Validate() error {
 
 	// no validation rules for EmitDynamicMetadata
 
+	if len(errors) > 0 {
+		return MongoProxyMultiError(errors)
+	}
 	return nil
 }
+
+// MongoProxyMultiError is an error wrapping multiple validation errors
+// returned by MongoProxy.ValidateAll() if the designated constraints aren't met.
+type MongoProxyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MongoProxyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MongoProxyMultiError) AllErrors() []error { return m }
 
 // MongoProxyValidationError is the validation error returned by
 // MongoProxy.Validate if the designated constraints aren't met.

@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,24 +32,62 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on UdpProxyConfig with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *UdpProxyConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UdpProxyConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UdpProxyConfigMultiError,
+// or nil if none found.
+func (m *UdpProxyConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UdpProxyConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if len(m.GetStatPrefix()) < 1 {
-		return UdpProxyConfigValidationError{
+		err := UdpProxyConfigValidationError{
 			field:  "StatPrefix",
 			reason: "value length must be at least 1 bytes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetIdleTimeout()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetIdleTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UdpProxyConfigValidationError{
+					field:  "IdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UdpProxyConfigValidationError{
+					field:  "IdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return UdpProxyConfigValidationError{
 				field:  "IdleTimeout",
@@ -63,22 +102,50 @@ func (m *UdpProxyConfig) Validate() error {
 	case *UdpProxyConfig_Cluster:
 
 		if len(m.GetCluster()) < 1 {
-			return UdpProxyConfigValidationError{
+			err := UdpProxyConfigValidationError{
 				field:  "Cluster",
 				reason: "value length must be at least 1 bytes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	default:
-		return UdpProxyConfigValidationError{
+		err := UdpProxyConfigValidationError{
 			field:  "RouteSpecifier",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 
 	}
 
+	if len(errors) > 0 {
+		return UdpProxyConfigMultiError(errors)
+	}
 	return nil
 }
+
+// UdpProxyConfigMultiError is an error wrapping multiple validation errors
+// returned by UdpProxyConfig.ValidateAll() if the designated constraints
+// aren't met.
+type UdpProxyConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UdpProxyConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UdpProxyConfigMultiError) AllErrors() []error { return m }
 
 // UdpProxyConfigValidationError is the validation error returned by
 // UdpProxyConfig.Validate if the designated constraints aren't met.

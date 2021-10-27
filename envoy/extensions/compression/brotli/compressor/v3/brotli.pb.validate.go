@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,40 +32,67 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on Brotli with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *Brotli) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Brotli with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in BrotliMultiError, or nil if none found.
+func (m *Brotli) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Brotli) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if wrapper := m.GetQuality(); wrapper != nil {
 
 		if wrapper.GetValue() > 11 {
-			return BrotliValidationError{
+			err := BrotliValidationError{
 				field:  "Quality",
 				reason: "value must be less than or equal to 11",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if _, ok := Brotli_EncoderMode_name[int32(m.GetEncoderMode())]; !ok {
-		return BrotliValidationError{
+		err := BrotliValidationError{
 			field:  "EncoderMode",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if wrapper := m.GetWindowBits(); wrapper != nil {
 
 		if val := wrapper.GetValue(); val < 10 || val > 24 {
-			return BrotliValidationError{
+			err := BrotliValidationError{
 				field:  "WindowBits",
 				reason: "value must be inside range [10, 24]",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -72,10 +100,14 @@ func (m *Brotli) Validate() error {
 	if wrapper := m.GetInputBlockBits(); wrapper != nil {
 
 		if val := wrapper.GetValue(); val < 16 || val > 24 {
-			return BrotliValidationError{
+			err := BrotliValidationError{
 				field:  "InputBlockBits",
 				reason: "value must be inside range [16, 24]",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -83,18 +115,41 @@ func (m *Brotli) Validate() error {
 	if wrapper := m.GetChunkSize(); wrapper != nil {
 
 		if val := wrapper.GetValue(); val < 4096 || val > 65536 {
-			return BrotliValidationError{
+			err := BrotliValidationError{
 				field:  "ChunkSize",
 				reason: "value must be inside range [4096, 65536]",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	// no validation rules for DisableLiteralContextModeling
 
+	if len(errors) > 0 {
+		return BrotliMultiError(errors)
+	}
 	return nil
 }
+
+// BrotliMultiError is an error wrapping multiple validation errors returned by
+// Brotli.ValidateAll() if the designated constraints aren't met.
+type BrotliMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BrotliMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BrotliMultiError) AllErrors() []error { return m }
 
 // BrotliValidationError is the validation error returned by Brotli.Validate if
 // the designated constraints aren't met.

@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,23 +32,62 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on TcpProxy with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *TcpProxy) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TcpProxy with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in TcpProxyMultiError, or nil
+// if none found.
+func (m *TcpProxy) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TcpProxy) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
-		return TcpProxyValidationError{
+		err := TcpProxyValidationError{
 			field:  "StatPrefix",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetMetadataMatch()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "MetadataMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "MetadataMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TcpProxyValidationError{
 				field:  "MetadataMatch",
@@ -57,7 +97,26 @@ func (m *TcpProxy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetIdleTimeout()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetIdleTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "IdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "IdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TcpProxyValidationError{
 				field:  "IdleTimeout",
@@ -67,7 +126,26 @@ func (m *TcpProxy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDownstreamIdleTimeout()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetDownstreamIdleTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "DownstreamIdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "DownstreamIdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDownstreamIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TcpProxyValidationError{
 				field:  "DownstreamIdleTimeout",
@@ -77,7 +155,26 @@ func (m *TcpProxy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetUpstreamIdleTimeout()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetUpstreamIdleTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "UpstreamIdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "UpstreamIdleTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUpstreamIdleTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TcpProxyValidationError{
 				field:  "UpstreamIdleTimeout",
@@ -90,7 +187,26 @@ func (m *TcpProxy) Validate() error {
 	for idx, item := range m.GetAccessLog() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TcpProxyValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TcpProxyValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return TcpProxyValidationError{
 					field:  fmt.Sprintf("AccessLog[%v]", idx),
@@ -105,25 +221,52 @@ func (m *TcpProxy) Validate() error {
 	if wrapper := m.GetMaxConnectAttempts(); wrapper != nil {
 
 		if wrapper.GetValue() < 1 {
-			return TcpProxyValidationError{
+			err := TcpProxyValidationError{
 				field:  "MaxConnectAttempts",
 				reason: "value must be greater than or equal to 1",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetHashPolicy()) > 1 {
-		return TcpProxyValidationError{
+		err := TcpProxyValidationError{
 			field:  "HashPolicy",
 			reason: "value must contain no more than 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetHashPolicy() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TcpProxyValidationError{
+						field:  fmt.Sprintf("HashPolicy[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TcpProxyValidationError{
+						field:  fmt.Sprintf("HashPolicy[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return TcpProxyValidationError{
 					field:  fmt.Sprintf("HashPolicy[%v]", idx),
@@ -135,7 +278,26 @@ func (m *TcpProxy) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetTunnelingConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetTunnelingConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "TunnelingConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TcpProxyValidationError{
+					field:  "TunnelingConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTunnelingConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TcpProxyValidationError{
 				field:  "TunnelingConfig",
@@ -148,22 +310,31 @@ func (m *TcpProxy) Validate() error {
 	if d := m.GetMaxDownstreamConnectionDuration(); d != nil {
 		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
-			return TcpProxyValidationError{
+			err = TcpProxyValidationError{
 				field:  "MaxDownstreamConnectionDuration",
 				reason: "value is not a valid duration",
 				cause:  err,
 			}
-		}
-
-		gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
-
-		if dur < gte {
-			return TcpProxyValidationError{
-				field:  "MaxDownstreamConnectionDuration",
-				reason: "value must be greater than or equal to 1ms",
+			if !all {
+				return err
 			}
-		}
+			errors = append(errors, err)
+		} else {
 
+			gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+			if dur < gte {
+				err := TcpProxyValidationError{
+					field:  "MaxDownstreamConnectionDuration",
+					reason: "value must be greater than or equal to 1ms",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
 	}
 
 	switch m.ClusterSpecifier.(type) {
@@ -173,7 +344,26 @@ func (m *TcpProxy) Validate() error {
 
 	case *TcpProxy_WeightedClusters:
 
-		if v, ok := interface{}(m.GetWeightedClusters()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetWeightedClusters()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TcpProxyValidationError{
+						field:  "WeightedClusters",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TcpProxyValidationError{
+						field:  "WeightedClusters",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetWeightedClusters()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return TcpProxyValidationError{
 					field:  "WeightedClusters",
@@ -184,15 +374,38 @@ func (m *TcpProxy) Validate() error {
 		}
 
 	default:
-		return TcpProxyValidationError{
+		err := TcpProxyValidationError{
 			field:  "ClusterSpecifier",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 
 	}
 
+	if len(errors) > 0 {
+		return TcpProxyMultiError(errors)
+	}
 	return nil
 }
+
+// TcpProxyMultiError is an error wrapping multiple validation errors returned
+// by TcpProxy.ValidateAll() if the designated constraints aren't met.
+type TcpProxyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TcpProxyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TcpProxyMultiError) AllErrors() []error { return m }
 
 // TcpProxyValidationError is the validation error returned by
 // TcpProxy.Validate if the designated constraints aren't met.
@@ -250,23 +463,60 @@ var _ interface {
 
 // Validate checks the field values on TcpProxy_WeightedCluster with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *TcpProxy_WeightedCluster) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TcpProxy_WeightedCluster with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TcpProxy_WeightedClusterMultiError, or nil if none found.
+func (m *TcpProxy_WeightedCluster) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TcpProxy_WeightedCluster) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if len(m.GetClusters()) < 1 {
-		return TcpProxy_WeightedClusterValidationError{
+		err := TcpProxy_WeightedClusterValidationError{
 			field:  "Clusters",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TcpProxy_WeightedClusterValidationError{
+						field:  fmt.Sprintf("Clusters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TcpProxy_WeightedClusterValidationError{
+						field:  fmt.Sprintf("Clusters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return TcpProxy_WeightedClusterValidationError{
 					field:  fmt.Sprintf("Clusters[%v]", idx),
@@ -278,8 +528,28 @@ func (m *TcpProxy_WeightedCluster) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return TcpProxy_WeightedClusterMultiError(errors)
+	}
 	return nil
 }
+
+// TcpProxy_WeightedClusterMultiError is an error wrapping multiple validation
+// errors returned by TcpProxy_WeightedCluster.ValidateAll() if the designated
+// constraints aren't met.
+type TcpProxy_WeightedClusterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TcpProxy_WeightedClusterMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TcpProxy_WeightedClusterMultiError) AllErrors() []error { return m }
 
 // TcpProxy_WeightedClusterValidationError is the validation error returned by
 // TcpProxy_WeightedCluster.Validate if the designated constraints aren't met.
@@ -339,32 +609,73 @@ var _ interface {
 
 // Validate checks the field values on TcpProxy_TunnelingConfig with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *TcpProxy_TunnelingConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TcpProxy_TunnelingConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TcpProxy_TunnelingConfigMultiError, or nil if none found.
+func (m *TcpProxy_TunnelingConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TcpProxy_TunnelingConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetHostname()) < 1 {
-		return TcpProxy_TunnelingConfigValidationError{
+		err := TcpProxy_TunnelingConfigValidationError{
 			field:  "Hostname",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for UsePost
 
 	if len(m.GetHeadersToAdd()) > 1000 {
-		return TcpProxy_TunnelingConfigValidationError{
+		err := TcpProxy_TunnelingConfigValidationError{
 			field:  "HeadersToAdd",
 			reason: "value must contain no more than 1000 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetHeadersToAdd() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TcpProxy_TunnelingConfigValidationError{
+						field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TcpProxy_TunnelingConfigValidationError{
+						field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return TcpProxy_TunnelingConfigValidationError{
 					field:  fmt.Sprintf("HeadersToAdd[%v]", idx),
@@ -376,8 +687,28 @@ func (m *TcpProxy_TunnelingConfig) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return TcpProxy_TunnelingConfigMultiError(errors)
+	}
 	return nil
 }
+
+// TcpProxy_TunnelingConfigMultiError is an error wrapping multiple validation
+// errors returned by TcpProxy_TunnelingConfig.ValidateAll() if the designated
+// constraints aren't met.
+type TcpProxy_TunnelingConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TcpProxy_TunnelingConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TcpProxy_TunnelingConfigMultiError) AllErrors() []error { return m }
 
 // TcpProxy_TunnelingConfigValidationError is the validation error returned by
 // TcpProxy_TunnelingConfig.Validate if the designated constraints aren't met.
@@ -437,27 +768,70 @@ var _ interface {
 
 // Validate checks the field values on TcpProxy_WeightedCluster_ClusterWeight
 // with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
 func (m *TcpProxy_WeightedCluster_ClusterWeight) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// TcpProxy_WeightedCluster_ClusterWeight with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// TcpProxy_WeightedCluster_ClusterWeightMultiError, or nil if none found.
+func (m *TcpProxy_WeightedCluster_ClusterWeight) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TcpProxy_WeightedCluster_ClusterWeight) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetName()) < 1 {
-		return TcpProxy_WeightedCluster_ClusterWeightValidationError{
+		err := TcpProxy_WeightedCluster_ClusterWeightValidationError{
 			field:  "Name",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if m.GetWeight() < 1 {
-		return TcpProxy_WeightedCluster_ClusterWeightValidationError{
+		err := TcpProxy_WeightedCluster_ClusterWeightValidationError{
 			field:  "Weight",
 			reason: "value must be greater than or equal to 1",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetMetadataMatch()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TcpProxy_WeightedCluster_ClusterWeightValidationError{
+					field:  "MetadataMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TcpProxy_WeightedCluster_ClusterWeightValidationError{
+					field:  "MetadataMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetadataMatch()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TcpProxy_WeightedCluster_ClusterWeightValidationError{
 				field:  "MetadataMatch",
@@ -467,8 +841,29 @@ func (m *TcpProxy_WeightedCluster_ClusterWeight) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return TcpProxy_WeightedCluster_ClusterWeightMultiError(errors)
+	}
 	return nil
 }
+
+// TcpProxy_WeightedCluster_ClusterWeightMultiError is an error wrapping
+// multiple validation errors returned by
+// TcpProxy_WeightedCluster_ClusterWeight.ValidateAll() if the designated
+// constraints aren't met.
+type TcpProxy_WeightedCluster_ClusterWeightMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TcpProxy_WeightedCluster_ClusterWeightMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TcpProxy_WeightedCluster_ClusterWeightMultiError) AllErrors() []error { return m }
 
 // TcpProxy_WeightedCluster_ClusterWeightValidationError is the validation
 // error returned by TcpProxy_WeightedCluster_ClusterWeight.Validate if the

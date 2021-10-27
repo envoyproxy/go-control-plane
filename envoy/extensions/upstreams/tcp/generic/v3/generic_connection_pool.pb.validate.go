@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,18 +32,53 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on GenericConnectionPoolProto with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GenericConnectionPoolProto) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GenericConnectionPoolProto with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GenericConnectionPoolProtoMultiError, or nil if none found.
+func (m *GenericConnectionPoolProto) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GenericConnectionPoolProto) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return GenericConnectionPoolProtoMultiError(errors)
+	}
 	return nil
 }
+
+// GenericConnectionPoolProtoMultiError is an error wrapping multiple
+// validation errors returned by GenericConnectionPoolProto.ValidateAll() if
+// the designated constraints aren't met.
+type GenericConnectionPoolProtoMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GenericConnectionPoolProtoMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GenericConnectionPoolProtoMultiError) AllErrors() []error { return m }
 
 // GenericConnectionPoolProtoValidationError is the validation error returned
 // by GenericConnectionPoolProto.Validate if the designated constraints aren't met.

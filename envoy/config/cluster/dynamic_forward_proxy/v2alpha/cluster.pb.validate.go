@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,24 +32,62 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on ClusterConfig with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ClusterConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ClusterConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ClusterConfigMultiError, or
+// nil if none found.
+func (m *ClusterConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ClusterConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if m.GetDnsCacheConfig() == nil {
-		return ClusterConfigValidationError{
+		err := ClusterConfigValidationError{
 			field:  "DnsCacheConfig",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetDnsCacheConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetDnsCacheConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterConfigValidationError{
+					field:  "DnsCacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterConfigValidationError{
+					field:  "DnsCacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDnsCacheConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ClusterConfigValidationError{
 				field:  "DnsCacheConfig",
@@ -58,8 +97,28 @@ func (m *ClusterConfig) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return ClusterConfigMultiError(errors)
+	}
 	return nil
 }
+
+// ClusterConfigMultiError is an error wrapping multiple validation errors
+// returned by ClusterConfig.ValidateAll() if the designated constraints
+// aren't met.
+type ClusterConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ClusterConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ClusterConfigMultiError) AllErrors() []error { return m }
 
 // ClusterConfigValidationError is the validation error returned by
 // ClusterConfig.Validate if the designated constraints aren't met.

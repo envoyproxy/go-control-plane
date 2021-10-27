@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,16 +32,50 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on SXG with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
 func (m *SXG) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SXG with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SXGMultiError, or nil if none found.
+func (m *SXG) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SXG) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetCertificate()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetCertificate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SXGValidationError{
+					field:  "Certificate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SXGValidationError{
+					field:  "Certificate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCertificate()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SXGValidationError{
 				field:  "Certificate",
@@ -50,7 +85,26 @@ func (m *SXG) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetPrivateKey()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetPrivateKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SXGValidationError{
+					field:  "PrivateKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SXGValidationError{
+					field:  "PrivateKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPrivateKey()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SXGValidationError{
 				field:  "PrivateKey",
@@ -60,7 +114,26 @@ func (m *SXG) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetDuration()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetDuration()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SXGValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SXGValidationError{
+					field:  "Duration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDuration()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return SXGValidationError{
 				field:  "Duration",
@@ -73,40 +146,60 @@ func (m *SXG) Validate() error {
 	// no validation rules for MiRecordSize
 
 	if utf8.RuneCountInString(m.GetCborUrl()) < 1 {
-		return SXGValidationError{
+		err := SXGValidationError{
 			field:  "CborUrl",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if !strings.HasPrefix(m.GetCborUrl(), "/") {
-		return SXGValidationError{
+		err := SXGValidationError{
 			field:  "CborUrl",
 			reason: "value does not have prefix \"/\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if utf8.RuneCountInString(m.GetValidityUrl()) < 1 {
-		return SXGValidationError{
+		err := SXGValidationError{
 			field:  "ValidityUrl",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if !strings.HasPrefix(m.GetValidityUrl(), "/") {
-		return SXGValidationError{
+		err := SXGValidationError{
 			field:  "ValidityUrl",
 			reason: "value does not have prefix \"/\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if m.GetClientCanAcceptSxgHeader() != "" {
 
 		if !_SXG_ClientCanAcceptSxgHeader_Pattern.MatchString(m.GetClientCanAcceptSxgHeader()) {
-			return SXGValidationError{
+			err := SXGValidationError{
 				field:  "ClientCanAcceptSxgHeader",
 				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -114,10 +207,14 @@ func (m *SXG) Validate() error {
 	if m.GetShouldEncodeSxgHeader() != "" {
 
 		if !_SXG_ShouldEncodeSxgHeader_Pattern.MatchString(m.GetShouldEncodeSxgHeader()) {
-			return SXGValidationError{
+			err := SXGValidationError{
 				field:  "ShouldEncodeSxgHeader",
 				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -126,16 +223,39 @@ func (m *SXG) Validate() error {
 		_, _ = idx, item
 
 		if !_SXG_HeaderPrefixFilters_Pattern.MatchString(item) {
-			return SXGValidationError{
+			err := SXGValidationError{
 				field:  fmt.Sprintf("HeaderPrefixFilters[%v]", idx),
 				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return SXGMultiError(errors)
+	}
 	return nil
 }
+
+// SXGMultiError is an error wrapping multiple validation errors returned by
+// SXG.ValidateAll() if the designated constraints aren't met.
+type SXGMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SXGMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SXGMultiError) AllErrors() []error { return m }
 
 // SXGValidationError is the validation error returned by SXG.Validate if the
 // designated constraints aren't met.

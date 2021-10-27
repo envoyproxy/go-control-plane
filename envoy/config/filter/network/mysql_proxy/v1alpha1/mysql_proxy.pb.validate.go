@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,26 +32,65 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on MySQLProxy with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *MySQLProxy) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MySQLProxy with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MySQLProxyMultiError, or
+// nil if none found.
+func (m *MySQLProxy) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MySQLProxy) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if len(m.GetStatPrefix()) < 1 {
-		return MySQLProxyValidationError{
+		err := MySQLProxyValidationError{
 			field:  "StatPrefix",
 			reason: "value length must be at least 1 bytes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for AccessLog
 
+	if len(errors) > 0 {
+		return MySQLProxyMultiError(errors)
+	}
 	return nil
 }
+
+// MySQLProxyMultiError is an error wrapping multiple validation errors
+// returned by MySQLProxy.ValidateAll() if the designated constraints aren't met.
+type MySQLProxyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MySQLProxyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MySQLProxyMultiError) AllErrors() []error { return m }
 
 // MySQLProxyValidationError is the validation error returned by
 // MySQLProxy.Validate if the designated constraints aren't met.

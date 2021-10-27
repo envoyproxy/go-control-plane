@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,28 +32,66 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on StdoutAccessLog with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *StdoutAccessLog) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StdoutAccessLog with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StdoutAccessLogMultiError, or nil if none found.
+func (m *StdoutAccessLog) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StdoutAccessLog) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	switch m.AccessLogFormat.(type) {
 
 	case *StdoutAccessLog_LogFormat:
 
 		if m.GetLogFormat() == nil {
-			return StdoutAccessLogValidationError{
+			err := StdoutAccessLogValidationError{
 				field:  "LogFormat",
 				reason: "value is required",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
-		if v, ok := interface{}(m.GetLogFormat()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetLogFormat()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StdoutAccessLogValidationError{
+						field:  "LogFormat",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StdoutAccessLogValidationError{
+						field:  "LogFormat",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLogFormat()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return StdoutAccessLogValidationError{
 					field:  "LogFormat",
@@ -64,8 +103,28 @@ func (m *StdoutAccessLog) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return StdoutAccessLogMultiError(errors)
+	}
 	return nil
 }
+
+// StdoutAccessLogMultiError is an error wrapping multiple validation errors
+// returned by StdoutAccessLog.ValidateAll() if the designated constraints
+// aren't met.
+type StdoutAccessLogMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StdoutAccessLogMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StdoutAccessLogMultiError) AllErrors() []error { return m }
 
 // StdoutAccessLogValidationError is the validation error returned by
 // StdoutAccessLog.Validate if the designated constraints aren't met.
@@ -122,25 +181,62 @@ var _ interface {
 } = StdoutAccessLogValidationError{}
 
 // Validate checks the field values on StderrAccessLog with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *StderrAccessLog) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StderrAccessLog with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// StderrAccessLogMultiError, or nil if none found.
+func (m *StderrAccessLog) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StderrAccessLog) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	switch m.AccessLogFormat.(type) {
 
 	case *StderrAccessLog_LogFormat:
 
 		if m.GetLogFormat() == nil {
-			return StderrAccessLogValidationError{
+			err := StderrAccessLogValidationError{
 				field:  "LogFormat",
 				reason: "value is required",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
-		if v, ok := interface{}(m.GetLogFormat()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetLogFormat()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, StderrAccessLogValidationError{
+						field:  "LogFormat",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, StderrAccessLogValidationError{
+						field:  "LogFormat",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetLogFormat()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return StderrAccessLogValidationError{
 					field:  "LogFormat",
@@ -152,8 +248,28 @@ func (m *StderrAccessLog) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return StderrAccessLogMultiError(errors)
+	}
 	return nil
 }
+
+// StderrAccessLogMultiError is an error wrapping multiple validation errors
+// returned by StderrAccessLog.ValidateAll() if the designated constraints
+// aren't met.
+type StderrAccessLogMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StderrAccessLogMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StderrAccessLogMultiError) AllErrors() []error { return m }
 
 // StderrAccessLogValidationError is the validation error returned by
 // StderrAccessLog.Validate if the designated constraints aren't met.

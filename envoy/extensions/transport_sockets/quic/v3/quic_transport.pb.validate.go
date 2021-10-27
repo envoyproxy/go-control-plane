@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,24 +32,62 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on QuicDownstreamTransport with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *QuicDownstreamTransport) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QuicDownstreamTransport with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// QuicDownstreamTransportMultiError, or nil if none found.
+func (m *QuicDownstreamTransport) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QuicDownstreamTransport) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if m.GetDownstreamTlsContext() == nil {
-		return QuicDownstreamTransportValidationError{
+		err := QuicDownstreamTransportValidationError{
 			field:  "DownstreamTlsContext",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetDownstreamTlsContext()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetDownstreamTlsContext()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuicDownstreamTransportValidationError{
+					field:  "DownstreamTlsContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuicDownstreamTransportValidationError{
+					field:  "DownstreamTlsContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDownstreamTlsContext()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return QuicDownstreamTransportValidationError{
 				field:  "DownstreamTlsContext",
@@ -58,8 +97,28 @@ func (m *QuicDownstreamTransport) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return QuicDownstreamTransportMultiError(errors)
+	}
 	return nil
 }
+
+// QuicDownstreamTransportMultiError is an error wrapping multiple validation
+// errors returned by QuicDownstreamTransport.ValidateAll() if the designated
+// constraints aren't met.
+type QuicDownstreamTransportMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QuicDownstreamTransportMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QuicDownstreamTransportMultiError) AllErrors() []error { return m }
 
 // QuicDownstreamTransportValidationError is the validation error returned by
 // QuicDownstreamTransport.Validate if the designated constraints aren't met.
@@ -119,20 +178,57 @@ var _ interface {
 
 // Validate checks the field values on QuicUpstreamTransport with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *QuicUpstreamTransport) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on QuicUpstreamTransport with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// QuicUpstreamTransportMultiError, or nil if none found.
+func (m *QuicUpstreamTransport) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QuicUpstreamTransport) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if m.GetUpstreamTlsContext() == nil {
-		return QuicUpstreamTransportValidationError{
+		err := QuicUpstreamTransportValidationError{
 			field:  "UpstreamTlsContext",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetUpstreamTlsContext()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetUpstreamTlsContext()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuicUpstreamTransportValidationError{
+					field:  "UpstreamTlsContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuicUpstreamTransportValidationError{
+					field:  "UpstreamTlsContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetUpstreamTlsContext()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return QuicUpstreamTransportValidationError{
 				field:  "UpstreamTlsContext",
@@ -142,8 +238,28 @@ func (m *QuicUpstreamTransport) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return QuicUpstreamTransportMultiError(errors)
+	}
 	return nil
 }
+
+// QuicUpstreamTransportMultiError is an error wrapping multiple validation
+// errors returned by QuicUpstreamTransport.ValidateAll() if the designated
+// constraints aren't met.
+type QuicUpstreamTransportMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QuicUpstreamTransportMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QuicUpstreamTransportMultiError) AllErrors() []error { return m }
 
 // QuicUpstreamTransportValidationError is the validation error returned by
 // QuicUpstreamTransport.Validate if the designated constraints aren't met.

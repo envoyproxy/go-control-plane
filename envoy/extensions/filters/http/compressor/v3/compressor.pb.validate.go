@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,16 +32,51 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on Compressor with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *Compressor) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Compressor with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CompressorMultiError, or
+// nil if none found.
+func (m *Compressor) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Compressor) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetContentLength()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetContentLength()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "ContentLength",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "ContentLength",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetContentLength()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CompressorValidationError{
 				field:  "ContentLength",
@@ -54,7 +90,26 @@ func (m *Compressor) Validate() error {
 
 	// no validation rules for RemoveAcceptEncodingHeader
 
-	if v, ok := interface{}(m.GetRuntimeEnabled()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetRuntimeEnabled()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "RuntimeEnabled",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "RuntimeEnabled",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRuntimeEnabled()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CompressorValidationError{
 				field:  "RuntimeEnabled",
@@ -65,13 +120,36 @@ func (m *Compressor) Validate() error {
 	}
 
 	if m.GetCompressorLibrary() == nil {
-		return CompressorValidationError{
+		err := CompressorValidationError{
 			field:  "CompressorLibrary",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetCompressorLibrary()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetCompressorLibrary()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "CompressorLibrary",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "CompressorLibrary",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCompressorLibrary()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CompressorValidationError{
 				field:  "CompressorLibrary",
@@ -81,7 +159,26 @@ func (m *Compressor) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetRequestDirectionConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetRequestDirectionConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "RequestDirectionConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "RequestDirectionConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequestDirectionConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CompressorValidationError{
 				field:  "RequestDirectionConfig",
@@ -91,7 +188,26 @@ func (m *Compressor) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetResponseDirectionConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetResponseDirectionConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "ResponseDirectionConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CompressorValidationError{
+					field:  "ResponseDirectionConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetResponseDirectionConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CompressorValidationError{
 				field:  "ResponseDirectionConfig",
@@ -101,8 +217,27 @@ func (m *Compressor) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return CompressorMultiError(errors)
+	}
 	return nil
 }
+
+// CompressorMultiError is an error wrapping multiple validation errors
+// returned by Compressor.ValidateAll() if the designated constraints aren't met.
+type CompressorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CompressorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CompressorMultiError) AllErrors() []error { return m }
 
 // CompressorValidationError is the validation error returned by
 // Compressor.Validate if the designated constraints aren't met.
@@ -160,13 +295,47 @@ var _ interface {
 
 // Validate checks the field values on Compressor_CommonDirectionConfig with
 // the rules defined in the proto definition for this message. If any rules
-// are violated, an error is returned.
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
 func (m *Compressor_CommonDirectionConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Compressor_CommonDirectionConfig with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// Compressor_CommonDirectionConfigMultiError, or nil if none found.
+func (m *Compressor_CommonDirectionConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Compressor_CommonDirectionConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetEnabled()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Compressor_CommonDirectionConfigValidationError{
+					field:  "Enabled",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Compressor_CommonDirectionConfigValidationError{
+					field:  "Enabled",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetEnabled()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Compressor_CommonDirectionConfigValidationError{
 				field:  "Enabled",
@@ -176,7 +345,26 @@ func (m *Compressor_CommonDirectionConfig) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetMinContentLength()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetMinContentLength()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Compressor_CommonDirectionConfigValidationError{
+					field:  "MinContentLength",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Compressor_CommonDirectionConfigValidationError{
+					field:  "MinContentLength",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMinContentLength()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Compressor_CommonDirectionConfigValidationError{
 				field:  "MinContentLength",
@@ -186,8 +374,29 @@ func (m *Compressor_CommonDirectionConfig) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return Compressor_CommonDirectionConfigMultiError(errors)
+	}
 	return nil
 }
+
+// Compressor_CommonDirectionConfigMultiError is an error wrapping multiple
+// validation errors returned by
+// Compressor_CommonDirectionConfig.ValidateAll() if the designated
+// constraints aren't met.
+type Compressor_CommonDirectionConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Compressor_CommonDirectionConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Compressor_CommonDirectionConfigMultiError) AllErrors() []error { return m }
 
 // Compressor_CommonDirectionConfigValidationError is the validation error
 // returned by Compressor_CommonDirectionConfig.Validate if the designated
@@ -248,13 +457,47 @@ var _ interface {
 
 // Validate checks the field values on Compressor_RequestDirectionConfig with
 // the rules defined in the proto definition for this message. If any rules
-// are violated, an error is returned.
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
 func (m *Compressor_RequestDirectionConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Compressor_RequestDirectionConfig
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// Compressor_RequestDirectionConfigMultiError, or nil if none found.
+func (m *Compressor_RequestDirectionConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Compressor_RequestDirectionConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetCommonConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Compressor_RequestDirectionConfigValidationError{
+					field:  "CommonConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Compressor_RequestDirectionConfigValidationError{
+					field:  "CommonConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Compressor_RequestDirectionConfigValidationError{
 				field:  "CommonConfig",
@@ -264,8 +507,29 @@ func (m *Compressor_RequestDirectionConfig) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return Compressor_RequestDirectionConfigMultiError(errors)
+	}
 	return nil
 }
+
+// Compressor_RequestDirectionConfigMultiError is an error wrapping multiple
+// validation errors returned by
+// Compressor_RequestDirectionConfig.ValidateAll() if the designated
+// constraints aren't met.
+type Compressor_RequestDirectionConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Compressor_RequestDirectionConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Compressor_RequestDirectionConfigMultiError) AllErrors() []error { return m }
 
 // Compressor_RequestDirectionConfigValidationError is the validation error
 // returned by Compressor_RequestDirectionConfig.Validate if the designated
@@ -326,13 +590,47 @@ var _ interface {
 
 // Validate checks the field values on Compressor_ResponseDirectionConfig with
 // the rules defined in the proto definition for this message. If any rules
-// are violated, an error is returned.
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
 func (m *Compressor_ResponseDirectionConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Compressor_ResponseDirectionConfig
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// Compressor_ResponseDirectionConfigMultiError, or nil if none found.
+func (m *Compressor_ResponseDirectionConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Compressor_ResponseDirectionConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetCommonConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Compressor_ResponseDirectionConfigValidationError{
+					field:  "CommonConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Compressor_ResponseDirectionConfigValidationError{
+					field:  "CommonConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCommonConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return Compressor_ResponseDirectionConfigValidationError{
 				field:  "CommonConfig",
@@ -346,8 +644,29 @@ func (m *Compressor_ResponseDirectionConfig) Validate() error {
 
 	// no validation rules for RemoveAcceptEncodingHeader
 
+	if len(errors) > 0 {
+		return Compressor_ResponseDirectionConfigMultiError(errors)
+	}
 	return nil
 }
+
+// Compressor_ResponseDirectionConfigMultiError is an error wrapping multiple
+// validation errors returned by
+// Compressor_ResponseDirectionConfig.ValidateAll() if the designated
+// constraints aren't met.
+type Compressor_ResponseDirectionConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Compressor_ResponseDirectionConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Compressor_ResponseDirectionConfigMultiError) AllErrors() []error { return m }
 
 // Compressor_ResponseDirectionConfigValidationError is the validation error
 // returned by Compressor_ResponseDirectionConfig.Validate if the designated

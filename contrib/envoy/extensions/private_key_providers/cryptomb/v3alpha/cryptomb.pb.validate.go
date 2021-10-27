@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,17 +32,51 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on CryptoMbPrivateKeyMethodConfig with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *CryptoMbPrivateKeyMethodConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CryptoMbPrivateKeyMethodConfig with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// CryptoMbPrivateKeyMethodConfigMultiError, or nil if none found.
+func (m *CryptoMbPrivateKeyMethodConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CryptoMbPrivateKeyMethodConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetPrivateKey()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPrivateKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CryptoMbPrivateKeyMethodConfigValidationError{
+					field:  "PrivateKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CryptoMbPrivateKeyMethodConfigValidationError{
+					field:  "PrivateKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPrivateKey()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CryptoMbPrivateKeyMethodConfigValidationError{
 				field:  "PrivateKey",
@@ -52,35 +87,68 @@ func (m *CryptoMbPrivateKeyMethodConfig) Validate() error {
 	}
 
 	if m.GetPollDelay() == nil {
-		return CryptoMbPrivateKeyMethodConfigValidationError{
+		err := CryptoMbPrivateKeyMethodConfigValidationError{
 			field:  "PollDelay",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if d := m.GetPollDelay(); d != nil {
 		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
-			return CryptoMbPrivateKeyMethodConfigValidationError{
+			err = CryptoMbPrivateKeyMethodConfigValidationError{
 				field:  "PollDelay",
 				reason: "value is not a valid duration",
 				cause:  err,
 			}
-		}
-
-		gt := time.Duration(0*time.Second + 0*time.Nanosecond)
-
-		if dur <= gt {
-			return CryptoMbPrivateKeyMethodConfigValidationError{
-				field:  "PollDelay",
-				reason: "value must be greater than 0s",
+			if !all {
+				return err
 			}
-		}
+			errors = append(errors, err)
+		} else {
 
+			gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur <= gt {
+				err := CryptoMbPrivateKeyMethodConfigValidationError{
+					field:  "PollDelay",
+					reason: "value must be greater than 0s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
 	}
 
+	if len(errors) > 0 {
+		return CryptoMbPrivateKeyMethodConfigMultiError(errors)
+	}
 	return nil
 }
+
+// CryptoMbPrivateKeyMethodConfigMultiError is an error wrapping multiple
+// validation errors returned by CryptoMbPrivateKeyMethodConfig.ValidateAll()
+// if the designated constraints aren't met.
+type CryptoMbPrivateKeyMethodConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CryptoMbPrivateKeyMethodConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CryptoMbPrivateKeyMethodConfigMultiError) AllErrors() []error { return m }
 
 // CryptoMbPrivateKeyMethodConfigValidationError is the validation error
 // returned by CryptoMbPrivateKeyMethodConfig.Validate if the designated

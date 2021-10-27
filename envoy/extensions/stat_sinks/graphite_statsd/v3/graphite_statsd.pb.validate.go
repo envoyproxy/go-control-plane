@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,25 +32,44 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on GraphiteStatsdSink with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *GraphiteStatsdSink) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GraphiteStatsdSink with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GraphiteStatsdSinkMultiError, or nil if none found.
+func (m *GraphiteStatsdSink) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GraphiteStatsdSink) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Prefix
 
 	if wrapper := m.GetMaxBytesPerDatagram(); wrapper != nil {
 
 		if wrapper.GetValue() <= 0 {
-			return GraphiteStatsdSinkValidationError{
+			err := GraphiteStatsdSinkValidationError{
 				field:  "MaxBytesPerDatagram",
 				reason: "value must be greater than 0",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -58,7 +78,26 @@ func (m *GraphiteStatsdSink) Validate() error {
 
 	case *GraphiteStatsdSink_Address:
 
-		if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetAddress()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GraphiteStatsdSinkValidationError{
+						field:  "Address",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GraphiteStatsdSinkValidationError{
+						field:  "Address",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return GraphiteStatsdSinkValidationError{
 					field:  "Address",
@@ -69,15 +108,39 @@ func (m *GraphiteStatsdSink) Validate() error {
 		}
 
 	default:
-		return GraphiteStatsdSinkValidationError{
+		err := GraphiteStatsdSinkValidationError{
 			field:  "StatsdSpecifier",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 
 	}
 
+	if len(errors) > 0 {
+		return GraphiteStatsdSinkMultiError(errors)
+	}
 	return nil
 }
+
+// GraphiteStatsdSinkMultiError is an error wrapping multiple validation errors
+// returned by GraphiteStatsdSink.ValidateAll() if the designated constraints
+// aren't met.
+type GraphiteStatsdSinkMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GraphiteStatsdSinkMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GraphiteStatsdSinkMultiError) AllErrors() []error { return m }
 
 // GraphiteStatsdSinkValidationError is the validation error returned by
 // GraphiteStatsdSink.Validate if the designated constraints aren't met.

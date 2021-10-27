@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,17 +32,52 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on RawBuffer with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *RawBuffer) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RawBuffer with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RawBufferMultiError, or nil
+// if none found.
+func (m *RawBuffer) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RawBuffer) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return RawBufferMultiError(errors)
+	}
 	return nil
 }
+
+// RawBufferMultiError is an error wrapping multiple validation errors returned
+// by RawBuffer.ValidateAll() if the designated constraints aren't met.
+type RawBufferMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RawBufferMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RawBufferMultiError) AllErrors() []error { return m }
 
 // RawBufferValidationError is the validation error returned by
 // RawBuffer.Validate if the designated constraints aren't met.

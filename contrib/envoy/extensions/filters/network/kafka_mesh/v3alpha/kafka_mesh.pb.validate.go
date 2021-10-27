@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,33 +32,76 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on KafkaMesh with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *KafkaMesh) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KafkaMesh with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in KafkaMeshMultiError, or nil
+// if none found.
+func (m *KafkaMesh) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KafkaMesh) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetAdvertisedHost()) < 1 {
-		return KafkaMeshValidationError{
+		err := KafkaMeshValidationError{
 			field:  "AdvertisedHost",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if m.GetAdvertisedPort() <= 0 {
-		return KafkaMeshValidationError{
+		err := KafkaMeshValidationError{
 			field:  "AdvertisedPort",
 			reason: "value must be greater than 0",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetUpstreamClusters() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, KafkaMeshValidationError{
+						field:  fmt.Sprintf("UpstreamClusters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, KafkaMeshValidationError{
+						field:  fmt.Sprintf("UpstreamClusters[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return KafkaMeshValidationError{
 					field:  fmt.Sprintf("UpstreamClusters[%v]", idx),
@@ -72,7 +116,26 @@ func (m *KafkaMesh) Validate() error {
 	for idx, item := range m.GetForwardingRules() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, KafkaMeshValidationError{
+						field:  fmt.Sprintf("ForwardingRules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, KafkaMeshValidationError{
+						field:  fmt.Sprintf("ForwardingRules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return KafkaMeshValidationError{
 					field:  fmt.Sprintf("ForwardingRules[%v]", idx),
@@ -84,8 +147,27 @@ func (m *KafkaMesh) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return KafkaMeshMultiError(errors)
+	}
 	return nil
 }
+
+// KafkaMeshMultiError is an error wrapping multiple validation errors returned
+// by KafkaMesh.ValidateAll() if the designated constraints aren't met.
+type KafkaMeshMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KafkaMeshMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KafkaMeshMultiError) AllErrors() []error { return m }
 
 // KafkaMeshValidationError is the validation error returned by
 // KafkaMesh.Validate if the designated constraints aren't met.
@@ -143,37 +225,83 @@ var _ interface {
 
 // Validate checks the field values on KafkaClusterDefinition with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *KafkaClusterDefinition) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KafkaClusterDefinition with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// KafkaClusterDefinitionMultiError, or nil if none found.
+func (m *KafkaClusterDefinition) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KafkaClusterDefinition) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetClusterName()) < 1 {
-		return KafkaClusterDefinitionValidationError{
+		err := KafkaClusterDefinitionValidationError{
 			field:  "ClusterName",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if utf8.RuneCountInString(m.GetBootstrapServers()) < 1 {
-		return KafkaClusterDefinitionValidationError{
+		err := KafkaClusterDefinitionValidationError{
 			field:  "BootstrapServers",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if m.GetPartitionCount() <= 0 {
-		return KafkaClusterDefinitionValidationError{
+		err := KafkaClusterDefinitionValidationError{
 			field:  "PartitionCount",
 			reason: "value must be greater than 0",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for ProducerConfig
 
+	if len(errors) > 0 {
+		return KafkaClusterDefinitionMultiError(errors)
+	}
 	return nil
 }
+
+// KafkaClusterDefinitionMultiError is an error wrapping multiple validation
+// errors returned by KafkaClusterDefinition.ValidateAll() if the designated
+// constraints aren't met.
+type KafkaClusterDefinitionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KafkaClusterDefinitionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KafkaClusterDefinitionMultiError) AllErrors() []error { return m }
 
 // KafkaClusterDefinitionValidationError is the validation error returned by
 // KafkaClusterDefinition.Validate if the designated constraints aren't met.
@@ -232,12 +360,26 @@ var _ interface {
 } = KafkaClusterDefinitionValidationError{}
 
 // Validate checks the field values on ForwardingRule with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ForwardingRule) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ForwardingRule with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ForwardingRuleMultiError,
+// or nil if none found.
+func (m *ForwardingRule) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ForwardingRule) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for TargetCluster
 
@@ -248,8 +390,28 @@ func (m *ForwardingRule) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return ForwardingRuleMultiError(errors)
+	}
 	return nil
 }
+
+// ForwardingRuleMultiError is an error wrapping multiple validation errors
+// returned by ForwardingRule.ValidateAll() if the designated constraints
+// aren't met.
+type ForwardingRuleMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ForwardingRuleMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ForwardingRuleMultiError) AllErrors() []error { return m }
 
 // ForwardingRuleValidationError is the validation error returned by
 // ForwardingRule.Validate if the designated constraints aren't met.

@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,24 +32,62 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on FilterConfig with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *FilterConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on FilterConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in FilterConfigMultiError, or
+// nil if none found.
+func (m *FilterConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *FilterConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if m.GetDnsCacheConfig() == nil {
-		return FilterConfigValidationError{
+		err := FilterConfigValidationError{
 			field:  "DnsCacheConfig",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetDnsCacheConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetDnsCacheConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, FilterConfigValidationError{
+					field:  "DnsCacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, FilterConfigValidationError{
+					field:  "DnsCacheConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDnsCacheConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return FilterConfigValidationError{
 				field:  "DnsCacheConfig",
@@ -60,8 +99,27 @@ func (m *FilterConfig) Validate() error {
 
 	// no validation rules for SaveUpstreamAddress
 
+	if len(errors) > 0 {
+		return FilterConfigMultiError(errors)
+	}
 	return nil
 }
+
+// FilterConfigMultiError is an error wrapping multiple validation errors
+// returned by FilterConfig.ValidateAll() if the designated constraints aren't met.
+type FilterConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m FilterConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m FilterConfigMultiError) AllErrors() []error { return m }
 
 // FilterConfigValidationError is the validation error returned by
 // FilterConfig.Validate if the designated constraints aren't met.
@@ -118,12 +176,26 @@ var _ interface {
 } = FilterConfigValidationError{}
 
 // Validate checks the field values on PerRouteConfig with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *PerRouteConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PerRouteConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PerRouteConfigMultiError,
+// or nil if none found.
+func (m *PerRouteConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PerRouteConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	switch m.HostRewriteSpecifier.(type) {
 
@@ -135,8 +207,28 @@ func (m *PerRouteConfig) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return PerRouteConfigMultiError(errors)
+	}
 	return nil
 }
+
+// PerRouteConfigMultiError is an error wrapping multiple validation errors
+// returned by PerRouteConfig.ValidateAll() if the designated constraints
+// aren't met.
+type PerRouteConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PerRouteConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PerRouteConfigMultiError) AllErrors() []error { return m }
 
 // PerRouteConfigValidationError is the validation error returned by
 // PerRouteConfig.Validate if the designated constraints aren't met.

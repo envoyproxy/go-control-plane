@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,25 +32,64 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on S2AConfiguration with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *S2AConfiguration) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on S2AConfiguration with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// S2AConfigurationMultiError, or nil if none found.
+func (m *S2AConfiguration) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *S2AConfiguration) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetS2AAddress()) < 1 {
-		return S2AConfigurationValidationError{
+		err := S2AConfigurationValidationError{
 			field:  "S2AAddress",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
+	if len(errors) > 0 {
+		return S2AConfigurationMultiError(errors)
+	}
 	return nil
 }
+
+// S2AConfigurationMultiError is an error wrapping multiple validation errors
+// returned by S2AConfiguration.ValidateAll() if the designated constraints
+// aren't met.
+type S2AConfigurationMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m S2AConfigurationMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m S2AConfigurationMultiError) AllErrors() []error { return m }
 
 // S2AConfigurationValidationError is the validation error returned by
 // S2AConfiguration.Validate if the designated constraints aren't met.

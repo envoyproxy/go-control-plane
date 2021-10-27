@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,37 +32,84 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on RateLimit with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *RateLimit) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimit with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RateLimitMultiError, or nil
+// if none found.
+func (m *RateLimit) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimit) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetDomain()) < 1 {
-		return RateLimitValidationError{
+		err := RateLimitValidationError{
 			field:  "Domain",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if m.GetStage() > 10 {
-		return RateLimitValidationError{
+		err := RateLimitValidationError{
 			field:  "Stage",
 			reason: "value must be less than or equal to 10",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if _, ok := _RateLimit_RequestType_InLookup[m.GetRequestType()]; !ok {
-		return RateLimitValidationError{
+		err := RateLimitValidationError{
 			field:  "RequestType",
 			reason: "value must be in list [internal external both ]",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimitValidationError{
+					field:  "Timeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimitValidationError{
+					field:  "Timeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				field:  "Timeout",
@@ -76,13 +124,36 @@ func (m *RateLimit) Validate() error {
 	// no validation rules for RateLimitedAsResourceExhausted
 
 	if m.GetRateLimitService() == nil {
-		return RateLimitValidationError{
+		err := RateLimitValidationError{
 			field:  "RateLimitService",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetRateLimitService()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimitValidationError{
+					field:  "RateLimitService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimitValidationError{
+					field:  "RateLimitService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRateLimitService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitValidationError{
 				field:  "RateLimitService",
@@ -93,16 +164,39 @@ func (m *RateLimit) Validate() error {
 	}
 
 	if _, ok := RateLimit_XRateLimitHeadersRFCVersion_name[int32(m.GetEnableXRatelimitHeaders())]; !ok {
-		return RateLimitValidationError{
+		err := RateLimitValidationError{
 			field:  "EnableXRatelimitHeaders",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for DisableXEnvoyRatelimitedHeader
 
+	if len(errors) > 0 {
+		return RateLimitMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitMultiError is an error wrapping multiple validation errors returned
+// by RateLimit.ValidateAll() if the designated constraints aren't met.
+type RateLimitMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitMultiError) AllErrors() []error { return m }
 
 // RateLimitValidationError is the validation error returned by
 // RateLimit.Validate if the designated constraints aren't met.
@@ -166,33 +260,74 @@ var _RateLimit_RequestType_InLookup = map[string]struct{}{
 }
 
 // Validate checks the field values on RateLimitConfig with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *RateLimitConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RateLimitConfigMultiError, or nil if none found.
+func (m *RateLimitConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if m.GetStage() > 10 {
-		return RateLimitConfigValidationError{
+		err := RateLimitConfigValidationError{
 			field:  "Stage",
 			reason: "value must be less than or equal to 10",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for DisableKey
 
 	if len(m.GetActions()) < 1 {
-		return RateLimitConfigValidationError{
+		err := RateLimitConfigValidationError{
 			field:  "Actions",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetActions() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfigValidationError{
+						field:  fmt.Sprintf("Actions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfigValidationError{
+						field:  fmt.Sprintf("Actions[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfigValidationError{
 					field:  fmt.Sprintf("Actions[%v]", idx),
@@ -204,7 +339,26 @@ func (m *RateLimitConfig) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetLimit()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetLimit()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimitConfigValidationError{
+					field:  "Limit",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimitConfigValidationError{
+					field:  "Limit",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLimit()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitConfigValidationError{
 				field:  "Limit",
@@ -214,8 +368,28 @@ func (m *RateLimitConfig) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return RateLimitConfigMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfigMultiError is an error wrapping multiple validation errors
+// returned by RateLimitConfig.ValidateAll() if the designated constraints
+// aren't met.
+type RateLimitConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfigMultiError) AllErrors() []error { return m }
 
 // RateLimitConfigValidationError is the validation error returned by
 // RateLimitConfig.Validate if the designated constraints aren't met.
@@ -272,31 +446,72 @@ var _ interface {
 } = RateLimitConfigValidationError{}
 
 // Validate checks the field values on RateLimitPerRoute with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *RateLimitPerRoute) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitPerRoute with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RateLimitPerRouteMultiError, or nil if none found.
+func (m *RateLimitPerRoute) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitPerRoute) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if _, ok := RateLimitPerRoute_VhRateLimitsOptions_name[int32(m.GetVhRateLimits())]; !ok {
-		return RateLimitPerRouteValidationError{
+		err := RateLimitPerRouteValidationError{
 			field:  "VhRateLimits",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if _, ok := RateLimitPerRoute_OverrideOptions_name[int32(m.GetOverrideOption())]; !ok {
-		return RateLimitPerRouteValidationError{
+		err := RateLimitPerRouteValidationError{
 			field:  "OverrideOption",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetRateLimits() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitPerRouteValidationError{
+						field:  fmt.Sprintf("RateLimits[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitPerRouteValidationError{
+						field:  fmt.Sprintf("RateLimits[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitPerRouteValidationError{
 					field:  fmt.Sprintf("RateLimits[%v]", idx),
@@ -308,8 +523,28 @@ func (m *RateLimitPerRoute) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return RateLimitPerRouteMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitPerRouteMultiError is an error wrapping multiple validation errors
+// returned by RateLimitPerRoute.ValidateAll() if the designated constraints
+// aren't met.
+type RateLimitPerRouteMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitPerRouteMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitPerRouteMultiError) AllErrors() []error { return m }
 
 // RateLimitPerRouteValidationError is the validation error returned by
 // RateLimitPerRoute.Validate if the designated constraints aren't met.
@@ -369,17 +604,50 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Action with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *RateLimitConfig_Action) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig_Action with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RateLimitConfig_ActionMultiError, or nil if none found.
+func (m *RateLimitConfig_Action) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	switch m.ActionSpecifier.(type) {
 
 	case *RateLimitConfig_Action_SourceCluster_:
 
-		if v, ok := interface{}(m.GetSourceCluster()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetSourceCluster()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "SourceCluster",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "SourceCluster",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetSourceCluster()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "SourceCluster",
@@ -391,7 +659,26 @@ func (m *RateLimitConfig_Action) Validate() error {
 
 	case *RateLimitConfig_Action_DestinationCluster_:
 
-		if v, ok := interface{}(m.GetDestinationCluster()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetDestinationCluster()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "DestinationCluster",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "DestinationCluster",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDestinationCluster()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "DestinationCluster",
@@ -403,7 +690,26 @@ func (m *RateLimitConfig_Action) Validate() error {
 
 	case *RateLimitConfig_Action_RequestHeaders_:
 
-		if v, ok := interface{}(m.GetRequestHeaders()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetRequestHeaders()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "RequestHeaders",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "RequestHeaders",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRequestHeaders()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "RequestHeaders",
@@ -415,7 +721,26 @@ func (m *RateLimitConfig_Action) Validate() error {
 
 	case *RateLimitConfig_Action_RemoteAddress_:
 
-		if v, ok := interface{}(m.GetRemoteAddress()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetRemoteAddress()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "RemoteAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "RemoteAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRemoteAddress()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "RemoteAddress",
@@ -427,7 +752,26 @@ func (m *RateLimitConfig_Action) Validate() error {
 
 	case *RateLimitConfig_Action_GenericKey_:
 
-		if v, ok := interface{}(m.GetGenericKey()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetGenericKey()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "GenericKey",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "GenericKey",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetGenericKey()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "GenericKey",
@@ -439,7 +783,26 @@ func (m *RateLimitConfig_Action) Validate() error {
 
 	case *RateLimitConfig_Action_HeaderValueMatch_:
 
-		if v, ok := interface{}(m.GetHeaderValueMatch()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetHeaderValueMatch()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "HeaderValueMatch",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "HeaderValueMatch",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetHeaderValueMatch()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "HeaderValueMatch",
@@ -451,7 +814,26 @@ func (m *RateLimitConfig_Action) Validate() error {
 
 	case *RateLimitConfig_Action_Metadata:
 
-		if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetMetadata()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "Metadata",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "Metadata",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "Metadata",
@@ -463,7 +845,26 @@ func (m *RateLimitConfig_Action) Validate() error {
 
 	case *RateLimitConfig_Action_Extension:
 
-		if v, ok := interface{}(m.GetExtension()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetExtension()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "Extension",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_ActionValidationError{
+						field:  "Extension",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetExtension()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_ActionValidationError{
 					field:  "Extension",
@@ -474,15 +875,39 @@ func (m *RateLimitConfig_Action) Validate() error {
 		}
 
 	default:
-		return RateLimitConfig_ActionValidationError{
+		err := RateLimitConfig_ActionValidationError{
 			field:  "ActionSpecifier",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 
 	}
 
+	if len(errors) > 0 {
+		return RateLimitConfig_ActionMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_ActionMultiError is an error wrapping multiple validation
+// errors returned by RateLimitConfig_Action.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_ActionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_ActionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_ActionMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_ActionValidationError is the validation error returned by
 // RateLimitConfig_Action.Validate if the designated constraints aren't met.
@@ -542,17 +967,50 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Override with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *RateLimitConfig_Override) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig_Override with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RateLimitConfig_OverrideMultiError, or nil if none found.
+func (m *RateLimitConfig_Override) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Override) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	switch m.OverrideSpecifier.(type) {
 
 	case *RateLimitConfig_Override_DynamicMetadata_:
 
-		if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetDynamicMetadata()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_OverrideValidationError{
+						field:  "DynamicMetadata",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_OverrideValidationError{
+						field:  "DynamicMetadata",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_OverrideValidationError{
 					field:  "DynamicMetadata",
@@ -563,15 +1021,39 @@ func (m *RateLimitConfig_Override) Validate() error {
 		}
 
 	default:
-		return RateLimitConfig_OverrideValidationError{
+		err := RateLimitConfig_OverrideValidationError{
 			field:  "OverrideSpecifier",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 
 	}
 
+	if len(errors) > 0 {
+		return RateLimitConfig_OverrideMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_OverrideMultiError is an error wrapping multiple validation
+// errors returned by RateLimitConfig_Override.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_OverrideMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_OverrideMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_OverrideMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_OverrideValidationError is the validation error returned by
 // RateLimitConfig_Override.Validate if the designated constraints aren't met.
@@ -631,14 +1113,50 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Action_SourceCluster
 // with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
 func (m *RateLimitConfig_Action_SourceCluster) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig_Action_SourceCluster
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// RateLimitConfig_Action_SourceClusterMultiError, or nil if none found.
+func (m *RateLimitConfig_Action_SourceCluster) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action_SourceCluster) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return RateLimitConfig_Action_SourceClusterMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Action_SourceClusterMultiError is an error wrapping multiple
+// validation errors returned by
+// RateLimitConfig_Action_SourceCluster.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_SourceClusterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Action_SourceClusterMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Action_SourceClusterMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Action_SourceClusterValidationError is the validation error
 // returned by RateLimitConfig_Action_SourceCluster.Validate if the designated
@@ -699,14 +1217,51 @@ var _ interface {
 
 // Validate checks the field values on
 // RateLimitConfig_Action_DestinationCluster with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *RateLimitConfig_Action_DestinationCluster) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// RateLimitConfig_Action_DestinationCluster with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// RateLimitConfig_Action_DestinationClusterMultiError, or nil if none found.
+func (m *RateLimitConfig_Action_DestinationCluster) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action_DestinationCluster) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return RateLimitConfig_Action_DestinationClusterMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Action_DestinationClusterMultiError is an error wrapping
+// multiple validation errors returned by
+// RateLimitConfig_Action_DestinationCluster.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_DestinationClusterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Action_DestinationClusterMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Action_DestinationClusterMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Action_DestinationClusterValidationError is the validation
 // error returned by RateLimitConfig_Action_DestinationCluster.Validate if the
@@ -767,37 +1322,85 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Action_RequestHeaders
 // with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
 func (m *RateLimitConfig_Action_RequestHeaders) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig_Action_RequestHeaders
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// RateLimitConfig_Action_RequestHeadersMultiError, or nil if none found.
+func (m *RateLimitConfig_Action_RequestHeaders) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action_RequestHeaders) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetHeaderName()) < 1 {
-		return RateLimitConfig_Action_RequestHeadersValidationError{
+		err := RateLimitConfig_Action_RequestHeadersValidationError{
 			field:  "HeaderName",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if !_RateLimitConfig_Action_RequestHeaders_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
-		return RateLimitConfig_Action_RequestHeadersValidationError{
+		err := RateLimitConfig_Action_RequestHeadersValidationError{
 			field:  "HeaderName",
 			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if utf8.RuneCountInString(m.GetDescriptorKey()) < 1 {
-		return RateLimitConfig_Action_RequestHeadersValidationError{
+		err := RateLimitConfig_Action_RequestHeadersValidationError{
 			field:  "DescriptorKey",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for SkipIfAbsent
 
+	if len(errors) > 0 {
+		return RateLimitConfig_Action_RequestHeadersMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Action_RequestHeadersMultiError is an error wrapping
+// multiple validation errors returned by
+// RateLimitConfig_Action_RequestHeaders.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_RequestHeadersMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Action_RequestHeadersMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Action_RequestHeadersMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Action_RequestHeadersValidationError is the validation error
 // returned by RateLimitConfig_Action_RequestHeaders.Validate if the
@@ -860,14 +1463,50 @@ var _RateLimitConfig_Action_RequestHeaders_HeaderName_Pattern = regexp.MustCompi
 
 // Validate checks the field values on RateLimitConfig_Action_RemoteAddress
 // with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
 func (m *RateLimitConfig_Action_RemoteAddress) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig_Action_RemoteAddress
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// RateLimitConfig_Action_RemoteAddressMultiError, or nil if none found.
+func (m *RateLimitConfig_Action_RemoteAddress) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action_RemoteAddress) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
+	if len(errors) > 0 {
+		return RateLimitConfig_Action_RemoteAddressMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Action_RemoteAddressMultiError is an error wrapping multiple
+// validation errors returned by
+// RateLimitConfig_Action_RemoteAddress.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_RemoteAddressMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Action_RemoteAddressMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Action_RemoteAddressMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Action_RemoteAddressValidationError is the validation error
 // returned by RateLimitConfig_Action_RemoteAddress.Validate if the designated
@@ -928,23 +1567,63 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Action_GenericKey with
 // the rules defined in the proto definition for this message. If any rules
-// are violated, an error is returned.
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
 func (m *RateLimitConfig_Action_GenericKey) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig_Action_GenericKey
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// RateLimitConfig_Action_GenericKeyMultiError, or nil if none found.
+func (m *RateLimitConfig_Action_GenericKey) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action_GenericKey) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
-		return RateLimitConfig_Action_GenericKeyValidationError{
+		err := RateLimitConfig_Action_GenericKeyValidationError{
 			field:  "DescriptorValue",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for DescriptorKey
 
+	if len(errors) > 0 {
+		return RateLimitConfig_Action_GenericKeyMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Action_GenericKeyMultiError is an error wrapping multiple
+// validation errors returned by
+// RateLimitConfig_Action_GenericKey.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_GenericKeyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Action_GenericKeyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Action_GenericKeyMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Action_GenericKeyValidationError is the validation error
 // returned by RateLimitConfig_Action_GenericKey.Validate if the designated
@@ -1005,32 +1684,75 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Action_HeaderValueMatch
 // with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
 func (m *RateLimitConfig_Action_HeaderValueMatch) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// RateLimitConfig_Action_HeaderValueMatch with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// RateLimitConfig_Action_HeaderValueMatchMultiError, or nil if none found.
+func (m *RateLimitConfig_Action_HeaderValueMatch) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action_HeaderValueMatch) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
-		return RateLimitConfig_Action_HeaderValueMatchValidationError{
+		err := RateLimitConfig_Action_HeaderValueMatchValidationError{
 			field:  "DescriptorValue",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	// no validation rules for ExpectMatch
 
 	if len(m.GetHeaders()) < 1 {
-		return RateLimitConfig_Action_HeaderValueMatchValidationError{
+		err := RateLimitConfig_Action_HeaderValueMatchValidationError{
 			field:  "Headers",
 			reason: "value must contain at least 1 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	for idx, item := range m.GetHeaders() {
 		_, _ = idx, item
 
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitConfig_Action_HeaderValueMatchValidationError{
+						field:  fmt.Sprintf("Headers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitConfig_Action_HeaderValueMatchValidationError{
+						field:  fmt.Sprintf("Headers[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RateLimitConfig_Action_HeaderValueMatchValidationError{
 					field:  fmt.Sprintf("Headers[%v]", idx),
@@ -1042,8 +1764,29 @@ func (m *RateLimitConfig_Action_HeaderValueMatch) Validate() error {
 
 	}
 
+	if len(errors) > 0 {
+		return RateLimitConfig_Action_HeaderValueMatchMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Action_HeaderValueMatchMultiError is an error wrapping
+// multiple validation errors returned by
+// RateLimitConfig_Action_HeaderValueMatch.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_Action_HeaderValueMatchMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Action_HeaderValueMatchMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Action_HeaderValueMatchMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Action_HeaderValueMatchValidationError is the validation
 // error returned by RateLimitConfig_Action_HeaderValueMatch.Validate if the
@@ -1104,27 +1847,68 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Action_MetaData with the
 // rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *RateLimitConfig_Action_MetaData) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimitConfig_Action_MetaData with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// RateLimitConfig_Action_MetaDataMultiError, or nil if none found.
+func (m *RateLimitConfig_Action_MetaData) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Action_MetaData) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetDescriptorKey()) < 1 {
-		return RateLimitConfig_Action_MetaDataValidationError{
+		err := RateLimitConfig_Action_MetaDataValidationError{
 			field:  "DescriptorKey",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if m.GetMetadataKey() == nil {
-		return RateLimitConfig_Action_MetaDataValidationError{
+		err := RateLimitConfig_Action_MetaDataValidationError{
 			field:  "MetadataKey",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetMetadataKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimitConfig_Action_MetaDataValidationError{
+					field:  "MetadataKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimitConfig_Action_MetaDataValidationError{
+					field:  "MetadataKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitConfig_Action_MetaDataValidationError{
 				field:  "MetadataKey",
@@ -1137,14 +1921,38 @@ func (m *RateLimitConfig_Action_MetaData) Validate() error {
 	// no validation rules for DefaultValue
 
 	if _, ok := RateLimitConfig_Action_MetaData_Source_name[int32(m.GetSource())]; !ok {
-		return RateLimitConfig_Action_MetaDataValidationError{
+		err := RateLimitConfig_Action_MetaDataValidationError{
 			field:  "Source",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
+	if len(errors) > 0 {
+		return RateLimitConfig_Action_MetaDataMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Action_MetaDataMultiError is an error wrapping multiple
+// validation errors returned by RateLimitConfig_Action_MetaData.ValidateAll()
+// if the designated constraints aren't met.
+type RateLimitConfig_Action_MetaDataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Action_MetaDataMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Action_MetaDataMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Action_MetaDataValidationError is the validation error
 // returned by RateLimitConfig_Action_MetaData.Validate if the designated
@@ -1205,20 +2013,59 @@ var _ interface {
 
 // Validate checks the field values on RateLimitConfig_Override_DynamicMetadata
 // with the rules defined in the proto definition for this message. If any
-// rules are violated, an error is returned.
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
 func (m *RateLimitConfig_Override_DynamicMetadata) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// RateLimitConfig_Override_DynamicMetadata with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in
+// RateLimitConfig_Override_DynamicMetadataMultiError, or nil if none found.
+func (m *RateLimitConfig_Override_DynamicMetadata) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimitConfig_Override_DynamicMetadata) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if m.GetMetadataKey() == nil {
-		return RateLimitConfig_Override_DynamicMetadataValidationError{
+		err := RateLimitConfig_Override_DynamicMetadataValidationError{
 			field:  "MetadataKey",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetMetadataKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimitConfig_Override_DynamicMetadataValidationError{
+					field:  "MetadataKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimitConfig_Override_DynamicMetadataValidationError{
+					field:  "MetadataKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetadataKey()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RateLimitConfig_Override_DynamicMetadataValidationError{
 				field:  "MetadataKey",
@@ -1228,8 +2075,29 @@ func (m *RateLimitConfig_Override_DynamicMetadata) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return RateLimitConfig_Override_DynamicMetadataMultiError(errors)
+	}
 	return nil
 }
+
+// RateLimitConfig_Override_DynamicMetadataMultiError is an error wrapping
+// multiple validation errors returned by
+// RateLimitConfig_Override_DynamicMetadata.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimitConfig_Override_DynamicMetadataMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimitConfig_Override_DynamicMetadataMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimitConfig_Override_DynamicMetadataMultiError) AllErrors() []error { return m }
 
 // RateLimitConfig_Override_DynamicMetadataValidationError is the validation
 // error returned by RateLimitConfig_Override_DynamicMetadata.Validate if the

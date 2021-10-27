@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,60 +32,119 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on ProcessingMode with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ProcessingMode) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ProcessingMode with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ProcessingModeMultiError,
+// or nil if none found.
+func (m *ProcessingMode) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ProcessingMode) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if _, ok := ProcessingMode_HeaderSendMode_name[int32(m.GetRequestHeaderMode())]; !ok {
-		return ProcessingModeValidationError{
+		err := ProcessingModeValidationError{
 			field:  "RequestHeaderMode",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if _, ok := ProcessingMode_HeaderSendMode_name[int32(m.GetResponseHeaderMode())]; !ok {
-		return ProcessingModeValidationError{
+		err := ProcessingModeValidationError{
 			field:  "ResponseHeaderMode",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if _, ok := ProcessingMode_BodySendMode_name[int32(m.GetRequestBodyMode())]; !ok {
-		return ProcessingModeValidationError{
+		err := ProcessingModeValidationError{
 			field:  "RequestBodyMode",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if _, ok := ProcessingMode_BodySendMode_name[int32(m.GetResponseBodyMode())]; !ok {
-		return ProcessingModeValidationError{
+		err := ProcessingModeValidationError{
 			field:  "ResponseBodyMode",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if _, ok := ProcessingMode_HeaderSendMode_name[int32(m.GetRequestTrailerMode())]; !ok {
-		return ProcessingModeValidationError{
+		err := ProcessingModeValidationError{
 			field:  "RequestTrailerMode",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if _, ok := ProcessingMode_HeaderSendMode_name[int32(m.GetResponseTrailerMode())]; !ok {
-		return ProcessingModeValidationError{
+		err := ProcessingModeValidationError{
 			field:  "ResponseTrailerMode",
 			reason: "value must be one of the defined enum values",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
+	if len(errors) > 0 {
+		return ProcessingModeMultiError(errors)
+	}
 	return nil
 }
+
+// ProcessingModeMultiError is an error wrapping multiple validation errors
+// returned by ProcessingMode.ValidateAll() if the designated constraints
+// aren't met.
+type ProcessingModeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ProcessingModeMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ProcessingModeMultiError) AllErrors() []error { return m }
 
 // ProcessingModeValidationError is the validation error returned by
 // ProcessingMode.Validate if the designated constraints aren't met.

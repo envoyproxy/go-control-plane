@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,24 +32,62 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on RocketmqProxy with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *RocketmqProxy) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RocketmqProxy with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RocketmqProxyMultiError, or
+// nil if none found.
+func (m *RocketmqProxy) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RocketmqProxy) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
-		return RocketmqProxyValidationError{
+		err := RocketmqProxyValidationError{
 			field:  "StatPrefix",
 			reason: "value length must be at least 1 runes",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetRouteConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetRouteConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RocketmqProxyValidationError{
+					field:  "RouteConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RocketmqProxyValidationError{
+					field:  "RouteConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRouteConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RocketmqProxyValidationError{
 				field:  "RouteConfig",
@@ -58,7 +97,26 @@ func (m *RocketmqProxy) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTransientObjectLifeSpan()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetTransientObjectLifeSpan()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RocketmqProxyValidationError{
+					field:  "TransientObjectLifeSpan",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RocketmqProxyValidationError{
+					field:  "TransientObjectLifeSpan",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTransientObjectLifeSpan()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RocketmqProxyValidationError{
 				field:  "TransientObjectLifeSpan",
@@ -70,8 +128,28 @@ func (m *RocketmqProxy) Validate() error {
 
 	// no validation rules for DevelopMode
 
+	if len(errors) > 0 {
+		return RocketmqProxyMultiError(errors)
+	}
 	return nil
 }
+
+// RocketmqProxyMultiError is an error wrapping multiple validation errors
+// returned by RocketmqProxy.ValidateAll() if the designated constraints
+// aren't met.
+type RocketmqProxyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RocketmqProxyMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RocketmqProxyMultiError) AllErrors() []error { return m }
 
 // RocketmqProxyValidationError is the validation error returned by
 // RocketmqProxy.Validate if the designated constraints aren't met.

@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,17 +32,51 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on ExtensionWithMatcher with the rules
 // defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
+// violated, the first error encountered is returned, or nil if there are no violations.
 func (m *ExtensionWithMatcher) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExtensionWithMatcher with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExtensionWithMatcherMultiError, or nil if none found.
+func (m *ExtensionWithMatcher) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExtensionWithMatcher) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExtensionWithMatcherValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExtensionWithMatcherValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtensionWithMatcherValidationError{
 				field:  "Matcher",
@@ -51,7 +86,26 @@ func (m *ExtensionWithMatcher) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetXdsMatcher()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetXdsMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExtensionWithMatcherValidationError{
+					field:  "XdsMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExtensionWithMatcherValidationError{
+					field:  "XdsMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetXdsMatcher()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtensionWithMatcherValidationError{
 				field:  "XdsMatcher",
@@ -62,13 +116,36 @@ func (m *ExtensionWithMatcher) Validate() error {
 	}
 
 	if m.GetExtensionConfig() == nil {
-		return ExtensionWithMatcherValidationError{
+		err := ExtensionWithMatcherValidationError{
 			field:  "ExtensionConfig",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
-	if v, ok := interface{}(m.GetExtensionConfig()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetExtensionConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExtensionWithMatcherValidationError{
+					field:  "ExtensionConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExtensionWithMatcherValidationError{
+					field:  "ExtensionConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetExtensionConfig()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtensionWithMatcherValidationError{
 				field:  "ExtensionConfig",
@@ -78,8 +155,28 @@ func (m *ExtensionWithMatcher) Validate() error {
 		}
 	}
 
+	if len(errors) > 0 {
+		return ExtensionWithMatcherMultiError(errors)
+	}
 	return nil
 }
+
+// ExtensionWithMatcherMultiError is an error wrapping multiple validation
+// errors returned by ExtensionWithMatcher.ValidateAll() if the designated
+// constraints aren't met.
+type ExtensionWithMatcherMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExtensionWithMatcherMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExtensionWithMatcherMultiError) AllErrors() []error { return m }
 
 // ExtensionWithMatcherValidationError is the validation error returned by
 // ExtensionWithMatcher.Validate if the designated constraints aren't met.

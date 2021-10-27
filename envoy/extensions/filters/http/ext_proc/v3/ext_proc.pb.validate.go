@@ -11,6 +11,7 @@ import (
 	"net/mail"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,17 +32,51 @@ var (
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
+	_ = sort.Sort
 )
 
 // Validate checks the field values on ExternalProcessor with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *ExternalProcessor) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExternalProcessor with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExternalProcessorMultiError, or nil if none found.
+func (m *ExternalProcessor) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExternalProcessor) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetGrpcService()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "GrpcService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "GrpcService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExternalProcessorValidationError{
 				field:  "GrpcService",
@@ -53,7 +88,26 @@ func (m *ExternalProcessor) Validate() error {
 
 	// no validation rules for FailureModeAllow
 
-	if v, ok := interface{}(m.GetProcessingMode()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetProcessingMode()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "ProcessingMode",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "ProcessingMode",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProcessingMode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExternalProcessorValidationError{
 				field:  "ProcessingMode",
@@ -65,7 +119,26 @@ func (m *ExternalProcessor) Validate() error {
 
 	// no validation rules for AsyncMode
 
-	if v, ok := interface{}(m.GetMessageTimeout()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetMessageTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "MessageTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "MessageTimeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMessageTimeout()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExternalProcessorValidationError{
 				field:  "MessageTimeout",
@@ -77,8 +150,28 @@ func (m *ExternalProcessor) Validate() error {
 
 	// no validation rules for StatPrefix
 
+	if len(errors) > 0 {
+		return ExternalProcessorMultiError(errors)
+	}
 	return nil
 }
+
+// ExternalProcessorMultiError is an error wrapping multiple validation errors
+// returned by ExternalProcessor.ValidateAll() if the designated constraints
+// aren't met.
+type ExternalProcessorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExternalProcessorMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExternalProcessorMultiError) AllErrors() []error { return m }
 
 // ExternalProcessorValidationError is the validation error returned by
 // ExternalProcessor.Validate if the designated constraints aren't met.
@@ -137,27 +230,64 @@ var _ interface {
 } = ExternalProcessorValidationError{}
 
 // Validate checks the field values on ExtProcPerRoute with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *ExtProcPerRoute) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExtProcPerRoute with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExtProcPerRouteMultiError, or nil if none found.
+func (m *ExtProcPerRoute) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExtProcPerRoute) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	switch m.Override.(type) {
 
 	case *ExtProcPerRoute_Disabled:
 
 		if m.GetDisabled() != true {
-			return ExtProcPerRouteValidationError{
+			err := ExtProcPerRouteValidationError{
 				field:  "Disabled",
 				reason: "value must equal true",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	case *ExtProcPerRoute_Overrides:
 
-		if v, ok := interface{}(m.GetOverrides()).(interface{ Validate() error }); ok {
+		if all {
+			switch v := interface{}(m.GetOverrides()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ExtProcPerRouteValidationError{
+						field:  "Overrides",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ExtProcPerRouteValidationError{
+						field:  "Overrides",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetOverrides()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ExtProcPerRouteValidationError{
 					field:  "Overrides",
@@ -168,15 +298,39 @@ func (m *ExtProcPerRoute) Validate() error {
 		}
 
 	default:
-		return ExtProcPerRouteValidationError{
+		err := ExtProcPerRouteValidationError{
 			field:  "Override",
 			reason: "value is required",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 
 	}
 
+	if len(errors) > 0 {
+		return ExtProcPerRouteMultiError(errors)
+	}
 	return nil
 }
+
+// ExtProcPerRouteMultiError is an error wrapping multiple validation errors
+// returned by ExtProcPerRoute.ValidateAll() if the designated constraints
+// aren't met.
+type ExtProcPerRouteMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExtProcPerRouteMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExtProcPerRouteMultiError) AllErrors() []error { return m }
 
 // ExtProcPerRouteValidationError is the validation error returned by
 // ExtProcPerRoute.Validate if the designated constraints aren't met.
@@ -233,14 +387,47 @@ var _ interface {
 } = ExtProcPerRouteValidationError{}
 
 // Validate checks the field values on ExtProcOverrides with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *ExtProcOverrides) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExtProcOverrides with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExtProcOverridesMultiError, or nil if none found.
+func (m *ExtProcOverrides) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExtProcOverrides) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetProcessingMode()).(interface{ Validate() error }); ok {
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetProcessingMode()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExtProcOverridesValidationError{
+					field:  "ProcessingMode",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExtProcOverridesValidationError{
+					field:  "ProcessingMode",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProcessingMode()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExtProcOverridesValidationError{
 				field:  "ProcessingMode",
@@ -252,8 +439,28 @@ func (m *ExtProcOverrides) Validate() error {
 
 	// no validation rules for AsyncMode
 
+	if len(errors) > 0 {
+		return ExtProcOverridesMultiError(errors)
+	}
 	return nil
 }
+
+// ExtProcOverridesMultiError is an error wrapping multiple validation errors
+// returned by ExtProcOverrides.ValidateAll() if the designated constraints
+// aren't met.
+type ExtProcOverridesMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExtProcOverridesMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExtProcOverridesMultiError) AllErrors() []error { return m }
 
 // ExtProcOverridesValidationError is the validation error returned by
 // ExtProcOverrides.Validate if the designated constraints aren't met.
