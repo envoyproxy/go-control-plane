@@ -136,9 +136,9 @@ const (
 	Cluster_CLUSTER_PROVIDED Cluster_LbPolicy = 6
 	// Use the new :ref:`load_balancing_policy
 	// <envoy_v3_api_field_config.cluster.v3.Cluster.load_balancing_policy>` field to determine the LB policy.
-	// [#next-major-version: In the v3 API, we should consider deprecating the lb_policy field
-	// and instead using the new load_balancing_policy field as the one and only mechanism for
-	// configuring this.]
+	// This has been deprecated in favor of using the :ref:`load_balancing_policy
+	// <envoy_v3_api_field_config.cluster.v3.Cluster.load_balancing_policy>` field without
+	// setting any value in :ref:`lb_policy<envoy_v3_api_field_config.cluster.v3.Cluster.lb_policy>`.
 	Cluster_LOAD_BALANCING_POLICY_CONFIG Cluster_LbPolicy = 7
 )
 
@@ -866,9 +866,8 @@ type Cluster struct {
 	// The chain will be applied to all outgoing connections that Envoy makes to the upstream
 	// servers of this cluster.
 	Filters []*Filter `protobuf:"bytes,40,rep,name=filters,proto3" json:"filters,omitempty"`
-	// New mechanism for LB policy configuration. Used only if the
-	// :ref:`lb_policy<envoy_v3_api_field_config.cluster.v3.Cluster.lb_policy>` field has the value
-	// :ref:`LOAD_BALANCING_POLICY_CONFIG<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbPolicy.LOAD_BALANCING_POLICY_CONFIG>`.
+	// If this field is set and is supported by the client, it will supersede the value of
+	// :ref:`lb_policy<envoy_v3_api_field_config.cluster.v3.Cluster.lb_policy>`.
 	LoadBalancingPolicy *LoadBalancingPolicy `protobuf:"bytes,41,opt,name=load_balancing_policy,json=loadBalancingPolicy,proto3" json:"load_balancing_policy,omitempty"`
 	// [#not-implemented-hide:]
 	// If present, tells the client where to send load reports via LRS. If not present, the
