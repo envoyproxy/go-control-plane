@@ -201,10 +201,9 @@ type DownstreamTlsContext struct {
 	//	*DownstreamTlsContext_SessionTicketKeysSdsSecretConfig
 	//	*DownstreamTlsContext_DisableStatelessSessionResumption
 	SessionTicketKeysType isDownstreamTlsContext_SessionTicketKeysType `protobuf_oneof:"session_ticket_keys_type"`
-	// If specified, session_timeout will change maximum lifetime (in seconds) of TLS session
-	// Currently this value is used as a hint to `TLS session ticket lifetime (for TLSv1.2)
-	// <https://tools.ietf.org/html/rfc5077#section-5.6>`
-	// only seconds could be specified (fractional seconds are going to be ignored).
+	// If specified, ``session_timeout`` will change the maximum lifetime (in seconds) of the TLS session.
+	// Currently this value is used as a hint for the `TLS session ticket lifetime (for TLSv1.2) <https://tools.ietf.org/html/rfc5077#section-5.6>`_.
+	// Only seconds can be specified (fractional seconds are ignored).
 	SessionTimeout *duration.Duration `protobuf:"bytes,6,opt,name=session_timeout,json=sessionTimeout,proto3" json:"session_timeout,omitempty"`
 	// Config for whether to use certificates if they do not have
 	// an accompanying OCSP response or if the response expires at runtime.
