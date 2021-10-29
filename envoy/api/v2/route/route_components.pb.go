@@ -3936,8 +3936,8 @@ type RouteAction_HashPolicy_FilterState struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The name of the Object in the per-request filterState, which is an
-	// Envoy::Http::Hashable object. If there is no data associated with the key,
-	// or the stored object is not Envoy::Http::Hashable, no hash will be produced.
+	// Envoy::Hashable object. If there is no data associated with the key,
+	// or the stored object is not Envoy::Hashable, no hash will be produced.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 }
 
