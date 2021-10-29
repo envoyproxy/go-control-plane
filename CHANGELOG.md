@@ -15,14 +15,14 @@
 
 - Removed linearization in server API to preserve cache ordering (#443)
 - SetSnapshot now takes a `context` (#474)
-- Wildcard mode now responds immediately if no response and snapshot exists (#473)
+- Delta xDS now responds immediately for the first wildcard request in a delta stream if the corresponding snapshot exists and the response is empty (#473)
 - Reworked snapshot API to faciliate additional xDS resources without changes (#484)
 - Delta xDS won't delete non-existent resources in wildcard mode (#488)
 - Simple cache now holds a read lock when cancelling a snapshot watch (#507)
 
 ### Fixed
 
-- Delta xDS not registering another watcher after resource sent (#458)
+- Delta xDS not registering another watch after resource sent (#458)
 - Fixed data race in Linear cache (#502)
 - State of the World now tracks known resource names per caller stream (#508)
 
