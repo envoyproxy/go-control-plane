@@ -154,6 +154,10 @@ func (m *BandwidthLimit) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for EnableResponseTrailers
+
+	// no validation rules for ResponseTrailerPrefix
+
 	if len(errors) > 0 {
 		return BandwidthLimitMultiError(errors)
 	}
