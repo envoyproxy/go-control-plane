@@ -1161,6 +1161,8 @@ func (m *CertificateValidationContext) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for OnlyVerifyLeafCertCrl
+
 	if len(errors) > 0 {
 		return CertificateValidationContextMultiError(errors)
 	}
