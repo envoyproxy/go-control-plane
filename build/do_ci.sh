@@ -18,3 +18,7 @@ make bin/example
 make examples
 make test
 make integration
+
+cd ./xdsmatcher
+make test
+# TODO(snowp): Output coverage in CI
