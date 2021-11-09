@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package xdsmatcher.test.proto;
+
+option go_package = ".;proto";
+
+message TestData {
+	string foo = 1;
+	repeated string bar = 2;
+}
+
+message FooInput {}
+
+message BarInput {
+	uint32 index = 1;
+}
+
+message MatchAction {}

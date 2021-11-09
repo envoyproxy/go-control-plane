@@ -1,0 +1,32 @@
+matcher_tree:
+  input:
+    name: foo
+    typed_config:
+      "@type": type.googleapis.com/xdsmatcher.test.proto.FooInput
+  exact_match_map:
+    map:
+      "value":
+        matcher:
+          matcher_list:
+            matchers:
+              - predicate:
+                  single_predicate:
+                    input:
+                      name: bar
+                      typed_config:
+                        "@type": type.googleapis.com/xdsmatcher.test.proto.BarInput
+                        index: 1
+                    value_match:
+                      safe_regex:
+                        regex: baz.*boo
+                        google_re2: {}
+                on_match:
+                  action:
+                    name: action
+                    typed_config:
+                      "@type": type.googleapis.com/xdsmatcher.test.proto.MatchAction
+on_no_match:
+  action:
+    name: action
+    typed_config:
+      "@type": type.googleapis.com/xdsmatcher.test.proto.MatchAction
