@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ProtoFromYaml converts a YAML string into the specific protobuf message.
 func ProtoFromYaml(s []byte, m proto.Message) error {
 	var obj interface{}
 	if err := yaml.Unmarshal(s, &obj); err != nil {
@@ -29,6 +30,8 @@ func ProtoFromYaml(s []byte, m proto.Message) error {
 	return nil
 }
 
+// This is necessary because yaml.Unmarshal gives us map[interface{}]interface{} and we need
+// to cast the types in order to make json.Marshal accept it.
 func convert(i interface{}) interface{} {
 	switch x := i.(type) {
 	case map[interface{}]interface{}:

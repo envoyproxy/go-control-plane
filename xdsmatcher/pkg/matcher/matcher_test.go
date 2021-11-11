@@ -72,7 +72,7 @@ matcher_list:
 	testHelper(t, conjunctionMatcherConfig)
 }
 
-func TestDisjunctionMatch(t *testing.T) {
+func TestDisjunction(t *testing.T) {
 	disjunnctionMatcherConfig := func(inputType string) string {
 		return fmt.Sprintf(`
 matcher_list:
@@ -110,8 +110,13 @@ matcher_list:
 	testHelper(t, disjunnctionMatcherConfig)
 }
 
+// Helper that evaluates the provided configuration generator with various inputs to provide test coverage of a series of scenarios.
+// The configurator should follow the following convention:
+// when the provided type name is FooInput, the match should be succesful when ran against testData1, but fail when run against testData2.
+// if the provided test type is not available, the matching should fail, allowing us to surface needsMoreData responses.
 func testHelper(t *testing.T, configurationGenerator func(typeName string) string) {
 	t.Helper()
+
 	tcs := []struct {
 		name          string
 		inputType     string
