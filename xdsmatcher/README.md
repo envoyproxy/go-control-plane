@@ -88,7 +88,7 @@ matcher_tree:
 	_ = iproto.ProtoFromYaml([]byte(yaml), matcher)
 
 	m, _ := matcher.Create(matcher)
-	
+
 	data := &pbtest.TestData{}
 	r, _ := m.Match(data)
 	if r.MatchResult != nil && r.MatchResult.Action != nil {
