@@ -6,10 +6,11 @@ import (
 	"regexp"
 	"strings"
 
-	pbmatcher "github.com/envoyproxy/go-control-plane/envoy/config/common/matcher/v3"
-	pbtypematcher "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
+	pbmatcher "github.com/cncf/xds/go/xds/type/matcher/v3"
+	pblegacymatcher "github.com/envoyproxy/go-control-plane/envoy/config/common/matcher/v3"
 	"github.com/envoyproxy/go-control-plane/xdsmatcher/pkg/matcher/registry"
 	"github.com/envoyproxy/go-control-plane/xdsmatcher/pkg/matcher/types"
+	"google.golang.org/protobuf/proto"
 )
 
 type MatcherTree struct {
@@ -61,6 +62,21 @@ func (m MatcherTree) Match(data types.MatchingData) (types.Result, error) {
 
 func Create(matcher *pbmatcher.Matcher) (*MatcherTree, error) {
 	return create(matcher, &tracingLogger{})
+}
+
+func CreateLegacy(matcher *pblegacymatcher.Matcher) (*MatcherTree, error) {
+	// Wire cast the matcher to the new matcher format.
+	b, err := proto.Marshal(matcher)
+	if err != nil {
+		return nil, err
+	}
+	m := &pbmatcher.Matcher{}
+	err = proto.Unmarshal(b, m)
+	if err != nil {
+		return nil, err
+	}
+
+	return Create(m)
 }
 
 func create(matcher *pbmatcher.Matcher, logger *tracingLogger) (*MatcherTree, error) {
@@ -281,9 +297,9 @@ func createSinglePredicate(predicate *pbmatcher.Matcher_MatcherList_Predicate_Si
 	}
 }
 
-func createValueMatcher(valueMatcher *pbtypematcher.StringMatcher) (simpleMatcher, error) {
+func createValueMatcher(valueMatcher *pbmatcher.StringMatcher) (simpleMatcher, error) {
 	switch m := valueMatcher.MatchPattern.(type) {
-	case *pbtypematcher.StringMatcher_SafeRegex:
+	case *pbmatcher.StringMatcher_SafeRegex:
 		r, err := regexp.Compile(m.SafeRegex.Regex)
 		if err != nil {
 			return nil, err

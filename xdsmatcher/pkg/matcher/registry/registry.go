@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 
-	pbcore "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	pbcore "github.com/cncf/xds/go/xds/core/v3"
 	"github.com/envoyproxy/go-control-plane/xdsmatcher/pkg/matcher/types"
 )
 

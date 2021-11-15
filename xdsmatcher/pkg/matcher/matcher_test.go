@@ -7,7 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	pbmatcher "github.com/envoyproxy/go-control-plane/envoy/config/common/matcher/v3"
+	pbmatcher "github.com/cncf/xds/go/xds/type/matcher/v3"
+	pblegacymatcher "github.com/envoyproxy/go-control-plane/envoy/config/common/matcher/v3"
 	iproto "github.com/envoyproxy/go-control-plane/xdsmatcher/internal/proto"
 	_ "github.com/envoyproxy/go-control-plane/xdsmatcher/test"
 	pbtest "github.com/envoyproxy/go-control-plane/xdsmatcher/test/proto"
@@ -31,7 +32,28 @@ matcher_tree:
 `, inputType)
 	}
 
-	testHelper(t, configuration)
+	testHelper(t, configuration, false)
+}
+
+func TestSimpleLegacy(t *testing.T) {
+	configuration := func(inputType string) string {
+		return fmt.Sprintf(`
+matcher_tree:
+  input:
+    name: foo
+    typed_config:
+      "@type": %s
+  exact_match_map:
+    map:
+      "foo":
+        action:
+          name: action
+          typed_config:
+            "@type": type.googleapis.com/xdsmatcher.test.proto.MatchAction
+`, inputType)
+	}
+
+	testHelper(t, configuration, true)
 }
 
 func TestConjunction(t *testing.T) {
@@ -69,7 +91,7 @@ matcher_list:
           `, inputType)
 	}
 
-	testHelper(t, conjunctionMatcherConfig)
+	testHelper(t, conjunctionMatcherConfig, false)
 }
 
 func TestDisjunction(t *testing.T) {
@@ -107,14 +129,14 @@ matcher_list:
           `, inputType)
 	}
 
-	testHelper(t, disjunnctionMatcherConfig)
+	testHelper(t, disjunnctionMatcherConfig, false)
 }
 
 // Helper that evaluates the provided configuration generator with various inputs to provide test coverage of a series of scenarios.
 // The configurator should follow the following convention:
 // when the provided type name is FooInput, the match should be succesful when ran against testData1, but fail when run against testData2.
 // if the provided test type is not available, the matching should fail, allowing us to surface needsMoreData responses.
-func testHelper(t *testing.T, configurationGenerator func(typeName string) string) {
+func testHelper(t *testing.T, configurationGenerator func(typeName string) string, legacy bool) {
 	t.Helper()
 
 	tcs := []struct {
@@ -160,7 +182,7 @@ func testHelper(t *testing.T, configurationGenerator func(typeName string) strin
 	for _, tc := range tcs {
 		t.Run(tc.name, func(t *testing.T) {
 			configuration := configurationGenerator(tc.inputType)
-			m, err := createMatcher(t, configuration)
+			m, err := createMatcher(t, configuration, legacy)
 			assert.NoError(t, err)
 
 			r, err := m.Match(tc.input)
@@ -215,7 +237,7 @@ matcher_tree:
                     "@type": type.googleapis.com/xdsmatcher.test.proto.MatchAction
 `
 
-	m, err := createMatcher(t, configuration)
+	m, err := createMatcher(t, configuration, false)
 	assert.NoError(t, err)
 	r, err := m.Match(testData1)
 	assert.NoError(t, err)
@@ -241,7 +263,7 @@ matcher_tree:
             "@type": type.googleapis.com/xdsmatcher.test.proto.NotRegistered
 `
 
-	m, err := createMatcher(t, config)
+	m, err := createMatcher(t, config, false)
 	assert.Error(t, err)
 	assert.Nil(t, m)
 
@@ -260,7 +282,7 @@ matcher_tree:
             "@type": type.googleapis.com/xdsmatcher.test.proto.NotRegistered
 `
 
-	m, err = createMatcher(t, config)
+	m, err = createMatcher(t, config, false)
 	assert.Error(t, err)
 	assert.Nil(t, m)
 }
@@ -274,7 +296,14 @@ var testData2 = &pbtest.TestData{
 	Foo: "not-foo",
 }
 
-func createMatcher(t *testing.T, yaml string) (*MatcherTree, error) {
+func createMatcher(t *testing.T, yaml string, legacy bool) (*MatcherTree, error) {
+	if legacy {
+		matcher := &pblegacymatcher.Matcher{}
+		assert.NoError(t, iproto.ProtoFromYaml([]byte(yaml), matcher))
+
+		return CreateLegacy(matcher)
+	}
+
 	matcher := &pbmatcher.Matcher{}
 	assert.NoError(t, iproto.ProtoFromYaml([]byte(yaml), matcher))
 
