@@ -857,16 +857,12 @@ type Http2ProtocolOptions struct {
 	// be written into the socket). Exceeding this limit triggers flood mitigation and connection is
 	// terminated. The ``http2.outbound_flood`` stat tracks the number of terminated connections due
 	// to flood mitigation. The default limit is 10000.
-	// NOTE: flood and abuse mitigation for upstream connections is presently enabled by the
-	// `envoy.reloadable_features.upstream_http2_flood_checks` flag.
 	MaxOutboundFrames *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=max_outbound_frames,json=maxOutboundFrames,proto3" json:"max_outbound_frames,omitempty"`
 	// Limit the number of pending outbound downstream frames of types PING, SETTINGS and RST_STREAM,
 	// preventing high memory utilization when receiving continuous stream of these frames. Exceeding
 	// this limit triggers flood mitigation and connection is terminated. The
 	// ``http2.outbound_control_flood`` stat tracks the number of terminated connections due to flood
 	// mitigation. The default limit is 1000.
-	// NOTE: flood and abuse mitigation for upstream connections is presently enabled by the
-	// `envoy.reloadable_features.upstream_http2_flood_checks` flag.
 	MaxOutboundControlFrames *wrappers.UInt32Value `protobuf:"bytes,8,opt,name=max_outbound_control_frames,json=maxOutboundControlFrames,proto3" json:"max_outbound_control_frames,omitempty"`
 	// Limit the number of consecutive inbound frames of types HEADERS, CONTINUATION and DATA with an
 	// empty payload and no end stream flag. Those frames have no legitimate use and are abusive, but
@@ -874,8 +870,6 @@ type Http2ProtocolOptions struct {
 	// stat tracks the number of connections terminated due to flood mitigation.
 	// Setting this to 0 will terminate connection upon receiving first frame with an empty payload
 	// and no end stream flag. The default limit is 1.
-	// NOTE: flood and abuse mitigation for upstream connections is presently enabled by the
-	// `envoy.reloadable_features.upstream_http2_flood_checks` flag.
 	MaxConsecutiveInboundFramesWithEmptyPayload *wrappers.UInt32Value `protobuf:"bytes,9,opt,name=max_consecutive_inbound_frames_with_empty_payload,json=maxConsecutiveInboundFramesWithEmptyPayload,proto3" json:"max_consecutive_inbound_frames_with_empty_payload,omitempty"`
 	// Limit the number of inbound PRIORITY frames allowed per each opened stream. If the number
 	// of PRIORITY frames received over the lifetime of connection exceeds the value calculated
@@ -888,8 +882,6 @@ type Http2ProtocolOptions struct {
 	// `opened_streams` is incremented when Envoy send the HEADERS frame for a new stream. The
 	// ``http2.inbound_priority_frames_flood`` stat tracks
 	// the number of connections terminated due to flood mitigation. The default limit is 100.
-	// NOTE: flood and abuse mitigation for upstream connections is presently enabled by the
-	// `envoy.reloadable_features.upstream_http2_flood_checks` flag.
 	MaxInboundPriorityFramesPerStream *wrappers.UInt32Value `protobuf:"bytes,10,opt,name=max_inbound_priority_frames_per_stream,json=maxInboundPriorityFramesPerStream,proto3" json:"max_inbound_priority_frames_per_stream,omitempty"`
 	// Limit the number of inbound WINDOW_UPDATE frames allowed per DATA frame sent. If the number
 	// of WINDOW_UPDATE frames received over the lifetime of connection exceeds the value calculated
@@ -905,8 +897,6 @@ type Http2ProtocolOptions struct {
 	// flood mitigation. The default max_inbound_window_update_frames_per_data_frame_sent value is 10.
 	// Setting this to 1 should be enough to support HTTP/2 implementations with basic flow control,
 	// but more complex implementations that try to estimate available bandwidth require at least 2.
-	// NOTE: flood and abuse mitigation for upstream connections is presently enabled by the
-	// `envoy.reloadable_features.upstream_http2_flood_checks` flag.
 	MaxInboundWindowUpdateFramesPerDataFrameSent *wrappers.UInt32Value `protobuf:"bytes,11,opt,name=max_inbound_window_update_frames_per_data_frame_sent,json=maxInboundWindowUpdateFramesPerDataFrameSent,proto3" json:"max_inbound_window_update_frames_per_data_frame_sent,omitempty"`
 	// Allows invalid HTTP messaging and headers. When this option is disabled (default), then
 	// the whole HTTP/2 connection is terminated upon receiving invalid HEADERS frame. However,
