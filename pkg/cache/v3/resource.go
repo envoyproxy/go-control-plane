@@ -215,13 +215,27 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 			routeSpecifier := config.RouteSpecifier
 			switch r := routeSpecifier.(type) {
 			case *hcm.HttpConnectionManager_Rds:
-				if r != nil && r.Rds != nil {
-					routes[r.Rds.RouteConfigName] = true
+				if r == nil || r.Rds == nil {
+					break
 				}
 
+				routes[r.Rds.RouteConfigName] = true
+
 			case *hcm.HttpConnectionManager_ScopedRoutes:
-				if r != nil && r.ScopedRoutes != nil {
+				if r == nil || r.ScopedRoutes == nil {
+					break
+				}
+
+				// If we are using SRDS add the scoped route
+				// resource.
+				if r.ScopedRoutes.GetScopedRds() != nil {
 					scopedRoutes[r.ScopedRoutes.Name] = true
+				}
+
+				// If the scoped route mapping is embedded, add
+				// the referenced route resource names.
+				for _, s := range r.ScopedRoutes.GetScopedRouteConfigurationsList().GetScopedRouteConfigurations() {
+					routes[s.RouteConfigurationName] = true
 				}
 			}
 		}

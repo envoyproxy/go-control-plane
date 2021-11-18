@@ -351,6 +351,63 @@ func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32, 
 	return makeListener(listenerName, port, filterChains)
 }
 
+// MakeScopedRouteHTTPListenerForRoute is the same as
+// MakeScopedRouteHTTPListener, except it inlines a reference to the
+// routeConfigName, and so doesn't require a ScopedRouteConfiguration resource.
+func MakeScopedRouteHTTPListenerForRoute(mode string, listenerName string, port uint32, scopedRouteConfigName string, routeConfigName string) *listener.Listener {
+	source := configSource(mode)
+	routeSpecifier := &hcm.HttpConnectionManager_ScopedRoutes{
+		ScopedRoutes: &hcm.ScopedRoutes{
+			Name: scopedRouteConfigName,
+			ScopeKeyBuilder: &hcm.ScopedRoutes_ScopeKeyBuilder{
+				Fragments: []*hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder{
+					{
+						Type: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_{
+							HeaderValueExtractor: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor{
+								Name: "Host",
+								ExtractType: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index{
+									Index: 0,
+								},
+							},
+						},
+					},
+				},
+			},
+			RdsConfigSource: source,
+			ConfigSpecifier: &hcm.ScopedRoutes_ScopedRouteConfigurationsList{
+				ScopedRouteConfigurationsList: &hcm.ScopedRouteConfigurationsList{
+					ScopedRouteConfigurations: []*route.ScopedRouteConfiguration{{
+						RouteConfigurationName: routeConfigName,
+					}},
+				},
+			},
+		},
+	}
+
+	manager := buildHTTPConnectionManager()
+	manager.RouteSpecifier = routeSpecifier
+
+	pbst, err := anypb.New(manager)
+	if err != nil {
+		panic(err)
+	}
+
+	filterChains := []*listener.FilterChain{
+		{
+			Filters: []*listener.Filter{
+				{
+					Name: wellknown.HTTPConnectionManager,
+					ConfigType: &listener.Filter_TypedConfig{
+						TypedConfig: pbst,
+					},
+				},
+			},
+		},
+	}
+
+	return makeListener(listenerName, port, filterChains)
+}
+
 // Creates a TCP listener HTTP manager.
 func MakeTCPListener(listenerName string, port uint32, clusterName string) *listener.Listener {
 	// TCP filter configuration
