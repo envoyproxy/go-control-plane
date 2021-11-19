@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -113,7 +114,7 @@ func TestScopedRouteListenerWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 }
 
 func TestScopedRouteListenerWithInlineScopedRouteAndRouteIsConsistent(t *testing.T) {
-	snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
 			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "scopedRoute0", "testRoute0"),
 		},
@@ -122,9 +123,12 @@ func TestScopedRouteListenerWithInlineScopedRouteAndRouteIsConsistent(t *testing
 		},
 	})
 
+	require.NoError(t, err)
 	assert.NoError(t, snap.Consistent())
+}
 
-	snap, _ = cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+func TestScopedRouteListenerWithInlineScopedRouteAndNoRouteIsInconsistent(t *testing.T) {
+	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
 			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "scopedRoute0", "testRoute0"),
 		},
@@ -133,6 +137,7 @@ func TestScopedRouteListenerWithInlineScopedRouteAndRouteIsConsistent(t *testing
 		},
 	})
 
+	require.NoError(t, err)
 	assert.Error(t, snap.Consistent())
 }
 
