@@ -173,6 +173,8 @@ func (m *UdpProxyConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for UsePerPacketLoadBalancing
+
 	switch m.RouteSpecifier.(type) {
 
 	case *UdpProxyConfig_Cluster:
