@@ -2312,6 +2312,8 @@ func (m *RouteAction) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for AppendXForwardedHost
+
 	if all {
 		switch v := interface{}(m.GetTimeout()).(type) {
 		case interface{ ValidateAll() error }:
