@@ -893,6 +893,173 @@ var _ interface {
 	ErrorName() string
 } = CertificateProviderPluginInstanceValidationError{}
 
+// Validate checks the field values on SubjectAltNameMatcher with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SubjectAltNameMatcher) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SubjectAltNameMatcher with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SubjectAltNameMatcherMultiError, or nil if none found.
+func (m *SubjectAltNameMatcher) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SubjectAltNameMatcher) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if _, ok := _SubjectAltNameMatcher_SanType_NotInLookup[m.GetSanType()]; ok {
+		err := SubjectAltNameMatcherValidationError{
+			field:  "SanType",
+			reason: "value must not be in list [0]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := SubjectAltNameMatcher_SanType_name[int32(m.GetSanType())]; !ok {
+		err := SubjectAltNameMatcherValidationError{
+			field:  "SanType",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetMatcher() == nil {
+		err := SubjectAltNameMatcherValidationError{
+			field:  "Matcher",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SubjectAltNameMatcherValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SubjectAltNameMatcherValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SubjectAltNameMatcherValidationError{
+				field:  "Matcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SubjectAltNameMatcherMultiError(errors)
+	}
+	return nil
+}
+
+// SubjectAltNameMatcherMultiError is an error wrapping multiple validation
+// errors returned by SubjectAltNameMatcher.ValidateAll() if the designated
+// constraints aren't met.
+type SubjectAltNameMatcherMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SubjectAltNameMatcherMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SubjectAltNameMatcherMultiError) AllErrors() []error { return m }
+
+// SubjectAltNameMatcherValidationError is the validation error returned by
+// SubjectAltNameMatcher.Validate if the designated constraints aren't met.
+type SubjectAltNameMatcherValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SubjectAltNameMatcherValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SubjectAltNameMatcherValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SubjectAltNameMatcherValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SubjectAltNameMatcherValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SubjectAltNameMatcherValidationError) ErrorName() string {
+	return "SubjectAltNameMatcherValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SubjectAltNameMatcherValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSubjectAltNameMatcher.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SubjectAltNameMatcherValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SubjectAltNameMatcherValidationError{}
+
+var _SubjectAltNameMatcher_SanType_NotInLookup = map[SubjectAltNameMatcher_SanType]struct{}{
+	0: {},
+}
+
 // Validate checks the field values on CertificateValidationContext with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -1052,6 +1219,40 @@ func (m *CertificateValidationContext) validate(all bool) error {
 				return err
 			}
 			errors = append(errors, err)
+		}
+
+	}
+
+	for idx, item := range m.GetMatchTypedSubjectAltNames() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CertificateValidationContextValidationError{
+						field:  fmt.Sprintf("MatchTypedSubjectAltNames[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CertificateValidationContextValidationError{
+						field:  fmt.Sprintf("MatchTypedSubjectAltNames[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CertificateValidationContextValidationError{
+					field:  fmt.Sprintf("MatchTypedSubjectAltNames[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
 		}
 
 	}
