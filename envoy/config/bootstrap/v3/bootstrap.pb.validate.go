@@ -993,6 +993,8 @@ func (m *Admin) validate(all bool) error {
 
 	}
 
+	// no validation rules for IgnoreGlobalConnLimit
+
 	if len(errors) > 0 {
 		return AdminMultiError(errors)
 	}
