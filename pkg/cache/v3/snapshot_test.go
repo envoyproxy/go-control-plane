@@ -85,7 +85,7 @@ func TestRouteListenerWithRouteIsConsistent(t *testing.T) {
 func TestScopedRouteListenerWithScopedRouteOnlyIsInconsistent(t *testing.T) {
 	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80, "scopedRoute0"),
+			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
 		},
 		rsrc.ScopedRouteType: {
 			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
@@ -98,7 +98,7 @@ func TestScopedRouteListenerWithScopedRouteOnlyIsInconsistent(t *testing.T) {
 func TestScopedRouteListenerWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 	snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80, "scopedRoute0"),
+			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
 		},
 		rsrc.ScopedRouteType: {
 			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
@@ -108,15 +108,13 @@ func TestScopedRouteListenerWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 		},
 	})
 
-	if err := snap.Consistent(); err != nil {
-		t.Errorf("got inconsistent snapshot %s, %#v", err.Error(), snap)
-	}
+	assert.NoError(t, snap.Consistent(), "got inconsistent snapshot %#v", snap)
 }
 
 func TestScopedRouteListenerWithInlineScopedRouteAndRouteIsConsistent(t *testing.T) {
 	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "scopedRoute0", "testRoute0"),
+			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "testRoute0"),
 		},
 		rsrc.RouteType: {
 			resource.MakeRoute("testRoute0", clusterName),
@@ -130,7 +128,7 @@ func TestScopedRouteListenerWithInlineScopedRouteAndRouteIsConsistent(t *testing
 func TestScopedRouteListenerWithInlineScopedRouteAndNoRouteIsInconsistent(t *testing.T) {
 	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "scopedRoute0", "testRoute0"),
+			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "testRoute0"),
 		},
 		rsrc.RouteType: {
 			resource.MakeRoute("testRoute1", clusterName),
@@ -144,7 +142,7 @@ func TestScopedRouteListenerWithInlineScopedRouteAndNoRouteIsInconsistent(t *tes
 func TestMultipleListenersWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 	snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80, "scopedRoute0"),
+			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
 			resource.MakeRouteHTTPListener(resource.Xds, "listener1", 80, "testRoute1"),
 		},
 		rsrc.ScopedRouteType: {
