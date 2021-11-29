@@ -100,9 +100,11 @@ type CircuitBreakers_Thresholds struct {
 	MaxConnections *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_connections,json=maxConnections,proto3" json:"max_connections,omitempty"`
 	// The maximum number of pending requests that Envoy will allow to the
 	// upstream cluster. If not specified, the default is 1024.
+	// This limit is applied as a connection limit for non-HTTP traffic.
 	MaxPendingRequests *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=max_pending_requests,json=maxPendingRequests,proto3" json:"max_pending_requests,omitempty"`
 	// The maximum number of parallel requests that Envoy will make to the
 	// upstream cluster. If not specified, the default is 1024.
+	// This limit does not apply to non-HTTP traffic.
 	MaxRequests *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=max_requests,json=maxRequests,proto3" json:"max_requests,omitempty"`
 	// The maximum number of parallel retries that Envoy will allow to the
 	// upstream cluster. If not specified, the default is 3.
