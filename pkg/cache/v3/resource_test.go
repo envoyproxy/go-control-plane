@@ -125,6 +125,10 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[rsrc.Type]map[string]bool{},
 		},
 		{
+			in:  resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, listenerName, 80, routeName),
+			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+		},
+		{
 			in:  resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName),
 			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
 		},
