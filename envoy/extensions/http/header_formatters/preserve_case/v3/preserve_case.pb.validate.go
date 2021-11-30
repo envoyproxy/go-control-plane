@@ -57,6 +57,8 @@ func (m *PreserveCaseFormatterConfig) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for ForwardReasonPhrase
+
 	if len(errors) > 0 {
 		return PreserveCaseFormatterConfigMultiError(errors)
 	}
