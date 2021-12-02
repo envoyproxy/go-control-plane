@@ -25,6 +25,8 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/stretchr/testify/assert"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -303,13 +305,17 @@ func TestServerShutdown(t *testing.T) {
 func TestResponseHandlers(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
+			done := make(chan struct{})
+			ctx, cancel := context.WithCancel(context.Background())
+
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(ctx, config, server.CallbackFuncs{})
 
 			// make a request
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
+
 			go func(rType string) {
 				var err error
 				switch rType {
@@ -332,9 +338,8 @@ func TestResponseHandlers(t *testing.T) {
 				case opaqueType:
 					err = s.StreamAggregatedResources(resp)
 				}
-				if err != nil {
-					t.Errorf("Stream() => got %v, want no error", err)
-				}
+				assert.NoError(t, err)
+				close(done)
 			}(typ)
 
 			// check a response
@@ -347,6 +352,9 @@ func TestResponseHandlers(t *testing.T) {
 			case <-time.After(1 * time.Second):
 				t.Fatalf("got no response")
 			}
+
+			cancel()
+			<-done
 		})
 	}
 }
