@@ -466,6 +466,7 @@ type AccessLogFilter_GrpcStatusFilter struct {
 
 type AccessLogFilter_ExtensionFilter struct {
 	// Extension filter.
+	// [#extension-category: envoy.access_loggers.extension_filters]
 	ExtensionFilter *ExtensionFilter `protobuf:"bytes,11,opt,name=extension_filter,json=extensionFilter,proto3,oneof"`
 }
 
