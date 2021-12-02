@@ -161,7 +161,7 @@ var (
 	route              = resource.MakeRoute(routeName, clusterName)
 	scopedRoute        = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"127.0.0.1"})
 	httpListener       = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
-	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80, scopedRouteName)
+	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80)
 	secret             = resource.MakeSecrets(secretName, "test")[0]
 	runtime            = resource.MakeRuntime(runtimeName)
 	extensionConfig    = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)

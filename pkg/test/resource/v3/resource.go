@@ -299,11 +299,11 @@ func MakeRouteHTTPListener(mode string, listenerName string, port uint32, route 
 }
 
 // Creates a HTTP listener using Scoped Routes, which extracts the "Host" header field as the key.
-func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32, scopedRouteConfigName string) *listener.Listener {
+func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32) *listener.Listener {
 	source := configSource(mode)
 	routeSpecifier := &hcm.HttpConnectionManager_ScopedRoutes{
 		ScopedRoutes: &hcm.ScopedRoutes{
-			Name: scopedRouteConfigName,
+			Name: "scoped-route-config", // This name is not bound to a xDS resource.
 			ScopeKeyBuilder: &hcm.ScopedRoutes_ScopeKeyBuilder{
 				Fragments: []*hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder{
 					{
@@ -354,11 +354,11 @@ func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32, 
 // MakeScopedRouteHTTPListenerForRoute is the same as
 // MakeScopedRouteHTTPListener, except it inlines a reference to the
 // routeConfigName, and so doesn't require a ScopedRouteConfiguration resource.
-func MakeScopedRouteHTTPListenerForRoute(mode string, listenerName string, port uint32, scopedRouteConfigName string, routeConfigName string) *listener.Listener {
+func MakeScopedRouteHTTPListenerForRoute(mode string, listenerName string, port uint32, routeConfigName string) *listener.Listener {
 	source := configSource(mode)
 	routeSpecifier := &hcm.HttpConnectionManager_ScopedRoutes{
 		ScopedRoutes: &hcm.ScopedRoutes{
-			Name: scopedRouteConfigName,
+			Name: "scoped-route-config", // This name is not bound to a xDS resource.
 			ScopeKeyBuilder: &hcm.ScopedRoutes_ScopeKeyBuilder{
 				Fragments: []*hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder{
 					{
@@ -554,7 +554,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 			listener = MakeRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]))
 			numHTTPListeners--
 		} else if numScopedHTTPListeners > 0 {
-			listener = MakeScopedRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(scopedRoutes[numScopedHTTPListeners-1]))
+			listener = MakeScopedRouteHTTPListener(ts.Xds, name, port)
 			numScopedHTTPListeners--
 		} else if numTCPListeners > 0 {
 			listener = MakeTCPListener(name, port, cache.GetResourceName(clusters[i%ts.NumClusters]))

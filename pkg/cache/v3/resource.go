@@ -26,7 +26,6 @@ import (
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
-	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 	auth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -197,10 +196,9 @@ func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string
 
 // HTTP listeners will either reference ScopedRoutes or Routes.
 func getListenerReferences(src *listener.Listener, out map[resource.Type]map[string]bool) {
-	scopedRoutes := map[string]bool{}
 	routes := map[string]bool{}
 
-	// extract route configuration names from HTTP connection manager
+	// Extract route configuration names from HTTP connection manager.
 	for _, chain := range src.FilterChains {
 		for _, filter := range chain.Filters {
 			if filter.Name != wellknown.HTTPConnectionManager {
@@ -212,42 +210,18 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 				continue
 			}
 
-			routeSpecifier := config.RouteSpecifier
-			switch r := routeSpecifier.(type) {
-			case *hcm.HttpConnectionManager_Rds:
-				if r == nil || r.Rds == nil {
-					break
-				}
+			// If we are using RDS, add the referenced the route name.
+			if name := config.GetRds().GetRouteConfigName(); name != "" {
+				routes[name] = true
+			}
 
-				routes[r.Rds.RouteConfigName] = true
-
-			case *hcm.HttpConnectionManager_ScopedRoutes:
-				if r == nil || r.ScopedRoutes == nil {
-					break
-				}
-
-				// If we are using SRDS add the scoped route
-				// resource.
-				if r.ScopedRoutes.GetScopedRds() != nil {
-					scopedRoutes[r.ScopedRoutes.Name] = true
-				}
-
-				// If the scoped route mapping is embedded, add
-				// the referenced route resource names.
-				for _, s := range r.ScopedRoutes.GetScopedRouteConfigurationsList().GetScopedRouteConfigurations() {
-					routes[s.RouteConfigurationName] = true
-				}
+			// If the scoped route mapping is embedded, add the referenced route resource names.
+			for _, s := range config.GetScopedRoutes().GetScopedRouteConfigurationsList().GetScopedRouteConfigurations() {
+				routes[s.RouteConfigurationName] = true
 			}
 		}
 	}
 
-	if len(scopedRoutes) > 0 {
-		if _, ok := out[resource.ScopedRouteType]; !ok {
-			out[resource.ScopedRouteType] = map[string]bool{}
-		}
-
-		mapMerge(out[resource.ScopedRouteType], scopedRoutes)
-	}
 	if len(routes) > 0 {
 		if _, ok := out[resource.RouteType]; !ok {
 			out[resource.RouteType] = map[string]bool{}
