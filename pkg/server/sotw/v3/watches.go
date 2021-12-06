@@ -40,7 +40,8 @@ func (w *watches) close() {
 
 // recomputeWatches rebuilds the known list of dynamic channels if needed
 func (w *watches) recompute(ctx context.Context, req <-chan *discovery.DiscoveryRequest) {
-	w.cases = w.cases[0:]
+	w.cases = w.cases[:0] // Clear the existing cases while retaining capacity.
+
 	w.cases = append(w.cases,
 		reflect.SelectCase{
 			Dir:  reflect.SelectRecv,
