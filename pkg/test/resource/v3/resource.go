@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"time"
 
-	pstruct "github.com/golang/protobuf/ptypes/struct"
-
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	alf "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
@@ -103,7 +103,7 @@ func MakeCluster(mode string, clusterName string) *cluster.Cluster {
 	connectTimeout := 5 * time.Second
 	return &cluster.Cluster{
 		Name:                 clusterName,
-		ConnectTimeout:       ptypes.DurationProto(connectTimeout),
+		ConnectTimeout:       durationpb.New(connectTimeout),
 		ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
 		EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{
 			EdsConfig: edsSource,
@@ -189,7 +189,7 @@ func configSource(mode string) *core.ConfigSource {
 				ApiType:             core.ApiConfigSource_REST,
 				TransportApiVersion: resource.DefaultAPIVersion,
 				ClusterNames:        []string{XdsCluster},
-				RefreshDelay:        ptypes.DurationProto(RefreshDelay),
+				RefreshDelay:        durationpb.New(RefreshDelay),
 			},
 		}
 	case Delta:
@@ -209,7 +209,7 @@ func configSource(mode string) *core.ConfigSource {
 	return source
 }
 
-func buildHttpConnectionManager() *hcm.HttpConnectionManager {
+func buildHTTPConnectionManager() *hcm.HttpConnectionManager {
 	// access log service configuration.
 	alsConfig := &als.HttpGrpcAccessLogConfig{
 		CommonConfig: &als.CommonGrpcAccessLogConfig{
@@ -224,7 +224,7 @@ func buildHttpConnectionManager() *hcm.HttpConnectionManager {
 			},
 		},
 	}
-	alsConfigPbst, err := ptypes.MarshalAny(alsConfig)
+	alsConfigPbst, err := anypb.New(alsConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -274,10 +274,10 @@ func MakeRouteHTTPListener(mode string, listenerName string, port uint32, route 
 		},
 	}
 
-	manager := buildHttpConnectionManager()
+	manager := buildHTTPConnectionManager()
 	manager.RouteSpecifier = routeSpecifier
 
-	pbst, err := ptypes.MarshalAny(manager)
+	pbst, err := anypb.New(manager)
 	if err != nil {
 		panic(err)
 	}
@@ -299,11 +299,11 @@ func MakeRouteHTTPListener(mode string, listenerName string, port uint32, route 
 }
 
 // Creates a HTTP listener using Scoped Routes, which extracts the "Host" header field as the key.
-func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32, scopedRouteConfigName string) *listener.Listener {
+func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32) *listener.Listener {
 	source := configSource(mode)
 	routeSpecifier := &hcm.HttpConnectionManager_ScopedRoutes{
 		ScopedRoutes: &hcm.ScopedRoutes{
-			Name: scopedRouteConfigName,
+			Name: "scoped-route-config", // This name is not bound to a xDS resource.
 			ScopeKeyBuilder: &hcm.ScopedRoutes_ScopeKeyBuilder{
 				Fragments: []*hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder{
 					{
@@ -327,10 +327,67 @@ func MakeScopedRouteHTTPListener(mode string, listenerName string, port uint32, 
 		},
 	}
 
-	manager := buildHttpConnectionManager()
+	manager := buildHTTPConnectionManager()
 	manager.RouteSpecifier = routeSpecifier
 
-	pbst, err := ptypes.MarshalAny(manager)
+	pbst, err := anypb.New(manager)
+	if err != nil {
+		panic(err)
+	}
+
+	filterChains := []*listener.FilterChain{
+		{
+			Filters: []*listener.Filter{
+				{
+					Name: wellknown.HTTPConnectionManager,
+					ConfigType: &listener.Filter_TypedConfig{
+						TypedConfig: pbst,
+					},
+				},
+			},
+		},
+	}
+
+	return makeListener(listenerName, port, filterChains)
+}
+
+// MakeScopedRouteHTTPListenerForRoute is the same as
+// MakeScopedRouteHTTPListener, except it inlines a reference to the
+// routeConfigName, and so doesn't require a ScopedRouteConfiguration resource.
+func MakeScopedRouteHTTPListenerForRoute(mode string, listenerName string, port uint32, routeConfigName string) *listener.Listener {
+	source := configSource(mode)
+	routeSpecifier := &hcm.HttpConnectionManager_ScopedRoutes{
+		ScopedRoutes: &hcm.ScopedRoutes{
+			Name: "scoped-route-config", // This name is not bound to a xDS resource.
+			ScopeKeyBuilder: &hcm.ScopedRoutes_ScopeKeyBuilder{
+				Fragments: []*hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder{
+					{
+						Type: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_{
+							HeaderValueExtractor: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor{
+								Name: "Host",
+								ExtractType: &hcm.ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index{
+									Index: 0,
+								},
+							},
+						},
+					},
+				},
+			},
+			RdsConfigSource: source,
+			ConfigSpecifier: &hcm.ScopedRoutes_ScopedRouteConfigurationsList{
+				ScopedRouteConfigurationsList: &hcm.ScopedRouteConfigurationsList{
+					ScopedRouteConfigurations: []*route.ScopedRouteConfiguration{{
+						RouteConfigurationName: routeConfigName,
+					}},
+				},
+			},
+		},
+	}
+
+	manager := buildHTTPConnectionManager()
+	manager.RouteSpecifier = routeSpecifier
+
+	pbst, err := anypb.New(manager)
 	if err != nil {
 		panic(err)
 	}
@@ -360,7 +417,7 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *list
 			Cluster: clusterName,
 		},
 	}
-	pbst, err := ptypes.MarshalAny(config)
+	pbst, err := anypb.New(config)
 	if err != nil {
 		panic(err)
 	}
@@ -385,13 +442,13 @@ func MakeTCPListener(listenerName string, port uint32, clusterName string) *list
 func MakeRuntime(runtimeName string) *runtime.Runtime {
 	return &runtime.Runtime{
 		Name: runtimeName,
-		Layer: &pstruct.Struct{
-			Fields: map[string]*pstruct.Value{
+		Layer: &structpb.Struct{
+			Fields: map[string]*structpb.Value{
 				"field-0": {
-					Kind: &pstruct.Value_NumberValue{NumberValue: 100},
+					Kind: &structpb.Value_NumberValue{NumberValue: 100},
 				},
 				"field-1": {
-					Kind: &pstruct.Value_StringValue{StringValue: "foobar"},
+					Kind: &structpb.Value_StringValue{StringValue: "foobar"},
 				},
 			},
 		},
@@ -416,7 +473,7 @@ func MakeExtensionConfig(mode string, extensionConfigName string, route string) 
 			Name: wellknown.Router,
 		}},
 	}
-	pbst, err := ptypes.MarshalAny(manager)
+	pbst, err := anypb.New(manager)
 	if err != nil {
 		panic(err)
 	}
@@ -497,7 +554,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 			listener = MakeRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(routes[i]))
 			numHTTPListeners--
 		} else if numScopedHTTPListeners > 0 {
-			listener = MakeScopedRouteHTTPListener(ts.Xds, name, port, cache.GetResourceName(scopedRoutes[numScopedHTTPListeners-1]))
+			listener = MakeScopedRouteHTTPListener(ts.Xds, name, port)
 			numScopedHTTPListeners--
 		} else if numTCPListeners > 0 {
 			listener = MakeTCPListener(name, port, cache.GetResourceName(clusters[i%ts.NumClusters]))
@@ -520,7 +577,7 @@ func (ts TestSnapshot) Generate() cache.Snapshot {
 						},
 					},
 				}
-				mt, _ := ptypes.MarshalAny(tlsc)
+				mt, _ := anypb.New(tlsc)
 				chain.TransportSocket = &core.TransportSocket{
 					Name: "envoy.transport_sockets.tls",
 					ConfigType: &core.TransportSocket_TypedConfig{

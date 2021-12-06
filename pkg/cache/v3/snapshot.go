@@ -87,9 +87,8 @@ func (s *Snapshot) Consistent() error {
 
 	// Loop through each referenced resource.
 	referencedResponseTypes := map[types.ResponseType]struct{}{
-		types.Endpoint:    struct{}{},
-		types.ScopedRoute: struct{}{},
-		types.Route:       struct{}{},
+		types.Endpoint: {},
+		types.Route:    {},
 	}
 
 	for idx, items := range s.Resources {
@@ -106,12 +105,13 @@ func (s *Snapshot) Consistent() error {
 			referenceSet := referencedResources[typeURL]
 
 			if len(referenceSet) != len(items.Items) {
-				return fmt.Errorf("mismatched reference and resource lengths: len(%v) != %d", referenceSet, len(items.Items))
+				return fmt.Errorf("mismatched %q reference and resource lengths: len(%v) != %d",
+					typeURL, referenceSet, len(items.Items))
 			}
 
 			// Check superset.
 			if err := superset(referenceSet, items.Items); err != nil {
-				return err
+				return fmt.Errorf("inconsistent %q reference: %w", typeURL, err)
 			}
 		}
 	}
@@ -160,8 +160,8 @@ func (s *Snapshot) GetVersion(typeURL resource.Type) string {
 }
 
 // GetVersionMap will return the internal version map of the currently applied snapshot.
-func (s *Snapshot) GetVersionMap(typeUrl string) map[string]string {
-	return s.VersionMap[typeUrl]
+func (s *Snapshot) GetVersionMap(typeURL string) map[string]string {
+	return s.VersionMap[typeURL]
 }
 
 // ConstructVersionMap will construct a version map based on the current state of a snapshot

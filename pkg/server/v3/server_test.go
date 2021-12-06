@@ -153,7 +153,7 @@ var (
 	route              = resource.MakeRoute(routeName, clusterName)
 	scopedRoute        = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"127.0.0.1"})
 	httpListener       = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
-	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80, scopedRouteName)
+	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80)
 	secret             = resource.MakeSecrets(secretName, "test")[0]
 	runtime            = resource.MakeRuntime(runtimeName)
 	extensionConfig    = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
@@ -297,13 +297,17 @@ func TestServerShutdown(t *testing.T) {
 func TestResponseHandlers(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
+			done := make(chan struct{})
+			ctx, cancel := context.WithCancel(context.Background())
+
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(ctx, config, server.CallbackFuncs{})
 
 			// make a request
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
+
 			go func(rType string) {
 				var err error
 				switch rType {
@@ -327,6 +331,7 @@ func TestResponseHandlers(t *testing.T) {
 					err = s.StreamAggregatedResources(resp)
 				}
 				assert.NoError(t, err)
+				close(done)
 			}(typ)
 
 			// check a response
@@ -339,6 +344,9 @@ func TestResponseHandlers(t *testing.T) {
 			case <-time.After(1 * time.Second):
 				t.Fatalf("got no response")
 			}
+
+			cancel()
+			<-done
 		})
 	}
 }

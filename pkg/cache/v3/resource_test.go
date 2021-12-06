@@ -18,6 +18,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -44,31 +46,21 @@ var (
 	testRoute           = resource.MakeRoute(routeName, clusterName)
 	testScopedRoute     = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"1.2.3.4"})
 	testListener        = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
-	testScopedListener  = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80, scopedRouteName)
+	testScopedListener  = resource.MakeScopedRouteHTTPListenerForRoute(resource.Ads, scopedListenerName, 80, scopedRouteName)
 	testRuntime         = resource.MakeRuntime(runtimeName)
 	testSecret          = resource.MakeSecrets(tlsName, rootName)
 	testExtensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
 )
 
 func TestValidate(t *testing.T) {
-	if err := testEndpoint.Validate(); err != nil {
-		t.Error(err)
-	}
-	if err := testCluster.Validate(); err != nil {
-		t.Error(err)
-	}
-	if err := testRoute.Validate(); err != nil {
-		t.Error(err)
-	}
-	if err := testScopedRoute.Validate(); err != nil {
-		t.Error(err)
-	}
-	if err := testListener.Validate(); err != nil {
-		t.Error(err)
-	}
-	if err := testRuntime.Validate(); err != nil {
-		t.Error(err)
-	}
+	assert.NoError(t, testEndpoint.Validate())
+	assert.NoError(t, testCluster.Validate())
+	assert.NoError(t, testRoute.Validate())
+	assert.NoError(t, testScopedRoute.Validate())
+	assert.NoError(t, testListener.Validate())
+	assert.NoError(t, testScopedListener.Validate())
+	assert.NoError(t, testRuntime.Validate())
+	assert.NoError(t, testExtensionConfig.Validate())
 
 	invalidRoute := &route.RouteConfiguration{
 		Name: "test",
@@ -129,8 +121,12 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[rsrc.Type]map[string]bool{rsrc.EndpointType: {"test": true}},
 		},
 		{
-			in:  resource.MakeScopedRouteHTTPListener(resource.Xds, listenerName, 80, scopedRouteName),
-			out: map[rsrc.Type]map[string]bool{rsrc.ScopedRouteType: {scopedRouteName: true}},
+			in:  resource.MakeScopedRouteHTTPListener(resource.Xds, listenerName, 80),
+			out: map[rsrc.Type]map[string]bool{},
+		},
+		{
+			in:  resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, listenerName, 80, routeName),
+			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
 		},
 		{
 			in:  resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName),
@@ -167,9 +163,8 @@ func TestGetResourceReferences(t *testing.T) {
 
 func TestGetAllResourceReferencesReturnsExpectedRefs(t *testing.T) {
 	expected := map[rsrc.Type]map[string]bool{
-		rsrc.RouteType:       {routeName: true},
-		rsrc.ScopedRouteType: {scopedRouteName: true},
-		rsrc.EndpointType:    {clusterName: true},
+		rsrc.RouteType:    {routeName: true, scopedRouteName: true},
+		rsrc.EndpointType: {clusterName: true},
 	}
 
 	resources := [types.UnknownType]cache.Resources{}

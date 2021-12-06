@@ -19,14 +19,13 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
-	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 	auth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -107,14 +106,7 @@ func GetResourceName(res types.Resource) string {
 
 // MarshalResource converts the Resource to MarshaledResource.
 func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
-	b := proto.NewBuffer(nil)
-	b.SetDeterministic(true)
-	err := b.Marshal(resource)
-	if err != nil {
-		return nil, err
-	}
-
-	return b.Bytes(), nil
+	return proto.MarshalOptions{Deterministic: true}.Marshal(resource)
 }
 
 // GetResourceReferences returns a map of dependent resources keyed by resource type, given a map of resources.
@@ -132,9 +124,9 @@ func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[r
 
 	// We only check resources that we expect to have references to other resources.
 	responseTypesWithReferences := map[types.ResponseType]struct{}{
-		types.Cluster:     struct{}{},
-		types.Listener:    struct{}{},
-		types.ScopedRoute: struct{}{},
+		types.Cluster:     {},
+		types.Listener:    {},
+		types.ScopedRoute: {},
 	}
 
 	for responseType, resourceGroup := range resourceGroups {
@@ -204,10 +196,9 @@ func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string
 
 // HTTP listeners will either reference ScopedRoutes or Routes.
 func getListenerReferences(src *listener.Listener, out map[resource.Type]map[string]bool) {
-	scopedRoutes := map[string]bool{}
 	routes := map[string]bool{}
 
-	// extract route configuration names from HTTP connection manager
+	// Extract route configuration names from HTTP connection manager.
 	for _, chain := range src.FilterChains {
 		for _, filter := range chain.Filters {
 			if filter.Name != wellknown.HTTPConnectionManager {
@@ -219,28 +210,18 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 				continue
 			}
 
-			routeSpecifier := config.RouteSpecifier
-			switch r := routeSpecifier.(type) {
-			case *hcm.HttpConnectionManager_Rds:
-				if r != nil && r.Rds != nil {
-					routes[r.Rds.RouteConfigName] = true
-				}
+			// If we are using RDS, add the referenced the route name.
+			if name := config.GetRds().GetRouteConfigName(); name != "" {
+				routes[name] = true
+			}
 
-			case *hcm.HttpConnectionManager_ScopedRoutes:
-				if r != nil && r.ScopedRoutes != nil {
-					scopedRoutes[r.ScopedRoutes.Name] = true
-				}
+			// If the scoped route mapping is embedded, add the referenced route resource names.
+			for _, s := range config.GetScopedRoutes().GetScopedRouteConfigurationsList().GetScopedRouteConfigurations() {
+				routes[s.RouteConfigurationName] = true
 			}
 		}
 	}
 
-	if len(scopedRoutes) > 0 {
-		if _, ok := out[resource.ScopedRouteType]; !ok {
-			out[resource.ScopedRouteType] = map[string]bool{}
-		}
-
-		mapMerge(out[resource.ScopedRouteType], scopedRoutes)
-	}
 	if len(routes) > 0 {
 		if _, ok := out[resource.RouteType]; !ok {
 			out[resource.RouteType] = map[string]bool{}
