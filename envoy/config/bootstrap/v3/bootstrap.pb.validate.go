@@ -778,6 +778,8 @@ func (m *Bootstrap) validate(all bool) error {
 
 	}
 
+	// no validation rules for PerfTracingFilePath
+
 	switch m.StatsFlush.(type) {
 
 	case *Bootstrap_StatsFlushOnAdmin:
