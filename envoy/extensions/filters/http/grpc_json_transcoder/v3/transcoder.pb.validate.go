@@ -107,6 +107,8 @@ func (m *GrpcJsonTranscoder) validate(all bool) error {
 
 	// no validation rules for QueryParamUnescapePlus
 
+	// no validation rules for MatchUnregisteredCustomVerb
+
 	if all {
 		switch v := interface{}(m.GetRequestValidationOptions()).(type) {
 		case interface{ ValidateAll() error }:
