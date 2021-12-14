@@ -202,6 +202,12 @@ type RegexMatcher_GoogleRE2 struct {
 	// This field is deprecated; regexp validation should be performed on the management server
 	// instead of being done by each individual client.
 	//
+	// .. note::
+	//
+	//  Although this field is deprecated, the program size will still be checked against the
+	//  global ``re2.max_program_size.error_level`` runtime value.
+	//
+	//
 	// Deprecated: Do not use.
 	MaxProgramSize *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=max_program_size,json=maxProgramSize,proto3" json:"max_program_size,omitempty"`
 }
