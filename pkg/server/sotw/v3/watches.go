@@ -13,7 +13,7 @@ import (
 type watches struct {
 	responders map[string]*watch
 
-	// indexes is a list of indexes for each dynamic select case which match to a watch
+	// cases is a dynamic select case for the watched channels.
 	cases []reflect.SelectCase
 }
 
