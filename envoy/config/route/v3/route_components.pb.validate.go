@@ -3852,10 +3852,10 @@ func (m *DirectResponseAction) validate(all bool) error {
 
 	var errors []error
 
-	if val := m.GetStatus(); val < 100 || val >= 600 {
+	if val := m.GetStatus(); val < 200 || val >= 600 {
 		err := DirectResponseActionValidationError{
 			field:  "Status",
-			reason: "value must be inside range [100, 600)",
+			reason: "value must be inside range [200, 600)",
 		}
 		if !all {
 			return err
