@@ -144,6 +144,7 @@ const (
 	clusterName         = "cluster0"
 	routeName           = "route0"
 	scopedRouteName     = "scopedRoute0"
+	virtualHostName     = "virtualHost0"
 	listenerName        = "listener0"
 	scopedListenerName  = "scopedListener0"
 	secretName          = "secret0"
@@ -158,8 +159,9 @@ var (
 	}
 	endpoint           = resource.MakeEndpoint(clusterName, 8080)
 	cluster            = resource.MakeCluster(resource.Ads, clusterName)
-	route              = resource.MakeRoute(routeName, clusterName)
-	scopedRoute        = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"127.0.0.1"})
+	route              = resource.MakeRouteConfig(routeName, clusterName)
+	scopedRoute        = resource.MakeScopedRouteConfig(scopedRouteName, routeName, []string{"127.0.0.1"})
+	virtualHost        = resource.MakeVirtualHost(virtualHostName, clusterName)
 	httpListener       = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
 	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80)
 	secret             = resource.MakeSecrets(secretName, "test")[0]
@@ -210,30 +212,37 @@ func makeResponses() map[string][]cache.Response {
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ScopedRouteType},
 			},
 		},
-		rsrc.ListenerType: {
+		rsrc.VirtualHostType: {
 			&cache.RawResponse{
 				Version:   "5",
+				Resources: []types.ResourceWithTTL{{Resource: virtualHost}},
+				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.VirtualHostType},
+			},
+		},
+		rsrc.ListenerType: {
+			&cache.RawResponse{
+				Version:   "6",
 				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 			},
 		},
 		rsrc.SecretType: {
 			&cache.RawResponse{
-				Version:   "6",
+				Version:   "7",
 				Resources: []types.ResourceWithTTL{{Resource: secret}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
 			},
 		},
 		rsrc.RuntimeType: {
 			&cache.RawResponse{
-				Version:   "7",
+				Version:   "8",
 				Resources: []types.ResourceWithTTL{{Resource: runtime}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
 		rsrc.ExtensionConfigType: {
 			&cache.RawResponse{
-				Version:   "8",
+				Version:   "9",
 				Resources: []types.ResourceWithTTL{{Resource: extensionConfig}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
 			},
@@ -241,7 +250,7 @@ func makeResponses() map[string][]cache.Response {
 		// Pass-through type (xDS does not exist for this type)
 		opaqueType: {
 			&cache.RawResponse{
-				Version:   "9",
+				Version:   "10",
 				Resources: []types.ResourceWithTTL{{Resource: opaque}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
 			},
@@ -579,6 +588,10 @@ func TestAggregatedHandlers(t *testing.T) {
 		TypeUrl:       rsrc.ScopedRouteType,
 		ResourceNames: []string{scopedRouteName},
 	}
+	resp.recv <- &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.VirtualHostType,
+		ResourceNames: []string{virtualHostName},
+	}
 
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	go func() {
@@ -588,17 +601,19 @@ func TestAggregatedHandlers(t *testing.T) {
 	}()
 
 	count := 0
+	expectedCount := 6
 	for {
 		select {
 		case <-resp.sent:
 			count++
-			if count >= 5 {
+			if count >= expectedCount {
 				close(resp.recv)
 				if want := map[string]int{
 					rsrc.EndpointType:    1,
 					rsrc.ClusterType:     1,
 					rsrc.RouteType:       1,
 					rsrc.ScopedRouteType: 1,
+					rsrc.VirtualHostType: 1,
 					rsrc.ListenerType:    1,
 				}; !reflect.DeepEqual(want, config.counts) {
 					t.Errorf("watch counts => got %v, want %v", config.counts, want)
@@ -608,7 +623,7 @@ func TestAggregatedHandlers(t *testing.T) {
 				return
 			}
 		case <-time.After(1 * time.Second):
-			t.Fatalf("got %d messages on the stream, not 4", count)
+			t.Fatalf("got %d messages on the stream, not %d", count, expectedCount)
 		}
 	}
 }

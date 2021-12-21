@@ -45,6 +45,7 @@ type Server interface {
 	clusterservice.ClusterDiscoveryServiceServer
 	routeservice.RouteDiscoveryServiceServer
 	routeservice.ScopedRoutesDiscoveryServiceServer
+	routeservice.VirtualHostDiscoveryServiceServer
 	listenerservice.ListenerDiscoveryServiceServer
 	discoverygrpc.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
@@ -218,6 +219,8 @@ func (s *server) StreamExtensionConfigs(stream extensionconfigservice.ExtensionC
 	return s.StreamHandler(stream, resource.ExtensionConfigType)
 }
 
+// VHDS doesn't support SOTW requests, so no handler for it exists.
+
 // Fetch is the universal fetch method.
 func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
 	return s.rest.Fetch(ctx, req)
@@ -287,6 +290,8 @@ func (s *server) FetchExtensionConfigs(ctx context.Context, req *discovery.Disco
 	return s.Fetch(ctx, req)
 }
 
+// VHDS doesn't support REST requests, so no handler exists for this.
+
 func (s *server) DeltaStreamHandler(stream stream.DeltaStream, typeURL string) error {
 	return s.delta.DeltaStreamHandler(stream, typeURL)
 }
@@ -325,4 +330,8 @@ func (s *server) DeltaRuntime(stream runtimeservice.RuntimeDiscoveryService_Delt
 
 func (s *server) DeltaExtensionConfigs(stream extensionconfigservice.ExtensionConfigDiscoveryService_DeltaExtensionConfigsServer) error {
 	return s.DeltaStreamHandler(stream, resource.ExtensionConfigType)
+}
+
+func (s *server) DeltaVirtualHosts(stream routeservice.VirtualHostDiscoveryService_DeltaVirtualHostsServer) error {
+	return s.DeltaStreamHandler(stream, resource.VirtualHostType)
 }
