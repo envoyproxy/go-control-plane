@@ -18,10 +18,10 @@ package sotw
 import (
 	"context"
 	"errors"
-	"reflect"
 	"strconv"
 	"sync/atomic"
 
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -63,15 +63,6 @@ type server struct {
 	streamCount int64
 }
 
-// Discovery response that is sent over GRPC stream
-// We need to record what resource names are already sent to a client
-// So if the client requests a new name we can respond back
-// regardless current snapshot version (even if it is not changed yet)
-type lastDiscoveryResponse struct {
-	nonce     string
-	resources map[string]struct{}
-}
-
 // process handles a bi-di stream request
 func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
@@ -81,14 +72,12 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
 
-	streamState := stream.NewStreamState(false, map[string]string{})
-	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
+	streamState := stream.NewSTOWStreamState()
 
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
 
 	defer func() {
-		watches.close()
 		if s.callbacks != nil {
 			s.callbacks.OnStreamClosed(streamID)
 		}
@@ -109,14 +98,8 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 
-		lastResponse := lastDiscoveryResponse{
-			nonce:     out.Nonce,
-			resources: make(map[string]struct{}),
-		}
-		for _, r := range resp.GetRequest().ResourceNames {
-			lastResponse.resources[r] = struct{}{}
-		}
-		lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
+		lastResponse := stream.NewLastDiscoveryResponse(out.Nonce, resp.GetRequest().ResourceNames)
+		streamState.Set(resp.GetRequest().TypeUrl, lastResponse)
 
 		if s.callbacks != nil {
 			s.callbacks.OnStreamResponse(resp.GetContext(), streamID, resp.GetRequest(), out)
@@ -133,103 +116,100 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	// node may only be set on the first discovery request
 	var node = &core.Node{}
 
-	// recompute dynamic channels for this stream
-	watches.recompute(s.ctx, reqCh)
+	var resCh = make(chan cache.Response, 1)
 
-	for {
-		// The list of select cases looks like this:
-		// 0: <- ctx.Done
-		// 1: <- reqCh
-		// 2...: per type watches
-		index, value, ok := reflect.Select(watches.cases)
-		switch index {
-		// ctx.Done() -> if we receive a value here we return as no further computation is needed
-		case 0:
-			return nil
-		// Case 1 handles any request inbound on the stream and handles all initialization as needed
-		case 1:
-			// input stream ended or errored out
-			if !ok {
+	ctx, cancel := context.WithCancel(s.ctx)
+	eg, ctx := errgroup.WithContext(ctx)
+
+	eg.Go(func() error {
+		defer func() {
+			watches.close() // this should remove all watches from the cache
+			close(resCh)    // close resCh and let the second eg.Go drain it
+		}()
+
+		for {
+			select {
+			case <-ctx.Done():
 				return nil
-			}
-
-			req := value.Interface().(*discovery.DiscoveryRequest)
-			if req == nil {
-				return status.Errorf(codes.Unavailable, "empty request")
-			}
-
-			// node field in discovery request is delta-compressed
-			if req.Node != nil {
-				node = req.Node
-			} else {
-				req.Node = node
-			}
-
-			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
-			nonce := req.GetResponseNonce()
-
-			// type URL is required for ADS but is implicit for xDS
-			if defaultTypeURL == resource.AnyType {
-				if req.TypeUrl == "" {
-					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
+			case req, more := <-reqCh:
+				if !more {
+					return nil
 				}
-			} else if req.TypeUrl == "" {
-				req.TypeUrl = defaultTypeURL
-			}
-
-			if s.callbacks != nil {
-				if err := s.callbacks.OnStreamRequest(streamID, req); err != nil {
-					return err
+				if req == nil {
+					return status.Errorf(codes.Unavailable, "empty request")
 				}
-			}
-
-			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
-				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-					// Let's record Resource names that a client has received.
-					streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
+				// node field in discovery request is delta-compressed
+				if req.Node != nil {
+					node = req.Node
+				} else {
+					req.Node = node
 				}
-			}
 
-			typeURL := req.GetTypeUrl()
-			responder := make(chan cache.Response, 1)
-			if w, ok := watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
-				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
+				// nonces can be reused across streams; we verify nonce only if nonce is not initialized
+				nonce := req.GetResponseNonce()
 
+				// type URL is required for ADS but is implicit for xDS
+				if defaultTypeURL == resource.AnyType {
+					if req.TypeUrl == "" {
+						return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
+					}
+				} else if req.TypeUrl == "" {
+					req.TypeUrl = defaultTypeURL
+				}
+
+				if s.callbacks != nil {
+					if err := s.callbacks.OnStreamRequest(streamID, req); err != nil {
+						return err
+					}
+				}
+
+				if lastResponse, ok := streamState.Get(req.TypeUrl); ok {
+					if lastResponse.Nonce == "" || lastResponse.Nonce == nonce {
+						// Let's record Resource names that a client has received.
+						streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.Resources)
+					}
+				}
+
+				typeURL := req.GetTypeUrl()
+				if w := watches.getWatch(typeURL); w != nil {
+					// We've found a pre-existing watch, lets check and update if needed.
+					// If these requirements aren't satisfied, leave an open watch.
+					if n := w.getNonce(); n == "" || n == nonce {
+						w.close()
+
+						watches.addWatch(typeURL, &watch{
+							cancel: s.cache.CreateWatch(req, streamState.StreamState, resCh),
+						})
+					}
+				} else {
+					// No pre-existing watch exists, let's create one.
+					// We need to precompute the watches first then open a watch in the cache.
 					watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, streamState, responder),
-						response: responder,
+						cancel: s.cache.CreateWatch(req, streamState.StreamState, resCh),
 					})
 				}
-			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, streamState, responder),
-					response: responder,
-				})
 			}
-
-			// Recompute the dynamic select cases for this stream.
-			watches.recompute(s.ctx, reqCh)
-		default:
-			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
-			if !ok {
-				// Receiver channel was closed. TODO(jpeach): probably cancel the watch or something?
-				return status.Errorf(codes.Unavailable, "resource watch %d -> failed", index)
-			}
-
-			res := value.Interface().(cache.Response)
-			nonce, err := send(res)
-			if err != nil {
-				return err
-			}
-
-			watches.responders[res.GetRequest().TypeUrl].nonce = nonce
 		}
-	}
+	})
+
+	eg.Go(func() (err error) {
+		var nonce string
+		for res := range resCh {
+			if res == nil || err != nil {
+				continue // this loop should not exit until resCh closed
+			}
+			if nonce, err = send(res); err == nil {
+				if w := watches.getWatch(res.GetRequest().TypeUrl); w != nil {
+					w.setNonce(nonce)
+				}
+			} else {
+				cancel()
+			}
+		}
+		return err
+	})
+
+	return eg.Wait()
 }
 
 // StreamHandler converts a blocking read call to channels and initiates stream processing

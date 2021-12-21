@@ -12,6 +12,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	go.opentelemetry.io/proto/otlp v0.7.0
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
+	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013
 	google.golang.org/grpc v1.36.0
