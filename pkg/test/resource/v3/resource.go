@@ -565,7 +565,7 @@ func (ts *TestSnapshot) generateHTTPListeners(numListeners int, clusters []types
 		ts.addTLS(listener)
 		listeners = append(listeners, listener)
 
-		ts.currentPort += 1
+		ts.currentPort++
 	}
 
 	return listeners, routeConfigs
@@ -592,7 +592,7 @@ func (ts *TestSnapshot) generateScopedHTTPListeners(numListeners int, clusters [
 		ts.addTLS(listener)
 		listeners = append(listeners, listener)
 
-		ts.currentPort += 1
+		ts.currentPort++
 	}
 
 	return listeners, scopedRouteConfigs, routeConfigs
@@ -619,7 +619,7 @@ func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []t
 		ts.addTLS(listener)
 		listeners = append(listeners, listener)
 
-		ts.currentPort += 1
+		ts.currentPort++
 	}
 
 	return listeners, routeConfigs, virtualHosts
@@ -640,7 +640,7 @@ func (ts *TestSnapshot) generateTCPListeners(numListeners int, clusters []types.
 		ts.addTLS(listener)
 		listeners = append(listeners, listener)
 
-		ts.currentPort += 1
+		ts.currentPort++
 	}
 
 	return listeners
@@ -699,7 +699,7 @@ func (ts *TestSnapshot) Generate() cache.Snapshot {
 	listeners := append(l1, l2...)
 	listeners = append(listeners, l3...)
 	listeners = append(listeners, l4...)
-	scopedRoutes := append(sr1)
+	scopedRoutes := sr1
 	routes := append(r1, r2...)
 	routes = append(routes, r3...)
 	virtualHosts := vh1
