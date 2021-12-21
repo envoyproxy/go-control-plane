@@ -194,7 +194,7 @@ func (s *Snapshot) ConstructVersionMap() error {
 			}
 			v := HashResource(marshaledResource)
 			if v == "" {
-				return fmt.Errorf("failed to build resource version: %v", err)
+				return fmt.Errorf("failed to build resource version: %w", err)
 			}
 
 			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v
