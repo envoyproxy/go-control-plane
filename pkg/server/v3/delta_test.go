@@ -159,30 +159,37 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 				SystemVersionInfo: "4",
 			},
 		},
+		rsrc.VirtualHostType: {
+			&cache.RawDeltaResponse{
+				Resources:         []types.Resource{virtualHost},
+				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.VirtualHostType},
+				SystemVersionInfo: "5",
+			},
+		},
 		rsrc.ListenerType: {
 			&cache.RawDeltaResponse{
 				Resources:         []types.Resource{httpListener, httpScopedListener},
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ListenerType},
-				SystemVersionInfo: "5",
+				SystemVersionInfo: "6",
 			},
 		},
 		rsrc.SecretType: {
 			&cache.RawDeltaResponse{
-				SystemVersionInfo: "6",
+				SystemVersionInfo: "7",
 				Resources:         []types.Resource{secret},
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.SecretType},
 			},
 		},
 		rsrc.RuntimeType: {
 			&cache.RawDeltaResponse{
-				SystemVersionInfo: "7",
+				SystemVersionInfo: "8",
 				Resources:         []types.Resource{runtime},
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
 		rsrc.ExtensionConfigType: {
 			&cache.RawDeltaResponse{
-				SystemVersionInfo: "8",
+				SystemVersionInfo: "9",
 				Resources:         []types.Resource{extensionConfig},
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
 			},
@@ -190,7 +197,7 @@ func makeDeltaResponses() map[string][]cache.DeltaResponse {
 		// Pass-through type (types without explicit handling)
 		opaqueType: {
 			&cache.RawDeltaResponse{
-				SystemVersionInfo: "9",
+				SystemVersionInfo: "10",
 				Resources:         []types.Resource{opaque},
 				DeltaRequest:      &discovery.DeltaDiscoveryRequest{TypeUrl: opaqueType},
 			},
@@ -209,6 +216,8 @@ func process(typ string, resp *mockDeltaStream, s server.Server) error {
 		err = s.DeltaRoutes(resp)
 	case rsrc.ScopedRouteType:
 		err = s.DeltaScopedRoutes(resp)
+	case rsrc.VirtualHostType:
+		err = s.DeltaVirtualHosts(resp)
 	case rsrc.ListenerType:
 		err = s.DeltaListeners(resp)
 	case rsrc.SecretType:
@@ -339,6 +348,10 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 			ResourceNamesSubscribe: []string{scopedRouteName},
 		},
 		{
+			TypeUrl:                rsrc.VirtualHostType,
+			ResourceNamesSubscribe: []string{virtualHostName},
+		},
+		{
 			TypeUrl:                rsrc.SecretType,
 			ResourceNamesSubscribe: []string{secretName},
 		},
@@ -368,6 +381,7 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 						rsrc.ClusterType:     1,
 						rsrc.RouteType:       1,
 						rsrc.ScopedRouteType: 1,
+						rsrc.VirtualHostType: 1,
 						rsrc.ListenerType:    1,
 						rsrc.SecretType:      1},
 					config.deltaCounts,

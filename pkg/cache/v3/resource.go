@@ -44,6 +44,8 @@ func GetResponseType(typeURL resource.Type) types.ResponseType {
 		return types.Route
 	case resource.ScopedRouteType:
 		return types.ScopedRoute
+	case resource.VirtualHostType:
+		return types.VirtualHost
 	case resource.ListenerType:
 		return types.Listener
 	case resource.SecretType:
@@ -67,6 +69,8 @@ func GetResponseTypeURL(responseType types.ResponseType) (string, error) {
 		return resource.RouteType, nil
 	case types.ScopedRoute:
 		return resource.ScopedRouteType, nil
+	case types.VirtualHost:
+		return resource.VirtualHostType, nil
 	case types.Listener:
 		return resource.ListenerType, nil
 	case types.Secret:
@@ -77,7 +81,7 @@ func GetResponseTypeURL(responseType types.ResponseType) (string, error) {
 		return resource.ExtensionConfigType, nil
 	}
 
-	return "", fmt.Errorf("couldn't map response type to known resource type")
+	return "", fmt.Errorf("couldn't map response type (%v) to known resource type", responseType)
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.
@@ -90,6 +94,8 @@ func GetResourceName(res types.Resource) string {
 	case *route.RouteConfiguration:
 		return v.GetName()
 	case *route.ScopedRouteConfiguration:
+		return v.GetName()
+	case *route.VirtualHost:
 		return v.GetName()
 	case *listener.Listener:
 		return v.GetName()

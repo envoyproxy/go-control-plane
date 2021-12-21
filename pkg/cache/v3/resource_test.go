@@ -31,9 +31,11 @@ import (
 const (
 	clusterName         = "cluster0"
 	routeName           = "route0"
+	embeddedRouteName   = "embeddedRoute0"
 	scopedRouteName     = "scopedRoute0"
 	listenerName        = "listener0"
 	scopedListenerName  = "scopedListener0"
+	virtualHostName     = "virtualHost0"
 	runtimeName         = "runtime0"
 	tlsName             = "secret0"
 	rootName            = "root0"
@@ -43,10 +45,12 @@ const (
 var (
 	testEndpoint        = resource.MakeEndpoint(clusterName, 8080)
 	testCluster         = resource.MakeCluster(resource.Ads, clusterName)
-	testRoute           = resource.MakeRoute(routeName, clusterName)
-	testScopedRoute     = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"1.2.3.4"})
+	testRoute           = resource.MakeRouteConfig(routeName, clusterName)
+	testEmbeddedRoute   = resource.MakeRouteConfig(embeddedRouteName, clusterName)
+	testScopedRoute     = resource.MakeScopedRouteConfig(scopedRouteName, routeName, []string{"1.2.3.4"})
+	testVirtualHost     = resource.MakeVirtualHost(virtualHostName, clusterName)
 	testListener        = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
-	testScopedListener  = resource.MakeScopedRouteHTTPListenerForRoute(resource.Ads, scopedListenerName, 80, scopedRouteName)
+	testScopedListener  = resource.MakeScopedRouteHTTPListenerForRoute(resource.Ads, scopedListenerName, 80, embeddedRouteName)
 	testRuntime         = resource.MakeRuntime(runtimeName)
 	testSecret          = resource.MakeSecrets(tlsName, rootName)
 	testExtensionConfig = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
@@ -57,6 +61,7 @@ func TestValidate(t *testing.T) {
 	assert.NoError(t, testCluster.Validate())
 	assert.NoError(t, testRoute.Validate())
 	assert.NoError(t, testScopedRoute.Validate())
+	assert.NoError(t, testVirtualHost.Validate())
 	assert.NoError(t, testListener.Validate())
 	assert.NoError(t, testScopedListener.Validate())
 	assert.NoError(t, testRuntime.Validate())
@@ -90,6 +95,9 @@ func TestGetResourceName(t *testing.T) {
 	}
 	if name := cache.GetResourceName(testScopedRoute); name != scopedRouteName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", testScopedRoute, name, scopedRouteName)
+	}
+	if name := cache.GetResourceName(testVirtualHost); name != virtualHostName {
+		t.Errorf("GetResourceName(%v) => got %q, want %q", testVirtualHost, name, virtualHostName)
 	}
 	if name := cache.GetResourceName(testListener); name != listenerName {
 		t.Errorf("GetResourceName(%v) => got %q, want %q", testListener, name, listenerName)
@@ -141,8 +149,16 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[rsrc.Type]map[string]bool{},
 		},
 		{
+			in:  resource.MakeVHDSRouteConfig(resource.Ads, routeName),
+			out: map[rsrc.Type]map[string]bool{},
+		},
+		{
 			in:  testScopedRoute,
 			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+		},
+		{
+			in:  testVirtualHost,
+			out: map[rsrc.Type]map[string]bool{},
 		},
 		{
 			in:  testEndpoint,
@@ -160,10 +176,9 @@ func TestGetResourceReferences(t *testing.T) {
 		}
 	}
 }
-
 func TestGetAllResourceReferencesReturnsExpectedRefs(t *testing.T) {
 	expected := map[rsrc.Type]map[string]bool{
-		rsrc.RouteType:    {routeName: true, scopedRouteName: true},
+		rsrc.RouteType:    {routeName: true, embeddedRouteName: true},
 		rsrc.EndpointType: {clusterName: true},
 	}
 

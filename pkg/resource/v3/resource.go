@@ -19,6 +19,7 @@ const (
 	ClusterType         = apiTypePrefix + "envoy.config.cluster.v3.Cluster"
 	RouteType           = apiTypePrefix + "envoy.config.route.v3.RouteConfiguration"
 	ScopedRouteType     = apiTypePrefix + "envoy.config.route.v3.ScopedRouteConfiguration"
+	VirtualHostType     = apiTypePrefix + "envoy.config.route.v3.VirtualHost"
 	ListenerType        = apiTypePrefix + "envoy.config.listener.v3.Listener"
 	SecretType          = apiTypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
 	ExtensionConfigType = apiTypePrefix + "envoy.config.core.v3.TypedExtensionConfig"

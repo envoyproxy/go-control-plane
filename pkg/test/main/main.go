@@ -53,6 +53,7 @@ var (
 	clusters            int
 	httpListeners       int
 	scopedHTTPListeners int
+	vhdsHTTPListeners   int
 	tcpListeners        int
 	runtimes            int
 	tls                 bool
@@ -136,6 +137,8 @@ func init() {
 	flag.IntVar(&httpListeners, "http", 2, "Number of HTTP listeners (and RDS configs)")
 	// Test this many scoped HTTP listeners per snapshot
 	flag.IntVar(&scopedHTTPListeners, "scopedhttp", 2, "Number of HTTP listeners (and SRDS configs)")
+	// Test this many VHDS HTTP listeners per snapshot
+	flag.IntVar(&vhdsHTTPListeners, "vhdshttp", 2, "Number of VHDS HTTP listeners")
 	// Test this many TCP listeners per snapshot
 	flag.IntVar(&tcpListeners, "tcp", 2, "Number of TCP pass-through listeners")
 
@@ -195,6 +198,10 @@ func main() {
 	srv := server.NewServer(context.Background(), configCache, cb)
 	als := &testv3.AccessLogService{}
 
+	if mode != "delta" {
+		vhdsHTTPListeners = 0
+	}
+
 	// create a test snapshot
 	snapshots := resource.TestSnapshot{
 		Xds:                    mode,
@@ -203,6 +210,7 @@ func main() {
 		NumClusters:            clusters,
 		NumHTTPListeners:       httpListeners,
 		NumScopedHTTPListeners: scopedHTTPListeners,
+		NumVHDSHTTPListeners:   vhdsHTTPListeners,
 		NumTCPListeners:        tcpListeners,
 		TLS:                    tls,
 		NumRuntimes:            runtimes,
@@ -298,7 +306,7 @@ func main() {
 // callEcho calls upstream echo service on all listener ports and returns an error
 // if any of the listeners returned an error.
 func callEcho() (int, int) {
-	total := httpListeners + scopedHTTPListeners + tcpListeners
+	total := httpListeners + scopedHTTPListeners + tcpListeners + vhdsHTTPListeners
 	ok, failed := 0, 0
 	ch := make(chan error, total)
 
