@@ -2,6 +2,9 @@ run:
   timeout: 10m
 
 linters:
+  presets:
+  - bugs
+
   enable:
   - bodyclose
   - gofmt
@@ -12,6 +15,9 @@ linters:
   - unconvert
   - unparam
 
+  disable:
+  - scopelint # deprecated but still enabled in the bugs preset
+
 linters-settings:
   misspell:
     locale: US
@@ -21,6 +27,8 @@ linters-settings:
     check-exported: false
   goimports:
     local-prefixes: github.com/envoyproxy/go-control-plane
+  exhaustive:
+    default-signifies-exhaustive: true
 
 issues:
   fix: true

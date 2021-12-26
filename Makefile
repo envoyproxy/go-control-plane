@@ -40,12 +40,12 @@ examples:
 
 .PHONY: lint
 lint:
-	docker run \
+	@docker run \
 		--rm \
 		--volume $$(pwd):/src \
 		--workdir /src \
-		golangci/golangci-lint:v1.41.1 \
-	golangci-lint run
+		golangci/golangci-lint:v1.43.0 \
+	golangci-lint -v run
 
 #-----------------
 #-- integration

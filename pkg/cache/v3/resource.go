@@ -75,9 +75,10 @@ func GetResponseTypeURL(responseType types.ResponseType) (string, error) {
 		return resource.RuntimeType, nil
 	case types.ExtensionConfig:
 		return resource.ExtensionConfigType, nil
+	default:
+		return "", fmt.Errorf("couldn't map response type %v to known resource type", responseType)
 	}
 
-	return "", fmt.Errorf("couldn't map response type to known resource type")
 }
 
 // GetResourceName returns the resource name for a valid xDS response type.
