@@ -123,9 +123,9 @@ type GrpcJsonTranscoder struct {
 	//
 	//     {"code":5,"details":[{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"r-1"}]}
 	//
-	//  In order to transcode the message, the ``google.rpc.RequestInfo`` type from
-	//  the ``google/rpc/error_details.proto`` should be included in the configured
-	//  :ref:`proto descriptor set <config_grpc_json_generate_proto_descriptor_set>`.
+	// In order to transcode the message, the ``google.rpc.RequestInfo`` type from
+	// the ``google/rpc/error_details.proto`` should be included in the configured
+	// :ref:`proto descriptor set <config_grpc_json_generate_proto_descriptor_set>`.
 	ConvertGrpcStatus bool `protobuf:"varint,9,opt,name=convert_grpc_status,json=convertGrpcStatus,proto3" json:"convert_grpc_status,omitempty"`
 }
 
