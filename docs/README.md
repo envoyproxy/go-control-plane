@@ -4,7 +4,7 @@ Below lies a list of resources that may be helpful to those looking to understan
 
 ## Implementations
 The following guides may be helpful on how to use go-control-plane's Snapshot Cache:
-- [cache.md](snapshot.md)
+- [cache.md](cache.md)
 - [server.md](server.md)
 
 ## Getting Started
