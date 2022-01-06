@@ -41,7 +41,7 @@ const (
 	// end with the stream reset. The "httpN.requests_rejected_with_underscores_in_headers" counter
 	// is incremented for each rejected request.
 	HttpProtocolOptions_REJECT_REQUEST HttpProtocolOptions_HeadersWithUnderscoresAction = 1
-	// Drop the header with name containing underscores. The header is dropped before the filter chain is
+	// Drop the client header with name containing underscores. The header is dropped before the filter chain is
 	// invoked and as such filters will not see dropped headers. The
 	// "httpN.dropped_headers_with_underscores" is incremented for each dropped header.
 	HttpProtocolOptions_DROP_HEADER HttpProtocolOptions_HeadersWithUnderscoresAction = 2
@@ -502,6 +502,8 @@ type HttpProtocolOptions struct {
 	// Action to take when a client request with a header name containing underscore characters is received.
 	// If this setting is not specified, the value defaults to ALLOW.
 	// Note: upstream responses are not affected by this setting.
+	// Note: this only affects client headers. It does not affect headers added
+	// by Envoy filters and does not have any impact if added to cluster config.
 	HeadersWithUnderscoresAction HttpProtocolOptions_HeadersWithUnderscoresAction `protobuf:"varint,5,opt,name=headers_with_underscores_action,json=headersWithUnderscoresAction,proto3,enum=envoy.config.core.v3.HttpProtocolOptions_HeadersWithUnderscoresAction" json:"headers_with_underscores_action,omitempty"`
 	// Optional maximum requests for both upstream and downstream connections.
 	// If not specified, there is no limit.
