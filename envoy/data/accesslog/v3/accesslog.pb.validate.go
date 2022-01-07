@@ -1042,6 +1042,8 @@ func (m *AccessLogCommon) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for CustomTags
+
 	if len(errors) > 0 {
 		return AccessLogCommonMultiError(errors)
 	}
