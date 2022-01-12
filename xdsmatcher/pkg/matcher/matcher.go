@@ -13,6 +13,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+// MatcherTree is the constructed match tree, allowing for matching input data against the match tree.
 type MatcherTree struct {
 	onNoMatch *types.OnMatch
 	matchRoot types.Matcher
@@ -20,6 +21,8 @@ type MatcherTree struct {
 	logger *tracingLogger
 }
 
+// Match attempts to match the input data against the match tree.
+// An error is returned if something went wrong during match evaluation.
 func (m MatcherTree) Match(data types.MatchingData) (types.Result, error) {
 	result, err := m.matchRoot.Match(data)
 	if err != nil {
@@ -60,10 +63,13 @@ func (m MatcherTree) Match(data types.MatchingData) (types.Result, error) {
 	}, nil
 }
 
+// Create creates a new match tree from the provided match tree configuration.
 func Create(matcher *pbmatcher.Matcher) (*MatcherTree, error) {
 	return create(matcher, &tracingLogger{})
 }
 
+// CreateLegacy creates a new match tree from the provided match tree configuration, specified by the legacy
+// format.
 func CreateLegacy(matcher *pblegacymatcher.Matcher) (*MatcherTree, error) {
 	// Wire cast the matcher to the new matcher format.
 	b, err := proto.Marshal(matcher)
@@ -109,7 +115,6 @@ func create(matcher *pbmatcher.Matcher, logger *tracingLogger) (*MatcherTree, er
 		}, nil
 	default:
 		return nil, errors.New("not implemented: matcher tree")
-
 	}
 }
 
@@ -148,6 +153,8 @@ type predicateFunc interface {
 	match(types.MatchingData) (matcherResult, error)
 }
 
+// InputMatcher is the interface for a matcher implementation, specifying how
+// an input string should be matched.
 type InputMatcher interface {
 	match(value *string) (matcherResult, error)
 }
