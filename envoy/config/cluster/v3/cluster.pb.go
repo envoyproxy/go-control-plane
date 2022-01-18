@@ -598,11 +598,9 @@ type Cluster struct {
 	// emitting stats for the cluster and access logging the cluster name. This will appear as
 	// additional information in configuration dumps of a cluster's current status as
 	// :ref:`observability_name <envoy_v3_api_field_admin.v3.ClusterStatus.observability_name>`
-	// and as an additional tag "upstream_cluster.name" while tracing. Note: access logging using
-	// this field is presently enabled with runtime feature
-	// `envoy.reloadable_features.use_observable_cluster_name`. Any ``:`` in the name will be
-	// converted to ``_`` when emitting statistics. This should not be confused with :ref:`Router
-	// Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
+	// and as an additional tag "upstream_cluster.name" while tracing. Note: Any ``:`` in the name
+	// will be converted to ``_`` when emitting statistics. This should not be confused with
+	// :ref:`Router Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
 	AltStatName string `protobuf:"bytes,28,opt,name=alt_stat_name,json=altStatName,proto3" json:"alt_stat_name,omitempty"`
 	// Types that are assignable to ClusterDiscoveryType:
 	//	*Cluster_Type
