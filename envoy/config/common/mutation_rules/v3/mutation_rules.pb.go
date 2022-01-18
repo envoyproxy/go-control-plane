@@ -41,6 +41,10 @@ const (
 // tested against the rules here. Disallowed header mutations will be
 // ignored unless *disallow_is_error* is set to true.
 //
+// Attempts to remove headers are further constrained -- regardless of the
+// settings, system-defined headers (that start with ":") and the "host"
+// header may never be removed.
+//
 // In addition, a counter will be incremented whenever a mutation is
 // rejected. In the ext_proc filter, that counter is named
 // "rejected_header_mutations".
