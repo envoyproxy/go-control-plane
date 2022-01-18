@@ -143,8 +143,7 @@ type TlsParameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Minimum TLS protocol version. By default, it's ``TLSv1_2`` for clients and ``TLSv1_0`` for
-	// servers.
+	// Minimum TLS protocol version. By default, it's ``TLSv1_2`` for both clients and servers.
 	TlsMinimumProtocolVersion TlsParameters_TlsProtocol `protobuf:"varint,1,opt,name=tls_minimum_protocol_version,json=tlsMinimumProtocolVersion,proto3,enum=envoy.api.v2.auth.TlsParameters_TlsProtocol" json:"tls_minimum_protocol_version,omitempty"`
 	// Maximum TLS protocol version. By default, it's ``TLSv1_2`` for clients and ``TLSv1_3`` for
 	// servers.
