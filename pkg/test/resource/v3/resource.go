@@ -680,7 +680,7 @@ func (ts *TestSnapshot) getPath() string {
 }
 
 // Generate produces a snapshot from the parameters.
-func (ts *TestSnapshot) Generate() cache.Snapshot {
+func (ts *TestSnapshot) Generate() *cache.Snapshot {
 	ts.currentPort = ts.BasePort
 
 	clusters := make([]types.Resource, ts.NumClusters)

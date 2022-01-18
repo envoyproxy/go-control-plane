@@ -34,10 +34,13 @@ type QuicProtocolOptions struct {
 
 	QuicProtocolOptions *v3.QuicProtocolOptions `protobuf:"bytes,1,opt,name=quic_protocol_options,json=quicProtocolOptions,proto3" json:"quic_protocol_options,omitempty"`
 	// Maximum number of milliseconds that connection will be alive when there is
-	// no network activity. 300000ms if not specified.
+	// no network activity.
+	//
+	// If it is less than 1ms, Envoy will use 1ms. 300000ms if not specified.
 	IdleTimeout *duration.Duration `protobuf:"bytes,2,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// Connection timeout in milliseconds before the crypto handshake is finished.
-	// 20000ms if not specified.
+	//
+	// If it is less than 5000ms, Envoy will use 5000ms. 20000ms if not specified.
 	CryptoHandshakeTimeout *duration.Duration `protobuf:"bytes,3,opt,name=crypto_handshake_timeout,json=cryptoHandshakeTimeout,proto3" json:"crypto_handshake_timeout,omitempty"`
 	// Runtime flag that controls whether the listener is enabled or not. If not specified, defaults
 	// to enabled.

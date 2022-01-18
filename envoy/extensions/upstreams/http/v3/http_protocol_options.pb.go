@@ -273,8 +273,8 @@ type HttpProtocolOptions_ExplicitHttpConfig_Http2ProtocolOptions struct {
 
 type HttpProtocolOptions_ExplicitHttpConfig_Http3ProtocolOptions struct {
 	// .. warning::
-	//   QUIC support is currently alpha and should be used with caution. Please
-	//   see :ref:`here <arch_overview_http3>` for details.
+	//   QUIC upstream support is currently not ready for internet use.
+	//   Please see :ref:`here <arch_overview_http3>` for details.
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,3,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3,oneof"`
 }
 
@@ -300,8 +300,8 @@ type HttpProtocolOptions_UseDownstreamHttpConfig struct {
 	HttpProtocolOptions  *v3.Http1ProtocolOptions `protobuf:"bytes,1,opt,name=http_protocol_options,json=httpProtocolOptions,proto3" json:"http_protocol_options,omitempty"`
 	Http2ProtocolOptions *v3.Http2ProtocolOptions `protobuf:"bytes,2,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
 	// .. warning::
-	//   QUIC support is currently alpha and should be used with caution. Please
-	//   see :ref:`here <arch_overview_http3>` for details.
+	//   QUIC upstream support is currently not ready for internet use.
+	//   Please see :ref:`here <arch_overview_http3>` for details.
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,3,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
 }
 
@@ -381,10 +381,8 @@ type HttpProtocolOptions_AutoHttpConfig struct {
 	// when HTTP/3 will be used, and when Envoy will fail over to TCP.
 	//
 	// .. warning::
-	//   QUIC support is currently alpha and should be used with caution. Please
-	//   see :ref:`here <arch_overview_http3>` for details.
-	//   AutoHttpConfig config is undergoing especially rapid change and as it
-	//   is alpha is not guaranteed to be API-stable.
+	//   QUIC upstream support is currently not ready for internet use.
+	//   Please see :ref:`here <arch_overview_http3>` for details.
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,3,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
 	// The presence of alternate protocols cache options causes the use of the
 	// alternate protocols cache, which is responsible for parsing and caching
