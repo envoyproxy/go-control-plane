@@ -179,7 +179,7 @@ type server struct {
 	delta delta.Server
 }
 
-func (s *server) StreamHandler(stream sotw.Stream, typeURL string) error {
+func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 	return s.sotw.StreamHandler(stream, typeURL)
 }
 

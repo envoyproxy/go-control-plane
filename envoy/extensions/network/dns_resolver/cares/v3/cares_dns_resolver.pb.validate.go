@@ -104,6 +104,8 @@ func (m *CaresDnsResolverConfig) validate(all bool) error {
 
 	// no validation rules for UseResolversAsFallback
 
+	// no validation rules for FilterUnroutableFamilies
+
 	if all {
 		switch v := interface{}(m.GetDnsResolverOptions()).(type) {
 		case interface{ ValidateAll() error }:

@@ -310,31 +310,46 @@ func callEcho() (int, int) {
 	ok, failed := 0, 0
 	ch := make(chan error, total)
 
+	client := http.Client{
+		Timeout: 100 * time.Millisecond,
+		Transport: &http.Transport{
+			TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true}, // nolint:gosec
+		},
+	}
+
+	get := func(count int) (*http.Response, error) {
+		proto := "http"
+		if tls {
+			proto = "https"
+		}
+
+		req, err := http.NewRequestWithContext(
+			context.Background(),
+			http.MethodGet,
+			fmt.Sprintf("%s://127.0.0.1:%d", proto, basePort+uint(count)),
+			nil,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return client.Do(req)
+	}
+
 	// spawn requests
 	for i := 0; i < total; i++ {
 		go func(i int) {
-			client := http.Client{
-				Timeout: 100 * time.Millisecond,
-				Transport: &http.Transport{
-					TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true}, // nolint:gosec
-				},
-			}
-			proto := "http"
-			if tls {
-				proto = "https"
-			}
-			req, err := client.Get(fmt.Sprintf("%s://127.0.0.1:%d", proto, basePort+uint(i)))
+			resp, err := get(i)
 			if err != nil {
 				ch <- err
 				return
 			}
-			body, err := ioutil.ReadAll(req.Body)
+			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
-				req.Body.Close()
+				resp.Body.Close()
 				ch <- err
 				return
 			}
-			if err := req.Body.Close(); err != nil {
+			if err := resp.Body.Close(); err != nil {
 				ch <- err
 				return
 			}

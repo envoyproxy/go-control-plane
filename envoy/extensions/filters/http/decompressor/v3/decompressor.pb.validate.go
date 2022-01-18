@@ -283,6 +283,8 @@ func (m *Decompressor_CommonDirectionConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for IgnoreNoTransformHeader
+
 	if len(errors) > 0 {
 		return Decompressor_CommonDirectionConfigMultiError(errors)
 	}

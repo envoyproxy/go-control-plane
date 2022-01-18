@@ -35,38 +35,40 @@ type Snapshot struct {
 	VersionMap map[string]map[string]string
 }
 
+var _ ResourceSnapshot = &Snapshot{}
+
 // NewSnapshot creates a snapshot from response types and a version.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
-func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (Snapshot, error) {
+func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (*Snapshot, error) {
 	out := Snapshot{}
 
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
 		if index == types.UnknownType {
-			return out, errors.New("unknown resource type: " + typ)
+			return nil, errors.New("unknown resource type: " + typ)
 		}
 
 		out.Resources[index] = NewResources(version, resource)
 	}
 
-	return out, nil
+	return &out, nil
 }
 
 // NewSnapshotWithTTLs creates a snapshot of ResourceWithTTLs.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
-func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.ResourceWithTTL) (Snapshot, error) {
+func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.ResourceWithTTL) (*Snapshot, error) {
 	out := Snapshot{}
 
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
 		if index == types.UnknownType {
-			return out, errors.New("unknown resource type: " + typ)
+			return nil, errors.New("unknown resource type: " + typ)
 		}
 
 		out.Resources[index] = NewResourcesWithTTL(version, resource)
 	}
 
-	return out, nil
+	return &out, nil
 }
 
 // Consistent check verifies that the dependent resources are exactly listed in the
@@ -194,7 +196,7 @@ func (s *Snapshot) ConstructVersionMap() error {
 			}
 			v := HashResource(marshaledResource)
 			if v == "" {
-				return fmt.Errorf("failed to build resource version: %v", err)
+				return fmt.Errorf("failed to build resource version: %w", err)
 			}
 
 			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v
