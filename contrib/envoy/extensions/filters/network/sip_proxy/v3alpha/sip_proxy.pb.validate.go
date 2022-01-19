@@ -406,6 +406,40 @@ func (m *SipProtocolOptions) validate(all bool) error {
 
 	// no validation rules for RegistrationAffinity
 
+	for idx, item := range m.GetCustomizedAffinity() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SipProtocolOptionsValidationError{
+						field:  fmt.Sprintf("CustomizedAffinity[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SipProtocolOptionsValidationError{
+						field:  fmt.Sprintf("CustomizedAffinity[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SipProtocolOptionsValidationError{
+					field:  fmt.Sprintf("CustomizedAffinity[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return SipProtocolOptionsMultiError(errors)
 	}
@@ -485,6 +519,113 @@ var _ interface {
 	ErrorName() string
 } = SipProtocolOptionsValidationError{}
 
+// Validate checks the field values on CustomizedAffinity with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CustomizedAffinity) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CustomizedAffinity with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CustomizedAffinityMultiError, or nil if none found.
+func (m *CustomizedAffinity) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CustomizedAffinity) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for KeyName
+
+	// no validation rules for Query
+
+	// no validation rules for Subscribe
+
+	if len(errors) > 0 {
+		return CustomizedAffinityMultiError(errors)
+	}
+	return nil
+}
+
+// CustomizedAffinityMultiError is an error wrapping multiple validation errors
+// returned by CustomizedAffinity.ValidateAll() if the designated constraints
+// aren't met.
+type CustomizedAffinityMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CustomizedAffinityMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CustomizedAffinityMultiError) AllErrors() []error { return m }
+
+// CustomizedAffinityValidationError is the validation error returned by
+// CustomizedAffinity.Validate if the designated constraints aren't met.
+type CustomizedAffinityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CustomizedAffinityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CustomizedAffinityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CustomizedAffinityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CustomizedAffinityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CustomizedAffinityValidationError) ErrorName() string {
+	return "CustomizedAffinityValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CustomizedAffinityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCustomizedAffinity.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CustomizedAffinityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CustomizedAffinityValidationError{}
+
 // Validate checks the field values on SipProxy_SipSettings with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -539,6 +680,35 @@ func (m *SipProxy_SipSettings) validate(all bool) error {
 	// no validation rules for OwnDomain
 
 	// no validation rules for DomainMatchParameterName
+
+	if all {
+		switch v := interface{}(m.GetTraServiceConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SipProxy_SipSettingsValidationError{
+					field:  "TraServiceConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SipProxy_SipSettingsValidationError{
+					field:  "TraServiceConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTraServiceConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SipProxy_SipSettingsValidationError{
+				field:  "TraServiceConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return SipProxy_SipSettingsMultiError(errors)
