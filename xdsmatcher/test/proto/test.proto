@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package xdsmatcher.test.proto;
+
+option go_package = "github.com/envoyproxy/go-control-plane/xdsmatcher/test/proto";
+
+// This file contains a number of proto definitions used for registration of actions and inputs for testing.
+message TestData {
+	string foo = 1;
+	repeated string bar = 2;
+}
+
+message FooInput {}
+
+message BarInput {
+	uint32 index = 1;
+}
+
+message MatchAction {}
+
+message MoreDataAvailableInput {}
+
+message NoDataAvailableInput {}
+
+message ErrorInput {}
+
+message NotRegistered {}
