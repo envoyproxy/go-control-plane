@@ -674,7 +674,7 @@ func TestCallbackError(t *testing.T) {
 func TestSOTWLinearCacheIntegrationDeadLock(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
-			t.Log("Integrating LinearCache with SOTW server. If this take too long, they might be dead locked")
+			t.Log("Integrating LinearCache with SOTW server. If this is never completed, it might be because they are dead locked.")
 
 			nonce := int64(0)
 			ver, targetVer := uint64(0), uint64(100000)
