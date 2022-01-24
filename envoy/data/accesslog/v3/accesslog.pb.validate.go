@@ -1222,6 +1222,8 @@ func (m *ResponseFlags) validate(all bool) error {
 
 	// no validation rules for OverloadManager
 
+	// no validation rules for DnsResolutionFailure
+
 	if len(errors) > 0 {
 		return ResponseFlagsMultiError(errors)
 	}
