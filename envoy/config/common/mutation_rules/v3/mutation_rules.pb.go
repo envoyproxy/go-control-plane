@@ -49,7 +49,6 @@ const (
 // rejected. In the ext_proc filter, that counter is named
 // "rejected_header_mutations".
 // [#next-free-field: 8]
-// [#not-implemented-hide:]
 type HeaderMutationRules struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
