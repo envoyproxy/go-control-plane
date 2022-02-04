@@ -918,7 +918,8 @@ type ImmediateResponse struct {
 	// If set, then include a gRPC status trailer.
 	GrpcStatus *GrpcStatus `protobuf:"bytes,4,opt,name=grpc_status,json=grpcStatus,proto3" json:"grpc_status,omitempty"`
 	// A string detailing why this local reply was sent, which may be included
-	// in log and debug output.
+	// in log and debug output (e.g. this populates the %RESPONSE_CODE_DETAILS%
+	// command operator field for use in access logging).
 	Details string `protobuf:"bytes,5,opt,name=details,proto3" json:"details,omitempty"`
 }
 
