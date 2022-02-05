@@ -57,25 +57,31 @@ var (
 	snapshotWithTTL, _ = cache.NewSnapshotWithTTLs(fixture.version, map[rsrc.Type][]types.ResourceWithTTL{
 		rsrc.EndpointType:        {{Resource: testEndpoint, TTL: &ttl}},
 		rsrc.ClusterType:         {{Resource: testCluster}},
-		rsrc.RouteType:           {{Resource: testRoute}},
-		rsrc.ListenerType:        {{Resource: testListener}},
+		rsrc.RouteType:           {{Resource: testRoute}, {Resource: testEmbeddedRoute}},
+		rsrc.ScopedRouteType:     {{Resource: testScopedRoute}},
+		rsrc.VirtualHostType:     {{Resource: testVirtualHost}},
+		rsrc.ListenerType:        {{Resource: testScopedListener}, {Resource: testListener}},
 		rsrc.RuntimeType:         {{Resource: testRuntime}},
 		rsrc.SecretType:          {{Resource: testSecret[0]}},
 		rsrc.ExtensionConfigType: {{Resource: testExtensionConfig}},
 	})
 
 	names = map[string][]string{
-		rsrc.EndpointType: {clusterName},
-		rsrc.ClusterType:  nil,
-		rsrc.RouteType:    {routeName},
-		rsrc.ListenerType: nil,
-		rsrc.RuntimeType:  nil,
+		rsrc.EndpointType:    {clusterName},
+		rsrc.ClusterType:     nil,
+		rsrc.RouteType:       {routeName, embeddedRouteName},
+		rsrc.ScopedRouteType: nil,
+		rsrc.VirtualHostType: nil,
+		rsrc.ListenerType:    nil,
+		rsrc.RuntimeType:     nil,
 	}
 
 	testTypes = []string{
 		rsrc.EndpointType,
 		rsrc.ClusterType,
 		rsrc.RouteType,
+		rsrc.ScopedRouteType,
+		rsrc.VirtualHostType,
 		rsrc.ListenerType,
 		rsrc.RuntimeType,
 	}
@@ -431,8 +437,8 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	snapshot2, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
 		rsrc.EndpointType:        {testEndpoint, resource.MakeEndpoint(clusterName2, 8080)},
 		rsrc.ClusterType:         {testCluster, resource.MakeCluster(resource.Ads, clusterName2)},
-		rsrc.RouteType:           {testRoute, resource.MakeRoute(routeName2, clusterName2)},
-		rsrc.ListenerType:        {testListener, resource.MakeRouteHTTPListener(resource.Ads, listenerName2, 80, routeName2)},
+		rsrc.RouteType:           {testRoute, resource.MakeRouteConfig(routeName2, clusterName2)},
+		rsrc.ListenerType:        {testScopedListener, resource.MakeRouteHTTPListener(resource.Ads, listenerName2, 80, routeName2)},
 		rsrc.RuntimeType:         {},
 		rsrc.SecretType:          {},
 		rsrc.ExtensionConfigType: {},
