@@ -1491,6 +1491,13 @@ func (m *WeightedCluster) validate(all bool) error {
 
 	// no validation rules for RuntimeKeyPrefix
 
+	switch m.RandomValueSpecifier.(type) {
+
+	case *WeightedCluster_HeaderName:
+		// no validation rules for HeaderName
+
+	}
+
 	if len(errors) > 0 {
 		return WeightedClusterMultiError(errors)
 	}
