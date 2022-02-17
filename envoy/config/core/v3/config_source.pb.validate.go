@@ -636,6 +636,145 @@ var _ interface {
 	ErrorName() string
 } = RateLimitSettingsValidationError{}
 
+// Validate checks the field values on PathConfigSource with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *PathConfigSource) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PathConfigSource with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PathConfigSourceMultiError, or nil if none found.
+func (m *PathConfigSource) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PathConfigSource) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetPath()) < 1 {
+		err := PathConfigSourceValidationError{
+			field:  "Path",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetWatchedDirectory()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PathConfigSourceValidationError{
+					field:  "WatchedDirectory",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PathConfigSourceValidationError{
+					field:  "WatchedDirectory",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWatchedDirectory()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PathConfigSourceValidationError{
+				field:  "WatchedDirectory",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return PathConfigSourceMultiError(errors)
+	}
+	return nil
+}
+
+// PathConfigSourceMultiError is an error wrapping multiple validation errors
+// returned by PathConfigSource.ValidateAll() if the designated constraints
+// aren't met.
+type PathConfigSourceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PathConfigSourceMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PathConfigSourceMultiError) AllErrors() []error { return m }
+
+// PathConfigSourceValidationError is the validation error returned by
+// PathConfigSource.Validate if the designated constraints aren't met.
+type PathConfigSourceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PathConfigSourceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PathConfigSourceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PathConfigSourceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PathConfigSourceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PathConfigSourceValidationError) ErrorName() string { return "PathConfigSourceValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PathConfigSourceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPathConfigSource.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PathConfigSourceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PathConfigSourceValidationError{}
+
 // Validate checks the field values on ConfigSource with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -736,6 +875,37 @@ func (m *ConfigSource) validate(all bool) error {
 
 	case *ConfigSource_Path:
 		// no validation rules for Path
+
+	case *ConfigSource_PathConfigSource:
+
+		if all {
+			switch v := interface{}(m.GetPathConfigSource()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ConfigSourceValidationError{
+						field:  "PathConfigSource",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ConfigSourceValidationError{
+						field:  "PathConfigSource",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPathConfigSource()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ConfigSourceValidationError{
+					field:  "PathConfigSource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
 
 	case *ConfigSource_ApiConfigSource:
 
