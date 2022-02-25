@@ -371,6 +371,10 @@ func (m *RouteMatch) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Header
+
+	// no validation rules for Parameter
+
 	switch m.MatchSpecifier.(type) {
 
 	case *RouteMatch_Domain:
