@@ -274,6 +274,7 @@ func TestLinearSetResources(t *testing.T) {
 
 	// Create new resources
 	w1 := make(chan Response, 1)
+	streamState.SetKnownResourceNamesAsList(testType, []string{"a"})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w1)
 	mustBlock(t, w1)
 	w2 := make(chan Response, 1)
@@ -341,6 +342,7 @@ func TestLinearVersionPrefix(t *testing.T) {
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	verifyResponse(t, w, "instance1-1", 1)
 
+	streamState.SetKnownResourceNamesAsList(testType, []string{"a"})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "instance1-1"}, streamState, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
@@ -350,6 +352,7 @@ func TestLinearDeletion(t *testing.T) {
 	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
 	w := make(chan Response, 1)
+	streamState.SetKnownResourceNamesAsList(testType, []string{"a"})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
@@ -369,6 +372,7 @@ func TestLinearWatchTwo(t *testing.T) {
 	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
 	w := make(chan Response, 1)
+	streamState.SetKnownResourceNamesAsList(testType, []string{"a", "b"})
 	c.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	mustBlock(t, w)
 	w1 := make(chan Response, 1)
@@ -376,7 +380,7 @@ func TestLinearWatchTwo(t *testing.T) {
 	mustBlock(t, w1)
 	require.NoError(t, c.UpdateResource("a", testResource("aa")))
 	// should only get the modified resource
-	verifyResponse(t, w, "1", 1)
+	verifyResponse(t, w, "1", 2)
 	verifyResponse(t, w1, "1", 2)
 }
 
@@ -394,6 +398,7 @@ func TestLinearCancel(t *testing.T) {
 	checkWatchCount(t, c, "a", 0)
 
 	// cancel watch for "a"
+	streamState.SetKnownResourceNamesAsList(testType, []string{"a"})
 	cancel = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, streamState, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)

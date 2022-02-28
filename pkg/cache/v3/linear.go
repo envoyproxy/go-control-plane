@@ -27,7 +27,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-type watches = map[chan Response]struct{}
+type watches = map[chan Response]stream.StreamState
 
 // LinearCache supports collections of opaque resources. This cache has a
 // single collection indexed by resource names and manages resource versions
@@ -114,12 +114,17 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 }
 
 func (cache *LinearCache) respond(value chan Response, staleResources []string) {
-	var resources []types.ResourceWithTTL
+	var (
+		resources            []types.ResourceWithTTL
+		respondResourceNames []string
+	)
+
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
 		resources = make([]types.ResourceWithTTL, 0, len(cache.resources))
-		for _, resource := range cache.resources {
+		for name, resource := range cache.resources {
 			resources = append(resources, types.ResourceWithTTL{Resource: resource})
+			respondResourceNames = append(respondResourceNames, name)
 		}
 	} else {
 		resources = make([]types.ResourceWithTTL, 0, len(staleResources))
@@ -127,11 +132,12 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 			resource := cache.resources[name]
 			if resource != nil {
 				resources = append(resources, types.ResourceWithTTL{Resource: resource})
+				respondResourceNames = append(respondResourceNames, name)
 			}
 		}
 	}
 	value <- &RawResponse{
-		Request:   &Request{TypeUrl: cache.typeURL},
+		Request:   &Request{TypeUrl: cache.typeURL, ResourceNames: respondResourceNames},
 		Resources: resources,
 		Version:   cache.getVersion(),
 		Ctx:       context.Background(),
@@ -142,11 +148,25 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	// de-duplicate watches that need to be responded
 	notifyList := make(map[chan Response][]string)
 	for name := range modified {
-		for watch := range cache.watches[name] {
-			notifyList[watch] = append(notifyList[watch], name)
+		for watch, streamState := range cache.watches[name] {
+			resourceNames := streamState.GetKnownResourceNames(cache.typeURL)
+			modifiedNameInResourceName := false
+			for resourceName := range resourceNames {
+				if !modifiedNameInResourceName && resourceName == name {
+					modifiedNameInResourceName = true
+				}
+				// To avoid the stale in notifyList becomes empty slice.
+				// Don't skip resource name that has been deleted here.
+				// It would be filtered out in respond because the corresponding resource has been deleted.
+				notifyList[watch] = append(notifyList[watch], resourceName)
+			}
+			if !modifiedNameInResourceName {
+				notifyList[watch] = append(notifyList[watch], name)
+			}
 		}
 		delete(cache.watches, name)
 	}
+
 	for value, stale := range notifyList {
 		cache.respond(value, stale)
 	}
@@ -328,10 +348,16 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 		stale = lastVersion != cache.version
 	} else {
 		for _, name := range request.ResourceNames {
+			_, has := streamState.GetKnownResourceNames(request.TypeUrl)[name]
+			version, exists := cache.versionVector[name]
+
 			// When a resource is removed, its version defaults 0 and it is not considered stale.
-			if lastVersion < cache.versionVector[name] {
+			if lastVersion < version || (!has && exists) {
 				stale = true
-				staleResources = append(staleResources, name)
+
+				// Here we collect all requested names.
+				// It would be filtered out in respond if the resource name doesn't appear in cache.
+				staleResources = request.ResourceNames
 			}
 		}
 	}
@@ -341,7 +367,7 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 	}
 	// Create open watches since versions are up to date.
 	if len(request.ResourceNames) == 0 {
-		cache.watchAll[value] = struct{}{}
+		cache.watchAll[value] = streamState
 		return func() {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
@@ -354,7 +380,7 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 			set = make(watches)
 			cache.watches[name] = set
 		}
-		set[value] = struct{}{}
+		set[value] = streamState
 	}
 	return func() {
 		cache.mu.Lock()
