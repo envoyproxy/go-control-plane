@@ -18,17 +18,10 @@ package sotw
 import (
 	"context"
 	"errors"
-	"reflect"
 	"strconv"
-	"sync/atomic"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
@@ -61,6 +54,44 @@ type server struct {
 
 	// streamCount for counting bi-di streams
 	streamCount int64
+}
+
+type streamWrapper struct {
+	stream      stream.Stream // parent stream object
+	ID          int64         // stream ID in relation to total stream count
+	nonce       int64         // nonce per stream
+	watches     watches
+	callbacks   Callbacks
+	streamState stream.StreamState
+}
+
+func (s *streamWrapper) send(resp cache.Response) (string, error) {
+	if resp == nil {
+		return "", errors.New("missing response")
+	}
+
+	out, err := resp.GetDiscoveryResponse()
+	if err != nil {
+		return "", err
+	}
+
+	// increment nonce
+	s.nonce = s.nonce + 1
+	out.Nonce = strconv.FormatInt(s.nonce, 10)
+
+	lastResponse := lastDiscoveryResponse{
+		nonce:     out.Nonce,
+		resources: make(map[string]struct{}),
+	}
+	for _, r := range resp.GetRequest().ResourceNames {
+		lastResponse.resources[r] = struct{}{}
+	}
+	// lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
+
+	if s.callbacks != nil {
+		s.callbacks.OnStreamResponse(resp.GetContext(), s.ID, resp.GetRequest(), out)
+	}
+	return out.Nonce, s.stream.Send(out)
 }
 
 // Discovery response that is sent over GRPC stream
