@@ -20,8 +20,10 @@ import (
 	"errors"
 	"strconv"
 
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/config"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
@@ -43,8 +45,23 @@ type Callbacks interface {
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks) Server {
-	return &server{cache: config, callbacks: callbacks, ctx: ctx}
+func NewServer(ctx context.Context, cw cache.ConfigWatcher, callbacks Callbacks, opts ...config.XDSOption) Server {
+	s := &server{cache: cw, callbacks: callbacks, ctx: ctx, opts: config.NewOpts()}
+
+	// Parse through our options
+	for _, opt := range opts {
+		opt(&s.opts)
+	}
+
+	return s
+}
+
+// WithOrderedADS enables the internal flag to order responces
+// strictly.
+func WithOrderedADS() config.XDSOption {
+	return func(o *config.Opts) {
+		o.Ordered = true
+	}
 }
 
 type server struct {
@@ -54,17 +71,29 @@ type server struct {
 
 	// streamCount for counting bi-di streams
 	streamCount int64
+
+	// Local configuration flags for individual xDS implementations.
+	opts config.Opts
 }
 
+// streamWrapper abstracts specific data points inside a stream so we can access them
+// throughout various code paths in an xDS stream lifecycle. This comes in handy when dealing
+// with varying implementation types such as ordered vs unordered.
 type streamWrapper struct {
-	stream      stream.Stream // parent stream object
-	ID          int64         // stream ID in relation to total stream count
-	nonce       int64         // nonce per stream
-	watches     watches
-	callbacks   Callbacks
-	streamState stream.StreamState
+	stream    stream.Stream // parent stream object
+	ID        int64         // stream ID in relation to total stream count
+	nonce     int64         // nonce per stream
+	node      *core.Node
+	watches   watches   // collection of stack allocated watchers per request type
+	callbacks Callbacks // callbacks for performing actions through stream lifecycle
+
+	// The below config fields are for tracking resource cache state
+	streamState            stream.StreamState
+	lastDiscoveryResponses map[string]lastDiscoveryResponse
 }
 
+// Send packages the necessary resources before sending on the gRPC stream,
+// and sets the current state of the world.
 func (s *streamWrapper) send(resp cache.Response) (string, error) {
 	if resp == nil {
 		return "", errors.New("missing response")
@@ -86,7 +115,7 @@ func (s *streamWrapper) send(resp cache.Response) (string, error) {
 	for _, r := range resp.GetRequest().ResourceNames {
 		lastResponse.resources[r] = struct{}{}
 	}
-	// lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
+	s.lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
 	if s.callbacks != nil {
 		s.callbacks.OnStreamResponse(resp.GetContext(), s.ID, resp.GetRequest(), out)

@@ -21,6 +21,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/envoyproxy/go-control-plane/pkg/server/config"
 	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
@@ -165,10 +166,10 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
+func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks, opts ...config.XDSOption) Server {
 	return NewServerAdvanced(rest.NewServer(config, callbacks),
-		sotw.NewServer(ctx, config, callbacks),
-		delta.NewServer(ctx, config, callbacks),
+		sotw.NewServer(ctx, config, callbacks, opts...),
+		delta.NewServer(ctx, config, callbacks, opts...),
 	)
 }
 

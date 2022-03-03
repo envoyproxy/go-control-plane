@@ -24,7 +24,7 @@ node:
   id: test-id
 static_resources:
   clusters:
-  - connect_timeout: 1s
+  - connect_timeout: 30s
     load_assignment:
       cluster_name: xds_cluster
       endpoints:
@@ -36,7 +36,7 @@ static_resources:
                 port_value: 18000
     http2_protocol_options: {}
     name: xds_cluster
-  - connect_timeout: 1s
+  - connect_timeout: 30s
     load_assignment:
       cluster_name: als_cluster
       endpoints:

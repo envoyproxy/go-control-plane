@@ -1,13 +1,11 @@
 package sotw
 
 import (
-	"fmt"
 	"reflect"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
@@ -15,53 +13,50 @@ import (
 )
 
 // process handles a bi-di stream request
-func (s *server) processADS(sw *streamWrapper, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
-	// process := func(resp cache.Response) error {
-	// 	nonce, err := send(resp)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	typeUrl := resp.GetRequest().TypeUrl
-	// 	watches.nonces[typeUrl] = nonce
-	// 	return nil
-	// }
+func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+	process := func(resp cache.Response) error {
+		nonce, err := sw.send(resp)
+		if err != nil {
+			return err
+		}
 
-	// processAllExcept := func(typeUrl string) error {
-	// 	for {
-	// 		select {
-	// 		case resp := <-values.responses:
-	// 			if resp.GetRequest().TypeUrl != typeUrl {
-	// 				if err := process(resp); err != nil {
-	// 					return err
-	// 				}
-	// 			}
-	// 		default:
-	// 			return nil
-	// 		}
-	// 	}
-	// }
+		typeURL := resp.GetRequest().TypeUrl
+		sw.watches.responders[typeURL].nonce = nonce
+		return nil
+	}
 
-	// node may only be set on the first discovery request
-	var node = &core.Node{}
+	processAllExcept := func(typeURL string) error {
+		for {
+			index, value, ok := reflect.Select(sw.watches.cases)
+			// index is checked because if we receive a value
+			// from the Done() or request channel here
+			// we can ignore. The main control loop will handle that accordingly.
+			// This is strictly for handling incoming resources off the dynamic channels list.
+			if !ok || index < 2 {
+				// We just exit and assume the ordered parent resource isn't ready if !ok
+				return nil
+			}
+
+			res := value.Interface().(cache.Response)
+			if res.GetRequest().TypeUrl != typeURL {
+				if err := process(res); err != nil {
+					return err
+				}
+			}
+		}
+	}
 
 	// This control loop strictly orders resources when running in ADS mode.
 	// It should be treated as a child process of the original process() loop
-	// and should return on close of stream or error. This will cause the cleanup routines
-	// in the parent process() loop to execute.
+	// and should return on close of stream or error.
+	// This will cause the cleanup routinesin the parent process() loop to execute.
 	for {
-		fmt.Printf("%+v\n", sw.watches.cases)
 		index, value, ok := reflect.Select(sw.watches.cases)
-		fmt.Println(index)
-		fmt.Println(value)
-		fmt.Println(ok)
-
 		switch index {
 		case 0:
-			fmt.Println("recieved a Done() on the ADS code path.")
 			// ctx.Done() -> no further computation is needed
 			return nil
 		case 1:
-			fmt.Println("This is the ordered ADS code path request pipeline")
 			if !ok {
 				return nil
 			}
@@ -73,9 +68,9 @@ func (s *server) processADS(sw *streamWrapper, reqCh <-chan *discovery.Discovery
 
 			// Only first request is guaranteed to hold node info so if it's missing, reassign.
 			if req.Node != nil {
-				node = req.Node
+				sw.node = req.Node
 			} else {
-				req.Node = node
+				req.Node = sw.node
 			}
 
 			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
@@ -96,12 +91,12 @@ func (s *server) processADS(sw *streamWrapper, reqCh <-chan *discovery.Discovery
 				}
 			}
 
-			// if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
-			// 	if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-			// 		// Let's record Resource names that a client has received.
-			// 		streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
-			// 	}
-			// }
+			if lastResponse, ok := sw.lastDiscoveryResponses[req.TypeUrl]; ok {
+				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
+					// Let's record Resource names that a client has received.
+					sw.streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
+				}
+			}
 
 			typeURL := req.GetTypeUrl()
 			responder := make(chan cache.Response, 1)
@@ -110,6 +105,11 @@ func (s *server) processADS(sw *streamWrapper, reqCh <-chan *discovery.Discovery
 				// If these requirements aren't satisfied, leave an open watch.
 				if w.nonce == "" || w.nonce == nonce {
 					w.close()
+
+					// Only process if we have an existing watch otherwise go ahead and create.
+					if err := processAllExcept(typeURL); err != nil {
+						return err
+					}
 
 					sw.watches.addWatch(typeURL, &watch{
 						cancel:   s.cache.CreateWatch(req, stream.StreamState{}, responder),
@@ -128,9 +128,9 @@ func (s *server) processADS(sw *streamWrapper, reqCh <-chan *discovery.Discovery
 			// Recompute the dynamic select cases for this stream.
 			sw.watches.recompute(s.ctx, reqCh)
 		default:
-			fmt.Println("This is the ordered ADS code path default pipeline")
-
-			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
+			// Channel n -> these are the dynamic list of responders
+			// that correspond to the stream request typeURL
+			// No special processing here for ordering. We just send on the channels.
 			if !ok {
 				// Receiver channel was closed. TODO(jpeach): probably cancel the watch or something?
 				return status.Errorf(codes.Unavailable, "resource watch %d -> failed", index)
@@ -146,17 +146,3 @@ func (s *server) processADS(sw *streamWrapper, reqCh <-chan *discovery.Discovery
 		}
 	}
 }
-
-// typeUrl := req.TypeUrl
-// responseNonce, seen := values.nonces[typeUrl]
-// if !seen || responseNonce == nonce {
-// 	if cancel, seen := values.cancellations[typeUrl]; seen {
-// 		if cancel != nil {
-// 			cancel()
-// 		}
-// 		if err := processAllExcept(typeUrl); err != nil {
-// 			return err
-// 		}
-// 	}
-// 	values.cancellations[typeUrl] = s.cache.CreateWatch(req, values.responses)
-// }

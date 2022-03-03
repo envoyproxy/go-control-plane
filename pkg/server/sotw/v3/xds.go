@@ -4,28 +4,34 @@ import (
 	"reflect"
 	"sync/atomic"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 // process handles a bi-di stream request
-func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
+	// create our streamWrapper which can be passed down to sub control loops.
+	// this is useful for abstracting critical information for various types of
+	// xDS resource processing.
 	sw := streamWrapper{
-		stream:      str,
-		ID:          atomic.AddInt64(&s.streamCount, 1), // increment stream count
-		callbacks:   s.callbacks,
-		streamState: stream.NewStreamState(false, map[string]string{}),
-		watches:     newWatches(),
+		stream:    str,
+		ID:        atomic.AddInt64(&s.streamCount, 1), // increment stream count
+		callbacks: s.callbacks,
+		node:      &core.Node{}, // node may only be set on the first discovery request
+
+		// a collection of stack allocated watches per request type.
+		watches:                newWatches(),
+		streamState:            stream.NewStreamState(false, map[string]string{}),
+		lastDiscoveryResponses: make(map[string]lastDiscoveryResponse),
 	}
 
-	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
-	// a collection of stack allocated watches per request type
-
+	// cleanup once our stream has ended.
 	defer func() {
 		sw.watches.close()
 		if s.callbacks != nil {
@@ -39,10 +45,9 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		}
 	}
 
-	// node may only be set on the first discovery request
-	var node = &core.Node{}
-
-	// recompute dynamic channels for this stream
+	// do an initial recompute so we can load the first 2 channels:
+	// request
+	// s.ctx.Done()
 	sw.watches.recompute(s.ctx, reqCh)
 
 	for {
@@ -52,10 +57,12 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		// 2...: per type watches
 		index, value, ok := reflect.Select(sw.watches.cases)
 		switch index {
-		// ctx.Done() -> if we receive a value here we return as no further computation is needed
+		// ctx.Done() -> if we receive a value here we return
+		// as no further computation is needed
 		case 0:
 			return nil
-		// Case 1 handles any request inbound on the stream and handles all initialization as needed
+		// Case 1 handles any request inbound on the stream
+		// and handles all initialization as needed
 		case 1:
 			// input stream ended or errored out
 			if !ok {
@@ -69,9 +76,9 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 
 			// Only first request is guaranteed to hold node info so if it's missing, reassign.
 			if req.Node != nil {
-				node = req.Node
+				sw.node = req.Node
 			} else {
-				req.Node = node
+				req.Node = sw.node
 			}
 
 			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
@@ -83,15 +90,24 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
 				}
 
-				// When using ADS we need to order responses. This is guaranteed in the xDS protocol specification
-				// as ADS is required to be eventually consistent. More details can be found here if interested:
+				// When using ADS we need to order responses.
+				// This is guaranteed in the xDS protocol specification
+				// as ADS is required to be eventually consistent.
+				// More details can be found here if interested:
 				// https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#eventual-consistency-considerations
-				sw.streamState.IsOrdered(true)
+				if s.opts.Ordered {
+					// send our first request on the stream again so it doesn't get
+					// lost in processing on the new control loop
+					go func() {
+						reqCh <- req
+					}()
 
-				// Trigger a different code path specifically for ADS. We want resource ordering
-				// so things don't get sent before they should. This is a blocking call and
-				// will exit the process function on successful completion.
-				return s.processADS(&sw, reqCh, defaultTypeURL)
+					// Trigger a different code path specifically for ADS.
+					// We want resource ordering so things don't get sent before they should.
+					// This is a blocking call and will exit the process function
+					// on successful completion.
+					return s.processADS(&sw, reqCh, defaultTypeURL)
+				}
 			} else if req.TypeUrl == "" {
 				req.TypeUrl = defaultTypeURL
 			}
@@ -102,7 +118,7 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				}
 			}
 
-			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
+			if lastResponse, ok := sw.lastDiscoveryResponses[req.TypeUrl]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
 					sw.streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
@@ -124,7 +140,6 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				}
 			} else {
 				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
 				sw.watches.addWatch(typeURL, &watch{
 					cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
 					response: responder,
@@ -134,7 +149,8 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			// Recompute the dynamic select cases for this stream.
 			sw.watches.recompute(s.ctx, reqCh)
 		default:
-			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
+			// Channel n -> these are the dynamic list of
+			// responders that correspond to the stream request typeURL
 			if !ok {
 				// Receiver channel was closed. TODO(jpeach): probably cancel the watch or something?
 				return status.Errorf(codes.Unavailable, "resource watch %d -> failed", index)
