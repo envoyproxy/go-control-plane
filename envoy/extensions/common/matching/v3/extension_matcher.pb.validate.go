@@ -158,6 +158,7 @@ func (m *ExtensionWithMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtensionWithMatcherMultiError(errors)
 	}
+
 	return nil
 }
 

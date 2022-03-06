@@ -60,6 +60,7 @@ func (m *AppleDnsResolverConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return AppleDnsResolverConfigMultiError(errors)
 	}
+
 	return nil
 }
 

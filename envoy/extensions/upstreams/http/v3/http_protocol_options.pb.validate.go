@@ -225,6 +225,7 @@ func (m *HttpProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -435,6 +436,7 @@ func (m *HttpProtocolOptions_ExplicitHttpConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpProtocolOptions_ExplicitHttpConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -627,6 +629,7 @@ func (m *HttpProtocolOptions_UseDownstreamHttpConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpProtocolOptions_UseDownstreamHttpConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -847,6 +850,7 @@ func (m *HttpProtocolOptions_AutoHttpConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpProtocolOptions_AutoHttpConfigMultiError(errors)
 	}
+
 	return nil
 }
 

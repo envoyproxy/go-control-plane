@@ -64,6 +64,7 @@ func (m *Capability) validate(all bool) error {
 	if len(errors) > 0 {
 		return CapabilityMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -220,6 +221,7 @@ func (m *HealthCheckRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -352,6 +354,7 @@ func (m *EndpointHealth) validate(all bool) error {
 	if len(errors) > 0 {
 		return EndpointHealthMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -514,6 +517,7 @@ func (m *LocalityEndpointsHealth) validate(all bool) error {
 	if len(errors) > 0 {
 		return LocalityEndpointsHealthMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -651,6 +655,7 @@ func (m *ClusterEndpointsHealth) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClusterEndpointsHealthMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -820,6 +825,7 @@ func (m *EndpointHealthResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return EndpointHealthResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -989,6 +995,7 @@ func (m *HealthCheckRequestOrEndpointHealthResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckRequestOrEndpointHealthResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1155,6 +1162,7 @@ func (m *LocalityEndpoints) validate(all bool) error {
 	if len(errors) > 0 {
 		return LocalityEndpointsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1360,6 +1368,7 @@ func (m *ClusterHealthCheck) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClusterHealthCheckMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1524,6 +1533,7 @@ func (m *HealthCheckSpecifier) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckSpecifierMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1625,6 +1635,7 @@ func (m *HdsDummy) validate(all bool) error {
 	if len(errors) > 0 {
 		return HdsDummyMultiError(errors)
 	}
+
 	return nil
 }
 

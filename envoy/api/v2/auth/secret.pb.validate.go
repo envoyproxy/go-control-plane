@@ -89,6 +89,7 @@ func (m *GenericSecret) validate(all bool) error {
 	if len(errors) > 0 {
 		return GenericSecretMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -219,6 +220,7 @@ func (m *SdsSecretConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return SdsSecretConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -447,6 +449,7 @@ func (m *Secret) validate(all bool) error {
 	if len(errors) > 0 {
 		return SecretMultiError(errors)
 	}
+
 	return nil
 }
 

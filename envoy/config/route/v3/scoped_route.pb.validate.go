@@ -144,6 +144,7 @@ func (m *ScopedRouteConfiguration) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRouteConfigurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -290,6 +291,7 @@ func (m *ScopedRouteConfiguration_Key) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRouteConfiguration_KeyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -410,6 +412,7 @@ func (m *ScopedRouteConfiguration_Key_Fragment) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRouteConfiguration_Key_FragmentMultiError(errors)
 	}
+
 	return nil
 }
 

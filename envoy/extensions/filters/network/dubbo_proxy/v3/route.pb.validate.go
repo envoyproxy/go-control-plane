@@ -102,6 +102,7 @@ func (m *RouteConfiguration) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteConfigurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -282,6 +283,7 @@ func (m *Route) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -443,6 +445,7 @@ func (m *RouteMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -589,6 +592,7 @@ func (m *RouteAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -762,6 +766,7 @@ func (m *MethodMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return MethodMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -899,6 +904,7 @@ func (m *MethodMatch_ParameterMatchSpecifier) validate(all bool) error {
 	if len(errors) > 0 {
 		return MethodMatch_ParameterMatchSpecifierMultiError(errors)
 	}
+
 	return nil
 }
 

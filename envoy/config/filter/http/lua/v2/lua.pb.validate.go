@@ -70,6 +70,7 @@ func (m *Lua) validate(all bool) error {
 	if len(errors) > 0 {
 		return LuaMultiError(errors)
 	}
+
 	return nil
 }
 

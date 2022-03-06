@@ -263,6 +263,7 @@ func (m *HeaderMutationRules) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderMutationRulesMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -98,6 +98,7 @@ func (m *RateLimitRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -361,6 +362,7 @@ func (m *RateLimitResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -468,6 +470,7 @@ func (m *RateLimitResponse_RateLimit) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitResponse_RateLimitMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -618,6 +621,7 @@ func (m *RateLimitResponse_Quota) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitResponse_QuotaMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -811,6 +815,7 @@ func (m *RateLimitResponse_DescriptorStatus) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitResponse_DescriptorStatusMultiError(errors)
 	}
+
 	return nil
 }
 

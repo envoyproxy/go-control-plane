@@ -279,6 +279,7 @@ func (m *AdmissionControl) validate(all bool) error {
 	if len(errors) > 0 {
 		return AdmissionControlMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -437,6 +438,7 @@ func (m *AdmissionControl_SuccessCriteria) validate(all bool) error {
 	if len(errors) > 0 {
 		return AdmissionControl_SuccessCriteriaMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -587,6 +589,7 @@ func (m *AdmissionControl_SuccessCriteria_HttpCriteria) validate(all bool) error
 	if len(errors) > 0 {
 		return AdmissionControl_SuccessCriteria_HttpCriteriaMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -706,6 +709,7 @@ func (m *AdmissionControl_SuccessCriteria_GrpcCriteria) validate(all bool) error
 	if len(errors) > 0 {
 		return AdmissionControl_SuccessCriteria_GrpcCriteriaMultiError(errors)
 	}
+
 	return nil
 }
 

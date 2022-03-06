@@ -146,6 +146,7 @@ func (m *MetricsServiceConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return MetricsServiceConfigMultiError(errors)
 	}
+
 	return nil
 }
 

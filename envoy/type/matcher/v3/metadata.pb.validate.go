@@ -158,6 +158,7 @@ func (m *MetadataMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return MetadataMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -284,6 +285,7 @@ func (m *MetadataMatcher_PathSegment) validate(all bool) error {
 	if len(errors) > 0 {
 		return MetadataMatcher_PathSegmentMultiError(errors)
 	}
+
 	return nil
 }
 

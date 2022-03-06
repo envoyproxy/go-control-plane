@@ -60,6 +60,7 @@ func (m *ServiceMatchInput) validate(all bool) error {
 	if len(errors) > 0 {
 		return ServiceMatchInputMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -161,6 +162,7 @@ func (m *MethodMatchInput) validate(all bool) error {
 	if len(errors) > 0 {
 		return MethodMatchInputMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -271,6 +273,7 @@ func (m *PropertyMatchInput) validate(all bool) error {
 	if len(errors) > 0 {
 		return PropertyMatchInputMultiError(errors)
 	}
+
 	return nil
 }
 

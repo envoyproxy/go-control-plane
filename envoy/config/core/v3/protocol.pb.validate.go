@@ -60,6 +60,7 @@ func (m *TcpProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return TcpProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -223,6 +224,7 @@ func (m *QuicKeepAliveSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return QuicKeepAliveSettingsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -413,6 +415,7 @@ func (m *QuicProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return QuicProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -533,6 +536,7 @@ func (m *UpstreamHttpProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return UpstreamHttpProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -726,6 +730,7 @@ func (m *AlternateProtocolsCacheOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return AlternateProtocolsCacheOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -961,6 +966,7 @@ func (m *HttpProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1157,6 +1163,7 @@ func (m *Http1ProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return Http1ProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1388,6 +1395,7 @@ func (m *KeepaliveSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return KeepaliveSettingsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1764,6 +1772,7 @@ func (m *Http2ProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return Http2ProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1894,6 +1903,7 @@ func (m *GrpcProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return GrpcProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2055,6 +2065,7 @@ func (m *Http3ProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return Http3ProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2173,6 +2184,7 @@ func (m *SchemeHeaderTransformation) validate(all bool) error {
 	if len(errors) > 0 {
 		return SchemeHeaderTransformationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2308,6 +2320,7 @@ func (m *AlternateProtocolsCacheOptions_AlternateProtocolsCacheEntry) validate(a
 	if len(errors) > 0 {
 		return AlternateProtocolsCacheOptions_AlternateProtocolsCacheEntryMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2501,6 +2514,7 @@ func (m *Http1ProtocolOptions_HeaderKeyFormat) validate(all bool) error {
 	if len(errors) > 0 {
 		return Http1ProtocolOptions_HeaderKeyFormatMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2607,6 +2621,7 @@ func (m *Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords) validate(all bool
 	if len(errors) > 0 {
 		return Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWordsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2783,6 +2798,7 @@ func (m *Http2ProtocolOptions_SettingsParameter) validate(all bool) error {
 	if len(errors) > 0 {
 		return Http2ProtocolOptions_SettingsParameterMultiError(errors)
 	}
+
 	return nil
 }
 

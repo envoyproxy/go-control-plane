@@ -158,6 +158,7 @@ func (m *OpenTelemetryAccessLogConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return OpenTelemetryAccessLogConfigMultiError(errors)
 	}
+
 	return nil
 }
 

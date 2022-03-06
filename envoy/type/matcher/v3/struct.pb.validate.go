@@ -145,6 +145,7 @@ func (m *StructMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return StructMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -271,6 +272,7 @@ func (m *StructMatcher_PathSegment) validate(all bool) error {
 	if len(errors) > 0 {
 		return StructMatcher_PathSegmentMultiError(errors)
 	}
+
 	return nil
 }
 

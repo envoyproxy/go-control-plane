@@ -510,6 +510,7 @@ func (m *Bootstrap) validate(all bool) error {
 	if len(errors) > 0 {
 		return BootstrapMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -674,6 +675,7 @@ func (m *Admin) validate(all bool) error {
 	if len(errors) > 0 {
 		return AdminMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -861,6 +863,7 @@ func (m *ClusterManager) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClusterManagerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1076,6 +1079,7 @@ func (m *Watchdog) validate(all bool) error {
 	if len(errors) > 0 {
 		return WatchdogMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1208,6 +1212,7 @@ func (m *Runtime) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1455,6 +1460,7 @@ func (m *RuntimeLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1587,6 +1593,7 @@ func (m *LayeredRuntime) validate(all bool) error {
 	if len(errors) > 0 {
 		return LayeredRuntimeMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1788,6 +1795,7 @@ func (m *Bootstrap_StaticResources) validate(all bool) error {
 	if len(errors) > 0 {
 		return Bootstrap_StaticResourcesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1976,6 +1984,7 @@ func (m *Bootstrap_DynamicResources) validate(all bool) error {
 	if len(errors) > 0 {
 		return Bootstrap_DynamicResourcesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2108,6 +2117,7 @@ func (m *ClusterManager_OutlierDetection) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClusterManager_OutlierDetectionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2216,6 +2226,7 @@ func (m *RuntimeLayer_DiskLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayer_DiskLayerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2317,6 +2328,7 @@ func (m *RuntimeLayer_AdminLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayer_AdminLayerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2449,6 +2461,7 @@ func (m *RuntimeLayer_RtdsLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayer_RtdsLayerMultiError(errors)
 	}
+
 	return nil
 }
 

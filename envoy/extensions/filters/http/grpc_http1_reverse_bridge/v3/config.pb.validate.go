@@ -75,6 +75,7 @@ func (m *FilterConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -175,6 +176,7 @@ func (m *FilterConfigPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterConfigPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 

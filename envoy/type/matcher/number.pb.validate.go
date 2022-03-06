@@ -108,6 +108,7 @@ func (m *DoubleMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return DoubleMatcherMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -116,6 +116,7 @@ func (m *RBAC) validate(all bool) error {
 	if len(errors) > 0 {
 		return RBACMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -361,6 +362,7 @@ func (m *Policy) validate(all bool) error {
 	if len(errors) > 0 {
 		return PolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -809,6 +811,7 @@ func (m *Permission) validate(all bool) error {
 	if len(errors) > 0 {
 		return PermissionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1244,6 +1247,7 @@ func (m *Principal) validate(all bool) error {
 	if len(errors) > 0 {
 		return PrincipalMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1387,6 +1391,7 @@ func (m *Permission_Set) validate(all bool) error {
 	if len(errors) > 0 {
 		return Permission_SetMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1531,6 +1536,7 @@ func (m *Principal_Set) validate(all bool) error {
 	if len(errors) > 0 {
 		return Principal_SetMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1659,6 +1665,7 @@ func (m *Principal_Authenticated) validate(all bool) error {
 	if len(errors) > 0 {
 		return Principal_AuthenticatedMultiError(errors)
 	}
+
 	return nil
 }
 

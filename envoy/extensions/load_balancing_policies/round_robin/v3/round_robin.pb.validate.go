@@ -89,6 +89,7 @@ func (m *RoundRobin) validate(all bool) error {
 	if len(errors) > 0 {
 		return RoundRobinMultiError(errors)
 	}
+
 	return nil
 }
 

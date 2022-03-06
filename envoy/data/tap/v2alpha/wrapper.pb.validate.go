@@ -198,6 +198,7 @@ func (m *TraceWrapper) validate(all bool) error {
 	if len(errors) > 0 {
 		return TraceWrapperMultiError(errors)
 	}
+
 	return nil
 }
 

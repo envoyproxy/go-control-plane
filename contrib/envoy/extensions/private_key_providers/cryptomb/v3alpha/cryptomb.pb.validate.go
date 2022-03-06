@@ -130,6 +130,7 @@ func (m *CryptoMbPrivateKeyMethodConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return CryptoMbPrivateKeyMethodConfigMultiError(errors)
 	}
+
 	return nil
 }
 

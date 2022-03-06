@@ -104,6 +104,7 @@ func (m *ClusterConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClusterConfigMultiError(errors)
 	}
+
 	return nil
 }
 

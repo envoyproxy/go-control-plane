@@ -234,6 +234,7 @@ func (m *RedisProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -390,6 +391,7 @@ func (m *RedisProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -579,6 +581,7 @@ func (m *RedisProxy_ConnPoolSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_ConnPoolSettingsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -746,6 +749,7 @@ func (m *RedisProxy_PrefixRoutes) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_PrefixRoutesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -927,6 +931,7 @@ func (m *RedisProxy_RedisFault) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_RedisFaultMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1086,6 +1091,7 @@ func (m *RedisProxy_PrefixRoutes_Route) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_PrefixRoutes_RouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1232,6 +1238,7 @@ func (m *RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy) validate(all bool) e
 	if len(errors) > 0 {
 		return RedisProxy_PrefixRoutes_Route_RequestMirrorPolicyMultiError(errors)
 	}
+
 	return nil
 }
 

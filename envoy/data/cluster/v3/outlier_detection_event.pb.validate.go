@@ -273,6 +273,7 @@ func (m *OutlierDetectionEvent) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutlierDetectionEventMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -407,6 +408,7 @@ func (m *OutlierEjectSuccessRate) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutlierEjectSuccessRateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -508,6 +510,7 @@ func (m *OutlierEjectConsecutive) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutlierEjectConsecutiveMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -620,6 +623,7 @@ func (m *OutlierEjectFailurePercentage) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutlierEjectFailurePercentageMultiError(errors)
 	}
+
 	return nil
 }
 

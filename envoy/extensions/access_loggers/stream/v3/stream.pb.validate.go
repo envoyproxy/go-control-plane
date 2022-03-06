@@ -106,6 +106,7 @@ func (m *StdoutAccessLog) validate(all bool) error {
 	if len(errors) > 0 {
 		return StdoutAccessLogMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -251,6 +252,7 @@ func (m *StderrAccessLog) validate(all bool) error {
 	if len(errors) > 0 {
 		return StderrAccessLogMultiError(errors)
 	}
+
 	return nil
 }
 

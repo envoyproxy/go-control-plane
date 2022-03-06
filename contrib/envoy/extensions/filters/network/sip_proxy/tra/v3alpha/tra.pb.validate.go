@@ -144,6 +144,7 @@ func (m *TraServiceConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return TraServiceConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -404,6 +405,7 @@ func (m *TraServiceRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return TraServiceRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -670,6 +672,7 @@ func (m *TraServiceResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return TraServiceResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -773,6 +776,7 @@ func (m *CreateRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return CreateRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -872,6 +876,7 @@ func (m *CreateResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return CreateResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -973,6 +978,7 @@ func (m *UpdateRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return UpdateRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1072,6 +1078,7 @@ func (m *UpdateResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return UpdateResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1173,6 +1180,7 @@ func (m *RetrieveRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetrieveRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1274,6 +1282,7 @@ func (m *RetrieveResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetrieveResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1375,6 +1384,7 @@ func (m *DeleteRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return DeleteRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1474,6 +1484,7 @@ func (m *DeleteResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return DeleteResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1573,6 +1584,7 @@ func (m *SubscribeRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return SubscribeRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1674,6 +1686,7 @@ func (m *SubscribeResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return SubscribeResponseMultiError(errors)
 	}
+
 	return nil
 }
 

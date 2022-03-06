@@ -182,6 +182,7 @@ func (m *FileAccessLog) validate(all bool) error {
 	if len(errors) > 0 {
 		return FileAccessLogMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -127,6 +127,7 @@ func (m *RegexMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return RegexMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -267,6 +268,7 @@ func (m *RegexMatchAndSubstitute) validate(all bool) error {
 	if len(errors) > 0 {
 		return RegexMatchAndSubstituteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -397,6 +399,7 @@ func (m *RegexMatcher_GoogleRE2) validate(all bool) error {
 	if len(errors) > 0 {
 		return RegexMatcher_GoogleRE2MultiError(errors)
 	}
+
 	return nil
 }
 

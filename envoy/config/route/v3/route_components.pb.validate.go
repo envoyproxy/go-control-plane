@@ -583,6 +583,7 @@ func (m *VirtualHost) validate(all bool) error {
 	if len(errors) > 0 {
 		return VirtualHostMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -716,6 +717,7 @@ func (m *FilterAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1330,6 +1332,7 @@ func (m *Route) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1501,6 +1504,7 @@ func (m *WeightedCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return WeightedClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1911,6 +1915,7 @@ func (m *RouteMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2144,6 +2149,7 @@ func (m *CorsPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return CorsPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2998,6 +3004,7 @@ func (m *RouteAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3418,6 +3425,7 @@ func (m *RetryPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3562,6 +3570,7 @@ func (m *HedgePolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return HedgePolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3757,6 +3766,7 @@ func (m *RedirectAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedirectActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3902,6 +3912,7 @@ func (m *DirectResponseAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return DirectResponseActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4003,6 +4014,7 @@ func (m *NonForwardingAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return NonForwardingActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4144,6 +4156,7 @@ func (m *Decorator) validate(all bool) error {
 	if len(errors) > 0 {
 		return DecoratorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4362,6 +4375,7 @@ func (m *Tracing) validate(all bool) error {
 	if len(errors) > 0 {
 		return TracingMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4505,6 +4519,7 @@ func (m *VirtualCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return VirtualClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4695,6 +4710,7 @@ func (m *RateLimit) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4959,6 +4975,7 @@ func (m *HeaderMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5131,6 +5148,7 @@ func (m *QueryParameterMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return QueryParameterMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5308,6 +5326,7 @@ func (m *InternalRedirectPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return InternalRedirectPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5440,6 +5459,7 @@ func (m *FilterConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5794,6 +5814,7 @@ func (m *WeightedCluster_ClusterWeight) validate(all bool) error {
 	if len(errors) > 0 {
 		return WeightedCluster_ClusterWeightMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5905,6 +5926,7 @@ func (m *RouteMatch_GrpcRouteMatchOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatch_GrpcRouteMatchOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6067,6 +6089,7 @@ func (m *RouteMatch_TlsContextMatchOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatch_TlsContextMatchOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6170,6 +6193,7 @@ func (m *RouteMatch_ConnectMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatch_ConnectMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6340,6 +6364,7 @@ func (m *RouteAction_RequestMirrorPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_RequestMirrorPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6613,6 +6638,7 @@ func (m *RouteAction_HashPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6794,6 +6820,7 @@ func (m *RouteAction_UpgradeConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_UpgradeConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6984,6 +7011,7 @@ func (m *RouteAction_MaxStreamDuration) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_MaxStreamDurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7137,6 +7165,7 @@ func (m *RouteAction_HashPolicy_Header) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_HeaderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7283,6 +7312,7 @@ func (m *RouteAction_HashPolicy_Cookie) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_CookieMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7389,6 +7419,7 @@ func (m *RouteAction_HashPolicy_ConnectionProperties) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_ConnectionPropertiesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7504,6 +7535,7 @@ func (m *RouteAction_HashPolicy_QueryParameter) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_QueryParameterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7619,6 +7651,7 @@ func (m *RouteAction_HashPolicy_FilterState) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_FilterStateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7755,6 +7788,7 @@ func (m *RouteAction_UpgradeConfig_ConnectConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_UpgradeConfig_ConnectConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7904,6 +7938,7 @@ func (m *RetryPolicy_RetryPriority) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RetryPriorityMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8051,6 +8086,7 @@ func (m *RetryPolicy_RetryHostPredicate) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RetryHostPredicateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8224,6 +8260,7 @@ func (m *RetryPolicy_RetryBackOff) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RetryBackOffMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8358,6 +8395,7 @@ func (m *RetryPolicy_ResetHeader) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_ResetHeaderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8537,6 +8575,7 @@ func (m *RetryPolicy_RateLimitedRetryBackOff) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RateLimitedRetryBackOffMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8933,6 +8972,7 @@ func (m *RateLimit_Action) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_ActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9077,6 +9117,7 @@ func (m *RateLimit_Override) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_OverrideMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9178,6 +9219,7 @@ func (m *RateLimit_Action_SourceCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_SourceClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9281,6 +9323,7 @@ func (m *RateLimit_Action_DestinationCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_DestinationClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9419,6 +9462,7 @@ func (m *RateLimit_Action_RequestHeaders) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_RequestHeadersMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9523,6 +9567,7 @@ func (m *RateLimit_Action_RemoteAddress) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_RemoteAddressMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9638,6 +9683,7 @@ func (m *RateLimit_Action_GenericKey) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_GenericKeyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9826,6 +9872,7 @@ func (m *RateLimit_Action_HeaderValueMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_HeaderValueMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9983,6 +10030,7 @@ func (m *RateLimit_Action_DynamicMetaData) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_DynamicMetaDataMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -10150,6 +10198,7 @@ func (m *RateLimit_Action_MetaData) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_MetaDataMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -10292,6 +10341,7 @@ func (m *RateLimit_Override_DynamicMetadata) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Override_DynamicMetadataMultiError(errors)
 	}
+
 	return nil
 }
 

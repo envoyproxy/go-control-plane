@@ -388,6 +388,7 @@ func (m *TcpProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return TcpProxyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -531,6 +532,7 @@ func (m *TcpProxy_WeightedCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return TcpProxy_WeightedClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -690,6 +692,7 @@ func (m *TcpProxy_TunnelingConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return TcpProxy_TunnelingConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -844,6 +847,7 @@ func (m *TcpProxy_WeightedCluster_ClusterWeight) validate(all bool) error {
 	if len(errors) > 0 {
 		return TcpProxy_WeightedCluster_ClusterWeightMultiError(errors)
 	}
+
 	return nil
 }
 

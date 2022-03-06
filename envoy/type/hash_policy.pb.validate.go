@@ -105,6 +105,7 @@ func (m *HashPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return HashPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -203,6 +204,7 @@ func (m *HashPolicy_SourceIp) validate(all bool) error {
 	if len(errors) > 0 {
 		return HashPolicy_SourceIpMultiError(errors)
 	}
+
 	return nil
 }
 

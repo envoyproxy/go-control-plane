@@ -100,6 +100,7 @@ func (m *StatefulSession) validate(all bool) error {
 	if len(errors) > 0 {
 		return StatefulSessionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -257,6 +258,7 @@ func (m *StatefulSessionPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return StatefulSessionPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 

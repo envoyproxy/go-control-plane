@@ -84,6 +84,7 @@ func (m *AwsRequestSigning) validate(all bool) error {
 	if len(errors) > 0 {
 		return AwsRequestSigningMultiError(errors)
 	}
+
 	return nil
 }
 

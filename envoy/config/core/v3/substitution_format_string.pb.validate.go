@@ -188,6 +188,7 @@ func (m *SubstitutionFormatString) validate(all bool) error {
 	if len(errors) > 0 {
 		return SubstitutionFormatStringMultiError(errors)
 	}
+
 	return nil
 }
 

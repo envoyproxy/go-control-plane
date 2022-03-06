@@ -94,6 +94,7 @@ func (m *Certificates) validate(all bool) error {
 	if len(errors) > 0 {
 		return CertificatesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -260,6 +261,7 @@ func (m *Certificate) validate(all bool) error {
 	if len(errors) > 0 {
 		return CertificateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -456,6 +458,7 @@ func (m *CertificateDetails) validate(all bool) error {
 	if len(errors) > 0 {
 		return CertificateDetailsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -570,6 +573,7 @@ func (m *SubjectAlternateName) validate(all bool) error {
 	if len(errors) > 0 {
 		return SubjectAlternateNameMultiError(errors)
 	}
+
 	return nil
 }
 

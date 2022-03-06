@@ -723,6 +723,7 @@ func (m *HealthCheck) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -851,6 +852,7 @@ func (m *HealthCheck_Payload) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheck_PayloadMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1212,6 +1214,7 @@ func (m *HealthCheck_HttpHealthCheck) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheck_HttpHealthCheckMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1383,6 +1386,7 @@ func (m *HealthCheck_TcpHealthCheck) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheck_TcpHealthCheckMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1486,6 +1490,7 @@ func (m *HealthCheck_RedisHealthCheck) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheck_RedisHealthCheckMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1646,6 +1651,7 @@ func (m *HealthCheck_GrpcHealthCheck) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheck_GrpcHealthCheckMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1796,6 +1802,7 @@ func (m *HealthCheck_CustomHealthCheck) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheck_CustomHealthCheckMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1898,6 +1905,7 @@ func (m *HealthCheck_TlsOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheck_TlsOptionsMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -100,6 +100,7 @@ func (m *FileBasedKeyValueStoreConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return FileBasedKeyValueStoreConfigMultiError(errors)
 	}
+
 	return nil
 }
 

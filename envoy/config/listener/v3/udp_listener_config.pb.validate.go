@@ -118,6 +118,7 @@ func (m *UdpListenerConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return UdpListenerConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -219,6 +220,7 @@ func (m *ActiveRawUdpListenerConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return ActiveRawUdpListenerConfigMultiError(errors)
 	}
+
 	return nil
 }
 

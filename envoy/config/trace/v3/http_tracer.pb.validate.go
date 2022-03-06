@@ -88,6 +88,7 @@ func (m *Tracing) validate(all bool) error {
 	if len(errors) > 0 {
 		return TracingMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -232,6 +233,7 @@ func (m *Tracing_Http) validate(all bool) error {
 	if len(errors) > 0 {
 		return Tracing_HttpMultiError(errors)
 	}
+
 	return nil
 }
 

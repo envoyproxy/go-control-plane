@@ -169,6 +169,7 @@ func (m *TapConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return TapConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -511,6 +512,7 @@ func (m *MatchPredicate) validate(all bool) error {
 	if len(errors) > 0 {
 		return MatchPredicateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -644,6 +646,7 @@ func (m *HttpHeadersMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpHeadersMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -848,6 +851,7 @@ func (m *OutputConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutputConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1064,6 +1068,7 @@ func (m *OutputSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutputSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1162,6 +1167,7 @@ func (m *StreamingAdminSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamingAdminSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1274,6 +1280,7 @@ func (m *FilePerTapSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilePerTapSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1415,6 +1422,7 @@ func (m *StreamingGrpcSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamingGrpcSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1561,6 +1569,7 @@ func (m *MatchPredicate_MatchSet) validate(all bool) error {
 	if len(errors) > 0 {
 		return MatchPredicate_MatchSetMultiError(errors)
 	}
+
 	return nil
 }
 

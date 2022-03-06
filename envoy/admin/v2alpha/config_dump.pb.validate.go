@@ -94,6 +94,7 @@ func (m *ConfigDump) validate(all bool) error {
 	if len(errors) > 0 {
 		return ConfigDumpMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -252,6 +253,7 @@ func (m *UpdateFailureState) validate(all bool) error {
 	if len(errors) > 0 {
 		return UpdateFailureStateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -411,6 +413,7 @@ func (m *BootstrapConfigDump) validate(all bool) error {
 	if len(errors) > 0 {
 		return BootstrapConfigDumpMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -582,6 +585,7 @@ func (m *ListenersConfigDump) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenersConfigDumpMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -787,6 +791,7 @@ func (m *ClustersConfigDump) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClustersConfigDumpMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -956,6 +961,7 @@ func (m *RoutesConfigDump) validate(all bool) error {
 	if len(errors) > 0 {
 		return RoutesConfigDumpMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1123,6 +1129,7 @@ func (m *ScopedRoutesConfigDump) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRoutesConfigDumpMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1326,6 +1333,7 @@ func (m *SecretsConfigDump) validate(all bool) error {
 	if len(errors) > 0 {
 		return SecretsConfigDumpMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1486,6 +1494,7 @@ func (m *ListenersConfigDump_StaticListener) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenersConfigDump_StaticListenerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1651,6 +1660,7 @@ func (m *ListenersConfigDump_DynamicListenerState) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenersConfigDump_DynamicListenerStateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1873,6 +1883,7 @@ func (m *ListenersConfigDump_DynamicListener) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenersConfigDump_DynamicListenerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2035,6 +2046,7 @@ func (m *ClustersConfigDump_StaticCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClustersConfigDump_StaticClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2199,6 +2211,7 @@ func (m *ClustersConfigDump_DynamicCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClustersConfigDump_DynamicClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2361,6 +2374,7 @@ func (m *RoutesConfigDump_StaticRouteConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RoutesConfigDump_StaticRouteConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2525,6 +2539,7 @@ func (m *RoutesConfigDump_DynamicRouteConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RoutesConfigDump_DynamicRouteConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2695,6 +2710,7 @@ func (m *ScopedRoutesConfigDump_InlineScopedRouteConfigs) validate(all bool) err
 	if len(errors) > 0 {
 		return ScopedRoutesConfigDump_InlineScopedRouteConfigsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2872,6 +2888,7 @@ func (m *ScopedRoutesConfigDump_DynamicScopedRouteConfigs) validate(all bool) er
 	if len(errors) > 0 {
 		return ScopedRoutesConfigDump_DynamicScopedRouteConfigsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3044,6 +3061,7 @@ func (m *SecretsConfigDump_DynamicSecret) validate(all bool) error {
 	if len(errors) > 0 {
 		return SecretsConfigDump_DynamicSecretMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3206,6 +3224,7 @@ func (m *SecretsConfigDump_StaticSecret) validate(all bool) error {
 	if len(errors) > 0 {
 		return SecretsConfigDump_StaticSecretMultiError(errors)
 	}
+
 	return nil
 }
 

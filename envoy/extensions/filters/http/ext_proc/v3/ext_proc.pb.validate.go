@@ -182,6 +182,7 @@ func (m *ExternalProcessor) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExternalProcessorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -341,6 +342,7 @@ func (m *ExtProcPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtProcPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -471,6 +473,7 @@ func (m *ExtProcOverrides) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtProcOverridesMultiError(errors)
 	}
+
 	return nil
 }
 

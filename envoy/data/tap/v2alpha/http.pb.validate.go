@@ -118,6 +118,7 @@ func (m *HttpBufferedTrace) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpBufferedTraceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -411,6 +412,7 @@ func (m *HttpStreamedTraceSegment) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpStreamedTraceSegmentMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -609,6 +611,7 @@ func (m *HttpBufferedTrace_Message) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpBufferedTrace_MessageMultiError(errors)
 	}
+
 	return nil
 }
 

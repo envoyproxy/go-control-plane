@@ -296,6 +296,7 @@ func (m *ExtAuthz) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtAuthzMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -409,6 +410,7 @@ func (m *BufferSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return BufferSettingsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -597,6 +599,7 @@ func (m *HttpService) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpServiceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -758,6 +761,7 @@ func (m *AuthorizationRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return AuthorizationRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1004,6 +1008,7 @@ func (m *AuthorizationResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return AuthorizationResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1174,6 +1179,7 @@ func (m *ExtAuthzPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtAuthzPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1277,6 +1283,7 @@ func (m *CheckSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return CheckSettingsMultiError(errors)
 	}
+
 	return nil
 }
 

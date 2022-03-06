@@ -82,6 +82,7 @@ func (m *TlsParameters) validate(all bool) error {
 	if len(errors) > 0 {
 		return TlsParametersMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -227,6 +228,7 @@ func (m *PrivateKeyProvider) validate(all bool) error {
 	if len(errors) > 0 {
 		return PrivateKeyProviderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -565,6 +567,7 @@ func (m *TlsCertificate) validate(all bool) error {
 	if len(errors) > 0 {
 		return TlsCertificateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -709,6 +712,7 @@ func (m *TlsSessionTicketKeys) validate(all bool) error {
 	if len(errors) > 0 {
 		return TlsSessionTicketKeysMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -815,6 +819,7 @@ func (m *CertificateProviderPluginInstance) validate(all bool) error {
 	if len(errors) > 0 {
 		return CertificateProviderPluginInstanceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -980,6 +985,7 @@ func (m *SubjectAltNameMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return SubjectAltNameMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1396,6 +1402,7 @@ func (m *CertificateValidationContext) validate(all bool) error {
 	if len(errors) > 0 {
 		return CertificateValidationContextMultiError(errors)
 	}
+
 	return nil
 }
 

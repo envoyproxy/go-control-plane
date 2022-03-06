@@ -136,6 +136,7 @@ func (m *CommonExtensionConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return CommonExtensionConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -248,6 +249,7 @@ func (m *AdminConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return AdminConfigMultiError(errors)
 	}
+
 	return nil
 }
 

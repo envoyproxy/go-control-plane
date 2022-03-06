@@ -105,6 +105,7 @@ func (m *RateLimitDescriptor) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitDescriptorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -228,6 +229,7 @@ func (m *RateLimitDescriptor_Entry) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitDescriptor_EntryMultiError(errors)
 	}
+
 	return nil
 }
 

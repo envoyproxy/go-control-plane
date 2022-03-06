@@ -156,6 +156,7 @@ func (m *ThriftProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return ThriftProxyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -331,6 +332,7 @@ func (m *ThriftFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return ThriftFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -451,6 +453,7 @@ func (m *ThriftProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return ThriftProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 

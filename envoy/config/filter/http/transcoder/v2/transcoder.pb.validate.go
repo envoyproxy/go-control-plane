@@ -128,6 +128,7 @@ func (m *GrpcJsonTranscoder) validate(all bool) error {
 	if len(errors) > 0 {
 		return GrpcJsonTranscoderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -237,6 +238,7 @@ func (m *GrpcJsonTranscoder_PrintOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return GrpcJsonTranscoder_PrintOptionsMultiError(errors)
 	}
+
 	return nil
 }
 

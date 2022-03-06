@@ -309,6 +309,7 @@ func (m *HealthCheckEvent) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckEventMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -419,6 +420,7 @@ func (m *HealthCheckEjectUnhealthy) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckEjectUnhealthyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -522,6 +524,7 @@ func (m *HealthCheckAddHealthy) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckAddHealthyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -636,6 +639,7 @@ func (m *HealthCheckFailure) validate(all bool) error {
 	if len(errors) > 0 {
 		return HealthCheckFailureMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -737,6 +741,7 @@ func (m *DegradedHealthyHost) validate(all bool) error {
 	if len(errors) > 0 {
 		return DegradedHealthyHostMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -838,6 +843,7 @@ func (m *NoLongerDegradedHost) validate(all bool) error {
 	if len(errors) > 0 {
 		return NoLongerDegradedHostMultiError(errors)
 	}
+
 	return nil
 }
 

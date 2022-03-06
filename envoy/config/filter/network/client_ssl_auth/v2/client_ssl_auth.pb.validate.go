@@ -145,6 +145,7 @@ func (m *ClientSSLAuth) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClientSSLAuthMultiError(errors)
 	}
+
 	return nil
 }
 

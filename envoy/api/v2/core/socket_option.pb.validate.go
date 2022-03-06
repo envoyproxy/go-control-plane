@@ -97,6 +97,7 @@ func (m *SocketOption) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketOptionMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -119,6 +119,7 @@ func (m *RBAC) validate(all bool) error {
 	if len(errors) > 0 {
 		return RBACMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -246,6 +247,7 @@ func (m *RBACPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return RBACPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 

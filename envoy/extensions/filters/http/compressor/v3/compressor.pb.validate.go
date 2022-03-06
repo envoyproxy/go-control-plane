@@ -220,6 +220,7 @@ func (m *Compressor) validate(all bool) error {
 	if len(errors) > 0 {
 		return CompressorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -377,6 +378,7 @@ func (m *Compressor_CommonDirectionConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return Compressor_CommonDirectionConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -510,6 +512,7 @@ func (m *Compressor_RequestDirectionConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return Compressor_RequestDirectionConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -647,6 +650,7 @@ func (m *Compressor_ResponseDirectionConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return Compressor_ResponseDirectionConfigMultiError(errors)
 	}
+
 	return nil
 }
 

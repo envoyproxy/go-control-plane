@@ -71,6 +71,7 @@ func (m *Body) validate(all bool) error {
 	if len(errors) > 0 {
 		return BodyMultiError(errors)
 	}
+
 	return nil
 }
 

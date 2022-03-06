@@ -196,6 +196,7 @@ func (m *OAuth2Credentials) validate(all bool) error {
 	if len(errors) > 0 {
 		return OAuth2CredentialsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -504,6 +505,7 @@ func (m *OAuth2Config) validate(all bool) error {
 	if len(errors) > 0 {
 		return OAuth2ConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -630,6 +632,7 @@ func (m *OAuth2) validate(all bool) error {
 	if len(errors) > 0 {
 		return OAuth2MultiError(errors)
 	}
+
 	return nil
 }
 
@@ -773,6 +776,7 @@ func (m *OAuth2Credentials_CookieNames) validate(all bool) error {
 	if len(errors) > 0 {
 		return OAuth2Credentials_CookieNamesMultiError(errors)
 	}
+
 	return nil
 }
 

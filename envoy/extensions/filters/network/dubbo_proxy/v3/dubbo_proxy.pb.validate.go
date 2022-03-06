@@ -161,6 +161,7 @@ func (m *DubboProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return DubboProxyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -299,6 +300,7 @@ func (m *DubboFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return DubboFilterMultiError(errors)
 	}
+
 	return nil
 }
 

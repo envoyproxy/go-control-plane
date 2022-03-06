@@ -129,6 +129,7 @@ func (m *DnsFilterConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsFilterConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -305,6 +306,7 @@ func (m *DnsFilterConfig_ServerContextConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsFilterConfig_ServerContextConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -542,6 +544,7 @@ func (m *DnsFilterConfig_ClientContextConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsFilterConfig_ClientContextConfigMultiError(errors)
 	}
+
 	return nil
 }
 

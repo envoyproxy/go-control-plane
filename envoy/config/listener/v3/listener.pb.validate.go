@@ -98,6 +98,7 @@ func (m *ListenerCollection) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenerCollectionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -861,6 +862,7 @@ func (m *Listener) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -988,6 +990,7 @@ func (m *Listener_DeprecatedV1) validate(all bool) error {
 	if len(errors) > 0 {
 		return Listener_DeprecatedV1MultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1135,6 +1138,7 @@ func (m *Listener_ConnectionBalanceConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return Listener_ConnectionBalanceConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1238,6 +1242,7 @@ func (m *Listener_InternalListenerConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return Listener_InternalListenerConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1342,6 +1347,7 @@ func (m *Listener_ConnectionBalanceConfig_ExactBalance) validate(all bool) error
 	if len(errors) > 0 {
 		return Listener_ConnectionBalanceConfig_ExactBalanceMultiError(errors)
 	}
+
 	return nil
 }
 

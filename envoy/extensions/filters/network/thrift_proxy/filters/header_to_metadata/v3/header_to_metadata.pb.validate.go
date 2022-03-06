@@ -105,6 +105,7 @@ func (m *HeaderToMetadata) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderToMetadataMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -268,6 +269,7 @@ func (m *HeaderToMetadata_KeyValuePair) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderToMetadata_KeyValuePairMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -452,6 +454,7 @@ func (m *HeaderToMetadata_Rule) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderToMetadata_RuleMultiError(errors)
 	}
+
 	return nil
 }
 

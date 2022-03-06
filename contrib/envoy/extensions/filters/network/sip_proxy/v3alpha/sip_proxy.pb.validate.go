@@ -163,6 +163,7 @@ func (m *SipProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return SipProxyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -307,6 +308,7 @@ func (m *SipFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return SipFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -438,6 +440,7 @@ func (m *SipProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return SipProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -575,6 +578,7 @@ func (m *CustomizedAffinity) validate(all bool) error {
 	if len(errors) > 0 {
 		return CustomizedAffinityMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -711,6 +715,7 @@ func (m *CustomizedAffinityEntry) validate(all bool) error {
 	if len(errors) > 0 {
 		return CustomizedAffinityEntryMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -815,6 +820,7 @@ func (m *Cache) validate(all bool) error {
 	if len(errors) > 0 {
 		return CacheMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -917,6 +923,7 @@ func (m *LocalService) validate(all bool) error {
 	if len(errors) > 0 {
 		return LocalServiceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1109,6 +1116,7 @@ func (m *SipProxy_SipSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return SipProxy_SipSettingsMultiError(errors)
 	}
+
 	return nil
 }
 

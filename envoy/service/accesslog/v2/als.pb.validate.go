@@ -60,6 +60,7 @@ func (m *StreamAccessLogsResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamAccessLogsResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -266,6 +267,7 @@ func (m *StreamAccessLogsMessage) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamAccessLogsMessageMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -419,6 +421,7 @@ func (m *StreamAccessLogsMessage_Identifier) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamAccessLogsMessage_IdentifierMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -569,6 +572,7 @@ func (m *StreamAccessLogsMessage_HTTPAccessLogEntries) validate(all bool) error 
 	if len(errors) > 0 {
 		return StreamAccessLogsMessage_HTTPAccessLogEntriesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -720,6 +724,7 @@ func (m *StreamAccessLogsMessage_TCPAccessLogEntries) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamAccessLogsMessage_TCPAccessLogEntriesMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -105,6 +105,7 @@ func (m *EventServiceConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return EventServiceConfigMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -169,6 +169,7 @@ func (m *GradientControllerConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return GradientControllerConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -355,6 +356,7 @@ func (m *AdaptiveConcurrency) validate(all bool) error {
 	if len(errors) > 0 {
 		return AdaptiveConcurrencyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -515,6 +517,7 @@ func (m *GradientControllerConfig_ConcurrencyLimitCalculationParams) validate(al
 	if len(errors) > 0 {
 		return GradientControllerConfig_ConcurrencyLimitCalculationParamsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -761,6 +764,7 @@ func (m *GradientControllerConfig_MinimumRTTCalculationParams) validate(all bool
 	if len(errors) > 0 {
 		return GradientControllerConfig_MinimumRTTCalculationParamsMultiError(errors)
 	}
+
 	return nil
 }
 

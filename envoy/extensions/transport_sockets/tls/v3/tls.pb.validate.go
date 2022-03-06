@@ -131,6 +131,7 @@ func (m *UpstreamTlsContext) validate(all bool) error {
 	if len(errors) > 0 {
 		return UpstreamTlsContextMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -430,6 +431,7 @@ func (m *DownstreamTlsContext) validate(all bool) error {
 	if len(errors) > 0 {
 		return DownstreamTlsContextMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -914,6 +916,7 @@ func (m *CommonTlsContext) validate(all bool) error {
 	if len(errors) > 0 {
 		return CommonTlsContextMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1070,6 +1073,7 @@ func (m *CommonTlsContext_CertificateProvider) validate(all bool) error {
 	if len(errors) > 0 {
 		return CommonTlsContext_CertificateProviderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1179,6 +1183,7 @@ func (m *CommonTlsContext_CertificateProviderInstance) validate(all bool) error 
 	if len(errors) > 0 {
 		return CommonTlsContext_CertificateProviderInstanceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1424,6 +1429,7 @@ func (m *CommonTlsContext_CombinedCertificateValidationContext) validate(all boo
 	if len(errors) > 0 {
 		return CommonTlsContext_CombinedCertificateValidationContextMultiError(errors)
 	}
+
 	return nil
 }
 

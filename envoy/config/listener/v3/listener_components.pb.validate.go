@@ -136,6 +136,7 @@ func (m *Filter) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -411,6 +412,7 @@ func (m *FilterChainMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterChainMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -720,6 +722,7 @@ func (m *FilterChain) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterChainMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -970,6 +973,7 @@ func (m *ListenerFilterChainMatchPredicate) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenerFilterChainMatchPredicateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1179,6 +1183,7 @@ func (m *ListenerFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenerFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1308,6 +1313,7 @@ func (m *FilterChain_OnDemandConfiguration) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterChain_OnDemandConfigurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1458,6 +1464,7 @@ func (m *ListenerFilterChainMatchPredicate_MatchSet) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListenerFilterChainMatchPredicate_MatchSetMultiError(errors)
 	}
+
 	return nil
 }
 

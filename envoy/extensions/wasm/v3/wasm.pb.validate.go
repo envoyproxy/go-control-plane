@@ -106,6 +106,7 @@ func (m *CapabilityRestrictionConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return CapabilityRestrictionConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -208,6 +209,7 @@ func (m *SanitizationConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return SanitizationConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -413,6 +415,7 @@ func (m *VmConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return VmConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -513,6 +516,7 @@ func (m *EnvironmentVariables) validate(all bool) error {
 	if len(errors) > 0 {
 		return EnvironmentVariablesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -713,6 +717,7 @@ func (m *PluginConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return PluginConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -842,6 +847,7 @@ func (m *WasmService) validate(all bool) error {
 	if len(errors) > 0 {
 		return WasmServiceMultiError(errors)
 	}
+
 	return nil
 }
 

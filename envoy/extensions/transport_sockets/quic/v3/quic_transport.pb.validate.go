@@ -100,6 +100,7 @@ func (m *QuicDownstreamTransport) validate(all bool) error {
 	if len(errors) > 0 {
 		return QuicDownstreamTransportMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -241,6 +242,7 @@ func (m *QuicUpstreamTransport) validate(all bool) error {
 	if len(errors) > 0 {
 		return QuicUpstreamTransportMultiError(errors)
 	}
+
 	return nil
 }
 

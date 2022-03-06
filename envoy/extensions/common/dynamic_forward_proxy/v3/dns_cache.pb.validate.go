@@ -93,6 +93,7 @@ func (m *DnsCacheCircuitBreakers) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsCacheCircuitBreakersMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -502,6 +503,7 @@ func (m *DnsCacheConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsCacheConfigMultiError(errors)
 	}
+
 	return nil
 }
 
