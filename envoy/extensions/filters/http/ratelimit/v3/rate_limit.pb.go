@@ -28,6 +28,8 @@ const (
 )
 
 // Defines the version of the standard to use for X-RateLimit headers.
+//
+// [#next-major-version: unify with local ratelimit, should use common.ratelimit.v3.XRateLimitHeadersRFCVersion instead.]
 type RateLimit_XRateLimitHeadersRFCVersion int32
 
 const (
@@ -294,6 +296,8 @@ type RateLimit struct {
 	// the `draft RFC <https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html>`_.
 	//
 	// Disabled by default.
+	//
+	// [#next-major-version: unify with local ratelimit, should use common.ratelimit.v3.XRateLimitHeadersRFCVersion instead.]
 	EnableXRatelimitHeaders RateLimit_XRateLimitHeadersRFCVersion `protobuf:"varint,8,opt,name=enable_x_ratelimit_headers,json=enableXRatelimitHeaders,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimit_XRateLimitHeadersRFCVersion" json:"enable_x_ratelimit_headers,omitempty"`
 	// Disables emitting the :ref:`x-envoy-ratelimited<config_http_filters_router_x-envoy-ratelimited>` header
 	// in case of rate limiting (i.e. 429 responses).
