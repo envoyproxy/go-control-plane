@@ -30,25 +30,37 @@ type resourceContainer struct {
 
 func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.StreamState, resources resourceContainer) *RawDeltaResponse {
 	// variables to build our response with
-	nextVersionMap := make(map[string]string)
-	filtered := make([]types.Resource, 0, len(resources.resourceMap))
-	toRemove := make([]string, 0)
+	var nextVersionMap map[string]string
+	var filtered []types.Resource
+	var toRemove []string
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case state.IsWildcard():
+		if len(state.GetResourceVersions()) == 0 {
+			filtered = make([]types.Resource, 0, len(resources.resourceMap))
+		}
+		nextVersionMap = make(map[string]string, len(resources.resourceMap))
 		for name, r := range resources.resourceMap {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
 			version := resources.versionMap[name]
 			nextVersionMap[name] = version
 			prevVersion, found := state.GetResourceVersions()[name]
-			if !found || (prevVersion != nextVersionMap[name]) {
+			if !found || (prevVersion != version) {
 				filtered = append(filtered, r)
+			}
+		}
+
+		// Compute resources for removal
+		for name := range state.GetResourceVersions() {
+			if _, ok := resources.resourceMap[name]; !ok {
+				toRemove = append(toRemove, name)
 			}
 		}
 	default:
 		// Reply only with the requested resources
+		nextVersionMap = make(map[string]string, len(state.GetResourceVersions()))
 		for name, prevVersion := range state.GetResourceVersions() {
 			if r, ok := resources.resourceMap[name]; ok {
 				nextVersion := resources.versionMap[name]
@@ -59,16 +71,12 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 			} else {
 				// We track non-existent resources for non-wildcard streams until the client explicitly unsubscribes from them.
 				nextVersionMap[name] = ""
+				// The version check is to make sure we are only sending an update once right after removal.
+				// If the client keeps the subscription, we skip the add for every subsequent response.
+				if prevVersion != "" {
+					toRemove = append(toRemove, name)
+				}
 			}
-		}
-	}
-
-	// Compute resources for removal regardless of the request type
-	for name, prevVersion := range state.GetResourceVersions() {
-		// The prevVersion != "" check is in place to make sure we are only sending an update to the client once right after it is removed.
-		// If the client decides to keep the subscription we skip the add for every subsequent response.
-		if _, ok := resources.resourceMap[name]; !ok && prevVersion != "" {
-			toRemove = append(toRemove, name)
 		}
 	}
 
