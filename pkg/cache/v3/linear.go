@@ -50,7 +50,7 @@ type LinearCache struct {
 	deltaWatches map[int64]DeltaResponseWatch
 	// Continuously incremented counter used to index delta watches.
 	deltaWatchCount int64
-	// versionMap holds the current hash map of all resources in the cache.
+	// versionMap holds the current hash map of all resources in the cache when delta watches are present.
 	// versionMap is only to be used with delta xDS.
 	versionMap map[string]string
 	// Continuously incremented version.
@@ -103,7 +103,7 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 		watches:       make(map[string]watches),
 		watchAll:      make(watches),
 		deltaWatches:  make(map[int64]DeltaResponseWatch),
-		versionMap:    make(map[string]string),
+		versionMap:    nil,
 		version:       0,
 		versionVector: make(map[string]uint64),
 	}
@@ -154,15 +154,19 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	}
 	cache.watchAll = make(watches)
 
-	err := cache.updateVersionMap(modified)
-	if err != nil {
-		cache.log.Errorf("failed to update version map: %v", err)
-	}
+	// Building the version map has a very high cost when using SetResources to do full updates.
+	// As it is only used with delta watches, it is only maintained when applicable.
+	if cache.versionMap != nil {
+		err := cache.updateVersionMap(modified)
+		if err != nil {
+			cache.log.Errorf("failed to update version map: %v", err)
+		}
 
-	for id, watch := range cache.deltaWatches {
-		res := cache.respondDelta(watch.Request, watch.Response, watch.StreamState)
-		if res != nil {
-			delete(cache.deltaWatches, id)
+		for id, watch := range cache.deltaWatches {
+			res := cache.respondDelta(watch.Request, watch.Response, watch.StreamState)
+			if res != nil {
+				delete(cache.deltaWatches, id)
+			}
 		}
 	}
 }
@@ -366,6 +370,18 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
+	if cache.versionMap == nil {
+		// If we had no delta watch before, we need to build the version map for the first time.
+		// The map will not be removed when the last delta watch is removed to avoid rebuilding it constantly when only a few delta watches are applicable.
+		modified := map[string]struct{}{}
+		for name := range cache.resources {
+			modified[name] = struct{}{}
+		}
+		err := cache.updateVersionMap(modified)
+		if err != nil && cache.log != nil {
+			cache.log.Errorf("failed to update version map: %v", err)
+		}
+	}
 	response := cache.respondDelta(request, value, state)
 
 	// if respondDelta returns nil this means that there is no change in any resource version
@@ -386,9 +402,14 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 }
 
 func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {
-	for name, r := range cache.resources {
-		// skip recalculating hash for the resoces that weren't modified
-		if _, ok := modified[name]; !ok {
+	if cache.versionMap == nil {
+		cache.versionMap = make(map[string]string, len(modified))
+	}
+	for name := range modified {
+		r, ok := cache.resources[name]
+		if !ok {
+			// The resource was deleted
+			delete(cache.versionMap, name)
 			continue
 		}
 		// hash our version in here and build the version map
@@ -401,12 +422,7 @@ func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {
 			return errors.New("failed to build resource version")
 		}
 
-		cache.versionMap[GetResourceName(r)] = v
-	}
-	for name := range modified {
-		if r, ok := cache.resources[name]; !ok {
-			delete(cache.versionMap, GetResourceName(r))
-		}
+		cache.versionMap[name] = v
 	}
 	return nil
 }
@@ -430,6 +446,14 @@ func (cache *LinearCache) nextDeltaWatchID() int64 {
 
 func (cache *LinearCache) Fetch(ctx context.Context, request *Request) (Response, error) {
 	return nil, errors.New("not implemented")
+}
+
+// Number of resources currently on the cache.
+// As GetResources is building a clone it is expensive to get metrics otherwise.
+func (cache *LinearCache) NumResources() int {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+	return len(cache.resources)
 }
 
 // Number of active watches for a resource name.
