@@ -9784,6 +9784,8 @@ func (m *RateLimit_Action_HeaderValueMatch) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for DescriptorKey
+
 	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
 		err := RateLimit_Action_HeaderValueMatchValidationError{
 			field:  "DescriptorValue",
