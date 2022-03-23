@@ -371,8 +371,9 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 	defer cache.mu.Unlock()
 
 	if cache.versionMap == nil {
-		// If we had no delta watch before, we need to build the version map for the first time.
-		// The map will not be removed when the last delta watch is removed to avoid rebuilding it constantly when only a few delta watches are applicable.
+		// If we had no previously open delta watches, we need to build the version map for the first time.
+		// The version map will not be destroyed when the last delta watch is removed.
+		// This avoids constantly rebuilding when only a few delta watches are open.
 		modified := map[string]struct{}{}
 		for name := range cache.resources {
 			modified[name] = struct{}{}
