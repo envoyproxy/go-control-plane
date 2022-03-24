@@ -27,6 +27,7 @@ const (
 // e.g. if the request contains two 'foo' headers with value 'bar' and 'baz', the input
 // string will be 'bar,baz'.
 // [#comment:TODO(snowp): Link to unified matching docs.]
+// [#extension: envoy.matching.inputs.request_headers]
 type HttpRequestHeaderMatchInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -80,6 +81,7 @@ func (x *HttpRequestHeaderMatchInput) GetHeaderName() string {
 // e.g. if the request contains two 'foo' headers with value 'bar' and 'baz', the input
 // string will be 'bar,baz'.
 // [#comment:TODO(snowp): Link to unified matching docs.]
+// [#extension: envoy.matching.inputs.request_trailers]
 type HttpRequestTrailerMatchInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -133,6 +135,7 @@ func (x *HttpRequestTrailerMatchInput) GetHeaderName() string {
 // e.g. if the response contains two 'foo' headers with value 'bar' and 'baz', the input
 // string will be 'bar,baz'.
 // [#comment:TODO(snowp): Link to unified matching docs.]
+// [#extension: envoy.matching.inputs.response_headers]
 type HttpResponseHeaderMatchInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -186,6 +189,7 @@ func (x *HttpResponseHeaderMatchInput) GetHeaderName() string {
 // e.g. if the request contains two 'foo' headers with value 'bar' and 'baz', the input
 // string will be 'bar,baz'.
 // [#comment:TODO(snowp): Link to unified matching docs.]
+// [#extension: envoy.matching.inputs.response_trailers]
 type HttpResponseTrailerMatchInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -22,6 +22,7 @@ const (
 )
 
 // Specifies that matching should be performed by the destination IP address.
+// [#extension: envoy.matching.inputs.destination_ip]
 type DestinationIPInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -61,6 +62,7 @@ func (*DestinationIPInput) Descriptor() ([]byte, []int) {
 }
 
 // Specifies that matching should be performed by the destination port.
+// [#extension: envoy.matching.inputs.destination_port]
 type DestinationPortInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -100,6 +102,7 @@ func (*DestinationPortInput) Descriptor() ([]byte, []int) {
 }
 
 // Specifies that matching should be performed by the source IP address.
+// [#extension: envoy.matching.inputs.source_ip]
 type SourceIPInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -139,6 +142,7 @@ func (*SourceIPInput) Descriptor() ([]byte, []int) {
 }
 
 // Specifies that matching should be performed by the source port.
+// [#extension: envoy.matching.inputs.source_port]
 type SourcePortInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -181,6 +185,7 @@ func (*SourcePortInput) Descriptor() ([]byte, []int) {
 // will only be different from the source IP address when using a listener
 // filter that overrides the source address, such as the :ref:`Proxy Protocol
 // listener filter <config_listener_filters_proxy_protocol>`).
+// [#extension: envoy.matching.inputs.direct_source_ip]
 type DirectSourceIPInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -223,6 +228,7 @@ func (*DirectSourceIPInput) Descriptor() ([]byte, []int) {
 // Specifies the source IP match type. The values include:
 //
 // * ``local`` - matches a connection originating from the same host,
+// [#extension: envoy.matching.inputs.source_type]
 type SourceTypeInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -265,6 +271,7 @@ func (*SourceTypeInput) Descriptor() ([]byte, []int) {
 //
 // :ref:`TLS Inspector <config_listener_filters_tls_inspector>` provides the requested server name based on SNI,
 // when TLS protocol is detected.
+// [#extension: envoy.matching.inputs.server_name]
 type ServerNameInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -310,6 +317,7 @@ func (*ServerNameInput) Descriptor() ([]byte, []int) {
 // * ``raw_buffer`` - default, used when no transport protocol is detected,
 // * ``tls`` - set by :ref:`envoy.filters.listener.tls_inspector <config_listener_filters_tls_inspector>`
 //   when TLS protocol is detected.
+// [#extension: envoy.matching.inputs.transport_protocol]
 type TransportProtocolInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -373,6 +381,7 @@ func (*TransportProtocolInput) Descriptor() ([]byte, []int) {
 //   However, the use of ALPN is pretty much limited to the HTTP/2 traffic on the Internet,
 //   and matching on values other than ``h2`` is going to lead to a lot of false negatives,
 //   unless all connecting clients are known to use ALPN.
+// [#extension: envoy.matching.inputs.application_protocol]
 type ApplicationProtocolInput struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
