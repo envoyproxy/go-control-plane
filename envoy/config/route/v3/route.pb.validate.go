@@ -491,6 +491,8 @@ func (m *ClusterSpecifierPlugin) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for IsOptional
+
 	if len(errors) > 0 {
 		return ClusterSpecifierPluginMultiError(errors)
 	}
