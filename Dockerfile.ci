@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 FROM golang:1.19
 
 # TODO(mattklein123): Update this to envoy-dev:latest and fix tests.
 COPY --from=envoyproxy/envoy-dev:latest /usr/local/bin/envoy /usr/local/bin/envoy
+=======
+FROM golang:1.18
+
+COPY --from=envoyproxy/envoy-dev:latest /usr/local/bin/envoy /usr/local/bin/envoy
+>>>>>>> 47306103 (code cleanup and refactoring)

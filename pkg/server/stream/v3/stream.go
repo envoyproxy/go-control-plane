@@ -22,7 +22,7 @@ type DeltaStream interface {
 	Recv() (*discovery.DeltaDiscoveryRequest, error)
 }
 
-// StreamState will keep track of resource state per type on a stream.
+// StreamState will keep track of resource cache state per type on a stream.
 type StreamState struct { // nolint:golint,revive
 	// Indicates whether the delta stream currently has a wildcard watch
 	wildcard bool
@@ -35,7 +35,7 @@ type StreamState struct { // nolint:golint,revive
 	// This field stores the last state sent to the client.
 	resourceVersions map[string]string
 
-	// knownResourceNames contains resource names that a client has received previously (SOTW)
+	// knownResourceNames contains resource names that a client has received previously (SOTW).
 	knownResourceNames map[string]map[string]struct{}
 
 	// First indicates whether the StreamState has been modified since its creation

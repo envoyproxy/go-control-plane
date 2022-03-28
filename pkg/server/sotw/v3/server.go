@@ -87,7 +87,8 @@ type streamWrapper struct {
 	watches   watches   // collection of stack allocated watchers per request type
 	callbacks Callbacks // callbacks for performing actions through stream lifecycle
 
-	// The below config fields are for tracking resource cache state
+	// The below fields are used for tracking resource
+	// cache state and should be maintained per stream.
 	streamState            stream.StreamState
 	lastDiscoveryResponses map[string]lastDiscoveryResponse
 }
@@ -123,7 +124,15 @@ func (s *streamWrapper) send(resp cache.Response) (string, error) {
 	return out.Nonce, s.stream.Send(out)
 }
 
-// Discovery response that is sent over GRPC stream
+// Shutdown closes all open watches, and notifies API consumers the stream has closed.
+func (s *streamWrapper) shutdown() {
+	s.watches.close()
+	if s.callbacks != nil {
+		s.callbacks.OnStreamClosed(s.ID)
+	}
+}
+
+// Discovery response that is sent over GRPC stream.
 // We need to record what resource names are already sent to a client
 // So if the client requests a new name we can respond back
 // regardless current snapshot version (even if it is not changed yet)

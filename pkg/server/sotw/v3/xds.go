@@ -32,12 +32,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 	}
 
 	// cleanup once our stream has ended.
-	defer func() {
-		sw.watches.close()
-		if s.callbacks != nil {
-			s.callbacks.OnStreamClosed(sw.ID)
-		}
-	}()
+	defer sw.shutdown()
 
 	if s.callbacks != nil {
 		if err := s.callbacks.OnStreamOpen(str.Context(), sw.ID, defaultTypeURL); err != nil {
@@ -46,7 +41,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 	}
 
 	// do an initial recompute so we can load the first 2 channels:
-	// request
+	// <-reqCh
 	// s.ctx.Done()
 	sw.watches.recompute(s.ctx, reqCh)
 
@@ -64,7 +59,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 		// Case 1 handles any request inbound on the stream
 		// and handles all initialization as needed
 		case 1:
-			// input stream ended or errored out
+			// input stream ended or failed
 			if !ok {
 				return nil
 			}

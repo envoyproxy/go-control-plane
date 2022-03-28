@@ -15,6 +15,7 @@ type Callbacks struct {
 	Debug          bool
 	Fetches        int
 	Requests       int
+	Responses      int
 	DeltaRequests  int
 	DeltaResponses int
 	mu             sync.Mutex
@@ -25,7 +26,7 @@ var _ server.Callbacks = &Callbacks{}
 func (cb *Callbacks) Report() {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-	log.Printf("server callbacks fetches=%d requests=%d\n", cb.Fetches, cb.Requests)
+	log.Printf("server callbacks fetches=%d requests=%d responses=%d\n", cb.Fetches, cb.Requests, cb.Responses)
 }
 
 func (cb *Callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error {
@@ -60,17 +61,19 @@ func (cb *Callbacks) OnStreamRequest(id int64, req *discovery.DiscoveryRequest) 
 		close(cb.Signal)
 		cb.Signal = nil
 	}
-
 	if cb.Debug {
-		log.Printf("received request on stream %d for %s:%v", id, req.GetTypeUrl(), req.GetResourceNames())
+		log.Printf("received request for %s on stream %d", req.GetTypeUrl(), id)
 	}
 
 	return nil
 }
 
 func (cb *Callbacks) OnStreamResponse(ctx context.Context, id int64, req *discovery.DiscoveryRequest, res *discovery.DiscoveryResponse) {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.Responses++
 	if cb.Debug {
-		log.Printf("responding on stream %d with %s:%s", id, res.GetVersionInfo(), res.GetTypeUrl())
+		log.Printf("responding to request for %s on stream %d", req.GetTypeUrl(), id)
 	}
 }
 
