@@ -33,7 +33,8 @@ type RegexMatcher struct {
 	// Types that are assignable to EngineType:
 	//	*RegexMatcher_GoogleRe2
 	EngineType isRegexMatcher_EngineType `protobuf_oneof:"engine_type"`
-	// The regex match string. The string must be supported by the configured engine.
+	// The regex match string. The string must be supported by the configured engine. The regex is matched
+	// against the full string, not as a partial match.
 	Regex string `protobuf:"bytes,2,opt,name=regex,proto3" json:"regex,omitempty"`
 }
 
