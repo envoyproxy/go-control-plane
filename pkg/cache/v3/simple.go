@@ -231,7 +231,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 		for id, watch := range info.watches {
 			version := snapshot.GetVersion(watch.Request.TypeUrl)
 			if version != watch.Request.VersionInfo {
-				cache.log.Debugf("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
+				cache.log.Debugf("respond open watch %d %s%v with new version %q", id, watch.Request.TypeUrl, watch.Request.ResourceNames, version)
 
 				resources := snapshot.GetResourcesAndTTL(watch.Request.TypeUrl)
 				err := cache.respond(ctx, watch.Request, watch.Response, resources, version, false)
