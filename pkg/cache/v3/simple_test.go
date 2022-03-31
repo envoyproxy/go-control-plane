@@ -345,7 +345,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 		i := i
 		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
 			t.Parallel()
-			id := fmt.Sprintf("%d", i%2)
+			id := t.Name()
 			value := make(chan cache.Response, 1)
 			if i < 25 {
 				snap := cache.Snapshot{}
@@ -542,6 +542,7 @@ func (s *singleResourceSnapshot) GetResources(typeURL string) map[string]types.R
 	if typeURL != s.typeurl {
 		return nil
 	}
+
 	return map[string]types.Resource{
 		s.name: s.resource,
 	}

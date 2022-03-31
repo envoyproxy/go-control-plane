@@ -41,8 +41,8 @@ type ResponseType int
 const (
 	Endpoint ResponseType = iota
 	Cluster
-	Route
 	ScopedRoute
+	Route
 	VirtualHost
 	Listener
 	Secret

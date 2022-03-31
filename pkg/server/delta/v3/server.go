@@ -44,15 +44,25 @@ type server struct {
 	// total stream count for counting bi-di streams
 	streamCount int64
 	ctx         context.Context
+
+	// Local configuration flags for individual xDS implementations.
+	opts config.Opts
 }
 
 // NewServer creates a delta xDS specific server which utilizes a ConfigWatcher and delta Callbacks.
 func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callbacks, opts ...config.XDSOption) Server {
-	return &server{
+	s := &server{
 		cache:     config,
 		callbacks: callbacks,
 		ctx:       ctx,
 	}
+
+	// Parse through our options
+	for _, opt := range opts {
+		opt(&s.opts)
+	}
+
+	return s
 }
 
 func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {

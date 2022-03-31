@@ -93,42 +93,8 @@ func (s *StreamState) WatchesResources(resourceNames map[string]struct{}) bool {
 	return false
 }
 
-func (s *StreamState) GetResourceVersions() map[string]string {
-	return s.resourceVersions
-}
-
-func (s *StreamState) SetResourceVersions(resourceVersions map[string]string) {
-	s.first = false
-	s.resourceVersions = resourceVersions
-}
-
-// IsFirst returns whether the StreamState has been modified since its creation
-func (s *StreamState) IsFirst() bool {
-	return s.first
-}
-
 func (s *StreamState) SetWildcard(wildcard bool) {
 	s.wildcard = wildcard
-}
-
-func (s *StreamState) IsWildcard() bool {
-	return s.wildcard
-}
-
-func (s *StreamState) SetKnownResourceNames(url string, names map[string]struct{}) {
-	s.knownResourceNames[url] = names
-}
-
-func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
-	m := map[string]struct{}{}
-	for _, name := range names {
-		m[name] = struct{}{}
-	}
-	s.knownResourceNames[url] = m
-}
-
-func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
-	return s.knownResourceNames[url]
 }
 
 // GetResourceVersions returns a map of current resources grouped by type URL.
@@ -160,6 +126,11 @@ func (s *StreamState) IsOrdered(ordered bool) bool {
 	return ordered
 }
 
+// GetKnownResourceNames returns the current known list of resources on a SOTW stream.
+func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
+	return s.knownResourceNames[url]
+}
+
 // SetKnownResourceNames sets a list of resource names in a stream utilizing the SOTW protocol.
 func (s *StreamState) SetKnownResourceNames(url string, names map[string]struct{}) {
 	s.knownResourceNames[url] = names
@@ -172,9 +143,4 @@ func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
 		m[name] = struct{}{}
 	}
 	s.knownResourceNames[url] = m
-}
-
-// GetKnownResourceNames returns the current known list of resources on a SOTW stream.
-func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
-	return s.knownResourceNames[url]
 }

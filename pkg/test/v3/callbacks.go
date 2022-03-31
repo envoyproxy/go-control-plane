@@ -1,3 +1,4 @@
+//nolint:all
 package test
 
 import (
@@ -62,7 +63,7 @@ func (cb *Callbacks) OnStreamRequest(id int64, req *discovery.DiscoveryRequest) 
 		cb.Signal = nil
 	}
 	if cb.Debug {
-		log.Printf("received request for %s on stream %d", req.GetTypeUrl(), id)
+		log.Printf("received request for %s on stream %d: %v:%v", req.GetTypeUrl(), id, req.VersionInfo, req.ResourceNames)
 	}
 
 	return nil

@@ -22,13 +22,11 @@ import (
 )
 
 func ExampleLoggerFuncs() {
-	logger := log.Logger{}
-
 	xdsLogger := LoggerFuncs{
-		DebugFunc: logger.Printf,
-		InfoFunc:  logger.Printf,
-		WarnFunc:  logger.Printf,
-		ErrorFunc: logger.Printf,
+		DebugFunc: log.Printf,
+		InfoFunc:  log.Printf,
+		WarnFunc:  log.Printf,
+		ErrorFunc: log.Printf,
 	}
 
 	xdsLogger.Debugf("debug")

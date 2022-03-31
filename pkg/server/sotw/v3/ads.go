@@ -49,8 +49,8 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 
 	// This control loop strictly orders resources when running in ADS mode.
 	// It should be treated as a child process of the original process() loop
-	// and should return on close of stream or error.
-	// This will cause the cleanup routines in the parent process() loop to execute.
+	// and should return on close of stream or error. This will cause the
+	// cleanup routines in the parent process() loop to execute.
 	for {
 		select {
 		case <-s.ctx.Done():

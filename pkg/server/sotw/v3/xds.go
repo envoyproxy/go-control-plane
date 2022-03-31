@@ -135,6 +135,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				}
 			} else {
 				// No pre-existing watch exists, let's create one.
+				// We need to precompute the watches first then open a watch in the cache.
 				sw.watches.addWatch(typeURL, &watch{
 					cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
 					response: responder,
@@ -144,8 +145,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 			// Recompute the dynamic select cases for this stream.
 			sw.watches.recompute(s.ctx, reqCh)
 		default:
-			// Channel n -> these are the dynamic list of
-			// responders that correspond to the stream request typeURL
+			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
 			if !ok {
 				// Receiver channel was closed. TODO(jpeach): probably cancel the watch or something?
 				return status.Errorf(codes.Unavailable, "resource watch %d -> failed", index)

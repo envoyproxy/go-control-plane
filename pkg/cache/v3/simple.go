@@ -220,7 +220,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 	}
 }
 
-// SetSnapshotCacheContext updates a snapshot for a node.
+// SetSnapshotCache updates a snapshot for a node.
 func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapshot ResourceSnapshot) error {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -232,19 +232,40 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
 		defer info.mu.Unlock()
-		for id, watch := range info.watches {
+
+		// responder callback for SOTW watches
+		respond := func(watch ResponseWatch, id int64) error {
 			version := snapshot.GetVersion(watch.Request.TypeUrl)
 			if version != watch.Request.VersionInfo {
 				cache.log.Debugf("respond open watch %d %s%v with new version %q", id, watch.Request.TypeUrl, watch.Request.ResourceNames, version)
-
 				resources := snapshot.GetResourcesAndTTL(watch.Request.TypeUrl)
 				err := cache.respond(ctx, watch.Request, watch.Response, resources, version, false)
 				if err != nil {
 					return err
 				}
-
 				// discard the watch
 				delete(info.watches, id)
+			}
+			return nil
+		}
+
+		// If ADS is enabled we need to order response watches so we guarantee
+		// sending them in the correct order. Go's default implementation
+		// of maps are randomized order when ranged over.
+		if cache.ads {
+			info.orderResponseWatches(cache.ads)
+			for _, key := range info.orderedWatches {
+				err := respond(info.watches[key.ID], key.ID)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			for id, watch := range info.watches {
+				err := respond(watch, id)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
@@ -258,7 +279,8 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 			}
 		}
 
-		// process our delta watches
+		// this won't run if there are no delta watches
+		// to process.
 		for id, watch := range info.deltaWatches {
 			res, err := cache.respondDelta(
 				ctx,
@@ -281,7 +303,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 	return nil
 }
 
-// GetSnapshots gets the snapshot for a node, and returns an error if not found.
+// GetSnapshot gets the snapshot for a node, and returns an error if not found.
 func (cache *snapshotCache) GetSnapshot(node string) (ResourceSnapshot, error) {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
@@ -341,7 +363,6 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 	info.mu.Unlock()
 
 	var version string
-
 	snapshot, exists := cache.snapshots[nodeID]
 	if exists {
 		version = snapshot.GetVersion(request.TypeUrl)

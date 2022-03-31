@@ -53,16 +53,16 @@ static_resources:
                 port_value: 18090
     http2_protocol_options: {}
     name: als_cluster
-layered_runtime:
-  layers:
-    - name: runtime-0
-      rtds_layer:
-        rtds_config:
-          resource_api_version: V3
-          api_config_source:
-            transport_api_version: V3
-            api_type: GRPC
-            grpc_services:
-              envoy_grpc:
-                cluster_name: xds_cluster
-        name: runtime-0
+# layered_runtime:
+#   layers:
+#     - name: runtime-0
+#       rtds_layer:
+#         rtds_config:
+#           resource_api_version: V3
+#           api_config_source:
+#             transport_api_version: V3
+#             api_type: GRPC
+#             grpc_services:
+#               envoy_grpc:
+#                 cluster_name: xds_cluster
+#         name: runtime-0
