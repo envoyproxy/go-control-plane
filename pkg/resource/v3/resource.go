@@ -14,16 +14,16 @@ type Type = string
 
 // Resource types in xDS v3.
 const (
-	apiTypePrefix       = "type.googleapis.com/"
-	EndpointType        = apiTypePrefix + "envoy.config.endpoint.v3.ClusterLoadAssignment"
-	ClusterType         = apiTypePrefix + "envoy.config.cluster.v3.Cluster"
-	RouteType           = apiTypePrefix + "envoy.config.route.v3.RouteConfiguration"
-	ScopedRouteType     = apiTypePrefix + "envoy.config.route.v3.ScopedRouteConfiguration"
-	VirtualHostType     = apiTypePrefix + "envoy.config.route.v3.VirtualHost"
-	ListenerType        = apiTypePrefix + "envoy.config.listener.v3.Listener"
-	SecretType          = apiTypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
-	ExtensionConfigType = apiTypePrefix + "envoy.config.core.v3.TypedExtensionConfig"
-	RuntimeType         = apiTypePrefix + "envoy.service.runtime.v3.Runtime"
+	ApiTypePrefix       = "type.googleapis.com/"
+	EndpointType        = ApiTypePrefix + "envoy.config.endpoint.v3.ClusterLoadAssignment"
+	ClusterType         = ApiTypePrefix + "envoy.config.cluster.v3.Cluster"
+	RouteType           = ApiTypePrefix + "envoy.config.route.v3.RouteConfiguration"
+	ScopedRouteType     = ApiTypePrefix + "envoy.config.route.v3.ScopedRouteConfiguration"
+	VirtualHostType     = ApiTypePrefix + "envoy.config.route.v3.VirtualHost"
+	ListenerType        = ApiTypePrefix + "envoy.config.listener.v3.Listener"
+	SecretType          = ApiTypePrefix + "envoy.extensions.transport_sockets.tls.v3.Secret"
+	ExtensionConfigType = ApiTypePrefix + "envoy.config.core.v3.TypedExtensionConfig"
+	RuntimeType         = ApiTypePrefix + "envoy.service.runtime.v3.Runtime"
 
 	// AnyType is used only by ADS
 	AnyType = ""
