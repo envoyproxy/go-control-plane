@@ -1934,6 +1934,19 @@ func (m *RouteMatch) validate(all bool) error {
 			}
 		}
 
+	case *RouteMatch_PathSeparatedPrefix:
+
+		if !_RouteMatch_PathSeparatedPrefix_Pattern.MatchString(m.GetPathSeparatedPrefix()) {
+			err := RouteMatchValidationError{
+				field:  "PathSeparatedPrefix",
+				reason: "value does not match regex pattern \"^[^?#]+[^?#/]$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
 	default:
 		err := RouteMatchValidationError{
 			field:  "PathSpecifier",
@@ -2022,6 +2035,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteMatchValidationError{}
+
+var _RouteMatch_PathSeparatedPrefix_Pattern = regexp.MustCompile("^[^?#]+[^?#/]$")
 
 // Validate checks the field values on CorsPolicy with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
