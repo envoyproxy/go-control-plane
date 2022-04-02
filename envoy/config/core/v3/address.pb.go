@@ -129,9 +129,9 @@ func (x *Pipe) GetMode() uint32 {
 	return 0
 }
 
-// [#not-implemented-hide:] The address represents an envoy internal listener.
-// TODO(lambdai): Make this address available for listener and endpoint.
-// TODO(asraa): When address available, remove workaround from test/server/server_fuzz_test.cc:30.
+// The address represents an envoy internal listener.
+// [#comment: TODO(lambdai): Make this address available for listener and endpoint.
+// TODO(asraa): When address available, remove workaround from test/server/server_fuzz_test.cc:30.]
 type EnvoyInternalAddress struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
