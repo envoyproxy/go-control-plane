@@ -42,10 +42,9 @@ type TcpProxy struct {
 	ClusterSpecifier isTcpProxy_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
 	// The on demand policy for the upstream cluster.
 	// It applies to both
-	// :ref:`TcpProxy.cluster <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.cluster`
+	// :ref:`TcpProxy.cluster <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.cluster>`
 	// and
-	// :ref:`TcpProxy.weighted_clusters <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.weighted_clusters`.
-	// [#not-implemented-hide:]
+	// :ref:`TcpProxy.weighted_clusters <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.weighted_clusters>`.
 	OnDemand *TcpProxy_OnDemand `protobuf:"bytes,14,opt,name=on_demand,json=onDemand,proto3" json:"on_demand,omitempty"`
 	// Optional endpoint metadata match criteria. Only endpoints in the upstream
 	// cluster with metadata matching that set in metadata_match will be
