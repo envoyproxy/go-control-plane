@@ -51,6 +51,8 @@ const (
 	HTTPRoleBasedAccessControl = "envoy.filters.http.rbac"
 	// HTTPGRPCStats HTTP filter
 	HTTPGRPCStats = "envoy.filters.http.grpc_stats"
+	// HTTP WASM filter
+	HTTPWasm = "envoy.extensions.filters.http.wasm.v3.Wasm"
 )
 
 // Network filter names
