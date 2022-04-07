@@ -86,8 +86,7 @@ type Filter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The name of the filter to instantiate. The name must match a
-	// :ref:`supported filter <config_network_filters>`.
+	// The name of the filter configuration.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to ConfigType:
 	//	*Filter_TypedConfig
@@ -713,8 +712,7 @@ type ListenerFilter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The name of the filter to instantiate. The name must match a
-	// :ref:`supported filter <config_listener_filters>`.
+	// The name of the filter configuration.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to ConfigType:
 	//	*ListenerFilter_TypedConfig

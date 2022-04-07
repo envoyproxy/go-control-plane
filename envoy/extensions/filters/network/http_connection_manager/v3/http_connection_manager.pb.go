@@ -1574,9 +1574,7 @@ type HttpFilter struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The name of the filter configuration. The name is used as a fallback to
-	// select an extension if the type of the configuration proto is not
-	// sufficient. It also serves as a resource name in ExtensionConfigDS.
+	// The name of the filter configuration. It also serves as a resource name in ExtensionConfigDS.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to ConfigType:
 	//	*HttpFilter_TypedConfig
