@@ -295,9 +295,8 @@ func (x *LedsClusterLocalityConfig) GetLedsCollectionName() string {
 }
 
 // A group of endpoints belonging to a Locality.
-// One can have multiple LocalityLbEndpoints for a locality, but this is
-// generally only done if the different groups need to have different load
-// balancing weights or different priorities.
+// One can have multiple LocalityLbEndpoints for a locality, but only if
+// they have different priorities.
 // [#next-free-field: 9]
 type LocalityLbEndpoints struct {
 	state         protoimpl.MessageState
