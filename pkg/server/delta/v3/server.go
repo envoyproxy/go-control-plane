@@ -160,14 +160,17 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			if !ok {
 				// Initialize the state of the stream.
 				// Since there was no previous state, we know we're handling the first request of this type
-				// so we set the initial resource versions if we have any, and also signal if this stream is in wildcard mode.
+				// so we set the initial resource versions if we have any.
+				// We also set the stream as wildcard based on its legacy meaning (no resource subscribed).
+				// If the state starts with this legacy mode, adding new resources will not unsubscribe to wildcard.
+				// It can still be done by unsubscribing from "*"
 				watch.state = stream.NewStreamState(len(req.GetResourceNamesSubscribe()) == 0, req.GetInitialResourceVersions())
 			} else {
 				watch.Cancel()
 			}
 
-			s.subscribe(req.GetResourceNamesSubscribe(), watch.state.GetResourceVersions())
-			s.unsubscribe(req.GetResourceNamesUnsubscribe(), watch.state.GetResourceVersions())
+			s.subscribe(req.GetResourceNamesSubscribe(), &watch.state)
+			s.unsubscribe(req.GetResourceNamesUnsubscribe(), &watch.state)
 
 			watch.responses = make(chan cache.DeltaResponse, 1)
 			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
@@ -210,17 +213,27 @@ func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) erro
 }
 
 // When we subscribe, we just want to make the cache know we are subscribing to a resource.
-// Providing a name with an empty version is enough to make that happen.
-func (s *server) subscribe(resources []string, sv map[string]string) {
+// Even if the stream is wildcard, we keep the list of explicitly subscribed resources as the wildcard subscription can be discarded later on.
+func (s *server) subscribe(resources []string, streamState *stream.StreamState) {
+	sv := streamState.GetSubscribedResourceNames()
 	for _, resource := range resources {
-		sv[resource] = ""
+		if resource == "*" {
+			streamState.SetWildcard(true)
+			continue
+		}
+		sv[resource] = struct{}{}
 	}
 }
 
-// Unsubscriptions remove resources from the stream state to
-// indicate to the cache that we don't care about the resource anymore
-func (s *server) unsubscribe(resources []string, sv map[string]string) {
+// Unsubscriptions remove resources from the stream subscribed resources.
+// If explicitly unsubscribing from wildcard, the stream is updated and is now watching only subscribed resources.
+func (s *server) unsubscribe(resources []string, streamState *stream.StreamState) {
+	sv := streamState.GetSubscribedResourceNames()
 	for _, resource := range resources {
+		if resource == "*" {
+			streamState.SetWildcard(false)
+			continue
+		}
 		delete(sv, resource)
 	}
 }

@@ -23,8 +23,12 @@ type DeltaStream interface {
 
 // StreamState will keep track of resource state per type on a stream.
 type StreamState struct { // nolint:golint,revive
-	// Indicates whether the original DeltaRequest was a wildcard LDS/RDS request.
+	// Indicates whether the stream currently has a wildcard watch
 	wildcard bool
+
+	// Provides the list of resources explicitly requested by the client
+	// This list might be non-empty even when set as wildcard
+	subscribedResourceNames map[string]struct{}
 
 	// ResourceVersions contains a hash of the resource as the value and the resource name as the key.
 	// This field stores the last state sent to the client.
@@ -33,8 +37,28 @@ type StreamState struct { // nolint:golint,revive
 	// knownResourceNames contains resource names that a client has received previously
 	knownResourceNames map[string]map[string]struct{}
 
-	// indicates whether the object has beed modified since its creation
+	// indicates whether the object has been modified since its creation
 	first bool
+}
+
+func (s *StreamState) GetSubscribedResourceNames() map[string]struct{} {
+	return s.subscribedResourceNames
+}
+
+func (s *StreamState) SetSubscribedResourceNames(subscribedResourceNames map[string]struct{}) {
+	s.subscribedResourceNames = subscribedResourceNames
+}
+
+func (s *StreamState) WatchesResources(resourceNames map[string]struct{}) bool {
+	if s.IsWildcard() {
+		return true
+	}
+	for resourceName := range resourceNames {
+		if _, ok := s.subscribedResourceNames[resourceName]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *StreamState) GetResourceVersions() map[string]string {
@@ -48,6 +72,10 @@ func (s *StreamState) SetResourceVersions(resourceVersions map[string]string) {
 
 func (s *StreamState) IsFirst() bool {
 	return s.first
+}
+
+func (s *StreamState) SetWildcard(wildcard bool) {
+	s.wildcard = wildcard
 }
 
 func (s *StreamState) IsWildcard() bool {
@@ -73,10 +101,11 @@ func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
 // NewStreamState initializes a stream state.
 func NewStreamState(wildcard bool, initialResourceVersions map[string]string) StreamState {
 	state := StreamState{
-		wildcard:           wildcard,
-		resourceVersions:   initialResourceVersions,
-		first:              true,
-		knownResourceNames: map[string]map[string]struct{}{},
+		wildcard:                wildcard,
+		subscribedResourceNames: map[string]struct{}{},
+		resourceVersions:        initialResourceVersions,
+		first:                   true,
+		knownResourceNames:      map[string]map[string]struct{}{},
 	}
 
 	if initialResourceVersions == nil {

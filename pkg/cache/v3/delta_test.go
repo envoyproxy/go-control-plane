@@ -67,13 +67,17 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// all resources as well as individual resource removals
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
+		state := stream.NewStreamState(false, versionMap[typ])
+		for resource := range versionMap[typ] {
+			state.GetSubscribedResourceNames()[resource] = struct{}{}
+		}
 		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: "node",
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.NewStreamState(false, versionMap[typ]), watches[typ])
+		}, state, watches[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -221,13 +225,15 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.DeltaResponse)
+	state := stream.NewStreamState(false, nil)
+	state.SetSubscribedResourceNames(map[string]struct{}{names[rsrc.EndpointType][0]: {}})
 	c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 		Node: &core.Node{
 			Id: key,
 		},
 		TypeUrl:                rsrc.EndpointType,
 		ResourceNamesSubscribe: names[rsrc.EndpointType],
-	}, stream.NewStreamState(false, map[string]string{names[rsrc.EndpointType][0]: ""}), watchCh)
+	}, state, watchCh)
 
 	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
