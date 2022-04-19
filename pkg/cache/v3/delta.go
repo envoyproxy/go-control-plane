@@ -53,6 +53,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 		}
 
 		// Compute resources for removal
+		// The resource version can be set to "" here to trigger a removal even if never returned before
 		for name := range state.GetResourceVersions() {
 			if _, ok := resources.resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
