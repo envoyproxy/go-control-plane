@@ -30,9 +30,8 @@ const (
 // filter state before the matcher is executed by RBAC filter. The state should be saved with key
 // `envoy.stream.upstream_address` (See
 // :repo:`upstream_address.h<source/common/stream_info/upstream_address.h>`).
-// Also, See :repo:`proxy_filter.cc<
-// source/extensions/filters/http/dynamic_forward_proxy/proxy_filter.cc>` for an example of a
-// filter which populates the FilterState.
+// Also, See :repo:`proxy_filter.cc<source/extensions/filters/http/dynamic_forward_proxy/proxy_filter.cc>`
+// for an example of a filter which populates the FilterState.
 type UpstreamIpPortMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
