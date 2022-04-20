@@ -30,7 +30,11 @@ type RouteConfiguration struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The name of the route configuration. Reserved for future use in asynchronous route discovery.
+	// The name of the route configuration. This name is used in asynchronous route discovery.
+	// For example, it might match
+	// :ref:`route_config_name
+	// <envoy_v3_api_field_extensions.filters.network.thrift_proxy.v3.Trds.route_config_name>` in
+	// :ref:`envoy_v3_api_msg_extensions.filters.network.thrift_proxy.v3.Trds`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The list of routes that will be matched, in order, against incoming requests. The first route
 	// that matches will be used.
