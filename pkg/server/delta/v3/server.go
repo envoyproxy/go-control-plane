@@ -234,7 +234,6 @@ func (s *server) unsubscribe(resources []string, streamState *stream.StreamState
 			streamState.SetWildcard(false)
 			continue
 		}
-		delete(sv, resource)
 		if _, ok := sv[resource]; ok && streamState.IsWildcard() {
 			// xds protocol specifically states that if a resource if unsubscribed while a wildcard watch is present,
 			// the control-plane must return a response with either the resource set as removed (if no longer present in the snapshot)
@@ -243,5 +242,6 @@ func (s *server) unsubscribe(resources []string, streamState *stream.StreamState
 			// or mark it as removed (done in createDeltaResponse)
 			streamState.GetResourceVersions()[resource] = ""
 		}
+		delete(sv, resource)
 	}
 }
