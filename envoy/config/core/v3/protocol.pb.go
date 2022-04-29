@@ -737,7 +737,9 @@ type KeepaliveSettings struct {
 	// If this is zero, interval PINGs will not be sent.
 	Interval *duration.Duration `protobuf:"bytes,1,opt,name=interval,proto3" json:"interval,omitempty"`
 	// How long to wait for a response to a keepalive PING. If a response is not received within this
-	// time period, the connection will be aborted.
+	// time period, the connection will be aborted. Note that in order to prevent the influence of
+	// Head-of-line (HOL) blocking the timeout period is extended when *any* frame is received on
+	// the connection, under the assumption that if a frame is received the connection is healthy.
 	Timeout *duration.Duration `protobuf:"bytes,2,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// A random jitter amount as a percentage of interval that will be added to each interval.
 	// A value of zero means there will be no jitter.
