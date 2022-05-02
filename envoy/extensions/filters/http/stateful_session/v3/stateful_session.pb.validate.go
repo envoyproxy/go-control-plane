@@ -57,17 +57,6 @@ func (m *StatefulSession) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetSessionState() == nil {
-		err := StatefulSessionValidationError{
-			field:  "SessionState",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetSessionState()).(type) {
 		case interface{ ValidateAll() error }:
