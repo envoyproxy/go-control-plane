@@ -211,6 +211,8 @@ type TlsParameters struct {
 	//
 	// If not specified, a default list will be used. Defaults are different for server (downstream) and
 	// client (upstream) TLS configurations.
+	// Defaults will change over time in response to security considerations; If you care, configure
+	// it instead of using the default.
 	//
 	// In non-FIPS builds, the default server cipher list is:
 	//
@@ -220,14 +222,10 @@ type TlsParameters struct {
 	//   [ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]
 	//   ECDHE-ECDSA-AES128-SHA
 	//   ECDHE-RSA-AES128-SHA
-	//   AES128-GCM-SHA256
-	//   AES128-SHA
 	//   ECDHE-ECDSA-AES256-GCM-SHA384
 	//   ECDHE-RSA-AES256-GCM-SHA384
 	//   ECDHE-ECDSA-AES256-SHA
 	//   ECDHE-RSA-AES256-SHA
-	//   AES256-GCM-SHA384
-	//   AES256-SHA
 	//
 	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default server cipher list is:
 	//
@@ -237,14 +235,10 @@ type TlsParameters struct {
 	//   ECDHE-RSA-AES128-GCM-SHA256
 	//   ECDHE-ECDSA-AES128-SHA
 	//   ECDHE-RSA-AES128-SHA
-	//   AES128-GCM-SHA256
-	//   AES128-SHA
 	//   ECDHE-ECDSA-AES256-GCM-SHA384
 	//   ECDHE-RSA-AES256-GCM-SHA384
 	//   ECDHE-ECDSA-AES256-SHA
 	//   ECDHE-RSA-AES256-SHA
-	//   AES256-GCM-SHA384
-	//   AES256-SHA
 	//
 	// In non-FIPS builds, the default client cipher list is:
 	//
