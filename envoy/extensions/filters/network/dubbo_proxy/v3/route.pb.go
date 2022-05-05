@@ -380,6 +380,63 @@ func (x *MethodMatch) GetParamsMatch() map[uint32]*MethodMatch_ParameterMatchSpe
 	return nil
 }
 
+type MultipleRouteConfiguration struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The name of the named route configurations. This name is used in asynchronous route discovery.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The route table of the dubbo connection manager.
+	RouteConfig []*RouteConfiguration `protobuf:"bytes,4,rep,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
+}
+
+func (x *MultipleRouteConfiguration) Reset() {
+	*x = MultipleRouteConfiguration{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MultipleRouteConfiguration) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MultipleRouteConfiguration) ProtoMessage() {}
+
+func (x *MultipleRouteConfiguration) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MultipleRouteConfiguration.ProtoReflect.Descriptor instead.
+func (*MultipleRouteConfiguration) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MultipleRouteConfiguration) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *MultipleRouteConfiguration) GetRouteConfig() []*RouteConfiguration {
+	if x != nil {
+		return x.RouteConfig
+	}
+	return nil
+}
+
 // The parameter matching type.
 type MethodMatch_ParameterMatchSpecifier struct {
 	state         protoimpl.MessageState
@@ -395,7 +452,7 @@ type MethodMatch_ParameterMatchSpecifier struct {
 func (x *MethodMatch_ParameterMatchSpecifier) Reset() {
 	*x = MethodMatch_ParameterMatchSpecifier{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[5]
+		mi := &file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -408,7 +465,7 @@ func (x *MethodMatch_ParameterMatchSpecifier) String() string {
 func (*MethodMatch_ParameterMatchSpecifier) ProtoMessage() {}
 
 func (x *MethodMatch_ParameterMatchSpecifier) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -600,19 +657,29 @@ var file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_rawDesc = [
 	0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72,
 	0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x64, 0x75, 0x62, 0x62, 0x6f, 0x5f, 0x70,
 	0x72, 0x6f, 0x78, 0x79, 0x2e, 0x76, 0x32, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2e, 0x4d, 0x65,
-	0x74, 0x68, 0x6f, 0x64, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x42, 0xbb, 0x01, 0x0a, 0x3d, 0x69, 0x6f,
-	0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f,
-	0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c,
-	0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x64, 0x75, 0x62,
-	0x62, 0x6f, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x76, 0x33, 0x42, 0x0a, 0x52, 0x6f, 0x75,
-	0x74, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x64, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79,
-	0x2f, 0x67, 0x6f, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x2d, 0x70, 0x6c, 0x61, 0x6e,
-	0x65, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f,
-	0x6e, 0x73, 0x2f, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2f, 0x6e, 0x65, 0x74, 0x77, 0x6f,
-	0x72, 0x6b, 0x2f, 0x64, 0x75, 0x62, 0x62, 0x6f, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x76,
-	0x33, 0x3b, 0x64, 0x75, 0x62, 0x62, 0x6f, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x76, 0x33, 0xba,
-	0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x68, 0x6f, 0x64, 0x4d, 0x61, 0x74, 0x63, 0x68, 0x22, 0x98, 0x01, 0x0a, 0x1a, 0x4d, 0x75,
+	0x6c, 0x74, 0x69, 0x70, 0x6c, 0x65, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x66, 0x69,
+	0x67, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x66, 0x0a, 0x0c,
+	0x72, 0x6f, 0x75, 0x74, 0x65, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x18, 0x04, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x43, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74, 0x65, 0x6e,
+	0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e, 0x6e, 0x65,
+	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x64, 0x75, 0x62, 0x62, 0x6f, 0x5f, 0x70, 0x72, 0x6f, 0x78,
+	0x79, 0x2e, 0x76, 0x33, 0x2e, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67,
+	0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0b, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x43, 0x6f,
+	0x6e, 0x66, 0x69, 0x67, 0x42, 0xbb, 0x01, 0x0a, 0x3d, 0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f,
+	0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74,
+	0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e,
+	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x64, 0x75, 0x62, 0x62, 0x6f, 0x5f, 0x70, 0x72,
+	0x6f, 0x78, 0x79, 0x2e, 0x76, 0x33, 0x42, 0x0a, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x64, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
+	0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x67, 0x6f, 0x2d, 0x63,
+	0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x2d, 0x70, 0x6c, 0x61, 0x6e, 0x65, 0x2f, 0x65, 0x6e, 0x76,
+	0x6f, 0x79, 0x2f, 0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x66, 0x69,
+	0x6c, 0x74, 0x65, 0x72, 0x73, 0x2f, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x64, 0x75,
+	0x62, 0x62, 0x6f, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f, 0x76, 0x33, 0x3b, 0x64, 0x75, 0x62,
+	0x62, 0x6f, 0x5f, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x76, 0x33, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02,
+	0x10, 0x02, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -627,36 +694,38 @@ func file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_rawDescGZI
 	return file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_goTypes = []interface{}{
 	(*RouteConfiguration)(nil),                  // 0: envoy.extensions.filters.network.dubbo_proxy.v3.RouteConfiguration
 	(*Route)(nil),                               // 1: envoy.extensions.filters.network.dubbo_proxy.v3.Route
 	(*RouteMatch)(nil),                          // 2: envoy.extensions.filters.network.dubbo_proxy.v3.RouteMatch
 	(*RouteAction)(nil),                         // 3: envoy.extensions.filters.network.dubbo_proxy.v3.RouteAction
 	(*MethodMatch)(nil),                         // 4: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch
-	(*MethodMatch_ParameterMatchSpecifier)(nil), // 5: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParameterMatchSpecifier
-	nil,                        // 6: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParamsMatchEntry
-	(*v3.HeaderMatcher)(nil),   // 7: envoy.config.route.v3.HeaderMatcher
-	(*v3.WeightedCluster)(nil), // 8: envoy.config.route.v3.WeightedCluster
-	(*v31.StringMatcher)(nil),  // 9: envoy.type.matcher.v3.StringMatcher
-	(*v32.Int64Range)(nil),     // 10: envoy.type.v3.Int64Range
+	(*MultipleRouteConfiguration)(nil),          // 5: envoy.extensions.filters.network.dubbo_proxy.v3.MultipleRouteConfiguration
+	(*MethodMatch_ParameterMatchSpecifier)(nil), // 6: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParameterMatchSpecifier
+	nil,                        // 7: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParamsMatchEntry
+	(*v3.HeaderMatcher)(nil),   // 8: envoy.config.route.v3.HeaderMatcher
+	(*v3.WeightedCluster)(nil), // 9: envoy.config.route.v3.WeightedCluster
+	(*v31.StringMatcher)(nil),  // 10: envoy.type.matcher.v3.StringMatcher
+	(*v32.Int64Range)(nil),     // 11: envoy.type.v3.Int64Range
 }
 var file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_depIdxs = []int32{
 	1,  // 0: envoy.extensions.filters.network.dubbo_proxy.v3.RouteConfiguration.routes:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.Route
 	2,  // 1: envoy.extensions.filters.network.dubbo_proxy.v3.Route.match:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.RouteMatch
 	3,  // 2: envoy.extensions.filters.network.dubbo_proxy.v3.Route.route:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.RouteAction
 	4,  // 3: envoy.extensions.filters.network.dubbo_proxy.v3.RouteMatch.method:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch
-	7,  // 4: envoy.extensions.filters.network.dubbo_proxy.v3.RouteMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	8,  // 5: envoy.extensions.filters.network.dubbo_proxy.v3.RouteAction.weighted_clusters:type_name -> envoy.config.route.v3.WeightedCluster
-	9,  // 6: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.name:type_name -> envoy.type.matcher.v3.StringMatcher
-	6,  // 7: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.params_match:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParamsMatchEntry
-	10, // 8: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParameterMatchSpecifier.range_match:type_name -> envoy.type.v3.Int64Range
-	5,  // 9: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParamsMatchEntry.value:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParameterMatchSpecifier
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	8,  // 4: envoy.extensions.filters.network.dubbo_proxy.v3.RouteMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	9,  // 5: envoy.extensions.filters.network.dubbo_proxy.v3.RouteAction.weighted_clusters:type_name -> envoy.config.route.v3.WeightedCluster
+	10, // 6: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.name:type_name -> envoy.type.matcher.v3.StringMatcher
+	7,  // 7: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.params_match:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParamsMatchEntry
+	0,  // 8: envoy.extensions.filters.network.dubbo_proxy.v3.MultipleRouteConfiguration.route_config:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.RouteConfiguration
+	11, // 9: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParameterMatchSpecifier.range_match:type_name -> envoy.type.v3.Int64Range
+	6,  // 10: envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParamsMatchEntry.value:type_name -> envoy.extensions.filters.network.dubbo_proxy.v3.MethodMatch.ParameterMatchSpecifier
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_init() }
@@ -726,6 +795,18 @@ func file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_init() {
 			}
 		}
 		file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MultipleRouteConfiguration); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MethodMatch_ParameterMatchSpecifier); i {
 			case 0:
 				return &v.state
@@ -742,7 +823,7 @@ func file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_init() {
 		(*RouteAction_Cluster)(nil),
 		(*RouteAction_WeightedClusters)(nil),
 	}
-	file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[5].OneofWrappers = []interface{}{
+	file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_msgTypes[6].OneofWrappers = []interface{}{
 		(*MethodMatch_ParameterMatchSpecifier_ExactMatch)(nil),
 		(*MethodMatch_ParameterMatchSpecifier_RangeMatch)(nil),
 	}
@@ -752,7 +833,7 @@ func file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_extensions_filters_network_dubbo_proxy_v3_route_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
