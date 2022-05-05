@@ -9181,6 +9181,37 @@ func (m *RateLimit_Action) validate(all bool) error {
 			}
 		}
 
+	case *RateLimit_Action_MaskedRemoteAddress_:
+
+		if all {
+			switch v := interface{}(m.GetMaskedRemoteAddress()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimit_ActionValidationError{
+						field:  "MaskedRemoteAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimit_ActionValidationError{
+						field:  "MaskedRemoteAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetMaskedRemoteAddress()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimit_ActionValidationError{
+					field:  "MaskedRemoteAddress",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		err := RateLimit_ActionValidationError{
 			field:  "ActionSpecifier",
@@ -9868,6 +9899,141 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RateLimit_Action_RemoteAddressValidationError{}
+
+// Validate checks the field values on RateLimit_Action_MaskedRemoteAddress
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *RateLimit_Action_MaskedRemoteAddress) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimit_Action_MaskedRemoteAddress
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// RateLimit_Action_MaskedRemoteAddressMultiError, or nil if none found.
+func (m *RateLimit_Action_MaskedRemoteAddress) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimit_Action_MaskedRemoteAddress) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if wrapper := m.GetV4PrefixMaskLen(); wrapper != nil {
+
+		if wrapper.GetValue() > 32 {
+			err := RateLimit_Action_MaskedRemoteAddressValidationError{
+				field:  "V4PrefixMaskLen",
+				reason: "value must be less than or equal to 32",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if wrapper := m.GetV6PrefixMaskLen(); wrapper != nil {
+
+		if wrapper.GetValue() > 128 {
+			err := RateLimit_Action_MaskedRemoteAddressValidationError{
+				field:  "V6PrefixMaskLen",
+				reason: "value must be less than or equal to 128",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return RateLimit_Action_MaskedRemoteAddressMultiError(errors)
+	}
+
+	return nil
+}
+
+// RateLimit_Action_MaskedRemoteAddressMultiError is an error wrapping multiple
+// validation errors returned by
+// RateLimit_Action_MaskedRemoteAddress.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimit_Action_MaskedRemoteAddressMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimit_Action_MaskedRemoteAddressMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimit_Action_MaskedRemoteAddressMultiError) AllErrors() []error { return m }
+
+// RateLimit_Action_MaskedRemoteAddressValidationError is the validation error
+// returned by RateLimit_Action_MaskedRemoteAddress.Validate if the designated
+// constraints aren't met.
+type RateLimit_Action_MaskedRemoteAddressValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) ErrorName() string {
+	return "RateLimit_Action_MaskedRemoteAddressValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimit_Action_MaskedRemoteAddress.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimit_Action_MaskedRemoteAddressValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimit_Action_MaskedRemoteAddressValidationError{}
 
 // Validate checks the field values on RateLimit_Action_GenericKey with the
 // rules defined in the proto definition for this message. If any rules are
