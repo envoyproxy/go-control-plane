@@ -25,7 +25,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#not-implemented-hide:]
 // The behavior of the filter for a stream.
 // [#next-free-field: 6]
 type BufferBehavior struct {
@@ -159,7 +158,6 @@ func (*BufferBehavior_FullyBufferAndAlwaysInjectContentLength_) isBufferBehavior
 
 func (*BufferBehavior_FullyBuffer_) isBufferBehavior_Behavior() {}
 
-// [#not-implemented-hide:]
 // The configuration for one direction of the filter behavior.
 type StreamConfig struct {
 	state         protoimpl.MessageState
@@ -183,11 +181,12 @@ type StreamConfig struct {
 	// ``memory_buffer_bytes_limit`` was 32MiB, and ``storage_buffer_queue_high_watermark_bytes``
 	// was 64MiB, and the filesystem is backed up so writes are not occurring promptly,
 	// then:
+	//
 	// * Any request less than 32MiB will eventually pass through without ever attempting
 	//   to write to disk.
 	// * Any request with over 32MiB buffered will start trying to write to disk.
-	//   * If it reaches (32+64)MiB buffered and not yet written to disk, a high
-	//     watermark signal is sent to the source.
+	//   If it reaches (32+64)MiB buffered in memory (write to disk isn't keeping up), a high
+	//   watermark signal is sent to the source.
 	// * Any stream whose total size exceeds
 	//   ``memory_buffer_bytes_limit + storage_buffer_bytes_limit`` will provoke an error.
 	//   (Note, if the recipient *is* consuming data then it is possible for such an
@@ -195,7 +194,7 @@ type StreamConfig struct {
 	//   isn't consuming data too slowly.)
 	//
 	// The low watermark signal is sent when the memory buffer is at size
-	//  ``memory_buffer_bytes_limit + (storage_buffer_queue_high_watermark_bytes / 2)``.
+	// ``memory_buffer_bytes_limit + (storage_buffer_queue_high_watermark_bytes / 2)``.
 	StorageBufferQueueHighWatermarkBytes *wrappers.UInt64Value `protobuf:"bytes,4,opt,name=storage_buffer_queue_high_watermark_bytes,json=storageBufferQueueHighWatermarkBytes,proto3" json:"storage_buffer_queue_high_watermark_bytes,omitempty"`
 }
 
@@ -259,8 +258,7 @@ func (x *StreamConfig) GetStorageBufferQueueHighWatermarkBytes() *wrappers.UInt6
 	return nil
 }
 
-// [#not-implemented-hide:]
-// Configuration for file system buffer filter.
+// A :ref:`file system buffer <config_http_filters_file_system_buffer>` filter configuration.
 //
 // Route-specific configs override only the fields they explicitly include; unset
 // fields inherit from the vhost or listener-level config, or, if never set,
