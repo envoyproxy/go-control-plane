@@ -6516,10 +6516,12 @@ func (m *RouteAction_RequestMirrorPolicy) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetCluster()) < 1 {
+	// no validation rules for Cluster
+
+	if !_RouteAction_RequestMirrorPolicy_ClusterHeader_Pattern.MatchString(m.GetClusterHeader()) {
 		err := RouteAction_RequestMirrorPolicyValidationError{
-			field:  "Cluster",
-			reason: "value length must be at least 1 runes",
+			field:  "ClusterHeader",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 		if !all {
 			return err
@@ -6665,6 +6667,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteAction_RequestMirrorPolicyValidationError{}
+
+var _RouteAction_RequestMirrorPolicy_ClusterHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on RouteAction_HashPolicy with the rules
 // defined in the proto definition for this message. If any rules are
