@@ -5331,6 +5331,12 @@ type RateLimit_Action_Metadata struct {
 
 type RateLimit_Action_Extension struct {
 	// Rate limit descriptor extension. See the rate limit descriptor extensions documentation.
+	//
+	// :ref:`HTTP matching input functions <arch_overview_matching_api>` are
+	// permitted as descriptor extensions. The input functions are only
+	// looked up if there is no rate limit descriptor extension matching
+	// the type URL.
+	//
 	// [#extension-category: envoy.rate_limit_descriptors]
 	Extension *v31.TypedExtensionConfig `protobuf:"bytes,9,opt,name=extension,proto3,oneof"`
 }
