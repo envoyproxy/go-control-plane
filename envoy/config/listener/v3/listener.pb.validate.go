@@ -199,17 +199,6 @@ func (m *Listener) validate(all bool) error {
 
 	// no validation rules for Name
 
-	if m.GetAddress() == nil {
-		err := ListenerValidationError{
-			field:  "Address",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetAddress()).(type) {
 		case interface{ ValidateAll() error }:
