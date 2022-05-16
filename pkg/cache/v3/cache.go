@@ -122,6 +122,9 @@ type RawResponse struct {
 	// Resources to be included in the response.
 	Resources []types.ResourceWithTTL
 
+	// NextVersionMap consists of updated version mappings after this response is applied
+	NextVersionMap map[string]string
+
 	// Whether this is a heartbeat response. For xDS versions that support TTL, this
 	// will be converted into a response that doesn't contain the actual resource protobuf.
 	// This allows for more lightweight updates that server only to update the TTL timer.

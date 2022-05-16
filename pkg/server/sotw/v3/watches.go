@@ -7,6 +7,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // watches for all xDS resource types
@@ -65,6 +66,8 @@ type watch struct {
 	cancel   func()
 	nonce    string
 	response chan cache.Response
+
+	state stream.StreamState
 }
 
 // close cancels an open watch

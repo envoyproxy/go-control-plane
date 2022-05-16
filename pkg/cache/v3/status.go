@@ -88,6 +88,9 @@ type ResponseWatch struct {
 
 	// Response is the channel to push responses to.
 	Response chan Response
+
+	// State for this request stream
+	StreamState stream.StreamState
 }
 
 // DeltaResponseWatch is a watch record keeping both the delta request and an open channel for the delta response.

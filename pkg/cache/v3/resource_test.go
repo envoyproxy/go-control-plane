@@ -113,60 +113,60 @@ func TestGetResourceName(t *testing.T) {
 func TestGetResourceReferences(t *testing.T) {
 	cases := []struct {
 		in  types.Resource
-		out map[rsrc.Type]map[string]bool
+		out map[rsrc.Type]map[string]struct{}
 	}{
 		{
 			in:  nil,
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 		{
 			in:  testCluster,
-			out: map[rsrc.Type]map[string]bool{rsrc.EndpointType: {clusterName: true}},
+			out: map[rsrc.Type]map[string]struct{}{rsrc.EndpointType: {clusterName: {}}},
 		},
 		{
 			in: &cluster.Cluster{Name: clusterName, ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
 				EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{ServiceName: "test"}},
-			out: map[rsrc.Type]map[string]bool{rsrc.EndpointType: {"test": true}},
+			out: map[rsrc.Type]map[string]struct{}{rsrc.EndpointType: {"test": {}}},
 		},
 		{
 			in:  resource.MakeScopedRouteHTTPListener(resource.Xds, listenerName, 80),
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 		{
 			in:  resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, listenerName, 80, routeName),
-			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+			out: map[rsrc.Type]map[string]struct{}{rsrc.RouteType: {routeName: {}}},
 		},
 		{
 			in:  resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName),
-			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+			out: map[rsrc.Type]map[string]struct{}{rsrc.RouteType: {routeName: {}}},
 		},
 		{
 			in:  resource.MakeTCPListener(listenerName, 80, clusterName),
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 		{
 			in:  testRoute,
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 		{
 			in:  resource.MakeVHDSRouteConfig(resource.Ads, routeName),
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 		{
 			in:  testScopedRoute,
-			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+			out: map[rsrc.Type]map[string]struct{}{rsrc.RouteType: {routeName: {}}},
 		},
 		{
 			in:  testVirtualHost,
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 		{
 			in:  testEndpoint,
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 		{
 			in:  testRuntime,
-			out: map[rsrc.Type]map[string]bool{},
+			out: map[rsrc.Type]map[string]struct{}{},
 		},
 	}
 	for _, cs := range cases {
@@ -177,9 +177,9 @@ func TestGetResourceReferences(t *testing.T) {
 	}
 }
 func TestGetAllResourceReferencesReturnsExpectedRefs(t *testing.T) {
-	expected := map[rsrc.Type]map[string]bool{
-		rsrc.RouteType:    {routeName: true, embeddedRouteName: true},
-		rsrc.EndpointType: {clusterName: true},
+	expected := map[rsrc.Type]map[string]struct{}{
+		rsrc.RouteType:    {routeName: {}, embeddedRouteName: {}},
+		rsrc.EndpointType: {clusterName: {}},
 	}
 
 	resources := [types.UnknownType]cache.Resources{}

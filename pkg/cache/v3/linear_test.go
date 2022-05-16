@@ -195,18 +195,22 @@ func createWildcardDeltaWatch(c *LinearCache, w chan DeltaResponse) {
 }
 
 func TestLinearInitialResources(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
+
 	w := make(chan Response, 1)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState.SetSubscribedResourceNames(map[string]struct{}{"a": {}})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType}, streamState, w)
 	verifyResponse(t, w, "0", 1)
-	c.CreateWatch(&Request{TypeUrl: testType}, streamState, w)
+
+	wildcardStreamState := stream.NewStreamState(true, map[string]string{})
+	c.CreateWatch(&Request{TypeUrl: testType}, wildcardStreamState, w)
 	verifyResponse(t, w, "0", 2)
 	checkVersionMapNotSet(t, c)
 }
 
 func TestLinearCornerCases(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState := stream.NewStreamState(true, map[string]string{})
 	c := NewLinearCache(testType)
 	err := c.UpdateResource("a", nil)
 	if err == nil {
@@ -226,17 +230,19 @@ func TestLinearCornerCases(t *testing.T) {
 }
 
 func TestLinearBasic(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType)
 
 	// Create watches before a resource is ready
 	w1 := make(chan Response, 1)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState.SetSubscribedResourceNames(map[string]struct{}{"a": {}})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w1)
 	mustBlock(t, w1)
 	checkVersionMapNotSet(t, c)
 
 	w := make(chan Response, 1)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w)
+	wildcardStreamState := stream.NewStreamState(true, map[string]string{})
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, wildcardStreamState, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 2)
 	checkWatchCount(t, c, "b", 1)
@@ -245,48 +251,56 @@ func TestLinearBasic(t *testing.T) {
 	checkWatchCount(t, c, "b", 0)
 	verifyResponse(t, w1, "1", 1)
 	verifyResponse(t, w, "1", 1)
+	streamState.SetResourceVersions(map[string]string{"a": ""})
+	wildcardStreamState.SetResourceVersions(map[string]string{"a": ""})
 
 	// Request again, should get same response
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	checkWatchCount(t, c, "a", 0)
 	verifyResponse(t, w, "1", 1)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w)
+	streamState.SetResourceVersions(map[string]string{"a": ""})
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, wildcardStreamState, w)
 	checkWatchCount(t, c, "a", 0)
 	verifyResponse(t, w, "1", 1)
+	wildcardStreamState.SetResourceVersions(map[string]string{"a": ""})
 
 	// Add another element and update the first, response should be different
 	require.NoError(t, c.UpdateResource("b", testResource("b")))
 	require.NoError(t, c.UpdateResource("a", testResource("aa")))
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	verifyResponse(t, w, "3", 1)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w)
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, wildcardStreamState, w)
 	verifyResponse(t, w, "3", 2)
 	// Ensure the version map was not created as we only ever used stow watches
 	checkVersionMapNotSet(t, c)
 }
 
 func TestLinearSetResources(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType)
 
 	// Create new resources
 	w1 := make(chan Response, 1)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState.SetSubscribedResourceNames(map[string]struct{}{"a": {}})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w1)
 	mustBlock(t, w1)
 	w2 := make(chan Response, 1)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w2)
+	wildcardStreamState := stream.NewStreamState(true, map[string]string{})
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, wildcardStreamState, w2)
 	mustBlock(t, w2)
 	c.SetResources(map[string]types.Resource{
 		"a": testResource("a"),
 		"b": testResource("b"),
 	})
 	verifyResponse(t, w1, "1", 1)
+	streamState.SetResourceVersions(map[string]string{"a": ""})
 	verifyResponse(t, w2, "1", 2) // the version was only incremented once for all resources
+	wildcardStreamState.SetResourceVersions(map[string]string{"a": "", "b": ""})
 
 	// Add another element and update the first, response should be different
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, streamState, w1)
 	mustBlock(t, w1)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, streamState, w2)
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, wildcardStreamState, w2)
 	mustBlock(t, w2)
 	c.SetResources(map[string]types.Resource{
 		"a": testResource("aa"),
@@ -294,12 +308,14 @@ func TestLinearSetResources(t *testing.T) {
 		"c": testResource("c"),
 	})
 	verifyResponse(t, w1, "2", 1)
+	streamState.SetResourceVersions(map[string]string{"a": ""})
 	verifyResponse(t, w2, "2", 3)
+	wildcardStreamState.SetResourceVersions(map[string]string{"a": "", "b": "", "c": ""})
 
 	// Delete resource
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "2"}, streamState, w1)
 	mustBlock(t, w1)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "2"}, streamState, w2)
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "2"}, wildcardStreamState, w2)
 	mustBlock(t, w2)
 	c.SetResources(map[string]types.Resource{
 		"b": testResource("b"),
@@ -327,16 +343,18 @@ func TestLinearGetResources(t *testing.T) {
 }
 
 func TestLinearVersionPrefix(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType, WithVersionPrefix("instance1-"))
 
 	w := make(chan Response, 1)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState.SetSubscribedResourceNames(map[string]struct{}{"a": {}})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	verifyResponse(t, w, "instance1-0", 0)
 
 	require.NoError(t, c.UpdateResource("a", testResource("a")))
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	verifyResponse(t, w, "instance1-1", 1)
+	streamState.SetResourceVersions(map[string]string{"a": ""})
 
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "instance1-1"}, streamState, w)
 	mustBlock(t, w)
@@ -344,32 +362,39 @@ func TestLinearVersionPrefix(t *testing.T) {
 }
 
 func TestLinearDeletion(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
 	w := make(chan Response, 1)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState.SetSubscribedResourceNames(map[string]struct{}{"a": {}})
 	c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 	require.NoError(t, c.DeleteResource("a"))
 	verifyResponse(t, w, "1", 0)
+	streamState.SetResourceVersions(map[string]string{})
 	checkWatchCount(t, c, "a", 0)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w)
+	wildcardStreamState := stream.NewStreamState(true, map[string]string{})
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, wildcardStreamState, w)
 	verifyResponse(t, w, "1", 1)
+	wildcardStreamState.SetResourceVersions(map[string]string{"a": ""})
 	checkWatchCount(t, c, "b", 0)
 	require.NoError(t, c.DeleteResource("b"))
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, streamState, w)
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, wildcardStreamState, w)
 	verifyResponse(t, w, "2", 0)
 	checkWatchCount(t, c, "b", 0)
+	wildcardStreamState.SetResourceVersions(map[string]string{})
 }
 
 func TestLinearWatchTwo(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
 	w := make(chan Response, 1)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	c.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	mustBlock(t, w)
 	w1 := make(chan Response, 1)
-	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w1)
+	wildcardStreamState := stream.NewStreamState(true, map[string]string{})
+	c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, wildcardStreamState, w1)
 	mustBlock(t, w1)
 	require.NoError(t, c.UpdateResource("a", testResource("aa")))
 	// should only get the modified resource
@@ -378,19 +403,21 @@ func TestLinearWatchTwo(t *testing.T) {
 }
 
 func TestLinearCancel(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType)
 	require.NoError(t, c.UpdateResource("a", testResource("a")))
 
 	// cancel watch-all
 	w := make(chan Response, 1)
-	cancel := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, streamState, w)
+	wildcardStreamState := stream.NewStreamState(true, map[string]string{})
+	cancel := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, wildcardStreamState, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
 	cancel()
 	checkWatchCount(t, c, "a", 0)
 
 	// cancel watch for "a"
+	streamState := stream.NewStreamState(false, map[string]string{})
+	streamState.SetSubscribedResourceNames(map[string]struct{}{"a": {}})
 	cancel = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, streamState, w)
 	mustBlock(t, w)
 	checkWatchCount(t, c, "a", 1)
@@ -401,10 +428,14 @@ func TestLinearCancel(t *testing.T) {
 	w2 := make(chan Response, 1)
 	w3 := make(chan Response, 1)
 	w4 := make(chan Response, 1)
+	stream2 := stream.NewStreamState(false, map[string]string{})
+	stream2.SetSubscribedResourceNames(map[string]struct{}{"b": {}})
+	stream3 := stream.NewStreamState(true, map[string]string{})
+	stream4 := stream.NewStreamState(true, map[string]string{})
 	cancel = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "1"}, streamState, w)
-	cancel2 := c.CreateWatch(&Request{ResourceNames: []string{"b"}, TypeUrl: testType, VersionInfo: "1"}, streamState, w2)
-	cancel3 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, streamState, w3)
-	cancel4 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, streamState, w4)
+	cancel2 := c.CreateWatch(&Request{ResourceNames: []string{"b"}, TypeUrl: testType, VersionInfo: "1"}, stream2, w2)
+	cancel3 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, stream3, w3)
+	cancel4 := c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "1"}, stream4, w4)
 	mustBlock(t, w)
 	mustBlock(t, w2)
 	mustBlock(t, w3)
@@ -426,7 +457,6 @@ func TestLinearCancel(t *testing.T) {
 // TODO(mattklein123): This test requires GOMAXPROCS or -parallel >= 100. This should be
 // rewritten to not require that. This is not the case in the GH actions environment.
 func TestLinearConcurrentSetWatch(t *testing.T) {
-	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType)
 	n := 50
 	for i := 0; i < 2*n; i++ {
@@ -441,6 +471,8 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 					id2 := fmt.Sprintf("%d", i-1)
 					t.Logf("request resources %q and %q", id, id2)
 					value := make(chan Response, 1)
+					streamState := stream.NewStreamState(false, map[string]string{})
+					streamState.SetSubscribedResourceNames(map[string]struct{}{id: {}, id2: {}})
 					c.CreateWatch(&Request{
 						// Only expect one to become stale
 						ResourceNames: []string{id, id2},
@@ -734,6 +766,7 @@ func TestLinearMixedWatches(t *testing.T) {
 	assert.Equal(t, 2, c.NumResources())
 
 	sotwState := stream.NewStreamState(false, nil)
+	sotwState.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w := make(chan Response, 1)
 	c.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: c.getVersion()}, sotwState, w)
 	mustBlock(t, w)
@@ -747,6 +780,7 @@ func TestLinearMixedWatches(t *testing.T) {
 	assert.NoError(t, err)
 	// This behavior is currently invalid for cds and lds, but due to a current limitation of linear cache sotw implementation
 	verifyResponse(t, w, c.getVersion(), 1)
+	sotwState.SetResourceVersions(map[string]string{"a": ""})
 	checkVersionMapNotSet(t, c)
 
 	c.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: c.getVersion()}, sotwState, w)

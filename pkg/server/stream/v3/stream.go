@@ -34,9 +34,6 @@ type StreamState struct { // nolint:golint,revive
 	// This field stores the last state sent to the client.
 	resourceVersions map[string]string
 
-	// knownResourceNames contains resource names that a client has received previously
-	knownResourceNames map[string]map[string]struct{}
-
 	// indicates whether the object has been modified since its creation
 	first bool
 }
@@ -92,22 +89,6 @@ func (s *StreamState) IsWildcard() bool {
 	return s.wildcard
 }
 
-func (s *StreamState) SetKnownResourceNames(url string, names map[string]struct{}) {
-	s.knownResourceNames[url] = names
-}
-
-func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
-	m := map[string]struct{}{}
-	for _, name := range names {
-		m[name] = struct{}{}
-	}
-	s.knownResourceNames[url] = m
-}
-
-func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
-	return s.knownResourceNames[url]
-}
-
 // NewStreamState initializes a stream state.
 func NewStreamState(wildcard bool, initialResourceVersions map[string]string) StreamState {
 	state := StreamState{
@@ -115,7 +96,6 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		subscribedResourceNames: map[string]struct{}{},
 		resourceVersions:        initialResourceVersions,
 		first:                   true,
-		knownResourceNames:      map[string]map[string]struct{}{},
 	}
 
 	if initialResourceVersions == nil {

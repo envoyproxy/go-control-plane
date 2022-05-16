@@ -63,15 +63,6 @@ type server struct {
 	streamCount int64
 }
 
-// Discovery response that is sent over GRPC stream
-// We need to record what resource names are already sent to a client
-// So if the client requests a new name we can respond back
-// regardless current snapshot version (even if it is not changed yet)
-type lastDiscoveryResponse struct {
-	nonce     string
-	resources map[string]struct{}
-}
-
 // process handles a bi-di stream request
 func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
@@ -80,9 +71,6 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	// unique nonce generator for req-resp pairs per xDS stream; the server
 	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
-
-	streamState := stream.NewStreamState(false, map[string]string{})
-	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
 
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
@@ -108,15 +96,6 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		// increment nonce
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
-
-		lastResponse := lastDiscoveryResponse{
-			nonce:     out.Nonce,
-			resources: make(map[string]struct{}),
-		}
-		for _, r := range resp.GetRequest().ResourceNames {
-			lastResponse.resources[r] = struct{}{}
-		}
-		lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
 		if s.callbacks != nil {
 			s.callbacks.OnStreamResponse(resp.GetContext(), streamID, resp.GetRequest(), out)
@@ -183,34 +162,34 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				}
 			}
 
-			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
-				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-					// Let's record Resource names that a client has received.
-					streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
-				}
-			}
-
 			typeURL := req.GetTypeUrl()
 			responder := make(chan cache.Response, 1)
-			if w, ok := watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
-				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
 
-					watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, streamState, responder),
-						response: responder,
-					})
+			var state stream.StreamState
+			if w, ok := watches.responders[typeURL]; ok {
+				if w.nonce != "" && w.nonce != nonce {
+					// The request received does not match the current state of the type, we ignore it and keep our current watch
+					continue
 				}
+				w.close()
+				state = w.state
 			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, streamState, responder),
-					response: responder,
-				})
+				// Initialize the state of the stream.
+				// Since there was no previous state, we know we're handling the first request of this type.
+				// We also set the stream as wildcard based on its legacy meaning (no resource name sent in resource_names_subscribe).
+				// If the state starts with this legacy mode, adding new resources will not unsubscribe from wildcard.
+				// It can still be done by explicitly unsubscribing from "*"
+				state = stream.NewStreamState(len(req.ResourceNames) == 0, nil)
 			}
+
+			// This update of registered resources must occur after the previous watch is closed if existing
+			// It would otherwise potentially leak watches in caches
+			s.registerResourceNames(req.ResourceNames, &state)
+			watches.addWatch(typeURL, &watch{
+				cancel:   s.cache.CreateWatch(req, state, responder),
+				response: responder,
+				state:    state,
+			})
 
 			// Recompute the dynamic select cases for this stream.
 			watches.recompute(s.ctx, reqCh)
@@ -226,8 +205,10 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			if err != nil {
 				return err
 			}
-
 			watches.responders[res.GetRequest().TypeUrl].nonce = nonce
+
+			rawResponse := value.Interface().(*cache.RawResponse)
+			watches.responders[res.GetRequest().TypeUrl].state.SetResourceVersions(rawResponse.NextVersionMap)
 		}
 	}
 }
@@ -254,4 +235,28 @@ func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 	}()
 
 	return s.process(stream, reqCh, typeURL)
+}
+
+func (s *server) registerResourceNames(resources []string, streamState *stream.StreamState) {
+	if len(resources) == 0 && streamState.IsWildcard() {
+		// The xDS protocol states that if there has never been any resource set, the request should be considered wildcard
+		// This would theoretically require keeping track on whether we ever became non-empty.
+		// As it is also technically allowed to return resources which have not been subscribed to, it is a best effort here.
+		return
+	}
+
+	// When resources are provided, they may still include the wildcard symbol '*', as well as potentially other resources
+	// This allows the client to subscribe/unsubscribe to wildcard during the stream lifespan.
+	wantsWildcard := false
+	wantedResources := make(map[string]struct{}, len(resources))
+	for _, resourceName := range resources {
+		// We do not track '*' as a resource name to avoid confusion in further processing and rely on the IsWildcard method instead
+		if resourceName == "*" {
+			wantsWildcard = true
+			continue
+		}
+		wantedResources[resourceName] = struct{}{}
+	}
+	streamState.SetWildcard(wantsWildcard)
+	streamState.SetSubscribedResourceNames(wantedResources)
 }

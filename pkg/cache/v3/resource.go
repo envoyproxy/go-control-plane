@@ -117,16 +117,16 @@ func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 
 // GetResourceReferences returns a map of dependent resources keyed by resource type, given a map of resources.
 // (EDS cluster names for CDS, RDS/SRDS routes names for LDS, RDS route names for SRDS).
-func GetResourceReferences(resources map[string]types.ResourceWithTTL) map[resource.Type]map[string]bool {
-	out := make(map[resource.Type]map[string]bool)
+func GetResourceReferences(resources map[string]types.ResourceWithTTL) map[resource.Type]map[string]struct{} {
+	out := make(map[resource.Type]map[string]struct{})
 	getResourceReferences(resources, out)
 
 	return out
 }
 
 // GetAllResourceReferences returns a map of dependent resources keyed by resources type, given all resources.
-func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[resource.Type]map[string]bool {
-	ret := map[resource.Type]map[string]bool{}
+func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[resource.Type]map[string]struct{} {
+	ret := map[resource.Type]map[string]struct{}{}
 
 	// We only check resources that we expect to have references to other resources.
 	responseTypesWithReferences := map[types.ResponseType]struct{}{
@@ -145,7 +145,7 @@ func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[r
 	return ret
 }
 
-func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[resource.Type]map[string]bool) {
+func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[resource.Type]map[string]struct{}) {
 	for _, res := range resources {
 		if res.Resource == nil {
 			continue
@@ -170,30 +170,30 @@ func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[r
 	}
 }
 
-func mapMerge(dst map[string]bool, src map[string]bool) {
-	for k, v := range src {
-		dst[k] = v
+func mapMerge(dst map[string]struct{}, src map[string]struct{}) {
+	for k := range src {
+		dst[k] = struct{}{}
 	}
 }
 
 // Clusters will reference either the endpoint's cluster name or ServiceName override.
-func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string]bool) {
-	endpoints := map[string]bool{}
+func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string]struct{}) {
+	endpoints := map[string]struct{}{}
 
 	switch typ := src.ClusterDiscoveryType.(type) {
 	case *cluster.Cluster_Type:
 		if typ.Type == cluster.Cluster_EDS {
 			if src.EdsClusterConfig != nil && src.EdsClusterConfig.ServiceName != "" {
-				endpoints[src.EdsClusterConfig.ServiceName] = true
+				endpoints[src.EdsClusterConfig.ServiceName] = struct{}{}
 			} else {
-				endpoints[src.Name] = true
+				endpoints[src.Name] = struct{}{}
 			}
 		}
 	}
 
 	if len(endpoints) > 0 {
 		if _, ok := out[resource.EndpointType]; !ok {
-			out[resource.EndpointType] = map[string]bool{}
+			out[resource.EndpointType] = map[string]struct{}{}
 		}
 
 		mapMerge(out[resource.EndpointType], endpoints)
@@ -201,8 +201,8 @@ func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string
 }
 
 // HTTP listeners will either reference ScopedRoutes or Routes.
-func getListenerReferences(src *listener.Listener, out map[resource.Type]map[string]bool) {
-	routes := map[string]bool{}
+func getListenerReferences(src *listener.Listener, out map[resource.Type]map[string]struct{}) {
+	routes := map[string]struct{}{}
 
 	// Extract route configuration names from HTTP connection manager.
 	for _, chain := range src.FilterChains {
@@ -218,34 +218,34 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 
 			// If we are using RDS, add the referenced the route name.
 			if name := config.GetRds().GetRouteConfigName(); name != "" {
-				routes[name] = true
+				routes[name] = struct{}{}
 			}
 
 			// If the scoped route mapping is embedded, add the referenced route resource names.
 			for _, s := range config.GetScopedRoutes().GetScopedRouteConfigurationsList().GetScopedRouteConfigurations() {
-				routes[s.RouteConfigurationName] = true
+				routes[s.RouteConfigurationName] = struct{}{}
 			}
 		}
 	}
 
 	if len(routes) > 0 {
 		if _, ok := out[resource.RouteType]; !ok {
-			out[resource.RouteType] = map[string]bool{}
+			out[resource.RouteType] = map[string]struct{}{}
 		}
 
 		mapMerge(out[resource.RouteType], routes)
 	}
 }
 
-func getScopedRouteReferences(src *route.ScopedRouteConfiguration, out map[resource.Type]map[string]bool) {
-	routes := map[string]bool{}
+func getScopedRouteReferences(src *route.ScopedRouteConfiguration, out map[resource.Type]map[string]struct{}) {
+	routes := map[string]struct{}{}
 
 	// For a scoped route configuration, the dependent resource is the RouteConfigurationName.
-	routes[src.RouteConfigurationName] = true
+	routes[src.RouteConfigurationName] = struct{}{}
 
 	if len(routes) > 0 {
 		if _, ok := out[resource.RouteType]; !ok {
-			out[resource.RouteType] = map[string]bool{}
+			out[resource.RouteType] = map[string]struct{}{}
 		}
 
 		mapMerge(out[resource.RouteType], routes)

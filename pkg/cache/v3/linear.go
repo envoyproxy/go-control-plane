@@ -114,26 +114,41 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 }
 
 func (cache *LinearCache) respond(value chan Response, staleResources []string) {
-	var resources []types.ResourceWithTTL
-	// TODO: optimize the resources slice creations across different clients
-	if len(staleResources) == 0 {
-		resources = make([]types.ResourceWithTTL, 0, len(cache.resources))
-		for _, resource := range cache.resources {
+	resources := make([]types.ResourceWithTTL, 0, len(staleResources))
+	resourceVersions := make(map[string]string, len(staleResources))
+	for _, name := range staleResources {
+		resource := cache.resources[name]
+		if resource != nil {
 			resources = append(resources, types.ResourceWithTTL{Resource: resource})
-		}
-	} else {
-		resources = make([]types.ResourceWithTTL, 0, len(staleResources))
-		for _, name := range staleResources {
-			resource := cache.resources[name]
-			if resource != nil {
-				resources = append(resources, types.ResourceWithTTL{Resource: resource})
-			}
+			resourceVersions[name] = ""
 		}
 	}
 	value <- &RawResponse{
-		Request:   &Request{TypeUrl: cache.typeURL},
-		Resources: resources,
-		Version:   cache.getVersion(),
+		Request:        &Request{TypeUrl: cache.typeURL},
+		Resources:      resources,
+		NextVersionMap: resourceVersions,
+		Version:        cache.getVersion(),
+	}
+}
+
+func (cache *LinearCache) respondWildcards(respChannels map[chan Response]struct{}) {
+	if len(respChannels) == 0 {
+		return
+	}
+
+	resources := make([]types.ResourceWithTTL, 0, len(cache.resources))
+	resourceVersions := make(map[string]string, len(cache.resources))
+	for name, resource := range cache.resources {
+		resources = append(resources, types.ResourceWithTTL{Resource: resource})
+		resourceVersions[name] = ""
+	}
+	for respChannel := range respChannels {
+		respChannel <- &RawResponse{
+			Request:        &Request{TypeUrl: cache.typeURL},
+			Resources:      resources,
+			NextVersionMap: resourceVersions,
+			Version:        cache.getVersion(),
+		}
 	}
 }
 
@@ -149,9 +164,8 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	for value, stale := range notifyList {
 		cache.respond(value, stale)
 	}
-	for value := range cache.watchAll {
-		cache.respond(value, nil)
-	}
+
+	cache.respondWildcards(cache.watchAll)
 	cache.watchAll = make(watches)
 
 	// Building the version map has a very high cost when using SetResources to do full updates.
@@ -302,11 +316,6 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 		value <- nil
 		return nil
 	}
-	// If the version is not up to date, check whether any requested resource has
-	// been updated between the last version and the current version. This avoids the problem
-	// of sending empty updates whenever an irrelevant resource changes.
-	stale := false
-	staleResources := []string{} // empty means all
 
 	// strip version prefix if it is present
 	var lastVersion uint64
@@ -320,26 +329,47 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
+	// If the version is not up to date, check whether any requested resource has
+	// been updated between the last version and the current version. This avoids the problem
+	// of sending empty updates whenever an irrelevant resource changes.
+	stale := false
+	var staleResources map[string]struct{} // empty means all
+
 	if err != nil {
+		// The request does not include a version or the version could not be parsed.
+		// It will send all resources matching the request with no regards to the version.
 		stale = true
-		staleResources = request.ResourceNames
-	} else if len(request.ResourceNames) == 0 {
+		if !streamState.IsWildcard() {
+			staleResources = streamState.GetSubscribedResourceNames()
+		}
+	} else if streamState.IsWildcard() {
 		stale = lastVersion != cache.version
 	} else {
-		for _, name := range request.ResourceNames {
+		staleResources = map[string]struct{}{}
+		for name := range streamState.GetSubscribedResourceNames() {
 			// When a resource is removed, its version defaults 0 and it is not considered stale.
 			if lastVersion < cache.versionVector[name] {
 				stale = true
-				staleResources = append(staleResources, name)
+				staleResources[name] = struct{}{}
 			}
 		}
 	}
+
 	if stale {
-		cache.respond(value, staleResources)
+		if streamState.IsWildcard() {
+			cache.respondWildcards(map[chan Response]struct{}{value: {}})
+		} else {
+			resourcesToSend := make([]string, 0, len(staleResources))
+			for name := range staleResources {
+				resourcesToSend = append(resourcesToSend, name)
+			}
+			cache.respond(value, resourcesToSend)
+		}
 		return nil
 	}
+
 	// Create open watches since versions are up to date.
-	if len(request.ResourceNames) == 0 {
+	if streamState.IsWildcard() {
 		cache.watchAll[value] = struct{}{}
 		return func() {
 			cache.mu.Lock()
@@ -347,7 +377,8 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 			delete(cache.watchAll, value)
 		}
 	}
-	for _, name := range request.ResourceNames {
+
+	for name := range streamState.GetSubscribedResourceNames() {
 		set, exists := cache.watches[name]
 		if !exists {
 			set = make(watches)
@@ -358,7 +389,10 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 	return func() {
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
-		for _, name := range request.ResourceNames {
+		// This creates a dependency on the streamstate not being altered between the call to CreateWatch
+		// and the call to the cancel method.
+		// It is currently enforced in the sotw server logic.
+		for name := range streamState.GetSubscribedResourceNames() {
 			set, exists := cache.watches[name]
 			if exists {
 				delete(set, value)
