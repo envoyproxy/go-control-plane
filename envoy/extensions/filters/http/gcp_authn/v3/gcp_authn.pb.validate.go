@@ -228,7 +228,16 @@ func (m *Audience) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for AudienceMap
+	if utf8.RuneCountInString(m.GetUrl()) < 1 {
+		err := AudienceValidationError{
+			field:  "Url",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return AudienceMultiError(errors)

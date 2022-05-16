@@ -211,6 +211,8 @@ type TlsParameters struct {
 	//
 	// If not specified, a default list will be used. Defaults are different for server (downstream) and
 	// client (upstream) TLS configurations.
+	// Defaults will change over time in response to security considerations; If you care, configure
+	// it instead of using the default.
 	//
 	// In non-FIPS builds, the default server cipher list is:
 	//
@@ -218,16 +220,8 @@ type TlsParameters struct {
 	//
 	//   [ECDHE-ECDSA-AES128-GCM-SHA256|ECDHE-ECDSA-CHACHA20-POLY1305]
 	//   [ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]
-	//   ECDHE-ECDSA-AES128-SHA
-	//   ECDHE-RSA-AES128-SHA
-	//   AES128-GCM-SHA256
-	//   AES128-SHA
 	//   ECDHE-ECDSA-AES256-GCM-SHA384
 	//   ECDHE-RSA-AES256-GCM-SHA384
-	//   ECDHE-ECDSA-AES256-SHA
-	//   ECDHE-RSA-AES256-SHA
-	//   AES256-GCM-SHA384
-	//   AES256-SHA
 	//
 	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default server cipher list is:
 	//
@@ -235,16 +229,8 @@ type TlsParameters struct {
 	//
 	//   ECDHE-ECDSA-AES128-GCM-SHA256
 	//   ECDHE-RSA-AES128-GCM-SHA256
-	//   ECDHE-ECDSA-AES128-SHA
-	//   ECDHE-RSA-AES128-SHA
-	//   AES128-GCM-SHA256
-	//   AES128-SHA
 	//   ECDHE-ECDSA-AES256-GCM-SHA384
 	//   ECDHE-RSA-AES256-GCM-SHA384
-	//   ECDHE-ECDSA-AES256-SHA
-	//   ECDHE-RSA-AES256-SHA
-	//   AES256-GCM-SHA384
-	//   AES256-SHA
 	//
 	// In non-FIPS builds, the default client cipher list is:
 	//
@@ -907,8 +893,12 @@ type CertificateValidationContext struct {
 	//   therefore this option must be used together with :ref:`trusted_ca
 	//   <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`.
 	MatchTypedSubjectAltNames []*SubjectAltNameMatcher `protobuf:"bytes,15,rep,name=match_typed_subject_alt_names,json=matchTypedSubjectAltNames,proto3" json:"match_typed_subject_alt_names,omitempty"`
-	// This field is deprecated in favor of ref:`match_typed_subject_alt_names
+	// This field is deprecated in favor of
+	// :ref:`match_typed_subject_alt_names
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.match_typed_subject_alt_names>`.
+	// Note that if both this field and :ref:`match_typed_subject_alt_names
 	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.match_typed_subject_alt_names>`
+	// are specified, the former (deprecated field) is ignored.
 	//
 	// Deprecated: Do not use.
 	MatchSubjectAltNames []*v31.StringMatcher `protobuf:"bytes,9,rep,name=match_subject_alt_names,json=matchSubjectAltNames,proto3" json:"match_subject_alt_names,omitempty"`

@@ -677,6 +677,8 @@ func (m *CustomizedAffinityEntry) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Header
+
 	// no validation rules for KeyName
 
 	// no validation rules for Subscribe
