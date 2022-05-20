@@ -388,6 +388,8 @@ func (m *RouteConfiguration) validate(all bool) error {
 
 	}
 
+	// no validation rules for IgnorePortInHostMatching
+
 	if len(errors) > 0 {
 		return RouteConfigurationMultiError(errors)
 	}
