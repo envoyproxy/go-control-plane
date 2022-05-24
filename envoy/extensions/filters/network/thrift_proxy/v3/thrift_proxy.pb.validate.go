@@ -387,6 +387,8 @@ func (m *ThriftProxy) validate(all bool) error {
 
 	}
 
+	// no validation rules for HeaderKeysPreserveCase
+
 	if len(errors) > 0 {
 		return ThriftProxyMultiError(errors)
 	}
