@@ -78,7 +78,6 @@ type RouteConfiguration struct {
 	// To allow setting overrides at the route or virtual host level, this order can be reversed
 	// by setting this option to true. Defaults to false.
 	//
-	// [#next-major-version: In the v3 API, this will default to true.]
 	MostSpecificHeaderMutationsWins bool `protobuf:"varint,10,opt,name=most_specific_header_mutations_wins,json=mostSpecificHeaderMutationsWins,proto3" json:"most_specific_header_mutations_wins,omitempty"`
 	// An optional boolean that specifies whether the clusters that the route
 	// table refers to will be validated by the cluster manager. If set to true
