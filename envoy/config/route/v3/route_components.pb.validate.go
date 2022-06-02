@@ -1531,7 +1531,17 @@ func (m *WeightedCluster) validate(all bool) error {
 	switch m.RandomValueSpecifier.(type) {
 
 	case *WeightedCluster_HeaderName:
-		// no validation rules for HeaderName
+
+		if !_WeightedCluster_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+			err := WeightedClusterValidationError{
+				field:  "HeaderName",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 	}
 
@@ -1612,6 +1622,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WeightedClusterValidationError{}
+
+var _WeightedCluster_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on ClusterSpecifierPlugin with the rules
 // defined in the proto definition for this message. If any rules are
