@@ -205,7 +205,7 @@ func (TrafficDirection) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_base_proto_rawDescGZIP(), []int{2}
 }
 
-// Describes the supported actions types for header append action.
+// [#not-implemented-hide:] Describes the supported actions types for header append action.
 type HeaderValueOption_HeaderAppendAction int32
 
 const (
