@@ -1194,6 +1194,8 @@ func (m *Route) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for StatPrefix
+
 	switch m.Action.(type) {
 
 	case *Route_Route:
