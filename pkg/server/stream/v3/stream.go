@@ -23,7 +23,7 @@ type DeltaStream interface {
 
 // StreamState will keep track of resource state per type on a stream.
 type StreamState struct { // nolint:golint,revive
-	// Indicates whether the stream currently has a wildcard watch
+	// Indicates whether the delta stream currently has a wildcard watch
 	wildcard bool
 
 	// Provides the list of resources explicitly requested by the client
@@ -41,14 +41,24 @@ type StreamState struct { // nolint:golint,revive
 	first bool
 }
 
+// GetSubscribedResourceNames returns the list of resources currently explicitly subscribed to
+// If the request is set to wildcard it may be empty
+// Currently populated only when using delta-xds
 func (s *StreamState) GetSubscribedResourceNames() map[string]struct{} {
 	return s.subscribedResourceNames
 }
 
+// SetSubscribedResourceNames is setting the list of resources currently explicitly subscribed to
+// It is decorrelated from the wildcard state of the stream
+// Currently used only when using delta-xds
 func (s *StreamState) SetSubscribedResourceNames(subscribedResourceNames map[string]struct{}) {
 	s.subscribedResourceNames = subscribedResourceNames
 }
 
+// WatchesResources returns whether at least one of the resource provided is currently watch by the stream
+// It is currently only applicable to delta-xds
+// If the request is wildcard, it will always return true
+// Otherwise it will compare the provided resources to the list of resources currently subscribed
 func (s *StreamState) WatchesResources(resourceNames map[string]struct{}) bool {
 	if s.IsWildcard() {
 		return true
