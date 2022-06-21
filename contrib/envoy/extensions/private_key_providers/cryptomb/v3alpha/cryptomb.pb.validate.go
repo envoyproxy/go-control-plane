@@ -111,12 +111,12 @@ func (m *CryptoMbPrivateKeyMethodConfig) validate(all bool) error {
 			errors = append(errors, err)
 		} else {
 
-			gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+			gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
 
-			if dur <= gt {
+			if dur < gte {
 				err := CryptoMbPrivateKeyMethodConfigValidationError{
 					field:  "PollDelay",
-					reason: "value must be greater than 0s",
+					reason: "value must be greater than or equal to 1ms",
 				}
 				if !all {
 					return err
