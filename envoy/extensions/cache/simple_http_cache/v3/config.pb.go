@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#extension: envoy.cache.simple_http_cache]
+// [#extension: envoy.extensions.http.cache.simple]
 type SimpleHttpCacheConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

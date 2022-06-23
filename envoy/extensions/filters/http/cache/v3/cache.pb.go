@@ -32,7 +32,7 @@ type CacheConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Config specific to the cache storage implementation.
-	// [#extension-category: envoy.filters.http.cache]
+	// [#extension-category: envoy.http.cache]
 	TypedConfig *any.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 	// List of matching rules that defines allowed *Vary* headers.
 	//
