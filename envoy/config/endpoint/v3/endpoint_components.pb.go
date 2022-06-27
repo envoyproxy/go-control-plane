@@ -137,9 +137,9 @@ type LbEndpoint struct {
 	// of the weights of all endpoints in the endpoint's locality to produce a
 	// percentage of traffic for the endpoint. This percentage is then further
 	// weighted by the endpoint's locality's load balancing weight from
-	// LocalityLbEndpoints. If unspecified, each host is presumed to have equal
-	// weight in a locality. The sum of the weights of all endpoints in the
-	// endpoint's locality must not exceed uint32_t maximal value (4294967295).
+	// LocalityLbEndpoints. If unspecified, will be treated as 1. The sum
+	// of the weights of all endpoints in the endpoint's locality must not
+	// exceed uint32_t maximal value (4294967295).
 	LoadBalancingWeight *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=load_balancing_weight,json=loadBalancingWeight,proto3" json:"load_balancing_weight,omitempty"`
 }
 
