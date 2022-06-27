@@ -355,33 +355,19 @@ func (m *StreamConfig) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetMemoryBufferBytesLimit()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, StreamConfigValidationError{
-					field:  "MemoryBufferBytesLimit",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, StreamConfigValidationError{
-					field:  "MemoryBufferBytesLimit",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetMemoryBufferBytesLimit()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return StreamConfigValidationError{
+	if wrapper := m.GetMemoryBufferBytesLimit(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			err := StreamConfigValidationError{
 				field:  "MemoryBufferBytesLimit",
-				reason: "embedded message failed validation",
-				cause:  err,
+				reason: "value must be greater than 0",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
+
 	}
 
 	if all {
