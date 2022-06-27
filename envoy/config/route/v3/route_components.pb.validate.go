@@ -2105,6 +2105,23 @@ func (m *RouteMatch) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
+	case *RouteMatch_PathTemplate:
+
+		if m.GetPathTemplate() != "" {
+
+			if l := utf8.RuneCountInString(m.GetPathTemplate()); l < 1 || l > 256 {
+				err := RouteMatchValidationError{
+					field:  "PathTemplate",
+					reason: "value length must be between 1 and 256 runes, inclusive",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+
 	default:
 		err := RouteMatchValidationError{
 			field:  "PathSpecifier",
@@ -2530,6 +2547,21 @@ func (m *RouteAction) validate(all bool) error {
 				cause:  err,
 			}
 		}
+	}
+
+	if m.GetPathTemplateRewrite() != "" {
+
+		if l := utf8.RuneCountInString(m.GetPathTemplateRewrite()); l < 1 || l > 256 {
+			err := RouteActionValidationError{
+				field:  "PathTemplateRewrite",
+				reason: "value length must be between 1 and 256 runes, inclusive",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
 	}
 
 	// no validation rules for AppendXForwardedHost
