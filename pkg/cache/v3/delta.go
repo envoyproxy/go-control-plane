@@ -53,29 +53,26 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 		}
 
 		// Compute resources for removal
+		// The resource version can be set to "" here to trigger a removal even if never returned before
 		for name := range state.GetResourceVersions() {
 			if _, ok := resources.resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
 			}
 		}
 	default:
-		// Reply only with the requested resources
-		nextVersionMap = make(map[string]string, len(state.GetResourceVersions()))
-		for name, prevVersion := range state.GetResourceVersions() {
+		nextVersionMap = make(map[string]string, len(state.GetSubscribedResourceNames()))
+		// state.GetResourceVersions() may include resources no longer subscribed
+		// In the current code this gets silently cleaned when updating the version map
+		for name := range state.GetSubscribedResourceNames() {
+			prevVersion, found := state.GetResourceVersions()[name]
 			if r, ok := resources.resourceMap[name]; ok {
 				nextVersion := resources.versionMap[name]
 				if prevVersion != nextVersion {
 					filtered = append(filtered, r)
 				}
 				nextVersionMap[name] = nextVersion
-			} else {
-				// We track non-existent resources for non-wildcard streams until the client explicitly unsubscribes from them.
-				nextVersionMap[name] = ""
-				// The version check is to make sure we are only sending an update once right after removal.
-				// If the client keeps the subscription, we skip the add for every subsequent response.
-				if prevVersion != "" {
-					toRemove = append(toRemove, name)
-				}
+			} else if found {
+				toRemove = append(toRemove, name)
 			}
 		}
 	}

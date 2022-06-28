@@ -300,7 +300,7 @@ func (cache *snapshotCache) ClearSnapshot(node string) {
 
 // nameSet creates a map from a string slice to value true.
 func nameSet(names []string) map[string]bool {
-	set := make(map[string]bool)
+	set := make(map[string]bool, len(names))
 	for _, name := range names {
 		set[name] = true
 	}
@@ -498,9 +498,9 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		watchID := cache.nextDeltaWatchID()
 
 		if exists {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q,  version %q", watchID, t, state.GetResourceVersions(), nodeID, snapshot.GetVersion(t))
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q,  version %q", watchID, t, state.GetSubscribedResourceNames(), nodeID, snapshot.GetVersion(t))
 		} else {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q", watchID, t, state.GetResourceVersions(), nodeID)
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q", watchID, t, state.GetSubscribedResourceNames(), nodeID)
 		}
 
 		info.setDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})

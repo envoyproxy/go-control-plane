@@ -487,13 +487,15 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 	err = c.UpdateResource("b", b)
 	assert.NoError(t, err)
 
-	state := stream.NewStreamState(false, map[string]string{"b": "", "c": ""}) // watching b and c - not interested in a
+	state := stream.NewStreamState(false, nil)
+	state.SetSubscribedResourceNames(map[string]struct{}{"b": {}, "c": {}}) // watching b and c - not interested in a
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}}, []string{})
 
-	state = stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
+	state = stream.NewStreamState(false, nil)
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
@@ -511,13 +513,15 @@ func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
 	err = c.UpdateResource("b", b)
 	assert.NoError(t, err)
 
-	state := stream.NewStreamState(false, map[string]string{"a": "", "b": hashB})
+	state := stream.NewStreamState(false, map[string]string{"b": hashB})
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil) // b is up to date and shouldn't be returned
 
 	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
@@ -543,7 +547,8 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	// There is currently no delta watch
 	checkVersionMapNotSet(t, c)
 
-	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
+	state := stream.NewStreamState(false, nil)
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
@@ -551,6 +556,7 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	checkVersionMapSet(t, c)
 
 	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
@@ -577,13 +583,15 @@ func TestLinearDeltaResourceDelete(t *testing.T) {
 	err = c.UpdateResource("b", b)
 	assert.NoError(t, err)
 
-	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
+	state := stream.NewStreamState(false, nil)
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w := make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
 
 	state = stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w = make(chan DeltaResponse, 1)
 	c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, state, w)
 	mustBlockDelta(t, w)
@@ -600,7 +608,8 @@ func TestLinearDeltaResourceDelete(t *testing.T) {
 func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	c := NewLinearCache(testType)
 
-	state := stream.NewStreamState(false, map[string]string{"a": "", "b": ""})
+	state := stream.NewStreamState(false, nil)
+	state.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	w := make(chan DeltaResponse, 1)
 	checkVersionMapNotSet(t, c)
 	assert.Equal(t, 0, c.NumResources())
@@ -745,6 +754,7 @@ func TestLinearMixedWatches(t *testing.T) {
 	checkVersionMapNotSet(t, c)
 
 	deltaState := stream.NewStreamState(false, map[string]string{"a": hashA, "b": hashB})
+	deltaState.SetSubscribedResourceNames(map[string]struct{}{"a": {}, "b": {}})
 	wd := make(chan DeltaResponse, 1)
 
 	// Initial update

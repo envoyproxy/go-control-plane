@@ -163,6 +163,10 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 		}
 
 		for id, watch := range cache.deltaWatches {
+			if !watch.StreamState.WatchesResources(modified) {
+				continue
+			}
+
 			res := cache.respondDelta(watch.Request, watch.Response, watch.StreamState)
 			if res != nil {
 				delete(cache.deltaWatches, id)
@@ -391,7 +395,7 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("[linear cache] open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
-				cache.typeURL, state.GetResourceVersions(), cache.getVersion())
+				cache.typeURL, state.GetSubscribedResourceNames(), cache.getVersion())
 		}
 
 		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: state}

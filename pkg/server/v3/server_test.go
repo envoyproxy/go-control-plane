@@ -41,7 +41,7 @@ type mockConfigWatcher struct {
 	counts         map[string]int
 	deltaCounts    map[string]int
 	responses      map[string][]cache.Response
-	deltaResponses map[string][]cache.DeltaResponse
+	deltaResources map[string]map[string]types.Resource
 	watches        int
 	deltaWatches   int
 
