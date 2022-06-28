@@ -7,6 +7,7 @@
 - Documentation rewrite in the `/docs` folder (#520)
 - Updated go module version to 1.16 (#536)
 - Exposed `ApiTypePrefix` (#553)
+- Envoy Protos Commit SHA: `97dfffde06115e58261dbab3707ad70d5c86ba1f`
 
 ### Added
 
