@@ -344,6 +344,7 @@ type Bootstrap struct {
 	PerfTracingFilePath string `protobuf:"bytes,33,opt,name=perf_tracing_file_path,json=perfTracingFilePath,proto3" json:"perf_tracing_file_path,omitempty"`
 	// Optional overriding of default regex engine.
 	// If the value is not specified, Google RE2 will be used by default.
+	// [#extension-category: envoy.regex_engines]
 	DefaultRegexEngine *v3.TypedExtensionConfig `protobuf:"bytes,34,opt,name=default_regex_engine,json=defaultRegexEngine,proto3" json:"default_regex_engine,omitempty"`
 }
 
