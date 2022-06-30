@@ -270,7 +270,8 @@ type FileSystemBufferFilterConfig struct {
 
 	// A configuration for an AsyncFileManager.
 	//
-	// If unset in route, vhost and listener, an exception will be thrown.
+	// If unset in route, vhost and listener, and the behavior is not ``bypass``
+	// in both directions, an Internal Server Error response will be sent.
 	ManagerConfig *v3.AsyncFileManagerConfig `protobuf:"bytes,1,opt,name=manager_config,json=managerConfig,proto3" json:"manager_config,omitempty"`
 	// An optional path to which the unlinked files should be written - this may
 	// determine which physical storage device will be used.
