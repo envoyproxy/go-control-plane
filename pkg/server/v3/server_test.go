@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -28,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	ep "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -38,17 +40,21 @@ import (
 )
 
 type mockConfigWatcher struct {
-	counts         map[string]int
-	deltaCounts    map[string]int
-	responses      map[string][]cache.Response
-	deltaResources map[string]map[string]types.Resource
-	watches        int
-	deltaWatches   int
+	counts          map[string]int
+	deltaCounts     map[string]int
+	responses       map[string][]cache.Response
+	deltaResources  map[string]map[string]types.Resource
+	watchAssertions func(req *discovery.DiscoveryRequest, state stream.StreamState)
+	watches         int
+	deltaWatches    int
 
 	mu *sync.RWMutex
 }
 
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, state stream.StreamState, out chan cache.Response) func() {
+	if config.watchAssertions != nil {
+		config.watchAssertions(req, state)
+	}
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
@@ -681,4 +687,164 @@ func TestCallbackError(t *testing.T) {
 			close(resp.recv)
 		})
 	}
+}
+
+func TestWildcardStreams(t *testing.T) {
+	config := makeMockConfigWatcher()
+	updateResponses := func(version string, port uint32, endpointNb int) {
+		var resources []types.ResourceWithTTL
+		nextVersions := map[string]string{}
+		for i := 0; i < endpointNb; i++ {
+			resources = append(resources, types.ResourceWithTTL{Resource: resource.MakeEndpoint("endpoints"+strconv.Itoa(i), port)})
+			nextVersions["endpoints"+strconv.Itoa(i)] = ""
+		}
+		config.responses = map[string][]cache.Response{
+			rsrc.EndpointType: {
+				&cache.RawResponse{
+					Version:        version,
+					Resources:      resources,
+					Request:        &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
+					NextVersionMap: nextVersions,
+				},
+			},
+		}
+	}
+
+	validateResponse := func(t *testing.T, replies <-chan *discovery.DiscoveryResponse, expectedResources []string) string {
+		t.Helper()
+		select {
+		case response := <-replies:
+			assert.Equal(t, rsrc.EndpointType, response.TypeUrl)
+			if assert.Equal(t, len(expectedResources), len(response.Resources)) {
+				var names []string
+				for _, pbResource := range response.Resources {
+					resource := &ep.ClusterLoadAssignment{}
+					err := pbResource.UnmarshalTo(resource)
+					if err != nil {
+						t.Errorf("failed to process returned resource, got error %v", err)
+					}
+					names = append(names, cache.GetResourceName(resource))
+				}
+				assert.ElementsMatch(t, names, expectedResources)
+			}
+			return response.Nonce
+		case <-time.After(1 * time.Second):
+			t.Fatalf("got no response")
+			return ""
+		}
+	}
+
+	t.Run("legacy still working", func(t *testing.T) {
+		resp := makeMockStream(t)
+		defer close(resp.recv)
+		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+		go func() {
+			err := s.StreamAggregatedResources(resp)
+			assert.NoError(t, err)
+		}()
+
+		updateResponses("1", 1234, 4)
+		config.watchAssertions = func(req *discovery.DiscoveryRequest, state stream.StreamState) {
+			t.Helper()
+			assert.True(t, state.IsWildcard())
+			assert.Empty(t, state.GetSubscribedResourceNames())
+			assert.Empty(t, state.GetResourceVersions())
+		}
+
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:    node,
+			TypeUrl: rsrc.EndpointType,
+		}
+
+		nonce := validateResponse(t, resp.sent, []string{"endpoints0", "endpoints1", "endpoints2", "endpoints3"})
+
+		// Send a new request, validate the previous state was properly passed and wildcard is still set
+		updateResponses("2", 2345, 4)
+		config.watchAssertions = func(req *discovery.DiscoveryRequest, state stream.StreamState) {
+			t.Helper()
+			assert.True(t, state.IsWildcard())
+			assert.Empty(t, state.GetSubscribedResourceNames())
+			assert.Len(t, state.GetResourceVersions(), 4)
+		}
+
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			ResponseNonce: nonce,
+			TypeUrl:       rsrc.EndpointType,
+		}
+
+		_ = validateResponse(t, resp.sent, []string{"endpoints0", "endpoints1", "endpoints2", "endpoints3"})
+	})
+
+	t.Run("* subscribtion/unsubscription support", func(t *testing.T) {
+		resp := makeMockStream(t)
+		defer close(resp.recv)
+		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+		go func() {
+			err := s.StreamAggregatedResources(resp)
+			assert.NoError(t, err)
+		}()
+
+		updateResponses("1", 1234, 1)
+		config.watchAssertions = func(req *discovery.DiscoveryRequest, state stream.StreamState) {
+			t.Helper()
+			assert.False(t, state.IsWildcard())
+			assert.Equal(t, map[string]struct{}{"endpoints0": {}}, state.GetSubscribedResourceNames())
+			assert.Empty(t, state.GetResourceVersions())
+		}
+
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			TypeUrl:       rsrc.EndpointType,
+			ResourceNames: []string{"endpoints0"},
+		}
+		nonce := validateResponse(t, resp.sent, []string{"endpoints0"})
+
+		updateResponses("2", 1234, 4)
+		config.watchAssertions = func(req *discovery.DiscoveryRequest, state stream.StreamState) {
+			t.Helper()
+			assert.True(t, state.IsWildcard())
+			assert.Equal(t, map[string]struct{}{"endpoints0": {}}, state.GetSubscribedResourceNames())
+			assert.Len(t, state.GetResourceVersions(), 1)
+		}
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			ResponseNonce: nonce,
+			TypeUrl:       rsrc.EndpointType,
+			ResourceNames: []string{"*", "endpoints0"},
+		}
+		nonce = validateResponse(t, resp.sent, []string{"endpoints0", "endpoints1", "endpoints2", "endpoints3"})
+
+		updateResponses("3", 1234, 2)
+		config.watchAssertions = func(req *discovery.DiscoveryRequest, state stream.StreamState) {
+			t.Helper()
+			assert.False(t, state.IsWildcard())
+			assert.Equal(t, map[string]struct{}{"endpoints0": {}, "endpoints1": {}}, state.GetSubscribedResourceNames())
+			assert.Len(t, state.GetResourceVersions(), 4)
+		}
+
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			ResponseNonce: nonce,
+			TypeUrl:       rsrc.EndpointType,
+			ResourceNames: []string{"endpoints0", "endpoints1"},
+		}
+		nonce = validateResponse(t, resp.sent, []string{"endpoints0", "endpoints1"})
+
+		updateResponses("3", 1234, 4)
+		config.watchAssertions = func(req *discovery.DiscoveryRequest, state stream.StreamState) {
+			t.Helper()
+			assert.True(t, state.IsWildcard())
+			assert.Equal(t, map[string]struct{}{}, state.GetSubscribedResourceNames())
+			assert.Len(t, state.GetResourceVersions(), 2)
+		}
+
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:          node,
+			ResponseNonce: nonce,
+			TypeUrl:       rsrc.EndpointType,
+			ResourceNames: []string{"*"},
+		}
+		_ = validateResponse(t, resp.sent, []string{"endpoints0", "endpoints1", "endpoints2", "endpoints3"})
+	})
 }

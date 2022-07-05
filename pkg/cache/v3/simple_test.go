@@ -354,6 +354,105 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	}
 }
 
+func TestSnapshotCacheWatchWildcard(t *testing.T) {
+	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	watches := make(map[string]chan cache.Response)
+	states := make(map[string]*stream.StreamState, len(testTypes))
+
+	createWatch := func(typeUrl string, request *discovery.DiscoveryRequest, state *stream.StreamState) {
+		watches[typeUrl] = make(chan cache.Response, 1)
+		c.CreateWatch(request, *state, watches[typeUrl])
+		states[typeUrl] = state
+	}
+	// Legacy wildcard
+	typ := rsrc.ClusterType
+	req, streamState := buildWatchRequest(typ, nil)
+	createWatch(typ, req, &streamState)
+
+	// Not wildcard with partial resources
+	typ = rsrc.RouteType
+	req, streamState = buildWatchRequest(typ, names[typ][:1])
+	createWatch(typ, req, &streamState)
+
+	// New wildcard with a resource set
+	typ = rsrc.ListenerType
+	req, streamState = buildWatchRequest(typ, names[typ])
+	req.ResourceNames = append(req.ResourceNames, "*")
+	streamState.SetWildcard(true)
+	createWatch(typ, req, &streamState)
+
+	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
+		t.Fatal(err)
+	}
+	for _, typ := range []string{rsrc.ClusterType, rsrc.RouteType, rsrc.ListenerType} {
+		t.Run(typ, func(t *testing.T) {
+			select {
+			case out := <-watches[typ]:
+				if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version {
+					t.Errorf("got version %q, want %q", gotVersion, fixture.version)
+				}
+				snapshot := fixture.snapshot()
+				expectedResources := snapshot.GetResourcesAndTTL(typ)
+				if typ == rsrc.RouteType {
+					expectedResources = map[string]types.ResourceWithTTL{
+						names[typ][0]: expectedResources[names[typ][0]],
+					}
+				}
+
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), expectedResources) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, expectedResources)
+				}
+				states[typ].SetResourceVersions(out.(*cache.RawResponse).NextVersionMap)
+			case <-time.After(time.Second):
+				t.Fatal("failed to receive snapshot response")
+			}
+		})
+	}
+
+	// open new watches with the latest version
+	for typ := range watches {
+		watches[typ] = make(chan cache.Response, 1)
+		resourceNames := []string{}
+		switch typ {
+		case rsrc.ClusterType:
+			// Nothing changing, confirm this doesn't reply
+			resourceNames = nil
+		case rsrc.RouteType:
+			// Transform the partial watch into a wildcard. This must return
+			states[typ].SetWildcard(true)
+			resourceNames = []string{names[typ][0], "*"}
+		case rsrc.ListenerType:
+			// Remove the wildcard and keep subscription to 1, this should not return
+			states[typ].SetWildcard(false)
+			resourceNames = []string{listenerName}
+		}
+
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: resourceNames, VersionInfo: fixture.version},
+			*states[typ], watches[typ])
+	}
+	if count := c.GetStatusInfo(key).GetNumWatches(); count != 2 {
+		t.Errorf("watches should be created for the latest version: %d", count)
+	}
+
+	for _, typ := range []string{rsrc.RouteType} {
+		t.Run(typ, func(t *testing.T) {
+			select {
+			case out := <-watches[typ]:
+				if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version {
+					t.Errorf("got version %q, want %q", gotVersion, fixture.version)
+				}
+				snapshot := fixture.snapshot()
+				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
+					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
+				}
+				states[typ].SetResourceVersions(out.(*cache.RawResponse).NextVersionMap)
+			case <-time.After(time.Second):
+				t.Fatal("failed to receive snapshot response")
+			}
+		})
+	}
+}
+
 func TestConcurrentSetWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	for i := 0; i < 50; i++ {
