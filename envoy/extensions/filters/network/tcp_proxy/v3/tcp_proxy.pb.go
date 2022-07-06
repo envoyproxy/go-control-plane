@@ -297,6 +297,22 @@ type TcpProxy_TunnelingConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The hostname to send in the synthesized CONNECT headers to the upstream proxy.
+	// This field evaluates command operators if set, otherwise returns hostname as is.
+	//
+	// Example: dynamically set hostname using downstream SNI
+	//
+	// .. code-block:: yaml
+	//
+	//    tunneling_config:
+	//      hostname: "%REQUESTED_SERVER_NAME%:443"
+	//
+	// Example: dynamically set hostname using dynamic metadata
+	//
+	// .. code-block: yaml
+	//
+	//    tunneling_config:
+	//      hostname: "%DYNAMIC_METADATA(tunnel:address)%"
+	//
 	Hostname string `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
 	// Use POST method instead of CONNECT method to tunnel the TCP stream.
 	// The 'protocol: bytestream' header is also NOT set for HTTP/2 to comply with the spec.
