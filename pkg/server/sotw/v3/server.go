@@ -168,23 +168,21 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			var state stream.StreamState
 			if w, ok := watches.responders[typeURL]; ok {
 				if w.nonce != "" && w.nonce != nonce {
-					// The request received does not match the current state of the type, we ignore it and keep our current watch
+					// The request received does not match the current state for the resource type, we ignore it and keep our current watch
 					continue
 				}
 				w.close()
 				state = w.state
 			} else {
 				// Initialize the state of the stream.
-				// Since there was no previous state, we know we're handling the first request of this type.
-				// We also set the stream as wildcard based on its legacy meaning (no resource name sent in resource_names_subscribe).
-				// If the state starts with this legacy mode, adding new resources will not unsubscribe from wildcard.
-				// It can still be done by explicitly unsubscribing from "*"
+				// Set the stream as wildcard based on its legacy meaning (no resource name sent in resource_names).
+				// Sending any resource later on without explicitly subscribing to wildcard will get out of wildcard mode.
 				state = stream.NewStreamState(len(req.ResourceNames) == 0, nil)
 			}
 
 			// This update of registered resources must occur after the previous watch is closed if existing
 			// It would otherwise potentially leak watches in caches
-			s.registerResourceNames(req.ResourceNames, &state)
+			state.RegisterSubscribedResources(req.ResourceNames)
 			watches.addWatch(typeURL, &watch{
 				cancel:   s.cache.CreateWatch(req, state, responder),
 				response: responder,
@@ -235,28 +233,4 @@ func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 	}()
 
 	return s.process(stream, reqCh, typeURL)
-}
-
-func (s *server) registerResourceNames(resources []string, streamState *stream.StreamState) {
-	if len(resources) == 0 && streamState.IsWildcard() {
-		// The xDS protocol states that if there has never been any resource set, the request should be considered wildcard
-		// This would theoretically require keeping track on whether we ever became non-empty.
-		// As it is also technically allowed to return resources which have not been subscribed to, it is a best effort here.
-		return
-	}
-
-	// When resources are provided, they may still include the wildcard symbol '*', as well as potentially other resources
-	// This allows the client to subscribe/unsubscribe to wildcard during the stream lifespan.
-	wantsWildcard := false
-	wantedResources := make(map[string]struct{}, len(resources))
-	for _, resourceName := range resources {
-		// We do not track '*' as a resource name to avoid confusion in further processing and rely on the IsWildcard method instead
-		if resourceName == "*" {
-			wantsWildcard = true
-			continue
-		}
-		wantedResources[resourceName] = struct{}{}
-	}
-	streamState.SetWildcard(wantsWildcard)
-	streamState.SetSubscribedResourceNames(wantedResources)
 }

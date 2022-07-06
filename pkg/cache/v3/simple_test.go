@@ -91,19 +91,27 @@ type logger struct {
 	t *testing.T
 }
 
-func (log logger) Debugf(format string, args ...interface{}) { log.t.Logf(format, args...) }
-func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
+func (log logger) Debugf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+func (log logger) Infof(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+func (log logger) Warnf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+func (log logger) Errorf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
 
-func buildWatchRequest(typeUrl string, resourceNames []string) (*discovery.DiscoveryRequest, stream.StreamState) {
-	subscribed := map[string]struct{}{}
-	for _, name := range resourceNames {
-		subscribed[name] = struct{}{}
-	}
+func buildWatchRequest(typeURL string, resourceNames []string) (*discovery.DiscoveryRequest, stream.StreamState) {
 	streamState := stream.NewStreamState(len(resourceNames) == 0, nil)
-	streamState.SetSubscribedResourceNames(subscribed)
-	return &discovery.DiscoveryRequest{TypeUrl: typeUrl, ResourceNames: resourceNames}, streamState
+	streamState.RegisterSubscribedResources(resourceNames)
+	return &discovery.DiscoveryRequest{TypeUrl: typeURL, ResourceNames: resourceNames}, streamState
 }
 
 func TestSnapshotCacheWithTTL(t *testing.T) {
@@ -359,27 +367,26 @@ func TestSnapshotCacheWatchWildcard(t *testing.T) {
 	watches := make(map[string]chan cache.Response)
 	states := make(map[string]*stream.StreamState, len(testTypes))
 
-	createWatch := func(typeUrl string, request *discovery.DiscoveryRequest, state *stream.StreamState) {
+	createWatch := func(typeUrl string, request *discovery.DiscoveryRequest, state stream.StreamState) {
 		watches[typeUrl] = make(chan cache.Response, 1)
-		c.CreateWatch(request, *state, watches[typeUrl])
-		states[typeUrl] = state
+		c.CreateWatch(request, state, watches[typeUrl])
+		states[typeUrl] = &state
 	}
 	// Legacy wildcard
 	typ := rsrc.ClusterType
 	req, streamState := buildWatchRequest(typ, nil)
-	createWatch(typ, req, &streamState)
+	createWatch(typ, req, streamState)
 
 	// Not wildcard with partial resources
 	typ = rsrc.RouteType
 	req, streamState = buildWatchRequest(typ, names[typ][:1])
-	createWatch(typ, req, &streamState)
+	createWatch(typ, req, streamState)
 
 	// New wildcard with a resource set
 	typ = rsrc.ListenerType
-	req, streamState = buildWatchRequest(typ, names[typ])
-	req.ResourceNames = append(req.ResourceNames, "*")
-	streamState.SetWildcard(true)
-	createWatch(typ, req, &streamState)
+	resources := append(names[typ], "*")
+	req, streamState = buildWatchRequest(typ, resources)
+	createWatch(typ, req, streamState)
 
 	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
 		t.Fatal(err)
@@ -419,14 +426,13 @@ func TestSnapshotCacheWatchWildcard(t *testing.T) {
 			resourceNames = nil
 		case rsrc.RouteType:
 			// Transform the partial watch into a wildcard. This must return
-			states[typ].SetWildcard(true)
 			resourceNames = []string{names[typ][0], "*"}
 		case rsrc.ListenerType:
 			// Remove the wildcard and keep subscription to 1, this should not return
-			states[typ].SetWildcard(false)
 			resourceNames = []string{listenerName}
 		}
 
+		states[typ].RegisterSubscribedResources(resourceNames)
 		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: resourceNames, VersionInfo: fixture.version},
 			*states[typ], watches[typ])
 	}
@@ -583,7 +589,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 
 	// Request additional resource with name=clusterName2 for same version
 	go func() {
-		streamState.SetSubscribedResourceNames(map[string]struct{}{clusterName: {}, clusterName2: {}})
+		streamState.RegisterSubscribedResources([]string{clusterName, clusterName2})
 		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
 			ResourceNames: []string{clusterName, clusterName2}}, streamState, watch)
 	}()

@@ -585,18 +585,8 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request *Request) (Respon
 			return nil, &types.SkipFetchError{}
 		}
 
-		// This code is duplicated from sotw/server.go
 		state := stream.NewStreamState(len(request.ResourceNames) == 0, nil)
-		wantedResources := make(map[string]struct{}, len(request.ResourceNames))
-		for _, resourceName := range request.ResourceNames {
-			if resourceName == "*" {
-				state.SetWildcard(true)
-				continue
-			}
-			wantedResources[resourceName] = struct{}{}
-		}
-		state.SetSubscribedResourceNames(wantedResources)
-
+		state.RegisterSubscribedResources(request.ResourceNames)
 		resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
 		out := createResponse(ctx, request, state, resources, version, false)
 		return out, nil

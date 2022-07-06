@@ -40,7 +40,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl:                typ,
-			ResourceNamesSubscribe: names[typ],
+			ResourceNamesSubscribe: nil,
 		}, stream.NewStreamState(true, nil), watches[typ])
 	}
 
@@ -226,7 +226,7 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.DeltaResponse)
 	state := stream.NewStreamState(false, nil)
-	state.SetSubscribedResourceNames(map[string]struct{}{names[rsrc.EndpointType][0]: {}})
+	state.SubscribeToResources(names[rsrc.EndpointType][:1])
 	c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 		Node: &core.Node{
 			Id: key,

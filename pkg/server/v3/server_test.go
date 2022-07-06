@@ -776,7 +776,7 @@ func TestWildcardStreams(t *testing.T) {
 		_ = validateResponse(t, resp.sent, []string{"endpoints0", "endpoints1", "endpoints2", "endpoints3"})
 	})
 
-	t.Run("* subscribtion/unsubscription support", func(t *testing.T) {
+	t.Run("* subscription/unsubscription support", func(t *testing.T) {
 		resp := makeMockStream(t)
 		defer close(resp.recv)
 		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})

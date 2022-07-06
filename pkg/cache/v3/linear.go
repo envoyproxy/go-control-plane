@@ -317,6 +317,12 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 		return nil
 	}
 
+	// If the version is not up to date, check whether any requested resource has
+	// been updated between the last version and the current version. This avoids the problem
+	// of sending empty updates whenever an irrelevant resource changes.
+	stale := false
+	var staleResources map[string]struct{}
+
 	// strip version prefix if it is present
 	var lastVersion uint64
 	var err error
@@ -329,15 +335,9 @@ func (cache *LinearCache) CreateWatch(request *Request, streamState stream.Strea
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	// If the version is not up to date, check whether any requested resource has
-	// been updated between the last version and the current version. This avoids the problem
-	// of sending empty updates whenever an irrelevant resource changes.
-	stale := false
-	var staleResources map[string]struct{} // empty means all
-
 	if err != nil {
 		// The request does not include a version or the version could not be parsed.
-		// It will send all resources matching the request with no regards to the version.
+		// Send all resources matching the request with no regards to the version.
 		stale = true
 		if !streamState.IsWildcard() {
 			staleResources = streamState.GetSubscribedResourceNames()

@@ -122,7 +122,7 @@ type RawResponse struct {
 	// Resources to be included in the response.
 	Resources []types.ResourceWithTTL
 
-	// NextVersionMap consists of updated version mappings after this response is applied
+	// NextVersionMap maps the resource name to the empty string for resources that were included in the response.
 	NextVersionMap map[string]string
 
 	// Whether this is a heartbeat response. For xDS versions that support TTL, this
