@@ -210,7 +210,7 @@ type Bootstrap struct {
 	// Optional duration between flushes to configured stats sinks. For
 	// performance reasons Envoy latches counters and only flushes counters and
 	// gauges at a periodic interval. If not specified the default is 5000ms (5
-	// seconds). Only one of `stats_flush_interval` or `stats_flush_on_admin`
+	// seconds). Only one of ``stats_flush_interval`` or ``stats_flush_on_admin``
 	// can be set.
 	// Duration must be at least 1ms and at most 5 min.
 	StatsFlushInterval *duration.Duration `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval,proto3" json:"stats_flush_interval,omitempty"`
@@ -621,8 +621,8 @@ type isBootstrap_StatsFlush interface {
 
 type Bootstrap_StatsFlushOnAdmin struct {
 	// Flush stats to sinks only when queried for on the admin interface. If set,
-	// a flush timer is not created. Only one of `stats_flush_on_admin` or
-	// `stats_flush_interval` can be set.
+	// a flush timer is not created. Only one of ``stats_flush_on_admin`` or
+	// ``stats_flush_interval`` can be set.
 	StatsFlushOnAdmin bool `protobuf:"varint,29,opt,name=stats_flush_on_admin,json=statsFlushOnAdmin,proto3,oneof"`
 }
 

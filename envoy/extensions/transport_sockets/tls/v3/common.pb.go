@@ -428,7 +428,7 @@ type TlsCertificate struct {
 	// directory for any file moves to support rotation. This currently only
 	// applies to dynamic secrets, when the *TlsCertificate* is delivered via SDS.
 	PrivateKey *v3.DataSource `protobuf:"bytes,2,opt,name=private_key,json=privateKey,proto3" json:"private_key,omitempty"`
-	// `Pkcs12` data containing TLS certificate, chain, and private key.
+	// ``Pkcs12`` data containing TLS certificate, chain, and private key.
 	//
 	// If *pkcs12* is a filesystem path, the file will be read, but no watch will
 	// be added to the parent directory, since *pkcs12* isn't used by SDS.
@@ -440,7 +440,7 @@ type TlsCertificate struct {
 	// and :ref:`pkcs12 <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.pkcs12>`
 	// fields will result in an error. Use :ref:`password
 	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.password>`
-	// to specify the password to unprotect the `PKCS12` data, if necessary.
+	// to specify the password to unprotect the ``PKCS12`` data, if necessary.
 	Pkcs12 *v3.DataSource `protobuf:"bytes,8,opt,name=pkcs12,proto3" json:"pkcs12,omitempty"`
 	// If specified, updates of file-based *certificate_chain* and *private_key*
 	// sources will be triggered by this watch. The certificate/key pair will be

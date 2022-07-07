@@ -23,7 +23,7 @@ const (
 )
 
 // StructMatcher provides a general interface to check if a given value is matched in
-// google.protobuf.Struct. It uses `path` to retrieve the value
+// google.protobuf.Struct. It uses ``path`` to retrieve the value
 // from the struct and then check if it's matched to the specified value.
 //
 // For example, for the following Struct:

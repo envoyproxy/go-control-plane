@@ -27,7 +27,7 @@ type Config struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// If true then requests with content type set to `application/x-protobuf` will be automatically converted to gRPC.
+	// If true then requests with content type set to ``application/x-protobuf`` will be automatically converted to gRPC.
 	// This works by prepending the payload data with the gRPC header frame, as defined by the wiring format, and
 	// Content-Type will be updated accordingly before sending the request.
 	// For the requests that went through this upgrade the filter will also strip the frame before forwarding the

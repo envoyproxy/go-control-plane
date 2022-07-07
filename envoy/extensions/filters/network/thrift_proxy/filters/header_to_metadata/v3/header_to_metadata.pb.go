@@ -297,7 +297,7 @@ type HeaderToMetadata_KeyValuePair_RegexValueRewrite struct {
 	//
 	// This is only used for on_present.
 	//
-	// Note: if the `value` field is non-empty this field should be empty.
+	// Note: if the ``value`` field is non-empty this field should be empty.
 	RegexValueRewrite *v3.RegexMatchAndSubstitute `protobuf:"bytes,4,opt,name=regex_value_rewrite,json=regexValueRewrite,proto3,oneof"`
 }
 

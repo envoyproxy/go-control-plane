@@ -47,7 +47,7 @@ type UuidRequestIdConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Whether the implementation alters the UUID to contain the trace sampling decision as per the
-	// `UuidRequestIdConfig` message documentation. This defaults to true. If disabled no
+	// ``UuidRequestIdConfig`` message documentation. This defaults to true. If disabled no
 	// modification to the UUID will be performed. It is important to note that if disabled,
 	// stable sampling of traces, access logs, etc. will no longer work and only random sampling will
 	// be possible.

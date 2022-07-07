@@ -200,8 +200,8 @@ type Listener struct {
 	// [#not-implemented-hide:]
 	AdditionalAddresses []*AdditionalAddress `protobuf:"bytes,33,rep,name=additional_addresses,json=additionalAddresses,proto3" json:"additional_addresses,omitempty"`
 	// Optional prefix to use on listener stats. If empty, the stats will be rooted at
-	// `listener.<address as string>.`. If non-empty, stats will be rooted at
-	// `listener.<stat_prefix>.`.
+	// ``listener.<address as string>.``. If non-empty, stats will be rooted at
+	// ``listener.<stat_prefix>.``.
 	StatPrefix string `protobuf:"bytes,28,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// A list of filter chains to consider for this listener. The
 	// :ref:`FilterChain <envoy_v3_api_msg_config.listener.v3.FilterChain>` with the most specific
@@ -259,7 +259,7 @@ type Listener struct {
 	ListenerFilters []*ListenerFilter `protobuf:"bytes,9,rep,name=listener_filters,json=listenerFilters,proto3" json:"listener_filters,omitempty"`
 	// The timeout to wait for all listener filters to complete operation. If the timeout is reached,
 	// the accepted socket is closed without a connection being created unless
-	// `continue_on_listener_filters_timeout` is set to true. Specify 0 to disable the
+	// ``continue_on_listener_filters_timeout`` is set to true. Specify 0 to disable the
 	// timeout. If not specified, a default timeout of 15s is used.
 	ListenerFiltersTimeout *duration.Duration `protobuf:"bytes,15,opt,name=listener_filters_timeout,json=listenerFiltersTimeout,proto3" json:"listener_filters_timeout,omitempty"`
 	// Whether a connection should be created when listener filters timeout. Default is false.
@@ -346,7 +346,7 @@ type Listener struct {
 	// it is recommended to disable the balance config in listener X to avoid the cost of balancing, and
 	// enable the balance config in Y1 and Y2 to balance the connections among the workers.
 	ConnectionBalanceConfig *Listener_ConnectionBalanceConfig `protobuf:"bytes,20,opt,name=connection_balance_config,json=connectionBalanceConfig,proto3" json:"connection_balance_config,omitempty"`
-	// Deprecated. Use `enable_reuse_port` instead.
+	// Deprecated. Use ``enable_reuse_port`` instead.
 	//
 	// Deprecated: Do not use.
 	ReusePort bool `protobuf:"varint,21,opt,name=reuse_port,json=reusePort,proto3" json:"reuse_port,omitempty"`

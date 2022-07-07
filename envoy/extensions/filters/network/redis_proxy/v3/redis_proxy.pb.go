@@ -314,17 +314,17 @@ func (x *RedisProxy) GetDownstreamAuthUsername() *v3.DataSource {
 
 // RedisProtocolOptions specifies Redis upstream protocol options. This object is used in
 // :ref:`typed_extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
-// keyed by the name `envoy.filters.network.redis_proxy`.
+// keyed by the name ``envoy.filters.network.redis_proxy``.
 type RedisProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Upstream server password as defined by the `requirepass` directive
-	// <https://redis.io/topics/config>`_ in the server's configuration file.
+	// Upstream server password as defined by the ``requirepass`` directive
+	// `<https://redis.io/topics/config>`_ in the server's configuration file.
 	AuthPassword *v3.DataSource `protobuf:"bytes,1,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
-	// Upstream server username as defined by the `user` directive
-	// <https://redis.io/topics/acl>`_ in the server's configuration file.
+	// Upstream server username as defined by the ``user`` directive
+	// `<https://redis.io/topics/acl>`_ in the server's configuration file.
 	AuthUsername *v3.DataSource `protobuf:"bytes,2,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 }
 
@@ -414,18 +414,18 @@ type RedisProxy_ConnPoolSettings struct {
 	// Recommended size (if enabled) is 1024 bytes.
 	MaxBufferSizeBeforeFlush uint32 `protobuf:"varint,4,opt,name=max_buffer_size_before_flush,json=maxBufferSizeBeforeFlush,proto3" json:"max_buffer_size_before_flush,omitempty"`
 	// The encoded request buffer is flushed N milliseconds after the first request has been
-	// encoded, unless the buffer size has already exceeded `max_buffer_size_before_flush`.
-	// If `max_buffer_size_before_flush` is not set, this flush timer is not used. Otherwise,
+	// encoded, unless the buffer size has already exceeded ``max_buffer_size_before_flush``.
+	// If ``max_buffer_size_before_flush`` is not set, this flush timer is not used. Otherwise,
 	// the timer should be set according to the number of clients, overall request rate and
 	// desired maximum latency for a single command. For example, if there are many requests
 	// being batched together at a high rate, the buffer will likely be filled before the timer
 	// fires. Alternatively, if the request rate is lower the buffer will not be filled as often
 	// before the timer fires.
-	// If `max_buffer_size_before_flush` is set, but `buffer_flush_timeout` is not, the latter
+	// If ``max_buffer_size_before_flush`` is set, but ``buffer_flush_timeout`` is not, the latter
 	// defaults to 3ms.
 	BufferFlushTimeout *duration.Duration `protobuf:"bytes,5,opt,name=buffer_flush_timeout,json=bufferFlushTimeout,proto3" json:"buffer_flush_timeout,omitempty"`
-	// `max_upstream_unknown_connections` controls how many upstream connections to unknown hosts
-	// can be created at any given time by any given worker thread (see `enable_redirection` for
+	// ``max_upstream_unknown_connections`` controls how many upstream connections to unknown hosts
+	// can be created at any given time by any given worker thread (see ``enable_redirection`` for
 	// more details). If the host is unknown and a connection cannot be created due to enforcing
 	// this limit, then redirection will fail and the original redirection error will be passed
 	// downstream unchanged. This limit defaults to 100.

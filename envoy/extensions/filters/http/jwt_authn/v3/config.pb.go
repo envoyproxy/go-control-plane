@@ -131,7 +131,7 @@ type JwtProvider struct {
 	//   ``x-goog-iap-jwt-assertion: <JWT>``.
 	//
 	FromHeaders []*JwtHeader `protobuf:"bytes,6,rep,name=from_headers,json=fromHeaders,proto3" json:"from_headers,omitempty"`
-	// JWT is sent in a query parameter. `jwt_params` represents the query parameter names.
+	// JWT is sent in a query parameter. ``jwt_params`` represents the query parameter names.
 	//
 	// For example, if config is:
 	//
@@ -145,7 +145,7 @@ type JwtProvider struct {
 	//    /path?jwt_token=<JWT>
 	//
 	FromParams []string `protobuf:"bytes,7,rep,name=from_params,json=fromParams,proto3" json:"from_params,omitempty"`
-	// JWT is sent in a cookie. `from_cookies` represents the cookie names to extract from.
+	// JWT is sent in a cookie. ``from_cookies`` represents the cookie names to extract from.
 	//
 	// For example, if config is:
 	//
@@ -154,7 +154,7 @@ type JwtProvider struct {
 	//   from_cookies:
 	//   - auth-token
 	//
-	// Then JWT will be extracted from `auth-token` cookie in the request.
+	// Then JWT will be extracted from ``auth-token`` cookie in the request.
 	//
 	FromCookies []string `protobuf:"bytes,13,rep,name=from_cookies,json=fromCookies,proto3" json:"from_cookies,omitempty"`
 	// This field specifies the header name to forward a successfully verified JWT payload to the
@@ -229,7 +229,7 @@ type JwtProvider struct {
 	//
 	HeaderInMetadata string `protobuf:"bytes,14,opt,name=header_in_metadata,json=headerInMetadata,proto3" json:"header_in_metadata,omitempty"`
 	// Specify the clock skew in seconds when verifying JWT time constraint,
-	// such as `exp`, and `nbf`. If not specified, default is 60 seconds.
+	// such as ``exp``, and ``nbf``. If not specified, default is 60 seconds.
 	ClockSkewSeconds uint32 `protobuf:"varint,10,opt,name=clock_skew_seconds,json=clockSkewSeconds,proto3" json:"clock_skew_seconds,omitempty"`
 	// Enables JWT cache, its size is specified by *jwt_cache_size*.
 	// Only valid JWT tokens are cached.
@@ -1196,7 +1196,7 @@ type RequirementRule_RequirementName struct {
 	// Use requirement_name to specify a Jwt requirement.
 	// This requirement_name MUST be specified at the
 	// :ref:`requirement_map <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map>`
-	// in `JwtAuthentication`.
+	// in ``JwtAuthentication``.
 	RequirementName string `protobuf:"bytes,3,opt,name=requirement_name,json=requirementName,proto3,oneof"`
 }
 
@@ -1205,7 +1205,7 @@ func (*RequirementRule_Requires) isRequirementRule_RequirementType() {}
 func (*RequirementRule_RequirementName) isRequirementRule_RequirementType() {}
 
 // This message specifies Jwt requirements based on stream_info.filterState.
-// This FilterState should use `Router::StringAccessor` object to set a string value.
+// This FilterState should use ``Router::StringAccessor`` object to set a string value.
 // Other HTTP filters can use it to specify Jwt requirements dynamically.
 //
 // Example:
@@ -1226,7 +1226,7 @@ type FilterStateRule struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The filter state name to retrieve the `Router::StringAccessor` object.
+	// The filter state name to retrieve the ``Router::StringAccessor`` object.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A map of string keys to requirements. The string key is the string value
 	// in the FilterState with the name specified in the *name* field above.
@@ -1389,7 +1389,7 @@ type JwtAuthentication struct {
 	BypassCorsPreflight bool `protobuf:"varint,4,opt,name=bypass_cors_preflight,json=bypassCorsPreflight,proto3" json:"bypass_cors_preflight,omitempty"`
 	// A map of unique requirement_names to JwtRequirements.
 	// :ref:`requirement_name <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.PerRouteConfig.requirement_name>`
-	// in `PerRouteConfig` uses this map to specify a JwtRequirement.
+	// in ``PerRouteConfig`` uses this map to specify a JwtRequirement.
 	RequirementMap map[string]*JwtRequirement `protobuf:"bytes,5,rep,name=requirement_map,json=requirementMap,proto3" json:"requirement_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -1538,7 +1538,7 @@ type PerRouteConfig_RequirementName struct {
 	// Use requirement_name to specify a JwtRequirement.
 	// This requirement_name MUST be specified at the
 	// :ref:`requirement_map <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map>`
-	// in `JwtAuthentication`. If no, the requests using this route will be rejected with 403.
+	// in ``JwtAuthentication``. If no, the requests using this route will be rejected with 403.
 	RequirementName string `protobuf:"bytes,2,opt,name=requirement_name,json=requirementName,proto3,oneof"`
 }
 

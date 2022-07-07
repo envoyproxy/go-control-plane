@@ -27,7 +27,7 @@ type TlsInspector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Populate `JA3` fingerprint hash using data from the TLS Client Hello packet. Default is false.
+	// Populate ``JA3`` fingerprint hash using data from the TLS Client Hello packet. Default is false.
 	EnableJa3Fingerprinting *wrappers.BoolValue `protobuf:"bytes,1,opt,name=enable_ja3_fingerprinting,json=enableJa3Fingerprinting,proto3" json:"enable_ja3_fingerprinting,omitempty"`
 }
 

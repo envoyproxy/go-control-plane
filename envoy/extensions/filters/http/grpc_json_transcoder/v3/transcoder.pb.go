@@ -26,15 +26,15 @@ type GrpcJsonTranscoder_UrlUnescapeSpec int32
 
 const (
 	// URL path parameters will not decode RFC 6570 reserved characters.
-	// For example, segment `%2f%23/%20%2523` is unescaped to `%2f%23/ %23`.
+	// For example, segment ``%2f%23/%20%2523`` is unescaped to ``%2f%23/ %23``.
 	GrpcJsonTranscoder_ALL_CHARACTERS_EXCEPT_RESERVED GrpcJsonTranscoder_UrlUnescapeSpec = 0
 	// URL path parameters will be fully URI-decoded except in
-	// cases of single segment matches in reserved expansion, where "%2F" will be
+	// cases of single segment matches in reserved expansion, where ``%2F`` will be
 	// left encoded.
-	// For example, segment `%2f%23/%20%2523` is unescaped to `%2f#/ %23`.
+	// For example, segment ``%2f%23/%20%2523`` is unescaped to ``%2f#/ %23``.
 	GrpcJsonTranscoder_ALL_CHARACTERS_EXCEPT_SLASH GrpcJsonTranscoder_UrlUnescapeSpec = 1
 	// URL path parameters will be fully URI-decoded.
-	// For example, segment `%2f%23/%20%2523` is unescaped to `/#/ %23`.
+	// For example, segment ``%2f%23/%20%2523`` is unescaped to ``/#/ %23``.
 	GrpcJsonTranscoder_ALL_CHARACTERS GrpcJsonTranscoder_UrlUnescapeSpec = 2
 )
 
@@ -200,8 +200,8 @@ type GrpcJsonTranscoder struct {
 	ConvertGrpcStatus bool `protobuf:"varint,9,opt,name=convert_grpc_status,json=convertGrpcStatus,proto3" json:"convert_grpc_status,omitempty"`
 	// URL unescaping policy.
 	// This spec is only applied when extracting variable with multiple segments in the URL path.
-	// For example, in case of `/foo/{x=*}/bar/{y=prefix/*}/{z=**}` `x` variable is single segment and `y` and `z` are multiple segments.
-	// For a path with `/foo/first/bar/prefix/second/third/fourth`, `x=first`, `y=prefix/second`, `z=third/fourth`.
+	// For example, in case of ``/foo/{x=*}/bar/{y=prefix/*}/{z=**}`` ``x`` variable is single segment and ``y`` and ``z`` are multiple segments.
+	// For a path with ``/foo/first/bar/prefix/second/third/fourth``, ``x=first``, ``y=prefix/second``, ``z=third/fourth``.
 	// If this setting is not specified, the value defaults to :ref:`ALL_CHARACTERS_EXCEPT_RESERVED<envoy_v3_api_enum_value_extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder.UrlUnescapeSpec.ALL_CHARACTERS_EXCEPT_RESERVED>`.
 	UrlUnescapeSpec GrpcJsonTranscoder_UrlUnescapeSpec `protobuf:"varint,10,opt,name=url_unescape_spec,json=urlUnescapeSpec,proto3,enum=envoy.extensions.filters.http.grpc_json_transcoder.v3.GrpcJsonTranscoder_UrlUnescapeSpec" json:"url_unescape_spec,omitempty"`
 	// If true, unescape '+' to space when extracting variables in query parameters.
@@ -213,9 +213,9 @@ type GrpcJsonTranscoder struct {
 	// According to the http template `syntax <https://github.com/googleapis/googleapis/blob/master/google/api/http.proto#L226-L231>`_,
 	// the custom verb is **":" LITERAL** at the end of http template.
 	//
-	// For a request with */foo/bar:baz* and *:baz* is not registered in any url_template, here is the behavior change
-	// - if the field is not set, *:baz* will not be treated as custom verb, so it will match **/foo/{x=*}**.
-	// - if the field is set, *:baz* is treated as custom verb,  so it will NOT match **/foo/{x=*}** since the template doesn't use any custom verb.
+	// For a request with ``/foo/bar:baz`` and ``:baz`` is not registered in any url_template, here is the behavior change
+	// - if the field is not set, ``:baz`` will not be treated as custom verb, so it will match ``/foo/{x=*}``.
+	// - if the field is set, ``:baz`` is treated as custom verb,  so it will NOT match ``/foo/{x=*}`` since the template doesn't use any custom verb.
 	MatchUnregisteredCustomVerb bool `protobuf:"varint,13,opt,name=match_unregistered_custom_verb,json=matchUnregisteredCustomVerb,proto3" json:"match_unregistered_custom_verb,omitempty"`
 	// Configure the behavior when handling requests that cannot be transcoded.
 	//

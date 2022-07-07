@@ -557,14 +557,14 @@ type Node struct {
 	Extensions []*Extension `protobuf:"bytes,9,rep,name=extensions,proto3" json:"extensions,omitempty"`
 	// Client feature support list. These are well known features described
 	// in the Envoy API repository for a given major version of an API. Client features
-	// use reverse DNS naming scheme, for example `com.acme.feature`.
+	// use reverse DNS naming scheme, for example ``com.acme.feature``.
 	// See :ref:`the list of features <client_features>` that xDS client may
 	// support.
 	ClientFeatures []string `protobuf:"bytes,10,rep,name=client_features,json=clientFeatures,proto3" json:"client_features,omitempty"`
 	// Known listening ports on the node as a generic hint to the management server
 	// for filtering :ref:`listeners <config_listeners>` to be returned. For example,
 	// if there is a listener bound to port 80, the list can optionally contain the
-	// SocketAddress `(0.0.0.0,80)`. The field is optional and just a hint.
+	// SocketAddress ``(0.0.0.0,80)``. The field is optional and just a hint.
 	//
 	// Deprecated: Do not use.
 	ListeningAddresses []*Address `protobuf:"bytes,11,rep,name=listening_addresses,json=listeningAddresses,proto3" json:"listening_addresses,omitempty"`
@@ -1099,7 +1099,7 @@ type HeaderValue struct {
 	//
 	// The same :ref:`format specifier <config_access_log_format>` as used for
 	// :ref:`HTTP access logging <config_access_log>` applies here, however
-	// unknown header values are replaced with the empty string instead of `-`.
+	// unknown header values are replaced with the empty string instead of ``-``.
 	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
@@ -1742,7 +1742,7 @@ func (*TransportSocket_TypedConfig) isTransportSocket_ConfigType() {}
 //   :ref:`FractionalPercent <envoy_v3_api_msg_type.v3.FractionalPercent>` proto represented as JSON/YAML
 //   and may also be represented as an integer with the assumption that the value is an integral
 //   percentage out of 100. For instance, a runtime key lookup returning the value "42" would parse
-//   as a `FractionalPercent` whose numerator is 42 and denominator is HUNDRED.
+//   as a ``FractionalPercent`` whose numerator is 42 and denominator is HUNDRED.
 type RuntimeFractionalPercent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

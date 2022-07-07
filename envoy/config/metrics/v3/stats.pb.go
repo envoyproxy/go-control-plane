@@ -312,7 +312,7 @@ type isStatsMatcher_StatsMatcher interface {
 }
 
 type StatsMatcher_RejectAll struct {
-	// If `reject_all` is true, then all stats are disabled. If `reject_all` is false, then all
+	// If ``reject_all`` is true, then all stats are disabled. If ``reject_all`` is false, then all
 	// stats are enabled.
 	RejectAll bool `protobuf:"varint,1,opt,name=reject_all,json=rejectAll,proto3,oneof"`
 }
@@ -501,7 +501,7 @@ type HistogramBucketSettings struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The stats that this rule applies to. The match is applied to the original stat name
-	// before tag-extraction, for example `cluster.exampleclustername.upstream_cx_length_ms`.
+	// before tag-extraction, for example ``cluster.exampleclustername.upstream_cx_length_ms``.
 	Match *v3.StringMatcher `protobuf:"bytes,1,opt,name=match,proto3" json:"match,omitempty"`
 	// Each value is the upper bound of a bucket. Each bucket must be greater than 0 and unique.
 	// The order of the buckets does not matter.
