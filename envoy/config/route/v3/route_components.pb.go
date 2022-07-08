@@ -411,11 +411,15 @@ type VirtualHost struct {
 	ResponseHeadersToRemove []string `protobuf:"bytes,11,rep,name=response_headers_to_remove,json=responseHeadersToRemove,proto3" json:"response_headers_to_remove,omitempty"`
 	// Indicates that the virtual host has a CORS policy.
 	Cors *CorsPolicy `protobuf:"bytes,8,opt,name=cors,proto3" json:"cors,omitempty"`
-	// The per_filter_config field can be used to provide virtual host-specific
-	// configurations for filters. The key should match the filter name, such as
-	// *envoy.filters.http.buffer* for the HTTP buffer filter. Use of this field is filter
-	// specific; see the :ref:`HTTP filter documentation <config_http_filters>`
-	// for if and how it is utilized.
+	// The per_filter_config field can be used to provide virtual host-specific configurations for filters.
+	// The key should match the :ref:`filter config name
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
+	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
+	// entry referred by the canonical filter name will be provided to the filters as fallback.
+	//
+	// Use of this field is filter specific;
+	// see the :ref:`HTTP filter documentation <config_http_filters>` for if and how it is utilized.
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
@@ -716,11 +720,15 @@ type Route struct {
 	Metadata *v31.Metadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Decorator for the matched route.
 	Decorator *Decorator `protobuf:"bytes,5,opt,name=decorator,proto3" json:"decorator,omitempty"`
-	// The typed_per_filter_config field can be used to provide route-specific
-	// configurations for filters. The key should match the filter name, such as
-	// *envoy.filters.http.buffer* for the HTTP buffer filter. Use of this field is filter
-	// specific; see the :ref:`HTTP filter documentation <config_http_filters>` for
-	// if and how it is utilized.
+	// The per_filter_config field can be used to provide route-specific configurations for filters.
+	// The key should match the :ref:`filter config name
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
+	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
+	// entry referred by the canonical filter name will be provided to the filters as fallback.
+	//
+	// Use of this field is filter specific;
+	// see the :ref:`HTTP filter documentation <config_http_filters>` for if and how it is utilized.
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
@@ -3842,11 +3850,16 @@ type WeightedCluster_ClusterWeight struct {
 	// Specifies a list of headers to be removed from responses when this cluster is selected
 	// through the enclosing :ref:`envoy_v3_api_msg_config.route.v3.RouteAction`.
 	ResponseHeadersToRemove []string `protobuf:"bytes,6,rep,name=response_headers_to_remove,json=responseHeadersToRemove,proto3" json:"response_headers_to_remove,omitempty"`
-	// The per_filter_config field can be used to provide weighted cluster-specific
-	// configurations for filters. The key should match the filter name, such as
-	// *envoy.filters.http.buffer* for the HTTP buffer filter. Use of this field is filter
-	// specific; see the :ref:`HTTP filter documentation <config_http_filters>`
-	// for if and how it is utilized.
+	// The per_filter_config field can be used to provide weighted cluster-specific configurations
+	// for filters.
+	// The key should match the :ref:`filter config name
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
+	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
+	// entry referred by the canonical filter name will be provided to the filters as fallback.
+	//
+	// Use of this field is filter specific;
+	// see the :ref:`HTTP filter documentation <config_http_filters>` for if and how it is utilized.
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
