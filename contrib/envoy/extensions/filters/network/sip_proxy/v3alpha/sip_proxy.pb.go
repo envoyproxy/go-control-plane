@@ -459,9 +459,9 @@ type LocalService struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	//The domain need to matched
+	// The domain need to matched
 	Domain string `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
-	//The parameter to get domain
+	// The parameter to get domain
 	Parameter string `protobuf:"bytes,2,opt,name=parameter,proto3" json:"parameter,omitempty"`
 }
 
