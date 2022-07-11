@@ -26,6 +26,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -68,9 +69,9 @@ type Callbacks interface {
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
 type CallbackFuncs struct {
 	StreamOpenFunc          func(context.Context, int64, string) error
-	StreamClosedFunc        func(int64)
+	StreamClosedFunc        func(int64, *core.Node)
 	DeltaStreamOpenFunc     func(context.Context, int64, string) error
-	DeltaStreamClosedFunc   func(int64)
+	DeltaStreamClosedFunc   func(int64, *core.Node)
 	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
 	StreamResponseFunc      func(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
@@ -91,9 +92,9 @@ func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL
 }
 
 // OnStreamClosed invokes StreamClosedFunc.
-func (c CallbackFuncs) OnStreamClosed(streamID int64) {
+func (c CallbackFuncs) OnStreamClosed(streamID int64, node *core.Node) {
 	if c.StreamClosedFunc != nil {
-		c.StreamClosedFunc(streamID)
+		c.StreamClosedFunc(streamID, node)
 	}
 }
 
@@ -107,9 +108,9 @@ func (c CallbackFuncs) OnDeltaStreamOpen(ctx context.Context, streamID int64, ty
 }
 
 // OnDeltaStreamClosed invokes DeltaStreamClosedFunc.
-func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64) {
+func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64, node *core.Node) {
 	if c.DeltaStreamClosedFunc != nil {
-		c.DeltaStreamClosedFunc(streamID)
+		c.DeltaStreamClosedFunc(streamID, node)
 	}
 }
 

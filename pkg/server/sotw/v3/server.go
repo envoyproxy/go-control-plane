@@ -41,7 +41,7 @@ type Callbacks interface {
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnStreamOpen(context.Context, int64, string) error
 	// OnStreamClosed is called immediately prior to closing an xDS stream with a stream ID.
-	OnStreamClosed(int64)
+	OnStreamClosed(int64, *core.Node)
 	// OnStreamRequest is called once a request is received on a stream.
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnStreamRequest(int64, *discovery.DiscoveryRequest) error
@@ -87,10 +87,13 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
 
+	// node may only be set on the first discovery request
+	var node = &core.Node{}
+
 	defer func() {
 		watches.close()
 		if s.callbacks != nil {
-			s.callbacks.OnStreamClosed(streamID)
+			s.callbacks.OnStreamClosed(streamID, node)
 		}
 	}()
 
@@ -129,9 +132,6 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			return err
 		}
 	}
-
-	// node may only be set on the first discovery request
-	var node = &core.Node{}
 
 	// recompute dynamic channels for this stream
 	watches.recompute(s.ctx, reqCh)
