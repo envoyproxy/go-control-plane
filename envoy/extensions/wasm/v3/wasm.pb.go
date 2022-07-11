@@ -350,7 +350,7 @@ type PluginConfig struct {
 	//	*PluginConfig_VmConfig
 	Vm isPluginConfig_Vm `protobuf_oneof:"vm"`
 	// Filter/service configuration used to configure or reconfigure a plugin
-	// (proxy_on_configuration).
+	// (``proxy_on_configure``).
 	// ``google.protobuf.Struct`` is serialized as JSON before
 	// passing it to the plugin. ``google.protobuf.BytesValue`` and
 	// ``google.protobuf.StringValue`` are passed directly without the wrapper.
