@@ -134,6 +134,7 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 		Request:   &Request{TypeUrl: cache.typeURL},
 		Resources: resources,
 		Version:   cache.getVersion(),
+		Ctx:       context.Background(),
 	}
 }
 
