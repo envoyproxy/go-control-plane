@@ -599,8 +599,8 @@ type HttpConnectionManager struct {
 	NormalizePath *wrappers.BoolValue `protobuf:"bytes,30,opt,name=normalize_path,json=normalizePath,proto3" json:"normalize_path,omitempty"`
 	// Determines if adjacent slashes in the path are merged into one before any processing of
 	// requests by HTTP filters or routing. This affects the upstream *:path* header as well. Without
-	// setting this option, incoming requests with path `//dir///file` will not match against route
-	// with `prefix` match set to `/dir`. Defaults to `false`. Note that slash merging is not part of
+	// setting this option, incoming requests with path ``//dir///file`` will not match against route
+	// with ``prefix`` match set to ``/dir``. Defaults to ``false``. Note that slash merging is not part of
 	// `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
 	// [#comment:TODO: This field is ignored when the
 	// :ref:`header validation configuration <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.typed_header_validation_config>`
@@ -641,10 +641,10 @@ type HttpConnectionManager struct {
 	// local port. This affects the upstream host header unless the method is
 	// CONNECT in which case if no filter adds a port the original port will be restored before headers are
 	// sent upstream.
-	// Without setting this option, incoming requests with host `example:443` will not match against
-	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to `example`. Defaults to `false`. Note that port removal is not part
+	// Without setting this option, incoming requests with host ``example:443`` will not match against
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to ``example``. Defaults to ``false``. Note that port removal is not part
 	// of `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
-	// Only one of `strip_matching_host_port` or `strip_any_host_port` can be set.
+	// Only one of ``strip_matching_host_port`` or ``strip_any_host_port`` can be set.
 	StripMatchingHostPort bool `protobuf:"varint,39,opt,name=strip_matching_host_port,json=stripMatchingHostPort,proto3" json:"strip_matching_host_port,omitempty"`
 	// Types that are assignable to StripPortMode:
 	//	*HttpConnectionManager_StripAnyHostPort
@@ -678,11 +678,11 @@ type HttpConnectionManager struct {
 	// Determines if trailing dot of the host should be removed from host/authority header before any
 	// processing of request by HTTP filters or routing.
 	// This affects the upstream host header.
-	// Without setting this option, incoming requests with host `example.com.` will not match against
-	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to `example.com`. Defaults to `false`.
+	// Without setting this option, incoming requests with host ``example.com.`` will not match against
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to ``example.com``. Defaults to ``false``.
 	// When the incoming request contains a host/authority header that includes a port number,
 	// setting this option will strip a trailing dot, if present, from the host section,
-	// leaving the port as is (e.g. host value `example.com.:443` will be updated to `example.com:443`).
+	// leaving the port as is (e.g. host value ``example.com.:443`` will be updated to ``example.com:443``).
 	StripTrailingHostDot bool `protobuf:"varint,47,opt,name=strip_trailing_host_dot,json=stripTrailingHostDot,proto3" json:"strip_trailing_host_dot,omitempty"`
 	// Proxy-Status HTTP response header configuration.
 	// If this config is set, the Proxy-Status HTTP response header field is
@@ -1131,10 +1131,10 @@ type HttpConnectionManager_StripAnyHostPort struct {
 	// of request by HTTP filters or routing.
 	// This affects the upstream host header unless the method is CONNECT in
 	// which case if no filter adds a port the original port will be restored before headers are sent upstream.
-	// Without setting this option, incoming requests with host `example:443` will not match against
-	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to `example`. Defaults to `false`. Note that port removal is not part
+	// Without setting this option, incoming requests with host ``example:443`` will not match against
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to ``example``. Defaults to ``false``. Note that port removal is not part
 	// of `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
-	// Only one of `strip_matching_host_port` or `strip_any_host_port` can be set.
+	// Only one of ``strip_matching_host_port`` or ``strip_any_host_port`` can be set.
 	StripAnyHostPort bool `protobuf:"varint,42,opt,name=strip_any_host_port,json=stripAnyHostPort,proto3,oneof"`
 }
 
@@ -1247,10 +1247,10 @@ type ResponseMapper struct {
 	Filter *v31.AccessLogFilter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
 	// The new response status code if specified.
 	StatusCode *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
-	// The new local reply body text if specified. It will be used in the `%LOCAL_REPLY_BODY%`
-	// command operator in the `body_format`.
+	// The new local reply body text if specified. It will be used in the ``%LOCAL_REPLY_BODY%``
+	// command operator in the ``body_format``.
 	Body *v3.DataSource `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
-	// A per mapper `body_format` to override the :ref:`body_format <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.LocalReplyConfig.body_format>`.
+	// A per mapper ``body_format`` to override the :ref:`body_format <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.LocalReplyConfig.body_format>`.
 	// It will be used when this mapper is matched.
 	BodyFormatOverride *v3.SubstitutionFormatString `protobuf:"bytes,4,opt,name=body_format_override,json=bodyFormatOverride,proto3" json:"body_format_override,omitempty"`
 	// HTTP headers to add to a local reply. This allows the response mapper to append, to add
@@ -2293,25 +2293,25 @@ type HttpConnectionManager_ProxyStatusConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// If true, the details field of the Proxy-Status header is not populated with stream_info.response_code_details.
-	// This value defaults to `false`, i.e. the `details` field is populated by default.
+	// This value defaults to ``false``, i.e. the ``details`` field is populated by default.
 	RemoveDetails bool `protobuf:"varint,1,opt,name=remove_details,json=removeDetails,proto3" json:"remove_details,omitempty"`
 	// If true, the details field of the Proxy-Status header will not contain
-	// connection termination details. This value defaults to `false`, i.e. the
-	// `details` field will contain connection termination details by default.
+	// connection termination details. This value defaults to ``false``, i.e. the
+	// ``details`` field will contain connection termination details by default.
 	RemoveConnectionTerminationDetails bool `protobuf:"varint,2,opt,name=remove_connection_termination_details,json=removeConnectionTerminationDetails,proto3" json:"remove_connection_termination_details,omitempty"`
 	// If true, the details field of the Proxy-Status header will not contain an
-	// enumeration of the Envoy ResponseFlags. This value defaults to `false`,
-	// i.e. the `details` field will contain a list of ResponseFlags by default.
+	// enumeration of the Envoy ResponseFlags. This value defaults to ``false``,
+	// i.e. the ``details`` field will contain a list of ResponseFlags by default.
 	RemoveResponseFlags bool `protobuf:"varint,3,opt,name=remove_response_flags,json=removeResponseFlags,proto3" json:"remove_response_flags,omitempty"`
 	// If true, overwrites the existing Status header with the response code
 	// recommended by the Proxy-Status spec.
-	// This value defaults to `false`, i.e. the HTTP response code is not
+	// This value defaults to ``false``, i.e. the HTTP response code is not
 	// overwritten.
 	SetRecommendedResponseCode bool `protobuf:"varint,4,opt,name=set_recommended_response_code,json=setRecommendedResponseCode,proto3" json:"set_recommended_response_code,omitempty"`
 	// The name of the proxy as it appears at the start of the Proxy-Status
 	// header.
 	//
-	// If neither of these values are set, this value defaults to `server_name`,
+	// If neither of these values are set, this value defaults to ``server_name``,
 	// which itself defaults to "envoy".
 	//
 	// Types that are assignable to ProxyName:
@@ -2406,13 +2406,13 @@ type isHttpConnectionManager_ProxyStatusConfig_ProxyName interface {
 }
 
 type HttpConnectionManager_ProxyStatusConfig_UseNodeId struct {
-	// If `use_node_id` is set, Proxy-Status headers will use the Envoy's node
+	// If ``use_node_id`` is set, Proxy-Status headers will use the Envoy's node
 	// ID as the name of the proxy.
 	UseNodeId bool `protobuf:"varint,5,opt,name=use_node_id,json=useNodeId,proto3,oneof"`
 }
 
 type HttpConnectionManager_ProxyStatusConfig_LiteralProxyName struct {
-	// If `literal_proxy_name` is set, Proxy-Status headers will use this
+	// If ``literal_proxy_name`` is set, Proxy-Status headers will use this
 	// value as the name of the proxy.
 	LiteralProxyName string `protobuf:"bytes,6,opt,name=literal_proxy_name,json=literalProxyName,proto3,oneof"`
 }

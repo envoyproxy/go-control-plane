@@ -266,8 +266,8 @@ type RateLimit struct {
 	// not respond back. When it is set to true, Envoy will not allow traffic in case of
 	// communication failure between rate limiting service and the proxy.
 	FailureModeDeny bool `protobuf:"varint,5,opt,name=failure_mode_deny,json=failureModeDeny,proto3" json:"failure_mode_deny,omitempty"`
-	// Specifies whether a `RESOURCE_EXHAUSTED` gRPC code must be returned instead
-	// of the default `UNAVAILABLE` gRPC code for a rate limited gRPC call. The
+	// Specifies whether a ``RESOURCE_EXHAUSTED`` gRPC code must be returned instead
+	// of the default ``UNAVAILABLE`` gRPC code for a rate limited gRPC call. The
 	// HTTP code will be 200 for a gRPC response.
 	RateLimitedAsResourceExhausted bool `protobuf:"varint,6,opt,name=rate_limited_as_resource_exhausted,json=rateLimitedAsResourceExhausted,proto3" json:"rate_limited_as_resource_exhausted,omitempty"`
 	// Configuration for an external rate limit service provider. If not
@@ -280,7 +280,7 @@ type RateLimit struct {
 	//   client in the current time-window followed by the description of the
 	//   quota policy. The values are returned by the rate limiting service in
 	//   :ref:`current_limit<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.current_limit>`
-	//   field. Example: `10, 10;w=1;name="per-ip", 1000;w=3600`.
+	//   field. Example: ``10, 10;w=1;name="per-ip", 1000;w=3600``.
 	// * ``X-RateLimit-Remaining`` - indicates the remaining requests in the
 	//   current time-window. The values are returned by the rate limiting service
 	//   in :ref:`limit_remaining<envoy_v3_api_field_service.ratelimit.v3.RateLimitResponse.DescriptorStatus.limit_remaining>`

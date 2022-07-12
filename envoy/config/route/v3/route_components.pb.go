@@ -374,10 +374,10 @@ type VirtualHost struct {
 	Domains []string `protobuf:"bytes,2,rep,name=domains,proto3" json:"domains,omitempty"`
 	// The list of routes that will be matched, in order, for incoming requests.
 	// The first route that matches will be used.
-	// Only one of this and `matcher` can be specified.
+	// Only one of this and ``matcher`` can be specified.
 	Routes []*Route `protobuf:"bytes,3,rep,name=routes,proto3" json:"routes,omitempty"`
 	// [#next-major-version: This should be included in a oneof with routes wrapped in a message.]
-	// The match tree to use when resolving route actions for incoming requests. Only one of this and `routes`
+	// The match tree to use when resolving route actions for incoming requests. Only one of this and ``routes``
 	// can be specified.
 	Matcher *v3.Matcher `protobuf:"bytes,21,opt,name=matcher,proto3" json:"matcher,omitempty"`
 	// Specifies the type of TLS enforcement the virtual host expects. If this option is not
@@ -411,11 +411,15 @@ type VirtualHost struct {
 	ResponseHeadersToRemove []string `protobuf:"bytes,11,rep,name=response_headers_to_remove,json=responseHeadersToRemove,proto3" json:"response_headers_to_remove,omitempty"`
 	// Indicates that the virtual host has a CORS policy.
 	Cors *CorsPolicy `protobuf:"bytes,8,opt,name=cors,proto3" json:"cors,omitempty"`
-	// The per_filter_config field can be used to provide virtual host-specific
-	// configurations for filters. The key should match the filter name, such as
-	// *envoy.filters.http.buffer* for the HTTP buffer filter. Use of this field is filter
-	// specific; see the :ref:`HTTP filter documentation <config_http_filters>`
-	// for if and how it is utilized.
+	// The per_filter_config field can be used to provide virtual host-specific configurations for filters.
+	// The key should match the :ref:`filter config name
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
+	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
+	// entry referred by the canonical filter name will be provided to the filters as fallback.
+	//
+	// Use of this field is filter specific;
+	// see the :ref:`HTTP filter documentation <config_http_filters>` for if and how it is utilized.
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
@@ -716,11 +720,15 @@ type Route struct {
 	Metadata *v31.Metadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Decorator for the matched route.
 	Decorator *Decorator `protobuf:"bytes,5,opt,name=decorator,proto3" json:"decorator,omitempty"`
-	// The typed_per_filter_config field can be used to provide route-specific
-	// configurations for filters. The key should match the filter name, such as
-	// *envoy.filters.http.buffer* for the HTTP buffer filter. Use of this field is filter
-	// specific; see the :ref:`HTTP filter documentation <config_http_filters>` for
-	// if and how it is utilized.
+	// The per_filter_config field can be used to provide route-specific configurations for filters.
+	// The key should match the :ref:`filter config name
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
+	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
+	// entry referred by the canonical filter name will be provided to the filters as fallback.
+	//
+	// Use of this field is filter specific;
+	// see the :ref:`HTTP filter documentation <config_http_filters>` for if and how it is utilized.
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
@@ -1819,7 +1827,7 @@ type RouteAction struct {
 	// or its default value (infinity) instead of
 	// :ref:`timeout <envoy_v3_api_field_config.route.v3.RouteAction.timeout>`, but limit the applied timeout
 	// to the maximum value specified here. If configured as 0, the maximum allowed timeout for
-	// gRPC requests is infinity. If not configured at all, the `grpc-timeout` header is not used
+	// gRPC requests is infinity. If not configured at all, the ``grpc-timeout`` header is not used
 	// and gRPC requests time out like any other requests using
 	// :ref:`timeout <envoy_v3_api_field_config.route.v3.RouteAction.timeout>` or its default.
 	// This can be used to prevent unexpected upstream request timeouts due to potentially long
@@ -1837,7 +1845,7 @@ type RouteAction struct {
 	// Deprecated: Do not use.
 	MaxGrpcTimeout *duration.Duration `protobuf:"bytes,23,opt,name=max_grpc_timeout,json=maxGrpcTimeout,proto3" json:"max_grpc_timeout,omitempty"`
 	// Deprecated by :ref:`grpc_timeout_header_offset <envoy_v3_api_field_config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_offset>`.
-	// If present, Envoy will adjust the timeout provided by the `grpc-timeout` header by subtracting
+	// If present, Envoy will adjust the timeout provided by the ``grpc-timeout`` header by subtracting
 	// the provided duration from the header. This is useful in allowing Envoy to set its global
 	// timeout to be less than that of the deadline imposed by the calling client, which makes it more
 	// likely that Envoy will handle the timeout instead of having the call canceled by the client.
@@ -2292,7 +2300,7 @@ type RouteAction_HostRewritePathRegex struct {
 	//         regex: "^/(.+)/.+$"
 	//       substitution: \1
 	//
-	// Would rewrite the host header to `envoyproxy.io` given the path `/envoyproxy.io/some/path`.
+	// Would rewrite the host header to ``envoyproxy.io`` given the path ``/envoyproxy.io/some/path``.
 	HostRewritePathRegex *v32.RegexMatchAndSubstitute `protobuf:"bytes,35,opt,name=host_rewrite_path_regex,json=hostRewritePathRegex,proto3,oneof"`
 }
 
@@ -2372,7 +2380,7 @@ type RetryPolicy struct {
 	RetriableStatusCodes []uint32 `protobuf:"varint,7,rep,packed,name=retriable_status_codes,json=retriableStatusCodes,proto3" json:"retriable_status_codes,omitempty"`
 	// Specifies parameters that control exponential retry back off. This parameter is optional, in which case the
 	// default base interval is 25 milliseconds or, if set, the current value of the
-	// `upstream.base_retry_backoff_ms` runtime parameter. The default maximum interval is 10 times
+	// ``upstream.base_retry_backoff_ms`` runtime parameter. The default maximum interval is 10 times
 	// the base interval. The documentation for :ref:`config_http_filters_router_x-envoy-max-retries`
 	// describes Envoy's back-off algorithm.
 	RetryBackOff *RetryPolicy_RetryBackOff `protobuf:"bytes,8,opt,name=retry_back_off,json=retryBackOff,proto3" json:"retry_back_off,omitempty"`
@@ -2381,7 +2389,7 @@ type RetryPolicy struct {
 	// return a response header like ``Retry-After`` or ``X-RateLimit-Reset`` to
 	// provide feedback to the client on how long to wait before retrying. If
 	// configured, this back-off strategy will be used instead of the
-	// default exponential back off strategy (configured using `retry_back_off`)
+	// default exponential back off strategy (configured using ``retry_back_off``)
 	// whenever a response includes the matching headers.
 	RateLimitedRetryBackOff *RetryPolicy_RateLimitedRetryBackOff `protobuf:"bytes,11,opt,name=rate_limited_retry_back_off,json=rateLimitedRetryBackOff,proto3" json:"rate_limited_retry_back_off,omitempty"`
 	// HTTP response headers that trigger a retry if present in the response. A retry will be
@@ -2607,10 +2615,10 @@ type RedirectAction struct {
 	unknownFields protoimpl.UnknownFields
 
 	// When the scheme redirection take place, the following rules apply:
-	//  1. If the source URI scheme is `http` and the port is explicitly
-	//     set to `:80`, the port will be removed after the redirection
-	//  2. If the source URI scheme is `https` and the port is explicitly
-	//     set to `:443`, the port will be removed after the redirection
+	//  1. If the source URI scheme is ``http`` and the port is explicitly
+	//     set to ``:80``, the port will be removed after the redirection
+	//  2. If the source URI scheme is ``https`` and the port is explicitly
+	//     set to ``:443``, the port will be removed after the redirection
 	//
 	// Types that are assignable to SchemeRewriteSpecifier:
 	//	*RedirectAction_HttpsRedirect
@@ -3115,7 +3123,7 @@ type VirtualCluster struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Specifies a list of header matchers to use for matching requests. Each specified header must
-	// match. The pseudo-headers `:path` and `:method` can be used to match the request path and
+	// match. The pseudo-headers ``:path`` and ``:method`` can be used to match the request path and
 	// method, respectively.
 	Headers []*HeaderMatcher `protobuf:"bytes,4,rep,name=headers,proto3" json:"headers,omitempty"`
 	// Specifies the name of the virtual cluster. The virtual cluster name as well
@@ -3842,11 +3850,16 @@ type WeightedCluster_ClusterWeight struct {
 	// Specifies a list of headers to be removed from responses when this cluster is selected
 	// through the enclosing :ref:`envoy_v3_api_msg_config.route.v3.RouteAction`.
 	ResponseHeadersToRemove []string `protobuf:"bytes,6,rep,name=response_headers_to_remove,json=responseHeadersToRemove,proto3" json:"response_headers_to_remove,omitempty"`
-	// The per_filter_config field can be used to provide weighted cluster-specific
-	// configurations for filters. The key should match the filter name, such as
-	// *envoy.filters.http.buffer* for the HTTP buffer filter. Use of this field is filter
-	// specific; see the :ref:`HTTP filter documentation <config_http_filters>`
-	// for if and how it is utilized.
+	// The per_filter_config field can be used to provide weighted cluster-specific configurations
+	// for filters.
+	// The key should match the :ref:`filter config name
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
+	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
+	// entry referred by the canonical filter name will be provided to the filters as fallback.
+	//
+	// Use of this field is filter specific;
+	// see the :ref:`HTTP filter documentation <config_http_filters>` for if and how it is utilized.
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
@@ -4153,7 +4166,7 @@ type RouteAction_RequestMirrorPolicy struct {
 	ClusterHeader string `protobuf:"bytes,5,opt,name=cluster_header,json=clusterHeader,proto3" json:"cluster_header,omitempty"`
 	// If not specified, all requests to the target cluster will be mirrored.
 	//
-	// If specified, this field takes precedence over the `runtime_key` field and requests must also
+	// If specified, this field takes precedence over the ``runtime_key`` field and requests must also
 	// fall under the percentage of matches indicated by this field.
 	//
 	// For some fraction N/D, a random number in the range [0,D) is selected. If the
@@ -4475,9 +4488,9 @@ type RouteAction_MaxStreamDuration struct {
 	// If present, and the request contains a `grpc-timeout header
 	// <https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md>`_, use that value as the
 	// *max_stream_duration*, but limit the applied timeout to the maximum value specified here.
-	// If set to 0, the `grpc-timeout` header is used without modification.
+	// If set to 0, the ``grpc-timeout`` header is used without modification.
 	GrpcTimeoutHeaderMax *duration.Duration `protobuf:"bytes,2,opt,name=grpc_timeout_header_max,json=grpcTimeoutHeaderMax,proto3" json:"grpc_timeout_header_max,omitempty"`
-	// If present, Envoy will adjust the timeout provided by the `grpc-timeout` header by
+	// If present, Envoy will adjust the timeout provided by the ``grpc-timeout`` header by
 	// subtracting the provided duration from the header. This is useful for allowing Envoy to set
 	// its global timeout to be less than that of the deadline imposed by the calling client, which
 	// makes it more likely that Envoy will handle the timeout instead of having the call canceled
@@ -5053,8 +5066,8 @@ type RetryPolicy_RetryBackOff struct {
 	// back-off algorithm.
 	BaseInterval *duration.Duration `protobuf:"bytes,1,opt,name=base_interval,json=baseInterval,proto3" json:"base_interval,omitempty"`
 	// Specifies the maximum interval between retries. This parameter is optional, but must be
-	// greater than or equal to the `base_interval` if set. The default is 10 times the
-	// `base_interval`. See :ref:`config_http_filters_router_x-envoy-max-retries` for a discussion
+	// greater than or equal to the ``base_interval`` if set. The default is 10 times the
+	// ``base_interval``. See :ref:`config_http_filters_router_x-envoy-max-retries` for a discussion
 	// of Envoy's back-off algorithm.
 	MaxInterval *duration.Duration `protobuf:"bytes,2,opt,name=max_interval,json=maxInterval,proto3" json:"max_interval,omitempty"`
 }
@@ -5786,13 +5799,13 @@ type RateLimit_Action_MaskedRemoteAddress struct {
 
 	// Length of prefix mask len for IPv4 (e.g. 0, 32).
 	// Defaults to 32 when unset.
-	// For example, trusted address from x-forwarded-for is `192.168.1.1`,
+	// For example, trusted address from x-forwarded-for is ``192.168.1.1``,
 	// the descriptor entry is ("masked_remote_address", "192.168.1.1/32");
 	// if mask len is 24, the descriptor entry is ("masked_remote_address", "192.168.1.0/24").
 	V4PrefixMaskLen *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=v4_prefix_mask_len,json=v4PrefixMaskLen,proto3" json:"v4_prefix_mask_len,omitempty"`
 	// Length of prefix mask len for IPv6 (e.g. 0, 128).
 	// Defaults to 128 when unset.
-	// For example, trusted address from x-forwarded-for is `2001:abcd:ef01:2345:6789:abcd:ef01:234`,
+	// For example, trusted address from x-forwarded-for is ``2001:abcd:ef01:2345:6789:abcd:ef01:234``,
 	// the descriptor entry is ("masked_remote_address", "2001:abcd:ef01:2345:6789:abcd:ef01:234/128");
 	// if mask len is 64, the descriptor entry is ("masked_remote_address", "2001:abcd:ef01:2345::/64").
 	V6PrefixMaskLen *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=v6_prefix_mask_len,json=v6PrefixMaskLen,proto3" json:"v6_prefix_mask_len,omitempty"`
@@ -5917,7 +5930,7 @@ type RateLimit_Action_HeaderValueMatch struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The key to use in the descriptor entry. Defaults to `header_match`.
+	// The key to use in the descriptor entry. Defaults to ``header_match``.
 	DescriptorKey string `protobuf:"bytes,4,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
 	// The value to use in the descriptor entry.
 	DescriptorValue string `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue,proto3" json:"descriptor_value,omitempty"`

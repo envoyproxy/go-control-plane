@@ -128,6 +128,7 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 		Resources:      resources,
 		NextVersionMap: resourceVersions,
 		Version:        cache.getVersion(),
+		Ctx:            context.Background(),
 	}
 }
 
@@ -148,6 +149,7 @@ func (cache *LinearCache) respondWildcards(respChannels map[chan Response]struct
 			Resources:      resources,
 			NextVersionMap: resourceVersions,
 			Version:        cache.getVersion(),
+			Ctx:            context.Background(),
 		}
 	}
 }

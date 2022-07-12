@@ -94,17 +94,17 @@ type Hyperscan_Regex struct {
 	Id uint32 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Matching will be performed case-insensitively.
 	//
-	// The expression may still use PCRE tokens (notably `(?i)` and `(?-i)`) to switch
+	// The expression may still use PCRE tokens (notably ``(?i)`` and ``(?-i)``) to switch
 	// case-insensitive matching on and off.
 	Caseless bool `protobuf:"varint,3,opt,name=caseless,proto3" json:"caseless,omitempty"`
-	// Matching a `.` will not exclude newlines.
+	// Matching a ``.`` will not exclude newlines.
 	DotAll bool `protobuf:"varint,4,opt,name=dot_all,json=dotAll,proto3" json:"dot_all,omitempty"`
-	// `^` and `$` anchors match any newlines in data.
+	// ``^`` and ``$`` anchors match any newlines in data.
 	Multiline bool `protobuf:"varint,5,opt,name=multiline,proto3" json:"multiline,omitempty"`
 	// Allow expressions which can match against an empty string.
 	//
 	// This option instructs the compiler to allow expressions that can match against empty buffers,
-	// such as `.?`, `.*`, `(a|)`. Since Hyperscan can return every possible match for an expression,
+	// such as ``.?``, ``.*``, ``(a|)``. Since Hyperscan can return every possible match for an expression,
 	// such expressions generally execute very slowly.
 	AllowEmpty bool `protobuf:"varint,6,opt,name=allow_empty,json=allowEmpty,proto3" json:"allow_empty,omitempty"`
 	// Treat the pattern as a sequence of UTF-8 characters.
@@ -112,14 +112,14 @@ type Hyperscan_Regex struct {
 	// Use Unicode properties for character classes.
 	//
 	// This option instructs Hyperscan to use Unicode properties, rather than the default ASCII
-	// interpretations, for character mnemonics like `\w` and `\s` as well as the POSIX character
-	// classes. It is only meaningful in conjunction with `utf8`.
+	// interpretations, for character mnemonics like ``\w`` and ``\s`` as well as the POSIX character
+	// classes. It is only meaningful in conjunction with ``utf8``.
 	Ucp bool `protobuf:"varint,8,opt,name=ucp,proto3" json:"ucp,omitempty"`
 	// Logical combination.
 	//
 	// This option instructs Hyperscan to parse this expression as logical combination syntax.
 	// Logical constraints consist of operands, operators and parentheses. The operands are
-	// expression indices, and operators can be `!`, `&` or `|`.
+	// expression indices, and operators can be ``!``, ``&`` or ``|``.
 	Combination bool `protobuf:"varint,9,opt,name=combination,proto3" json:"combination,omitempty"`
 	// Don’t do any match reporting.
 	//

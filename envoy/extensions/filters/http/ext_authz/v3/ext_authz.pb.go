@@ -87,7 +87,7 @@ type ExtAuthz struct {
 	// Specifies a list of metadata namespaces whose values, if present, will be passed to the
 	// ext_authz service. :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>` is passed as an *protobuf::Any*.
 	//
-	// It works in a way similar to `metadata_context_namespaces` but allows envoy and external authz server to share the protobuf message definition
+	// It works in a way similar to ``metadata_context_namespaces`` but allows envoy and external authz server to share the protobuf message definition
 	// in order to do a safe parsing.
 	//
 	TypedMetadataContextNamespaces []string `protobuf:"bytes,16,rep,name=typed_metadata_context_namespaces,json=typedMetadataContextNamespaces,proto3" json:"typed_metadata_context_namespaces,omitempty"`

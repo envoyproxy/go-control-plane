@@ -170,9 +170,9 @@ type VmConfig struct {
 	// The Wasm code that Envoy will execute.
 	Code *v3.AsyncDataSource `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
 	// The Wasm configuration used in initialization of a new VM
-	// (proxy_on_start). `google.protobuf.Struct` is serialized as JSON before
-	// passing it to the plugin. `google.protobuf.BytesValue` and
-	// `google.protobuf.StringValue` are passed directly without the wrapper.
+	// (proxy_on_start). ``google.protobuf.Struct`` is serialized as JSON before
+	// passing it to the plugin. ``google.protobuf.BytesValue`` and
+	// ``google.protobuf.StringValue`` are passed directly without the wrapper.
 	Configuration *any.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
 	// Allow the wasm file to include pre-compiled code on VMs which support it.
 	// Warning: this should only be enable for trusted sources as the precompiled code is not
@@ -350,10 +350,10 @@ type PluginConfig struct {
 	//	*PluginConfig_VmConfig
 	Vm isPluginConfig_Vm `protobuf_oneof:"vm"`
 	// Filter/service configuration used to configure or reconfigure a plugin
-	// (proxy_on_configuration).
-	// `google.protobuf.Struct` is serialized as JSON before
-	// passing it to the plugin. `google.protobuf.BytesValue` and
-	// `google.protobuf.StringValue` are passed directly without the wrapper.
+	// (``proxy_on_configure``).
+	// ``google.protobuf.Struct`` is serialized as JSON before
+	// passing it to the plugin. ``google.protobuf.BytesValue`` and
+	// ``google.protobuf.StringValue`` are passed directly without the wrapper.
 	Configuration *any.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
 	// If there is a fatal error on the VM (e.g. exception, abort(), on_start or on_configure return false),
 	// then all plugins associated with the VM will either fail closed (by default), e.g. by returning an HTTP 503 error,

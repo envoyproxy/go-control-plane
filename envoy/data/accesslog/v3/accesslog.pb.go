@@ -458,8 +458,8 @@ type AccessLogCommon struct {
 	// for example the x-forwarder-for header, proxy protocol, etc.
 	DownstreamDirectRemoteAddress *v3.Address `protobuf:"bytes,20,opt,name=downstream_direct_remote_address,json=downstreamDirectRemoteAddress,proto3" json:"downstream_direct_remote_address,omitempty"`
 	// Map of filter state in stream info that have been configured to be logged. If the filter
-	// state serialized to any message other than `google.protobuf.Any` it will be packed into
-	// `google.protobuf.Any`.
+	// state serialized to any message other than ``google.protobuf.Any`` it will be packed into
+	// ``google.protobuf.Any``.
 	FilterStateObjects map[string]*any.Any `protobuf:"bytes,21,rep,name=filter_state_objects,json=filterStateObjects,proto3" json:"filter_state_objects,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// A list of custom tags, which annotate logs with additional information.
 	// To configure this value, users should configure

@@ -314,14 +314,14 @@ type UpstreamHttpProtocolOptions struct {
 	// Automatic validate upstream presented certificate for new upstream connections based on the
 	// downstream HTTP host/authority header or any other arbitrary header when :ref:`override_auto_sni_header <envoy_v3_api_field_config.core.v3.UpstreamHttpProtocolOptions.override_auto_sni_header>`
 	// is set, as seen by the :ref:`router filter <config_http_filters_router>`.
-	// This field is intended to be set with `auto_sni` field.
+	// This field is intended to be set with ``auto_sni`` field.
 	AutoSanValidation bool `protobuf:"varint,2,opt,name=auto_san_validation,json=autoSanValidation,proto3" json:"auto_san_validation,omitempty"`
 	// An optional alternative to the host/authority header to be used for setting the SNI value.
 	// It should be a valid downstream HTTP header, as seen by the
 	// :ref:`router filter <config_http_filters_router>`.
 	// If unset, host/authority header will be used for populating the SNI. If the specified header
 	// is not found or the value is empty, host/authority header will be used instead.
-	// This field is intended to be set with `auto_sni` and/or `auto_san_validation` fields.
+	// This field is intended to be set with ``auto_sni`` and/or ``auto_san_validation`` fields.
 	// If none of these fields are set then setting this would be a no-op.
 	OverrideAutoSniHeader string `protobuf:"bytes,3,opt,name=override_auto_sni_header,json=overrideAutoSniHeader,proto3" json:"override_auto_sni_header,omitempty"`
 }
@@ -629,7 +629,7 @@ type Http1ProtocolOptions struct {
 	//   - Not a response to a HEAD request.
 	//   - The content length header is not present.
 	EnableTrailers bool `protobuf:"varint,5,opt,name=enable_trailers,json=enableTrailers,proto3" json:"enable_trailers,omitempty"`
-	// Allows Envoy to process requests/responses with both `Content-Length` and `Transfer-Encoding`
+	// Allows Envoy to process requests/responses with both ``Content-Length`` and ``Transfer-Encoding``
 	// headers set. By default such messages are rejected, but if option is enabled - Envoy will
 	// remove Content-Length header and process message.
 	// See `RFC7230, sec. 3.3.3 <https://tools.ietf.org/html/rfc7230#section-3.3.3>`_ for details.
@@ -902,9 +902,9 @@ type Http2ProtocolOptions struct {
 	//
 	//   max_inbound_priority_frames_per_stream * (1 + opened_streams)
 	//
-	// the connection is terminated. For downstream connections the `opened_streams` is incremented when
+	// the connection is terminated. For downstream connections the ``opened_streams`` is incremented when
 	// Envoy receives complete response headers from the upstream server. For upstream connection the
-	// `opened_streams` is incremented when Envoy send the HEADERS frame for a new stream. The
+	// ``opened_streams`` is incremented when Envoy send the HEADERS frame for a new stream. The
 	// ``http2.inbound_priority_frames_flood`` stat tracks
 	// the number of connections terminated due to flood mitigation. The default limit is 100.
 	MaxInboundPriorityFramesPerStream *wrappers.UInt32Value `protobuf:"bytes,10,opt,name=max_inbound_priority_frames_per_stream,json=maxInboundPriorityFramesPerStream,proto3" json:"max_inbound_priority_frames_per_stream,omitempty"`
@@ -915,9 +915,9 @@ type Http2ProtocolOptions struct {
 	//   5 + 2 * (opened_streams +
 	//            max_inbound_window_update_frames_per_data_frame_sent * outbound_data_frames)
 	//
-	// the connection is terminated. For downstream connections the `opened_streams` is incremented when
+	// the connection is terminated. For downstream connections the ``opened_streams`` is incremented when
 	// Envoy receives complete response headers from the upstream server. For upstream connections the
-	// `opened_streams` is incremented when Envoy sends the HEADERS frame for a new stream. The
+	// ``opened_streams`` is incremented when Envoy sends the HEADERS frame for a new stream. The
 	// ``http2.inbound_priority_frames_flood`` stat tracks the number of connections terminated due to
 	// flood mitigation. The default max_inbound_window_update_frames_per_data_frame_sent value is 10.
 	// Setting this to 1 should be enough to support HTTP/2 implementations with basic flow control,

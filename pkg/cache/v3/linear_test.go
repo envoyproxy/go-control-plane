@@ -44,6 +44,9 @@ func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	if r.GetRequest().TypeUrl != testType {
 		t.Errorf("unexpected empty request type URL: %q", r.GetRequest().TypeUrl)
 	}
+	if r.GetContext() == nil {
+		t.Errorf("unexpected empty response context")
+	}
 	out, err := r.GetDiscoveryResponse()
 	if err != nil {
 		t.Fatal(err)

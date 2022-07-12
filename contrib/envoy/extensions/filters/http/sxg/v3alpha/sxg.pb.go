@@ -50,14 +50,14 @@ type SXG struct {
 	CborUrl string `protobuf:"bytes,5,opt,name=cbor_url,json=cborUrl,proto3" json:"cbor_url,omitempty"`
 	// URL to retrieve validity data for signature, a CBOR map. See specification [here](https://tools.ietf.org/html/draft-yasskin-httpbis-origin-signed-exchanges-impl-00#section-3.6)
 	ValidityUrl string `protobuf:"bytes,6,opt,name=validity_url,json=validityUrl,proto3" json:"validity_url,omitempty"`
-	// Header that will be set if it is determined that the client can accept SXG (typically `accept: application/signed-exchange;v=b3)
-	// If not set, filter will default to: `x-client-can-accept-sxg`
+	// Header that will be set if it is determined that the client can accept SXG (typically ``accept: application/signed-exchange;v=b3``)
+	// If not set, filter will default to: ``x-client-can-accept-sxg``
 	ClientCanAcceptSxgHeader string `protobuf:"bytes,7,opt,name=client_can_accept_sxg_header,json=clientCanAcceptSxgHeader,proto3" json:"client_can_accept_sxg_header,omitempty"`
 	// Header set by downstream service to signal that the response should be transformed to SXG If not set,
-	// filter will default to: `x-should-encode-sxg`
+	// filter will default to: ``x-should-encode-sxg``
 	ShouldEncodeSxgHeader string `protobuf:"bytes,8,opt,name=should_encode_sxg_header,json=shouldEncodeSxgHeader,proto3" json:"should_encode_sxg_header,omitempty"`
-	// Headers that will be stripped from the SXG document, by listing a prefix (i.e. `x-custom-` will cause
-	// all headers prefixed by `x-custom-` to be omitted from the SXG document)
+	// Headers that will be stripped from the SXG document, by listing a prefix (i.e. ``x-custom-`` will cause
+	// all headers prefixed by ``x-custom-`` to be omitted from the SXG document)
 	HeaderPrefixFilters []string `protobuf:"bytes,9,rep,name=header_prefix_filters,json=headerPrefixFilters,proto3" json:"header_prefix_filters,omitempty"`
 }
 

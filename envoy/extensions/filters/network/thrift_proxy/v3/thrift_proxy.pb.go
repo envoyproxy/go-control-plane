@@ -234,7 +234,7 @@ type ThriftProxy struct {
 	// A list of individual Thrift filters that make up the filter chain for requests made to the
 	// Thrift proxy. Order matters as the filters are processed sequentially. For backwards
 	// compatibility, if no thrift_filters are specified, a default Thrift router filter
-	// (`envoy.filters.thrift.router`) is used.
+	// (``envoy.filters.thrift.router``) is used.
 	// [#extension-category: envoy.thrift_proxy.filters]
 	ThriftFilters []*ThriftFilter `protobuf:"bytes,5,rep,name=thrift_filters,json=thriftFilters,proto3" json:"thrift_filters,omitempty"`
 	// If set to true, Envoy will try to skip decode data after metadata in the Thrift message.
@@ -444,7 +444,7 @@ func (*ThriftFilter_TypedConfig) isThriftFilter_ConfigType() {}
 // ThriftProtocolOptions specifies Thrift upstream protocol options. This object is used in
 // in
 // :ref:`typed_extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
-// keyed by the name `envoy.filters.network.thrift_proxy`.
+// keyed by the name ``envoy.filters.network.thrift_proxy``.
 type ThriftProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

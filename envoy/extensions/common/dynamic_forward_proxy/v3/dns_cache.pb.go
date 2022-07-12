@@ -106,11 +106,11 @@ type DnsCacheConfig struct {
 	// The refresh rate is rounded to the closest millisecond, and must be at least 1ms.
 	//
 	// Once a host has been resolved, the refresh rate will be the DNS TTL, capped
-	// at a minimum of `dns_min_refresh_rate`.
+	// at a minimum of ``dns_min_refresh_rate``.
 	DnsRefreshRate *duration.Duration `protobuf:"bytes,3,opt,name=dns_refresh_rate,json=dnsRefreshRate,proto3" json:"dns_refresh_rate,omitempty"`
-	// The minimum rate that DNS resolution will occur. Per `dns_refresh_rate`, once a host is
-	// resolved, the DNS TTL will be used, with a minimum set by `dns_min_refresh_rate`.
-	// `dns_min_refresh_rate` defaults to 5s and must also be >= 5s.
+	// The minimum rate that DNS resolution will occur. Per ``dns_refresh_rate``, once a host is
+	// resolved, the DNS TTL will be used, with a minimum set by ``dns_min_refresh_rate``.
+	// ``dns_min_refresh_rate`` defaults to 5s and must also be >= 5s.
 	DnsMinRefreshRate *duration.Duration `protobuf:"bytes,14,opt,name=dns_min_refresh_rate,json=dnsMinRefreshRate,proto3" json:"dns_min_refresh_rate,omitempty"`
 	// The TTL for hosts that are unused. Hosts that have not been used in the configured time
 	// interval will be purged. If not specified defaults to 5m.

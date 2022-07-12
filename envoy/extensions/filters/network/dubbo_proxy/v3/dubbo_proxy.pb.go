@@ -202,7 +202,7 @@ type DubboProxy struct {
 	// A list of individual Dubbo filters that make up the filter chain for requests made to the
 	// Dubbo proxy. Order matters as the filters are processed sequentially. For backwards
 	// compatibility, if no dubbo_filters are specified, a default Dubbo router filter
-	// (`envoy.filters.dubbo.router`) is used.
+	// (``envoy.filters.dubbo.router``) is used.
 	DubboFilters []*DubboFilter `protobuf:"bytes,5,rep,name=dubbo_filters,json=dubboFilters,proto3" json:"dubbo_filters,omitempty"`
 }
 

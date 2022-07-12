@@ -796,7 +796,7 @@ func (*StreamingAdminSink) Descriptor() ([]byte, []int) {
 // BufferedAdminSink configures a tap output to collect traces without returning them until
 // one of multiple criteria are satisfied.
 // Similar to StreamingAdminSink, it is only allowed to specify the buffered admin output
-// sink if the tap is being configured from the `/tap` admin endpoint.
+// sink if the tap is being configured from the ``/tap`` admin endpoint.
 type BufferedAdminSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

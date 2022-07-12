@@ -689,7 +689,7 @@ type Cluster struct {
 	// set so that Envoy will assume that the upstream supports HTTP/2 when
 	// making new HTTP connection pool connections. Currently, Envoy only
 	// supports prior knowledge for upstream connections. Even if TLS is used
-	// with ALPN, `http2_protocol_options` must be specified. As an aside this allows HTTP/2
+	// with ALPN, ``http2_protocol_options`` must be specified. As an aside this allows HTTP/2
 	// connections to happen over plain text.
 	// This has been deprecated in favor of http2_protocol_options fields in the
 	// :ref:`http_protocol_options <envoy_v3_api_msg_extensions.upstreams.http.v3.HttpProtocolOptions>`
@@ -822,8 +822,8 @@ type Cluster struct {
 	// Common configuration for all load balancer implementations.
 	CommonLbConfig *Cluster_CommonLbConfig `protobuf:"bytes,27,opt,name=common_lb_config,json=commonLbConfig,proto3" json:"common_lb_config,omitempty"`
 	// Optional custom transport socket implementation to use for upstream connections.
-	// To setup TLS, set a transport socket with name `envoy.transport_sockets.tls` and
-	// :ref:`UpstreamTlsContexts <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.UpstreamTlsContext>` in the `typed_config`.
+	// To setup TLS, set a transport socket with name ``envoy.transport_sockets.tls`` and
+	// :ref:`UpstreamTlsContexts <envoy_v3_api_msg_extensions.transport_sockets.tls.v3.UpstreamTlsContext>` in the ``typed_config``.
 	// If no transport socket configuration is specified, new connections
 	// will be set up with plaintext.
 	TransportSocket *v32.TransportSocket `protobuf:"bytes,24,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
@@ -892,7 +892,7 @@ type Cluster struct {
 	//
 	// .. attention::
 	//
-	//   This field has been deprecated in favor of `timeout_budgets`, part of
+	//   This field has been deprecated in favor of ``timeout_budgets``, part of
 	//   :ref:`track_cluster_stats <envoy_v3_api_field_config.cluster.v3.Cluster.track_cluster_stats>`.
 	//
 	// Deprecated: Do not use.
@@ -903,7 +903,7 @@ type Cluster struct {
 	// TCP upstreams.
 	//
 	// For HTTP traffic, Envoy will generally take downstream HTTP and send it upstream as upstream
-	// HTTP, using the http connection pool and the codec from `http2_protocol_options`
+	// HTTP, using the http connection pool and the codec from ``http2_protocol_options``
 	//
 	// For routes where CONNECT termination is configured, Envoy will take downstream CONNECT
 	// requests and forward the CONNECT payload upstream over raw TCP using the tcp connection pool.
@@ -920,7 +920,7 @@ type Cluster struct {
 	TrackClusterStats *TrackClusterStats `protobuf:"bytes,49,opt,name=track_cluster_stats,json=trackClusterStats,proto3" json:"track_cluster_stats,omitempty"`
 	// Preconnect configuration for this cluster.
 	PreconnectPolicy *Cluster_PreconnectPolicy `protobuf:"bytes,50,opt,name=preconnect_policy,json=preconnectPolicy,proto3" json:"preconnect_policy,omitempty"`
-	// If `connection_pool_per_downstream_connection` is true, the cluster will use a separate
+	// If ``connection_pool_per_downstream_connection`` is true, the cluster will use a separate
 	// connection pool for every downstream connection
 	ConnectionPoolPerDownstreamConnection bool `protobuf:"varint,51,opt,name=connection_pool_per_downstream_connection,json=connectionPoolPerDownstreamConnection,proto3" json:"connection_pool_per_downstream_connection,omitempty"`
 }
@@ -1993,8 +1993,8 @@ type Cluster_SlowStartConfig struct {
 	// By tuning the parameter, is possible to achieve polynomial or exponential shape of ramp-up curve.
 	//
 	// During slow start window, effective weight of an endpoint would be scaled with time factor and aggression:
-	// `new_weight = weight * max(min_weight_percent, time_factor ^ (1 / aggression))`,
-	// where `time_factor=(time_since_start_seconds / slow_start_time_seconds)`.
+	// ``new_weight = weight * max(min_weight_percent, time_factor ^ (1 / aggression))``,
+	// where ``time_factor=(time_since_start_seconds / slow_start_time_seconds)``.
 	//
 	// As time progresses, more and more traffic would be sent to endpoint, which is in slow start window.
 	// Once host exits slow start, time_factor and aggression no longer affect its weight.
@@ -2120,18 +2120,18 @@ type Cluster_LeastRequestLbConfig struct {
 	// The following formula is used to calculate the dynamic weights when hosts have different load
 	// balancing weights:
 	//
-	// `weight = load_balancing_weight / (active_requests + 1)^active_request_bias`
+	// ``weight = load_balancing_weight / (active_requests + 1)^active_request_bias``
 	//
 	// The larger the active request bias is, the more aggressively active requests will lower the
 	// effective weight when all host weights are not equal.
 	//
-	// `active_request_bias` must be greater than or equal to 0.0.
+	// ``active_request_bias`` must be greater than or equal to 0.0.
 	//
-	// When `active_request_bias == 0.0` the Least Request Load Balancer doesn't consider the number
+	// When ``active_request_bias == 0.0`` the Least Request Load Balancer doesn't consider the number
 	// of active requests at the time it picks a host and behaves like the Round Robin Load
 	// Balancer.
 	//
-	// When `active_request_bias > 0.0` the Least Request Load Balancer scales the load balancing
+	// When ``active_request_bias > 0.0`` the Least Request Load Balancer scales the load balancing
 	// weight by the number of active requests at the time it does a pick.
 	//
 	// The value is cached for performance reasons and refreshed whenever one of the Load Balancer's
@@ -2435,7 +2435,7 @@ type Cluster_CommonLbConfig struct {
 	// when computing load balancing weights until they have been health checked for the first time.
 	// This will have no effect unless active health checking is also configured.
 	IgnoreNewHostsUntilFirstHc bool `protobuf:"varint,5,opt,name=ignore_new_hosts_until_first_hc,json=ignoreNewHostsUntilFirstHc,proto3" json:"ignore_new_hosts_until_first_hc,omitempty"`
-	// If set to `true`, the cluster manager will drain all existing
+	// If set to ``true``, the cluster manager will drain all existing
 	// connections to upstream hosts whenever hosts are added or removed from the cluster.
 	CloseConnectionsOnHostSetChange bool `protobuf:"varint,6,opt,name=close_connections_on_host_set_change,json=closeConnectionsOnHostSetChange,proto3" json:"close_connections_on_host_set_change,omitempty"`
 	// Common Configuration for all consistent hashing load balancers (MaglevLb, RingHashLb, etc.)
@@ -2738,10 +2738,10 @@ type Cluster_LbSubsetConfig_LbSubsetSelector struct {
 	//
 	// If a match is found to a host, that host will be used regardless of priority levels, unless the host is unhealthy.
 	//
-	// Currently, this mode is only supported if `subset_selectors` has only one entry, and `keys` contains
+	// Currently, this mode is only supported if ``subset_selectors`` has only one entry, and ``keys`` contains
 	// only one entry.
 	//
-	// When this mode is enabled, configurations that contain more than one host with the same metadata value for the single key in `keys`
+	// When this mode is enabled, configurations that contain more than one host with the same metadata value for the single key in ``keys``
 	// will use only one of the hosts with the given key; no requests will be routed to the others. The cluster gauge
 	// :ref:`lb_subsets_single_host_per_subset_duplicate<config_cluster_manager_cluster_stats_subset_lb>` indicates how many duplicates are
 	// present in the current configuration.
@@ -2757,7 +2757,7 @@ type Cluster_LbSubsetConfig_LbSubsetSelector struct {
 	// For any other fallback policy the parameter is not used and should not be set.
 	// Only values also present in
 	// :ref:`keys<envoy_v3_api_field_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.keys>` are allowed, but
-	// `fallback_keys_subset` cannot be equal to `keys`.
+	// ``fallback_keys_subset`` cannot be equal to ``keys``.
 	FallbackKeysSubset []string `protobuf:"bytes,3,rep,name=fallback_keys_subset,json=fallbackKeysSubset,proto3" json:"fallback_keys_subset,omitempty"`
 }
 
@@ -2945,7 +2945,7 @@ type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// If set to `true`, the cluster will use hostname instead of the resolved
+	// If set to ``true``, the cluster will use hostname instead of the resolved
 	// address as the key to consistently hash to an upstream host. Only valid for StrictDNS clusters with hostnames which resolve to a single IP address.
 	UseHostnameForHashing bool `protobuf:"varint,1,opt,name=use_hostname_for_hashing,json=useHostnameForHashing,proto3" json:"use_hostname_for_hashing,omitempty"`
 	// Configures percentage of average cluster load to bound per upstream host. For example, with a value of 150
@@ -2956,7 +2956,7 @@ type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	// Applies to both Ring Hash and Maglev load balancers.
 	//
 	// This is implemented based on the method described in the paper https://arxiv.org/abs/1608.01350. For the specified
-	// `hash_balance_factor`, requests to any upstream host are capped at `hash_balance_factor/100` times the average number of requests
+	// ``hash_balance_factor``, requests to any upstream host are capped at ``hash_balance_factor/100`` times the average number of requests
 	// across the cluster. When a request arrives for an upstream host that is currently serving at its max capacity, linear probing
 	// is used to identify an eligible host. Further, the linear probe is implemented using a random jump in hosts ring/table to identify
 	// the eligible host (this technique is as described in the paper https://arxiv.org/abs/1908.08762 - the random jump avoids the
@@ -2964,7 +2964,7 @@ type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	//
 	// If weights are specified on the hosts, they are respected.
 	//
-	// This is an O(N) algorithm, unlike other load balancers. Using a lower `hash_balance_factor` results in more hosts
+	// This is an O(N) algorithm, unlike other load balancers. Using a lower ``hash_balance_factor`` results in more hosts
 	// being probed, so use a higher value if you require better performance.
 	HashBalanceFactor *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=hash_balance_factor,json=hashBalanceFactor,proto3" json:"hash_balance_factor,omitempty"`
 }
