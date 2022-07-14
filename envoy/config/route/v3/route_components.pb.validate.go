@@ -1513,19 +1513,33 @@ func (m *WeightedCluster) validate(all bool) error {
 
 	}
 
-	if wrapper := m.GetTotalWeight(); wrapper != nil {
-
-		if wrapper.GetValue() < 1 {
-			err := WeightedClusterValidationError{
-				field:  "TotalWeight",
-				reason: "value must be greater than or equal to 1",
+	if all {
+		switch v := interface{}(m.GetTotalWeight()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WeightedClusterValidationError{
+					field:  "TotalWeight",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			if !all {
-				return err
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WeightedClusterValidationError{
+					field:  "TotalWeight",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			errors = append(errors, err)
 		}
-
+	} else if v, ok := interface{}(m.GetTotalWeight()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WeightedClusterValidationError{
+				field:  "TotalWeight",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	// no validation rules for RuntimeKeyPrefix
