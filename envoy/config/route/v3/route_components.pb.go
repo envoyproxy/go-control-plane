@@ -418,7 +418,7 @@ type VirtualHost struct {
 	// The per_filter_config field can be used to provide virtual host-specific configurations for filters.
 	// The key should match the :ref:`filter config name
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
-	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// The canonical filter name (e.g., ``envoy.filters.http.buffer`` for the HTTP buffer filter) can also
 	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
 	// entry referred by the canonical filter name will be provided to the filters as fallback.
 	//
@@ -720,14 +720,14 @@ type Route struct {
 	// about the route. It can be used for configuration, stats, and logging.
 	// The metadata should go under the filter namespace that will need it.
 	// For instance, if the metadata is intended for the Router filter,
-	// the filter name should be specified as *envoy.filters.http.router*.
+	// the filter name should be specified as ``envoy.filters.http.router``.
 	Metadata *v31.Metadata `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Decorator for the matched route.
 	Decorator *Decorator `protobuf:"bytes,5,opt,name=decorator,proto3" json:"decorator,omitempty"`
 	// The per_filter_config field can be used to provide route-specific configurations for filters.
 	// The key should match the :ref:`filter config name
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
-	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// The canonical filter name (e.g., ``envoy.filters.http.buffer`` for the HTTP buffer filter) can also
 	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
 	// entry referred by the canonical filter name will be provided to the filters as fallback.
 	//
@@ -1001,10 +1001,10 @@ type WeightedCluster struct {
 	// value, if this is greater than 0.
 	TotalWeight *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=total_weight,json=totalWeight,proto3" json:"total_weight,omitempty"`
 	// Specifies the runtime key prefix that should be used to construct the
-	// runtime keys associated with each cluster. When the *runtime_key_prefix* is
+	// runtime keys associated with each cluster. When the ``runtime_key_prefix`` is
 	// specified, the router will look for weights associated with each upstream
-	// cluster under the key *runtime_key_prefix* + "." + *cluster[i].name* where
-	// *cluster[i]* denotes an entry in the clusters array field. If the runtime
+	// cluster under the key ``runtime_key_prefix`` + ``.`` + ``cluster[i].name`` where
+	// ``cluster[i]`` denotes an entry in the clusters array field. If the runtime
 	// key for the cluster does not exist, the value specified in the
 	// configuration file will be used as the default weight. See the :ref:`runtime documentation
 	// <operations_runtime>` for how key names map to the underlying implementation.
@@ -1199,9 +1199,9 @@ type RouteMatch struct {
 	// is not in the config).
 	Headers []*HeaderMatcher `protobuf:"bytes,6,rep,name=headers,proto3" json:"headers,omitempty"`
 	// Specifies a set of URL query parameters on which the route should
-	// match. The router will check the query string from the *path* header
+	// match. The router will check the query string from the ``path`` header
 	// against all the specified query parameters. If the number of specified
-	// query parameters is nonzero, they all must match the *path* header's
+	// query parameters is nonzero, they all must match the ``path`` header's
 	// query string for a match to occur.
 	//
 	// .. note::
@@ -1364,21 +1364,21 @@ type isRouteMatch_PathSpecifier interface {
 
 type RouteMatch_Prefix struct {
 	// If specified, the route is a prefix rule meaning that the prefix must
-	// match the beginning of the *:path* header.
+	// match the beginning of the ``:path`` header.
 	Prefix string `protobuf:"bytes,1,opt,name=prefix,proto3,oneof"`
 }
 
 type RouteMatch_Path struct {
 	// If specified, the route is an exact path rule meaning that the path must
-	// exactly match the *:path* header once the query string is removed.
+	// exactly match the ``:path`` header once the query string is removed.
 	Path string `protobuf:"bytes,2,opt,name=path,proto3,oneof"`
 }
 
 type RouteMatch_SafeRegex struct {
 	// If specified, the route is a regular expression rule meaning that the
-	// regex must match the *:path* header once the query string is removed. The entire path
+	// regex must match the ``:path`` header once the query string is removed. The entire path
 	// (without the query string) must match the regex. The rule will not match if only a
-	// subsequence of the *:path* header matches the regex.
+	// subsequence of the ``:path`` header matches the regex.
 	//
 	// [#next-major-version: In the v3 API we should redo how path specification works such
 	// that we utilize StringMatcher, and additionally have consistent options around whether we
@@ -1467,13 +1467,13 @@ type CorsPolicy struct {
 	// Specifies string patterns that match allowed origins. An origin is allowed if any of the
 	// string matchers match.
 	AllowOriginStringMatch []*v32.StringMatcher `protobuf:"bytes,11,rep,name=allow_origin_string_match,json=allowOriginStringMatch,proto3" json:"allow_origin_string_match,omitempty"`
-	// Specifies the content for the *access-control-allow-methods* header.
+	// Specifies the content for the ``access-control-allow-methods`` header.
 	AllowMethods string `protobuf:"bytes,2,opt,name=allow_methods,json=allowMethods,proto3" json:"allow_methods,omitempty"`
-	// Specifies the content for the *access-control-allow-headers* header.
+	// Specifies the content for the ``access-control-allow-headers`` header.
 	AllowHeaders string `protobuf:"bytes,3,opt,name=allow_headers,json=allowHeaders,proto3" json:"allow_headers,omitempty"`
-	// Specifies the content for the *access-control-expose-headers* header.
+	// Specifies the content for the ``access-control-expose-headers`` header.
 	ExposeHeaders string `protobuf:"bytes,4,opt,name=expose_headers,json=exposeHeaders,proto3" json:"expose_headers,omitempty"`
-	// Specifies the content for the *access-control-max-age* header.
+	// Specifies the content for the ``access-control-max-age`` header.
 	MaxAge string `protobuf:"bytes,5,opt,name=max_age,json=maxAge,proto3" json:"max_age,omitempty"`
 	// Specifies whether the resource allows credentials.
 	AllowCredentials *wrappers.BoolValue `protobuf:"bytes,6,opt,name=allow_credentials,json=allowCredentials,proto3" json:"allow_credentials,omitempty"`
@@ -1488,7 +1488,7 @@ type CorsPolicy struct {
 	//
 	// If :ref:`runtime_key <envoy_v3_api_field_config.core.v3.RuntimeFractionalPercent.runtime_key>` is specified,
 	// Envoy will lookup the runtime key to get the percentage of requests for which it will evaluate
-	// and track the request's *Origin* to determine if it's valid but will not enforce any policies.
+	// and track the request's ``Origin`` to determine if it's valid but will not enforce any policies.
 	ShadowEnabled *v31.RuntimeFractionalPercent `protobuf:"bytes,10,opt,name=shadow_enabled,json=shadowEnabled,proto3" json:"shadow_enabled,omitempty"`
 }
 
@@ -1624,7 +1624,7 @@ type RouteAction struct {
 	// in the upstream cluster with metadata matching what's set in this field will be considered
 	// for load balancing. If using :ref:`weighted_clusters
 	// <envoy_v3_api_field_config.route.v3.RouteAction.weighted_clusters>`, metadata will be merged, with values
-	// provided there taking precedence. The filter name should be specified as *envoy.lb*.
+	// provided there taking precedence. The filter name should be specified as ``envoy.lb``.
 	MetadataMatch *v31.Metadata `protobuf:"bytes,4,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 	// Indicates that during forwarding, the matched prefix (or path) should be
 	// swapped with this value. This option allows application URLs to be rooted
@@ -1634,14 +1634,14 @@ type RouteAction struct {
 	//
 	// Only one of :ref:`regex_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>`
 	// [#comment:TODO(silverstar194) add the following once path_template_rewrite is implemented: :ref:`path_template_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.path_template_rewrite>`]
-	// or *prefix_rewrite* may be specified.
+	// or ``prefix_rewrite`` may be specified.
 	//
 	// .. attention::
 	//
 	//   Pay careful attention to the use of trailing slashes in the
 	//   :ref:`route's match <envoy_v3_api_field_config.route.v3.Route.match>` prefix value.
 	//   Stripping a prefix from a path requires multiple Routes to handle all cases. For example,
-	//   rewriting */prefix* to */* and */prefix/etc* to */etc* cannot be done in a single
+	//   rewriting ``/prefix`` to ``/`` and ``/prefix/etc`` to ``/etc`` cannot be done in a single
 	//   :ref:`Route <envoy_v3_api_msg_config.route.v3.Route>`, as shown by the below config entries:
 	//
 	//   .. code-block:: yaml
@@ -1655,8 +1655,8 @@ type RouteAction struct {
 	//       route:
 	//         prefix_rewrite: "/"
 	//
-	//   Having above entries in the config, requests to */prefix* will be stripped to */*, while
-	//   requests to */prefix/etc* will be stripped to */etc*.
+	//   Having above entries in the config, requests to ``/prefix`` will be stripped to ``/``, while
+	//   requests to ``/prefix/etc`` will be stripped to ``/etc``.
 	PrefixRewrite string `protobuf:"bytes,5,opt,name=prefix_rewrite,json=prefixRewrite,proto3" json:"prefix_rewrite,omitempty"`
 	// Indicates that during forwarding, portions of the path that match the
 	// pattern should be rewritten, even allowing the substitution of capture
@@ -1669,7 +1669,7 @@ type RouteAction struct {
 	//
 	// Only one of :ref:`prefix_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`
 	// [#comment:TODO(silverstar194) add the following once path_template_rewrite is implemented: :ref:`path_template_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.path_template_rewrite>`,]
-	// or *regex_rewrite* may be specified.
+	// or ``regex_rewrite`` may be specified.
 	//
 	// Examples using Google's `RE2 <https://github.com/google/re2>`_ engine:
 	//
@@ -1699,7 +1699,7 @@ type RouteAction struct {
 	//
 	// Only one of :ref:`prefix_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`,
 	// :ref:`regex_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>`,
-	// or *path_template_rewrite* may be specified.
+	// or ``path_template_rewrite`` may be specified.
 	//
 	// Template pattern matching types:
 	//
@@ -2199,8 +2199,8 @@ type RouteAction_ClusterHeader struct {
 	//
 	// .. attention::
 	//
-	//   Internally, Envoy always uses the HTTP/2 *:authority* header to represent the HTTP/1
-	//   *Host* header. Thus, if attempting to match on *Host*, match on *:authority* instead.
+	//   Internally, Envoy always uses the HTTP/2 ``:authority`` header to represent the HTTP/1
+	//   ``Host`` header. Thus, if attempting to match on ``Host``, match on ``:authority`` instead.
 	//
 	// .. note::
 	//
@@ -2258,7 +2258,7 @@ type RouteAction_AutoHostRewrite struct {
 	// Indicates that during forwarding, the host header will be swapped with
 	// the hostname of the upstream host chosen by the cluster manager. This
 	// option is applicable only when the destination cluster for a route is of
-	// type *strict_dns* or *logical_dns*. Setting this to true with other cluster types
+	// type ``strict_dns`` or ``logical_dns``. Setting this to true with other cluster types
 	// has no effect. Using this option will append the
 	// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
 	// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
@@ -2853,7 +2853,7 @@ type DirectResponseAction struct {
 	//
 	// .. note::
 	//
-	//   Headers can be specified using *response_headers_to_add* in the enclosing
+	//   Headers can be specified using ``response_headers_to_add`` in the enclosing
 	//   :ref:`envoy_v3_api_msg_config.route.v3.Route`, :ref:`envoy_v3_api_msg_config.route.v3.RouteConfiguration` or
 	//   :ref:`envoy_v3_api_msg_config.route.v3.VirtualHost`.
 	Body *v31.DataSource `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
@@ -3275,12 +3275,12 @@ func (x *RateLimit) GetLimit() *RateLimit_Override {
 
 // .. attention::
 //
-//   Internally, Envoy always uses the HTTP/2 *:authority* header to represent the HTTP/1 *Host*
-//   header. Thus, if attempting to match on *Host*, match on *:authority* instead.
+//   Internally, Envoy always uses the HTTP/2 ``:authority`` header to represent the HTTP/1 ``Host``
+//   header. Thus, if attempting to match on ``Host``, match on ``:authority`` instead.
 //
 // .. attention::
 //
-//   To route on HTTP method, use the special HTTP/2 *:method* header. This works for both
+//   To route on HTTP method, use the special HTTP/2 ``:method`` header. This works for both
 //   HTTP/1 and HTTP/2 as Envoy normalizes headers. E.g.,
 //
 //   .. code-block:: json
@@ -3321,7 +3321,7 @@ type HeaderMatcher struct {
 	//
 	// Examples:
 	//
-	// * The regex ``\d{3}`` does not match the value *1234*, so it will match when inverted.
+	// * The regex ``\d{3}`` does not match the value ``1234``, so it will match when inverted.
 	// * The range [-10,0) will match the value -1, so it will not match when inverted.
 	InvertMatch bool `protobuf:"varint,8,opt,name=invert_match,json=invertMatch,proto3" json:"invert_match,omitempty"`
 	// If specified, for any header match rule, if the header match rule specified header
@@ -3506,8 +3506,8 @@ type HeaderMatcher_RangeMatch struct {
 	//
 	// Examples:
 	//
-	// * For range [-10,0), route will match for header value -1, but not for 0, "somestring", 10.9,
-	//   "-1somestring"
+	// * For range [-10,0), route will match for header value -1, but not for 0, ``somestring``, 10.9,
+	//   ``-1somestring``
 	RangeMatch *v33.Int64Range `protobuf:"bytes,6,opt,name=range_match,json=rangeMatch,proto3,oneof"`
 }
 
@@ -3524,7 +3524,7 @@ type HeaderMatcher_PrefixMatch struct {
 	//
 	// Examples:
 	//
-	// * The prefix *abcd* matches the value *abcdxyz*, but not for *abcxyz*.
+	// * The prefix ``abcd`` matches the value ``abcdxyz``, but not for ``abcxyz``.
 	//
 	// Deprecated: Do not use.
 	PrefixMatch string `protobuf:"bytes,9,opt,name=prefix_match,json=prefixMatch,proto3,oneof"`
@@ -3537,7 +3537,7 @@ type HeaderMatcher_SuffixMatch struct {
 	//
 	// Examples:
 	//
-	// * The suffix *abcd* matches the value *xyzabcd*, but not for *xyzbcd*.
+	// * The suffix ``abcd`` matches the value ``xyzabcd``, but not for ``xyzbcd``.
 	//
 	// Deprecated: Do not use.
 	SuffixMatch string `protobuf:"bytes,10,opt,name=suffix_match,json=suffixMatch,proto3,oneof"`
@@ -3551,7 +3551,7 @@ type HeaderMatcher_ContainsMatch struct {
 	//
 	// Examples:
 	//
-	// * The value *abcd* matches the value *xyzabcdpqr*, but not for *xyzbcdpqr*.
+	// * The value ``abcd`` matches the value ``xyzabcdpqr``, but not for ``xyzbcdpqr``.
 	//
 	// Deprecated: Do not use.
 	ContainsMatch string `protobuf:"bytes,12,opt,name=contains_match,json=containsMatch,proto3,oneof"`
@@ -3587,7 +3587,7 @@ type QueryParameterMatcher struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Specifies the name of a key that must be present in the requested
-	// *path*'s query string.
+	// ``path``'s query string.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to QueryParameterMatchSpecifier:
 	//	*QueryParameterMatcher_StringMatch
@@ -3834,12 +3834,12 @@ type WeightedCluster_ClusterWeight struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Only one of *name* and *cluster_header* may be specified.
+	// Only one of ``name`` and ``cluster_header`` may be specified.
 	// [#next-major-version: Need to add back the validation rule: (validate.rules).string = {min_len: 1}]
 	// Name of the upstream cluster. The cluster must exist in the
 	// :ref:`cluster manager configuration <config_cluster_manager>`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Only one of *name* and *cluster_header* may be specified.
+	// Only one of ``name`` and ``cluster_header`` may be specified.
 	// [#next-major-version: Need to add back the validation rule: (validate.rules).string = {min_len: 1 }]
 	// Envoy will determine the cluster to route to by reading the value of the
 	// HTTP header named by cluster_header from the request headers. If the
@@ -3848,8 +3848,8 @@ type WeightedCluster_ClusterWeight struct {
 	//
 	// .. attention::
 	//
-	//   Internally, Envoy always uses the HTTP/2 *:authority* header to represent the HTTP/1
-	//   *Host* header. Thus, if attempting to match on *Host*, match on *:authority* instead.
+	//   Internally, Envoy always uses the HTTP/2 ``:authority`` header to represent the HTTP/1
+	//   ``Host`` header. Thus, if attempting to match on ``Host``, match on ``:authority`` instead.
 	//
 	// .. note::
 	//
@@ -3864,7 +3864,7 @@ type WeightedCluster_ClusterWeight struct {
 	// the upstream cluster with metadata matching what is set in this field will be considered for
 	// load balancing. Note that this will be merged with what's provided in
 	// :ref:`RouteAction.metadata_match <envoy_v3_api_field_config.route.v3.RouteAction.metadata_match>`, with
-	// values here taking precedence. The filter name should be specified as *envoy.lb*.
+	// values here taking precedence. The filter name should be specified as ``envoy.lb``.
 	MetadataMatch *v31.Metadata `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 	// Specifies a list of headers to be added to requests when this cluster is selected
 	// through the enclosing :ref:`envoy_v3_api_msg_config.route.v3.RouteAction`.
@@ -3892,7 +3892,7 @@ type WeightedCluster_ClusterWeight struct {
 	// for filters.
 	// The key should match the :ref:`filter config name
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpFilter.name>`.
-	// The canonical filter name (e.g., *envoy.filters.http.buffer* for the HTTP buffer filter) can also
+	// The canonical filter name (e.g., ``envoy.filters.http.buffer`` for the HTTP buffer filter) can also
 	// be used for the backwards compatibility. If there is no entry referred by the filter config name, the
 	// entry referred by the canonical filter name will be provided to the filters as fallback.
 	//
@@ -4170,8 +4170,8 @@ func (*RouteMatch_ConnectMatcher) Descriptor() ([]byte, []int) {
 // respond before returning the response from the primary cluster. All normal statistics are
 // collected for the shadow cluster making this feature useful for testing.
 //
-// During shadowing, the host/authority header is altered such that *-shadow* is appended. This is
-// useful for logging. For example, *cluster1* becomes *cluster1-shadow*.
+// During shadowing, the host/authority header is altered such that ``-shadow`` is appended. This is
+// useful for logging. For example, ``cluster1`` becomes ``cluster1-shadow``.
 //
 // .. note::
 //
@@ -4182,12 +4182,12 @@ type RouteAction_RequestMirrorPolicy struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Only one of *cluster* and *cluster_header* can be specified.
+	// Only one of ``cluster`` and ``cluster_header`` can be specified.
 	// [#next-major-version: Need to add back the validation rule: (validate.rules).string = {min_len: 1}]
 	// Specifies the cluster that requests will be mirrored to. The cluster must
 	// exist in the cluster manager configuration.
 	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
-	// Only one of *cluster* and *cluster_header* can be specified.
+	// Only one of ``cluster`` and ``cluster_header`` can be specified.
 	// Envoy will determine the cluster to route to by reading the value of the
 	// HTTP header named by cluster_header from the request headers. Only the first value in header is used,
 	// and no shadow request will happen if the value is not found in headers. Envoy will not wait for
@@ -4195,8 +4195,8 @@ type RouteAction_RequestMirrorPolicy struct {
 	//
 	// .. attention::
 	//
-	//   Internally, Envoy always uses the HTTP/2 *:authority* header to represent the HTTP/1
-	//   *Host* header. Thus, if attempting to match on *Host*, match on *:authority* instead.
+	//   Internally, Envoy always uses the HTTP/2 ``:authority`` header to represent the HTTP/1
+	//   ``Host`` header. Thus, if attempting to match on ``Host``, match on ``:authority`` instead.
 	//
 	// .. note::
 	//
@@ -4525,7 +4525,7 @@ type RouteAction_MaxStreamDuration struct {
 	MaxStreamDuration *duration.Duration `protobuf:"bytes,1,opt,name=max_stream_duration,json=maxStreamDuration,proto3" json:"max_stream_duration,omitempty"`
 	// If present, and the request contains a `grpc-timeout header
 	// <https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md>`_, use that value as the
-	// *max_stream_duration*, but limit the applied timeout to the maximum value specified here.
+	// ``max_stream_duration``, but limit the applied timeout to the maximum value specified here.
 	// If set to 0, the ``grpc-timeout`` header is used without modification.
 	GrpcTimeoutHeaderMax *duration.Duration `protobuf:"bytes,2,opt,name=grpc_timeout_header_max,json=grpcTimeoutHeaderMax,proto3" json:"grpc_timeout_header_max,omitempty"`
 	// If present, Envoy will adjust the timeout provided by the ``grpc-timeout`` header by
@@ -5705,7 +5705,7 @@ func (*RateLimit_Action_DestinationCluster) Descriptor() ([]byte, []int) {
 }
 
 // The following descriptor entry is appended when a header contains a key that matches the
-// *header_name*:
+// ``header_name``:
 //
 // .. code-block:: cpp
 //
@@ -6064,7 +6064,7 @@ type RateLimit_Action_DynamicMetaData struct {
 	// Metadata struct that defines the key and path to retrieve the string value. A match will
 	// only happen if the value in the dynamic metadata is of type string.
 	MetadataKey *v35.MetadataKey `protobuf:"bytes,2,opt,name=metadata_key,json=metadataKey,proto3" json:"metadata_key,omitempty"`
-	// An optional value to use if *metadata_key* is empty. If not set and
+	// An optional value to use if ``metadata_key`` is empty. If not set and
 	// no value is present under the metadata_key then no descriptor is generated.
 	DefaultValue string `protobuf:"bytes,3,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 }
@@ -6137,7 +6137,7 @@ type RateLimit_Action_MetaData struct {
 	// Metadata struct that defines the key and path to retrieve the string value. A match will
 	// only happen if the value in the metadata is of type string.
 	MetadataKey *v35.MetadataKey `protobuf:"bytes,2,opt,name=metadata_key,json=metadataKey,proto3" json:"metadata_key,omitempty"`
-	// An optional value to use if *metadata_key* is empty. If not set and
+	// An optional value to use if ``metadata_key`` is empty. If not set and
 	// no value is present under the metadata_key then no descriptor is generated.
 	DefaultValue string `protobuf:"bytes,3,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 	// Source of metadata

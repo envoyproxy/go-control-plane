@@ -248,7 +248,7 @@ type RouteAction struct {
 	ClusterSpecifier isRouteAction_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
 	// Optional endpoint metadata match criteria used by the subset load balancer. Only endpoints in
 	// the upstream cluster with metadata matching what is set in this field will be considered for
-	// load balancing. The filter name should be specified as *envoy.lb*.
+	// load balancing. The filter name should be specified as ``envoy.lb``.
 	MetadataMatch *v31.Metadata `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 }
 

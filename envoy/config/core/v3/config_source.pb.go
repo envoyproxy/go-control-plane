@@ -473,14 +473,14 @@ type PathConfigSource struct {
 	//
 	// .. note::
 	//
-	//   If ``watched_directory`` is *not* configured, Envoy will watch the file path for *moves.*
+	//   If ``watched_directory`` is *not* configured, Envoy will watch the file path for *moves*.
 	//   This is because in general only moves are atomic. The same method of swapping files as is
 	//   demonstrated in the :ref:`runtime documentation <config_runtime_symbolic_link_swap>` can be
 	//   used here also. If ``watched_directory`` is configured, no watch will be placed directly on
 	//   this path. Instead, the configured ``watched_directory`` will be used to trigger reloads of
 	//   this path. This is required in certain deployment scenarios. See below for more information.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	// If configured, this directory will be watched for *moves.* When an entry in this directory is
+	// If configured, this directory will be watched for *moves*. When an entry in this directory is
 	// moved to, the ``path`` will be reloaded. This is required in certain deployment scenarios.
 	//
 	// Specifically, if trying to load an xDS resource using a
@@ -555,7 +555,7 @@ type ConfigSource struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Authorities that this config source may be used for. An authority specified in a xdstp:// URL
-	// is resolved to a *ConfigSource* prior to configuration fetch. This field provides the
+	// is resolved to a ``ConfigSource`` prior to configuration fetch. This field provides the
 	// association between authority name and configuration source.
 	// [#not-implemented-hide:]
 	Authorities []*v3.Authority `protobuf:"bytes,7,rep,name=authorities,proto3" json:"authorities,omitempty"`

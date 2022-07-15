@@ -115,7 +115,7 @@ type GrpcJsonTranscoder struct {
 	PrintOptions *GrpcJsonTranscoder_PrintOptions `protobuf:"bytes,3,opt,name=print_options,json=printOptions,proto3" json:"print_options,omitempty"`
 	// Whether to keep the incoming request route after the outgoing headers have been transformed to
 	// the match the upstream gRPC service. Note: This means that routes for gRPC services that are
-	// not transcoded cannot be used in combination with *match_incoming_request_route*.
+	// not transcoded cannot be used in combination with ``match_incoming_request_route``.
 	MatchIncomingRequestRoute bool `protobuf:"varint,5,opt,name=match_incoming_request_route,json=matchIncomingRequestRoute,proto3" json:"match_incoming_request_route,omitempty"`
 	// A list of query parameters to be ignored for transcoding method mapping.
 	// By default, the transcoder filter will not transcode a request if there are any

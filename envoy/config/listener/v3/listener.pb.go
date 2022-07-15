@@ -130,7 +130,7 @@ func (x *AdditionalAddress) GetAddress() *v3.Address {
 	return nil
 }
 
-// Listener list collections. Entries are *Listener* resources or references.
+// Listener list collections. Entries are ``Listener`` resources or references.
 // [#not-implemented-hide:]
 type ListenerCollection struct {
 	state         protoimpl.MessageState
@@ -192,7 +192,7 @@ type Listener struct {
 	// The address that the listener should listen on. In general, the address must be unique, though
 	// that is governed by the bind rules of the OS. E.g., multiple listeners can listen on port 0 on
 	// Linux as the actual port will be allocated by the OS.
-	// Required unless *api_listener* or *listener_specifier* is populated.
+	// Required unless ``api_listener`` or ``listener_specifier`` is populated.
 	Address *v3.Address `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 	// The additional addresses the listener should listen on. The addresses must be unique across all
 	// listeners. Multiple addresses with port 0 can be supplied. When using multiple addresses in a single listener,
@@ -228,7 +228,7 @@ type Listener struct {
 	//  filter chain is removed or structurally modified, then the drain for its
 	//  connections is initiated.
 	FilterChainMatcher *v32.Matcher `protobuf:"bytes,32,opt,name=filter_chain_matcher,json=filterChainMatcher,proto3" json:"filter_chain_matcher,omitempty"`
-	// If a connection is redirected using *iptables*, the port on which the proxy
+	// If a connection is redirected using ``iptables``, the port on which the proxy
 	// receives it might be different from the original destination address. When this flag is set to
 	// true, the listener hands off redirected connections to the listener associated with the
 	// original destination address. If there is no listener associated with the original destination
@@ -272,23 +272,23 @@ type Listener struct {
 	ContinueOnListenerFiltersTimeout bool `protobuf:"varint,17,opt,name=continue_on_listener_filters_timeout,json=continueOnListenerFiltersTimeout,proto3" json:"continue_on_listener_filters_timeout,omitempty"`
 	// Whether the listener should be set as a transparent socket.
 	// When this flag is set to true, connections can be redirected to the listener using an
-	// *iptables* *TPROXY* target, in which case the original source and destination addresses and
+	// ``iptables`` ``TPROXY`` target, in which case the original source and destination addresses and
 	// ports are preserved on accepted connections. This flag should be used in combination with
 	// :ref:`an original_dst <config_listener_filters_original_dst>` :ref:`listener filter
 	// <envoy_v3_api_field_config.listener.v3.Listener.listener_filters>` to mark the connections' local addresses as
 	// "restored." This can be used to hand off each redirected connection to another listener
 	// associated with the connection's destination address. Direct connections to the socket without
-	// using *TPROXY* cannot be distinguished from connections redirected using *TPROXY* and are
+	// using ``TPROXY`` cannot be distinguished from connections redirected using ``TPROXY`` and are
 	// therefore treated as if they were redirected.
 	// When this flag is set to false, the listener's socket is explicitly reset as non-transparent.
-	// Setting this flag requires Envoy to run with the *CAP_NET_ADMIN* capability.
+	// Setting this flag requires Envoy to run with the ``CAP_NET_ADMIN`` capability.
 	// When this flag is not set (default), the socket is not modified, i.e. the transparent option
 	// is neither set nor reset.
 	Transparent *wrappers.BoolValue `protobuf:"bytes,10,opt,name=transparent,proto3" json:"transparent,omitempty"`
-	// Whether the listener should set the *IP_FREEBIND* socket option. When this
+	// Whether the listener should set the ``IP_FREEBIND`` socket option. When this
 	// flag is set to true, listeners can be bound to an IP address that is not
 	// configured on the system running Envoy. When this flag is set to false, the
-	// option *IP_FREEBIND* is disabled on the socket. When this flag is not set
+	// option ``IP_FREEBIND`` is disabled on the socket. When this flag is not set
 	// (default), the socket is not modified, i.e. the option is neither enabled
 	// nor disabled.
 	Freebind *wrappers.BoolValue `protobuf:"bytes,11,opt,name=freebind,proto3" json:"freebind,omitempty"`
@@ -350,7 +350,7 @@ type Listener struct {
 	//
 	// Deprecated: Do not use.
 	ReusePort bool `protobuf:"varint,21,opt,name=reuse_port,json=reusePort,proto3" json:"reuse_port,omitempty"`
-	// When this flag is set to true, listeners set the *SO_REUSEPORT* socket option and
+	// When this flag is set to true, listeners set the ``SO_REUSEPORT`` socket option and
 	// create one socket for each worker thread. This makes inbound connections
 	// distribute among worker threads roughly evenly in cases where there are a high number
 	// of connections. When this flag is set to false, all worker threads share one socket. This field

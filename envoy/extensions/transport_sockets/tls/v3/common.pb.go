@@ -417,22 +417,22 @@ type TlsCertificate struct {
 
 	// The TLS certificate chain.
 	//
-	// If *certificate_chain* is a filesystem path, a watch will be added to the
+	// If ``certificate_chain`` is a filesystem path, a watch will be added to the
 	// parent directory for any file moves to support rotation. This currently
-	// only applies to dynamic secrets, when the *TlsCertificate* is delivered via
+	// only applies to dynamic secrets, when the ``TlsCertificate`` is delivered via
 	// SDS.
 	CertificateChain *v3.DataSource `protobuf:"bytes,1,opt,name=certificate_chain,json=certificateChain,proto3" json:"certificate_chain,omitempty"`
 	// The TLS private key.
 	//
-	// If *private_key* is a filesystem path, a watch will be added to the parent
+	// If ``private_key`` is a filesystem path, a watch will be added to the parent
 	// directory for any file moves to support rotation. This currently only
-	// applies to dynamic secrets, when the *TlsCertificate* is delivered via SDS.
+	// applies to dynamic secrets, when the ``TlsCertificate`` is delivered via SDS.
 	PrivateKey *v3.DataSource `protobuf:"bytes,2,opt,name=private_key,json=privateKey,proto3" json:"private_key,omitempty"`
 	// ``Pkcs12`` data containing TLS certificate, chain, and private key.
 	//
-	// If *pkcs12* is a filesystem path, the file will be read, but no watch will
-	// be added to the parent directory, since *pkcs12* isn't used by SDS.
-	// This field is mutually exclusive with *certificate_chain*, *private_key* and *private_key_provider*.
+	// If ``pkcs12`` is a filesystem path, the file will be read, but no watch will
+	// be added to the parent directory, since ``pkcs12`` isn't used by SDS.
+	// This field is mutually exclusive with ``certificate_chain``, ``private_key`` and ``private_key_provider``.
 	// This can't be marked as ``oneof`` due to API compatibility reasons. Setting
 	// both :ref:`private_key <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>`,
 	// :ref:`certificate_chain <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.certificate_chain>`,
@@ -442,14 +442,14 @@ type TlsCertificate struct {
 	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.password>`
 	// to specify the password to unprotect the ``PKCS12`` data, if necessary.
 	Pkcs12 *v3.DataSource `protobuf:"bytes,8,opt,name=pkcs12,proto3" json:"pkcs12,omitempty"`
-	// If specified, updates of file-based *certificate_chain* and *private_key*
+	// If specified, updates of file-based ``certificate_chain`` and ``private_key``
 	// sources will be triggered by this watch. The certificate/key pair will be
 	// read together and validated for atomic read consistency (i.e. no
 	// intervening modification occurred between cert/key read, verified by file
 	// hash comparisons). This allows explicit control over the path watched, by
 	// default the parent directories of the filesystem paths in
-	// *certificate_chain* and *private_key* are watched if this field is not
-	// specified. This only applies when a *TlsCertificate* is delivered by SDS
+	// ``certificate_chain`` and ``private_key`` are watched if this field is not
+	// specified. This only applies when a ``TlsCertificate`` is delivered by SDS
 	// with references to filesystem paths. See the :ref:`SDS key rotation
 	// <sds_key_rotation>` documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,7,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
@@ -789,26 +789,26 @@ type CertificateValidationContext struct {
 	// See :ref:`the TLS overview <arch_overview_ssl_enabling_verification>` for a list of common
 	// system CA locations.
 	//
-	// If *trusted_ca* is a filesystem path, a watch will be added to the parent
+	// If ``trusted_ca`` is a filesystem path, a watch will be added to the parent
 	// directory for any file moves to support rotation. This currently only
-	// applies to dynamic secrets, when the *CertificateValidationContext* is
+	// applies to dynamic secrets, when the ``CertificateValidationContext`` is
 	// delivered via SDS.
 	//
-	// Only one of *trusted_ca* and *ca_certificate_provider_instance* may be specified.
+	// Only one of ``trusted_ca`` and ``ca_certificate_provider_instance`` may be specified.
 	//
 	// [#next-major-version: This field and watched_directory below should ideally be moved into a
 	// separate sub-message, since there's no point in specifying the latter field without this one.]
 	TrustedCa *v3.DataSource `protobuf:"bytes,1,opt,name=trusted_ca,json=trustedCa,proto3" json:"trusted_ca,omitempty"`
 	// Certificate provider instance for fetching TLS certificates.
 	//
-	// Only one of *trusted_ca* and *ca_certificate_provider_instance* may be specified.
+	// Only one of ``trusted_ca`` and ``ca_certificate_provider_instance`` may be specified.
 	// [#not-implemented-hide:]
 	CaCertificateProviderInstance *CertificateProviderPluginInstance `protobuf:"bytes,13,opt,name=ca_certificate_provider_instance,json=caCertificateProviderInstance,proto3" json:"ca_certificate_provider_instance,omitempty"`
-	// If specified, updates of a file-based *trusted_ca* source will be triggered
+	// If specified, updates of a file-based ``trusted_ca`` source will be triggered
 	// by this watch. This allows explicit control over the path watched, by
-	// default the parent directory of the filesystem path in *trusted_ca* is
+	// default the parent directory of the filesystem path in ``trusted_ca`` is
 	// watched if this field is not specified. This only applies when a
-	// *CertificateValidationContext* is delivered by SDS with references to
+	// ``CertificateValidationContext`` is delivered by SDS with references to
 	// filesystem paths. See the :ref:`SDS key rotation <sds_key_rotation>`
 	// documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,11,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`

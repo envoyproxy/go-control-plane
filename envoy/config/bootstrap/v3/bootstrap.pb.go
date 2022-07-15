@@ -219,7 +219,7 @@ type Bootstrap struct {
 	StatsFlush isBootstrap_StatsFlush `protobuf_oneof:"stats_flush"`
 	// Optional watchdog configuration.
 	// This is for a single watchdog configuration for the entire system.
-	// Deprecated in favor of *watchdogs* which has finer granularity.
+	// Deprecated in favor of ``watchdogs`` which has finer granularity.
 	//
 	// Deprecated: Do not use.
 	Watchdog *Watchdog `protobuf:"bytes,8,opt,name=watchdog,proto3" json:"watchdog,omitempty"`
@@ -269,7 +269,7 @@ type Bootstrap struct {
 	// when :ref:`dns_resolvers <envoy_v3_api_field_config.cluster.v3.Cluster.dns_resolvers>` and
 	// :ref:`use_tcp_for_dns_lookups <envoy_v3_api_field_config.cluster.v3.Cluster.use_tcp_for_dns_lookups>` are
 	// specified.
-	// This field is deprecated in favor of *dns_resolution_config*
+	// This field is deprecated in favor of ``dns_resolution_config``
 	// which aggregates all of the DNS resolver configuration in a single message.
 	//
 	// Deprecated: Do not use.
@@ -287,12 +287,12 @@ type Bootstrap struct {
 	// or any other DNS resolver types and the related parameters.
 	// For example, an object of
 	// :ref:`CaresDnsResolverConfig <envoy_v3_api_msg_extensions.network.dns_resolver.cares.v3.CaresDnsResolverConfig>`
-	// can be packed into this *typed_dns_resolver_config*. This configuration replaces the
+	// can be packed into this ``typed_dns_resolver_config``. This configuration replaces the
 	// :ref:`dns_resolution_config <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.dns_resolution_config>`
 	// configuration.
-	// During the transition period when both *dns_resolution_config* and *typed_dns_resolver_config* exists,
-	// when *typed_dns_resolver_config* is in place, Envoy will use it and ignore *dns_resolution_config*.
-	// When *typed_dns_resolver_config* is missing, the default behavior is in place.
+	// During the transition period when both ``dns_resolution_config`` and ``typed_dns_resolver_config`` exists,
+	// when ``typed_dns_resolver_config`` is in place, Envoy will use it and ignore ``dns_resolution_config``.
+	// When ``typed_dns_resolver_config`` is missing, the default behavior is in place.
 	// [#extension-category: envoy.network.dns_resolver]
 	TypedDnsResolverConfig *v3.TypedExtensionConfig `protobuf:"bytes,31,opt,name=typed_dns_resolver_config,json=typedDnsResolverConfig,proto3" json:"typed_dns_resolver_config,omitempty"`
 	// Specifies optional bootstrap extensions to be instantiated at startup time.
@@ -306,18 +306,18 @@ type Bootstrap struct {
 	// xdstp:// URL authority resolution. The algorithm is as
 	// follows:
 	// 1. The authority field is taken from the xdstp:// URL, call
-	//    this *resource_authority*.
-	// 2. *resource_authority* is compared against the authorities in any peer
-	//    *ConfigSource*. The peer *ConfigSource* is the configuration source
+	//    this ``resource_authority``.
+	// 2. ``resource_authority`` is compared against the authorities in any peer
+	//    ``ConfigSource``. The peer ``ConfigSource`` is the configuration source
 	//    message which would have been used unconditionally for resolution
 	//    with opaque resource names. If there is a match with an authority, the
-	//    peer *ConfigSource* message is used.
-	// 3. *resource_authority* is compared sequentially with the authorities in
-	//    each configuration source in *config_sources*. The first *ConfigSource*
+	//    peer ``ConfigSource`` message is used.
+	// 3. ``resource_authority`` is compared sequentially with the authorities in
+	//    each configuration source in ``config_sources``. The first ``ConfigSource``
 	//    to match wins.
 	// 4. As a fallback, if no configuration source matches, then
-	//    *default_config_source* is used.
-	// 5. If *default_config_source* is not specified, resolution fails.
+	//    ``default_config_source`` is used.
+	// 5. If ``default_config_source`` is not specified, resolution fails.
 	// [#not-implemented-hide:]
 	ConfigSources []*v3.ConfigSource `protobuf:"bytes,22,rep,name=config_sources,json=configSources,proto3" json:"config_sources,omitempty"`
 	// Default configuration source for xdstp:// URLs if all
@@ -642,7 +642,7 @@ type Admin struct {
 	// The path to write the access log for the administration server. If no
 	// access log is desired specify ‘/dev/null’. This is only required if
 	// :ref:`address <envoy_v3_api_field_config.bootstrap.v3.Admin.address>` is set.
-	// Deprecated in favor of *access_log* which offers more options.
+	// Deprecated in favor of ``access_log`` which offers more options.
 	//
 	// Deprecated: Do not use.
 	AccessLogPath string `protobuf:"bytes,1,opt,name=access_log_path,json=accessLogPath,proto3" json:"access_log_path,omitempty"`
@@ -744,7 +744,7 @@ type ClusterManager struct {
 	// Name of the local cluster (i.e., the cluster that owns the Envoy running
 	// this configuration). In order to enable :ref:`zone aware routing
 	// <arch_overview_load_balancing_zone_aware_routing>` this option must be set.
-	// If *local_cluster_name* is defined then :ref:`clusters
+	// If ``local_cluster_name`` is defined then :ref:`clusters
 	// <envoy_v3_api_msg_config.cluster.v3.Cluster>` must be defined in the :ref:`Bootstrap
 	// static cluster resources
 	// <envoy_v3_api_field_config.bootstrap.v3.Bootstrap.StaticResources.clusters>`. This is unrelated to
@@ -757,7 +757,7 @@ type ClusterManager struct {
 	// This may be overridden on a per-cluster basis by upstream_bind_config in the cds_config.
 	UpstreamBindConfig *v3.BindConfig `protobuf:"bytes,3,opt,name=upstream_bind_config,json=upstreamBindConfig,proto3" json:"upstream_bind_config,omitempty"`
 	// A management server endpoint to stream load stats to via
-	// *StreamLoadStats*. This must have :ref:`api_type
+	// ``StreamLoadStats``. This must have :ref:`api_type
 	// <envoy_v3_api_field_config.core.v3.ApiConfigSource.api_type>` :ref:`GRPC
 	// <envoy_v3_api_enum_value_config.core.v3.ApiConfigSource.ApiType.GRPC>`.
 	LoadStatsConfig *v3.ApiConfigSource `protobuf:"bytes,4,opt,name=load_stats_config,json=loadStatsConfig,proto3" json:"load_stats_config,omitempty"`
@@ -893,31 +893,31 @@ type Watchdog struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Register actions that will fire on given WatchDog events.
-	// See *WatchDogAction* for priority of events.
+	// See ``WatchDogAction`` for priority of events.
 	Actions []*Watchdog_WatchdogAction `protobuf:"bytes,7,rep,name=actions,proto3" json:"actions,omitempty"`
 	// The duration after which Envoy counts a nonresponsive thread in the
-	// *watchdog_miss* statistic. If not specified the default is 200ms.
+	// ``watchdog_miss`` statistic. If not specified the default is 200ms.
 	MissTimeout *duration.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout,proto3" json:"miss_timeout,omitempty"`
 	// The duration after which Envoy counts a nonresponsive thread in the
-	// *watchdog_mega_miss* statistic. If not specified the default is
+	// ``watchdog_mega_miss`` statistic. If not specified the default is
 	// 1000ms.
 	MegamissTimeout *duration.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout,proto3" json:"megamiss_timeout,omitempty"`
 	// If a watched thread has been nonresponsive for this duration, assume a
 	// programming error and kill the entire Envoy process. Set to 0 to disable
 	// kill behavior. If not specified the default is 0 (disabled).
 	KillTimeout *duration.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout,proto3" json:"kill_timeout,omitempty"`
-	// Defines the maximum jitter used to adjust the *kill_timeout* if *kill_timeout* is
+	// Defines the maximum jitter used to adjust the ``kill_timeout`` if ``kill_timeout`` is
 	// enabled. Enabling this feature would help to reduce risk of synchronized
 	// watchdog kill events across proxies due to external triggers. Set to 0 to
 	// disable. If not specified the default is 0 (disabled).
 	MaxKillTimeoutJitter *duration.Duration `protobuf:"bytes,6,opt,name=max_kill_timeout_jitter,json=maxKillTimeoutJitter,proto3" json:"max_kill_timeout_jitter,omitempty"`
-	// If max(2, ceil(registered_threads * Fraction(*multikill_threshold*)))
+	// If ``max(2, ceil(registered_threads * Fraction(*multikill_threshold*)))``
 	// threads have been nonresponsive for at least this duration kill the entire
 	// Envoy process. Set to 0 to disable this behavior. If not specified the
 	// default is 0 (disabled).
 	MultikillTimeout *duration.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout,proto3" json:"multikill_timeout,omitempty"`
-	// Sets the threshold for *multikill_timeout* in terms of the percentage of
-	// nonresponsive threads required for the *multikill_timeout*.
+	// Sets the threshold for ``multikill_timeout`` in terms of the percentage of
+	// nonresponsive threads required for the ``multikill_timeout``.
 	// If not specified the default is 0.
 	MultikillThreshold *v35.Percent `protobuf:"bytes,5,opt,name=multikill_threshold,json=multikillThreshold,proto3" json:"multikill_threshold,omitempty"`
 }
@@ -1009,7 +1009,7 @@ func (x *Watchdog) GetMultikillThreshold() *v35.Percent {
 // have an out of band system to terminate the process.
 //
 // The interface for the extension is ``Envoy::Server::Configuration::FatalAction``.
-// *FatalAction* extensions live in the ``envoy.extensions.fatal_actions`` API
+// ``FatalAction`` extensions live in the ``envoy.extensions.fatal_actions`` API
 // namespace.
 type FatalAction struct {
 	state         protoimpl.MessageState
@@ -1810,7 +1810,7 @@ type RuntimeLayer_RtdsLayer struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Resource to subscribe to at *rtds_config* for the RTDS layer.
+	// Resource to subscribe to at ``rtds_config`` for the RTDS layer.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// RTDS configuration source.
 	RtdsConfig *v3.ConfigSource `protobuf:"bytes,2,opt,name=rtds_config,json=rtdsConfig,proto3" json:"rtds_config,omitempty"`

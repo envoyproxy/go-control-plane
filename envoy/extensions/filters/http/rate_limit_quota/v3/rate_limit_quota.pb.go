@@ -340,7 +340,7 @@ type RateLimitQuotaBucketSettings struct {
 	// In this example, the value of ``BucketId`` key ``env`` is substituted from the ``environment``
 	// request header.
 	//
-	// This is equivalent to the following *pseudo-code*:
+	// This is equivalent to the following ``pseudo-code``:
 	//
 	// .. code-block:: yaml
 	//
@@ -401,7 +401,7 @@ type RateLimitQuotaBucketSettings struct {
 	// Configures the behavior in the "expired assignment" state: the bucket's assignment has expired,
 	// and cannot be refreshed.
 	//
-	// If not set, the bucket is abandoned when its *active* assignment expires.
+	// If not set, the bucket is abandoned when its ``active`` assignment expires.
 	// The process of abandoning the bucket, and restarting the subscription is described in the
 	// :ref:`AbandonAction <envoy_v3_api_msg_service.rate_limit_quota.v3.RateLimitQuotaResponse.BucketAction.AbandonAction>`
 	// message.
@@ -567,7 +567,7 @@ type RateLimitQuotaBucketSettings_ExpiredAssignmentBehavior struct {
 	//    message.
 	//
 	// If the field is not set, the ``ExpiredAssignmentBehavior`` time is **not limited**:
-	// it applies to the bucket until replaced by an *active* assignment.
+	// it applies to the bucket until replaced by an ``active`` assignment.
 	ExpiredAssignmentBehaviorTimeout *duration.Duration `protobuf:"bytes,1,opt,name=expired_assignment_behavior_timeout,json=expiredAssignmentBehaviorTimeout,proto3" json:"expired_assignment_behavior_timeout,omitempty"`
 	// Types that are assignable to ExpiredAssignmentBehavior:
 	//	*RateLimitQuotaBucketSettings_ExpiredAssignmentBehavior_FallbackRateLimit
@@ -648,7 +648,7 @@ type RateLimitQuotaBucketSettings_ExpiredAssignmentBehavior_FallbackRateLimit st
 }
 
 type RateLimitQuotaBucketSettings_ExpiredAssignmentBehavior_ReuseLastAssignment_ struct {
-	// Reuse the last *active* assignment until the RLQS server sends a new assignment, or the
+	// Reuse the last ``active`` assignment until the RLQS server sends a new assignment, or the
 	// :ref:`expired_assignment_behavior_timeout
 	// <envoy_v3_api_field_extensions.filters.http.rate_limit_quota.v3.RateLimitQuotaBucketSettings.ExpiredAssignmentBehavior.expired_assignment_behavior_timeout>`
 	// runs out.

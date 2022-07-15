@@ -48,7 +48,7 @@ type TcpProxy struct {
 	OnDemand *TcpProxy_OnDemand `protobuf:"bytes,14,opt,name=on_demand,json=onDemand,proto3" json:"on_demand,omitempty"`
 	// Optional endpoint metadata match criteria. Only endpoints in the upstream
 	// cluster with metadata matching that set in metadata_match will be
-	// considered. The filter name should be specified as *envoy.lb*.
+	// considered. The filter name should be specified as ``envoy.lb``.
 	MetadataMatch *v3.Metadata `protobuf:"bytes,9,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 	// The idle timeout for connections managed by the TCP proxy filter. The idle timeout
 	// is defined as the period in which there are no bytes sent or received on either
@@ -322,7 +322,7 @@ type TcpProxy_TunnelingConfig struct {
 	// Additional request headers to upstream proxy. This is mainly used to
 	// trigger upstream to convert POST requests back to CONNECT requests.
 	//
-	// Neither *:-prefixed* pseudo-headers nor the Host: header can be overridden.
+	// Neither ``:-prefixed`` pseudo-headers nor the Host: header can be overridden.
 	HeadersToAdd []*v3.HeaderValueOption `protobuf:"bytes,3,rep,name=headers_to_add,json=headersToAdd,proto3" json:"headers_to_add,omitempty"`
 }
 
@@ -469,7 +469,7 @@ type TcpProxy_WeightedCluster_ClusterWeight struct {
 	// for load balancing. Note that this will be merged with what's provided in
 	// :ref:`TcpProxy.metadata_match
 	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.metadata_match>`, with values
-	// here taking precedence. The filter name should be specified as *envoy.lb*.
+	// here taking precedence. The filter name should be specified as ``envoy.lb``.
 	MetadataMatch *v3.Metadata `protobuf:"bytes,3,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 }
 

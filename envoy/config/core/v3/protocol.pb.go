@@ -217,9 +217,9 @@ type QuicProtocolOptions struct {
 	// QUIC stream send and receive buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
 	// stop the flow of data to the stream buffers.
 	InitialStreamWindowSize *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
-	// Similar to *initial_stream_window_size*, but for connection-level
+	// Similar to ``initial_stream_window_size``, but for connection-level
 	// flow-control. Valid values rage from 1 to 25165824 (24MB, maximum supported by QUICHE) and defaults to 65536 (2^16).
-	// window. Currently, this has the same minimum/default as *initial_stream_window_size*.
+	// window. Currently, this has the same minimum/default as ``initial_stream_window_size``.
 	//
 	// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
 	// window size now, so it's also the minimum.
@@ -605,16 +605,16 @@ type Http1ProtocolOptions struct {
 	// Handle HTTP requests with absolute URLs in the requests. These requests
 	// are generally sent by clients to forward/explicit proxies. This allows clients to configure
 	// envoy as their HTTP proxy. In Unix, for example, this is typically done by setting the
-	// *http_proxy* environment variable.
+	// ``http_proxy`` environment variable.
 	AllowAbsoluteUrl *wrappers.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl,proto3" json:"allow_absolute_url,omitempty"`
 	// Handle incoming HTTP/1.0 and HTTP 0.9 requests.
 	// This is off by default, and not fully standards compliant. There is support for pre-HTTP/1.1
 	// style connect logic, dechunking, and handling lack of client host iff
-	// *default_host_for_http_10* is configured.
+	// ``default_host_for_http_10`` is configured.
 	AcceptHttp_10 bool `protobuf:"varint,2,opt,name=accept_http_10,json=acceptHttp10,proto3" json:"accept_http_10,omitempty"`
-	// A default host for HTTP/1.0 requests. This is highly suggested if *accept_http_10* is true as
+	// A default host for HTTP/1.0 requests. This is highly suggested if ``accept_http_10`` is true as
 	// Envoy does not otherwise support HTTP/1.0 without a Host header.
-	// This is a no-op if *accept_http_10* is not true.
+	// This is a no-op if ``accept_http_10`` is not true.
 	DefaultHostForHttp_10 string `protobuf:"bytes,3,opt,name=default_host_for_http_10,json=defaultHostForHttp10,proto3" json:"default_host_for_http_10,omitempty"`
 	// Describes how the keys for response headers should be formatted. By default, all header keys
 	// are lower cased.
@@ -866,8 +866,8 @@ type Http2ProtocolOptions struct {
 	// HTTP/2 codec buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
 	// stop the flow of data to the codec buffers.
 	InitialStreamWindowSize *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
-	// Similar to *initial_stream_window_size*, but for connection-level flow-control
-	// window. Currently, this has the same minimum/maximum/default as *initial_stream_window_size*.
+	// Similar to ``initial_stream_window_size``, but for connection-level flow-control
+	// window. Currently, this has the same minimum/maximum/default as ``initial_stream_window_size``.
 	InitialConnectionWindowSize *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// Allows proxying Websocket and other upgrades over H2 connect.
 	AllowConnect bool `protobuf:"varint,5,opt,name=allow_connect,json=allowConnect,proto3" json:"allow_connect,omitempty"`
@@ -900,7 +900,7 @@ type Http2ProtocolOptions struct {
 	// of PRIORITY frames received over the lifetime of connection exceeds the value calculated
 	// using this formula::
 	//
-	//   max_inbound_priority_frames_per_stream * (1 + opened_streams)
+	//   ``max_inbound_priority_frames_per_stream`` * (1 + ``opened_streams``)
 	//
 	// the connection is terminated. For downstream connections the ``opened_streams`` is incremented when
 	// Envoy receives complete response headers from the upstream server. For upstream connection the
@@ -912,8 +912,8 @@ type Http2ProtocolOptions struct {
 	// of WINDOW_UPDATE frames received over the lifetime of connection exceeds the value calculated
 	// using this formula::
 	//
-	//   5 + 2 * (opened_streams +
-	//            max_inbound_window_update_frames_per_data_frame_sent * outbound_data_frames)
+	//   5 + 2 * (``opened_streams`` +
+	//            ``max_inbound_window_update_frames_per_data_frame_sent`` * ``outbound_data_frames``)
 	//
 	// the connection is terminated. For downstream connections the ``opened_streams`` is incremented when
 	// Envoy receives complete response headers from the upstream server. For upstream connections the

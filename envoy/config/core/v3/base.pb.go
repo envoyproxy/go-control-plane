@@ -733,19 +733,19 @@ type Metadata struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Key is the reverse DNS filter name, e.g. com.acme.widget. The envoy.*
+	// Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
 	// namespace is reserved for Envoy's built-in filters.
-	// If both *filter_metadata* and
+	// If both ``filter_metadata`` and
 	// :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>`
 	// fields are present in the metadata with same keys,
-	// only *typed_filter_metadata* field will be parsed.
+	// only ``typed_filter_metadata`` field will be parsed.
 	FilterMetadata map[string]*_struct.Struct `protobuf:"bytes,1,rep,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// Key is the reverse DNS filter name, e.g. com.acme.widget. The envoy.*
+	// Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
 	// namespace is reserved for Envoy's built-in filters.
 	// The value is encoded as google.protobuf.Any.
 	// If both :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
-	// and *typed_filter_metadata* fields are present in the metadata with same keys,
-	// only *typed_filter_metadata* field will be parsed.
+	// and ``typed_filter_metadata`` fields are present in the metadata with same keys,
+	// only ``typed_filter_metadata`` field will be parsed.
 	TypedFilterMetadata map[string]*any.Any `protobuf:"bytes,2,rep,name=typed_filter_metadata,json=typedFilterMetadata,proto3" json:"typed_filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 

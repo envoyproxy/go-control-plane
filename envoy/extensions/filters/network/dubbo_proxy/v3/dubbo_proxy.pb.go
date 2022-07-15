@@ -121,7 +121,7 @@ type Drds struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Configuration source specifier.
-	// In case of *api_config_source* only aggregated *api_type* is supported.
+	// In case of ``api_config_source`` only aggregated ``api_type`` is supported.
 	ConfigSource *v3.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
 	// The name of the multiple route configuration. This allows to use different multiple route
 	// configurations. Tells which multiple route configuration should be fetched from the configuration
@@ -300,7 +300,7 @@ type isDubboProxy_RouteSpecifier interface {
 }
 
 type DubboProxy_Drds struct {
-	// Use xDS to fetch the route configuration. It is invalid to define both *route_config* and *drds*.
+	// Use xDS to fetch the route configuration. It is invalid to define both ``route_config`` and ``drds``.
 	Drds *Drds `protobuf:"bytes,6,opt,name=drds,proto3,oneof"`
 }
 

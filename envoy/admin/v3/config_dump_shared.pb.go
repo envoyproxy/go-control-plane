@@ -656,7 +656,7 @@ type ListenersConfigDump_DynamicListener struct {
 	// configuration dump, the draining listeners should generally be discarded.
 	DrainingState *ListenersConfigDump_DynamicListenerState `protobuf:"bytes,4,opt,name=draining_state,json=drainingState,proto3" json:"draining_state,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
-	// The *error_state* field contains the rejected version of this particular
+	// The ``error_state`` field contains the rejected version of this particular
 	// resource along with the reason and timestamp. For successfully updated or
 	// acknowledged resource, this field should be empty.
 	ErrorState *UpdateFailureState `protobuf:"bytes,5,opt,name=error_state,json=errorState,proto3" json:"error_state,omitempty"`
@@ -814,7 +814,7 @@ type ClustersConfigDump_DynamicCluster struct {
 	// The timestamp when the Cluster was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
-	// The *error_state* field contains the rejected version of this particular
+	// The ``error_state`` field contains the rejected version of this particular
 	// resource along with the reason and timestamp. For successfully updated or
 	// acknowledged resource, this field should be empty.
 	// [#not-implemented-hide:]
@@ -963,7 +963,7 @@ type RoutesConfigDump_DynamicRouteConfig struct {
 	// The timestamp when the Route was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
-	// The *error_state* field contains the rejected version of this particular
+	// The ``error_state`` field contains the rejected version of this particular
 	// resource along with the reason and timestamp. For successfully updated or
 	// acknowledged resource, this field should be empty.
 	// [#not-implemented-hide:]
@@ -1123,7 +1123,7 @@ type ScopedRoutesConfigDump_DynamicScopedRouteConfigs struct {
 	// The timestamp when the scoped route config set was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,4,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
-	// The *error_state* field contains the rejected version of this particular
+	// The ``error_state`` field contains the rejected version of this particular
 	// resource along with the reason and timestamp. For successfully updated or
 	// acknowledged resource, this field should be empty.
 	// [#not-implemented-hide:]
@@ -1279,7 +1279,7 @@ type EndpointsConfigDump_DynamicEndpointConfig struct {
 	// [#not-implemented-hide:] The timestamp when the Endpoint was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
-	// The *error_state* field contains the rejected version of this particular
+	// The ``error_state`` field contains the rejected version of this particular
 	// resource along with the reason and timestamp. For successfully updated or
 	// acknowledged resource, this field should be empty.
 	// [#not-implemented-hide:]

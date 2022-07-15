@@ -158,7 +158,7 @@ type Trds struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Configuration source specifier.
-	// In case of *api_config_source* only aggregated *api_type* is supported.
+	// In case of ``api_config_source`` only aggregated ``api_type`` is supported.
 	ConfigSource *v3.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
 	// The name of the route configuration. This allows to use different route
 	// configurations. Tells which route configuration should be fetched from the configuration source.
@@ -227,9 +227,9 @@ type ThriftProxy struct {
 	// The human readable prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// The route table for the connection manager is static and is specified in this property.
-	// It is invalid to define both *route_config* and *trds*.
+	// It is invalid to define both ``route_config`` and ``trds``.
 	RouteConfig *RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
-	// Use xDS to fetch the route configuration. It is invalid to define both *route_config* and *trds*.
+	// Use xDS to fetch the route configuration. It is invalid to define both ``route_config`` and ``trds``.
 	Trds *Trds `protobuf:"bytes,8,opt,name=trds,proto3" json:"trds,omitempty"`
 	// A list of individual Thrift filters that make up the filter chain for requests made to the
 	// Thrift proxy. Order matters as the filters are processed sequentially. For backwards

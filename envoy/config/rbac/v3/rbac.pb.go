@@ -96,10 +96,10 @@ func (RBAC_Action) EnumDescriptor() ([]byte, []int) {
 //
 // Here is an example of RBAC configuration. It has two policies:
 //
-// * Service account "cluster.local/ns/default/sa/admin" has full access to the service, and so
+// * Service account ``cluster.local/ns/default/sa/admin`` has full access to the service, and so
 //   does "cluster.local/ns/default/sa/superuser".
 //
-// * Any user can read ("GET") the service at paths with prefix "/products", so long as the
+// * Any user can read (``GET``) the service at paths with prefix ``/products``, so long as the
 //   destination port is either 80 or 443.
 //
 //  .. code-block:: yaml
@@ -143,13 +143,13 @@ type RBAC struct {
 	//
 	// Actions:
 	//
-	//  * ALLOW: Allows the request if and only if there is a policy that matches
+	//  * ``ALLOW``: Allows the request if and only if there is a policy that matches
 	//    the request.
-	//  * DENY: Allows the request if and only if there are no policies that
+	//  * ``DENY``: Allows the request if and only if there are no policies that
 	//    match the request.
-	//  * LOG: Allows all requests. If at least one policy matches, the dynamic
+	//  * ``LOG``: Allows all requests. If at least one policy matches, the dynamic
 	//    metadata key ``access_log_hint`` is set to the value ``true`` under the shared
-	//    key namespace 'envoy.common'. If no policies match, it is set to ``false``.
+	//    key namespace ``envoy.common``. If no policies match, it is set to ``false``.
 	//    Other actions do not modify this key.
 	//
 	Action RBAC_Action `protobuf:"varint,1,opt,name=action,proto3,enum=envoy.config.rbac.v3.RBAC_Action" json:"action,omitempty"`
@@ -805,12 +805,12 @@ type Action struct {
 	//
 	// Actions:
 	//
-	//  * ALLOW: If the request gets matched on ALLOW, it is permitted.
-	//  * DENY: If the request gets matched on DENY, it is not permitted.
-	//  * LOG: If the request gets matched on LOG, it is permitted. Besides, the
+	//  * ``ALLOW``: If the request gets matched on ALLOW, it is permitted.
+	//  * ``DENY``: If the request gets matched on DENY, it is not permitted.
+	//  * ``LOG``: If the request gets matched on LOG, it is permitted. Besides, the
 	//    dynamic metadata key ``access_log_hint`` under the shared key namespace
-	//    'envoy.common' will be set to the value ``true``.
-	//  * If the request cannot get matched, it will fallback to DENY.
+	//    ``envoy.common`` will be set to the value ``true``.
+	//  * If the request cannot get matched, it will fallback to ``DENY``.
 	//
 	// Log behavior:
 	//

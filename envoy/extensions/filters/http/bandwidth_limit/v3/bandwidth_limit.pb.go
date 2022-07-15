@@ -115,10 +115,10 @@ type BandwidthLimit struct {
 	//
 	// .. note::
 	//
-	//   * If set true, the response trailers *bandwidth-request-delay-ms* and *bandwidth-response-delay-ms* will be added, prefixed by *response_trailer_prefix*.
+	//   * If set true, the response trailers ``bandwidth-request-delay-ms`` and ``bandwidth-response-delay-ms`` will be added, prefixed by ``response_trailer_prefix``.
 	//   * bandwidth-request-delay-ms: delay time in milliseconds it took for the request stream transfer.
 	//   * bandwidth-response-delay-ms: delay time in milliseconds it took for the response stream transfer.
-	//   * If :ref:`enable_mode <envoy_v3_api_field_extensions.filters.http.bandwidth_limit.v3.BandwidthLimit.enable_mode>` is DISABLED or REQUEST, the trailers will not be set.
+	//   * If :ref:`enable_mode <envoy_v3_api_field_extensions.filters.http.bandwidth_limit.v3.BandwidthLimit.enable_mode>` is ``DISABLED`` or ``REQUEST``, the trailers will not be set.
 	//   * If both the request and response delay time is 0, the trailers will not be set.
 	//
 	EnableResponseTrailers bool `protobuf:"varint,6,opt,name=enable_response_trailers,json=enableResponseTrailers,proto3" json:"enable_response_trailers,omitempty"`

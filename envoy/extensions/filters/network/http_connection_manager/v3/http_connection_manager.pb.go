@@ -381,7 +381,7 @@ type HttpConnectionManager struct {
 	// [#not-implemented-hide:]
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,44,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
 	// An optional override that the connection manager will write to the server
-	// header in responses. If not set, the default is *envoy*.
+	// header in responses. If not set, the default is ``envoy``.
 	ServerName string `protobuf:"bytes,10,opt,name=server_name,json=serverName,proto3" json:"server_name,omitempty"`
 	// Defines the action to be applied to the Server header on the response path.
 	// By default, Envoy will overwrite the header with the value specified in
@@ -531,7 +531,7 @@ type HttpConnectionManager struct {
 	// has mutated the request headers. While :ref:`use_remote_address
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
 	// will also suppress XFF addition, it has consequences for logging and other
-	// Envoy uses of the remote address, so *skip_xff_append* should be used
+	// Envoy uses of the remote address, so ``skip_xff_append`` should be used
 	// when only an elision of XFF addition is intended.
 	SkipXffAppend bool `protobuf:"varint,21,opt,name=skip_xff_append,json=skipXffAppend,proto3" json:"skip_xff_append,omitempty"`
 	// Via header value to append to request and response headers. If this is
@@ -558,8 +558,8 @@ type HttpConnectionManager struct {
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.forward_client_cert_details>`
 	// is APPEND_FORWARD or SANITIZE_SET and the client connection is mTLS. It specifies the fields in
 	// the client certificate to be forwarded. Note that in the
-	// :ref:`config_http_conn_man_headers_x-forwarded-client-cert` header, *Hash* is always set, and
-	// *By* is always set when the client certificate presents the URI type Subject Alternative Name
+	// :ref:`config_http_conn_man_headers_x-forwarded-client-cert` header, ``Hash`` is always set, and
+	// ``By`` is always set when the client certificate presents the URI type Subject Alternative Name
 	// value.
 	SetCurrentClientCertDetails *HttpConnectionManager_SetCurrentClientCertDetails `protobuf:"bytes,17,opt,name=set_current_client_cert_details,json=setCurrentClientCertDetails,proto3" json:"set_current_client_cert_details,omitempty"`
 	// If proxy_100_continue is true, Envoy will proxy incoming "Expect:
@@ -571,7 +571,7 @@ type HttpConnectionManager struct {
 	// :ref:`use_remote_address
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
 	// is true and represent_ipv4_remote_address_as_ipv4_mapped_ipv6 is true and the remote address is
-	// an IPv4 address, the address will be mapped to IPv6 before it is appended to *x-forwarded-for*.
+	// an IPv4 address, the address will be mapped to IPv6 before it is appended to ``x-forwarded-for``.
 	// This is useful for testing compatibility of upstream services that parse the header value. For
 	// example, 50.0.0.1 is represented as ::FFFF:50.0.0.1. See `IPv4-Mapped IPv6 Addresses
 	// <https://tools.ietf.org/html/rfc4291#section-2.5.5.2>`_ for details. This will also affect the
@@ -583,7 +583,7 @@ type HttpConnectionManager struct {
 	RepresentIpv4RemoteAddressAsIpv4MappedIpv6 bool                                   `protobuf:"varint,20,opt,name=represent_ipv4_remote_address_as_ipv4_mapped_ipv6,json=representIpv4RemoteAddressAsIpv4MappedIpv6,proto3" json:"represent_ipv4_remote_address_as_ipv4_mapped_ipv6,omitempty"`
 	UpgradeConfigs                             []*HttpConnectionManager_UpgradeConfig `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs,proto3" json:"upgrade_configs,omitempty"`
 	// Should paths be normalized according to RFC 3986 before any processing of
-	// requests by HTTP filters or routing? This affects the upstream *:path* header
+	// requests by HTTP filters or routing? This affects the upstream ``:path`` header
 	// as well. For paths that fail this check, Envoy will respond with 400 to
 	// paths that are malformed. This defaults to false currently but will default
 	// true in the future. When not specified, this value may be overridden by the
@@ -598,7 +598,7 @@ type HttpConnectionManager struct {
 	// is present.]
 	NormalizePath *wrappers.BoolValue `protobuf:"bytes,30,opt,name=normalize_path,json=normalizePath,proto3" json:"normalize_path,omitempty"`
 	// Determines if adjacent slashes in the path are merged into one before any processing of
-	// requests by HTTP filters or routing. This affects the upstream *:path* header as well. Without
+	// requests by HTTP filters or routing. This affects the upstream ``:path`` header as well. Without
 	// setting this option, incoming requests with path ``//dir///file`` will not match against route
 	// with ``prefix`` match set to ``/dir``. Defaults to ``false``. Note that slash merging is not part of
 	// `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
@@ -663,13 +663,13 @@ type HttpConnectionManager struct {
 	// <envoy_v3_api_field_config.core.v3.Http1ProtocolOptions.override_stream_error_on_invalid_http_message>` or the new HTTP/2 option
 	// :ref:`override_stream_error_on_invalid_http_message
 	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.override_stream_error_on_invalid_http_message>`
-	// *not* the deprecated but similarly named :ref:`stream_error_on_invalid_http_messaging
+	// ``not`` the deprecated but similarly named :ref:`stream_error_on_invalid_http_messaging
 	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.stream_error_on_invalid_http_messaging>`
 	StreamErrorOnInvalidHttpMessage *wrappers.BoolValue `protobuf:"bytes,40,opt,name=stream_error_on_invalid_http_message,json=streamErrorOnInvalidHttpMessage,proto3" json:"stream_error_on_invalid_http_message,omitempty"`
 	// [#not-implemented-hide:] Path normalization configuration. This includes
 	// configurations for transformations (e.g. RFC 3986 normalization or merge
 	// adjacent slashes) and the policy to apply them. The policy determines
-	// whether transformations affect the forwarded *:path* header. RFC 3986 path
+	// whether transformations affect the forwarded ``:path`` header. RFC 3986 path
 	// normalization is enabled by default and the default policy is that the
 	// normalized header will be forwarded. See :ref:`PathNormalizationOptions
 	// <envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.PathNormalizationOptions>`
@@ -1869,7 +1869,7 @@ type HttpConnectionManager_Tracing struct {
 	// If not specified, no tracing will be performed.
 	//
 	// .. attention::
-	//   Please be aware that *envoy.tracers.opencensus* provider can only be configured once
+	//   Please be aware that ``envoy.tracers.opencensus`` provider can only be configured once
 	//   in Envoy lifetime.
 	//   Any attempts to reconfigure it or to use different configurations for different HCM filters
 	//   will be rejected.
@@ -2200,17 +2200,17 @@ func (x *HttpConnectionManager_UpgradeConfig) GetEnabled() *wrappers.BoolValue {
 // path will be visible internally if a transformation is enabled. Any path rewrites that the
 // router performs (e.g. :ref:`regex_rewrite
 // <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>` or :ref:`prefix_rewrite
-// <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`) will apply to the *:path* header
+// <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`) will apply to the ``:path`` header
 // destined for the upstream.
 //
-// Note: access logging and tracing will show the original *:path* header.
+// Note: access logging and tracing will show the original ``:path`` header.
 type HttpConnectionManager_PathNormalizationOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// [#not-implemented-hide:] Normalization applies internally before any processing of requests by
-	// HTTP filters, routing, and matching *and* will affect the forwarded *:path* header. Defaults
+	// HTTP filters, routing, and matching *and* will affect the forwarded ``:path`` header. Defaults
 	// to :ref:`NormalizePathRFC3986
 	// <envoy_v3_api_msg_type.http.v3.PathTransformation.Operation.NormalizePathRFC3986>`. When not
 	// specified, this value may be overridden by the runtime variable
@@ -2220,7 +2220,7 @@ type HttpConnectionManager_PathNormalizationOptions struct {
 	ForwardingTransformation *v36.PathTransformation `protobuf:"bytes,1,opt,name=forwarding_transformation,json=forwardingTransformation,proto3" json:"forwarding_transformation,omitempty"`
 	// [#not-implemented-hide:] Normalization only applies internally before any processing of
 	// requests by HTTP filters, routing, and matching. These will be applied after full
-	// transformation is applied. The *:path* header before this transformation will be restored in
+	// transformation is applied. The ``:path`` header before this transformation will be restored in
 	// the router filter and sent upstream unless it was mutated by a filter. Defaults to no
 	// transformations.
 	// Multiple actions can be applied in the same Transformation, forming a sequential

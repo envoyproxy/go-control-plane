@@ -31,7 +31,7 @@ const (
 	// In case upstream host returns certain number of consecutive 5xx.
 	// If
 	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
-	// is *false*, all type of errors are treated as HTTP 5xx errors.
+	// is ``false``, all type of errors are treated as HTTP 5xx errors.
 	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
 	// details.
 	OutlierEjectionType_CONSECUTIVE_5XX OutlierEjectionType = 0
@@ -42,21 +42,21 @@ const (
 	// in the cluster.
 	// If
 	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
-	// is *false*, all errors (externally and locally generated) are used to calculate success rate
+	// is ``false``, all errors (externally and locally generated) are used to calculate success rate
 	// statistics. See :ref:`Cluster outlier detection <arch_overview_outlier_detection>`
 	// documentation for details.
 	OutlierEjectionType_SUCCESS_RATE OutlierEjectionType = 2
 	// Consecutive local origin failures: Connection failures, resets, timeouts, etc
 	// This type of ejection happens only when
 	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
-	// is set to *true*.
+	// is set to ``true``.
 	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
 	OutlierEjectionType_CONSECUTIVE_LOCAL_ORIGIN_FAILURE OutlierEjectionType = 3
 	// Runs over aggregated success rate statistics for local origin failures
 	// for all hosts in the cluster and selects hosts for which success rate deviates from other
 	// hosts in the cluster. This type of ejection happens only when
 	// :ref:`outlier_detection.split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
-	// is set to *true*.
+	// is set to ``true``.
 	// See :ref:`Cluster outlier detection <arch_overview_outlier_detection>` documentation for
 	OutlierEjectionType_SUCCESS_RATE_LOCAL_ORIGIN OutlierEjectionType = 4
 	// Runs over aggregated success rate statistics from every host in cluster and selects hosts for

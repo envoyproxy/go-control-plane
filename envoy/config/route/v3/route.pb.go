@@ -38,10 +38,10 @@ type RouteConfiguration struct {
 	// An array of virtual hosts that make up the route table.
 	VirtualHosts []*VirtualHost `protobuf:"bytes,2,rep,name=virtual_hosts,json=virtualHosts,proto3" json:"virtual_hosts,omitempty"`
 	// An array of virtual hosts will be dynamically loaded via the VHDS API.
-	// Both *virtual_hosts* and *vhds* fields will be used when present. *virtual_hosts* can be used
-	// for a base routing table or for infrequently changing virtual hosts. *vhds* is used for
+	// Both ``virtual_hosts`` and ``vhds`` fields will be used when present. ``virtual_hosts`` can be used
+	// for a base routing table or for infrequently changing virtual hosts. ``vhds`` is used for
 	// on-demand discovery of virtual hosts. The contents of these two fields will be merged to
-	// generate a routing table for a given RouteConfiguration, with *vhds* derived configuration
+	// generate a routing table for a given RouteConfiguration, with ``vhds`` derived configuration
 	// taking precedence.
 	Vhds *Vhds `protobuf:"bytes,9,opt,name=vhds,proto3" json:"vhds,omitempty"`
 	// Optionally specifies a list of HTTP headers that the connection manager
@@ -107,7 +107,7 @@ type RouteConfiguration struct {
 	MaxDirectResponseBodySizeBytes *wrappers.UInt32Value `protobuf:"bytes,11,opt,name=max_direct_response_body_size_bytes,json=maxDirectResponseBodySizeBytes,proto3" json:"max_direct_response_body_size_bytes,omitempty"`
 	// A list of plugins and their configurations which may be used by a
 	// :ref:`cluster specifier plugin name <envoy_v3_api_field_config.route.v3.RouteAction.cluster_specifier_plugin>`
-	// within the route. All *extension.name* fields in this list must be unique.
+	// within the route. All ``extension.name`` fields in this list must be unique.
 	ClusterSpecifierPlugins []*ClusterSpecifierPlugin `protobuf:"bytes,12,rep,name=cluster_specifier_plugins,json=clusterSpecifierPlugins,proto3" json:"cluster_specifier_plugins,omitempty"`
 	// Specify a set of default request mirroring policies which apply to all routes under its virtual hosts.
 	// Note that policies are not merged, the most specific non-empty one becomes the mirror policies.

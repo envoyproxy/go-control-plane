@@ -46,7 +46,7 @@ type CsrfPolicy struct {
 	//
 	// If :ref:`runtime_key <envoy_v3_api_field_config.core.v3.RuntimeFractionalPercent.runtime_key>` is specified,
 	// Envoy will lookup the runtime key to get the percentage of requests for which it will evaluate
-	// and track the request's *Origin* and *Destination* to determine if it's valid, but will not
+	// and track the request's ``Origin`` and ``Destination`` to determine if it's valid, but will not
 	// enforce any policies.
 	ShadowEnabled *v3.RuntimeFractionalPercent `protobuf:"bytes,2,opt,name=shadow_enabled,json=shadowEnabled,proto3" json:"shadow_enabled,omitempty"`
 	// Specifies additional source origins that will be allowed in addition to

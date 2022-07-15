@@ -31,7 +31,7 @@ type CapabilityRestrictionConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The Proxy-Wasm capabilities which will be allowed. Capabilities are mapped by
-	// name. The *SanitizationConfig* which each capability maps to is currently unimplemented and ignored,
+	// name. The ``SanitizationConfig`` which each capability maps to is currently unimplemented and ignored,
 	// and so should be left empty.
 	//
 	// The capability names are given in the
@@ -39,8 +39,8 @@ type CapabilityRestrictionConfig struct {
 	// Additionally, the following WASI capabilities from
 	// `this list <https://github.com/WebAssembly/WASI/blob/master/phases/snapshot/docs.md#modules>`_
 	// are implemented and can be allowed:
-	// *fd_write*, *fd_read*, *fd_seek*, *fd_close*, *fd_fdstat_get*, *environ_get*, *environ_sizes_get*,
-	// *args_get*, *args_sizes_get*, *proc_exit*, *clock_time_get*, *random_get*.
+	// ``fd_write``, ``fd_read``, ``fd_seek``, ``fd_close``, ``fd_fdstat_get``, ``environ_get``, ``environ_sizes_get``,
+	// ``args_get``, ``args_sizes_get``, ``proc_exit``, ``clock_time_get``, ``random_get``.
 	AllowedCapabilities map[string]*SanitizationConfig `protobuf:"bytes,1,rep,name=allowed_capabilities,json=allowedCapabilities,proto3" json:"allowed_capabilities,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -133,7 +133,7 @@ type VmConfig struct {
 
 	// An ID which will be used along with a hash of the wasm code (or the name of the registered Null
 	// VM plugin) to determine which VM will be used for the plugin. All plugins which use the same
-	// *vm_id* and code will use the same VM. May be left blank. Sharing a VM between plugins can
+	// ``vm_id`` and code will use the same VM. May be left blank. Sharing a VM between plugins can
 	// reduce memory utilization and make sharing of data easier which may have security implications.
 	// [#comment: TODO: add ref for details.]
 	VmId string `protobuf:"bytes,1,opt,name=vm_id,json=vmId,proto3" json:"vm_id,omitempty"`
@@ -144,7 +144,7 @@ type VmConfig struct {
 	// .. _extension_envoy.wasm.runtime.null:
 	//
 	// **envoy.wasm.runtime.null**: Null sandbox, the Wasm module must be compiled and linked into the
-	// Envoy binary. The registered name is given in the *code* field as *inline_string*.
+	// Envoy binary. The registered name is given in the ``code`` field as ``inline_string``.
 	//
 	// .. _extension_envoy.wasm.runtime.v8:
 	//
@@ -337,12 +337,12 @@ type PluginConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// A unique name for a filters/services in a VM for use in identifying the filter/service if
-	// multiple filters/services are handled by the same *vm_id* and *root_id* and for
+	// multiple filters/services are handled by the same ``vm_id`` and ``root_id`` and for
 	// logging/debugging.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A unique ID for a set of filters/services in a VM which will share a RootContext and Contexts
 	// if applicable (e.g. an Wasm HttpFilter and an Wasm AccessLog). If left blank, all
-	// filters/services with a blank root_id with the same *vm_id* will share Context(s).
+	// filters/services with a blank root_id with the same ``vm_id`` will share Context(s).
 	RootId string `protobuf:"bytes,2,opt,name=root_id,json=rootId,proto3" json:"root_id,omitempty"`
 	// Configuration for finding or starting VM.
 	//
@@ -456,7 +456,7 @@ type PluginConfig_VmConfig struct {
 
 func (*PluginConfig_VmConfig) isPluginConfig_Vm() {}
 
-// WasmService is configured as a built-in *envoy.wasm_service* :ref:`WasmService
+// WasmService is configured as a built-in ``envoy.wasm_service`` :ref:`WasmService
 // <config_wasm_service>` This opaque configuration will be used to create a Wasm Service.
 type WasmService struct {
 	state         protoimpl.MessageState

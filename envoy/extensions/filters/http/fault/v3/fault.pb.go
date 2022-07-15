@@ -144,7 +144,7 @@ type HTTPFault struct {
 	// object.
 	Delay *v31.FaultDelay `protobuf:"bytes,1,opt,name=delay,proto3" json:"delay,omitempty"`
 	// If specified, the filter will abort requests based on the values in
-	// the object. At least *abort* or *delay* must be specified.
+	// the object. At least ``abort`` or ``delay`` must be specified.
 	Abort *FaultAbort `protobuf:"bytes,2,opt,name=abort,proto3" json:"abort,omitempty"`
 	// Specifies the name of the (destination) upstream cluster that the
 	// filter should match on. Fault injection will be restricted to requests
@@ -158,7 +158,7 @@ type HTTPFault struct {
 	// The filter will check the request's headers against all the specified
 	// headers in the filter config. A match will happen if all the headers in the
 	// config are present in the request with the same values (or based on
-	// presence if the *value* field is not in the config).
+	// presence if the ``value`` field is not in the config).
 	Headers []*v32.HeaderMatcher `protobuf:"bytes,4,rep,name=headers,proto3" json:"headers,omitempty"`
 	// Faults are injected for the specified list of downstream hosts. If this
 	// setting is not set, faults are injected for all downstream nodes.

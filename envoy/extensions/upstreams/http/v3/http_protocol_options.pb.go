@@ -162,8 +162,8 @@ type isHttpProtocolOptions_UpstreamProtocolOptions interface {
 }
 
 type HttpProtocolOptions_ExplicitHttpConfig_ struct {
-	// To explicitly configure either HTTP/1 or HTTP/2 (but not both!) use *explicit_http_config*.
-	// If the *explicit_http_config* is empty, HTTP/1.1 is used.
+	// To explicitly configure either HTTP/1 or HTTP/2 (but not both!) use ``explicit_http_config``.
+	// If the ``explicit_http_config`` is empty, HTTP/1.1 is used.
 	ExplicitHttpConfig *HttpProtocolOptions_ExplicitHttpConfig `protobuf:"bytes,3,opt,name=explicit_http_config,json=explicitHttpConfig,proto3,oneof"`
 }
 
@@ -360,9 +360,9 @@ func (x *HttpProtocolOptions_UseDownstreamHttpConfig) GetHttp3ProtocolOptions() 
 
 // If this is used, the cluster can use either HTTP/1 or HTTP/2, and will use whichever
 // protocol is negotiated by ALPN with the upstream.
-// Clusters configured with *AutoHttpConfig* will use the highest available
+// Clusters configured with ``AutoHttpConfig`` will use the highest available
 // protocol; HTTP/2 if supported, otherwise HTTP/1.
-// If the upstream does not support ALPN, *AutoHttpConfig* will fail over to HTTP/1.
+// If the upstream does not support ALPN, ``AutoHttpConfig`` will fail over to HTTP/1.
 // This can only be used with transport sockets which support ALPN. Using a
 // transport socket which does not support ALPN will result in configuration
 // failure. The transport layer may be configured with custom ALPN, but the default ALPN

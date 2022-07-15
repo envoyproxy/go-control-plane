@@ -33,7 +33,7 @@ type OmitHostMetadataConfig struct {
 	// Retry host predicate metadata match criteria. The hosts in
 	// the upstream cluster with matching metadata will be omitted while
 	// attempting a retry of a failed request. The metadata should be specified
-	// under the *envoy.lb* key.
+	// under the ``envoy.lb`` key.
 	MetadataMatch *v3.Metadata `protobuf:"bytes,1,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 }
 

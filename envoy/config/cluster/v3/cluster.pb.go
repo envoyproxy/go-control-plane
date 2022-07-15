@@ -484,7 +484,7 @@ func (Cluster_RingHashLbConfig_HashFunction) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 7, 0}
 }
 
-// Cluster list collections. Entries are *Cluster* resources or references.
+// Cluster list collections. Entries are ``Cluster`` resources or references.
 // [#not-implemented-hide:]
 type ClusterCollection struct {
 	state         protoimpl.MessageState
@@ -541,7 +541,7 @@ type Cluster struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Configuration to use different transport sockets for different endpoints.
-	// The entry of *envoy.transport_socket_match* in the
+	// The entry of ``envoy.transport_socket_match`` in the
 	// :ref:`LbEndpoint.Metadata <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>`
 	// is used to match against the transport sockets as they appear in the list. The first
 	// :ref:`match <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>` is used.
@@ -561,16 +561,16 @@ type Cluster struct {
 	//    transport_socket:
 	//      name: envoy.transport_sockets.raw_buffer
 	//
-	// Connections to the endpoints whose metadata value under *envoy.transport_socket_match*
+	// Connections to the endpoints whose metadata value under ``envoy.transport_socket_match``
 	// having "acceptMTLS"/"true" key/value pair use the "enableMTLS" socket configuration.
 	//
 	// If a :ref:`socket match <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>` with empty match
 	// criteria is provided, that always match any endpoint. For example, the "defaultToPlaintext"
 	// socket match in case above.
 	//
-	// If an endpoint metadata's value under *envoy.transport_socket_match* does not match any
-	// *TransportSocketMatch*, socket configuration fallbacks to use the *tls_context* or
-	// *transport_socket* specified in this cluster.
+	// If an endpoint metadata's value under ``envoy.transport_socket_match`` does not match any
+	// ``TransportSocketMatch``, socket configuration fallbacks to use the ``tls_context`` or
+	// ``transport_socket`` specified in this cluster.
 	//
 	// This field allows gradual and flexible transport socket configuration changes.
 	//
@@ -581,8 +581,8 @@ type Cluster struct {
 	//
 	// Then the xDS server can configure the CDS to a client, Envoy A, to send mutual TLS
 	// traffic for endpoints with "acceptMTLS": "true", by adding a corresponding
-	// *TransportSocketMatch* in this field. Other client Envoys receive CDS without
-	// *transport_socket_match* set, and still send plain text traffic to the same cluster.
+	// ``TransportSocketMatch`` in this field. Other client Envoys receive CDS without
+	// ``transport_socket_match`` set, and still send plain text traffic to the same cluster.
 	//
 	// This field can be used to specify custom transport socket configurations for health
 	// checks by adding matching key/value pairs in a health check's
@@ -623,7 +623,7 @@ type Cluster struct {
 	// :ref:`STATIC<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STATIC>`,
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
 	// or :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>` clusters.
-	// This field supersedes the *hosts* field in the v2 API.
+	// This field supersedes the ``hosts`` field in the v2 API.
 	//
 	// .. attention::
 	//
@@ -744,13 +744,13 @@ type Cluster struct {
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
 	// and :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`
 	// this setting is ignored.
-	// This field is deprecated in favor of *dns_resolution_config*
+	// This field is deprecated in favor of ``dns_resolution_config``
 	// which aggregates all of the DNS resolver configuration in a single message.
 	//
 	// Deprecated: Do not use.
 	DnsResolvers []*v32.Address `protobuf:"bytes,18,rep,name=dns_resolvers,json=dnsResolvers,proto3" json:"dns_resolvers,omitempty"`
 	// Always use TCP queries instead of UDP queries for DNS lookups.
-	// This field is deprecated in favor of *dns_resolution_config*
+	// This field is deprecated in favor of ``dns_resolution_config``
 	// which aggregates all of the DNS resolver configuration in a single message.
 	//
 	// Deprecated: Do not use.
@@ -765,12 +765,12 @@ type Cluster struct {
 	// or any other DNS resolver types and the related parameters.
 	// For example, an object of
 	// :ref:`CaresDnsResolverConfig <envoy_v3_api_msg_extensions.network.dns_resolver.cares.v3.CaresDnsResolverConfig>`
-	// can be packed into this *typed_dns_resolver_config*. This configuration replaces the
+	// can be packed into this ``typed_dns_resolver_config``. This configuration replaces the
 	// :ref:`dns_resolution_config <envoy_v3_api_field_config.cluster.v3.Cluster.dns_resolution_config>`
 	// configuration.
-	// During the transition period when both *dns_resolution_config* and *typed_dns_resolver_config* exists,
-	// when *typed_dns_resolver_config* is in place, Envoy will use it and ignore *dns_resolution_config*.
-	// When *typed_dns_resolver_config* is missing, the default behavior is in place.
+	// During the transition period when both ``dns_resolution_config`` and ``typed_dns_resolver_config`` exists,
+	// when ``typed_dns_resolver_config`` is in place, Envoy will use it and ignore ``dns_resolution_config``.
+	// When ``typed_dns_resolver_config`` is missing, the default behavior is in place.
 	// [#extension-category: envoy.network.dns_resolver]
 	TypedDnsResolverConfig *v32.TypedExtensionConfig `protobuf:"bytes,55,opt,name=typed_dns_resolver_config,json=typedDnsResolverConfig,proto3" json:"typed_dns_resolver_config,omitempty"`
 	// Optional configuration for having cluster readiness block on warm-up. Currently, only applicable for
@@ -831,7 +831,7 @@ type Cluster struct {
 	// cluster. It can be used for stats, logging, and varying filter behavior.
 	// Fields should use reverse DNS notation to denote which entity within Envoy
 	// will need the information. For instance, if the metadata is intended for
-	// the Router filter, the filter name should be specified as *envoy.filters.http.router*.
+	// the Router filter, the filter name should be specified as ``envoy.filters.http.router``.
 	Metadata *v32.Metadata `protobuf:"bytes,25,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Determines how Envoy selects the protocol used to speak to upstream hosts.
 	// This has been deprecated in favor of setting explicit protocol selection
@@ -1649,7 +1649,7 @@ type Cluster_TransportSocketMatch struct {
 	// Optional endpoint metadata match criteria.
 	// The connection to the endpoint with metadata matching what is set in this field
 	// will use the transport socket configuration specified here.
-	// The endpoint's metadata entry in *envoy.transport_socket_match* is used to match
+	// The endpoint's metadata entry in ``envoy.transport_socket_match`` is used to match
 	// against the values specified in this field.
 	Match *_struct.Struct `protobuf:"bytes,2,opt,name=match,proto3" json:"match,omitempty"`
 	// The configuration of the transport socket.
@@ -1846,13 +1846,13 @@ type Cluster_LbSubsetConfig struct {
 	// fallback_policy is
 	// :ref:`DEFAULT_SUBSET<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.DEFAULT_SUBSET>`.
 	// Each field in default_subset is
-	// compared to the matching LbEndpoint.Metadata under the *envoy.lb*
+	// compared to the matching LbEndpoint.Metadata under the ``envoy.lb``
 	// namespace. It is valid for no hosts to match, in which case the behavior
 	// is the same as a fallback_policy of
 	// :ref:`NO_FALLBACK<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.NO_FALLBACK>`.
 	DefaultSubset *_struct.Struct `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset,proto3" json:"default_subset,omitempty"`
 	// For each entry, LbEndpoint.Metadata's
-	// *envoy.lb* namespace is traversed and a subset is created for each unique
+	// ``envoy.lb`` namespace is traversed and a subset is created for each unique
 	// combination of key and value. For example:
 	//
 	// .. code-block:: json
@@ -2657,7 +2657,7 @@ type Cluster_PreconnectPolicy struct {
 	// Indicates how many many streams (rounded up) can be anticipated across a cluster for each
 	// stream, useful for low QPS services. This is currently supported for a subset of
 	// deterministic non-hash-based load-balancing algorithms (weighted round robin, random).
-	// Unlike *per_upstream_preconnect_ratio* this preconnects across the upstream instances in a
+	// Unlike ``per_upstream_preconnect_ratio`` this preconnects across the upstream instances in a
 	// cluster, doing best effort predictions of what upstream would be picked next and
 	// pre-establishing a connection.
 	//

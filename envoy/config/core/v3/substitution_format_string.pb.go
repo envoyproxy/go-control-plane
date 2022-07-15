@@ -43,9 +43,9 @@ type SubstitutionFormatString struct {
 	//   empty string, so that empty values are omitted entirely.
 	// * for ``json_format`` the keys with null values are omitted in the output structure.
 	OmitEmptyValues bool `protobuf:"varint,3,opt,name=omit_empty_values,json=omitEmptyValues,proto3" json:"omit_empty_values,omitempty"`
-	// Specify a *content_type* field.
-	// If this field is not set then ``text/plain`` is used for *text_format* and
-	// ``application/json`` is used for *json_format*.
+	// Specify a ``content_type`` field.
+	// If this field is not set then ``text/plain`` is used for ``text_format`` and
+	// ``application/json`` is used for ``json_format``.
 	//
 	// .. validated-code-block:: yaml
 	//   :type-name: envoy.config.core.v3.SubstitutionFormatString

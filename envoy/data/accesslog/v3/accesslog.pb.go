@@ -401,13 +401,13 @@ type AccessLogCommon struct {
 	// downstream byte received (i.e. time it takes to receive a request).
 	TimeToLastRxByte *duration.Duration `protobuf:"bytes,6,opt,name=time_to_last_rx_byte,json=timeToLastRxByte,proto3" json:"time_to_last_rx_byte,omitempty"`
 	// Interval between the first downstream byte received and the first upstream byte sent. There may
-	// by considerable delta between *time_to_last_rx_byte* and this value due to filters.
-	// Additionally, the same caveats apply as documented in *time_to_last_downstream_tx_byte* about
+	// by considerable delta between ``time_to_last_rx_byte`` and this value due to filters.
+	// Additionally, the same caveats apply as documented in ``time_to_last_downstream_tx_byte`` about
 	// not accounting for kernel socket buffer time, etc.
 	TimeToFirstUpstreamTxByte *duration.Duration `protobuf:"bytes,7,opt,name=time_to_first_upstream_tx_byte,json=timeToFirstUpstreamTxByte,proto3" json:"time_to_first_upstream_tx_byte,omitempty"`
 	// Interval between the first downstream byte received and the last upstream byte sent. There may
-	// by considerable delta between *time_to_last_rx_byte* and this value due to filters.
-	// Additionally, the same caveats apply as documented in *time_to_last_downstream_tx_byte* about
+	// by considerable delta between ``time_to_last_rx_byte`` and this value due to filters.
+	// Additionally, the same caveats apply as documented in ``time_to_last_downstream_tx_byte`` about
 	// not accounting for kernel socket buffer time, etc.
 	TimeToLastUpstreamTxByte *duration.Duration `protobuf:"bytes,8,opt,name=time_to_last_upstream_tx_byte,json=timeToLastUpstreamTxByte,proto3" json:"time_to_last_upstream_tx_byte,omitempty"`
 	// Interval between the first downstream byte received and the first upstream
@@ -417,13 +417,13 @@ type AccessLogCommon struct {
 	// byte received (i.e. time it takes to receive a complete response).
 	TimeToLastUpstreamRxByte *duration.Duration `protobuf:"bytes,10,opt,name=time_to_last_upstream_rx_byte,json=timeToLastUpstreamRxByte,proto3" json:"time_to_last_upstream_rx_byte,omitempty"`
 	// Interval between the first downstream byte received and the first downstream byte sent.
-	// There may be a considerable delta between the *time_to_first_upstream_rx_byte* and this field
+	// There may be a considerable delta between the ``time_to_first_upstream_rx_byte`` and this field
 	// due to filters. Additionally, the same caveats apply as documented in
-	// *time_to_last_downstream_tx_byte* about not accounting for kernel socket buffer time, etc.
+	// ``time_to_last_downstream_tx_byte`` about not accounting for kernel socket buffer time, etc.
 	TimeToFirstDownstreamTxByte *duration.Duration `protobuf:"bytes,11,opt,name=time_to_first_downstream_tx_byte,json=timeToFirstDownstreamTxByte,proto3" json:"time_to_first_downstream_tx_byte,omitempty"`
 	// Interval between the first downstream byte received and the last downstream byte sent.
 	// Depending on protocol, buffering, windowing, filters, etc. there may be a considerable delta
-	// between *time_to_last_upstream_rx_byte* and this field. Note also that this is an approximate
+	// between ``time_to_last_upstream_rx_byte`` and this field. Note also that this is an approximate
 	// time. In the current implementation it does not include kernel socket buffer time. In the
 	// current implementation it also does not include send window buffering inside the HTTP/2 codec.
 	// In the future it is likely that work will be done to make this duration more accurate.
@@ -433,7 +433,7 @@ type AccessLogCommon struct {
 	UpstreamRemoteAddress *v3.Address `protobuf:"bytes,13,opt,name=upstream_remote_address,json=upstreamRemoteAddress,proto3" json:"upstream_remote_address,omitempty"`
 	// The upstream local/origin address that handles this exchange. This does not include retries.
 	UpstreamLocalAddress *v3.Address `protobuf:"bytes,14,opt,name=upstream_local_address,json=upstreamLocalAddress,proto3" json:"upstream_local_address,omitempty"`
-	// The upstream cluster that *upstream_remote_address* belongs to.
+	// The upstream cluster that ``upstream_remote_address`` belongs to.
 	UpstreamCluster string `protobuf:"bytes,15,opt,name=upstream_cluster,json=upstreamCluster,proto3" json:"upstream_cluster,omitempty"`
 	// Flags indicating occurrences during request/response processing.
 	ResponseFlags *ResponseFlags `protobuf:"bytes,16,opt,name=response_flags,json=responseFlags,proto3" json:"response_flags,omitempty"`

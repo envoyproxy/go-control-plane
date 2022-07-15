@@ -45,7 +45,7 @@ type UdpProxyConfig struct {
 	// the session. The default if not specified is 1 minute.
 	IdleTimeout *duration.Duration `protobuf:"bytes,3,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// Use the remote downstream IP address as the sender IP address when sending packets to upstream hosts.
-	// This option requires Envoy to be run with the *CAP_NET_ADMIN* capability on Linux.
+	// This option requires Envoy to be run with the ``CAP_NET_ADMIN`` capability on Linux.
 	// And the IPv6 stack must be enabled on Linux kernel.
 	// This option does not preserve the remote downstream port.
 	// If this option is enabled, the IP address of sent datagrams will be changed to the remote downstream IP address.

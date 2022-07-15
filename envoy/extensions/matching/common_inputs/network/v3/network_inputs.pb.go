@@ -362,7 +362,7 @@ func (*TransportProtocolInput) Descriptor() ([]byte, []int) {
 // Examples:
 //
 // * ``'h2','http/1.1'``
-// * ``'h2c'```
+// * ``'h2c'``
 //
 // Suggested values in the list include:
 //
