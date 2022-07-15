@@ -5143,6 +5143,8 @@ func (m *HeaderMatcher) validate(all bool) error {
 
 	// no validation rules for InvertMatch
 
+	// no validation rules for TreatMissingHeaderAsEmpty
+
 	switch m.HeaderMatchSpecifier.(type) {
 
 	case *HeaderMatcher_ExactMatch:
