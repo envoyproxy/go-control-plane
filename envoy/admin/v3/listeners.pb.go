@@ -85,7 +85,6 @@ type ListenerStatus struct {
 	LocalAddress *v3.Address `protobuf:"bytes,2,opt,name=local_address,json=localAddress,proto3" json:"local_address,omitempty"`
 	// The additional addresses the listener is listening on as specified via the :ref:`additional_addresses <envoy_v3_api_field_config.listener.v3.Listener.additional_addresses>`
 	// configuration.
-	// [#not-implemented-hide:]
 	AdditionalLocalAddresses []*v3.Address `protobuf:"bytes,3,rep,name=additional_local_addresses,json=additionalLocalAddresses,proto3" json:"additional_local_addresses,omitempty"`
 }
 

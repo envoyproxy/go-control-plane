@@ -82,7 +82,6 @@ func (Listener_DrainType) EnumDescriptor() ([]byte, []int) {
 }
 
 // The additional address the listener is listening on.
-// [#not-implemented-hide:]
 type AdditionalAddress struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -197,7 +196,6 @@ type Listener struct {
 	// The additional addresses the listener should listen on. The addresses must be unique across all
 	// listeners. Multiple addresses with port 0 can be supplied. When using multiple addresses in a single listener,
 	// all addresses use the same protocol, and multiple internal addresses are not supported.
-	// [#not-implemented-hide:]
 	AdditionalAddresses []*AdditionalAddress `protobuf:"bytes,33,rep,name=additional_addresses,json=additionalAddresses,proto3" json:"additional_addresses,omitempty"`
 	// Optional prefix to use on listener stats. If empty, the stats will be rooted at
 	// ``listener.<address as string>.``. If non-empty, stats will be rooted at
