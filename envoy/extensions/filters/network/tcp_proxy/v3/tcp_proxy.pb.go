@@ -308,7 +308,7 @@ type TcpProxy_TunnelingConfig struct {
 	//
 	// Example: dynamically set hostname using dynamic metadata
 	//
-	// .. code-block: yaml
+	// .. code-block:: yaml
 	//
 	//    tunneling_config:
 	//      hostname: "%DYNAMIC_METADATA(tunnel:address)%"
