@@ -95,7 +95,6 @@ type Tracing_Http struct {
 	// The name of the HTTP trace driver to instantiate. The name must match a
 	// supported HTTP trace driver. Built-in trace drivers:
 	//
-	// - *envoy.tracers.lightstep*
 	// - *envoy.tracers.zipkin*
 	// - *envoy.tracers.dynamic_ot*
 	// - *envoy.tracers.datadog*
@@ -105,7 +104,6 @@ type Tracing_Http struct {
 	// Trace driver specific configuration which depends on the driver being instantiated.
 	// See the trace drivers for examples:
 	//
-	// - :ref:`LightstepConfig <envoy_api_msg_config.trace.v2.LightstepConfig>`
 	// - :ref:`ZipkinConfig <envoy_api_msg_config.trace.v2.ZipkinConfig>`
 	// - :ref:`DynamicOtConfig <envoy_api_msg_config.trace.v2.DynamicOtConfig>`
 	// - :ref:`DatadogConfig <envoy_api_msg_config.trace.v2.DatadogConfig>`
