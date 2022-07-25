@@ -115,10 +115,11 @@ type StatsConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Each stat name is iteratively processed through these tag specifiers.
-	// When a tag is matched, the first capture group is removed from the name so
-	// later :ref:`TagSpecifiers <envoy_v3_api_msg_config.metrics.v3.TagSpecifier>` cannot match that
-	// same portion of the match.
+	// Each stat name is independently processed through these tag specifiers. When a tag is
+	// matched, the first capture group is not immediately removed from the name, so later
+	// :ref:`TagSpecifiers <envoy_v3_api_msg_config.metrics.v3.TagSpecifier>` can also match that
+	// same portion of the match. After all tag matching is complete, a tag-extracted version of
+	// the name is produced and is used in stats sinks that represent tags, such as Prometheus.
 	StatsTags []*TagSpecifier `protobuf:"bytes,1,rep,name=stats_tags,json=statsTags,proto3" json:"stats_tags,omitempty"`
 	// Use all default tag regexes specified in Envoy. These can be combined with
 	// custom tags specified in :ref:`stats_tags
@@ -470,18 +471,18 @@ type TagSpecifier_Regex struct {
 	//     }
 	//   ]
 	//
-	// The two regexes of the specifiers will be processed in the definition order.
+	// The two regexes of the specifiers will be processed from the elaborated
+	// stat name.
 	//
-	// The first regex will remove ``ios.``, leaving the tag extracted name
-	// ``http.connection_manager_1.user_agent.downstream_cx_total``. The tag
-	// ``envoy.http_user_agent`` will be added with tag value ``ios``.
+	// The first regex will save ``ios.`` as the tag value for ``envoy.http_user_agent``. It will
+	// leave it in the name for potential matching with additional tag specifiers. After all tag
+	// specifiers are processed the tags will be removed from the name.
 	//
-	// The second regex will remove ``connection_manager_1.`` from the tag
-	// extracted name produced by the first regex
-	// ``http.connection_manager_1.user_agent.downstream_cx_total``, leaving
-	// ``http.user_agent.downstream_cx_total`` as the tag extracted name. The tag
-	// ``envoy.http_conn_manager_prefix`` will be added with the tag value
-	// ``connection_manager_1``.
+	// The second regex will populate tag ``envoy.http_conn_manager_prefix`` with value
+	// ``connection_manager_1.``, based on the original stat name.
+	//
+	// As a final step, the matched tags are removed, leaving
+	// ``http.user_agent.downstream_cx_total`` as the tag extracted name.
 	Regex string `protobuf:"bytes,2,opt,name=regex,proto3,oneof"`
 }
 
