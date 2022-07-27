@@ -2119,21 +2119,35 @@ func (m *RouteMatch) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
-	case *RouteMatch_PathTemplate:
+	case *RouteMatch_PathMatchPolicy:
 
-		if m.GetPathTemplate() != "" {
-
-			if l := utf8.RuneCountInString(m.GetPathTemplate()); l < 1 || l > 256 {
-				err := RouteMatchValidationError{
-					field:  "PathTemplate",
-					reason: "value length must be between 1 and 256 runes, inclusive",
+		if all {
+			switch v := interface{}(m.GetPathMatchPolicy()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RouteMatchValidationError{
+						field:  "PathMatchPolicy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
 				}
-				if !all {
-					return err
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RouteMatchValidationError{
+						field:  "PathMatchPolicy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
 				}
-				errors = append(errors, err)
 			}
-
+		} else if v, ok := interface{}(m.GetPathMatchPolicy()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteMatchValidationError{
+					field:  "PathMatchPolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
 		}
 
 	default:
@@ -2563,19 +2577,33 @@ func (m *RouteAction) validate(all bool) error {
 		}
 	}
 
-	if m.GetPathTemplateRewrite() != "" {
-
-		if l := utf8.RuneCountInString(m.GetPathTemplateRewrite()); l < 1 || l > 256 {
-			err := RouteActionValidationError{
-				field:  "PathTemplateRewrite",
-				reason: "value length must be between 1 and 256 runes, inclusive",
+	if all {
+		switch v := interface{}(m.GetPathRewritePolicy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RouteActionValidationError{
+					field:  "PathRewritePolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			if !all {
-				return err
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RouteActionValidationError{
+					field:  "PathRewritePolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
 			}
-			errors = append(errors, err)
 		}
-
+	} else if v, ok := interface{}(m.GetPathRewritePolicy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteActionValidationError{
+				field:  "PathRewritePolicy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	// no validation rules for AppendXForwardedHost
