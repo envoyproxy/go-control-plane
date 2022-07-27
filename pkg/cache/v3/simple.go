@@ -342,32 +342,6 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 		version = snapshot.GetVersion(request.TypeUrl)
 	}
 
-	if exists {
-		knownResourceNames := streamState.GetKnownResourceNames(request.TypeUrl)
-		diff := []string{}
-		for _, r := range request.ResourceNames {
-			if _, ok := knownResourceNames[r]; !ok {
-				diff = append(diff, r)
-			}
-		}
-
-		cache.log.Debugf("nodeID %q requested %s%v and known %v. Diff %v", nodeID,
-			request.TypeUrl, request.ResourceNames, knownResourceNames, diff)
-
-		if len(diff) > 0 {
-			resources := snapshot.GetResourcesAndTTL(request.TypeUrl)
-			for _, name := range diff {
-				if _, exists := resources[name]; exists {
-					if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
-						cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
-							request.ResourceNames, nodeID, err)
-					}
-					return nil
-				}
-			}
-		}
-	}
-
 	// if the requested version is up-to-date or missing a response, leave an open watch
 	if !exists || request.VersionInfo == version {
 		watchID := cache.nextWatchID()

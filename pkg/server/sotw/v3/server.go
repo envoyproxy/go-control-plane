@@ -68,8 +68,22 @@ type server struct {
 // So if the client requests a new name we can respond back
 // regardless current snapshot version (even if it is not changed yet)
 type lastDiscoveryResponse struct {
-	nonce     string
-	resources map[string]struct{}
+	nonce         string
+	resourceNames []string
+}
+
+func stringSlicesEqual(s1, s2 []string) bool {
+	if len(s1) != len(s2) {
+		return false
+	}
+
+	for i := range s1 {
+		if s1[i] != s2[i] {
+			return false
+		}
+	}
+
+	return true
 }
 
 // process handles a bi-di stream request
@@ -83,6 +97,8 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 
 	streamState := stream.NewStreamState(false, map[string]string{})
 	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
+
+	resourceNames := map[string][]string{}
 
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
@@ -113,11 +129,8 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 
 		lastResponse := lastDiscoveryResponse{
-			nonce:     out.Nonce,
-			resources: make(map[string]struct{}),
-		}
-		for _, r := range resp.GetRequest().ResourceNames {
-			lastResponse.resources[r] = struct{}{}
+			nonce:         out.Nonce,
+			resourceNames: resp.GetRequest().ResourceNames,
 		}
 		lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
@@ -186,8 +199,12 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
-					streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
+					resourceNames[req.TypeUrl] = lastResponse.resourceNames
 				}
+			}
+
+			if previousResourceNames, ok := resourceNames[req.TypeUrl]; ok && !stringSlicesEqual(previousResourceNames, req.ResourceNames) {
+				req.VersionInfo = ""
 			}
 
 			typeURL := req.GetTypeUrl()

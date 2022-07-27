@@ -471,7 +471,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	go func() {
 		state := stream.NewStreamState(false, map[string]string{})
 		state.SetKnownResourceNames(rsrc.EndpointType, map[string]struct{}{clusterName: {}})
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
+		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, VersionInfo: "",
 			ResourceNames: []string{clusterName, clusterName2}}, state, watch)
 	}()
 
