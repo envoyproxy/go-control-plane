@@ -629,7 +629,7 @@ func TestAvertPanicForWatchOnNonExistentSnapshot(t *testing.T) {
 			resource: durationpb.New(time.Second),
 		}
 		if err := c.SetSnapshot(ctx, "test", srs); err != nil {
-			panic(err)
+			t.Errorf("unexpected error setting snapshot %v", err)
 		}
 	}()
 
