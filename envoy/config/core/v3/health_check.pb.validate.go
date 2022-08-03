@@ -1327,6 +1327,28 @@ func (m *HealthCheck_HttpHealthCheck) validate(all bool) error {
 		}
 	}
 
+	if _, ok := _HealthCheck_HttpHealthCheck_Method_NotInLookup[m.GetMethod()]; ok {
+		err := HealthCheck_HttpHealthCheckValidationError{
+			field:  "Method",
+			reason: "value must not be in list [6]",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := RequestMethod_name[int32(m.GetMethod())]; !ok {
+		err := HealthCheck_HttpHealthCheckValidationError{
+			field:  "Method",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return HealthCheck_HttpHealthCheckMultiError(errors)
 	}
@@ -1413,6 +1435,10 @@ var _HealthCheck_HttpHealthCheck_Host_Pattern = regexp.MustCompile("^[^\x00\n\r]
 var _HealthCheck_HttpHealthCheck_Path_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 var _HealthCheck_HttpHealthCheck_RequestHeadersToRemove_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _HealthCheck_HttpHealthCheck_Method_NotInLookup = map[RequestMethod]struct{}{
+	6: {},
+}
 
 // Validate checks the field values on HealthCheck_TcpHealthCheck with the
 // rules defined in the proto definition for this message. If any rules are
