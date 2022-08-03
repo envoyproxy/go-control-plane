@@ -22,14 +22,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// `Hyperscan <https://github.com/intel/hyperscan>`_ regex matcher. The engine of the matcher uses
-// hybrid automata techniques to allow simultaneous matching of large numbers of regular
-// expressions across streams of data.
-//
-// The matcher follows PCRE pattern syntax, and the regex string must adhere to the documented
-// `pattern support <https://intel.github.io/hyperscan/dev-reference/compilation.html#pattern-support>`_.
-// The syntax is not compatible with the default RE2 regex matcher. Depending on configured expressions,
-// swapping regex matcher may cause match rules to no longer be valid.
+// `Hyperscan <https://github.com/intel/hyperscan>`_ regex matcher. The matcher uses the Hyperscan
+// engine which exploits x86 SIMD instructions to accelerate matching large numbers of regular
+// expressions simultaneously across streams of data.
 type Hyperscan struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
