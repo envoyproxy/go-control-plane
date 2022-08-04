@@ -2280,8 +2280,8 @@ type Cluster_MaglevLbConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The table size for Maglev hashing. The Maglev aims for ‘minimal disruption’ rather than an absolute guarantee.
-	// Minimal disruption means that when the set of upstreams changes, a connection will likely be sent to the same
+	// The table size for Maglev hashing. Maglev aims for "minimal disruption" rather than an absolute guarantee.
+	// Minimal disruption means that when the set of upstream hosts change, a connection will likely be sent to the same
 	// upstream as it was before. Increasing the table size reduces the amount of disruption.
 	// The table size must be prime number limited to 5000011. If it is not specified, the default is 65537.
 	TableSize *wrappers.UInt64Value `protobuf:"bytes,1,opt,name=table_size,json=tableSize,proto3" json:"table_size,omitempty"`
