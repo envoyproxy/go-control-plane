@@ -177,6 +177,8 @@ func (m *EnvoyInternalAddress) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for EndpointId
+
 	switch m.AddressNameSpecifier.(type) {
 
 	case *EnvoyInternalAddress_ServerListenerName:

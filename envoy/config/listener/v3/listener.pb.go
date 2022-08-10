@@ -381,9 +381,6 @@ type Listener struct {
 	// to true. Default is true.
 	BindToPort *wrappers.BoolValue `protobuf:"bytes,26,opt,name=bind_to_port,json=bindToPort,proto3" json:"bind_to_port,omitempty"`
 	// The exclusive listener type and the corresponding config.
-	// TODO(lambdai): https://github.com/envoyproxy/envoy/issues/15372
-	// Will create and add TcpListenerConfig. Will add UdpListenerConfig and ApiListener.
-	// [#not-implemented-hide:]
 	//
 	// Types that are assignable to ListenerSpecifier:
 	//	*Listener_InternalListener
@@ -661,18 +658,18 @@ type isListener_ListenerSpecifier interface {
 type Listener_InternalListener struct {
 	// Used to represent an internal listener which does not listen on OSI L4 address but can be used by the
 	// :ref:`envoy cluster <envoy_v3_api_msg_config.cluster.v3.Cluster>` to create a user space connection to.
-	// The internal listener acts as a tcp listener. It supports listener filters and network filter chains.
-	// The internal listener require :ref:`address <envoy_v3_api_field_config.listener.v3.Listener.address>` has
-	// field `envoy_internal_address`.
+	// The internal listener acts as a TCP listener. It supports listener filters and network filter chains.
+	// Upstream clusters refer to the internal listeners by their :ref:`name
+	// <envoy_v3_api_field_config.listener.v3.Listener.name>`. :ref:`Address
+	// <envoy_v3_api_field_config.listener.v3.Listener.address>` must not be set on the internal listeners.
 	//
-	// There are some limitations are derived from the implementation. The known limitations include
+	// There are some limitations that are derived from the implementation. The known limitations include:
 	//
 	// * :ref:`ConnectionBalanceConfig <envoy_v3_api_msg_config.listener.v3.Listener.ConnectionBalanceConfig>` is not
-	//   allowed because both cluster connection and listener connection must be owned by the same dispatcher.
+	//   allowed because both the cluster connection and the listener connection must be owned by the same dispatcher.
 	// * :ref:`tcp_backlog_size <envoy_v3_api_field_config.listener.v3.Listener.tcp_backlog_size>`
 	// * :ref:`freebind <envoy_v3_api_field_config.listener.v3.Listener.freebind>`
 	// * :ref:`transparent <envoy_v3_api_field_config.listener.v3.Listener.transparent>`
-	// [#not-implemented-hide:]
 	InternalListener *Listener_InternalListenerConfig `protobuf:"bytes,27,opt,name=internal_listener,json=internalListener,proto3,oneof"`
 }
 
@@ -820,7 +817,6 @@ func (*Listener_ConnectionBalanceConfig_ExtendBalance) isListener_ConnectionBala
 }
 
 // Configuration for envoy internal listener. All the future internal listener features should be added here.
-// [#not-implemented-hide:]
 type Listener_InternalListenerConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
