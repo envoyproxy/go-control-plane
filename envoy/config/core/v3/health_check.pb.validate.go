@@ -1129,33 +1129,53 @@ func (m *HealthCheck_HttpHealthCheck) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetReceive()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, HealthCheck_HttpHealthCheckValidationError{
-					field:  "Receive",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	for idx, item := range m.GetReceive() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, HealthCheck_HttpHealthCheckValidationError{
+						field:  fmt.Sprintf("Receive[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, HealthCheck_HttpHealthCheckValidationError{
+						field:  fmt.Sprintf("Receive[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
 			}
-		case interface{ Validate() error }:
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, HealthCheck_HttpHealthCheckValidationError{
-					field:  "Receive",
+				return HealthCheck_HttpHealthCheckValidationError{
+					field:  fmt.Sprintf("Receive[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetReceive()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return HealthCheck_HttpHealthCheckValidationError{
-				field:  "Receive",
-				reason: "embedded message failed validation",
-				cause:  err,
+
+	}
+
+	if wrapper := m.GetResponseBufferSize(); wrapper != nil {
+
+		if wrapper.GetValue() < 0 {
+			err := HealthCheck_HttpHealthCheckValidationError{
+				field:  "ResponseBufferSize",
+				reason: "value must be greater than or equal to 0",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
+
 	}
 
 	if len(m.GetRequestHeadersToAdd()) > 1000 {
