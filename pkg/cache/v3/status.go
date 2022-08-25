@@ -19,7 +19,6 @@ import (
 	"time"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // NodeHash computes string identifiers for Envoy nodes.
@@ -99,7 +98,23 @@ type DeltaResponseWatch struct {
 	Response chan DeltaResponse
 
 	// VersionMap for the stream
-	StreamState stream.StreamState
+	clientState ClientState
+}
+
+// WatchesResources returns whether at least one of the resource provided is currently watch by the stream
+// It is currently only applicable to delta-xds
+// If the request is wildcard, it will always return true
+// Otherwise it will compare the provided resources to the list of resources currently subscribed
+func (w *DeltaResponseWatch) WatchesResources(resourceNames map[string]struct{}) bool {
+	if w.clientState.IsWildcard() {
+		return true
+	}
+	for resourceName := range resourceNames {
+		if _, ok := w.clientState.GetSubscribedResources()[resourceName]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 // newStatusInfo initializes a status info data structure.

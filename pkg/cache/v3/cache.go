@@ -26,7 +26,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 )
@@ -36,6 +35,27 @@ type Request = discovery.DiscoveryRequest
 
 // DeltaRequest is an alias for the delta discovery request type.
 type DeltaRequest = discovery.DeltaDiscoveryRequest
+
+// ClientState provides additional data on the client knowledge for the type matching the request
+// This allows proper implementation of stateful aspects of the protocol (e.g. returning only some updated resources)
+// Though the methods may return mutable parts of the state for performance reasons,
+// the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation
+type ClientState interface {
+	// GetKnownResources returns the list of resources the clients has ACKed and their associated version.
+	// The versions are:
+	//  - delta protocol: version of the specific resource set in the response
+	//  - sotw protocol: version of the global response when the resource was last ACKed
+	GetKnownResources() map[string]string
+
+	// GetSubscribedResources returns the list of resources currently subscribed to by the client for the type.
+	// For delta it keeps track across requests
+	// For sotw it is a normalized view of the request resources
+	GetSubscribedResources() map[string]struct{}
+
+	// IsWildcard returns whether the client has a wildcard watch.
+	// This considers subtilities related to the current migration of wildcard definition within the protocol.
+	IsWildcard() bool
+}
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
@@ -50,7 +70,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(*Request, stream.StreamState, chan Response) (cancel func())
+	CreateWatch(*Request, ClientState, chan Response) (cancel func())
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	//
@@ -59,7 +79,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, stream.StreamState, chan DeltaResponse) (cancel func())
+	CreateDeltaWatch(*DeltaRequest, ClientState, chan DeltaResponse) (cancel func())
 }
 
 // ConfigFetcher fetches configuration resources from cache

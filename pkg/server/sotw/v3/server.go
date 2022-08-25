@@ -69,7 +69,7 @@ type server struct {
 // regardless current snapshot version (even if it is not changed yet)
 type lastDiscoveryResponse struct {
 	nonce     string
-	resources map[string]struct{}
+	resources map[string]string
 }
 
 // process handles a bi-di stream request
@@ -81,7 +81,7 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
 
-	streamState := stream.NewStreamState(false, map[string]string{})
+	streamStates := map[string]stream.StreamState{}
 	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
 
 	// a collection of stack allocated watches per request type
@@ -112,12 +112,17 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
 
+		version, err := resp.GetVersion()
+		if err != nil {
+			return "", err
+		}
+
 		lastResponse := lastDiscoveryResponse{
 			nonce:     out.Nonce,
-			resources: make(map[string]struct{}),
+			resources: make(map[string]string),
 		}
 		for _, r := range resp.GetRequest().ResourceNames {
-			lastResponse.resources[r] = struct{}{}
+			lastResponse.resources[r] = version
 		}
 		lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
@@ -183,14 +188,15 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				}
 			}
 
+			typeURL := req.GetTypeUrl()
+			state := streamStates[typeURL]
 			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
-					streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
+					state.SetResourceVersions(lastResponse.resources)
 				}
 			}
 
-			typeURL := req.GetTypeUrl()
 			responder := make(chan cache.Response, 1)
 			if w, ok := watches.responders[typeURL]; ok {
 				// We've found a pre-existing watch, lets check and update if needed.
@@ -199,7 +205,7 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 					w.close()
 
 					watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, streamState, responder),
+						cancel:   s.cache.CreateWatch(req, &state, responder),
 						response: responder,
 					})
 				}
@@ -207,10 +213,12 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				// No pre-existing watch exists, let's create one.
 				// We need to precompute the watches first then open a watch in the cache.
 				watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, streamState, responder),
+					cancel:   s.cache.CreateWatch(req, &state, responder),
 					response: responder,
 				})
 			}
+
+			streamStates[typeURL] = state
 
 			// Recompute the dynamic select cases for this stream.
 			watches.recompute(s.ctx, reqCh)

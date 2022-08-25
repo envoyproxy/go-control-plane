@@ -174,7 +174,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), &watch.state)
 
 			watch.responses = make(chan cache.DeltaResponse, 1)
-			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
+			watch.cancel = s.cache.CreateDeltaWatch(req, &watch.state, watch.responses)
 			watches.deltaWatches[typeURL] = watch
 
 			go func() {
@@ -216,7 +216,7 @@ func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) erro
 // When we subscribe, we just want to make the cache know we are subscribing to a resource.
 // Even if the stream is wildcard, we keep the list of explicitly subscribed resources as the wildcard subscription can be discarded later on.
 func (s *server) subscribe(resources []string, streamState *stream.StreamState) {
-	sv := streamState.GetSubscribedResourceNames()
+	sv := streamState.GetSubscribedResources()
 	for _, resource := range resources {
 		if resource == "*" {
 			streamState.SetWildcard(true)
@@ -229,7 +229,7 @@ func (s *server) subscribe(resources []string, streamState *stream.StreamState) 
 // Unsubscriptions remove resources from the stream's subscribed resource list.
 // If a client explicitly unsubscribes from a wildcard request, the stream is updated and now watches only subscribed resources.
 func (s *server) unsubscribe(resources []string, streamState *stream.StreamState) {
-	sv := streamState.GetSubscribedResourceNames()
+	sv := streamState.GetSubscribedResources()
 	for _, resource := range resources {
 		if resource == "*" {
 			streamState.SetWildcard(false)
@@ -244,7 +244,7 @@ func (s *server) unsubscribe(resources []string, streamState *stream.StreamState
 			// To achieve that, we mark the resource as having been returned with an empty version. While creating the response, the cache will either:
 			// * detect the version change, and return the resource (as an update)
 			// * detect the resource deletion, and set it as removed in the response
-			streamState.GetResourceVersions()[resource] = ""
+			streamState.GetKnownResources()[resource] = ""
 		}
 		delete(sv, resource)
 	}

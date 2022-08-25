@@ -15,12 +15,11 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state stream.StreamState, out chan cache.DeltaResponse) func() {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state cache.ClientState, out chan cache.DeltaResponse) func() {
 	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
 
 	// This is duplicated from pkg/cache/v3/delta.go as private there
@@ -37,7 +36,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case state.IsWildcard():
-		if len(state.GetResourceVersions()) == 0 {
+		if len(state.GetKnownResources()) == 0 {
 			filtered = make([]types.Resource, 0, len(resourceMap))
 		}
 		nextVersionMap = make(map[string]string, len(resourceMap))
@@ -46,24 +45,24 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			// we can just set it here to be used for comparison later
 			version := versionMap[name]
 			nextVersionMap[name] = version
-			prevVersion, found := state.GetResourceVersions()[name]
+			prevVersion, found := state.GetKnownResources()[name]
 			if !found || (prevVersion != version) {
 				filtered = append(filtered, r)
 			}
 		}
 
 		// Compute resources for removal
-		for name := range state.GetResourceVersions() {
+		for name := range state.GetKnownResources() {
 			if _, ok := resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
 			}
 		}
 	default:
-		nextVersionMap = make(map[string]string, len(state.GetSubscribedResourceNames()))
+		nextVersionMap = make(map[string]string, len(state.GetSubscribedResources()))
 		// state.GetResourceVersions() may include resources no longer subscribed
 		// In the current code this gets silently cleaned when updating the version map
-		for name := range state.GetSubscribedResourceNames() {
-			prevVersion, found := state.GetResourceVersions()[name]
+		for name := range state.GetSubscribedResources() {
+			prevVersion, found := state.GetKnownResources()[name]
 			if r, ok := resourceMap[name]; ok {
 				nextVersion := versionMap[name]
 				if prevVersion != nextVersion {
@@ -155,36 +154,36 @@ func makeMockDeltaStream(t *testing.T) *mockDeltaStream {
 
 func makeDeltaResources() map[string]map[string]types.Resource {
 	return map[string]map[string]types.Resource{
-		rsrc.EndpointType: map[string]types.Resource{
+		rsrc.EndpointType: {
 			endpoint.GetClusterName(): endpoint,
 		},
-		rsrc.ClusterType: map[string]types.Resource{
+		rsrc.ClusterType: {
 			cluster.Name: cluster,
 		},
-		rsrc.RouteType: map[string]types.Resource{
+		rsrc.RouteType: {
 			route.Name: route,
 		},
-		rsrc.ScopedRouteType: map[string]types.Resource{
+		rsrc.ScopedRouteType: {
 			scopedRoute.Name: scopedRoute,
 		},
-		rsrc.VirtualHostType: map[string]types.Resource{
+		rsrc.VirtualHostType: {
 			virtualHost.Name: virtualHost,
 		},
-		rsrc.ListenerType: map[string]types.Resource{
+		rsrc.ListenerType: {
 			httpListener.Name:       httpListener,
 			httpScopedListener.Name: httpScopedListener,
 		},
-		rsrc.SecretType: map[string]types.Resource{
+		rsrc.SecretType: {
 			secret.Name: secret,
 		},
-		rsrc.RuntimeType: map[string]types.Resource{
+		rsrc.RuntimeType: {
 			runtime.Name: runtime,
 		},
-		rsrc.ExtensionConfigType: map[string]types.Resource{
+		rsrc.ExtensionConfigType: {
 			extensionConfig.Name: extensionConfig,
 		},
 		// Pass-through type (types without explicit handling)
-		opaqueType: map[string]types.Resource{
+		opaqueType: {
 			"opaque": opaque,
 		},
 	}
@@ -460,7 +459,7 @@ func TestDeltaCallbackError(t *testing.T) {
 func TestDeltaWildcardSubscriptions(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.deltaResources = map[string]map[string]types.Resource{
-		rsrc.EndpointType: map[string]types.Resource{
+		rsrc.EndpointType: {
 			"endpoints0": resource.MakeEndpoint("endpoints0", 1234),
 			"endpoints1": resource.MakeEndpoint("endpoints1", 1234),
 			"endpoints2": resource.MakeEndpoint("endpoints2", 1234),

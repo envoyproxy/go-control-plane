@@ -3,12 +3,12 @@ package cache_test
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/testing/protocmp"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -35,13 +35,14 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// Make our initial request as a wildcard to get all resources and make sure the wildcard requesting works as intended
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
+		state := stream.NewStreamState(true, nil)
 		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: "node",
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.NewStreamState(true, nil), watches[typ])
+		}, &state, watches[typ])
 	}
 
 	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
@@ -69,7 +70,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
 		state := stream.NewStreamState(false, versionMap[typ])
 		for resource := range versionMap[typ] {
-			state.GetSubscribedResourceNames()[resource] = struct{}{}
+			state.GetSubscribedResources()[resource] = struct{}{}
 		}
 		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
@@ -77,7 +78,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, state, watches[typ])
+		}, &state, watches[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -123,12 +124,10 @@ func TestDeltaRemoveResources(t *testing.T) {
 				Id: "node",
 			},
 			TypeUrl: typ,
-		}, *streams[typ], watches[typ])
+		}, streams[typ], watches[typ])
 	}
 
-	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(context.Background(), key, fixture.snapshot()))
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
@@ -139,7 +138,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 				nextVersionMap := out.GetNextVersionMap()
 				streams[typ].SetResourceVersions(nextVersionMap)
 			case <-time.After(time.Second):
-				t.Fatal("failed to receive a snapshot response")
+				require.Fail(t, "failed to receive a snapshot response")
 			}
 		})
 	}
@@ -152,20 +151,17 @@ func TestDeltaRemoveResources(t *testing.T) {
 			Node: &core.Node{
 				Id: "node",
 			},
-			TypeUrl: typ,
-		}, *streams[typ], watches[typ])
+			TypeUrl:       typ,
+			ResponseNonce: "nonce",
+		}, streams[typ], watches[typ])
 	}
 
-	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-		t.Errorf("watches should be created for the latest version, saw %d watches expected %d", count, len(testTypes))
-	}
+	assert.Equal(t, len(testTypes), c.GetStatusInfo(key).GetNumDeltaWatches(), "watches should be created for the latest version")
 
 	// set a partially versioned snapshot with no endpoints
 	snapshot2 := fixture.snapshot()
 	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
-	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot2))
 
 	// validate response for endpoints
 	select {
@@ -176,11 +172,9 @@ func TestDeltaRemoveResources(t *testing.T) {
 		nextVersionMap := out.GetNextVersionMap()
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
-		if reflect.DeepEqual(streams[testTypes[0]].GetResourceVersions(), nextVersionMap) {
-			t.Fatalf("versionMap for the endpoint resource type did not change, received: %v, instead of an empty map", nextVersionMap)
-		}
+		require.Equal(t, nextVersionMap, streams[testTypes[0]].GetKnownResources(), "versionMap for the endpoint resource type did not change")
 	case <-time.After(time.Second):
-		t.Fatal("failed to receive snapshot response")
+		assert.Fail(t, "failed to receive snapshot response")
 	}
 }
 
@@ -203,13 +197,14 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						t.Fatalf("snapshot failed: %s", err)
 					}
 				} else {
+					state := stream.NewStreamState(false, make(map[string]string))
 					cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 						Node: &core.Node{
 							Id: id,
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, stream.NewStreamState(false, make(map[string]string)), responses)
+					}, &state, responses)
 
 					defer cancel()
 				}
@@ -226,14 +221,14 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.DeltaResponse)
 	state := stream.NewStreamState(false, nil)
-	state.SetSubscribedResourceNames(map[string]struct{}{names[rsrc.EndpointType][0]: {}})
+	state.SetSubscribedResources(map[string]struct{}{names[rsrc.EndpointType][0]: {}})
 	c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 		Node: &core.Node{
 			Id: key,
 		},
 		TypeUrl:                rsrc.EndpointType,
 		ResourceNamesSubscribe: names[rsrc.EndpointType],
-	}, state, watchCh)
+	}, &state, watchCh)
 
 	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
@@ -269,13 +264,14 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	for _, typ := range testTypes {
 		responses := make(chan cache.DeltaResponse, 1)
+		state := stream.NewStreamState(false, make(map[string]string))
 		cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: key,
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.NewStreamState(false, make(map[string]string)), responses)
+		}, &state, responses)
 
 		// Cancel the watch
 		cancel()
