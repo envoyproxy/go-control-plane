@@ -245,6 +245,11 @@ func (s *server) unsubscribe(resources []string, streamState *stream.StreamState
 			// * detect the version change, and return the resource (as an update)
 			// * detect the resource deletion, and set it as removed in the response
 			streamState.GetKnownResources()[resource] = ""
+		} else {
+			// Clean-up the state version for this resource.
+			// This addresses https://github.com/envoyproxy/go-control-plane/issues/583, where a resource unsubscribed then subscribed again
+			// is not sent again while envoy expects it.
+			delete(streamState.GetKnownResources(), resource)
 		}
 		delete(sv, resource)
 	}

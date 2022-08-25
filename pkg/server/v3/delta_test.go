@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -467,7 +468,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		},
 	}
 
-	validateResponse := func(t *testing.T, replies <-chan *discovery.DeltaDiscoveryResponse, expectedResources []string, expectedRemovedResources []string) {
+	validateResponse := func(t *testing.T, replies <-chan *discovery.DeltaDiscoveryResponse, expectedResources []string, expectedRemovedResources []string) string {
 		t.Helper()
 		select {
 		case response := <-replies:
@@ -480,8 +481,10 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 				assert.ElementsMatch(t, names, expectedResources)
 				assert.ElementsMatch(t, response.RemovedResources, expectedRemovedResources)
 			}
+			return response.Nonce
 		case <-time.After(1 * time.Second):
-			t.Fatalf("got no response")
+			require.Fail(t, "got no response")
+			return ""
 		}
 	}
 
@@ -528,6 +531,41 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		}
 		validateResponse(t, resp.sent, []string{"endpoints0"}, nil)
 
+	})
+
+	t.Run("unsubscribed resources are sent again if re-subscribed later on and the version has not changed", func(t *testing.T) {
+		resp := makeMockDeltaStream(t)
+		defer close(resp.recv)
+		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+		go func() {
+			err := s.DeltaAggregatedResources(resp)
+			assert.NoError(t, err)
+		}()
+
+		resp.recv <- &discovery.DeltaDiscoveryRequest{
+			Node:                   node,
+			TypeUrl:                rsrc.EndpointType,
+			ResourceNamesSubscribe: []string{"endpoints0", "endpoints1"},
+		}
+		nonce := validateResponse(t, resp.sent, []string{"endpoints0", "endpoints1"}, nil)
+
+		// Unsubscribe from endpoints0
+		resp.recv <- &discovery.DeltaDiscoveryRequest{
+			Node:                     node,
+			TypeUrl:                  rsrc.EndpointType,
+			ResponseNonce:            nonce,
+			ResourceNamesUnsubscribe: []string{"endpoints0"},
+		}
+		// No reply is expected here
+
+		// Subscribe again to endpoints0
+		resp.recv <- &discovery.DeltaDiscoveryRequest{
+			Node:                   node,
+			TypeUrl:                rsrc.EndpointType,
+			ResponseNonce:          nonce,
+			ResourceNamesSubscribe: []string{"endpoints0"},
+		}
+		validateResponse(t, resp.sent, []string{"endpoints0"}, nil)
 	})
 
 	t.Run("* subscribtion/unsubscription support", func(t *testing.T) {
