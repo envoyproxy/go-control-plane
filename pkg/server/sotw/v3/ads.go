@@ -101,10 +101,12 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 				}
 			}
 
+			streamState := sw.streamStates[req.TypeUrl]
+
 			if lastResponse, ok := sw.lastDiscoveryResponses[req.TypeUrl]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
-					sw.streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
+					streamState.SetResourceVersions(lastResponse.resources)
 				}
 			}
 
@@ -123,7 +125,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 					}
 
 					sw.watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
+						cancel:   s.cache.CreateWatch(req, streamState, responder),
 						response: responder,
 					})
 				}
@@ -131,10 +133,12 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 				// No pre-existing watch exists, let's create one.
 				// We need to precompute the watches first then open a watch in the cache.
 				sw.watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
+					cancel:   s.cache.CreateWatch(req, streamState, responder),
 					response: responder,
 				})
 			}
+
+			sw.streamStates[req.TypeUrl] = streamState
 		}
 	}
 }

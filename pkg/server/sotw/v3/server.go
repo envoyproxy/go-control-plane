@@ -91,7 +91,7 @@ type streamWrapper struct {
 
 	// The below fields are used for tracking resource
 	// cache state and should be maintained per stream.
-	streamState            stream.StreamState
+	streamStates           map[string]stream.StreamState
 	lastDiscoveryResponses map[string]lastDiscoveryResponse
 }
 
@@ -110,12 +110,17 @@ func (s *streamWrapper) send(resp cache.Response) (string, error) {
 	// increment nonce and convert it to base10
 	out.Nonce = strconv.FormatInt(atomic.AddInt64(&s.nonce, 1), 10)
 
+	version, err := resp.GetVersion()
+	if err != nil {
+		return "", err
+	}
+
 	lastResponse := lastDiscoveryResponse{
 		nonce:     out.Nonce,
-		resources: make(map[string]struct{}),
+		resources: make(map[string]string),
 	}
 	for _, r := range resp.GetRequest().ResourceNames {
-		lastResponse.resources[r] = struct{}{}
+		lastResponse.resources[r] = version
 	}
 	s.lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
@@ -141,7 +146,7 @@ func (s *streamWrapper) shutdown() {
 // regardless current snapshot version (even if it is not changed yet)
 type lastDiscoveryResponse struct {
 	nonce     string
-	resources map[string]struct{}
+	resources map[string]string
 }
 
 // StreamHandler converts a blocking read call to channels and initiates stream processing
