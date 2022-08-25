@@ -708,11 +708,11 @@ type LinearCacheMock struct {
 	mu sync.Mutex
 }
 
-func (m *LinearCacheMock) setExpectation(assert Assert, version string) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	m.assert = assert
-	m.version = version
+func (mock *LinearCacheMock) setExpectation(assert Assert, version string) {
+	mock.mu.Lock()
+	defer mock.mu.Unlock()
+	mock.assert = assert
+	mock.version = version
 }
 
 func (mock *LinearCacheMock) CreateWatch(req *discovery.DiscoveryRequest, state cache.ClientState, out chan cache.Response) func() {

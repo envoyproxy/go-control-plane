@@ -135,7 +135,7 @@ func (cache *LinearCache) respond(req *Request, value chan Response, staleResour
 		}
 	}
 	value <- &RawResponse{
-		Request:       &Request{TypeUrl: cache.typeURL},
+		Request:       req,
 		Resources:     resources,
 		ResourceNames: resourceNames,
 		Version:       cache.getVersion(),

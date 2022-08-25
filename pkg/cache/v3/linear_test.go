@@ -49,7 +49,7 @@ func (l testLogger) log(level string, format string, args ...interface{}) {
 
 func (l testLogger) Debugf(format string, args ...interface{}) {
 	l.t.Helper()
-	l.log("INFO", format, args...)
+	l.log("DEBUG", format, args...)
 }
 
 func (l testLogger) Infof(format string, args ...interface{}) {
@@ -59,12 +59,12 @@ func (l testLogger) Infof(format string, args ...interface{}) {
 
 func (l testLogger) Warnf(format string, args ...interface{}) {
 	l.t.Helper()
-	l.log("INFO", format, args...)
+	l.log("WARN", format, args...)
 }
 
 func (l testLogger) Errorf(format string, args ...interface{}) {
 	l.t.Helper()
-	l.log("INFO", format, args...)
+	l.log("ERROR", format, args...)
 }
 
 func testResource(s string) types.Resource {
