@@ -530,7 +530,7 @@ func TestStaleNonce(t *testing.T) {
 				err := s.StreamAggregatedResources(resp)
 				assert.NoError(t, err)
 				// should be two watches called
-				assert.False(t, !reflect.DeepEqual(map[string]int{typ: 2}, config.counts))
+				assert.Equal(t, map[string]int{typ: 2}, config.counts)
 				close(stop)
 			}()
 			select {
@@ -756,18 +756,16 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 		assert.Empty(t, state.GetKnownResources())
 	}, "1")
 
-	var nonce string
 	resp.recv <- &discovery.DiscoveryRequest{
 		Node:          node,
-		ResponseNonce: nonce,
 		TypeUrl:       rsrc.EndpointType,
 		ResourceNames: []string{clusterName},
 	}
 
+	var epResponse *discovery.DiscoveryResponse
 	select {
-	case epResponse := <-resp.sent:
+	case epResponse = <-resp.sent:
 		assert.Len(t, epResponse.Resources, 1)
-		nonce = epResponse.Nonce
 	case <-time.After(100 * time.Millisecond):
 		require.Fail(t, "no response received")
 	}
@@ -781,18 +779,19 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 	// No longer listen to this resource
 	resp.recv <- &discovery.DiscoveryRequest{
 		Node:          node,
-		ResponseNonce: nonce,
+		ResponseNonce: epResponse.Nonce,
+		VersionInfo:   epResponse.VersionInfo,
 		TypeUrl:       rsrc.EndpointType,
 		ResourceNames: []string{},
 	}
 
 	select {
-	case epResponse := <-resp.sent:
+	case <-resp.sent:
 		require.Fail(t, "unexpected response")
-		nonce = epResponse.Nonce
 	case <-time.After(100 * time.Millisecond):
 		// go on
 	}
+	fmt.Println("now?")
 
 	// Cache version did not change
 	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
@@ -804,15 +803,15 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 	//Subscribe to it again
 	resp.recv <- &discovery.DiscoveryRequest{
 		Node:          node,
-		ResponseNonce: nonce,
+		ResponseNonce: epResponse.Nonce,
+		VersionInfo:   epResponse.VersionInfo,
 		TypeUrl:       rsrc.EndpointType,
 		ResourceNames: []string{clusterName},
 	}
 
 	select {
-	case epResponse := <-resp.sent:
+	case epResponse = <-resp.sent:
 		assert.Len(t, epResponse.Resources, 1)
-		nonce = epResponse.Nonce
 	case <-time.After(100 * time.Millisecond):
 		require.Fail(t, "no response received")
 	}
@@ -820,14 +819,14 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 	// Cache version did not change
 	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
 		assert.Equal(t, []string{clusterName}, req.ResourceNames)
-		// This should also be empty
 		assert.Equal(t, map[string]string{clusterName: "1"}, state.GetKnownResources())
 	}, "")
 
 	// Don't change anything, simply ack the current one
 	resp.recv <- &discovery.DiscoveryRequest{
 		Node:          node,
-		ResponseNonce: nonce,
+		ResponseNonce: epResponse.Nonce,
+		VersionInfo:   epResponse.VersionInfo,
 		TypeUrl:       rsrc.EndpointType,
 		ResourceNames: []string{clusterName},
 	}

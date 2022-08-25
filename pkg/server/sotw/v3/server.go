@@ -165,11 +165,30 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			}
 
 			typeURL := req.GetTypeUrl()
-			state := streamStates[typeURL]
-			// Check if we're pending an ACK
-			if responder, ok := watches.responders[typeURL]; ok {
-				if responder.nonce != "" && responder.nonce == nonce {
-					// The nonce is matching, this is an ACK from the client
+			// State cannot be modified until any potential watch is closed
+			state, ok := streamStates[typeURL]
+			if !ok {
+				// We don't have a current state for this type, create one
+				state = stream.NewStreamState(len(req.ResourceNames) == 0, nil)
+			} else if nonce != state.LastResponseNonce() {
+				// The request does not match the last response we sent.
+				// The protocol is a bit unclear in this case, but currently we discard such request and wait
+				// for the client to acknowledge the previous response.
+				// This is unclear how this handles cases where a response would be missed as any subsequent request will be discarded.
+
+				// We can continue here as the watch list hasn't changed so we don't need to recompute the watches select
+				continue
+			}
+
+			responder := make(chan cache.Response, 1)
+			if w, ok := watches.responders[typeURL]; ok {
+				// If we had an open watch, close it to make sure we don't end up sending a cache response while we update the state of the request
+				w.close()
+
+				// Check if the new request ACKs the previous response
+				// This is defined as nonce and versions are matching, as well as no error present
+				if state.LastResponseNonce() == nonce && state.LastResponseVersion() == req.VersionInfo && req.ErrorDetail == nil {
+					// The nonce and versions are matching, this is an ACK from the client
 					state.CommitPendingResources()
 				}
 			}
@@ -185,26 +204,10 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			// Remove from pending resources to ensure we won't lose this state when commiting
 			state.RemovePendingResources(unsubscribedResources)
 
-			responder := make(chan cache.Response, 1)
-			if w, ok := watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
-				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
-
-					watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, &state, responder),
-						response: responder,
-					})
-				}
-			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, &state, responder),
-					response: responder,
-				})
-			}
+			watches.addWatch(typeURL, &watch{
+				cancel:   s.cache.CreateWatch(req, &state, responder),
+				response: responder,
+			})
 
 			streamStates[typeURL] = state
 
@@ -237,10 +240,10 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 			for _, name := range res.GetResourceNames() {
 				resources[name] = version
 			}
-			state.SetPendingResources(resources)
+			// Pending resources can be modified in the server while a watch is opened
+			// It will only be visible to caches once those resources are commited
+			state.SetPendingResources(nonce, version, resources)
 			streamStates[res.GetRequest().TypeUrl] = state
-
-			watches.responders[res.GetRequest().TypeUrl].nonce = nonce
 		}
 	}
 }

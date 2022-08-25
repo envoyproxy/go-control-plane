@@ -63,7 +63,6 @@ func (w *watches) recompute(ctx context.Context, req <-chan *discovery.Discovery
 // watch contains the necessary modifiables for receiving resource responses
 type watch struct {
 	cancel   func()
-	nonce    string
 	response chan cache.Response
 }
 

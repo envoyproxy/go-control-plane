@@ -37,6 +37,10 @@ type StreamState struct { // nolint:golint,revive
 	// Provides the list of resources (and their version) that have been sent to the client
 	// but not ACKed yet
 	pendingResources map[string]string
+
+	// Provides the nonce and versions of the last response sent on the stream. Used to validate ACK/NACK and avoid races
+	lastNonce   string
+	lastVersion string
 }
 
 // GetSubscribedResourceNames returns the list of resources currently explicitly subscribed to
@@ -53,8 +57,10 @@ func (s *StreamState) SetSubscribedResources(subscribedResourceNames map[string]
 	s.subscribedResourceNames = subscribedResourceNames
 }
 
-func (s *StreamState) SetPendingResources(resources map[string]string) {
+func (s *StreamState) SetPendingResources(nonce, version string, resources map[string]string) {
 	s.pendingResources = resources
+	s.lastNonce = nonce
+	s.lastVersion = version
 }
 
 func (s *StreamState) RemovePendingResources(resources []string) {
@@ -71,10 +77,15 @@ func (s *StreamState) CommitPendingResources() {
 	}
 }
 
+func (s *StreamState) LastResponseNonce() string {
+	return s.lastNonce
+}
+
+func (s *StreamState) LastResponseVersion() string {
+	return s.lastVersion
+}
+
 func (s *StreamState) GetKnownResources() map[string]string {
-	if s.resourceVersions == nil {
-		s.resourceVersions = make(map[string]string)
-	}
 	return s.resourceVersions
 }
 
@@ -96,6 +107,10 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		wildcard:                wildcard,
 		subscribedResourceNames: map[string]struct{}{},
 		resourceVersions:        initialResourceVersions,
+	}
+
+	if initialResourceVersions == nil {
+		state.resourceVersions = make(map[string]string)
 	}
 
 	return state
