@@ -34,7 +34,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -50,18 +49,19 @@ type mockConfigWatcher struct {
 	mu *sync.RWMutex
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ stream.StreamState, out chan cache.Response) func() {
-	config.counts[req.GetTypeUrl()] = config.counts[req.GetTypeUrl()] + 1
-	if len(config.responses[req.GetTypeUrl()]) > 0 {
-		out <- config.responses[req.GetTypeUrl()][0]
-		config.responses[req.GetTypeUrl()] = config.responses[req.GetTypeUrl()][1:]
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ cache.SubscriptionState, out chan cache.Response) (func(), error) {
+	typ := req.GetTypeUrl()
+	config.counts[typ] = config.counts[typ] + 1
+	if len(config.responses[typ]) > 0 {
+		out <- config.responses[typ][0]
+		config.responses[typ] = config.responses[typ][1:]
 	} else {
 		config.watches++
 		return func() {
 			config.watches--
-		}
+		}, nil
 	}
-	return nil
+	return nil, nil
 }
 
 func (config *mockConfigWatcher) Fetch(_ context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {

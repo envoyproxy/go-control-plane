@@ -8,6 +8,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // process handles a bi-di stream request
@@ -101,14 +102,24 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 				}
 			}
 
-			if lastResponse, ok := sw.lastDiscoveryResponses[req.GetTypeUrl()]; ok {
+			typeURL := req.GetTypeUrl()
+			streamState, ok := sw.streamStates[typeURL]
+			if !ok {
+				// Supports legacy wildcard mode
+				// Wildcard will be set to true if no resource is set
+				streamState = stream.NewSubscriptionState(len(req.ResourceNames) == 0, nil)
+			}
+
+			// ToDo: track ACK through subscription state
+			if lastResponse, ok := sw.lastDiscoveryResponses[typeURL]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
-					sw.streamState.SetKnownResourceNames(req.GetTypeUrl(), lastResponse.resources)
+					streamState.SetKnownResources(lastResponse.resources)
 				}
 			}
 
-			typeURL := req.GetTypeUrl()
+			updateSubscriptionResources(req, &streamState)
+
 			// Use the multiplexed channel for new watches.
 			responder := sw.watches.responders[resource.AnyType].response
 			if w, ok := sw.watches.responders[typeURL]; ok {
@@ -122,19 +133,31 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 						return err
 					}
 
+					cancel, err := s.cache.CreateWatch(req, streamState, responder)
+					if err != nil {
+						return err
+					}
+
 					sw.watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
+						cancel:   cancel,
 						response: responder,
 					})
 				}
 			} else {
 				// No pre-existing watch exists, let's create one.
 				// We need to precompute the watches first then open a watch in the cache.
+				cancel, err := s.cache.CreateWatch(req, streamState, responder)
+				if err != nil {
+					return err
+				}
+
 				sw.watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
+					cancel:   cancel,
 					response: responder,
 				})
 			}
+
+			sw.streamStates[req.TypeUrl] = streamState
 		}
 	}
 }
