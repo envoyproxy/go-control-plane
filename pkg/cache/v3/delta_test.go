@@ -113,6 +113,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 	watches := make(map[string]chan cache.DeltaResponse)
 	streams := make(map[string]*stream.StreamState)
 
+	// At this stage the cache is empty, so a watch is opened
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
 		state := stream.NewStreamState(true, make(map[string]string))
@@ -127,13 +128,17 @@ func TestDeltaRemoveResources(t *testing.T) {
 		}, streams[typ], watches[typ])
 	}
 
-	require.NoError(t, c.SetSnapshot(context.Background(), key, fixture.snapshot()))
+	snapshot := fixture.snapshot()
+	snapshot.Resources[types.Endpoint] = cache.NewResources(fixture.version, []types.Resource{
+		testEndpoint,
+		resource.MakeEndpoint("otherCluster", 8080),
+	})
+	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot))
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				snapshot := fixture.snapshot()
 				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
 				nextVersionMap := out.GetNextVersionMap()
 				streams[typ].SetResourceVersions(nextVersionMap)
@@ -158,21 +163,21 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 	assert.Equal(t, len(testTypes), c.GetStatusInfo(key).GetNumDeltaWatches(), "watches should be created for the latest version")
 
-	// set a partially versioned snapshot with no endpoints
+	// set a partially versioned snapshot with only one endpoint
 	snapshot2 := fixture.snapshot()
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
+	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{
+		testEndpoint, // this cluster is not changed, we do not expect it back in "resources"
+	})
 	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot2))
 
 	// validate response for endpoints
 	select {
 	case out := <-watches[testTypes[0]]:
-		snapshot2 := fixture.snapshot()
-		snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		assert.Empty(t, out.(*cache.RawDeltaResponse).Resources)
+		assert.Equal(t, []string{"otherCluster"}, out.(*cache.RawDeltaResponse).RemovedResources)
 		nextVersionMap := out.GetNextVersionMap()
-
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
-		require.Equal(t, nextVersionMap, streams[testTypes[0]].GetKnownResources(), "versionMap for the endpoint resource type did not change")
+		assert.NotEqual(t, nextVersionMap, streams[testTypes[0]].GetKnownResources(), "versionMap for the endpoint resource type did not change")
 	case <-time.After(time.Second):
 		assert.Fail(t, "failed to receive snapshot response")
 	}
