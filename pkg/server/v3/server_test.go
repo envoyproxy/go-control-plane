@@ -26,6 +26,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -694,15 +695,29 @@ func TestCallbackError(t *testing.T) {
 	}
 }
 
+type Assert func(req *discovery.DiscoveryRequest, state cache.ClientState)
 type LinearCacheMock struct {
 	// name -> version
 	assert        func(req *discovery.DiscoveryRequest, state cache.ClientState)
 	resources     []types.ResourceWithTTL
 	resourceNames []string
 	version       string
+
+	// This mutex is not really useful as the test is organized to not conflict
+	// But it is needed to make sure race detector accepts it
+	mu sync.Mutex
+}
+
+func (m *LinearCacheMock) setExpectation(assert Assert, version string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.assert = assert
+	m.version = version
 }
 
 func (mock *LinearCacheMock) CreateWatch(req *discovery.DiscoveryRequest, state cache.ClientState, out chan cache.Response) func() {
+	mock.mu.Lock()
+	defer mock.mu.Unlock()
 	if mock.assert != nil {
 		mock.assert(req, state)
 	}
@@ -726,23 +741,20 @@ func (mock *LinearCacheMock) Fetch(ctx context.Context, req *discovery.Discovery
 
 func TestSubscriptionsThroughLinearCache(t *testing.T) {
 	resp := makeMockStream(t)
-	linearCache := LinearCacheMock{}
+	linearCache := LinearCacheMock{
+		resources:     []types.ResourceWithTTL{{Resource: endpoint}},
+		resourceNames: []string{clusterName},
+	}
 	defer close(resp.recv)
-
+	s := server.NewServer(context.Background(), &linearCache, server.CallbackFuncs{})
 	go func() {
-		s := server.NewServer(context.Background(), &linearCache, server.CallbackFuncs{})
 		assert.NoError(t, s.StreamAggregatedResources(resp))
 	}()
 
-	linearCache.version = "1"
-	linearCache.resources = []types.ResourceWithTTL{
-		{Resource: endpoint},
-	}
-	linearCache.resourceNames = []string{clusterName}
-	linearCache.assert = func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
 		assert.Equal(t, []string{clusterName}, req.ResourceNames)
 		assert.Empty(t, state.GetKnownResources())
-	}
+	}, "1")
 
 	var nonce string
 	resp.recv <- &discovery.DiscoveryRequest{
@@ -757,15 +769,14 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 		assert.Len(t, epResponse.Resources, 1)
 		nonce = epResponse.Nonce
 	case <-time.After(100 * time.Millisecond):
-		assert.Fail(t, "no response received")
+		require.Fail(t, "no response received")
 	}
 
-	linearCache.version = ""
-	linearCache.assert = func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
 		assert.Equal(t, []string{}, req.ResourceNames)
 		// This should also be empty
 		assert.Empty(t, state.GetKnownResources())
-	}
+	}, "")
 
 	// No longer listen to this resource
 	resp.recv <- &discovery.DiscoveryRequest{
@@ -777,19 +788,18 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 
 	select {
 	case epResponse := <-resp.sent:
-		assert.Fail(t, "unexpected response")
+		require.Fail(t, "unexpected response")
 		nonce = epResponse.Nonce
 	case <-time.After(100 * time.Millisecond):
 		// go on
 	}
 
 	// Cache version did not change
-	linearCache.version = "1"
-	linearCache.assert = func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
 		assert.Equal(t, []string{clusterName}, req.ResourceNames)
 		// This should also be empty
 		assert.Empty(t, state.GetKnownResources())
-	}
+	}, "1")
 
 	//Subscribe to it again
 	resp.recv <- &discovery.DiscoveryRequest{
@@ -804,16 +814,15 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 		assert.Len(t, epResponse.Resources, 1)
 		nonce = epResponse.Nonce
 	case <-time.After(100 * time.Millisecond):
-		assert.Fail(t, "no response received")
+		require.Fail(t, "no response received")
 	}
 
 	// Cache version did not change
-	linearCache.version = ""
-	linearCache.assert = func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
 		assert.Equal(t, []string{clusterName}, req.ResourceNames)
 		// This should also be empty
 		assert.Equal(t, map[string]string{clusterName: "1"}, state.GetKnownResources())
-	}
+	}, "")
 
 	// Don't change anything, simply ack the current one
 	resp.recv <- &discovery.DiscoveryRequest{
@@ -824,7 +833,7 @@ func TestSubscriptionsThroughLinearCache(t *testing.T) {
 	}
 	select {
 	case <-resp.sent:
-		assert.Fail(t, "unexpected response")
+		require.Fail(t, "unexpected response")
 	case <-time.After(100 * time.Millisecond):
 		// go on
 	}
