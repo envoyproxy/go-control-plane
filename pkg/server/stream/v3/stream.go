@@ -33,6 +33,10 @@ type StreamState struct { // nolint:golint,revive
 	// ResourceVersions contains a hash of the resource as the value and the resource name as the key.
 	// This field stores the last state sent to the client.
 	resourceVersions map[string]string
+
+	// Provides the list of resources (and their version) that have been sent to the client
+	// but not ACKed yet
+	pendingResources map[string]string
 }
 
 // GetSubscribedResourceNames returns the list of resources currently explicitly subscribed to
@@ -49,7 +53,28 @@ func (s *StreamState) SetSubscribedResources(subscribedResourceNames map[string]
 	s.subscribedResourceNames = subscribedResourceNames
 }
 
+func (s *StreamState) SetPendingResources(resources map[string]string) {
+	s.pendingResources = resources
+}
+
+func (s *StreamState) RemovePendingResources(resources []string) {
+	for _, resource := range resources {
+		delete(s.pendingResources, resource)
+	}
+}
+
+func (s *StreamState) CommitPendingResources() {
+	clientVersions := s.GetKnownResources()
+	for name, version := range s.pendingResources {
+		clientVersions[name] = version
+		delete(s.pendingResources, name)
+	}
+}
+
 func (s *StreamState) GetKnownResources() map[string]string {
+	if s.resourceVersions == nil {
+		s.resourceVersions = make(map[string]string)
+	}
 	return s.resourceVersions
 }
 
@@ -71,10 +96,6 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		wildcard:                wildcard,
 		subscribedResourceNames: map[string]struct{}{},
 		resourceVersions:        initialResourceVersions,
-	}
-
-	if initialResourceVersions == nil {
-		state.resourceVersions = make(map[string]string)
 	}
 
 	return state
