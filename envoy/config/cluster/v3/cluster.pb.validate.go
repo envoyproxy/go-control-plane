@@ -2574,6 +2574,17 @@ func (m *Cluster_LbSubsetConfig) validate(all bool) error {
 
 	// no validation rules for ListAsAny
 
+	if _, ok := Cluster_LbSubsetConfig_LbSubsetMetadataFallbackPolicy_name[int32(m.GetMetadataFallbackPolicy())]; !ok {
+		err := Cluster_LbSubsetConfigValidationError{
+			field:  "MetadataFallbackPolicy",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return Cluster_LbSubsetConfigMultiError(errors)
 	}
