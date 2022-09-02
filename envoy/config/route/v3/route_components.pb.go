@@ -4127,6 +4127,10 @@ func (*RouteMatch_ConnectMatcher) Descriptor() ([]byte, []int) {
 // .. note::
 //
 //   Shadowing will not be triggered if the primary cluster does not exist.
+//
+// .. note::
+//
+//   Shadowing doesn't support Http CONNECT and upgrades.
 // [#next-free-field: 6]
 type RouteAction_RequestMirrorPolicy struct {
 	state         protoimpl.MessageState
