@@ -60,6 +60,7 @@ func (m *ProxyProtocol) validate(all bool) error {
 	if len(errors) > 0 {
 		return ProxyProtocolMultiError(errors)
 	}
+
 	return nil
 }
 

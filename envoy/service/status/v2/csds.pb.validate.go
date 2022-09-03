@@ -94,6 +94,7 @@ func (m *ClientStatusRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClientStatusRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -325,6 +326,7 @@ func (m *PerXdsConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return PerXdsConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -486,6 +488,7 @@ func (m *ClientConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClientConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -618,6 +621,7 @@ func (m *ClientStatusResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClientStatusResponseMultiError(errors)
 	}
+
 	return nil
 }
 

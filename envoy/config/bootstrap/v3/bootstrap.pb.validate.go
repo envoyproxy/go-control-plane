@@ -780,6 +780,35 @@ func (m *Bootstrap) validate(all bool) error {
 
 	// no validation rules for PerfTracingFilePath
 
+	if all {
+		switch v := interface{}(m.GetDefaultRegexEngine()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "DefaultRegexEngine",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BootstrapValidationError{
+					field:  "DefaultRegexEngine",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDefaultRegexEngine()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BootstrapValidationError{
+				field:  "DefaultRegexEngine",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.StatsFlush.(type) {
 
 	case *Bootstrap_StatsFlushOnAdmin:
@@ -800,6 +829,7 @@ func (m *Bootstrap) validate(all bool) error {
 	if len(errors) > 0 {
 		return BootstrapMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1000,6 +1030,7 @@ func (m *Admin) validate(all bool) error {
 	if len(errors) > 0 {
 		return AdminMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1187,6 +1218,7 @@ func (m *ClusterManager) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClusterManagerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1344,6 +1376,7 @@ func (m *Watchdogs) validate(all bool) error {
 	if len(errors) > 0 {
 		return WatchdogsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1651,6 +1684,7 @@ func (m *Watchdog) validate(all bool) error {
 	if len(errors) > 0 {
 		return WatchdogMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1778,6 +1812,7 @@ func (m *FatalAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return FatalActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1910,6 +1945,7 @@ func (m *Runtime) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2157,6 +2193,7 @@ func (m *RuntimeLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2289,6 +2326,7 @@ func (m *LayeredRuntime) validate(all bool) error {
 	if len(errors) > 0 {
 		return LayeredRuntimeMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2421,6 +2459,7 @@ func (m *CustomInlineHeader) validate(all bool) error {
 	if len(errors) > 0 {
 		return CustomInlineHeaderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2626,6 +2665,7 @@ func (m *Bootstrap_StaticResources) validate(all bool) error {
 	if len(errors) > 0 {
 		return Bootstrap_StaticResourcesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2818,6 +2858,7 @@ func (m *Bootstrap_DynamicResources) validate(all bool) error {
 	if len(errors) > 0 {
 		return Bootstrap_DynamicResourcesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2950,6 +2991,7 @@ func (m *ClusterManager_OutlierDetection) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClusterManager_OutlierDetectionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3092,6 +3134,7 @@ func (m *Watchdog_WatchdogAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return Watchdog_WatchdogActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3199,6 +3242,7 @@ func (m *RuntimeLayer_DiskLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayer_DiskLayerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3300,6 +3344,7 @@ func (m *RuntimeLayer_AdminLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayer_AdminLayerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3432,6 +3477,7 @@ func (m *RuntimeLayer_RtdsLayer) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeLayer_RtdsLayerMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -96,6 +96,7 @@ func (m *RouteConfiguration) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteConfigurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -276,6 +277,7 @@ func (m *Route) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -430,6 +432,7 @@ func (m *RouteMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -664,6 +667,7 @@ func (m *RouteAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -807,6 +811,7 @@ func (m *WeightedCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return WeightedClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -961,6 +966,7 @@ func (m *WeightedCluster_ClusterWeight) validate(all bool) error {
 	if len(errors) > 0 {
 		return WeightedCluster_ClusterWeightMultiError(errors)
 	}
+
 	return nil
 }
 

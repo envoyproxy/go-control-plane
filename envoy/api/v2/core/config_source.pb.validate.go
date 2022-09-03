@@ -206,6 +206,7 @@ func (m *ApiConfigSource) validate(all bool) error {
 	if len(errors) > 0 {
 		return ApiConfigSourceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -305,6 +306,7 @@ func (m *AggregatedConfigSource) validate(all bool) error {
 	if len(errors) > 0 {
 		return AggregatedConfigSourceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -417,6 +419,7 @@ func (m *SelfConfigSource) validate(all bool) error {
 	if len(errors) > 0 {
 		return SelfConfigSourceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -560,6 +563,7 @@ func (m *RateLimitSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitSettingsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -811,6 +815,7 @@ func (m *ConfigSource) validate(all bool) error {
 	if len(errors) > 0 {
 		return ConfigSourceMultiError(errors)
 	}
+
 	return nil
 }
 

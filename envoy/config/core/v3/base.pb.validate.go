@@ -66,6 +66,7 @@ func (m *Locality) validate(all bool) error {
 	if len(errors) > 0 {
 		return LocalityMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -222,6 +223,7 @@ func (m *BuildVersion) validate(all bool) error {
 	if len(errors) > 0 {
 		return BuildVersionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -357,6 +359,7 @@ func (m *Extension) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtensionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -670,6 +673,7 @@ func (m *Node) validate(all bool) error {
 	if len(errors) > 0 {
 		return NodeMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -860,6 +864,7 @@ func (m *Metadata) validate(all bool) error {
 	if len(errors) > 0 {
 		return MetadataMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -971,6 +976,7 @@ func (m *RuntimeUInt32) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeUInt32MultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1110,6 +1116,7 @@ func (m *RuntimePercent) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimePercentMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1222,6 +1229,7 @@ func (m *RuntimeDouble) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeDoubleMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1372,6 +1380,7 @@ func (m *RuntimeFeatureFlag) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeFeatureFlagMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1486,6 +1495,7 @@ func (m *QueryParameter) validate(all bool) error {
 	if len(errors) > 0 {
 		return QueryParameterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1640,6 +1650,7 @@ func (m *HeaderValue) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderValueMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1819,9 +1830,12 @@ func (m *HeaderValueOption) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for KeepEmptyValue
+
 	if len(errors) > 0 {
 		return HeaderValueOptionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1957,6 +1971,7 @@ func (m *HeaderMap) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderMapMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2066,6 +2081,7 @@ func (m *WatchedDirectory) validate(all bool) error {
 	if len(errors) > 0 {
 		return WatchedDirectoryMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2211,6 +2227,7 @@ func (m *DataSource) validate(all bool) error {
 	if len(errors) > 0 {
 		return DataSourceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2367,6 +2384,7 @@ func (m *RetryPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2545,6 +2563,7 @@ func (m *RemoteDataSource) validate(all bool) error {
 	if len(errors) > 0 {
 		return RemoteDataSourceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2720,6 +2739,7 @@ func (m *AsyncDataSource) validate(all bool) error {
 	if len(errors) > 0 {
 		return AsyncDataSourceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2865,6 +2885,7 @@ func (m *TransportSocket) validate(all bool) error {
 	if len(errors) > 0 {
 		return TransportSocketMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3006,6 +3027,7 @@ func (m *RuntimeFractionalPercent) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeFractionalPercentMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3109,6 +3131,7 @@ func (m *ControlPlane) validate(all bool) error {
 	if len(errors) > 0 {
 		return ControlPlaneMultiError(errors)
 	}
+
 	return nil
 }
 

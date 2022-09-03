@@ -95,9 +95,44 @@ func (m *CircuitBreakers) validate(all bool) error {
 
 	}
 
+	for idx, item := range m.GetPerHostThresholds() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CircuitBreakersValidationError{
+						field:  fmt.Sprintf("PerHostThresholds[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CircuitBreakersValidationError{
+						field:  fmt.Sprintf("PerHostThresholds[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CircuitBreakersValidationError{
+					field:  fmt.Sprintf("PerHostThresholds[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return CircuitBreakersMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -384,6 +419,7 @@ func (m *CircuitBreakers_Thresholds) validate(all bool) error {
 	if len(errors) > 0 {
 		return CircuitBreakers_ThresholdsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -545,6 +581,7 @@ func (m *CircuitBreakers_Thresholds_RetryBudget) validate(all bool) error {
 	if len(errors) > 0 {
 		return CircuitBreakers_Thresholds_RetryBudgetMultiError(errors)
 	}
+
 	return nil
 }
 

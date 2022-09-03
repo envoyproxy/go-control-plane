@@ -178,6 +178,7 @@ func (m *AttributeContext) validate(all bool) error {
 	if len(errors) > 0 {
 		return AttributeContextMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -314,6 +315,7 @@ func (m *AttributeContext_Peer) validate(all bool) error {
 	if len(errors) > 0 {
 		return AttributeContext_PeerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -473,6 +475,7 @@ func (m *AttributeContext_Request) validate(all bool) error {
 	if len(errors) > 0 {
 		return AttributeContext_RequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -596,6 +599,7 @@ func (m *AttributeContext_HttpRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return AttributeContext_HttpRequestMultiError(errors)
 	}
+
 	return nil
 }
 

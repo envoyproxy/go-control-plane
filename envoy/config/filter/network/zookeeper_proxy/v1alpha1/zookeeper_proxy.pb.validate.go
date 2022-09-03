@@ -102,6 +102,7 @@ func (m *ZooKeeperProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return ZooKeeperProxyMultiError(errors)
 	}
+
 	return nil
 }
 

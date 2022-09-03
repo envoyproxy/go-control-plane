@@ -81,6 +81,7 @@ func (m *Pipe) validate(all bool) error {
 	if len(errors) > 0 {
 		return PipeMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -235,6 +236,7 @@ func (m *SocketAddress) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketAddressMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -421,6 +423,7 @@ func (m *TcpKeepalive) validate(all bool) error {
 	if len(errors) > 0 {
 		return TcpKeepaliveMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -622,6 +625,7 @@ func (m *BindConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return BindConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -795,6 +799,7 @@ func (m *Address) validate(all bool) error {
 	if len(errors) > 0 {
 		return AddressMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -919,6 +924,7 @@ func (m *CidrRange) validate(all bool) error {
 	if len(errors) > 0 {
 		return CidrRangeMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -129,6 +129,7 @@ func (m *XRayConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return XRayConfigMultiError(errors)
 	}
+
 	return nil
 }
 

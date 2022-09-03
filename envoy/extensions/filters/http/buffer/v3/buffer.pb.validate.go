@@ -83,6 +83,7 @@ func (m *Buffer) validate(all bool) error {
 	if len(errors) > 0 {
 		return BufferMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -250,6 +251,7 @@ func (m *BufferPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return BufferPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 

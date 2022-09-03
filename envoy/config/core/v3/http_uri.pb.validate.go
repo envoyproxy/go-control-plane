@@ -138,6 +138,7 @@ func (m *HttpUri) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpUriMultiError(errors)
 	}
+
 	return nil
 }
 

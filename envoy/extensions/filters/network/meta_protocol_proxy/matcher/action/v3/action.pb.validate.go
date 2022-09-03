@@ -108,6 +108,7 @@ func (m *RouteAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteActionMultiError(errors)
 	}
+
 	return nil
 }
 

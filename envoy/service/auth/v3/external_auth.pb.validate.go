@@ -89,6 +89,7 @@ func (m *CheckRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return CheckRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -252,6 +253,7 @@ func (m *DeniedHttpResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return DeniedHttpResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -484,6 +486,7 @@ func (m *OkHttpResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return OkHttpResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -707,6 +710,7 @@ func (m *CheckResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return CheckResponseMultiError(errors)
 	}
+
 	return nil
 }
 

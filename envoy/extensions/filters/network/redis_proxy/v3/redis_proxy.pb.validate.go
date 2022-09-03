@@ -168,6 +168,40 @@ func (m *RedisProxy) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetDownstreamAuthPasswords() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RedisProxyValidationError{
+						field:  fmt.Sprintf("DownstreamAuthPasswords[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RedisProxyValidationError{
+						field:  fmt.Sprintf("DownstreamAuthPasswords[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RedisProxyValidationError{
+					field:  fmt.Sprintf("DownstreamAuthPasswords[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	for idx, item := range m.GetFaults() {
 		_, _ = idx, item
 
@@ -234,6 +268,7 @@ func (m *RedisProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -390,6 +425,7 @@ func (m *RedisProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -579,6 +615,7 @@ func (m *RedisProxy_ConnPoolSettings) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_ConnPoolSettingsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -746,6 +783,7 @@ func (m *RedisProxy_PrefixRoutes) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_PrefixRoutesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -927,6 +965,7 @@ func (m *RedisProxy_RedisFault) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_RedisFaultMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1086,6 +1125,7 @@ func (m *RedisProxy_PrefixRoutes_Route) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedisProxy_PrefixRoutes_RouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1232,6 +1272,7 @@ func (m *RedisProxy_PrefixRoutes_Route_RequestMirrorPolicy) validate(all bool) e
 	if len(errors) > 0 {
 		return RedisProxy_PrefixRoutes_Route_RequestMirrorPolicyMultiError(errors)
 	}
+
 	return nil
 }
 

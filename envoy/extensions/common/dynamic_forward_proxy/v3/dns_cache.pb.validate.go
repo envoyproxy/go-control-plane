@@ -93,6 +93,7 @@ func (m *DnsCacheCircuitBreakers) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsCacheCircuitBreakersMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -233,6 +234,36 @@ func (m *DnsCacheConfig) validate(all bool) error {
 				err := DnsCacheConfigValidationError{
 					field:  "DnsRefreshRate",
 					reason: "value must be greater than or equal to 1ms",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if d := m.GetDnsMinRefreshRate(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = DnsCacheConfigValidationError{
+				field:  "DnsMinRefreshRate",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(5*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := DnsCacheConfigValidationError{
+					field:  "DnsMinRefreshRate",
+					reason: "value must be greater than or equal to 5s",
 				}
 				if !all {
 					return err
@@ -502,6 +533,7 @@ func (m *DnsCacheConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsCacheConfigMultiError(errors)
 	}
+
 	return nil
 }
 

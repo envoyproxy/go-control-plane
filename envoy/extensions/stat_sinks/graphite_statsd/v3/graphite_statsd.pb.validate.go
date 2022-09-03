@@ -122,6 +122,7 @@ func (m *GraphiteStatsdSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return GraphiteStatsdSinkMultiError(errors)
 	}
+
 	return nil
 }
 

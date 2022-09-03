@@ -126,6 +126,7 @@ func (m *AccessLog) validate(all bool) error {
 	if len(errors) > 0 {
 		return AccessLogMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -610,6 +611,7 @@ func (m *AccessLogFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return AccessLogFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -717,6 +719,17 @@ func (m *ComparisonFilter) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	if m.GetValue() == nil {
+		err := ComparisonFilterValidationError{
+			field:  "Value",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if all {
 		switch v := interface{}(m.GetValue()).(type) {
 		case interface{ ValidateAll() error }:
@@ -749,6 +762,7 @@ func (m *ComparisonFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return ComparisonFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -888,6 +902,7 @@ func (m *StatusCodeFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return StatusCodeFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1027,6 +1042,7 @@ func (m *DurationFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return DurationFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1126,6 +1142,7 @@ func (m *NotHealthCheckFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return NotHealthCheckFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1227,6 +1244,7 @@ func (m *TraceableFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return TraceableFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1368,6 +1386,7 @@ func (m *RuntimeFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return RuntimeFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1512,6 +1531,7 @@ func (m *AndFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return AndFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1655,6 +1675,7 @@ func (m *OrFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return OrFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1793,6 +1814,7 @@ func (m *HeaderFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1907,6 +1929,7 @@ func (m *ResponseFlagFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return ResponseFlagFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2055,6 +2078,7 @@ func (m *GrpcStatusFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return GrpcStatusFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2212,6 +2236,7 @@ func (m *MetadataFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return MetadataFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2348,6 +2373,7 @@ func (m *ExtensionFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtensionFilterMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -122,6 +122,7 @@ func (m *TCPAccessLogEntry) validate(all bool) error {
 	if len(errors) > 0 {
 		return TCPAccessLogEntryMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -312,6 +313,7 @@ func (m *HTTPAccessLogEntry) validate(all bool) error {
 	if len(errors) > 0 {
 		return HTTPAccessLogEntryMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -417,6 +419,7 @@ func (m *ConnectionProperties) validate(all bool) error {
 	if len(errors) > 0 {
 		return ConnectionPropertiesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1045,6 +1048,7 @@ func (m *AccessLogCommon) validate(all bool) error {
 	if len(errors) > 0 {
 		return AccessLogCommonMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1209,6 +1213,7 @@ func (m *ResponseFlags) validate(all bool) error {
 	if len(errors) > 0 {
 		return ResponseFlagsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1401,6 +1406,7 @@ func (m *TLSProperties) validate(all bool) error {
 	if len(errors) > 0 {
 		return TLSPropertiesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1562,6 +1568,7 @@ func (m *HTTPRequestProperties) validate(all bool) error {
 	if len(errors) > 0 {
 		return HTTPRequestPropertiesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1702,6 +1709,7 @@ func (m *HTTPResponseProperties) validate(all bool) error {
 	if len(errors) > 0 {
 		return HTTPResponsePropertiesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1805,6 +1813,7 @@ func (m *ResponseFlags_Unauthorized) validate(all bool) error {
 	if len(errors) > 0 {
 		return ResponseFlags_UnauthorizedMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1943,6 +1952,7 @@ func (m *TLSProperties_CertificateProperties) validate(all bool) error {
 	if len(errors) > 0 {
 		return TLSProperties_CertificatePropertiesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2059,6 +2069,7 @@ func (m *TLSProperties_CertificateProperties_SubjectAltName) validate(all bool) 
 	if len(errors) > 0 {
 		return TLSProperties_CertificateProperties_SubjectAltNameMultiError(errors)
 	}
+
 	return nil
 }
 

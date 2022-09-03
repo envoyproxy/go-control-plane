@@ -221,6 +221,7 @@ func (m *MetaProtocolProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return MetaProtocolProxyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -373,6 +374,7 @@ func (m *ApplicationProtocol) validate(all bool) error {
 	if len(errors) > 0 {
 		return ApplicationProtocolMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -524,6 +526,7 @@ func (m *MetaRds) validate(all bool) error {
 	if len(errors) > 0 {
 		return MetaRdsMultiError(errors)
 	}
+
 	return nil
 }
 

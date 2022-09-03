@@ -59,7 +59,16 @@ func (m *SubstitutionFormatString) validate(all bool) error {
 
 	// no validation rules for OmitEmptyValues
 
-	// no validation rules for ContentType
+	if !_SubstitutionFormatString_ContentType_Pattern.MatchString(m.GetContentType()) {
+		err := SubstitutionFormatStringValidationError{
+			field:  "ContentType",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	for idx, item := range m.GetFormatters() {
 		_, _ = idx, item
@@ -188,6 +197,7 @@ func (m *SubstitutionFormatString) validate(all bool) error {
 	if len(errors) > 0 {
 		return SubstitutionFormatStringMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -263,3 +273,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SubstitutionFormatStringValidationError{}
+
+var _SubstitutionFormatString_ContentType_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")

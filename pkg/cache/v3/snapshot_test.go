@@ -62,7 +62,7 @@ func TestListenerWithMissingRoutesIsInconsistent(t *testing.T) {
 
 func TestListenerWithUnidentifiedRouteIsInconsistent(t *testing.T) {
 	if snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
-		rsrc.RouteType:    {resource.MakeRoute("test", clusterName)},
+		rsrc.RouteType:    {resource.MakeRouteConfig("test", clusterName)},
 		rsrc.ListenerType: {testListener},
 	}); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
@@ -75,7 +75,7 @@ func TestRouteListenerWithRouteIsConsistent(t *testing.T) {
 			resource.MakeRouteHTTPListener(resource.Xds, "listener1", 80, "testRoute0"),
 		},
 		rsrc.RouteType: {
-			resource.MakeRoute("testRoute0", clusterName),
+			resource.MakeRouteConfig("testRoute0", clusterName),
 		},
 	})
 
@@ -90,7 +90,7 @@ func TestScopedRouteListenerWithScopedRouteOnlyIsInconsistent(t *testing.T) {
 			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
 		},
 		rsrc.ScopedRouteType: {
-			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
+			resource.MakeScopedRouteConfig("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
 		},
 	}); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
@@ -103,10 +103,10 @@ func TestScopedRouteListenerWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
 		},
 		rsrc.ScopedRouteType: {
-			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
+			resource.MakeScopedRouteConfig("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
 		},
 		rsrc.RouteType: {
-			resource.MakeRoute("testRoute0", clusterName),
+			resource.MakeRouteConfig("testRoute0", clusterName),
 		},
 	})
 
@@ -119,7 +119,7 @@ func TestScopedRouteListenerWithInlineScopedRouteAndRouteIsConsistent(t *testing
 			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "testRoute0"),
 		},
 		rsrc.RouteType: {
-			resource.MakeRoute("testRoute0", clusterName),
+			resource.MakeRouteConfig("testRoute0", clusterName),
 		},
 	})
 
@@ -133,7 +133,7 @@ func TestScopedRouteListenerWithInlineScopedRouteAndNoRouteIsInconsistent(t *tes
 			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "testRoute0"),
 		},
 		rsrc.RouteType: {
-			resource.MakeRoute("testRoute1", clusterName),
+			resource.MakeRouteConfig("testRoute1", clusterName),
 		},
 	})
 
@@ -148,11 +148,11 @@ func TestMultipleListenersWithScopedRouteAndRouteIsConsistent(t *testing.T) {
 			resource.MakeRouteHTTPListener(resource.Xds, "listener1", 80, "testRoute1"),
 		},
 		rsrc.ScopedRouteType: {
-			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
+			resource.MakeScopedRouteConfig("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
 		},
 		rsrc.RouteType: {
-			resource.MakeRoute("testRoute0", clusterName),
-			resource.MakeRoute("testRoute1", clusterName),
+			resource.MakeRouteConfig("testRoute0", clusterName),
+			resource.MakeRouteConfig("testRoute1", clusterName),
 		},
 	})
 

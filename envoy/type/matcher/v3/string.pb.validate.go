@@ -160,6 +160,7 @@ func (m *StringMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return StringMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -304,6 +305,7 @@ func (m *ListStringMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListStringMatcherMultiError(errors)
 	}
+
 	return nil
 }
 

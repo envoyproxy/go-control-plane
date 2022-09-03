@@ -100,6 +100,7 @@ func (m *RateLimitServiceConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitServiceConfigMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -60,6 +60,7 @@ func (m *VclSocketInterface) validate(all bool) error {
 	if len(errors) > 0 {
 		return VclSocketInterfaceMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -82,6 +82,7 @@ func (m *HttpStatus) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpStatusMultiError(errors)
 	}
+
 	return nil
 }
 

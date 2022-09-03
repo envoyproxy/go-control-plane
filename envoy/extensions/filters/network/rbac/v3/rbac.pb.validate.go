@@ -86,6 +86,35 @@ func (m *RBAC) validate(all bool) error {
 	}
 
 	if all {
+		switch v := interface{}(m.GetMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RBACValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RBACValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RBACValidationError{
+				field:  "Matcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
 		switch v := interface{}(m.GetShadowRules()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -114,6 +143,35 @@ func (m *RBAC) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetShadowMatcher()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RBACValidationError{
+					field:  "ShadowMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RBACValidationError{
+					field:  "ShadowMatcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetShadowMatcher()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RBACValidationError{
+				field:  "ShadowMatcher",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for ShadowRulesStatPrefix
 
 	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
@@ -132,6 +190,7 @@ func (m *RBAC) validate(all bool) error {
 	if len(errors) > 0 {
 		return RBACMultiError(errors)
 	}
+
 	return nil
 }
 

@@ -118,6 +118,7 @@ func (m *Connection) validate(all bool) error {
 	if len(errors) > 0 {
 		return ConnectionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -342,6 +343,7 @@ func (m *SocketEvent) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketEventMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -509,6 +511,7 @@ func (m *SocketBufferedTrace) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketBufferedTraceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -678,6 +681,7 @@ func (m *SocketStreamedTraceSegment) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketStreamedTraceSegmentMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -808,6 +812,7 @@ func (m *SocketEvent_Read) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketEvent_ReadMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -938,6 +943,7 @@ func (m *SocketEvent_Write) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketEvent_WriteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1039,6 +1045,7 @@ func (m *SocketEvent_Closed) validate(all bool) error {
 	if len(errors) > 0 {
 		return SocketEvent_ClosedMultiError(errors)
 	}
+
 	return nil
 }
 

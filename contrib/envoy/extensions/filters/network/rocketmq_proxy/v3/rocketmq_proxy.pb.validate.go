@@ -131,6 +131,7 @@ func (m *RocketmqProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RocketmqProxyMultiError(errors)
 	}
+
 	return nil
 }
 

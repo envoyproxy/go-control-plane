@@ -104,6 +104,7 @@ func (m *HttpGrpcAccessLogConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpGrpcAccessLogConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -245,6 +246,7 @@ func (m *TcpGrpcAccessLogConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return TcpGrpcAccessLogConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -493,9 +495,44 @@ func (m *CommonGrpcAccessLogConfig) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetCustomTags() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, CommonGrpcAccessLogConfigValidationError{
+						field:  fmt.Sprintf("CustomTags[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, CommonGrpcAccessLogConfigValidationError{
+						field:  fmt.Sprintf("CustomTags[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CommonGrpcAccessLogConfigValidationError{
+					field:  fmt.Sprintf("CustomTags[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return CommonGrpcAccessLogConfigMultiError(errors)
 	}
+
 	return nil
 }
 

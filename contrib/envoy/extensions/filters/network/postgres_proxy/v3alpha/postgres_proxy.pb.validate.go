@@ -102,6 +102,7 @@ func (m *PostgresProxy) validate(all bool) error {
 	if len(errors) > 0 {
 		return PostgresProxyMultiError(errors)
 	}
+
 	return nil
 }
 

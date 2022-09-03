@@ -71,6 +71,7 @@ func (m *KafkaBroker) validate(all bool) error {
 	if len(errors) > 0 {
 		return KafkaBrokerMultiError(errors)
 	}
+
 	return nil
 }
 

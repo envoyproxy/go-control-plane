@@ -204,6 +204,7 @@ func (m *ValueMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return ValueMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -347,6 +348,7 @@ func (m *ListMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return ListMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -445,6 +447,7 @@ func (m *ValueMatcher_NullMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return ValueMatcher_NullMatchMultiError(errors)
 	}
+
 	return nil
 }
 

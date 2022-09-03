@@ -166,6 +166,7 @@ func (m *FaultDelay) validate(all bool) error {
 	if len(errors) > 0 {
 		return FaultDelayMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -369,6 +370,7 @@ func (m *FaultRateLimit) validate(all bool) error {
 	if len(errors) > 0 {
 		return FaultRateLimitMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -468,6 +470,7 @@ func (m *FaultDelay_HeaderDelay) validate(all bool) error {
 	if len(errors) > 0 {
 		return FaultDelay_HeaderDelayMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -580,6 +583,7 @@ func (m *FaultRateLimit_FixedLimit) validate(all bool) error {
 	if len(errors) > 0 {
 		return FaultRateLimit_FixedLimitMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -681,6 +685,7 @@ func (m *FaultRateLimit_HeaderLimit) validate(all bool) error {
 	if len(errors) > 0 {
 		return FaultRateLimit_HeaderLimitMultiError(errors)
 	}
+
 	return nil
 }
 

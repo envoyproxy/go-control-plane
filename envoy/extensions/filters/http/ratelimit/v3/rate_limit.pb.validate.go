@@ -176,9 +176,84 @@ func (m *RateLimit) validate(all bool) error {
 
 	// no validation rules for DisableXEnvoyRatelimitedHeader
 
+	if all {
+		switch v := interface{}(m.GetRateLimitedStatus()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RateLimitValidationError{
+					field:  "RateLimitedStatus",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RateLimitValidationError{
+					field:  "RateLimitedStatus",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRateLimitedStatus()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RateLimitValidationError{
+				field:  "RateLimitedStatus",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(m.GetResponseHeadersToAdd()) > 10 {
+		err := RateLimitValidationError{
+			field:  "ResponseHeadersToAdd",
+			reason: "value must contain no more than 10 item(s)",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	for idx, item := range m.GetResponseHeadersToAdd() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimitValidationError{
+						field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimitValidationError{
+						field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimitValidationError{
+					field:  fmt.Sprintf("ResponseHeadersToAdd[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return RateLimitMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -371,6 +446,7 @@ func (m *RateLimitConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -526,6 +602,7 @@ func (m *RateLimitPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -889,6 +966,7 @@ func (m *RateLimitConfig_Action) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_ActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1035,6 +1113,7 @@ func (m *RateLimitConfig_Override) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_OverrideMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1137,6 +1216,7 @@ func (m *RateLimitConfig_Action_SourceCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Action_SourceClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1242,6 +1322,7 @@ func (m *RateLimitConfig_Action_DestinationCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Action_DestinationClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1381,6 +1462,7 @@ func (m *RateLimitConfig_Action_RequestHeaders) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Action_RequestHeadersMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1487,6 +1569,7 @@ func (m *RateLimitConfig_Action_RemoteAddress) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Action_RemoteAddressMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1604,6 +1687,7 @@ func (m *RateLimitConfig_Action_GenericKey) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Action_GenericKeyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1767,6 +1851,7 @@ func (m *RateLimitConfig_Action_HeaderValueMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Action_HeaderValueMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1934,6 +2019,7 @@ func (m *RateLimitConfig_Action_MetaData) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Action_MetaDataMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2078,6 +2164,7 @@ func (m *RateLimitConfig_Override_DynamicMetadata) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitConfig_Override_DynamicMetadataMultiError(errors)
 	}
+
 	return nil
 }
 

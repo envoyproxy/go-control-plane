@@ -122,6 +122,7 @@ func (m *Compressor) validate(all bool) error {
 	if len(errors) > 0 {
 		return CompressorMultiError(errors)
 	}
+
 	return nil
 }
 

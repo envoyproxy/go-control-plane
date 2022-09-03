@@ -129,6 +129,7 @@ func (m *SkyWalkingConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return SkyWalkingConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -268,6 +269,7 @@ func (m *ClientConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return ClientConfigMultiError(errors)
 	}
+
 	return nil
 }
 

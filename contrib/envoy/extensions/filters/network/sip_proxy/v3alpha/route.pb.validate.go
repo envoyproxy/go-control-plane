@@ -96,6 +96,7 @@ func (m *RouteConfiguration) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteConfigurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -276,6 +277,7 @@ func (m *Route) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -371,6 +373,10 @@ func (m *RouteMatch) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Header
+
+	// no validation rules for Parameter
+
 	switch m.MatchSpecifier.(type) {
 
 	case *RouteMatch_Domain:
@@ -391,6 +397,7 @@ func (m *RouteMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -516,6 +523,7 @@ func (m *RouteAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteActionMultiError(errors)
 	}
+
 	return nil
 }
 

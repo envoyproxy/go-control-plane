@@ -187,6 +187,7 @@ func (m *TapConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return TapConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -591,6 +592,7 @@ func (m *MatchPredicate) validate(all bool) error {
 	if len(errors) > 0 {
 		return MatchPredicateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -724,6 +726,7 @@ func (m *HttpHeadersMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpHeadersMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -870,6 +873,7 @@ func (m *HttpGenericBodyMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpGenericBodyMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1076,6 +1080,7 @@ func (m *OutputConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutputConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1277,6 +1282,37 @@ func (m *OutputSink) validate(all bool) error {
 			}
 		}
 
+	case *OutputSink_BufferedAdmin:
+
+		if all {
+			switch v := interface{}(m.GetBufferedAdmin()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, OutputSinkValidationError{
+						field:  "BufferedAdmin",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, OutputSinkValidationError{
+						field:  "BufferedAdmin",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetBufferedAdmin()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return OutputSinkValidationError{
+					field:  "BufferedAdmin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		err := OutputSinkValidationError{
 			field:  "OutputSinkType",
@@ -1292,6 +1328,7 @@ func (m *OutputSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return OutputSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1390,6 +1427,7 @@ func (m *StreamingAdminSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamingAdminSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1466,6 +1504,148 @@ var _ interface {
 	ErrorName() string
 } = StreamingAdminSinkValidationError{}
 
+// Validate checks the field values on BufferedAdminSink with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *BufferedAdminSink) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on BufferedAdminSink with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// BufferedAdminSinkMultiError, or nil if none found.
+func (m *BufferedAdminSink) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *BufferedAdminSink) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetMaxTraces() <= 0 {
+		err := BufferedAdminSinkValidationError{
+			field:  "MaxTraces",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, BufferedAdminSinkValidationError{
+					field:  "Timeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, BufferedAdminSinkValidationError{
+					field:  "Timeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return BufferedAdminSinkValidationError{
+				field:  "Timeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return BufferedAdminSinkMultiError(errors)
+	}
+
+	return nil
+}
+
+// BufferedAdminSinkMultiError is an error wrapping multiple validation errors
+// returned by BufferedAdminSink.ValidateAll() if the designated constraints
+// aren't met.
+type BufferedAdminSinkMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m BufferedAdminSinkMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m BufferedAdminSinkMultiError) AllErrors() []error { return m }
+
+// BufferedAdminSinkValidationError is the validation error returned by
+// BufferedAdminSink.Validate if the designated constraints aren't met.
+type BufferedAdminSinkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BufferedAdminSinkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BufferedAdminSinkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BufferedAdminSinkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BufferedAdminSinkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BufferedAdminSinkValidationError) ErrorName() string {
+	return "BufferedAdminSinkValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BufferedAdminSinkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBufferedAdminSink.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BufferedAdminSinkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BufferedAdminSinkValidationError{}
+
 // Validate checks the field values on FilePerTapSink with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -1502,6 +1682,7 @@ func (m *FilePerTapSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilePerTapSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1643,6 +1824,7 @@ func (m *StreamingGrpcSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return StreamingGrpcSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1789,6 +1971,7 @@ func (m *MatchPredicate_MatchSet) validate(all bool) error {
 	if len(errors) > 0 {
 		return MatchPredicate_MatchSetMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1931,6 +2114,7 @@ func (m *HttpGenericBodyMatch_GenericTextMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpGenericBodyMatch_GenericTextMatchMultiError(errors)
 	}
+
 	return nil
 }
 

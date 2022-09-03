@@ -150,6 +150,7 @@ func (m *KafkaMesh) validate(all bool) error {
 	if len(errors) > 0 {
 		return KafkaMeshMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -283,6 +284,7 @@ func (m *KafkaClusterDefinition) validate(all bool) error {
 	if len(errors) > 0 {
 		return KafkaClusterDefinitionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -393,6 +395,7 @@ func (m *ForwardingRule) validate(all bool) error {
 	if len(errors) > 0 {
 		return ForwardingRuleMultiError(errors)
 	}
+
 	return nil
 }
 

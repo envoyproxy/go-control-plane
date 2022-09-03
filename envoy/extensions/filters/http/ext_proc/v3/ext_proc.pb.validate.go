@@ -150,9 +150,39 @@ func (m *ExternalProcessor) validate(all bool) error {
 
 	// no validation rules for StatPrefix
 
+	if all {
+		switch v := interface{}(m.GetMutationRules()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "MutationRules",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "MutationRules",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMutationRules()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExternalProcessorValidationError{
+				field:  "MutationRules",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ExternalProcessorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -312,6 +342,7 @@ func (m *ExtProcPerRoute) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtProcPerRouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -439,9 +470,39 @@ func (m *ExtProcOverrides) validate(all bool) error {
 
 	// no validation rules for AsyncMode
 
+	if all {
+		switch v := interface{}(m.GetGrpcService()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExtProcOverridesValidationError{
+					field:  "GrpcService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExtProcOverridesValidationError{
+					field:  "GrpcService",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGrpcService()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtProcOverridesValidationError{
+				field:  "GrpcService",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ExtProcOverridesMultiError(errors)
 	}
+
 	return nil
 }
 

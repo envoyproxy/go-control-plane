@@ -56,9 +56,12 @@ func (m *Config) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for UpgradeProtobufToGrpc
+
 	if len(errors) > 0 {
 		return ConfigMultiError(errors)
 	}
+
 	return nil
 }
 

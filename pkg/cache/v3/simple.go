@@ -184,7 +184,11 @@ func NewSnapshotCacheWithHeartbeating(ctx context.Context, ads bool, hash NodeHa
 }
 
 func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
-	snapshot := cache.snapshots[node]
+	snapshot, ok := cache.snapshots[node]
+	if !ok {
+		return
+	}
+
 	if info, ok := cache.status[node]; ok {
 		info.mu.Lock()
 		for id, watch := range info.watches {
@@ -231,7 +235,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 		for id, watch := range info.watches {
 			version := snapshot.GetVersion(watch.Request.TypeUrl)
 			if version != watch.Request.VersionInfo {
-				cache.log.Debugf("respond open watch %d%v with new version %q", id, watch.Request.ResourceNames, version)
+				cache.log.Debugf("respond open watch %d %s%v with new version %q", id, watch.Request.TypeUrl, watch.Request.ResourceNames, version)
 
 				resources := snapshot.GetResourcesAndTTL(watch.Request.TypeUrl)
 				err := cache.respond(ctx, watch.Request, watch.Response, resources, version, false)
@@ -300,7 +304,7 @@ func (cache *snapshotCache) ClearSnapshot(node string) {
 
 // nameSet creates a map from a string slice to value true.
 func nameSet(names []string) map[string]bool {
-	set := make(map[string]bool)
+	set := make(map[string]bool, len(names))
 	for _, name := range names {
 		set[name] = true
 	}
@@ -498,9 +502,9 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		watchID := cache.nextDeltaWatchID()
 
 		if exists {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q,  version %q", watchID, t, state.GetResourceVersions(), nodeID, snapshot.GetVersion(t))
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q,  version %q", watchID, t, state.GetSubscribedResourceNames(), nodeID, snapshot.GetVersion(t))
 		} else {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q", watchID, t, state.GetResourceVersions(), nodeID)
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q", watchID, t, state.GetSubscribedResourceNames(), nodeID)
 		}
 
 		info.setDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})

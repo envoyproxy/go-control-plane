@@ -904,6 +904,64 @@ func (m *HttpConnectionManager) validate(all bool) error {
 
 	// no validation rules for StripTrailingHostDot
 
+	if all {
+		switch v := interface{}(m.GetProxyStatusConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, HttpConnectionManagerValidationError{
+					field:  "ProxyStatusConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, HttpConnectionManagerValidationError{
+					field:  "ProxyStatusConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProxyStatusConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "ProxyStatusConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetTypedHeaderValidationConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, HttpConnectionManagerValidationError{
+					field:  "TypedHeaderValidationConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, HttpConnectionManagerValidationError{
+					field:  "TypedHeaderValidationConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTypedHeaderValidationConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "TypedHeaderValidationConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.RouteSpecifier.(type) {
 
 	case *HttpConnectionManager_Rds:
@@ -1021,6 +1079,7 @@ func (m *HttpConnectionManager) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpConnectionManagerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1189,6 +1248,7 @@ func (m *LocalReplyConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return LocalReplyConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1446,6 +1506,7 @@ func (m *ResponseMapper) validate(all bool) error {
 	if len(errors) > 0 {
 		return ResponseMapperMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1586,6 +1647,7 @@ func (m *Rds) validate(all bool) error {
 	if len(errors) > 0 {
 		return RdsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1729,6 +1791,7 @@ func (m *ScopedRouteConfigurationsList) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRouteConfigurationsListMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1987,6 +2050,7 @@ func (m *ScopedRoutes) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRoutesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2127,6 +2191,7 @@ func (m *ScopedRds) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRdsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2304,6 +2369,7 @@ func (m *HttpFilter) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpFilterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2431,6 +2497,7 @@ func (m *RequestIDExtension) validate(all bool) error {
 	if len(errors) > 0 {
 		return RequestIDExtensionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2562,6 +2629,7 @@ func (m *EnvoyMobileHttpConnectionManager) validate(all bool) error {
 	if len(errors) > 0 {
 		return EnvoyMobileHttpConnectionManagerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2846,6 +2914,7 @@ func (m *HttpConnectionManager_Tracing) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpConnectionManager_TracingMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2949,9 +3018,44 @@ func (m *HttpConnectionManager_InternalAddressConfig) validate(all bool) error {
 
 	// no validation rules for UnixSockets
 
+	for idx, item := range m.GetCidrRanges() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, HttpConnectionManager_InternalAddressConfigValidationError{
+						field:  fmt.Sprintf("CidrRanges[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, HttpConnectionManager_InternalAddressConfigValidationError{
+						field:  fmt.Sprintf("CidrRanges[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return HttpConnectionManager_InternalAddressConfigValidationError{
+					field:  fmt.Sprintf("CidrRanges[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return HttpConnectionManager_InternalAddressConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3094,6 +3198,7 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) validate(all bool) e
 	if len(errors) > 0 {
 		return HttpConnectionManager_SetCurrentClientCertDetailsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3270,6 +3375,7 @@ func (m *HttpConnectionManager_UpgradeConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return HttpConnectionManager_UpgradeConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3433,6 +3539,7 @@ func (m *HttpConnectionManager_PathNormalizationOptions) validate(all bool) erro
 	if len(errors) > 0 {
 		return HttpConnectionManager_PathNormalizationOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3514,6 +3621,130 @@ var _ interface {
 	ErrorName() string
 } = HttpConnectionManager_PathNormalizationOptionsValidationError{}
 
+// Validate checks the field values on HttpConnectionManager_ProxyStatusConfig
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *HttpConnectionManager_ProxyStatusConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// HttpConnectionManager_ProxyStatusConfig with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// HttpConnectionManager_ProxyStatusConfigMultiError, or nil if none found.
+func (m *HttpConnectionManager_ProxyStatusConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *HttpConnectionManager_ProxyStatusConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RemoveDetails
+
+	// no validation rules for RemoveConnectionTerminationDetails
+
+	// no validation rules for RemoveResponseFlags
+
+	// no validation rules for SetRecommendedResponseCode
+
+	switch m.ProxyName.(type) {
+
+	case *HttpConnectionManager_ProxyStatusConfig_UseNodeId:
+		// no validation rules for UseNodeId
+
+	case *HttpConnectionManager_ProxyStatusConfig_LiteralProxyName:
+		// no validation rules for LiteralProxyName
+
+	}
+
+	if len(errors) > 0 {
+		return HttpConnectionManager_ProxyStatusConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// HttpConnectionManager_ProxyStatusConfigMultiError is an error wrapping
+// multiple validation errors returned by
+// HttpConnectionManager_ProxyStatusConfig.ValidateAll() if the designated
+// constraints aren't met.
+type HttpConnectionManager_ProxyStatusConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m HttpConnectionManager_ProxyStatusConfigMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m HttpConnectionManager_ProxyStatusConfigMultiError) AllErrors() []error { return m }
+
+// HttpConnectionManager_ProxyStatusConfigValidationError is the validation
+// error returned by HttpConnectionManager_ProxyStatusConfig.Validate if the
+// designated constraints aren't met.
+type HttpConnectionManager_ProxyStatusConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HttpConnectionManager_ProxyStatusConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HttpConnectionManager_ProxyStatusConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HttpConnectionManager_ProxyStatusConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HttpConnectionManager_ProxyStatusConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HttpConnectionManager_ProxyStatusConfigValidationError) ErrorName() string {
+	return "HttpConnectionManager_ProxyStatusConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e HttpConnectionManager_ProxyStatusConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHttpConnectionManager_ProxyStatusConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HttpConnectionManager_ProxyStatusConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HttpConnectionManager_ProxyStatusConfigValidationError{}
+
 // Validate checks the field values on ScopedRoutes_ScopeKeyBuilder with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -3584,6 +3815,7 @@ func (m *ScopedRoutes_ScopeKeyBuilder) validate(all bool) error {
 	if len(errors) > 0 {
 		return ScopedRoutes_ScopeKeyBuilderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3733,6 +3965,7 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder) validate(all bool) error 
 	if len(errors) > 0 {
 		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3891,6 +4124,7 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor) vali
 	if len(errors) > 0 {
 		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4031,6 +4265,7 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvEle
 	if len(errors) > 0 {
 		return ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElementMultiError(errors)
 	}
+
 	return nil
 }
 

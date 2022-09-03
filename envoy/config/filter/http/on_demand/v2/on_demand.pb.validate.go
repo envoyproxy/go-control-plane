@@ -60,6 +60,7 @@ func (m *OnDemand) validate(all bool) error {
 	if len(errors) > 0 {
 		return OnDemandMultiError(errors)
 	}
+
 	return nil
 }
 

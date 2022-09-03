@@ -124,6 +124,7 @@ func (m *DiscoveryRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return DiscoveryRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -294,6 +295,7 @@ func (m *DiscoveryResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return DiscoveryResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -459,6 +461,7 @@ func (m *DeltaDiscoveryRequest) validate(all bool) error {
 	if len(errors) > 0 {
 		return DeltaDiscoveryRequestMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -600,6 +603,7 @@ func (m *DeltaDiscoveryResponse) validate(all bool) error {
 	if len(errors) > 0 {
 		return DeltaDiscoveryResponseMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -734,6 +738,7 @@ func (m *Resource) validate(all bool) error {
 	if len(errors) > 0 {
 		return ResourceMultiError(errors)
 	}
+
 	return nil
 }
 

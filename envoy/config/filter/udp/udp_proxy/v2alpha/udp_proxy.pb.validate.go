@@ -127,6 +127,7 @@ func (m *UdpProxyConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return UdpProxyConfigMultiError(errors)
 	}
+
 	return nil
 }
 

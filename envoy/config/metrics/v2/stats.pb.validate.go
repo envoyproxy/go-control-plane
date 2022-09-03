@@ -128,6 +128,7 @@ func (m *StatsSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return StatsSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -318,6 +319,7 @@ func (m *StatsConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return StatsConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -495,6 +497,7 @@ func (m *StatsMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return StatsMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -615,6 +618,7 @@ func (m *TagSpecifier) validate(all bool) error {
 	if len(errors) > 0 {
 		return TagSpecifierMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -763,6 +767,7 @@ func (m *StatsdSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return StatsdSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -908,6 +913,7 @@ func (m *DogStatsdSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return DogStatsdSinkMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1009,6 +1015,7 @@ func (m *HystrixSink) validate(all bool) error {
 	if len(errors) > 0 {
 		return HystrixSinkMultiError(errors)
 	}
+
 	return nil
 }
 

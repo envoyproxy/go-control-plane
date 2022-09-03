@@ -139,6 +139,7 @@ func (m *DnsTable) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTableMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -264,6 +265,7 @@ func (m *DnsTable_AddressList) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTable_AddressListMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -416,6 +418,7 @@ func (m *DnsTable_DnsServiceProtocol) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTable_DnsServiceProtocolMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -615,6 +618,7 @@ func (m *DnsTable_DnsServiceTarget) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTable_DnsServiceTargetMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -846,6 +850,7 @@ func (m *DnsTable_DnsService) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTable_DnsServiceMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -994,6 +999,7 @@ func (m *DnsTable_DnsServiceList) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTable_DnsServiceListMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1174,6 +1180,7 @@ func (m *DnsTable_DnsEndpoint) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTable_DnsEndpointMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1356,6 +1363,7 @@ func (m *DnsTable_DnsVirtualDomain) validate(all bool) error {
 	if len(errors) > 0 {
 		return DnsTable_DnsVirtualDomainMultiError(errors)
 	}
+
 	return nil
 }
 

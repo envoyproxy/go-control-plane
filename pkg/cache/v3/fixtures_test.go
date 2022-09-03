@@ -22,8 +22,10 @@ func (f *fixtureGenerator) snapshot() *cache.Snapshot {
 		map[rsrc.Type][]types.Resource{
 			rsrc.EndpointType:        {testEndpoint},
 			rsrc.ClusterType:         {testCluster},
-			rsrc.RouteType:           {testRoute},
-			rsrc.ListenerType:        {testListener},
+			rsrc.RouteType:           {testRoute, testEmbeddedRoute},
+			rsrc.ScopedRouteType:     {testScopedRoute},
+			rsrc.VirtualHostType:     {testVirtualHost},
+			rsrc.ListenerType:        {testScopedListener, testListener},
 			rsrc.RuntimeType:         {testRuntime},
 			rsrc.SecretType:          {testSecret[0]},
 			rsrc.ExtensionConfigType: {testExtensionConfig},

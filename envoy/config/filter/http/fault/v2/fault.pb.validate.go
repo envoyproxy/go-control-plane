@@ -147,6 +147,7 @@ func (m *FaultAbort) validate(all bool) error {
 	if len(errors) > 0 {
 		return FaultAbortMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -409,6 +410,7 @@ func (m *HTTPFault) validate(all bool) error {
 	if len(errors) > 0 {
 		return HTTPFaultMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -507,6 +509,7 @@ func (m *FaultAbort_HeaderAbort) validate(all bool) error {
 	if len(errors) > 0 {
 		return FaultAbort_HeaderAbortMultiError(errors)
 	}
+
 	return nil
 }
 

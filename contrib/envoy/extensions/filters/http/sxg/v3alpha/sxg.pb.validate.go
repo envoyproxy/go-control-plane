@@ -238,6 +238,7 @@ func (m *SXG) validate(all bool) error {
 	if len(errors) > 0 {
 		return SXGMultiError(errors)
 	}
+
 	return nil
 }
 

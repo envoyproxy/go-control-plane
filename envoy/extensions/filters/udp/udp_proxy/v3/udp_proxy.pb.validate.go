@@ -175,6 +175,40 @@ func (m *UdpProxyConfig) validate(all bool) error {
 
 	// no validation rules for UsePerPacketLoadBalancing
 
+	for idx, item := range m.GetAccessLog() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UdpProxyConfigValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UdpProxyConfigValidationError{
+						field:  fmt.Sprintf("AccessLog[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UdpProxyConfigValidationError{
+					field:  fmt.Sprintf("AccessLog[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.RouteSpecifier.(type) {
 
 	case *UdpProxyConfig_Cluster:
@@ -188,6 +222,37 @@ func (m *UdpProxyConfig) validate(all bool) error {
 				return err
 			}
 			errors = append(errors, err)
+		}
+
+	case *UdpProxyConfig_Matcher:
+
+		if all {
+			switch v := interface{}(m.GetMatcher()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, UdpProxyConfigValidationError{
+						field:  "Matcher",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, UdpProxyConfigValidationError{
+						field:  "Matcher",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetMatcher()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return UdpProxyConfigValidationError{
+					field:  "Matcher",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
 		}
 
 	default:
@@ -205,6 +270,7 @@ func (m *UdpProxyConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return UdpProxyConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -344,6 +410,7 @@ func (m *UdpProxyConfig_HashPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return UdpProxyConfig_HashPolicyMultiError(errors)
 	}
+
 	return nil
 }
 

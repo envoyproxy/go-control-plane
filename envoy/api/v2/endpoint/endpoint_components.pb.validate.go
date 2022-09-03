@@ -124,6 +124,7 @@ func (m *Endpoint) validate(all bool) error {
 	if len(errors) > 0 {
 		return EndpointMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -306,6 +307,7 @@ func (m *LbEndpoint) validate(all bool) error {
 	if len(errors) > 0 {
 		return LbEndpointMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -522,6 +524,7 @@ func (m *LocalityLbEndpoints) validate(all bool) error {
 	if len(errors) > 0 {
 		return LocalityLbEndpointsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -636,6 +639,7 @@ func (m *Endpoint_HealthCheckConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return Endpoint_HealthCheckConfigMultiError(errors)
 	}
+
 	return nil
 }
 

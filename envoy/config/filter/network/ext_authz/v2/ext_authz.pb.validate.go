@@ -104,6 +104,7 @@ func (m *ExtAuthz) validate(all bool) error {
 	if len(errors) > 0 {
 		return ExtAuthzMultiError(errors)
 	}
+
 	return nil
 }
 

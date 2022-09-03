@@ -580,9 +580,44 @@ func (m *VirtualHost) validate(all bool) error {
 		}
 	}
 
+	for idx, item := range m.GetRequestMirrorPolicies() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, VirtualHostValidationError{
+						field:  fmt.Sprintf("RequestMirrorPolicies[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, VirtualHostValidationError{
+						field:  fmt.Sprintf("RequestMirrorPolicies[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return VirtualHostValidationError{
+					field:  fmt.Sprintf("RequestMirrorPolicies[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return VirtualHostMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -716,6 +751,7 @@ func (m *FilterAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1158,6 +1194,8 @@ func (m *Route) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for StatPrefix
+
 	switch m.Action.(type) {
 
 	case *Route_Route:
@@ -1330,6 +1368,7 @@ func (m *Route) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1474,12 +1513,45 @@ func (m *WeightedCluster) validate(all bool) error {
 
 	}
 
-	if wrapper := m.GetTotalWeight(); wrapper != nil {
-
-		if wrapper.GetValue() < 1 {
-			err := WeightedClusterValidationError{
+	if all {
+		switch v := interface{}(m.GetTotalWeight()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, WeightedClusterValidationError{
+					field:  "TotalWeight",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, WeightedClusterValidationError{
+					field:  "TotalWeight",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTotalWeight()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WeightedClusterValidationError{
 				field:  "TotalWeight",
-				reason: "value must be greater than or equal to 1",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for RuntimeKeyPrefix
+
+	switch m.RandomValueSpecifier.(type) {
+
+	case *WeightedCluster_HeaderName:
+
+		if !_WeightedCluster_HeaderName_Pattern.MatchString(m.GetHeaderName()) {
+			err := WeightedClusterValidationError{
+				field:  "HeaderName",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 			}
 			if !all {
 				return err
@@ -1489,11 +1561,10 @@ func (m *WeightedCluster) validate(all bool) error {
 
 	}
 
-	// no validation rules for RuntimeKeyPrefix
-
 	if len(errors) > 0 {
 		return WeightedClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1567,6 +1638,152 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = WeightedClusterValidationError{}
+
+var _WeightedCluster_HeaderName_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on ClusterSpecifierPlugin with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ClusterSpecifierPlugin) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ClusterSpecifierPlugin with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ClusterSpecifierPluginMultiError, or nil if none found.
+func (m *ClusterSpecifierPlugin) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ClusterSpecifierPlugin) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetExtension() == nil {
+		err := ClusterSpecifierPluginValidationError{
+			field:  "Extension",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetExtension()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterSpecifierPluginValidationError{
+					field:  "Extension",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterSpecifierPluginValidationError{
+					field:  "Extension",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetExtension()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterSpecifierPluginValidationError{
+				field:  "Extension",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for IsOptional
+
+	if len(errors) > 0 {
+		return ClusterSpecifierPluginMultiError(errors)
+	}
+
+	return nil
+}
+
+// ClusterSpecifierPluginMultiError is an error wrapping multiple validation
+// errors returned by ClusterSpecifierPlugin.ValidateAll() if the designated
+// constraints aren't met.
+type ClusterSpecifierPluginMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ClusterSpecifierPluginMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ClusterSpecifierPluginMultiError) AllErrors() []error { return m }
+
+// ClusterSpecifierPluginValidationError is the validation error returned by
+// ClusterSpecifierPlugin.Validate if the designated constraints aren't met.
+type ClusterSpecifierPluginValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClusterSpecifierPluginValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClusterSpecifierPluginValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClusterSpecifierPluginValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClusterSpecifierPluginValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClusterSpecifierPluginValidationError) ErrorName() string {
+	return "ClusterSpecifierPluginValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClusterSpecifierPluginValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClusterSpecifierPlugin.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClusterSpecifierPluginValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClusterSpecifierPluginValidationError{}
 
 // Validate checks the field values on RouteMatch with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -1889,6 +2106,50 @@ func (m *RouteMatch) validate(all bool) error {
 			}
 		}
 
+	case *RouteMatch_PathSeparatedPrefix:
+
+		if !_RouteMatch_PathSeparatedPrefix_Pattern.MatchString(m.GetPathSeparatedPrefix()) {
+			err := RouteMatchValidationError{
+				field:  "PathSeparatedPrefix",
+				reason: "value does not match regex pattern \"^[^?#]+[^?#/]$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	case *RouteMatch_PathMatchPolicy:
+
+		if all {
+			switch v := interface{}(m.GetPathMatchPolicy()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RouteMatchValidationError{
+						field:  "PathMatchPolicy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RouteMatchValidationError{
+						field:  "PathMatchPolicy",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetPathMatchPolicy()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteMatchValidationError{
+					field:  "PathMatchPolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		err := RouteMatchValidationError{
 			field:  "PathSpecifier",
@@ -1904,6 +2165,7 @@ func (m *RouteMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1976,6 +2238,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteMatchValidationError{}
+
+var _RouteMatch_PathSeparatedPrefix_Pattern = regexp.MustCompile("^[^?#]+[^?#/]$")
 
 // Validate checks the field values on CorsPolicy with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -2099,6 +2363,35 @@ func (m *CorsPolicy) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetAllowPrivateNetworkAccess()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CorsPolicyValidationError{
+					field:  "AllowPrivateNetworkAccess",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CorsPolicyValidationError{
+					field:  "AllowPrivateNetworkAccess",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAllowPrivateNetworkAccess()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CorsPolicyValidationError{
+				field:  "AllowPrivateNetworkAccess",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.EnabledSpecifier.(type) {
 
 	case *CorsPolicy_FilterEnabled:
@@ -2137,6 +2430,7 @@ func (m *CorsPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return CorsPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2312,6 +2606,35 @@ func (m *RouteAction) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetPathRewritePolicy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RouteActionValidationError{
+					field:  "PathRewritePolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RouteActionValidationError{
+					field:  "PathRewritePolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPathRewritePolicy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteActionValidationError{
+				field:  "PathRewritePolicy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for AppendXForwardedHost
 
 	if all {
@@ -2366,6 +2689,35 @@ func (m *RouteAction) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return RouteActionValidationError{
 				field:  "IdleTimeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetEarlyDataPolicy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RouteActionValidationError{
+					field:  "EarlyDataPolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RouteActionValidationError{
+					field:  "EarlyDataPolicy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetEarlyDataPolicy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteActionValidationError{
+				field:  "EarlyDataPolicy",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -2884,6 +3236,37 @@ func (m *RouteAction) validate(all bool) error {
 	case *RouteAction_ClusterSpecifierPlugin:
 		// no validation rules for ClusterSpecifierPlugin
 
+	case *RouteAction_InlineClusterSpecifierPlugin:
+
+		if all {
+			switch v := interface{}(m.GetInlineClusterSpecifierPlugin()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RouteActionValidationError{
+						field:  "InlineClusterSpecifierPlugin",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RouteActionValidationError{
+						field:  "InlineClusterSpecifierPlugin",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetInlineClusterSpecifierPlugin()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteActionValidationError{
+					field:  "InlineClusterSpecifierPlugin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		err := RouteActionValidationError{
 			field:  "ClusterSpecifier",
@@ -2991,6 +3374,7 @@ func (m *RouteAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3411,6 +3795,7 @@ func (m *RetryPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3555,6 +3940,7 @@ func (m *HedgePolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return HedgePolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3750,6 +4136,7 @@ func (m *RedirectAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return RedirectActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3895,6 +4282,7 @@ func (m *DirectResponseAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return DirectResponseActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -3996,6 +4384,7 @@ func (m *NonForwardingAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return NonForwardingActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4137,6 +4526,7 @@ func (m *Decorator) validate(all bool) error {
 	if len(errors) > 0 {
 		return DecoratorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4355,6 +4745,7 @@ func (m *Tracing) validate(all bool) error {
 	if len(errors) > 0 {
 		return TracingMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4498,6 +4889,7 @@ func (m *VirtualCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return VirtualClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4688,6 +5080,7 @@ func (m *RateLimit) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimitMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -4806,6 +5199,8 @@ func (m *HeaderMatcher) validate(all bool) error {
 	}
 
 	// no validation rules for InvertMatch
+
+	// no validation rules for TreatMissingHeaderAsEmpty
 
 	switch m.HeaderMatchSpecifier.(type) {
 
@@ -4952,6 +5347,7 @@ func (m *HeaderMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return HeaderMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5124,6 +5520,7 @@ func (m *QueryParameterMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return QueryParameterMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5301,6 +5698,7 @@ func (m *InternalRedirectPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return InternalRedirectPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5433,6 +5831,7 @@ func (m *FilterConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5787,6 +6186,7 @@ func (m *WeightedCluster_ClusterWeight) validate(all bool) error {
 	if len(errors) > 0 {
 		return WeightedCluster_ClusterWeightMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -5898,6 +6298,7 @@ func (m *RouteMatch_GrpcRouteMatchOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatch_GrpcRouteMatchOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6060,6 +6461,7 @@ func (m *RouteMatch_TlsContextMatchOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatch_TlsContextMatchOptionsMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6163,6 +6565,7 @@ func (m *RouteMatch_ConnectMatcher) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteMatch_ConnectMatcherMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6261,10 +6664,12 @@ func (m *RouteAction_RequestMirrorPolicy) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetCluster()) < 1 {
+	// no validation rules for Cluster
+
+	if !_RouteAction_RequestMirrorPolicy_ClusterHeader_Pattern.MatchString(m.GetClusterHeader()) {
 		err := RouteAction_RequestMirrorPolicyValidationError{
-			field:  "Cluster",
-			reason: "value length must be at least 1 runes",
+			field:  "ClusterHeader",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
 		}
 		if !all {
 			return err
@@ -6333,6 +6738,7 @@ func (m *RouteAction_RequestMirrorPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_RequestMirrorPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6409,6 +6815,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RouteAction_RequestMirrorPolicyValidationError{}
+
+var _RouteAction_RequestMirrorPolicy_ClusterHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on RouteAction_HashPolicy with the rules
 // defined in the proto definition for this message. If any rules are
@@ -6606,6 +7014,7 @@ func (m *RouteAction_HashPolicy) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6787,6 +7196,7 @@ func (m *RouteAction_UpgradeConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_UpgradeConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -6977,6 +7387,7 @@ func (m *RouteAction_MaxStreamDuration) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_MaxStreamDurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7130,6 +7541,7 @@ func (m *RouteAction_HashPolicy_Header) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_HeaderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7276,6 +7688,7 @@ func (m *RouteAction_HashPolicy_Cookie) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_CookieMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7382,6 +7795,7 @@ func (m *RouteAction_HashPolicy_ConnectionProperties) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_ConnectionPropertiesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7497,6 +7911,7 @@ func (m *RouteAction_HashPolicy_QueryParameter) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_QueryParameterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7612,6 +8027,7 @@ func (m *RouteAction_HashPolicy_FilterState) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_HashPolicy_FilterStateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7748,6 +8164,7 @@ func (m *RouteAction_UpgradeConfig_ConnectConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteAction_UpgradeConfig_ConnectConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -7897,6 +8314,7 @@ func (m *RetryPolicy_RetryPriority) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RetryPriorityMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8044,6 +8462,7 @@ func (m *RetryPolicy_RetryHostPredicate) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RetryHostPredicateMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8217,6 +8636,7 @@ func (m *RetryPolicy_RetryBackOff) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RetryBackOffMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8351,6 +8771,7 @@ func (m *RetryPolicy_ResetHeader) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_ResetHeaderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8530,6 +8951,7 @@ func (m *RetryPolicy_RateLimitedRetryBackOff) validate(all bool) error {
 	if len(errors) > 0 {
 		return RetryPolicy_RateLimitedRetryBackOffMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -8911,6 +9333,37 @@ func (m *RateLimit_Action) validate(all bool) error {
 			}
 		}
 
+	case *RateLimit_Action_MaskedRemoteAddress_:
+
+		if all {
+			switch v := interface{}(m.GetMaskedRemoteAddress()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RateLimit_ActionValidationError{
+						field:  "MaskedRemoteAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RateLimit_ActionValidationError{
+						field:  "MaskedRemoteAddress",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetMaskedRemoteAddress()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RateLimit_ActionValidationError{
+					field:  "MaskedRemoteAddress",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		err := RateLimit_ActionValidationError{
 			field:  "ActionSpecifier",
@@ -8926,6 +9379,7 @@ func (m *RateLimit_Action) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_ActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9070,6 +9524,7 @@ func (m *RateLimit_Override) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_OverrideMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9171,6 +9626,7 @@ func (m *RateLimit_Action_SourceCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_SourceClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9274,6 +9730,7 @@ func (m *RateLimit_Action_DestinationCluster) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_DestinationClusterMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9412,6 +9869,7 @@ func (m *RateLimit_Action_RequestHeaders) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_RequestHeadersMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9516,6 +9974,7 @@ func (m *RateLimit_Action_RemoteAddress) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_RemoteAddressMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9593,6 +10052,141 @@ var _ interface {
 	ErrorName() string
 } = RateLimit_Action_RemoteAddressValidationError{}
 
+// Validate checks the field values on RateLimit_Action_MaskedRemoteAddress
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *RateLimit_Action_MaskedRemoteAddress) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RateLimit_Action_MaskedRemoteAddress
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// RateLimit_Action_MaskedRemoteAddressMultiError, or nil if none found.
+func (m *RateLimit_Action_MaskedRemoteAddress) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RateLimit_Action_MaskedRemoteAddress) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if wrapper := m.GetV4PrefixMaskLen(); wrapper != nil {
+
+		if wrapper.GetValue() > 32 {
+			err := RateLimit_Action_MaskedRemoteAddressValidationError{
+				field:  "V4PrefixMaskLen",
+				reason: "value must be less than or equal to 32",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if wrapper := m.GetV6PrefixMaskLen(); wrapper != nil {
+
+		if wrapper.GetValue() > 128 {
+			err := RateLimit_Action_MaskedRemoteAddressValidationError{
+				field:  "V6PrefixMaskLen",
+				reason: "value must be less than or equal to 128",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return RateLimit_Action_MaskedRemoteAddressMultiError(errors)
+	}
+
+	return nil
+}
+
+// RateLimit_Action_MaskedRemoteAddressMultiError is an error wrapping multiple
+// validation errors returned by
+// RateLimit_Action_MaskedRemoteAddress.ValidateAll() if the designated
+// constraints aren't met.
+type RateLimit_Action_MaskedRemoteAddressMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RateLimit_Action_MaskedRemoteAddressMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RateLimit_Action_MaskedRemoteAddressMultiError) AllErrors() []error { return m }
+
+// RateLimit_Action_MaskedRemoteAddressValidationError is the validation error
+// returned by RateLimit_Action_MaskedRemoteAddress.Validate if the designated
+// constraints aren't met.
+type RateLimit_Action_MaskedRemoteAddressValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) ErrorName() string {
+	return "RateLimit_Action_MaskedRemoteAddressValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RateLimit_Action_MaskedRemoteAddressValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRateLimit_Action_MaskedRemoteAddress.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RateLimit_Action_MaskedRemoteAddressValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RateLimit_Action_MaskedRemoteAddressValidationError{}
+
 // Validate checks the field values on RateLimit_Action_GenericKey with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -9631,6 +10225,7 @@ func (m *RateLimit_Action_GenericKey) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_GenericKeyMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9731,6 +10326,8 @@ func (m *RateLimit_Action_HeaderValueMatch) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for DescriptorKey
+
 	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
 		err := RateLimit_Action_HeaderValueMatchValidationError{
 			field:  "DescriptorValue",
@@ -9819,6 +10416,7 @@ func (m *RateLimit_Action_HeaderValueMatch) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_HeaderValueMatchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -9976,6 +10574,7 @@ func (m *RateLimit_Action_DynamicMetaData) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_DynamicMetaDataMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -10143,6 +10742,7 @@ func (m *RateLimit_Action_MetaData) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Action_MetaDataMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -10285,6 +10885,7 @@ func (m *RateLimit_Override_DynamicMetadata) validate(all bool) error {
 	if len(errors) > 0 {
 		return RateLimit_Override_DynamicMetadataMultiError(errors)
 	}
+
 	return nil
 }
 

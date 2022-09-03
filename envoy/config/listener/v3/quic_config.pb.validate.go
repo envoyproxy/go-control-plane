@@ -249,6 +249,7 @@ func (m *QuicProtocolOptions) validate(all bool) error {
 	if len(errors) > 0 {
 		return QuicProtocolOptionsMultiError(errors)
 	}
+
 	return nil
 }
 

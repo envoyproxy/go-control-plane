@@ -222,6 +222,7 @@ func (m *JwtProvider) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwtProviderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -324,6 +325,7 @@ func (m *JwtCacheConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwtCacheConfigMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -539,6 +541,7 @@ func (m *RemoteJwks) validate(all bool) error {
 	if len(errors) > 0 {
 		return RemoteJwksMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -639,6 +642,7 @@ func (m *JwksAsyncFetch) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwksAsyncFetchMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -771,6 +775,7 @@ func (m *JwtHeader) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwtHeaderMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -875,6 +880,7 @@ func (m *ProviderWithAudiences) validate(all bool) error {
 	if len(errors) > 0 {
 		return ProviderWithAudiencesMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1138,6 +1144,7 @@ func (m *JwtRequirement) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwtRequirementMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1282,6 +1289,7 @@ func (m *JwtRequirementOrList) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwtRequirementOrListMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1428,6 +1436,7 @@ func (m *JwtRequirementAndList) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwtRequirementAndListMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1617,6 +1626,7 @@ func (m *RequirementRule) validate(all bool) error {
 	if len(errors) > 0 {
 		return RequirementRuleMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -1773,6 +1783,7 @@ func (m *FilterStateRule) validate(all bool) error {
 	if len(errors) > 0 {
 		return FilterStateRuleMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2029,6 +2040,7 @@ func (m *JwtAuthentication) validate(all bool) error {
 	if len(errors) > 0 {
 		return JwtAuthenticationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -2170,6 +2182,7 @@ func (m *PerRouteConfig) validate(all bool) error {
 	if len(errors) > 0 {
 		return PerRouteConfigMultiError(errors)
 	}
+
 	return nil
 }
 

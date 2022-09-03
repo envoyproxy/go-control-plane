@@ -59,6 +59,7 @@ func (m *Dynamo) validate(all bool) error {
 	if len(errors) > 0 {
 		return DynamoMultiError(errors)
 	}
+
 	return nil
 }
 

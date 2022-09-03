@@ -60,6 +60,7 @@ func (m *TlsInspector) validate(all bool) error {
 	if len(errors) > 0 {
 		return TlsInspectorMultiError(errors)
 	}
+
 	return nil
 }
 

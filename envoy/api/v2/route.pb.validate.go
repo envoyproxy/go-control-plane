@@ -294,6 +294,7 @@ func (m *RouteConfiguration) validate(all bool) error {
 	if len(errors) > 0 {
 		return RouteConfigurationMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -440,6 +441,7 @@ func (m *Vhds) validate(all bool) error {
 	if len(errors) > 0 {
 		return VhdsMultiError(errors)
 	}
+
 	return nil
 }
 

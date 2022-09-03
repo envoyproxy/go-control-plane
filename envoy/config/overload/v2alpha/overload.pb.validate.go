@@ -137,6 +137,7 @@ func (m *ResourceMonitor) validate(all bool) error {
 	if len(errors) > 0 {
 		return ResourceMonitorMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -247,6 +248,7 @@ func (m *ThresholdTrigger) validate(all bool) error {
 	if len(errors) > 0 {
 		return ThresholdTriggerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -401,6 +403,7 @@ func (m *Trigger) validate(all bool) error {
 	if len(errors) > 0 {
 		return TriggerMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -555,6 +558,7 @@ func (m *OverloadAction) validate(all bool) error {
 	if len(errors) > 0 {
 		return OverloadActionMultiError(errors)
 	}
+
 	return nil
 }
 
@@ -762,6 +766,7 @@ func (m *OverloadManager) validate(all bool) error {
 	if len(errors) > 0 {
 		return OverloadManagerMultiError(errors)
 	}
+
 	return nil
 }
 

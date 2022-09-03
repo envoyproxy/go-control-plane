@@ -121,6 +121,7 @@ func (m *Descriptor) validate(all bool) error {
 	if len(errors) > 0 {
 		return DescriptorMultiError(errors)
 	}
+
 	return nil
 }
 
