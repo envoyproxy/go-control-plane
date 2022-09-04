@@ -742,6 +742,7 @@ func TestLinearMixedWatches(t *testing.T) {
 	assert.Equal(t, 2, c.NumResources())
 
 	sotwState := stream.NewStreamState(false, nil)
+	sotwState.SetKnownResourceNamesAsList(testType, []string{"a", "b"})
 	w := make(chan Response, 1)
 	c.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: c.getVersion()}, sotwState, w)
 	mustBlock(t, w)
@@ -754,7 +755,7 @@ func TestLinearMixedWatches(t *testing.T) {
 	err = c.UpdateResources(map[string]types.Resource{"a": a}, nil)
 	assert.NoError(t, err)
 	// This behavior is currently invalid for cds and lds, but due to a current limitation of linear cache sotw implementation
-	verifyResponse(t, w, c.getVersion(), 1)
+	verifyResponse(t, w, c.getVersion(), 2)
 	checkVersionMapNotSet(t, c)
 
 	c.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: c.getVersion()}, sotwState, w)
@@ -775,6 +776,6 @@ func TestLinearMixedWatches(t *testing.T) {
 	assert.NoError(t, err)
 	checkVersionMapSet(t, c)
 
-	verifyResponse(t, w, c.getVersion(), 0)
+	verifyResponse(t, w, c.getVersion(), 1)
 	verifyDeltaResponse(t, wd, nil, []string{"b"})
 }

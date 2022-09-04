@@ -41,6 +41,8 @@ type StreamState struct { // nolint:golint,revive
 
 	// indicates whether the object has been modified since its creation
 	first bool
+
+	mu *sync.RWMutex
 }
 
 // GetSubscribedResourceNames returns the list of resources currently explicitly subscribed to
@@ -95,10 +97,16 @@ func (s *StreamState) IsWildcard() bool {
 }
 
 func (s *StreamState) SetKnownResourceNames(url string, names map[string]struct{}) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.knownResourceNames[url] = names
 }
 
 func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	m := map[string]struct{}{}
 	for _, name := range names {
 		m[name] = struct{}{}
@@ -107,6 +115,9 @@ func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
 }
 
 func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	return s.knownResourceNames[url]
 }
 
@@ -118,6 +129,7 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		resourceVersions:        initialResourceVersions,
 		first:                   true,
 		knownResourceNames:      map[string]map[string]struct{}{},
+		mu:                      &sync.RWMutex{},
 	}
 
 	if initialResourceVersions == nil {
