@@ -115,8 +115,8 @@ func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
 }
 
 func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return s.knownResourceNames[url]
 }
