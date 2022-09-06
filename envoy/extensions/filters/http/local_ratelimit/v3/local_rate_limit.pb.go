@@ -79,7 +79,7 @@ type LocalRateLimit struct {
 	// on. The rate limit descriptor is selected by the first full match from the
 	// request descriptors.
 	//
-	// Example on how to use ::ref:`this <config_http_filters_local_rate_limit_descriptors>`
+	// Example on how to use :ref:`this <config_http_filters_local_rate_limit_descriptors>`.
 	//
 	// .. note::
 	//
