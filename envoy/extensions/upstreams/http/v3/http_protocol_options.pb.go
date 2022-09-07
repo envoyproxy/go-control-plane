@@ -82,8 +82,19 @@ type HttpProtocolOptions struct {
 	//	*HttpProtocolOptions_UseDownstreamProtocolConfig
 	//	*HttpProtocolOptions_AutoConfig
 	UpstreamProtocolOptions isHttpProtocolOptions_UpstreamProtocolOptions `protobuf_oneof:"upstream_protocol_options"`
-	// [#not-implemented-hide:]
+	// .. warning::
+	//   Upstream HTTP filters are not supported by default.
+	//   This warning will be removed as support moves beyond alpha.
+	//
 	// Optional HTTP filters for the upstream filter chain.
+	//
+	// These filters will be applied for all HTTP streams which flow through this
+	// cluster. Unlike downstream filters, they will *not* be applied to terminated CONNECT requests.
+	//
+	// If using upstream filters, please be aware that local errors sent by
+	// upstream filters will not trigger retries, and local errors sent by
+	// upstream filters will count as a final response if hedging is configured.
+	// [#extension-category: envoy.filters.http.upstream]
 	HttpFilters []*v31.HttpFilter `protobuf:"bytes,6,rep,name=http_filters,json=httpFilters,proto3" json:"http_filters,omitempty"`
 }
 
