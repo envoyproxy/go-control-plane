@@ -3447,6 +3447,21 @@ func (m *Cluster_OriginalDstLbConfig) validate(all bool) error {
 
 	// no validation rules for HttpHeaderName
 
+	if wrapper := m.GetUpstreamPortOverride(); wrapper != nil {
+
+		if wrapper.GetValue() > 65535 {
+			err := Cluster_OriginalDstLbConfigValidationError{
+				field:  "UpstreamPortOverride",
+				reason: "value must be less than or equal to 65535",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return Cluster_OriginalDstLbConfigMultiError(errors)
 	}
