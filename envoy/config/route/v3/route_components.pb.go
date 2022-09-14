@@ -1417,8 +1417,7 @@ type RouteMatch_PathSeparatedPrefix struct {
 }
 
 type RouteMatch_PathMatchPolicy struct {
-	// [#not-implemented-hide:]
-	// [#comment: TODO(silverstar195): Hook into extension once added]
+	// [#extension-category: envoy.path.match]
 	PathMatchPolicy *v31.TypedExtensionConfig `protobuf:"bytes,15,opt,name=path_match_policy,json=pathMatchPolicy,proto3,oneof"`
 }
 
@@ -1620,9 +1619,9 @@ type RouteAction struct {
 	// place the original path before rewrite into the :ref:`x-envoy-original-path
 	// <config_http_filters_router_x-envoy-original-path>` header.
 	//
-	// Only one of :ref:`regex_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>` or
-	// [#comment:TODO(silverstar194) add the following once implemented: :ref:`path_rewrite_policy <envoy_v3_api_field_config.route.v3.RouteAction.path_rewrite_policy>`]
-	// :ref:`prefix_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>` may be specified.
+	// Only one of :ref:`regex_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>`
+	// :ref:`path_rewrite_policy <envoy_v3_api_field_config.route.v3.RouteAction.path_rewrite_policy>`,
+	// or :ref:`prefix_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>` may be specified.
 	//
 	// .. attention::
 	//
@@ -1655,9 +1654,9 @@ type RouteAction struct {
 	// before the rewrite into the :ref:`x-envoy-original-path
 	// <config_http_filters_router_x-envoy-original-path>` header.
 	//
-	// Only one of :ref:`regex_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>`
-	// or :ref:`prefix_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`
-	// [#comment:TODO(silverstar194) add the following once implemented: :ref:`path_rewrite_policy <envoy_v3_api_field_config.route.v3.RouteAction.path_rewrite_policy>`]
+	// Only one of :ref:`regex_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>`,
+	// :ref:`prefix_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`, or
+	// :ref:`path_rewrite_policy <envoy_v3_api_field_config.route.v3.RouteAction.path_rewrite_policy>`]
 	// may be specified.
 	//
 	// Examples using Google's `RE2 <https://github.com/google/re2>`_ engine:
@@ -1677,8 +1676,7 @@ type RouteAction struct {
 	//   would do a case-insensitive match and transform path ``/aaa/XxX/bbb`` to
 	//   ``/aaa/yyy/bbb``.
 	RegexRewrite *v32.RegexMatchAndSubstitute `protobuf:"bytes,32,opt,name=regex_rewrite,json=regexRewrite,proto3" json:"regex_rewrite,omitempty"`
-	// [#not-implemented-hide:]
-	// [#comment: TODO(silverstar195): Hook into extension once added]
+	// [#extension-category: envoy.path.rewrite]
 	PathRewritePolicy *v31.TypedExtensionConfig `protobuf:"bytes,41,opt,name=path_rewrite_policy,json=pathRewritePolicy,proto3" json:"path_rewrite_policy,omitempty"`
 	// Types that are assignable to HostRewriteSpecifier:
 	//	*RouteAction_HostRewriteLiteral
