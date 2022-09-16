@@ -127,6 +127,7 @@ func (RateLimitConfig_Action_MetaData_Source) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_ratelimit_v3_rate_limit_proto_rawDescGZIP(), []int{1, 0, 6, 0}
 }
 
+// [#next-major-version: unify with local ratelimit, should use common.ratelimit.v3.VhRateLimitsOptions instead.]
 type RateLimitPerRoute_VhRateLimitsOptions int32
 
 const (
@@ -523,6 +524,7 @@ type RateLimitPerRoute struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Specifies if the rate limit filter should include the virtual host rate limits.
+	// [#next-major-version: unify with local ratelimit, should use common.ratelimit.v3.VhRateLimitsOptions instead.]
 	VhRateLimits RateLimitPerRoute_VhRateLimitsOptions `protobuf:"varint,1,opt,name=vh_rate_limits,json=vhRateLimits,proto3,enum=envoy.extensions.filters.http.ratelimit.v3.RateLimitPerRoute_VhRateLimitsOptions" json:"vh_rate_limits,omitempty"`
 	// Specifies if the rate limit filter should include the lower levels (route level, virtual host level or cluster weight level) rate limits override options.
 	// [#not-implemented-hide:]
