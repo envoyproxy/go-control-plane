@@ -315,8 +315,8 @@ type BufferSettings struct {
 	AllowPartialMessage bool `protobuf:"varint,2,opt,name=allow_partial_message,json=allowPartialMessage,proto3" json:"allow_partial_message,omitempty"`
 	// If true, the body sent to the external authorization service is set with raw bytes, it sets
 	// the :ref:`raw_body<envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.raw_body>`
-	// field of HTTP request attribute context. Otherwise, :ref:`
-	// body<envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.body>` will be filled
+	// field of HTTP request attribute context. Otherwise, :ref:`body
+	// <envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.body>` will be filled
 	// with UTF-8 string request body.
 	PackAsBytes bool `protobuf:"varint,3,opt,name=pack_as_bytes,json=packAsBytes,proto3" json:"pack_as_bytes,omitempty"`
 }
