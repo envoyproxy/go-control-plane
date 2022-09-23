@@ -138,6 +138,8 @@ func (m *GrpcJsonTranscoder) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for CaseInsensitiveEnumParsing
+
 	switch m.DescriptorSet.(type) {
 
 	case *GrpcJsonTranscoder_ProtoDescriptor:
