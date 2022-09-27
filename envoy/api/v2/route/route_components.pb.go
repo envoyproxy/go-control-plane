@@ -1851,8 +1851,9 @@ type RouteAction_AutoHostRewrite struct {
 	// Indicates that during forwarding, the host header will be swapped with
 	// the hostname of the upstream host chosen by the cluster manager. This
 	// option is applicable only when the destination cluster for a route is of
-	// type *strict_dns* or *logical_dns*. Setting this to true with other cluster
-	// types has no effect.
+	// type ``STRICT_DNS``,  ``LOGICAL_DNS`` or ``STATIC``. For ``STATIC`` clusters, the
+	// hostname attribute of the endpoint must be configured. Setting this to true
+	// with other cluster types has no effect.
 	AutoHostRewrite *wrappers.BoolValue `protobuf:"bytes,7,opt,name=auto_host_rewrite,json=autoHostRewrite,proto3,oneof"`
 }
 
