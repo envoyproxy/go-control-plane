@@ -32,9 +32,9 @@ type OutlierDetection struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The number of consecutive 5xx responses or local origin errors that are mapped
-	// to 5xx error codes before a consecutive 5xx ejection
-	// occurs. Defaults to 5.
+	// The number of consecutive server-side error responses (for HTTP traffic,
+	// 5xx responses; for TCP traffic, connection failures; for Redis, failure to
+	// respond PONG; etc.) before a consecutive 5xx ejection occurs. Defaults to 5.
 	Consecutive_5Xx *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=consecutive_5xx,json=consecutive5xx,proto3" json:"consecutive_5xx,omitempty"`
 	// The time interval between ejection analysis sweeps. This can result in
 	// both new ejections as well as hosts being returned to service. Defaults
