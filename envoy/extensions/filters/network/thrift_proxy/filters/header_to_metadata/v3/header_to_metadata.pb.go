@@ -283,21 +283,17 @@ type HeaderToMetadata_KeyValuePair_Value struct {
 	// The value to pair with the given key.
 	//
 	// When used for on_present case, if value is non-empty it'll be used instead
-	// of the header value. If both are empty, no metadata is added.
+	// of the header value. If both are empty, the header value is used as-is.
 	//
-	// When used for on_missing case, a non-empty value must be provided otherwise
-	// no metadata is added.
+	// When used for on_missing case, a non-empty value must be provided.
 	Value string `protobuf:"bytes,3,opt,name=value,proto3,oneof"`
 }
 
 type HeaderToMetadata_KeyValuePair_RegexValueRewrite struct {
 	// If present, the header's value will be matched and substituted with this.
-	// If there is no match or substitution, the header value
-	// is used as-is.
+	// If there is no match or substitution, the header value is used as-is.
 	//
 	// This is only used for on_present.
-	//
-	// Note: if the ``value`` field is non-empty this field should be empty.
 	RegexValueRewrite *v3.RegexMatchAndSubstitute `protobuf:"bytes,4,opt,name=regex_value_rewrite,json=regexValueRewrite,proto3,oneof"`
 }
 
