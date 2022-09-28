@@ -38,8 +38,9 @@ type RouteAction struct {
 	ClusterSpecifier isRouteAction_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
 	// Route metadata.
 	Metadata *v3.Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	// Route level config for L7 generic filters. The key should always be the generic
-	// filter name.
+	// Route level config for L7 generic filters. The key should be the related :ref:`extension name
+	// <envoy_v3_api_field_config.core.v3.TypedExtensionConfig.name>` in the :ref:`generic filters
+	// <envoy_v3_api_field_extensions.filters.network.generic_proxy.v3.GenericProxy.filters>`.
 	PerFilterConfig map[string]*any.Any `protobuf:"bytes,4,rep,name=per_filter_config,json=perFilterConfig,proto3" json:"per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
