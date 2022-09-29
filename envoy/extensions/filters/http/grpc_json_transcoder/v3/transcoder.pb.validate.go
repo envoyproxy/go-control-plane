@@ -270,6 +270,8 @@ func (m *GrpcJsonTranscoder_PrintOptions) validate(all bool) error {
 
 	// no validation rules for PreserveProtoFieldNames
 
+	// no validation rules for StreamNewlineDelimited
+
 	if len(errors) > 0 {
 		return GrpcJsonTranscoder_PrintOptionsMultiError(errors)
 	}
