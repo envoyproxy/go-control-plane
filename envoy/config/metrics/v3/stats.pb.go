@@ -356,7 +356,11 @@ type TagSpecifier struct {
 	//
 	// .. note::
 	//
-	//   It is invalid to specify the same tag name twice in a config.
+	//   A stat name may be spelled in such a way that it matches two different
+	//   tag extractors for the same tag name. In that case, all but one of the
+	//   tag values will be dropped. It is not specified which tag value will be
+	//   retained. The extraction will only occur for one of the extractors, and
+	//   only the matched extraction will be removed from the tag name.
 	TagName string `protobuf:"bytes,1,opt,name=tag_name,json=tagName,proto3" json:"tag_name,omitempty"`
 	// Types that are assignable to TagValue:
 	//	*TagSpecifier_Regex
