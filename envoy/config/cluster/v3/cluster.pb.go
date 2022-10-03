@@ -1551,56 +1551,6 @@ func (x *LoadBalancingPolicy) GetPolicies() []*LoadBalancingPolicy_Policy {
 	return nil
 }
 
-// An extensible structure containing the address Envoy should bind to when
-// establishing upstream connections.
-type UpstreamBindConfig struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// The address Envoy should bind to when establishing upstream connections.
-	SourceAddress *v32.Address `protobuf:"bytes,1,opt,name=source_address,json=sourceAddress,proto3" json:"source_address,omitempty"`
-}
-
-func (x *UpstreamBindConfig) Reset() {
-	*x = UpstreamBindConfig{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *UpstreamBindConfig) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpstreamBindConfig) ProtoMessage() {}
-
-func (x *UpstreamBindConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpstreamBindConfig.ProtoReflect.Descriptor instead.
-func (*UpstreamBindConfig) Descriptor() ([]byte, []int) {
-	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *UpstreamBindConfig) GetSourceAddress() *v32.Address {
-	if x != nil {
-		return x.SourceAddress
-	}
-	return nil
-}
-
 type UpstreamConnectionOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1617,7 +1567,7 @@ type UpstreamConnectionOptions struct {
 func (x *UpstreamConnectionOptions) Reset() {
 	*x = UpstreamConnectionOptions{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[4]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1630,7 +1580,7 @@ func (x *UpstreamConnectionOptions) String() string {
 func (*UpstreamConnectionOptions) ProtoMessage() {}
 
 func (x *UpstreamConnectionOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[4]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1643,7 +1593,7 @@ func (x *UpstreamConnectionOptions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpstreamConnectionOptions.ProtoReflect.Descriptor instead.
 func (*UpstreamConnectionOptions) Descriptor() ([]byte, []int) {
-	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{4}
+	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UpstreamConnectionOptions) GetTcpKeepalive() *v32.TcpKeepalive {
@@ -1680,7 +1630,7 @@ type TrackClusterStats struct {
 func (x *TrackClusterStats) Reset() {
 	*x = TrackClusterStats{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[5]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1693,7 +1643,7 @@ func (x *TrackClusterStats) String() string {
 func (*TrackClusterStats) ProtoMessage() {}
 
 func (x *TrackClusterStats) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[5]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1706,7 +1656,7 @@ func (x *TrackClusterStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrackClusterStats.ProtoReflect.Descriptor instead.
 func (*TrackClusterStats) Descriptor() ([]byte, []int) {
-	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{5}
+	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *TrackClusterStats) GetTimeoutBudgets() bool {
@@ -1746,7 +1696,7 @@ type Cluster_TransportSocketMatch struct {
 func (x *Cluster_TransportSocketMatch) Reset() {
 	*x = Cluster_TransportSocketMatch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[6]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1759,7 +1709,7 @@ func (x *Cluster_TransportSocketMatch) String() string {
 func (*Cluster_TransportSocketMatch) ProtoMessage() {}
 
 func (x *Cluster_TransportSocketMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[6]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1813,7 +1763,7 @@ type Cluster_CustomClusterType struct {
 func (x *Cluster_CustomClusterType) Reset() {
 	*x = Cluster_CustomClusterType{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[7]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1826,7 +1776,7 @@ func (x *Cluster_CustomClusterType) String() string {
 func (*Cluster_CustomClusterType) ProtoMessage() {}
 
 func (x *Cluster_CustomClusterType) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[7]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1873,7 +1823,7 @@ type Cluster_EdsClusterConfig struct {
 func (x *Cluster_EdsClusterConfig) Reset() {
 	*x = Cluster_EdsClusterConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[8]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1886,7 +1836,7 @@ func (x *Cluster_EdsClusterConfig) String() string {
 func (*Cluster_EdsClusterConfig) ProtoMessage() {}
 
 func (x *Cluster_EdsClusterConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[8]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1992,7 +1942,7 @@ type Cluster_LbSubsetConfig struct {
 func (x *Cluster_LbSubsetConfig) Reset() {
 	*x = Cluster_LbSubsetConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[9]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2005,7 +1955,7 @@ func (x *Cluster_LbSubsetConfig) String() string {
 func (*Cluster_LbSubsetConfig) ProtoMessage() {}
 
 func (x *Cluster_LbSubsetConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[9]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2109,7 +2059,7 @@ type Cluster_SlowStartConfig struct {
 func (x *Cluster_SlowStartConfig) Reset() {
 	*x = Cluster_SlowStartConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[10]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2122,7 +2072,7 @@ func (x *Cluster_SlowStartConfig) String() string {
 func (*Cluster_SlowStartConfig) ProtoMessage() {}
 
 func (x *Cluster_SlowStartConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[10]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2173,7 +2123,7 @@ type Cluster_RoundRobinLbConfig struct {
 func (x *Cluster_RoundRobinLbConfig) Reset() {
 	*x = Cluster_RoundRobinLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[11]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2186,7 +2136,7 @@ func (x *Cluster_RoundRobinLbConfig) String() string {
 func (*Cluster_RoundRobinLbConfig) ProtoMessage() {}
 
 func (x *Cluster_RoundRobinLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[11]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2250,7 +2200,7 @@ type Cluster_LeastRequestLbConfig struct {
 func (x *Cluster_LeastRequestLbConfig) Reset() {
 	*x = Cluster_LeastRequestLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[12]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2263,7 +2213,7 @@ func (x *Cluster_LeastRequestLbConfig) String() string {
 func (*Cluster_LeastRequestLbConfig) ProtoMessage() {}
 
 func (x *Cluster_LeastRequestLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[12]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2324,7 +2274,7 @@ type Cluster_RingHashLbConfig struct {
 func (x *Cluster_RingHashLbConfig) Reset() {
 	*x = Cluster_RingHashLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[13]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2337,7 +2287,7 @@ func (x *Cluster_RingHashLbConfig) String() string {
 func (*Cluster_RingHashLbConfig) ProtoMessage() {}
 
 func (x *Cluster_RingHashLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[13]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2391,7 +2341,7 @@ type Cluster_MaglevLbConfig struct {
 func (x *Cluster_MaglevLbConfig) Reset() {
 	*x = Cluster_MaglevLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[14]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2404,7 +2354,7 @@ func (x *Cluster_MaglevLbConfig) String() string {
 func (*Cluster_MaglevLbConfig) ProtoMessage() {}
 
 func (x *Cluster_MaglevLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[14]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2459,7 +2409,7 @@ type Cluster_OriginalDstLbConfig struct {
 func (x *Cluster_OriginalDstLbConfig) Reset() {
 	*x = Cluster_OriginalDstLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[15]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2472,7 +2422,7 @@ func (x *Cluster_OriginalDstLbConfig) String() string {
 func (*Cluster_OriginalDstLbConfig) ProtoMessage() {}
 
 func (x *Cluster_OriginalDstLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[15]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2563,7 +2513,7 @@ type Cluster_CommonLbConfig struct {
 func (x *Cluster_CommonLbConfig) Reset() {
 	*x = Cluster_CommonLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[16]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2576,7 +2526,7 @@ func (x *Cluster_CommonLbConfig) String() string {
 func (*Cluster_CommonLbConfig) ProtoMessage() {}
 
 func (x *Cluster_CommonLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[16]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2692,7 +2642,7 @@ type Cluster_RefreshRate struct {
 func (x *Cluster_RefreshRate) Reset() {
 	*x = Cluster_RefreshRate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[17]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2705,7 +2655,7 @@ func (x *Cluster_RefreshRate) String() string {
 func (*Cluster_RefreshRate) ProtoMessage() {}
 
 func (x *Cluster_RefreshRate) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[17]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2793,7 +2743,7 @@ type Cluster_PreconnectPolicy struct {
 func (x *Cluster_PreconnectPolicy) Reset() {
 	*x = Cluster_PreconnectPolicy{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[18]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2806,7 +2756,7 @@ func (x *Cluster_PreconnectPolicy) String() string {
 func (*Cluster_PreconnectPolicy) ProtoMessage() {}
 
 func (x *Cluster_PreconnectPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[18]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2872,7 +2822,7 @@ type Cluster_LbSubsetConfig_LbSubsetSelector struct {
 func (x *Cluster_LbSubsetConfig_LbSubsetSelector) Reset() {
 	*x = Cluster_LbSubsetConfig_LbSubsetSelector{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[20]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2885,7 +2835,7 @@ func (x *Cluster_LbSubsetConfig_LbSubsetSelector) String() string {
 func (*Cluster_LbSubsetConfig_LbSubsetSelector) ProtoMessage() {}
 
 func (x *Cluster_LbSubsetConfig_LbSubsetSelector) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[20]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2957,7 +2907,7 @@ type Cluster_CommonLbConfig_ZoneAwareLbConfig struct {
 func (x *Cluster_CommonLbConfig_ZoneAwareLbConfig) Reset() {
 	*x = Cluster_CommonLbConfig_ZoneAwareLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[21]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2970,7 +2920,7 @@ func (x *Cluster_CommonLbConfig_ZoneAwareLbConfig) String() string {
 func (*Cluster_CommonLbConfig_ZoneAwareLbConfig) ProtoMessage() {}
 
 func (x *Cluster_CommonLbConfig_ZoneAwareLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[21]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3018,7 +2968,7 @@ type Cluster_CommonLbConfig_LocalityWeightedLbConfig struct {
 func (x *Cluster_CommonLbConfig_LocalityWeightedLbConfig) Reset() {
 	*x = Cluster_CommonLbConfig_LocalityWeightedLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[22]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3031,7 +2981,7 @@ func (x *Cluster_CommonLbConfig_LocalityWeightedLbConfig) String() string {
 func (*Cluster_CommonLbConfig_LocalityWeightedLbConfig) ProtoMessage() {}
 
 func (x *Cluster_CommonLbConfig_LocalityWeightedLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[22]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3080,7 +3030,7 @@ type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 func (x *Cluster_CommonLbConfig_ConsistentHashingLbConfig) Reset() {
 	*x = Cluster_CommonLbConfig_ConsistentHashingLbConfig{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[23]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3093,7 +3043,7 @@ func (x *Cluster_CommonLbConfig_ConsistentHashingLbConfig) String() string {
 func (*Cluster_CommonLbConfig_ConsistentHashingLbConfig) ProtoMessage() {}
 
 func (x *Cluster_CommonLbConfig_ConsistentHashingLbConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[23]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3134,7 +3084,7 @@ type LoadBalancingPolicy_Policy struct {
 func (x *LoadBalancingPolicy_Policy) Reset() {
 	*x = LoadBalancingPolicy_Policy{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[24]
+		mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3147,7 +3097,7 @@ func (x *LoadBalancingPolicy_Policy) String() string {
 func (*LoadBalancingPolicy_Policy) ProtoMessage() {}
 
 func (x *LoadBalancingPolicy_Policy) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[24]
+	mi := &file_envoy_config_cluster_v3_cluster_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3915,48 +3865,40 @@ var file_envoy_config_cluster_v3_cluster_proto_rawDesc = []byte{
 	0x67, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x52, 0x0c, 0x74, 0x79, 0x70, 0x65, 0x64, 0x5f, 0x63,
 	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x3a, 0x27, 0x9a, 0xc5, 0x88, 0x1e, 0x22, 0x0a, 0x20, 0x65, 0x6e,
 	0x76, 0x6f, 0x79, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x32, 0x2e, 0x4c, 0x6f, 0x61, 0x64, 0x42,
-	0x61, 0x6c, 0x61, 0x6e, 0x63, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x22, 0x82,
-	0x01, 0x0a, 0x12, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x42, 0x69, 0x6e, 0x64, 0x43,
-	0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x44, 0x0a, 0x0e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f,
-	0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e,
-	0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72,
-	0x65, 0x2e, 0x76, 0x33, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x52, 0x0d, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x3a, 0x26, 0x9a, 0xc5, 0x88,
-	0x1e, 0x21, 0x0a, 0x1f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x32,
-	0x2e, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x42, 0x69, 0x6e, 0x64, 0x43, 0x6f, 0x6e,
-	0x66, 0x69, 0x67, 0x22, 0xf9, 0x01, 0x0a, 0x19, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d,
-	0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e,
-	0x73, 0x12, 0x47, 0x0a, 0x0d, 0x74, 0x63, 0x70, 0x5f, 0x6b, 0x65, 0x65, 0x70, 0x61, 0x6c, 0x69,
-	0x76, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79,
-	0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x33, 0x2e,
-	0x54, 0x63, 0x70, 0x4b, 0x65, 0x65, 0x70, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x52, 0x0c, 0x74, 0x63,
-	0x70, 0x4b, 0x65, 0x65, 0x70, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x12, 0x64, 0x0a, 0x30, 0x73, 0x65,
-	0x74, 0x5f, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63,
-	0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x5f, 0x6f, 0x6e, 0x5f, 0x75, 0x70, 0x73, 0x74, 0x72, 0x65,
-	0x61, 0x6d, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x08, 0x52, 0x2a, 0x73, 0x65, 0x74, 0x4c, 0x6f, 0x63, 0x61, 0x6c, 0x49, 0x6e,
-	0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x4f, 0x6e, 0x55, 0x70, 0x73,
-	0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x3a, 0x2d, 0x9a, 0xc5, 0x88, 0x1e, 0x28, 0x0a, 0x26, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x61,
-	0x70, 0x69, 0x2e, 0x76, 0x32, 0x2e, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x6f,
-	0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22,
-	0x72, 0x0a, 0x11, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x53,
-	0x74, 0x61, 0x74, 0x73, 0x12, 0x27, 0x0a, 0x0f, 0x74, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x5f,
-	0x62, 0x75, 0x64, 0x67, 0x65, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0e, 0x74,
-	0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x42, 0x75, 0x64, 0x67, 0x65, 0x74, 0x73, 0x12, 0x34, 0x0a,
-	0x16, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x5f, 0x73, 0x69, 0x7a, 0x65, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x14, 0x72,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x53, 0x69,
-	0x7a, 0x65, 0x73, 0x42, 0x89, 0x01, 0x0a, 0x25, 0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79,
-	0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66,
-	0x69, 0x67, 0x2e, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x42, 0x0c, 0x43,
-	0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x48, 0x67,
-	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70,
-	0x72, 0x6f, 0x78, 0x79, 0x2f, 0x67, 0x6f, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x2d,
-	0x70, 0x6c, 0x61, 0x6e, 0x65, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2f, 0x63, 0x6f, 0x6e, 0x66,
-	0x69, 0x67, 0x2f, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x2f, 0x76, 0x33, 0x3b, 0x63, 0x6c,
-	0x75, 0x73, 0x74, 0x65, 0x72, 0x76, 0x33, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x6c, 0x61, 0x6e, 0x63, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x22, 0xf9,
+	0x01, 0x0a, 0x19, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x6f, 0x6e, 0x6e, 0x65,
+	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x47, 0x0a, 0x0d,
+	0x74, 0x63, 0x70, 0x5f, 0x6b, 0x65, 0x65, 0x70, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66,
+	0x69, 0x67, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x76, 0x33, 0x2e, 0x54, 0x63, 0x70, 0x4b, 0x65,
+	0x65, 0x70, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x52, 0x0c, 0x74, 0x63, 0x70, 0x4b, 0x65, 0x65, 0x70,
+	0x61, 0x6c, 0x69, 0x76, 0x65, 0x12, 0x64, 0x0a, 0x30, 0x73, 0x65, 0x74, 0x5f, 0x6c, 0x6f, 0x63,
+	0x61, 0x6c, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x5f, 0x6e, 0x61, 0x6d,
+	0x65, 0x5f, 0x6f, 0x6e, 0x5f, 0x75, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x5f, 0x63, 0x6f,
+	0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x2a, 0x73, 0x65, 0x74, 0x4c, 0x6f, 0x63, 0x61, 0x6c, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61,
+	0x63, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x4f, 0x6e, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d,
+	0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x3a, 0x2d, 0x9a, 0xc5, 0x88,
+	0x1e, 0x28, 0x0a, 0x26, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x32,
+	0x2e, 0x55, 0x70, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74,
+	0x69, 0x6f, 0x6e, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x72, 0x0a, 0x11, 0x54, 0x72,
+	0x61, 0x63, 0x6b, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x73, 0x12,
+	0x27, 0x0a, 0x0f, 0x74, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x5f, 0x62, 0x75, 0x64, 0x67, 0x65,
+	0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0e, 0x74, 0x69, 0x6d, 0x65, 0x6f, 0x75,
+	0x74, 0x42, 0x75, 0x64, 0x67, 0x65, 0x74, 0x73, 0x12, 0x34, 0x0a, 0x16, 0x72, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x5f, 0x73, 0x69, 0x7a,
+	0x65, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x14, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x53, 0x69, 0x7a, 0x65, 0x73, 0x42, 0x89,
+	0x01, 0x0a, 0x25, 0x69, 0x6f, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79,
+	0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2e, 0x63, 0x6c,
+	0x75, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x76, 0x33, 0x42, 0x0c, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65,
+	0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x48, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2f,
+	0x67, 0x6f, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x2d, 0x70, 0x6c, 0x61, 0x6e, 0x65,
+	0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x2f, 0x63, 0x6c,
+	0x75, 0x73, 0x74, 0x65, 0x72, 0x2f, 0x76, 0x33, 0x3b, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72,
+	0x76, 0x33, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -3972,7 +3914,7 @@ func file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP() []byte {
 }
 
 var file_envoy_config_cluster_v3_cluster_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
-var file_envoy_config_cluster_v3_cluster_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_envoy_config_cluster_v3_cluster_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_envoy_config_cluster_v3_cluster_proto_goTypes = []interface{}{
 	(Cluster_DiscoveryType)(0),                                                  // 0: envoy.config.cluster.v3.Cluster.DiscoveryType
 	(Cluster_LbPolicy)(0),                                                       // 1: envoy.config.cluster.v3.Cluster.LbPolicy
@@ -3985,146 +3927,144 @@ var file_envoy_config_cluster_v3_cluster_proto_goTypes = []interface{}{
 	(*ClusterCollection)(nil),                                                   // 8: envoy.config.cluster.v3.ClusterCollection
 	(*Cluster)(nil),                                                             // 9: envoy.config.cluster.v3.Cluster
 	(*LoadBalancingPolicy)(nil),                                                 // 10: envoy.config.cluster.v3.LoadBalancingPolicy
-	(*UpstreamBindConfig)(nil),                                                  // 11: envoy.config.cluster.v3.UpstreamBindConfig
-	(*UpstreamConnectionOptions)(nil),                                           // 12: envoy.config.cluster.v3.UpstreamConnectionOptions
-	(*TrackClusterStats)(nil),                                                   // 13: envoy.config.cluster.v3.TrackClusterStats
-	(*Cluster_TransportSocketMatch)(nil),                                        // 14: envoy.config.cluster.v3.Cluster.TransportSocketMatch
-	(*Cluster_CustomClusterType)(nil),                                           // 15: envoy.config.cluster.v3.Cluster.CustomClusterType
-	(*Cluster_EdsClusterConfig)(nil),                                            // 16: envoy.config.cluster.v3.Cluster.EdsClusterConfig
-	(*Cluster_LbSubsetConfig)(nil),                                              // 17: envoy.config.cluster.v3.Cluster.LbSubsetConfig
-	(*Cluster_SlowStartConfig)(nil),                                             // 18: envoy.config.cluster.v3.Cluster.SlowStartConfig
-	(*Cluster_RoundRobinLbConfig)(nil),                                          // 19: envoy.config.cluster.v3.Cluster.RoundRobinLbConfig
-	(*Cluster_LeastRequestLbConfig)(nil),                                        // 20: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig
-	(*Cluster_RingHashLbConfig)(nil),                                            // 21: envoy.config.cluster.v3.Cluster.RingHashLbConfig
-	(*Cluster_MaglevLbConfig)(nil),                                              // 22: envoy.config.cluster.v3.Cluster.MaglevLbConfig
-	(*Cluster_OriginalDstLbConfig)(nil),                                         // 23: envoy.config.cluster.v3.Cluster.OriginalDstLbConfig
-	(*Cluster_CommonLbConfig)(nil),                                              // 24: envoy.config.cluster.v3.Cluster.CommonLbConfig
-	(*Cluster_RefreshRate)(nil),                                                 // 25: envoy.config.cluster.v3.Cluster.RefreshRate
-	(*Cluster_PreconnectPolicy)(nil),                                            // 26: envoy.config.cluster.v3.Cluster.PreconnectPolicy
-	nil,                                                                         // 27: envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry
-	(*Cluster_LbSubsetConfig_LbSubsetSelector)(nil),                             // 28: envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector
-	(*Cluster_CommonLbConfig_ZoneAwareLbConfig)(nil),                            // 29: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig
-	(*Cluster_CommonLbConfig_LocalityWeightedLbConfig)(nil),                     // 30: envoy.config.cluster.v3.Cluster.CommonLbConfig.LocalityWeightedLbConfig
-	(*Cluster_CommonLbConfig_ConsistentHashingLbConfig)(nil),                    // 31: envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig
-	(*LoadBalancingPolicy_Policy)(nil),                                          // 32: envoy.config.cluster.v3.LoadBalancingPolicy.Policy
-	(*v3.CollectionEntry)(nil),                                                  // 33: xds.core.v3.CollectionEntry
-	(*duration.Duration)(nil),                                                   // 34: google.protobuf.Duration
-	(*wrappers.UInt32Value)(nil),                                                // 35: google.protobuf.UInt32Value
-	(*v31.ClusterLoadAssignment)(nil),                                           // 36: envoy.config.endpoint.v3.ClusterLoadAssignment
-	(*v32.HealthCheck)(nil),                                                     // 37: envoy.config.core.v3.HealthCheck
-	(*CircuitBreakers)(nil),                                                     // 38: envoy.config.cluster.v3.CircuitBreakers
-	(*v32.UpstreamHttpProtocolOptions)(nil),                                     // 39: envoy.config.core.v3.UpstreamHttpProtocolOptions
-	(*v32.HttpProtocolOptions)(nil),                                             // 40: envoy.config.core.v3.HttpProtocolOptions
-	(*v32.Http1ProtocolOptions)(nil),                                            // 41: envoy.config.core.v3.Http1ProtocolOptions
-	(*v32.Http2ProtocolOptions)(nil),                                            // 42: envoy.config.core.v3.Http2ProtocolOptions
-	(*v32.Address)(nil),                                                         // 43: envoy.config.core.v3.Address
-	(*v32.DnsResolutionConfig)(nil),                                             // 44: envoy.config.core.v3.DnsResolutionConfig
-	(*v32.TypedExtensionConfig)(nil),                                            // 45: envoy.config.core.v3.TypedExtensionConfig
-	(*wrappers.BoolValue)(nil),                                                  // 46: google.protobuf.BoolValue
-	(*OutlierDetection)(nil),                                                    // 47: envoy.config.cluster.v3.OutlierDetection
-	(*v32.BindConfig)(nil),                                                      // 48: envoy.config.core.v3.BindConfig
-	(*v32.TransportSocket)(nil),                                                 // 49: envoy.config.core.v3.TransportSocket
-	(*v32.Metadata)(nil),                                                        // 50: envoy.config.core.v3.Metadata
-	(*Filter)(nil),                                                              // 51: envoy.config.cluster.v3.Filter
-	(*v32.ConfigSource)(nil),                                                    // 52: envoy.config.core.v3.ConfigSource
-	(*v32.TcpKeepalive)(nil),                                                    // 53: envoy.config.core.v3.TcpKeepalive
-	(*_struct.Struct)(nil),                                                      // 54: google.protobuf.Struct
-	(*any.Any)(nil),                                                             // 55: google.protobuf.Any
-	(*v32.RuntimeDouble)(nil),                                                   // 56: envoy.config.core.v3.RuntimeDouble
-	(*v33.Percent)(nil),                                                         // 57: envoy.type.v3.Percent
-	(*wrappers.UInt64Value)(nil),                                                // 58: google.protobuf.UInt64Value
-	(*v32.HealthStatusSet)(nil),                                                 // 59: envoy.config.core.v3.HealthStatusSet
-	(*wrappers.DoubleValue)(nil),                                                // 60: google.protobuf.DoubleValue
+	(*UpstreamConnectionOptions)(nil),                                           // 11: envoy.config.cluster.v3.UpstreamConnectionOptions
+	(*TrackClusterStats)(nil),                                                   // 12: envoy.config.cluster.v3.TrackClusterStats
+	(*Cluster_TransportSocketMatch)(nil),                                        // 13: envoy.config.cluster.v3.Cluster.TransportSocketMatch
+	(*Cluster_CustomClusterType)(nil),                                           // 14: envoy.config.cluster.v3.Cluster.CustomClusterType
+	(*Cluster_EdsClusterConfig)(nil),                                            // 15: envoy.config.cluster.v3.Cluster.EdsClusterConfig
+	(*Cluster_LbSubsetConfig)(nil),                                              // 16: envoy.config.cluster.v3.Cluster.LbSubsetConfig
+	(*Cluster_SlowStartConfig)(nil),                                             // 17: envoy.config.cluster.v3.Cluster.SlowStartConfig
+	(*Cluster_RoundRobinLbConfig)(nil),                                          // 18: envoy.config.cluster.v3.Cluster.RoundRobinLbConfig
+	(*Cluster_LeastRequestLbConfig)(nil),                                        // 19: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig
+	(*Cluster_RingHashLbConfig)(nil),                                            // 20: envoy.config.cluster.v3.Cluster.RingHashLbConfig
+	(*Cluster_MaglevLbConfig)(nil),                                              // 21: envoy.config.cluster.v3.Cluster.MaglevLbConfig
+	(*Cluster_OriginalDstLbConfig)(nil),                                         // 22: envoy.config.cluster.v3.Cluster.OriginalDstLbConfig
+	(*Cluster_CommonLbConfig)(nil),                                              // 23: envoy.config.cluster.v3.Cluster.CommonLbConfig
+	(*Cluster_RefreshRate)(nil),                                                 // 24: envoy.config.cluster.v3.Cluster.RefreshRate
+	(*Cluster_PreconnectPolicy)(nil),                                            // 25: envoy.config.cluster.v3.Cluster.PreconnectPolicy
+	nil,                                                                         // 26: envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry
+	(*Cluster_LbSubsetConfig_LbSubsetSelector)(nil),                             // 27: envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector
+	(*Cluster_CommonLbConfig_ZoneAwareLbConfig)(nil),                            // 28: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig
+	(*Cluster_CommonLbConfig_LocalityWeightedLbConfig)(nil),                     // 29: envoy.config.cluster.v3.Cluster.CommonLbConfig.LocalityWeightedLbConfig
+	(*Cluster_CommonLbConfig_ConsistentHashingLbConfig)(nil),                    // 30: envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig
+	(*LoadBalancingPolicy_Policy)(nil),                                          // 31: envoy.config.cluster.v3.LoadBalancingPolicy.Policy
+	(*v3.CollectionEntry)(nil),                                                  // 32: xds.core.v3.CollectionEntry
+	(*duration.Duration)(nil),                                                   // 33: google.protobuf.Duration
+	(*wrappers.UInt32Value)(nil),                                                // 34: google.protobuf.UInt32Value
+	(*v31.ClusterLoadAssignment)(nil),                                           // 35: envoy.config.endpoint.v3.ClusterLoadAssignment
+	(*v32.HealthCheck)(nil),                                                     // 36: envoy.config.core.v3.HealthCheck
+	(*CircuitBreakers)(nil),                                                     // 37: envoy.config.cluster.v3.CircuitBreakers
+	(*v32.UpstreamHttpProtocolOptions)(nil),                                     // 38: envoy.config.core.v3.UpstreamHttpProtocolOptions
+	(*v32.HttpProtocolOptions)(nil),                                             // 39: envoy.config.core.v3.HttpProtocolOptions
+	(*v32.Http1ProtocolOptions)(nil),                                            // 40: envoy.config.core.v3.Http1ProtocolOptions
+	(*v32.Http2ProtocolOptions)(nil),                                            // 41: envoy.config.core.v3.Http2ProtocolOptions
+	(*v32.Address)(nil),                                                         // 42: envoy.config.core.v3.Address
+	(*v32.DnsResolutionConfig)(nil),                                             // 43: envoy.config.core.v3.DnsResolutionConfig
+	(*v32.TypedExtensionConfig)(nil),                                            // 44: envoy.config.core.v3.TypedExtensionConfig
+	(*wrappers.BoolValue)(nil),                                                  // 45: google.protobuf.BoolValue
+	(*OutlierDetection)(nil),                                                    // 46: envoy.config.cluster.v3.OutlierDetection
+	(*v32.BindConfig)(nil),                                                      // 47: envoy.config.core.v3.BindConfig
+	(*v32.TransportSocket)(nil),                                                 // 48: envoy.config.core.v3.TransportSocket
+	(*v32.Metadata)(nil),                                                        // 49: envoy.config.core.v3.Metadata
+	(*Filter)(nil),                                                              // 50: envoy.config.cluster.v3.Filter
+	(*v32.ConfigSource)(nil),                                                    // 51: envoy.config.core.v3.ConfigSource
+	(*v32.TcpKeepalive)(nil),                                                    // 52: envoy.config.core.v3.TcpKeepalive
+	(*_struct.Struct)(nil),                                                      // 53: google.protobuf.Struct
+	(*any.Any)(nil),                                                             // 54: google.protobuf.Any
+	(*v32.RuntimeDouble)(nil),                                                   // 55: envoy.config.core.v3.RuntimeDouble
+	(*v33.Percent)(nil),                                                         // 56: envoy.type.v3.Percent
+	(*wrappers.UInt64Value)(nil),                                                // 57: google.protobuf.UInt64Value
+	(*v32.HealthStatusSet)(nil),                                                 // 58: envoy.config.core.v3.HealthStatusSet
+	(*wrappers.DoubleValue)(nil),                                                // 59: google.protobuf.DoubleValue
 }
 var file_envoy_config_cluster_v3_cluster_proto_depIdxs = []int32{
-	33, // 0: envoy.config.cluster.v3.ClusterCollection.entries:type_name -> xds.core.v3.CollectionEntry
-	14, // 1: envoy.config.cluster.v3.Cluster.transport_socket_matches:type_name -> envoy.config.cluster.v3.Cluster.TransportSocketMatch
+	32, // 0: envoy.config.cluster.v3.ClusterCollection.entries:type_name -> xds.core.v3.CollectionEntry
+	13, // 1: envoy.config.cluster.v3.Cluster.transport_socket_matches:type_name -> envoy.config.cluster.v3.Cluster.TransportSocketMatch
 	0,  // 2: envoy.config.cluster.v3.Cluster.type:type_name -> envoy.config.cluster.v3.Cluster.DiscoveryType
-	15, // 3: envoy.config.cluster.v3.Cluster.cluster_type:type_name -> envoy.config.cluster.v3.Cluster.CustomClusterType
-	16, // 4: envoy.config.cluster.v3.Cluster.eds_cluster_config:type_name -> envoy.config.cluster.v3.Cluster.EdsClusterConfig
-	34, // 5: envoy.config.cluster.v3.Cluster.connect_timeout:type_name -> google.protobuf.Duration
-	35, // 6: envoy.config.cluster.v3.Cluster.per_connection_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	14, // 3: envoy.config.cluster.v3.Cluster.cluster_type:type_name -> envoy.config.cluster.v3.Cluster.CustomClusterType
+	15, // 4: envoy.config.cluster.v3.Cluster.eds_cluster_config:type_name -> envoy.config.cluster.v3.Cluster.EdsClusterConfig
+	33, // 5: envoy.config.cluster.v3.Cluster.connect_timeout:type_name -> google.protobuf.Duration
+	34, // 6: envoy.config.cluster.v3.Cluster.per_connection_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
 	1,  // 7: envoy.config.cluster.v3.Cluster.lb_policy:type_name -> envoy.config.cluster.v3.Cluster.LbPolicy
-	36, // 8: envoy.config.cluster.v3.Cluster.load_assignment:type_name -> envoy.config.endpoint.v3.ClusterLoadAssignment
-	37, // 9: envoy.config.cluster.v3.Cluster.health_checks:type_name -> envoy.config.core.v3.HealthCheck
-	35, // 10: envoy.config.cluster.v3.Cluster.max_requests_per_connection:type_name -> google.protobuf.UInt32Value
-	38, // 11: envoy.config.cluster.v3.Cluster.circuit_breakers:type_name -> envoy.config.cluster.v3.CircuitBreakers
-	39, // 12: envoy.config.cluster.v3.Cluster.upstream_http_protocol_options:type_name -> envoy.config.core.v3.UpstreamHttpProtocolOptions
-	40, // 13: envoy.config.cluster.v3.Cluster.common_http_protocol_options:type_name -> envoy.config.core.v3.HttpProtocolOptions
-	41, // 14: envoy.config.cluster.v3.Cluster.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
-	42, // 15: envoy.config.cluster.v3.Cluster.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	27, // 16: envoy.config.cluster.v3.Cluster.typed_extension_protocol_options:type_name -> envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry
-	34, // 17: envoy.config.cluster.v3.Cluster.dns_refresh_rate:type_name -> google.protobuf.Duration
-	25, // 18: envoy.config.cluster.v3.Cluster.dns_failure_refresh_rate:type_name -> envoy.config.cluster.v3.Cluster.RefreshRate
+	35, // 8: envoy.config.cluster.v3.Cluster.load_assignment:type_name -> envoy.config.endpoint.v3.ClusterLoadAssignment
+	36, // 9: envoy.config.cluster.v3.Cluster.health_checks:type_name -> envoy.config.core.v3.HealthCheck
+	34, // 10: envoy.config.cluster.v3.Cluster.max_requests_per_connection:type_name -> google.protobuf.UInt32Value
+	37, // 11: envoy.config.cluster.v3.Cluster.circuit_breakers:type_name -> envoy.config.cluster.v3.CircuitBreakers
+	38, // 12: envoy.config.cluster.v3.Cluster.upstream_http_protocol_options:type_name -> envoy.config.core.v3.UpstreamHttpProtocolOptions
+	39, // 13: envoy.config.cluster.v3.Cluster.common_http_protocol_options:type_name -> envoy.config.core.v3.HttpProtocolOptions
+	40, // 14: envoy.config.cluster.v3.Cluster.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
+	41, // 15: envoy.config.cluster.v3.Cluster.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	26, // 16: envoy.config.cluster.v3.Cluster.typed_extension_protocol_options:type_name -> envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry
+	33, // 17: envoy.config.cluster.v3.Cluster.dns_refresh_rate:type_name -> google.protobuf.Duration
+	24, // 18: envoy.config.cluster.v3.Cluster.dns_failure_refresh_rate:type_name -> envoy.config.cluster.v3.Cluster.RefreshRate
 	2,  // 19: envoy.config.cluster.v3.Cluster.dns_lookup_family:type_name -> envoy.config.cluster.v3.Cluster.DnsLookupFamily
-	43, // 20: envoy.config.cluster.v3.Cluster.dns_resolvers:type_name -> envoy.config.core.v3.Address
-	44, // 21: envoy.config.cluster.v3.Cluster.dns_resolution_config:type_name -> envoy.config.core.v3.DnsResolutionConfig
-	45, // 22: envoy.config.cluster.v3.Cluster.typed_dns_resolver_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	46, // 23: envoy.config.cluster.v3.Cluster.wait_for_warm_on_init:type_name -> google.protobuf.BoolValue
-	47, // 24: envoy.config.cluster.v3.Cluster.outlier_detection:type_name -> envoy.config.cluster.v3.OutlierDetection
-	34, // 25: envoy.config.cluster.v3.Cluster.cleanup_interval:type_name -> google.protobuf.Duration
-	48, // 26: envoy.config.cluster.v3.Cluster.upstream_bind_config:type_name -> envoy.config.core.v3.BindConfig
-	17, // 27: envoy.config.cluster.v3.Cluster.lb_subset_config:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig
-	21, // 28: envoy.config.cluster.v3.Cluster.ring_hash_lb_config:type_name -> envoy.config.cluster.v3.Cluster.RingHashLbConfig
-	22, // 29: envoy.config.cluster.v3.Cluster.maglev_lb_config:type_name -> envoy.config.cluster.v3.Cluster.MaglevLbConfig
-	23, // 30: envoy.config.cluster.v3.Cluster.original_dst_lb_config:type_name -> envoy.config.cluster.v3.Cluster.OriginalDstLbConfig
-	20, // 31: envoy.config.cluster.v3.Cluster.least_request_lb_config:type_name -> envoy.config.cluster.v3.Cluster.LeastRequestLbConfig
-	19, // 32: envoy.config.cluster.v3.Cluster.round_robin_lb_config:type_name -> envoy.config.cluster.v3.Cluster.RoundRobinLbConfig
-	24, // 33: envoy.config.cluster.v3.Cluster.common_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig
-	49, // 34: envoy.config.cluster.v3.Cluster.transport_socket:type_name -> envoy.config.core.v3.TransportSocket
-	50, // 35: envoy.config.cluster.v3.Cluster.metadata:type_name -> envoy.config.core.v3.Metadata
+	42, // 20: envoy.config.cluster.v3.Cluster.dns_resolvers:type_name -> envoy.config.core.v3.Address
+	43, // 21: envoy.config.cluster.v3.Cluster.dns_resolution_config:type_name -> envoy.config.core.v3.DnsResolutionConfig
+	44, // 22: envoy.config.cluster.v3.Cluster.typed_dns_resolver_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	45, // 23: envoy.config.cluster.v3.Cluster.wait_for_warm_on_init:type_name -> google.protobuf.BoolValue
+	46, // 24: envoy.config.cluster.v3.Cluster.outlier_detection:type_name -> envoy.config.cluster.v3.OutlierDetection
+	33, // 25: envoy.config.cluster.v3.Cluster.cleanup_interval:type_name -> google.protobuf.Duration
+	47, // 26: envoy.config.cluster.v3.Cluster.upstream_bind_config:type_name -> envoy.config.core.v3.BindConfig
+	16, // 27: envoy.config.cluster.v3.Cluster.lb_subset_config:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig
+	20, // 28: envoy.config.cluster.v3.Cluster.ring_hash_lb_config:type_name -> envoy.config.cluster.v3.Cluster.RingHashLbConfig
+	21, // 29: envoy.config.cluster.v3.Cluster.maglev_lb_config:type_name -> envoy.config.cluster.v3.Cluster.MaglevLbConfig
+	22, // 30: envoy.config.cluster.v3.Cluster.original_dst_lb_config:type_name -> envoy.config.cluster.v3.Cluster.OriginalDstLbConfig
+	19, // 31: envoy.config.cluster.v3.Cluster.least_request_lb_config:type_name -> envoy.config.cluster.v3.Cluster.LeastRequestLbConfig
+	18, // 32: envoy.config.cluster.v3.Cluster.round_robin_lb_config:type_name -> envoy.config.cluster.v3.Cluster.RoundRobinLbConfig
+	23, // 33: envoy.config.cluster.v3.Cluster.common_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig
+	48, // 34: envoy.config.cluster.v3.Cluster.transport_socket:type_name -> envoy.config.core.v3.TransportSocket
+	49, // 35: envoy.config.cluster.v3.Cluster.metadata:type_name -> envoy.config.core.v3.Metadata
 	3,  // 36: envoy.config.cluster.v3.Cluster.protocol_selection:type_name -> envoy.config.cluster.v3.Cluster.ClusterProtocolSelection
-	12, // 37: envoy.config.cluster.v3.Cluster.upstream_connection_options:type_name -> envoy.config.cluster.v3.UpstreamConnectionOptions
-	51, // 38: envoy.config.cluster.v3.Cluster.filters:type_name -> envoy.config.cluster.v3.Filter
+	11, // 37: envoy.config.cluster.v3.Cluster.upstream_connection_options:type_name -> envoy.config.cluster.v3.UpstreamConnectionOptions
+	50, // 38: envoy.config.cluster.v3.Cluster.filters:type_name -> envoy.config.cluster.v3.Filter
 	10, // 39: envoy.config.cluster.v3.Cluster.load_balancing_policy:type_name -> envoy.config.cluster.v3.LoadBalancingPolicy
-	52, // 40: envoy.config.cluster.v3.Cluster.lrs_server:type_name -> envoy.config.core.v3.ConfigSource
-	45, // 41: envoy.config.cluster.v3.Cluster.upstream_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	13, // 42: envoy.config.cluster.v3.Cluster.track_cluster_stats:type_name -> envoy.config.cluster.v3.TrackClusterStats
-	26, // 43: envoy.config.cluster.v3.Cluster.preconnect_policy:type_name -> envoy.config.cluster.v3.Cluster.PreconnectPolicy
-	32, // 44: envoy.config.cluster.v3.LoadBalancingPolicy.policies:type_name -> envoy.config.cluster.v3.LoadBalancingPolicy.Policy
-	43, // 45: envoy.config.cluster.v3.UpstreamBindConfig.source_address:type_name -> envoy.config.core.v3.Address
-	53, // 46: envoy.config.cluster.v3.UpstreamConnectionOptions.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
-	54, // 47: envoy.config.cluster.v3.Cluster.TransportSocketMatch.match:type_name -> google.protobuf.Struct
-	49, // 48: envoy.config.cluster.v3.Cluster.TransportSocketMatch.transport_socket:type_name -> envoy.config.core.v3.TransportSocket
-	55, // 49: envoy.config.cluster.v3.Cluster.CustomClusterType.typed_config:type_name -> google.protobuf.Any
-	52, // 50: envoy.config.cluster.v3.Cluster.EdsClusterConfig.eds_config:type_name -> envoy.config.core.v3.ConfigSource
-	4,  // 51: envoy.config.cluster.v3.Cluster.LbSubsetConfig.fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy
-	54, // 52: envoy.config.cluster.v3.Cluster.LbSubsetConfig.default_subset:type_name -> google.protobuf.Struct
-	28, // 53: envoy.config.cluster.v3.Cluster.LbSubsetConfig.subset_selectors:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector
-	5,  // 54: envoy.config.cluster.v3.Cluster.LbSubsetConfig.metadata_fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetMetadataFallbackPolicy
-	34, // 55: envoy.config.cluster.v3.Cluster.SlowStartConfig.slow_start_window:type_name -> google.protobuf.Duration
-	56, // 56: envoy.config.cluster.v3.Cluster.SlowStartConfig.aggression:type_name -> envoy.config.core.v3.RuntimeDouble
-	57, // 57: envoy.config.cluster.v3.Cluster.SlowStartConfig.min_weight_percent:type_name -> envoy.type.v3.Percent
-	18, // 58: envoy.config.cluster.v3.Cluster.RoundRobinLbConfig.slow_start_config:type_name -> envoy.config.cluster.v3.Cluster.SlowStartConfig
-	35, // 59: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig.choice_count:type_name -> google.protobuf.UInt32Value
-	56, // 60: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig.active_request_bias:type_name -> envoy.config.core.v3.RuntimeDouble
-	18, // 61: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig.slow_start_config:type_name -> envoy.config.cluster.v3.Cluster.SlowStartConfig
-	58, // 62: envoy.config.cluster.v3.Cluster.RingHashLbConfig.minimum_ring_size:type_name -> google.protobuf.UInt64Value
-	7,  // 63: envoy.config.cluster.v3.Cluster.RingHashLbConfig.hash_function:type_name -> envoy.config.cluster.v3.Cluster.RingHashLbConfig.HashFunction
-	58, // 64: envoy.config.cluster.v3.Cluster.RingHashLbConfig.maximum_ring_size:type_name -> google.protobuf.UInt64Value
-	58, // 65: envoy.config.cluster.v3.Cluster.MaglevLbConfig.table_size:type_name -> google.protobuf.UInt64Value
-	35, // 66: envoy.config.cluster.v3.Cluster.OriginalDstLbConfig.upstream_port_override:type_name -> google.protobuf.UInt32Value
-	57, // 67: envoy.config.cluster.v3.Cluster.CommonLbConfig.healthy_panic_threshold:type_name -> envoy.type.v3.Percent
-	29, // 68: envoy.config.cluster.v3.Cluster.CommonLbConfig.zone_aware_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig
-	30, // 69: envoy.config.cluster.v3.Cluster.CommonLbConfig.locality_weighted_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig.LocalityWeightedLbConfig
-	34, // 70: envoy.config.cluster.v3.Cluster.CommonLbConfig.update_merge_window:type_name -> google.protobuf.Duration
-	31, // 71: envoy.config.cluster.v3.Cluster.CommonLbConfig.consistent_hashing_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig
-	59, // 72: envoy.config.cluster.v3.Cluster.CommonLbConfig.override_host_status:type_name -> envoy.config.core.v3.HealthStatusSet
-	34, // 73: envoy.config.cluster.v3.Cluster.RefreshRate.base_interval:type_name -> google.protobuf.Duration
-	34, // 74: envoy.config.cluster.v3.Cluster.RefreshRate.max_interval:type_name -> google.protobuf.Duration
-	60, // 75: envoy.config.cluster.v3.Cluster.PreconnectPolicy.per_upstream_preconnect_ratio:type_name -> google.protobuf.DoubleValue
-	60, // 76: envoy.config.cluster.v3.Cluster.PreconnectPolicy.predictive_preconnect_ratio:type_name -> google.protobuf.DoubleValue
-	55, // 77: envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry.value:type_name -> google.protobuf.Any
-	6,  // 78: envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.LbSubsetSelectorFallbackPolicy
-	57, // 79: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.routing_enabled:type_name -> envoy.type.v3.Percent
-	58, // 80: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.min_cluster_size:type_name -> google.protobuf.UInt64Value
-	35, // 81: envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig.hash_balance_factor:type_name -> google.protobuf.UInt32Value
-	45, // 82: envoy.config.cluster.v3.LoadBalancingPolicy.Policy.typed_extension_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	83, // [83:83] is the sub-list for method output_type
-	83, // [83:83] is the sub-list for method input_type
-	83, // [83:83] is the sub-list for extension type_name
-	83, // [83:83] is the sub-list for extension extendee
-	0,  // [0:83] is the sub-list for field type_name
+	51, // 40: envoy.config.cluster.v3.Cluster.lrs_server:type_name -> envoy.config.core.v3.ConfigSource
+	44, // 41: envoy.config.cluster.v3.Cluster.upstream_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	12, // 42: envoy.config.cluster.v3.Cluster.track_cluster_stats:type_name -> envoy.config.cluster.v3.TrackClusterStats
+	25, // 43: envoy.config.cluster.v3.Cluster.preconnect_policy:type_name -> envoy.config.cluster.v3.Cluster.PreconnectPolicy
+	31, // 44: envoy.config.cluster.v3.LoadBalancingPolicy.policies:type_name -> envoy.config.cluster.v3.LoadBalancingPolicy.Policy
+	52, // 45: envoy.config.cluster.v3.UpstreamConnectionOptions.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
+	53, // 46: envoy.config.cluster.v3.Cluster.TransportSocketMatch.match:type_name -> google.protobuf.Struct
+	48, // 47: envoy.config.cluster.v3.Cluster.TransportSocketMatch.transport_socket:type_name -> envoy.config.core.v3.TransportSocket
+	54, // 48: envoy.config.cluster.v3.Cluster.CustomClusterType.typed_config:type_name -> google.protobuf.Any
+	51, // 49: envoy.config.cluster.v3.Cluster.EdsClusterConfig.eds_config:type_name -> envoy.config.core.v3.ConfigSource
+	4,  // 50: envoy.config.cluster.v3.Cluster.LbSubsetConfig.fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy
+	53, // 51: envoy.config.cluster.v3.Cluster.LbSubsetConfig.default_subset:type_name -> google.protobuf.Struct
+	27, // 52: envoy.config.cluster.v3.Cluster.LbSubsetConfig.subset_selectors:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector
+	5,  // 53: envoy.config.cluster.v3.Cluster.LbSubsetConfig.metadata_fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetMetadataFallbackPolicy
+	33, // 54: envoy.config.cluster.v3.Cluster.SlowStartConfig.slow_start_window:type_name -> google.protobuf.Duration
+	55, // 55: envoy.config.cluster.v3.Cluster.SlowStartConfig.aggression:type_name -> envoy.config.core.v3.RuntimeDouble
+	56, // 56: envoy.config.cluster.v3.Cluster.SlowStartConfig.min_weight_percent:type_name -> envoy.type.v3.Percent
+	17, // 57: envoy.config.cluster.v3.Cluster.RoundRobinLbConfig.slow_start_config:type_name -> envoy.config.cluster.v3.Cluster.SlowStartConfig
+	34, // 58: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig.choice_count:type_name -> google.protobuf.UInt32Value
+	55, // 59: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig.active_request_bias:type_name -> envoy.config.core.v3.RuntimeDouble
+	17, // 60: envoy.config.cluster.v3.Cluster.LeastRequestLbConfig.slow_start_config:type_name -> envoy.config.cluster.v3.Cluster.SlowStartConfig
+	57, // 61: envoy.config.cluster.v3.Cluster.RingHashLbConfig.minimum_ring_size:type_name -> google.protobuf.UInt64Value
+	7,  // 62: envoy.config.cluster.v3.Cluster.RingHashLbConfig.hash_function:type_name -> envoy.config.cluster.v3.Cluster.RingHashLbConfig.HashFunction
+	57, // 63: envoy.config.cluster.v3.Cluster.RingHashLbConfig.maximum_ring_size:type_name -> google.protobuf.UInt64Value
+	57, // 64: envoy.config.cluster.v3.Cluster.MaglevLbConfig.table_size:type_name -> google.protobuf.UInt64Value
+	34, // 65: envoy.config.cluster.v3.Cluster.OriginalDstLbConfig.upstream_port_override:type_name -> google.protobuf.UInt32Value
+	56, // 66: envoy.config.cluster.v3.Cluster.CommonLbConfig.healthy_panic_threshold:type_name -> envoy.type.v3.Percent
+	28, // 67: envoy.config.cluster.v3.Cluster.CommonLbConfig.zone_aware_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig
+	29, // 68: envoy.config.cluster.v3.Cluster.CommonLbConfig.locality_weighted_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig.LocalityWeightedLbConfig
+	33, // 69: envoy.config.cluster.v3.Cluster.CommonLbConfig.update_merge_window:type_name -> google.protobuf.Duration
+	30, // 70: envoy.config.cluster.v3.Cluster.CommonLbConfig.consistent_hashing_lb_config:type_name -> envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig
+	58, // 71: envoy.config.cluster.v3.Cluster.CommonLbConfig.override_host_status:type_name -> envoy.config.core.v3.HealthStatusSet
+	33, // 72: envoy.config.cluster.v3.Cluster.RefreshRate.base_interval:type_name -> google.protobuf.Duration
+	33, // 73: envoy.config.cluster.v3.Cluster.RefreshRate.max_interval:type_name -> google.protobuf.Duration
+	59, // 74: envoy.config.cluster.v3.Cluster.PreconnectPolicy.per_upstream_preconnect_ratio:type_name -> google.protobuf.DoubleValue
+	59, // 75: envoy.config.cluster.v3.Cluster.PreconnectPolicy.predictive_preconnect_ratio:type_name -> google.protobuf.DoubleValue
+	54, // 76: envoy.config.cluster.v3.Cluster.TypedExtensionProtocolOptionsEntry.value:type_name -> google.protobuf.Any
+	6,  // 77: envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.fallback_policy:type_name -> envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.LbSubsetSelectorFallbackPolicy
+	56, // 78: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.routing_enabled:type_name -> envoy.type.v3.Percent
+	57, // 79: envoy.config.cluster.v3.Cluster.CommonLbConfig.ZoneAwareLbConfig.min_cluster_size:type_name -> google.protobuf.UInt64Value
+	34, // 80: envoy.config.cluster.v3.Cluster.CommonLbConfig.ConsistentHashingLbConfig.hash_balance_factor:type_name -> google.protobuf.UInt32Value
+	44, // 81: envoy.config.cluster.v3.LoadBalancingPolicy.Policy.typed_extension_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	82, // [82:82] is the sub-list for method output_type
+	82, // [82:82] is the sub-list for method input_type
+	82, // [82:82] is the sub-list for extension type_name
+	82, // [82:82] is the sub-list for extension extendee
+	0,  // [0:82] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_cluster_v3_cluster_proto_init() }
@@ -4173,18 +4113,6 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 			}
 		}
 		file_envoy_config_cluster_v3_cluster_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpstreamBindConfig); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpstreamConnectionOptions); i {
 			case 0:
 				return &v.state
@@ -4196,7 +4124,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TrackClusterStats); i {
 			case 0:
 				return &v.state
@@ -4208,7 +4136,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_TransportSocketMatch); i {
 			case 0:
 				return &v.state
@@ -4220,7 +4148,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_CustomClusterType); i {
 			case 0:
 				return &v.state
@@ -4232,7 +4160,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_EdsClusterConfig); i {
 			case 0:
 				return &v.state
@@ -4244,7 +4172,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_LbSubsetConfig); i {
 			case 0:
 				return &v.state
@@ -4256,7 +4184,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_SlowStartConfig); i {
 			case 0:
 				return &v.state
@@ -4268,7 +4196,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_RoundRobinLbConfig); i {
 			case 0:
 				return &v.state
@@ -4280,7 +4208,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_LeastRequestLbConfig); i {
 			case 0:
 				return &v.state
@@ -4292,7 +4220,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_RingHashLbConfig); i {
 			case 0:
 				return &v.state
@@ -4304,7 +4232,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_MaglevLbConfig); i {
 			case 0:
 				return &v.state
@@ -4316,7 +4244,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_OriginalDstLbConfig); i {
 			case 0:
 				return &v.state
@@ -4328,7 +4256,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_CommonLbConfig); i {
 			case 0:
 				return &v.state
@@ -4340,7 +4268,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_RefreshRate); i {
 			case 0:
 				return &v.state
@@ -4352,7 +4280,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_PreconnectPolicy); i {
 			case 0:
 				return &v.state
@@ -4364,7 +4292,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_LbSubsetConfig_LbSubsetSelector); i {
 			case 0:
 				return &v.state
@@ -4376,7 +4304,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_CommonLbConfig_ZoneAwareLbConfig); i {
 			case 0:
 				return &v.state
@@ -4388,7 +4316,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_CommonLbConfig_LocalityWeightedLbConfig); i {
 			case 0:
 				return &v.state
@@ -4400,7 +4328,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Cluster_CommonLbConfig_ConsistentHashingLbConfig); i {
 			case 0:
 				return &v.state
@@ -4412,7 +4340,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 				return nil
 			}
 		}
-		file_envoy_config_cluster_v3_cluster_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+		file_envoy_config_cluster_v3_cluster_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*LoadBalancingPolicy_Policy); i {
 			case 0:
 				return &v.state
@@ -4434,7 +4362,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 		(*Cluster_LeastRequestLbConfig_)(nil),
 		(*Cluster_RoundRobinLbConfig_)(nil),
 	}
-	file_envoy_config_cluster_v3_cluster_proto_msgTypes[16].OneofWrappers = []interface{}{
+	file_envoy_config_cluster_v3_cluster_proto_msgTypes[15].OneofWrappers = []interface{}{
 		(*Cluster_CommonLbConfig_ZoneAwareLbConfig_)(nil),
 		(*Cluster_CommonLbConfig_LocalityWeightedLbConfig_)(nil),
 	}
@@ -4444,7 +4372,7 @@ func file_envoy_config_cluster_v3_cluster_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_config_cluster_v3_cluster_proto_rawDesc,
 			NumEnums:      8,
-			NumMessages:   25,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
