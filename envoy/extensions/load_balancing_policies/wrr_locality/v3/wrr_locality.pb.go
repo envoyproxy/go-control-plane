@@ -25,7 +25,7 @@ const (
 
 // Configuration for the wrr_locality LB policy. See the :ref:`load balancing architecture overview
 // <arch_overview_load_balancing_types>` for more information.
-// [#extension: envoy.clusters.lb_policy]
+// [#extension: envoy.load_balancing_policies]
 type WrrLocality struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

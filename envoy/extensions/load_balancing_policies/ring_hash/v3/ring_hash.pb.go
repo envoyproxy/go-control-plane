@@ -81,7 +81,7 @@ func (RingHash_HashFunction) EnumDescriptor() ([]byte, []int) {
 // This configuration allows the built-in RING_HASH LB policy to be configured via the LB policy
 // extension point. See the :ref:`load balancing architecture overview
 // <arch_overview_load_balancing_types>` for more information.
-// [#extension: envoy.clusters.lb_policy]
+// [#extension: envoy.load_balancing_policies]
 // [#next-free-field: 6]
 type RingHash struct {
 	state         protoimpl.MessageState
