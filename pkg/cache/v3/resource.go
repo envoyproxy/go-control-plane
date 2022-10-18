@@ -31,6 +31,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
+	ratelimit "github.com/envoyproxy/go-control-plane/ratelimit/config/ratelimit/v3"
 )
 
 // GetResponseType returns the enumeration for a valid xDS type URL.
@@ -108,6 +109,8 @@ func GetResourceName(res types.Resource) string {
 	case *runtime.Runtime:
 		return v.GetName()
 	case *core.TypedExtensionConfig:
+		return v.GetName()
+	case *ratelimit.RateLimitConfig:
 		return v.GetName()
 	default:
 		return ""
