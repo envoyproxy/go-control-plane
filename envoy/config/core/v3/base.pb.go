@@ -1162,6 +1162,11 @@ type HeaderValueOption struct {
 	// This field is deprecated and please use
 	// :ref:`append_action <envoy_v3_api_field_config.core.v3.HeaderValueOption.append_action>` as replacement.
 	//
+	// .. note::
+	//   The :ref:`external authorization service <envoy_v3_api_msg_service.auth.v3.CheckResponse>` and
+	//   :ref:`external processor service <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` have
+	//   default value (``false``) for this field.
+	//
 	// Deprecated: Do not use.
 	Append *wrappers.BoolValue `protobuf:"bytes,2,opt,name=append,proto3" json:"append,omitempty"`
 	// Describes the action taken to append/overwrite the given value for an existing header
