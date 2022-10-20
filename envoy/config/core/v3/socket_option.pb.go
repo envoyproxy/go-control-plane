@@ -217,7 +217,6 @@ func (*SocketOption_IntValue) isSocketOption_Value() {}
 
 func (*SocketOption_BufValue) isSocketOption_Value() {}
 
-// [#not-implemented-hide:]
 type SocketOptionsOverride struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

@@ -425,7 +425,6 @@ type ExtraSourceAddress struct {
 
 	// The additional address to bind.
 	Address *SocketAddress `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	// [#not-implemented-hide:]
 	// Additional socket options that may not be present in Envoy source code or
 	// precompiled binaries. If specified, this will override the
 	// :ref:`socket_options <envoy_v3_api_field_config.core.v3.BindConfig.socket_options>`
