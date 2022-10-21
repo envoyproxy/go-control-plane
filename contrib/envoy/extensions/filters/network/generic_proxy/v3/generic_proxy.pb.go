@@ -33,6 +33,7 @@ type GenericProxy struct {
 	// The human readable prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// The codec which encodes and decodes the application protocol.
+	// [#extension-category: envoy.generic_proxy.codecs]
 	CodecConfig *v3.TypedExtensionConfig `protobuf:"bytes,2,opt,name=codec_config,json=codecConfig,proto3" json:"codec_config,omitempty"`
 	// Types that are assignable to RouteSpecifier:
 	//	*GenericProxy_GenericRds
@@ -41,6 +42,7 @@ type GenericProxy struct {
 	// A list of individual Layer-7 filters that make up the filter chain for requests made to the
 	// proxy. Order matters as the filters are processed sequentially as request events
 	// happen.
+	// [#extension-category: envoy.generic_proxy.filters]
 	Filters []*v3.TypedExtensionConfig `protobuf:"bytes,5,rep,name=filters,proto3" json:"filters,omitempty"`
 }
 
