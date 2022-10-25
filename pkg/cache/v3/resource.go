@@ -110,6 +110,15 @@ func GetResourceName(res types.Resource) string {
 	}
 }
 
+// GetResourceName returns the resource names for a list of valid xDS response types.
+func GetResourceNames(resources []types.Resource) []string {
+	out := make([]string, 0, len(resources))
+	for _, r := range resources {
+		out = append(out, GetResourceName(r))
+	}
+	return out
+}
+
 // MarshalResource converts the Resource to MarshaledResource.
 func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 	return proto.MarshalOptions{Deterministic: true}.Marshal(resource)

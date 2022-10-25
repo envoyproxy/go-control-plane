@@ -110,6 +110,32 @@ func TestGetResourceName(t *testing.T) {
 	}
 }
 
+func TestGetResourceNames(t *testing.T) {
+	tests := []struct {
+		name  string
+		input []types.Resource
+		want  []string
+	}{
+		{
+			name:  "empty",
+			input: []types.Resource{},
+			want:  []string{},
+		},
+		{
+			name:  "many",
+			input: []types.Resource{testRuntime, testListener, testVirtualHost},
+			want:  []string{runtimeName, listenerName, virtualHostName},
+		},
+	}
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			got := cache.GetResourceNames(test.input)
+			assert.ElementsMatch(t, test.want, got)
+		})
+	}
+}
+
 func TestGetResourceReferences(t *testing.T) {
 	cases := []struct {
 		in  types.Resource
