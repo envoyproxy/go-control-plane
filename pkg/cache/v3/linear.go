@@ -186,7 +186,7 @@ func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaRe
 	// Only send a response if there were changes
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
 		if cache.log != nil {
-			cache.log.Debugf("[linear cache] node: %s, sending delta response for typeURL %s with resources: %v removed resources %v with wildcard: %t",
+			cache.log.Debugf("[linear cache] node: %s, sending delta response for typeURL %s with resources: %v removed resources: %v with wildcard: %t",
 				request.GetNode().GetId(), request.TypeUrl, GetResourceNames(resp.Resources), resp.RemovedResources, state.IsWildcard())
 		}
 		value <- resp

@@ -527,7 +527,7 @@ func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceS
 	// otherwise, envoy won't complete initialization
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFirst()) {
 		if cache.log != nil {
-			cache.log.Debugf("node: %s, sending delta response for typeURL %s with resources: %v removed resources %v with wildcard: %t",
+			cache.log.Debugf("node: %s, sending delta response for typeURL %s with resources: %v removed resources: %v with wildcard: %t",
 				request.GetNode().GetId(), request.TypeUrl, GetResourceNames(resp.Resources), resp.RemovedResources, state.IsWildcard())
 		}
 		select {

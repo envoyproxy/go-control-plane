@@ -112,9 +112,9 @@ func GetResourceName(res types.Resource) string {
 
 // GetResourceName returns the resource names for a list of valid xDS response types.
 func GetResourceNames(resources []types.Resource) []string {
-	out := make([]string, 0, len(resources))
-	for _, r := range resources {
-		out = append(out, GetResourceName(r))
+	out := make([]string, len(resources))
+	for i, r := range resources {
+		out[i] = GetResourceName(r)
 	}
 	return out
 }
