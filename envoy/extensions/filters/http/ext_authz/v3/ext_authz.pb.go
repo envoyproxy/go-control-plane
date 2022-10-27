@@ -564,13 +564,13 @@ type AuthorizationResponse struct {
 	// response headers that have a correspondent match will be added to the client's response. Note
 	// that coexistent headers will be appended.
 	AllowedUpstreamHeadersToAppend *v32.ListStringMatcher `protobuf:"bytes,3,opt,name=allowed_upstream_headers_to_append,json=allowedUpstreamHeadersToAppend,proto3" json:"allowed_upstream_headers_to_append,omitempty"`
-	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`. is set, authorization
+	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the client's response. Note
 	// that when this list is *not* set, all the authorization response headers, except ``Authority
 	// (Host)`` will be in the response to the client. When a header is included in this list, ``Path``,
 	// ``Status``, ``Content-Length``, ``WWWAuthenticate`` and ``Location`` are automatically added.
 	AllowedClientHeaders *v32.ListStringMatcher `protobuf:"bytes,2,opt,name=allowed_client_headers,json=allowedClientHeaders,proto3" json:"allowed_client_headers,omitempty"`
-	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`. is set, authorization
+	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the client's response when
 	// the authorization response itself is successful, i.e. not failed or denied. When this list is
 	// *not* set, no additional headers will be added to the client's response on success.
