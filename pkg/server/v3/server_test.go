@@ -26,13 +26,13 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -48,10 +48,12 @@ type mockConfigWatcher struct {
 	mu *sync.RWMutex
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, state stream.StreamState, out chan cache.Response) func() {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, state cache.ClientState, out chan cache.Response) func() {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	if len(config.responses[req.TypeUrl]) > 0 {
-		out <- config.responses[req.TypeUrl][0]
+		resp := config.responses[req.TypeUrl][0].(*cache.RawResponse)
+		resp.Request = req
+		out <- resp
 		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
 	} else {
 		config.watches++
@@ -178,73 +180,83 @@ func makeResponses() map[string][]cache.Response {
 	return map[string][]cache.Response{
 		rsrc.EndpointType: {
 			&cache.RawResponse{
-				Version:   "1",
-				Resources: []types.ResourceWithTTL{{Resource: endpoint}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
+				Version:       "1",
+				Resources:     []types.ResourceWithTTL{{Resource: endpoint}},
+				ResourceNames: []string{clusterName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
 			},
 		},
 		rsrc.ClusterType: {
 			&cache.RawResponse{
-				Version:   "2",
-				Resources: []types.ResourceWithTTL{{Resource: cluster}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
+				Version:       "2",
+				Resources:     []types.ResourceWithTTL{{Resource: cluster}},
+				ResourceNames: []string{clusterName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
 			},
 		},
 		rsrc.RouteType: {
 			&cache.RawResponse{
-				Version:   "3",
-				Resources: []types.ResourceWithTTL{{Resource: route}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
+				Version:       "3",
+				Resources:     []types.ResourceWithTTL{{Resource: route}},
+				ResourceNames: []string{routeName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
 			},
 		},
 		rsrc.ScopedRouteType: {
 			&cache.RawResponse{
-				Version:   "4",
-				Resources: []types.ResourceWithTTL{{Resource: scopedRoute}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ScopedRouteType},
+				Version:       "4",
+				Resources:     []types.ResourceWithTTL{{Resource: scopedRoute}},
+				ResourceNames: []string{routeName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.ScopedRouteType},
 			},
 		},
 		rsrc.VirtualHostType: {
 			&cache.RawResponse{
-				Version:   "5",
-				Resources: []types.ResourceWithTTL{{Resource: virtualHost}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.VirtualHostType},
+				Version:       "5",
+				Resources:     []types.ResourceWithTTL{{Resource: virtualHost}},
+				ResourceNames: []string{virtualHostName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.VirtualHostType},
 			},
 		},
 		rsrc.ListenerType: {
 			&cache.RawResponse{
-				Version:   "6",
-				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
+				Version:       "6",
+				Resources:     []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
+				ResourceNames: []string{listenerName, scopedListenerName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 			},
 		},
 		rsrc.SecretType: {
 			&cache.RawResponse{
-				Version:   "7",
-				Resources: []types.ResourceWithTTL{{Resource: secret}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
+				Version:       "7",
+				Resources:     []types.ResourceWithTTL{{Resource: secret}},
+				ResourceNames: []string{secretName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
 			},
 		},
 		rsrc.RuntimeType: {
 			&cache.RawResponse{
-				Version:   "8",
-				Resources: []types.ResourceWithTTL{{Resource: runtime}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
+				Version:       "8",
+				Resources:     []types.ResourceWithTTL{{Resource: runtime}},
+				ResourceNames: []string{runtimeName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
 		rsrc.ExtensionConfigType: {
 			&cache.RawResponse{
-				Version:   "9",
-				Resources: []types.ResourceWithTTL{{Resource: extensionConfig}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
+				Version:       "9",
+				Resources:     []types.ResourceWithTTL{{Resource: extensionConfig}},
+				ResourceNames: []string{extensionConfigName},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
 			},
 		},
 		// Pass-through type (xDS does not exist for this type)
 		opaqueType: {
 			&cache.RawResponse{
-				Version:   "10",
-				Resources: []types.ResourceWithTTL{{Resource: opaque}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
+				Version:       "10",
+				Resources:     []types.ResourceWithTTL{{Resource: opaque}},
+				ResourceNames: []string{"opaque"},
+				Request:       &discovery.DiscoveryRequest{TypeUrl: opaqueType},
 			},
 		},
 	}
@@ -518,7 +530,7 @@ func TestStaleNonce(t *testing.T) {
 				err := s.StreamAggregatedResources(resp)
 				assert.NoError(t, err)
 				// should be two watches called
-				assert.False(t, !reflect.DeepEqual(map[string]int{typ: 2}, config.counts))
+				assert.Equal(t, map[string]int{typ: 2}, config.counts)
 				close(stop)
 			}()
 			select {
@@ -680,5 +692,148 @@ func TestCallbackError(t *testing.T) {
 
 			close(resp.recv)
 		})
+	}
+}
+
+type Assert func(req *discovery.DiscoveryRequest, state cache.ClientState)
+type LinearCacheMock struct {
+	// name -> version
+	assert        func(req *discovery.DiscoveryRequest, state cache.ClientState)
+	resources     []types.ResourceWithTTL
+	resourceNames []string
+	version       string
+
+	// This mutex is not really useful as the test is organized to not conflict
+	// But it is needed to make sure race detector accepts it
+	mu sync.Mutex
+}
+
+func (mock *LinearCacheMock) setExpectation(assert Assert, version string) {
+	mock.mu.Lock()
+	defer mock.mu.Unlock()
+	mock.assert = assert
+	mock.version = version
+}
+
+func (mock *LinearCacheMock) CreateWatch(req *discovery.DiscoveryRequest, state cache.ClientState, out chan cache.Response) func() {
+	mock.mu.Lock()
+	defer mock.mu.Unlock()
+	if mock.assert != nil {
+		mock.assert(req, state)
+	}
+	if mock.version != "" {
+		out <- &cache.RawResponse{
+			Request:       req,
+			Version:       mock.version,
+			Resources:     mock.resources,
+			ResourceNames: mock.resourceNames,
+		}
+	}
+	return func() {}
+}
+
+func (mock *LinearCacheMock) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state cache.ClientState, out chan cache.DeltaResponse) func() {
+	return nil
+}
+func (mock *LinearCacheMock) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
+	return nil, errors.New("unimplemented")
+}
+
+func TestSubscriptionsThroughLinearCache(t *testing.T) {
+	resp := makeMockStream(t)
+	linearCache := LinearCacheMock{
+		resources:     []types.ResourceWithTTL{{Resource: endpoint}},
+		resourceNames: []string{clusterName},
+	}
+	defer close(resp.recv)
+	s := server.NewServer(context.Background(), &linearCache, server.CallbackFuncs{})
+	go func() {
+		assert.NoError(t, s.StreamAggregatedResources(resp))
+	}()
+
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+		assert.Equal(t, []string{clusterName}, req.ResourceNames)
+		assert.Empty(t, state.GetKnownResources())
+	}, "1")
+
+	resp.recv <- &discovery.DiscoveryRequest{
+		Node:          node,
+		TypeUrl:       rsrc.EndpointType,
+		ResourceNames: []string{clusterName},
+	}
+
+	var epResponse *discovery.DiscoveryResponse
+	select {
+	case epResponse = <-resp.sent:
+		assert.Len(t, epResponse.Resources, 1)
+	case <-time.After(100 * time.Millisecond):
+		require.Fail(t, "no response received")
+	}
+
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+		assert.Equal(t, []string{}, req.ResourceNames)
+		// This should also be empty
+		assert.Empty(t, state.GetKnownResources())
+	}, "")
+
+	// No longer listen to this resource
+	resp.recv <- &discovery.DiscoveryRequest{
+		Node:          node,
+		ResponseNonce: epResponse.Nonce,
+		VersionInfo:   epResponse.VersionInfo,
+		TypeUrl:       rsrc.EndpointType,
+		ResourceNames: []string{},
+	}
+
+	select {
+	case <-resp.sent:
+		require.Fail(t, "unexpected response")
+	case <-time.After(100 * time.Millisecond):
+		// go on
+	}
+	fmt.Println("now?")
+
+	// Cache version did not change
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+		assert.Equal(t, []string{clusterName}, req.ResourceNames)
+		// This should also be empty
+		assert.Empty(t, state.GetKnownResources())
+	}, "1")
+
+	//Subscribe to it again
+	resp.recv <- &discovery.DiscoveryRequest{
+		Node:          node,
+		ResponseNonce: epResponse.Nonce,
+		VersionInfo:   epResponse.VersionInfo,
+		TypeUrl:       rsrc.EndpointType,
+		ResourceNames: []string{clusterName},
+	}
+
+	select {
+	case epResponse = <-resp.sent:
+		assert.Len(t, epResponse.Resources, 1)
+	case <-time.After(100 * time.Millisecond):
+		require.Fail(t, "no response received")
+	}
+
+	// Cache version did not change
+	linearCache.setExpectation(func(req *discovery.DiscoveryRequest, state cache.ClientState) {
+		assert.Equal(t, []string{clusterName}, req.ResourceNames)
+		assert.Equal(t, map[string]string{clusterName: "1"}, state.GetKnownResources())
+	}, "")
+
+	// Don't change anything, simply ack the current one
+	resp.recv <- &discovery.DiscoveryRequest{
+		Node:          node,
+		ResponseNonce: epResponse.Nonce,
+		VersionInfo:   epResponse.VersionInfo,
+		TypeUrl:       rsrc.EndpointType,
+		ResourceNames: []string{clusterName},
+	}
+	select {
+	case <-resp.sent:
+		require.Fail(t, "unexpected response")
+	case <-time.After(100 * time.Millisecond):
+		// go on
 	}
 }

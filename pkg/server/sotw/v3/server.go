@@ -63,15 +63,6 @@ type server struct {
 	streamCount int64
 }
 
-// Discovery response that is sent over GRPC stream
-// We need to record what resource names are already sent to a client
-// So if the client requests a new name we can respond back
-// regardless current snapshot version (even if it is not changed yet)
-type lastDiscoveryResponse struct {
-	nonce     string
-	resources map[string]struct{}
-}
-
 // process handles a bi-di stream request
 func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// increment stream count
@@ -81,8 +72,7 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 	// ignores stale nonces. nonce is only modified within send() function.
 	var streamNonce int64
 
-	streamState := stream.NewStreamState(false, map[string]string{})
-	lastDiscoveryResponses := map[string]lastDiscoveryResponse{}
+	streamStates := map[string]stream.StreamState{}
 
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
@@ -111,15 +101,6 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 		// increment nonce
 		streamNonce = streamNonce + 1
 		out.Nonce = strconv.FormatInt(streamNonce, 10)
-
-		lastResponse := lastDiscoveryResponse{
-			nonce:     out.Nonce,
-			resources: make(map[string]struct{}),
-		}
-		for _, r := range resp.GetRequest().ResourceNames {
-			lastResponse.resources[r] = struct{}{}
-		}
-		lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
 
 		if s.callbacks != nil {
 			s.callbacks.OnStreamResponse(resp.GetContext(), streamID, resp.GetRequest(), out)
@@ -183,34 +164,52 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				}
 			}
 
-			if lastResponse, ok := lastDiscoveryResponses[req.TypeUrl]; ok {
-				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-					// Let's record Resource names that a client has received.
-					streamState.SetKnownResourceNames(req.TypeUrl, lastResponse.resources)
-				}
+			typeURL := req.GetTypeUrl()
+			// State cannot be modified until any potential watch is closed
+			state, ok := streamStates[typeURL]
+			if !ok {
+				// We don't have a current state for this type, create one
+				state = stream.NewStreamState(len(req.ResourceNames) == 0, nil)
+			} else if nonce != state.LastResponseNonce() {
+				// The request does not match the last response we sent.
+				// The protocol is a bit unclear in this case, but currently we discard such request and wait
+				// for the client to acknowledge the previous response.
+				// This is unclear how this handles cases where a response would be missed as any subsequent request will be discarded.
+
+				// We can continue here as the watch list hasn't changed so we don't need to recompute the watches select
+				continue
 			}
 
-			typeURL := req.GetTypeUrl()
 			responder := make(chan cache.Response, 1)
 			if w, ok := watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
-				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
+				// If we had an open watch, close it to make sure we don't end up sending a cache response while we update the state of the request
+				w.close()
 
-					watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, streamState, responder),
-						response: responder,
-					})
+				// Check if the new request ACKs the previous response
+				// This is defined as nonce and versions are matching, as well as no error present
+				if state.LastResponseNonce() == nonce && state.LastResponseVersion() == req.VersionInfo && req.ErrorDetail == nil {
+					// The nonce and versions are matching, this is an ACK from the client
+					state.CommitPendingResources()
 				}
-			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, streamState, responder),
-					response: responder,
-				})
 			}
+
+			// Remove resources no longer subscribed from the stream state
+			// This ensures we will send a resource if it is unsubscribed then subscribed again
+			// without a cache version change
+			knownResources := state.GetKnownResources()
+			unsubscribedResources := getUnsubscribedResources(req.ResourceNames, knownResources)
+			for _, resourceName := range unsubscribedResources {
+				delete(knownResources, resourceName)
+			}
+			// Remove from pending resources to ensure we won't lose this state when commiting
+			state.RemovePendingResources(unsubscribedResources)
+
+			watches.addWatch(typeURL, &watch{
+				cancel:   s.cache.CreateWatch(req, &state, responder),
+				response: responder,
+			})
+
+			streamStates[typeURL] = state
 
 			// Recompute the dynamic select cases for this stream.
 			watches.recompute(s.ctx, reqCh)
@@ -227,7 +226,24 @@ func (s *server) process(str stream.Stream, reqCh <-chan *discovery.DiscoveryReq
 				return err
 			}
 
-			watches.responders[res.GetRequest().TypeUrl].nonce = nonce
+			// Track the resources returned in the response
+			// Those are staged pending the client ACK
+			// The protocol clearly states that if we send another response prior to an ACK
+			// the previous one is to be considered as discarded
+			version, err := res.GetVersion()
+			if err != nil {
+				return err
+			}
+
+			state := streamStates[res.GetRequest().TypeUrl]
+			resources := make(map[string]string, len(res.GetResourceNames()))
+			for _, name := range res.GetResourceNames() {
+				resources[name] = version
+			}
+			// Pending resources can be modified in the server while a watch is opened
+			// It will only be visible to caches once those resources are commited
+			state.SetPendingResources(nonce, version, resources)
+			streamStates[res.GetRequest().TypeUrl] = state
 		}
 	}
 }
@@ -254,4 +270,17 @@ func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 	}()
 
 	return s.process(stream, reqCh, typeURL)
+}
+
+func getUnsubscribedResources(newResources []string, knownResources map[string]string) (removedResources []string) {
+	newResourcesMap := make(map[string]struct{}, len(newResources))
+	for _, resourceName := range newResources {
+		newResourcesMap[resourceName] = struct{}{}
+	}
+	for resourceName := range knownResources {
+		if _, ok := newResourcesMap[resourceName]; !ok {
+			removedResources = append(removedResources, resourceName)
+		}
+	}
+	return
 }
