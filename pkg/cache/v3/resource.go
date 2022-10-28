@@ -30,7 +30,6 @@ import (
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
 // GetResponseType returns the enumeration for a valid xDS type URL.
@@ -216,10 +215,6 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 	// Extract route configuration names from HTTP connection manager.
 	for _, chain := range src.FilterChains {
 		for _, filter := range chain.Filters {
-			if filter.Name != wellknown.HTTPConnectionManager {
-				continue
-			}
-
 			config := resource.GetHTTPConnectionManager(filter)
 			if config == nil {
 				continue
