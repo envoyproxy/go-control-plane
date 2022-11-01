@@ -135,7 +135,6 @@ func TestDeltaRemoveResources(t *testing.T) {
 	})
 	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot))
 
-	snapshot := fixture.snapshot()
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			select {

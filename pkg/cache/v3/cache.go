@@ -48,8 +48,8 @@ type ClientState interface {
 	GetKnownResources() map[string]string
 
 	// GetSubscribedResources returns the list of resources currently subscribed to by the client for the type.
-	// For delta it keeps track across requests
-	// For sotw it is a normalized view of the request resources
+	// For delta it keeps track of subscription updates across requests
+	// For sotw it is a normalized view of the last request resources
 	GetSubscribedResources() map[string]struct{}
 
 	// IsWildcard returns whether the client has a wildcard watch.

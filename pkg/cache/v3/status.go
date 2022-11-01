@@ -103,10 +103,10 @@ type DeltaResponseWatch struct {
 	clientState ClientState
 }
 
-// WatchesResources returns whether at least one of the resource provided is currently watch by the stream
-// It is currently only applicable to delta-xds
-// If the request is wildcard, it will always return true
-// Otherwise it will compare the provided resources to the list of resources currently subscribed
+// WatchesResources returns whether at least one of the resources provided is currently being watched by the stream.
+// It is currently only applicable to delta-xds.
+// If the request is wildcard, it will always return true,
+// otherwise it will compare the provided resources to the list of resources currently subscribed
 func (w *DeltaResponseWatch) WatchesResources(resourceNames map[string]struct{}) bool {
 	if w.clientState.IsWildcard() {
 		return true
