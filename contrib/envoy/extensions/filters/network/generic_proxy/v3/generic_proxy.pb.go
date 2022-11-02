@@ -125,7 +125,6 @@ type isGenericProxy_RouteSpecifier interface {
 }
 
 type GenericProxy_GenericRds struct {
-	// [#not-implemented-hide:]
 	// The generic proxies route table will be dynamically loaded via the meta RDS API.
 	GenericRds *GenericRds `protobuf:"bytes,3,opt,name=generic_rds,json=genericRds,proto3,oneof"`
 }
@@ -139,7 +138,6 @@ func (*GenericProxy_GenericRds) isGenericProxy_RouteSpecifier() {}
 
 func (*GenericProxy_RouteConfig) isGenericProxy_RouteSpecifier() {}
 
-// [#not-implemented-hide:]
 type GenericRds struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
