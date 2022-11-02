@@ -2380,6 +2380,7 @@ func (x *Cluster_MaglevLbConfig) GetTableSize() *wrappers.UInt64Value {
 // Specific configuration for the
 // :ref:`Original Destination <arch_overview_load_balancing_types_original_destination>`
 // load balancing policy.
+// [#extension: envoy.clusters.original_dst]
 type Cluster_OriginalDstLbConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
