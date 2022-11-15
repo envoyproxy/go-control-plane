@@ -864,6 +864,8 @@ func (m *Endpoint_HealthCheckConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DisableActiveHealthCheck
+
 	if len(errors) > 0 {
 		return Endpoint_HealthCheckConfigMultiError(errors)
 	}
