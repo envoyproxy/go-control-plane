@@ -82,9 +82,8 @@ type HttpProtocolOptions struct {
 	//	*HttpProtocolOptions_UseDownstreamProtocolConfig
 	//	*HttpProtocolOptions_AutoConfig
 	UpstreamProtocolOptions isHttpProtocolOptions_UpstreamProtocolOptions `protobuf_oneof:"upstream_protocol_options"`
-	// .. warning::
-	//   Upstream HTTP filters are not supported by default.
-	//   This warning will be removed as support moves beyond alpha.
+	// .. note::
+	//   Upstream HTTP filters are currently in alpha.
 	//
 	// Optional HTTP filters for the upstream filter chain.
 	//
