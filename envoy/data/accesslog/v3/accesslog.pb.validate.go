@@ -1080,6 +1080,10 @@ func (m *AccessLogCommon) validate(all bool) error {
 
 	// no validation rules for ConnectionTerminationDetails
 
+	// no validation rules for StreamId
+
+	// no validation rules for IntermediateLogEntry
+
 	if len(errors) > 0 {
 		return AccessLogCommonMultiError(errors)
 	}
