@@ -177,9 +177,20 @@ func (m *JwtProvider) validate(all bool) error {
 
 	}
 
-	switch m.JwksSourceSpecifier.(type) {
-
+	oneofJwksSourceSpecifierPresent := false
+	switch v := m.JwksSourceSpecifier.(type) {
 	case *JwtProvider_RemoteJwks:
+		if v == nil {
+			err := JwtProviderValidationError{
+				field:  "JwksSourceSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofJwksSourceSpecifierPresent = true
 
 		if all {
 			switch v := interface{}(m.GetRemoteJwks()).(type) {
@@ -211,6 +222,17 @@ func (m *JwtProvider) validate(all bool) error {
 		}
 
 	case *JwtProvider_LocalJwks:
+		if v == nil {
+			err := JwtProviderValidationError{
+				field:  "JwksSourceSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofJwksSourceSpecifierPresent = true
 
 		if all {
 			switch v := interface{}(m.GetLocalJwks()).(type) {
@@ -242,6 +264,9 @@ func (m *JwtProvider) validate(all bool) error {
 		}
 
 	default:
+		_ = v // ensures v is used
+	}
+	if !oneofJwksSourceSpecifierPresent {
 		err := JwtProviderValidationError{
 			field:  "JwksSourceSpecifier",
 			reason: "value is required",
@@ -250,7 +275,6 @@ func (m *JwtProvider) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
-
 	}
 
 	if len(errors) > 0 {
@@ -1042,12 +1066,30 @@ func (m *JwtRequirement) validate(all bool) error {
 
 	var errors []error
 
-	switch m.RequiresType.(type) {
-
+	switch v := m.RequiresType.(type) {
 	case *JwtRequirement_ProviderName:
+		if v == nil {
+			err := JwtRequirementValidationError{
+				field:  "RequiresType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 		// no validation rules for ProviderName
-
 	case *JwtRequirement_ProviderAndAudiences:
+		if v == nil {
+			err := JwtRequirementValidationError{
+				field:  "RequiresType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetProviderAndAudiences()).(type) {
@@ -1079,6 +1121,16 @@ func (m *JwtRequirement) validate(all bool) error {
 		}
 
 	case *JwtRequirement_RequiresAny:
+		if v == nil {
+			err := JwtRequirementValidationError{
+				field:  "RequiresType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetRequiresAny()).(type) {
@@ -1110,6 +1162,16 @@ func (m *JwtRequirement) validate(all bool) error {
 		}
 
 	case *JwtRequirement_RequiresAll:
+		if v == nil {
+			err := JwtRequirementValidationError{
+				field:  "RequiresType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetRequiresAll()).(type) {
@@ -1141,6 +1203,16 @@ func (m *JwtRequirement) validate(all bool) error {
 		}
 
 	case *JwtRequirement_AllowMissingOrFailed:
+		if v == nil {
+			err := JwtRequirementValidationError{
+				field:  "RequiresType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetAllowMissingOrFailed()).(type) {
@@ -1172,6 +1244,16 @@ func (m *JwtRequirement) validate(all bool) error {
 		}
 
 	case *JwtRequirement_AllowMissing:
+		if v == nil {
+			err := JwtRequirementValidationError{
+				field:  "RequiresType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetAllowMissing()).(type) {
@@ -1202,6 +1284,8 @@ func (m *JwtRequirement) validate(all bool) error {
 			}
 		}
 
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -1638,9 +1722,18 @@ func (m *RequirementRule) validate(all bool) error {
 		}
 	}
 
-	switch m.RequirementType.(type) {
-
+	switch v := m.RequirementType.(type) {
 	case *RequirementRule_Requires:
+		if v == nil {
+			err := RequirementRuleValidationError{
+				field:  "RequirementType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetRequires()).(type) {
@@ -1672,6 +1765,16 @@ func (m *RequirementRule) validate(all bool) error {
 		}
 
 	case *RequirementRule_RequirementName:
+		if v == nil {
+			err := RequirementRuleValidationError{
+				field:  "RequirementType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if utf8.RuneCountInString(m.GetRequirementName()) < 1 {
 			err := RequirementRuleValidationError{
@@ -1684,6 +1787,8 @@ func (m *RequirementRule) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -2202,9 +2307,20 @@ func (m *PerRouteConfig) validate(all bool) error {
 
 	var errors []error
 
-	switch m.RequirementSpecifier.(type) {
-
+	oneofRequirementSpecifierPresent := false
+	switch v := m.RequirementSpecifier.(type) {
 	case *PerRouteConfig_Disabled:
+		if v == nil {
+			err := PerRouteConfigValidationError{
+				field:  "RequirementSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofRequirementSpecifierPresent = true
 
 		if m.GetDisabled() != true {
 			err := PerRouteConfigValidationError{
@@ -2218,6 +2334,17 @@ func (m *PerRouteConfig) validate(all bool) error {
 		}
 
 	case *PerRouteConfig_RequirementName:
+		if v == nil {
+			err := PerRouteConfigValidationError{
+				field:  "RequirementSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofRequirementSpecifierPresent = true
 
 		if utf8.RuneCountInString(m.GetRequirementName()) < 1 {
 			err := PerRouteConfigValidationError{
@@ -2231,6 +2358,9 @@ func (m *PerRouteConfig) validate(all bool) error {
 		}
 
 	default:
+		_ = v // ensures v is used
+	}
+	if !oneofRequirementSpecifierPresent {
 		err := PerRouteConfigValidationError{
 			field:  "RequirementSpecifier",
 			reason: "value is required",
@@ -2239,7 +2369,6 @@ func (m *PerRouteConfig) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
-
 	}
 
 	if len(errors) > 0 {

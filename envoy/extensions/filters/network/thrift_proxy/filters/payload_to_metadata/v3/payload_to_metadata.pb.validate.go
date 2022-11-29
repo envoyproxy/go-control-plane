@@ -228,12 +228,30 @@ func (m *PayloadToMetadata_KeyValuePair) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	switch m.ValueType.(type) {
-
+	switch v := m.ValueType.(type) {
 	case *PayloadToMetadata_KeyValuePair_Value:
+		if v == nil {
+			err := PayloadToMetadata_KeyValuePairValidationError{
+				field:  "ValueType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 		// no validation rules for Value
-
 	case *PayloadToMetadata_KeyValuePair_RegexValueRewrite:
+		if v == nil {
+			err := PayloadToMetadata_KeyValuePairValidationError{
+				field:  "ValueType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetRegexValueRewrite()).(type) {
@@ -264,6 +282,8 @@ func (m *PayloadToMetadata_KeyValuePair) validate(all bool) error {
 			}
 		}
 
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -467,15 +487,38 @@ func (m *PayloadToMetadata_Rule) validate(all bool) error {
 		}
 	}
 
-	switch m.MatchSpecifier.(type) {
-
+	oneofMatchSpecifierPresent := false
+	switch v := m.MatchSpecifier.(type) {
 	case *PayloadToMetadata_Rule_MethodName:
+		if v == nil {
+			err := PayloadToMetadata_RuleValidationError{
+				field:  "MatchSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofMatchSpecifierPresent = true
 		// no validation rules for MethodName
-
 	case *PayloadToMetadata_Rule_ServiceName:
+		if v == nil {
+			err := PayloadToMetadata_RuleValidationError{
+				field:  "MatchSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofMatchSpecifierPresent = true
 		// no validation rules for ServiceName
-
 	default:
+		_ = v // ensures v is used
+	}
+	if !oneofMatchSpecifierPresent {
 		err := PayloadToMetadata_RuleValidationError{
 			field:  "MatchSpecifier",
 			reason: "value is required",
@@ -484,7 +527,6 @@ func (m *PayloadToMetadata_Rule) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
-
 	}
 
 	if len(errors) > 0 {

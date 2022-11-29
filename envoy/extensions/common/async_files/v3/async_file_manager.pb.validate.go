@@ -59,9 +59,20 @@ func (m *AsyncFileManagerConfig) validate(all bool) error {
 
 	// no validation rules for Id
 
-	switch m.ManagerType.(type) {
-
+	oneofManagerTypePresent := false
+	switch v := m.ManagerType.(type) {
 	case *AsyncFileManagerConfig_ThreadPool_:
+		if v == nil {
+			err := AsyncFileManagerConfigValidationError{
+				field:  "ManagerType",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofManagerTypePresent = true
 
 		if all {
 			switch v := interface{}(m.GetThreadPool()).(type) {
@@ -93,6 +104,9 @@ func (m *AsyncFileManagerConfig) validate(all bool) error {
 		}
 
 	default:
+		_ = v // ensures v is used
+	}
+	if !oneofManagerTypePresent {
 		err := AsyncFileManagerConfigValidationError{
 			field:  "ManagerType",
 			reason: "value is required",
@@ -101,7 +115,6 @@ func (m *AsyncFileManagerConfig) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
-
 	}
 
 	if len(errors) > 0 {
