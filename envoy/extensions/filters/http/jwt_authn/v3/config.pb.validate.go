@@ -673,6 +673,35 @@ func (m *JwksAsyncFetch) validate(all bool) error {
 
 	// no validation rules for FastListener
 
+	if all {
+		switch v := interface{}(m.GetFailedRefetchDuration()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, JwksAsyncFetchValidationError{
+					field:  "FailedRefetchDuration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, JwksAsyncFetchValidationError{
+					field:  "FailedRefetchDuration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetFailedRefetchDuration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return JwksAsyncFetchValidationError{
+				field:  "FailedRefetchDuration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return JwksAsyncFetchMultiError(errors)
 	}
