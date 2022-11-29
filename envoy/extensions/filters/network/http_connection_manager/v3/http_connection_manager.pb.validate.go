@@ -962,6 +962,8 @@ func (m *HttpConnectionManager) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for AppendXForwardedPort
+
 	oneofRouteSpecifierPresent := false
 	switch v := m.RouteSpecifier.(type) {
 	case *HttpConnectionManager_Rds:
