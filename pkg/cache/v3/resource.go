@@ -104,6 +104,8 @@ func GetResourceName(res types.Resource) string {
 		return v.GetName()
 	case *core.TypedExtensionConfig:
 		return v.GetName()
+	case types.ResourceWithName:
+		return v.GetName()
 	default:
 		return ""
 	}
