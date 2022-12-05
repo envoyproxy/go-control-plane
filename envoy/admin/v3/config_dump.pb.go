@@ -39,8 +39,6 @@ type ConfigDump struct {
 	//
 	// * ``bootstrap``: :ref:`BootstrapConfigDump <envoy_v3_api_msg_admin.v3.BootstrapConfigDump>`
 	// * ``clusters``: :ref:`ClustersConfigDump <envoy_v3_api_msg_admin.v3.ClustersConfigDump>`
-	// * ``ecds_filter_http``: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
-	// * ``ecds_filter_tcp_listener``: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
 	// * ``endpoints``:  :ref:`EndpointsConfigDump <envoy_v3_api_msg_admin.v3.EndpointsConfigDump>`
 	// * ``listeners``: :ref:`ListenersConfigDump <envoy_v3_api_msg_admin.v3.ListenersConfigDump>`
 	// * ``scoped_routes``: :ref:`ScopedRoutesConfigDump <envoy_v3_api_msg_admin.v3.ScopedRoutesConfigDump>`
@@ -48,9 +46,6 @@ type ConfigDump struct {
 	// * ``secrets``:  :ref:`SecretsConfigDump <envoy_v3_api_msg_admin.v3.SecretsConfigDump>`
 	//
 	// EDS Configuration will only be dumped by using parameter ``?include_eds``
-	//
-	// Currently ECDS is supported in HTTP and listener filters. Note, ECDS configuration for
-	// either HTTP or listener filter will only be dumped if it is actually configured.
 	//
 	// You can filter output with the resource and mask query parameters.
 	// See :ref:`/config_dump?resource={} <operations_admin_interface_config_dump_by_resource>`,
