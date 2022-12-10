@@ -1,34 +1,36 @@
 package sotw
 
 import (
-	"context"
-	"reflect"
+	"sync"
 
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 )
 
 // watches for all xDS resource types
 type watches struct {
+	mu         sync.RWMutex
 	responders map[string]*watch
-
-	// cases is a dynamic select case for the watched channels.
-	cases []reflect.SelectCase
 }
 
 // newWatches creates and initializes watches.
 func newWatches() watches {
 	return watches{
 		responders: make(map[string]*watch, int(types.UnknownType)),
-		cases:      make([]reflect.SelectCase, 0),
 	}
 }
 
 // addWatch creates a new watch entry in the watches map.
 // Watches are sorted by typeURL.
 func (w *watches) addWatch(typeURL string, watch *watch) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
 	w.responders[typeURL] = watch
+}
+
+func (w *watches) getWatch(typeURL string) (watch *watch) {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
+	return w.responders[typeURL]
 }
 
 // close all open watches
@@ -38,33 +40,23 @@ func (w *watches) close() {
 	}
 }
 
-// recomputeWatches rebuilds the known list of dynamic channels if needed
-func (w *watches) recompute(ctx context.Context, req <-chan *discovery.DiscoveryRequest) {
-	w.cases = w.cases[:0] // Clear the existing cases while retaining capacity.
-
-	w.cases = append(w.cases,
-		reflect.SelectCase{
-			Dir:  reflect.SelectRecv,
-			Chan: reflect.ValueOf(ctx.Done()),
-		}, reflect.SelectCase{
-			Dir:  reflect.SelectRecv,
-			Chan: reflect.ValueOf(req),
-		},
-	)
-
-	for _, watch := range w.responders {
-		w.cases = append(w.cases, reflect.SelectCase{
-			Dir:  reflect.SelectRecv,
-			Chan: reflect.ValueOf(watch.response),
-		})
-	}
-}
-
 // watch contains the necessary modifiables for receiving resource responses
 type watch struct {
-	cancel   func()
-	nonce    string
-	response chan cache.Response
+	mu     sync.RWMutex
+	cancel func()
+	nonce  string
+}
+
+func (w *watch) getNonce() (n string) {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
+	return w.nonce
+}
+
+func (w *watch) setNonce(n string) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.nonce = n
 }
 
 // close cancels an open watch

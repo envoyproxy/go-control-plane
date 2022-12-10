@@ -1,6 +1,8 @@
 package stream
 
 import (
+	"sync"
+
 	"google.golang.org/grpc"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -39,6 +41,8 @@ type StreamState struct { // nolint:golint,revive
 
 	// indicates whether the object has been modified since its creation
 	first bool
+
+	mu *sync.RWMutex
 }
 
 // GetSubscribedResourceNames returns the list of resources currently explicitly subscribed to
@@ -93,10 +97,16 @@ func (s *StreamState) IsWildcard() bool {
 }
 
 func (s *StreamState) SetKnownResourceNames(url string, names map[string]struct{}) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.knownResourceNames[url] = names
 }
 
 func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	m := map[string]struct{}{}
 	for _, name := range names {
 		m[name] = struct{}{}
@@ -105,6 +115,9 @@ func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
 }
 
 func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	return s.knownResourceNames[url]
 }
 
@@ -116,6 +129,7 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		resourceVersions:        initialResourceVersions,
 		first:                   true,
 		knownResourceNames:      map[string]map[string]struct{}{},
+		mu:                      &sync.RWMutex{},
 	}
 
 	if initialResourceVersions == nil {
@@ -123,4 +137,50 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 	}
 
 	return state
+}
+
+func NewLastDiscoveryResponse(nonce string, resources []string) LastDiscoveryResponse {
+	resp := LastDiscoveryResponse{
+		Nonce:     nonce,
+		Resources: make(map[string]struct{}),
+	}
+	for _, r := range resources {
+		resp.Resources[r] = struct{}{}
+	}
+	return resp
+}
+
+// LastDiscoveryResponse that is sent over GRPC stream
+// We need to record what resource names are already sent to a client
+// So if the client requests a new name we can respond back
+// regardless current snapshot version (even if it is not changed yet)
+type LastDiscoveryResponse struct {
+	Nonce     string
+	Resources map[string]struct{}
+}
+
+func NewSTOWStreamState() STOWStreamState {
+	return STOWStreamState{
+		StreamState: NewStreamState(false, map[string]string{}),
+		responses:   make(map[string]LastDiscoveryResponse),
+	}
+}
+
+type STOWStreamState struct {
+	StreamState
+	responses map[string]LastDiscoveryResponse
+	mu        sync.RWMutex
+}
+
+func (l *STOWStreamState) Set(key string, value LastDiscoveryResponse) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	l.responses[key] = value
+}
+
+func (l *STOWStreamState) Get(key string) (value LastDiscoveryResponse, ok bool) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	value, ok = l.responses[key]
+	return
 }
