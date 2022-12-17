@@ -7,7 +7,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20220314180256-7f1daf1720fc
 	github.com/envoyproxy/protoc-gen-validate v0.6.7
 	github.com/golang/protobuf v1.5.2
-	github.com/google/go-cmp v0.5.7
+	github.com/google/go-cmp v0.5.9
 	github.com/prometheus/client_model v0.3.0
 	github.com/stretchr/testify v1.7.1
 	go.opentelemetry.io/proto/otlp v0.15.0
