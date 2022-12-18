@@ -142,9 +142,20 @@ func (m *GenericProxy) validate(all bool) error {
 
 	}
 
-	switch m.RouteSpecifier.(type) {
-
+	oneofRouteSpecifierPresent := false
+	switch v := m.RouteSpecifier.(type) {
 	case *GenericProxy_GenericRds:
+		if v == nil {
+			err := GenericProxyValidationError{
+				field:  "RouteSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofRouteSpecifierPresent = true
 
 		if all {
 			switch v := interface{}(m.GetGenericRds()).(type) {
@@ -176,6 +187,17 @@ func (m *GenericProxy) validate(all bool) error {
 		}
 
 	case *GenericProxy_RouteConfig:
+		if v == nil {
+			err := GenericProxyValidationError{
+				field:  "RouteSpecifier",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofRouteSpecifierPresent = true
 
 		if all {
 			switch v := interface{}(m.GetRouteConfig()).(type) {
@@ -207,6 +229,9 @@ func (m *GenericProxy) validate(all bool) error {
 		}
 
 	default:
+		_ = v // ensures v is used
+	}
+	if !oneofRouteSpecifierPresent {
 		err := GenericProxyValidationError{
 			field:  "RouteSpecifier",
 			reason: "value is required",
@@ -215,7 +240,6 @@ func (m *GenericProxy) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
-
 	}
 
 	if len(errors) > 0 {

@@ -243,9 +243,18 @@ func (m *TraServiceRequest) validate(all bool) error {
 
 	// no validation rules for Type
 
-	switch m.Request.(type) {
-
+	switch v := m.Request.(type) {
 	case *TraServiceRequest_CreateRequest:
+		if v == nil {
+			err := TraServiceRequestValidationError{
+				field:  "Request",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetCreateRequest()).(type) {
@@ -277,6 +286,16 @@ func (m *TraServiceRequest) validate(all bool) error {
 		}
 
 	case *TraServiceRequest_UpdateRequest:
+		if v == nil {
+			err := TraServiceRequestValidationError{
+				field:  "Request",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetUpdateRequest()).(type) {
@@ -308,6 +327,16 @@ func (m *TraServiceRequest) validate(all bool) error {
 		}
 
 	case *TraServiceRequest_RetrieveRequest:
+		if v == nil {
+			err := TraServiceRequestValidationError{
+				field:  "Request",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetRetrieveRequest()).(type) {
@@ -339,6 +368,16 @@ func (m *TraServiceRequest) validate(all bool) error {
 		}
 
 	case *TraServiceRequest_DeleteRequest:
+		if v == nil {
+			err := TraServiceRequestValidationError{
+				field:  "Request",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetDeleteRequest()).(type) {
@@ -370,6 +409,16 @@ func (m *TraServiceRequest) validate(all bool) error {
 		}
 
 	case *TraServiceRequest_SubscribeRequest:
+		if v == nil {
+			err := TraServiceRequestValidationError{
+				field:  "Request",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetSubscribeRequest()).(type) {
@@ -400,6 +449,8 @@ func (m *TraServiceRequest) validate(all bool) error {
 			}
 		}
 
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -510,9 +561,18 @@ func (m *TraServiceResponse) validate(all bool) error {
 
 	// no validation rules for Reason
 
-	switch m.Response.(type) {
-
+	switch v := m.Response.(type) {
 	case *TraServiceResponse_CreateResponse:
+		if v == nil {
+			err := TraServiceResponseValidationError{
+				field:  "Response",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetCreateResponse()).(type) {
@@ -544,6 +604,16 @@ func (m *TraServiceResponse) validate(all bool) error {
 		}
 
 	case *TraServiceResponse_UpdateResponse:
+		if v == nil {
+			err := TraServiceResponseValidationError{
+				field:  "Response",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetUpdateResponse()).(type) {
@@ -575,6 +645,16 @@ func (m *TraServiceResponse) validate(all bool) error {
 		}
 
 	case *TraServiceResponse_RetrieveResponse:
+		if v == nil {
+			err := TraServiceResponseValidationError{
+				field:  "Response",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetRetrieveResponse()).(type) {
@@ -606,6 +686,16 @@ func (m *TraServiceResponse) validate(all bool) error {
 		}
 
 	case *TraServiceResponse_DeleteResponse:
+		if v == nil {
+			err := TraServiceResponseValidationError{
+				field:  "Response",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetDeleteResponse()).(type) {
@@ -637,6 +727,16 @@ func (m *TraServiceResponse) validate(all bool) error {
 		}
 
 	case *TraServiceResponse_SubscribeResponse:
+		if v == nil {
+			err := TraServiceResponseValidationError{
+				field:  "Response",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 
 		if all {
 			switch v := interface{}(m.GetSubscribeResponse()).(type) {
@@ -667,6 +767,8 @@ func (m *TraServiceResponse) validate(all bool) error {
 			}
 		}
 
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
