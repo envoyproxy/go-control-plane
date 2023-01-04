@@ -551,6 +551,8 @@ func (m *VirtualHost) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for IncludeIsTimeoutRetryHeader
+
 	if all {
 		switch v := interface{}(m.GetPerRequestBufferLimitBytes()).(type) {
 		case interface{ ValidateAll() error }:
