@@ -16,7 +16,7 @@ import (
 	v34 "github.com/envoyproxy/go-control-plane/envoy/type/tracing/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -1701,7 +1701,7 @@ func (m *HttpFilter) GetConfigType() isHttpFilter_ConfigType {
 	return nil
 }
 
-func (x *HttpFilter) GetTypedConfig() *any.Any {
+func (x *HttpFilter) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*HttpFilter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -1734,7 +1734,7 @@ type HttpFilter_TypedConfig struct {
 	// :ref:`ExtensionWithMatcher <envoy_v3_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
 	// with the desired HTTP filter.
 	// [#extension-category: envoy.filters.http]
-	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 type HttpFilter_ConfigDiscovery struct {
@@ -1759,7 +1759,7 @@ type RequestIDExtension struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Request ID extension specific configuration.
-	TypedConfig *any.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
+	TypedConfig *any1.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 
 func (x *RequestIDExtension) Reset() {
@@ -1794,7 +1794,7 @@ func (*RequestIDExtension) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *RequestIDExtension) GetTypedConfig() *any.Any {
+func (x *RequestIDExtension) GetTypedConfig() *any1.Any {
 	if x != nil {
 		return x.TypedConfig
 	}
@@ -3613,7 +3613,7 @@ var file_envoy_extensions_filters_network_http_connection_manager_v3_http_connec
 	(*v3.HeaderValueOption)(nil),                                                        // 39: envoy.config.core.v3.HeaderValueOption
 	(*v3.ConfigSource)(nil),                                                             // 40: envoy.config.core.v3.ConfigSource
 	(*v32.ScopedRouteConfiguration)(nil),                                                // 41: envoy.config.route.v3.ScopedRouteConfiguration
-	(*any.Any)(nil),                                                                     // 42: google.protobuf.Any
+	(*any1.Any)(nil),                                                                    // 42: google.protobuf.Any
 	(*v3.ExtensionConfigSource)(nil),                                                    // 43: envoy.config.core.v3.ExtensionConfigSource
 	(*v33.Percent)(nil),                                                                 // 44: envoy.type.v3.Percent
 	(*v34.CustomTag)(nil),                                                               // 45: envoy.type.tracing.v3.CustomTag

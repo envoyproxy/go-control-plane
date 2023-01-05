@@ -10,7 +10,7 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
@@ -460,7 +460,7 @@ type AccessLogCommon struct {
 	// Map of filter state in stream info that have been configured to be logged. If the filter
 	// state serialized to any message other than ``google.protobuf.Any`` it will be packed into
 	// ``google.protobuf.Any``.
-	FilterStateObjects map[string]*any.Any `protobuf:"bytes,21,rep,name=filter_state_objects,json=filterStateObjects,proto3" json:"filter_state_objects,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	FilterStateObjects map[string]*any1.Any `protobuf:"bytes,21,rep,name=filter_state_objects,json=filterStateObjects,proto3" json:"filter_state_objects,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// A list of custom tags, which annotate logs with additional information.
 	// To configure this value, users should configure
 	// :ref:`custom_tags <envoy_v3_api_field_extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfig.custom_tags>`.
@@ -660,7 +660,7 @@ func (x *AccessLogCommon) GetDownstreamDirectRemoteAddress() *v3.Address {
 	return nil
 }
 
-func (x *AccessLogCommon) GetFilterStateObjects() map[string]*any.Any {
+func (x *AccessLogCommon) GetFilterStateObjects() map[string]*any1.Any {
 	if x != nil {
 		return x.FilterStateObjects
 	}
@@ -2098,7 +2098,7 @@ var file_envoy_data_accesslog_v3_accesslog_proto_goTypes = []interface{}{
 	(*v3.Metadata)(nil),          // 22: envoy.config.core.v3.Metadata
 	(*wrappers.UInt32Value)(nil), // 23: google.protobuf.UInt32Value
 	(v3.RequestMethod)(0),        // 24: envoy.config.core.v3.RequestMethod
-	(*any.Any)(nil),              // 25: google.protobuf.Any
+	(*any1.Any)(nil),             // 25: google.protobuf.Any
 }
 var file_envoy_data_accesslog_v3_accesslog_proto_depIdxs = []int32{
 	6,  // 0: envoy.data.accesslog.v3.TCPAccessLogEntry.common_properties:type_name -> envoy.data.accesslog.v3.AccessLogCommon

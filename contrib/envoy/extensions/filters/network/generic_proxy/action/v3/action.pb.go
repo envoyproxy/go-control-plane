@@ -12,7 +12,7 @@ import (
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -41,7 +41,7 @@ type RouteAction struct {
 	// Route level config for L7 generic filters. The key should be the related :ref:`extension name
 	// <envoy_v3_api_field_config.core.v3.TypedExtensionConfig.name>` in the :ref:`generic filters
 	// <envoy_v3_api_field_extensions.filters.network.generic_proxy.v3.GenericProxy.filters>`.
-	PerFilterConfig map[string]*any.Any `protobuf:"bytes,4,rep,name=per_filter_config,json=perFilterConfig,proto3" json:"per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	PerFilterConfig map[string]*any1.Any `protobuf:"bytes,4,rep,name=per_filter_config,json=perFilterConfig,proto3" json:"per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *RouteAction) Reset() {
@@ -104,7 +104,7 @@ func (x *RouteAction) GetMetadata() *v3.Metadata {
 	return nil
 }
 
-func (x *RouteAction) GetPerFilterConfig() map[string]*any.Any {
+func (x *RouteAction) GetPerFilterConfig() map[string]*any1.Any {
 	if x != nil {
 		return x.PerFilterConfig
 	}
@@ -218,7 +218,7 @@ var file_contrib_envoy_extensions_filters_network_generic_proxy_action_v3_action
 	nil,                         // 1: envoy.extensions.filters.network.generic_proxy.action.v3.RouteAction.PerFilterConfigEntry
 	(*v31.WeightedCluster)(nil), // 2: envoy.config.route.v3.WeightedCluster
 	(*v3.Metadata)(nil),         // 3: envoy.config.core.v3.Metadata
-	(*any.Any)(nil),             // 4: google.protobuf.Any
+	(*any1.Any)(nil),            // 4: google.protobuf.Any
 }
 var file_contrib_envoy_extensions_filters_network_generic_proxy_action_v3_action_proto_depIdxs = []int32{
 	2, // 0: envoy.extensions.filters.network.generic_proxy.action.v3.RouteAction.weighted_clusters:type_name -> envoy.config.route.v3.WeightedCluster

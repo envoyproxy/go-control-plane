@@ -17,7 +17,7 @@ import (
 	v34 "github.com/envoyproxy/go-control-plane/envoy/type/tracing/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -437,7 +437,7 @@ type VirtualHost struct {
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
-	TypedPerFilterConfig map[string]*any.Any `protobuf:"bytes,15,rep,name=typed_per_filter_config,json=typedPerFilterConfig,proto3" json:"typed_per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TypedPerFilterConfig map[string]*any1.Any `protobuf:"bytes,15,rep,name=typed_per_filter_config,json=typedPerFilterConfig,proto3" json:"typed_per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Decides whether the :ref:`x-envoy-attempt-count
 	// <config_http_filters_router_x-envoy-attempt-count>` header should be included
 	// in the upstream request. Setting this option will cause it to override any existing header
@@ -467,7 +467,7 @@ type VirtualHost struct {
 	// will take precedence over this config and it'll be treated independently (e.g.: values are not
 	// inherited). :ref:`Retry policy <envoy_v3_api_field_config.route.v3.VirtualHost.retry_policy>` should not be
 	// set if this field is used.
-	RetryPolicyTypedConfig *any.Any `protobuf:"bytes,20,opt,name=retry_policy_typed_config,json=retryPolicyTypedConfig,proto3" json:"retry_policy_typed_config,omitempty"`
+	RetryPolicyTypedConfig *any1.Any `protobuf:"bytes,20,opt,name=retry_policy_typed_config,json=retryPolicyTypedConfig,proto3" json:"retry_policy_typed_config,omitempty"`
 	// Indicates the hedge policy for all routes in this virtual host. Note that setting a
 	// route level entry will take precedence over this config and it'll be treated
 	// independently (e.g.: values are not inherited).
@@ -602,7 +602,7 @@ func (x *VirtualHost) GetCors() *CorsPolicy {
 	return nil
 }
 
-func (x *VirtualHost) GetTypedPerFilterConfig() map[string]*any.Any {
+func (x *VirtualHost) GetTypedPerFilterConfig() map[string]*any1.Any {
 	if x != nil {
 		return x.TypedPerFilterConfig
 	}
@@ -630,7 +630,7 @@ func (x *VirtualHost) GetRetryPolicy() *RetryPolicy {
 	return nil
 }
 
-func (x *VirtualHost) GetRetryPolicyTypedConfig() *any.Any {
+func (x *VirtualHost) GetRetryPolicyTypedConfig() *any1.Any {
 	if x != nil {
 		return x.RetryPolicyTypedConfig
 	}
@@ -671,7 +671,7 @@ type FilterAction struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Action *any.Any `protobuf:"bytes,1,opt,name=action,proto3" json:"action,omitempty"`
+	Action *any1.Any `protobuf:"bytes,1,opt,name=action,proto3" json:"action,omitempty"`
 }
 
 func (x *FilterAction) Reset() {
@@ -706,7 +706,7 @@ func (*FilterAction) Descriptor() ([]byte, []int) {
 	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *FilterAction) GetAction() *any.Any {
+func (x *FilterAction) GetAction() *any1.Any {
 	if x != nil {
 		return x.Action
 	}
@@ -807,7 +807,7 @@ type Route struct {
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
-	TypedPerFilterConfig map[string]*any.Any `protobuf:"bytes,13,rep,name=typed_per_filter_config,json=typedPerFilterConfig,proto3" json:"typed_per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TypedPerFilterConfig map[string]*any1.Any `protobuf:"bytes,13,rep,name=typed_per_filter_config,json=typedPerFilterConfig,proto3" json:"typed_per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Specifies a set of headers that will be added to requests matching this
 	// route. Headers specified at this level are applied before headers from the
 	// enclosing :ref:`envoy_v3_api_msg_config.route.v3.VirtualHost` and
@@ -953,7 +953,7 @@ func (x *Route) GetDecorator() *Decorator {
 	return nil
 }
 
-func (x *Route) GetTypedPerFilterConfig() map[string]*any.Any {
+func (x *Route) GetTypedPerFilterConfig() map[string]*any1.Any {
 	if x != nil {
 		return x.TypedPerFilterConfig
 	}
@@ -1824,7 +1824,7 @@ type RouteAction struct {
 	// precedence over the virtual host level retry policy entirely (e.g.: policies are not merged,
 	// most internal one becomes the enforced policy). :ref:`Retry policy <envoy_v3_api_field_config.route.v3.VirtualHost.retry_policy>`
 	// should not be set if this field is used.
-	RetryPolicyTypedConfig *any.Any `protobuf:"bytes,33,opt,name=retry_policy_typed_config,json=retryPolicyTypedConfig,proto3" json:"retry_policy_typed_config,omitempty"`
+	RetryPolicyTypedConfig *any1.Any `protobuf:"bytes,33,opt,name=retry_policy_typed_config,json=retryPolicyTypedConfig,proto3" json:"retry_policy_typed_config,omitempty"`
 	// Specify a set of route request mirroring policies.
 	// It takes precedence over the virtual host and route config mirror policy entirely.
 	// That is, policies are not merged, the most specific non-empty one becomes the mirror policies.
@@ -2115,7 +2115,7 @@ func (x *RouteAction) GetRetryPolicy() *RetryPolicy {
 	return nil
 }
 
-func (x *RouteAction) GetRetryPolicyTypedConfig() *any.Any {
+func (x *RouteAction) GetRetryPolicyTypedConfig() *any1.Any {
 	if x != nil {
 		return x.RetryPolicyTypedConfig
 	}
@@ -3822,7 +3822,7 @@ type FilterConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The filter config.
-	Config *any.Any `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+	Config *any1.Any `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
 	// If true, the filter is optional, meaning that if the client does
 	// not support the specified filter, it may ignore the map entry rather
 	// than rejecting the config.
@@ -3861,7 +3861,7 @@ func (*FilterConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *FilterConfig) GetConfig() *any.Any {
+func (x *FilterConfig) GetConfig() *any1.Any {
 	if x != nil {
 		return x.Config
 	}
@@ -3948,7 +3948,7 @@ type WeightedCluster_ClusterWeight struct {
 	// [#comment: An entry's value may be wrapped in a
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
-	TypedPerFilterConfig map[string]*any.Any `protobuf:"bytes,10,rep,name=typed_per_filter_config,json=typedPerFilterConfig,proto3" json:"typed_per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TypedPerFilterConfig map[string]*any1.Any `protobuf:"bytes,10,rep,name=typed_per_filter_config,json=typedPerFilterConfig,proto3" json:"typed_per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Types that are assignable to HostRewriteSpecifier:
 	//	*WeightedCluster_ClusterWeight_HostRewriteLiteral
 	HostRewriteSpecifier isWeightedCluster_ClusterWeight_HostRewriteSpecifier `protobuf_oneof:"host_rewrite_specifier"`
@@ -4042,7 +4042,7 @@ func (x *WeightedCluster_ClusterWeight) GetResponseHeadersToRemove() []string {
 	return nil
 }
 
-func (x *WeightedCluster_ClusterWeight) GetTypedPerFilterConfig() map[string]*any.Any {
+func (x *WeightedCluster_ClusterWeight) GetTypedPerFilterConfig() map[string]*any1.Any {
 	if x != nil {
 		return x.TypedPerFilterConfig
 	}
@@ -5051,7 +5051,7 @@ func (m *RetryPolicy_RetryPriority) GetConfigType() isRetryPolicy_RetryPriority_
 	return nil
 }
 
-func (x *RetryPolicy_RetryPriority) GetTypedConfig() *any.Any {
+func (x *RetryPolicy_RetryPriority) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*RetryPolicy_RetryPriority_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -5063,7 +5063,7 @@ type isRetryPolicy_RetryPriority_ConfigType interface {
 }
 
 type RetryPolicy_RetryPriority_TypedConfig struct {
-	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*RetryPolicy_RetryPriority_TypedConfig) isRetryPolicy_RetryPriority_ConfigType() {}
@@ -5127,7 +5127,7 @@ func (m *RetryPolicy_RetryHostPredicate) GetConfigType() isRetryPolicy_RetryHost
 	return nil
 }
 
-func (x *RetryPolicy_RetryHostPredicate) GetTypedConfig() *any.Any {
+func (x *RetryPolicy_RetryHostPredicate) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*RetryPolicy_RetryHostPredicate_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -5139,7 +5139,7 @@ type isRetryPolicy_RetryHostPredicate_ConfigType interface {
 }
 
 type RetryPolicy_RetryHostPredicate_TypedConfig struct {
-	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*RetryPolicy_RetryHostPredicate_TypedConfig) isRetryPolicy_RetryHostPredicate_ConfigType() {}
@@ -7908,7 +7908,7 @@ var file_envoy_config_route_v3_route_components_proto_goTypes = []interface{}{
 	(*RateLimit_Override_DynamicMetadata)(nil),          // 62: envoy.config.route.v3.RateLimit.Override.DynamicMetadata
 	(*v3.Matcher)(nil),                                  // 63: xds.type.matcher.v3.Matcher
 	(*v31.HeaderValueOption)(nil),                       // 64: envoy.config.core.v3.HeaderValueOption
-	(*any.Any)(nil),                                     // 65: google.protobuf.Any
+	(*any1.Any)(nil),                                    // 65: google.protobuf.Any
 	(*wrappers.UInt32Value)(nil),                        // 66: google.protobuf.UInt32Value
 	(*v31.Metadata)(nil),                                // 67: envoy.config.core.v3.Metadata
 	(*v31.TypedExtensionConfig)(nil),                    // 68: envoy.config.core.v3.TypedExtensionConfig

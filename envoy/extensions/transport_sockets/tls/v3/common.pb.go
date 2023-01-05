@@ -12,7 +12,7 @@ import (
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -399,7 +399,7 @@ func (m *PrivateKeyProvider) GetConfigType() isPrivateKeyProvider_ConfigType {
 	return nil
 }
 
-func (x *PrivateKeyProvider) GetTypedConfig() *any.Any {
+func (x *PrivateKeyProvider) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*PrivateKeyProvider_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -411,7 +411,7 @@ type isPrivateKeyProvider_ConfigType interface {
 }
 
 type PrivateKeyProvider_TypedConfig struct {
-	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*PrivateKeyProvider_TypedConfig) isPrivateKeyProvider_ConfigType() {}
@@ -1373,7 +1373,7 @@ var file_envoy_extensions_transport_sockets_tls_v3_common_proto_goTypes = []inte
 	(*CertificateProviderPluginInstance)(nil),                // 7: envoy.extensions.transport_sockets.tls.v3.CertificateProviderPluginInstance
 	(*SubjectAltNameMatcher)(nil),                            // 8: envoy.extensions.transport_sockets.tls.v3.SubjectAltNameMatcher
 	(*CertificateValidationContext)(nil),                     // 9: envoy.extensions.transport_sockets.tls.v3.CertificateValidationContext
-	(*any.Any)(nil),                                          // 10: google.protobuf.Any
+	(*any1.Any)(nil),                                         // 10: google.protobuf.Any
 	(*v3.DataSource)(nil),                                    // 11: envoy.config.core.v3.DataSource
 	(*v3.WatchedDirectory)(nil),                              // 12: envoy.config.core.v3.WatchedDirectory
 	(*v31.StringMatcher)(nil),                                // 13: envoy.type.matcher.v3.StringMatcher

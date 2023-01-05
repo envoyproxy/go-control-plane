@@ -12,7 +12,7 @@ import (
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -746,7 +746,7 @@ type Metadata struct {
 	// If both :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
 	// and ``typed_filter_metadata`` fields are present in the metadata with same keys,
 	// only ``typed_filter_metadata`` field will be parsed.
-	TypedFilterMetadata map[string]*any.Any `protobuf:"bytes,2,rep,name=typed_filter_metadata,json=typedFilterMetadata,proto3" json:"typed_filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TypedFilterMetadata map[string]*any1.Any `protobuf:"bytes,2,rep,name=typed_filter_metadata,json=typedFilterMetadata,proto3" json:"typed_filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *Metadata) Reset() {
@@ -788,7 +788,7 @@ func (x *Metadata) GetFilterMetadata() map[string]*_struct.Struct {
 	return nil
 }
 
-func (x *Metadata) GetTypedFilterMetadata() map[string]*any.Any {
+func (x *Metadata) GetTypedFilterMetadata() map[string]*any1.Any {
 	if x != nil {
 		return x.TypedFilterMetadata
 	}
@@ -1728,7 +1728,7 @@ func (m *TransportSocket) GetConfigType() isTransportSocket_ConfigType {
 	return nil
 }
 
-func (x *TransportSocket) GetTypedConfig() *any.Any {
+func (x *TransportSocket) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*TransportSocket_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -1740,7 +1740,7 @@ type isTransportSocket_ConfigType interface {
 }
 
 type TransportSocket_TypedConfig struct {
-	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*TransportSocket_TypedConfig) isTransportSocket_ConfigType() {}
@@ -2260,7 +2260,7 @@ var file_envoy_config_core_v3_base_proto_goTypes = []interface{}{
 	(*BackoffStrategy)(nil),                   // 33: envoy.config.core.v3.BackoffStrategy
 	(*wrappers.UInt32Value)(nil),              // 34: google.protobuf.UInt32Value
 	(*HttpUri)(nil),                           // 35: envoy.config.core.v3.HttpUri
-	(*any.Any)(nil),                           // 36: google.protobuf.Any
+	(*any1.Any)(nil),                          // 36: google.protobuf.Any
 	(*v3.FractionalPercent)(nil),              // 37: envoy.type.v3.FractionalPercent
 	(*v31.ContextParams)(nil),                 // 38: xds.core.v3.ContextParams
 }

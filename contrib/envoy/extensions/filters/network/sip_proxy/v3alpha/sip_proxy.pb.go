@@ -10,7 +10,7 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3alpha "github.com/envoyproxy/go-control-plane/contrib/envoy/extensions/filters/network/sip_proxy/tra/v3alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -167,7 +167,7 @@ func (m *SipFilter) GetConfigType() isSipFilter_ConfigType {
 	return nil
 }
 
-func (x *SipFilter) GetTypedConfig() *any.Any {
+func (x *SipFilter) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*SipFilter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -179,7 +179,7 @@ type isSipFilter_ConfigType interface {
 }
 
 type SipFilter_TypedConfig struct {
-	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*SipFilter_TypedConfig) isSipFilter_ConfigType() {}
@@ -788,7 +788,7 @@ var file_contrib_envoy_extensions_filters_network_sip_proxy_v3alpha_sip_proxy_pr
 	(*LocalService)(nil),             // 6: envoy.extensions.filters.network.sip_proxy.v3alpha.LocalService
 	(*SipProxy_SipSettings)(nil),     // 7: envoy.extensions.filters.network.sip_proxy.v3alpha.SipProxy.SipSettings
 	(*RouteConfiguration)(nil),       // 8: envoy.extensions.filters.network.sip_proxy.v3alpha.RouteConfiguration
-	(*any.Any)(nil),                  // 9: google.protobuf.Any
+	(*any1.Any)(nil),                 // 9: google.protobuf.Any
 	(*duration.Duration)(nil),        // 10: google.protobuf.Duration
 	(*v3alpha.TraServiceConfig)(nil), // 11: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceConfig
 }

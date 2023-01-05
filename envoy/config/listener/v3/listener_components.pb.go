@@ -12,7 +12,7 @@ import (
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -140,7 +140,7 @@ func (m *Filter) GetConfigType() isFilter_ConfigType {
 	return nil
 }
 
-func (x *Filter) GetTypedConfig() *any.Any {
+func (x *Filter) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*Filter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -162,7 +162,7 @@ type Filter_TypedConfig struct {
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.
 	// [#extension-category: envoy.filters.network]
-	TypedConfig *any.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 type Filter_ConfigDiscovery struct {
@@ -778,7 +778,7 @@ func (m *ListenerFilter) GetConfigType() isListenerFilter_ConfigType {
 	return nil
 }
 
-func (x *ListenerFilter) GetTypedConfig() *any.Any {
+func (x *ListenerFilter) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*ListenerFilter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -807,7 +807,7 @@ type ListenerFilter_TypedConfig struct {
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.
 	// [#extension-category: envoy.filters.listener,envoy.filters.udp_listener]
-	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 type ListenerFilter_ConfigDiscovery struct {
@@ -1181,7 +1181,7 @@ var file_envoy_config_listener_v3_listener_components_proto_goTypes = []interfac
 	(*ListenerFilter)(nil),                             // 5: envoy.config.listener.v3.ListenerFilter
 	(*FilterChain_OnDemandConfiguration)(nil),          // 6: envoy.config.listener.v3.FilterChain.OnDemandConfiguration
 	(*ListenerFilterChainMatchPredicate_MatchSet)(nil), // 7: envoy.config.listener.v3.ListenerFilterChainMatchPredicate.MatchSet
-	(*any.Any)(nil),                                    // 8: google.protobuf.Any
+	(*any1.Any)(nil),                                   // 8: google.protobuf.Any
 	(*v3.ExtensionConfigSource)(nil),                   // 9: envoy.config.core.v3.ExtensionConfigSource
 	(*wrappers.UInt32Value)(nil),                       // 10: google.protobuf.UInt32Value
 	(*v3.CidrRange)(nil),                               // 11: envoy.config.core.v3.CidrRange

@@ -8,7 +8,7 @@ package adminv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -98,7 +98,7 @@ type UpdateFailureState struct {
 
 	// What the component configuration would have been if the update had succeeded.
 	// This field may not be populated by xDS clients due to storage overhead.
-	FailedConfiguration *any.Any `protobuf:"bytes,1,opt,name=failed_configuration,json=failedConfiguration,proto3" json:"failed_configuration,omitempty"`
+	FailedConfiguration *any1.Any `protobuf:"bytes,1,opt,name=failed_configuration,json=failedConfiguration,proto3" json:"failed_configuration,omitempty"`
 	// Time of the latest failed update attempt.
 	LastUpdateAttempt *timestamp.Timestamp `protobuf:"bytes,2,opt,name=last_update_attempt,json=lastUpdateAttempt,proto3" json:"last_update_attempt,omitempty"`
 	// Details about the last failed update attempt.
@@ -140,7 +140,7 @@ func (*UpdateFailureState) Descriptor() ([]byte, []int) {
 	return file_envoy_admin_v3_config_dump_shared_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UpdateFailureState) GetFailedConfiguration() *any.Any {
+func (x *UpdateFailureState) GetFailedConfiguration() *any1.Any {
 	if x != nil {
 		return x.FailedConfiguration
 	}
@@ -565,7 +565,7 @@ type ListenersConfigDump_StaticListener struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The listener config.
-	Listener *any.Any `protobuf:"bytes,1,opt,name=listener,proto3" json:"listener,omitempty"`
+	Listener *any1.Any `protobuf:"bytes,1,opt,name=listener,proto3" json:"listener,omitempty"`
 	// The timestamp when the Listener was last successfully updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,2,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 }
@@ -602,7 +602,7 @@ func (*ListenersConfigDump_StaticListener) Descriptor() ([]byte, []int) {
 	return file_envoy_admin_v3_config_dump_shared_proto_rawDescGZIP(), []int{1, 0}
 }
 
-func (x *ListenersConfigDump_StaticListener) GetListener() *any.Any {
+func (x *ListenersConfigDump_StaticListener) GetListener() *any1.Any {
 	if x != nil {
 		return x.Listener
 	}
@@ -627,7 +627,7 @@ type ListenersConfigDump_DynamicListenerState struct {
 	// by the API.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The listener config.
-	Listener *any.Any `protobuf:"bytes,2,opt,name=listener,proto3" json:"listener,omitempty"`
+	Listener *any1.Any `protobuf:"bytes,2,opt,name=listener,proto3" json:"listener,omitempty"`
 	// The timestamp when the Listener was last successfully updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 }
@@ -671,7 +671,7 @@ func (x *ListenersConfigDump_DynamicListenerState) GetVersionInfo() string {
 	return ""
 }
 
-func (x *ListenersConfigDump_DynamicListenerState) GetListener() *any.Any {
+func (x *ListenersConfigDump_DynamicListenerState) GetListener() *any1.Any {
 	if x != nil {
 		return x.Listener
 	}
@@ -798,7 +798,7 @@ type ClustersConfigDump_StaticCluster struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The cluster config.
-	Cluster *any.Any `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	Cluster *any1.Any `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
 	// The timestamp when the Cluster was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,2,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 }
@@ -835,7 +835,7 @@ func (*ClustersConfigDump_StaticCluster) Descriptor() ([]byte, []int) {
 	return file_envoy_admin_v3_config_dump_shared_proto_rawDescGZIP(), []int{2, 0}
 }
 
-func (x *ClustersConfigDump_StaticCluster) GetCluster() *any.Any {
+func (x *ClustersConfigDump_StaticCluster) GetCluster() *any1.Any {
 	if x != nil {
 		return x.Cluster
 	}
@@ -862,7 +862,7 @@ type ClustersConfigDump_DynamicCluster struct {
 	// the API.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The cluster config.
-	Cluster *any.Any `protobuf:"bytes,2,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	Cluster *any1.Any `protobuf:"bytes,2,opt,name=cluster,proto3" json:"cluster,omitempty"`
 	// The timestamp when the Cluster was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
@@ -915,7 +915,7 @@ func (x *ClustersConfigDump_DynamicCluster) GetVersionInfo() string {
 	return ""
 }
 
-func (x *ClustersConfigDump_DynamicCluster) GetCluster() *any.Any {
+func (x *ClustersConfigDump_DynamicCluster) GetCluster() *any1.Any {
 	if x != nil {
 		return x.Cluster
 	}
@@ -949,7 +949,7 @@ type RoutesConfigDump_StaticRouteConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The route config.
-	RouteConfig *any.Any `protobuf:"bytes,1,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
+	RouteConfig *any1.Any `protobuf:"bytes,1,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
 	// The timestamp when the Route was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,2,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 }
@@ -986,7 +986,7 @@ func (*RoutesConfigDump_StaticRouteConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_admin_v3_config_dump_shared_proto_rawDescGZIP(), []int{3, 0}
 }
 
-func (x *RoutesConfigDump_StaticRouteConfig) GetRouteConfig() *any.Any {
+func (x *RoutesConfigDump_StaticRouteConfig) GetRouteConfig() *any1.Any {
 	if x != nil {
 		return x.RouteConfig
 	}
@@ -1011,7 +1011,7 @@ type RoutesConfigDump_DynamicRouteConfig struct {
 	// the route configuration was loaded.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The route config.
-	RouteConfig *any.Any `protobuf:"bytes,2,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
+	RouteConfig *any1.Any `protobuf:"bytes,2,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
 	// The timestamp when the Route was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
@@ -1064,7 +1064,7 @@ func (x *RoutesConfigDump_DynamicRouteConfig) GetVersionInfo() string {
 	return ""
 }
 
-func (x *RoutesConfigDump_DynamicRouteConfig) GetRouteConfig() *any.Any {
+func (x *RoutesConfigDump_DynamicRouteConfig) GetRouteConfig() *any1.Any {
 	if x != nil {
 		return x.RouteConfig
 	}
@@ -1100,7 +1100,7 @@ type ScopedRoutesConfigDump_InlineScopedRouteConfigs struct {
 	// The name assigned to the scoped route configurations.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The scoped route configurations.
-	ScopedRouteConfigs []*any.Any `protobuf:"bytes,2,rep,name=scoped_route_configs,json=scopedRouteConfigs,proto3" json:"scoped_route_configs,omitempty"`
+	ScopedRouteConfigs []*any1.Any `protobuf:"bytes,2,rep,name=scoped_route_configs,json=scopedRouteConfigs,proto3" json:"scoped_route_configs,omitempty"`
 	// The timestamp when the scoped route config set was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 }
@@ -1144,7 +1144,7 @@ func (x *ScopedRoutesConfigDump_InlineScopedRouteConfigs) GetName() string {
 	return ""
 }
 
-func (x *ScopedRoutesConfigDump_InlineScopedRouteConfigs) GetScopedRouteConfigs() []*any.Any {
+func (x *ScopedRoutesConfigDump_InlineScopedRouteConfigs) GetScopedRouteConfigs() []*any1.Any {
 	if x != nil {
 		return x.ScopedRouteConfigs
 	}
@@ -1171,7 +1171,7 @@ type ScopedRoutesConfigDump_DynamicScopedRouteConfigs struct {
 	// the scoped routes configuration was loaded.
 	VersionInfo string `protobuf:"bytes,2,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The scoped route configurations.
-	ScopedRouteConfigs []*any.Any `protobuf:"bytes,3,rep,name=scoped_route_configs,json=scopedRouteConfigs,proto3" json:"scoped_route_configs,omitempty"`
+	ScopedRouteConfigs []*any1.Any `protobuf:"bytes,3,rep,name=scoped_route_configs,json=scopedRouteConfigs,proto3" json:"scoped_route_configs,omitempty"`
 	// The timestamp when the scoped route config set was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,4,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
@@ -1231,7 +1231,7 @@ func (x *ScopedRoutesConfigDump_DynamicScopedRouteConfigs) GetVersionInfo() stri
 	return ""
 }
 
-func (x *ScopedRoutesConfigDump_DynamicScopedRouteConfigs) GetScopedRouteConfigs() []*any.Any {
+func (x *ScopedRoutesConfigDump_DynamicScopedRouteConfigs) GetScopedRouteConfigs() []*any1.Any {
 	if x != nil {
 		return x.ScopedRouteConfigs
 	}
@@ -1265,7 +1265,7 @@ type EndpointsConfigDump_StaticEndpointConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The endpoint config.
-	EndpointConfig *any.Any `protobuf:"bytes,1,opt,name=endpoint_config,json=endpointConfig,proto3" json:"endpoint_config,omitempty"`
+	EndpointConfig *any1.Any `protobuf:"bytes,1,opt,name=endpoint_config,json=endpointConfig,proto3" json:"endpoint_config,omitempty"`
 	// [#not-implemented-hide:] The timestamp when the Endpoint was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,2,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 }
@@ -1302,7 +1302,7 @@ func (*EndpointsConfigDump_StaticEndpointConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_admin_v3_config_dump_shared_proto_rawDescGZIP(), []int{5, 0}
 }
 
-func (x *EndpointsConfigDump_StaticEndpointConfig) GetEndpointConfig() *any.Any {
+func (x *EndpointsConfigDump_StaticEndpointConfig) GetEndpointConfig() *any1.Any {
 	if x != nil {
 		return x.EndpointConfig
 	}
@@ -1327,7 +1327,7 @@ type EndpointsConfigDump_DynamicEndpointConfig struct {
 	// the endpoint configuration was loaded.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The endpoint config.
-	EndpointConfig *any.Any `protobuf:"bytes,2,opt,name=endpoint_config,json=endpointConfig,proto3" json:"endpoint_config,omitempty"`
+	EndpointConfig *any1.Any `protobuf:"bytes,2,opt,name=endpoint_config,json=endpointConfig,proto3" json:"endpoint_config,omitempty"`
 	// [#not-implemented-hide:] The timestamp when the Endpoint was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
@@ -1380,7 +1380,7 @@ func (x *EndpointsConfigDump_DynamicEndpointConfig) GetVersionInfo() string {
 	return ""
 }
 
-func (x *EndpointsConfigDump_DynamicEndpointConfig) GetEndpointConfig() *any.Any {
+func (x *EndpointsConfigDump_DynamicEndpointConfig) GetEndpointConfig() *any1.Any {
 	if x != nil {
 		return x.EndpointConfig
 	}
@@ -1420,7 +1420,7 @@ type EcdsConfigDump_EcdsFilterConfig struct {
 	// field at the time that the ECDS filter was loaded.
 	VersionInfo string `protobuf:"bytes,1,opt,name=version_info,json=versionInfo,proto3" json:"version_info,omitempty"`
 	// The ECDS filter config.
-	EcdsFilter *any.Any `protobuf:"bytes,2,opt,name=ecds_filter,json=ecdsFilter,proto3" json:"ecds_filter,omitempty"`
+	EcdsFilter *any1.Any `protobuf:"bytes,2,opt,name=ecds_filter,json=ecdsFilter,proto3" json:"ecds_filter,omitempty"`
 	// The timestamp when the ECDS filter was last updated.
 	LastUpdated *timestamp.Timestamp `protobuf:"bytes,3,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
@@ -1473,7 +1473,7 @@ func (x *EcdsConfigDump_EcdsFilterConfig) GetVersionInfo() string {
 	return ""
 }
 
-func (x *EcdsConfigDump_EcdsFilterConfig) GetEcdsFilter() *any.Any {
+func (x *EcdsConfigDump_EcdsFilterConfig) GetEcdsFilter() *any1.Any {
 	if x != nil {
 		return x.EcdsFilter
 	}
@@ -1923,7 +1923,7 @@ var file_envoy_admin_v3_config_dump_shared_proto_goTypes = []interface{}{
 	(*EndpointsConfigDump_StaticEndpointConfig)(nil),         // 17: envoy.admin.v3.EndpointsConfigDump.StaticEndpointConfig
 	(*EndpointsConfigDump_DynamicEndpointConfig)(nil),        // 18: envoy.admin.v3.EndpointsConfigDump.DynamicEndpointConfig
 	(*EcdsConfigDump_EcdsFilterConfig)(nil),                  // 19: envoy.admin.v3.EcdsConfigDump.EcdsFilterConfig
-	(*any.Any)(nil),                                          // 20: google.protobuf.Any
+	(*any1.Any)(nil),                                         // 20: google.protobuf.Any
 	(*timestamp.Timestamp)(nil),                              // 21: google.protobuf.Timestamp
 }
 var file_envoy_admin_v3_config_dump_shared_proto_depIdxs = []int32{

@@ -11,7 +11,7 @@ import (
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -92,7 +92,7 @@ func (m *StatsSink) GetConfigType() isStatsSink_ConfigType {
 	return nil
 }
 
-func (x *StatsSink) GetTypedConfig() *any.Any {
+func (x *StatsSink) GetTypedConfig() *any1.Any {
 	if x, ok := x.GetConfigType().(*StatsSink_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -104,7 +104,7 @@ type isStatsSink_ConfigType interface {
 }
 
 type StatsSink_TypedConfig struct {
-	TypedConfig *any.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*StatsSink_TypedConfig) isStatsSink_ConfigType() {}
@@ -1010,7 +1010,7 @@ var file_envoy_config_metrics_v3_stats_proto_goTypes = []interface{}{
 	(*StatsdSink)(nil),              // 5: envoy.config.metrics.v3.StatsdSink
 	(*DogStatsdSink)(nil),           // 6: envoy.config.metrics.v3.DogStatsdSink
 	(*HystrixSink)(nil),             // 7: envoy.config.metrics.v3.HystrixSink
-	(*any.Any)(nil),                 // 8: google.protobuf.Any
+	(*any1.Any)(nil),                // 8: google.protobuf.Any
 	(*wrappers.BoolValue)(nil),      // 9: google.protobuf.BoolValue
 	(*v3.ListStringMatcher)(nil),    // 10: envoy.type.matcher.v3.ListStringMatcher
 	(*v3.StringMatcher)(nil),        // 11: envoy.type.matcher.v3.StringMatcher

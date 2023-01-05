@@ -9,7 +9,7 @@ package adminv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/bootstrap/v3"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -57,7 +57,7 @@ type ConfigDump struct {
 	// :ref:`/config_dump?mask={} <operations_admin_interface_config_dump_by_mask>`,
 	// or :ref:`/config_dump?resource={},mask={}
 	// <operations_admin_interface_config_dump_by_resource_and_mask>` for more information.
-	Configs []*any.Any `protobuf:"bytes,1,rep,name=configs,proto3" json:"configs,omitempty"`
+	Configs []*any1.Any `protobuf:"bytes,1,rep,name=configs,proto3" json:"configs,omitempty"`
 }
 
 func (x *ConfigDump) Reset() {
@@ -92,7 +92,7 @@ func (*ConfigDump) Descriptor() ([]byte, []int) {
 	return file_envoy_admin_v3_config_dump_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ConfigDump) GetConfigs() []*any.Any {
+func (x *ConfigDump) GetConfigs() []*any1.Any {
 	if x != nil {
 		return x.Configs
 	}
@@ -244,7 +244,7 @@ type SecretsConfigDump_DynamicSecret struct {
 	// The actual secret information.
 	// Security sensitive information is redacted (replaced with "[redacted]") for
 	// private keys and passwords in TLS certificates.
-	Secret *any.Any `protobuf:"bytes,4,opt,name=secret,proto3" json:"secret,omitempty"`
+	Secret *any1.Any `protobuf:"bytes,4,opt,name=secret,proto3" json:"secret,omitempty"`
 	// Set if the last update failed, cleared after the next successful update.
 	// The *error_state* field contains the rejected version of this particular
 	// resource along with the reason and timestamp. For successfully updated or
@@ -309,7 +309,7 @@ func (x *SecretsConfigDump_DynamicSecret) GetLastUpdated() *timestamp.Timestamp 
 	return nil
 }
 
-func (x *SecretsConfigDump_DynamicSecret) GetSecret() *any.Any {
+func (x *SecretsConfigDump_DynamicSecret) GetSecret() *any1.Any {
 	if x != nil {
 		return x.Secret
 	}
@@ -343,7 +343,7 @@ type SecretsConfigDump_StaticSecret struct {
 	// The actual secret information.
 	// Security sensitive information is redacted (replaced with "[redacted]") for
 	// private keys and passwords in TLS certificates.
-	Secret *any.Any `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
+	Secret *any1.Any `protobuf:"bytes,3,opt,name=secret,proto3" json:"secret,omitempty"`
 }
 
 func (x *SecretsConfigDump_StaticSecret) Reset() {
@@ -392,7 +392,7 @@ func (x *SecretsConfigDump_StaticSecret) GetLastUpdated() *timestamp.Timestamp {
 	return nil
 }
 
-func (x *SecretsConfigDump_StaticSecret) GetSecret() *any.Any {
+func (x *SecretsConfigDump_StaticSecret) GetSecret() *any1.Any {
 	if x != nil {
 		return x.Secret
 	}
@@ -526,7 +526,7 @@ var file_envoy_admin_v3_config_dump_proto_goTypes = []interface{}{
 	(*SecretsConfigDump)(nil),               // 2: envoy.admin.v3.SecretsConfigDump
 	(*SecretsConfigDump_DynamicSecret)(nil), // 3: envoy.admin.v3.SecretsConfigDump.DynamicSecret
 	(*SecretsConfigDump_StaticSecret)(nil),  // 4: envoy.admin.v3.SecretsConfigDump.StaticSecret
-	(*any.Any)(nil),                         // 5: google.protobuf.Any
+	(*any1.Any)(nil),                        // 5: google.protobuf.Any
 	(*v3.Bootstrap)(nil),                    // 6: envoy.config.bootstrap.v3.Bootstrap
 	(*timestamp.Timestamp)(nil),             // 7: google.protobuf.Timestamp
 	(*UpdateFailureState)(nil),              // 8: envoy.admin.v3.UpdateFailureState

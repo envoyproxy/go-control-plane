@@ -11,7 +11,7 @@ import (
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -323,7 +323,7 @@ type DubboFilter struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.
-	Config *any.Any `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
+	Config *any1.Any `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 }
 
 func (x *DubboFilter) Reset() {
@@ -365,7 +365,7 @@ func (x *DubboFilter) GetName() string {
 	return ""
 }
 
-func (x *DubboFilter) GetConfig() *any.Any {
+func (x *DubboFilter) GetConfig() *any1.Any {
 	if x != nil {
 		return x.Config
 	}
@@ -513,7 +513,7 @@ var file_envoy_extensions_filters_network_dubbo_proxy_v3_dubbo_proxy_proto_goTyp
 	(*v3.ConfigSource)(nil),            // 5: envoy.config.core.v3.ConfigSource
 	(*RouteConfiguration)(nil),         // 6: envoy.extensions.filters.network.dubbo_proxy.v3.RouteConfiguration
 	(*MultipleRouteConfiguration)(nil), // 7: envoy.extensions.filters.network.dubbo_proxy.v3.MultipleRouteConfiguration
-	(*any.Any)(nil),                    // 8: google.protobuf.Any
+	(*any1.Any)(nil),                   // 8: google.protobuf.Any
 }
 var file_envoy_extensions_filters_network_dubbo_proxy_v3_dubbo_proxy_proto_depIdxs = []int32{
 	5, // 0: envoy.extensions.filters.network.dubbo_proxy.v3.Drds.config_source:type_name -> envoy.config.core.v3.ConfigSource

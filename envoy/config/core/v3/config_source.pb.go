@@ -11,7 +11,7 @@ import (
 	v3 "github.com/cncf/xds/go/xds/core/v3"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any "github.com/golang/protobuf/ptypes/any"
+	any1 "github.com/golang/protobuf/ptypes/any"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -748,7 +748,7 @@ type ExtensionConfigSource struct {
 	// Optional default configuration to use as the initial configuration if
 	// there is a failure to receive the initial extension configuration or if
 	// ``apply_default_config_without_warming`` flag is set.
-	DefaultConfig *any.Any `protobuf:"bytes,2,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
+	DefaultConfig *any1.Any `protobuf:"bytes,2,opt,name=default_config,json=defaultConfig,proto3" json:"default_config,omitempty"`
 	// Use the default config as the initial configuration without warming and
 	// waiting for the first discovery response. Requires the default configuration
 	// to be supplied.
@@ -797,7 +797,7 @@ func (x *ExtensionConfigSource) GetConfigSource() *ConfigSource {
 	return nil
 }
 
-func (x *ExtensionConfigSource) GetDefaultConfig() *any.Any {
+func (x *ExtensionConfigSource) GetDefaultConfig() *any1.Any {
 	if x != nil {
 		return x.DefaultConfig
 	}
@@ -1044,7 +1044,7 @@ var file_envoy_config_core_v3_config_source_proto_goTypes = []interface{}{
 	(*wrappers.DoubleValue)(nil),   // 13: google.protobuf.DoubleValue
 	(*WatchedDirectory)(nil),       // 14: envoy.config.core.v3.WatchedDirectory
 	(*v3.Authority)(nil),           // 15: xds.core.v3.Authority
-	(*any.Any)(nil),                // 16: google.protobuf.Any
+	(*any1.Any)(nil),               // 16: google.protobuf.Any
 }
 var file_envoy_config_core_v3_config_source_proto_depIdxs = []int32{
 	1,  // 0: envoy.config.core.v3.ApiConfigSource.api_type:type_name -> envoy.config.core.v3.ApiConfigSource.ApiType
