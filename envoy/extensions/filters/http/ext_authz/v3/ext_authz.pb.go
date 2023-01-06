@@ -69,8 +69,8 @@ type ExtAuthz struct {
 	// altering another client request header.
 	//
 	ClearRouteCache bool `protobuf:"varint,6,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
-	// Sets the HTTP status that is returned to the client when there is a network error between the
-	// filter and the authorization server. The default status is HTTP 403 Forbidden.
+	// Sets the HTTP status that is returned to the client when the authorization server returns an error
+	// or cannot be reached. The default status is HTTP 403 Forbidden.
 	StatusOnError *v31.HttpStatus `protobuf:"bytes,7,opt,name=status_on_error,json=statusOnError,proto3" json:"status_on_error,omitempty"`
 	// Specifies a list of metadata namespaces whose values, if present, will be passed to the
 	// ext_authz service. :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>` is passed as an opaque ``protobuf::Struct``.
@@ -109,6 +109,10 @@ type ExtAuthz struct {
 	// typed_per_filter_config for the path, requests will not be denied.
 	//
 	// If this field is not specified, all requests will be allowed when disabled.
+	//
+	// If a request is denied due to this setting, the response code in :ref:`status_on_error
+	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.status_on_error>` will
+	// be returned.
 	DenyAtDisable *v3.RuntimeFeatureFlag `protobuf:"bytes,11,opt,name=deny_at_disable,json=denyAtDisable,proto3" json:"deny_at_disable,omitempty"`
 	// Specifies if the peer certificate is sent to the external service.
 	//
