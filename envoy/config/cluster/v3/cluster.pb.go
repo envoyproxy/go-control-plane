@@ -3079,6 +3079,7 @@ type LoadBalancingPolicy_Policy struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// [#extension-category: envoy.load_balancing_policies]
 	TypedExtensionConfig *v32.TypedExtensionConfig `protobuf:"bytes,4,opt,name=typed_extension_config,json=typedExtensionConfig,proto3" json:"typed_extension_config,omitempty"`
 }
 
