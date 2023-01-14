@@ -3,24 +3,26 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"net"
 	"time"
 
 	"google.golang.org/grpc"
 
-	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
+	coreV3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	endpointV3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
+	clusterService "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
+	discoveryGRPC "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	endpointService "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
+	listenerService "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
+	routeService "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
-	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
+	xds "github.com/envoyproxy/go-control-plane/pkg/server/v3"
 
-	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2"
-	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
-	endpointv2 "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
-
-	corev1 "k8s.io/api/core/v1"
+	k8sCoreV1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
-	k8scache "k8s.io/client-go/tools/cache"
+	k8sCache "k8s.io/client-go/tools/cache"
 )
 
 type EnvoyCluster struct {
@@ -33,7 +35,7 @@ var (
 	endpoints         []types.Resource
 	version           int
 	snapshotCache     cache.SnapshotCache
-	endpointInformers []k8scache.SharedIndexInformer
+	endpointInformers []k8sCache.SharedIndexInformer
 )
 
 func main() {
@@ -43,11 +45,11 @@ func main() {
 	grpcServer := grpc.NewServer()
 	lis, _ := net.Listen("tcp", ":8080")
 
-	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
-	api.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
-	api.RegisterClusterDiscoveryServiceServer(grpcServer, server)
-	api.RegisterRouteDiscoveryServiceServer(grpcServer, server)
-	api.RegisterListenerDiscoveryServiceServer(grpcServer, server)
+	discoveryGRPC.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
+	endpointService.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	clusterService.RegisterClusterDiscoveryServiceServer(grpcServer, server)
+	routeService.RegisterRouteDiscoveryServiceServer(grpcServer, server)
+	listenerService.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 
 	clusters, _ := CreateBootstrapClients()
 
@@ -59,7 +61,7 @@ func main() {
 		informer := factory.Core().V1().Endpoints().Informer()
 		endpointInformers = append(endpointInformers, informer)
 
-		informer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
+		informer.AddEventHandler(k8sCache.ResourceEventHandlerFuncs{
 			UpdateFunc: HandleEndpointsUpdate,
 		})
 
@@ -80,7 +82,7 @@ func HandleEndpointsUpdate(oldObj, newObj interface{}) {
 	for _, inform := range endpointInformers {
 		for _, ep := range inform.GetStore().List() {
 
-			endpoints := ep.(*corev1.Endpoints)
+			endpoints := ep.(*k8sCoreV1.Endpoints)
 			if _, ok := endpoints.Labels["xds"]; !ok {
 				continue
 			}
@@ -106,35 +108,44 @@ func HandleEndpointsUpdate(oldObj, newObj interface{}) {
 		edsEndpoints = append(edsEndpoints, MakeEndpointsForCluster(envoyCluster))
 	}
 
-	snapshot := cache.NewSnapshot(fmt.Sprintf("%v.0", version), edsEndpoints, nil, nil, nil, nil, nil)
-
-	err := snapshotCache.SetSnapshot("mesh", snapshot)
+	snapshot, err := cache.NewSnapshot(fmt.Sprintf("%v.0", version), map[resource.Type][]types.Resource{
+		resource.EndpointType: edsEndpoints,
+	})
 	if err != nil {
 		fmt.Printf("%v", err)
+		return
+	}
+
+	IDs := snapshotCache.GetStatusKeys()
+	for _, id := range IDs {
+		err = snapshotCache.SetSnapshot(context.Background(), id, snapshot)
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
 	}
 
 	version++
 }
 
-func MakeEndpointsForCluster(service *EnvoyCluster) *endpoint.ClusterLoadAssignment {
+func MakeEndpointsForCluster(service *EnvoyCluster) *endpointV3.ClusterLoadAssignment {
 	fmt.Printf("Updating endpoints for cluster %s: %v\n", service.name, service.endpoints)
-	cla := &endpoint.ClusterLoadAssignment{
+	cla := &endpointV3.ClusterLoadAssignment{
 		ClusterName: service.name,
-		Endpoints:   []*endpointv2.LocalityLbEndpoints{},
+		Endpoints:   []*endpointV3.LocalityLbEndpoints{},
 	}
 
 	for _, endpoint := range service.endpoints {
 		cla.Endpoints = append(cla.Endpoints,
-			&endpointv2.LocalityLbEndpoints{
-				LbEndpoints: []*endpointv2.LbEndpoint{{
-					HostIdentifier: &endpointv2.LbEndpoint_Endpoint{
-						Endpoint: &endpointv2.Endpoint{
-							Address: &core.Address{
-								Address: &core.Address_SocketAddress{
-									SocketAddress: &core.SocketAddress{
-										Protocol: core.SocketAddress_TCP,
+			&endpointV3.LocalityLbEndpoints{
+				LbEndpoints: []*endpointV3.LbEndpoint{{
+					HostIdentifier: &endpointV3.LbEndpoint_Endpoint{
+						Endpoint: &endpointV3.Endpoint{
+							Address: &coreV3.Address{
+								Address: &coreV3.Address_SocketAddress{
+									SocketAddress: &coreV3.SocketAddress{
+										Protocol: coreV3.SocketAddress_TCP,
 										Address:  endpoint,
-										PortSpecifier: &core.SocketAddress_PortValue{
+										PortSpecifier: &coreV3.SocketAddress_PortValue{
 											PortValue: service.port,
 										},
 									},
