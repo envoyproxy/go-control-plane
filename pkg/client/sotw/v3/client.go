@@ -59,7 +59,7 @@ type Response struct {
 type adsClient struct {
 	ctx     context.Context
 	mu      sync.RWMutex
-	nodeID  string
+	node    *core.Node
 	typeURL string
 
 	// streamClient is the ADS discovery client
@@ -71,10 +71,10 @@ type adsClient struct {
 }
 
 // NewADSClient returns a new ADSClient
-func NewADSClient(ctx context.Context, nodeID string, typeURL string) ADSClient {
+func NewADSClient(ctx context.Context, node *core.Node, typeURL string) ADSClient {
 	return &adsClient{
 		ctx:     ctx,
-		nodeID:  nodeID,
+		node:    node,
 		typeURL: typeURL,
 	}
 }
@@ -149,7 +149,7 @@ func IsConnError(err error) bool {
 func (c *adsClient) send(errorDetail *status.Status) error {
 	c.mu.RLock()
 	req := &discovery.DiscoveryRequest{
-		Node:          &core.Node{Id: c.nodeID},
+		Node:          c.node,
 		VersionInfo:   c.lastAckedResponse.GetVersionInfo(),
 		TypeUrl:       c.typeURL,
 		ResponseNonce: c.lastReceivedResponse.GetNonce(),

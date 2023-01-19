@@ -8,6 +8,7 @@ import (
 	"time"
 
 	clusterv3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -36,7 +37,7 @@ func TestFetch(t *testing.T) {
 	assert.NoError(t, err)
 	defer conn.Close()
 
-	c := client.NewADSClient(ctx, "node_1", resource.ClusterType)
+	c := client.NewADSClient(ctx, &core.Node{Id: "node_1"}, resource.ClusterType)
 	c.InitConnect(conn)
 
 	t.Run("Test initial fetch", testInitialFetch(t, ctx, snapCache, c))
