@@ -58,7 +58,7 @@ type Response struct {
 
 type adsClient struct {
 	ctx     context.Context
-	mu      sync.RWMutex
+	mu      sync.Mutex
 	node    *core.Node
 	typeURL string
 
@@ -81,6 +81,9 @@ func NewADSClient(ctx context.Context, node *core.Node, typeURL string) ADSClien
 
 // Initialize the gRPC connection with management server and send the initial Discovery Request.
 func (c *adsClient) InitConnect(clientConn grpc.ClientConnInterface, opts ...grpc.CallOption) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	streamClient, err := discovery.NewAggregatedDiscoveryServiceClient(clientConn).StreamAggregatedResources(c.ctx, opts...)
 	if err != nil {
 		return err
@@ -91,6 +94,9 @@ func (c *adsClient) InitConnect(clientConn grpc.ClientConnInterface, opts ...grp
 
 // Fetch waits for a response from management server and returns response or error.
 func (c *adsClient) Fetch() (*Response, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if c.streamClient == nil {
 		return nil, ErrInit
 	}
@@ -98,14 +104,11 @@ func (c *adsClient) Fetch() (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	if resp == nil {
 		return nil, ErrNilResp
 	}
-
-	c.mu.Lock()
 	c.lastReceivedResponse = resp
-	c.mu.Unlock()
-
 	return &Response{
 		Resources: resp.GetResources(),
 	}, err
@@ -114,13 +117,17 @@ func (c *adsClient) Fetch() (*Response, error) {
 // Ack acknowledge the validity of the last received response to management server.
 func (c *adsClient) Ack() error {
 	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.lastAckedResponse = c.lastReceivedResponse
-	c.mu.Unlock()
 	return c.send(nil)
 }
 
 // Nack acknowledge the invalidity of the last received response to management server.
 func (c *adsClient) Nack(message string) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	errorDetail := &status.Status{
 		Message: message,
 	}
@@ -147,18 +154,16 @@ func IsConnError(err error) bool {
 }
 
 func (c *adsClient) send(errorDetail *status.Status) error {
-	c.mu.RLock()
+	if c.streamClient == nil {
+		return ErrInit
+	}
+
 	req := &discovery.DiscoveryRequest{
 		Node:          c.node,
 		VersionInfo:   c.lastAckedResponse.GetVersionInfo(),
 		TypeUrl:       c.typeURL,
 		ResponseNonce: c.lastReceivedResponse.GetNonce(),
 		ErrorDetail:   errorDetail,
-	}
-	c.mu.RUnlock()
-
-	if c.streamClient == nil {
-		return ErrInit
 	}
 	return c.streamClient.Send(req)
 }
