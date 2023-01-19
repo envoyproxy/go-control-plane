@@ -385,11 +385,21 @@ func (m *ForwardingRule) validate(all bool) error {
 
 	// no validation rules for TargetCluster
 
-	switch m.Trigger.(type) {
-
+	switch v := m.Trigger.(type) {
 	case *ForwardingRule_TopicPrefix:
+		if v == nil {
+			err := ForwardingRuleValidationError{
+				field:  "Trigger",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
 		// no validation rules for TopicPrefix
-
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {

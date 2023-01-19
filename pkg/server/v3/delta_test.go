@@ -155,36 +155,36 @@ func makeMockDeltaStream(t *testing.T) *mockDeltaStream {
 
 func makeDeltaResources() map[string]map[string]types.Resource {
 	return map[string]map[string]types.Resource{
-		rsrc.EndpointType: map[string]types.Resource{
+		rsrc.EndpointType: {
 			endpoint.GetClusterName(): endpoint,
 		},
-		rsrc.ClusterType: map[string]types.Resource{
+		rsrc.ClusterType: {
 			cluster.Name: cluster,
 		},
-		rsrc.RouteType: map[string]types.Resource{
+		rsrc.RouteType: {
 			route.Name: route,
 		},
-		rsrc.ScopedRouteType: map[string]types.Resource{
+		rsrc.ScopedRouteType: {
 			scopedRoute.Name: scopedRoute,
 		},
-		rsrc.VirtualHostType: map[string]types.Resource{
+		rsrc.VirtualHostType: {
 			virtualHost.Name: virtualHost,
 		},
-		rsrc.ListenerType: map[string]types.Resource{
+		rsrc.ListenerType: {
 			httpListener.Name:       httpListener,
 			httpScopedListener.Name: httpScopedListener,
 		},
-		rsrc.SecretType: map[string]types.Resource{
+		rsrc.SecretType: {
 			secret.Name: secret,
 		},
-		rsrc.RuntimeType: map[string]types.Resource{
+		rsrc.RuntimeType: {
 			runtime.Name: runtime,
 		},
-		rsrc.ExtensionConfigType: map[string]types.Resource{
+		rsrc.ExtensionConfigType: {
 			extensionConfig.Name: extensionConfig,
 		},
 		// Pass-through type (types without explicit handling)
-		opaqueType: map[string]types.Resource{
+		opaqueType: {
 			"opaque": opaque,
 		},
 	}
@@ -460,7 +460,7 @@ func TestDeltaCallbackError(t *testing.T) {
 func TestDeltaWildcardSubscriptions(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.deltaResources = map[string]map[string]types.Resource{
-		rsrc.EndpointType: map[string]types.Resource{
+		rsrc.EndpointType: {
 			"endpoints0": resource.MakeEndpoint("endpoints0", 1234),
 			"endpoints1": resource.MakeEndpoint("endpoints1", 1234),
 			"endpoints2": resource.MakeEndpoint("endpoints2", 1234),
@@ -531,7 +531,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 
 	})
 
-	t.Run("* subscribtion/unsubscription support", func(t *testing.T) {
+	t.Run("* subscription/unsubscription support", func(t *testing.T) {
 		resp := makeMockDeltaStream(t)
 		defer close(resp.recv)
 		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
@@ -576,7 +576,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		validateResponse(t, resp.sent, []string{"endpoints1", "endpoints2"}, nil)
 	})
 
-	t.Run("resource specific subscribtions while using wildcard", func(t *testing.T) {
+	t.Run("resource specific subscriptions while using wildcard", func(t *testing.T) {
 		resp := makeMockDeltaStream(t)
 		defer close(resp.recv)
 		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})

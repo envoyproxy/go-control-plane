@@ -106,7 +106,7 @@ func HandleEndpointsUpdate(oldObj, newObj interface{}) {
 		edsEndpoints = append(edsEndpoints, MakeEndpointsForCluster(envoyCluster))
 	}
 
-	snapshot := cache.NewSnapshot(fmt.Sprintf("%v.0", version), edsEndpoints, nil, nil, nil, nil)
+	snapshot := cache.NewSnapshot(fmt.Sprintf("%v.0", version), edsEndpoints, nil, nil, nil, nil, nil)
 
 	err := snapshotCache.SetSnapshot("mesh", snapshot)
 	if err != nil {
