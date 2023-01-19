@@ -36,14 +36,14 @@ func TestFetch(t *testing.T) {
 	assert.NoError(t, err)
 	defer conn.Close()
 
-	c := client.NewAdsClient(ctx, "node_1", resource.ClusterType)
+	c := client.NewADSClient(ctx, "node_1", resource.ClusterType)
 	c.InitConnect(conn)
 
 	t.Run("Test initial fetch", testInitialFetch(t, ctx, snapCache, c))
 	t.Run("Test next fetch", testNextFetch(t, ctx, snapCache, c))
 }
 
-func testInitialFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCache, c client.AdsClient) func(t *testing.T) {
+func testInitialFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
 	return func(t *testing.T) {
 		go func() {
 			// watch for configs
@@ -75,7 +75,7 @@ func testInitialFetch(t *testing.T, ctx context.Context, snapCache cache.Snapsho
 	}
 }
 
-func testNextFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCache, c client.AdsClient) func(t *testing.T) {
+func testNextFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
 	return func(t *testing.T) {
 		go func() {
 			// watch for configs

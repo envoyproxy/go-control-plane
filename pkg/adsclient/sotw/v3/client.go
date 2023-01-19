@@ -31,11 +31,14 @@ import (
 )
 
 var (
-	errInit    = errors.New("ads client: grpc connection is not initialized (use InitConnect() method to initialize connection)")
-	errNilResp = errors.New("ads client: nil response from xds management server")
+	ErrInit    = errors.New("ads client: grpc connection is not initialized (use InitConnect() method to initialize connection)")
+	ErrNilResp = errors.New("ads client: nil response from xds management server")
 )
 
-type AdsClient interface {
+// ADSClient is a SoTW and ADS based generic gRPC xDS client which can be used to
+// implement an xDS client which fetches resources from an xDS server and responds
+// the server back with ack or nack the resources.
+type ADSClient interface {
 	// Initialize the gRPC connection with management server and send the initial Discovery Request.
 	InitConnect(clientConn grpc.ClientConnInterface, opts ...grpc.CallOption) error
 	// Fetch waits for a response from management server and returns response or error.
@@ -46,6 +49,9 @@ type AdsClient interface {
 	Nack(message string) error
 }
 
+// Response wraps the latest Resources from the xDS server.
+// For the time being it only contains the Resources from server. This can be extended with
+// other response details. For example some metadata from DiscoveryResponse.
 type Response struct {
 	Resources []*any.Any
 }
@@ -64,7 +70,8 @@ type adsClient struct {
 	lastReceivedResponse *discovery.DiscoveryResponse
 }
 
-func NewAdsClient(ctx context.Context, nodeID string, typeURL string) AdsClient {
+// NewADSClient returns a new ADSClient
+func NewADSClient(ctx context.Context, nodeID string, typeURL string) ADSClient {
 	return &adsClient{
 		ctx:     ctx,
 		nodeID:  nodeID,
@@ -72,6 +79,7 @@ func NewAdsClient(ctx context.Context, nodeID string, typeURL string) AdsClient 
 	}
 }
 
+// Initialize the gRPC connection with management server and send the initial Discovery Request.
 func (c *adsClient) InitConnect(clientConn grpc.ClientConnInterface, opts ...grpc.CallOption) error {
 	streamClient, err := discovery.NewAggregatedDiscoveryServiceClient(clientConn).StreamAggregatedResources(c.ctx, opts...)
 	if err != nil {
@@ -81,16 +89,17 @@ func (c *adsClient) InitConnect(clientConn grpc.ClientConnInterface, opts ...grp
 	return c.Ack()
 }
 
+// Fetch waits for a response from management server and returns response or error.
 func (c *adsClient) Fetch() (*Response, error) {
 	if c.streamClient == nil {
-		return nil, errInit
+		return nil, ErrInit
 	}
 	resp, err := c.streamClient.Recv()
 	if err != nil {
 		return nil, err
 	}
 	if resp == nil {
-		return nil, errNilResp
+		return nil, ErrNilResp
 	}
 
 	c.mu.Lock()
@@ -102,6 +111,7 @@ func (c *adsClient) Fetch() (*Response, error) {
 	}, err
 }
 
+// Ack acknowledge the validity of the last received response to management server.
 func (c *adsClient) Ack() error {
 	c.mu.Lock()
 	c.lastAckedResponse = c.lastReceivedResponse
@@ -109,6 +119,7 @@ func (c *adsClient) Ack() error {
 	return c.send(nil)
 }
 
+// Nack acknowledge the invalidity of the last received response to management server.
 func (c *adsClient) Nack(message string) error {
 	errorDetail := &status.Status{
 		Message: message,
@@ -120,7 +131,7 @@ func (c *adsClient) Nack(message string) error {
 // and returns true if it is due to the gRPC connection.
 //
 // In this case the gRPC connection with the server should be re initialized with the
-// AdsClient.InitConnect method.
+// ADSClient.InitConnect method.
 func IsConnError(err error) bool {
 	if err == nil {
 		return false
@@ -147,7 +158,7 @@ func (c *adsClient) send(errorDetail *status.Status) error {
 	c.mu.RUnlock()
 
 	if c.streamClient == nil {
-		return errInit
+		return ErrInit
 	}
 	return c.streamClient.Send(req)
 }
