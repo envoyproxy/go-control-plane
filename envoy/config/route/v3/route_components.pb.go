@@ -3905,7 +3905,8 @@ type WeightedCluster_ClusterWeight struct {
 	// The weight of the cluster. This value is relative to the other clusters'
 	// weights. When a request matches the route, the choice of an upstream cluster
 	// is determined by its weight. The sum of weights across all
-	// entries in the clusters array must be greater than 0.
+	// entries in the clusters array must be greater than 0, and must not exceed
+	// uint32_t maximal value (4294967295).
 	Weight *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=weight,proto3" json:"weight,omitempty"`
 	// Optional endpoint metadata match criteria used by the subset load balancer. Only endpoints in
 	// the upstream cluster with metadata matching what is set in this field will be considered for
