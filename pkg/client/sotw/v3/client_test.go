@@ -38,7 +38,8 @@ func TestFetch(t *testing.T) {
 	defer conn.Close()
 
 	c := client.NewADSClient(ctx, &core.Node{Id: "node_1"}, resource.ClusterType)
-	c.InitConnect(conn)
+	err = c.InitConnect(conn)
+	assert.NoError(t, err)
 
 	t.Run("Test initial fetch", testInitialFetch(t, ctx, snapCache, c))
 	t.Run("Test next fetch", testNextFetch(t, ctx, snapCache, c))
@@ -53,7 +54,8 @@ func testInitialFetch(t *testing.T, ctx context.Context, snapCache cache.Snapsho
 			assert.Equal(t, 3, len(resp.Resources))
 			for i, r := range resp.Resources {
 				cluster := &clusterv3.Cluster{}
-				anypb.UnmarshalTo(r, cluster, proto.UnmarshalOptions{})
+				err := anypb.UnmarshalTo(r, cluster, proto.UnmarshalOptions{})
+				assert.NoError(t, err)
 				assert.Equal(t, fmt.Sprint("cluster_", i), cluster.Name)
 			}
 
@@ -72,7 +74,8 @@ func testInitialFetch(t *testing.T, ctx context.Context, snapCache cache.Snapsho
 
 		err = snapshot.Consistent()
 		assert.NoError(t, err)
-		snapCache.SetSnapshot(ctx, "node_1", snapshot)
+		err = snapCache.SetSnapshot(ctx, "node_1", snapshot)
+		assert.NoError(t, err)
 	}
 }
 
@@ -85,7 +88,8 @@ func testNextFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCa
 			assert.Equal(t, 2, len(resp.Resources))
 			for i, r := range resp.Resources {
 				cluster := &clusterv3.Cluster{}
-				anypb.UnmarshalTo(r, cluster, proto.UnmarshalOptions{})
+				err = anypb.UnmarshalTo(r, cluster, proto.UnmarshalOptions{})
+				assert.NoError(t, err)
 				assert.Equal(t, fmt.Sprint("cluster_", i), cluster.Name)
 			}
 
@@ -103,7 +107,8 @@ func testNextFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCa
 
 		err = snapshot.Consistent()
 		assert.NoError(t, err)
-		snapCache.SetSnapshot(ctx, "node_1", snapshot)
+		err = snapCache.SetSnapshot(ctx, "node_1", snapshot)
+		assert.NoError(t, err)
 	}
 }
 

@@ -136,7 +136,7 @@ func IsConnError(err error) bool {
 	if err == nil {
 		return false
 	}
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		return true
 	}
 	errStatus, ok := grpcStatus.FromError(err)
