@@ -11520,6 +11520,8 @@ func (m *RateLimit_Action_MetaData) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for SkipIfAbsent
+
 	if len(errors) > 0 {
 		return RateLimit_Action_MetaDataMultiError(errors)
 	}
