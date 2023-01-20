@@ -21,13 +21,14 @@ import (
 	"io"
 	"sync"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/golang/protobuf/ptypes/any"
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	grpcStatus "google.golang.org/grpc/status"
+
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 )
 
 var (
@@ -81,9 +82,6 @@ func NewADSClient(ctx context.Context, node *core.Node, typeURL string) ADSClien
 
 // Initialize the gRPC connection with management server and send the initial Discovery Request.
 func (c *adsClient) InitConnect(clientConn grpc.ClientConnInterface, opts ...grpc.CallOption) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	streamClient, err := discovery.NewAggregatedDiscoveryServiceClient(clientConn).StreamAggregatedResources(c.ctx, opts...)
 	if err != nil {
 		return err

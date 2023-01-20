@@ -2,10 +2,15 @@ package sotw_test
 
 import (
 	"context"
-	"fmt"
 	"net"
+	"sync"
 	"testing"
 	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	clusterv3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -15,10 +20,6 @@ import (
 	client "github.com/envoyproxy/go-control-plane/pkg/client/sotw/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -29,7 +30,7 @@ func TestFetch(t *testing.T) {
 
 	snapCache := cache.NewSnapshotCache(true, cache.IDHash{}, nil)
 	go func() {
-		err := startAdsServer(t, ctx, snapCache)
+		err := startAdsServer(ctx, snapCache)
 		assert.NoError(t, err)
 	}()
 
@@ -41,26 +42,30 @@ func TestFetch(t *testing.T) {
 	err = c.InitConnect(conn)
 	assert.NoError(t, err)
 
-	t.Run("Test initial fetch", testInitialFetch(t, ctx, snapCache, c))
-	t.Run("Test next fetch", testNextFetch(t, ctx, snapCache, c))
+	t.Run("Test initial fetch", testInitialFetch(ctx, snapCache, c))
+	t.Run("Test next fetch", testNextFetch(ctx, snapCache, c))
 }
 
-func testInitialFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
+func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
 	return func(t *testing.T) {
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+
 		go func() {
 			// watch for configs
 			resp, err := c.Fetch()
 			assert.NoError(t, err)
 			assert.Equal(t, 3, len(resp.Resources))
-			for i, r := range resp.Resources {
+			for _, r := range resp.Resources {
 				cluster := &clusterv3.Cluster{}
 				err := anypb.UnmarshalTo(r, cluster, proto.UnmarshalOptions{})
 				assert.NoError(t, err)
-				assert.Equal(t, fmt.Sprint("cluster_", i), cluster.Name)
+				assert.Contains(t, []string{"cluster_1", "cluster_2", "cluster_3"}, cluster.Name)
 			}
 
 			err = c.Ack()
 			assert.NoError(t, err)
+			wg.Done()
 		}()
 
 		snapshot, err := cache.NewSnapshot("1", map[resource.Type][]types.Resource{
@@ -75,32 +80,37 @@ func testInitialFetch(t *testing.T, ctx context.Context, snapCache cache.Snapsho
 		err = snapshot.Consistent()
 		assert.NoError(t, err)
 		err = snapCache.SetSnapshot(ctx, "node_1", snapshot)
+		wg.Wait()
 		assert.NoError(t, err)
 	}
 }
 
-func testNextFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
+func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
 	return func(t *testing.T) {
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+
 		go func() {
 			// watch for configs
 			resp, err := c.Fetch()
 			assert.NoError(t, err)
 			assert.Equal(t, 2, len(resp.Resources))
-			for i, r := range resp.Resources {
+			for _, r := range resp.Resources {
 				cluster := &clusterv3.Cluster{}
 				err = anypb.UnmarshalTo(r, cluster, proto.UnmarshalOptions{})
 				assert.NoError(t, err)
-				assert.Equal(t, fmt.Sprint("cluster_", i), cluster.Name)
+				assert.Contains(t, []string{"cluster_2", "cluster_4"}, cluster.Name)
 			}
 
 			err = c.Ack()
 			assert.NoError(t, err)
+			wg.Done()
 		}()
 
 		snapshot, err := cache.NewSnapshot("2", map[resource.Type][]types.Resource{
 			resource.ClusterType: {
-				&clusterv3.Cluster{Name: "cluster_1"},
 				&clusterv3.Cluster{Name: "cluster_2"},
+				&clusterv3.Cluster{Name: "cluster_4"},
 			},
 		})
 		assert.NoError(t, err)
@@ -109,10 +119,11 @@ func testNextFetch(t *testing.T, ctx context.Context, snapCache cache.SnapshotCa
 		assert.NoError(t, err)
 		err = snapCache.SetSnapshot(ctx, "node_1", snapshot)
 		assert.NoError(t, err)
+		wg.Wait()
 	}
 }
 
-func startAdsServer(t *testing.T, ctx context.Context, snapCache cache.SnapshotCache) error {
+func startAdsServer(ctx context.Context, snapCache cache.SnapshotCache) error {
 	lis, err := net.Listen("tcp", "127.0.0.1:18001")
 	if err != nil {
 		return err
