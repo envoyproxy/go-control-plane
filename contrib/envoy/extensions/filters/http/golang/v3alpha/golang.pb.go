@@ -24,6 +24,13 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// The meanings are as follows:
+//
+// :``MERGE_VIRTUALHOST_ROUTER_FILTER``: Pass all configuration into Go plugin.
+// :``MERGE_VIRTUALHOST_ROUTER``: Pass merged Virtual host and Router configuration into Go plugin.
+// :``OVERRIDE``: Pass merged Virtual host, Router, and plugin configuration into Go plugin.
+//
+// [#not-implemented-hide:]
 type Config_MergePolicy int32
 
 const (
@@ -73,150 +80,45 @@ func (Config_MergePolicy) EnumDescriptor() ([]byte, []int) {
 	return file_contrib_envoy_extensions_filters_http_golang_v3alpha_golang_proto_rawDescGZIP(), []int{0, 0}
 }
 
-// [#protodoc-title: golang extension filter]
-// Golang :ref:`configuration overview <config_http_filters_golang>`.
-// [#extension: envoy.filters.http.golang]
-//
-// In the below example, we configured the go plugin 'auth' and 'limit' dynamic libraries into
-// Envoy, which can avoid rebuilding Envoy.
-//
-// * Develop go-plugin
-//
-// We can implement the interface of ``StreamFilter <contrib/golang/filters/http/source/go/pkg/api.StreamFilter>``
-// API by the GO language to achieve the effects of Envoy native filter.
-//
-// The filter based on the APIs implementation ``StreamFilter <contrib/golang/filters/http/source/go/pkg/api.StreamFilter>``
-// For details, take a look at the :repo:`/contrib/golang/filters/http/test/test_data/echo`.
-//
-// Then put the GO plugin source code into the ${OUTPUT}/src/ directory with the name of the plugin
-// for GO plugin builds.
-// The following examples implement limit and auth GO plugins.
-//
-// .. code-block:: bash
-//
-//   $ tree /home/admin/envoy/go-plugins/src/
-//     |--auth
-//     |   |--config.go
-//     |   |--filter.go
-//     ---limit
-//         |--config.go
-//         |--filter.go
-//
-// * Build go-plugin
-//
-// Build the Go plugin so by `go_plugin_generate.sh` script, below example the `liblimit.so` and
-// `libauth.so` will be generated in the `/home/admin/envoy/go-plugins/` directory.
-//
-// .. code-block:: bash
-//
-//   #!/bin/bash
-//   if [ $# != 2 ]; then
-//      echo "need input the go plugin name"
-//      exit 1
-//   fi
-//
-//   PLUGINNAME=$1
-//   OUTPUT=/home/admin/envoy/go-plugins/
-//   PLUGINSRCDIR=${OUTPUT}/src/${PLUGINNAME}
-//   go build --buildmode=c-shared  -v -o $OUTPUT/lib${PLUGINNAME}.so $PLUGINSRCDIR
-//
-// .. code-block:: bash
-//
-//   $ go_plugin_generate.sh limit
-//   $ go_plugin_generate.sh auth
-//
-// * Configure go-plugin
-//
-// Use the http filter of :ref: `golang <envoy.filters.http.golang>` to specify
-// :ref: `library` <envoy.filters.http.golang> in ingress and egress to enable the plugin.
-//
-// Example:
-//
-// .. code-block:: yaml
-//
-//   static_resources:
-//     listeners:
-//       - name: ingress
-//         address:
-//           socket_address:
-//             protocol: TCP
-//             address: 0.0.0.0
-//             port_value: 8080
-//         filter_chains:
-//           - filters:
-//               - name: envoy.filters.network.http_connection_manager
-//               ......
-//                   http_filters:
-//                     - name: envoy.filters.http.golang
-//                       typed_config:
-//                         "@type": type.googleapis.com/envoy.extensions.filters.http.golang.v3alpha.Config
-//                         library_id: limit-id
-//                         library_path: "/home/admin/envoy/go-plugins/liblimit.so"
-//                         plugine_name: limit
-//                         plugin_config:
-//                           "@type": type.googleapis.com/envoy.extensions.filters.http.golang.plugins.limit.v3.Config
-//                           xxx1: xx1
-//                           xxx2: xx2
-//                     - name: envoy.filters.http.header_to_metadata
-//                     - name: envoy.filters.http.golang
-//                       typed_config:
-//                         "@type": type.googleapis.com/envoy.extensions.filters.http.golang.v3alpha.Config
-//                         library_id: auth-id
-//                         library_path: "/home/admin/envoy/go-plugins/libauth.so"
-//                         plugine_name: auth
-//                         plugin_config:
-//                           "@type": type.googleapis.com/envoy.extensions.filters.http.golang.plugins.auth.v3.Config
-//                           xxx1: xx1
-//                           xxx2: xx2
-//                     - name: envoy.filters.http.router
-//       - name: egress
-//         address:
-//           socket_address:
-//             protocol: TCP
-//             address: 0.0.0.0
-//             port_value: 8081
-//         filter_chains:
-//           - filters:
-//               - name: envoy.filters.network.http_connection_manager
-//                   ......
-//                   http_filters:
-//                     - name: envoy.filters.http.golang
-//                       typed_config:
-//                         "@type": type.googleapis.com/envoy.extensions.filters.http.golang.v3alpha.Config
-//                         library_id: auth-id
-//                         library_path: "/home/admin/envoy/go-plugins/libauth.so"
-//                         plugine_name: auth
-//                         plugin_config:
-//                           "@type": type.googleapis.com/envoy.extensions.filters.http.golang.plugins.auth.v3.Config
-//                           xxx1: xx1
-//                           xxx2: xx2
-//                     - name: envoy.filters.http.router
 // [#next-free-field: 6]
 type Config struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// library_id is a unique ID for a dynamic library file, must be unique globally.
+	// Globally unique ID for a dynamic library file.
 	LibraryId string `protobuf:"bytes,1,opt,name=library_id,json=libraryId,proto3" json:"library_id,omitempty"`
-	// Dynamic library implementing the interface of
-	// ``StreamFilter <contrib/golang/filters/http/source/go/pkg/api.StreamFilter>``.
+	// Path to a dynamic library implementing the
+	// :repo:`StreamFilter API <contrib/golang/filters/http/source/go/pkg/api.StreamFilter>`
+	// interface.
 	// [#comment:TODO(wangfakang): Support for downloading libraries from remote repositories.]
 	LibraryPath string `protobuf:"bytes,2,opt,name=library_path,json=libraryPath,proto3" json:"library_path,omitempty"`
-	// plugin_name is the name of the go plugin, which needs to be consistent with the name
-	// registered in http::RegisterHttpFilterConfigFactory.
+	// Globally unique name of the Go plugin.
+	//
+	// This name **must** be consistent with the name registered in ``http::RegisterHttpFilterConfigFactory``,
+	// and can be used to associate :ref:`route and virtualHost plugin configuration
+	// <envoy_v3_api_field_extensions.filters.http.golang.v3alpha.ConfigsPerRoute.plugins_config>`.
+	//
 	PluginName string `protobuf:"bytes,3,opt,name=plugin_name,json=pluginName,proto3" json:"plugin_name,omitempty"`
-	// plugin_config is the configuration of the go plugin, note that this configuration is
-	// only parsed in the go plugin.
+	// Configuration for the Go plugin.
+	//
+	// .. note::
+	//     This configuration is only parsed in the go plugin, and is therefore not validated
+	//     by Envoy.
+	//
+	//     See the :repo:`StreamFilter API <contrib/golang/filters/http/source/go/pkg/api/filter.go>`
+	//     for more information about how the plugin's configuration data can be accessed.
+	//
 	PluginConfig *any1.Any `protobuf:"bytes,4,opt,name=plugin_config,json=pluginConfig,proto3" json:"plugin_config,omitempty"`
-	// merge_policy is the merge policy configured by the go plugin.
-	// go plugin configuration supports three dimensions: the virtual host’s typed_per_filter_config,
-	// the route’s typed_per_filter_config or filter's config.
-	// The meanings are as follows:
-	// MERGE_VIRTUALHOST_ROUTER_FILTER: pass all configuration into go plugin.
-	// MERGE_VIRTUALHOST_ROUTER: pass Virtual-Host and Router configuration into go plugin.
-	// OVERRIDE: override according to Router > Virtual_host > Filter priority and pass the
-	// configuration to the go plugin.
+	// Merge policy for plugin configuration.
+	//
+	// The Go plugin configuration supports three dimensions:
+	//
+	// * Virtual host’s :ref:`typed_per_filter_config <envoy_v3_api_field_config.route.v3.VirtualHost.typed_per_filter_config>`
+	// * Route’s :ref:`typed_per_filter_config <envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`
+	// * The filter's :ref:`plugin_config <envoy_v3_api_field_extensions.filters.http.golang.v3alpha.Config.plugin_config>`
+	//
+	// [#not-implemented-hide:]
 	MergePolicy Config_MergePolicy `protobuf:"varint,5,opt,name=merge_policy,json=mergePolicy,proto3,enum=envoy.extensions.filters.http.golang.v3alpha.Config_MergePolicy" json:"merge_policy,omitempty"`
 }
 
@@ -292,17 +194,6 @@ type RouterPlugin struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Example
-	//
-	// .. code-block:: yaml
-	//
-	//   typed_per_filter_config:
-	//     envoy.filters.http.golang:
-	//       "@type": type.googleapis.com/envoy.extensions.filters.http.golang.v3alpha.ConfigsPerRoute
-	//       plugins_config:
-	//         plugin1:
-	//          disabled: true
-	//
 	// Types that are assignable to Override:
 	//	*RouterPlugin_Disabled
 	//	*RouterPlugin_Config
@@ -374,7 +265,7 @@ type RouterPlugin_Disabled struct {
 }
 
 type RouterPlugin_Config struct {
-	// The config field is used to setting per-route plugin config.
+	// The config field is used for setting per-route and per-virtualhost plugin config.
 	Config *any1.Any `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
 }
 
@@ -387,22 +278,10 @@ type ConfigsPerRoute struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// plugins_config is the configuration of the go plugin at the per-router, and
-	// key is the name of the go plugin.
-	// Example
+	// Configuration of the Go plugin at the per-router or per-virtualhost level,
+	// keyed on the :ref:`plugin_name <envoy_v3_api_field_extensions.filters.http.golang.v3alpha.Config.plugin_name>`
+	// of the Go plugin.
 	//
-	// .. code-block:: yaml
-	//
-	//   typed_per_filter_config:
-	//     envoy.filters.http.golang:
-	//       "@type": type.googleapis.com/envoy.extensions.filters.http.golang.v3alpha.ConfigsPerRoute
-	//       plugins_config:
-	//         plugin1:
-	//          disabled: true
-	//         plugin2:
-	//          config:
-	//            "@type": type.googleapis.com/golang.http.plugin2
-	//            xxx: xxx
 	PluginsConfig map[string]*RouterPlugin `protobuf:"bytes,1,rep,name=plugins_config,json=pluginsConfig,proto3" json:"plugins_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
