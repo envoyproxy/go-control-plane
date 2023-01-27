@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"net"
 	"time"
@@ -23,7 +22,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
-	k8sCache "k8s.io/client-go/tools/cache"
+	k8scache "k8s.io/client-go/tools/cache"
 )
 
 type EnvoyCluster struct {
@@ -36,7 +35,7 @@ var (
 	endpoints         []types.Resource
 	version           int
 	snapshotCache     cache.SnapshotCache
-	endpointInformers []k8sCache.SharedIndexInformer
+	endpointInformers []k8scache.SharedIndexInformer
 )
 
 func main() {
@@ -62,7 +61,7 @@ func main() {
 		informer := factory.Core().V1().Endpoints().Informer()
 		endpointInformers = append(endpointInformers, informer)
 
-		informer.AddEventHandler(k8sCache.ResourceEventHandlerFuncs{
+		informer.AddEventHandler(k8scache.ResourceEventHandlerFuncs{
 			UpdateFunc: HandleEndpointsUpdate,
 		})
 
@@ -83,7 +82,7 @@ func HandleEndpointsUpdate(oldObj, newObj interface{}) {
 	for _, inform := range endpointInformers {
 		for _, ep := range inform.GetStore().List() {
 
-			endpoints := ep.(*k8sCoreV1.Endpoints)
+			endpoints := ep.(*corev1.Endpoints)
 			if _, ok := endpoints.Labels["xds"]; !ok {
 				continue
 			}
@@ -146,7 +145,7 @@ func MakeEndpointsForCluster(service *EnvoyCluster) *endpointv3.ClusterLoadAssig
 									SocketAddress: &core.SocketAddress{
 										Protocol: core.SocketAddress_TCP,
 										Address:  endpoint,
-										PortSpecifier: &coreV3.SocketAddress_PortValue{
+										PortSpecifier: &core.SocketAddress_PortValue{
 											PortValue: service.port,
 										},
 									},
