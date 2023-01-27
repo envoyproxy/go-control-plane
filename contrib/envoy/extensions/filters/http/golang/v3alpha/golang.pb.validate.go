@@ -78,10 +78,10 @@ func (m *Config) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if len(m.GetPluginName()) < 1 {
+	if utf8.RuneCountInString(m.GetPluginName()) < 1 {
 		err := ConfigValidationError{
 			field:  "PluginName",
-			reason: "value length must be at least 1 bytes",
+			reason: "value length must be at least 1 runes",
 		}
 		if !all {
 			return err
