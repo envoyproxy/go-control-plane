@@ -10,17 +10,18 @@ import (
 
 	"google.golang.org/grpc"
 
-	coreV3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	endpointV3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
-	clusterService "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
-	discoveryGRPC "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	endpointService "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
-	listenerService "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
-	routeService "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
+	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	endpointv3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
+	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
+	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
+	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
+	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	xds "github.com/envoyproxy/go-control-plane/pkg/server/v3"
 
-	k8sCoreV1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
 	k8sCache "k8s.io/client-go/tools/cache"
 )
@@ -45,11 +46,11 @@ func main() {
 	grpcServer := grpc.NewServer()
 	lis, _ := net.Listen("tcp", ":8080")
 
-	discoveryGRPC.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
-	endpointService.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
-	clusterService.RegisterClusterDiscoveryServiceServer(grpcServer, server)
-	routeService.RegisterRouteDiscoveryServiceServer(grpcServer, server)
-	listenerService.RegisterListenerDiscoveryServiceServer(grpcServer, server)
+	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
+	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	clusterservice.RegisterClusterDiscoveryServiceServer(grpcServer, server)
+	routeservice.RegisterRouteDiscoveryServiceServer(grpcServer, server)
+	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 
 	clusters, _ := CreateBootstrapClients()
 
@@ -127,23 +128,23 @@ func HandleEndpointsUpdate(oldObj, newObj interface{}) {
 	version++
 }
 
-func MakeEndpointsForCluster(service *EnvoyCluster) *endpointV3.ClusterLoadAssignment {
+func MakeEndpointsForCluster(service *EnvoyCluster) *endpointv3.ClusterLoadAssignment {
 	fmt.Printf("Updating endpoints for cluster %s: %v\n", service.name, service.endpoints)
-	cla := &endpointV3.ClusterLoadAssignment{
+	cla := &endpointv3.ClusterLoadAssignment{
 		ClusterName: service.name,
-		Endpoints:   []*endpointV3.LocalityLbEndpoints{},
+		Endpoints:   []*endpointv3.LocalityLbEndpoints{},
 	}
 
 	for _, endpoint := range service.endpoints {
 		cla.Endpoints = append(cla.Endpoints,
-			&endpointV3.LocalityLbEndpoints{
-				LbEndpoints: []*endpointV3.LbEndpoint{{
-					HostIdentifier: &endpointV3.LbEndpoint_Endpoint{
-						Endpoint: &endpointV3.Endpoint{
-							Address: &coreV3.Address{
-								Address: &coreV3.Address_SocketAddress{
-									SocketAddress: &coreV3.SocketAddress{
-										Protocol: coreV3.SocketAddress_TCP,
+			&endpointv3.LocalityLbEndpoints{
+				LbEndpoints: []*endpointv3.LbEndpoint{{
+					HostIdentifier: &endpointv3.LbEndpoint_Endpoint{
+						Endpoint: &endpointv3.Endpoint{
+							Address: &core.Address{
+								Address: &core.Address_SocketAddress{
+									SocketAddress: &core.SocketAddress{
+										Protocol: core.SocketAddress_TCP,
 										Address:  endpoint,
 										PortSpecifier: &coreV3.SocketAddress_PortValue{
 											PortValue: service.port,

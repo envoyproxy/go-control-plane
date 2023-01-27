@@ -830,17 +830,6 @@ func (m *CommonTlsContext) validate(all bool) error {
 
 	}
 
-	if len(m.GetTlsCertificateSdsSecretConfigs()) > 2 {
-		err := CommonTlsContextValidationError{
-			field:  "TlsCertificateSdsSecretConfigs",
-			reason: "value must contain no more than 2 item(s)",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	for idx, item := range m.GetTlsCertificateSdsSecretConfigs() {
 		_, _ = idx, item
 
