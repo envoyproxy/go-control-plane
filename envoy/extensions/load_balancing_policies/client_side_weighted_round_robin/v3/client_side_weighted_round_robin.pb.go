@@ -61,7 +61,7 @@ type ClientSideWeightedRoundRobin struct {
 	// value, if we later start seeing fresh reports again, the
 	// blackout_period applies. Defaults to 3 minutes.
 	WeightExpirationPeriod *duration.Duration `protobuf:"bytes,4,opt,name=weight_expiration_period,json=weightExpirationPeriod,proto3" json:"weight_expiration_period,omitempty"`
-	// How often endpoint weights are recalculated.  Default is 1 second.
+	// How often endpoint weights are recalculated. Default is 1 second.
 	WeightUpdatePeriod *duration.Duration `protobuf:"bytes,5,opt,name=weight_update_period,json=weightUpdatePeriod,proto3" json:"weight_update_period,omitempty"`
 }
 
