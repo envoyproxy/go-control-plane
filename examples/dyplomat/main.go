@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"net"
 	"time"
 
@@ -107,11 +108,20 @@ func HandleEndpointsUpdate(oldObj, newObj interface{}) {
 		edsEndpoints = append(edsEndpoints, MakeEndpointsForCluster(envoyCluster))
 	}
 
-	snapshot := cache.NewSnapshot(fmt.Sprintf("%v.0", version), edsEndpoints, nil, nil, nil, nil, nil)
-
-	err := snapshotCache.SetSnapshot("mesh", snapshot)
+	snapshot, err := cache.NewSnapshot(fmt.Sprintf("%v.0", version), map[resource.Type][]types.Resource{
+		resource.EndpointType: edsEndpoints,
+	})
 	if err != nil {
 		fmt.Printf("%v", err)
+		return
+	}
+
+	IDs := snapshotCache.GetStatusKeys()
+	for _, id := range IDs {
+		err = snapshotCache.SetSnapshot(context.Background(), id, snapshot)
+		if err != nil {
+			fmt.Printf("%v", err)
+		}
 	}
 
 	version++
