@@ -67,5 +67,5 @@ func main() {
 	ctx := context.Background()
 	cb := &test.Callbacks{Debug: l.Debug}
 	srv := server.NewServer(ctx, cache, cb)
-	example.RunServer(ctx, srv, port)
+	example.RunServer(srv, port)
 }
