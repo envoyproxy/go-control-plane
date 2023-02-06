@@ -1,4 +1,4 @@
-FROM golang:1.19
+FROM golang:1.20
 
 # TODO(mattklein123): Update this to envoy-dev:latest and fix tests.
 COPY --from=envoyproxy/envoy-dev:latest /usr/local/bin/envoy /usr/local/bin/envoy
