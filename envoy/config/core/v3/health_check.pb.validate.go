@@ -698,6 +698,8 @@ func (m *HealthCheck) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DisableHealthCheckIfActiveTraffic
+
 	oneofHealthCheckerPresent := false
 	switch v := m.HealthChecker.(type) {
 	case *HealthCheck_HttpHealthCheck_:
