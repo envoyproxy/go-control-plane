@@ -185,7 +185,7 @@ type ProxyProtocolConfig struct {
 
 	// The PROXY protocol version to use. See https://www.haproxy.org/download/2.1/doc/proxy-protocol.txt for details
 	Version ProxyProtocolConfig_Version `protobuf:"varint,1,opt,name=version,proto3,enum=envoy.config.core.v3.ProxyProtocolConfig_Version" json:"version,omitempty"`
-	// This config controls which TLVs can be passed to filter state if it is Proxy Protocol
+	// This config controls which TLVs can be passed to upstream if it is Proxy Protocol
 	// V2 header. If there is no setting for this field, no TLVs will be passed through.
 	PassThroughTlvs *ProxyProtocolPassThroughTLVs `protobuf:"bytes,2,opt,name=pass_through_tlvs,json=passThroughTlvs,proto3" json:"pass_through_tlvs,omitempty"`
 }

@@ -48,6 +48,12 @@ type ProxyProtocol struct {
 	AllowRequestsWithoutProxyProtocol bool `protobuf:"varint,2,opt,name=allow_requests_without_proxy_protocol,json=allowRequestsWithoutProxyProtocol,proto3" json:"allow_requests_without_proxy_protocol,omitempty"`
 	// This config controls which TLVs can be passed to filter state if it is Proxy Protocol
 	// V2 header. If there is no setting for this field, no TLVs will be passed through.
+	//
+	// .. note::
+	//
+	//   If this is configured, you likely also want to set
+	//   :ref:`core.v3.ProxyProtocolConfig.pass_through_tlvs <envoy_v3_api_field_config.core.v3.ProxyProtocolConfig.pass_through_tlvs>`,
+	//   which controls pass-through for the upstream.
 	PassThroughTlvs *v3.ProxyProtocolPassThroughTLVs `protobuf:"bytes,3,opt,name=pass_through_tlvs,json=passThroughTlvs,proto3" json:"pass_through_tlvs,omitempty"`
 }
 
