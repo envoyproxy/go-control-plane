@@ -1084,6 +1084,8 @@ func (m *AccessLogCommon) validate(all bool) error {
 
 	// no validation rules for IntermediateLogEntry
 
+	// no validation rules for DownstreamTransportFailureReason
+
 	if len(errors) > 0 {
 		return AccessLogCommonMultiError(errors)
 	}
