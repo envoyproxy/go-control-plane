@@ -516,6 +516,8 @@ type AuthorizationRequest struct {
 
 	// Authorization request includes the client request headers that have a correspondent match
 	// in the :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`.
+	// This field has been deprecated in favor of :ref:`allowed_headers
+	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.allowed_headers>`.
 	//
 	// .. note::
 	//
@@ -530,8 +532,6 @@ type AuthorizationRequest struct {
 	//   <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.with_request_body>`
 	//   setting) hence the value of its ``Content-Length`` reflects the size of its payload size.
 	//
-	//   This field has been deprecated in favor of :ref:`allowed_headers
-	//   <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.allowed_headers>`.
 	//
 	// Deprecated: Do not use.
 	AllowedHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
