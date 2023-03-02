@@ -57,6 +57,17 @@ func (m *ExternalProcessor) validate(all bool) error {
 
 	var errors []error
 
+	if m.GetGrpcService() == nil {
+		err := ExternalProcessorValidationError{
+			field:  "GrpcService",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if all {
 		switch v := interface{}(m.GetGrpcService()).(type) {
 		case interface{ ValidateAll() error }:
