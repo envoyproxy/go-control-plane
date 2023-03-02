@@ -998,6 +998,35 @@ func (m *HttpConnectionManager) validate(all bool) error {
 
 	// no validation rules for AppendXForwardedPort
 
+	if all {
+		switch v := interface{}(m.GetAddProxyProtocolConnectionState()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, HttpConnectionManagerValidationError{
+					field:  "AddProxyProtocolConnectionState",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, HttpConnectionManagerValidationError{
+					field:  "AddProxyProtocolConnectionState",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAddProxyProtocolConnectionState()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return HttpConnectionManagerValidationError{
+				field:  "AddProxyProtocolConnectionState",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	oneofRouteSpecifierPresent := false
 	switch v := m.RouteSpecifier.(type) {
 	case *HttpConnectionManager_Rds:
