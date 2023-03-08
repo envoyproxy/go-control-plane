@@ -415,7 +415,7 @@ type AlternateProtocolsCacheOptions struct {
 	// this list contained the value ``.c.example.com``, then an Alt-Svc entry for ``foo.c.example.com``
 	// could be shared with ``bar.c.example.com`` but would not be shared with ``baz.example.com``. On
 	// the other hand, if the list contained the value ``.example.com`` then all three hosts could share
-	// Alt-Svc entries. Each entry must start with ``.``.  If a hostname matches multiple suffixes, the
+	// Alt-Svc entries. Each entry must start with ``.``. If a hostname matches multiple suffixes, the
 	// first listed suffix will be used.
 	//
 	// Since lookup in this list is O(n), it is recommended that the number of suffixes be limited.
@@ -614,7 +614,7 @@ func (x *HttpProtocolOptions) GetMaxRequestsPerConnection() *wrappers.UInt32Valu
 	return nil
 }
 
-// [#next-free-field: 9]
+// [#next-free-field: 10]
 type Http1ProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -672,6 +672,12 @@ type Http1ProtocolOptions struct {
 	// (inferred if not present), host (from the host/:authority header) and path
 	// (from first line or :path header).
 	SendFullyQualifiedUrl bool `protobuf:"varint,8,opt,name=send_fully_qualified_url,json=sendFullyQualifiedUrl,proto3" json:"send_fully_qualified_url,omitempty"`
+	// [#not-implemented-hide:] Hiding so that field can be removed after BalsaParser is rolled out.
+	// If set, force HTTP/1 parser: BalsaParser if true, http-parser if false.
+	// If unset, HTTP/1 parser is selected based on
+	// envoy.reloadable_features.http1_use_balsa_parser.
+	// See issue #21245.
+	UseBalsaParser *wrappers.BoolValue `protobuf:"bytes,9,opt,name=use_balsa_parser,json=useBalsaParser,proto3" json:"use_balsa_parser,omitempty"`
 }
 
 func (x *Http1ProtocolOptions) Reset() {
@@ -760,6 +766,13 @@ func (x *Http1ProtocolOptions) GetSendFullyQualifiedUrl() bool {
 		return x.SendFullyQualifiedUrl
 	}
 	return false
+}
+
+func (x *Http1ProtocolOptions) GetUseBalsaParser() *wrappers.BoolValue {
+	if x != nil {
+		return x.UseBalsaParser
+	}
+	return nil
 }
 
 type KeepaliveSettings struct {
@@ -1747,7 +1760,7 @@ var file_envoy_config_core_v3_protocol_proto_rawDesc = []byte{
 	0x4f, 0x50, 0x5f, 0x48, 0x45, 0x41, 0x44, 0x45, 0x52, 0x10, 0x02, 0x3a, 0x2c, 0x9a, 0xc5, 0x88,
 	0x1e, 0x27, 0x0a, 0x25, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x32,
 	0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x48, 0x74, 0x74, 0x70, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63,
-	0x6f, 0x6c, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x87, 0x08, 0x0a, 0x14, 0x48, 0x74,
+	0x6f, 0x6c, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0xd7, 0x08, 0x0a, 0x14, 0x48, 0x74,
 	0x74, 0x70, 0x31, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x4f, 0x70, 0x74, 0x69, 0x6f,
 	0x6e, 0x73, 0x12, 0x48, 0x0a, 0x12, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x61, 0x62, 0x73, 0x6f,
 	0x6c, 0x75, 0x74, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
@@ -1783,7 +1796,12 @@ var file_envoy_config_core_v3_protocol_proto_rawDesc = []byte{
 	0x64, 0x5f, 0x66, 0x75, 0x6c, 0x6c, 0x79, 0x5f, 0x71, 0x75, 0x61, 0x6c, 0x69, 0x66, 0x69, 0x65,
 	0x64, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x08, 0x20, 0x01, 0x28, 0x08, 0x52, 0x15, 0x73, 0x65, 0x6e,
 	0x64, 0x46, 0x75, 0x6c, 0x6c, 0x79, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x66, 0x69, 0x65, 0x64, 0x55,
-	0x72, 0x6c, 0x1a, 0x9f, 0x03, 0x0a, 0x0f, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4b, 0x65, 0x79,
+	0x72, 0x6c, 0x12, 0x4e, 0x0a, 0x10, 0x75, 0x73, 0x65, 0x5f, 0x62, 0x61, 0x6c, 0x73, 0x61, 0x5f,
+	0x70, 0x61, 0x72, 0x73, 0x65, 0x72, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x42,
+	0x6f, 0x6f, 0x6c, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x42, 0x08, 0xd2, 0xc6, 0xa4, 0xe1, 0x06, 0x02,
+	0x08, 0x01, 0x52, 0x0e, 0x75, 0x73, 0x65, 0x42, 0x61, 0x6c, 0x73, 0x61, 0x50, 0x61, 0x72, 0x73,
+	0x65, 0x72, 0x1a, 0x9f, 0x03, 0x0a, 0x0f, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x4b, 0x65, 0x79,
 	0x46, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x12, 0x78, 0x0a, 0x11, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72,
 	0x5f, 0x63, 0x61, 0x73, 0x65, 0x5f, 0x77, 0x6f, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x4a, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x67,
@@ -2051,34 +2069,35 @@ var file_envoy_config_core_v3_protocol_proto_depIdxs = []int32{
 	20, // 16: envoy.config.core.v3.Http1ProtocolOptions.allow_absolute_url:type_name -> google.protobuf.BoolValue
 	14, // 17: envoy.config.core.v3.Http1ProtocolOptions.header_key_format:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat
 	20, // 18: envoy.config.core.v3.Http1ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	17, // 19: envoy.config.core.v3.KeepaliveSettings.interval:type_name -> google.protobuf.Duration
-	17, // 20: envoy.config.core.v3.KeepaliveSettings.timeout:type_name -> google.protobuf.Duration
-	21, // 21: envoy.config.core.v3.KeepaliveSettings.interval_jitter:type_name -> envoy.type.v3.Percent
-	17, // 22: envoy.config.core.v3.KeepaliveSettings.connection_idle_interval:type_name -> google.protobuf.Duration
-	18, // 23: envoy.config.core.v3.Http2ProtocolOptions.hpack_table_size:type_name -> google.protobuf.UInt32Value
-	18, // 24: envoy.config.core.v3.Http2ProtocolOptions.max_concurrent_streams:type_name -> google.protobuf.UInt32Value
-	18, // 25: envoy.config.core.v3.Http2ProtocolOptions.initial_stream_window_size:type_name -> google.protobuf.UInt32Value
-	18, // 26: envoy.config.core.v3.Http2ProtocolOptions.initial_connection_window_size:type_name -> google.protobuf.UInt32Value
-	18, // 27: envoy.config.core.v3.Http2ProtocolOptions.max_outbound_frames:type_name -> google.protobuf.UInt32Value
-	18, // 28: envoy.config.core.v3.Http2ProtocolOptions.max_outbound_control_frames:type_name -> google.protobuf.UInt32Value
-	18, // 29: envoy.config.core.v3.Http2ProtocolOptions.max_consecutive_inbound_frames_with_empty_payload:type_name -> google.protobuf.UInt32Value
-	18, // 30: envoy.config.core.v3.Http2ProtocolOptions.max_inbound_priority_frames_per_stream:type_name -> google.protobuf.UInt32Value
-	18, // 31: envoy.config.core.v3.Http2ProtocolOptions.max_inbound_window_update_frames_per_data_frame_sent:type_name -> google.protobuf.UInt32Value
-	20, // 32: envoy.config.core.v3.Http2ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	16, // 33: envoy.config.core.v3.Http2ProtocolOptions.custom_settings_parameters:type_name -> envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter
-	8,  // 34: envoy.config.core.v3.Http2ProtocolOptions.connection_keepalive:type_name -> envoy.config.core.v3.KeepaliveSettings
-	9,  // 35: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	3,  // 36: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
-	20, // 37: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	15, // 38: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
-	19, // 39: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	18, // 40: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
-	18, // 41: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
-	42, // [42:42] is the sub-list for method output_type
-	42, // [42:42] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	20, // 19: envoy.config.core.v3.Http1ProtocolOptions.use_balsa_parser:type_name -> google.protobuf.BoolValue
+	17, // 20: envoy.config.core.v3.KeepaliveSettings.interval:type_name -> google.protobuf.Duration
+	17, // 21: envoy.config.core.v3.KeepaliveSettings.timeout:type_name -> google.protobuf.Duration
+	21, // 22: envoy.config.core.v3.KeepaliveSettings.interval_jitter:type_name -> envoy.type.v3.Percent
+	17, // 23: envoy.config.core.v3.KeepaliveSettings.connection_idle_interval:type_name -> google.protobuf.Duration
+	18, // 24: envoy.config.core.v3.Http2ProtocolOptions.hpack_table_size:type_name -> google.protobuf.UInt32Value
+	18, // 25: envoy.config.core.v3.Http2ProtocolOptions.max_concurrent_streams:type_name -> google.protobuf.UInt32Value
+	18, // 26: envoy.config.core.v3.Http2ProtocolOptions.initial_stream_window_size:type_name -> google.protobuf.UInt32Value
+	18, // 27: envoy.config.core.v3.Http2ProtocolOptions.initial_connection_window_size:type_name -> google.protobuf.UInt32Value
+	18, // 28: envoy.config.core.v3.Http2ProtocolOptions.max_outbound_frames:type_name -> google.protobuf.UInt32Value
+	18, // 29: envoy.config.core.v3.Http2ProtocolOptions.max_outbound_control_frames:type_name -> google.protobuf.UInt32Value
+	18, // 30: envoy.config.core.v3.Http2ProtocolOptions.max_consecutive_inbound_frames_with_empty_payload:type_name -> google.protobuf.UInt32Value
+	18, // 31: envoy.config.core.v3.Http2ProtocolOptions.max_inbound_priority_frames_per_stream:type_name -> google.protobuf.UInt32Value
+	18, // 32: envoy.config.core.v3.Http2ProtocolOptions.max_inbound_window_update_frames_per_data_frame_sent:type_name -> google.protobuf.UInt32Value
+	20, // 33: envoy.config.core.v3.Http2ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	16, // 34: envoy.config.core.v3.Http2ProtocolOptions.custom_settings_parameters:type_name -> envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter
+	8,  // 35: envoy.config.core.v3.Http2ProtocolOptions.connection_keepalive:type_name -> envoy.config.core.v3.KeepaliveSettings
+	9,  // 36: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	3,  // 37: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
+	20, // 38: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	15, // 39: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
+	19, // 40: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	18, // 41: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
+	18, // 42: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
+	43, // [43:43] is the sub-list for method output_type
+	43, // [43:43] is the sub-list for method input_type
+	43, // [43:43] is the sub-list for extension type_name
+	43, // [43:43] is the sub-list for extension extendee
+	0,  // [0:43] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_protocol_proto_init() }
