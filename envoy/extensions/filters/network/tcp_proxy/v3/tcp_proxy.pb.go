@@ -80,6 +80,8 @@ type TcpProxy struct {
 	HashPolicy []*v32.HashPolicy `protobuf:"bytes,11,rep,name=hash_policy,json=hashPolicy,proto3" json:"hash_policy,omitempty"`
 	// If set, this configures tunneling, e.g. configuration options to tunnel TCP payload over
 	// HTTP CONNECT. If this message is absent, the payload will be proxied upstream as per usual.
+	// It is possible to dynamically override this configuration and disable tunneling per connection,
+	// by setting a per-connection filter state object for the key ``envoy.tcp_proxy.disable_tunneling``.
 	TunnelingConfig *TcpProxy_TunnelingConfig `protobuf:"bytes,12,opt,name=tunneling_config,json=tunnelingConfig,proto3" json:"tunneling_config,omitempty"`
 	// The maximum duration of a connection. The duration is defined as the period since a connection
 	// was established. If not set, there is no max duration. When max_downstream_connection_duration
