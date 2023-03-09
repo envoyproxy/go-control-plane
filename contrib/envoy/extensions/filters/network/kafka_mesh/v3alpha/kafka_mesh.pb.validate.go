@@ -147,6 +147,8 @@ func (m *KafkaMesh) validate(all bool) error {
 
 	}
 
+	// no validation rules for ConsumerProxyMode
+
 	if len(errors) > 0 {
 		return KafkaMeshMultiError(errors)
 	}
@@ -280,6 +282,8 @@ func (m *KafkaClusterDefinition) validate(all bool) error {
 	}
 
 	// no validation rules for ProducerConfig
+
+	// no validation rules for ConsumerConfig
 
 	if len(errors) > 0 {
 		return KafkaClusterDefinitionMultiError(errors)
