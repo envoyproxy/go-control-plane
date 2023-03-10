@@ -533,6 +533,36 @@ func (m *HttpConnectionManager) validate(all bool) error {
 
 	}
 
+	if d := m.GetAccessLogFlushInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = HttpConnectionManagerValidationError{
+				field:  "AccessLogFlushInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+			if dur < gte {
+				err := HttpConnectionManagerValidationError{
+					field:  "AccessLogFlushInterval",
+					reason: "value must be greater than or equal to 1ms",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if all {
 		switch v := interface{}(m.GetUseRemoteAddress()).(type) {
 		case interface{ ValidateAll() error }:
