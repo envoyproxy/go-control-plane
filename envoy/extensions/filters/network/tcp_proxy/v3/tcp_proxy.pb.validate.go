@@ -396,6 +396,8 @@ func (m *TcpProxy) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for FlushAccessLogOnConnected
+
 	oneofClusterSpecifierPresent := false
 	switch v := m.ClusterSpecifier.(type) {
 	case *TcpProxy_Cluster:
