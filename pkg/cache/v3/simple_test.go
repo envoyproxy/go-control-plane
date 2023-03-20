@@ -343,12 +343,14 @@ func TestConcurrentSetWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
 	for i := 0; i < 50; i++ {
 		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
+			// Take a copy prior to calling parallel to get the correct value
+			index := i
 			t.Parallel()
-			id := fmt.Sprintf("%d", i%2)
+			id := t.Name()
 			value := make(chan cache.Response, 1)
-			if i < 25 {
+			if index < 25 {
 				snap := cache.Snapshot{}
-				snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+				snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", index), []types.Resource{resource.MakeEndpoint(clusterName, uint32(index))})
 				if err := c.SetSnapshot(context.Background(), id, &snap); err != nil {
 					t.Fatalf("failed to set snapshot %q: %s", id, err)
 				}
