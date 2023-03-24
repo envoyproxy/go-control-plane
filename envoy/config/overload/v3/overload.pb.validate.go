@@ -1344,7 +1344,7 @@ func (m *ScaleTimersOverloadActionConfig_ScaleTimer) validate(all bool) error {
 	if _, ok := _ScaleTimersOverloadActionConfig_ScaleTimer_Timer_NotInLookup[m.GetTimer()]; ok {
 		err := ScaleTimersOverloadActionConfig_ScaleTimerValidationError{
 			field:  "Timer",
-			reason: "value must not be in list [0]",
+			reason: "value must not be in list [UNSPECIFIED]",
 		}
 		if !all {
 			return err
