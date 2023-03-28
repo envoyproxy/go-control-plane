@@ -563,6 +563,8 @@ func (m *HttpConnectionManager) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for FlushAccessLogOnNewRequest
+
 	if all {
 		switch v := interface{}(m.GetUseRemoteAddress()).(type) {
 		case interface{ ValidateAll() error }:
