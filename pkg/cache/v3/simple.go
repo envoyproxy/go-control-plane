@@ -281,7 +281,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 	return nil
 }
 
-// GetSnapshots gets the snapshot for a node, and returns an error if not found.
+// GetSnapshot gets the snapshot for a node, and returns an error if not found.
 func (cache *snapshotCache) GetSnapshot(node string) (ResourceSnapshot, error) {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
