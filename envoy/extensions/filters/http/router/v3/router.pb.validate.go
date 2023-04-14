@@ -315,6 +315,36 @@ func (m *Router_UpstreamAccessLogOptions) validate(all bool) error {
 
 	// no validation rules for FlushUpstreamLogOnUpstreamStream
 
+	if d := m.GetUpstreamLogFlushInterval(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = Router_UpstreamAccessLogOptionsValidationError{
+				field:  "UpstreamLogFlushInterval",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(0*time.Second + 1000000*time.Nanosecond)
+
+			if dur < gte {
+				err := Router_UpstreamAccessLogOptionsValidationError{
+					field:  "UpstreamLogFlushInterval",
+					reason: "value must be greater than or equal to 1ms",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return Router_UpstreamAccessLogOptionsMultiError(errors)
 	}
