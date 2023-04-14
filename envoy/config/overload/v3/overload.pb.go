@@ -634,7 +634,6 @@ type OverloadManager struct {
 	ResourceMonitors []*ResourceMonitor `protobuf:"bytes,2,rep,name=resource_monitors,json=resourceMonitors,proto3" json:"resource_monitors,omitempty"`
 	// The set of overload actions.
 	Actions []*OverloadAction `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
-	// [#not-implemented-hide:]
 	// The set of load shed points.
 	LoadshedPoints []*LoadShedPoint `protobuf:"bytes,5,rep,name=loadshed_points,json=loadshedPoints,proto3" json:"loadshed_points,omitempty"`
 	// Configuration for buffer factory.
