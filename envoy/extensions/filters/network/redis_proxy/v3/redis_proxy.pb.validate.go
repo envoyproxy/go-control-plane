@@ -1151,6 +1151,8 @@ func (m *RedisProxy_PrefixRoutes_Route) validate(all bool) error {
 
 	}
 
+	// no validation rules for KeyFormatter
+
 	if len(errors) > 0 {
 		return RedisProxy_PrefixRoutes_RouteMultiError(errors)
 	}
