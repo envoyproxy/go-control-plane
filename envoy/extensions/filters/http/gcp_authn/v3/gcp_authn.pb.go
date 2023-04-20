@@ -33,8 +33,7 @@ type GcpAuthnFilterConfig struct {
 	// The HTTP URI to fetch tokens from GCE Metadata Server(https://cloud.google.com/compute/docs/metadata/overview).
 	// The URL format is "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=[AUDIENCE]"
 	HttpUri *v3.HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
-	// Retry policy for fetching tokens.
-	// This field is optional. If it is not configured, the filter will be fail-closed (i.e., reject the requests).
+	// Retry policy for fetching tokens. This field is optional.
 	RetryPolicy *v3.RetryPolicy `protobuf:"bytes,2,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	// Token cache configuration. This field is optional.
 	CacheConfig *TokenCacheConfig `protobuf:"bytes,3,opt,name=cache_config,json=cacheConfig,proto3" json:"cache_config,omitempty"`
