@@ -57,6 +57,8 @@ func (m *RouteAction) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for Name
+
 	if all {
 		switch v := interface{}(m.GetMetadata()).(type) {
 		case interface{ ValidateAll() error }:

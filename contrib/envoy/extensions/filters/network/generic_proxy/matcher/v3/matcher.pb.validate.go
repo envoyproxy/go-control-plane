@@ -137,6 +137,206 @@ var _ interface {
 	ErrorName() string
 } = ServiceMatchInputValidationError{}
 
+// Validate checks the field values on HostMatchInput with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *HostMatchInput) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on HostMatchInput with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in HostMatchInputMultiError,
+// or nil if none found.
+func (m *HostMatchInput) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *HostMatchInput) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return HostMatchInputMultiError(errors)
+	}
+
+	return nil
+}
+
+// HostMatchInputMultiError is an error wrapping multiple validation errors
+// returned by HostMatchInput.ValidateAll() if the designated constraints
+// aren't met.
+type HostMatchInputMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m HostMatchInputMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m HostMatchInputMultiError) AllErrors() []error { return m }
+
+// HostMatchInputValidationError is the validation error returned by
+// HostMatchInput.Validate if the designated constraints aren't met.
+type HostMatchInputValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HostMatchInputValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HostMatchInputValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HostMatchInputValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HostMatchInputValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HostMatchInputValidationError) ErrorName() string { return "HostMatchInputValidationError" }
+
+// Error satisfies the builtin error interface
+func (e HostMatchInputValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHostMatchInput.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HostMatchInputValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HostMatchInputValidationError{}
+
+// Validate checks the field values on PathMatchInput with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PathMatchInput) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PathMatchInput with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PathMatchInputMultiError,
+// or nil if none found.
+func (m *PathMatchInput) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PathMatchInput) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return PathMatchInputMultiError(errors)
+	}
+
+	return nil
+}
+
+// PathMatchInputMultiError is an error wrapping multiple validation errors
+// returned by PathMatchInput.ValidateAll() if the designated constraints
+// aren't met.
+type PathMatchInputMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PathMatchInputMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PathMatchInputMultiError) AllErrors() []error { return m }
+
+// PathMatchInputValidationError is the validation error returned by
+// PathMatchInput.Validate if the designated constraints aren't met.
+type PathMatchInputValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PathMatchInputValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PathMatchInputValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PathMatchInputValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PathMatchInputValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PathMatchInputValidationError) ErrorName() string { return "PathMatchInputValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PathMatchInputValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPathMatchInput.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PathMatchInputValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PathMatchInputValidationError{}
+
 // Validate checks the field values on MethodMatchInput with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -349,3 +549,479 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = PropertyMatchInputValidationError{}
+
+// Validate checks the field values on RequestMatchInput with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *RequestMatchInput) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RequestMatchInput with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// RequestMatchInputMultiError, or nil if none found.
+func (m *RequestMatchInput) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RequestMatchInput) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return RequestMatchInputMultiError(errors)
+	}
+
+	return nil
+}
+
+// RequestMatchInputMultiError is an error wrapping multiple validation errors
+// returned by RequestMatchInput.ValidateAll() if the designated constraints
+// aren't met.
+type RequestMatchInputMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RequestMatchInputMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RequestMatchInputMultiError) AllErrors() []error { return m }
+
+// RequestMatchInputValidationError is the validation error returned by
+// RequestMatchInput.Validate if the designated constraints aren't met.
+type RequestMatchInputValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RequestMatchInputValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RequestMatchInputValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RequestMatchInputValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RequestMatchInputValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RequestMatchInputValidationError) ErrorName() string {
+	return "RequestMatchInputValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e RequestMatchInputValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRequestMatchInput.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RequestMatchInputValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RequestMatchInputValidationError{}
+
+// Validate checks the field values on KeyValueMatchEntry with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *KeyValueMatchEntry) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KeyValueMatchEntry with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// KeyValueMatchEntryMultiError, or nil if none found.
+func (m *KeyValueMatchEntry) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KeyValueMatchEntry) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := KeyValueMatchEntryValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetStringMatch() == nil {
+		err := KeyValueMatchEntryValidationError{
+			field:  "StringMatch",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetStringMatch()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, KeyValueMatchEntryValidationError{
+					field:  "StringMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, KeyValueMatchEntryValidationError{
+					field:  "StringMatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStringMatch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return KeyValueMatchEntryValidationError{
+				field:  "StringMatch",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return KeyValueMatchEntryMultiError(errors)
+	}
+
+	return nil
+}
+
+// KeyValueMatchEntryMultiError is an error wrapping multiple validation errors
+// returned by KeyValueMatchEntry.ValidateAll() if the designated constraints
+// aren't met.
+type KeyValueMatchEntryMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KeyValueMatchEntryMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KeyValueMatchEntryMultiError) AllErrors() []error { return m }
+
+// KeyValueMatchEntryValidationError is the validation error returned by
+// KeyValueMatchEntry.Validate if the designated constraints aren't met.
+type KeyValueMatchEntryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e KeyValueMatchEntryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e KeyValueMatchEntryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e KeyValueMatchEntryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e KeyValueMatchEntryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e KeyValueMatchEntryValidationError) ErrorName() string {
+	return "KeyValueMatchEntryValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e KeyValueMatchEntryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sKeyValueMatchEntry.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = KeyValueMatchEntryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = KeyValueMatchEntryValidationError{}
+
+// Validate checks the field values on RequestMatcher with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RequestMatcher) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RequestMatcher with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RequestMatcherMultiError,
+// or nil if none found.
+func (m *RequestMatcher) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RequestMatcher) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetHost()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RequestMatcherValidationError{
+					field:  "Host",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RequestMatcherValidationError{
+					field:  "Host",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetHost()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RequestMatcherValidationError{
+				field:  "Host",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPath()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RequestMatcherValidationError{
+					field:  "Path",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RequestMatcherValidationError{
+					field:  "Path",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPath()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RequestMatcherValidationError{
+				field:  "Path",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetMethod()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RequestMatcherValidationError{
+					field:  "Method",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RequestMatcherValidationError{
+					field:  "Method",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMethod()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RequestMatcherValidationError{
+				field:  "Method",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetProperties() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RequestMatcherValidationError{
+						field:  fmt.Sprintf("Properties[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RequestMatcherValidationError{
+						field:  fmt.Sprintf("Properties[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RequestMatcherValidationError{
+					field:  fmt.Sprintf("Properties[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return RequestMatcherMultiError(errors)
+	}
+
+	return nil
+}
+
+// RequestMatcherMultiError is an error wrapping multiple validation errors
+// returned by RequestMatcher.ValidateAll() if the designated constraints
+// aren't met.
+type RequestMatcherMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RequestMatcherMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RequestMatcherMultiError) AllErrors() []error { return m }
+
+// RequestMatcherValidationError is the validation error returned by
+// RequestMatcher.Validate if the designated constraints aren't met.
+type RequestMatcherValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RequestMatcherValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RequestMatcherValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RequestMatcherValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RequestMatcherValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RequestMatcherValidationError) ErrorName() string { return "RequestMatcherValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RequestMatcherValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRequestMatcher.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RequestMatcherValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RequestMatcherValidationError{}
