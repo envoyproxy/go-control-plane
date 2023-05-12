@@ -130,32 +130,34 @@ func (m *ExternalProcessor) validate(all bool) error {
 
 	// no validation rules for AsyncMode
 
-	if all {
-		switch v := interface{}(m.GetMessageTimeout()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ExternalProcessorValidationError{
-					field:  "MessageTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, ExternalProcessorValidationError{
-					field:  "MessageTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetMessageTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ExternalProcessorValidationError{
+	if d := m.GetMessageTimeout(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = ExternalProcessorValidationError{
 				field:  "MessageTimeout",
-				reason: "embedded message failed validation",
+				reason: "value is not a valid duration",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			lte := time.Duration(3600*time.Second + 0*time.Nanosecond)
+			gte := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur < gte || dur > lte {
+				err := ExternalProcessorValidationError{
+					field:  "MessageTimeout",
+					reason: "value must be inside range [0s, 1h0m0s]",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
 		}
 	}
 
@@ -190,32 +192,34 @@ func (m *ExternalProcessor) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetMaxMessageTimeout()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ExternalProcessorValidationError{
-					field:  "MaxMessageTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, ExternalProcessorValidationError{
-					field:  "MaxMessageTimeout",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetMaxMessageTimeout()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ExternalProcessorValidationError{
+	if d := m.GetMaxMessageTimeout(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = ExternalProcessorValidationError{
 				field:  "MaxMessageTimeout",
-				reason: "embedded message failed validation",
+				reason: "value is not a valid duration",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			lte := time.Duration(3600*time.Second + 0*time.Nanosecond)
+			gte := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur < gte || dur > lte {
+				err := ExternalProcessorValidationError{
+					field:  "MaxMessageTimeout",
+					reason: "value must be inside range [0s, 1h0m0s]",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
 		}
 	}
 
