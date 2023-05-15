@@ -253,7 +253,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 		// sending them in the correct order. Go's default implementation
 		// of maps are randomized order when ranged over.
 		if cache.ads {
-			info.orderResponseWatches(cache.ads)
+			info.orderResponseWatches()
 			for _, key := range info.orderedWatches {
 				err := respond(info.watches[key.ID], key.ID)
 				if err != nil {

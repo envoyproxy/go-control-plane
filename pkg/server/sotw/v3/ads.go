@@ -31,6 +31,10 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 		return nil
 	}
 
+	// Instead of creating a separate channel for each incoming request and abandoning the old one
+	// This algorithm uses (and reuses) a single channel for all request types and guarantees
+	// the server will send updates over the wire in an ordered fashion.
+	// Downside is there is no longer back pressure per resource.
 	processAllExcept := func(typeURL string) error {
 		for {
 			select {
@@ -86,8 +90,6 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 				if req.TypeUrl == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
 				}
-			} else if req.TypeUrl == "" {
-				req.TypeUrl = defaultTypeURL
 			}
 
 			if s.callbacks != nil {

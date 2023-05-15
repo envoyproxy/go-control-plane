@@ -162,11 +162,9 @@ func (info *statusInfo) setDeltaResponseWatch(id int64, drw DeltaResponseWatch) 
 
 // orderResponseWatches will track a list of watch keys and order them if
 // true is passed.
-func (info *statusInfo) orderResponseWatches(order bool) {
+func (info *statusInfo) orderResponseWatches() {
 	info.orderedWatches = make(keys, len(info.watches))
 
-	// This runs in O(n) which could become problematic when we have an extremely high watch count.
-	// TODO(alec): revisit this and optimize for speed.
 	var index int
 	for id, watch := range info.watches {
 		info.orderedWatches[index] = key{
@@ -178,7 +176,5 @@ func (info *statusInfo) orderResponseWatches(order bool) {
 
 	// Sort our list which we can use in the SetSnapshot functions.
 	// This is only run when we enable ADS on the cache.
-	if order {
-		sort.Sort(info.orderedWatches)
-	}
+	sort.Sort(info.orderedWatches)
 }
