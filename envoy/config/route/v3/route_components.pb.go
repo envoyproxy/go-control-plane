@@ -1774,7 +1774,8 @@ type RouteAction struct {
 	// :ref:`host_rewrite_header <envoy_v3_api_field_config.route.v3.RouteAction.host_rewrite_header>`, or
 	// :ref:`host_rewrite_path_regex <envoy_v3_api_field_config.route.v3.RouteAction.host_rewrite_path_regex>`)
 	// causes the original value of the host header, if any, to be appended to the
-	// :ref:`config_http_conn_man_headers_x-forwarded-host` HTTP header.
+	// :ref:`config_http_conn_man_headers_x-forwarded-host` HTTP header if it is different to the last value appended.
+	// This can be disabled by setting the runtime guard `envoy_reloadable_features_append_xfh_idempotent` to false.
 	AppendXForwardedHost bool `protobuf:"varint,38,opt,name=append_x_forwarded_host,json=appendXForwardedHost,proto3" json:"append_x_forwarded_host,omitempty"`
 	// Specifies the upstream timeout for the route. If not specified, the default is 15s. This
 	// spans between the point at which the entire downstream request (i.e. end-of-stream) has been
