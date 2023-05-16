@@ -72,8 +72,9 @@ type ExternalProcessor struct {
 	// a message on the stream that requires a response, it will reset this timer,
 	// and will stop processing and return an error (subject to the processing mode)
 	// if the timer expires before a matching response is received. There is no
-	// timeout when the filter is running in asynchronous mode. The
-	// ``message_timeout`` range is >= 0s and <= 3600s. Default is 200 milliseconds.
+	// timeout when the filter is running in asynchronous mode. Zero is a valid
+	// config which means the timer will be triggered immediately. If not
+	// configured, default is 200 milliseconds.
 	MessageTimeout *duration.Duration `protobuf:"bytes,7,opt,name=message_timeout,json=messageTimeout,proto3" json:"message_timeout,omitempty"`
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
 	// emitted statistics between configured *ext_proc* filters in an HTTP filter chain.
@@ -92,7 +93,6 @@ type ExternalProcessor struct {
 	MutationRules *v31.HeaderMutationRules `protobuf:"bytes,9,opt,name=mutation_rules,json=mutationRules,proto3" json:"mutation_rules,omitempty"`
 	// Specify the upper bound of
 	// :ref:`override_message_timeout <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.override_message_timeout>`
-	// The ``max_message_timeout`` range is >= 0s and <= 3600s.
 	// If not specified, by default it is 0, which will effectively disable the ``override_message_timeout`` API.
 	MaxMessageTimeout *duration.Duration `protobuf:"bytes,10,opt,name=max_message_timeout,json=maxMessageTimeout,proto3" json:"max_message_timeout,omitempty"`
 	// Prevents clearing the route-cache when the
