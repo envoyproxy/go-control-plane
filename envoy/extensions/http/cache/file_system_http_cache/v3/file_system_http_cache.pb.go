@@ -30,7 +30,7 @@ const (
 //
 // By default this cache uses a least-recently-used eviction strategy.
 //
-// For implementation details, see `DESIGN.md <https://github.com/envoyproxy/envoy/blob/main/test/extensions/http/cache/file_system_http_cache/DESIGN.md>`_.
+// For implementation details, see `DESIGN.md <https://github.com/envoyproxy/envoy/blob/main/source/extensions/http/cache/file_system_http_cache/DESIGN.md>`_.
 // [#next-free-field: 11]
 type FileSystemHttpCacheConfig struct {
 	state         protoimpl.MessageState
