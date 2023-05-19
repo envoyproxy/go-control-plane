@@ -321,7 +321,8 @@ func superset(names map[string]bool, resources map[string]types.ResourceWithTTL)
 	return nil
 }
 
-// CreateWatch returns a watch for an xDS request.
+// CreateWatch returns a watch for an xDS request.  A nil function may be
+// returned if an error occurs.
 func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.StreamState, value chan Response) func() {
 	nodeID := cache.hash.ID(request.Node)
 
@@ -365,8 +366,9 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 					if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
 						cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
 							request.ResourceNames, nodeID, err)
+						return nil
 					}
-					return nil
+					return func() {}
 				}
 			}
 		}
@@ -387,9 +389,10 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 	if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
 		cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
 			request.ResourceNames, nodeID, err)
+		return nil
 	}
 
-	return nil
+	return func() {}
 }
 
 func (cache *snapshotCache) nextWatchID() int64 {
