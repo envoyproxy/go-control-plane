@@ -520,6 +520,10 @@ type singleResourceSnapshot struct {
 }
 
 func (s *singleResourceSnapshot) GetVersion(typeURL string) string {
+	if typeURL != s.typeurl {
+		return ""
+	}
+
 	return s.version
 }
 

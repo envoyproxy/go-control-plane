@@ -61,12 +61,12 @@ func (cb *Callbacks) OnStreamRequest(int64, *discovery.DiscoveryRequest) error {
 }
 func (cb *Callbacks) OnStreamResponse(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
 }
-func (cb *Callbacks) OnStreamDeltaResponse(id int64, req *discovery.DeltaDiscoveryRequest, res *discovery.DeltaDiscoveryResponse) {
+func (cb *Callbacks) OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaResponses++
 }
-func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscoveryRequest) error {
+func (cb *Callbacks) OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaRequests++
@@ -77,7 +77,7 @@ func (cb *Callbacks) OnStreamDeltaRequest(id int64, req *discovery.DeltaDiscover
 
 	return nil
 }
-func (cb *Callbacks) OnFetchRequest(_ context.Context, req *discovery.DiscoveryRequest) error {
+func (cb *Callbacks) OnFetchRequest(context.Context, *discovery.DiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.Fetches++
