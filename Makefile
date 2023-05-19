@@ -4,8 +4,8 @@
 # Variables
 #------------------------------------------------------------------------------
 
-SHELL 	:= /bin/bash
-BINDIR	:= bin
+SHELL 		:= /bin/bash
+BINDIR		:= bin
 PKG 		:= github.com/envoyproxy/go-control-plane
 
 .PHONY: build
@@ -19,6 +19,9 @@ clean:
 	@go mod tidy
 	@rm -rf $(BINDIR)
 	@rm -rf *.log
+	@rm -rf *.pprof
+	@rm -rf benchmarks/reports
+	@rm -rf benchmarks/pngs
 
 # TODO(mattklein123): See the note in TestLinearConcurrentSetWatch() for why we set -parallel here
 # This should be removed.
@@ -78,6 +81,18 @@ integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
 
 integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
 	env XDS=delta-ads build/integration.sh
+
+
+#------------------------------------------------------------------------------
+# Benchmarks utilizing intergration tests
+#------------------------------------------------------------------------------
+.PHONY: benchmark docker_benchmarks
+benchmark: $(BINDIR)/test $(BINDIR)/upstream
+	env XDS=xds build/integration.sh
+
+docker_benchmarks:
+	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
+	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_benchmarks.sh
 
 #--------------------------------------
 #-- example xDS control plane server

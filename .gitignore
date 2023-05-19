@@ -16,3 +16,9 @@ examples/dyplomat/dyplomat
 *_gen_test.go
 
 /envoy*.log
+
+# Benchmarking artifacts
+*.gz
+*.pprof
+/benchmarks/reports
+/benchmarks/pngs
