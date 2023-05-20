@@ -41,27 +41,27 @@ func TestLoggerFuncs(t *testing.T) {
 	debug := 0
 	info := 0
 	warn := 0
-	error := 0
+	err := 0
 
 	xdsLogger := LoggerFuncs{
 		DebugFunc: func(string, ...interface{}) { debug++ },
 		InfoFunc:  func(string, ...interface{}) { info++ },
 		WarnFunc:  func(string, ...interface{}) { warn++ },
-		ErrorFunc: func(string, ...interface{}) { error++ },
+		ErrorFunc: func(string, ...interface{}) { err++ },
 	}
 
 	xdsLogger.Debugf("debug")
 	xdsLogger.Infof("info")
 	xdsLogger.Warnf("warn")
-	xdsLogger.Errorf("error")
+	xdsLogger.Errorf("err")
 
 	assert.Equal(t, debug, 1)
 	assert.Equal(t, info, 1)
 	assert.Equal(t, warn, 1)
-	assert.Equal(t, error, 1)
+	assert.Equal(t, err, 1)
 }
 
-func TestNilLoggerFuncs(t *testing.T) {
+func TestNilLoggerFuncs(_ *testing.T) {
 	xdsLogger := LoggerFuncs{}
 
 	// Just verifying that nothing panics.
