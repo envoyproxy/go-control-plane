@@ -310,11 +310,13 @@ type UpstreamHttpProtocolOptions struct {
 	// upstream connections based on the downstream HTTP host/authority header or any other arbitrary
 	// header when :ref:`override_auto_sni_header <envoy_v3_api_field_config.core.v3.UpstreamHttpProtocolOptions.override_auto_sni_header>`
 	// is set, as seen by the :ref:`router filter <config_http_filters_router>`.
+	// Does nothing if a filter before the http router filter sets the corresponding metadata.
 	AutoSni bool `protobuf:"varint,1,opt,name=auto_sni,json=autoSni,proto3" json:"auto_sni,omitempty"`
 	// Automatic validate upstream presented certificate for new upstream connections based on the
 	// downstream HTTP host/authority header or any other arbitrary header when :ref:`override_auto_sni_header <envoy_v3_api_field_config.core.v3.UpstreamHttpProtocolOptions.override_auto_sni_header>`
 	// is set, as seen by the :ref:`router filter <config_http_filters_router>`.
 	// This field is intended to be set with ``auto_sni`` field.
+	// Does nothing if a filter before the http router filter sets the corresponding metadata.
 	AutoSanValidation bool `protobuf:"varint,2,opt,name=auto_san_validation,json=autoSanValidation,proto3" json:"auto_san_validation,omitempty"`
 	// An optional alternative to the host/authority header to be used for setting the SNI value.
 	// It should be a valid downstream HTTP header, as seen by the
@@ -323,6 +325,7 @@ type UpstreamHttpProtocolOptions struct {
 	// is not found or the value is empty, host/authority header will be used instead.
 	// This field is intended to be set with ``auto_sni`` and/or ``auto_san_validation`` fields.
 	// If none of these fields are set then setting this would be a no-op.
+	// Does nothing if a filter before the http router filter sets the corresponding metadata.
 	OverrideAutoSniHeader string `protobuf:"bytes,3,opt,name=override_auto_sni_header,json=overrideAutoSniHeader,proto3" json:"override_auto_sni_header,omitempty"`
 }
 
