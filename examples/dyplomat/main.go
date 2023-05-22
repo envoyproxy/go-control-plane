@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"net"
 	"time"
+
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 
 	"google.golang.org/grpc"
 
@@ -71,7 +72,7 @@ func main() {
 	}
 
 	if err := grpcServer.Serve(lis); err != nil {
-		fmt.Errorf("", err)
+		fmt.Printf("%v", err)
 	}
 }
 

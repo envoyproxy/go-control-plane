@@ -22,6 +22,7 @@ make examples
 make test
 make integration
 
-cd ./xdsmatcher
-make test
+make -C xdsmatcher test
 # TODO(snowp): Output coverage in CI
+
+make -C examples/dyplomat test
