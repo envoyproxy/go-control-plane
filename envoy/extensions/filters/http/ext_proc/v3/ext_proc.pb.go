@@ -167,7 +167,6 @@ type ExternalProcessor struct {
 	// :ref:`clear_route_cache <envoy_v3_api_field_service.ext_proc.v3.CommonResponse.clear_route_cache>`
 	// field is set in an external processor response.
 	DisableClearRouteCache bool `protobuf:"varint,11,opt,name=disable_clear_route_cache,json=disableClearRouteCache,proto3" json:"disable_clear_route_cache,omitempty"`
-	// [#not-implemented-hide:]
 	// Allow headers matching the ``forward_rules`` to be forwarded to the external processing server.
 	// If not set, all headers are forwarded to the external processing server.
 	ForwardRules *HeaderForwardingRules `protobuf:"bytes,12,opt,name=forward_rules,json=forwardRules,proto3" json:"forward_rules,omitempty"`
@@ -321,6 +320,7 @@ type HeaderForwardingRules struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// If not set, all headers are forwarded to the external processing server.
 	AllowedHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
 }
 
