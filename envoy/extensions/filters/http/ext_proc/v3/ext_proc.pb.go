@@ -69,7 +69,8 @@ const (
 // By default, the processor sends only the request and response headers messages.
 // This may be changed to include any of the six steps by changing the processing_mode
 // setting of the filter configuration, or by setting the mode_override of any response
-// from the external processor. This way, a processor may, for example, use information
+// from the external processor. The latter is only enabled if allow_mode_override is
+// set to true. This way, a processor may, for example, use information
 // in the request header to determine whether the message body must be examined, or whether
 // the proxy should simply stream it straight through.
 //
@@ -174,7 +175,6 @@ type ExternalProcessor struct {
 	// will be added to StreamInfo's filter state under the namespace corresponding to the
 	// ext_proc filter name.
 	FilterMetadata *_struct.Struct `protobuf:"bytes,13,opt,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty"`
-	// [#not-implemented-hide:]
 	// If ``allow_mode_override`` is set to true, the filter config :ref:`processing_mode
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
 	// can be overridden by the response message from the external processing server
