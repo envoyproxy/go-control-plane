@@ -10,7 +10,7 @@ implements the discovery service APIs defined in
 
 ## Proto files
 
-The go proto files are synced from the upstream Envoy repository (https://github.com/envoyproxy/envoy) on every upstream commit.
+The Go proto files are synced from the upstream Envoy repository (https://github.com/envoyproxy/envoy) on every upstream commit.
 
 Synchronization is triggered using the `envoy-sync.yaml` workflow.
 

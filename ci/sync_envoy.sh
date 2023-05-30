@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
 set -o pipefail
 
@@ -8,12 +8,13 @@ GO_TARGETS=(@envoy_api//...)
 IMPORT_BASE="github.com/envoyproxy/go-control-plane"
 COMMITTER_NAME="envoy-sync[bot]"
 COMMITTER_EMAIL="envoy-sync[bot]@users.noreply.github.com"
+ENVOY_SRC_DIR="${ENVOY_SRC_DIR:-}"
 
 
 if [[ -z "$ENVOY_SRC_DIR" ]]; then
     echo "ENVOY_SRC_DIR not set, it should point to a cloned Envoy repo" >&2
     exit 1
-elif [[ ! -e "$ENVOY_SRC_DIR" ]]; then
+elif [[ ! -d "$ENVOY_SRC_DIR" ]]; then
     echo "ENVOY_SRC_DIR ($ENVOY_SRC_DIR) not found, did you clone it?" >&2
     exit 1
 fi
@@ -28,7 +29,7 @@ build_protos () {
     # shellcheck disable=SC1091
     . ci/setup_cache.sh
 
-    read -a go_protos <<< "$(bazel query "kind('go_proto_library', ${GO_TARGETS[*]})" | tr '\n' ' ')"
+    read -r -a go_protos <<< "$(bazel query "kind('go_proto_library', ${GO_TARGETS[*]})" | tr '\n' ' ')"
     bazel build \
           --experimental_proto_descriptor_sets_include_source_info \
           "${go_protos[@]}"
