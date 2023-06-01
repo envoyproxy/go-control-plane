@@ -1708,7 +1708,6 @@ type HttpFilter struct {
 	// If true, clients that do not support this filter may ignore the
 	// filter but otherwise accept the config.
 	// Otherwise, clients that do not support this filter must reject the config.
-	// This is also same with typed per filter config.
 	IsOptional bool `protobuf:"varint,6,opt,name=is_optional,json=isOptional,proto3" json:"is_optional,omitempty"`
 }
 

@@ -3816,7 +3816,6 @@ func (x *InternalRedirectPolicy) GetAllowCrossSchemeRedirect() bool {
 // :ref:`Route.typed_per_filter_config<envoy_v3_api_field_config.route.v3.Route.typed_per_filter_config>`,
 // or :ref:`WeightedCluster.ClusterWeight.typed_per_filter_config<envoy_v3_api_field_config.route.v3.WeightedCluster.ClusterWeight.typed_per_filter_config>`
 // to add additional flags to the filter.
-// [#not-implemented-hide:]
 type FilterConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3840,6 +3839,8 @@ type FilterConfig struct {
 	//   created and it is too late to change the chain.
 	//
 	//   This field only make sense for the downstream HTTP filters for now.
+	//
+	// [#not-implemented-hide:]
 	Disabled bool `protobuf:"varint,3,opt,name=disabled,proto3" json:"disabled,omitempty"`
 }
 
