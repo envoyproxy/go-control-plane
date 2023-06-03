@@ -21,12 +21,19 @@ jobs:
           || github.actor == 'sync-envoy[bot]'
       }}
     steps:
+    - id: appauth
+      uses: envoyproxy/toolshed/gh-actions/appauth@actions-v0
+      with:
+        key: ${{ secrets.ENVOY_CI_UPDATE_BOT_KEY }}
+        app_id: ${{ secrets.ENVOY_CI_UPDATE_APP_ID }}
+
     # Checkout the repo
     - name: 'Checkout Repository'
       uses: actions/checkout@v3
       with:
         ref: main
         fetch-depth: 0
+        token: ${{ steps.appauth.outputs.value }}
 
     # Checkout the Envoy repo
     - name: 'Checkout Repository'
@@ -41,3 +48,4 @@ jobs:
     - run: ci/sync_envoy.sh
       env:
         ENVOY_SRC_DIR: ../envoy
+        NO_BUILD_SETUP: 1
