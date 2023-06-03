@@ -21,31 +21,9 @@ fi
 
 
 build_protos () {
-    # TODO(phlax): use envoy do_ci target once https://github.com/envoyproxy/envoy/pull/27675 lands
-    local go_protos go_proto go_file rule_dir proto input_dir output_dir
     echo "Building go protos ..."
     cd "${ENVOY_SRC_DIR}" || exit 1
-
-    # shellcheck disable=SC1091
-    . ci/setup_cache.sh
-
-    read -r -a go_protos <<< "$(bazel query "kind('go_proto_library', ${GO_TARGETS[*]})" | tr '\n' ' ')"
-    bazel build \
-          --experimental_proto_descriptor_sets_include_source_info \
-          "${go_protos[@]}"
-    rm -rf build_go
-    mkdir -p build_go
-    for go_proto in "${go_protos[@]}"; do
-        # strip @envoy_api//
-        rule_dir="$(echo "${go_proto:12}" | cut -d: -f1)"
-        proto="$(echo "${go_proto:12}" | cut -d: -f2)"
-        input_dir="bazel-bin/external/envoy_api/${rule_dir}/${proto}_/${IMPORT_BASE}/${rule_dir}"
-        output_dir="build_go/${rule_dir}"
-        mkdir -p "$output_dir"
-        while read -r go_file; do
-            cp -a "$go_file" "$output_dir"
-        done <<< "$(find "$input_dir" -name "*.go")"
-    done
+    ./ci/do_ci.sh api.go
     cd - || exit 1
 }
 
