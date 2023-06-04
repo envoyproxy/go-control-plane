@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# ARBITRARY CHANGE
+
 set -o pipefail
 
 MIRROR_MSG="Mirrored from envoyproxy/envoy"
