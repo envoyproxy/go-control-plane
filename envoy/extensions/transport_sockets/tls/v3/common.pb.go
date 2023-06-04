@@ -969,6 +969,11 @@ type CertificateValidationContext struct {
 	// from that chain. This default behavior can be altered by setting
 	// :ref:`only_verify_leaf_cert_crl <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.only_verify_leaf_cert_crl>` to
 	// true.
+	//
+	// If ``crl`` is a filesystem path, a watch will be added to the parent
+	// directory for any file moves to support rotation. This currently only
+	// applies to dynamic secrets, when the ``CertificateValidationContext`` is
+	// delivered via SDS.
 	Crl *v3.DataSource `protobuf:"bytes,7,opt,name=crl,proto3" json:"crl,omitempty"`
 	// If specified, Envoy will not reject expired certificates.
 	AllowExpiredCertificate bool `protobuf:"varint,8,opt,name=allow_expired_certificate,json=allowExpiredCertificate,proto3" json:"allow_expired_certificate,omitempty"`
