@@ -6,8 +6,8 @@ MIRROR_MSG="Mirrored from envoyproxy/envoy"
 SRCS=(envoy contrib)
 GO_TARGETS=(@envoy_api//...)
 IMPORT_BASE="github.com/envoyproxy/go-control-plane"
-COMMITTER_NAME="envoy-sync[bot]"
-COMMITTER_EMAIL="envoy-sync[bot]@users.noreply.github.com"
+COMMITTER_NAME="update-envoy[bot]"
+COMMITTER_EMAIL="135279899+update-envoy[bot]@users.noreply.github.com"
 ENVOY_SRC_DIR="${ENVOY_SRC_DIR:-}"
 
 
@@ -56,13 +56,15 @@ commit_changes () {
         return
     fi
     last_envoy_sha="$(get_last_envoy_sha)"
+    echo "Latest Envoy SHA: ${last_envoy_sha}"
     changes="$(git -C "${ENVOY_SRC_DIR}" rev-list "${last_envoy_sha}"..HEAD)"
     echo "Changes detected: "
     echo "$changes"
-    latest_commit="$(git -C "${ENVOY_SRC_DIR}" rev-list "${last_envoy_sha}"..HEAD | head -n1)"
+    latest_commit="$(git -C "${ENVOY_SRC_DIR}" rev-list HEAD -n1)"
+    echo "Latest commit: ${latest_commit}"
     echo "$latest_commit" > envoy/COMMIT
-    git config --global user.email "$COMMITTER_EMAIL"
-    git config --global user.name "$COMMITTER_NAME"
+    git config user.email "$COMMITTER_EMAIL"
+    git config user.name "$COMMITTER_NAME"
     git add envoy contrib
     git commit --allow-empty -s -m "${MIRROR_MSG} @ ${latest_commit}"
     git push origin main
