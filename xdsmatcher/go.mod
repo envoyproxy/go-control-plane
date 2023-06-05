@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/cncf/xds/go v0.0.0-20230428030218-4003588d1b74
 	github.com/envoyproxy/go-control-plane v0.11.1
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	google.golang.org/protobuf v1.30.0
 	gopkg.in/yaml.v2 v2.4.0
 )
