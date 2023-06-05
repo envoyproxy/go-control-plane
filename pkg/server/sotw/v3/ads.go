@@ -35,6 +35,9 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 	// This algorithm uses (and reuses) a single channel for all request types and guarantees
 	// the server will send updates over the wire in an ordered fashion.
 	// Downside is there is no longer back pressure per resource.
+	// There is potential for a dropped response from the cache but this is not impactful
+	// to the client since SOTW version handling is global and a new sequence will be
+	// initiated on a new request.
 	processAllExcept := func(typeURL string) error {
 		for {
 			select {

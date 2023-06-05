@@ -1,7 +1,7 @@
 package config
 
 // Opts for individual xDS implementations that can be
-// utilized through the functional opts pattern
+// utilized through the functional opts pattern.
 type Opts struct {
 	// If true respond to ADS requests with a guaranteed resource ordering
 	Ordered bool

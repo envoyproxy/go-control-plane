@@ -119,13 +119,6 @@ func (s *StreamState) IsWildcard() bool {
 	return s.wildcard
 }
 
-// IsOrdered returns whether or not the current stream should run as an ordered ADS stream.
-// This means less back-pressure relief but a guarantee of correct discovery response order.
-func (s *StreamState) IsOrdered(ordered bool) bool {
-	s.ordered = ordered
-	return ordered
-}
-
 // GetKnownResourceNames returns the current known list of resources on a SOTW stream.
 func (s *StreamState) GetKnownResourceNames(url string) map[string]struct{} {
 	return s.knownResourceNames[url]

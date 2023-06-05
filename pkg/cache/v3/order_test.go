@@ -1,9 +1,10 @@
 package cache
 
 import (
-	"errors"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
@@ -31,13 +32,35 @@ func TestOrderKeys(t *testing.T) {
 			TypeURL: resource.ScopedRouteType,
 		},
 	}
+	expected := keys{
+		{
+			ID:      4,
+			TypeURL: resource.ListenerType,
+		},
+		{
+			ID:      3,
+			TypeURL: resource.RouteType,
+		},
+		{
+			ID:      5,
+			TypeURL: resource.ScopedRouteType,
+		},
+		{
+			ID:      2,
+			TypeURL: resource.ClusterType,
+		},
+		{
+			ID:      1,
+			TypeURL: resource.EndpointType,
+		},
+	}
 
 	orderedKeys := unorderedKeys
 	sort.Sort(orderedKeys)
 
-	if !sort.IsSorted(orderedKeys) {
-		t.Fatal(errors.New("failed to sort keys"))
-	}
+	assert.True(t, sort.IsSorted(orderedKeys))
+	assert.NotEqual(t, unorderedKeys, &orderedKeys)
+	assert.Equal(t, expected, orderedKeys)
 
 	// Ordering:
 	// === RUN   TestOrderKeys
