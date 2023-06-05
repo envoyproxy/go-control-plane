@@ -66,7 +66,6 @@ type statusInfo struct {
 	node *core.Node
 
 	// watches are indexed channels for the response watches and the original requests.
-	// watches map[int64]ResponseWatch
 	watches        map[int64]ResponseWatch
 	orderedWatches keys
 

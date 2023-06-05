@@ -93,6 +93,9 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				if s.opts.Ordered {
 					// send our first request on the stream again so it doesn't get
 					// lost in processing on the new control loop
+					// There's a risk (albeit very limited) that we'd end up handling requests in the wrong order here.
+					// If envoy is using ADS for endpoints, and clusters are added in short sequence,
+					// the following request might include a new cluster and be discarded as the previous one will be handled after.
 					go func() {
 						reqCh <- req
 					}()
