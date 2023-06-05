@@ -32,6 +32,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
@@ -579,7 +580,9 @@ func TestAggregatedHandlers(t *testing.T) {
 		ResourceNames: []string{virtualHostName},
 	}
 
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	// We create the server with the optional ordered ADS flag so we guarantee resource
+	// ordering over the stream.
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithOrderedADS())
 	go func() {
 		err := s.StreamAggregatedResources(resp)
 		assert.NoError(t, err)
