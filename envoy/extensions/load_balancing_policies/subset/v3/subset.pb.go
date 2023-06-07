@@ -180,7 +180,7 @@ const (
 	Subset_LbSubsetSelector_DEFAULT_SUBSET Subset_LbSubsetSelector_LbSubsetSelectorFallbackPolicy = 3
 	// If KEYS_SUBSET is selected, subset selector matching is performed again with metadata
 	// keys reduced to
-	// :ref:`fallback_keys_subset<envoy_v3_api_field_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.fallback_keys_subset>`.
+	// :ref:`fallback_keys_subset<envoy_v3_api_field_extensions.load_balancing_policies.subset.v3.Subset.LbSubsetSelector.fallback_keys_subset>`.
 	// It allows for a fallback to a different, less specific selector if some of the keys of
 	// the selector are considered optional.
 	Subset_LbSubsetSelector_KEYS_SUBSET Subset_LbSubsetSelector_LbSubsetSelectorFallbackPolicy = 4
@@ -241,16 +241,16 @@ type Subset struct {
 
 	// The behavior used when no endpoint subset matches the selected route's
 	// metadata. The value defaults to
-	// :ref:`NO_FALLBACK<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.NO_FALLBACK>`.
+	// :ref:`NO_FALLBACK<envoy_v3_api_enum_value_extensions.load_balancing_policies.subset.v3.Subset.LbSubsetFallbackPolicy.NO_FALLBACK>`.
 	FallbackPolicy Subset_LbSubsetFallbackPolicy `protobuf:"varint,1,opt,name=fallback_policy,json=fallbackPolicy,proto3,enum=envoy.extensions.load_balancing_policies.subset.v3.Subset_LbSubsetFallbackPolicy" json:"fallback_policy,omitempty"`
 	// Specifies the default subset of endpoints used during fallback if
 	// fallback_policy is
-	// :ref:`DEFAULT_SUBSET<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.DEFAULT_SUBSET>`.
+	// :ref:`DEFAULT_SUBSET<envoy_v3_api_enum_value_extensions.load_balancing_policies.subset.v3.Subset.LbSubsetFallbackPolicy.DEFAULT_SUBSET>`.
 	// Each field in default_subset is
 	// compared to the matching LbEndpoint.Metadata under the ``envoy.lb``
 	// namespace. It is valid for no hosts to match, in which case the behavior
 	// is the same as a fallback_policy of
-	// :ref:`NO_FALLBACK<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.NO_FALLBACK>`.
+	// :ref:`NO_FALLBACK<envoy_v3_api_enum_value_extensions.load_balancing_policies.subset.v3.Subset.LbSubsetFallbackPolicy.NO_FALLBACK>`.
 	DefaultSubset *_struct.Struct `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset,proto3" json:"default_subset,omitempty"`
 	// For each entry, LbEndpoint.Metadata's
 	// ``envoy.lb`` namespace is traversed and a subset is created for each unique
@@ -301,7 +301,7 @@ type Subset struct {
 	//
 	// The value defaults to
 	// :ref:`METADATA_NO_FALLBACK
-	// <envoy_v3_api_field_extensions.load_balancing_policies.subset.v3.subset.LbSubsetMetadataFallbackPolicy.METADATA_NO_FALLBACK>`.
+	// <envoy_v3_api_enum_value_extensions.load_balancing_policies.subset.v3.subset.LbSubsetMetadataFallbackPolicy.METADATA_NO_FALLBACK>`.
 	MetadataFallbackPolicy Subset_LbSubsetMetadataFallbackPolicy `protobuf:"varint,8,opt,name=metadata_fallback_policy,json=metadataFallbackPolicy,proto3,enum=envoy.extensions.load_balancing_policies.subset.v3.Subset_LbSubsetMetadataFallbackPolicy" json:"metadata_fallback_policy,omitempty"`
 	// The child LB policy to create for endpoint-picking within the chosen subset.
 	SubsetLbPolicy *v3.LoadBalancingPolicy `protobuf:"bytes,9,opt,name=subset_lb_policy,json=subsetLbPolicy,proto3" json:"subset_lb_policy,omitempty"`
@@ -424,13 +424,13 @@ type Subset_LbSubsetSelector struct {
 	// metadata.
 	FallbackPolicy Subset_LbSubsetSelector_LbSubsetSelectorFallbackPolicy `protobuf:"varint,2,opt,name=fallback_policy,json=fallbackPolicy,proto3,enum=envoy.extensions.load_balancing_policies.subset.v3.Subset_LbSubsetSelector_LbSubsetSelectorFallbackPolicy" json:"fallback_policy,omitempty"`
 	// Subset of
-	// :ref:`keys<envoy_v3_api_field_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.keys>` used by
-	// :ref:`KEYS_SUBSET<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.LbSubsetSelectorFallbackPolicy.KEYS_SUBSET>`
+	// :ref:`keys<envoy_v3_api_field_extensions.load_balancing_policies.subset.v3.Subset.LbSubsetSelector.keys>` used by
+	// :ref:`KEYS_SUBSET<envoy_v3_api_enum_value_extensions.load_balancing_policies.subset.v3.Subset.LbSubsetSelector.LbSubsetSelectorFallbackPolicy.KEYS_SUBSET>`
 	// fallback policy.
 	// It has to be a non empty list if KEYS_SUBSET fallback policy is selected.
 	// For any other fallback policy the parameter is not used and should not be set.
 	// Only values also present in
-	// :ref:`keys<envoy_v3_api_field_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector.keys>` are allowed, but
+	// :ref:`keys<envoy_v3_api_field_extensions.load_balancing_policies.subset.v3.Subset.LbSubsetSelector.keys>` are allowed, but
 	// ``fallback_keys_subset`` cannot be equal to ``keys``.
 	FallbackKeysSubset []string `protobuf:"bytes,3,rep,name=fallback_keys_subset,json=fallbackKeysSubset,proto3" json:"fallback_keys_subset,omitempty"`
 }
