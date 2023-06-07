@@ -45,7 +45,7 @@ const (
 //       fragments:
 //         - header_value_extractor:
 //             name: X-Route-Selector
-//             element_separator: ,
+//             element_separator: ","
 //             element:
 //               separator: =
 //               key: vip
