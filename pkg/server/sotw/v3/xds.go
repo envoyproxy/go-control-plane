@@ -27,7 +27,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 
 		// a collection of stack allocated watches per request type.
 		watches:                newWatches(),
-		streamStates:           make(map[string]stream.StreamState),
+		streamStates:           make(map[string]stream.SubscriptionState),
 		lastDiscoveryResponses: make(map[string]lastDiscoveryResponse),
 	}
 
@@ -121,9 +121,11 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 			if lastResponse, ok := sw.lastDiscoveryResponses[req.TypeUrl]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
-					streamState.SetResourceVersions(lastResponse.resources)
+					streamState.SetKnownResources(lastResponse.resources)
 				}
 			}
+
+			updateSubscriptionResources(req, &streamState)
 
 			typeURL := req.GetTypeUrl()
 			responder := make(chan cache.Response, 1)
@@ -133,16 +135,24 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				if w.nonce == "" || w.nonce == nonce {
 					w.close()
 
+					cancel, err := s.cache.CreateWatch(req, streamState, responder)
+					if err != nil {
+						return err
+					}
 					sw.watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, streamState, responder),
+						cancel:   cancel,
 						response: responder,
 					})
 				}
 			} else {
 				// No pre-existing watch exists, let's create one.
 				// We need to precompute the watches first then open a watch in the cache.
+				cancel, err := s.cache.CreateWatch(req, streamState, responder)
+				if err != nil {
+					return err
+				}
 				sw.watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, streamState, responder),
+					cancel:   cancel,
 					response: responder,
 				})
 			}
@@ -167,4 +177,37 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 			sw.watches.responders[res.GetRequest().TypeUrl].nonce = nonce
 		}
 	}
+}
+
+// updateSubscriptionResources provides a normalized view of resources to be used in Cache
+// It is also implementing the new behavior of wildcard as described in
+// https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#how-the-client-specifies-what-resources-to-return
+func updateSubscriptionResources(req *discovery.DiscoveryRequest, subscriptionState *stream.SubscriptionState) {
+	subscribedResources := make(map[string]struct{}, len(req.ResourceNames))
+	explicitWildcard := false
+	for _, resource := range req.ResourceNames {
+		if resource == "*" {
+			explicitWildcard = true
+		} else {
+			subscribedResources[resource] = struct{}{}
+		}
+	}
+
+	if subscriptionState.IsWildcard() && len(req.ResourceNames) == 0 && len(subscriptionState.GetSubscribedResources()) == 0 {
+		// We were wildcard and no resource has been subscribed
+		// Legacy wildcard mode states that we remain in wildcard mode
+		subscriptionState.SetWildcard(true)
+	} else if explicitWildcard {
+		// Explicit subscription to wildcard
+		// Documentation states that we should no longer allow to fallback to the previous case
+		// and no longer setting wildcard would no longer subscribe to anything
+		// For now we ignore this case and will not support unsubscribing in this case
+		subscriptionState.SetWildcard(true)
+	} else {
+		// The subscription is currently not wildcard, or there are resources or have been resources subscribed to
+		// This is no longer the legacy wildcard case as described by the specification
+		subscriptionState.SetWildcard(false)
+	}
+	subscriptionState.SetSubscribedResources(subscribedResources)
+
 }

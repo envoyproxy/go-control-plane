@@ -17,6 +17,7 @@ package cache
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -163,11 +164,11 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 		}
 
 		for id, watch := range cache.deltaWatches {
-			if !watch.WatchesResources(modified) {
+			if !watch.subscriptionState.WatchesResources(modified) {
 				continue
 			}
 
-			res := cache.respondDelta(watch.Request, watch.Response, watch.clientState)
+			res := cache.respondDelta(watch.Request, watch.Response, watch.subscriptionState)
 			if res != nil {
 				delete(cache.deltaWatches, id)
 			}
@@ -175,7 +176,7 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	}
 }
 
-func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, clientState ClientState) *RawDeltaResponse {
+func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, clientState SubscriptionState) *RawDeltaResponse {
 	resp := createDeltaResponse(context.Background(), request, clientState, resourceContainer{
 		resourceMap:   cache.resources,
 		versionMap:    cache.versionMap,
@@ -297,10 +298,10 @@ func (cache *LinearCache) GetResources() map[string]types.Resource {
 	return resources
 }
 
-func (cache *LinearCache) CreateWatch(request *Request, clientState ClientState, value chan Response) func() {
+func (cache *LinearCache) CreateWatch(request *Request, _ SubscriptionState, value chan Response) (func(), error) {
 	if request.TypeUrl != cache.typeURL {
 		value <- nil
-		return nil
+		return nil, fmt.Errorf("request type %s does not match cache type %s", request.TypeUrl, cache.typeURL)
 	}
 	// If the version is not up to date, check whether any requested resource has
 	// been updated between the last version and the current version. This avoids the problem
@@ -336,7 +337,7 @@ func (cache *LinearCache) CreateWatch(request *Request, clientState ClientState,
 	}
 	if stale {
 		cache.respond(value, staleResources)
-		return nil
+		return nil, nil
 	}
 	// Create open watches since versions are up to date.
 	if len(request.ResourceNames) == 0 {
@@ -345,7 +346,7 @@ func (cache *LinearCache) CreateWatch(request *Request, clientState ClientState,
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
 			delete(cache.watchAll, value)
-		}
+		}, nil
 	}
 	for _, name := range request.ResourceNames {
 		set, exists := cache.watches[name]
@@ -367,10 +368,10 @@ func (cache *LinearCache) CreateWatch(request *Request, clientState ClientState,
 				delete(cache.watches, name)
 			}
 		}
-	}
+	}, nil
 }
 
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, clientState ClientState, value chan DeltaResponse) func() {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, clientState SubscriptionState, value chan DeltaResponse) (func(), error) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -398,12 +399,12 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, clientState Cl
 				cache.typeURL, clientState.GetSubscribedResources(), cache.getVersion())
 		}
 
-		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, clientState: clientState}
+		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, subscriptionState: clientState}
 
-		return cache.cancelDeltaWatch(watchID)
+		return cache.cancelDeltaWatch(watchID), nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {

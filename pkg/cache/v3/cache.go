@@ -36,12 +36,12 @@ type Request = discovery.DiscoveryRequest
 // DeltaRequest is an alias for the delta discovery request type.
 type DeltaRequest = discovery.DeltaDiscoveryRequest
 
-// ClientState provides additional data on the client knowledge for the type matching the request
+// SubscriptionState provides additional data on the client knowledge for the type matching the request
 // This allows proper implementation of stateful aspects of the protocol (e.g. returning only some updated resources)
 // Though the methods may return mutable parts of the state for performance reasons,
 // the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation
-type ClientState interface {
-	// GetKnownResources returns the list of resources the clients has ACKed and their associated version.
+type SubscriptionState interface {
+	// GetKnownResources returns a list of resources that the client has ACK'd and their associated version.
 	// The versions are:
 	//  - delta protocol: version of the specific resource set in the response
 	//  - sotw protocol: version of the global response when the resource was last ACKed
@@ -53,8 +53,15 @@ type ClientState interface {
 	GetSubscribedResources() map[string]struct{}
 
 	// IsWildcard returns whether the client has a wildcard watch.
-	// This considers subtilities related to the current migration of wildcard definition within the protocol.
+	// This considers subtleties related to the current migration of wildcard definitions within the protocol.
+	// More details on the behavior of wildcard are present at https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#how-the-client-specifies-what-resources-to-return
 	IsWildcard() bool
+
+	// WatchesResources returns whether at least one of the resources provided is currently being watched by the subscription.
+	// It is currently only applicable to delta-xds.
+	// If the request is wildcard, it will always return true,
+	// otherwise it will compare the provided resources to the list of resources currently subscribed
+	WatchesResources(resourceNames map[string]struct{}) bool
 }
 
 // ConfigWatcher requests watches for configuration resources by a node, last
@@ -74,7 +81,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(*Request, ClientState, chan Response) (cancel func())
+	CreateWatch(*Request, SubscriptionState, chan Response) (cancel func(), err error)
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	// This is the entrypoint to propagate configuration changes the
@@ -86,7 +93,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, ClientState, chan DeltaResponse) (cancel func())
+	CreateDeltaWatch(*DeltaRequest, SubscriptionState, chan DeltaResponse) (cancel func(), err error)
 }
 
 // ConfigFetcher fetches configuration resources from cache

@@ -91,7 +91,7 @@ type streamWrapper struct {
 
 	// The below fields are used for tracking resource
 	// cache state and should be maintained per stream.
-	streamStates           map[string]stream.StreamState
+	streamStates           map[string]stream.SubscriptionState
 	lastDiscoveryResponses map[string]lastDiscoveryResponse
 }
 

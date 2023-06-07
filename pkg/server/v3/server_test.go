@@ -48,7 +48,7 @@ type mockConfigWatcher struct {
 	mu *sync.RWMutex
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, state cache.ClientState, out chan cache.Response) func() {
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ cache.SubscriptionState, out chan cache.Response) (func(), error) {
 	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
 	if len(config.responses[req.TypeUrl]) > 0 {
 		out <- config.responses[req.TypeUrl][0]
@@ -57,9 +57,9 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, st
 		config.watches++
 		return func() {
 			config.watches--
-		}
+		}, nil
 	}
-	return nil
+	return nil, nil
 }
 
 func (config *mockConfigWatcher) Fetch(_ context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {

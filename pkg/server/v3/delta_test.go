@@ -19,7 +19,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state cache.ClientState, out chan cache.DeltaResponse) func() {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state cache.SubscriptionState, out chan cache.DeltaResponse) (func(), error) {
 	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
 
 	// This is duplicated from pkg/cache/v3/delta.go as private there
@@ -87,10 +87,10 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		config.deltaWatches++
 		return func() {
 			config.deltaWatches--
-		}
+		}, nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 type mockDeltaStream struct {

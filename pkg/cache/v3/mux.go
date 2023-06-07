@@ -17,6 +17,7 @@ package cache
 import (
 	"context"
 	"errors"
+	"fmt"
 )
 
 // MuxCache multiplexes across several caches using a classification function.
@@ -35,22 +36,22 @@ type MuxCache struct {
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request *Request, state ClientState, value chan Response) func() {
+func (mux *MuxCache) CreateWatch(request *Request, state SubscriptionState, value chan Response) (func(), error) {
 	key := mux.Classify(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
 		value <- nil
-		return nil
+		return nil, fmt.Errorf("no cache defined for key %s", key)
 	}
 	return cache.CreateWatch(request, state, value)
 }
 
-func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state ClientState, value chan DeltaResponse) func() {
+func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state SubscriptionState, value chan DeltaResponse) (func(), error) {
 	key := mux.ClassifyDelta(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
 		value <- nil
-		return nil
+		return nil, fmt.Errorf("no cache defined for key %s", key)
 	}
 	return cache.CreateDeltaWatch(request, state, value)
 }

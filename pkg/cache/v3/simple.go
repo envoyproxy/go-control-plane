@@ -286,7 +286,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 				snapshot,
 				watch.Request,
 				watch.Response,
-				watch.clientState,
+				watch.subscriptionState,
 			)
 			if err != nil {
 				return err
@@ -344,7 +344,7 @@ func superset(names map[string]bool, resources map[string]types.ResourceWithTTL)
 
 // CreateWatch returns a watch for an xDS request.  A nil function may be
 // returned if an error occurs.
-func (cache *snapshotCache) CreateWatch(request *Request, clientState ClientState, value chan Response) func() {
+func (cache *snapshotCache) CreateWatch(request *Request, clientState SubscriptionState, value chan Response) (func(), error) {
 	nodeID := cache.hash.ID(request.Node)
 
 	cache.mu.Lock()
@@ -386,9 +386,9 @@ func (cache *snapshotCache) CreateWatch(request *Request, clientState ClientStat
 					if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
 						cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
 							request.ResourceNames, nodeID, err)
-						return nil
+						return nil, fmt.Errorf("failed to send the response: %w", err)
 					}
-					return func() {}
+					return func() {}, nil
 				}
 			}
 		}
@@ -401,7 +401,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, clientState ClientStat
 		info.mu.Lock()
 		info.watches[watchID] = ResponseWatch{Request: request, Response: value}
 		info.mu.Unlock()
-		return cache.cancelWatch(nodeID, watchID)
+		return cache.cancelWatch(nodeID, watchID), nil
 	}
 
 	// otherwise, the watch may be responded immediately
@@ -409,10 +409,10 @@ func (cache *snapshotCache) CreateWatch(request *Request, clientState ClientStat
 	if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
 		cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.TypeUrl,
 			request.ResourceNames, nodeID, err)
-		return nil
+		return nil, fmt.Errorf("failed to send the response: %w", err)
 	}
 
-	return func() {}
+	return func() {}, nil
 }
 
 func (cache *snapshotCache) nextWatchID() int64 {
@@ -484,7 +484,7 @@ func createResponse(ctx context.Context, request *Request, resources map[string]
 }
 
 // CreateDeltaWatch returns a watch for a delta xDS request which implements the Simple SnapshotCache.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, clientState ClientState, value chan DeltaResponse) func() {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, clientState SubscriptionState, value chan DeltaResponse) (func(), error) {
 	nodeID := cache.hash.ID(request.Node)
 	t := request.GetTypeUrl()
 
@@ -530,15 +530,15 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, clientState 
 			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q", watchID, t, clientState.GetSubscribedResources(), nodeID)
 		}
 
-		info.setDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, clientState: clientState})
-		return cache.cancelDeltaWatch(nodeID, watchID)
+		info.setDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, subscriptionState: clientState})
+		return cache.cancelDeltaWatch(nodeID, watchID), nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
-func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceSnapshot, request *DeltaRequest, value chan DeltaResponse, clientState ClientState) (*RawDeltaResponse, error) {
+func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceSnapshot, request *DeltaRequest, value chan DeltaResponse, clientState SubscriptionState) (*RawDeltaResponse, error) {
 	resp := createDeltaResponse(ctx, request, clientState, resourceContainer{
 		resourceMap:   snapshot.GetResources(request.TypeUrl),
 		versionMap:    snapshot.GetVersionMap(request.TypeUrl),
