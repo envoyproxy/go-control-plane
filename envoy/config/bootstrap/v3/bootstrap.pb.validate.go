@@ -3308,6 +3308,19 @@ func (m *Bootstrap_ApplicationLogConfig_LogFormat) validate(all bool) error {
 			}
 		}
 
+	case *Bootstrap_ApplicationLogConfig_LogFormat_TextFormat:
+		if v == nil {
+			err := Bootstrap_ApplicationLogConfig_LogFormatValidationError{
+				field:  "LogFormat",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofLogFormatPresent = true
+		// no validation rules for TextFormat
 	default:
 		_ = v // ensures v is used
 	}
