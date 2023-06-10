@@ -35,8 +35,6 @@ type Callbacks interface {
 	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
 }
 
-var deltaErrorResponse = &cache.RawDeltaResponse{}
-
 type server struct {
 	cache     cache.ConfigWatcher
 	callbacks Callbacks
@@ -94,10 +92,15 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			return "", err
 		}
 
+		req, err := resp.GetDeltaDiscoveryRequest()
+		if err != nil {
+			return "", err
+		}
+
 		streamNonce = streamNonce + 1
 		response.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
-			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), response)
+			s.callbacks.OnStreamDeltaResponse(streamID, req, response)
 		}
 
 		return response.Nonce, str.Send(response)
@@ -119,7 +122,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			}
 
 			typ := resp.GetDeltaRequest().GetTypeUrl()
-			if resp == deltaErrorResponse {
+			if _, err := resp.GetDeltaDiscoveryResponse(); err != nil {
 				return status.Errorf(codes.Unavailable, typ+" watch failed")
 			}
 
@@ -131,7 +134,15 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			watch := watches.deltaWatches[typ]
 			watch.nonce = nonce
 
-			watch.state.SetKnownResources(resp.GetNextVersionMap())
+			for resource, version := range resp.GetReturnedResources() {
+				if version != "" {
+					watch.state.GetKnownResources()[resource] = version
+				} else {
+					// The response indicates that the resource is deleted
+					// We keep the knowledge that the resource does not exist
+					watch.state.GetKnownResources()[resource] = ""
+				}
+			}
 			watches.deltaWatches[typ] = watch
 		case req, more := <-reqCh:
 			// input stream ended or errored out
@@ -256,10 +267,13 @@ func (s *server) unsubscribe(resources []string, streamState *stream.Subscriptio
 			// * a resource is explicitly unsubscribed by name
 			// Then the control-plane must return in the response whether the resource is removed (if no longer present for this node)
 			// or still existing. In the latter case the entire resource must be returned, same as if it had been created or updated
-			// To achieve that, we mark the resource as having been returned with an empty version. While creating the response, the cache will either:
+			// To achieve that, we mark the resource as having been returned with a fake version. While creating the response, the cache will either:
 			// * detect the version change, and return the resource (as an update)
 			// * detect the resource deletion, and set it as removed in the response
-			streamState.GetKnownResources()[resource] = ""
+			streamState.GetKnownResources()[resource] = "unsubscribed"
+		} else {
+			// If a resource is unsubscribed, we must assume that envoy no longer tracks it
+			delete(streamState.GetKnownResources(), resource)
 		}
 		delete(sv, resource)
 	}

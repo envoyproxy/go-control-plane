@@ -85,21 +85,24 @@ type statusInfo struct {
 // ResponseWatch is a watch record keeping both the request and an open channel for the response.
 type ResponseWatch struct {
 	// Request is the original request for the watch.
-	Request *Request
+	Request Request
 
 	// Response is the channel to push responses to.
 	Response chan Response
+
+	// subscriptionState is the current state of the given type subscription on the stream
+	subscriptionState SubscriptionState
 }
 
 // DeltaResponseWatch is a watch record keeping both the delta request and an open channel for the delta response.
 type DeltaResponseWatch struct {
 	// Request is the most recent delta request for the watch
-	Request *DeltaRequest
+	Request DeltaRequest
 
 	// Response is the channel to push the delta responses to
 	Response chan DeltaResponse
 
-	// VersionMap for the stream
+	// subscriptionState is the current state of the given type subscription on the stream
 	subscriptionState SubscriptionState
 }
 
@@ -167,7 +170,7 @@ func (info *statusInfo) orderResponseWatches() {
 	for id, watch := range info.watches {
 		info.orderedWatches[index] = key{
 			ID:      id,
-			TypeURL: watch.Request.TypeUrl,
+			TypeURL: watch.Request.GetTypeUrl(),
 		}
 		index++
 	}

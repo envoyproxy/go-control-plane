@@ -2,12 +2,15 @@ package cache_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 )
+
+var ttl = 2 * time.Second
 
 func TestIndexResourcesByName(t *testing.T) {
 	tests := []struct {

@@ -204,9 +204,11 @@ func TestLinearInitialResources(t *testing.T) {
 	streamState := stream.NewSubscriptionState(false, map[string]string{})
 	c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
 	w := make(chan Response, 1)
+	streamState.SetSubscribedResources(map[string]struct{}{"a": {}})
 	_, err := c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType}, streamState, w)
 	require.NoError(t, err)
 	verifyResponse(t, w, "0", 1)
+	streamState.SetSubscribedResources(map[string]struct{}{})
 	_, err = c.CreateWatch(&Request{TypeUrl: testType}, streamState, w)
 	require.NoError(t, err)
 	verifyResponse(t, w, "0", 2)
@@ -237,12 +239,14 @@ func TestLinearBasic(t *testing.T) {
 
 	// Create watches before a resource is ready
 	w1 := make(chan Response, 1)
+	streamState.SetSubscribedResources(map[string]struct{}{"a": {}})
 	_, err := c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w1)
 	require.NoError(t, err)
 	mustBlock(t, w1)
 	checkVersionMapNotSet(t, c)
 
 	w := make(chan Response, 1)
+	streamState.SetSubscribedResources(map[string]struct{}{})
 	_, err = c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	require.NoError(t, err)
 	mustBlock(t, w)
@@ -255,10 +259,12 @@ func TestLinearBasic(t *testing.T) {
 	verifyResponse(t, w, "1", 1)
 
 	// Request again, should get same response
+	streamState.SetSubscribedResources(map[string]struct{}{"a": {}})
 	_, err = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	require.NoError(t, err)
 	checkWatchCount(t, c, "a", 0)
 	verifyResponse(t, w, "1", 1)
+	streamState.SetSubscribedResources(map[string]struct{}{})
 	_, err = c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	require.NoError(t, err)
 	checkWatchCount(t, c, "a", 0)
@@ -267,9 +273,11 @@ func TestLinearBasic(t *testing.T) {
 	// Add another element and update the first, response should be different
 	require.NoError(t, c.UpdateResource("b", testResource("b")))
 	require.NoError(t, c.UpdateResource("a", testResource("aa")))
+	streamState.SetSubscribedResources(map[string]struct{}{"a": {}})
 	_, err = c.CreateWatch(&Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	require.NoError(t, err)
 	verifyResponse(t, w, "3", 1)
+	streamState.SetSubscribedResources(map[string]struct{}{})
 	_, err = c.CreateWatch(&Request{TypeUrl: testType, VersionInfo: "0"}, streamState, w)
 	require.NoError(t, err)
 	verifyResponse(t, w, "3", 2)

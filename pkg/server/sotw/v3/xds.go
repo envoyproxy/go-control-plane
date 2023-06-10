@@ -26,9 +26,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 		node:      &core.Node{}, // node may only be set on the first discovery request
 
 		// a collection of stack allocated watches per request type.
-		watches:                newWatches(),
-		streamStates:           make(map[string]stream.SubscriptionState),
-		lastDiscoveryResponses: make(map[string]lastDiscoveryResponse),
+		subscriptions: newSubscriptions(),
 	}
 
 	// cleanup once our stream has ended.
@@ -43,14 +41,14 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 	// do an initial recompute so we can load the first 2 channels:
 	// <-reqCh
 	// s.ctx.Done()
-	sw.watches.recompute(s.ctx, reqCh)
+	sw.subscriptions.recomputeWatches(s.ctx, reqCh)
 
 	for {
 		// The list of select cases looks like this:
 		// 0: <- ctx.Done
 		// 1: <- reqCh
 		// 2...: per type watches
-		index, value, ok := reflect.Select(sw.watches.cases)
+		index, value, ok := reflect.Select(sw.subscriptions.cases)
 		switch index {
 		// ctx.Done() -> if we receive a value here we return
 		// as no further computation is needed
@@ -110,57 +108,48 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				req.TypeUrl = defaultTypeURL
 			}
 
-			streamState := sw.streamStates[req.TypeUrl]
-
 			if s.callbacks != nil {
 				if err := s.callbacks.OnStreamRequest(sw.ID, req); err != nil {
 					return err
 				}
 			}
 
-			if lastResponse, ok := sw.lastDiscoveryResponses[req.TypeUrl]; ok {
-				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-					// Let's record Resource names that a client has received.
-					streamState.SetKnownResources(lastResponse.resources)
-				}
-			}
-
-			updateSubscriptionResources(req, &streamState)
-
-			typeURL := req.GetTypeUrl()
-			responder := make(chan cache.Response, 1)
-			if w, ok := sw.watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
+			// sub must not be modified until any potential watch is closed
+			// as we commit in the Cache interface that it is immutable for the lifetime of the watch
+			sub, ok := sw.subscriptions.responders[req.GetTypeUrl()]
+			if ok {
+				// Existing subscription, lets check and update if needed.
 				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
+				if sub.nonce == "" || sub.nonce == nonce {
+					sub.watch.close()
+				} else {
+					// The request does not match the previous nonce.
+					// Currently we drop the new request in this context
+					break
+				}
 
-					cancel, err := s.cache.CreateWatch(req, streamState, responder)
-					if err != nil {
-						return err
-					}
-					sw.watches.addWatch(typeURL, &watch{
-						cancel:   cancel,
-						response: responder,
-					})
-				}
+				// Record Resource names that a client has received.
+				sub.state.SetKnownResources(sub.lastResponseResources)
 			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				cancel, err := s.cache.CreateWatch(req, streamState, responder)
-				if err != nil {
-					return err
-				}
-				sw.watches.addWatch(typeURL, &watch{
-					cancel:   cancel,
-					response: responder,
-				})
+				sub = newSubscription(len(req.ResourceNames) == 0)
 			}
 
-			sw.streamStates[req.TypeUrl] = streamState
+			updateSubscriptionResources(req, &sub.state)
+
+			responder := make(chan cache.Response, 1)
+			cancel, err := s.cache.CreateWatch(req, sub.state, responder)
+			if err != nil {
+				return err
+			}
+			sub.watch = watch{
+				cancel:   cancel,
+				response: responder,
+			}
+
+			sw.subscriptions.addSubscription(req.TypeUrl, sub)
 
 			// Recompute the dynamic select cases for this stream.
-			sw.watches.recompute(s.ctx, reqCh)
+			sw.subscriptions.recomputeWatches(s.ctx, reqCh)
 		default:
 			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
 			if !ok {
@@ -174,7 +163,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				return err
 			}
 
-			sw.watches.responders[res.GetRequest().TypeUrl].nonce = nonce
+			sw.subscriptions.responders[res.GetRequest().GetTypeUrl()].nonce = nonce
 		}
 	}
 }

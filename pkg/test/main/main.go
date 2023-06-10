@@ -185,8 +185,8 @@ func main() {
 	eds := cache.NewLinearCache(typeURL)
 	if mux {
 		configCache = &cache.MuxCache{
-			Classify: func(req *cache.Request) string {
-				if req.TypeUrl == typeURL {
+			Classify: func(req cache.Request) string {
+				if req.GetTypeUrl() == typeURL {
 					return "eds"
 				}
 				return "default"

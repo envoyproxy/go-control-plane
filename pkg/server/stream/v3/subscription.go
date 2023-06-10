@@ -11,7 +11,12 @@ type SubscriptionState struct {
 
 	// resourceVersions contains the resources acknowledged by the client and the versions
 	// associated to them
+	// a resource with a version set to "" is a resource not returned when requested
+	// which has a functional meaning of "the resource does not exist"
 	resourceVersions map[string]string
+
+	//
+	isFirstResponse bool
 }
 
 // NewSubscriptionState initializes a stream state.
@@ -20,6 +25,7 @@ func NewSubscriptionState(wildcard bool, initialResourceVersions map[string]stri
 		wildcard:                wildcard,
 		subscribedResourceNames: map[string]struct{}{},
 		resourceVersions:        initialResourceVersions,
+		isFirstResponse:         true,
 	}
 
 	if initialResourceVersions == nil {
@@ -53,6 +59,7 @@ func (s SubscriptionState) GetKnownResources() map[string]string {
 // The cache can use this state to compute resources added/updated/deleted
 func (s *SubscriptionState) SetKnownResources(resourceVersions map[string]string) {
 	s.resourceVersions = resourceVersions
+	s.isFirstResponse = false
 }
 
 // SetWildcard will set the subscription to return all known resources
@@ -63,6 +70,11 @@ func (s *SubscriptionState) SetWildcard(wildcard bool) {
 // IsWildcard returns whether or not the subscription currently has a wildcard watch
 func (s SubscriptionState) IsWildcard() bool {
 	return s.wildcard
+}
+
+// IsWildcard returns whether or not the subscription currently has a wildcard watch
+func (s SubscriptionState) IsFirstResponse() bool {
+	return s.isFirstResponse
 }
 
 // WatchesResources returns whether at least one of the resources provided is currently being watched by the subscription.

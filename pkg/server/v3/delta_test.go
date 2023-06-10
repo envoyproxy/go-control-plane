@@ -19,46 +19,52 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state cache.SubscriptionState, out chan cache.DeltaResponse) (func(), error) {
-	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
+func (config *mockConfigWatcher) CreateDeltaWatch(req cache.DeltaRequest, state cache.SubscriptionState, out chan cache.DeltaResponse) (func(), error) {
+	config.deltaCounts[req.GetTypeUrl()] = config.deltaCounts[req.GetTypeUrl()] + 1
 
 	// This is duplicated from pkg/cache/v3/delta.go as private there
-	resourceMap := config.deltaResources[req.TypeUrl]
+	resourceMap := config.deltaResources[req.GetTypeUrl()]
 	versionMap := map[string]string{}
 	for name, resource := range resourceMap {
 		marshaledResource, _ := cache.MarshalResource(resource)
 		versionMap[name] = cache.HashResource(marshaledResource)
 	}
-	var nextVersionMap map[string]string
-	var filtered []types.Resource
+
+	// variables to build our response with
+	var filtered []cache.TestNamedResource
 	var toRemove []string
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case state.IsWildcard():
 		if len(state.GetKnownResources()) == 0 {
-			filtered = make([]types.Resource, 0, len(resourceMap))
+			filtered = make([]cache.TestNamedResource, 0, len(resourceMap))
 		}
-		nextVersionMap = make(map[string]string, len(resourceMap))
 		for name, r := range resourceMap {
 			// Since we've already precomputed the version hashes of the new snapshot,
 			// we can just set it here to be used for comparison later
 			version := versionMap[name]
-			nextVersionMap[name] = version
 			prevVersion, found := state.GetKnownResources()[name]
 			if !found || (prevVersion != version) {
-				filtered = append(filtered, r)
+				filtered = append(filtered, cache.TestNamedResource{
+					Name:     name,
+					Version:  version,
+					Resource: r,
+				})
 			}
 		}
 
 		// Compute resources for removal
-		for name := range state.GetKnownResources() {
+		for name, version := range state.GetKnownResources() {
+			if version == "" {
+				// The resource version can be set to "" to indicate that we already notified the deletion
+				continue
+			}
 			if _, ok := resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
 			}
 		}
 	default:
-		nextVersionMap = make(map[string]string, len(state.GetSubscribedResources()))
 		// state.GetResourceVersions() may include resources no longer subscribed
 		// In the current code this gets silently cleaned when updating the version map
 		for name := range state.GetSubscribedResources() {
@@ -66,23 +72,25 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			if r, ok := resourceMap[name]; ok {
 				nextVersion := versionMap[name]
 				if prevVersion != nextVersion {
-					filtered = append(filtered, r)
+					filtered = append(filtered, cache.TestNamedResource{
+						Name:     name,
+						Version:  nextVersion,
+						Resource: r,
+					})
 				}
-				nextVersionMap[name] = nextVersion
-			} else if found {
+			} else if found && prevVersion != "" {
 				toRemove = append(toRemove, name)
 			}
 		}
 	}
 
 	if len(filtered)+len(toRemove) > 0 {
-		out <- &cache.RawDeltaResponse{
-			DeltaRequest:      req,
-			Resources:         filtered,
-			RemovedResources:  toRemove,
-			SystemVersionInfo: "",
-			NextVersionMap:    nextVersionMap,
-		}
+		out <- cache.NewTestRawDeltaResponse(
+			req,
+			"",
+			filtered,
+			toRemove,
+		)
 	} else {
 		config.deltaWatches++
 		return func() {

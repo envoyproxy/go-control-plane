@@ -8,19 +8,12 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // process handles a bi-di stream request
 func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// We make a responder channel here so we can multiplex responses from the dynamic channels.
-	sw.watches.addWatch(resource.AnyType, &watch{
-		// Create a buffered channel the size of the known resource types.
-		response: make(chan cache.Response, types.UnknownType),
-		cancel: func() {
-			close(sw.watches.responders[resource.AnyType].response)
-		},
-	})
+	muxChannel := make(chan cache.Response, types.UnknownType)
 
 	process := func(resp cache.Response) error {
 		nonce, err := sw.send(resp)
@@ -28,7 +21,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 			return err
 		}
 
-		sw.watches.responders[resp.GetRequest().TypeUrl].nonce = nonce
+		sw.subscriptions.responders[resp.GetRequest().GetTypeUrl()].nonce = nonce
 		return nil
 	}
 
@@ -43,8 +36,8 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 		for {
 			select {
 			// We watch the multiplexed ADS channel for incoming responses.
-			case res := <-sw.watches.responders[resource.AnyType].response:
-				if res.GetRequest().TypeUrl != typeURL {
+			case res := <-muxChannel:
+				if res.GetRequest().GetTypeUrl() != typeURL {
 					if err := process(res); err != nil {
 						return err
 					}
@@ -64,7 +57,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 		case <-s.ctx.Done():
 			return nil
 		// We only watch the multiplexed channel since all values will come through from process.
-		case res := <-sw.watches.responders[resource.AnyType].response:
+		case res := <-muxChannel:
 			if err := process(res); err != nil {
 				return status.Errorf(codes.Unavailable, err.Error())
 			}
@@ -102,62 +95,46 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 				}
 			}
 
-			streamState, ok := sw.streamStates[req.TypeUrl]
-			if !ok {
-				// Supports legacy wildcard mode
-				// Wildcard will be set to true if no resource is set
-				streamState = stream.NewSubscriptionState(len(req.ResourceNames) == 0, nil)
-			}
-
-			// ToDo: track ACK through subscription state
-			if lastResponse, ok := sw.lastDiscoveryResponses[req.TypeUrl]; ok {
-				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-					// Let's record Resource names that a client has received.
-					streamState.SetKnownResources(lastResponse.resources)
-				}
-			}
-
-			updateSubscriptionResources(req, &streamState)
-
 			typeURL := req.GetTypeUrl()
-			// Use the multiplexed channel for new watches.
-			responder := sw.watches.responders[resource.AnyType].response
-			if w, ok := sw.watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
+
+			// sub must not be modified until any potential watch is closed
+			// as we commit in the Cache interface that it is immutable for the lifetime of the watch
+			sub, ok := sw.subscriptions.responders[typeURL]
+			if ok {
+				// Existing subscription, lets check and update if needed.
 				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
-
-					// Only process if we have an existing watch otherwise go ahead and create.
-					if err := processAllExcept(typeURL); err != nil {
-						return err
-					}
-
-					cancel, err := s.cache.CreateWatch(req, streamState, responder)
-					if err != nil {
-						return err
-					}
-
-					sw.watches.addWatch(typeURL, &watch{
-						cancel:   cancel,
-						response: responder,
-					})
+				if sub.nonce == "" || sub.nonce == nonce {
+					sub.watch.close()
+				} else {
+					// The request does not match the previous nonce.
+					// Currently we drop the new request in this context
+					break
 				}
-			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				cancel, err := s.cache.CreateWatch(req, streamState, responder)
-				if err != nil {
+
+				if err := processAllExcept(typeURL); err != nil {
 					return err
 				}
 
-				sw.watches.addWatch(typeURL, &watch{
-					cancel:   cancel,
-					response: responder,
-				})
+				// Record Resource names that a client has received.
+				sub.state.SetKnownResources(sub.lastResponseResources)
+			} else {
+				// Supports legacy wildcard mode
+				// Wildcard will be set to true if no resource is set
+				sub = newSubscription(len(req.ResourceNames) == 0)
 			}
 
-			sw.streamStates[req.TypeUrl] = streamState
+			updateSubscriptionResources(req, &sub.state)
+
+			cancel, err := s.cache.CreateWatch(req, sub.state, muxChannel)
+			if err != nil {
+				return err
+			}
+			sub.watch = watch{
+				cancel:   cancel,
+				response: muxChannel,
+			}
+
+			sw.subscriptions.addSubscription(req.TypeUrl, sub)
 		}
 	}
 }

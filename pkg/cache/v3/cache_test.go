@@ -1,4 +1,4 @@
-package cache_test
+package cache
 
 import (
 	"testing"
@@ -11,7 +11,6 @@ import (
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
@@ -20,16 +19,16 @@ const (
 )
 
 func TestResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []types.ResourceWithTTL{{Resource: &route.RouteConfiguration{Name: resourceName}}}
-	resp := cache.RawResponse{
-		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
-		Version:   "v",
-		Resources: routes,
+	routes := []resourceWithTTLAndName{ttlResource{resource: &route.RouteConfiguration{Name: resourceName}, name: resourceName}}
+	resp := rawResponse{
+		request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
+		version:   "v",
+		resources: routes,
 	}
 
 	discoveryResponse, err := resp.GetDiscoveryResponse()
 	assert.Nil(t, err)
-	assert.Equal(t, discoveryResponse.VersionInfo, resp.Version)
+	assert.Equal(t, discoveryResponse.VersionInfo, resp.version)
 	assert.Equal(t, len(discoveryResponse.Resources), 1)
 
 	cachedResponse, err := resp.GetDiscoveryResponse()
@@ -51,14 +50,14 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 		Resources:   []*anypb.Any{rsrc},
 		VersionInfo: "v",
 	}
-	resp := cache.PassthroughResponse{
-		Request:           &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
-		DiscoveryResponse: dr,
+	resp := passthroughResponse{
+		discoveryRequest:  &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
+		discoveryResponse: dr,
 	}
 
 	discoveryResponse, err := resp.GetDiscoveryResponse()
 	assert.Nil(t, err)
-	assert.Equal(t, discoveryResponse.VersionInfo, resp.DiscoveryResponse.VersionInfo)
+	assert.Equal(t, discoveryResponse.VersionInfo, resp.discoveryResponse.VersionInfo)
 	assert.Equal(t, len(discoveryResponse.Resources), 1)
 
 	r := &route.RouteConfiguration{}
@@ -69,17 +68,17 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 }
 
 func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []types.ResourceWithTTL{{Resource: &route.RouteConfiguration{Name: resourceName}}}
-	resp := cache.RawResponse{
-		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
-		Version:   "v",
-		Resources: routes,
-		Heartbeat: true,
+	routes := []resourceWithTTLAndName{ttlResource{resource: &route.RouteConfiguration{Name: resourceName}, name: resourceName}}
+	resp := rawResponse{
+		request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
+		version:   "v",
+		resources: routes,
+		heartbeat: true,
 	}
 
 	discoveryResponse, err := resp.GetDiscoveryResponse()
 	assert.Nil(t, err)
-	assert.Equal(t, discoveryResponse.VersionInfo, resp.Version)
+	assert.Equal(t, discoveryResponse.VersionInfo, resp.version)
 	assert.Equal(t, len(discoveryResponse.Resources), 1)
 	assert.False(t, isTTLResource(discoveryResponse.Resources[0]))
 

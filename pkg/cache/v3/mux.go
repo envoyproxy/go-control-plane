@@ -28,15 +28,15 @@ import (
 // making sure there is always a matching cache.
 type MuxCache struct {
 	// Classification functions.
-	Classify      func(*Request) string
-	ClassifyDelta func(*DeltaRequest) string
+	Classify      func(Request) string
+	ClassifyDelta func(DeltaRequest) string
 	// Muxed caches.
 	Caches map[string]Cache
 }
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request *Request, state SubscriptionState, value chan Response) (func(), error) {
+func (mux *MuxCache) CreateWatch(request Request, state SubscriptionState, value chan Response) (func(), error) {
 	key := mux.Classify(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
@@ -46,7 +46,7 @@ func (mux *MuxCache) CreateWatch(request *Request, state SubscriptionState, valu
 	return cache.CreateWatch(request, state, value)
 }
 
-func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state SubscriptionState, value chan DeltaResponse) (func(), error) {
+func (mux *MuxCache) CreateDeltaWatch(request DeltaRequest, state SubscriptionState, value chan DeltaResponse) (func(), error) {
 	key := mux.ClassifyDelta(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
@@ -56,6 +56,6 @@ func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state SubscriptionS
 	return cache.CreateDeltaWatch(request, state, value)
 }
 
-func (mux *MuxCache) Fetch(context.Context, *Request) (Response, error) {
+func (mux *MuxCache) Fetch(context.Context, FetchRequest) (Response, error) {
 	return nil, errors.New("not implemented")
 }

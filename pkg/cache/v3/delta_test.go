@@ -1,4 +1,4 @@
-package cache_test
+package cache
 
 import (
 	"context"
@@ -14,7 +14,6 @@ import (
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
@@ -29,8 +28,8 @@ func assertResourceMapEqual(t *testing.T, want map[string]types.Resource, got ma
 }
 
 func TestSnapshotCacheDeltaWatch(t *testing.T) {
-	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
-	watches := make(map[string]chan cache.DeltaResponse)
+	c := NewSnapshotCache(false, group{}, logger{t: t})
+	watches := make(map[string]chan DeltaResponse)
 
 	// Make our initial request as a wildcard to get all resources and make sure the wildcard requesting works as intended
 	for _, typ := range testTypes {

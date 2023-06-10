@@ -83,16 +83,14 @@ type server struct {
 type streamWrapper struct {
 	stream    stream.Stream // parent stream object
 	ID        int64         // stream ID in relation to total stream count
-	nonce     int64         // nonce per stream
-	watches   watches       // collection of stack allocated watchers per request type
+	nonce     int64         // global nonce per stream, used to seed new messages
 	callbacks Callbacks     // callbacks for performing actions through stream lifecycle
 
 	node *core.Node // registered xDS client
 
-	// The below fields are used for tracking resource
-	// cache state and should be maintained per stream.
-	streamStates           map[string]stream.SubscriptionState
-	lastDiscoveryResponses map[string]lastDiscoveryResponse
+	// subscriptions track the current resource types requested, including the current watches
+	// and subscription states
+	subscriptions subscriptions
 }
 
 // Send packages the necessary resources before sending on the gRPC stream,
@@ -115,18 +113,32 @@ func (s *streamWrapper) send(resp cache.Response) (string, error) {
 		return "", err
 	}
 
-	lastResponse := lastDiscoveryResponse{
-		nonce:     out.Nonce,
-		resources: make(map[string]string),
+	req, err := resp.GetDiscoveryRequest()
+	if err != nil {
+		return "", err
 	}
-	for _, r := range resp.GetRequest().ResourceNames {
-		lastResponse.resources[r] = version
+
+	subscription := s.subscriptions.responders[resp.GetRequest().GetTypeUrl()]
+
+	resources := make(map[string]string, len(resp.GetReturnedResources()))
+
+	// Add all resources explicitly requested and not returned
+	// The absence of the resource in the response is knowledge from the client side
+	// This is also used to track resources addition from one request to the next one
+	for r := range subscription.state.GetSubscribedResources() {
+		resources[r] = ""
 	}
-	s.lastDiscoveryResponses[resp.GetRequest().TypeUrl] = lastResponse
+
+	// Fill in the resources actually returned
+	for _, r := range resp.GetReturnedResources() {
+		resources[r] = version
+	}
+
+	subscription.lastResponseResources = resources
 
 	// Register with the callbacks provided that we are sending the response.
 	if s.callbacks != nil {
-		s.callbacks.OnStreamResponse(resp.GetContext(), s.ID, resp.GetRequest(), out)
+		s.callbacks.OnStreamResponse(resp.GetContext(), s.ID, req, out)
 	}
 
 	return out.Nonce, s.stream.Send(out)
@@ -134,19 +146,10 @@ func (s *streamWrapper) send(resp cache.Response) (string, error) {
 
 // Shutdown closes all open watches, and notifies API consumers the stream has closed.
 func (s *streamWrapper) shutdown() {
-	s.watches.close()
+	s.subscriptions.close()
 	if s.callbacks != nil {
 		s.callbacks.OnStreamClosed(s.ID, s.node)
 	}
-}
-
-// Discovery response that is sent over GRPC stream.
-// We need to record what resource names are already sent to a client
-// So if the client requests a new name we can respond back
-// regardless current snapshot version (even if it is not changed yet)
-type lastDiscoveryResponse struct {
-	nonce     string
-	resources map[string]string
 }
 
 // StreamHandler converts a blocking read call to channels and initiates stream processing
