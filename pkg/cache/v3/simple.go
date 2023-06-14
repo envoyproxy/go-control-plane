@@ -441,7 +441,7 @@ func (cache *snapshotCache) respond(ctx context.Context, request *Request, value
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.ResourceNames) != 0 && cache.ads {
 		if err := superset(nameSet(request.ResourceNames), resources); err != nil {
-			cache.log.Warnf("ADS mode: not responding to request: %v", err)
+			cache.log.Warnf("ADS mode: not responding to request %s%v: %v", request.TypeUrl, request.ResourceNames, err)
 			return nil
 		}
 	}
