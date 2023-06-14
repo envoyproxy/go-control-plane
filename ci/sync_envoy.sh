@@ -3,7 +3,7 @@
 set -o pipefail
 
 MIRROR_MSG="Mirrored from envoyproxy/envoy"
-SRCS=(envoy contrib)
+SRCS=(proto)
 GO_TARGETS=(@envoy_api//...)
 IMPORT_BASE="github.com/envoyproxy/go-control-plane"
 COMMITTER_NAME="update-envoy[bot]"
@@ -37,13 +37,18 @@ get_last_envoy_sha () {
 
 sync_protos () {
     local src envoy_src
-    echo "Syncing go protos ..."
+    echo "Syncing Go protos ..."
     for src in "${SRCS[@]}"; do
         envoy_src="${ENVOY_SRC_DIR}/build_go/${src}"
         rm -rf "$src"
         echo "Copying ${envoy_src} -> ${src}"
         cp -a "$envoy_src" "$src"
         git add "$src"
+    done
+    for src in "${SRCS[@]}"; do
+        if [ -e "${src}/go.mod" ] ; then
+            ( cd "${src}" ; go mod tidy )
+        fi
     done
 }
 
@@ -65,7 +70,7 @@ commit_changes () {
     echo "$latest_commit" > envoy/COMMIT
     git config user.email "$COMMITTER_EMAIL"
     git config user.name "$COMMITTER_NAME"
-    git add envoy contrib
+    git add proto
     git commit --allow-empty -s -m "${MIRROR_MSG} @ ${latest_commit}"
     git push origin main
 }
