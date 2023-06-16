@@ -306,6 +306,10 @@ type ProcessingResponse struct {
 	// for the duration of this particular request/response only. Servers
 	// may use this to intelligently control how requests are processed
 	// based on the headers and other metadata that they see.
+	// This field is ignored by Envoy when the ext_proc filter config
+	// :ref:`allow_mode_override
+	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.allow_mode_override>`
+	// is set to false.
 	ModeOverride *v3.ProcessingMode `protobuf:"bytes,9,opt,name=mode_override,json=modeOverride,proto3" json:"mode_override,omitempty"`
 	// When ext_proc server receives a request message, in case it needs more
 	// time to process the message, it sends back a ProcessingResponse message
@@ -837,17 +841,20 @@ type CommonResponse struct {
 	HeaderMutation *HeaderMutation `protobuf:"bytes,2,opt,name=header_mutation,json=headerMutation,proto3" json:"header_mutation,omitempty"`
 	// Replace the body of the last message sent to the remote server on this
 	// stream. If responding to an HttpBody request, simply replace or clear
-	// the body chunk that was sent with that request. Body mutations only take
-	// effect in response to ``body`` messages and are ignored otherwise.
+	// the body chunk that was sent with that request. Body mutations may take
+	// effect in response either to ``header`` or ``body`` messages. When it is
+	// in response to ``header`` messages, it only take effect if the
+	// :ref:`status <envoy_v3_api_field_service.ext_proc.v3.CommonResponse.status>`
+	// is set to CONTINUE_AND_REPLACE.
 	BodyMutation *BodyMutation `protobuf:"bytes,3,opt,name=body_mutation,json=bodyMutation,proto3" json:"body_mutation,omitempty"`
 	// [#not-implemented-hide:]
 	// Add new trailers to the message. This may be used when responding to either a
 	// HttpHeaders or HttpBody message, but only if this message is returned
 	// along with the CONTINUE_AND_REPLACE status.
 	Trailers *v31.HeaderMap `protobuf:"bytes,4,opt,name=trailers,proto3" json:"trailers,omitempty"`
-	// Clear the route cache for the current request.
-	// This is necessary if the remote server
-	// modified headers that are used to calculate the route.
+	// Clear the route cache for the current client request. This is necessary
+	// if the remote server modified headers that are used to calculate the route.
+	// This field is ignored in the response direction.
 	ClearRouteCache bool `protobuf:"varint,5,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 }
 

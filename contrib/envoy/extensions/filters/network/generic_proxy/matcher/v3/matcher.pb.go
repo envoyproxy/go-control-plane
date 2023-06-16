@@ -276,7 +276,6 @@ func (*RequestMatchInput) Descriptor() ([]byte, []int) {
 	return file_contrib_envoy_extensions_filters_network_generic_proxy_matcher_v3_matcher_proto_rawDescGZIP(), []int{5}
 }
 
-// [#not-implemented-hide:]
 // Used to match an arbitrary key-value pair for headers, trailers or properties.
 type KeyValueMatchEntry struct {
 	state         protoimpl.MessageState
@@ -335,7 +334,6 @@ func (x *KeyValueMatchEntry) GetStringMatch() *v3.StringMatcher {
 	return nil
 }
 
-// [#not-implemented-hide:]
 // Custom matcher to match on the generic downstream request. This is used to match
 // multiple fields of the downstream request and avoid complex combinations of
 // HostMatchInput, PathMatchInput, MethodMatchInput and PropertyMatchInput.

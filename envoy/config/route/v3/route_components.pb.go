@@ -3839,8 +3839,6 @@ type FilterConfig struct {
 	//   created and it is too late to change the chain.
 	//
 	//   This field only make sense for the downstream HTTP filters for now.
-	//
-	// [#not-implemented-hide:]
 	Disabled bool `protobuf:"varint,3,opt,name=disabled,proto3" json:"disabled,omitempty"`
 }
 

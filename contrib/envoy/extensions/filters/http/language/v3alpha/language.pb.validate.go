@@ -110,6 +110,8 @@ func (m *Language) validate(all bool) error {
 
 	}
 
+	// no validation rules for ClearRouteCache
+
 	if len(errors) > 0 {
 		return LanguageMultiError(errors)
 	}
