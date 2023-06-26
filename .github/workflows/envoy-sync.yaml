@@ -22,7 +22,7 @@ jobs:
       }}
     steps:
     - id: appauth
-      uses: envoyproxy/toolshed/gh-actions/appauth@actions-v0.0.1
+      uses: envoyproxy/toolshed/gh-actions/appauth@actions-v0.0.3
       with:
         key: ${{ secrets.ENVOY_CI_UPDATE_BOT_KEY }}
         app_id: ${{ secrets.ENVOY_CI_UPDATE_APP_ID }}
