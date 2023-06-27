@@ -206,7 +206,6 @@ type Bootstrap struct {
 	// Optional set of stats sinks.
 	StatsSinks []*v31.StatsSink `protobuf:"bytes,6,rep,name=stats_sinks,json=statsSinks,proto3" json:"stats_sinks,omitempty"`
 	// Options to control behaviors of deferred creation compatible stats.
-	// [#not-implemented-hide:]
 	DeferredStatOptions *Bootstrap_DeferredStatOptions `protobuf:"bytes,39,opt,name=deferred_stat_options,json=deferredStatOptions,proto3" json:"deferred_stat_options,omitempty"`
 	// Configuration for internal processing of stats.
 	StatsConfig *v31.StatsConfig `protobuf:"bytes,13,opt,name=stats_config,json=statsConfig,proto3" json:"stats_config,omitempty"`
