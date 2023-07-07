@@ -73,7 +73,7 @@ type LocalRateLimit struct {
 	// filter is enabled but not enforced.
 	RequestHeadersToAddWhenNotEnforced []*v31.HeaderValueOption `protobuf:"bytes,10,rep,name=request_headers_to_add_when_not_enforced,json=requestHeadersToAddWhenNotEnforced,proto3" json:"request_headers_to_add_when_not_enforced,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each response for requests that
-	// have been rate limited. This occurs when the filter is either enabled or fully enforced.
+	// have been rate limited. This occurs when the filter is enabled and fully enforced.
 	ResponseHeadersToAdd []*v31.HeaderValueOption `protobuf:"bytes,6,rep,name=response_headers_to_add,json=responseHeadersToAdd,proto3" json:"response_headers_to_add,omitempty"`
 	// The rate limit descriptor list to use in the local rate limit to override
 	// on. The rate limit descriptor is selected by the first full match from the
