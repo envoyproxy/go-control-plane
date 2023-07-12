@@ -60,6 +60,8 @@ func (m *Dlb) validate(all bool) error {
 
 	// no validation rules for MaxRetries
 
+	// no validation rules for FallbackPolicy
+
 	if len(errors) > 0 {
 		return DlbMultiError(errors)
 	}
