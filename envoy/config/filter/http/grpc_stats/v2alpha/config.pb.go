@@ -123,9 +123,7 @@ type FilterConfig_StatsForAllMethods struct {
 	//
 	// .. attention::
 	//   If neither `individual_method_stats_allowlist` nor `stats_for_all_methods` is set, the
-	//   behavior will default to `stats_for_all_methods=false`. This default value is changed due
-	//   to the previous value being deprecated. This behavior can be changed with runtime override
-	//   `envoy.deprecated_features.grpc_stats_filter_enable_stats_for_all_methods_by_default`.
+	//   behavior will default to `stats_for_all_methods=false`.
 	StatsForAllMethods *wrappers.BoolValue `protobuf:"bytes,3,opt,name=stats_for_all_methods,json=statsForAllMethods,proto3,oneof"`
 }
 
