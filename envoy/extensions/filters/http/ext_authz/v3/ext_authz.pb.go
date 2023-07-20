@@ -362,6 +362,11 @@ type BufferSettings struct {
 	// field of HTTP request attribute context. Otherwise, :ref:`body
 	// <envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.body>` will be filled
 	// with UTF-8 string request body.
+	//
+	// This field only affects configurations using a :ref:`grpc_service
+	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.grpc_service>`. In configurations that use
+	// an :ref:`http_service <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.http_service>`, this
+	// has no effect.
 	PackAsBytes bool `protobuf:"varint,3,opt,name=pack_as_bytes,json=packAsBytes,proto3" json:"pack_as_bytes,omitempty"`
 }
 
