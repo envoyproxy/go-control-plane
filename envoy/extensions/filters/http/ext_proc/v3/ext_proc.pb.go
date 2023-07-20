@@ -334,7 +334,6 @@ type HeaderForwardingRules struct {
 	AllowedHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
 	// If set, specifically disallow any header in this list to be forwarded to the external
 	// processing server. This overrides the above ``allowed_headers`` if a header matches both.
-	// [#not-implemented-hide:]
 	DisallowedHeaders *v32.ListStringMatcher `protobuf:"bytes,2,opt,name=disallowed_headers,json=disallowedHeaders,proto3" json:"disallowed_headers,omitempty"`
 }
 
