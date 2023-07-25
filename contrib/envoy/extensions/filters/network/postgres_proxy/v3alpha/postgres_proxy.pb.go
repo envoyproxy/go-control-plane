@@ -100,7 +100,9 @@ type PostgresProxy struct {
 	// Postgres filter is able to read Postgres payload in clear-text. It happens when
 	// a client established a clear-text connection to Envoy or when a client established
 	// SSL connection to Envoy and Postgres filter is configured to terminate SSL.
-	// Defaults to SSL_DISABLE.
+	// In order for upstream encryption to work, the corresponding cluster must be configured to use
+	// :ref:`starttls transport socket <envoy_v3_api_msg_extensions.transport_sockets.starttls.v3.UpstreamStartTlsConfig>`.
+	// Defaults to ``SSL_DISABLE``.
 	UpstreamSsl PostgresProxy_SSLMode `protobuf:"varint,4,opt,name=upstream_ssl,json=upstreamSsl,proto3,enum=envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy_SSLMode" json:"upstream_ssl,omitempty"`
 }
 
