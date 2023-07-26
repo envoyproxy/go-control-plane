@@ -236,7 +236,6 @@ func (x *PropertyMatchInput) GetPropertyName() string {
 	return ""
 }
 
-// [#not-implemented-hide:]
 // Used to match an whole generic downstream request.
 type RequestMatchInput struct {
 	state         protoimpl.MessageState
