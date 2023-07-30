@@ -169,7 +169,6 @@ type Filter_ConfigDiscovery struct {
 	// Configuration source specifier for an extension configuration discovery
 	// service. In case of a failure and without the default configuration, the
 	// listener closes the connections.
-	// [#not-implemented-hide:]
 	ConfigDiscovery *v3.ExtensionConfigSource `protobuf:"bytes,5,opt,name=config_discovery,json=configDiscovery,proto3,oneof"`
 }
 
