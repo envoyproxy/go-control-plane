@@ -184,7 +184,6 @@ type ExternalProcessor struct {
 	// message in an external processor response. In such case, no local reply will be sent.
 	// Instead, the stream to the external processor will be closed. There will be no
 	// more external processing for this stream from now on.
-	// [#not-implemented-hide:]
 	DisableImmediateResponse bool `protobuf:"varint,15,opt,name=disable_immediate_response,json=disableImmediateResponse,proto3" json:"disable_immediate_response,omitempty"`
 }
 
