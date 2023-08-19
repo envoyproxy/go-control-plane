@@ -104,7 +104,7 @@ type RingHash struct {
 	// If set to `true`, the cluster will use hostname instead of the resolved
 	// address as the key to consistently hash to an upstream host. Only valid for StrictDNS clusters with hostnames which resolve to a single IP address.
 	//
-	// ..note::
+	// .. note::
 	//   This is deprecated and please use :ref:`consistent_hashing_lb_config
 	//   <envoy_v3_api_field_extensions.load_balancing_policies.ring_hash.v3.RingHash.consistent_hashing_lb_config>` instead.
 	//
@@ -127,7 +127,7 @@ type RingHash struct {
 	// This is an O(N) algorithm, unlike other load balancers. Using a lower `hash_balance_factor` results in more hosts
 	// being probed, so use a higher value if you require better performance.
 	//
-	// ..note::
+	// .. note::
 	//   This is deprecated and please use :ref:`consistent_hashing_lb_config
 	//   <envoy_v3_api_field_extensions.load_balancing_policies.ring_hash.v3.RingHash.consistent_hashing_lb_config>` instead.
 	//
