@@ -289,11 +289,13 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 	// We only calculate version hashes when using delta. We don't
 	// want to do this when using SOTW so we can avoid unnecessary
 	// computational cost if not using delta.
-	if len(info.deltaWatches) > 0 {
-		err := snapshot.ConstructVersionMap()
-		if err != nil {
-			return err
-		}
+	if len(info.deltaWatches) == 0 {
+		return nil
+	}
+
+	err := snapshot.ConstructVersionMap()
+	if err != nil {
+		return err
 	}
 
 	// If ADS is enabled we need to order response delta watches so we guarantee

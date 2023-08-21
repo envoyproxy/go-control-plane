@@ -11,7 +11,6 @@ import (
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/config"
@@ -74,9 +73,6 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callba
 }
 
 func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
-	// create a sharedChan for the watches to send ordered responses to
-	sharedChan := make(chan cache.DeltaResponse, types.UnknownType)
-
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
 	// streamNonce holds a unique nonce for req-resp pairs per xDS stream.
@@ -85,24 +81,10 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
 
-	// use a single go routine to send responses to the muxedResponses channel to retain resource orders
-	go func() {
-		for {
-			select {
-			case resp, more := <-sharedChan:
-				if !more {
-					return
-				}
-				watches.deltaMuxedResponses <- resp
-			}
-		}
-	}()
-
 	var node = &core.Node{}
 
 	defer func() {
 		watches.Cancel()
-		close(sharedChan)
 		if s.callbacks != nil {
 			s.callbacks.OnDeltaStreamClosed(streamID, node)
 		}
@@ -214,18 +196,17 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), &watch.state)
 
 			if ordered {
-				// Use the shared channel for ordered responses
-				watch.responses = sharedChan
-				watch.isSharedChan = true
+				// Use the shared channel to keep the order of responses.
+				watch.UseSharedResponseChan(watches.deltaMuxedResponses)
 			} else {
-				watch.responses = make(chan cache.DeltaResponse, 1)
+				watch.MakeResponseChan()
 			}
 			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
 			watches.deltaWatches[typeURL] = watch
 
 			// just handle normal non-ordered responses here
-			// all ordered responses are handled in a single go routine
-			if !watch.isSharedChan {
+			// all ordered responses are sent to the muxedResponses channel directly
+			if !watch.useSharedChan {
 				go func() {
 					resp, more := <-watch.responses
 					if more {

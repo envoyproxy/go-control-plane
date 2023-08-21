@@ -32,12 +32,22 @@ func (w *watches) Cancel() {
 
 // watch contains the necessary modifiables for receiving resource responses
 type watch struct {
-	responses    chan cache.DeltaResponse
-	isSharedChan bool // is this watch using a shared channel
-	cancel       func()
-	nonce        string
+	responses     chan cache.DeltaResponse
+	useSharedChan bool // is this watch using a shared channel
+	cancel        func()
+	nonce         string
 
 	state stream.StreamState
+}
+
+func (w *watch) MakeResponseChan() {
+	w.responses = make(chan cache.DeltaResponse, 1)
+	w.useSharedChan = false
+}
+
+func (w *watch) UseSharedResponseChan(sharedChan chan cache.DeltaResponse) {
+	w.responses = sharedChan
+	w.useSharedChan = true
 }
 
 // Cancel calls terminate and cancel
@@ -45,7 +55,7 @@ func (w *watch) Cancel() {
 	if w.cancel != nil {
 		w.cancel()
 	}
-	if w.responses != nil && !w.isSharedChan {
+	if w.responses != nil && !w.useSharedChan {
 		// w.responses should never be used by a producer once cancel() has been closed, so we can safely close it here
 		// This is needed to release resources taken by goroutines watching this channel
 		close(w.responses)
