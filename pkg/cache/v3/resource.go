@@ -22,15 +22,12 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
-	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
-	auth "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	ratelimit "github.com/envoyproxy/go-control-plane/ratelimit/config/ratelimit/v3"
 )
 
 // GetResponseType returns the enumeration for a valid xDS type URL.
@@ -93,24 +90,6 @@ func GetResourceName(res types.Resource) string {
 	switch v := res.(type) {
 	case *endpoint.ClusterLoadAssignment:
 		return v.GetClusterName()
-	case *cluster.Cluster:
-		return v.GetName()
-	case *route.RouteConfiguration:
-		return v.GetName()
-	case *route.ScopedRouteConfiguration:
-		return v.GetName()
-	case *route.VirtualHost:
-		return v.GetName()
-	case *listener.Listener:
-		return v.GetName()
-	case *auth.Secret:
-		return v.GetName()
-	case *runtime.Runtime:
-		return v.GetName()
-	case *core.TypedExtensionConfig:
-		return v.GetName()
-	case *ratelimit.RateLimitConfig:
-		return v.GetName()
 	case types.ResourceWithName:
 		return v.GetName()
 	default:
