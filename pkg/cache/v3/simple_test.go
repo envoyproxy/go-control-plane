@@ -640,3 +640,17 @@ func TestAvertPanicForWatchOnNonExistentSnapshot(t *testing.T) {
 
 	<-responder
 }
+
+func TestGetNodeIDs(t *testing.T) {
+	nodeIDs := []string{"node1", "node2", "node3"}
+
+	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	for _, nodeID := range nodeIDs {
+		if err := c.SetSnapshot(context.Background(), nodeID, fixture.snapshot()); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	collectedNodeIDs := c.GetNodeIDs()
+	assert.Equal(t, nodeIDs, collectedNodeIDs)
+}

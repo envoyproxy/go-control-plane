@@ -83,6 +83,9 @@ type SnapshotCache interface {
 	// ClearSnapshot removes all status and snapshot information associated with a node.
 	ClearSnapshot(node string)
 
+	// GetNodeIDs gets the all node ID in cache.
+	GetNodeIDs() []string
+
 	// GetStatusInfo retrieves status information for a node ID.
 	GetStatusInfo(string) StatusInfo
 
@@ -604,6 +607,20 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request *Request) (Respon
 	}
 
 	return nil, fmt.Errorf("missing snapshot for %q", nodeID)
+}
+
+// GetNodeIDs gets the all node ID in cache.
+func (cache *snapshotCache) GetNodeIDs() []string {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+
+	nodeIDs := []string{}
+
+	for nodeID := range cache.snapshots {
+		nodeIDs = append(nodeIDs, nodeID)
+	}
+
+	return nodeIDs
 }
 
 // GetStatusInfo retrieves the status info for the node.
