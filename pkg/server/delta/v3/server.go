@@ -3,7 +3,6 @@ package delta
 import (
 	"context"
 	"errors"
-	"log"
 	"strconv"
 	"sync/atomic"
 
@@ -37,6 +36,13 @@ type Callbacks interface {
 }
 
 var deltaErrorResponse = &cache.RawDeltaResponse{}
+
+// WithOrderedADS enables the internal flag to order responses strictly.
+func WithOrderedADS() config.XDSOption {
+	return func(o *config.Opts) {
+		o.Ordered = true
+	}
+}
 
 type server struct {
 	cache     cache.ConfigWatcher
@@ -78,9 +84,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	var node = &core.Node{}
 
 	defer func() {
-		watches.mu.Lock()
 		watches.Cancel()
-		watches.mu.Unlock()
 		if s.callbacks != nil {
 			s.callbacks.OnDeltaStreamClosed(streamID, node)
 		}
@@ -112,44 +116,30 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		}
 	}
 
-	done := make(chan struct{}, 1)
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case resp, more := <-watches.deltaMuxedResponses:
-				if !more {
-					break
-				}
-
-				typ := resp.GetDeltaRequest().GetTypeUrl()
-				if resp == deltaErrorResponse {
-					log.Printf("%s watch failed\n", typ)
-					break
-				}
-
-				nonce, err := send(resp)
-				if err != nil {
-					log.Printf("failed to send response %+v\n", err)
-					break
-				}
-
-				watches.mu.Lock()
-				watch := watches.deltaWatches[typ]
-				watch.nonce = nonce
-				watch.state.SetResourceVersions(resp.GetNextVersionMap())
-				watches.deltaWatches[typ] = watch
-				watches.mu.Unlock()
-			}
-		}
-	}()
-
 	for {
 		select {
 		case <-s.ctx.Done():
-			done <- struct{}{}
 			return nil
+		case resp, more := <-watches.deltaMuxedResponses:
+			if !more {
+				break
+			}
+
+			typ := resp.GetDeltaRequest().GetTypeUrl()
+			if resp == deltaErrorResponse {
+				return status.Errorf(codes.Unavailable, typ+" watch failed")
+			}
+
+			nonce, err := send(resp)
+			if err != nil {
+				return err
+			}
+
+			watch := watches.deltaWatches[typ]
+			watch.nonce = nonce
+
+			watch.state.SetResourceVersions(resp.GetNextVersionMap())
+			watches.deltaWatches[typ] = watch
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
@@ -173,10 +163,14 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				req.Node = node
 			}
 
+			ordered := false
 			// type URL is required for ADS but is implicit for any other xDS stream
 			if defaultTypeURL == resource.AnyType {
 				if req.TypeUrl == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
+				}
+				if s.opts.Ordered {
+					ordered = true
 				}
 			} else if req.TypeUrl == "" {
 				req.TypeUrl = defaultTypeURL
@@ -185,7 +179,6 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			typeURL := req.GetTypeUrl()
 
 			// cancel existing watch to (re-)request a newer version
-			watches.mu.Lock()
 			watch, ok := watches.deltaWatches[typeURL]
 			if !ok {
 				// Initialize the state of the stream.
@@ -202,10 +195,25 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			s.subscribe(req.GetResourceNamesSubscribe(), &watch.state)
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), &watch.state)
 
-			watch.responses = watches.deltaMuxedResponses
+			if ordered {
+				// Use the shared channel to keep the order of responses.
+				watch.UseSharedResponseChan(watches.deltaMuxedResponses)
+			} else {
+				watch.MakeResponseChan()
+			}
 			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
 			watches.deltaWatches[typeURL] = watch
-			watches.mu.Unlock()
+
+			// just handle normal non-ordered responses here
+			// all ordered responses are sent to the muxedResponses channel directly
+			if !watch.useSharedChan {
+				go func() {
+					resp, more := <-watch.responses
+					if more {
+						watches.deltaMuxedResponses <- resp
+					}
+				}()
+			}
 		}
 	}
 }
