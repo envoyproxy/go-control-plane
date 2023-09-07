@@ -1122,7 +1122,16 @@ func (m *RedisProxy_ConnectionRateLimit) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for ConnectionRateLimitPerSec
+	if m.GetConnectionRateLimitPerSec() <= 0 {
+		err := RedisProxy_ConnectionRateLimitValidationError{
+			field:  "ConnectionRateLimitPerSec",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return RedisProxy_ConnectionRateLimitMultiError(errors)
