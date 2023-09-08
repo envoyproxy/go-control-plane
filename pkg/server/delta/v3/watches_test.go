@@ -30,13 +30,5 @@ func TestDeltaWatches(t *testing.T) {
 		watches.Cancel()
 
 		assert.Equal(t, 3, cancelCount)
-		for _, channel := range channels {
-			select {
-			case _, ok := <-channel:
-				assert.False(t, ok, "a channel was not closed")
-			default:
-				assert.Fail(t, "a channel was not closed")
-			}
-		}
 	})
 }

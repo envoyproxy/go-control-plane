@@ -37,13 +37,6 @@ type Callbacks interface {
 
 var deltaErrorResponse = &cache.RawDeltaResponse{}
 
-// WithOrderedADS enables the internal flag to order responses strictly.
-func WithOrderedADS() config.XDSOption {
-	return func(o *config.Opts) {
-		o.Ordered = true
-	}
-}
-
 type server struct {
 	cache     cache.ConfigWatcher
 	callbacks Callbacks
@@ -72,7 +65,7 @@ func NewServer(ctx context.Context, config cache.ConfigWatcher, callbacks Callba
 	return s
 }
 
-func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
+func (s *server) processDelta(str stream.DeltaStream, reqCh chan *discovery.DeltaDiscoveryRequest, defaultTypeURL string) error {
 	streamID := atomic.AddInt64(&s.streamCount, 1)
 
 	// streamNonce holds a unique nonce for req-resp pairs per xDS stream.
@@ -149,6 +142,14 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				return status.Errorf(codes.Unavailable, "empty request")
 			}
 
+			// make sure responses are processed prior to new requests to avoid deadlock
+			if len(watches.deltaMuxedResponses) > 0 {
+				go func() {
+					reqCh <- req
+				}()
+				break
+			}
+
 			if s.callbacks != nil {
 				if err := s.callbacks.OnStreamDeltaRequest(streamID, req); err != nil {
 					return err
@@ -163,14 +164,10 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				req.Node = node
 			}
 
-			ordered := false
 			// type URL is required for ADS but is implicit for any other xDS stream
 			if defaultTypeURL == resource.AnyType {
 				if req.TypeUrl == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
-				}
-				if s.opts.Ordered {
-					ordered = true
 				}
 			} else if req.TypeUrl == "" {
 				req.TypeUrl = defaultTypeURL
@@ -195,25 +192,9 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			s.subscribe(req.GetResourceNamesSubscribe(), &watch.state)
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), &watch.state)
 
-			if ordered {
-				// Use the shared channel to keep the order of responses.
-				watch.UseSharedResponseChan(watches.deltaMuxedResponses)
-			} else {
-				watch.MakeResponseChan()
-			}
+			watch.responses = watches.deltaMuxedResponses
 			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
 			watches.deltaWatches[typeURL] = watch
-
-			// just handle normal non-ordered responses here
-			// all ordered responses are sent to the muxedResponses channel directly
-			if !watch.useSharedChan {
-				go func() {
-					resp, more := <-watch.responses
-					if more {
-						watches.deltaMuxedResponses <- resp
-					}
-				}()
-			}
 		}
 	}
 }
