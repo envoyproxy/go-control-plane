@@ -25,6 +25,10 @@ updates:
     directory: /examples/dyplomat
     schedule:
       interval: weekly
+    groups:
+      k8s.io:
+          patterns:
+            - "k8s.io/*"
   - package-ecosystem: gomod
     directory: /xdsmatcher
     schedule:
