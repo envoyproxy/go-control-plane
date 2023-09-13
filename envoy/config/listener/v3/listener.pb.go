@@ -268,7 +268,12 @@ type Listener struct {
 	// before a connection is created.
 	// UDP Listener filters can be specified when the protocol in the listener socket address in
 	// :ref:`protocol <envoy_v3_api_field_config.core.v3.SocketAddress.protocol>` is :ref:`UDP
-	// <envoy_v3_api_enum_value_config.core.v3.SocketAddress.Protocol.UDP>`.
+	// <envoy_v3_api_enum_value_config.core.v3.SocketAddress.Protocol.UDP>` and no
+	// :ref:`quic_options <envoy_v3_api_field_config.listener.v3.UdpListenerConfig.quic_options>` is specified in :ref:`udp_listener_config <envoy_v3_api_field_config.listener.v3.Listener.udp_listener_config>`.
+	// QUIC listener filters can be specified when :ref:`quic_options
+	// <envoy_v3_api_field_config.listener.v3.UdpListenerConfig.quic_options>` is
+	// specified in :ref:`udp_listener_config <envoy_v3_api_field_config.listener.v3.Listener.udp_listener_config>`.
+	// They are processed sequentially right before connection creation. And like TCP Listener filters, they can be used to manipulate the connection metadata and socket. But the difference is that they can't be used to pause connection creation.
 	ListenerFilters []*ListenerFilter `protobuf:"bytes,9,rep,name=listener_filters,json=listenerFilters,proto3" json:"listener_filters,omitempty"`
 	// The timeout to wait for all listener filters to complete operation. If the timeout is reached,
 	// the accepted socket is closed without a connection being created unless
