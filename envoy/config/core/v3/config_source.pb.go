@@ -407,7 +407,8 @@ type RateLimitSettings struct {
 	// default value of 100 will be used.
 	MaxTokens *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
 	// Rate at which tokens will be filled per second. If not set, a default fill rate of 10 tokens
-	// per second will be used.
+	// per second will be used. The minimal fill rate is once per year. Lower
+	// fill rates will be set to once per year.
 	FillRate *wrappers.DoubleValue `protobuf:"bytes,2,opt,name=fill_rate,json=fillRate,proto3" json:"fill_rate,omitempty"`
 }
 

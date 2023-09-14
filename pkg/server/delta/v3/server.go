@@ -31,7 +31,7 @@ type Callbacks interface {
 	// OnStreamDeltaRequest is called once a request is received on a stream.
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error
-	// OnStreamDelatResponse is called immediately prior to sending a response on a stream.
+	// OnStreamDeltaResponse is called immediately prior to sending a response on a stream.
 	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
 }
 
