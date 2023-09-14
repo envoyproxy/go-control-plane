@@ -71,12 +71,14 @@ type UdpProxyConfig struct {
 	// Perform per packet load balancing (upstream host selection) on each received data chunk.
 	// The default if not specified is false, that means each data chunk is forwarded
 	// to upstream host selected on first chunk receival for that "session" (identified by source IP/port and local IP/port).
+	// Only one of use_per_packet_load_balancing or session_filters can be used.
 	UsePerPacketLoadBalancing bool `protobuf:"varint,7,opt,name=use_per_packet_load_balancing,json=usePerPacketLoadBalancing,proto3" json:"use_per_packet_load_balancing,omitempty"`
 	// Configuration for session access logs emitted by the UDP proxy. Note that certain UDP specific data is emitted as :ref:`Dynamic Metadata <config_access_log_format_dynamic_metadata>`.
 	AccessLog []*v31.AccessLog `protobuf:"bytes,8,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
 	// Configuration for proxy access logs emitted by the UDP proxy. Note that certain UDP specific data is emitted as :ref:`Dynamic Metadata <config_access_log_format_dynamic_metadata>`.
 	ProxyAccessLog []*v31.AccessLog `protobuf:"bytes,10,rep,name=proxy_access_log,json=proxyAccessLog,proto3" json:"proxy_access_log,omitempty"`
 	// Optional session filters that will run for each UDP session.
+	// Only one of use_per_packet_load_balancing or session_filters can be used.
 	SessionFilters []*UdpProxyConfig_SessionFilter `protobuf:"bytes,11,rep,name=session_filters,json=sessionFilters,proto3" json:"session_filters,omitempty"`
 }
 
