@@ -30,7 +30,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/wellknown"
 )
 
 const (
@@ -118,7 +117,7 @@ func makeHTTPListener(listenerName string, route string) *listener.Listener {
 			},
 		},
 		HttpFilters: []*hcm.HttpFilter{{
-			Name:       wellknown.Router,
+			Name:       "http-router",
 			ConfigType: &hcm.HttpFilter_TypedConfig{TypedConfig: routerConfig},
 		}},
 	}
@@ -142,7 +141,7 @@ func makeHTTPListener(listenerName string, route string) *listener.Listener {
 		},
 		FilterChains: []*listener.FilterChain{{
 			Filters: []*listener.Filter{{
-				Name: wellknown.HTTPConnectionManager,
+				Name: "http-connection-manager",
 				ConfigType: &listener.Filter_TypedConfig{
 					TypedConfig: pbst,
 				},
