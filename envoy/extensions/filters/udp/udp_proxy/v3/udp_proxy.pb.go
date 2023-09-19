@@ -79,7 +79,6 @@ type UdpProxyConfig struct {
 	ProxyAccessLog []*v31.AccessLog `protobuf:"bytes,10,rep,name=proxy_access_log,json=proxyAccessLog,proto3" json:"proxy_access_log,omitempty"`
 	// Optional session filters that will run for each UDP session.
 	// Only one of use_per_packet_load_balancing or session_filters can be used.
-	// [#extension-category: envoy.filters.udp.session]
 	SessionFilters []*UdpProxyConfig_SessionFilter `protobuf:"bytes,11,rep,name=session_filters,json=sessionFilters,proto3" json:"session_filters,omitempty"`
 }
 
