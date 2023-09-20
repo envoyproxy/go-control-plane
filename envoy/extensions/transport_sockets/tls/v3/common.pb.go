@@ -394,7 +394,6 @@ type PrivateKeyProvider struct {
 	// Types that are assignable to ConfigType:
 	//	*PrivateKeyProvider_TypedConfig
 	ConfigType isPrivateKeyProvider_ConfigType `protobuf_oneof:"config_type"`
-	// [#not-implemented-hide:]
 	// If the private key provider isn't available (eg. the required hardware capability doesn't existed),
 	// Envoy will fallback to the BoringSSL default implementation when the `fallback` is true.
 	// The default value is `false`.
