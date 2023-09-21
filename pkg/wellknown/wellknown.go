@@ -30,6 +30,8 @@ const (
 	Dynamo = "envoy.filters.http.dynamo"
 	// Fault HTTP filter
 	Fault = "envoy.filters.http.fault"
+	// GRPCFieldExtraction HTTP filter
+	GRPCFieldExtraction = "envoy.filters.http.grpc_field_extraction"
 	// GRPCHTTP1Bridge HTTP filter
 	GRPCHTTP1Bridge = "envoy.filters.http.grpc_http1_bridge"
 	// GRPCJSONTranscoder HTTP filter
