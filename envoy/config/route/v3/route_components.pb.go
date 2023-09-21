@@ -1270,7 +1270,8 @@ type RouteMatch struct {
 	// match. The router will check the query string from the ``path`` header
 	// against all the specified query parameters. If the number of specified
 	// query parameters is nonzero, they all must match the ``path`` header's
-	// query string for a match to occur.
+	// query string for a match to occur.  In the event query parameters are
+	// repeated, only the first value for each key will be considered.
 	//
 	// .. note::
 	//
