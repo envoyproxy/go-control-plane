@@ -68,7 +68,6 @@ type ExtAuthz struct {
 	// 3. At least one ``authorization response header`` is added to the client request, or is used for
 	// altering another client request header.
 	//
-	// It is an error to set this field when the filter is configured on an upstream filter chain.
 	ClearRouteCache bool `protobuf:"varint,6,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 	// Sets the HTTP status that is returned to the client when the authorization server returns an error
 	// or cannot be reached. The default status is HTTP 403 Forbidden.
@@ -119,8 +118,6 @@ type ExtAuthz struct {
 	//
 	// When this field is true, Envoy will include the peer X.509 certificate, if available, in the
 	// :ref:`certificate<envoy_v3_api_field_service.auth.v3.AttributeContext.Peer.certificate>`.
-	//
-	// It is an error to set this field when the filter is configured on an upstream filter chain.
 	IncludePeerCertificate bool `protobuf:"varint,10,opt,name=include_peer_certificate,json=includePeerCertificate,proto3" json:"include_peer_certificate,omitempty"`
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
 	// emitted statistics between configured ``ext_authz`` filters in an HTTP filter chain. For example:
@@ -166,8 +163,6 @@ type ExtAuthz struct {
 	//
 	// When this field is true, Envoy will include the SNI name used for TLSClientHello, if available, in the
 	// :ref:`tls_session<envoy_v3_api_field_service.auth.v3.AttributeContext.tls_session>`.
-	//
-	// It is an error to set this field when the filter is configured on an upstream filter chain.
 	IncludeTlsSession bool `protobuf:"varint,18,opt,name=include_tls_session,json=includeTlsSession,proto3" json:"include_tls_session,omitempty"`
 }
 
