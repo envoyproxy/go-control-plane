@@ -4916,7 +4916,8 @@ type RouteAction_HashPolicy_QueryParameter struct {
 
 	// The name of the URL query parameter that will be used to obtain the hash
 	// key. If the parameter is not present, no hash will be produced. Query
-	// parameter names are case-sensitive.
+	// parameter names are case-sensitive. If query parameters are repeated, only
+	// the first value will be considered.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
