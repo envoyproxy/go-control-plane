@@ -167,7 +167,7 @@ type ZooKeeperProxy struct {
 	// if that is set. If it isn't, ZooKeeper's default is also 1Mb.
 	MaxPacketBytes *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=max_packet_bytes,json=maxPacketBytes,proto3" json:"max_packet_bytes,omitempty"`
 	// Whether to emit latency threshold metrics. If not set, it defaults to false.
-	// If false, setting `default_latency_threshold` and `latency_threshold_overrides` will not have effect.
+	// If false, setting ``default_latency_threshold`` and ``latency_threshold_overrides`` will not have effect.
 	EnableLatencyThresholdMetrics bool `protobuf:"varint,4,opt,name=enable_latency_threshold_metrics,json=enableLatencyThresholdMetrics,proto3" json:"enable_latency_threshold_metrics,omitempty"`
 	// The default latency threshold to decide the fast/slow responses and emit metrics (used for error budget calculation).
 	//

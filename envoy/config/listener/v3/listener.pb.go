@@ -313,7 +313,7 @@ type Listener struct {
 	// Additional socket options that may not be present in Envoy source code or
 	// precompiled binaries. The socket options can be updated for a listener when
 	// :ref:`enable_reuse_port <envoy_v3_api_field_config.listener.v3.Listener.enable_reuse_port>`
-	// is `true`. Otherwise, if socket options change during a listener update the update will be rejected
+	// is ``true``. Otherwise, if socket options change during a listener update the update will be rejected
 	// to make it clear that the options were not updated.
 	SocketOptions []*v3.SocketOption `protobuf:"bytes,13,rep,name=socket_options,json=socketOptions,proto3" json:"socket_options,omitempty"`
 	// Whether the listener should accept TCP Fast Open (TFO) connections.

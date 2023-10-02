@@ -395,8 +395,8 @@ type PrivateKeyProvider struct {
 	//	*PrivateKeyProvider_TypedConfig
 	ConfigType isPrivateKeyProvider_ConfigType `protobuf_oneof:"config_type"`
 	// If the private key provider isn't available (eg. the required hardware capability doesn't existed),
-	// Envoy will fallback to the BoringSSL default implementation when the `fallback` is true.
-	// The default value is `false`.
+	// Envoy will fallback to the BoringSSL default implementation when the ``fallback`` is true.
+	// The default value is ``false``.
 	Fallback bool `protobuf:"varint,4,opt,name=fallback,proto3" json:"fallback,omitempty"`
 }
 
@@ -1002,7 +1002,7 @@ type CertificateValidationContext struct {
 	// Defines maximum depth of a certificate chain accepted in verification, the default limit is 100, though this can be system-dependent.
 	// This number does not include the leaf, so a depth of 1 allows the leaf and one CA certificate. If a trusted issuer appears in the chain,
 	// but in a depth larger than configured, the certificate validation will fail.
-	// See `BoringSSL SSL_CTX_set_verify_depth <https://commondatastorage.googleapis.com/chromium-boringssl-docs/ssl.h.html#SSL_CTX_set_verify_depth>`
+	// See `BoringSSL SSL_CTX_set_verify_depth <https://commondatastorage.googleapis.com/chromium-boringssl-docs/ssl.h.html#SSL_CTX_set_verify_depth>`_
 	// If you use OpenSSL, its behavior is different from BoringSSL, this will define a limit on the number of certificates between the end-entity and trust-anchor certificates.
 	// Neither the end-entity nor the trust-anchor certificates count against depth.
 	// See `OpenSSL SSL set_verify_depth <https://www.openssl.org/docs/man1.1.1/man3/SSL_CTX_set_verify_depth.html>`_.

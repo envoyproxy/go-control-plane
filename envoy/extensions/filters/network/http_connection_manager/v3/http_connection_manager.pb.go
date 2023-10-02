@@ -742,11 +742,11 @@ type HttpConnectionManager struct {
 	// [#not-implemented-hide:]
 	// [#extension-category: envoy.http.header_validators]
 	TypedHeaderValidationConfig *v3.TypedExtensionConfig `protobuf:"bytes,50,opt,name=typed_header_validation_config,json=typedHeaderValidationConfig,proto3" json:"typed_header_validation_config,omitempty"`
-	// Append the `x-forwarded-port` header with the port value client used to connect to Envoy. It
-	// will be ignored if the `x-forwarded-port` header has been set by any trusted proxy in front of Envoy.
+	// Append the ``x-forwarded-port`` header with the port value client used to connect to Envoy. It
+	// will be ignored if the ``x-forwarded-port`` header has been set by any trusted proxy in front of Envoy.
 	AppendXForwardedPort bool `protobuf:"varint,51,opt,name=append_x_forwarded_port,json=appendXForwardedPort,proto3" json:"append_x_forwarded_port,omitempty"`
-	// Whether the HCM will add ProxyProtocolFilterState to the Connection lifetime filter state. Defaults to `true`.
-	// This should be set to `false` in cases where Envoy's view of the downstream address may not correspond to the
+	// Whether the HCM will add ProxyProtocolFilterState to the Connection lifetime filter state. Defaults to ``true``.
+	// This should be set to ``false`` in cases where Envoy's view of the downstream address may not correspond to the
 	// actual client address, for example, if there's another proxy in front of the Envoy.
 	AddProxyProtocolConnectionState *wrappers.BoolValue `protobuf:"bytes,53,opt,name=add_proxy_protocol_connection_state,json=addProxyProtocolConnectionState,proto3" json:"add_proxy_protocol_connection_state,omitempty"`
 }
@@ -2540,7 +2540,7 @@ type HttpConnectionManager_HcmAccessLogOptions struct {
 	// on stream close, when the HTTP request is complete. If this field is set, the HCM will flush access
 	// logs periodically at the specified interval. This is especially useful in the case of long-lived
 	// requests, such as CONNECT and Websockets. Final access logs can be detected via the
-	// `requestComplete()` method of `StreamInfo` in access log filters, or thru the `%DURATION%` substitution
+	// ``requestComplete()`` method of ``StreamInfo`` in access log filters, or through the ``%DURATION%`` substitution
 	// string.
 	// The interval must be at least 1 millisecond.
 	AccessLogFlushInterval *duration.Duration `protobuf:"bytes,1,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`

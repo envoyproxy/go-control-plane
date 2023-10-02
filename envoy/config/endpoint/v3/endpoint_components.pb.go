@@ -53,8 +53,8 @@ type Endpoint struct {
 	// that require a hostname, like
 	// :ref:`auto_host_rewrite <envoy_v3_api_field_config.route.v3.RouteAction.auto_host_rewrite>`.
 	Hostname string `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	// An ordered list of addresses that together with `address` comprise the
-	// list of addresses for an endpoint. The address given in the `address` is
+	// An ordered list of addresses that together with ``address`` comprise the
+	// list of addresses for an endpoint. The address given in the ``address`` is
 	// prepended to this list. It is assumed that the list must already be
 	// sorted by preference order of the addresses. This will only be supported
 	// for STATIC and EDS clusters.

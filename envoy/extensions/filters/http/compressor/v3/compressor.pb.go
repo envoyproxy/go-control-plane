@@ -84,7 +84,7 @@ type Compressor struct {
 	//    instead of
 	//    ``<stat_prefix>.compressor.<compressor_library.name>.<compressor_library_stat_prefix>.*``.
 	ResponseDirectionConfig *Compressor_ResponseDirectionConfig `protobuf:"bytes,8,opt,name=response_direction_config,json=responseDirectionConfig,proto3" json:"response_direction_config,omitempty"`
-	// If true, chooses this compressor first to do compression when the q-values in `Accept-Encoding` are same.
+	// If true, chooses this compressor first to do compression when the q-values in ``Accept-Encoding`` are same.
 	// The last compressor which enables choose_first will be chosen if multiple compressor filters in the chain have choose_first as true.
 	ChooseFirst bool `protobuf:"varint,9,opt,name=choose_first,json=chooseFirst,proto3" json:"choose_first,omitempty"`
 }
@@ -189,7 +189,7 @@ func (x *Compressor) GetChooseFirst() bool {
 	return false
 }
 
-// Per-route overrides of `ResponseDirectionConfig`. Anything added here should be optional,
+// Per-route overrides of ``ResponseDirectionConfig``. Anything added here should be optional,
 // to allow overriding arbitrary subsets of configuration. Omitted fields must have no affect.
 type ResponseDirectionOverrides struct {
 	state         protoimpl.MessageState
@@ -230,7 +230,7 @@ func (*ResponseDirectionOverrides) Descriptor() ([]byte, []int) {
 }
 
 // Per-route overrides. As per-route overrides are needed, they should be
-// added here, mirroring the structure of `Compressor`. All fields should be
+// added here, mirroring the structure of ``Compressor``. All fields should be
 // optional, to allow overriding arbitrary subsets of configuration.
 type CompressorOverrides struct {
 	state         protoimpl.MessageState
@@ -355,7 +355,7 @@ type CompressorPerRoute_Disabled struct {
 }
 
 type CompressorPerRoute_Overrides struct {
-	// Per-route overrides. Fields set here will override corresponding fields in `Compressor`.
+	// Per-route overrides. Fields set here will override corresponding fields in ``Compressor``.
 	Overrides *CompressorOverrides `protobuf:"bytes,2,opt,name=overrides,proto3,oneof"`
 }
 

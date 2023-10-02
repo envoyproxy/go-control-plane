@@ -228,8 +228,8 @@ type JwtProvider struct {
 	//   config validation.
 	//
 	HeaderInMetadata string `protobuf:"bytes,14,opt,name=header_in_metadata,json=headerInMetadata,proto3" json:"header_in_metadata,omitempty"`
-	// If non empty, the failure status `::google::jwt_verify::Status` for a non verified JWT will be written to StreamInfo DynamicMetadata
-	// in the format as: ``namespace`` is the jwt_authn filter name as ````envoy.filters.http.jwt_authn````
+	// If non empty, the failure status ``::google::jwt_verify::Status`` for a non verified JWT will be written to StreamInfo DynamicMetadata
+	// in the format as: ``namespace`` is the jwt_authn filter name as ``envoy.filters.http.jwt_authn``
 	// The value is the ``protobuf::Struct``. The values of this field will be ``code`` and ``message``
 	// and they will contain the JWT authentication failure status code and a message describing the failure.
 	//
