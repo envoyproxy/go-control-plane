@@ -105,7 +105,7 @@ func (x *VirtualHost) GetRoutes() *v3.Matcher {
 	return nil
 }
 
-// The generic proxy makes use of the `xds matching API` for routing configurations.
+// The generic proxy makes use of the xDS matching API for routing configurations.
 //
 // In the below example, we combine a top level tree matcher with a linear matcher to match
 // the incoming requests, and send the matching requests to v1 of the upstream service.

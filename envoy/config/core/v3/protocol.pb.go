@@ -233,10 +233,10 @@ type QuicProtocolOptions struct {
 	// If absent, use the default keepalive behavior of which a client connection sends PINGs every 15s, and a server connection doesn't do anything.
 	ConnectionKeepalive *QuicKeepAliveSettings `protobuf:"bytes,5,opt,name=connection_keepalive,json=connectionKeepalive,proto3" json:"connection_keepalive,omitempty"`
 	// A comma-separated list of strings representing QUIC connection options defined in
-	// `QUICHE <https://github.com/google/quiche/blob/main/quiche/quic/core/crypto/crypto_protocol.h>` and to be sent by upstream connections.
+	// `QUICHE <https://github.com/google/quiche/blob/main/quiche/quic/core/crypto/crypto_protocol.h>`_ and to be sent by upstream connections.
 	ConnectionOptions string `protobuf:"bytes,6,opt,name=connection_options,json=connectionOptions,proto3" json:"connection_options,omitempty"`
 	// A comma-separated list of strings representing QUIC client connection options defined in
-	// `QUICHE <https://github.com/google/quiche/blob/main/quiche/quic/core/crypto/crypto_protocol.h>` and to be sent by upstream connections.
+	// `QUICHE <https://github.com/google/quiche/blob/main/quiche/quic/core/crypto/crypto_protocol.h>`_ and to be sent by upstream connections.
 	ClientConnectionOptions string `protobuf:"bytes,7,opt,name=client_connection_options,json=clientConnectionOptions,proto3" json:"client_connection_options,omitempty"`
 }
 

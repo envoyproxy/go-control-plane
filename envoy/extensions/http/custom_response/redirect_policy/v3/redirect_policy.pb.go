@@ -157,12 +157,12 @@ type RedirectPolicy_Uri struct {
 
 type RedirectPolicy_RedirectAction struct {
 	// Specify elements of the redirect url individually.
-	// Note: Do not specify the `response_code` field in `redirect_action`, use
-	// `status_code` instead.
-	// The following fields in `redirect_action` are currently not supported,
+	// Note: Do not specify the ``response_code`` field in ``redirect_action``, use
+	// ``status_code`` instead.
+	// The following fields in ``redirect_action`` are currently not supported,
 	// and specifying them will cause the config to be rejected:
-	// - `prefix_rewrite`
-	// - `regex_rewrite`
+	// - ``prefix_rewrite``
+	// - ``regex_rewrite``
 	RedirectAction *v31.RedirectAction `protobuf:"bytes,2,opt,name=redirect_action,json=redirectAction,proto3,oneof"`
 }
 

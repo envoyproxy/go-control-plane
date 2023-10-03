@@ -500,7 +500,7 @@ type BindConfig struct {
 	// Additional socket options that may not be present in Envoy source code or
 	// precompiled binaries.
 	SocketOptions []*SocketOption `protobuf:"bytes,3,rep,name=socket_options,json=socketOptions,proto3" json:"socket_options,omitempty"`
-	// Extra source addresses appended to the address specified in the `source_address`
+	// Extra source addresses appended to the address specified in the ``source_address``
 	// field. This enables to specify multiple source addresses.
 	// The source address selection is determined by :ref:`local_address_selector
 	// <envoy_v3_api_field_config.core.v3.BindConfig.local_address_selector>`.
