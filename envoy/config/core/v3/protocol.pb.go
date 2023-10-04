@@ -225,7 +225,7 @@ type QuicProtocolOptions struct {
 	// window size now, so it's also the minimum.
 	InitialConnectionWindowSize *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// The number of timeouts that can occur before port migration is triggered for QUIC clients.
-	// This defaults to 1. If set to 0, port migration will not occur on path degrading.
+	// This defaults to 4. If set to 0, port migration will not occur on path degrading.
 	// Timeout here refers to QUIC internal path degrading timeout mechanism, such as PTO.
 	// This has no effect on server sessions.
 	NumTimeoutsToTriggerPortMigration *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=num_timeouts_to_trigger_port_migration,json=numTimeoutsToTriggerPortMigration,proto3" json:"num_timeouts_to_trigger_port_migration,omitempty"`
