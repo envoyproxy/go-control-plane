@@ -21,11 +21,12 @@ import (
 	"io"
 	"sync"
 
-	"github.com/golang/protobuf/ptypes/any"
 	status "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	grpcStatus "google.golang.org/grpc/status"
+
+	"github.com/golang/protobuf/ptypes/any"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
