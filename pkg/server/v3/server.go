@@ -70,16 +70,18 @@ type Callbacks interface {
 
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
 type CallbackFuncs struct {
-	StreamOpenFunc          func(context.Context, int64, string) error
-	StreamClosedFunc        func(int64, *core.Node)
-	DeltaStreamOpenFunc     func(context.Context, int64, string) error
-	DeltaStreamClosedFunc   func(int64, *core.Node)
-	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
-	StreamResponseFunc      func(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
-	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
-	StreamDeltaResponseFunc func(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
-	FetchRequestFunc        func(context.Context, *discovery.DiscoveryRequest) error
-	FetchResponseFunc       func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamOpenFunc                func(context.Context, int64, string) error
+	StreamClosedFunc              func(int64, *core.Node)
+	DeltaStreamOpenFunc           func(context.Context, int64, string) error
+	DeltaStreamClosedFunc         func(int64, *core.Node)
+	StreamRequestFunc             func(int64, *discovery.DiscoveryRequest) error
+	StreamResponseFunc            func(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	StreamResponseNackedFunc      func(int64, *discovery.DiscoveryRequest) bool
+	StreamDeltaRequestFunc        func(int64, *discovery.DeltaDiscoveryRequest) error
+	StreamDeltaResponseFunc       func(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
+	StreamDeltaResponseNackedFunc func(int64, *discovery.DeltaDiscoveryRequest) bool
+	FetchRequestFunc              func(context.Context, *discovery.DiscoveryRequest) error
+	FetchResponseFunc             func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 }
 
 var _ Callbacks = CallbackFuncs{}
@@ -132,6 +134,16 @@ func (c CallbackFuncs) OnStreamResponse(ctx context.Context, streamID int64, req
 	}
 }
 
+// OnStreamResponseNacked invokes StreamResponseNackedFunc.
+func (c CallbackFuncs) OnStreamResponseNacked(streamID int64, req *discovery.DiscoveryRequest) bool {
+	if c.StreamResponseNackedFunc != nil {
+		return c.StreamResponseNackedFunc(streamID, req)
+	}
+
+	// Default to true
+	return true
+}
+
 // OnStreamDeltaRequest invokes StreamDeltaResponseFunc
 func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discovery.DeltaDiscoveryRequest) error {
 	if c.StreamDeltaRequestFunc != nil {
@@ -139,6 +151,15 @@ func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discovery.Delta
 	}
 
 	return nil
+}
+
+// OnStreamDeltaResponseNacked invokes StreamDeltaResponseNackedFunc.
+func (c CallbackFuncs) OnStreamDeltaResponseNacked(streamID int64, req *discovery.DeltaDiscoveryRequest) bool {
+	if c.StreamDeltaResponseNackedFunc != nil {
+		return c.StreamDeltaResponseNackedFunc(streamID, req)
+	}
+
+	return true
 }
 
 // OnStreamDeltaResponse invokes StreamDeltaResponseFunc.

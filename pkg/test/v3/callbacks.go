@@ -12,14 +12,16 @@ import (
 )
 
 type Callbacks struct {
-	Signal         chan struct{}
-	Debug          bool
-	Fetches        int
-	Requests       int
-	Responses      int
-	DeltaRequests  int
-	DeltaResponses int
-	mu             sync.Mutex
+	Signal             chan struct{}
+	Debug              bool
+	Fetches            int
+	Requests           int
+	Responses          int
+	ResponseNacks      int
+	DeltaRequests      int
+	DeltaResponses     int
+	DeltaResponseNacks int
+	mu                 sync.Mutex
 }
 
 var _ server.Callbacks = &Callbacks{}
@@ -78,11 +80,30 @@ func (cb *Callbacks) OnStreamResponse(ctx context.Context, id int64, req *discov
 	}
 }
 
+func (cb *Callbacks) OnStreamResponseNacked(streamID int64, req *discovery.DiscoveryRequest) bool {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.ResponseNacks++
+	if cb.Debug {
+		log.Printf("received nack for %s on stream %d with error %v", req.GetTypeUrl(), streamID, req.ErrorDetail)
+	}
+
+	return false
+}
+
 func (cb *Callbacks) OnStreamDeltaResponse(id int64, req *discovery.DeltaDiscoveryRequest, res *discovery.DeltaDiscoveryResponse) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaResponses++
 }
+
+func (cb *Callbacks) OnStreamDeltaResponseNacked(int64, *discovery.DeltaDiscoveryRequest) bool {
+	cb.mu.Lock()
+	defer cb.mu.Unlock()
+	cb.DeltaResponseNacks++
+	return false
+}
+
 func (cb *Callbacks) OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()

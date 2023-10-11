@@ -43,6 +43,9 @@ type Callbacks interface {
 	OnStreamRequest(int64, *discovery.DiscoveryRequest) error
 	// OnStreamResponse is called immediately prior to sending a response on a stream.
 	OnStreamResponse(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
+	// OnStreamResponseNacked is called when a stream receives a NACK response.
+	// Returning true will cause the server to retry the response.
+	OnStreamResponseNacked(int64, *discovery.DiscoveryRequest) bool
 }
 
 // NewServer creates handlers from a config watcher and callbacks.

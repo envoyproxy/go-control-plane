@@ -33,6 +33,9 @@ type Callbacks interface {
 	OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error
 	// OnStreamDeltaResponse is called immediately prior to sending a response on a stream.
 	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
+	// OnStreamDeltaResponseNacked is called when a response is NACKed.
+	// Returning true will cause the server to retry the response.
+	OnStreamDeltaResponseNacked(int64, *discovery.DeltaDiscoveryRequest) bool
 }
 
 var deltaErrorResponse = &cache.RawDeltaResponse{}
@@ -212,6 +215,17 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 				// It can still be done by explicitly unsubscribing from "*"
 				watch.state = stream.NewStreamState(len(req.GetResourceNamesSubscribe()) == 0, req.GetInitialResourceVersions())
 			} else {
+				if watch.nonce == req.ResponseNonce {
+					// If client responded with a NACK, check if we should retry.
+					if req.ErrorDetail != nil || s.callbacks != nil {
+						if !s.callbacks.OnStreamDeltaResponseNacked(streamID, req) {
+							// Don't cancel the watch if the response was nacked.
+							// Discovery Response will not be sent to the client.
+							continue
+						}
+					}
+				}
+
 				watch.Cancel()
 			}
 

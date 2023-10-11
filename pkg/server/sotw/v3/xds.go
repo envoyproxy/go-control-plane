@@ -129,6 +129,15 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				// We've found a pre-existing watch, lets check and update if needed.
 				// If these requirements aren't satisfied, leave an open watch.
 				if w.nonce == "" || w.nonce == nonce {
+					// If client responded with a NACK, check if we should retry.
+					if req.ErrorDetail != nil || s.callbacks != nil {
+						if !s.callbacks.OnStreamResponseNacked(sw.ID, req) {
+							// Don't recreate the watch if the response was nacked.
+							// Discovery Response will not be sent to the client.
+							continue
+						}
+					}
+
 					w.close()
 
 					sw.watches.addWatch(typeURL, &watch{
