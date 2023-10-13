@@ -53,8 +53,8 @@ type Compressor struct {
 	//
 	// .. attention::
 	//
-	//    To avoid interfering with other compression filters in the same chain use this option in
-	//    the filter closest to the upstream.
+	//	To avoid interfering with other compression filters in the same chain use this option in
+	//	the filter closest to the upstream.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
 	RemoveAcceptEncodingHeader bool `protobuf:"varint,4,opt,name=remove_accept_encoding_header,json=removeAcceptEncodingHeader,proto3" json:"remove_accept_encoding_header,omitempty"`
@@ -75,16 +75,16 @@ type Compressor struct {
 	//
 	// .. attention::
 	//
-	//    If the field is not empty then the duplicate deprecated fields of the ``Compressor`` message,
-	//    such as ``content_length``, ``content_type``, ``disable_on_etag_header``,
-	//    ``remove_accept_encoding_header`` and ``runtime_enabled``, are ignored.
+	//	If the field is not empty then the duplicate deprecated fields of the ``Compressor`` message,
+	//	such as ``content_length``, ``content_type``, ``disable_on_etag_header``,
+	//	``remove_accept_encoding_header`` and ``runtime_enabled``, are ignored.
 	//
-	//    Also all the statistics related to response compression will be rooted in
-	//    ``<stat_prefix>.compressor.<compressor_library.name>.<compressor_library_stat_prefix>.response.*``
-	//    instead of
-	//    ``<stat_prefix>.compressor.<compressor_library.name>.<compressor_library_stat_prefix>.*``.
+	//	Also all the statistics related to response compression will be rooted in
+	//	``<stat_prefix>.compressor.<compressor_library.name>.<compressor_library_stat_prefix>.response.*``
+	//	instead of
+	//	``<stat_prefix>.compressor.<compressor_library.name>.<compressor_library_stat_prefix>.*``.
 	ResponseDirectionConfig *Compressor_ResponseDirectionConfig `protobuf:"bytes,8,opt,name=response_direction_config,json=responseDirectionConfig,proto3" json:"response_direction_config,omitempty"`
-	// If true, chooses this compressor first to do compression when the q-values in ``Accept-Encoding`` are same.
+	// If true, chooses this compressor first to do compression when the q-values in “Accept-Encoding“ are same.
 	// The last compressor which enables choose_first will be chosen if multiple compressor filters in the chain have choose_first as true.
 	ChooseFirst bool `protobuf:"varint,9,opt,name=choose_first,json=chooseFirst,proto3" json:"choose_first,omitempty"`
 }
@@ -189,7 +189,7 @@ func (x *Compressor) GetChooseFirst() bool {
 	return false
 }
 
-// Per-route overrides of ``ResponseDirectionConfig``. Anything added here should be optional,
+// Per-route overrides of “ResponseDirectionConfig“. Anything added here should be optional,
 // to allow overriding arbitrary subsets of configuration. Omitted fields must have no effect.
 type ResponseDirectionOverrides struct {
 	state         protoimpl.MessageState
@@ -241,7 +241,7 @@ func (x *ResponseDirectionOverrides) GetRemoveAcceptEncodingHeader() *wrappers.B
 }
 
 // Per-route overrides. As per-route overrides are needed, they should be
-// added here, mirroring the structure of ``Compressor``. All fields should be
+// added here, mirroring the structure of “Compressor“. All fields should be
 // optional, to allow overriding arbitrary subsets of configuration.
 type CompressorOverrides struct {
 	state         protoimpl.MessageState
@@ -297,6 +297,7 @@ type CompressorPerRoute struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Override:
+	//
 	//	*CompressorPerRoute_Disabled
 	//	*CompressorPerRoute_Overrides
 	Override isCompressorPerRoute_Override `protobuf_oneof:"override"`
@@ -366,7 +367,7 @@ type CompressorPerRoute_Disabled struct {
 }
 
 type CompressorPerRoute_Overrides struct {
-	// Per-route overrides. Fields set here will override corresponding fields in ``Compressor``.
+	// Per-route overrides. Fields set here will override corresponding fields in “Compressor“.
 	Overrides *CompressorOverrides `protobuf:"bytes,2,opt,name=overrides,proto3,oneof"`
 }
 
@@ -511,8 +512,8 @@ type Compressor_ResponseDirectionConfig struct {
 	//
 	// .. attention::
 	//
-	//    To avoid interfering with other compression filters in the same chain use this option in
-	//    the filter closest to the upstream.
+	//	To avoid interfering with other compression filters in the same chain use this option in
+	//	the filter closest to the upstream.
 	RemoveAcceptEncodingHeader bool `protobuf:"varint,3,opt,name=remove_accept_encoding_header,json=removeAcceptEncodingHeader,proto3" json:"remove_accept_encoding_header,omitempty"`
 }
 

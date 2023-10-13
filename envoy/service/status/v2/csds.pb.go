@@ -150,6 +150,7 @@ type PerXdsConfig struct {
 
 	Status ConfigStatus `protobuf:"varint,1,opt,name=status,proto3,enum=envoy.service.status.v2.ConfigStatus" json:"status,omitempty"`
 	// Types that are assignable to PerXdsConfig:
+	//
 	//	*PerXdsConfig_ListenerConfig
 	//	*PerXdsConfig_ClusterConfig
 	//	*PerXdsConfig_RouteConfig

@@ -40,15 +40,15 @@ type Squash struct {
 	//
 	// .. code-block:: json
 	//
-	//  {
-	//    "spec": {
-	//      "attachment": {
-	//        "pod": "{{ POD_NAME }}",
-	//        "namespace": "{{ POD_NAMESPACE }}"
-	//      },
-	//      "match_request": true
-	//    }
-	//  }
+	//	{
+	//	  "spec": {
+	//	    "attachment": {
+	//	      "pod": "{{ POD_NAME }}",
+	//	      "namespace": "{{ POD_NAMESPACE }}"
+	//	    },
+	//	    "match_request": true
+	//	  }
+	//	}
 	//
 	// (where POD_NAME, POD_NAMESPACE are configured in the pod via the Downward API)
 	AttachmentTemplate *_struct.Struct `protobuf:"bytes,2,opt,name=attachment_template,json=attachmentTemplate,proto3" json:"attachment_template,omitempty"`

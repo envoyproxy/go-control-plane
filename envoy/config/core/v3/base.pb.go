@@ -555,6 +555,7 @@ type Node struct {
 	// E.g. "envoy" or "grpc"
 	UserAgentName string `protobuf:"bytes,6,opt,name=user_agent_name,json=userAgentName,proto3" json:"user_agent_name,omitempty"`
 	// Types that are assignable to UserAgentVersionType:
+	//
 	//	*Node_UserAgentVersion
 	//	*Node_UserAgentBuildVersion
 	UserAgentVersionType isNode_UserAgentVersionType `protobuf_oneof:"user_agent_version_type"`
@@ -562,14 +563,14 @@ type Node struct {
 	Extensions []*Extension `protobuf:"bytes,9,rep,name=extensions,proto3" json:"extensions,omitempty"`
 	// Client feature support list. These are well known features described
 	// in the Envoy API repository for a given major version of an API. Client features
-	// use reverse DNS naming scheme, for example ``com.acme.feature``.
+	// use reverse DNS naming scheme, for example “com.acme.feature“.
 	// See :ref:`the list of features <client_features>` that xDS client may
 	// support.
 	ClientFeatures []string `protobuf:"bytes,10,rep,name=client_features,json=clientFeatures,proto3" json:"client_features,omitempty"`
 	// Known listening ports on the node as a generic hint to the management server
 	// for filtering :ref:`listeners <config_listeners>` to be returned. For example,
 	// if there is a listener bound to port 80, the list can optionally contain the
-	// SocketAddress ``(0.0.0.0,80)``. The field is optional and just a hint.
+	// SocketAddress “(0.0.0.0,80)“. The field is optional and just a hint.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/core/v3/base.proto.
 	ListeningAddresses []*Address `protobuf:"bytes,11,rep,name=listening_addresses,json=listeningAddresses,proto3" json:"listening_addresses,omitempty"`
@@ -729,28 +730,29 @@ func (*Node_UserAgentBuildVersion) isNode_UserAgentVersionType() {}
 // object to match against. There are some well defined metadata used today for
 // this purpose:
 //
-// * ``{"envoy.lb": {"canary": <bool> }}`` This indicates the canary status of an
-//   endpoint and is also used during header processing
-//   (x-envoy-upstream-canary) and for stats purposes.
+//   - “{"envoy.lb": {"canary": <bool> }}“ This indicates the canary status of an
+//     endpoint and is also used during header processing
+//     (x-envoy-upstream-canary) and for stats purposes.
+//
 // [#next-major-version: move to type/metadata/v2]
 type Metadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
+	// Key is the reverse DNS filter name, e.g. com.acme.widget. The “envoy.*“
 	// namespace is reserved for Envoy's built-in filters.
-	// If both ``filter_metadata`` and
+	// If both “filter_metadata“ and
 	// :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>`
 	// fields are present in the metadata with same keys,
-	// only ``typed_filter_metadata`` field will be parsed.
+	// only “typed_filter_metadata“ field will be parsed.
 	FilterMetadata map[string]*_struct.Struct `protobuf:"bytes,1,rep,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// Key is the reverse DNS filter name, e.g. com.acme.widget. The ``envoy.*``
+	// Key is the reverse DNS filter name, e.g. com.acme.widget. The “envoy.*“
 	// namespace is reserved for Envoy's built-in filters.
 	// The value is encoded as google.protobuf.Any.
 	// If both :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
-	// and ``typed_filter_metadata`` fields are present in the metadata with same keys,
-	// only ``typed_filter_metadata`` field will be parsed.
+	// and “typed_filter_metadata“ fields are present in the metadata with same keys,
+	// only “typed_filter_metadata“ field will be parsed.
 	TypedFilterMetadata map[string]*any1.Any `protobuf:"bytes,2,rep,name=typed_filter_metadata,json=typedFilterMetadata,proto3" json:"typed_filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
@@ -1104,12 +1106,12 @@ type HeaderValue struct {
 	//
 	// The same :ref:`format specifier <config_access_log_format>` as used for
 	// :ref:`HTTP access logging <config_access_log>` applies here, however
-	// unknown header values are replaced with the empty string instead of ``-``.
+	// unknown header values are replaced with the empty string instead of “-“.
 	// Header value is encoded as string. This does not work for non-utf8 characters.
-	// Only one of ``value`` or ``raw_value`` can be set.
+	// Only one of “value“ or “raw_value“ can be set.
 	Value string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	// Header value is encoded as bytes which can support non-utf8 characters.
-	// Only one of ``value`` or ``raw_value`` can be set.
+	// Only one of “value“ or “raw_value“ can be set.
 	RawValue []byte `protobuf:"bytes,3,opt,name=raw_value,json=rawValue,proto3" json:"raw_value,omitempty"`
 }
 
@@ -1180,9 +1182,10 @@ type HeaderValueOption struct {
 	// :ref:`append_action <envoy_v3_api_field_config.core.v3.HeaderValueOption.append_action>` as replacement.
 	//
 	// .. note::
-	//   The :ref:`external authorization service <envoy_v3_api_msg_service.auth.v3.CheckResponse>` and
-	//   :ref:`external processor service <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` have
-	//   default value (``false``) for this field.
+	//
+	//	The :ref:`external authorization service <envoy_v3_api_msg_service.auth.v3.CheckResponse>` and
+	//	:ref:`external processor service <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` have
+	//	default value (``false``) for this field.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/core/v3/base.proto.
 	Append *wrappers.BoolValue `protobuf:"bytes,2,opt,name=append,proto3" json:"append,omitempty"`
@@ -1362,6 +1365,7 @@ type DataSource struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Specifier:
+	//
 	//	*DataSource_Filename
 	//	*DataSource_InlineBytes
 	//	*DataSource_InlineString
@@ -1603,6 +1607,7 @@ type AsyncDataSource struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Specifier:
+	//
 	//	*AsyncDataSource_Local
 	//	*AsyncDataSource_Remote
 	Specifier isAsyncDataSource_Specifier `protobuf_oneof:"specifier"`
@@ -1695,6 +1700,7 @@ type TransportSocket struct {
 	// See the supported transport socket implementations for further documentation.
 	//
 	// Types that are assignable to ConfigType:
+	//
 	//	*TransportSocket_TypedConfig
 	ConfigType isTransportSocket_ConfigType `protobuf_oneof:"config_type"`
 }
@@ -1767,11 +1773,11 @@ func (*TransportSocket_TypedConfig) isTransportSocket_ConfigType() {}
 //
 // .. note::
 //
-//   Parsing of the runtime key's data is implemented such that it may be represented as a
-//   :ref:`FractionalPercent <envoy_v3_api_msg_type.v3.FractionalPercent>` proto represented as JSON/YAML
-//   and may also be represented as an integer with the assumption that the value is an integral
-//   percentage out of 100. For instance, a runtime key lookup returning the value "42" would parse
-//   as a ``FractionalPercent`` whose numerator is 42 and denominator is HUNDRED.
+//	Parsing of the runtime key's data is implemented such that it may be represented as a
+//	:ref:`FractionalPercent <envoy_v3_api_msg_type.v3.FractionalPercent>` proto represented as JSON/YAML
+//	and may also be represented as an integer with the assumption that the value is an integral
+//	percentage out of 100. For instance, a runtime key lookup returning the value "42" would parse
+//	as a ``FractionalPercent`` whose numerator is 42 and denominator is HUNDRED.
 type RuntimeFractionalPercent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

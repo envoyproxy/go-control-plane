@@ -34,8 +34,9 @@ type TcpProtocolOptions struct {
 	// If not set, the default idle timeout is 10 minutes. To disable idle timeouts, explicitly set this to 0.
 	//
 	// .. warning::
-	//   Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP
-	//   FIN packets, etc.
+	//
+	//	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP
+	//	FIN packets, etc.
 	IdleTimeout *duration.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 }
 

@@ -29,9 +29,11 @@ type FixedServerPreferredAddressConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Ipv4Type:
+	//
 	//	*FixedServerPreferredAddressConfig_Ipv4Address
 	Ipv4Type isFixedServerPreferredAddressConfig_Ipv4Type `protobuf_oneof:"ipv4_type"`
 	// Types that are assignable to Ipv6Type:
+	//
 	//	*FixedServerPreferredAddressConfig_Ipv6Address
 	Ipv6Type isFixedServerPreferredAddressConfig_Ipv6Type `protobuf_oneof:"ipv6_type"`
 }

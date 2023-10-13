@@ -216,6 +216,7 @@ type CheckResponse struct {
 	// downstream client or, to modify/add request headers being dispatched to the upstream.
 	//
 	// Types that are assignable to HttpResponse:
+	//
 	//	*CheckResponse_DeniedResponse
 	//	*CheckResponse_OkResponse
 	HttpResponse isCheckResponse_HttpResponse `protobuf_oneof:"http_response"`

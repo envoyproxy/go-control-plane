@@ -184,6 +184,7 @@ type HeaderToMetadata_KeyValuePair struct {
 	// The key to use within the namespace.
 	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	// Types that are assignable to ValueType:
+	//
 	//	*HeaderToMetadata_KeyValuePair_Value
 	//	*HeaderToMetadata_KeyValuePair_RegexValueRewrite
 	ValueType isHeaderToMetadata_KeyValuePair_ValueType `protobuf_oneof:"value_type"`

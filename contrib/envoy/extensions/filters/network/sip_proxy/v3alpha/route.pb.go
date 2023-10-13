@@ -143,6 +143,7 @@ type RouteMatch struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to MatchSpecifier:
+	//
 	//	*RouteMatch_Domain
 	MatchSpecifier isRouteMatch_MatchSpecifier `protobuf_oneof:"match_specifier"`
 	// The header to get match parameter, default is "Route".
@@ -228,6 +229,7 @@ type RouteAction struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to ClusterSpecifier:
+	//
 	//	*RouteAction_Cluster
 	ClusterSpecifier isRouteAction_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
 }

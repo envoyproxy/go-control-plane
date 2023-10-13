@@ -42,9 +42,10 @@ type Router struct {
 	// parent. Defaults to false.
 	//
 	// .. attention::
-	//   This field is deprecated by the
-	//   :ref:`spawn_upstream_span <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.spawn_upstream_span>`.
-	//   Please use that ``spawn_upstream_span`` field to control the span creation.
+	//
+	//	This field is deprecated by the
+	//	:ref:`spawn_upstream_span <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.spawn_upstream_span>`.
+	//	Please use that ``spawn_upstream_span`` field to control the span creation.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/router/v3/router.proto.
 	StartChildSpan bool `protobuf:"varint,2,opt,name=start_child_span,json=startChildSpan,proto3" json:"start_child_span,omitempty"`
@@ -55,10 +56,10 @@ type Router struct {
 	UpstreamLog []*v3.AccessLog `protobuf:"bytes,3,rep,name=upstream_log,json=upstreamLog,proto3" json:"upstream_log,omitempty"`
 	// Additional upstream access log options.
 	UpstreamLogOptions *Router_UpstreamAccessLogOptions `protobuf:"bytes,9,opt,name=upstream_log_options,json=upstreamLogOptions,proto3" json:"upstream_log_options,omitempty"`
-	// Do not add any additional ``x-envoy-`` headers to requests or responses. This
+	// Do not add any additional “x-envoy-“ headers to requests or responses. This
 	// only affects the :ref:`router filter generated x-envoy- headers
 	// <config_http_filters_router_headers_set>`, other Envoy filters and the HTTP
-	// connection manager may continue to set ``x-envoy-`` headers.
+	// connection manager may continue to set “x-envoy-“ headers.
 	SuppressEnvoyHeaders bool `protobuf:"varint,4,opt,name=suppress_envoy_headers,json=suppressEnvoyHeaders,proto3" json:"suppress_envoy_headers,omitempty"`
 	// Specifies a list of HTTP headers to strictly validate. Envoy will reject a
 	// request and respond with HTTP status 400 if the request contains an invalid
@@ -91,7 +92,8 @@ type Router struct {
 	// for more details.
 	SuppressGrpcRequestFailureCodeStats bool `protobuf:"varint,7,opt,name=suppress_grpc_request_failure_code_stats,json=suppressGrpcRequestFailureCodeStats,proto3" json:"suppress_grpc_request_failure_code_stats,omitempty"`
 	// .. note::
-	//   Upstream HTTP filters are currently in alpha.
+	//
+	//	Upstream HTTP filters are currently in alpha.
 	//
 	// Optional HTTP filters for the upstream filter chain.
 	//

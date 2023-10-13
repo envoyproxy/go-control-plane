@@ -133,6 +133,7 @@ type JsonToMetadata_KeyValuePair struct {
 	// The key to use within the namespace.
 	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	// Types that are assignable to ValueType:
+	//
 	//	*JsonToMetadata_KeyValuePair_Value
 	ValueType isJsonToMetadata_KeyValuePair_ValueType `protobuf_oneof:"value_type"`
 	// The value's type — defaults to protobuf.Value.
@@ -243,6 +244,7 @@ type JsonToMetadata_Selector struct {
 	// TODO(kuochunghsu): Explore matchers for array handling.
 	//
 	// Types that are assignable to Selector:
+	//
 	//	*JsonToMetadata_Selector_Key
 	Selector isJsonToMetadata_Selector_Selector `protobuf_oneof:"selector"`
 }
@@ -398,9 +400,9 @@ type JsonToMetadata_MatchRules struct {
 	// The list of rules to apply.
 	Rules []*JsonToMetadata_Rule `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
 	// Allowed content-type for json to metadata transformation.
-	// Default to ``{"application/json"}``.
+	// Default to “{"application/json"}“.
 	//
-	// Set ``allow_empty_content_type`` if empty/missing content-type header
+	// Set “allow_empty_content_type“ if empty/missing content-type header
 	// is allowed.
 	AllowContentTypes []string `protobuf:"bytes,2,rep,name=allow_content_types,json=allowContentTypes,proto3" json:"allow_content_types,omitempty"`
 	// Allowed empty content-type for json to metadata transformation.

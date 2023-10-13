@@ -201,16 +201,16 @@ type TlsParameters struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Minimum TLS protocol version. By default, it's ``TLSv1_2`` for both clients and servers.
+	// Minimum TLS protocol version. By default, it's “TLSv1_2“ for both clients and servers.
 	//
 	// TLS protocol versions below TLSv1_2 require setting compatible ciphers with the
-	// ``cipher_suites`` setting as the default ciphers no longer include compatible ciphers.
+	// “cipher_suites“ setting as the default ciphers no longer include compatible ciphers.
 	//
 	// .. attention::
 	//
-	//   Using TLS protocol versions below TLSv1_2 has serious security considerations and risks.
+	//	Using TLS protocol versions below TLSv1_2 has serious security considerations and risks.
 	TlsMinimumProtocolVersion TlsParameters_TlsProtocol `protobuf:"varint,1,opt,name=tls_minimum_protocol_version,json=tlsMinimumProtocolVersion,proto3,enum=envoy.extensions.transport_sockets.tls.v3.TlsParameters_TlsProtocol" json:"tls_minimum_protocol_version,omitempty"`
-	// Maximum TLS protocol version. By default, it's ``TLSv1_2`` for clients and ``TLSv1_3`` for
+	// Maximum TLS protocol version. By default, it's “TLSv1_2“ for clients and “TLSv1_3“ for
 	// servers.
 	TlsMaximumProtocolVersion TlsParameters_TlsProtocol `protobuf:"varint,2,opt,name=tls_maximum_protocol_version,json=tlsMaximumProtocolVersion,proto3,enum=envoy.extensions.transport_sockets.tls.v3.TlsParameters_TlsProtocol" json:"tls_maximum_protocol_version,omitempty"`
 	// If specified, the TLS listener will only support the specified `cipher list
@@ -226,37 +226,37 @@ type TlsParameters struct {
 	//
 	// .. code-block:: none
 	//
-	//   [ECDHE-ECDSA-AES128-GCM-SHA256|ECDHE-ECDSA-CHACHA20-POLY1305]
-	//   [ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]
-	//   ECDHE-ECDSA-AES256-GCM-SHA384
-	//   ECDHE-RSA-AES256-GCM-SHA384
+	//	[ECDHE-ECDSA-AES128-GCM-SHA256|ECDHE-ECDSA-CHACHA20-POLY1305]
+	//	[ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]
+	//	ECDHE-ECDSA-AES256-GCM-SHA384
+	//	ECDHE-RSA-AES256-GCM-SHA384
 	//
 	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default server cipher list is:
 	//
 	// .. code-block:: none
 	//
-	//   ECDHE-ECDSA-AES128-GCM-SHA256
-	//   ECDHE-RSA-AES128-GCM-SHA256
-	//   ECDHE-ECDSA-AES256-GCM-SHA384
-	//   ECDHE-RSA-AES256-GCM-SHA384
+	//	ECDHE-ECDSA-AES128-GCM-SHA256
+	//	ECDHE-RSA-AES128-GCM-SHA256
+	//	ECDHE-ECDSA-AES256-GCM-SHA384
+	//	ECDHE-RSA-AES256-GCM-SHA384
 	//
 	// In non-FIPS builds, the default client cipher list is:
 	//
 	// .. code-block:: none
 	//
-	//   [ECDHE-ECDSA-AES128-GCM-SHA256|ECDHE-ECDSA-CHACHA20-POLY1305]
-	//   [ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]
-	//   ECDHE-ECDSA-AES256-GCM-SHA384
-	//   ECDHE-RSA-AES256-GCM-SHA384
+	//	[ECDHE-ECDSA-AES128-GCM-SHA256|ECDHE-ECDSA-CHACHA20-POLY1305]
+	//	[ECDHE-RSA-AES128-GCM-SHA256|ECDHE-RSA-CHACHA20-POLY1305]
+	//	ECDHE-ECDSA-AES256-GCM-SHA384
+	//	ECDHE-RSA-AES256-GCM-SHA384
 	//
 	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default client cipher list is:
 	//
 	// .. code-block:: none
 	//
-	//   ECDHE-ECDSA-AES128-GCM-SHA256
-	//   ECDHE-RSA-AES128-GCM-SHA256
-	//   ECDHE-ECDSA-AES256-GCM-SHA384
-	//   ECDHE-RSA-AES256-GCM-SHA384
+	//	ECDHE-ECDSA-AES128-GCM-SHA256
+	//	ECDHE-RSA-AES128-GCM-SHA256
+	//	ECDHE-ECDSA-AES256-GCM-SHA384
+	//	ECDHE-RSA-AES256-GCM-SHA384
 	CipherSuites []string `protobuf:"bytes,3,rep,name=cipher_suites,json=cipherSuites,proto3" json:"cipher_suites,omitempty"`
 	// If specified, the TLS connection will only support the specified ECDH
 	// curves. If not specified, the default curves will be used.
@@ -265,14 +265,14 @@ type TlsParameters struct {
 	//
 	// .. code-block:: none
 	//
-	//   X25519
-	//   P-256
+	//	X25519
+	//	P-256
 	//
 	// In builds using :ref:`BoringSSL FIPS <arch_overview_ssl_fips>`, the default curve is:
 	//
 	// .. code-block:: none
 	//
-	//   P-256
+	//	P-256
 	EcdhCurves []string `protobuf:"bytes,4,rep,name=ecdh_curves,json=ecdhCurves,proto3" json:"ecdh_curves,omitempty"`
 	// If specified, the TLS connection will only support the specified signature algorithms.
 	// The list is ordered by preference.
@@ -282,32 +282,32 @@ type TlsParameters struct {
 	//
 	// .. code-block:: none
 	//
-	//   ecdsa_secp256r1_sha256
-	//   rsa_pss_rsae_sha256
-	//   rsa_pkcs1_sha256
-	//   ecdsa_secp384r1_sha384
-	//   rsa_pss_rsae_sha384
-	//   rsa_pkcs1_sha384
-	//   rsa_pss_rsae_sha512
-	//   rsa_pkcs1_sha512
-	//   rsa_pkcs1_sha1
+	//	ecdsa_secp256r1_sha256
+	//	rsa_pss_rsae_sha256
+	//	rsa_pkcs1_sha256
+	//	ecdsa_secp384r1_sha384
+	//	rsa_pss_rsae_sha384
+	//	rsa_pkcs1_sha384
+	//	rsa_pss_rsae_sha512
+	//	rsa_pkcs1_sha512
+	//	rsa_pkcs1_sha1
 	//
 	// Signature algorithms supported by BoringSSL (may be out of date):
 	//
 	// .. code-block:: none
 	//
-	//   rsa_pkcs1_sha256
-	//   rsa_pkcs1_sha384
-	//   rsa_pkcs1_sha512
-	//   ecdsa_secp256r1_sha256
-	//   ecdsa_secp384r1_sha384
-	//   ecdsa_secp521r1_sha512
-	//   rsa_pss_rsae_sha256
-	//   rsa_pss_rsae_sha384
-	//   rsa_pss_rsae_sha512
-	//   ed25519
-	//   rsa_pkcs1_sha1
-	//   ecdsa_sha1
+	//	rsa_pkcs1_sha256
+	//	rsa_pkcs1_sha384
+	//	rsa_pkcs1_sha512
+	//	ecdsa_secp256r1_sha256
+	//	ecdsa_secp384r1_sha384
+	//	ecdsa_secp521r1_sha512
+	//	rsa_pss_rsae_sha256
+	//	rsa_pss_rsae_sha384
+	//	rsa_pss_rsae_sha512
+	//	ed25519
+	//	rsa_pkcs1_sha1
+	//	ecdsa_sha1
 	SignatureAlgorithms []string `protobuf:"bytes,5,rep,name=signature_algorithms,json=signatureAlgorithms,proto3" json:"signature_algorithms,omitempty"`
 }
 
@@ -392,11 +392,12 @@ type PrivateKeyProvider struct {
 	// Private key method provider specific configuration.
 	//
 	// Types that are assignable to ConfigType:
+	//
 	//	*PrivateKeyProvider_TypedConfig
 	ConfigType isPrivateKeyProvider_ConfigType `protobuf_oneof:"config_type"`
 	// If the private key provider isn't available (eg. the required hardware capability doesn't existed),
-	// Envoy will fallback to the BoringSSL default implementation when the ``fallback`` is true.
-	// The default value is ``false``.
+	// Envoy will fallback to the BoringSSL default implementation when the “fallback“ is true.
+	// The default value is “false“.
 	Fallback bool `protobuf:"varint,4,opt,name=fallback,proto3" json:"fallback,omitempty"`
 }
 
@@ -478,45 +479,45 @@ type TlsCertificate struct {
 
 	// The TLS certificate chain.
 	//
-	// If ``certificate_chain`` is a filesystem path, a watch will be added to the
+	// If “certificate_chain“ is a filesystem path, a watch will be added to the
 	// parent directory for any file moves to support rotation. This currently
-	// only applies to dynamic secrets, when the ``TlsCertificate`` is delivered via
+	// only applies to dynamic secrets, when the “TlsCertificate“ is delivered via
 	// SDS.
 	CertificateChain *v3.DataSource `protobuf:"bytes,1,opt,name=certificate_chain,json=certificateChain,proto3" json:"certificate_chain,omitempty"`
 	// The TLS private key.
 	//
-	// If ``private_key`` is a filesystem path, a watch will be added to the parent
+	// If “private_key“ is a filesystem path, a watch will be added to the parent
 	// directory for any file moves to support rotation. This currently only
-	// applies to dynamic secrets, when the ``TlsCertificate`` is delivered via SDS.
+	// applies to dynamic secrets, when the “TlsCertificate“ is delivered via SDS.
 	PrivateKey *v3.DataSource `protobuf:"bytes,2,opt,name=private_key,json=privateKey,proto3" json:"private_key,omitempty"`
-	// ``Pkcs12`` data containing TLS certificate, chain, and private key.
+	// “Pkcs12“ data containing TLS certificate, chain, and private key.
 	//
-	// If ``pkcs12`` is a filesystem path, the file will be read, but no watch will
-	// be added to the parent directory, since ``pkcs12`` isn't used by SDS.
-	// This field is mutually exclusive with ``certificate_chain``, ``private_key`` and ``private_key_provider``.
-	// This can't be marked as ``oneof`` due to API compatibility reasons. Setting
+	// If “pkcs12“ is a filesystem path, the file will be read, but no watch will
+	// be added to the parent directory, since “pkcs12“ isn't used by SDS.
+	// This field is mutually exclusive with “certificate_chain“, “private_key“ and “private_key_provider“.
+	// This can't be marked as “oneof“ due to API compatibility reasons. Setting
 	// both :ref:`private_key <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>`,
 	// :ref:`certificate_chain <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.certificate_chain>`,
 	// or :ref:`private_key_provider <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key_provider>`
 	// and :ref:`pkcs12 <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.pkcs12>`
 	// fields will result in an error. Use :ref:`password
 	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.password>`
-	// to specify the password to unprotect the ``PKCS12`` data, if necessary.
+	// to specify the password to unprotect the “PKCS12“ data, if necessary.
 	Pkcs12 *v3.DataSource `protobuf:"bytes,8,opt,name=pkcs12,proto3" json:"pkcs12,omitempty"`
-	// If specified, updates of file-based ``certificate_chain`` and ``private_key``
+	// If specified, updates of file-based “certificate_chain“ and “private_key“
 	// sources will be triggered by this watch. The certificate/key pair will be
 	// read together and validated for atomic read consistency (i.e. no
 	// intervening modification occurred between cert/key read, verified by file
 	// hash comparisons). This allows explicit control over the path watched, by
 	// default the parent directories of the filesystem paths in
-	// ``certificate_chain`` and ``private_key`` are watched if this field is not
-	// specified. This only applies when a ``TlsCertificate`` is delivered by SDS
+	// “certificate_chain“ and “private_key“ are watched if this field is not
+	// specified. This only applies when a “TlsCertificate“ is delivered by SDS
 	// with references to filesystem paths. See the :ref:`SDS key rotation
 	// <sds_key_rotation>` documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,7,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
 	// BoringSSL private key method provider. This is an alternative to :ref:`private_key
 	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` field. This can't be
-	// marked as ``oneof`` due to API compatibility reasons. Setting both :ref:`private_key
+	// marked as “oneof“ due to API compatibility reasons. Setting both :ref:`private_key
 	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` and
 	// :ref:`private_key_provider
 	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key_provider>` fields will result in an
@@ -526,8 +527,8 @@ type TlsCertificate struct {
 	// TLS private key is not password encrypted.
 	Password *v3.DataSource `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
 	// The OCSP response to be stapled with this certificate during the handshake.
-	// The response must be DER-encoded and may only be  provided via ``filename`` or
-	// ``inline_bytes``. The response may pertain to only one certificate.
+	// The response must be DER-encoded and may only be  provided via “filename“ or
+	// “inline_bytes“. The response may pertain to only one certificate.
 	OcspStaple *v3.DataSource `protobuf:"bytes,4,opt,name=ocsp_staple,json=ocspStaple,proto3" json:"ocsp_staple,omitempty"`
 	// [#not-implemented-hide:]
 	SignedCertificateTimestamp []*v3.DataSource `protobuf:"bytes,5,rep,name=signed_certificate_timestamp,json=signedCertificateTimestamp,proto3" json:"signed_certificate_timestamp,omitempty"`
@@ -637,18 +638,18 @@ type TlsSessionTicketKeys struct {
 	// or on different hosts.
 	//
 	// Each key must contain exactly 80 bytes of cryptographically-secure random data. For
-	// example, the output of ``openssl rand 80``.
+	// example, the output of “openssl rand 80“.
 	//
 	// .. attention::
 	//
-	//   Using this feature has serious security considerations and risks. Improper handling of keys
-	//   may result in loss of secrecy in connections, even if ciphers supporting perfect forward
-	//   secrecy are used. See https://www.imperialviolet.org/2013/06/27/botchingpfs.html for some
-	//   discussion. To minimize the risk, you must:
+	//	Using this feature has serious security considerations and risks. Improper handling of keys
+	//	may result in loss of secrecy in connections, even if ciphers supporting perfect forward
+	//	secrecy are used. See https://www.imperialviolet.org/2013/06/27/botchingpfs.html for some
+	//	discussion. To minimize the risk, you must:
 	//
-	//   * Keep the session ticket keys at least as secure as your TLS certificate private keys
-	//   * Rotate session ticket keys at least daily, and preferably hourly
-	//   * Always generate keys using a cryptographically-secure random data source
+	//	* Keep the session ticket keys at least as secure as your TLS certificate private keys
+	//	* Rotate session ticket keys at least daily, and preferably hourly
+	//	* Always generate keys using a cryptographically-secure random data source
 	Keys []*v3.DataSource `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
 }
 
@@ -850,30 +851,30 @@ type CertificateValidationContext struct {
 	// See :ref:`the TLS overview <arch_overview_ssl_enabling_verification>` for a list of common
 	// system CA locations.
 	//
-	// If ``trusted_ca`` is a filesystem path, a watch will be added to the parent
+	// If “trusted_ca“ is a filesystem path, a watch will be added to the parent
 	// directory for any file moves to support rotation. This currently only
-	// applies to dynamic secrets, when the ``CertificateValidationContext`` is
+	// applies to dynamic secrets, when the “CertificateValidationContext“ is
 	// delivered via SDS.
 	//
-	// X509_V_FLAG_PARTIAL_CHAIN is set by default, so non-root/intermediate ca certificate in ``trusted_ca``
+	// X509_V_FLAG_PARTIAL_CHAIN is set by default, so non-root/intermediate ca certificate in “trusted_ca“
 	// can be treated as trust anchor as well. It allows verification with building valid partial chain instead
 	// of a full chain.
 	//
-	// Only one of ``trusted_ca`` and ``ca_certificate_provider_instance`` may be specified.
+	// Only one of “trusted_ca“ and “ca_certificate_provider_instance“ may be specified.
 	//
 	// [#next-major-version: This field and watched_directory below should ideally be moved into a
 	// separate sub-message, since there's no point in specifying the latter field without this one.]
 	TrustedCa *v3.DataSource `protobuf:"bytes,1,opt,name=trusted_ca,json=trustedCa,proto3" json:"trusted_ca,omitempty"`
 	// Certificate provider instance for fetching TLS certificates.
 	//
-	// Only one of ``trusted_ca`` and ``ca_certificate_provider_instance`` may be specified.
+	// Only one of “trusted_ca“ and “ca_certificate_provider_instance“ may be specified.
 	// [#not-implemented-hide:]
 	CaCertificateProviderInstance *CertificateProviderPluginInstance `protobuf:"bytes,13,opt,name=ca_certificate_provider_instance,json=caCertificateProviderInstance,proto3" json:"ca_certificate_provider_instance,omitempty"`
-	// If specified, updates of a file-based ``trusted_ca`` source will be triggered
+	// If specified, updates of a file-based “trusted_ca“ source will be triggered
 	// by this watch. This allows explicit control over the path watched, by
-	// default the parent directory of the filesystem path in ``trusted_ca`` is
+	// default the parent directory of the filesystem path in “trusted_ca“ is
 	// watched if this field is not specified. This only applies when a
-	// ``CertificateValidationContext`` is delivered by SDS with references to
+	// “CertificateValidationContext“ is delivered by SDS with references to
 	// filesystem paths. See the :ref:`SDS key rotation <sds_key_rotation>`
 	// documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,11,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
@@ -886,11 +887,11 @@ type CertificateValidationContext struct {
 	//
 	// .. code-block:: bash
 	//
-	//   $ openssl x509 -in path/to/client.crt -noout -pubkey
-	//     | openssl pkey -pubin -outform DER
-	//     | openssl dgst -sha256 -binary
-	//     | openssl enc -base64
-	//   NvqYIYSbgK2vCJpQhObf77vv+bQWtc5ek5RIOwPiC9A=
+	//	$ openssl x509 -in path/to/client.crt -noout -pubkey
+	//	  | openssl pkey -pubin -outform DER
+	//	  | openssl dgst -sha256 -binary
+	//	  | openssl enc -base64
+	//	NvqYIYSbgK2vCJpQhObf77vv+bQWtc5ek5RIOwPiC9A=
 	//
 	// This is the format used in HTTP Public Key Pinning.
 	//
@@ -903,10 +904,10 @@ type CertificateValidationContext struct {
 	//
 	// .. attention::
 	//
-	//   This option is preferred over :ref:`verify_certificate_hash
-	//   <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>`,
-	//   because SPKI is tied to a private key, so it doesn't change when the certificate
-	//   is renewed using the same private key.
+	//	This option is preferred over :ref:`verify_certificate_hash
+	//	<envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.verify_certificate_hash>`,
+	//	because SPKI is tied to a private key, so it doesn't change when the certificate
+	//	is renewed using the same private key.
 	VerifyCertificateSpki []string `protobuf:"bytes,3,rep,name=verify_certificate_spki,json=verifyCertificateSpki,proto3" json:"verify_certificate_spki,omitempty"`
 	// An optional list of hex-encoded SHA-256 hashes. If specified, Envoy will verify that
 	// the SHA-256 of the DER-encoded presented certificate matches one of the specified values.
@@ -915,16 +916,16 @@ type CertificateValidationContext struct {
 	//
 	// .. code-block:: bash
 	//
-	//   $ openssl x509 -in path/to/client.crt -outform DER | openssl dgst -sha256 | cut -d" " -f2
-	//   df6ff72fe9116521268f6f2dd4966f51df479883fe7037b39f75916ac3049d1a
+	//	$ openssl x509 -in path/to/client.crt -outform DER | openssl dgst -sha256 | cut -d" " -f2
+	//	df6ff72fe9116521268f6f2dd4966f51df479883fe7037b39f75916ac3049d1a
 	//
 	// A long hex-encoded and colon-separated SHA-256 (a.k.a. "fingerprint") of the certificate
 	// can be generated with the following command:
 	//
 	// .. code-block:: bash
 	//
-	//   $ openssl x509 -in path/to/client.crt -noout -fingerprint -sha256 | cut -d"=" -f2
-	//   DF:6F:F7:2F:E9:11:65:21:26:8F:6F:2D:D4:96:6F:51:DF:47:98:83:FE:70:37:B3:9F:75:91:6A:C3:04:9D:1A
+	//	$ openssl x509 -in path/to/client.crt -noout -fingerprint -sha256 | cut -d"=" -f2
+	//	DF:6F:F7:2F:E9:11:65:21:26:8F:6F:2D:D4:96:6F:51:DF:47:98:83:FE:70:37:B3:9F:75:91:6A:C3:04:9D:1A
 	//
 	// Both of those formats are acceptable.
 	//
@@ -947,16 +948,16 @@ type CertificateValidationContext struct {
 	//
 	// .. code-block:: yaml
 	//
-	//  match_typed_subject_alt_names:
-	//  - san_type: DNS
-	//    matcher:
-	//      exact: "api.example.com"
+	//	match_typed_subject_alt_names:
+	//	- san_type: DNS
+	//	  matcher:
+	//	    exact: "api.example.com"
 	//
 	// .. attention::
 	//
-	//   Subject Alternative Names are easily spoofable and verifying only them is insecure,
-	//   therefore this option must be used together with :ref:`trusted_ca
-	//   <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`.
+	//	Subject Alternative Names are easily spoofable and verifying only them is insecure,
+	//	therefore this option must be used together with :ref:`trusted_ca
+	//	<envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`.
 	MatchTypedSubjectAltNames []*SubjectAltNameMatcher `protobuf:"bytes,15,rep,name=match_typed_subject_alt_names,json=matchTypedSubjectAltNames,proto3" json:"match_typed_subject_alt_names,omitempty"`
 	// This field is deprecated in favor of
 	// :ref:`match_typed_subject_alt_names
@@ -981,9 +982,9 @@ type CertificateValidationContext struct {
 	// :ref:`only_verify_leaf_cert_crl <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.only_verify_leaf_cert_crl>` to
 	// true.
 	//
-	// If ``crl`` is a filesystem path, a watch will be added to the parent
+	// If “crl“ is a filesystem path, a watch will be added to the parent
 	// directory for any file moves to support rotation. This currently only
-	// applies to dynamic secrets, when the ``CertificateValidationContext`` is
+	// applies to dynamic secrets, when the “CertificateValidationContext“ is
 	// delivered via SDS.
 	Crl *v3.DataSource `protobuf:"bytes,7,opt,name=crl,proto3" json:"crl,omitempty"`
 	// If specified, Envoy will not reject expired certificates.

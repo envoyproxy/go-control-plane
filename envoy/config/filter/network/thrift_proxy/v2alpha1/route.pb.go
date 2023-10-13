@@ -146,6 +146,7 @@ type RouteMatch struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to MatchSpecifier:
+	//
 	//	*RouteMatch_MethodName
 	//	*RouteMatch_ServiceName
 	MatchSpecifier isRouteMatch_MatchSpecifier `protobuf_oneof:"match_specifier"`
@@ -157,10 +158,10 @@ type RouteMatch struct {
 	//
 	// .. note::
 	//
-	//   This does not invert matching done as part of the :ref:`headers field
-	//   <envoy_api_field_config.filter.network.thrift_proxy.v2alpha1.RouteMatch.headers>` field. To
-	//   invert header matching, see :ref:`invert_match
-	//   <envoy_api_field_route.HeaderMatcher.invert_match>`.
+	//	This does not invert matching done as part of the :ref:`headers field
+	//	<envoy_api_field_config.filter.network.thrift_proxy.v2alpha1.RouteMatch.headers>` field. To
+	//	invert header matching, see :ref:`invert_match
+	//	<envoy_api_field_route.HeaderMatcher.invert_match>`.
 	Invert bool `protobuf:"varint,3,opt,name=invert,proto3" json:"invert,omitempty"`
 	// Specifies a set of headers that the route should match on. The router will check the request’s
 	// headers against all the specified headers in the route config. A match will happen if all the
@@ -265,6 +266,7 @@ type RouteAction struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to ClusterSpecifier:
+	//
 	//	*RouteAction_Cluster
 	//	*RouteAction_WeightedClusters
 	//	*RouteAction_ClusterHeader

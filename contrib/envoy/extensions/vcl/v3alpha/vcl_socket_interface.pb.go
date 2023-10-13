@@ -21,7 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Configuration for vcl socket interface that relies on ``vpp`` ``comms`` library (VCL)
+// Configuration for vcl socket interface that relies on “vpp“ “comms“ library (VCL)
 type VclSocketInterface struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

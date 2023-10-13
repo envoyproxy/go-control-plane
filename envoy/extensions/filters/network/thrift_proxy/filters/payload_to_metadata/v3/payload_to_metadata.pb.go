@@ -128,6 +128,7 @@ type PayloadToMetadata_KeyValuePair struct {
 	// The key to use within the namespace.
 	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	// Types that are assignable to ValueType:
+	//
 	//	*PayloadToMetadata_KeyValuePair_Value
 	//	*PayloadToMetadata_KeyValuePair_RegexValueRewrite
 	ValueType isPayloadToMetadata_KeyValuePair_ValueType `protobuf_oneof:"value_type"`
@@ -244,6 +245,7 @@ type PayloadToMetadata_Rule struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to MatchSpecifier:
+	//
 	//	*PayloadToMetadata_Rule_MethodName
 	//	*PayloadToMetadata_Rule_ServiceName
 	MatchSpecifier isPayloadToMetadata_Rule_MatchSpecifier `protobuf_oneof:"match_specifier"`

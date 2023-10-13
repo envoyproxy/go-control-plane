@@ -141,6 +141,7 @@ type HealthCheckEvent struct {
 	Host              *v3.Address       `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty"`
 	ClusterName       string            `protobuf:"bytes,3,opt,name=cluster_name,json=clusterName,proto3" json:"cluster_name,omitempty"`
 	// Types that are assignable to Event:
+	//
 	//	*HealthCheckEvent_EjectUnhealthyEvent
 	//	*HealthCheckEvent_AddHealthyEvent
 	//	*HealthCheckEvent_HealthCheckFailureEvent

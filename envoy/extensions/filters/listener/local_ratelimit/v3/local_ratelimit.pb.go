@@ -36,9 +36,10 @@ type LocalRateLimit struct {
 	// the socket will be allowed. If no tokens are available, the socket will be immediately closed.
 	//
 	// .. note::
-	//   In the current implementation the token bucket's :ref:`fill_interval
-	//   <envoy_v3_api_field_type.v3.TokenBucket.fill_interval>` must be >= 50ms to avoid too aggressive
-	//   refills.
+	//
+	//	In the current implementation the token bucket's :ref:`fill_interval
+	//	<envoy_v3_api_field_type.v3.TokenBucket.fill_interval>` must be >= 50ms to avoid too aggressive
+	//	refills.
 	TokenBucket *v3.TokenBucket `protobuf:"bytes,2,opt,name=token_bucket,json=tokenBucket,proto3" json:"token_bucket,omitempty"`
 	// Runtime flag that controls whether the filter is enabled or not. If not specified, defaults
 	// to enabled.

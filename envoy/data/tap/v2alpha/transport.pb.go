@@ -92,6 +92,7 @@ type SocketEvent struct {
 	// Read or write with content as bytes string.
 	//
 	// Types that are assignable to EventSelector:
+	//
 	//	*SocketEvent_Read_
 	//	*SocketEvent_Write_
 	//	*SocketEvent_Closed_
@@ -286,6 +287,7 @@ type SocketStreamedTraceSegment struct {
 	// for long term stable uniqueness. Matches connection IDs used in Envoy logs.
 	TraceId uint64 `protobuf:"varint,1,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
 	// Types that are assignable to MessagePiece:
+	//
 	//	*SocketStreamedTraceSegment_Connection
 	//	*SocketStreamedTraceSegment_Event
 	MessagePiece isSocketStreamedTraceSegment_MessagePiece `protobuf_oneof:"message_piece"`

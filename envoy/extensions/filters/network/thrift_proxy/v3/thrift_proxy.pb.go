@@ -158,7 +158,7 @@ type Trds struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Configuration source specifier.
-	// In case of ``api_config_source`` only aggregated ``api_type`` is supported.
+	// In case of “api_config_source“ only aggregated “api_type“ is supported.
 	ConfigSource *v3.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
 	// The name of the route configuration. This allows to use different route
 	// configurations. Tells which route configuration should be fetched from the configuration source.
@@ -227,14 +227,14 @@ type ThriftProxy struct {
 	// The human readable prefix to use when emitting statistics.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// The route table for the connection manager is static and is specified in this property.
-	// It is invalid to define both ``route_config`` and ``trds``.
+	// It is invalid to define both “route_config“ and “trds“.
 	RouteConfig *RouteConfiguration `protobuf:"bytes,4,opt,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
-	// Use xDS to fetch the route configuration. It is invalid to define both ``route_config`` and ``trds``.
+	// Use xDS to fetch the route configuration. It is invalid to define both “route_config“ and “trds“.
 	Trds *Trds `protobuf:"bytes,8,opt,name=trds,proto3" json:"trds,omitempty"`
 	// A list of individual Thrift filters that make up the filter chain for requests made to the
 	// Thrift proxy. Order matters as the filters are processed sequentially. For backwards
 	// compatibility, if no thrift_filters are specified, a default Thrift router filter
-	// (``envoy.filters.thrift.router``) is used.
+	// (“envoy.filters.thrift.router“) is used.
 	// [#extension-category: envoy.thrift_proxy.filters]
 	ThriftFilters []*ThriftFilter `protobuf:"bytes,5,rep,name=thrift_filters,json=thriftFilters,proto3" json:"thrift_filters,omitempty"`
 	// If set to true, Envoy will try to skip decode data after metadata in the Thrift message.
@@ -374,6 +374,7 @@ type ThriftFilter struct {
 	// filters for further documentation.
 	//
 	// Types that are assignable to ConfigType:
+	//
 	//	*ThriftFilter_TypedConfig
 	ConfigType isThriftFilter_ConfigType `protobuf_oneof:"config_type"`
 }
@@ -444,7 +445,7 @@ func (*ThriftFilter_TypedConfig) isThriftFilter_ConfigType() {}
 // ThriftProtocolOptions specifies Thrift upstream protocol options. This object is used in
 // in
 // :ref:`typed_extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
-// keyed by the name ``envoy.filters.network.thrift_proxy``.
+// keyed by the name “envoy.filters.network.thrift_proxy“.
 type ThriftProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

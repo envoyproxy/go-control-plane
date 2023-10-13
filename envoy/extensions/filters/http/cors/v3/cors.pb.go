@@ -29,7 +29,7 @@ const (
 // to enable the CORS filter.
 //
 // Please note that the :ref:`CorsPolicy <envoy_v3_api_msg_extensions.filters.http.cors.v3.CorsPolicy>`
-// must be configured in the ``RouteConfiguration`` as ``typed_per_filter_config`` at some level to make the filter work.
+// must be configured in the “RouteConfiguration“ as “typed_per_filter_config“ at some level to make the filter work.
 type Cors struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -68,7 +68,7 @@ func (*Cors) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_cors_v3_cors_proto_rawDescGZIP(), []int{0}
 }
 
-// Per route configuration for the CORS filter. This configuration should be configured in the ``RouteConfiguration`` as ``typed_per_filter_config`` at some level to
+// Per route configuration for the CORS filter. This configuration should be configured in the “RouteConfiguration“ as “typed_per_filter_config“ at some level to
 // make the filter work.
 // [#next-free-field: 10]
 type CorsPolicy struct {
@@ -79,19 +79,19 @@ type CorsPolicy struct {
 	// Specifies string patterns that match allowed origins. An origin is allowed if any of the
 	// string matchers match.
 	AllowOriginStringMatch []*v3.StringMatcher `protobuf:"bytes,1,rep,name=allow_origin_string_match,json=allowOriginStringMatch,proto3" json:"allow_origin_string_match,omitempty"`
-	// Specifies the content for the ``access-control-allow-methods`` header.
+	// Specifies the content for the “access-control-allow-methods“ header.
 	AllowMethods string `protobuf:"bytes,2,opt,name=allow_methods,json=allowMethods,proto3" json:"allow_methods,omitempty"`
-	// Specifies the content for the ``access-control-allow-headers`` header.
+	// Specifies the content for the “access-control-allow-headers“ header.
 	AllowHeaders string `protobuf:"bytes,3,opt,name=allow_headers,json=allowHeaders,proto3" json:"allow_headers,omitempty"`
-	// Specifies the content for the ``access-control-expose-headers`` header.
+	// Specifies the content for the “access-control-expose-headers“ header.
 	ExposeHeaders string `protobuf:"bytes,4,opt,name=expose_headers,json=exposeHeaders,proto3" json:"expose_headers,omitempty"`
-	// Specifies the content for the ``access-control-max-age`` header.
+	// Specifies the content for the “access-control-max-age“ header.
 	MaxAge string `protobuf:"bytes,5,opt,name=max_age,json=maxAge,proto3" json:"max_age,omitempty"`
 	// Specifies whether the resource allows credentials.
 	AllowCredentials *wrappers.BoolValue `protobuf:"bytes,6,opt,name=allow_credentials,json=allowCredentials,proto3" json:"allow_credentials,omitempty"`
 	// Specifies the % of requests for which the CORS filter is enabled.
 	//
-	// If neither ``filter_enabled``, nor ``shadow_enabled`` are specified, the CORS
+	// If neither “filter_enabled“, nor “shadow_enabled“ are specified, the CORS
 	// filter will be enabled for 100% of the requests.
 	//
 	// If :ref:`runtime_key <envoy_v3_api_field_config.core.v3.RuntimeFractionalPercent.runtime_key>` is
@@ -100,12 +100,12 @@ type CorsPolicy struct {
 	// Specifies the % of requests for which the CORS policies will be evaluated and tracked, but not
 	// enforced.
 	//
-	// This field is intended to be used when ``filter_enabled`` is off. That field have to explicitly disable
+	// This field is intended to be used when “filter_enabled“ is off. That field have to explicitly disable
 	// the filter in order for this setting to take effect.
 	//
 	// If :ref:`runtime_key <envoy_v3_api_field_config.core.v3.RuntimeFractionalPercent.runtime_key>` is specified,
 	// Envoy will lookup the runtime key to get the percentage of requests for which it will evaluate
-	// and track the request's ``Origin`` to determine if it's valid but will not enforce any policies.
+	// and track the request's “Origin“ to determine if it's valid but will not enforce any policies.
 	ShadowEnabled *v31.RuntimeFractionalPercent `protobuf:"bytes,8,opt,name=shadow_enabled,json=shadowEnabled,proto3" json:"shadow_enabled,omitempty"`
 	// Specify whether allow requests whose target server's IP address is more private than that from
 	// which the request initiator was fetched.

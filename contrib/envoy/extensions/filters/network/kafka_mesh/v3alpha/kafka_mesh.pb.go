@@ -254,6 +254,7 @@ type ForwardingRule struct {
 	// Cluster name.
 	TargetCluster string `protobuf:"bytes,1,opt,name=target_cluster,json=targetCluster,proto3" json:"target_cluster,omitempty"`
 	// Types that are assignable to Trigger:
+	//
 	//	*ForwardingRule_TopicPrefix
 	Trigger isForwardingRule_Trigger `protobuf_oneof:"trigger"`
 }

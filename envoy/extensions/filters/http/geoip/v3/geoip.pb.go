@@ -30,7 +30,7 @@ type Geoip struct {
 	unknownFields protoimpl.UnknownFields
 
 	// If set, the :ref:`xff_num_trusted_hops <envoy_v3_api_field_extensions.filters.http.geoip.v3.Geoip.XffConfig.xff_num_trusted_hops>` field will be used to determine
-	// trusted client address from ``x-forwarded-for`` header.
+	// trusted client address from “x-forwarded-for“ header.
 	// Otherwise, the immediate downstream connection source address will be used.
 	// [#next-free-field: 2]
 	XffConfig *Geoip_XffConfig `protobuf:"bytes,1,opt,name=xff_config,json=xffConfig,proto3" json:"xff_config,omitempty"`

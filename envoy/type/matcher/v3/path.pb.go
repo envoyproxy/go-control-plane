@@ -29,6 +29,7 @@ type PathMatcher struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Rule:
+	//
 	//	*PathMatcher_Path
 	Rule isPathMatcher_Rule `protobuf_oneof:"rule"`
 }
@@ -84,9 +85,9 @@ type isPathMatcher_Rule interface {
 }
 
 type PathMatcher_Path struct {
-	// The ``path`` must match the URL path portion of the :path header. The query and fragment
+	// The “path“ must match the URL path portion of the :path header. The query and fragment
 	// string (if present) are removed in the URL path portion.
-	// For example, the path ``/data`` will match the ``:path`` header ``/data#fragment?param=value``.
+	// For example, the path “/data“ will match the “:path“ header “/data#fragment?param=value“.
 	Path *StringMatcher `protobuf:"bytes,1,opt,name=path,proto3,oneof"`
 }
 

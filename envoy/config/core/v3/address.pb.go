@@ -138,6 +138,7 @@ type EnvoyInternalAddress struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to AddressNameSpecifier:
+	//
 	//	*EnvoyInternalAddress_ServerListenerName
 	AddressNameSpecifier isEnvoyInternalAddress_AddressNameSpecifier `protobuf_oneof:"address_name_specifier"`
 	// Specifies an endpoint identifier to distinguish between multiple endpoints for the same internal listener in a
@@ -219,18 +220,19 @@ type SocketAddress struct {
 
 	Protocol SocketAddress_Protocol `protobuf:"varint,1,opt,name=protocol,proto3,enum=envoy.config.core.v3.SocketAddress_Protocol" json:"protocol,omitempty"`
 	// The address for this socket. :ref:`Listeners <config_listeners>` will bind
-	// to the address. An empty address is not allowed. Specify ``0.0.0.0`` or ``::``
+	// to the address. An empty address is not allowed. Specify “0.0.0.0“ or “::“
 	// to bind to any address. [#comment:TODO(zuercher) reinstate when implemented:
 	// It is possible to distinguish a Listener address via the prefix/suffix matching
 	// in :ref:`FilterChainMatch <envoy_v3_api_msg_config.listener.v3.FilterChainMatch>`.] When used
 	// within an upstream :ref:`BindConfig <envoy_v3_api_msg_config.core.v3.BindConfig>`, the address
 	// controls the source address of outbound connections. For :ref:`clusters
 	// <envoy_v3_api_msg_config.cluster.v3.Cluster>`, the cluster type determines whether the
-	// address must be an IP (``STATIC`` or ``EDS`` clusters) or a hostname resolved by DNS
-	// (``STRICT_DNS`` or ``LOGICAL_DNS`` clusters). Address resolution can be customized
+	// address must be an IP (“STATIC“ or “EDS“ clusters) or a hostname resolved by DNS
+	// (“STRICT_DNS“ or “LOGICAL_DNS“ clusters). Address resolution can be customized
 	// via :ref:`resolver_name <envoy_v3_api_field_config.core.v3.SocketAddress.resolver_name>`.
 	Address string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 	// Types that are assignable to PortSpecifier:
+	//
 	//	*SocketAddress_PortValue
 	//	*SocketAddress_NamedPort
 	PortSpecifier isSocketAddress_PortSpecifier `protobuf_oneof:"port_specifier"`
@@ -238,12 +240,12 @@ type SocketAddress struct {
 	// this is empty, a context dependent default applies. If the address is a concrete
 	// IP address, no resolution will occur. If address is a hostname this
 	// should be set for resolution other than DNS. Specifying a custom resolver with
-	// ``STRICT_DNS`` or ``LOGICAL_DNS`` will generate an error at runtime.
+	// “STRICT_DNS“ or “LOGICAL_DNS“ will generate an error at runtime.
 	ResolverName string `protobuf:"bytes,5,opt,name=resolver_name,json=resolverName,proto3" json:"resolver_name,omitempty"`
 	// When binding to an IPv6 address above, this enables `IPv4 compatibility
-	// <https://tools.ietf.org/html/rfc3493#page-11>`_. Binding to ``::`` will
+	// <https://tools.ietf.org/html/rfc3493#page-11>`_. Binding to “::“ will
 	// allow both IPv4 and IPv6 connections, with peer IPv4 addresses mapped into
-	// IPv6 space as ``::FFFF:<IPv4-address>``.
+	// IPv6 space as “::FFFF:<IPv4-address>“.
 	Ipv4Compat bool `protobuf:"varint,6,opt,name=ipv4_compat,json=ipv4Compat,proto3" json:"ipv4_compat,omitempty"`
 }
 
@@ -489,18 +491,18 @@ type BindConfig struct {
 
 	// The address to bind to when creating a socket.
 	SourceAddress *SocketAddress `protobuf:"bytes,1,opt,name=source_address,json=sourceAddress,proto3" json:"source_address,omitempty"`
-	// Whether to set the ``IP_FREEBIND`` option when creating the socket. When this
+	// Whether to set the “IP_FREEBIND“ option when creating the socket. When this
 	// flag is set to true, allows the :ref:`source_address
 	// <envoy_v3_api_field_config.core.v3.BindConfig.source_address>` to be an IP address
 	// that is not configured on the system running Envoy. When this flag is set
-	// to false, the option ``IP_FREEBIND`` is disabled on the socket. When this
+	// to false, the option “IP_FREEBIND“ is disabled on the socket. When this
 	// flag is not set (default), the socket is not modified, i.e. the option is
 	// neither enabled nor disabled.
 	Freebind *wrappers.BoolValue `protobuf:"bytes,2,opt,name=freebind,proto3" json:"freebind,omitempty"`
 	// Additional socket options that may not be present in Envoy source code or
 	// precompiled binaries.
 	SocketOptions []*SocketOption `protobuf:"bytes,3,rep,name=socket_options,json=socketOptions,proto3" json:"socket_options,omitempty"`
-	// Extra source addresses appended to the address specified in the ``source_address``
+	// Extra source addresses appended to the address specified in the “source_address“
 	// field. This enables to specify multiple source addresses.
 	// The source address selection is determined by :ref:`local_address_selector
 	// <envoy_v3_api_field_config.core.v3.BindConfig.local_address_selector>`.
@@ -601,6 +603,7 @@ type Address struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Address:
+	//
 	//	*Address_SocketAddress
 	//	*Address_Pipe
 	//	*Address_EnvoyInternalAddress
@@ -698,7 +701,7 @@ type CidrRange struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// IPv4 or IPv6 address, e.g. ``192.0.0.0`` or ``2001:db8::``.
+	// IPv4 or IPv6 address, e.g. “192.0.0.0“ or “2001:db8::“.
 	AddressPrefix string `protobuf:"bytes,1,opt,name=address_prefix,json=addressPrefix,proto3" json:"address_prefix,omitempty"`
 	// Length of prefix, e.g. 0, 32. Defaults to 0 when unset.
 	PrefixLen *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=prefix_len,json=prefixLen,proto3" json:"prefix_len,omitempty"`

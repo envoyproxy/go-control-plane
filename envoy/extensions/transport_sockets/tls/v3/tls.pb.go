@@ -99,9 +99,9 @@ type UpstreamTlsContext struct {
 	//
 	// .. attention::
 	//
-	//   Server certificate verification is not enabled by default. Configure
-	//   :ref:`trusted_ca<envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>` to enable
-	//   verification.
+	//	Server certificate verification is not enabled by default. Configure
+	//	:ref:`trusted_ca<envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>` to enable
+	//	verification.
 	CommonTlsContext *CommonTlsContext `protobuf:"bytes,1,opt,name=common_tls_context,json=commonTlsContext,proto3" json:"common_tls_context,omitempty"`
 	// SNI string to use when creating TLS backend connections.
 	Sni string `protobuf:"bytes,2,opt,name=sni,proto3" json:"sni,omitempty"`
@@ -109,7 +109,7 @@ type UpstreamTlsContext struct {
 	//
 	// .. attention::
 	//
-	//   TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary.
+	//	TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary.
 	AllowRenegotiation bool `protobuf:"varint,3,opt,name=allow_renegotiation,json=allowRenegotiation,proto3" json:"allow_renegotiation,omitempty"`
 	// Maximum number of session keys (Pre-Shared Keys for TLSv1.3+, Session IDs and Session Tickets
 	// for TLSv1.2 and older) to store for the purpose of session resumption.
@@ -119,7 +119,7 @@ type UpstreamTlsContext struct {
 	// This field is used to control the enforcement, whereby the handshake will fail if the keyUsage extension
 	// is present and incompatible with the TLS usage. Currently, the default value is false (i.e., enforcement off)
 	// but it is expected to be changed to true by default in a future release.
-	// ``ssl.was_key_usage_invalid`` in :ref:`listener metrics <config_listener_stats>` will be set for certificate
+	// “ssl.was_key_usage_invalid“ in :ref:`listener metrics <config_listener_stats>` will be set for certificate
 	// configurations that would fail if this option were set to true.
 	EnforceRsaKeyUsage *wrappers.BoolValue `protobuf:"bytes,5,opt,name=enforce_rsa_key_usage,json=enforceRsaKeyUsage,proto3" json:"enforce_rsa_key_usage,omitempty"`
 }
@@ -206,6 +206,7 @@ type DownstreamTlsContext struct {
 	// [#not-implemented-hide:]
 	RequireSni *wrappers.BoolValue `protobuf:"bytes,3,opt,name=require_sni,json=requireSni,proto3" json:"require_sni,omitempty"`
 	// Types that are assignable to SessionTicketKeysType:
+	//
 	//	*DownstreamTlsContext_SessionTicketKeys
 	//	*DownstreamTlsContext_SessionTicketKeysSdsSecretConfig
 	//	*DownstreamTlsContext_DisableStatelessSessionResumption
@@ -213,7 +214,7 @@ type DownstreamTlsContext struct {
 	// If set to true, the TLS server will not maintain a session cache of TLS sessions. (This is
 	// relevant only for TLSv1.2 and earlier.)
 	DisableStatefulSessionResumption bool `protobuf:"varint,10,opt,name=disable_stateful_session_resumption,json=disableStatefulSessionResumption,proto3" json:"disable_stateful_session_resumption,omitempty"`
-	// If specified, ``session_timeout`` will change the maximum lifetime (in seconds) of the TLS session.
+	// If specified, “session_timeout“ will change the maximum lifetime (in seconds) of the TLS session.
 	// Currently this value is used as a hint for the `TLS session ticket lifetime (for TLSv1.2) <https://tools.ietf.org/html/rfc5077#section-5.6>`_.
 	// Only seconds can be specified (fractional seconds are ignored).
 	SessionTimeout *duration.Duration `protobuf:"bytes,6,opt,name=session_timeout,json=sessionTimeout,proto3" json:"session_timeout,omitempty"`
@@ -453,8 +454,8 @@ type CommonTlsContext struct {
 	// :ref:`Multiple TLS certificates <arch_overview_ssl_cert_select>` can be associated with the
 	// same context to allow both RSA and ECDSA certificates and support SNI-based selection.
 	//
-	// Only one of ``tls_certificates``, ``tls_certificate_sds_secret_configs``,
-	// and ``tls_certificate_provider_instance`` may be used.
+	// Only one of “tls_certificates“, “tls_certificate_sds_secret_configs“,
+	// and “tls_certificate_provider_instance“ may be used.
 	// [#next-major-version: These mutually exclusive fields should ideally be in a oneof, but it's
 	// not legal to put a repeated field in a oneof. In the next major version, we should rework
 	// this to avoid this problem.]
@@ -465,16 +466,16 @@ type CommonTlsContext struct {
 	// The same number and types of certificates as :ref:`tls_certificates <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CommonTlsContext.tls_certificates>`
 	// are valid in the the certificates fetched through this setting.
 	//
-	// Only one of ``tls_certificates``, ``tls_certificate_sds_secret_configs``,
-	// and ``tls_certificate_provider_instance`` may be used.
+	// Only one of “tls_certificates“, “tls_certificate_sds_secret_configs“,
+	// and “tls_certificate_provider_instance“ may be used.
 	// [#next-major-version: These mutually exclusive fields should ideally be in a oneof, but it's
 	// not legal to put a repeated field in a oneof. In the next major version, we should rework
 	// this to avoid this problem.]
 	TlsCertificateSdsSecretConfigs []*SdsSecretConfig `protobuf:"bytes,6,rep,name=tls_certificate_sds_secret_configs,json=tlsCertificateSdsSecretConfigs,proto3" json:"tls_certificate_sds_secret_configs,omitempty"`
 	// Certificate provider instance for fetching TLS certs.
 	//
-	// Only one of ``tls_certificates``, ``tls_certificate_sds_secret_configs``,
-	// and ``tls_certificate_provider_instance`` may be used.
+	// Only one of “tls_certificates“, “tls_certificate_sds_secret_configs“,
+	// and “tls_certificate_provider_instance“ may be used.
 	// [#not-implemented-hide:]
 	TlsCertificateProviderInstance *CertificateProviderPluginInstance `protobuf:"bytes,14,opt,name=tls_certificate_provider_instance,json=tlsCertificateProviderInstance,proto3" json:"tls_certificate_provider_instance,omitempty"`
 	// Certificate provider for fetching TLS certificates.
@@ -488,6 +489,7 @@ type CommonTlsContext struct {
 	// Deprecated: Marked as deprecated in envoy/extensions/transport_sockets/tls/v3/tls.proto.
 	TlsCertificateCertificateProviderInstance *CommonTlsContext_CertificateProviderInstance `protobuf:"bytes,11,opt,name=tls_certificate_certificate_provider_instance,json=tlsCertificateCertificateProviderInstance,proto3" json:"tls_certificate_certificate_provider_instance,omitempty"`
 	// Types that are assignable to ValidationContextType:
+	//
 	//	*CommonTlsContext_ValidationContext
 	//	*CommonTlsContext_ValidationContextSdsSecretConfig
 	//	*CommonTlsContext_CombinedValidationContext
@@ -732,6 +734,7 @@ type CommonTlsContext_CertificateProvider struct {
 	// This config could be supplied inline or (in future) a named xDS resource.
 	//
 	// Types that are assignable to Config:
+	//
 	//	*CommonTlsContext_CertificateProvider_TypedConfig
 	Config isCommonTlsContext_CertificateProvider_Config `protobuf_oneof:"config"`
 }
@@ -885,13 +888,13 @@ type CommonTlsContext_CombinedCertificateValidationContext struct {
 	// fetched/refreshed over the network asynchronously with respect to the TLS handshake.
 	ValidationContextSdsSecretConfig *SdsSecretConfig `protobuf:"bytes,2,opt,name=validation_context_sds_secret_config,json=validationContextSdsSecretConfig,proto3" json:"validation_context_sds_secret_config,omitempty"`
 	// Certificate provider for fetching CA certs. This will populate the
-	// ``default_validation_context.trusted_ca`` field.
+	// “default_validation_context.trusted_ca“ field.
 	// [#not-implemented-hide:]
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/transport_sockets/tls/v3/tls.proto.
 	ValidationContextCertificateProvider *CommonTlsContext_CertificateProvider `protobuf:"bytes,3,opt,name=validation_context_certificate_provider,json=validationContextCertificateProvider,proto3" json:"validation_context_certificate_provider,omitempty"`
 	// Certificate provider instance for fetching CA certs. This will populate the
-	// ``default_validation_context.trusted_ca`` field.
+	// “default_validation_context.trusted_ca“ field.
 	// [#not-implemented-hide:]
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/transport_sockets/tls/v3/tls.proto.

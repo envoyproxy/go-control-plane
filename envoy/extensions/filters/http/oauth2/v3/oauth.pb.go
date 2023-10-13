@@ -30,10 +30,10 @@ const (
 type OAuth2Config_AuthType int32
 
 const (
-	// The ``client_id`` and ``client_secret`` will be sent in the URL encoded request body.
+	// The “client_id“ and “client_secret“ will be sent in the URL encoded request body.
 	// This type should only be used when Auth server does not support Basic authentication.
 	OAuth2Config_URL_ENCODED_BODY OAuth2Config_AuthType = 0
-	// The ``client_id`` and ``client_secret`` will be sent using HTTP Basic authentication scheme.
+	// The “client_id“ and “client_secret“ will be sent using HTTP Basic authentication scheme.
 	OAuth2Config_BASIC_AUTH OAuth2Config_AuthType = 1
 )
 
@@ -88,6 +88,7 @@ type OAuth2Credentials struct {
 	// Configures how the secret token should be created.
 	//
 	// Types that are assignable to TokenFormation:
+	//
 	//	*OAuth2Credentials_HmacSecret
 	TokenFormation isOAuth2Credentials_TokenFormation `protobuf_oneof:"token_formation"`
 	// The cookie names used in OAuth filters flow.
@@ -207,7 +208,7 @@ type OAuth2Config struct {
 	// Optional resource parameter for authorization request
 	// RFC: https://tools.ietf.org/html/rfc8707
 	Resources []string `protobuf:"bytes,10,rep,name=resources,proto3" json:"resources,omitempty"`
-	// Defines how ``client_id`` and ``client_secret`` are sent in OAuth client to OAuth server requests.
+	// Defines how “client_id“ and “client_secret“ are sent in OAuth client to OAuth server requests.
 	// RFC https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1
 	AuthType OAuth2Config_AuthType `protobuf:"varint,11,opt,name=auth_type,json=authType,proto3,enum=envoy.extensions.filters.http.oauth2.v3.OAuth2Config_AuthType" json:"auth_type,omitempty"`
 	// If set to true, allows automatic access token refresh using the associated refresh token (see
@@ -391,15 +392,15 @@ type OAuth2Credentials_CookieNames struct {
 	// client and returns an authorization token back to the OAuth filter, no matter what format
 	// that token is, if :ref:`forward_bearer_token <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.forward_bearer_token>`
 	// is set to true the filter will send over the bearer token as a cookie with this name to the
-	// upstream. Defaults to ``BearerToken``.
+	// upstream. Defaults to “BearerToken“.
 	BearerToken string `protobuf:"bytes,1,opt,name=bearer_token,json=bearerToken,proto3" json:"bearer_token,omitempty"`
-	// Cookie name to hold OAuth HMAC value. Defaults to ``OauthHMAC``.
+	// Cookie name to hold OAuth HMAC value. Defaults to “OauthHMAC“.
 	OauthHmac string `protobuf:"bytes,2,opt,name=oauth_hmac,json=oauthHmac,proto3" json:"oauth_hmac,omitempty"`
-	// Cookie name to hold OAuth expiry value. Defaults to ``OauthExpires``.
+	// Cookie name to hold OAuth expiry value. Defaults to “OauthExpires“.
 	OauthExpires string `protobuf:"bytes,3,opt,name=oauth_expires,json=oauthExpires,proto3" json:"oauth_expires,omitempty"`
-	// Cookie name to hold the id token. Defaults to ``IdToken``.
+	// Cookie name to hold the id token. Defaults to “IdToken“.
 	IdToken string `protobuf:"bytes,4,opt,name=id_token,json=idToken,proto3" json:"id_token,omitempty"`
-	// Cookie name to hold the refresh token. Defaults to ``RefreshToken``.
+	// Cookie name to hold the refresh token. Defaults to “RefreshToken“.
 	RefreshToken string `protobuf:"bytes,5,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
 }
 

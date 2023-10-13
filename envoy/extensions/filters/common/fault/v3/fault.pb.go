@@ -77,6 +77,7 @@ type FaultDelay struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to FaultDelaySecifier:
+	//
 	//	*FaultDelay_FixedDelay
 	//	*FaultDelay_HeaderDelay_
 	FaultDelaySecifier isFaultDelay_FaultDelaySecifier `protobuf_oneof:"fault_delay_secifier"`
@@ -173,6 +174,7 @@ type FaultRateLimit struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to LimitType:
+	//
 	//	*FaultRateLimit_FixedLimit_
 	//	*FaultRateLimit_HeaderLimit_
 	LimitType isFaultRateLimit_LimitType `protobuf_oneof:"limit_type"`

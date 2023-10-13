@@ -163,6 +163,7 @@ type DnsTable_DnsServiceProtocol struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to ProtocolConfig:
+	//
 	//	*DnsTable_DnsServiceProtocol_Number
 	//	*DnsTable_DnsServiceProtocol_Name
 	ProtocolConfig isDnsTable_DnsServiceProtocol_ProtocolConfig `protobuf_oneof:"protocol_config"`
@@ -252,6 +253,7 @@ type DnsTable_DnsServiceTarget struct {
 	// Specify the name of the endpoint for the Service. The name is a hostname or a cluster
 	//
 	// Types that are assignable to EndpointType:
+	//
 	//	*DnsTable_DnsServiceTarget_HostName
 	//	*DnsTable_DnsServiceTarget_ClusterName
 	EndpointType isDnsTable_DnsServiceTarget_EndpointType `protobuf_oneof:"endpoint_type"`
@@ -487,6 +489,7 @@ type DnsTable_DnsEndpoint struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to EndpointConfig:
+	//
 	//	*DnsTable_DnsEndpoint_AddressList
 	//	*DnsTable_DnsEndpoint_ClusterName
 	//	*DnsTable_DnsEndpoint_ServiceList

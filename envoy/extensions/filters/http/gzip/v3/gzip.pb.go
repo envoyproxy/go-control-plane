@@ -153,7 +153,7 @@ type Gzip struct {
 	// zlib manual > deflateInit2.
 	WindowBits *wrappers.UInt32Value `protobuf:"bytes,9,opt,name=window_bits,json=windowBits,proto3" json:"window_bits,omitempty"`
 	// Set of configuration parameters common for all compression filters. You can define
-	// ``content_length``, ``content_type`` and other parameters in this field.
+	// “content_length“, “content_type“ and other parameters in this field.
 	Compressor *v3.Compressor `protobuf:"bytes,10,opt,name=compressor,proto3" json:"compressor,omitempty"`
 	// Value for Zlib's next output buffer. If not set, defaults to 4096.
 	// See https://www.zlib.net/manual.html for more details. Also see

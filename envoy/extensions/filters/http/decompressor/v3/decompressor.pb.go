@@ -102,7 +102,7 @@ type Decompressor_CommonDirectionConfig struct {
 	// Runtime flag that controls whether the filter is enabled for decompression or not. If set to false, the
 	// filter will operate as a pass-through filter. If the message is unspecified, the filter will be enabled.
 	Enabled *v3.RuntimeFeatureFlag `protobuf:"bytes,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	// If set to true, will decompress response even if a ``no-transform`` cache control header is set.
+	// If set to true, will decompress response even if a “no-transform“ cache control header is set.
 	IgnoreNoTransformHeader bool `protobuf:"varint,2,opt,name=ignore_no_transform_header,json=ignoreNoTransformHeader,proto3" json:"ignore_no_transform_header,omitempty"`
 }
 

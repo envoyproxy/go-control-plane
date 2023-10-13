@@ -160,6 +160,7 @@ type DnsTable_DnsEndpoint struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to EndpointConfig:
+	//
 	//	*DnsTable_DnsEndpoint_AddressList
 	EndpointConfig isDnsTable_DnsEndpoint_EndpointConfig `protobuf_oneof:"endpoint_config"`
 }

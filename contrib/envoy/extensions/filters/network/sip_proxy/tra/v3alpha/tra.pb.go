@@ -104,6 +104,7 @@ type TraServiceRequest struct {
 
 	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
 	// Types that are assignable to Request:
+	//
 	//	*TraServiceRequest_CreateRequest
 	//	*TraServiceRequest_UpdateRequest
 	//	*TraServiceRequest_RetrieveRequest
@@ -237,6 +238,7 @@ type TraServiceResponse struct {
 	Ret    int32  `protobuf:"varint,2,opt,name=ret,proto3" json:"ret,omitempty"`
 	Reason string `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
 	// Types that are assignable to Response:
+	//
 	//	*TraServiceResponse_CreateResponse
 	//	*TraServiceResponse_UpdateResponse
 	//	*TraServiceResponse_RetrieveResponse

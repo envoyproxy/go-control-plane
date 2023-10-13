@@ -101,6 +101,7 @@ type HttpStreamedTraceSegment struct {
 	// for long term stable uniqueness.
 	TraceId uint64 `protobuf:"varint,1,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
 	// Types that are assignable to MessagePiece:
+	//
 	//	*HttpStreamedTraceSegment_RequestHeaders
 	//	*HttpStreamedTraceSegment_RequestBodyChunk
 	//	*HttpStreamedTraceSegment_RequestTrailers

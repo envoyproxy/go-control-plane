@@ -29,8 +29,8 @@ type ChecksumConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// A set of matcher and checksum pairs for which, if a path matching ``path_matcher``
-	// is requested and the checksum of the response body does not match the ``sha256``, the
+	// A set of matcher and checksum pairs for which, if a path matching “path_matcher“
+	// is requested and the checksum of the response body does not match the “sha256“, the
 	// response will be replaced with a 403 Forbidden status.
 	//
 	// If multiple matchers match the same path, the first to match takes precedence.
@@ -92,10 +92,11 @@ type ChecksumConfig_Checksum struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Matcher:
+	//
 	//	*ChecksumConfig_Checksum_PathMatcher
 	Matcher isChecksumConfig_Checksum_Matcher `protobuf_oneof:"matcher"`
 	// A hex-encoded sha256 string required to match the sha256sum of the response body
-	// of the path specified in the ``path_matcher`` field.
+	// of the path specified in the “path_matcher“ field.
 	Sha256 string `protobuf:"bytes,2,opt,name=sha256,proto3" json:"sha256,omitempty"`
 }
 
@@ -158,7 +159,7 @@ type isChecksumConfig_Checksum_Matcher interface {
 
 type ChecksumConfig_Checksum_PathMatcher struct {
 	// A matcher for a path that is expected to have a specific checksum, as specified
-	// in the ``sha256`` field.
+	// in the “sha256“ field.
 	PathMatcher *v3.StringMatcher `protobuf:"bytes,1,opt,name=path_matcher,json=pathMatcher,proto3,oneof"`
 }
 

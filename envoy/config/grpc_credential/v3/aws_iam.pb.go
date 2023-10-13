@@ -34,7 +34,7 @@ type AwsIamConfig struct {
 	// Example: appmesh
 	ServiceName string `protobuf:"bytes,1,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
 	// The `region <https://docs.aws.amazon.com/general/latest/gr/rande.html>`_ hosting the Grpc
-	// endpoint. If unspecified, the extension will use the value in the ``AWS_REGION`` environment
+	// endpoint. If unspecified, the extension will use the value in the “AWS_REGION“ environment
 	// variable.
 	//
 	// Example: us-west-2

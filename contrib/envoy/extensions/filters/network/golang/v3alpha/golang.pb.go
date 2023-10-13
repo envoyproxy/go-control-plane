@@ -30,7 +30,7 @@ type Config struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Bool ``true`` if this filter must be the last filter in a filter chain, ``false`` otherwise.
+	// Bool “true“ if this filter must be the last filter in a filter chain, “false“ otherwise.
 	IsTerminalFilter bool `protobuf:"varint,1,opt,name=is_terminal_filter,json=isTerminalFilter,proto3" json:"is_terminal_filter,omitempty"`
 	// Globally unique ID for a dynamic library file.
 	LibraryId string `protobuf:"bytes,2,opt,name=library_id,json=libraryId,proto3" json:"library_id,omitempty"`
@@ -41,18 +41,17 @@ type Config struct {
 	LibraryPath string `protobuf:"bytes,3,opt,name=library_path,json=libraryPath,proto3" json:"library_path,omitempty"`
 	// Globally unique name of the Go plugin.
 	//
-	// This name **must** be consistent with the name registered in ``network::RegisterNetworkFilterConfigFactory``
-	//
+	// This name **must** be consistent with the name registered in “network::RegisterNetworkFilterConfigFactory“
 	PluginName string `protobuf:"bytes,4,opt,name=plugin_name,json=pluginName,proto3" json:"plugin_name,omitempty"`
 	// Configuration for the Go plugin.
 	//
 	// .. note::
-	//     This configuration is only parsed in the go plugin, and is therefore not validated
-	//     by Envoy.
 	//
-	//     See the :repo:`DownstreamFilter API <contrib/golang/common/go/api/filter.go>`
-	//     for more information about how the plugin's configuration data can be accessed.
+	//	This configuration is only parsed in the go plugin, and is therefore not validated
+	//	by Envoy.
 	//
+	//	See the :repo:`DownstreamFilter API <contrib/golang/common/go/api/filter.go>`
+	//	for more information about how the plugin's configuration data can be accessed.
 	PluginConfig *any1.Any `protobuf:"bytes,5,opt,name=plugin_config,json=pluginConfig,proto3" json:"plugin_config,omitempty"`
 }
 

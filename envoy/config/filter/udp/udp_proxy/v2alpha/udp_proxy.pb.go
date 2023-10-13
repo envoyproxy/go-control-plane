@@ -32,6 +32,7 @@ type UdpProxyConfig struct {
 	// The stat prefix used when emitting UDP proxy filter stats.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to RouteSpecifier:
+	//
 	//	*UdpProxyConfig_Cluster
 	RouteSpecifier isUdpProxyConfig_RouteSpecifier `protobuf_oneof:"route_specifier"`
 	// The idle timeout for sessions. Idle is defined as no datagrams between received or sent by

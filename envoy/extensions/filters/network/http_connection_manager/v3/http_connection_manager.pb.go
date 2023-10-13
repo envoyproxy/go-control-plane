@@ -351,6 +351,7 @@ type HttpConnectionManager struct {
 	// more information.
 	StatPrefix string `protobuf:"bytes,2,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to RouteSpecifier:
+	//
 	//	*HttpConnectionManager_Rds
 	//	*HttpConnectionManager_RouteConfig
 	//	*HttpConnectionManager_ScopedRoutes
@@ -382,7 +383,7 @@ type HttpConnectionManager struct {
 	// [#not-implemented-hide:]
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,44,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
 	// An optional override that the connection manager will write to the server
-	// header in responses. If not set, the default is ``envoy``.
+	// header in responses. If not set, the default is “envoy“.
 	ServerName string `protobuf:"bytes,10,opt,name=server_name,json=serverName,proto3" json:"server_name,omitempty"`
 	// Defines the action to be applied to the Server header on the response path.
 	// By default, Envoy will overwrite the header with the value specified in
@@ -477,14 +478,16 @@ type HttpConnectionManager struct {
 	// The default timeout is 1000 ms if this option is not specified.
 	//
 	// .. NOTE::
-	//    To be useful in avoiding the race condition described above, this timeout must be set
-	//    to *at least* <max round trip time expected between clients and Envoy>+<100ms to account for
-	//    a reasonable "worst" case processing time for a full iteration of Envoy's event loop>.
+	//
+	//	To be useful in avoiding the race condition described above, this timeout must be set
+	//	to *at least* <max round trip time expected between clients and Envoy>+<100ms to account for
+	//	a reasonable "worst" case processing time for a full iteration of Envoy's event loop>.
 	//
 	// .. WARNING::
-	//    A value of 0 will completely disable delayed close processing. When disabled, the downstream
-	//    connection's socket will be closed immediately after the write flush is completed or will
-	//    never close if the write flush does not complete.
+	//
+	//	A value of 0 will completely disable delayed close processing. When disabled, the downstream
+	//	connection's socket will be closed immediately after the write flush is completed or will
+	//	never close if the write flush does not complete.
 	DelayedCloseTimeout *duration.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
 	// Configuration for :ref:`HTTP access logs <arch_overview_access_logs>`
 	// emitted by the connection manager.
@@ -536,10 +539,11 @@ type HttpConnectionManager struct {
 	// fallback to using the remote address.
 	//
 	// .. WARNING::
-	//    Extensions cannot be used in conjunction with :ref:`use_remote_address
-	//    <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
-	//    nor :ref:`xff_num_trusted_hops
-	//    <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.xff_num_trusted_hops>`.
+	//
+	//	Extensions cannot be used in conjunction with :ref:`use_remote_address
+	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
+	//	nor :ref:`xff_num_trusted_hops
+	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.xff_num_trusted_hops>`.
 	//
 	// [#extension-category: envoy.http.original_ip_detection]
 	OriginalIpDetectionExtensions []*v3.TypedExtensionConfig `protobuf:"bytes,46,rep,name=original_ip_detection_extensions,json=originalIpDetectionExtensions,proto3" json:"original_ip_detection_extensions,omitempty"`
@@ -562,7 +566,7 @@ type HttpConnectionManager struct {
 	// has mutated the request headers. While :ref:`use_remote_address
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
 	// will also suppress XFF addition, it has consequences for logging and other
-	// Envoy uses of the remote address, so ``skip_xff_append`` should be used
+	// Envoy uses of the remote address, so “skip_xff_append“ should be used
 	// when only an elision of XFF addition is intended.
 	SkipXffAppend bool `protobuf:"varint,21,opt,name=skip_xff_append,json=skipXffAppend,proto3" json:"skip_xff_append,omitempty"`
 	// Via header value to append to request and response headers. If this is
@@ -589,8 +593,8 @@ type HttpConnectionManager struct {
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.forward_client_cert_details>`
 	// is APPEND_FORWARD or SANITIZE_SET and the client connection is mTLS. It specifies the fields in
 	// the client certificate to be forwarded. Note that in the
-	// :ref:`config_http_conn_man_headers_x-forwarded-client-cert` header, ``Hash`` is always set, and
-	// ``By`` is always set when the client certificate presents the URI type Subject Alternative Name
+	// :ref:`config_http_conn_man_headers_x-forwarded-client-cert` header, “Hash“ is always set, and
+	// “By“ is always set when the client certificate presents the URI type Subject Alternative Name
 	// value.
 	SetCurrentClientCertDetails *HttpConnectionManager_SetCurrentClientCertDetails `protobuf:"bytes,17,opt,name=set_current_client_cert_details,json=setCurrentClientCertDetails,proto3" json:"set_current_client_cert_details,omitempty"`
 	// If proxy_100_continue is true, Envoy will proxy incoming "Expect:
@@ -602,7 +606,7 @@ type HttpConnectionManager struct {
 	// :ref:`use_remote_address
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
 	// is true and represent_ipv4_remote_address_as_ipv4_mapped_ipv6 is true and the remote address is
-	// an IPv4 address, the address will be mapped to IPv6 before it is appended to ``x-forwarded-for``.
+	// an IPv4 address, the address will be mapped to IPv6 before it is appended to “x-forwarded-for“.
 	// This is useful for testing compatibility of upstream services that parse the header value. For
 	// example, 50.0.0.1 is represented as ::FFFF:50.0.0.1. See `IPv4-Mapped IPv6 Addresses
 	// <https://tools.ietf.org/html/rfc4291#section-2.5.5.2>`_ for details. This will also affect the
@@ -614,7 +618,7 @@ type HttpConnectionManager struct {
 	RepresentIpv4RemoteAddressAsIpv4MappedIpv6 bool                                   `protobuf:"varint,20,opt,name=represent_ipv4_remote_address_as_ipv4_mapped_ipv6,json=representIpv4RemoteAddressAsIpv4MappedIpv6,proto3" json:"represent_ipv4_remote_address_as_ipv4_mapped_ipv6,omitempty"`
 	UpgradeConfigs                             []*HttpConnectionManager_UpgradeConfig `protobuf:"bytes,23,rep,name=upgrade_configs,json=upgradeConfigs,proto3" json:"upgrade_configs,omitempty"`
 	// Should paths be normalized according to RFC 3986 before any processing of
-	// requests by HTTP filters or routing? This affects the upstream ``:path`` header
+	// requests by HTTP filters or routing? This affects the upstream “:path“ header
 	// as well. For paths that fail this check, Envoy will respond with 400 to
 	// paths that are malformed. This defaults to false currently but will default
 	// true in the future. When not specified, this value may be overridden by the
@@ -629,9 +633,9 @@ type HttpConnectionManager struct {
 	// is present.]
 	NormalizePath *wrappers.BoolValue `protobuf:"bytes,30,opt,name=normalize_path,json=normalizePath,proto3" json:"normalize_path,omitempty"`
 	// Determines if adjacent slashes in the path are merged into one before any processing of
-	// requests by HTTP filters or routing. This affects the upstream ``:path`` header as well. Without
-	// setting this option, incoming requests with path ``//dir///file`` will not match against route
-	// with ``prefix`` match set to ``/dir``. Defaults to ``false``. Note that slash merging is not part of
+	// requests by HTTP filters or routing. This affects the upstream “:path“ header as well. Without
+	// setting this option, incoming requests with path “//dir///file“ will not match against route
+	// with “prefix“ match set to “/dir“. Defaults to “false“. Note that slash merging is not part of
 	// `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
 	// [#comment:TODO: This field is ignored when the
 	// :ref:`header validation configuration <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.typed_header_validation_config>`
@@ -655,11 +659,12 @@ type HttpConnectionManager struct {
 	// the following configuration can be used:
 	//
 	// .. validated-code-block:: yaml
-	//   :type-name: envoy.extensions.filters.network.http_connection_manager.v3.RequestIDExtension
 	//
-	//   typed_config:
-	//     "@type": type.googleapis.com/envoy.extensions.request_id.uuid.v3.UuidRequestIdConfig
-	//     pack_trace_reason: false
+	//	:type-name: envoy.extensions.filters.network.http_connection_manager.v3.RequestIDExtension
+	//
+	//	typed_config:
+	//	  "@type": type.googleapis.com/envoy.extensions.request_id.uuid.v3.UuidRequestIdConfig
+	//	  pack_trace_reason: false
 	//
 	// [#extension-category: envoy.request_id]
 	RequestIdExtension *RequestIDExtension `protobuf:"bytes,36,opt,name=request_id_extension,json=requestIdExtension,proto3" json:"request_id_extension,omitempty"`
@@ -672,12 +677,13 @@ type HttpConnectionManager struct {
 	// local port. This affects the upstream host header unless the method is
 	// CONNECT in which case if no filter adds a port the original port will be restored before headers are
 	// sent upstream.
-	// Without setting this option, incoming requests with host ``example:443`` will not match against
-	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to ``example``. Defaults to ``false``. Note that port removal is not part
+	// Without setting this option, incoming requests with host “example:443“ will not match against
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to “example“. Defaults to “false“. Note that port removal is not part
 	// of `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
-	// Only one of ``strip_matching_host_port`` or ``strip_any_host_port`` can be set.
+	// Only one of “strip_matching_host_port“ or “strip_any_host_port“ can be set.
 	StripMatchingHostPort bool `protobuf:"varint,39,opt,name=strip_matching_host_port,json=stripMatchingHostPort,proto3" json:"strip_matching_host_port,omitempty"`
 	// Types that are assignable to StripPortMode:
+	//
 	//	*HttpConnectionManager_StripAnyHostPort
 	StripPortMode isHttpConnectionManager_StripPortMode `protobuf_oneof:"strip_port_mode"`
 	// Governs Envoy's behavior when receiving invalid HTTP from downstream.
@@ -694,13 +700,13 @@ type HttpConnectionManager struct {
 	// <envoy_v3_api_field_config.core.v3.Http1ProtocolOptions.override_stream_error_on_invalid_http_message>` or the new HTTP/2 option
 	// :ref:`override_stream_error_on_invalid_http_message
 	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.override_stream_error_on_invalid_http_message>`
-	// ``not`` the deprecated but similarly named :ref:`stream_error_on_invalid_http_messaging
+	// “not“ the deprecated but similarly named :ref:`stream_error_on_invalid_http_messaging
 	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.stream_error_on_invalid_http_messaging>`
 	StreamErrorOnInvalidHttpMessage *wrappers.BoolValue `protobuf:"bytes,40,opt,name=stream_error_on_invalid_http_message,json=streamErrorOnInvalidHttpMessage,proto3" json:"stream_error_on_invalid_http_message,omitempty"`
 	// [#not-implemented-hide:] Path normalization configuration. This includes
 	// configurations for transformations (e.g. RFC 3986 normalization or merge
 	// adjacent slashes) and the policy to apply them. The policy determines
-	// whether transformations affect the forwarded ``:path`` header. RFC 3986 path
+	// whether transformations affect the forwarded “:path“ header. RFC 3986 path
 	// normalization is enabled by default and the default policy is that the
 	// normalized header will be forwarded. See :ref:`PathNormalizationOptions
 	// <envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.PathNormalizationOptions>`
@@ -709,11 +715,11 @@ type HttpConnectionManager struct {
 	// Determines if trailing dot of the host should be removed from host/authority header before any
 	// processing of request by HTTP filters or routing.
 	// This affects the upstream host header.
-	// Without setting this option, incoming requests with host ``example.com.`` will not match against
-	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to ``example.com``. Defaults to ``false``.
+	// Without setting this option, incoming requests with host “example.com.“ will not match against
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to “example.com“. Defaults to “false“.
 	// When the incoming request contains a host/authority header that includes a port number,
 	// setting this option will strip a trailing dot, if present, from the host section,
-	// leaving the port as is (e.g. host value ``example.com.:443`` will be updated to ``example.com:443``).
+	// leaving the port as is (e.g. host value “example.com.:443“ will be updated to “example.com:443“).
 	StripTrailingHostDot bool `protobuf:"varint,47,opt,name=strip_trailing_host_dot,json=stripTrailingHostDot,proto3" json:"strip_trailing_host_dot,omitempty"`
 	// Proxy-Status HTTP response header configuration.
 	// If this config is set, the Proxy-Status HTTP response header field is
@@ -723,8 +729,8 @@ type HttpConnectionManager struct {
 	// UHV is an extensible mechanism for checking validity of HTTP requests as well as providing
 	// normalization for request attributes, such as URI path.
 	// If the typed_header_validation_config is present it overrides the following options:
-	// ``normalize_path``, ``merge_slashes``, ``path_with_escaped_slashes_action``
-	// ``http_protocol_options.allow_chunked_length``, ``common_http_protocol_options.headers_with_underscores_action``.
+	// “normalize_path“, “merge_slashes“, “path_with_escaped_slashes_action“
+	// “http_protocol_options.allow_chunked_length“, “common_http_protocol_options.headers_with_underscores_action“.
 	//
 	// The default UHV checks the following:
 	//
@@ -734,19 +740,20 @@ type HttpConnectionManager struct {
 	// #. Syntax of HTTP/2 pseudo headers
 	// #. HTTP/3 header map validity according to `RFC 9114 section 4.3 <https://www.rfc-editor.org/rfc/rfc9114.html>`_
 	// #. Syntax of HTTP/3 pseudo headers
-	// #. Syntax of ``Content-Length`` and ``Transfer-Encoding``
-	// #. Validation of HTTP/1 requests with both ``Content-Length`` and ``Transfer-Encoding`` headers
+	// #. Syntax of “Content-Length“ and “Transfer-Encoding“
+	// #. Validation of HTTP/1 requests with both “Content-Length“ and “Transfer-Encoding“ headers
 	// #. Normalization of the URI path according to `Normalization and Comparison <https://datatracker.ietf.org/doc/html/rfc3986#section-6>`_
-	//    without `case normalization <https://datatracker.ietf.org/doc/html/rfc3986#section-6.2.2.1>`_
+	//
+	//	without `case normalization <https://datatracker.ietf.org/doc/html/rfc3986#section-6.2.2.1>`_
 	//
 	// [#not-implemented-hide:]
 	// [#extension-category: envoy.http.header_validators]
 	TypedHeaderValidationConfig *v3.TypedExtensionConfig `protobuf:"bytes,50,opt,name=typed_header_validation_config,json=typedHeaderValidationConfig,proto3" json:"typed_header_validation_config,omitempty"`
-	// Append the ``x-forwarded-port`` header with the port value client used to connect to Envoy. It
-	// will be ignored if the ``x-forwarded-port`` header has been set by any trusted proxy in front of Envoy.
+	// Append the “x-forwarded-port“ header with the port value client used to connect to Envoy. It
+	// will be ignored if the “x-forwarded-port“ header has been set by any trusted proxy in front of Envoy.
 	AppendXForwardedPort bool `protobuf:"varint,51,opt,name=append_x_forwarded_port,json=appendXForwardedPort,proto3" json:"append_x_forwarded_port,omitempty"`
-	// Whether the HCM will add ProxyProtocolFilterState to the Connection lifetime filter state. Defaults to ``true``.
-	// This should be set to ``false`` in cases where Envoy's view of the downstream address may not correspond to the
+	// Whether the HCM will add ProxyProtocolFilterState to the Connection lifetime filter state. Defaults to “true“.
+	// This should be set to “false“ in cases where Envoy's view of the downstream address may not correspond to the
 	// actual client address, for example, if there's another proxy in front of the Envoy.
 	AddProxyProtocolConnectionState *wrappers.BoolValue `protobuf:"bytes,53,opt,name=add_proxy_protocol_connection_state,json=addProxyProtocolConnectionState,proto3" json:"add_proxy_protocol_connection_state,omitempty"`
 }
@@ -1213,10 +1220,10 @@ type HttpConnectionManager_StripAnyHostPort struct {
 	// of request by HTTP filters or routing.
 	// This affects the upstream host header unless the method is CONNECT in
 	// which case if no filter adds a port the original port will be restored before headers are sent upstream.
-	// Without setting this option, incoming requests with host ``example:443`` will not match against
-	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to ``example``. Defaults to ``false``. Note that port removal is not part
+	// Without setting this option, incoming requests with host “example:443“ will not match against
+	// route with :ref:`domains<envoy_v3_api_field_config.route.v3.VirtualHost.domains>` match set to “example“. Defaults to “false“. Note that port removal is not part
 	// of `HTTP spec <https://tools.ietf.org/html/rfc3986>`_ and is provided for convenience.
-	// Only one of ``strip_matching_host_port`` or ``strip_any_host_port`` can be set.
+	// Only one of “strip_matching_host_port“ or “strip_any_host_port“ can be set.
 	StripAnyHostPort bool `protobuf:"varint,42,opt,name=strip_any_host_port,json=stripAnyHostPort,proto3,oneof"`
 }
 
@@ -1234,41 +1241,42 @@ type LocalReplyConfig struct {
 	// The configuration to form response body from the :ref:`command operators <config_access_log_command_operators>`
 	// and to specify response content type as one of: plain/text or application/json.
 	//
-	// Example one: "plain/text" ``body_format``.
+	// Example one: "plain/text" “body_format“.
 	//
 	// .. validated-code-block:: yaml
-	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
-	//   text_format: "%LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=%REQ(:path)%\n"
+	//	:type-name: envoy.config.core.v3.SubstitutionFormatString
+	//
+	//	text_format: "%LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=%REQ(:path)%\n"
 	//
 	// The following response body in "plain/text" format will be generated for a request with
 	// local reply body of "upstream connection error", response_code=503 and path=/foo.
 	//
 	// .. code-block:: text
 	//
-	//   upstream connect error:503:path=/foo
+	//	upstream connect error:503:path=/foo
 	//
-	// Example two: "application/json" ``body_format``.
+	// Example two: "application/json" “body_format“.
 	//
 	// .. validated-code-block:: yaml
-	//   :type-name: envoy.config.core.v3.SubstitutionFormatString
 	//
-	//   json_format:
-	//     status: "%RESPONSE_CODE%"
-	//     message: "%LOCAL_REPLY_BODY%"
-	//     path: "%REQ(:path)%"
+	//	:type-name: envoy.config.core.v3.SubstitutionFormatString
+	//
+	//	json_format:
+	//	  status: "%RESPONSE_CODE%"
+	//	  message: "%LOCAL_REPLY_BODY%"
+	//	  path: "%REQ(:path)%"
 	//
 	// The following response body in "application/json" format would be generated for a request with
 	// local reply body of "upstream connection error", response_code=503 and path=/foo.
 	//
 	// .. code-block:: json
 	//
-	//  {
-	//    "status": 503,
-	//    "message": "upstream connection error",
-	//    "path": "/foo"
-	//  }
-	//
+	//	{
+	//	  "status": 503,
+	//	  "message": "upstream connection error",
+	//	  "path": "/foo"
+	//	}
 	BodyFormat *v3.SubstitutionFormatString `protobuf:"bytes,2,opt,name=body_format,json=bodyFormat,proto3" json:"body_format,omitempty"`
 }
 
@@ -1329,10 +1337,10 @@ type ResponseMapper struct {
 	Filter *v31.AccessLogFilter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
 	// The new response status code if specified.
 	StatusCode *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
-	// The new local reply body text if specified. It will be used in the ``%LOCAL_REPLY_BODY%``
-	// command operator in the ``body_format``.
+	// The new local reply body text if specified. It will be used in the “%LOCAL_REPLY_BODY%“
+	// command operator in the “body_format“.
 	Body *v3.DataSource `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
-	// A per mapper ``body_format`` to override the :ref:`body_format <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.LocalReplyConfig.body_format>`.
+	// A per mapper “body_format“ to override the :ref:`body_format <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.LocalReplyConfig.body_format>`.
 	// It will be used when this mapper is matched.
 	BodyFormatOverride *v3.SubstitutionFormatString `protobuf:"bytes,4,opt,name=body_format_override,json=bodyFormatOverride,proto3" json:"body_format_override,omitempty"`
 	// HTTP headers to add to a local reply. This allows the response mapper to append, to add
@@ -1530,6 +1538,7 @@ type ScopedRoutes struct {
 	// ScopedRouteConfiguration messages.
 	RdsConfigSource *v3.ConfigSource `protobuf:"bytes,3,opt,name=rds_config_source,json=rdsConfigSource,proto3" json:"rds_config_source,omitempty"`
 	// Types that are assignable to ConfigSpecifier:
+	//
 	//	*ScopedRoutes_ScopedRouteConfigurationsList
 	//	*ScopedRoutes_ScopedRds
 	ConfigSpecifier isScopedRoutes_ConfigSpecifier `protobuf_oneof:"config_specifier"`
@@ -1702,6 +1711,7 @@ type HttpFilter struct {
 	// The name of the filter configuration. It also serves as a resource name in ExtensionConfigDS.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to ConfigType:
+	//
 	//	*HttpFilter_TypedConfig
 	//	*HttpFilter_ConfigDiscovery
 	ConfigType isHttpFilter_ConfigType `protobuf_oneof:"config_type"`
@@ -1950,12 +1960,13 @@ type HttpConnectionManager_Tracing struct {
 	// If not specified, no tracing will be performed.
 	//
 	// .. attention::
-	//   Please be aware that ``envoy.tracers.opencensus`` provider can only be configured once
-	//   in Envoy lifetime.
-	//   Any attempts to reconfigure it or to use different configurations for different HCM filters
-	//   will be rejected.
-	//   Such a constraint is inherent to OpenCensus itself. It cannot be overcome without changes
-	//   on OpenCensus side.
+	//
+	//	Please be aware that ``envoy.tracers.opencensus`` provider can only be configured once
+	//	in Envoy lifetime.
+	//	Any attempts to reconfigure it or to use different configurations for different HCM filters
+	//	will be rejected.
+	//	Such a constraint is inherent to OpenCensus itself. It cannot be overcome without changes
+	//	on OpenCensus side.
 	Provider *v35.Tracing_Http `protobuf:"bytes,9,opt,name=provider,proto3" json:"provider,omitempty"`
 	// Create separate tracing span for each upstream request if true. And if this flag is set to true,
 	// the tracing provider will assume that Envoy will be independent hop in the trace chain and may
@@ -1966,14 +1977,14 @@ type HttpConnectionManager_Tracing struct {
 	//
 	// Users should set appropriate value based on their tracing provider and actual scenario:
 	//
-	// * If Envoy is used as sidecar and users want to make the sidecar and its application as only one
-	//   hop in the trace chain, this flag should be set to false. And please also make sure the
-	//   :ref:`start_child_span <envoy_v3_api_field_extensions.filters.http.router.v3.Router.start_child_span>`
-	//   in the router is not set to true.
-	// * If Envoy is used as gateway or independent proxy, or users want to make the sidecar and its
-	//   application as different hops in the trace chain, this flag should be set to true.
-	// * If tracing provider that has explicit requirements on span creation (like SkyWalking),
-	//   this flag should be set to true.
+	//   - If Envoy is used as sidecar and users want to make the sidecar and its application as only one
+	//     hop in the trace chain, this flag should be set to false. And please also make sure the
+	//     :ref:`start_child_span <envoy_v3_api_field_extensions.filters.http.router.v3.Router.start_child_span>`
+	//     in the router is not set to true.
+	//   - If Envoy is used as gateway or independent proxy, or users want to make the sidecar and its
+	//     application as different hops in the trace chain, this flag should be set to true.
+	//   - If tracing provider that has explicit requirements on span creation (like SkyWalking),
+	//     this flag should be set to true.
 	//
 	// The default value is false for now for backward compatibility.
 	SpawnUpstreamSpan *wrappers.BoolValue `protobuf:"bytes,10,opt,name=spawn_upstream_span,json=spawnUpstreamSpan,proto3" json:"spawn_upstream_span,omitempty"`
@@ -2222,13 +2233,14 @@ func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetUri() bool {
 //
 // .. warning::
 //
-//    The current implementation of upgrade headers does not handle
-//    multi-valued upgrade headers. Support for multi-valued headers may be
-//    added in the future if needed.
+//	The current implementation of upgrade headers does not handle
+//	multi-valued upgrade headers. Support for multi-valued headers may be
+//	added in the future if needed.
 //
 // .. warning::
-//    The current implementation of upgrade headers does not work with HTTP/2
-//    upstreams.
+//
+//	The current implementation of upgrade headers does not work with HTTP/2
+//	upstreams.
 type HttpConnectionManager_UpgradeConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2308,17 +2320,17 @@ func (x *HttpConnectionManager_UpgradeConfig) GetEnabled() *wrappers.BoolValue {
 // path will be visible internally if a transformation is enabled. Any path rewrites that the
 // router performs (e.g. :ref:`regex_rewrite
 // <envoy_v3_api_field_config.route.v3.RouteAction.regex_rewrite>` or :ref:`prefix_rewrite
-// <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`) will apply to the ``:path`` header
+// <envoy_v3_api_field_config.route.v3.RouteAction.prefix_rewrite>`) will apply to the “:path“ header
 // destined for the upstream.
 //
-// Note: access logging and tracing will show the original ``:path`` header.
+// Note: access logging and tracing will show the original “:path“ header.
 type HttpConnectionManager_PathNormalizationOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// [#not-implemented-hide:] Normalization applies internally before any processing of requests by
-	// HTTP filters, routing, and matching *and* will affect the forwarded ``:path`` header. Defaults
+	// HTTP filters, routing, and matching *and* will affect the forwarded “:path“ header. Defaults
 	// to :ref:`NormalizePathRFC3986
 	// <envoy_v3_api_msg_type.http.v3.PathTransformation.Operation.NormalizePathRFC3986>`. When not
 	// specified, this value may be overridden by the runtime variable
@@ -2328,7 +2340,7 @@ type HttpConnectionManager_PathNormalizationOptions struct {
 	ForwardingTransformation *v36.PathTransformation `protobuf:"bytes,1,opt,name=forwarding_transformation,json=forwardingTransformation,proto3" json:"forwarding_transformation,omitempty"`
 	// [#not-implemented-hide:] Normalization only applies internally before any processing of
 	// requests by HTTP filters, routing, and matching. These will be applied after full
-	// transformation is applied. The ``:path`` header before this transformation will be restored in
+	// transformation is applied. The “:path“ header before this transformation will be restored in
 	// the router filter and sent upstream unless it was mutated by a filter. Defaults to no
 	// transformations.
 	// Multiple actions can be applied in the same Transformation, forming a sequential
@@ -2393,7 +2405,8 @@ func (x *HttpConnectionManager_PathNormalizationOptions) GetHttpFilterTransforma
 //
 // The Proxy-Status header is a string of the form:
 //
-//   "<server_name>; error=<error_type>; details=<details>"
+//	"<server_name>; error=<error_type>; details=<details>"
+//
 // [#next-free-field: 7]
 type HttpConnectionManager_ProxyStatusConfig struct {
 	state         protoimpl.MessageState
@@ -2401,28 +2414,29 @@ type HttpConnectionManager_ProxyStatusConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// If true, the details field of the Proxy-Status header is not populated with stream_info.response_code_details.
-	// This value defaults to ``false``, i.e. the ``details`` field is populated by default.
+	// This value defaults to “false“, i.e. the “details“ field is populated by default.
 	RemoveDetails bool `protobuf:"varint,1,opt,name=remove_details,json=removeDetails,proto3" json:"remove_details,omitempty"`
 	// If true, the details field of the Proxy-Status header will not contain
-	// connection termination details. This value defaults to ``false``, i.e. the
-	// ``details`` field will contain connection termination details by default.
+	// connection termination details. This value defaults to “false“, i.e. the
+	// “details“ field will contain connection termination details by default.
 	RemoveConnectionTerminationDetails bool `protobuf:"varint,2,opt,name=remove_connection_termination_details,json=removeConnectionTerminationDetails,proto3" json:"remove_connection_termination_details,omitempty"`
 	// If true, the details field of the Proxy-Status header will not contain an
-	// enumeration of the Envoy ResponseFlags. This value defaults to ``false``,
-	// i.e. the ``details`` field will contain a list of ResponseFlags by default.
+	// enumeration of the Envoy ResponseFlags. This value defaults to “false“,
+	// i.e. the “details“ field will contain a list of ResponseFlags by default.
 	RemoveResponseFlags bool `protobuf:"varint,3,opt,name=remove_response_flags,json=removeResponseFlags,proto3" json:"remove_response_flags,omitempty"`
 	// If true, overwrites the existing Status header with the response code
 	// recommended by the Proxy-Status spec.
-	// This value defaults to ``false``, i.e. the HTTP response code is not
+	// This value defaults to “false“, i.e. the HTTP response code is not
 	// overwritten.
 	SetRecommendedResponseCode bool `protobuf:"varint,4,opt,name=set_recommended_response_code,json=setRecommendedResponseCode,proto3" json:"set_recommended_response_code,omitempty"`
 	// The name of the proxy as it appears at the start of the Proxy-Status
 	// header.
 	//
-	// If neither of these values are set, this value defaults to ``server_name``,
+	// If neither of these values are set, this value defaults to “server_name“,
 	// which itself defaults to "envoy".
 	//
 	// Types that are assignable to ProxyName:
+	//
 	//	*HttpConnectionManager_ProxyStatusConfig_UseNodeId
 	//	*HttpConnectionManager_ProxyStatusConfig_LiteralProxyName
 	ProxyName isHttpConnectionManager_ProxyStatusConfig_ProxyName `protobuf_oneof:"proxy_name"`
@@ -2514,13 +2528,13 @@ type isHttpConnectionManager_ProxyStatusConfig_ProxyName interface {
 }
 
 type HttpConnectionManager_ProxyStatusConfig_UseNodeId struct {
-	// If ``use_node_id`` is set, Proxy-Status headers will use the Envoy's node
+	// If “use_node_id“ is set, Proxy-Status headers will use the Envoy's node
 	// ID as the name of the proxy.
 	UseNodeId bool `protobuf:"varint,5,opt,name=use_node_id,json=useNodeId,proto3,oneof"`
 }
 
 type HttpConnectionManager_ProxyStatusConfig_LiteralProxyName struct {
-	// If ``literal_proxy_name`` is set, Proxy-Status headers will use this
+	// If “literal_proxy_name“ is set, Proxy-Status headers will use this
 	// value as the name of the proxy.
 	LiteralProxyName string `protobuf:"bytes,6,opt,name=literal_proxy_name,json=literalProxyName,proto3,oneof"`
 }
@@ -2540,7 +2554,7 @@ type HttpConnectionManager_HcmAccessLogOptions struct {
 	// on stream close, when the HTTP request is complete. If this field is set, the HCM will flush access
 	// logs periodically at the specified interval. This is especially useful in the case of long-lived
 	// requests, such as CONNECT and Websockets. Final access logs can be detected via the
-	// ``requestComplete()`` method of ``StreamInfo`` in access log filters, or through the ``%DURATION%`` substitution
+	// “requestComplete()“ method of “StreamInfo“ in access log filters, or through the “%DURATION%“ substitution
 	// string.
 	// The interval must be at least 1 millisecond.
 	AccessLogFlushInterval *duration.Duration `protobuf:"bytes,1,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
@@ -2674,6 +2688,7 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Type:
+	//
 	//	*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_
 	Type isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_Type `protobuf_oneof:"type"`
 }
@@ -2741,18 +2756,18 @@ func (*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_) isSco
 //
 // .. code::
 //
-//              <0> <1>   <-- index
-//    X-Header: a=b;c=d
-//    |         || |
-//    |         || \----> <element_separator>
-//    |         ||
-//    |         |\----> <element.separator>
-//    |         |
-//    |         \----> <element.key>
-//    |
-//    \----> <name>
+//	          <0> <1>   <-- index
+//	X-Header: a=b;c=d
+//	|         || |
+//	|         || \----> <element_separator>
+//	|         ||
+//	|         |\----> <element.separator>
+//	|         |
+//	|         \----> <element.key>
+//	|
+//	\----> <name>
 //
-//    Each 'a=b' key-value pair constitutes an 'element' of the header field.
+//	Each 'a=b' key-value pair constitutes an 'element' of the header field.
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2762,7 +2777,7 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	//
 	// .. note::
 	//
-	//   If the header appears multiple times only the first value is used.
+	//	If the header appears multiple times only the first value is used.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The element separator (e.g., ';' separates 'a;b;c;d').
 	// Default: empty string. This causes the entirety of the header field to be extracted.
@@ -2770,6 +2785,7 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	// must be set to 0.
 	ElementSeparator string `protobuf:"bytes,2,opt,name=element_separator,json=elementSeparator,proto3" json:"element_separator,omitempty"`
 	// Types that are assignable to ExtractType:
+	//
 	//	*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index
 	//	*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Element
 	ExtractType isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_ExtractType `protobuf_oneof:"extract_type"`

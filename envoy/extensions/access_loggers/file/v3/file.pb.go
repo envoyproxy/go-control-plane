@@ -26,7 +26,7 @@ const (
 )
 
 // Custom configuration for an :ref:`AccessLog <envoy_v3_api_msg_config.accesslog.v3.AccessLog>`
-// that writes log entries directly to a file. Configures the built-in ``envoy.access_loggers.file``
+// that writes log entries directly to a file. Configures the built-in “envoy.access_loggers.file“
 // AccessLog.
 // [#next-free-field: 6]
 type FileAccessLog struct {
@@ -37,6 +37,7 @@ type FileAccessLog struct {
 	// A path to a local file to which to write the access log entries.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	// Types that are assignable to AccessLogFormat:
+	//
 	//	*FileAccessLog_Format
 	//	*FileAccessLog_JsonFormat
 	//	*FileAccessLog_TypedJsonFormat

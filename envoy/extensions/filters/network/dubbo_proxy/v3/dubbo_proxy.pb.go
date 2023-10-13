@@ -121,7 +121,7 @@ type Drds struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Configuration source specifier.
-	// In case of ``api_config_source`` only aggregated ``api_type`` is supported.
+	// In case of “api_config_source“ only aggregated “api_type“ is supported.
 	ConfigSource *v3.ConfigSource `protobuf:"bytes,1,opt,name=config_source,json=configSource,proto3" json:"config_source,omitempty"`
 	// The name of the multiple route configuration. This allows to use different multiple route
 	// configurations. Tells which multiple route configuration should be fetched from the configuration
@@ -191,18 +191,19 @@ type DubboProxy struct {
 	//
 	// .. note::
 	//
-	//   This field is deprecated. Please use ``drds`` or ``multiple_route_config`` first.
+	//	This field is deprecated. Please use ``drds`` or ``multiple_route_config`` first.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/dubbo_proxy/v3/dubbo_proxy.proto.
 	RouteConfig []*RouteConfiguration `protobuf:"bytes,4,rep,name=route_config,json=routeConfig,proto3" json:"route_config,omitempty"`
 	// Types that are assignable to RouteSpecifier:
+	//
 	//	*DubboProxy_Drds
 	//	*DubboProxy_MultipleRouteConfig
 	RouteSpecifier isDubboProxy_RouteSpecifier `protobuf_oneof:"route_specifier"`
 	// A list of individual Dubbo filters that make up the filter chain for requests made to the
 	// Dubbo proxy. Order matters as the filters are processed sequentially. For backwards
 	// compatibility, if no dubbo_filters are specified, a default Dubbo router filter
-	// (``envoy.filters.dubbo.router``) is used.
+	// (“envoy.filters.dubbo.router“) is used.
 	DubboFilters []*DubboFilter `protobuf:"bytes,5,rep,name=dubbo_filters,json=dubboFilters,proto3" json:"dubbo_filters,omitempty"`
 }
 
@@ -300,7 +301,7 @@ type isDubboProxy_RouteSpecifier interface {
 }
 
 type DubboProxy_Drds struct {
-	// Use xDS to fetch the route configuration. It is invalid to define both ``route_config`` and ``drds``.
+	// Use xDS to fetch the route configuration. It is invalid to define both “route_config“ and “drds“.
 	Drds *Drds `protobuf:"bytes,6,opt,name=drds,proto3,oneof"`
 }
 

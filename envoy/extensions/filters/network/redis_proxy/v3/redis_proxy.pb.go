@@ -164,20 +164,20 @@ type RedisProxy struct {
 	//
 	// .. code-block:: yaml
 	//
-	//    prefix_routes:
-	//      routes:
-	//        - prefix: "ab"
-	//          cluster: "cluster_a"
-	//        - prefix: "abc"
-	//          cluster: "cluster_b"
+	//	prefix_routes:
+	//	  routes:
+	//	    - prefix: "ab"
+	//	      cluster: "cluster_a"
+	//	    - prefix: "abc"
+	//	      cluster: "cluster_b"
 	//
 	// When using the above routes, the following prefixes would be sent to:
 	//
-	// * ``get abc:users`` would retrieve the key 'abc:users' from cluster_b.
-	// * ``get ab:users`` would retrieve the key 'ab:users' from cluster_a.
-	// * ``get z:users`` would return a NoUpstreamHost error. A :ref:`catch-all
-	//   route<envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.catch_all_route>`
-	//   would have retrieved the key from that cluster instead.
+	//   - “get abc:users“ would retrieve the key 'abc:users' from cluster_b.
+	//   - “get ab:users“ would retrieve the key 'ab:users' from cluster_a.
+	//   - “get z:users“ would return a NoUpstreamHost error. A :ref:`catch-all
+	//     route<envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.PrefixRoutes.catch_all_route>`
+	//     would have retrieved the key from that cluster instead.
 	//
 	// See the :ref:`configuration section
 	// <arch_overview_redis_configuration>` of the architecture overview for recommendations on
@@ -193,8 +193,9 @@ type RedisProxy struct {
 	// AUTH, but no password is set" error will be returned.
 	//
 	// .. attention::
-	//   This field is deprecated. Use :ref:`downstream_auth_passwords
-	//   <envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_passwords>`.
+	//
+	//	This field is deprecated. Use :ref:`downstream_auth_passwords
+	//	<envoy_v3_api_field_extensions.filters.network.redis_proxy.v3.RedisProxy.downstream_auth_passwords>`.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/redis_proxy/v3/redis_proxy.proto.
 	DownstreamAuthPassword *v3.DataSource `protobuf:"bytes,6,opt,name=downstream_auth_password,json=downstreamAuthPassword,proto3" json:"downstream_auth_password,omitempty"`
@@ -215,32 +216,32 @@ type RedisProxy struct {
 	//
 	// .. code-block:: yaml
 	//
-	//    faults:
-	//    - fault_type: ERROR
-	//      fault_enabled:
-	//        default_value:
-	//          numerator: 10
-	//          denominator: HUNDRED
-	//        runtime_key: "bogus_key"
-	//        commands:
-	//        - GET
-	//      - fault_type: DELAY
-	//        fault_enabled:
-	//          default_value:
-	//            numerator: 10
-	//            denominator: HUNDRED
-	//          runtime_key: "bogus_key"
-	//        delay: 2s
+	//	faults:
+	//	- fault_type: ERROR
+	//	  fault_enabled:
+	//	    default_value:
+	//	      numerator: 10
+	//	      denominator: HUNDRED
+	//	    runtime_key: "bogus_key"
+	//	    commands:
+	//	    - GET
+	//	  - fault_type: DELAY
+	//	    fault_enabled:
+	//	      default_value:
+	//	        numerator: 10
+	//	        denominator: HUNDRED
+	//	      runtime_key: "bogus_key"
+	//	    delay: 2s
 	//
 	// See the :ref:`fault injection section
 	// <config_network_filters_redis_proxy_fault_injection>` for more information on how to configure this.
 	Faults []*RedisProxy_RedisFault `protobuf:"bytes,8,rep,name=faults,proto3" json:"faults,omitempty"`
 	// If a username is provided an ACL style AUTH command will be required with a username and password.
 	// Authenticate Redis client connections locally by forcing downstream clients to issue a `Redis
-	// AUTH command <https://redis.io/commands/auth>`_ with this username and the ``downstream_auth_password``
+	// AUTH command <https://redis.io/commands/auth>`_ with this username and the “downstream_auth_password“
 	// before enabling any other command. If an AUTH command's username and password matches this username
-	// and the ``downstream_auth_password`` , an "OK" response will be returned to the client. If the AUTH
-	// command username or password does not match this username or the ``downstream_auth_password``, then an
+	// and the “downstream_auth_password“ , an "OK" response will be returned to the client. If the AUTH
+	// command username or password does not match this username or the “downstream_auth_password“, then an
 	// "WRONGPASS invalid username-password pair" error will be returned. If any other command is received before AUTH when this
 	// password is set, then a "NOAUTH Authentication required." error response will be sent to the
 	// client. If an AUTH command is received when the password is not set, then an "ERR Client sent
@@ -339,16 +340,16 @@ func (x *RedisProxy) GetDownstreamAuthUsername() *v3.DataSource {
 
 // RedisProtocolOptions specifies Redis upstream protocol options. This object is used in
 // :ref:`typed_extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
-// keyed by the name ``envoy.filters.network.redis_proxy``.
+// keyed by the name “envoy.filters.network.redis_proxy“.
 type RedisProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Upstream server password as defined by the ``requirepass`` directive
+	// Upstream server password as defined by the “requirepass“ directive
 	// `<https://redis.io/topics/config>`_ in the server's configuration file.
 	AuthPassword *v3.DataSource `protobuf:"bytes,1,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
-	// Upstream server username as defined by the ``user`` directive
+	// Upstream server username as defined by the “user“ directive
 	// `<https://redis.io/topics/acl>`_ in the server's configuration file.
 	AuthUsername *v3.DataSource `protobuf:"bytes,2,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 }
@@ -430,7 +431,7 @@ type RedisProxy_ConnPoolSettings struct {
 	// need to be known to the cluster manager. If the command cannot be redirected, then the
 	// original error is passed downstream unchanged. By default, this support is not enabled.
 	EnableRedirection bool `protobuf:"varint,3,opt,name=enable_redirection,json=enableRedirection,proto3" json:"enable_redirection,omitempty"`
-	// If ``enable_redirection`` is set to true this option configures the DNS cache that the
+	// If “enable_redirection“ is set to true this option configures the DNS cache that the
 	// connection pool will use to resolve hostnames that are returned with MOVED and ASK responses.
 	// If no configuration is provided, DNS lookups will not be performed (and thus the MOVED/ASK errors
 	// will be propagated verbatim to the user).
@@ -444,18 +445,18 @@ type RedisProxy_ConnPoolSettings struct {
 	// Recommended size (if enabled) is 1024 bytes.
 	MaxBufferSizeBeforeFlush uint32 `protobuf:"varint,4,opt,name=max_buffer_size_before_flush,json=maxBufferSizeBeforeFlush,proto3" json:"max_buffer_size_before_flush,omitempty"`
 	// The encoded request buffer is flushed N milliseconds after the first request has been
-	// encoded, unless the buffer size has already exceeded ``max_buffer_size_before_flush``.
-	// If ``max_buffer_size_before_flush`` is not set, this flush timer is not used. Otherwise,
+	// encoded, unless the buffer size has already exceeded “max_buffer_size_before_flush“.
+	// If “max_buffer_size_before_flush“ is not set, this flush timer is not used. Otherwise,
 	// the timer should be set according to the number of clients, overall request rate and
 	// desired maximum latency for a single command. For example, if there are many requests
 	// being batched together at a high rate, the buffer will likely be filled before the timer
 	// fires. Alternatively, if the request rate is lower the buffer will not be filled as often
 	// before the timer fires.
-	// If ``max_buffer_size_before_flush`` is set, but ``buffer_flush_timeout`` is not, the latter
+	// If “max_buffer_size_before_flush“ is set, but “buffer_flush_timeout“ is not, the latter
 	// defaults to 3ms.
 	BufferFlushTimeout *duration.Duration `protobuf:"bytes,5,opt,name=buffer_flush_timeout,json=bufferFlushTimeout,proto3" json:"buffer_flush_timeout,omitempty"`
-	// ``max_upstream_unknown_connections`` controls how many upstream connections to unknown hosts
-	// can be created at any given time by any given worker thread (see ``enable_redirection`` for
+	// “max_upstream_unknown_connections“ controls how many upstream connections to unknown hosts
+	// can be created at any given time by any given worker thread (see “enable_redirection“ for
 	// more details). If the host is unknown and a connection cannot be created due to enforcing
 	// this limit, then redirection will fail and the original redirection error will be passed
 	// downstream unchanged. This limit defaults to 100.

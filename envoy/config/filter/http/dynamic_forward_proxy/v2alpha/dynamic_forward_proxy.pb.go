@@ -83,6 +83,7 @@ type PerRouteConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to HostRewriteSpecifier:
+	//
 	//	*PerRouteConfig_HostRewrite
 	//	*PerRouteConfig_AutoHostRewriteHeader
 	HostRewriteSpecifier isPerRouteConfig_HostRewriteSpecifier `protobuf_oneof:"host_rewrite_specifier"`
@@ -171,7 +172,7 @@ type PerRouteConfig_AutoHostRewriteHeader struct {
 	//
 	// .. note::
 	//
-	//   If the header appears multiple times only the first value is used.
+	//	If the header appears multiple times only the first value is used.
 	AutoHostRewriteHeader string `protobuf:"bytes,2,opt,name=auto_host_rewrite_header,json=autoHostRewriteHeader,proto3,oneof"`
 }
 

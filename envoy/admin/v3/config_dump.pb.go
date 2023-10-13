@@ -37,18 +37,18 @@ type ConfigDump struct {
 	// The following configurations are currently supported and will be dumped in the order given
 	// below:
 	//
-	// * ``bootstrap``: :ref:`BootstrapConfigDump <envoy_v3_api_msg_admin.v3.BootstrapConfigDump>`
-	// * ``clusters``: :ref:`ClustersConfigDump <envoy_v3_api_msg_admin.v3.ClustersConfigDump>`
-	// * ``ecds_filter_http``: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
-	// * ``ecds_filter_quic_listener``: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
-	// * ``ecds_filter_tcp_listener``: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
-	// * ``endpoints``:  :ref:`EndpointsConfigDump <envoy_v3_api_msg_admin.v3.EndpointsConfigDump>`
-	// * ``listeners``: :ref:`ListenersConfigDump <envoy_v3_api_msg_admin.v3.ListenersConfigDump>`
-	// * ``scoped_routes``: :ref:`ScopedRoutesConfigDump <envoy_v3_api_msg_admin.v3.ScopedRoutesConfigDump>`
-	// * ``routes``:  :ref:`RoutesConfigDump <envoy_v3_api_msg_admin.v3.RoutesConfigDump>`
-	// * ``secrets``:  :ref:`SecretsConfigDump <envoy_v3_api_msg_admin.v3.SecretsConfigDump>`
+	// * “bootstrap“: :ref:`BootstrapConfigDump <envoy_v3_api_msg_admin.v3.BootstrapConfigDump>`
+	// * “clusters“: :ref:`ClustersConfigDump <envoy_v3_api_msg_admin.v3.ClustersConfigDump>`
+	// * “ecds_filter_http“: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
+	// * “ecds_filter_quic_listener“: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
+	// * “ecds_filter_tcp_listener“: :ref:`EcdsConfigDump <envoy_v3_api_msg_admin.v3.EcdsConfigDump>`
+	// * “endpoints“:  :ref:`EndpointsConfigDump <envoy_v3_api_msg_admin.v3.EndpointsConfigDump>`
+	// * “listeners“: :ref:`ListenersConfigDump <envoy_v3_api_msg_admin.v3.ListenersConfigDump>`
+	// * “scoped_routes“: :ref:`ScopedRoutesConfigDump <envoy_v3_api_msg_admin.v3.ScopedRoutesConfigDump>`
+	// * “routes“:  :ref:`RoutesConfigDump <envoy_v3_api_msg_admin.v3.RoutesConfigDump>`
+	// * “secrets“:  :ref:`SecretsConfigDump <envoy_v3_api_msg_admin.v3.SecretsConfigDump>`
 	//
-	// EDS Configuration will only be dumped by using parameter ``?include_eds``
+	// EDS Configuration will only be dumped by using parameter “?include_eds“
 	//
 	// Currently ECDS is supported in HTTP and listener filters. Note, ECDS configuration for
 	// either HTTP or listener filter will only be dumped if it is actually configured.

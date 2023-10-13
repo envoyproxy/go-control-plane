@@ -111,7 +111,7 @@ type ZipkinConfig struct {
 	// Determines whether client and server spans will share the same span context.
 	// The default value is true.
 	SharedSpanContext *wrappers.BoolValue `protobuf:"bytes,4,opt,name=shared_span_context,json=sharedSpanContext,proto3" json:"shared_span_context,omitempty"`
-	// Determines the selected collector endpoint version. By default, the ``HTTP_JSON_V1`` will be
+	// Determines the selected collector endpoint version. By default, the “HTTP_JSON_V1“ will be
 	// used.
 	CollectorEndpointVersion ZipkinConfig_CollectorEndpointVersion `protobuf:"varint,5,opt,name=collector_endpoint_version,json=collectorEndpointVersion,proto3,enum=envoy.config.trace.v2.ZipkinConfig_CollectorEndpointVersion" json:"collector_endpoint_version,omitempty"`
 }

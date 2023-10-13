@@ -30,6 +30,7 @@ type Body struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to BodyType:
+	//
 	//	*Body_AsBytes
 	//	*Body_AsString
 	BodyType isBody_BodyType `protobuf_oneof:"body_type"`
@@ -107,7 +108,7 @@ type isBody_BodyType interface {
 
 type Body_AsBytes struct {
 	// Body data as bytes. By default, tap body data will be present in this field, as the proto
-	// ``bytes`` type can contain any valid byte.
+	// “bytes“ type can contain any valid byte.
 	AsBytes []byte `protobuf:"bytes,1,opt,name=as_bytes,json=asBytes,proto3,oneof"`
 }
 

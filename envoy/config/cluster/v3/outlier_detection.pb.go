@@ -144,7 +144,7 @@ type OutlierDetection struct {
 	MaxEjectionTimeJitter *duration.Duration `protobuf:"bytes,22,opt,name=max_ejection_time_jitter,json=maxEjectionTimeJitter,proto3" json:"max_ejection_time_jitter,omitempty"`
 	// If active health checking is enabled and a host is ejected by outlier detection, a successful active health check
 	// unejects the host by default and considers it as healthy. Unejection also clears all the outlier detection counters.
-	// To change this default behavior set this config to ``false`` where active health checking will not uneject the host.
+	// To change this default behavior set this config to “false“ where active health checking will not uneject the host.
 	// Defaults to true.
 	SuccessfulActiveHealthCheckUnejectHost *wrappers.BoolValue `protobuf:"bytes,23,opt,name=successful_active_health_check_uneject_host,json=successfulActiveHealthCheckUnejectHost,proto3" json:"successful_active_health_check_uneject_host,omitempty"`
 }

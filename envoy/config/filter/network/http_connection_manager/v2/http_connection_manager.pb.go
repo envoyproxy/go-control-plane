@@ -278,6 +278,7 @@ type HttpConnectionManager struct {
 	// more information.
 	StatPrefix string `protobuf:"bytes,2,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to RouteSpecifier:
+	//
 	//	*HttpConnectionManager_Rds
 	//	*HttpConnectionManager_RouteConfig
 	//	*HttpConnectionManager_ScopedRoutes
@@ -396,14 +397,16 @@ type HttpConnectionManager struct {
 	// The default timeout is 1000 ms if this option is not specified.
 	//
 	// .. NOTE::
-	//    To be useful in avoiding the race condition described above, this timeout must be set
-	//    to *at least* <max round trip time expected between clients and Envoy>+<100ms to account for
-	//    a reasonable "worst" case processing time for a full iteration of Envoy's event loop>.
+	//
+	//	To be useful in avoiding the race condition described above, this timeout must be set
+	//	to *at least* <max round trip time expected between clients and Envoy>+<100ms to account for
+	//	a reasonable "worst" case processing time for a full iteration of Envoy's event loop>.
 	//
 	// .. WARNING::
-	//    A value of 0 will completely disable delayed close processing. When disabled, the downstream
-	//    connection's socket will be closed immediately after the write flush is completed or will
-	//    never close if the write flush does not complete.
+	//
+	//	A value of 0 will completely disable delayed close processing. When disabled, the downstream
+	//	connection's socket will be closed immediately after the write flush is completed or will
+	//	never close if the write flush does not complete.
 	DelayedCloseTimeout *duration.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
 	// Configuration for :ref:`HTTP access logs <arch_overview_access_logs>`
 	// emitted by the connection manager.
@@ -946,6 +949,7 @@ type ScopedRoutes struct {
 	// ScopedRouteConfiguration messages.
 	RdsConfigSource *core.ConfigSource `protobuf:"bytes,3,opt,name=rds_config_source,json=rdsConfigSource,proto3" json:"rds_config_source,omitempty"`
 	// Types that are assignable to ConfigSpecifier:
+	//
 	//	*ScopedRoutes_ScopedRouteConfigurationsList
 	//	*ScopedRoutes_ScopedRds
 	ConfigSpecifier isScopedRoutes_ConfigSpecifier `protobuf_oneof:"config_specifier"`
@@ -1111,6 +1115,7 @@ type HttpFilter struct {
 	// filters for further documentation.
 	//
 	// Types that are assignable to ConfigType:
+	//
 	//	*HttpFilter_Config
 	//	*HttpFilter_TypedConfig
 	ConfigType isHttpFilter_ConfigType `protobuf_oneof:"config_type"`
@@ -1253,7 +1258,8 @@ type HttpConnectionManager_Tracing struct {
 	// specified on the parent listener, then it is used instead of this field.
 	//
 	// .. attention::
-	//  This field has been deprecated in favor of `traffic_direction`.
+	//
+	//	This field has been deprecated in favor of `traffic_direction`.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto.
 	OperationName HttpConnectionManager_Tracing_OperationName `protobuf:"varint,1,opt,name=operation_name,json=operationName,proto3,enum=envoy.config.filter.network.http_connection_manager.v2.HttpConnectionManager_Tracing_OperationName" json:"operation_name,omitempty"`
@@ -1262,8 +1268,9 @@ type HttpConnectionManager_Tracing struct {
 	// created if the specified header name is present in the request's headers.
 	//
 	// .. attention::
-	//  This field has been deprecated in favor of :ref:`custom_tags
-	//  <envoy_api_field_config.filter.network.http_connection_manager.v2.HttpConnectionManager.tracing.custom_tags>`.
+	//
+	//	This field has been deprecated in favor of :ref:`custom_tags
+	//	<envoy_api_field_config.filter.network.http_connection_manager.v2.HttpConnectionManager.tracing.custom_tags>`.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/filter/network/http_connection_manager/v2/http_connection_manager.proto.
 	RequestHeadersForTags []string `protobuf:"bytes,2,rep,name=request_headers_for_tags,json=requestHeadersForTags,proto3" json:"request_headers_for_tags,omitempty"`
@@ -1302,12 +1309,13 @@ type HttpConnectionManager_Tracing struct {
 	// If not specified, no tracing will be performed.
 	//
 	// .. attention::
-	//   Please be aware that *envoy.tracers.opencensus* provider can only be configured once
-	//   in Envoy lifetime.
-	//   Any attempts to reconfigure it or to use different configurations for different HCM filters
-	//   will be rejected.
-	//   Such a constraint is inherent to OpenCensus itself. It cannot be overcome without changes
-	//   on OpenCensus side.
+	//
+	//	Please be aware that *envoy.tracers.opencensus* provider can only be configured once
+	//	in Envoy lifetime.
+	//	Any attempts to reconfigure it or to use different configurations for different HCM filters
+	//	will be rejected.
+	//	Such a constraint is inherent to OpenCensus itself. It cannot be overcome without changes
+	//	on OpenCensus side.
 	Provider *v23.Tracing_Http `protobuf:"bytes,9,opt,name=provider,proto3" json:"provider,omitempty"`
 }
 
@@ -1553,13 +1561,14 @@ func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetUri() bool {
 //
 // .. warning::
 //
-//    The current implementation of upgrade headers does not handle
-//    multi-valued upgrade headers. Support for multi-valued headers may be
-//    added in the future if needed.
+//	The current implementation of upgrade headers does not handle
+//	multi-valued upgrade headers. Support for multi-valued headers may be
+//	added in the future if needed.
 //
 // .. warning::
-//    The current implementation of upgrade headers does not work with HTTP/2
-//    upstreams.
+//
+//	The current implementation of upgrade headers does not work with HTTP/2
+//	upstreams.
 type HttpConnectionManager_UpgradeConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1700,6 +1709,7 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Type:
+	//
 	//	*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_
 	Type isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_Type `protobuf_oneof:"type"`
 }
@@ -1767,18 +1777,18 @@ func (*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_) isSco
 //
 // .. code::
 //
-//              <0> <1>   <-- index
-//    X-Header: a=b;c=d
-//    |         || |
-//    |         || \----> <element_separator>
-//    |         ||
-//    |         |\----> <element.separator>
-//    |         |
-//    |         \----> <element.key>
-//    |
-//    \----> <name>
+//	          <0> <1>   <-- index
+//	X-Header: a=b;c=d
+//	|         || |
+//	|         || \----> <element_separator>
+//	|         ||
+//	|         |\----> <element.separator>
+//	|         |
+//	|         \----> <element.key>
+//	|
+//	\----> <name>
 //
-//    Each 'a=b' key-value pair constitutes an 'element' of the header field.
+//	Each 'a=b' key-value pair constitutes an 'element' of the header field.
 type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1788,7 +1798,7 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	//
 	// .. note::
 	//
-	//   If the header appears multiple times only the first value is used.
+	//	If the header appears multiple times only the first value is used.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The element separator (e.g., ';' separates 'a;b;c;d').
 	// Default: empty string. This causes the entirety of the header field to be extracted.
@@ -1796,6 +1806,7 @@ type ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor struct {
 	// must be set to 0.
 	ElementSeparator string `protobuf:"bytes,2,opt,name=element_separator,json=elementSeparator,proto3" json:"element_separator,omitempty"`
 	// Types that are assignable to ExtractType:
+	//
 	//	*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Index
 	//	*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Element
 	ExtractType isScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_ExtractType `protobuf_oneof:"extract_type"`

@@ -81,6 +81,7 @@ type StreamAccessLogsMessage struct {
 	// ever include one type of log entry.
 	//
 	// Types that are assignable to LogEntries:
+	//
 	//	*StreamAccessLogsMessage_HttpLogs
 	//	*StreamAccessLogsMessage_TcpLogs
 	LogEntries isStreamAccessLogsMessage_LogEntries `protobuf_oneof:"log_entries"`

@@ -80,6 +80,7 @@ type StatefulSessionPerRoute struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Override:
+	//
 	//	*StatefulSessionPerRoute_Disabled
 	//	*StatefulSessionPerRoute_StatefulSession
 	Override isStatefulSessionPerRoute_Override `protobuf_oneof:"override"`

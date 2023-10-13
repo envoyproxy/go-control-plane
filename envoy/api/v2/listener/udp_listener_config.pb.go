@@ -36,6 +36,7 @@ type UdpListenerConfig struct {
 	// "raw_udp_listener", config is not needed.
 	//
 	// Types that are assignable to ConfigType:
+	//
 	//	*UdpListenerConfig_Config
 	//	*UdpListenerConfig_TypedConfig
 	ConfigType isUdpListenerConfig_ConfigType `protobuf_oneof:"config_type"`

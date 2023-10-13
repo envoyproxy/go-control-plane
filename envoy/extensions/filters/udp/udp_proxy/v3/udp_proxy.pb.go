@@ -40,6 +40,7 @@ type UdpProxyConfig struct {
 	// The stat prefix used when emitting UDP proxy filter stats.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to RouteSpecifier:
+	//
 	//	*UdpProxyConfig_Cluster
 	//	*UdpProxyConfig_Matcher
 	RouteSpecifier isUdpProxyConfig_RouteSpecifier `protobuf_oneof:"route_specifier"`
@@ -47,7 +48,7 @@ type UdpProxyConfig struct {
 	// the session. The default if not specified is 1 minute.
 	IdleTimeout *duration.Duration `protobuf:"bytes,3,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// Use the remote downstream IP address as the sender IP address when sending packets to upstream hosts.
-	// This option requires Envoy to be run with the ``CAP_NET_ADMIN`` capability on Linux.
+	// This option requires Envoy to be run with the “CAP_NET_ADMIN“ capability on Linux.
 	// And the IPv6 stack must be enabled on Linux kernel.
 	// This option does not preserve the remote downstream port.
 	// If this option is enabled, the IP address of sent datagrams will be changed to the remote downstream IP address.
@@ -242,6 +243,7 @@ type UdpProxyConfig_HashPolicy struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to PolicySpecifier:
+	//
 	//	*UdpProxyConfig_HashPolicy_SourceIp
 	//	*UdpProxyConfig_HashPolicy_Key
 	PolicySpecifier isUdpProxyConfig_HashPolicy_PolicySpecifier `protobuf_oneof:"policy_specifier"`
@@ -331,6 +333,7 @@ type UdpProxyConfig_SessionFilter struct {
 	// The name of the filter configuration.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Types that are assignable to ConfigType:
+	//
 	//	*UdpProxyConfig_SessionFilter_TypedConfig
 	ConfigType isUdpProxyConfig_SessionFilter_ConfigType `protobuf_oneof:"config_type"`
 }
@@ -415,13 +418,12 @@ type UdpProxyConfig_UdpTunnelingConfig struct {
 	//
 	// .. code-block:: yaml
 	//
-	//    tunneling_config:
-	//      proxy_host: "%FILTER_STATE(proxy.host.key:PLAIN)%"
-	//
+	//	tunneling_config:
+	//	  proxy_host: "%FILTER_STATE(proxy.host.key:PLAIN)%"
 	ProxyHost string `protobuf:"bytes,1,opt,name=proxy_host,json=proxyHost,proto3" json:"proxy_host,omitempty"`
 	// Optional port value to add to the HTTP request URI.
 	// This value can be overridden per-session by setting the required port value for
-	// the filter state key ``udp.connect.proxy_port``.
+	// the filter state key “udp.connect.proxy_port“.
 	ProxyPort *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=proxy_port,json=proxyPort,proto3" json:"proxy_port,omitempty"`
 	// The target host to send in the synthesized CONNECT headers to the upstream proxy.
 	// This field evaluates command operators if set, otherwise returns hostname as is.
@@ -430,29 +432,28 @@ type UdpProxyConfig_UdpTunnelingConfig struct {
 	//
 	// .. code-block:: yaml
 	//
-	//    tunneling_config:
-	//      target_host: "%FILTER_STATE(target.host.key:PLAIN)%"
-	//
+	//	tunneling_config:
+	//	  target_host: "%FILTER_STATE(target.host.key:PLAIN)%"
 	TargetHost string `protobuf:"bytes,3,opt,name=target_host,json=targetHost,proto3" json:"target_host,omitempty"`
 	// The default target port to send in the CONNECT headers to the upstream proxy.
 	// This value can be overridden per-session by setting the required port value for
-	// the filter state key ``udp.connect.target_port``.
+	// the filter state key “udp.connect.target_port“.
 	DefaultTargetPort uint32 `protobuf:"varint,4,opt,name=default_target_port,json=defaultTargetPort,proto3" json:"default_target_port,omitempty"`
 	// Use POST method instead of CONNECT method to tunnel the UDP stream.
 	//
 	// .. note::
-	//   If use_post is set, the upstream stream does not comply with the connect-udp RFC, and
-	//   instead it will be a POST request. the path used in the headers will be set from the
-	//   post_path field, and the headers will not contain the target host and target port, as
-	//   required by the connect-udp protocol. This flag should be used carefully.
 	//
+	//	If use_post is set, the upstream stream does not comply with the connect-udp RFC, and
+	//	instead it will be a POST request. the path used in the headers will be set from the
+	//	post_path field, and the headers will not contain the target host and target port, as
+	//	required by the connect-udp protocol. This flag should be used carefully.
 	UsePost bool `protobuf:"varint,5,opt,name=use_post,json=usePost,proto3" json:"use_post,omitempty"`
-	// The path used with POST method. Default path is ``/``. If post path is specified and
+	// The path used with POST method. Default path is “/“. If post path is specified and
 	// use_post field isn't true, it will be rejected.
 	PostPath string `protobuf:"bytes,6,opt,name=post_path,json=postPath,proto3" json:"post_path,omitempty"`
 	// Optional retry options, in case connecting to the upstream failed.
 	RetryOptions *UdpProxyConfig_UdpTunnelingConfig_RetryOptions `protobuf:"bytes,7,opt,name=retry_options,json=retryOptions,proto3" json:"retry_options,omitempty"`
-	// Additional request headers to upstream proxy. Neither ``:-prefixed`` pseudo-headers
+	// Additional request headers to upstream proxy. Neither “:-prefixed“ pseudo-headers
 	// nor the Host: header can be overridden. Values of the added headers evaluates command
 	// operators if they are set in the value template.
 	//
@@ -460,17 +461,16 @@ type UdpProxyConfig_UdpTunnelingConfig struct {
 	//
 	// .. code-block:: yaml
 	//
-	//    headers_to_add:
-	//    - header:
-	//        key: original_dst_port
-	//        value: "%DOWNSTREAM_LOCAL_PORT%"
-	//
+	//	headers_to_add:
+	//	- header:
+	//	    key: original_dst_port
+	//	    value: "%DOWNSTREAM_LOCAL_PORT%"
 	HeadersToAdd []*v3.HeaderValueOption `protobuf:"bytes,8,rep,name=headers_to_add,json=headersToAdd,proto3" json:"headers_to_add,omitempty"`
 	// If configured, the filter will buffer datagrams in case that it is waiting for the upstream to be
 	// ready, whether if it is during the connection process or due to upstream buffer watermarks.
 	// If this field is not configured, there will be no buffering and downstream datagrams that arrive
 	// while the upstream is not ready will be dropped. In case this field is set but the options
-	// are not configured, the default values will be applied as described in the ``BufferOptions``.
+	// are not configured, the default values will be applied as described in the “BufferOptions“.
 	BufferOptions *UdpProxyConfig_UdpTunnelingConfig_BufferOptions `protobuf:"bytes,9,opt,name=buffer_options,json=bufferOptions,proto3" json:"buffer_options,omitempty"`
 }
 

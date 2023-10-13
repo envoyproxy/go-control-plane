@@ -37,7 +37,7 @@ type RateLimit struct {
 	//
 	// .. note::
 	//
-	//  The filter supports a range of 0 - 10 inclusively for stage numbers.
+	//	The filter supports a range of 0 - 10 inclusively for stage numbers.
 	Stage uint32 `protobuf:"varint,2,opt,name=stage,proto3" json:"stage,omitempty"`
 	// The type of requests the filter should apply to. The supported
 	// types are *internal*, *external* or *both*. A request is considered internal if

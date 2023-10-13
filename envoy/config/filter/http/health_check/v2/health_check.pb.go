@@ -43,12 +43,12 @@ type HealthCheck struct {
 	//
 	// .. note::
 	//
-	//    This value is interpreted as an integer by truncating, so 12.50% will be calculated
-	//    as if it were 12%.
+	//	This value is interpreted as an integer by truncating, so 12.50% will be calculated
+	//	as if it were 12%.
 	ClusterMinHealthyPercentages map[string]*_type.Percent `protobuf:"bytes,4,rep,name=cluster_min_healthy_percentages,json=clusterMinHealthyPercentages,proto3" json:"cluster_min_healthy_percentages,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Specifies a set of health check request headers to match on. The health check filter will
 	// check a request’s headers against all the specified headers. To specify the health check
-	// endpoint, set the ``:path`` header to match on.
+	// endpoint, set the “:path“ header to match on.
 	Headers []*route.HeaderMatcher `protobuf:"bytes,5,rep,name=headers,proto3" json:"headers,omitempty"`
 }
 

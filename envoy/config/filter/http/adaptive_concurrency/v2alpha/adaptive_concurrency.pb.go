@@ -97,6 +97,7 @@ type AdaptiveConcurrency struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to ConcurrencyControllerConfig:
+	//
 	//	*AdaptiveConcurrency_GradientControllerConfig
 	ConcurrencyControllerConfig isAdaptiveConcurrency_ConcurrencyControllerConfig `protobuf_oneof:"concurrency_controller_config"`
 	// If set to false, the adaptive concurrency filter will operate as a pass-through filter. If the

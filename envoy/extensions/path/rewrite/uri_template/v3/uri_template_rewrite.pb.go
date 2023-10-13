@@ -37,30 +37,30 @@ const (
 //
 // Template pattern matching types:
 //
-// * ``*`` : Matches a single path component, up to the next path separator: /
+// * “*“ : Matches a single path component, up to the next path separator: /
 //
-// * ``**`` : Matches zero or more path segments. If present, must be the last operator.
+// * “**“ : Matches zero or more path segments. If present, must be the last operator.
 //
-// * ``{name} or {name=*}`` :  A named variable matching one path segment up to the next path separator: /.
+// * “{name} or {name=*}“ :  A named variable matching one path segment up to the next path separator: /.
 //
-// * ``{name=videos/*}`` : A named variable matching more than one path segment.
-//      The path component matching videos/* is captured as the named variable.
+//   - “{name=videos/*}“ : A named variable matching more than one path segment.
+//     The path component matching videos/* is captured as the named variable.
 //
-// * ``{name=**}`` : A named variable matching zero or more path segments.
+// * “{name=**}“ : A named variable matching zero or more path segments.
 //
 // Only named matches can be used to perform rewrites.
 //
 // Examples using path_template_rewrite:
 //
-// * The pattern ``/{one}/{two}`` paired with a substitution string of ``/{two}/{one}`` would
-//   transform ``/cat/dog`` into ``/dog/cat``.
+//   - The pattern “/{one}/{two}“ paired with a substitution string of “/{two}/{one}“ would
+//     transform “/cat/dog“ into “/dog/cat“.
 //
-// * The pattern ``/videos/{language=lang/*}/*`` paired with a substitution string of
-//   ``/{language}`` would transform ``/videos/lang/en/video.m4s`` into ``lang/en``.
+//   - The pattern “/videos/{language=lang/*}/*“ paired with a substitution string of
+//     “/{language}“ would transform “/videos/lang/en/video.m4s“ into “lang/en“.
 //
-// * The path pattern ``/content/{format}/{lang}/{id}/{file}.vtt`` paired with a substitution
-//   string of ``/{lang}/{format}/{file}.vtt`` would transform ``/content/hls/en-us/12345/en_193913.vtt``
-//   into ``/en-us/hls/en_193913.vtt``.
+//   - The path pattern “/content/{format}/{lang}/{id}/{file}.vtt“ paired with a substitution
+//     string of “/{lang}/{format}/{file}.vtt“ would transform “/content/hls/en-us/12345/en_193913.vtt“
+//     into “/en-us/hls/en_193913.vtt“.
 type UriTemplateRewriteConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

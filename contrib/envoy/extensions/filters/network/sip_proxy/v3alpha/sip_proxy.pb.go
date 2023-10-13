@@ -37,7 +37,7 @@ type SipProxy struct {
 	// A list of individual Sip filters that make up the filter chain for requests made to the
 	// Sip proxy. Order matters as the filters are processed sequentially. For backwards
 	// compatibility, if no sip_filters are specified, a default Sip router filter
-	// (``envoy.filters.sip.router``) is used.
+	// (“envoy.filters.sip.router“) is used.
 	// [#extension-category: envoy.sip_proxy.filters]
 	SipFilters []*SipFilter          `protobuf:"bytes,3,rep,name=sip_filters,json=sipFilters,proto3" json:"sip_filters,omitempty"`
 	Settings   *SipProxy_SipSettings `protobuf:"bytes,4,opt,name=settings,proto3" json:"settings,omitempty"`
@@ -111,12 +111,12 @@ type SipFilter struct {
 
 	// The name of the filter to instantiate. The name must match a supported
 	// filter. The built-in filters are:
-	//
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Filter specific configuration which depends on the filter being instantiated. See the supported
 	// filters for further documentation.
 	//
 	// Types that are assignable to ConfigType:
+	//
 	//	*SipFilter_TypedConfig
 	ConfigType isSipFilter_ConfigType `protobuf_oneof:"config_type"`
 }
@@ -186,7 +186,7 @@ func (*SipFilter_TypedConfig) isSipFilter_ConfigType() {}
 
 // SipProtocolOptions specifies Sip upstream protocol options. This object is used in
 // :ref:`typed_extension_protocol_options<envoy_v3_api_field_config.cluster.v3.Cluster.typed_extension_protocol_options>`,
-// keyed by the name ``envoy.filters.network.sip_proxy``.
+// keyed by the name “envoy.filters.network.sip_proxy“.
 type SipProtocolOptions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -518,7 +518,7 @@ type SipProxy_SipSettings struct {
 
 	// transaction timeout timer [Timer B] unit is milliseconds, default value 64*T1.
 	//
-	// Session Initiation Protocol (SIP) timer summary
+	// # Session Initiation Protocol (SIP) timer summary
 	//
 	// +---------+-------------------------+----------+------------------------------------------------------------------------------+
 	// | Timer   | Default value           | Section  | Meaning                                                                      |

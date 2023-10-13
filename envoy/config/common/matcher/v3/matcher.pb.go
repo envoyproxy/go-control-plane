@@ -32,13 +32,15 @@ const (
 // might repeat several times until the final OnMatch (or no match) is decided.
 //
 // .. note::
-//   Please use the syntactically equivalent :ref:`matching API <envoy_v3_api_msg_.xds.type.matcher.v3.Matcher>`
+//
+//	Please use the syntactically equivalent :ref:`matching API <envoy_v3_api_msg_.xds.type.matcher.v3.Matcher>`
 type Matcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to MatcherType:
+	//
 	//	*Matcher_MatcherList_
 	//	*Matcher_MatcherTree_
 	MatcherType isMatcher_MatcherType `protobuf_oneof:"matcher_type"`
@@ -136,6 +138,7 @@ type MatchPredicate struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Rule:
+	//
 	//	*MatchPredicate_OrMatch
 	//	*MatchPredicate_AndMatch
 	//	*MatchPredicate_NotMatch
@@ -390,9 +393,9 @@ func (x *HttpHeadersMatch) GetHeaders() []*v3.HeaderMatcher {
 //
 // .. attention::
 //
-//   Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
-//   If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
-//   to scan only part of the http body.
+//	Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
+//	If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
+//	to scan only part of the http body.
 type HttpGenericBodyMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -457,6 +460,7 @@ type Matcher_OnMatch struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to OnMatch:
+	//
 	//	*Matcher_OnMatch_Matcher
 	//	*Matcher_OnMatch_Action
 	OnMatch isMatcher_OnMatch_OnMatch `protobuf_oneof:"on_match"`
@@ -600,6 +604,7 @@ type Matcher_MatcherTree struct {
 	// the corresponding OnMatch is used.
 	//
 	// Types that are assignable to TreeType:
+	//
 	//	*Matcher_MatcherTree_ExactMatchMap
 	//	*Matcher_MatcherTree_PrefixMatchMap
 	//	*Matcher_MatcherTree_CustomMatch
@@ -704,6 +709,7 @@ type Matcher_MatcherList_Predicate struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to MatchType:
+	//
 	//	*Matcher_MatcherList_Predicate_SinglePredicate_
 	//	*Matcher_MatcherList_Predicate_OrMatcher
 	//	*Matcher_MatcherList_Predicate_AndMatcher
@@ -878,6 +884,7 @@ type Matcher_MatcherList_Predicate_SinglePredicate struct {
 	// [#extension-category: envoy.matching.common_inputs]
 	Input *v31.TypedExtensionConfig `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
 	// Types that are assignable to Matcher:
+	//
 	//	*Matcher_MatcherList_Predicate_SinglePredicate_ValueMatch
 	//	*Matcher_MatcherList_Predicate_SinglePredicate_CustomMatch
 	Matcher isMatcher_MatcherList_Predicate_SinglePredicate_Matcher `protobuf_oneof:"matcher"`
@@ -1115,6 +1122,7 @@ type HttpGenericBodyMatch_GenericTextMatch struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Rule:
+	//
 	//	*HttpGenericBodyMatch_GenericTextMatch_StringMatch
 	//	*HttpGenericBodyMatch_GenericTextMatch_BinaryMatch
 	Rule isHttpGenericBodyMatch_GenericTextMatch_Rule `protobuf_oneof:"rule"`

@@ -138,8 +138,8 @@ type TapConfig struct {
 	//
 	// .. note::
 	//
-	//   This field defaults to 100/:ref:`HUNDRED
-	//   <envoy_v3_api_enum_type.v3.FractionalPercent.DenominatorType>`.
+	//	This field defaults to 100/:ref:`HUNDRED
+	//	<envoy_v3_api_enum_type.v3.FractionalPercent.DenominatorType>`.
 	TapEnabled *v31.RuntimeFractionalPercent `protobuf:"bytes,3,opt,name=tap_enabled,json=tapEnabled,proto3" json:"tap_enabled,omitempty"`
 }
 
@@ -213,6 +213,7 @@ type MatchPredicate struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Rule:
+	//
 	//	*MatchPredicate_OrMatch
 	//	*MatchPredicate_AndMatch
 	//	*MatchPredicate_NotMatch
@@ -467,9 +468,9 @@ func (x *HttpHeadersMatch) GetHeaders() []*v32.HeaderMatcher {
 //
 // .. attention::
 //
-//   Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
-//   If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
-//   to scan only part of the http body.
+//	Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
+//	If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
+//	to scan only part of the http body.
 type HttpGenericBodyMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -625,6 +626,7 @@ type OutputSink struct {
 	// Sink output format.
 	Format OutputSink_Format `protobuf:"varint,1,opt,name=format,proto3,enum=envoy.config.tap.v3.OutputSink_Format" json:"format,omitempty"`
 	// Types that are assignable to OutputSinkType:
+	//
 	//	*OutputSink_StreamingAdmin
 	//	*OutputSink_FilePerTap
 	//	*OutputSink_StreamingGrpc
@@ -723,10 +725,10 @@ type OutputSink_StreamingAdmin struct {
 	//
 	// .. attention::
 	//
-	//   It is only allowed to specify the streaming admin output sink if the tap is being
-	//   configured from the :http:post:`/tap` admin endpoint. Thus, if an extension has
-	//   been configured to receive tap configuration from some other source (e.g., static
-	//   file, XDS, etc.) configuring the streaming admin output type will fail.
+	//	It is only allowed to specify the streaming admin output sink if the tap is being
+	//	configured from the :http:post:`/tap` admin endpoint. Thus, if an extension has
+	//	been configured to receive tap configuration from some other source (e.g., static
+	//	file, XDS, etc.) configuring the streaming admin output type will fail.
 	StreamingAdmin *StreamingAdminSink `protobuf:"bytes,2,opt,name=streaming_admin,json=streamingAdmin,proto3,oneof"`
 }
 
@@ -747,10 +749,10 @@ type OutputSink_BufferedAdmin struct {
 	//
 	// .. attention::
 	//
-	//   It is only allowed to specify the buffered admin output sink if the tap is being
-	//   configured from the :http:post:`/tap` admin endpoint. Thus, if an extension has
-	//   been configured to receive tap configuration from some other source (e.g., static
-	//   file, XDS, etc.) configuring the buffered admin output type will fail.
+	//	It is only allowed to specify the buffered admin output sink if the tap is being
+	//	configured from the :http:post:`/tap` admin endpoint. Thus, if an extension has
+	//	been configured to receive tap configuration from some other source (e.g., static
+	//	file, XDS, etc.) configuring the buffered admin output type will fail.
 	BufferedAdmin *BufferedAdminSink `protobuf:"bytes,5,opt,name=buffered_admin,json=bufferedAdmin,proto3,oneof"`
 }
 
@@ -811,7 +813,7 @@ func (*StreamingAdminSink) Descriptor() ([]byte, []int) {
 // BufferedAdminSink configures a tap output to collect traces without returning them until
 // one of multiple criteria are satisfied.
 // Similar to StreamingAdminSink, it is only allowed to specify the buffered admin output
-// sink if the tap is being configured from the ``/tap`` admin endpoint.
+// sink if the tap is being configured from the “/tap“ admin endpoint.
 type BufferedAdminSink struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1039,6 +1041,7 @@ type HttpGenericBodyMatch_GenericTextMatch struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Rule:
+	//
 	//	*HttpGenericBodyMatch_GenericTextMatch_StringMatch
 	//	*HttpGenericBodyMatch_GenericTextMatch_BinaryMatch
 	Rule isHttpGenericBodyMatch_GenericTextMatch_Rule `protobuf_oneof:"rule"`

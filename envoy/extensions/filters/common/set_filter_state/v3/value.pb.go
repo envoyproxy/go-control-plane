@@ -83,9 +83,11 @@ type FilterStateValue struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Key:
+	//
 	//	*FilterStateValue_ObjectKey
 	Key isFilterStateValue_Key `protobuf_oneof:"key"`
 	// Types that are assignable to Value:
+	//
 	//	*FilterStateValue_FormatString
 	Value isFilterStateValue_Value `protobuf_oneof:"value"`
 	// If marked as read-only, the filter state key value is locked, and cannot

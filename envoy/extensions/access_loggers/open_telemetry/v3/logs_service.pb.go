@@ -24,7 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Configuration for the built-in ``envoy.access_loggers.open_telemetry``
+// Configuration for the built-in “envoy.access_loggers.open_telemetry“
 // :ref:`AccessLog <envoy_v3_api_msg_config.accesslog.v3.AccessLog>`. This configuration will
 // populate `opentelemetry.proto.collector.v1.logs.ExportLogsServiceRequest.resource_logs <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/collector/logs/v1/logs_service.proto>`_.
 // In addition, the request start time is set in the dedicated field.
@@ -38,20 +38,20 @@ type OpenTelemetryAccessLogConfig struct {
 	// [#comment:TODO(itamarkam): add 'filter_state_objects_to_log' to logs.]
 	CommonConfig *v3.CommonGrpcAccessLogConfig `protobuf:"bytes,1,opt,name=common_config,json=commonConfig,proto3" json:"common_config,omitempty"`
 	// If specified, Envoy will not generate built-in resource labels
-	// like ``log_name``, ``zone_name``, ``cluster_name``, ``node_name``.
+	// like “log_name“, “zone_name“, “cluster_name“, “node_name“.
 	DisableBuiltinLabels bool `protobuf:"varint,5,opt,name=disable_builtin_labels,json=disableBuiltinLabels,proto3" json:"disable_builtin_labels,omitempty"`
 	// OpenTelemetry `Resource <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/logs/v1/logs.proto#L51>`_
 	// attributes are filled with Envoy node info.
-	// Example: ``resource_attributes { values { key: "region" value { string_value: "cn-north-7" } } }``.
+	// Example: “resource_attributes { values { key: "region" value { string_value: "cn-north-7" } } }“.
 	ResourceAttributes *v1.KeyValueList `protobuf:"bytes,4,opt,name=resource_attributes,json=resourceAttributes,proto3" json:"resource_attributes,omitempty"`
 	// OpenTelemetry `LogResource <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/logs/v1/logs.proto>`_
 	// fields, following `Envoy access logging formatting <https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage>`_.
 	//
 	// See 'body' in the LogResource proto for more details.
-	// Example: ``body { string_value: "%PROTOCOL%" }``.
+	// Example: “body { string_value: "%PROTOCOL%" }“.
 	Body *v1.AnyValue `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
 	// See 'attributes' in the LogResource proto for more details.
-	// Example: ``attributes { values { key: "user_agent" value { string_value: "%REQ(USER-AGENT)%" } } }``.
+	// Example: “attributes { values { key: "user_agent" value { string_value: "%REQ(USER-AGENT)%" } } }“.
 	Attributes *v1.KeyValueList `protobuf:"bytes,3,opt,name=attributes,proto3" json:"attributes,omitempty"`
 }
 

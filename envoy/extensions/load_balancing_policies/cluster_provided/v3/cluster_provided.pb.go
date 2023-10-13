@@ -26,8 +26,9 @@ const (
 // is created.
 //
 // .. note::
-//   Cluster provided load balancing policy could not be used as sub-policy of other hierarchical
-//   load balancing policies, such as subset load balancing policy.
+//
+//	Cluster provided load balancing policy could not be used as sub-policy of other hierarchical
+//	load balancing policies, such as subset load balancing policy.
 type ClusterProvided struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

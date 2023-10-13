@@ -30,6 +30,7 @@ type CommonExtensionConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to ConfigType:
+	//
 	//	*CommonExtensionConfig_AdminConfig
 	//	*CommonExtensionConfig_StaticConfig
 	ConfigType isCommonExtensionConfig_ConfigType `protobuf_oneof:"config_type"`

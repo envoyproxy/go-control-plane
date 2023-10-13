@@ -41,28 +41,28 @@ const (
 //
 // By implementing the protocol specified by the stream, the external server can choose:
 //
-// * Whether it receives the response message at all
-// * Whether it receives the message body at all, in separate chunks, or as a single buffer
-// * Whether subsequent HTTP requests are transmitted synchronously or whether they are
-//   sent asynchronously.
-// * To modify request or response trailers if they already exist
+//   - Whether it receives the response message at all
+//   - Whether it receives the message body at all, in separate chunks, or as a single buffer
+//   - Whether subsequent HTTP requests are transmitted synchronously or whether they are
+//     sent asynchronously.
+//   - To modify request or response trailers if they already exist
 //
 // The filter supports up to six different processing steps. Each is represented by
 // a gRPC stream message that is sent to the external processor. For each message, the
 // processor must send a matching response.
 //
-// * Request headers: Contains the headers from the original HTTP request.
-// * Request body: Delivered if they are present and sent in a single message if
-//   the BUFFERED or BUFFERED_PARTIAL mode is chosen, in multiple messages if the
-//   STREAMED mode is chosen, and not at all otherwise.
-// * Request trailers: Delivered if they are present and if the trailer mode is set
-//   to SEND.
-// * Response headers: Contains the headers from the HTTP response. Keep in mind
-//   that if the upstream system sends them before processing the request body that
-//   this message may arrive before the complete body.
-// * Response body: Sent according to the processing mode like the request body.
-// * Response trailers: Delivered according to the processing mode like the
-//   request trailers.
+//   - Request headers: Contains the headers from the original HTTP request.
+//   - Request body: Delivered if they are present and sent in a single message if
+//     the BUFFERED or BUFFERED_PARTIAL mode is chosen, in multiple messages if the
+//     STREAMED mode is chosen, and not at all otherwise.
+//   - Request trailers: Delivered if they are present and if the trailer mode is set
+//     to SEND.
+//   - Response headers: Contains the headers from the HTTP response. Keep in mind
+//     that if the upstream system sends them before processing the request body that
+//     this message may arrive before the complete body.
+//   - Response body: Sent according to the processing mode like the request body.
+//   - Response trailers: Delivered according to the processing mode like the
+//     request trailers.
 //
 // By default, the processor sends only the request and response headers messages.
 // This may be changed to include any of the six steps by changing the processing_mode
@@ -75,13 +75,13 @@ const (
 // All of this together allows a server to process the filter traffic in fairly
 // sophisticated ways. For example:
 //
-// * A server may choose to examine all or part of the HTTP message bodies depending
-//   on the content of the headers.
-// * A server may choose to immediately reject some messages based on their HTTP
-//   headers (or other dynamic metadata) and more carefully examine others.
-// * A server may asynchronously monitor traffic coming through the filter by inspecting
-//   headers, bodies, or both, and then decide to switch to a synchronous processing
-//   mode, either permanently or temporarily.
+//   - A server may choose to examine all or part of the HTTP message bodies depending
+//     on the content of the headers.
+//   - A server may choose to immediately reject some messages based on their HTTP
+//     headers (or other dynamic metadata) and more carefully examine others.
+//   - A server may asynchronously monitor traffic coming through the filter by inspecting
+//     headers, bodies, or both, and then decide to switch to a synchronous processing
+//     mode, either permanently or temporarily.
 //
 // The protocol itself is based on a bidirectional gRPC stream. Envoy will send the
 // server
@@ -160,24 +160,24 @@ type ExternalProcessor struct {
 	MutationRules *v31.HeaderMutationRules `protobuf:"bytes,9,opt,name=mutation_rules,json=mutationRules,proto3" json:"mutation_rules,omitempty"`
 	// Specify the upper bound of
 	// :ref:`override_message_timeout <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.override_message_timeout>`
-	// If not specified, by default it is 0, which will effectively disable the ``override_message_timeout`` API.
+	// If not specified, by default it is 0, which will effectively disable the “override_message_timeout“ API.
 	MaxMessageTimeout *duration.Duration `protobuf:"bytes,10,opt,name=max_message_timeout,json=maxMessageTimeout,proto3" json:"max_message_timeout,omitempty"`
 	// Prevents clearing the route-cache when the
 	// :ref:`clear_route_cache <envoy_v3_api_field_service.ext_proc.v3.CommonResponse.clear_route_cache>`
 	// field is set in an external processor response.
 	DisableClearRouteCache bool `protobuf:"varint,11,opt,name=disable_clear_route_cache,json=disableClearRouteCache,proto3" json:"disable_clear_route_cache,omitempty"`
-	// Allow headers matching the ``forward_rules`` to be forwarded to the external processing server.
+	// Allow headers matching the “forward_rules“ to be forwarded to the external processing server.
 	// If not set, all headers are forwarded to the external processing server.
 	ForwardRules *HeaderForwardingRules `protobuf:"bytes,12,opt,name=forward_rules,json=forwardRules,proto3" json:"forward_rules,omitempty"`
 	// Additional metadata to be added to the filter state for logging purposes. The metadata
 	// will be added to StreamInfo's filter state under the namespace corresponding to the
 	// ext_proc filter name.
 	FilterMetadata *_struct.Struct `protobuf:"bytes,13,opt,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty"`
-	// If ``allow_mode_override`` is set to true, the filter config :ref:`processing_mode
+	// If “allow_mode_override“ is set to true, the filter config :ref:`processing_mode
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
 	// can be overridden by the response message from the external processing server
 	// :ref:`mode_override <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>`.
-	// If not set, ``mode_override`` API in the response message will be ignored.
+	// If not set, “mode_override“ API in the response message will be ignored.
 	AllowModeOverride bool `protobuf:"varint,14,opt,name=allow_mode_override,json=allowModeOverride,proto3" json:"allow_mode_override,omitempty"`
 	// If set to true, ignore the
 	// :ref:`immediate_response <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.immediate_response>`
@@ -329,23 +329,23 @@ func (x *ExternalProcessor) GetDisableImmediateResponse() bool {
 //
 // This works as below:
 //
-//   1. If neither ``allowed_headers`` nor ``disallowed_headers`` is set, all headers are forwarded.
-//   2. If both ``allowed_headers`` and ``disallowed_headers`` are set, only headers in the
-//      ``allowed_headers`` but not in the ``disallowed_headers`` are forwarded.
-//   3. If ``allowed_headers`` is set, and ``disallowed_headers`` is not set, only headers in
-//      the ``allowed_headers`` are forwarded.
-//   4. If ``disallowed_headers`` is set, and ``allowed_headers`` is not set, all headers except
-//      headers in the ``disallowed_headers`` are forwarded.
+//  1. If neither “allowed_headers“ nor “disallowed_headers“ is set, all headers are forwarded.
+//  2. If both “allowed_headers“ and “disallowed_headers“ are set, only headers in the
+//     “allowed_headers“ but not in the “disallowed_headers“ are forwarded.
+//  3. If “allowed_headers“ is set, and “disallowed_headers“ is not set, only headers in
+//     the “allowed_headers“ are forwarded.
+//  4. If “disallowed_headers“ is set, and “allowed_headers“ is not set, all headers except
+//     headers in the “disallowed_headers“ are forwarded.
 type HeaderForwardingRules struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// If set, specifically allow any header in this list to be forwarded to the external
-	// processing server. This can be overridden by the below ``disallowed_headers``.
+	// processing server. This can be overridden by the below “disallowed_headers“.
 	AllowedHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
 	// If set, specifically disallow any header in this list to be forwarded to the external
-	// processing server. This overrides the above ``allowed_headers`` if a header matches both.
+	// processing server. This overrides the above “allowed_headers“ if a header matches both.
 	DisallowedHeaders *v32.ListStringMatcher `protobuf:"bytes,2,opt,name=disallowed_headers,json=disallowedHeaders,proto3" json:"disallowed_headers,omitempty"`
 }
 
@@ -403,6 +403,7 @@ type ExtProcPerRoute struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Override:
+	//
 	//	*ExtProcPerRoute_Disabled
 	//	*ExtProcPerRoute_Overrides
 	Override isExtProcPerRoute_Override `protobuf_oneof:"override"`
@@ -496,11 +497,11 @@ type ExtProcOverrides struct {
 	AsyncMode bool `protobuf:"varint,2,opt,name=async_mode,json=asyncMode,proto3" json:"async_mode,omitempty"`
 	// [#not-implemented-hide:]
 	// Set different optional attributes than the default setting of the
-	// ``request_attributes`` field.
+	// “request_attributes“ field.
 	RequestAttributes []string `protobuf:"bytes,3,rep,name=request_attributes,json=requestAttributes,proto3" json:"request_attributes,omitempty"`
 	// [#not-implemented-hide:]
 	// Set different optional properties than the default setting of the
-	// ``response_attributes`` field.
+	// “response_attributes“ field.
 	ResponseAttributes []string `protobuf:"bytes,4,rep,name=response_attributes,json=responseAttributes,proto3" json:"response_attributes,omitempty"`
 	// Set a different gRPC service for this route than the default.
 	GrpcService *v3.GrpcService `protobuf:"bytes,5,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`

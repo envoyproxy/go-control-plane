@@ -30,6 +30,7 @@ type GraphiteStatsdSink struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to StatsdSpecifier:
+	//
 	//	*GraphiteStatsdSink_Address
 	StatsdSpecifier isGraphiteStatsdSink_StatsdSpecifier `protobuf_oneof:"statsd_specifier"`
 	// Optional custom metric name prefix. See :ref:`StatsdSink's prefix field

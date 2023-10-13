@@ -34,6 +34,7 @@ type FileAccessLog struct {
 	// A path to a local file to which to write the access log entries.
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	// Types that are assignable to AccessLogFormat:
+	//
 	//	*FileAccessLog_Format
 	//	*FileAccessLog_JsonFormat
 	//	*FileAccessLog_TypedJsonFormat

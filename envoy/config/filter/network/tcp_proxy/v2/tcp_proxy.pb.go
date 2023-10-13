@@ -37,6 +37,7 @@ type TcpProxy struct {
 	// <config_network_filters_tcp_proxy_stats>`.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Types that are assignable to ClusterSpecifier:
+	//
 	//	*TcpProxy_Cluster
 	//	*TcpProxy_WeightedClusters
 	ClusterSpecifier isTcpProxy_ClusterSpecifier `protobuf_oneof:"cluster_specifier"`
@@ -50,8 +51,9 @@ type TcpProxy struct {
 	// to 0s, the timeout will be disabled.
 	//
 	// .. warning::
-	//   Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP
-	//   FIN packets, etc.
+	//
+	//	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP
+	//	FIN packets, etc.
 	IdleTimeout *duration.Duration `protobuf:"bytes,8,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// [#not-implemented-hide:] The idle timeout for connections managed by the TCP proxy
 	// filter. The idle timeout is defined as the period in which there is no

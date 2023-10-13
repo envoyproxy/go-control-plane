@@ -33,10 +33,10 @@ type LocalResponsePolicy struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Optional new local reply body text. It will be used
-	// in the ``%LOCAL_REPLY_BODY%`` command operator in the ``body_format``.
+	// in the “%LOCAL_REPLY_BODY%“ command operator in the “body_format“.
 	Body *v3.DataSource `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
-	// Optional body format to be used for this response. If ``body_format`` is  not
-	// provided, and ``body`` is, the contents of ``body`` will be used to populate
+	// Optional body format to be used for this response. If “body_format“ is  not
+	// provided, and “body“ is, the contents of “body“ will be used to populate
 	// the body of the local reply without formatting.
 	BodyFormat *v3.SubstitutionFormatString `protobuf:"bytes,2,opt,name=body_format,json=bodyFormat,proto3" json:"body_format,omitempty"`
 	// The new response status code if specified.

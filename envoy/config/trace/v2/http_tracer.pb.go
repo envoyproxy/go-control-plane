@@ -31,8 +31,8 @@ const (
 //
 // .. attention::
 //
-//   Use of this message type has been deprecated in favor of direct use of
-//   :ref:`Tracing.Http <envoy_api_msg_config.trace.v2.Tracing.Http>`.
+//	Use of this message type has been deprecated in favor of direct use of
+//	:ref:`Tracing.Http <envoy_api_msg_config.trace.v2.Tracing.Http>`.
 type Tracing struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -113,6 +113,7 @@ type Tracing_Http struct {
 	// - :ref:`AWS X-Ray <envoy_api_msg_config.trace.v2alpha.XRayConfig>`
 	//
 	// Types that are assignable to ConfigType:
+	//
 	//	*Tracing_Http_Config
 	//	*Tracing_Http_TypedConfig
 	ConfigType isTracing_Http_ConfigType `protobuf_oneof:"config_type"`

@@ -38,6 +38,7 @@ type GenericProxy struct {
 	// [#extension-category: envoy.generic_proxy.codecs]
 	CodecConfig *v3.TypedExtensionConfig `protobuf:"bytes,2,opt,name=codec_config,json=codecConfig,proto3" json:"codec_config,omitempty"`
 	// Types that are assignable to RouteSpecifier:
+	//
 	//	*GenericProxy_GenericRds
 	//	*GenericProxy_RouteConfig
 	RouteSpecifier isGenericProxy_RouteSpecifier `protobuf_oneof:"route_specifier"`

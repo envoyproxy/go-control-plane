@@ -41,10 +41,11 @@ type Ip struct {
 	// matcher. Names in the table below are concatenated to this prefix.
 	//
 	// .. csv-table::
-	//    :header: Name, Type, Description
-	//    :widths: 1, 1, 2
 	//
-	//    ip_parsing_failed, Counter, Total number of IP addresses the matcher was unable to parse
+	//	:header: Name, Type, Description
+	//	:widths: 1, 1, 2
+	//
+	//	ip_parsing_failed, Counter, Total number of IP addresses the matcher was unable to parse
 	StatPrefix string `protobuf:"bytes,2,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 }
 

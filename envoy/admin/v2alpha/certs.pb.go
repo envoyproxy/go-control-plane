@@ -232,6 +232,7 @@ type SubjectAlternateName struct {
 	// Subject Alternate Name.
 	//
 	// Types that are assignable to Name:
+	//
 	//	*SubjectAlternateName_Dns
 	//	*SubjectAlternateName_Uri
 	//	*SubjectAlternateName_IpAddress

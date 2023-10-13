@@ -31,13 +31,13 @@ const (
 	XRateLimitHeadersRFCVersion_OFF XRateLimitHeadersRFCVersion = 0
 	// Use `draft RFC Version 03 <https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html>`_ where 3 headers will be added:
 	//
-	// * ``X-RateLimit-Limit`` - indicates the request-quota associated to the
-	//   client in the current time-window followed by the description of the
-	//   quota policy. The value is returned by the maximum tokens of the token bucket.
-	// * ``X-RateLimit-Remaining`` - indicates the remaining requests in the
-	//   current time-window. The value is returned by the remaining tokens in the token bucket.
-	// * ``X-RateLimit-Reset`` - indicates the number of seconds until reset of
-	//   the current time-window. The value is returned by the remaining fill interval of the token bucket.
+	//   - “X-RateLimit-Limit“ - indicates the request-quota associated to the
+	//     client in the current time-window followed by the description of the
+	//     quota policy. The value is returned by the maximum tokens of the token bucket.
+	//   - “X-RateLimit-Remaining“ - indicates the remaining requests in the
+	//     current time-window. The value is returned by the remaining tokens in the token bucket.
+	//   - “X-RateLimit-Reset“ - indicates the number of seconds until reset of
+	//     the current time-window. The value is returned by the remaining fill interval of the token bucket.
 	XRateLimitHeadersRFCVersion_DRAFT_VERSION_03 XRateLimitHeadersRFCVersion = 1
 )
 
@@ -138,7 +138,7 @@ func (VhRateLimitsOptions) EnumDescriptor() ([]byte, []int) {
 //
 // .. code-block:: cpp
 //
-//   ["authenticated": "false"], ["remote_address": "10.0.0.1"]
+//	["authenticated": "false"], ["remote_address": "10.0.0.1"]
 //
 // What it does: Limits all unauthenticated traffic for the IP address 10.0.0.1. The
 // configuration supplies a default limit for the *remote_address* key. If there is a desire to
@@ -147,27 +147,27 @@ func (VhRateLimitsOptions) EnumDescriptor() ([]byte, []int) {
 //
 // .. code-block:: cpp
 //
-//   ["authenticated": "false"], ["path": "/foo/bar"]
+//	["authenticated": "false"], ["path": "/foo/bar"]
 //
 // What it does: Limits all unauthenticated traffic globally for a specific path (or prefix if
 // configured that way in the service).
 //
 // .. code-block:: cpp
 //
-//   ["authenticated": "false"], ["path": "/foo/bar"], ["remote_address": "10.0.0.1"]
+//	["authenticated": "false"], ["path": "/foo/bar"], ["remote_address": "10.0.0.1"]
 //
 // What it does: Limits unauthenticated traffic to a specific path for a specific IP address.
 // Like (1) we can raise/block specific IP addresses if we want with an override configuration.
 //
 // .. code-block:: cpp
 //
-//   ["authenticated": "true"], ["client_id": "foo"]
+//	["authenticated": "true"], ["client_id": "foo"]
 //
 // What it does: Limits all traffic for an authenticated client "foo"
 //
 // .. code-block:: cpp
 //
-//   ["authenticated": "true"], ["client_id": "foo"], ["path": "/foo/bar"]
+//	["authenticated": "true"], ["client_id": "foo"], ["path": "/foo/bar"]
 //
 // What it does: Limits traffic to a specific path for an authenticated client "foo"
 //

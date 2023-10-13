@@ -40,7 +40,7 @@ type RateLimit struct {
 	//
 	// .. note::
 	//
-	//  The filter supports a range of 0 - 10 inclusively for stage numbers.
+	//	The filter supports a range of 0 - 10 inclusively for stage numbers.
 	Stage uint32 `protobuf:"varint,2,opt,name=stage,proto3" json:"stage,omitempty"`
 	// The timeout in milliseconds for the rate limit service RPC. If not
 	// set, this defaults to 20ms.

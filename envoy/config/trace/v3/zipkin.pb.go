@@ -123,9 +123,9 @@ type ZipkinConfig struct {
 	//
 	// .. attention::
 	//
-	//   If this is set to true, then the
-	//   :ref:`start_child_span of router <envoy_v3_api_field_extensions.filters.http.router.v3.Router.start_child_span>`
-	//   SHOULD be set to true also to ensure the correctness of trace chain.
+	//	If this is set to true, then the
+	//	:ref:`start_child_span of router <envoy_v3_api_field_extensions.filters.http.router.v3.Router.start_child_span>`
+	//	SHOULD be set to true also to ensure the correctness of trace chain.
 	SplitSpansForRequest bool `protobuf:"varint,7,opt,name=split_spans_for_request,json=splitSpansForRequest,proto3" json:"split_spans_for_request,omitempty"`
 }
 

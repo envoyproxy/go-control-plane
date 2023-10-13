@@ -31,6 +31,7 @@ type FilterStateMatcher struct {
 	// The filter state key to retrieve the object.
 	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Types that are assignable to Matcher:
+	//
 	//	*FilterStateMatcher_StringMatch
 	Matcher isFilterStateMatcher_Matcher `protobuf_oneof:"matcher"`
 }

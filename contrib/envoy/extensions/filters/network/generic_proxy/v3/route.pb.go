@@ -35,18 +35,18 @@ type VirtualHost struct {
 	// the suffix or prefix form.
 	//
 	// Host search order:
-	//  1. Exact names: ``www.foo.com``.
-	//  2. Suffix wildcards: ``*.foo.com`` or ``*-bar.foo.com``.
-	//  3. Prefix wildcards: ``foo.*`` or ``foo-*``.
-	//  4. Special wildcard ``*`` matching any host and will be the default virtual host.
+	//  1. Exact names: “www.foo.com“.
+	//  2. Suffix wildcards: “*.foo.com“ or “*-bar.foo.com“.
+	//  3. Prefix wildcards: “foo.*“ or “foo-*“.
+	//  4. Special wildcard “*“ matching any host and will be the default virtual host.
 	//
 	// .. note::
 	//
-	//   The wildcard will not match the empty string.
-	//   e.g. ``*-bar.foo.com`` will match ``baz-bar.foo.com`` but not ``-bar.foo.com``.
-	//   The longest wildcards match first.
-	//   Only a single virtual host in the entire route configuration can match on ``*``. A domain
-	//   must be unique across all virtual hosts or the config will fail to load.
+	//	The wildcard will not match the empty string.
+	//	e.g. ``*-bar.foo.com`` will match ``baz-bar.foo.com`` but not ``-bar.foo.com``.
+	//	The longest wildcards match first.
+	//	Only a single virtual host in the entire route configuration can match on ``*``. A domain
+	//	must be unique across all virtual hosts or the config will fail to load.
 	Hosts []string `protobuf:"bytes,2,rep,name=hosts,proto3" json:"hosts,omitempty"`
 	// The match tree to use when resolving route actions for incoming requests.
 	Routes *v3.Matcher `protobuf:"bytes,3,opt,name=routes,proto3" json:"routes,omitempty"`
@@ -112,44 +112,44 @@ func (x *VirtualHost) GetRoutes() *v3.Matcher {
 //
 // .. code-block:: yaml
 //
-//   name: example
-//   routes:
-//     matcher_tree:
-//       input:
-//         name: request-service
-//         typed_config:
-//           "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.matcher.v3.ServiceMatchInput
-//       exact_match_map:
-//         map:
-//           service_name_0:
-//             matcher:
-//               matcher_list:
-//                 matchers:
-//                 - predicate:
-//                     and_matcher:
-//                       predicate:
-//                       - single_predicate:
-//                           input:
-//                             name: request-properties
-//                             typed_config:
-//                               "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.matcher.v3.PropertyMatchInput
-//                               property_name: version
-//                           value_match:
-//                             exact: v1
-//                       - single_predicate:
-//                           input:
-//                             name: request-properties
-//                             typed_config:
-//                               "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.matcher.v3.PropertyMatchInput
-//                               property_name: user
-//                           value_match:
-//                             exact: john
-//                   on_match:
-//                     action:
-//                       name: route
-//                       typed_config:
-//                         "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.action.v3.routeAction
-//                         cluster: cluster_0
+//	name: example
+//	routes:
+//	  matcher_tree:
+//	    input:
+//	      name: request-service
+//	      typed_config:
+//	        "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.matcher.v3.ServiceMatchInput
+//	    exact_match_map:
+//	      map:
+//	        service_name_0:
+//	          matcher:
+//	            matcher_list:
+//	              matchers:
+//	              - predicate:
+//	                  and_matcher:
+//	                    predicate:
+//	                    - single_predicate:
+//	                        input:
+//	                          name: request-properties
+//	                          typed_config:
+//	                            "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.matcher.v3.PropertyMatchInput
+//	                            property_name: version
+//	                        value_match:
+//	                          exact: v1
+//	                    - single_predicate:
+//	                        input:
+//	                          name: request-properties
+//	                          typed_config:
+//	                            "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.matcher.v3.PropertyMatchInput
+//	                            property_name: user
+//	                        value_match:
+//	                          exact: john
+//	                on_match:
+//	                  action:
+//	                    name: route
+//	                    typed_config:
+//	                      "@type": type.googleapis.com/envoy.extensions.filters.network.generic_proxy.action.v3.routeAction
+//	                      cluster: cluster_0
 type RouteConfiguration struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -159,9 +159,9 @@ type RouteConfiguration struct {
 	// envoy.extensions.filters.network.generic_proxy.v3.Rds.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The match tree to use when resolving route actions for incoming requests.
-	// If no any virtual host is configured in the ``virtual_hosts`` field or no special wildcard
-	// virtual host is configured, the ``routes`` field will be used as the default route table.
-	// If both the wildcard virtual host and ``routes`` are configured, the configuration will fail
+	// If no any virtual host is configured in the “virtual_hosts“ field or no special wildcard
+	// virtual host is configured, the “routes“ field will be used as the default route table.
+	// If both the wildcard virtual host and “routes“ are configured, the configuration will fail
 	// to load.
 	Routes *v3.Matcher `protobuf:"bytes,2,opt,name=routes,proto3" json:"routes,omitempty"`
 	// An array of virtual hosts that make up the route table.

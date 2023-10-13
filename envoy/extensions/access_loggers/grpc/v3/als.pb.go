@@ -26,7 +26,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Configuration for the built-in ``envoy.access_loggers.http_grpc``
+// Configuration for the built-in “envoy.access_loggers.http_grpc“
 // :ref:`AccessLog <envoy_v3_api_msg_config.accesslog.v3.AccessLog>`. This configuration will
 // populate :ref:`StreamAccessLogsMessage.http_logs
 // <envoy_v3_api_field_service.accesslog.v3.StreamAccessLogsMessage.http_logs>`.
@@ -108,8 +108,8 @@ func (x *HttpGrpcAccessLogConfig) GetAdditionalResponseTrailersToLog() []string 
 	return nil
 }
 
-// Configuration for the built-in ``envoy.access_loggers.tcp_grpc`` type. This configuration will
-// populate ``StreamAccessLogsMessage.tcp_logs``.
+// Configuration for the built-in “envoy.access_loggers.tcp_grpc“ type. This configuration will
+// populate “StreamAccessLogsMessage.tcp_logs“.
 // [#extension: envoy.access_loggers.tcp_grpc]
 type TcpGrpcAccessLogConfig struct {
 	state         protoimpl.MessageState
@@ -184,7 +184,7 @@ type CommonGrpcAccessLogConfig struct {
 	BufferSizeBytes *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=buffer_size_bytes,json=bufferSizeBytes,proto3" json:"buffer_size_bytes,omitempty"`
 	// Additional filter state objects to log in :ref:`filter_state_objects
 	// <envoy_v3_api_field_data.accesslog.v3.AccessLogCommon.filter_state_objects>`.
-	// Logger will call ``FilterState::Object::serializeAsProto`` to serialize the filter state object.
+	// Logger will call “FilterState::Object::serializeAsProto“ to serialize the filter state object.
 	FilterStateObjectsToLog []string `protobuf:"bytes,5,rep,name=filter_state_objects_to_log,json=filterStateObjectsToLog,proto3" json:"filter_state_objects_to_log,omitempty"`
 	// Sets the retry policy when the establishment of a gRPC stream fails.
 	// If the stream succeeds at least once in establishing itself,

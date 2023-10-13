@@ -31,13 +31,14 @@ type SinkConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to ProtocolSpecifier:
+	//
 	//	*SinkConfig_GrpcService
 	ProtocolSpecifier isSinkConfig_ProtocolSpecifier `protobuf_oneof:"protocol_specifier"`
 	// If set to true, counters will be emitted as deltas, and the OTLP message will have
-	// ``AGGREGATION_TEMPORALITY_DELTA`` set as AggregationTemporality.
+	// “AGGREGATION_TEMPORALITY_DELTA“ set as AggregationTemporality.
 	ReportCountersAsDeltas bool `protobuf:"varint,2,opt,name=report_counters_as_deltas,json=reportCountersAsDeltas,proto3" json:"report_counters_as_deltas,omitempty"`
 	// If set to true, histograms will be emitted as deltas, and the OTLP message will have
-	// ``AGGREGATION_TEMPORALITY_DELTA`` set as AggregationTemporality.
+	// “AGGREGATION_TEMPORALITY_DELTA“ set as AggregationTemporality.
 	ReportHistogramsAsDeltas bool `protobuf:"varint,3,opt,name=report_histograms_as_deltas,json=reportHistogramsAsDeltas,proto3" json:"report_histograms_as_deltas,omitempty"`
 	// If set to true, metrics will have their tags emitted as OTLP attributes, which may
 	// contain values used by the tag extractor or additional tags added during stats creation.

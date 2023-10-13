@@ -32,6 +32,7 @@ type StdoutAccessLog struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to AccessLogFormat:
+	//
 	//	*StdoutAccessLog_LogFormat
 	AccessLogFormat isStdoutAccessLog_AccessLogFormat `protobuf_oneof:"access_log_format"`
 }
@@ -103,6 +104,7 @@ type StderrAccessLog struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to AccessLogFormat:
+	//
 	//	*StderrAccessLog_LogFormat
 	AccessLogFormat isStderrAccessLog_AccessLogFormat `protobuf_oneof:"access_log_format"`
 }

@@ -23,19 +23,20 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Configuration to instantiate or select a singleton ``AsyncFileManager``.
+// Configuration to instantiate or select a singleton “AsyncFileManager“.
 type AsyncFileManagerConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	// An optional identifier for the manager. An empty string is a valid identifier
-	// for a common, default ``AsyncFileManager``.
+	// for a common, default “AsyncFileManager“.
 	//
 	// Reusing the same id with different configurations in the same envoy instance
 	// is an error.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Types that are assignable to ManagerType:
+	//
 	//	*AsyncFileManagerConfig_ThreadPool_
 	ManagerType isAsyncFileManagerConfig_ManagerType `protobuf_oneof:"manager_type"`
 }
