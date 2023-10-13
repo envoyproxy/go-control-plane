@@ -4497,6 +4497,17 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor) vali
 		errors = append(errors, err)
 	}
 
+	if !_ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Name_Pattern.MatchString(m.GetName()) {
+		err := ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractorValidationError{
+			field:  "Name",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	// no validation rules for ElementSeparator
 
 	switch v := m.ExtractType.(type) {
@@ -4649,6 +4660,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractorValidationError{}
+
+var _ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Name_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on
 // ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElement
