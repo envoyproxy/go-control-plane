@@ -130,7 +130,6 @@ type RouteConfiguration struct {
 	// :ref:`FilterConfig<envoy_v3_api_msg_config.route.v3.FilterConfig>`
 	// message to specify additional options.]
 	TypedPerFilterConfig map[string]*any1.Any `protobuf:"bytes,16,rep,name=typed_per_filter_config,json=typedPerFilterConfig,proto3" json:"typed_per_filter_config,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// [#not-implemented-hide:]
 	// The metadata field can be used to provide additional information
 	// about the route configuration. It can be used for configuration, stats, and logging.
 	// The metadata should go under the filter namespace that will need it.

@@ -479,7 +479,6 @@ type VirtualHost struct {
 	// It takes precedence over the route config mirror policy entirely.
 	// That is, policies are not merged, the most specific non-empty one becomes the mirror policies.
 	RequestMirrorPolicies []*RouteAction_RequestMirrorPolicy `protobuf:"bytes,22,rep,name=request_mirror_policies,json=requestMirrorPolicies,proto3" json:"request_mirror_policies,omitempty"`
-	// [#not-implemented-hide:]
 	// The metadata field can be used to provide additional information
 	// about the virtual host. It can be used for configuration, stats, and logging.
 	// The metadata should go under the filter namespace that will need it.
