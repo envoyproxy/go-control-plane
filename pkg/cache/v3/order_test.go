@@ -34,6 +34,14 @@ func TestOrderKeys(t *testing.T) {
 	}
 	expected := keys{
 		{
+			ID:      2,
+			TypeURL: resource.ClusterType,
+		},
+		{
+			ID:      1,
+			TypeURL: resource.EndpointType,
+		},
+		{
 			ID:      4,
 			TypeURL: resource.ListenerType,
 		},
@@ -44,14 +52,6 @@ func TestOrderKeys(t *testing.T) {
 		{
 			ID:      5,
 			TypeURL: resource.ScopedRouteType,
-		},
-		{
-			ID:      2,
-			TypeURL: resource.ClusterType,
-		},
-		{
-			ID:      1,
-			TypeURL: resource.EndpointType,
 		},
 	}
 
