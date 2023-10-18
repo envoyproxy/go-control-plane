@@ -2494,6 +2494,8 @@ func (m *HttpFilter) validate(all bool) error {
 
 	// no validation rules for IsOptional
 
+	// no validation rules for Disabled
+
 	switch v := m.ConfigType.(type) {
 	case *HttpFilter_TypedConfig:
 		if v == nil {
