@@ -241,8 +241,6 @@ type JsonToMetadata_Selector struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// TODO(kuochunghsu): Explore matchers for array handling.
-	//
 	// Types that are assignable to Selector:
 	//
 	//	*JsonToMetadata_Selector_Key
