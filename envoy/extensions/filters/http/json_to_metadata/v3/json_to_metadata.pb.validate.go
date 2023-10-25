@@ -57,17 +57,6 @@ func (m *JsonToMetadata) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetRequestRules() == nil {
-		err := JsonToMetadataValidationError{
-			field:  "RequestRules",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetRequestRules()).(type) {
 		case interface{ ValidateAll() error }:
@@ -91,6 +80,35 @@ func (m *JsonToMetadata) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return JsonToMetadataValidationError{
 				field:  "RequestRules",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetResponseRules()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, JsonToMetadataValidationError{
+					field:  "ResponseRules",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, JsonToMetadataValidationError{
+					field:  "ResponseRules",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetResponseRules()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return JsonToMetadataValidationError{
+				field:  "ResponseRules",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
