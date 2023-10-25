@@ -376,6 +376,8 @@ func (m *LocalRateLimit) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for RateLimitedAsResourceExhausted
+
 	if len(errors) > 0 {
 		return LocalRateLimitMultiError(errors)
 	}
