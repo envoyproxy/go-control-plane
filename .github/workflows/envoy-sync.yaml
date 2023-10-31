@@ -1,5 +1,8 @@
 name: Sync Envoy
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
 
@@ -7,44 +10,16 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
 
 jobs:
   sync:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: write
     if: |
       ${{
           !contains(github.actor, '[bot]')
           || github.actor == 'sync-envoy[bot]'
       }}
-    steps:
-    - id: appauth
-      uses: envoyproxy/toolshed/gh-actions/appauth@actions-v0.1.2
-      with:
-        key: ${{ secrets.ENVOY_CI_UPDATE_BOT_KEY }}
-        app_id: ${{ secrets.ENVOY_CI_UPDATE_APP_ID }}
-
-    # Checkout the repo
-    - name: 'Checkout Repository'
-      uses: actions/checkout@v4
-      with:
-        ref: main
-        fetch-depth: 0
-        token: ${{ steps.appauth.outputs.token }}
-
-    # Checkout the Envoy repo
-    - name: 'Checkout Repository'
-      uses: actions/checkout@v4
-      with:
-        repository: envoyproxy/envoy
-        ref: main
-        fetch-depth: 0
-        path: upstream
-
-    - run: mv upstream ../envoy
-    - run: ci/sync_envoy.sh
-      env:
-        ENVOY_SRC_DIR: ../envoy
+    uses: ./.github/workflows/_sync.yml
+    secrets:
+      app-id: ${{ secrets.ENVOY_CI_UPDATE_APP_ID }}
+      app-key: ${{ secrets.ENVOY_CI_UPDATE_BOT_KEY }}

@@ -1,0 +1,39 @@
+name: CI/sync
+
+on:
+  workflow_call:
+    secrets:
+      app-id:
+      app-key:
+    inputs:
+      sync:
+        type: boolean
+        default: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-22.04
+    steps:
+    - id: appauth
+      if: ${{ inputs.sync }}
+      uses: envoyproxy/toolshed/gh-actions/appauth@actions-v0.1.2
+      with:
+        key: ${{ secrets.app-key }}
+        app_id: ${{ secrets.app-id }}
+    - name: 'Checkout go-control-plane repository'
+      uses: actions/checkout@v4
+      with:
+        path: go-control-plane
+        fetch-depth: ${{ ! inputs.sync && 1 || 0 }}
+        token: ${{ steps.appauth.outputs.token || secrets.GITHUB_TOKEN }}
+    - name: 'Checkout Envoy repository'
+      uses: actions/checkout@v4
+      with:
+        repository: envoyproxy/envoy
+        fetch-depth: ${{ ! inputs.sync && 1 || 0 }}
+        path: envoy
+    - run: ci/sync_envoy.sh
+      env:
+        ENVOY_SRC_DIR: ../envoy
+        NO_COMMIT_CHANGES: ${{ ! inputs.sync && '1' || '' }}
+      working-directory: go-control-plane

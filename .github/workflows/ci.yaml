@@ -8,8 +8,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - name: build and test
         run: make docker_tests
+
+  sync:
+    uses: ./.github/workflows/_sync.yml
+    with:
+      sync: false

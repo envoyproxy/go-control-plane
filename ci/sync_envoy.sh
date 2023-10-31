@@ -73,4 +73,6 @@ commit_changes () {
 
 build_protos
 sync_protos
-commit_changes
+if [[ -z "$NO_COMMIT_CHANGES" ]]; then
+    commit_changes
+fi
