@@ -48,4 +48,3 @@ jobs:
     - run: ci/sync_envoy.sh
       env:
         ENVOY_SRC_DIR: ../envoy
-        NO_BUILD_SETUP: 1
