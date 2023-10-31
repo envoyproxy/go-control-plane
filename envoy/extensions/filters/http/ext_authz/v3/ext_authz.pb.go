@@ -78,7 +78,10 @@ type ExtAuthz struct {
 	// or cannot be reached. The default status is HTTP 403 Forbidden.
 	StatusOnError *v31.HttpStatus `protobuf:"bytes,7,opt,name=status_on_error,json=statusOnError,proto3" json:"status_on_error,omitempty"`
 	// Specifies a list of metadata namespaces whose values, if present, will be passed to the
-	// ext_authz service. :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>` is passed as an opaque “protobuf::Struct“.
+	// ext_authz service. The :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
+	// is passed as an opaque “protobuf::Struct“.
+	//
+	// Please note that this field exclusively applies to the gRPC ext_authz service and has no effect on the HTTP service.
 	//
 	// For example, if the “jwt_authn“ filter is used and :ref:`payload_in_metadata
 	// <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>` is set,
@@ -90,10 +93,13 @@ type ExtAuthz struct {
 	//	- envoy.filters.http.jwt_authn
 	MetadataContextNamespaces []string `protobuf:"bytes,8,rep,name=metadata_context_namespaces,json=metadataContextNamespaces,proto3" json:"metadata_context_namespaces,omitempty"`
 	// Specifies a list of metadata namespaces whose values, if present, will be passed to the
-	// ext_authz service. :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>` is passed as an “protobuf::Any“.
+	// ext_authz service. :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>`
+	// is passed as a “protobuf::Any“.
 	//
-	// It works in a way similar to “metadata_context_namespaces“ but allows envoy and external authz server to share the protobuf message definition
-	// in order to do a safe parsing.
+	// Please note that this field exclusively applies to the gRPC ext_authz service and has no effect on the HTTP service.
+	//
+	// It works in a way similar to “metadata_context_namespaces“ but allows Envoy and ext_authz server to share
+	// the protobuf message definition in order to do a safe parsing.
 	TypedMetadataContextNamespaces []string `protobuf:"bytes,16,rep,name=typed_metadata_context_namespaces,json=typedMetadataContextNamespaces,proto3" json:"typed_metadata_context_namespaces,omitempty"`
 	// Specifies if the filter is enabled.
 	//

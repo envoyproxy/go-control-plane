@@ -68,6 +68,8 @@ func (m *KafkaBroker) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for ForceResponseRewrite
+
 	if len(errors) > 0 {
 		return KafkaBrokerMultiError(errors)
 	}
