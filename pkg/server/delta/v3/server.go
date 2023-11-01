@@ -74,7 +74,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
 
-	var node = &core.Node{}
+	node := &core.Node{}
 
 	defer func() {
 		watches.Cancel()
@@ -100,7 +100,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), response)
 		}
 
-		return response.Nonce, str.Send(response)
+		return response.GetNonce(), str.Send(response)
 	}
 
 	// process a single delta response
@@ -184,18 +184,18 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			// The node information might only be set on the first incoming delta discovery request, so store it here so we can
 			// reset it on subsequent requests that omit it.
-			if req.Node != nil {
-				node = req.Node
+			if req.GetNode() != nil {
+				node = req.GetNode()
 			} else {
 				req.Node = node
 			}
 
 			// type URL is required for ADS but is implicit for any other xDS stream
 			if defaultTypeURL == resource.AnyType {
-				if req.TypeUrl == "" {
+				if req.GetTypeUrl() == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
 				}
-			} else if req.TypeUrl == "" {
+			} else if req.GetTypeUrl() == "" {
 				req.TypeUrl = defaultTypeURL
 			}
 

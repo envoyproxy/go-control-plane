@@ -155,7 +155,6 @@ func init() {
 
 	// Enable use of the pprof profiler
 	flag.BoolVar(&pprofEnabled, "pprof", false, "Enable use of the pprof profiler")
-
 }
 
 // main returns code 1 if any of the batches failed to pass all requests
@@ -186,7 +185,7 @@ func main() {
 	if mux {
 		configCache = &cache.MuxCache{
 			Classify: func(req *cache.Request) string {
-				if req.TypeUrl == typeURL {
+				if req.GetTypeUrl() == typeURL {
 					return "eds"
 				}
 				return "default"

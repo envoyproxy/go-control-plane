@@ -1,5 +1,12 @@
-run:
-  timeout: 10m
+issues:
+  fix: true
+  exclude-rules:
+    - linters:
+      - gosec
+      text: 'G101'
+      path: 'pkg/test/resource/v3/secret.go'
+  max-issues-per-linter: 0
+  max-same-issues: 0
 
 linters:
   presets:
@@ -7,7 +14,8 @@ linters:
 
   enable:
   - bodyclose
-  - gofmt
+  - errorlint
+  - gofumpt
   - goimports
   - gosec
   - misspell
@@ -30,5 +38,5 @@ linters-settings:
   exhaustive:
     default-signifies-exhaustive: true
 
-issues:
-  fix: true
+run:
+  timeout: 10m

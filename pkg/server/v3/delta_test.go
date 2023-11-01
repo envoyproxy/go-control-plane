@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
@@ -21,10 +22,10 @@ import (
 )
 
 func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state stream.StreamState, out chan cache.DeltaResponse) func() {
-	config.deltaCounts[req.TypeUrl] = config.deltaCounts[req.TypeUrl] + 1
+	config.deltaCounts[req.GetTypeUrl()] = config.deltaCounts[req.GetTypeUrl()] + 1
 
 	// This is duplicated from pkg/cache/v3/delta.go as private there
-	resourceMap := config.deltaResources[req.TypeUrl]
+	resourceMap := config.deltaResources[req.GetTypeUrl()]
 	versionMap := map[string]string{}
 	for name, resource := range resourceMap {
 		marshaledResource, _ := cache.MarshalResource(resource)
@@ -111,21 +112,21 @@ func (stream *mockDeltaStream) Context() context.Context {
 func (stream *mockDeltaStream) Send(resp *discovery.DeltaDiscoveryResponse) error {
 	// Check that nonce is incremented by one
 	stream.nonce = stream.nonce + 1
-	if resp.Nonce != fmt.Sprintf("%d", stream.nonce) {
-		stream.t.Errorf("Nonce => got %q, want %d", resp.Nonce, stream.nonce)
+	if resp.GetNonce() != fmt.Sprintf("%d", stream.nonce) {
+		stream.t.Errorf("Nonce => got %q, want %d", resp.GetNonce(), stream.nonce)
 	}
 	// Check that resources are non-empty
-	if len(resp.Resources) == 0 {
+	if len(resp.GetResources()) == 0 {
 		stream.t.Error("Resources => got none, want non-empty")
 	}
-	if resp.TypeUrl == "" {
+	if resp.GetTypeUrl() == "" {
 		stream.t.Error("TypeUrl => got none, want non-empty")
 	}
 
 	// Check that the per resource TypeURL is correctly set.
-	for _, res := range resp.Resources {
-		if res.Resource.TypeUrl != resp.TypeUrl {
-			stream.t.Errorf("TypeUrl => got %q, want %q", res.Resource.TypeUrl, resp.TypeUrl)
+	for _, res := range resp.GetResources() {
+		if res.GetResource().GetTypeUrl() != resp.GetTypeUrl() {
+			stream.t.Errorf("TypeUrl => got %q, want %q", res.GetResource().GetTypeUrl(), resp.GetTypeUrl())
 		}
 	}
 
@@ -159,29 +160,29 @@ func makeDeltaResources() map[string]map[string]types.Resource {
 			endpoint.GetClusterName(): endpoint,
 		},
 		rsrc.ClusterType: {
-			cluster.Name: cluster,
+			cluster.GetName(): cluster,
 		},
 		rsrc.RouteType: {
-			route.Name: route,
+			route.GetName(): route,
 		},
 		rsrc.ScopedRouteType: {
-			scopedRoute.Name: scopedRoute,
+			scopedRoute.GetName(): scopedRoute,
 		},
 		rsrc.VirtualHostType: {
-			virtualHost.Name: virtualHost,
+			virtualHost.GetName(): virtualHost,
 		},
 		rsrc.ListenerType: {
-			httpListener.Name:       httpListener,
-			httpScopedListener.Name: httpScopedListener,
+			httpListener.GetName():       httpListener,
+			httpScopedListener.GetName(): httpScopedListener,
 		},
 		rsrc.SecretType: {
-			secret.Name: secret,
+			secret.GetName(): secret,
 		},
 		rsrc.RuntimeType: {
-			runtime.Name: runtime,
+			runtime.GetName(): runtime,
 		},
 		rsrc.ExtensionConfigType: {
-			extensionConfig.Name: extensionConfig,
+			extensionConfig.GetName(): extensionConfig,
 		},
 		// Pass-through type (types without explicit handling)
 		opaqueType: {
@@ -231,7 +232,7 @@ func TestDeltaResponseHandlersWildcard(t *testing.T) {
 
 			go func() {
 				err := process(typ, resp, s)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}()
 
 			select {
@@ -264,7 +265,7 @@ func TestDeltaResponseHandlers(t *testing.T) {
 
 			go func() {
 				err := process(typ, resp, s)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}()
 
 			select {
@@ -297,7 +298,7 @@ func TestSendDeltaError(t *testing.T) {
 
 			// check that response fails since we expect an error to come through
 			err := s.DeltaAggregatedResources(resp)
-			assert.Error(t, err)
+			require.Error(t, err)
 
 			close(resp.recv)
 		})
@@ -350,7 +351,7 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	go func() {
 		err := s.DeltaAggregatedResources(resp)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	}()
 
 	count := 0
@@ -369,7 +370,8 @@ func TestDeltaAggregatedHandlers(t *testing.T) {
 						rsrc.ScopedRouteType: 1,
 						rsrc.VirtualHostType: 1,
 						rsrc.ListenerType:    1,
-						rsrc.SecretType:      1},
+						rsrc.SecretType:      1,
+					},
 					config.deltaCounts,
 				)
 				return
@@ -474,14 +476,14 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		t.Helper()
 		select {
 		case response := <-replies:
-			assert.Equal(t, rsrc.EndpointType, response.TypeUrl)
-			if assert.Equal(t, len(expectedResources), len(response.Resources)) {
+			assert.Equal(t, rsrc.EndpointType, response.GetTypeUrl())
+			if assert.Equal(t, len(expectedResources), len(response.GetResources())) {
 				var names []string
-				for _, resource := range response.Resources {
-					names = append(names, resource.Name)
+				for _, resource := range response.GetResources() {
+					names = append(names, resource.GetName())
 				}
 				assert.ElementsMatch(t, names, expectedResources)
-				assert.ElementsMatch(t, response.RemovedResources, expectedRemovedResources)
+				assert.ElementsMatch(t, response.GetRemovedResources(), expectedRemovedResources)
 			}
 		case <-time.After(1 * time.Second):
 			t.Fatalf("got no response")
@@ -501,7 +503,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 		go func() {
 			err := s.DeltaAggregatedResources(resp)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		}()
 
 		resp.recv <- &discovery.DeltaDiscoveryRequest{
@@ -530,7 +532,6 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 			ResourceNamesUnsubscribe: []string{"*"},
 		}
 		validateResponse(t, resp.sent, []string{"endpoints0"}, nil)
-
 	})
 
 	t.Run("* subscription/unsubscription support", func(t *testing.T) {
@@ -539,7 +540,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 		go func() {
 			err := s.DeltaAggregatedResources(resp)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		}()
 		updateResources(1234)
 
@@ -584,7 +585,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 		go func() {
 			err := s.DeltaAggregatedResources(resp)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 		}()
 
 		updateResources(1234)
@@ -614,5 +615,4 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		}
 		validateResponse(t, resp.sent, []string{"endpoints2"}, []string{"endpoints4"})
 	})
-
 }

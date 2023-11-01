@@ -65,10 +65,8 @@ const (
 	DeltaAds = "delta-ads"
 )
 
-var (
-	// RefreshDelay for the polling config source.
-	RefreshDelay = 500 * time.Millisecond
-)
+// RefreshDelay for the polling config source.
+var RefreshDelay = 500 * time.Millisecond
 
 // MakeEndpoint creates a localhost endpoint on a given port.
 func MakeEndpoint(clusterName string, port uint32) *endpoint.ClusterLoadAssignment {
@@ -155,7 +153,7 @@ func MakeScopedRouteConfig(scopedRouteName string, routeConfigurationName string
 				StringKey: key,
 			},
 		}
-		k.Fragments = append(k.Fragments, fragment)
+		k.Fragments = append(k.GetFragments(), fragment)
 	}
 
 	return &route.ScopedRouteConfiguration{
@@ -652,7 +650,7 @@ func (ts *TestSnapshot) generateTCPListeners(numListeners int, clusters []types.
 
 func (ts *TestSnapshot) addTLS(l *listener.Listener) {
 	if ts.TLS {
-		for i, chain := range l.FilterChains {
+		for i, chain := range l.GetFilterChains() {
 			tlsc := &auth.DownstreamTlsContext{
 				CommonTlsContext: &auth.CommonTlsContext{
 					TlsCertificateSdsSecretConfigs: []*auth.SdsSecretConfig{{
