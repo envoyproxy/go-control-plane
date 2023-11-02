@@ -184,7 +184,6 @@ type JwtProvider struct {
 	//	    aud: https://example.com
 	//	    exp: 1501281058
 	PayloadInMetadata string `protobuf:"bytes,9,opt,name=payload_in_metadata,json=payloadInMetadata,proto3" json:"payload_in_metadata,omitempty"`
-	// [#not-implemented-hide:]
 	// Normalizes the payload representation in the request metadata.
 	NormalizePayloadInMetadata *JwtProvider_NormalizePayload `protobuf:"bytes,18,opt,name=normalize_payload_in_metadata,json=normalizePayloadInMetadata,proto3" json:"normalize_payload_in_metadata,omitempty"`
 	// If not empty, similar to :ref:`payload_in_metadata <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtProvider.payload_in_metadata>`,
