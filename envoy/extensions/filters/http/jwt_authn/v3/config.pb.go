@@ -256,7 +256,6 @@ type JwtProvider struct {
 	//
 	// This header is only reserved for jwt claim; any other value will be overwritten.
 	ClaimToHeaders []*JwtClaimToHeader `protobuf:"bytes,15,rep,name=claim_to_headers,json=claimToHeaders,proto3" json:"claim_to_headers,omitempty"`
-	// [#not-implemented-hide:]
 	// Clears route cache in order to allow JWT token to correctly affect
 	// routing decisions. Filter clears all cached routes when:
 	//
