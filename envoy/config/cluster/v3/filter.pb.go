@@ -34,7 +34,7 @@ type Filter struct {
 	// Filter specific configuration which depends on the filter being
 	// instantiated. See the supported filters for further documentation.
 	// Note that Envoy's :ref:`downstream network
-	// filters <config_network_filters>` are not valid upstream filters.
+	// filters <config_network_filters>` are not valid upstream network filters.
 	// Only one of typed_config or config_discovery can be used.
 	TypedConfig *any1.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 	// Configuration source specifier for an extension configuration discovery
