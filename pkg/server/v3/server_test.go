@@ -97,7 +97,7 @@ func (stream *mockStream) Context() context.Context {
 
 func (stream *mockStream) Send(resp *discovery.DiscoveryResponse) error {
 	// check that nonce is monotonically incrementing
-	stream.nonce = stream.nonce + 1
+	stream.nonce++
 	assert.Equal(stream.t, resp.GetNonce(), fmt.Sprintf("%d", stream.nonce))
 	// check that version is set
 	assert.NotEmpty(stream.t, resp.GetVersionInfo())

@@ -111,7 +111,7 @@ func (stream *mockDeltaStream) Context() context.Context {
 
 func (stream *mockDeltaStream) Send(resp *discovery.DeltaDiscoveryResponse) error {
 	// Check that nonce is incremented by one
-	stream.nonce = stream.nonce + 1
+	stream.nonce++
 	if resp.GetNonce() != fmt.Sprintf("%d", stream.nonce) {
 		stream.t.Errorf("Nonce => got %q, want %d", resp.GetNonce(), stream.nonce)
 	}

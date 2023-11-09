@@ -94,7 +94,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			return "", err
 		}
 
-		streamNonce = streamNonce + 1
+		streamNonce++
 		response.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
 			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), response)
