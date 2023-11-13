@@ -321,12 +321,13 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
-	if err != nil {
+	switch {
+	case err != nil:
 		stale = true
 		staleResources = request.GetResourceNames()
-	} else if len(request.GetResourceNames()) == 0 {
+	case len(request.GetResourceNames()) == 0:
 		stale = lastVersion != cache.version
-	} else {
+	default:
 		for _, name := range request.GetResourceNames() {
 			// When a resource is removed, its version defaults 0 and it is not considered stale.
 			if lastVersion < cache.versionVector[name] {

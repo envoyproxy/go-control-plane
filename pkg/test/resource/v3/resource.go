@@ -553,7 +553,7 @@ func (ts *TestSnapshot) generateHTTPListeners(numListeners int, clusters []types
 	listeners := []types.Resource{}
 	routeConfigs := []types.Resource{}
 
-	if len(clusters) <= 0 {
+	if len(clusters) == 0 {
 		return nil, nil
 	}
 
@@ -578,7 +578,7 @@ func (ts *TestSnapshot) generateScopedHTTPListeners(numListeners int, clusters [
 	scopedRouteConfigs := []types.Resource{}
 	routeConfigs := []types.Resource{}
 
-	if len(clusters) <= 0 {
+	if len(clusters) == 0 {
 		return nil, nil, nil
 	}
 
@@ -605,7 +605,7 @@ func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []t
 	routeConfigs := []types.Resource{}
 	virtualHosts := []types.Resource{}
 
-	if len(clusters) <= 0 {
+	if len(clusters) == 0 {
 		return nil, nil, nil
 	}
 
@@ -630,7 +630,7 @@ func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []t
 func (ts *TestSnapshot) generateTCPListeners(numListeners int, clusters []types.Resource) []types.Resource {
 	listeners := []types.Resource{}
 
-	if len(clusters) <= 0 {
+	if len(clusters) == 0 {
 		return nil
 	}
 
