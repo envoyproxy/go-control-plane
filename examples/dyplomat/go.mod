@@ -6,9 +6,9 @@ require (
 	github.com/envoyproxy/go-control-plane v0.11.1
 	google.golang.org/grpc v1.59.0
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v0.28.2
-	k8s.io/apimachinery v0.28.2
-	k8s.io/client-go v0.28.2
+	k8s.io/api v0.28.3
+	k8s.io/apimachinery v0.28.3
+	k8s.io/client-go v0.28.3
 	sigs.k8s.io/aws-iam-authenticator v0.6.12
 )
 
