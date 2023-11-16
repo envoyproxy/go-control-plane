@@ -984,6 +984,10 @@ func (m *UdpProxyConfig_UdpTunnelingConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PropagateResponseHeaders
+
+	// no validation rules for PropagateResponseTrailers
+
 	if len(errors) > 0 {
 		return UdpProxyConfig_UdpTunnelingConfigMultiError(errors)
 	}
