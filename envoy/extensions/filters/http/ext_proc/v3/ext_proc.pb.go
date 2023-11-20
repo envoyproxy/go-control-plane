@@ -120,14 +120,12 @@ type ExternalProcessor struct {
 	// each message is sent to the remote service and wait up to "message_timeout"
 	// for a reply.
 	AsyncMode bool `protobuf:"varint,4,opt,name=async_mode,json=asyncMode,proto3" json:"async_mode,omitempty"`
-	// [#not-implemented-hide:]
 	// Envoy provides a number of :ref:`attributes <arch_overview_attributes>`
 	// for expressive policies. Each attribute name provided in this field will be
 	// matched against that list and populated in the request_headers message.
 	// See the :ref:`attribute documentation <arch_overview_request_attributes>`
 	// for the list of supported attributes and their types.
 	RequestAttributes []string `protobuf:"bytes,5,rep,name=request_attributes,json=requestAttributes,proto3" json:"request_attributes,omitempty"`
-	// [#not-implemented-hide:]
 	// Envoy provides a number of :ref:`attributes <arch_overview_attributes>`
 	// for expressive policies. Each attribute name provided in this field will be
 	// matched against that list and populated in the response_headers message.
@@ -495,11 +493,9 @@ type ExtProcOverrides struct {
 	// [#not-implemented-hide:]
 	// Set a different asynchronous processing option than the default.
 	AsyncMode bool `protobuf:"varint,2,opt,name=async_mode,json=asyncMode,proto3" json:"async_mode,omitempty"`
-	// [#not-implemented-hide:]
 	// Set different optional attributes than the default setting of the
 	// “request_attributes“ field.
 	RequestAttributes []string `protobuf:"bytes,3,rep,name=request_attributes,json=requestAttributes,proto3" json:"request_attributes,omitempty"`
-	// [#not-implemented-hide:]
 	// Set different optional properties than the default setting of the
 	// “response_attributes“ field.
 	ResponseAttributes []string `protobuf:"bytes,4,rep,name=response_attributes,json=responseAttributes,proto3" json:"response_attributes,omitempty"`
