@@ -664,8 +664,8 @@ type AuthorizationResponse struct {
 	// Note that coexistent headers will be overridden.
 	AllowedUpstreamHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_upstream_headers,json=allowedUpstreamHeaders,proto3" json:"allowed_upstream_headers,omitempty"`
 	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
-	// response headers that have a correspondent match will be added to the client's response. Note
-	// that coexistent headers will be appended.
+	// response headers that have a correspondent match will be added to the original client request.
+	// Note that coexistent headers will be appended.
 	AllowedUpstreamHeadersToAppend *v32.ListStringMatcher `protobuf:"bytes,3,opt,name=allowed_upstream_headers_to_append,json=allowedUpstreamHeadersToAppend,proto3" json:"allowed_upstream_headers_to_append,omitempty"`
 	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the client's response. Note
