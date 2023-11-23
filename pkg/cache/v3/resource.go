@@ -115,7 +115,7 @@ func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 // (EDS cluster names for CDS, RDS/SRDS routes names for LDS, RDS route names for SRDS).
 func GetResourceReferences(resources map[string]types.ResourceWithTTL) map[resource.Type]map[string]bool {
 	out := make(map[resource.Type]map[string]bool)
-	getResourceReferences(resources, out)
+	getResourceReferences(resources, out, nil)
 
 	return out
 }
@@ -134,14 +134,14 @@ func GetAllResourceReferences(resourceGroups [types.UnknownType]Resources) map[r
 	for responseType, resourceGroup := range resourceGroups {
 		if _, ok := responseTypesWithReferences[types.ResponseType(responseType)]; ok {
 			items := resourceGroup.Items
-			getResourceReferences(items, ret)
+			getResourceReferences(items, ret, resourceGroups[8].Items)
 		}
 	}
 
 	return ret
 }
 
-func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[resource.Type]map[string]bool) {
+func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[resource.Type]map[string]bool, extensions map[string]types.ResourceWithTTL) {
 	for _, res := range resources {
 		if res.Resource == nil {
 			continue
@@ -159,7 +159,7 @@ func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[r
 		case *route.ScopedRouteConfiguration:
 			getScopedRouteReferences(v, out)
 		case *listener.Listener:
-			getListenerReferences(v, out)
+			getListenerReferences(v, out, extensions)
 		case *runtime.Runtime:
 			// no dependencies
 		}
@@ -197,13 +197,13 @@ func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string
 }
 
 // HTTP listeners will either reference ScopedRoutes or Routes.
-func getListenerReferences(src *listener.Listener, out map[resource.Type]map[string]bool) {
+func getListenerReferences(src *listener.Listener, out map[resource.Type]map[string]bool, extensions map[string]types.ResourceWithTTL) {
 	routes := map[string]bool{}
 
 	// Extract route configuration names from HTTP connection manager.
 	for _, chain := range src.GetFilterChains() {
 		for _, filter := range chain.GetFilters() {
-			config := resource.GetHTTPConnectionManager(filter)
+			config := resource.GetHTTPConnectionManager(filter, extensions)
 			if config == nil {
 				continue
 			}

@@ -51,11 +51,26 @@ const DefaultAPIVersion = core.ApiVersion_V3
 // GetHTTPConnectionManager creates a HttpConnectionManager
 // from filter. Returns nil if the filter doesn't have a valid
 // HttpConnectionManager configuration.
-func GetHTTPConnectionManager(filter *listener.Filter) *hcm.HttpConnectionManager {
+func GetHTTPConnectionManager(filter *listener.Filter, extensions map[string]types.ResourceWithTTL) *hcm.HttpConnectionManager {
 	if typedConfig := filter.GetTypedConfig(); typedConfig != nil {
 		config := &hcm.HttpConnectionManager{}
 		if err := anypb.UnmarshalTo(typedConfig, config, proto.UnmarshalOptions{}); err == nil {
 			return config
+		}
+	} else if configDiscovery := filter.GetConfigDiscovery(); configDiscovery != nil {
+		for resourceName, resourceWithTTL := range extensions {
+			if filter.Name == resourceName {
+				typedExtConfig, ok := resourceWithTTL.Resource.(*core.TypedExtensionConfig)
+				if !ok {
+					continue
+				}
+
+				typedConfig := typedExtConfig.TypedConfig
+				config := &hcm.HttpConnectionManager{}
+				if err := anypb.UnmarshalTo(typedConfig, config, proto.UnmarshalOptions{}); err == nil {
+					return config
+				}
+			}
 		}
 	}
 
