@@ -1477,11 +1477,10 @@ type RouteMatch_SafeRegex struct {
 }
 
 type RouteMatch_ConnectMatcher_ struct {
-	// If this is used as the matcher, the matcher will only match CONNECT requests.
-	// Note that this will not match HTTP/2 upgrade-style CONNECT requests
-	// (WebSocket and the like) as they are normalized in Envoy as HTTP/1.1 style
-	// upgrades.
-	// This is the only way to match CONNECT requests for HTTP/1.1. For HTTP/2,
+	// If this is used as the matcher, the matcher will only match CONNECT or CONNECT-UDP requests.
+	// Note that this will not match other Extended CONNECT requests (WebSocket and the like) as
+	// they are normalized in Envoy as HTTP/1.1 style upgrades.
+	// This is the only way to match CONNECT requests for HTTP/1.1. For HTTP/2 and HTTP/3,
 	// where Extended CONNECT requests may have a path, the path matchers will work if
 	// there is a path present.
 	// Note that CONNECT support is currently considered alpha in Envoy.
@@ -4221,7 +4220,7 @@ func (x *RouteMatch_TlsContextMatchOptions) GetValidated() *wrappers.BoolValue {
 	return nil
 }
 
-// An extensible message for matching CONNECT requests.
+// An extensible message for matching CONNECT or CONNECT-UDP requests.
 type RouteMatch_ConnectMatcher struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
