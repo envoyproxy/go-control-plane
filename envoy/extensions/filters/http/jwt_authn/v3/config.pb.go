@@ -261,7 +261,8 @@ type JwtProvider struct {
 	//
 	// 1. The field is set to “true“.
 	//
-	// 2. At least one “claim_to_headers“ header is added to the request.
+	//  2. At least one “claim_to_headers“ header is added to the request OR
+	//     if “payload_in_metadata“ is set.
 	ClearRouteCache bool `protobuf:"varint,17,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 }
 
