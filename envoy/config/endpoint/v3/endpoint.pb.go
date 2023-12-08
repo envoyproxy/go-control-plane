@@ -142,7 +142,8 @@ type ClusterLoadAssignment_Policy struct {
 	//	"lb"_drop = 20%  // 50% of the remaining 'actual' load, which is 40%.
 	//	actual_outgoing_load = 20% // remaining after applying all categories.
 	//
-	// [#not-implemented-hide:]
+	// Envoy supports only one element and will NACK if more than one element is present.
+	// Other xDS-capable data planes will not necessarily have this limitation.
 	DropOverloads []*ClusterLoadAssignment_Policy_DropOverload `protobuf:"bytes,2,rep,name=drop_overloads,json=dropOverloads,proto3" json:"drop_overloads,omitempty"`
 	// Priority levels and localities are considered overprovisioned with this
 	// factor (in percentage). This means that we don't consider a priority
@@ -235,7 +236,6 @@ func (x *ClusterLoadAssignment_Policy) GetWeightedPriorityHealth() bool {
 	return false
 }
 
-// [#not-implemented-hide:]
 type ClusterLoadAssignment_Policy_DropOverload struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
