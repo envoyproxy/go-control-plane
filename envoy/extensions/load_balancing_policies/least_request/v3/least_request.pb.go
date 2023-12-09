@@ -67,6 +67,7 @@ type LeastRequest struct {
 	SlowStartConfig *v31.SlowStartConfig `protobuf:"bytes,3,opt,name=slow_start_config,json=slowStartConfig,proto3" json:"slow_start_config,omitempty"`
 	// Configuration for local zone aware load balancing or locality weighted load balancing.
 	LocalityLbConfig *v31.LocalityLbConfig `protobuf:"bytes,4,opt,name=locality_lb_config,json=localityLbConfig,proto3" json:"locality_lb_config,omitempty"`
+	// [#not-implemented-hide:]
 	// Configuration for performing full scan on the list of hosts.
 	// If this configuration is set, when selecting the host a full scan on the list hosts will be
 	// used to select the one with least requests instead of using random choices.
