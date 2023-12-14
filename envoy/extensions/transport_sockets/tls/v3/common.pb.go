@@ -1001,12 +1001,10 @@ type CertificateValidationContext struct {
 	// certificate chain will be subject to validation by :ref:`CRL <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.crl>`.
 	OnlyVerifyLeafCertCrl bool `protobuf:"varint,14,opt,name=only_verify_leaf_cert_crl,json=onlyVerifyLeafCertCrl,proto3" json:"only_verify_leaf_cert_crl,omitempty"`
 	// Defines maximum depth of a certificate chain accepted in verification, the default limit is 100, though this can be system-dependent.
-	// This number does not include the leaf, so a depth of 1 allows the leaf and one CA certificate. If a trusted issuer appears in the chain,
-	// but in a depth larger than configured, the certificate validation will fail.
-	// See `BoringSSL SSL_CTX_set_verify_depth <https://commondatastorage.googleapis.com/chromium-boringssl-docs/ssl.h.html#SSL_CTX_set_verify_depth>`_
-	// If you use OpenSSL, its behavior is different from BoringSSL, this will define a limit on the number of certificates between the end-entity and trust-anchor certificates.
-	// Neither the end-entity nor the trust-anchor certificates count against depth.
-	// See `OpenSSL SSL set_verify_depth <https://www.openssl.org/docs/man1.1.1/man3/SSL_CTX_set_verify_depth.html>`_.
+	// This number does not include the leaf but includes the trust anchor, so a depth of 1 allows the leaf and one CA certificate. If a trusted issuer
+	// appears in the chain, but in a depth larger than configured, the certificate validation will fail.
+	// This matches the semantics of “SSL_CTX_set_verify_depth“ in OpenSSL 1.0.x and older versions of BoringSSL. It differs from “SSL_CTX_set_verify_depth“
+	// in OpenSSL 1.1.x and newer versions of BoringSSL in that the trust anchor is included.
 	// Trusted issues are specified by setting :ref:`trusted_ca <envoy_v3_api_field_extensions.transport_sockets.tls.v3.CertificateValidationContext.trusted_ca>`
 	MaxVerifyDepth *wrappers.UInt32Value `protobuf:"bytes,16,opt,name=max_verify_depth,json=maxVerifyDepth,proto3" json:"max_verify_depth,omitempty"`
 }
