@@ -1721,14 +1721,8 @@ type HttpFilter struct {
 	IsOptional bool `protobuf:"varint,6,opt,name=is_optional,json=isOptional,proto3" json:"is_optional,omitempty"`
 	// If true, the filter is disabled by default and must be explicitly enabled by setting
 	// per filter configuration in the route configuration.
-	//
-	// A disabled filter will be treated as enabled in the following cases:
-	//
-	//  1. Valid per filter configuration is configured in the “typed_per_filter_config“ of route config.
-	//  2. :ref:`FilterConfig <envoy_v3_api_msg_config.route.v3.FilterConfig>` is configured in the
-	//     “typed_per_filter_config“ of route config and the
-	//     :ref:`disabled of FilterConfig <envoy_v3_api_field_config.route.v3.FilterConfig.disabled>`
-	//     is set to false.
+	// See :ref:`route based filter chain <arch_overview_http_filters_route_based_filter_chain>`
+	// for more details.
 	//
 	// Terminal filters (e.g. “envoy.filters.http.router“) cannot be marked as disabled.
 	Disabled bool `protobuf:"varint,7,opt,name=disabled,proto3" json:"disabled,omitempty"`

@@ -22,7 +22,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Buf Connect gRPC bridge filter configuration
+// Connect RPC to gRPC bridge filter configuration
 type FilterConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

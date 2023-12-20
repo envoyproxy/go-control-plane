@@ -3860,6 +3860,8 @@ type FilterConfig struct {
 	// than rejecting the config.
 	IsOptional bool `protobuf:"varint,2,opt,name=is_optional,json=isOptional,proto3" json:"is_optional,omitempty"`
 	// If true, the filter is disabled in the route or virtual host and the “config“ field is ignored.
+	// See :ref:`route based filter chain <arch_overview_http_filters_route_based_filter_chain>`
+	// for more details.
 	//
 	// .. note::
 	//
