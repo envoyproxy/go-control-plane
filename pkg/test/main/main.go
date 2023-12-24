@@ -261,7 +261,6 @@ func main() {
 				if err := eds.UpdateResource(name, res); err != nil {
 					log.Printf("update error %q for %+v\n", err, name)
 					os.Exit(1)
-
 				}
 			}
 		}

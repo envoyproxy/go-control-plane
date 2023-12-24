@@ -166,7 +166,7 @@ func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[r
 	}
 }
 
-func mapMerge(dst map[string]bool, src map[string]bool) {
+func mapMerge(dst, src map[string]bool) {
 	for k, v := range src {
 		dst[k] = v
 	}
