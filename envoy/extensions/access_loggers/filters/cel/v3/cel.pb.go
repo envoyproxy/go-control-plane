@@ -33,8 +33,9 @@ type ExpressionFilter struct {
 	// Expressions are based on the set of Envoy :ref:`attributes <arch_overview_attributes>`.
 	// The provided expression must evaluate to true for logging (expression errors are considered false).
 	// Examples:
-	// - “response.code >= 400“
-	// - “(connection.mtls && request.headers['x-log-mtls'] == 'true') || request.url_path.contains('v1beta3')“
+	//
+	// * “response.code >= 400“
+	// * “(connection.mtls && request.headers['x-log-mtls'] == 'true') || request.url_path.contains('v1beta3')“
 	Expression string `protobuf:"bytes,1,opt,name=expression,proto3" json:"expression,omitempty"`
 }
 
