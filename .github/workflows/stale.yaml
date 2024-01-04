@@ -1,3 +1,6 @@
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   schedule:
@@ -5,6 +8,9 @@ on:
 
 jobs:
   prune_stale:
+    permissions:
+      issues: write  # for actions/stale to close stale issues
+      pull-requests: write  # for actions/stale to close stale PRs
     name: Prune Stale
     runs-on: ubuntu-latest
 
