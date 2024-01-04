@@ -1,9 +1,9 @@
 name: golangci-lint
-
-on: [push, pull_request]
   
 permissions:
   contents: read
+
+on: [push, pull_request]
 
 jobs:
   golangci:
