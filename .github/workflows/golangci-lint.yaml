@@ -1,5 +1,5 @@
 name: golangci-lint
-  
+
 permissions:
   contents: read
 
