@@ -1,10 +1,10 @@
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 */4 * * *'
-
-permissions:
-  contents: read
 
 jobs:
   prune_stale:
