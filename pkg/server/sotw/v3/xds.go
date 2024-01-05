@@ -27,7 +27,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 
 		// a collection of stack allocated watches per request type.
 		watches:                newWatches(),
-		streamStates:           make(map[string]stream.SubscriptionState),
+		streamState:            make(map[string]stream.SubscriptionState),
 		lastDiscoveryResponses: make(map[string]lastDiscoveryResponse),
 	}
 
@@ -110,7 +110,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				req.TypeUrl = defaultTypeURL
 			}
 
-			streamState := sw.streamStates[req.TypeUrl]
+			streamState := sw.streamState[req.TypeUrl]
 
 			if s.callbacks != nil {
 				if err := s.callbacks.OnStreamRequest(sw.ID, req); err != nil {
@@ -121,7 +121,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 			if lastResponse, ok := sw.lastDiscoveryResponses[req.GetTypeUrl()]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
-					streamState.SetKnownResources(lastResponse.resources)
+					streamState.SetACKedResources(lastResponse.resources)
 				}
 			}
 
@@ -157,7 +157,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				})
 			}
 
-			sw.streamStates[req.TypeUrl] = streamState
+			sw.streamState[req.TypeUrl] = streamState
 
 			// Recompute the dynamic select cases for this stream.
 			sw.watches.recompute(s.ctx, reqCh)

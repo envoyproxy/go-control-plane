@@ -149,7 +149,7 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 				}
 				// Update streamState
 				for _, resource := range out.GetRequest().GetResourceNames() {
-					streamState.GetKnownResources()[resource] = fixture.version
+					streamState.GetACKedResources()[resource] = fixture.version
 				}
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
@@ -189,7 +189,7 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 					updatesByType[typ]++
 
 					for _, resource := range out.GetRequest().GetResourceNames() {
-						streamState.GetKnownResources()[resource] = fixture.version
+						streamState.GetACKedResources()[resource] = fixture.version
 					}
 				case <-end:
 					cancel()
@@ -321,7 +321,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
 				}
 				for _, resource := range out.GetRequest().GetResourceNames() {
-					streamState.GetKnownResources()[resource] = fixture.version
+					streamState.GetACKedResources()[resource] = fixture.version
 				}
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -501,7 +501,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	// Request additional resource with name=clusterName2 for same version
 	go func() {
 		state := stream.NewSubscriptionState(false, map[string]string{})
-		state.SetKnownResources(map[string]string{clusterName: fixture.version})
+		state.SetACKedResources(map[string]string{clusterName: fixture.version})
 		_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
 			ResourceNames: []string{clusterName, clusterName2}}, &state, watch)
 		require.NoError(t, err)
@@ -521,7 +521,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 
 	// Repeat request for with same version and make sure a watch is created
 	state := stream.NewSubscriptionState(false, map[string]string{})
-	state.SetKnownResources(map[string]string{clusterName: fixture.version, clusterName2: fixture.version})
+	state.SetACKedResources(map[string]string{clusterName: fixture.version, clusterName2: fixture.version})
 	if cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
 		ResourceNames: []string{clusterName, clusterName2}}, &state, watch); cancel == nil {
 		t.Fatal("Should create a watch")

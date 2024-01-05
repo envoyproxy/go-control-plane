@@ -195,7 +195,7 @@ func createWildcardDeltaWatch(c *LinearCache, w chan DeltaResponse) error {
 		return err
 	}
 	resp := <-w
-	state.SetKnownResources(resp.GetNextVersionMap())
+	state.SetACKedResources(resp.GetNextVersionMap())
 	_, err := c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, &state, w) // Ensure the watch is set properly with cache values
 	return err
 }
@@ -674,7 +674,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	validateDeltaResponse(t, resp, []resourceInfo{{"a", hashA}, {"b", hashB}}, nil)
 	checkVersionMapSet(t, c)
 	assert.Equal(t, 2, c.NumResources())
-	state.SetKnownResources(resp.GetNextVersionMap())
+	state.SetACKedResources(resp.GetNextVersionMap())
 
 	// Multiple updates
 	_, err = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, &state, w)
@@ -695,7 +695,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	validateDeltaResponse(t, resp, []resourceInfo{{"a", hashA}, {"b", hashB}}, nil)
 	checkVersionMapSet(t, c)
 	assert.Equal(t, 2, c.NumResources())
-	state.SetKnownResources(resp.GetNextVersionMap())
+	state.SetACKedResources(resp.GetNextVersionMap())
 
 	// Update/add/delete
 	_, err = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, &state, w)
@@ -715,7 +715,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	validateDeltaResponse(t, resp, []resourceInfo{{"a", hashA}}, []string{"b"})
 	checkVersionMapSet(t, c)
 	assert.Equal(t, 2, c.NumResources())
-	state.SetKnownResources(resp.GetNextVersionMap())
+	state.SetACKedResources(resp.GetNextVersionMap())
 
 	// Re-add previously deleted watched resource
 	_, err = c.CreateDeltaWatch(&DeltaRequest{TypeUrl: testType}, &state, w)
@@ -732,7 +732,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	validateDeltaResponse(t, resp, []resourceInfo{{"b", hashB}}, nil) // d is not watched and should not be returned
 	checkVersionMapSet(t, c)
 	assert.Equal(t, 2, c.NumResources())
-	state.SetKnownResources(resp.GetNextVersionMap())
+	state.SetACKedResources(resp.GetNextVersionMap())
 
 	// Wildcard create/update
 	require.NoError(t, createWildcardDeltaWatch(c, w))

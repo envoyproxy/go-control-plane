@@ -144,7 +144,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 			case out := <-watches[typ]:
 				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
 				nextVersionMap := out.GetNextVersionMap()
-				streams[typ].SetKnownResources(nextVersionMap)
+				streams[typ].SetACKedResources(nextVersionMap)
 			case <-time.After(time.Second):
 				require.Fail(t, "failed to receive a snapshot response")
 			}
@@ -181,7 +181,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 		assert.Equal(t, []string{"otherCluster"}, out.(*cache.RawDeltaResponse).RemovedResources)
 		nextVersionMap := out.GetNextVersionMap()
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
-		assert.NotEqual(t, nextVersionMap, streams[testTypes[0]].GetKnownResources(), "versionMap for the endpoint resource type did not change")
+		assert.NotEqual(t, nextVersionMap, streams[testTypes[0]].GetACKedResources(), "versionMap for the endpoint resource type did not change")
 	case <-time.After(time.Second):
 		assert.Fail(t, "failed to receive snapshot response")
 	}

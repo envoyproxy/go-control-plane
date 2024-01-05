@@ -1,17 +1,16 @@
 package stream
 
-// SubscriptionState will keep track of a resource subscription on a stream.
+// SubscriptionState stores the server view of a given type subscription in a stream.
 type SubscriptionState struct {
-	// wildcard is set if the subscription currently has a wildcard watch
+	// wildcard indicates if the subscription currently has a wildcard watch.
 	wildcard bool
 
 	// subscribedResourceNames provides the resources explicitly requested by the client
-	// This list might be non-empty even when set as wildcard
+	// This list might be non-empty even when set as wildcard.
 	subscribedResourceNames map[string]struct{}
 
-	// resourceVersions contains the resources acknowledged by the client and the versions
-	// associated to them
-	resourceVersions map[string]string
+	// ackedResources contains the resources acknowledged by the client and the acknowledged versions.
+	ackedResources map[string]string
 }
 
 // NewSubscriptionState initializes a stream state.
@@ -19,11 +18,11 @@ func NewSubscriptionState(wildcard bool, initialResourceVersions map[string]stri
 	state := SubscriptionState{
 		wildcard:                wildcard,
 		subscribedResourceNames: map[string]struct{}{},
-		resourceVersions:        initialResourceVersions,
+		ackedResources:          initialResourceVersions,
 	}
 
 	if initialResourceVersions == nil {
-		state.resourceVersions = make(map[string]string)
+		state.ackedResources = make(map[string]string)
 	}
 
 	return state
@@ -43,16 +42,16 @@ func (s *SubscriptionState) SetSubscribedResources(subscribedResourceNames map[s
 	s.subscribedResourceNames = subscribedResourceNames
 }
 
-// GetKnownResources returns the list of resources acknowledged by the client
+// GetACKedResources returns the list of resources acknowledged by the client
 // and their acknowledged version
-func (s SubscriptionState) GetKnownResources() map[string]string {
-	return s.resourceVersions
+func (s SubscriptionState) GetACKedResources() map[string]string {
+	return s.ackedResources
 }
 
-// SetKnownResources sets a list of resource versions currently known by the client
+// SetACKedResources sets a list of resource versions currently known by the client
 // The cache can use this state to compute resources added/updated/deleted
-func (s *SubscriptionState) SetKnownResources(resourceVersions map[string]string) {
-	s.resourceVersions = resourceVersions
+func (s *SubscriptionState) SetACKedResources(resourceVersions map[string]string) {
+	s.ackedResources = resourceVersions
 }
 
 // SetWildcard will set the subscription to return all known resources

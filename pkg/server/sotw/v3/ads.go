@@ -103,7 +103,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 			}
 
 			typeURL := req.GetTypeUrl()
-			streamState, ok := sw.streamStates[typeURL]
+			streamState, ok := sw.streamState[typeURL]
 			if !ok {
 				// Supports legacy wildcard mode
 				// Wildcard will be set to true if no resource is set
@@ -114,7 +114,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 			if lastResponse, ok := sw.lastDiscoveryResponses[typeURL]; ok {
 				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
 					// Let's record Resource names that a client has received.
-					streamState.SetKnownResources(lastResponse.resources)
+					streamState.SetACKedResources(lastResponse.resources)
 				}
 			}
 
@@ -157,7 +157,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 				})
 			}
 
-			sw.streamStates[req.TypeUrl] = streamState
+			sw.streamState[req.TypeUrl] = streamState
 		}
 	}
 }

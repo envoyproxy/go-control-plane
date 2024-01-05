@@ -408,7 +408,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, clientState Subscripti
 	}
 
 	if exists {
-		knownResourceNames := clientState.GetKnownResources()
+		knownResourceNames := clientState.GetACKedResources()
 		diff := []string{}
 		for _, r := range request.GetResourceNames() {
 			if _, ok := knownResourceNames[r]; !ok {

@@ -36,16 +36,16 @@ type Request = discovery.DiscoveryRequest
 // DeltaRequest is an alias for the delta discovery request type.
 type DeltaRequest = discovery.DeltaDiscoveryRequest
 
-// SubscriptionState provides additional data on the client knowledge for the type matching the request
-// This allows proper implementation of stateful aspects of the protocol (e.g. returning only some updated resources)
+// SubscriptionState stores the server view of the client state for a given resource type.
+// This allows proper implementation of stateful aspects of the protocol (e.g. returning only some updated resources).
 // Though the methods may return mutable parts of the state for performance reasons,
-// the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation
+// the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation.
 type SubscriptionState interface {
-	// GetKnownResources returns a list of resources that the client has ACK'd and their associated version.
+	// GetACKedResources returns a list of resources that the client has ACK'd and their associated version.
 	// The versions are:
 	//  - delta protocol: version of the specific resource set in the response
 	//  - sotw protocol: version of the global response when the resource was last ACKed
-	GetKnownResources() map[string]string
+	GetACKedResources() map[string]string
 
 	// GetSubscribedResources returns the list of resources currently subscribed to by the client for the type.
 	// For delta it keeps track of subscription updates across requests

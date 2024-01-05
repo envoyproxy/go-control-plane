@@ -118,7 +118,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		watch := watches.deltaWatches[typ]
 		watch.nonce = nonce
 
-		watch.state.SetKnownResources(resp.GetNextVersionMap())
+		watch.state.SetACKedResources(resp.GetNextVersionMap())
 		watches.deltaWatches[typ] = watch
 		return nil
 	}
@@ -285,7 +285,7 @@ func (s *server) unsubscribe(resources []string, streamState *stream.Subscriptio
 			// To achieve that, we mark the resource as having been returned with an empty version. While creating the response, the cache will either:
 			// * detect the version change, and return the resource (as an update)
 			// * detect the resource deletion, and set it as removed in the response
-			streamState.GetKnownResources()[resource] = ""
+			streamState.GetACKedResources()[resource] = ""
 		}
 		delete(sv, resource)
 	}

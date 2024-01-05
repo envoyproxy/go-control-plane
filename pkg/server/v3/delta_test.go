@@ -37,7 +37,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case state.IsWildcard():
-		if len(state.GetKnownResources()) == 0 {
+		if len(state.GetACKedResources()) == 0 {
 			filtered = make([]types.Resource, 0, len(resourceMap))
 		}
 		nextVersionMap = make(map[string]string, len(resourceMap))
@@ -46,14 +46,14 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			// we can just set it here to be used for comparison later
 			version := versionMap[name]
 			nextVersionMap[name] = version
-			prevVersion, found := state.GetKnownResources()[name]
+			prevVersion, found := state.GetACKedResources()[name]
 			if !found || (prevVersion != version) {
 				filtered = append(filtered, r)
 			}
 		}
 
 		// Compute resources for removal
-		for name := range state.GetKnownResources() {
+		for name := range state.GetACKedResources() {
 			if _, ok := resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
 			}
@@ -63,7 +63,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		// state.GetResourceVersions() may include resources no longer subscribed
 		// In the current code this gets silently cleaned when updating the version map
 		for name := range state.GetSubscribedResources() {
-			prevVersion, found := state.GetKnownResources()[name]
+			prevVersion, found := state.GetACKedResources()[name]
 			if r, ok := resourceMap[name]; ok {
 				nextVersion := versionMap[name]
 				if prevVersion != nextVersion {

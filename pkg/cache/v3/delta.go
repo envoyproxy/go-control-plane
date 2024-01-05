@@ -36,7 +36,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state Subscript
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case state.IsWildcard():
-		if len(state.GetKnownResources()) == 0 {
+		if len(state.GetACKedResources()) == 0 {
 			filtered = make([]types.Resource, 0, len(resources.resourceMap))
 		}
 		nextVersionMap = make(map[string]string, len(resources.resourceMap))
@@ -45,7 +45,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state Subscript
 			// we can just set it here to be used for comparison later
 			version := resources.versionMap[name]
 			nextVersionMap[name] = version
-			prevVersion, found := state.GetKnownResources()[name]
+			prevVersion, found := state.GetACKedResources()[name]
 			if !found || (prevVersion != version) {
 				filtered = append(filtered, r)
 			}
@@ -53,7 +53,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state Subscript
 
 		// Compute resources for removal
 		// The resource version can be set to "" here to trigger a removal even if never returned before
-		for name := range state.GetKnownResources() {
+		for name := range state.GetACKedResources() {
 			if _, ok := resources.resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
 			}
@@ -63,7 +63,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state Subscript
 		// state.GetResourceVersions() may include resources no longer subscribed
 		// In the current code this gets silently cleaned when updating the version map
 		for name := range state.GetSubscribedResources() {
-			prevVersion, found := state.GetKnownResources()[name]
+			prevVersion, found := state.GetACKedResources()[name]
 			if r, ok := resources.resourceMap[name]; ok {
 				nextVersion := resources.versionMap[name]
 				if prevVersion != nextVersion {
