@@ -70,14 +70,11 @@ type RouteConfiguration struct {
 	// Specifies a list of HTTP headers that should be removed from each request
 	// routed by the HTTP connection manager.
 	RequestHeadersToRemove []string `protobuf:"bytes,8,rep,name=request_headers_to_remove,json=requestHeadersToRemove,proto3" json:"request_headers_to_remove,omitempty"`
-	// By default, headers that should be added/removed are evaluated from most to least specific:
-	//
-	// * route level
-	// * virtual host level
-	// * connection manager level
-	//
-	// To allow setting overrides at the route or virtual host level, this order can be reversed
-	// by setting this option to true. Defaults to false.
+	// Headers mutations at all levels are evaluated, if specified. By default, the order is from most
+	// specific (i.e. route entry level) to least specific (i.e. route configuration level). Later header
+	// mutations may override earlier mutations.
+	// This order can be reversed by setting this field to true. In other words, most specific level mutation
+	// is evaluated last.
 	MostSpecificHeaderMutationsWins bool `protobuf:"varint,10,opt,name=most_specific_header_mutations_wins,json=mostSpecificHeaderMutationsWins,proto3" json:"most_specific_header_mutations_wins,omitempty"`
 	// An optional boolean that specifies whether the clusters that the route
 	// table refers to will be validated by the cluster manager. If set to true
