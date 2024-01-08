@@ -36,24 +36,22 @@ type MuxCache struct {
 
 var _ Cache = &MuxCache{}
 
-func (mux *MuxCache) CreateWatch(request *Request, state SubscriptionState, value chan Response) (func(), error) {
+func (mux *MuxCache) CreateWatch(request *Request, sub Subscription, value chan Response) (func(), error) {
 	key := mux.Classify(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
-		value <- nil
 		return nil, fmt.Errorf("no cache defined for key %s", key)
 	}
-	return cache.CreateWatch(request, state, value)
+	return cache.CreateWatch(request, sub, value)
 }
 
-func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, state SubscriptionState, value chan DeltaResponse) (func(), error) {
+func (mux *MuxCache) CreateDeltaWatch(request *DeltaRequest, sub Subscription, value chan DeltaResponse) (func(), error) {
 	key := mux.ClassifyDelta(request)
 	cache, exists := mux.Caches[key]
 	if !exists {
-		value <- nil
 		return nil, fmt.Errorf("no cache defined for key %s", key)
 	}
-	return cache.CreateDeltaWatch(request, state, value)
+	return cache.CreateDeltaWatch(request, sub, value)
 }
 
 func (mux *MuxCache) Fetch(context.Context, *Request) (Response, error) {

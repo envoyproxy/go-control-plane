@@ -13,24 +13,8 @@ import (
 
 // process handles a bi-di stream request
 func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
-	// We make a responder channel here so we can multiplex responses from the dynamic channels.
-	sw.watches.addWatch(resource.AnyType, &watch{
-		// Create a buffered channel the size of the known resource types.
-		response: make(chan cache.Response, types.UnknownType),
-		cancel: func() {
-			close(sw.watches.responders[resource.AnyType].response)
-		},
-	})
-
-	process := func(resp cache.Response) error {
-		nonce, err := sw.send(resp)
-		if err != nil {
-			return err
-		}
-
-		sw.watches.responders[resp.GetRequest().GetTypeUrl()].nonce = nonce
-		return nil
-	}
+	// Create a buffered channel the size of the known resource types.
+	respChan := make(chan cache.Response, types.UnknownType)
 
 	// Instead of creating a separate channel for each incoming request and abandoning the old one
 	// This algorithm uses (and reuses) a single channel for all request types and guarantees
@@ -43,9 +27,9 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 		for {
 			select {
 			// We watch the multiplexed ADS channel for incoming responses.
-			case res := <-sw.watches.responders[resource.AnyType].response:
+			case res := <-respChan:
 				if res.GetRequest().GetTypeUrl() != typeURL {
-					if err := process(res); err != nil {
+					if err := sw.send(res); err != nil {
 						return err
 					}
 				}
@@ -63,9 +47,8 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 		select {
 		case <-s.ctx.Done():
 			return nil
-		// We only watch the multiplexed channel since all values will come through from process.
-		case res := <-sw.watches.responders[resource.AnyType].response:
-			if err := process(res); err != nil {
+		case res := <-respChan:
+			if err := sw.send(res); err != nil {
 				return status.Errorf(codes.Unavailable, err.Error())
 			}
 		case req, ok := <-reqCh:
@@ -86,9 +69,6 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 				req.Node = sw.node
 			}
 
-			// Nonces can be reused across streams; we verify nonce only if nonce is not initialized.
-			nonce := req.GetResponseNonce()
-
 			// type URL is required for ADS but is implicit for xDS
 			if defaultTypeURL == resource.AnyType {
 				if req.GetTypeUrl() == "" {
@@ -103,61 +83,46 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 			}
 
 			typeURL := req.GetTypeUrl()
-			streamState, ok := sw.streamState[typeURL]
-			if !ok {
-				// Supports legacy wildcard mode
-				// Wildcard will be set to true if no resource is set
-				streamState = stream.NewSubscriptionState(len(req.ResourceNames) == 0, nil)
-			}
-
-			// ToDo: track ACK through subscription state
-			if lastResponse, ok := sw.lastDiscoveryResponses[typeURL]; ok {
-				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-					// Let's record Resource names that a client has received.
-					streamState.SetACKedResources(lastResponse.resources)
+			var subscription stream.Subscription
+			w, ok := sw.watches.responders[typeURL]
+			if ok {
+				if w.nonce != "" && req.GetResponseNonce() != w.nonce {
+					// The request does not match the stream nonce, ignore it as per
+					// https://www.envoyproxy.io/docs/envoy/v1.28.0/api-docs/xds_protocol#resource-updates
+					// Ignore this request and wait for the next one
+					// This behavior is being discussed in https://github.com/envoyproxy/envoy/issues/10363
+					// as it might create a race in edge cases, but it matches the current protocol defintion
+					s.opts.Logger.Debugf("[sotw ads] Skipping request as nonce is stale for %s", typeURL)
+					break
 				}
-			}
 
-			updateSubscriptionResources(req, &streamState)
+				// We found an existing watch
+				// Close it to ensure the Cache will not reply to it while we modify the subscription state
+				w.close()
 
-			// Use the multiplexed channel for new watches.
-			responder := sw.watches.responders[resource.AnyType].response
-			if w, ok := sw.watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
-				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
-
-					// Only process if we have an existing watch otherwise go ahead and create.
-					if err := processAllExcept(typeURL); err != nil {
-						return err
-					}
-
-					cancel, err := s.cache.CreateWatch(req, streamState, responder)
-					if err != nil {
-						return err
-					}
-
-					sw.watches.addWatch(typeURL, &watch{
-						cancel:   cancel,
-						response: responder,
-					})
-				}
-			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				cancel, err := s.cache.CreateWatch(req, streamState, responder)
-				if err != nil {
+				// Only process if we have an existing watch otherwise go ahead and create.
+				if err := processAllExcept(typeURL); err != nil {
 					return err
 				}
 
-				sw.watches.addWatch(typeURL, &watch{
-					cancel:   cancel,
-					response: responder,
-				})
+				subscription = w.sub
+			} else {
+				s.opts.Logger.Debugf("[sotw ads] New subscription for type %s and stream %d", typeURL, sw.ID)
+				subscription = stream.NewSubscription(len(req.ResourceNames) == 0, nil)
 			}
 
-			sw.streamState[req.TypeUrl] = streamState
+			subscription.SetResourceSubscription(req.GetResourceNames())
+
+			cancel, err := s.cache.CreateWatch(req, subscription, respChan)
+			if err != nil {
+				return err
+			}
+
+			sw.watches.addWatch(typeURL, &watch{
+				cancel:   cancel,
+				response: respChan,
+				sub:      subscription,
+			})
 		}
 	}
 }

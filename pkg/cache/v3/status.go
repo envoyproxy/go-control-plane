@@ -100,8 +100,8 @@ type DeltaResponseWatch struct {
 	// Response is the channel to push the delta responses to
 	Response chan DeltaResponse
 
-	// VersionMap for the stream
-	subscriptionState SubscriptionState
+	// Subscription stores the current client subscription state.
+	subscription Subscription
 }
 
 // newStatusInfo initializes a status info data structure.

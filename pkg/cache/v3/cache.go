@@ -36,21 +36,21 @@ type Request = discovery.DiscoveryRequest
 // DeltaRequest is an alias for the delta discovery request type.
 type DeltaRequest = discovery.DeltaDiscoveryRequest
 
-// SubscriptionState stores the server view of the client state for a given resource type.
+// Subscription stores the server view of the client state for a given resource type.
 // This allows proper implementation of stateful aspects of the protocol (e.g. returning only some updated resources).
 // Though the methods may return mutable parts of the state for performance reasons,
 // the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation.
-type SubscriptionState interface {
-	// GetACKedResources returns a list of resources that the client has ACK'd and their associated version.
+type Subscription interface {
+	// ReturnedResources returns a list of resources that clients have ACK'd and their associated version.
 	// The versions are:
 	//  - delta protocol: version of the specific resource set in the response
 	//  - sotw protocol: version of the global response when the resource was last ACKed
-	GetACKedResources() map[string]string
+	ReturnedResources() map[string]string
 
-	// GetSubscribedResources returns the list of resources currently subscribed to by the client for the type.
+	// SubscribedResources returns the list of resources currently subscribed to by the client for the type.
 	// For delta it keeps track of subscription updates across requests
 	// For sotw it is a normalized view of the last request resources
-	GetSubscribedResources() map[string]struct{}
+	SubscribedResources() map[string]struct{}
 
 	// IsWildcard returns whether the client has a wildcard watch.
 	// This considers subtleties related to the current migration of wildcard definitions within the protocol.
@@ -81,7 +81,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(*Request, SubscriptionState, chan Response) (cancel func(), err error)
+	CreateWatch(*Request, Subscription, chan Response) (cancel func(), err error)
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	// This is the entrypoint to propagate configuration changes the
@@ -93,7 +93,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, SubscriptionState, chan DeltaResponse) (cancel func(), err error)
+	CreateDeltaWatch(*DeltaRequest, Subscription, chan DeltaResponse) (cancel func(), err error)
 }
 
 // ConfigFetcher fetches configuration resources from cache

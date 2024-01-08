@@ -20,7 +20,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state cache.SubscriptionState, out chan cache.DeltaResponse) (func(), error) {
+func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, state cache.Subscription, out chan cache.DeltaResponse) (func(), error) {
 	config.deltaCounts[req.GetTypeUrl()] = config.deltaCounts[req.GetTypeUrl()] + 1
 
 	// This is duplicated from pkg/cache/v3/delta.go as private there
@@ -37,7 +37,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case state.IsWildcard():
-		if len(state.GetACKedResources()) == 0 {
+		if len(state.ReturnedResources()) == 0 {
 			filtered = make([]types.Resource, 0, len(resourceMap))
 		}
 		nextVersionMap = make(map[string]string, len(resourceMap))
@@ -46,24 +46,24 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			// we can just set it here to be used for comparison later
 			version := versionMap[name]
 			nextVersionMap[name] = version
-			prevVersion, found := state.GetACKedResources()[name]
+			prevVersion, found := state.ReturnedResources()[name]
 			if !found || (prevVersion != version) {
 				filtered = append(filtered, r)
 			}
 		}
 
 		// Compute resources for removal
-		for name := range state.GetACKedResources() {
+		for name := range state.ReturnedResources() {
 			if _, ok := resourceMap[name]; !ok {
 				toRemove = append(toRemove, name)
 			}
 		}
 	default:
-		nextVersionMap = make(map[string]string, len(state.GetSubscribedResources()))
+		nextVersionMap = make(map[string]string, len(state.SubscribedResources()))
 		// state.GetResourceVersions() may include resources no longer subscribed
 		// In the current code this gets silently cleaned when updating the version map
-		for name := range state.GetSubscribedResources() {
-			prevVersion, found := state.GetACKedResources()[name]
+		for name := range state.SubscribedResources() {
+			prevVersion, found := state.ReturnedResources()[name]
 			if r, ok := resourceMap[name]; ok {
 				nextVersion := versionMap[name]
 				if prevVersion != nextVersion {

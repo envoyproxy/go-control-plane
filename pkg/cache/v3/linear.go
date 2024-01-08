@@ -106,6 +106,7 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 		versionMap:    nil,
 		version:       0,
 		versionVector: make(map[string]uint64),
+		log:           log.NewDefaultLogger(),
 	}
 	for _, opt := range opts {
 		opt(out)
@@ -164,11 +165,11 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 		}
 
 		for id, watch := range cache.deltaWatches {
-			if !watch.subscriptionState.WatchesResources(modified) {
+			if !watch.subscription.WatchesResources(modified) {
 				continue
 			}
 
-			res := cache.respondDelta(watch.Request, watch.Response, watch.subscriptionState)
+			res := cache.respondDelta(watch.Request, watch.Response, watch.subscription)
 			if res != nil {
 				delete(cache.deltaWatches, id)
 			}
@@ -176,8 +177,8 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	}
 }
 
-func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, clientState SubscriptionState) *RawDeltaResponse {
-	resp := createDeltaResponse(context.Background(), request, clientState, resourceContainer{
+func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, sub Subscription) *RawDeltaResponse {
+	resp := createDeltaResponse(context.Background(), request, sub, resourceContainer{
 		resourceMap:   cache.resources,
 		versionMap:    cache.versionMap,
 		systemVersion: cache.getVersion(),
@@ -185,10 +186,8 @@ func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaRe
 
 	// Only send a response if there were changes
 	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 {
-		if cache.log != nil {
-			cache.log.Debugf("[linear cache] node: %s, sending delta response for typeURL %s with resources: %v removed resources: %v with wildcard: %t",
-				request.GetNode().GetId(), request.GetTypeUrl(), GetResourceNames(resp.Resources), resp.RemovedResources, clientState.IsWildcard())
-		}
+		cache.log.Debugf("[linear cache] node: %s, sending delta response for typeURL %s with resources: %v removed resources: %v with wildcard: %t",
+			request.GetNode().GetId(), request.GetTypeUrl(), GetResourceNames(resp.Resources), resp.RemovedResources, sub.IsWildcard())
 		value <- resp
 		return resp
 	}
@@ -298,7 +297,7 @@ func (cache *LinearCache) GetResources() map[string]types.Resource {
 	return resources
 }
 
-func (cache *LinearCache) CreateWatch(request *Request, _ SubscriptionState, value chan Response) (func(), error) {
+func (cache *LinearCache) CreateWatch(request *Request, _ Subscription, value chan Response) (func(), error) {
 	if request.GetTypeUrl() != cache.typeURL {
 		value <- nil
 		return nil, fmt.Errorf("request type %s does not match cache type %s", request.TypeUrl, cache.typeURL)
@@ -372,7 +371,7 @@ func (cache *LinearCache) CreateWatch(request *Request, _ SubscriptionState, val
 	}, nil
 }
 
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, clientState SubscriptionState, value chan DeltaResponse) (func(), error) {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sub Subscription, value chan DeltaResponse) (func(), error) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -385,22 +384,20 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, clientState Su
 			modified[name] = struct{}{}
 		}
 		err := cache.updateVersionMap(modified)
-		if err != nil && cache.log != nil {
+		if err != nil {
 			cache.log.Errorf("failed to update version map: %v", err)
 		}
 	}
-	response := cache.respondDelta(request, value, clientState)
+	response := cache.respondDelta(request, value, sub)
 
 	// if respondDelta returns nil this means that there is no change in any resource version
 	// create a new watch accordingly
 	if response == nil {
 		watchID := cache.nextDeltaWatchID()
-		if cache.log != nil {
-			cache.log.Infof("[linear cache] open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
-				cache.typeURL, clientState.GetSubscribedResources(), cache.getVersion())
-		}
+		cache.log.Infof("[linear cache] open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
+			cache.typeURL, sub.SubscribedResources(), cache.getVersion())
 
-		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, subscriptionState: clientState}
+		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, subscription: sub}
 
 		return cache.cancelDeltaWatch(watchID), nil
 	}
