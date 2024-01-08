@@ -184,7 +184,7 @@ type ZooKeeperProxy struct {
 	EnablePerOpcodeRequestBytesMetrics bool `protobuf:"varint,7,opt,name=enable_per_opcode_request_bytes_metrics,json=enablePerOpcodeRequestBytesMetrics,proto3" json:"enable_per_opcode_request_bytes_metrics,omitempty"`
 	// Whether to emit per opcode response bytes metrics. If not set, it defaults to false.
 	EnablePerOpcodeResponseBytesMetrics bool `protobuf:"varint,8,opt,name=enable_per_opcode_response_bytes_metrics,json=enablePerOpcodeResponseBytesMetrics,proto3" json:"enable_per_opcode_response_bytes_metrics,omitempty"`
-	// [#not-implemented-hide:] Whether to emit per opcode decoder error metrics. If not set, it defaults to false.
+	// Whether to emit per opcode decoder error metrics. If not set, it defaults to false.
 	EnablePerOpcodeDecoderErrorMetrics bool `protobuf:"varint,9,opt,name=enable_per_opcode_decoder_error_metrics,json=enablePerOpcodeDecoderErrorMetrics,proto3" json:"enable_per_opcode_decoder_error_metrics,omitempty"`
 }
 
