@@ -209,9 +209,12 @@ func (TrafficDirection) EnumDescriptor() ([]byte, []int) {
 type HeaderValueOption_HeaderAppendAction int32
 
 const (
-	// This action will append the specified value to the existing values if the header
-	// already exists. If the header doesn't exist then this will add the header with
-	// specified key and value.
+	// If the header already exists, this action will result in:
+	//
+	// - Comma-concatenated for predefined inline headers.
+	// - Duplicate header added in the “HeaderMap“ for other headers.
+	//
+	// If the header doesn't exist then this will add new header with specified key and value.
 	HeaderValueOption_APPEND_IF_EXISTS_OR_ADD HeaderValueOption_HeaderAppendAction = 0
 	// This action will add the header if it doesn't already exist. If the header
 	// already exists then this will be a no-op.
