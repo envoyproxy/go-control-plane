@@ -40,7 +40,14 @@ func testResource(s string) types.Resource {
 
 func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	t.Helper()
-	r := <-ch
+	var r Response
+	select {
+	case r = <-ch:
+	case <-time.After(1 * time.Second):
+		t.Error("failed to receive response after 1 second")
+		return
+	}
+
 	if r.GetRequest().GetTypeUrl() != testType {
 		t.Errorf("unexpected empty request type URL: %q", r.GetRequest().GetTypeUrl())
 	}
@@ -62,6 +69,9 @@ func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	}
 	if out.GetTypeUrl() != testType {
 		t.Errorf("unexpected type URL: %q", out.GetTypeUrl())
+	}
+	if len(r.GetRequest().GetResourceNames()) != 0 && len(r.GetRequest().GetResourceNames()) < len(out.Resources) {
+		t.Errorf("received more resources (%d) than requested (%d)", len(r.GetRequest().GetResourceNames()), len(out.Resources))
 	}
 }
 
@@ -782,4 +792,82 @@ func TestLinearMixedWatches(t *testing.T) {
 
 	verifyResponse(t, w, c.getVersion(), 0)
 	verifyDeltaResponse(t, wd, nil, []string{"b"})
+}
+
+func TestLinearSotwWatches(t *testing.T) {
+	t.Run("watches are properly removed from all objects", func(t *testing.T) {
+		cache := NewLinearCache(testType)
+		a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
+		err := cache.UpdateResource("a", a)
+		require.NoError(t, err)
+		b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
+		err = cache.UpdateResource("b", b)
+		require.NoError(t, err)
+		assert.Equal(t, 2, cache.NumResources())
+
+		// A watch tracks three different objects.
+		// An update is done for the three objects in a row
+		// If the watches are no properly purged, all three updates will send responses in the channel, but only the first one is tracked
+		// The buffer will therefore saturate and the third request will deadlock the entire cache as occurring under the mutex
+		sotwState := stream.NewStreamState(false, nil)
+		w := make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: []string{"a", "b", "c"}, TypeUrl: testType, VersionInfo: cache.getVersion()}, sotwState, w)
+		mustBlock(t, w)
+		checkVersionMapNotSet(t, cache)
+
+		assert.Len(t, cache.watches["a"], 1)
+		assert.Len(t, cache.watches["b"], 1)
+		assert.Len(t, cache.watches["c"], 1)
+
+		// Update a and c without touching b
+		a = &endpoint.ClusterLoadAssignment{ClusterName: "a", Endpoints: []*endpoint.LocalityLbEndpoints{ // resource update
+			{Priority: 25},
+		}}
+		err = cache.UpdateResources(map[string]types.Resource{"a": a}, nil)
+		require.NoError(t, err)
+		verifyResponse(t, w, cache.getVersion(), 1)
+		checkVersionMapNotSet(t, cache)
+
+		assert.Empty(t, cache.watches["a"])
+		assert.Empty(t, cache.watches["b"])
+		assert.Empty(t, cache.watches["c"])
+
+		// c no longer watched
+		w = make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: []string{"a", "b"}, TypeUrl: testType, VersionInfo: cache.getVersion()}, sotwState, w)
+		require.NoError(t, err)
+		mustBlock(t, w)
+		checkVersionMapNotSet(t, cache)
+
+		b = &endpoint.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{ // resource update
+			{Priority: 15},
+		}}
+		err = cache.UpdateResources(map[string]types.Resource{"b": b}, nil)
+
+		assert.Empty(t, cache.watches["a"])
+		assert.Empty(t, cache.watches["b"])
+		assert.Empty(t, cache.watches["c"])
+
+		require.NoError(t, err)
+		verifyResponse(t, w, cache.getVersion(), 1)
+		checkVersionMapNotSet(t, cache)
+
+		w = make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: []string{"c"}, TypeUrl: testType, VersionInfo: cache.getVersion()}, sotwState, w)
+		require.NoError(t, err)
+		mustBlock(t, w)
+		checkVersionMapNotSet(t, cache)
+
+		c := &endpoint.ClusterLoadAssignment{ClusterName: "c", Endpoints: []*endpoint.LocalityLbEndpoints{ // resource update
+			{Priority: 15},
+		}}
+		err = cache.UpdateResources(map[string]types.Resource{"c": c}, nil)
+		require.NoError(t, err)
+		verifyResponse(t, w, cache.getVersion(), 1)
+		checkVersionMapNotSet(t, cache)
+
+		assert.Empty(t, cache.watches["a"])
+		assert.Empty(t, cache.watches["b"])
+		assert.Empty(t, cache.watches["c"])
+	})
 }
