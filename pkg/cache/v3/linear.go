@@ -27,7 +27,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-type watches = map[chan Response]struct{}
+type watches = map[ResponseWatch]struct{}
 
 // LinearCache supports collections of opaque resources. This cache has a
 // single collection indexed by resource names and manages resource versions
@@ -113,7 +113,7 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	return out
 }
 
-func (cache *LinearCache) respond(value chan Response, staleResources []string) {
+func (cache *LinearCache) respond(watch ResponseWatch, staleResources []string) {
 	var resources []types.ResourceWithTTL
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
@@ -130,8 +130,8 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 			}
 		}
 	}
-	value <- &RawResponse{
-		Request:   &Request{TypeUrl: cache.typeURL},
+	watch.Response <- &RawResponse{
+		Request:   watch.Request,
 		Resources: resources,
 		Version:   cache.getVersion(),
 		Ctx:       context.Background(),
@@ -140,18 +140,18 @@ func (cache *LinearCache) respond(value chan Response, staleResources []string) 
 
 func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	// de-duplicate watches that need to be responded
-	notifyList := make(map[chan Response][]string)
+	notifyList := make(map[ResponseWatch][]string)
 	for name := range modified {
 		for watch := range cache.watches[name] {
 			notifyList[watch] = append(notifyList[watch], name)
 		}
-		delete(cache.watches, name)
 	}
-	for value, stale := range notifyList {
-		cache.respond(value, stale)
+	for watch, stale := range notifyList {
+		cache.removeWatch(watch)
+		cache.respond(watch, stale)
 	}
-	for value := range cache.watchAll {
-		cache.respond(value, nil)
+	for watch := range cache.watchAll {
+		cache.respond(watch, nil)
 	}
 	cache.watchAll = make(watches)
 
@@ -318,6 +318,8 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 		err = errors.New("mis-matched version prefix")
 	}
 
+	watch := ResponseWatch{Request: request, Response: value}
+
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -337,16 +339,16 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 		}
 	}
 	if stale {
-		cache.respond(value, staleResources)
+		cache.respond(watch, staleResources)
 		return nil
 	}
 	// Create open watches since versions are up to date.
 	if len(request.GetResourceNames()) == 0 {
-		cache.watchAll[value] = struct{}{}
+		cache.watchAll[watch] = struct{}{}
 		return func() {
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
-			delete(cache.watchAll, value)
+			delete(cache.watchAll, watch)
 		}
 	}
 	for _, name := range request.GetResourceNames() {
@@ -355,19 +357,24 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 			set = make(watches)
 			cache.watches[name] = set
 		}
-		set[value] = struct{}{}
+		set[watch] = struct{}{}
 	}
 	return func() {
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
-		for _, name := range request.GetResourceNames() {
-			set, exists := cache.watches[name]
-			if exists {
-				delete(set, value)
-			}
-			if len(set) == 0 {
-				delete(cache.watches, name)
-			}
+		cache.removeWatch(watch)
+	}
+}
+
+// Must be called under lock
+func (cache *LinearCache) removeWatch(watch ResponseWatch) {
+	// Make sure we clean the watch for ALL resources it might be associated with,
+	// as the channel will no longer be listened to
+	for _, resource := range watch.Request.ResourceNames {
+		resourceWatches := cache.watches[resource]
+		delete(resourceWatches, watch)
+		if len(resourceWatches) == 0 {
+			delete(cache.watches, resource)
 		}
 	}
 }
