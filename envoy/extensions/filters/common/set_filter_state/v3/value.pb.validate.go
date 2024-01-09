@@ -57,6 +57,8 @@ func (m *FilterStateValue) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for FactoryKey
+
 	// no validation rules for ReadOnly
 
 	// no validation rules for SharedWithUpstream
