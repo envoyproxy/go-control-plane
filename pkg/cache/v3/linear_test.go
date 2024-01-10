@@ -25,8 +25,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
+	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
@@ -38,18 +42,18 @@ func testResource(s string) types.Resource {
 	return wrapperspb.String(s)
 }
 
-func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
+func verifyResponseContent(t *testing.T, ch <-chan Response, expectedType string, expectedVersion string) (Response, *discovery.DiscoveryResponse) {
 	t.Helper()
 	var r Response
 	select {
 	case r = <-ch:
 	case <-time.After(1 * time.Second):
 		t.Error("failed to receive response after 1 second")
-		return
+		return nil, nil
 	}
 
-	if r.GetRequest().GetTypeUrl() != testType {
-		t.Errorf("unexpected empty request type URL: %q", r.GetRequest().GetTypeUrl())
+	if r.GetRequest().GetTypeUrl() != expectedType {
+		t.Errorf("unexpected request type URL: %q", r.GetRequest().GetTypeUrl())
 	}
 	if r.GetContext() == nil {
 		t.Errorf("unexpected empty response context")
@@ -61,18 +65,41 @@ func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	if out.GetVersionInfo() == "" {
 		t.Error("unexpected response empty version")
 	}
-	if n := len(out.GetResources()); n != num {
-		t.Errorf("unexpected number of responses: got %d, want %d", n, num)
+	if expectedVersion != "" && out.GetVersionInfo() != expectedVersion {
+		t.Errorf("unexpected version: got %q, want %q", out.GetVersionInfo(), expectedVersion)
 	}
-	if version != "" && out.GetVersionInfo() != version {
-		t.Errorf("unexpected version: got %q, want %q", out.GetVersionInfo(), version)
-	}
-	if out.GetTypeUrl() != testType {
+	if out.GetTypeUrl() != expectedType {
 		t.Errorf("unexpected type URL: %q", out.GetTypeUrl())
 	}
 	if len(r.GetRequest().GetResourceNames()) != 0 && len(r.GetRequest().GetResourceNames()) < len(out.Resources) {
 		t.Errorf("received more resources (%d) than requested (%d)", len(r.GetRequest().GetResourceNames()), len(out.Resources))
 	}
+	return r, out
+}
+
+func verifyResponse(t *testing.T, ch <-chan Response, expectedVersion string, expectedResourcesNb int) {
+	t.Helper()
+	_, r := verifyResponseContent(t, ch, testType, expectedVersion)
+	if r == nil {
+		return
+	}
+	if n := len(r.GetResources()); n != expectedResourcesNb {
+		t.Errorf("unexpected number of responses: got %d, want %d", n, expectedResourcesNb)
+	}
+}
+
+func verifyResponseResources(t *testing.T, ch <-chan Response, expectedType string, expectedVersion string, expectedResources ...string) {
+	t.Helper()
+	r, _ := verifyResponseContent(t, ch, expectedType, expectedVersion)
+	if r == nil {
+		return
+	}
+	out := r.(*RawResponse)
+	resourceNames := []string{}
+	for _, res := range out.Resources {
+		resourceNames = append(resourceNames, GetResourceName(res.Resource))
+	}
+	assert.ElementsMatch(t, resourceNames, expectedResources)
 }
 
 type resourceInfo struct {
@@ -172,6 +199,7 @@ func checkVersionMapSet(t *testing.T, c *LinearCache) {
 }
 
 func mustBlock(t *testing.T, w <-chan Response) {
+	t.Helper()
 	select {
 	case <-w:
 		t.Error("watch must block")
@@ -180,6 +208,7 @@ func mustBlock(t *testing.T, w <-chan Response) {
 }
 
 func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
+	t.Helper()
 	select {
 	case <-w:
 		t.Error("watch must block")
@@ -188,6 +217,7 @@ func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
 }
 
 func hashResource(t *testing.T, resource types.Resource) string {
+	t.Helper()
 	marshaledResource, err := MarshalResource(resource)
 	if err != nil {
 		t.Fatal(err)
@@ -815,7 +845,7 @@ func TestLinearSotwWatches(t *testing.T) {
 		}}
 		err = cache.UpdateResources(map[string]types.Resource{"a": a}, nil)
 		require.NoError(t, err)
-		verifyResponse(t, w, cache.getVersion(), 1)
+		verifyResponseResources(t, w, testType, cache.getVersion(), "a")
 		checkVersionMapNotSet(t, cache)
 
 		assert.Empty(t, cache.watches["a"])
@@ -839,7 +869,7 @@ func TestLinearSotwWatches(t *testing.T) {
 		assert.Empty(t, cache.watches["c"])
 
 		require.NoError(t, err)
-		verifyResponse(t, w, cache.getVersion(), 1)
+		verifyResponseResources(t, w, testType, cache.getVersion(), "b")
 		checkVersionMapNotSet(t, cache)
 
 		w = make(chan Response, 1)
@@ -853,11 +883,72 @@ func TestLinearSotwWatches(t *testing.T) {
 		}}
 		err = cache.UpdateResources(map[string]types.Resource{"c": c}, nil)
 		require.NoError(t, err)
-		verifyResponse(t, w, cache.getVersion(), 1)
+		verifyResponseResources(t, w, testType, cache.getVersion(), "c")
 		checkVersionMapNotSet(t, cache)
 
 		assert.Empty(t, cache.watches["a"])
 		assert.Empty(t, cache.watches["b"])
 		assert.Empty(t, cache.watches["c"])
+	})
+
+	t.Run("watches return full state for types requesting it", func(t *testing.T) {
+		a := &cluster.Cluster{Name: "a"}
+		b := &cluster.Cluster{Name: "b"}
+		c := &cluster.Cluster{Name: "c"}
+		// ClusterType requires all resources to always be returned
+		cache := NewLinearCache(resource.ClusterType, WithInitialResources(map[string]types.Resource{
+			"a": a,
+			"b": b,
+			"c": c,
+		}), WithLogger(log.NewTestLogger(t)))
+		assert.Equal(t, 3, cache.NumResources())
+
+		// Non-wildcard request
+		nonWildcardState := stream.NewStreamState(false, nil)
+		w1 := make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: []string{"a", "b", "d"}, TypeUrl: resource.ClusterType, VersionInfo: cache.getVersion()}, nonWildcardState, w1)
+		mustBlock(t, w1)
+		checkVersionMapNotSet(t, cache)
+
+		// wildcard request
+		wildcardState := stream.NewStreamState(true, nil)
+		w2 := make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: nil, TypeUrl: resource.ClusterType, VersionInfo: cache.getVersion()}, wildcardState, w2)
+		mustBlock(t, w2)
+		checkVersionMapNotSet(t, cache)
+
+		// request not requesting b
+		otherState := stream.NewStreamState(false, nil)
+		w3 := make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: []string{"a", "c", "d"}, TypeUrl: resource.ClusterType, VersionInfo: cache.getVersion()}, otherState, w3)
+		mustBlock(t, w3)
+		checkVersionMapNotSet(t, cache)
+
+		b.AltStatName = "othername"
+		err := cache.UpdateResources(map[string]types.Resource{"b": b}, nil)
+		require.NoError(t, err)
+
+		// Other watch has not triggered
+		mustBlock(t, w3)
+
+		verifyResponseResources(t, w1, resource.ClusterType, cache.getVersion(), "a", "b")      // a is also returned as cluster requires full state
+		verifyResponseResources(t, w2, resource.ClusterType, cache.getVersion(), "a", "b", "c") // a and c are also returned wildcard
+
+		// Recreate the watches
+		w1 = make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: []string{"a", "b", "d"}, TypeUrl: resource.ClusterType, VersionInfo: cache.getVersion()}, nonWildcardState, w1)
+		mustBlock(t, w1)
+		w2 = make(chan Response, 1)
+		_ = cache.CreateWatch(&Request{ResourceNames: nil, TypeUrl: resource.ClusterType, VersionInfo: cache.getVersion()}, wildcardState, w2)
+		mustBlock(t, w2)
+
+		// Update d, new resource in the cache
+		d := &cluster.Cluster{Name: "d"}
+		err = cache.UpdateResource("d", d)
+		require.NoError(t, err)
+
+		verifyResponseResources(t, w1, resource.ClusterType, cache.getVersion(), "a", "b", "d")
+		verifyResponseResources(t, w2, resource.ClusterType, cache.getVersion(), "a", "b", "c", "d")
+		verifyResponseResources(t, w3, resource.ClusterType, cache.getVersion(), "a", "c", "d")
 	})
 }
