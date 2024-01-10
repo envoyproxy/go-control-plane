@@ -106,6 +106,7 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 		versionMap:    nil,
 		version:       0,
 		versionVector: make(map[string]uint64),
+		log:           log.NewDefaultLogger(),
 	}
 	for _, opt := range opts {
 		opt(out)
@@ -117,11 +118,24 @@ func (cache *LinearCache) respond(watch ResponseWatch, staleResources []string) 
 	var resources []types.ResourceWithTTL
 	// TODO: optimize the resources slice creations across different clients
 	if len(staleResources) == 0 {
+		// Wildcard case, we return all resources in the cache
 		resources = make([]types.ResourceWithTTL, 0, len(cache.resources))
 		for _, resource := range cache.resources {
 			resources = append(resources, types.ResourceWithTTL{Resource: resource})
 		}
+	} else if ResourceRequiresFullStateInSotw(cache.typeURL) {
+		// Non-wildcard request for a type requiring full state response
+		// We need to return all requested resources, if existing, for this type
+		requestedResources := watch.Request.GetResourceNames()
+		resources = make([]types.ResourceWithTTL, 0, len(requestedResources))
+		for _, resource := range requestedResources {
+			resource := cache.resources[resource]
+			if resource != nil {
+				resources = append(resources, types.ResourceWithTTL{Resource: resource})
+			}
+		}
 	} else {
+		// Non-wildcard request for other types. Only return stale resources
 		resources = make([]types.ResourceWithTTL, 0, len(staleResources))
 		for _, name := range staleResources {
 			resource := cache.resources[name]
@@ -327,8 +341,12 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 	case err != nil:
 		stale = true
 		staleResources = request.GetResourceNames()
+		cache.log.Debugf("Watch is stale as version failed to parse %s", err.Error())
 	case len(request.GetResourceNames()) == 0:
-		stale = lastVersion != cache.version
+		stale = (lastVersion != cache.version)
+		if stale {
+			cache.log.Debugf("Watch is stale as cache version %d differs for wildcard watch %d", cache.version, lastVersion)
+		}
 	default:
 		for _, name := range request.GetResourceNames() {
 			// When a resource is removed, its version defaults 0 and it is not considered stale.
@@ -337,6 +355,9 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 				staleResources = append(staleResources, name)
 			}
 		}
+		if stale {
+			cache.log.Debugf("Watch is stale with stale resources %v", staleResources)
+		}
 	}
 	if stale {
 		cache.respond(watch, staleResources)
@@ -344,6 +365,7 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 	}
 	// Create open watches since versions are up to date.
 	if len(request.GetResourceNames()) == 0 {
+		cache.log.Infof("[linear cache] open watch for %s all resources, system version %q", cache.typeURL, cache.getVersion())
 		cache.watchAll[watch] = struct{}{}
 		return func() {
 			cache.mu.Lock()
@@ -351,6 +373,8 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 			delete(cache.watchAll, watch)
 		}
 	}
+
+	cache.log.Infof("[linear cache] open watch for %s resources %v, system version %q", cache.typeURL, request.ResourceNames, cache.getVersion())
 	for _, name := range request.GetResourceNames() {
 		set, exists := cache.watches[name]
 		if !exists {
