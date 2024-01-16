@@ -91,10 +91,25 @@ type logger struct {
 	t *testing.T
 }
 
-func (log logger) Debugf(format string, args ...interface{}) { log.t.Logf(format, args...) }
-func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
+func (log logger) Debugf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+
+func (log logger) Infof(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+
+func (log logger) Warnf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+
+func (log logger) Errorf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
 
 func TestSnapshotCacheWithTTL(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -119,13 +134,15 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 
 	wg := sync.WaitGroup{}
 	// All the resources should respond immediately when version is not up to date.
-	streamState := stream.NewStreamState(false, map[string]string{})
+	subs := map[string]stream.Subscription{}
 	for _, typ := range testTypes {
+		sub := stream.NewSotwSubscription(names[typ])
 		wg.Add(1)
 		t.Run(typ, func(t *testing.T) {
 			defer wg.Done()
 			value := make(chan cache.Response, 1)
-			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, streamState, value)
+			_, err = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, sub, value)
+			require.NoError(t, err)
 			select {
 			case out := <-value:
 				if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version {
@@ -134,8 +151,14 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTTL(typ))
 				}
-				// Update streamState
-				streamState.SetKnownResourceNamesAsList(typ, out.GetRequest().GetResourceNames())
+
+				returnedResources := make(map[string]string)
+				// Update sub to track what was returned
+				for _, resource := range out.GetRequest().GetResourceNames() {
+					returnedResources[resource] = fixture.version
+				}
+				sub.SetReturnedResources(returnedResources)
+				subs[typ] = sub
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
 			}
@@ -153,9 +176,11 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 
 			end := time.After(5 * time.Second)
 			for {
+				sub := subs[typ]
 				value := make(chan cache.Response, 1)
-				cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: fixture.version},
-					streamState, value)
+				cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: fixture.version},
+					sub, value)
+				require.NoError(t, err)
 
 				select {
 				case out := <-value:
@@ -172,7 +197,13 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 
 					updatesByType[typ]++
 
-					streamState.SetKnownResourceNamesAsList(typ, out.GetRequest().GetResourceNames())
+					returnedResources := make(map[string]string)
+					// Update sub to track what was returned
+					for _, resource := range out.GetRequest().GetResourceNames() {
+						returnedResources[resource] = fixture.version
+					}
+					sub.SetReturnedResources(returnedResources)
+					subs[typ] = sub
 				case <-end:
 					cancel()
 					return
@@ -214,9 +245,10 @@ func TestSnapshotCache(t *testing.T) {
 	// try to get endpoints with incorrect list of names
 	// should not receive response
 	value := make(chan cache.Response, 1)
-	streamState := stream.NewStreamState(false, map[string]string{})
-	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}},
-		streamState, value)
+	sub := stream.NewSotwSubscription([]string{"none"})
+	_, err = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}},
+		sub, value)
+	require.NoError(t, err)
 	select {
 	case out := <-value:
 		t.Errorf("watch for endpoints and mismatched names => got %v, want none", out)
@@ -226,9 +258,10 @@ func TestSnapshotCache(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			value := make(chan cache.Response, 1)
-			streamState := stream.NewStreamState(false, map[string]string{})
-			c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]},
-				streamState, value)
+			sub := stream.NewSotwSubscription(names[typ])
+			_, err = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]},
+				sub, value)
+			require.NoError(t, err)
 			select {
 			case out := <-value:
 				snapshot := fixture.snapshot()
@@ -279,10 +312,13 @@ func TestSnapshotCacheFetch(t *testing.T) {
 func TestSnapshotCacheWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	watches := make(map[string]chan cache.Response)
-	streamState := stream.NewStreamState(false, map[string]string{})
+	subs := map[string]stream.Subscription{}
 	for _, typ := range testTypes {
+		sub := stream.NewSotwSubscription(names[typ])
+		subs[typ] = sub
 		watches[typ] = make(chan cache.Response, 1)
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, streamState, watches[typ])
+		_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, sub, watches[typ])
+		require.NoError(t, err)
 	}
 	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
 		t.Fatal(err)
@@ -298,7 +334,14 @@ func TestSnapshotCacheWatch(t *testing.T) {
 				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
 				}
-				streamState.SetKnownResourceNamesAsList(typ, out.GetRequest().GetResourceNames())
+				returnedResources := make(map[string]string)
+				// Update sub to track what was returned
+				for _, resource := range out.GetRequest().GetResourceNames() {
+					returnedResources[resource] = fixture.version
+				}
+				sub := subs[typ]
+				sub.SetReturnedResources(returnedResources)
+				subs[typ] = sub
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}
@@ -308,8 +351,9 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	// open new watches with the latest version
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.Response, 1)
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: fixture.version},
-			streamState, watches[typ])
+		_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ], VersionInfo: fixture.version},
+			subs[typ], watches[typ])
+		require.NoError(t, err)
 	}
 	if count := c.GetStatusInfo(key).GetNumWatches(); count != len(testTypes) {
 		t.Errorf("watches should be created for the latest version: %d", count)
@@ -354,11 +398,12 @@ func TestConcurrentSetWatch(t *testing.T) {
 					t.Fatalf("failed to set snapshot %q: %s", id, err)
 				}
 			} else {
-				streamState := stream.NewStreamState(false, map[string]string{})
-				cancel := c.CreateWatch(&discovery.DiscoveryRequest{
+				sub := stream.NewSotwSubscription(nil)
+				cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{
 					Node:    &core.Node{Id: id},
 					TypeUrl: rsrc.EndpointType,
-				}, streamState, value)
+				}, sub, value)
+				require.NoError(t, err)
 				defer cancel()
 			}
 		})
@@ -367,10 +412,11 @@ func TestConcurrentSetWatch(t *testing.T) {
 
 func TestSnapshotCacheWatchCancel(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
-	streamState := stream.NewStreamState(false, map[string]string{})
 	for _, typ := range testTypes {
+		sub := stream.NewSotwSubscription(names[typ])
 		value := make(chan cache.Response, 1)
-		cancel := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, streamState, value)
+		cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, sub, value)
+		require.NoError(t, err)
 		cancel()
 	}
 	// should be status info for the node
@@ -394,15 +440,16 @@ func TestSnapshotCacheWatchTimeout(t *testing.T) {
 
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.Response)
-	streamState := stream.NewStreamState(false, map[string]string{})
-	c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]},
-		streamState, watchCh)
+	sub := stream.NewSotwSubscription(names[rsrc.EndpointType])
+	_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]},
+		sub, watchCh)
+	require.NoError(t, err)
 
 	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 	defer cancel()
 
-	err := c.SetSnapshot(ctx, key, fixture.snapshot())
+	err = c.SetSnapshot(ctx, key, fixture.snapshot())
 	require.EqualError(t, err, context.Canceled.Error())
 
 	// Now reset the snapshot with a consuming channel. This verifies that if setting the snapshot fails,
@@ -450,8 +497,9 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 
 	// Request resource with name=ClusterName
 	go func() {
-		c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{clusterName}},
-			stream.NewStreamState(false, map[string]string{}), watch)
+		_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{clusterName}},
+			stream.NewSotwSubscription([]string{clusterName}), watch)
+		require.NoError(t, err)
 	}()
 
 	select {
@@ -469,12 +517,13 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 
 	// Request additional resource with name=clusterName2 for same version
 	go func() {
-		state := stream.NewStreamState(false, map[string]string{})
-		state.SetKnownResourceNames(rsrc.EndpointType, map[string]struct{}{clusterName: {}})
-		c.CreateWatch(&discovery.DiscoveryRequest{
+		sub := stream.NewSotwSubscription([]string{clusterName, clusterName2})
+		sub.SetReturnedResources(map[string]string{clusterName: fixture.version})
+		_, err := c.CreateWatch(&discovery.DiscoveryRequest{
 			TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
 			ResourceNames: []string{clusterName, clusterName2},
-		}, state, watch)
+		}, sub, watch)
+		require.NoError(t, err)
 	}()
 
 	select {
@@ -490,12 +539,14 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	}
 
 	// Repeat request for with same version and make sure a watch is created
-	state := stream.NewStreamState(false, map[string]string{})
-	state.SetKnownResourceNames(rsrc.EndpointType, map[string]struct{}{clusterName: {}, clusterName2: {}})
-	if cancel := c.CreateWatch(&discovery.DiscoveryRequest{
+	sub := stream.NewSotwSubscription([]string{clusterName, clusterName2})
+	sub.SetReturnedResources(map[string]string{clusterName: fixture.version, clusterName2: fixture.version})
+	cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{
 		TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
 		ResourceNames: []string{clusterName, clusterName2},
-	}, state, watch); cancel == nil {
+	}, sub, watch)
+	require.NoError(t, err)
+	if cancel == nil {
 		t.Fatal("Should create a watch")
 	} else {
 		cancel()
@@ -624,9 +675,11 @@ func TestAvertPanicForWatchOnNonExistentSnapshot(t *testing.T) {
 		ResourceNames: []string{"rtds"},
 		TypeUrl:       rsrc.RuntimeType,
 	}
-	ss := stream.NewStreamState(false, map[string]string{"cluster": "abcdef"})
+	ss := stream.NewSotwSubscription([]string{"rtds"})
+	ss.SetReturnedResources(map[string]string{"cluster": "abcdef"})
 	responder := make(chan cache.Response)
-	c.CreateWatch(req, ss, responder)
+	_, err := c.CreateWatch(req, ss, responder)
+	require.NoError(t, err)
 
 	go func() {
 		// Wait for at least one heartbeat to occur, then set snapshot.
