@@ -19,7 +19,9 @@ import (
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 )
 
@@ -37,7 +39,7 @@ func TestTTLResponse(t *testing.T) {
 	defer cancel()
 
 	snapshotCache := cache.NewSnapshotCacheWithHeartbeating(ctx, false, cache.IDHash{}, logger{t: t}, time.Second)
-	server := server.NewServer(ctx, snapshotCache, nil)
+	server := server.NewServer(ctx, snapshotCache, nil, sotw.WithLogger(log.NewTestLogger(t)))
 	grpcServer := grpc.NewServer()
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
 
