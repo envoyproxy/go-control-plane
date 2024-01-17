@@ -26,10 +26,10 @@ const (
 
 // A CryptoMbPrivateKeyMethodConfig message specifies how the CryptoMb private
 // key provider is configured. The private key provider provides “SIMD“
-// processing for RSA sign and decrypt operations (ECDSA signing uses regular
-// BoringSSL functions). The provider works by gathering the operations into a
-// worker-thread specific queue, and processing the queue using “ipp-crypto“
-// library when the queue is full or when a timer expires.
+// processing for ECDSA sign operations and RSA sign and decrypt operations.
+// The provider works by gathering the operations into a worker-thread specific
+// queue, and processing the queue using “ipp-crypto“ library when the queue
+// is full or when a timer expires.
 // [#extension-category: envoy.tls.key_providers]
 type CryptoMbPrivateKeyMethodConfig struct {
 	state         protoimpl.MessageState
