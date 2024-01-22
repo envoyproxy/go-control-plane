@@ -488,6 +488,13 @@ func (m *ClientConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ClientScope) > 0 {
+		i -= len(m.ClientScope)
+		copy(dAtA[i:], m.ClientScope)
+		i = encodeVarint(dAtA, i, uint64(len(m.ClientScope)))
+		i--
+		dAtA[i] = 0x22
+	}
 	if len(m.GenericXdsConfigs) > 0 {
 		for iNdEx := len(m.GenericXdsConfigs) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.GenericXdsConfigs[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -813,6 +820,10 @@ func (m *ClientConfig) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 1 + l + sov(uint64(l))
 		}
+	}
+	l = len(m.ClientScope)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
