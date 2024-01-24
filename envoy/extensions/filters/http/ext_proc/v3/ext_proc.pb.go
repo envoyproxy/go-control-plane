@@ -120,14 +120,12 @@ type ExternalProcessor struct {
 	// each message is sent to the remote service and wait up to "message_timeout"
 	// for a reply.
 	AsyncMode bool `protobuf:"varint,4,opt,name=async_mode,json=asyncMode,proto3" json:"async_mode,omitempty"`
-	// [#not-implemented-hide:]
 	// Envoy provides a number of :ref:`attributes <arch_overview_attributes>`
 	// for expressive policies. Each attribute name provided in this field will be
 	// matched against that list and populated in the request_headers message.
 	// See the :ref:`attribute documentation <arch_overview_request_attributes>`
 	// for the list of supported attributes and their types.
 	RequestAttributes []string `protobuf:"bytes,5,rep,name=request_attributes,json=requestAttributes,proto3" json:"request_attributes,omitempty"`
-	// [#not-implemented-hide:]
 	// Envoy provides a number of :ref:`attributes <arch_overview_attributes>`
 	// for expressive policies. Each attribute name provided in this field will be
 	// matched against that list and populated in the response_headers message.
