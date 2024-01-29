@@ -239,7 +239,7 @@ type ProcessingRequest_RequestBody struct {
 }
 
 type ProcessingRequest_ResponseBody struct {
-	// A chunk of the HTTP request body. Unless “async_mode“ is “true“, the server must send back
+	// A chunk of the HTTP response body. Unless “async_mode“ is “true“, the server must send back
 	// a BodyResponse message or close the stream.
 	ResponseBody *HttpBody `protobuf:"bytes,5,opt,name=response_body,json=responseBody,proto3,oneof"`
 }
@@ -248,11 +248,8 @@ type ProcessingRequest_RequestTrailers struct {
 	// The HTTP trailers for the request path. Unless “async_mode“ is “true“, the server
 	// must send back a TrailerResponse message or close the stream.
 	//
-	// This message is only sent if the trailers processing mode is set to “SEND“.
-	// If there are no trailers on the original downstream request, then this message
-	// will only be sent (with empty trailers waiting to be populated) if the
-	// processing mode is set before the request headers are sent, such as
-	// in the filter configuration.
+	// This message is only sent if the trailers processing mode is set to “SEND“ and
+	// the original downstream request has trailers.
 	RequestTrailers *HttpTrailers `protobuf:"bytes,6,opt,name=request_trailers,json=requestTrailers,proto3,oneof"`
 }
 
@@ -260,11 +257,8 @@ type ProcessingRequest_ResponseTrailers struct {
 	// The HTTP trailers for the response path. Unless “async_mode“ is “true“, the server
 	// must send back a TrailerResponse message or close the stream.
 	//
-	// This message is only sent if the trailers processing mode is set to “SEND“.
-	// If there are no trailers on the original downstream request, then this message
-	// will only be sent (with empty trailers waiting to be populated) if the
-	// processing mode is set before the request headers are sent, such as
-	// in the filter configuration.
+	// This message is only sent if the trailers processing mode is set to “SEND“ and
+	// the original upstream response has trailers.
 	ResponseTrailers *HttpTrailers `protobuf:"bytes,7,opt,name=response_trailers,json=responseTrailers,proto3,oneof"`
 }
 
