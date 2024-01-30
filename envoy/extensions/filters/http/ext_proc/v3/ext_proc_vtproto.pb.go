@@ -49,6 +49,18 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MetadataOptions != nil {
+		size, err := m.MetadataOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
+	}
 	if m.DisableImmediateResponse {
 		i--
 		if m.DisableImmediateResponse {
@@ -215,6 +227,110 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 			copy(dAtA[i:], encoded)
 			i = encodeVarint(dAtA, i, uint64(len(encoded)))
 		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MetadataOptions_MetadataNamespaces) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MetadataOptions_MetadataNamespaces) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *MetadataOptions_MetadataNamespaces) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.Typed) > 0 {
+		for iNdEx := len(m.Typed) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Typed[iNdEx])
+			copy(dAtA[i:], m.Typed[iNdEx])
+			i = encodeVarint(dAtA, i, uint64(len(m.Typed[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Untyped) > 0 {
+		for iNdEx := len(m.Untyped) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Untyped[iNdEx])
+			copy(dAtA[i:], m.Untyped[iNdEx])
+			i = encodeVarint(dAtA, i, uint64(len(m.Untyped[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MetadataOptions) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MetadataOptions) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *MetadataOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ReceivingNamespaces != nil {
+		size, err := m.ReceivingNamespaces.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.ForwardingNamespaces != nil {
+		size, err := m.ForwardingNamespaces.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -411,6 +527,16 @@ func (m *ExtProcOverrides) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MetadataOptions != nil {
+		size, err := m.MetadataOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.GrpcService != nil {
 		if vtmsg, ok := interface{}(m.GrpcService).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -551,6 +677,50 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 	if m.DisableImmediateResponse {
 		n += 2
 	}
+	if m.MetadataOptions != nil {
+		l = m.MetadataOptions.SizeVT()
+		n += 2 + l + sov(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *MetadataOptions_MetadataNamespaces) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Untyped) > 0 {
+		for _, s := range m.Untyped {
+			l = len(s)
+			n += 1 + l + sov(uint64(l))
+		}
+	}
+	if len(m.Typed) > 0 {
+		for _, s := range m.Typed {
+			l = len(s)
+			n += 1 + l + sov(uint64(l))
+		}
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *MetadataOptions) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ForwardingNamespaces != nil {
+		l = m.ForwardingNamespaces.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.ReceivingNamespaces != nil {
+		l = m.ReceivingNamespaces.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -652,6 +822,10 @@ func (m *ExtProcOverrides) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.GrpcService)
 		}
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.MetadataOptions != nil {
+		l = m.MetadataOptions.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)

@@ -60,6 +60,35 @@ func (m *ProcessingRequest) validate(all bool) error {
 
 	// no validation rules for AsyncMode
 
+	if all {
+		switch v := interface{}(m.GetMetadataContext()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ProcessingRequestValidationError{
+					field:  "MetadataContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ProcessingRequestValidationError{
+					field:  "MetadataContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMetadataContext()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProcessingRequestValidationError{
+				field:  "MetadataContext",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	oneofRequestPresent := false
 	switch v := m.Request.(type) {
 	case *ProcessingRequest_RequestHeaders:
