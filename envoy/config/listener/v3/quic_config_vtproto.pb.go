@@ -49,6 +49,16 @@ func (m *QuicProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SendDisableActiveMigration != nil {
+		size, err := (*wrapperspb.BoolValue)(m.SendDisableActiveMigration).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x52
+	}
 	if m.ServerPreferredAddressConfig != nil {
 		if vtmsg, ok := interface{}(m.ServerPreferredAddressConfig).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -290,6 +300,10 @@ func (m *QuicProtocolOptions) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.ServerPreferredAddressConfig)
 		}
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.SendDisableActiveMigration != nil {
+		l = (*wrapperspb.BoolValue)(m.SendDisableActiveMigration).SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
