@@ -2250,6 +2250,54 @@ func (m *LoadBalancingPolicy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
+func (m *UpstreamConnectionOptions_HappyEyeballsConfig) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpstreamConnectionOptions_HappyEyeballsConfig) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *UpstreamConnectionOptions_HappyEyeballsConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.FirstAddressFamilyCount != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.FirstAddressFamilyCount).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.FirstAddressFamilyVersion != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.FirstAddressFamilyVersion))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *UpstreamConnectionOptions) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -2279,6 +2327,16 @@ func (m *UpstreamConnectionOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.HappyEyeballsConfig != nil {
+		size, err := m.HappyEyeballsConfig.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.SetLocalInterfaceNameOnUpstreamConnections {
 		i--
@@ -3238,6 +3296,23 @@ func (m *LoadBalancingPolicy) SizeVT() (n int) {
 	return n
 }
 
+func (m *UpstreamConnectionOptions_HappyEyeballsConfig) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.FirstAddressFamilyVersion != 0 {
+		n += 1 + sov(uint64(m.FirstAddressFamilyVersion))
+	}
+	if m.FirstAddressFamilyCount != nil {
+		l = (*wrapperspb.UInt32Value)(m.FirstAddressFamilyCount).SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *UpstreamConnectionOptions) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -3256,6 +3331,10 @@ func (m *UpstreamConnectionOptions) SizeVT() (n int) {
 	}
 	if m.SetLocalInterfaceNameOnUpstreamConnections {
 		n += 2
+	}
+	if m.HappyEyeballsConfig != nil {
+		l = m.HappyEyeballsConfig.SizeVT()
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
