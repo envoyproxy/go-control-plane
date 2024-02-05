@@ -119,6 +119,11 @@ type Response interface {
 	// Get the version in the Response.
 	GetVersion() (string, error)
 
+	// GetReturnedResources returns the map of resources and their versions returned in the subscription.
+	// It may include more resources than directly set in the response to consider the full state of the client.
+	// The caller is expected to provide this unchanged to the next call to CreateWatch as part of the subscription.
+	GetReturnedResources() map[string]string
+
 	// Get the context provided during response creation.
 	GetContext() context.Context
 }
@@ -155,6 +160,12 @@ type RawResponse struct {
 
 	// Resources to be included in the response.
 	Resources []types.ResourceWithTTL
+
+	// ReturnedResources tracks the resources returned for the subscription and the version when it was last returned,
+	// including previously returned ones when using non-full state resources.
+	// It allows the cache to know what the client knows. The server will transparently forward this
+	// across requests, and the cache is responsible for its interpretation.
+	ReturnedResources map[string]string
 
 	// Whether this is a heartbeat response. For xDS versions that support TTL, this
 	// will be converted into a response that doesn't contain the actual resource protobuf.
@@ -208,6 +219,12 @@ type PassthroughResponse struct {
 	DiscoveryResponse *discovery.DiscoveryResponse
 
 	ctx context.Context
+
+	// ReturnedResources tracks the resources returned for the subscription and the version when it was last returned,
+	// including previously returned ones when using non-full state resources.
+	// It allows the cache to know what the client knows. The server will transparently forward this
+	// across requests, and the cache is responsible for its interpretation.
+	ReturnedResources map[string]string
 }
 
 // DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshaling transformations.
@@ -263,6 +280,10 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 	}
 
 	return marshaledResponse.(*discovery.DiscoveryResponse), nil
+}
+
+func (r *RawResponse) GetReturnedResources() map[string]string {
+	return r.ReturnedResources
 }
 
 // GetDeltaDiscoveryResponse performs the marshaling the first time its called and uses the cached response subsequently.
@@ -366,6 +387,10 @@ func (r *RawResponse) maybeCreateTTLResource(resource types.ResourceWithTTL) (ty
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
 func (r *PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	return r.DiscoveryResponse, nil
+}
+
+func (r *PassthroughResponse) GetReturnedResources() map[string]string {
+	return r.ReturnedResources
 }
 
 // GetDeltaDiscoveryResponse returns the final passthrough Delta Discovery Response.

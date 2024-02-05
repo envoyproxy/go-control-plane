@@ -74,6 +74,17 @@ func (s *Subscription) SetResourceSubscription(subscribed []string) {
 		}
 	}
 
+	if !explicitWildcardSet {
+		// Cleanup resources no longer subscribed to.
+		// This ensures later subscriptions will trigger responses,
+		// even if the version has not changed
+		for resource := range s.returnedResources {
+			if _, ok := subscribedResources[resource]; !ok {
+				delete(s.returnedResources, resource)
+			}
+		}
+	}
+
 	// Explicit subscription to wildcard as we are not in legacy wildcard behavior
 	s.wildcard = explicitWildcardSet
 	s.subscribedResourceNames = subscribedResources
@@ -132,6 +143,10 @@ func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []st
 			// * detect the version change, and return the resource (as an update)
 			// * detect the resource deletion, and set it as removed in the response
 			s.returnedResources[resource] = ""
+		} else {
+			// Cleanup unsubscribed resources. This avoids returning a response
+			// if the versions have not changed
+			delete(s.returnedResources, resource)
 		}
 		delete(s.subscribedResourceNames, resource)
 	}
