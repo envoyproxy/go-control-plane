@@ -47,6 +47,13 @@ func (m *Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.HostRewrite) > 0 {
+		i -= len(m.HostRewrite)
+		copy(dAtA[i:], m.HostRewrite)
+		i = encodeVarint(dAtA, i, uint64(len(m.HostRewrite)))
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.InvocationMode != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.InvocationMode))
 		i--
@@ -141,6 +148,10 @@ func (m *Config) SizeVT() (n int) {
 	}
 	if m.InvocationMode != 0 {
 		n += 1 + sov(uint64(m.InvocationMode))
+	}
+	l = len(m.HostRewrite)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
