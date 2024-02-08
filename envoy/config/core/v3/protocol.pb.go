@@ -208,7 +208,7 @@ type QuicProtocolOptions struct {
 	MaxConcurrentStreams *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
 	// `Initial stream-level flow-control receive window
 	// <https://tools.ietf.org/html/draft-ietf-quic-transport-34#section-4.1>`_ size. Valid values range from
-	// 1 to 16777216 (2^24, maximum supported by QUICHE) and defaults to 65536 (2^16).
+	// 1 to 16777216 (2^24, maximum supported by QUICHE) and defaults to 16777216 (16 * 1024 * 1024).
 	//
 	// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. If configured smaller than it, we will use 16384 instead.
 	// QUICHE IETF Quic implementation supports 1 bytes window. We only support increasing the default window size now, so it's also the minimum.
@@ -218,8 +218,8 @@ type QuicProtocolOptions struct {
 	// stop the flow of data to the stream buffers.
 	InitialStreamWindowSize *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
 	// Similar to “initial_stream_window_size“, but for connection-level
-	// flow-control. Valid values rage from 1 to 25165824 (24MB, maximum supported by QUICHE) and defaults to 65536 (2^16).
-	// window. Currently, this has the same minimum/default as “initial_stream_window_size“.
+	// flow-control. Valid values rage from 1 to 25165824 (24MB, maximum supported by QUICHE) and defaults
+	// to 25165824 (24 * 1024 * 1024).
 	//
 	// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
 	// window size now, so it's also the minimum.
