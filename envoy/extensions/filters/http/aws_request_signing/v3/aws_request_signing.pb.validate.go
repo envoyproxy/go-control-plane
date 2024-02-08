@@ -69,16 +69,7 @@ func (m *AwsRequestSigning) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetRegion()) < 1 {
-		err := AwsRequestSigningValidationError{
-			field:  "Region",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Region
 
 	// no validation rules for HostRewrite
 
