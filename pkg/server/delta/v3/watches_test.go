@@ -5,11 +5,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
 func TestDeltaWatches(t *testing.T) {
 	t.Run("watches response channels are properly closed when the watches are canceled", func(t *testing.T) {
-		watches := newWatches()
+		watches := newWatches(int(types.UnknownType))
 
 		cancelCount := 0
 		// create a few watches, and ensure that the cancel function are called and the channels are closed
