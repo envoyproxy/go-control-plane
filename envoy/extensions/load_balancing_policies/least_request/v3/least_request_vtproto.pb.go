@@ -49,6 +49,11 @@ func (m *LeastRequest) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SelectionMethod != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.SelectionMethod))
+		i--
+		dAtA[i] = 0x30
+	}
 	if m.EnableFullScan != nil {
 		size, err := (*wrapperspb.BoolValue)(m.EnableFullScan).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -192,6 +197,9 @@ func (m *LeastRequest) SizeVT() (n int) {
 	if m.EnableFullScan != nil {
 		l = (*wrapperspb.BoolValue)(m.EnableFullScan).SizeVT()
 		n += 1 + l + sov(uint64(l))
+	}
+	if m.SelectionMethod != 0 {
+		n += 1 + sov(uint64(m.SelectionMethod))
 	}
 	n += len(m.unknownFields)
 	return n
