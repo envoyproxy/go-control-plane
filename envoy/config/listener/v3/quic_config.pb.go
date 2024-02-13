@@ -67,7 +67,7 @@ type QuicProtocolOptions struct {
 	// [#extension-category: envoy.quic.connection_id_generator]
 	ConnectionIdGeneratorConfig *v3.TypedExtensionConfig `protobuf:"bytes,8,opt,name=connection_id_generator_config,json=connectionIdGeneratorConfig,proto3" json:"connection_id_generator_config,omitempty"`
 	// Configure the server's preferred address to advertise so that client can migrate to it. See :ref:`example <envoy_v3_api_msg_extensions.quic.server_preferred_address.v3.FixedServerPreferredAddressConfig>` which configures a pair of v4 and v6 preferred addresses.
-	// The current QUICHE implementation will advertise only one of the preferred IPv4 and IPv6 addresses based on the address family the client initially connects with, and only if the client is also QUICHE-based.
+	// The current QUICHE implementation will advertise only one of the preferred IPv4 and IPv6 addresses based on the address family the client initially connects with.
 	// If not specified, Envoy will not advertise any server's preferred address.
 	// [#extension-category: envoy.quic.server_preferred_address]
 	ServerPreferredAddressConfig *v3.TypedExtensionConfig `protobuf:"bytes,9,opt,name=server_preferred_address_config,json=serverPreferredAddressConfig,proto3" json:"server_preferred_address_config,omitempty"`
