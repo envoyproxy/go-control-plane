@@ -33,7 +33,7 @@ type Cookie struct {
 	// new cookie for downstream.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Duration of cookie. This will be used to set the expiry time of a new cookie when it is
-	// generated. Set this to 0 to use a session cookie.
+	// generated. Set this to 0s to use a session cookie and disable cookie expiration.
 	Ttl *duration.Duration `protobuf:"bytes,2,opt,name=ttl,proto3" json:"ttl,omitempty"`
 	// Path of cookie. This will be used to set the path of a new cookie when it is generated.
 	// If no path is specified here, no path will be set for the cookie.
