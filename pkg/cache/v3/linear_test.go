@@ -917,7 +917,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	err = c.UpdateResources(map[string]types.Resource{"b": b, "d": d}, nil)
 	require.NoError(t, err)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"d", hashD}}, nil)
-	// d is now watched and shoudl be returned
+	// d is now watched and should be returned
 	checkStableVersionsAreComputed(t, c, "b", "d")
 	assert.Equal(t, 3, c.NumResources())
 
