@@ -22,12 +22,11 @@ import (
 
 // groups together resource-related arguments for the createDeltaResponse function
 type resourceContainer struct {
-	resourceMap   map[string]types.Resource
-	versionMap    map[string]string
-	systemVersion string
+	resourceMap map[string]types.Resource
+	versionMap  map[string]string
 }
 
-func createDeltaResponse(ctx context.Context, req *DeltaRequest, sub Subscription, resources resourceContainer) *RawDeltaResponse {
+func createDeltaResponse(ctx context.Context, req *DeltaRequest, sub Subscription, resources resourceContainer, cacheVersion string) *RawDeltaResponse {
 	// variables to build our response with
 	var nextVersionMap map[string]string
 	var filtered []types.Resource
@@ -81,7 +80,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, sub Subscriptio
 		Resources:         filtered,
 		RemovedResources:  toRemove,
 		NextVersionMap:    nextVersionMap,
-		SystemVersionInfo: resources.systemVersion,
+		SystemVersionInfo: cacheVersion,
 		Ctx:               ctx,
 	}
 }
