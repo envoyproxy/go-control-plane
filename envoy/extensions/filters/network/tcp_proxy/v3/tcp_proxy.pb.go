@@ -56,6 +56,8 @@ type TcpProxy struct {
 	// is defined as the period in which there are no bytes sent or received on either
 	// the upstream or downstream connection. If not set, the default idle timeout is 1 hour. If set
 	// to 0s, the timeout will be disabled.
+	// It is possible to dynamically override this configuration by setting a per-connection filter
+	// state object for the key “envoy.tcp_proxy.per_connection_idle_timeout_ms“.
 	//
 	// .. warning::
 	//
