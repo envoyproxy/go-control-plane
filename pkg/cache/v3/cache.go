@@ -56,12 +56,6 @@ type Subscription interface {
 	// This considers subtleties related to the current migration of wildcard definitions within the protocol.
 	// More details on the behavior of wildcard are present at https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#how-the-client-specifies-what-resources-to-return
 	IsWildcard() bool
-
-	// WatchesResources returns whether at least one of the resources provided is currently being watched by the subscription.
-	// It is currently only applicable to delta-xds.
-	// If the request is wildcard, it will always return true,
-	// otherwise it will compare the provided resources to the list of resources currently subscribed
-	WatchesResources(resourceNames map[string]struct{}) bool
 }
 
 // ConfigWatcher requests watches for configuration resources by a node, last

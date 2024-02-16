@@ -590,10 +590,9 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sub Subscrip
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
 func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceSnapshot, request *DeltaRequest, value chan DeltaResponse, sub Subscription) (*RawDeltaResponse, error) {
 	resp := createDeltaResponse(ctx, request, sub, resourceContainer{
-		resourceMap:   snapshot.GetResources(request.GetTypeUrl()),
-		versionMap:    snapshot.GetVersionMap(request.GetTypeUrl()),
-		systemVersion: snapshot.GetVersion(request.GetTypeUrl()),
-	})
+		resourceMap: snapshot.GetResources(request.GetTypeUrl()),
+		versionMap:  snapshot.GetVersionMap(request.GetTypeUrl()),
+	}, snapshot.GetVersion(request.GetTypeUrl()))
 
 	// Only send a response if there were changes
 	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
