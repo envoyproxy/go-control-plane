@@ -8,6 +8,7 @@ package clusterv3
 import (
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -47,6 +48,32 @@ func (m *OutlierDetection) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.Monitors) > 0 {
+		for iNdEx := len(m.Monitors) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.Monitors[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.Monitors[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = encodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0xc2
+		}
 	}
 	if m.SuccessfulActiveHealthCheckUnejectHost != nil {
 		size, err := (*wrapperspb.BoolValue)(m.SuccessfulActiveHealthCheckUnejectHost).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -393,6 +420,18 @@ func (m *OutlierDetection) SizeVT() (n int) {
 	if m.SuccessfulActiveHealthCheckUnejectHost != nil {
 		l = (*wrapperspb.BoolValue)(m.SuccessfulActiveHealthCheckUnejectHost).SizeVT()
 		n += 2 + l + sov(uint64(l))
+	}
+	if len(m.Monitors) > 0 {
+		for _, e := range m.Monitors {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 2 + l + sov(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
