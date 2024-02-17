@@ -30,7 +30,11 @@ func TestFetch(t *testing.T) {
 	defer cancel()
 
 	snapCache := cache.NewSnapshotCache(true, cache.IDHash{}, nil)
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		err := startAdsServer(ctx, snapCache)
 		require.NoError(t, err)
 	}()
@@ -45,6 +49,10 @@ func TestFetch(t *testing.T) {
 
 	t.Run("Test initial fetch", testInitialFetch(ctx, snapCache, c))
 	t.Run("Test next fetch", testNextFetch(ctx, snapCache, c))
+
+	// Ensure the ADS server is properly shutdown and has released the port
+	cancel()
+	wg.Wait()
 }
 
 func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
@@ -53,6 +61,7 @@ func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c clie
 		wg.Add(1)
 
 		go func() {
+			defer wg.Done()
 			// watch for configs
 			resp, err := c.Fetch()
 			require.NoError(t, err)
@@ -66,7 +75,6 @@ func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c clie
 
 			err = c.Ack()
 			require.NoError(t, err)
-			wg.Done()
 		}()
 
 		snapshot, err := cache.NewSnapshot("1", map[resource.Type][]types.Resource{
@@ -92,6 +100,7 @@ func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.
 		wg.Add(1)
 
 		go func() {
+			defer wg.Done()
 			// watch for configs
 			resp, err := c.Fetch()
 			require.NoError(t, err)
@@ -105,7 +114,6 @@ func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.
 
 			err = c.Ack()
 			require.NoError(t, err)
-			wg.Done()
 		}()
 
 		snapshot, err := cache.NewSnapshot("2", map[resource.Type][]types.Resource{
@@ -133,6 +141,11 @@ func startAdsServer(ctx context.Context, snapCache cache.SnapshotCache) error {
 	grpcServer := grpc.NewServer()
 	s := server.NewServer(ctx, snapCache, nil)
 	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, s)
+
+	go func() {
+		<-ctx.Done()
+		grpcServer.Stop()
+	}()
 
 	if e := grpcServer.Serve(lis); e != nil {
 		err = e
