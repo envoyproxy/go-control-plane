@@ -22,6 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
@@ -503,7 +504,7 @@ func TestLinearDeletion(t *testing.T) {
 	})
 
 	t.Run("full-state resource", func(t *testing.T) {
-		c := NewLinearCache(resource.ClusterType, WithInitialResources(map[string]types.Resource{"a": &cluster.Cluster{Name: "a"}, "b": &cluster.Cluster{Name: "b"}}))
+		c := NewLinearCache(resource.ClusterType, WithInitialResources(map[string]types.Resource{"a": &cluster.Cluster{Name: "a"}, "b": &cluster.Cluster{Name: "b"}}), WithLogger(log.NewTestLogger(t)))
 		w := make(chan Response, 1)
 		req := &Request{ResourceNames: []string{"a"}, TypeUrl: resource.ClusterType, VersionInfo: "0"}
 		sub := subFromRequest(req)
@@ -1448,5 +1449,143 @@ func TestLinearSotwNonWildcard(t *testing.T) {
 		validateResponse(2, []string{"a", "d"})
 		validateResponse(3, []string{"a", "b", "d", "e"})
 		checkPendingWatch(4)
+	})
+}
+
+func TestLinearSotwVersion(t *testing.T) {
+	cache := NewLinearCache(resource.EndpointType, WithLogger(log.NewTestLogger(t)), WithInitialResources(
+		map[string]types.Resource{
+			"a": &endpoint.ClusterLoadAssignment{ClusterName: "a"},
+			"b": &endpoint.ClusterLoadAssignment{ClusterName: "b"},
+			"c": &endpoint.ClusterLoadAssignment{ClusterName: "c"},
+		},
+	), WithSotwStableVersions())
+
+	buildRequest := func(res []string, version string) *discovery.DiscoveryRequest {
+		return &discovery.DiscoveryRequest{
+			ResourceNames: res,
+			TypeUrl:       resource.EndpointType,
+			VersionInfo:   version,
+		}
+	}
+
+	var lastVersion string
+	t.Run("watch without any version is replied to", func(t *testing.T) {
+		cache.log = log.NewTestLogger(t)
+		req := buildRequest([]string{"a", "b", "d"}, "")
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, subFromRequest(req), w)
+		require.NoError(t, err)
+		resp := verifyResponseResources(t, w, resource.EndpointType, "f8fac96556140daa", "a", "b")
+		lastVersion, err = resp.GetVersion()
+		require.NoError(t, err)
+		assert.NotEmpty(t, lastVersion)
+	})
+
+	t.Run("watch opened with the same last version", func(t *testing.T) {
+		cache.log = log.NewTestLogger(t)
+		req := buildRequest([]string{"a", "b", "d"}, lastVersion)
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, subFromRequest(req), w)
+		require.NoError(t, err)
+		mustBlock(t, w)
+	})
+
+	t.Run("watch opened with the same last version and different prefix", func(t *testing.T) {
+		cache.log = log.NewTestLogger(t)
+		req := buildRequest([]string{"a", "b", "d"}, "test-prefix-"+lastVersion)
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, subFromRequest(req), w)
+		require.NoError(t, err)
+		verifyResponseResources(t, w, resource.EndpointType, lastVersion, "a", "b")
+	})
+
+	t.Run("watch opened with the same last version missing prefix", func(t *testing.T) {
+		cache := NewLinearCache(resource.EndpointType, WithLogger(log.NewTestLogger(t)), WithInitialResources(
+			map[string]types.Resource{
+				"a": &endpoint.ClusterLoadAssignment{ClusterName: "a"},
+				"b": &endpoint.ClusterLoadAssignment{ClusterName: "b"},
+				"c": &endpoint.ClusterLoadAssignment{ClusterName: "c"},
+			},
+		), WithSotwStableVersions(), WithVersionPrefix("test-prefix-"))
+
+		req := buildRequest([]string{"a", "b", "d"}, lastVersion)
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, subFromRequest(req), w)
+		require.NoError(t, err)
+		verifyResponseResources(t, w, resource.EndpointType, "test-prefix-"+lastVersion, "a", "b")
+	})
+
+	t.Run("watch opened with the same last version including prefix", func(t *testing.T) {
+		cache := NewLinearCache(resource.EndpointType, WithLogger(log.NewTestLogger(t)), WithInitialResources(
+			map[string]types.Resource{
+				"a": &endpoint.ClusterLoadAssignment{ClusterName: "a"},
+				"b": &endpoint.ClusterLoadAssignment{ClusterName: "b"},
+				"c": &endpoint.ClusterLoadAssignment{ClusterName: "c"},
+			},
+		), WithSotwStableVersions(), WithVersionPrefix("test-prefix-"))
+
+		req := buildRequest([]string{"a", "b", "d"}, "test-prefix-"+lastVersion)
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, subFromRequest(req), w)
+		require.NoError(t, err)
+		mustBlock(t, w)
+	})
+
+	t.Run("watch opened with the same last version, different resource not changing the response", func(t *testing.T) {
+		cache.log = log.NewTestLogger(t)
+		req := buildRequest([]string{"a", "b", "e"}, lastVersion)
+		sub := subFromRequest(req)
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlock(t, w)
+
+		_ = cache.UpdateResource("e", &endpoint.ClusterLoadAssignment{ClusterName: "e"})
+		// Resources a and b are still at the proper version, so not returned
+		resp := verifyResponseResources(t, w, resource.EndpointType, "6ae65ee0b0c2bfa8", "e")
+		updateFromSotwResponse(resp, &sub, req)
+
+		w = make(chan Response, 1)
+		_, err = cache.CreateWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlock(t, w)
+		// Resource is not changed, nothing is returned
+		_ = cache.UpdateResource("e", &endpoint.ClusterLoadAssignment{ClusterName: "e"})
+		mustBlock(t, w)
+
+		_ = cache.UpdateResource("e", &endpoint.ClusterLoadAssignment{ClusterName: "e", Policy: &endpoint.ClusterLoadAssignment_Policy{
+			EndpointStaleAfter: durationpb.New(5 * time.Second),
+		}})
+		// Resources a and b are still at the proper version, so not returned
+		verifyResponseResources(t, w, resource.EndpointType, "633e4f7cb4f55524", "e")
+
+		_ = cache.UpdateResource("e", &endpoint.ClusterLoadAssignment{ClusterName: "e"})
+
+		// Another watch created with the proper version does not trigger
+		req2 := buildRequest([]string{"a", "b", "e"}, "6ae65ee0b0c2bfa8")
+		sub2 := subFromRequest(req2)
+		w = make(chan Response, 1)
+		_, err = cache.CreateWatch(req2, sub2, w)
+		require.NoError(t, err)
+		mustBlock(t, w)
+	})
+
+	t.Run("watch opened with the same last version and returning more resources", func(t *testing.T) {
+		cache.log = log.NewTestLogger(t)
+		req := buildRequest([]string{}, lastVersion)
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, subFromRequest(req), w)
+		require.NoError(t, err)
+		verifyResponseResources(t, w, resource.EndpointType, "68113a35fda99df9", "a", "b", "c", "e")
+	})
+
+	t.Run("watch opened with the same last version and returning less resources", func(t *testing.T) {
+		cache.log = log.NewTestLogger(t)
+		req := buildRequest([]string{"a", "d"}, lastVersion)
+		w := make(chan Response, 1)
+		_, err := cache.CreateWatch(req, subFromRequest(req), w)
+		require.NoError(t, err)
+		verifyResponseResources(t, w, resource.EndpointType, "55876f045443ee06", "a")
 	})
 }

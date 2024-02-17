@@ -188,10 +188,16 @@ func (s *Snapshot) ConstructVersionMap() error {
 		}
 
 		for _, r := range resources.Items {
-			v, err := computeResourceStableVersion(r.Resource)
+			// Hash our version in here and build the version map.
+			marshaledResource, err := MarshalResource(r.Resource)
 			if err != nil {
+				return err
+			}
+			v := HashResource(marshaledResource)
+			if v == "" {
 				return fmt.Errorf("failed to build resource version: %w", err)
 			}
+
 			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v
 		}
 	}
