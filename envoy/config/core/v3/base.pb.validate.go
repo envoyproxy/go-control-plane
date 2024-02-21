@@ -802,7 +802,16 @@ func (m *Metadata) validate(all bool) error {
 			val := m.GetFilterMetadata()[key]
 			_ = val
 
-			// no validation rules for FilterMetadata[key]
+			if utf8.RuneCountInString(key) < 1 {
+				err := MetadataValidationError{
+					field:  fmt.Sprintf("FilterMetadata[%v]", key),
+					reason: "value length must be at least 1 runes",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
 
 			if all {
 				switch v := interface{}(val).(type) {
@@ -848,7 +857,16 @@ func (m *Metadata) validate(all bool) error {
 			val := m.GetTypedFilterMetadata()[key]
 			_ = val
 
-			// no validation rules for TypedFilterMetadata[key]
+			if utf8.RuneCountInString(key) < 1 {
+				err := MetadataValidationError{
+					field:  fmt.Sprintf("TypedFilterMetadata[%v]", key),
+					reason: "value length must be at least 1 runes",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
 
 			if all {
 				switch v := interface{}(val).(type) {
