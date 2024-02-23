@@ -116,10 +116,10 @@ func ResourceRequiresFullStateInSotw(typeURL resource.Type) bool {
 }
 
 // GetResourceName returns the resource names for a list of valid xDS response types.
-func GetResourceNames(resources []types.Resource) []string {
+func GetResourceNames(resources []types.ResourceWithTTL) []string {
 	out := make([]string, len(resources))
 	for i, r := range resources {
-		out[i] = GetResourceName(r)
+		out[i] = GetResourceName(r.Resource)
 	}
 	return out
 }

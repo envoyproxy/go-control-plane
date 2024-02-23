@@ -22,7 +22,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func assertResourceMapEqual(t *testing.T, want, got map[string]types.Resource) {
+func assertResourceMapEqual(t *testing.T, want, got map[string]types.ResourceWithTTL) {
 	t.Helper()
 
 	if !cmp.Equal(want, got, protocmp.Transform()) {
@@ -57,7 +57,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
 				snapshot := fixture.snapshot()
-				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
+				assertResourceMapEqual(t, cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResourcesAndTTL(typ))
 				sub := subscriptions[typ]
 				sub.SetReturnedResources(out.GetNextVersionMap())
 				subscriptions[typ] = sub
@@ -109,7 +109,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	case out := <-watches[testTypes[0]]:
 		snapshot2 := fixture.snapshot()
 		snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		assertResourceMapEqual(t, cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResourcesAndTTL(rsrc.EndpointType))
 		sub := subscriptions[testTypes[0]]
 		sub.SetReturnedResources(out.GetNextVersionMap())
 		subscriptions[testTypes[0]] = sub
@@ -147,7 +147,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
 				snapshot := fixture.snapshot()
-				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
+				assertResourceMapEqual(t, cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResourcesAndTTL(typ))
 				nextVersionMap := out.GetNextVersionMap()
 				subscriptions[typ].SetReturnedResources(nextVersionMap)
 			case <-time.After(time.Second):
@@ -186,7 +186,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 	case out := <-watches[testTypes[0]]:
 		snapshot2 := fixture.snapshot()
 		snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		assertResourceMapEqual(t, cache.IndexResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResourcesAndTTL(rsrc.EndpointType))
 		nextVersionMap := out.GetNextVersionMap()
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources

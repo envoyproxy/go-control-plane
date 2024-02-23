@@ -127,17 +127,17 @@ func TestGetResourceName(t *testing.T) {
 func TestGetResourceNames(t *testing.T) {
 	tests := []struct {
 		name  string
-		input []types.Resource
+		input []types.ResourceWithTTL
 		want  []string
 	}{
 		{
 			name:  "empty",
-			input: []types.Resource{},
+			input: []types.ResourceWithTTL{},
 			want:  []string{},
 		},
 		{
 			name:  "many",
-			input: []types.Resource{testRuntime, testListener, testVirtualHost},
+			input: []types.ResourceWithTTL{{Resource: testRuntime}, {Resource: testListener}, {Resource: testVirtualHost}},
 			want:  []string{runtimeName, listenerName, virtualHostName},
 		},
 	}
