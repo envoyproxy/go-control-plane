@@ -411,7 +411,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 		return cache.cancelWatch(nodeID, watchID)
 	}
 
-	watch := ResponseWatch{Request: request, Response: value, subscription: sub}
+	watch := ResponseWatch{Request: request, Response: value, subscription: sub, fullStateResponses: ResourceRequiresFullStateInSotw(request.GetTypeUrl())}
 
 	snapshot, exists := cache.snapshots[nodeID]
 	if !exists {
