@@ -696,6 +696,18 @@ func (m *HttpConnectionManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AppendLocalOverload {
+		i--
+		if m.AppendLocalOverload {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0xc8
+	}
 	if m.AccessLogOptions != nil {
 		size, err := m.AccessLogOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -2948,6 +2960,9 @@ func (m *HttpConnectionManager) SizeVT() (n int) {
 	if m.AccessLogOptions != nil {
 		l = m.AccessLogOptions.SizeVT()
 		n += 2 + l + sov(uint64(l))
+	}
+	if m.AppendLocalOverload {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
