@@ -527,6 +527,30 @@ func (m *ExtProcOverrides) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.GrpcInitialMetadata) > 0 {
+		for iNdEx := len(m.GrpcInitialMetadata) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.GrpcInitialMetadata[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.GrpcInitialMetadata[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = encodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
 	if m.MetadataOptions != nil {
 		size, err := m.MetadataOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -827,6 +851,18 @@ func (m *ExtProcOverrides) SizeVT() (n int) {
 	if m.MetadataOptions != nil {
 		l = m.MetadataOptions.SizeVT()
 		n += 1 + l + sov(uint64(l))
+	}
+	if len(m.GrpcInitialMetadata) > 0 {
+		for _, e := range m.GrpcInitialMetadata {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 1 + l + sov(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
