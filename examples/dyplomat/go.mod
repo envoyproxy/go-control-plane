@@ -9,11 +9,11 @@ require (
 	k8s.io/api v0.28.2
 	k8s.io/apimachinery v0.28.2
 	k8s.io/client-go v0.28.2
-	sigs.k8s.io/aws-iam-authenticator v0.6.12
+	sigs.k8s.io/aws-iam-authenticator v0.6.18
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.44.213 // indirect
+	github.com/aws/aws-sdk-go v1.44.332 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
