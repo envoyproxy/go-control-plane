@@ -228,6 +228,30 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.DenyRedirectMatcher) > 0 {
+		for iNdEx := len(m.DenyRedirectMatcher) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.DenyRedirectMatcher[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.DenyRedirectMatcher[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = encodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x72
+		}
+	}
 	if m.DefaultExpiresIn != nil {
 		size, err := (*durationpb.Duration)(m.DefaultExpiresIn).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -616,6 +640,18 @@ func (m *OAuth2Config) SizeVT() (n int) {
 	if m.DefaultExpiresIn != nil {
 		l = (*durationpb.Duration)(m.DefaultExpiresIn).SizeVT()
 		n += 1 + l + sov(uint64(l))
+	}
+	if len(m.DenyRedirectMatcher) > 0 {
+		for _, e := range m.DenyRedirectMatcher {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 1 + l + sov(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
