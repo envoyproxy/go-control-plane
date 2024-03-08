@@ -696,6 +696,18 @@ func (m *ResponseFlags) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DownstreamRemoteReset {
+		i--
+		if m.DownstreamRemoteReset {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xe0
+	}
 	if m.DnsResolutionFailure {
 		i--
 		if m.DnsResolutionFailure {
@@ -1819,6 +1831,9 @@ func (m *ResponseFlags) SizeVT() (n int) {
 		n += 3
 	}
 	if m.DnsResolutionFailure {
+		n += 3
+	}
+	if m.DownstreamRemoteReset {
 		n += 3
 	}
 	n += len(m.unknownFields)

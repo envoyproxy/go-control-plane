@@ -1278,6 +1278,8 @@ func (m *ResponseFlags) validate(all bool) error {
 
 	// no validation rules for DnsResolutionFailure
 
+	// no validation rules for DownstreamRemoteReset
+
 	if len(errors) > 0 {
 		return ResponseFlagsMultiError(errors)
 	}
