@@ -1063,6 +1063,138 @@ func (m *DataSource_EnvironmentVariable) MarshalToSizedBufferVTStrict(dAtA []byt
 	dAtA[i] = 0x22
 	return len(dAtA) - i, nil
 }
+func (m *RetryPolicy_RetryPriority) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RetryPolicy_RetryPriority) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RetryPolicy_RetryPriority) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if msg, ok := m.ConfigType.(*RetryPolicy_RetryPriority_TypedConfig); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarint(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RetryPolicy_RetryPriority_TypedConfig) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RetryPolicy_RetryPriority_TypedConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.TypedConfig != nil {
+		size, err := (*anypb.Any)(m.TypedConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
+func (m *RetryPolicy_RetryHostPredicate) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RetryPolicy_RetryHostPredicate) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RetryPolicy_RetryHostPredicate) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if msg, ok := m.ConfigType.(*RetryPolicy_RetryHostPredicate_TypedConfig); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarint(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RetryPolicy_RetryHostPredicate_TypedConfig) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RetryPolicy_RetryHostPredicate_TypedConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.TypedConfig != nil {
+		size, err := (*anypb.Any)(m.TypedConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	return len(dAtA) - i, nil
+}
 func (m *RetryPolicy) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -1092,6 +1224,40 @@ func (m *RetryPolicy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.HostSelectionRetryMaxAttempts != 0 {
+		i = encodeVarint(dAtA, i, uint64(m.HostSelectionRetryMaxAttempts))
+		i--
+		dAtA[i] = 0x30
+	}
+	if len(m.RetryHostPredicate) > 0 {
+		for iNdEx := len(m.RetryHostPredicate) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.RetryHostPredicate[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if m.RetryPriority != nil {
+		size, err := m.RetryPriority.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.RetryOn) > 0 {
+		i -= len(m.RetryOn)
+		copy(dAtA[i:], m.RetryOn)
+		i = encodeVarint(dAtA, i, uint64(len(m.RetryOn)))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.NumRetries != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.NumRetries).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -1861,6 +2027,64 @@ func (m *DataSource_EnvironmentVariable) SizeVT() (n int) {
 	n += 1 + l + sov(uint64(l))
 	return n
 }
+func (m *RetryPolicy_RetryPriority) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
+	if vtmsg, ok := m.ConfigType.(interface{ SizeVT() int }); ok {
+		n += vtmsg.SizeVT()
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *RetryPolicy_RetryPriority_TypedConfig) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.TypedConfig != nil {
+		l = (*anypb.Any)(m.TypedConfig).SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	return n
+}
+func (m *RetryPolicy_RetryHostPredicate) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
+	if vtmsg, ok := m.ConfigType.(interface{ SizeVT() int }); ok {
+		n += vtmsg.SizeVT()
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *RetryPolicy_RetryHostPredicate_TypedConfig) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.TypedConfig != nil {
+		l = (*anypb.Any)(m.TypedConfig).SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	return n
+}
 func (m *RetryPolicy) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -1874,6 +2098,23 @@ func (m *RetryPolicy) SizeVT() (n int) {
 	if m.NumRetries != nil {
 		l = (*wrapperspb.UInt32Value)(m.NumRetries).SizeVT()
 		n += 1 + l + sov(uint64(l))
+	}
+	l = len(m.RetryOn)
+	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.RetryPriority != nil {
+		l = m.RetryPriority.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	if len(m.RetryHostPredicate) > 0 {
+		for _, e := range m.RetryHostPredicate {
+			l = e.SizeVT()
+			n += 1 + l + sov(uint64(l))
+		}
+	}
+	if m.HostSelectionRetryMaxAttempts != 0 {
+		n += 1 + sov(uint64(m.HostSelectionRetryMaxAttempts))
 	}
 	n += len(m.unknownFields)
 	return n
