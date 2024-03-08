@@ -6,6 +6,7 @@
 package matcherv3
 
 import (
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -45,6 +46,13 @@ func (m *StringMatcher) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if msg, ok := m.MatchPattern.(*StringMatcher_Custom); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
 	}
 	if msg, ok := m.MatchPattern.(*StringMatcher_Contains); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -169,6 +177,37 @@ func (m *StringMatcher_Contains) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 	dAtA[i] = 0x3a
 	return len(dAtA) - i, nil
 }
+func (m *StringMatcher_Custom) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *StringMatcher_Custom) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Custom != nil {
+		if vtmsg, ok := interface{}(m.Custom).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Custom)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = encodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
+	return len(dAtA) - i, nil
+}
 func (m *ListStringMatcher) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -280,6 +319,24 @@ func (m *StringMatcher_Contains) SizeVT() (n int) {
 	_ = l
 	l = len(m.Contains)
 	n += 1 + l + sov(uint64(l))
+	return n
+}
+func (m *StringMatcher_Custom) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Custom != nil {
+		if size, ok := interface{}(m.Custom).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.Custom)
+		}
+		n += 1 + l + sov(uint64(l))
+	}
 	return n
 }
 func (m *ListStringMatcher) SizeVT() (n int) {
