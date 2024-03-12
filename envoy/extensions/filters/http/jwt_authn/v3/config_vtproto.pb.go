@@ -92,6 +92,30 @@ func (m *JwtProvider) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Subjects != nil {
+		if vtmsg, ok := interface{}(m.Subjects).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.Subjects)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = encodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x9a
+	}
 	if m.NormalizePayloadInMetadata != nil {
 		size, err := m.NormalizePayloadInMetadata.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1366,6 +1390,16 @@ func (m *JwtProvider) SizeVT() (n int) {
 	}
 	if m.NormalizePayloadInMetadata != nil {
 		l = m.NormalizePayloadInMetadata.SizeVT()
+		n += 2 + l + sov(uint64(l))
+	}
+	if m.Subjects != nil {
+		if size, ok := interface{}(m.Subjects).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.Subjects)
+		}
 		n += 2 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
