@@ -2160,6 +2160,8 @@ func (m *Http3ProtocolOptions) validate(all bool) error {
 
 	// no validation rules for AllowExtendedConnect
 
+	// no validation rules for AllowMetadata
+
 	if len(errors) > 0 {
 		return Http3ProtocolOptionsMultiError(errors)
 	}

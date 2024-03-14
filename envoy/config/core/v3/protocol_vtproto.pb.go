@@ -1142,6 +1142,16 @@ func (m *Http3ProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AllowMetadata {
+		i--
+		if m.AllowMetadata {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
 	if m.AllowExtendedConnect {
 		i--
 		if m.AllowExtendedConnect {
@@ -1647,6 +1657,9 @@ func (m *Http3ProtocolOptions) SizeVT() (n int) {
 		n += 1 + l + sov(uint64(l))
 	}
 	if m.AllowExtendedConnect {
+		n += 2
+	}
+	if m.AllowMetadata {
 		n += 2
 	}
 	n += len(m.unknownFields)
