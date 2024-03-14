@@ -472,7 +472,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		},
 	}
 
-	validateResponse := func(t *testing.T, replies <-chan *discovery.DeltaDiscoveryResponse, expectedResources []string, expectedRemovedResources []string) {
+	validateResponse := func(t *testing.T, replies <-chan *discovery.DeltaDiscoveryResponse, expectedResources, expectedRemovedResources []string) {
 		t.Helper()
 		select {
 		case response := <-replies:

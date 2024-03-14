@@ -21,7 +21,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func assertResourceMapEqual(t *testing.T, want map[string]types.Resource, got map[string]types.Resource) {
+func assertResourceMapEqual(t *testing.T, want, got map[string]types.Resource) {
 	t.Helper()
 
 	if !cmp.Equal(want, got, protocmp.Transform()) {
