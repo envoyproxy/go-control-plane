@@ -439,7 +439,7 @@ func TestDeltaCallbackError(t *testing.T) {
 			config.deltaResources = makeDeltaResources()
 
 			s := server.NewServer(context.Background(), config, server.CallbackFuncs{
-				DeltaStreamOpenFunc: func(ctx context.Context, i int64, s string) error {
+				DeltaStreamOpenFunc: func(context.Context, int64, string) error {
 					return errors.New("stream open error")
 				},
 			})
