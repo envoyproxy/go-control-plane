@@ -49,6 +49,13 @@ func (m *HealthCheckEvent) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if msg, ok := m.Event.(*HealthCheckEvent_SuccessfulHealthCheckEvent); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if m.Locality != nil {
 		if vtmsg, ok := interface{}(m.Locality).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -270,6 +277,25 @@ func (m *HealthCheckEvent_NoLongerDegradedHost) MarshalToSizedBufferVTStrict(dAt
 	}
 	return len(dAtA) - i, nil
 }
+func (m *HealthCheckEvent_SuccessfulHealthCheckEvent) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *HealthCheckEvent_SuccessfulHealthCheckEvent) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.SuccessfulHealthCheckEvent != nil {
+		size, err := m.SuccessfulHealthCheckEvent.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x62
+	}
+	return len(dAtA) - i, nil
+}
 func (m *HealthCheckEjectUnhealthy) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -347,6 +373,39 @@ func (m *HealthCheckAddHealthy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		}
 		i--
 		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *HealthCheckSuccessful) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *HealthCheckSuccessful) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *HealthCheckSuccessful) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
 	}
 	return len(dAtA) - i, nil
 }
@@ -590,6 +649,18 @@ func (m *HealthCheckEvent_NoLongerDegradedHost) SizeVT() (n int) {
 	}
 	return n
 }
+func (m *HealthCheckEvent_SuccessfulHealthCheckEvent) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.SuccessfulHealthCheckEvent != nil {
+		l = m.SuccessfulHealthCheckEvent.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	return n
+}
 func (m *HealthCheckEjectUnhealthy) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -612,6 +683,16 @@ func (m *HealthCheckAddHealthy) SizeVT() (n int) {
 	if m.FirstCheck {
 		n += 2
 	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *HealthCheckSuccessful) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	n += len(m.unknownFields)
 	return n
 }

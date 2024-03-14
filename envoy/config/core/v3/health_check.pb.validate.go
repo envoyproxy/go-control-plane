@@ -675,6 +675,8 @@ func (m *HealthCheck) validate(all bool) error {
 
 	// no validation rules for AlwaysLogHealthCheckFailures
 
+	// no validation rules for AlwaysLogHealthCheckSuccess
+
 	if all {
 		switch v := interface{}(m.GetTlsOptions()).(type) {
 		case interface{ ValidateAll() error }:

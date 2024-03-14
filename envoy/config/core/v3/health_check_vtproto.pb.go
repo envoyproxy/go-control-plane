@@ -622,6 +622,18 @@ func (m *HealthCheck) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AlwaysLogHealthCheckSuccess {
+		i--
+		if m.AlwaysLogHealthCheckSuccess {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xd0
+	}
 	if len(m.EventLogger) > 0 {
 		for iNdEx := len(m.EventLogger) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.EventLogger[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -1268,6 +1280,9 @@ func (m *HealthCheck) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 2 + l + sov(uint64(l))
 		}
+	}
+	if m.AlwaysLogHealthCheckSuccess {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n

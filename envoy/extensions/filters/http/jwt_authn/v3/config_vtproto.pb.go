@@ -92,6 +92,30 @@ func (m *JwtProvider) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxLifetime != nil {
+		size, err := (*durationpb.Duration)(m.MaxLifetime).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xaa
+	}
+	if m.RequireExpiration {
+		i--
+		if m.RequireExpiration {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
 	if m.Subjects != nil {
 		if vtmsg, ok := interface{}(m.Subjects).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -1400,6 +1424,13 @@ func (m *JwtProvider) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.Subjects)
 		}
+		n += 2 + l + sov(uint64(l))
+	}
+	if m.RequireExpiration {
+		n += 3
+	}
+	if m.MaxLifetime != nil {
+		l = (*durationpb.Duration)(m.MaxLifetime).SizeVT()
 		n += 2 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
