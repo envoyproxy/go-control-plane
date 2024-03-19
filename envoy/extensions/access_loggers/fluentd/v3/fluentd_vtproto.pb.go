@@ -9,6 +9,7 @@ import (
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	structpb "github.com/planetscale/vtprotobuf/types/known/structpb"
 	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	bits "math/bits"
 )
@@ -19,6 +20,71 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+func (m *FluentdAccessLogConfig_RetryOptions) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FluentdAccessLogConfig_RetryOptions) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *FluentdAccessLogConfig_RetryOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.BackoffOptions != nil {
+		if vtmsg, ok := interface{}(m.BackoffOptions).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.BackoffOptions)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = encodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.MaxConnectAttempts != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxConnectAttempts).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
 
 func (m *FluentdAccessLogConfig) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
@@ -49,6 +115,16 @@ func (m *FluentdAccessLogConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.RetryOptions != nil {
+		size, err := m.RetryOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x3a
 	}
 	if m.Record != nil {
 		size, err := (*structpb.Struct)(m.Record).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -115,6 +191,30 @@ func encodeVarint(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *FluentdAccessLogConfig_RetryOptions) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.MaxConnectAttempts != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxConnectAttempts).SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.BackoffOptions != nil {
+		if size, ok := interface{}(m.BackoffOptions).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.BackoffOptions)
+		}
+		n += 1 + l + sov(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *FluentdAccessLogConfig) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -143,6 +243,10 @@ func (m *FluentdAccessLogConfig) SizeVT() (n int) {
 	}
 	if m.Record != nil {
 		l = (*structpb.Struct)(m.Record).SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.RetryOptions != nil {
+		l = m.RetryOptions.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
