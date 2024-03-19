@@ -86,6 +86,8 @@ func (m *RBAC) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for RulesStatPrefix
+
 	if all {
 		switch v := interface{}(m.GetMatcher()).(type) {
 		case interface{ ValidateAll() error }:

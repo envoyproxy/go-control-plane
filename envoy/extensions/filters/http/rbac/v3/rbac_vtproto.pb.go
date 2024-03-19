@@ -48,6 +48,13 @@ func (m *RBAC) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.RulesStatPrefix) > 0 {
+		i -= len(m.RulesStatPrefix)
+		copy(dAtA[i:], m.RulesStatPrefix)
+		i = encodeVarint(dAtA, i, uint64(len(m.RulesStatPrefix)))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.ShadowMatcher != nil {
 		if vtmsg, ok := interface{}(m.ShadowMatcher).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -248,6 +255,10 @@ func (m *RBAC) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.ShadowMatcher)
 		}
+		n += 1 + l + sov(uint64(l))
+	}
+	l = len(m.RulesStatPrefix)
+	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
