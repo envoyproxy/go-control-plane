@@ -228,6 +228,16 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DefaultRefreshTokenExpiresIn != nil {
+		size, err := (*durationpb.Duration)(m.DefaultRefreshTokenExpiresIn).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x7a
+	}
 	if len(m.DenyRedirectMatcher) > 0 {
 		for iNdEx := len(m.DenyRedirectMatcher) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.DenyRedirectMatcher[iNdEx]).(interface {
@@ -652,6 +662,10 @@ func (m *OAuth2Config) SizeVT() (n int) {
 			}
 			n += 1 + l + sov(uint64(l))
 		}
+	}
+	if m.DefaultRefreshTokenExpiresIn != nil {
+		l = (*durationpb.Duration)(m.DefaultRefreshTokenExpiresIn).SizeVT()
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
