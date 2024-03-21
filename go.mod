@@ -9,7 +9,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/google/go-cmp v0.6.0
 	github.com/planetscale/vtprotobuf v0.5.1-0.20231212170721-e7d721933795
-	github.com/prometheus/client_model v0.5.0
+	github.com/prometheus/client_model v0.6.0
 	github.com/stretchr/testify v1.9.0
 	go.opentelemetry.io/proto/otlp v1.0.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80
