@@ -41,7 +41,7 @@ type DynatraceSamplerConfig struct {
 	// .. code-block:: yaml
 	//
 	//	http_uri:
-	//	  uri: <tenant>.dev.dynatracelabs.com/api/v2/otlp/v1/traces
+	//	  uri: <tenant>.dev.dynatracelabs.com/api/v2/samplingConfiguration
 	//	  cluster: dynatrace
 	//	  timeout: 10s
 	HttpUri *v3.HttpUri `protobuf:"bytes,3,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
