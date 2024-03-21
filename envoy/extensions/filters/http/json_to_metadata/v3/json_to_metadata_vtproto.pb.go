@@ -7,6 +7,7 @@ package json_to_metadatav3
 
 import (
 	structpb "github.com/planetscale/vtprotobuf/types/known/structpb"
+	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	bits "math/bits"
 )
@@ -265,6 +266,28 @@ func (m *JsonToMetadata_MatchRules) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AllowContentTypesRegex != nil {
+		if vtmsg, ok := interface{}(m.AllowContentTypesRegex).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.AllowContentTypesRegex)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = encodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.AllowEmptyContentType {
 		i--
 		if m.AllowEmptyContentType {
@@ -473,6 +496,16 @@ func (m *JsonToMetadata_MatchRules) SizeVT() (n int) {
 	}
 	if m.AllowEmptyContentType {
 		n += 2
+	}
+	if m.AllowContentTypesRegex != nil {
+		if size, ok := interface{}(m.AllowContentTypesRegex).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.AllowContentTypesRegex)
+		}
+		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
