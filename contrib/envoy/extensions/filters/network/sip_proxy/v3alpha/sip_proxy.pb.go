@@ -10,10 +10,10 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3alpha "github.com/envoyproxy/go-control-plane/contrib/envoy/extensions/filters/network/sip_proxy/tra/v3alpha"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -167,7 +167,7 @@ func (m *SipFilter) GetConfigType() isSipFilter_ConfigType {
 	return nil
 }
 
-func (x *SipFilter) GetTypedConfig() *any1.Any {
+func (x *SipFilter) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*SipFilter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -179,7 +179,7 @@ type isSipFilter_ConfigType interface {
 }
 
 type SipFilter_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*SipFilter_TypedConfig) isSipFilter_ConfigType() {}
@@ -553,7 +553,7 @@ type SipProxy_SipSettings struct {
 	// | Timer K | T4 for UDP              | 17.1.2.2 | Wait time for response re-transmissions                                      |
 	// |         | 0 sec. for TCP and SCTP |          |                                                                              |
 	// +---------+-------------------------+----------+------------------------------------------------------------------------------+
-	TransactionTimeout *duration.Duration `protobuf:"bytes,1,opt,name=transaction_timeout,json=transactionTimeout,proto3" json:"transaction_timeout,omitempty"`
+	TransactionTimeout *durationpb.Duration `protobuf:"bytes,1,opt,name=transaction_timeout,json=transactionTimeout,proto3" json:"transaction_timeout,omitempty"`
 	// The service to match for ep insert
 	LocalServices    []*LocalService           `protobuf:"bytes,2,rep,name=local_services,json=localServices,proto3" json:"local_services,omitempty"`
 	TraServiceConfig *v3alpha.TraServiceConfig `protobuf:"bytes,3,opt,name=tra_service_config,json=traServiceConfig,proto3" json:"tra_service_config,omitempty"`
@@ -595,7 +595,7 @@ func (*SipProxy_SipSettings) Descriptor() ([]byte, []int) {
 	return file_contrib_envoy_extensions_filters_network_sip_proxy_v3alpha_sip_proxy_proto_rawDescGZIP(), []int{0, 0}
 }
 
-func (x *SipProxy_SipSettings) GetTransactionTimeout() *duration.Duration {
+func (x *SipProxy_SipSettings) GetTransactionTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.TransactionTimeout
 	}
@@ -789,8 +789,8 @@ var file_contrib_envoy_extensions_filters_network_sip_proxy_v3alpha_sip_proxy_pr
 	(*LocalService)(nil),             // 6: envoy.extensions.filters.network.sip_proxy.v3alpha.LocalService
 	(*SipProxy_SipSettings)(nil),     // 7: envoy.extensions.filters.network.sip_proxy.v3alpha.SipProxy.SipSettings
 	(*RouteConfiguration)(nil),       // 8: envoy.extensions.filters.network.sip_proxy.v3alpha.RouteConfiguration
-	(*any1.Any)(nil),                 // 9: google.protobuf.Any
-	(*duration.Duration)(nil),        // 10: google.protobuf.Duration
+	(*anypb.Any)(nil),                // 9: google.protobuf.Any
+	(*durationpb.Duration)(nil),      // 10: google.protobuf.Duration
 	(*v3alpha.TraServiceConfig)(nil), // 11: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceConfig
 }
 var file_contrib_envoy_extensions_filters_network_sip_proxy_v3alpha_sip_proxy_proto_depIdxs = []int32{

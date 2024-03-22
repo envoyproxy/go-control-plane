@@ -13,13 +13,13 @@ import (
 	v32 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -648,7 +648,7 @@ type HealthCheckSpecifier struct {
 
 	ClusterHealthChecks []*ClusterHealthCheck `protobuf:"bytes,1,rep,name=cluster_health_checks,json=clusterHealthChecks,proto3" json:"cluster_health_checks,omitempty"`
 	// The default is 1 second.
-	Interval *duration.Duration `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
+	Interval *durationpb.Duration `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
 }
 
 func (x *HealthCheckSpecifier) Reset() {
@@ -690,7 +690,7 @@ func (x *HealthCheckSpecifier) GetClusterHealthChecks() []*ClusterHealthCheck {
 	return nil
 }
 
-func (x *HealthCheckSpecifier) GetInterval() *duration.Duration {
+func (x *HealthCheckSpecifier) GetInterval() *durationpb.Duration {
 	if x != nil {
 		return x.Interval
 	}
@@ -990,7 +990,7 @@ var file_envoy_service_health_v3_hds_proto_goTypes = []interface{}{
 	(*v3.HealthCheck)(nil),                             // 16: envoy.config.core.v3.HealthCheck
 	(*v32.Cluster_TransportSocketMatch)(nil),           // 17: envoy.config.cluster.v3.Cluster.TransportSocketMatch
 	(*v3.BindConfig)(nil),                              // 18: envoy.config.core.v3.BindConfig
-	(*duration.Duration)(nil),                          // 19: google.protobuf.Duration
+	(*durationpb.Duration)(nil),                        // 19: google.protobuf.Duration
 }
 var file_envoy_service_health_v3_hds_proto_depIdxs = []int32{
 	0,  // 0: envoy.service.health.v3.Capability.health_check_protocols:type_name -> envoy.service.health.v3.Capability.Protocol

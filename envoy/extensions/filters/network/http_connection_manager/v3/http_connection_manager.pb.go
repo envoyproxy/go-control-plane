@@ -17,11 +17,11 @@ import (
 	v34 "github.com/envoyproxy/go-control-plane/envoy/type/tracing/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -363,7 +363,7 @@ type HttpConnectionManager struct {
 	// Whether the connection manager manipulates the :ref:`config_http_conn_man_headers_user-agent`
 	// and :ref:`config_http_conn_man_headers_downstream-service-cluster` headers. See the linked
 	// documentation for more information. Defaults to false.
-	AddUserAgent *wrappers.BoolValue `protobuf:"bytes,6,opt,name=add_user_agent,json=addUserAgent,proto3" json:"add_user_agent,omitempty"`
+	AddUserAgent *wrapperspb.BoolValue `protobuf:"bytes,6,opt,name=add_user_agent,json=addUserAgent,proto3" json:"add_user_agent,omitempty"`
 	// Presence of the object defines whether the connection manager
 	// emits :ref:`tracing <arch_overview_tracing>` data to the :ref:`configured tracing provider
 	// <envoy_v3_api_msg_config.trace.v3.Tracing>`.
@@ -396,7 +396,7 @@ type HttpConnectionManager struct {
 	// The maximum request headers size for incoming connections.
 	// If unconfigured, the default max request headers allowed is 60 KiB.
 	// Requests that exceed this limit will receive a 431 response.
-	MaxRequestHeadersKb *wrappers.UInt32Value `protobuf:"bytes,29,opt,name=max_request_headers_kb,json=maxRequestHeadersKb,proto3" json:"max_request_headers_kb,omitempty"`
+	MaxRequestHeadersKb *wrapperspb.UInt32Value `protobuf:"bytes,29,opt,name=max_request_headers_kb,json=maxRequestHeadersKb,proto3" json:"max_request_headers_kb,omitempty"`
 	// The stream idle timeout for connections managed by the connection manager.
 	// If not specified, this defaults to 5 minutes. The default value was selected
 	// so as not to interfere with any smaller configured timeouts that may have
@@ -436,16 +436,16 @@ type HttpConnectionManager struct {
 	//
 	// A value of 0 will completely disable the connection manager stream idle
 	// timeout, although per-route idle timeout overrides will continue to apply.
-	StreamIdleTimeout *duration.Duration `protobuf:"bytes,24,opt,name=stream_idle_timeout,json=streamIdleTimeout,proto3" json:"stream_idle_timeout,omitempty"`
+	StreamIdleTimeout *durationpb.Duration `protobuf:"bytes,24,opt,name=stream_idle_timeout,json=streamIdleTimeout,proto3" json:"stream_idle_timeout,omitempty"`
 	// The amount of time that Envoy will wait for the entire request to be received.
 	// The timer is activated when the request is initiated, and is disarmed when the last byte of the
 	// request is sent upstream (i.e. all decoding filters have processed the request), OR when the
 	// response is initiated. If not specified or set to 0, this timeout is disabled.
-	RequestTimeout *duration.Duration `protobuf:"bytes,28,opt,name=request_timeout,json=requestTimeout,proto3" json:"request_timeout,omitempty"`
+	RequestTimeout *durationpb.Duration `protobuf:"bytes,28,opt,name=request_timeout,json=requestTimeout,proto3" json:"request_timeout,omitempty"`
 	// The amount of time that Envoy will wait for the request headers to be received. The timer is
 	// activated when the first byte of the headers is received, and is disarmed when the last byte of
 	// the headers has been received. If not specified or set to 0, this timeout is disabled.
-	RequestHeadersTimeout *duration.Duration `protobuf:"bytes,41,opt,name=request_headers_timeout,json=requestHeadersTimeout,proto3" json:"request_headers_timeout,omitempty"`
+	RequestHeadersTimeout *durationpb.Duration `protobuf:"bytes,41,opt,name=request_headers_timeout,json=requestHeadersTimeout,proto3" json:"request_headers_timeout,omitempty"`
 	// The time that Envoy will wait between sending an HTTP/2 “shutdown
 	// notification” (GOAWAY frame with max stream ID) and a final GOAWAY frame.
 	// This is used so that Envoy provides a grace period for new streams that
@@ -455,7 +455,7 @@ type HttpConnectionManager struct {
 	// both when a connection hits the idle timeout or during general server
 	// draining. The default grace period is 5000 milliseconds (5 seconds) if this
 	// option is not specified.
-	DrainTimeout *duration.Duration `protobuf:"bytes,12,opt,name=drain_timeout,json=drainTimeout,proto3" json:"drain_timeout,omitempty"`
+	DrainTimeout *durationpb.Duration `protobuf:"bytes,12,opt,name=drain_timeout,json=drainTimeout,proto3" json:"drain_timeout,omitempty"`
 	// The delayed close timeout is for downstream connections managed by the HTTP connection manager.
 	// It is defined as a grace period after connection close processing has been locally initiated
 	// during which Envoy will wait for the peer to close (i.e., a TCP FIN/RST is received by Envoy
@@ -488,7 +488,7 @@ type HttpConnectionManager struct {
 	//	A value of 0 will completely disable delayed close processing. When disabled, the downstream
 	//	connection's socket will be closed immediately after the write flush is completed or will
 	//	never close if the write flush does not complete.
-	DelayedCloseTimeout *duration.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
+	DelayedCloseTimeout *durationpb.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
 	// Configuration for :ref:`HTTP access logs <arch_overview_access_logs>`
 	// emitted by the connection manager.
 	AccessLog []*v31.AccessLog `protobuf:"bytes,13,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
@@ -501,7 +501,7 @@ type HttpConnectionManager struct {
 	// are specified, the former (deprecated field) is ignored.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto.
-	AccessLogFlushInterval *duration.Duration `protobuf:"bytes,54,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
+	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,54,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
 	// .. attention::
 	// This field is deprecated in favor of
 	// :ref:`flush_access_log_on_new_request
@@ -521,7 +521,7 @@ type HttpConnectionManager struct {
 	// :ref:`config_http_conn_man_headers_x-forwarded-for`,
 	// :ref:`config_http_conn_man_headers_x-envoy-internal`, and
 	// :ref:`config_http_conn_man_headers_x-envoy-external-address` for more information.
-	UseRemoteAddress *wrappers.BoolValue `protobuf:"bytes,14,opt,name=use_remote_address,json=useRemoteAddress,proto3" json:"use_remote_address,omitempty"`
+	UseRemoteAddress *wrapperspb.BoolValue `protobuf:"bytes,14,opt,name=use_remote_address,json=useRemoteAddress,proto3" json:"use_remote_address,omitempty"`
 	// The number of additional ingress proxy hops from the right side of the
 	// :ref:`config_http_conn_man_headers_x-forwarded-for` HTTP header to trust when
 	// determining the origin client's IP address. The default is zero if this option
@@ -576,7 +576,7 @@ type HttpConnectionManager struct {
 	// <config_http_conn_man_headers_x-request-id>` header if it does not exist. This defaults to
 	// true. Generating a random UUID4 is expensive so in high throughput scenarios where this feature
 	// is not desired it can be disabled.
-	GenerateRequestId *wrappers.BoolValue `protobuf:"bytes,15,opt,name=generate_request_id,json=generateRequestId,proto3" json:"generate_request_id,omitempty"`
+	GenerateRequestId *wrapperspb.BoolValue `protobuf:"bytes,15,opt,name=generate_request_id,json=generateRequestId,proto3" json:"generate_request_id,omitempty"`
 	// Whether the connection manager will keep the :ref:`x-request-id
 	// <config_http_conn_man_headers_x-request-id>` header if passed for a request that is edge
 	// (Edge request is the request from external clients to front Envoy) and not reset it, which
@@ -631,7 +631,7 @@ type HttpConnectionManager struct {
 	// [#comment:TODO: This field is ignored when the
 	// :ref:`header validation configuration <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.typed_header_validation_config>`
 	// is present.]
-	NormalizePath *wrappers.BoolValue `protobuf:"bytes,30,opt,name=normalize_path,json=normalizePath,proto3" json:"normalize_path,omitempty"`
+	NormalizePath *wrapperspb.BoolValue `protobuf:"bytes,30,opt,name=normalize_path,json=normalizePath,proto3" json:"normalize_path,omitempty"`
 	// Determines if adjacent slashes in the path are merged into one before any processing of
 	// requests by HTTP filters or routing. This affects the upstream “:path“ header as well. Without
 	// setting this option, incoming requests with path “//dir///file“ will not match against route
@@ -702,7 +702,7 @@ type HttpConnectionManager struct {
 	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.override_stream_error_on_invalid_http_message>`
 	// “not“ the deprecated but similarly named :ref:`stream_error_on_invalid_http_messaging
 	// <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.stream_error_on_invalid_http_messaging>`
-	StreamErrorOnInvalidHttpMessage *wrappers.BoolValue `protobuf:"bytes,40,opt,name=stream_error_on_invalid_http_message,json=streamErrorOnInvalidHttpMessage,proto3" json:"stream_error_on_invalid_http_message,omitempty"`
+	StreamErrorOnInvalidHttpMessage *wrapperspb.BoolValue `protobuf:"bytes,40,opt,name=stream_error_on_invalid_http_message,json=streamErrorOnInvalidHttpMessage,proto3" json:"stream_error_on_invalid_http_message,omitempty"`
 	// [#not-implemented-hide:] Path normalization configuration. This includes
 	// configurations for transformations (e.g. RFC 3986 normalization or merge
 	// adjacent slashes) and the policy to apply them. The policy determines
@@ -758,7 +758,7 @@ type HttpConnectionManager struct {
 	// Whether the HCM will add ProxyProtocolFilterState to the Connection lifetime filter state. Defaults to “true“.
 	// This should be set to “false“ in cases where Envoy's view of the downstream address may not correspond to the
 	// actual client address, for example, if there's another proxy in front of the Envoy.
-	AddProxyProtocolConnectionState *wrappers.BoolValue `protobuf:"bytes,53,opt,name=add_proxy_protocol_connection_state,json=addProxyProtocolConnectionState,proto3" json:"add_proxy_protocol_connection_state,omitempty"`
+	AddProxyProtocolConnectionState *wrapperspb.BoolValue `protobuf:"bytes,53,opt,name=add_proxy_protocol_connection_state,json=addProxyProtocolConnectionState,proto3" json:"add_proxy_protocol_connection_state,omitempty"`
 }
 
 func (x *HttpConnectionManager) Reset() {
@@ -842,7 +842,7 @@ func (x *HttpConnectionManager) GetHttpFilters() []*HttpFilter {
 	return nil
 }
 
-func (x *HttpConnectionManager) GetAddUserAgent() *wrappers.BoolValue {
+func (x *HttpConnectionManager) GetAddUserAgent() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.AddUserAgent
 	}
@@ -905,42 +905,42 @@ func (x *HttpConnectionManager) GetSchemeHeaderTransformation() *v3.SchemeHeader
 	return nil
 }
 
-func (x *HttpConnectionManager) GetMaxRequestHeadersKb() *wrappers.UInt32Value {
+func (x *HttpConnectionManager) GetMaxRequestHeadersKb() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxRequestHeadersKb
 	}
 	return nil
 }
 
-func (x *HttpConnectionManager) GetStreamIdleTimeout() *duration.Duration {
+func (x *HttpConnectionManager) GetStreamIdleTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.StreamIdleTimeout
 	}
 	return nil
 }
 
-func (x *HttpConnectionManager) GetRequestTimeout() *duration.Duration {
+func (x *HttpConnectionManager) GetRequestTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.RequestTimeout
 	}
 	return nil
 }
 
-func (x *HttpConnectionManager) GetRequestHeadersTimeout() *duration.Duration {
+func (x *HttpConnectionManager) GetRequestHeadersTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.RequestHeadersTimeout
 	}
 	return nil
 }
 
-func (x *HttpConnectionManager) GetDrainTimeout() *duration.Duration {
+func (x *HttpConnectionManager) GetDrainTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.DrainTimeout
 	}
 	return nil
 }
 
-func (x *HttpConnectionManager) GetDelayedCloseTimeout() *duration.Duration {
+func (x *HttpConnectionManager) GetDelayedCloseTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.DelayedCloseTimeout
 	}
@@ -955,7 +955,7 @@ func (x *HttpConnectionManager) GetAccessLog() []*v31.AccessLog {
 }
 
 // Deprecated: Marked as deprecated in envoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto.
-func (x *HttpConnectionManager) GetAccessLogFlushInterval() *duration.Duration {
+func (x *HttpConnectionManager) GetAccessLogFlushInterval() *durationpb.Duration {
 	if x != nil {
 		return x.AccessLogFlushInterval
 	}
@@ -977,7 +977,7 @@ func (x *HttpConnectionManager) GetAccessLogOptions() *HttpConnectionManager_Hcm
 	return nil
 }
 
-func (x *HttpConnectionManager) GetUseRemoteAddress() *wrappers.BoolValue {
+func (x *HttpConnectionManager) GetUseRemoteAddress() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.UseRemoteAddress
 	}
@@ -1026,7 +1026,7 @@ func (x *HttpConnectionManager) GetVia() string {
 	return ""
 }
 
-func (x *HttpConnectionManager) GetGenerateRequestId() *wrappers.BoolValue {
+func (x *HttpConnectionManager) GetGenerateRequestId() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.GenerateRequestId
 	}
@@ -1082,7 +1082,7 @@ func (x *HttpConnectionManager) GetUpgradeConfigs() []*HttpConnectionManager_Upg
 	return nil
 }
 
-func (x *HttpConnectionManager) GetNormalizePath() *wrappers.BoolValue {
+func (x *HttpConnectionManager) GetNormalizePath() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.NormalizePath
 	}
@@ -1138,7 +1138,7 @@ func (x *HttpConnectionManager) GetStripAnyHostPort() bool {
 	return false
 }
 
-func (x *HttpConnectionManager) GetStreamErrorOnInvalidHttpMessage() *wrappers.BoolValue {
+func (x *HttpConnectionManager) GetStreamErrorOnInvalidHttpMessage() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.StreamErrorOnInvalidHttpMessage
 	}
@@ -1187,7 +1187,7 @@ func (x *HttpConnectionManager) GetAppendLocalOverload() bool {
 	return false
 }
 
-func (x *HttpConnectionManager) GetAddProxyProtocolConnectionState() *wrappers.BoolValue {
+func (x *HttpConnectionManager) GetAddProxyProtocolConnectionState() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.AddProxyProtocolConnectionState
 	}
@@ -1346,7 +1346,7 @@ type ResponseMapper struct {
 	// Filter to determine if this mapper should apply.
 	Filter *v31.AccessLogFilter `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
 	// The new response status code if specified.
-	StatusCode *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
+	StatusCode *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
 	// The new local reply body text if specified. It will be used in the “%LOCAL_REPLY_BODY%“
 	// command operator in the “body_format“.
 	Body *v3.DataSource `protobuf:"bytes,3,opt,name=body,proto3" json:"body,omitempty"`
@@ -1397,7 +1397,7 @@ func (x *ResponseMapper) GetFilter() *v31.AccessLogFilter {
 	return nil
 }
 
-func (x *ResponseMapper) GetStatusCode() *wrappers.UInt32Value {
+func (x *ResponseMapper) GetStatusCode() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.StatusCode
 	}
@@ -1784,7 +1784,7 @@ func (m *HttpFilter) GetConfigType() isHttpFilter_ConfigType {
 	return nil
 }
 
-func (x *HttpFilter) GetTypedConfig() *any1.Any {
+func (x *HttpFilter) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*HttpFilter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -1824,7 +1824,7 @@ type HttpFilter_TypedConfig struct {
 	// :ref:`ExtensionWithMatcher <envoy_v3_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>`
 	// with the desired HTTP filter.
 	// [#extension-category: envoy.filters.http]
-	TypedConfig *any1.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 type HttpFilter_ConfigDiscovery struct {
@@ -1849,7 +1849,7 @@ type RequestIDExtension struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Request ID extension specific configuration.
-	TypedConfig *any1.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
+	TypedConfig *anypb.Any `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 
 func (x *RequestIDExtension) Reset() {
@@ -1884,7 +1884,7 @@ func (*RequestIDExtension) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *RequestIDExtension) GetTypedConfig() *any1.Any {
+func (x *RequestIDExtension) GetTypedConfig() *anypb.Any {
 	if x != nil {
 		return x.TypedConfig
 	}
@@ -1977,7 +1977,7 @@ type HttpConnectionManager_Tracing struct {
 	// Maximum length of the request path to extract and include in the HttpUrl tag. Used to
 	// truncate lengthy request paths to meet the needs of a tracing backend.
 	// Default: 256
-	MaxPathTagLength *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=max_path_tag_length,json=maxPathTagLength,proto3" json:"max_path_tag_length,omitempty"`
+	MaxPathTagLength *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=max_path_tag_length,json=maxPathTagLength,proto3" json:"max_path_tag_length,omitempty"`
 	// A list of custom tags with unique tag name to create tags for the active span.
 	CustomTags []*v34.CustomTag `protobuf:"bytes,8,rep,name=custom_tags,json=customTags,proto3" json:"custom_tags,omitempty"`
 	// Configuration for an external tracing provider.
@@ -2011,7 +2011,7 @@ type HttpConnectionManager_Tracing struct {
 	//     this flag should be set to true.
 	//
 	// The default value is false for now for backward compatibility.
-	SpawnUpstreamSpan *wrappers.BoolValue `protobuf:"bytes,10,opt,name=spawn_upstream_span,json=spawnUpstreamSpan,proto3" json:"spawn_upstream_span,omitempty"`
+	SpawnUpstreamSpan *wrapperspb.BoolValue `protobuf:"bytes,10,opt,name=spawn_upstream_span,json=spawnUpstreamSpan,proto3" json:"spawn_upstream_span,omitempty"`
 }
 
 func (x *HttpConnectionManager_Tracing) Reset() {
@@ -2074,7 +2074,7 @@ func (x *HttpConnectionManager_Tracing) GetVerbose() bool {
 	return false
 }
 
-func (x *HttpConnectionManager_Tracing) GetMaxPathTagLength() *wrappers.UInt32Value {
+func (x *HttpConnectionManager_Tracing) GetMaxPathTagLength() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxPathTagLength
 	}
@@ -2095,7 +2095,7 @@ func (x *HttpConnectionManager_Tracing) GetProvider() *v35.Tracing_Http {
 	return nil
 }
 
-func (x *HttpConnectionManager_Tracing) GetSpawnUpstreamSpan() *wrappers.BoolValue {
+func (x *HttpConnectionManager_Tracing) GetSpawnUpstreamSpan() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.SpawnUpstreamSpan
 	}
@@ -2167,7 +2167,7 @@ type HttpConnectionManager_SetCurrentClientCertDetails struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Whether to forward the subject of the client cert. Defaults to false.
-	Subject *wrappers.BoolValue `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
+	Subject *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=subject,proto3" json:"subject,omitempty"`
 	// Whether to forward the entire client cert in URL encoded PEM format. This will appear in the
 	// XFCC header comma separated from other values with the value Cert="PEM".
 	// Defaults to false.
@@ -2217,7 +2217,7 @@ func (*HttpConnectionManager_SetCurrentClientCertDetails) Descriptor() ([]byte, 
 	return file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDescGZIP(), []int{0, 2}
 }
 
-func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetSubject() *wrappers.BoolValue {
+func (x *HttpConnectionManager_SetCurrentClientCertDetails) GetSubject() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.Subject
 	}
@@ -2283,7 +2283,7 @@ type HttpConnectionManager_UpgradeConfig struct {
 	// This can be overridden on a per-route basis with :ref:`cluster
 	// <envoy_v3_api_field_config.route.v3.RouteAction.upgrade_configs>` as documented in the
 	// :ref:`upgrade documentation <arch_overview_upgrades>`.
-	Enabled *wrappers.BoolValue `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	Enabled *wrapperspb.BoolValue `protobuf:"bytes,3,opt,name=enabled,proto3" json:"enabled,omitempty"`
 }
 
 func (x *HttpConnectionManager_UpgradeConfig) Reset() {
@@ -2332,7 +2332,7 @@ func (x *HttpConnectionManager_UpgradeConfig) GetFilters() []*HttpFilter {
 	return nil
 }
 
-func (x *HttpConnectionManager_UpgradeConfig) GetEnabled() *wrappers.BoolValue {
+func (x *HttpConnectionManager_UpgradeConfig) GetEnabled() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.Enabled
 	}
@@ -2581,7 +2581,7 @@ type HttpConnectionManager_HcmAccessLogOptions struct {
 	// “requestComplete()“ method of “StreamInfo“ in access log filters, or through the “%DURATION%“ substitution
 	// string.
 	// The interval must be at least 1 millisecond.
-	AccessLogFlushInterval *duration.Duration `protobuf:"bytes,1,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
+	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
 	// If set to true, HCM will flush an access log when a new HTTP request is received, after request
 	// headers have been evaluated, before iterating through the HTTP filter chain.
 	// This log record, if enabled, does not depend on periodic log records or request completion log.
@@ -2625,7 +2625,7 @@ func (*HttpConnectionManager_HcmAccessLogOptions) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDescGZIP(), []int{0, 6}
 }
 
-func (x *HttpConnectionManager_HcmAccessLogOptions) GetAccessLogFlushInterval() *duration.Duration {
+func (x *HttpConnectionManager_HcmAccessLogOptions) GetAccessLogFlushInterval() *durationpb.Duration {
 	if x != nil {
 		return x.AccessLogFlushInterval
 	}
@@ -3857,14 +3857,14 @@ var file_envoy_extensions_filters_network_http_connection_manager_v3_http_connec
 	(*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor)(nil),           // 24: envoy.extensions.filters.network.http_connection_manager.v3.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor
 	(*ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_KvElement)(nil), // 25: envoy.extensions.filters.network.http_connection_manager.v3.ScopedRoutes.ScopeKeyBuilder.FragmentBuilder.HeaderValueExtractor.KvElement
 	(*v32.RouteConfiguration)(nil),                                                      // 26: envoy.config.route.v3.RouteConfiguration
-	(*wrappers.BoolValue)(nil),                                                          // 27: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),                                                        // 27: google.protobuf.BoolValue
 	(*v3.HttpProtocolOptions)(nil),                                                      // 28: envoy.config.core.v3.HttpProtocolOptions
 	(*v3.Http1ProtocolOptions)(nil),                                                     // 29: envoy.config.core.v3.Http1ProtocolOptions
 	(*v3.Http2ProtocolOptions)(nil),                                                     // 30: envoy.config.core.v3.Http2ProtocolOptions
 	(*v3.Http3ProtocolOptions)(nil),                                                     // 31: envoy.config.core.v3.Http3ProtocolOptions
 	(*v3.SchemeHeaderTransformation)(nil),                                               // 32: envoy.config.core.v3.SchemeHeaderTransformation
-	(*wrappers.UInt32Value)(nil),                                                        // 33: google.protobuf.UInt32Value
-	(*duration.Duration)(nil),                                                           // 34: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),                                                      // 33: google.protobuf.UInt32Value
+	(*durationpb.Duration)(nil),                                                         // 34: google.protobuf.Duration
 	(*v31.AccessLog)(nil),                                                               // 35: envoy.config.accesslog.v3.AccessLog
 	(*v3.TypedExtensionConfig)(nil),                                                     // 36: envoy.config.core.v3.TypedExtensionConfig
 	(*v3.SubstitutionFormatString)(nil),                                                 // 37: envoy.config.core.v3.SubstitutionFormatString
@@ -3873,7 +3873,7 @@ var file_envoy_extensions_filters_network_http_connection_manager_v3_http_connec
 	(*v3.HeaderValueOption)(nil),                                                        // 40: envoy.config.core.v3.HeaderValueOption
 	(*v3.ConfigSource)(nil),                                                             // 41: envoy.config.core.v3.ConfigSource
 	(*v32.ScopedRouteConfiguration)(nil),                                                // 42: envoy.config.route.v3.ScopedRouteConfiguration
-	(*any1.Any)(nil),                                                                    // 43: google.protobuf.Any
+	(*anypb.Any)(nil),                                                                   // 43: google.protobuf.Any
 	(*v3.ExtensionConfigSource)(nil),                                                    // 44: envoy.config.core.v3.ExtensionConfigSource
 	(*v33.Percent)(nil),                                                                 // 45: envoy.type.v3.Percent
 	(*v34.CustomTag)(nil),                                                               // 46: envoy.type.tracing.v3.CustomTag

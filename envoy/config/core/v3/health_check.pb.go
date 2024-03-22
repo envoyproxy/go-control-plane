@@ -12,12 +12,12 @@ import (
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -155,16 +155,16 @@ type HealthCheck struct {
 
 	// The time to wait for a health check response. If the timeout is reached the
 	// health check attempt will be considered a failure.
-	Timeout *duration.Duration `protobuf:"bytes,1,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout *durationpb.Duration `protobuf:"bytes,1,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// The interval between health checks.
-	Interval *duration.Duration `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
+	Interval *durationpb.Duration `protobuf:"bytes,2,opt,name=interval,proto3" json:"interval,omitempty"`
 	// An optional jitter amount in milliseconds. If specified, Envoy will start health
 	// checking after for a random time in ms between 0 and initial_jitter. This only
 	// applies to the first health check.
-	InitialJitter *duration.Duration `protobuf:"bytes,20,opt,name=initial_jitter,json=initialJitter,proto3" json:"initial_jitter,omitempty"`
+	InitialJitter *durationpb.Duration `protobuf:"bytes,20,opt,name=initial_jitter,json=initialJitter,proto3" json:"initial_jitter,omitempty"`
 	// An optional jitter amount in milliseconds. If specified, during every
 	// interval Envoy will add interval_jitter to the wait time.
-	IntervalJitter *duration.Duration `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter,proto3" json:"interval_jitter,omitempty"`
+	IntervalJitter *durationpb.Duration `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter,proto3" json:"interval_jitter,omitempty"`
 	// An optional jitter amount as a percentage of interval_ms. If specified,
 	// during every interval Envoy will add “interval_ms“ *
 	// “interval_jitter_percent“ / 100 to the wait time.
@@ -177,15 +177,15 @@ type HealthCheck struct {
 	// :ref:`expected_statuses <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.expected_statuses>`
 	// or :ref:`retriable_statuses <envoy_v3_api_field_config.core.v3.HealthCheck.HttpHealthCheck.retriable_statuses>`,
 	// this threshold is ignored and the host is considered immediately unhealthy.
-	UnhealthyThreshold *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold,proto3" json:"unhealthy_threshold,omitempty"`
+	UnhealthyThreshold *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=unhealthy_threshold,json=unhealthyThreshold,proto3" json:"unhealthy_threshold,omitempty"`
 	// The number of healthy health checks required before a host is marked
 	// healthy. Note that during startup, only a single successful health check is
 	// required to mark a host healthy.
-	HealthyThreshold *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold,proto3" json:"healthy_threshold,omitempty"`
+	HealthyThreshold *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=healthy_threshold,json=healthyThreshold,proto3" json:"healthy_threshold,omitempty"`
 	// [#not-implemented-hide:] Non-serving port for health checking.
-	AltPort *wrappers.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort,proto3" json:"alt_port,omitempty"`
+	AltPort *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=alt_port,json=altPort,proto3" json:"alt_port,omitempty"`
 	// Reuse health check connection between health checks. Default is true.
-	ReuseConnection *wrappers.BoolValue `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection,proto3" json:"reuse_connection,omitempty"`
+	ReuseConnection *wrapperspb.BoolValue `protobuf:"bytes,7,opt,name=reuse_connection,json=reuseConnection,proto3" json:"reuse_connection,omitempty"`
 	// Types that are assignable to HealthChecker:
 	//
 	//	*HealthCheck_HttpHealthCheck_
@@ -201,7 +201,7 @@ type HealthCheck struct {
 	// any other.
 	//
 	// The default value for "no traffic interval" is 60 seconds.
-	NoTrafficInterval *duration.Duration `protobuf:"bytes,12,opt,name=no_traffic_interval,json=noTrafficInterval,proto3" json:"no_traffic_interval,omitempty"`
+	NoTrafficInterval *durationpb.Duration `protobuf:"bytes,12,opt,name=no_traffic_interval,json=noTrafficInterval,proto3" json:"no_traffic_interval,omitempty"`
 	// The "no traffic healthy interval" is a special health check interval that
 	// is used for hosts that are currently passing active health checking
 	// (including new hosts) when the cluster has received no traffic.
@@ -215,26 +215,26 @@ type HealthCheck struct {
 	//
 	// If no_traffic_healthy_interval is not set, it will default to the
 	// no traffic interval and send that interval regardless of health state.
-	NoTrafficHealthyInterval *duration.Duration `protobuf:"bytes,24,opt,name=no_traffic_healthy_interval,json=noTrafficHealthyInterval,proto3" json:"no_traffic_healthy_interval,omitempty"`
+	NoTrafficHealthyInterval *durationpb.Duration `protobuf:"bytes,24,opt,name=no_traffic_healthy_interval,json=noTrafficHealthyInterval,proto3" json:"no_traffic_healthy_interval,omitempty"`
 	// The "unhealthy interval" is a health check interval that is used for hosts that are marked as
 	// unhealthy. As soon as the host is marked as healthy, Envoy will shift back to using the
 	// standard health check interval that is defined.
 	//
 	// The default value for "unhealthy interval" is the same as "interval".
-	UnhealthyInterval *duration.Duration `protobuf:"bytes,14,opt,name=unhealthy_interval,json=unhealthyInterval,proto3" json:"unhealthy_interval,omitempty"`
+	UnhealthyInterval *durationpb.Duration `protobuf:"bytes,14,opt,name=unhealthy_interval,json=unhealthyInterval,proto3" json:"unhealthy_interval,omitempty"`
 	// The "unhealthy edge interval" is a special health check interval that is used for the first
 	// health check right after a host is marked as unhealthy. For subsequent health checks
 	// Envoy will shift back to using either "unhealthy interval" if present or the standard health
 	// check interval that is defined.
 	//
 	// The default value for "unhealthy edge interval" is the same as "unhealthy interval".
-	UnhealthyEdgeInterval *duration.Duration `protobuf:"bytes,15,opt,name=unhealthy_edge_interval,json=unhealthyEdgeInterval,proto3" json:"unhealthy_edge_interval,omitempty"`
+	UnhealthyEdgeInterval *durationpb.Duration `protobuf:"bytes,15,opt,name=unhealthy_edge_interval,json=unhealthyEdgeInterval,proto3" json:"unhealthy_edge_interval,omitempty"`
 	// The "healthy edge interval" is a special health check interval that is used for the first
 	// health check right after a host is marked as healthy. For subsequent health checks
 	// Envoy will shift back to using the standard health check interval that is defined.
 	//
 	// The default value for "healthy edge interval" is the same as the default interval.
-	HealthyEdgeInterval *duration.Duration `protobuf:"bytes,16,opt,name=healthy_edge_interval,json=healthyEdgeInterval,proto3" json:"healthy_edge_interval,omitempty"`
+	HealthyEdgeInterval *durationpb.Duration `protobuf:"bytes,16,opt,name=healthy_edge_interval,json=healthyEdgeInterval,proto3" json:"healthy_edge_interval,omitempty"`
 	// .. attention::
 	// This field is deprecated in favor of the extension
 	// :ref:`event_logger <envoy_v3_api_field_config.core.v3.HealthCheck.event_logger>` and
@@ -292,7 +292,7 @@ type HealthCheck struct {
 	// :ref:`transport socket matches <envoy_v3_api_field_config.cluster.v3.Cluster.transport_socket_matches>`,
 	// the cluster's :ref:`transport socket <envoy_v3_api_field_config.cluster.v3.Cluster.transport_socket>`
 	// will be used for health check socket configuration.
-	TransportSocketMatchCriteria *_struct.Struct `protobuf:"bytes,23,opt,name=transport_socket_match_criteria,json=transportSocketMatchCriteria,proto3" json:"transport_socket_match_criteria,omitempty"`
+	TransportSocketMatchCriteria *structpb.Struct `protobuf:"bytes,23,opt,name=transport_socket_match_criteria,json=transportSocketMatchCriteria,proto3" json:"transport_socket_match_criteria,omitempty"`
 }
 
 func (x *HealthCheck) Reset() {
@@ -327,28 +327,28 @@ func (*HealthCheck) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_health_check_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *HealthCheck) GetTimeout() *duration.Duration {
+func (x *HealthCheck) GetTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.Timeout
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetInterval() *duration.Duration {
+func (x *HealthCheck) GetInterval() *durationpb.Duration {
 	if x != nil {
 		return x.Interval
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetInitialJitter() *duration.Duration {
+func (x *HealthCheck) GetInitialJitter() *durationpb.Duration {
 	if x != nil {
 		return x.InitialJitter
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetIntervalJitter() *duration.Duration {
+func (x *HealthCheck) GetIntervalJitter() *durationpb.Duration {
 	if x != nil {
 		return x.IntervalJitter
 	}
@@ -362,28 +362,28 @@ func (x *HealthCheck) GetIntervalJitterPercent() uint32 {
 	return 0
 }
 
-func (x *HealthCheck) GetUnhealthyThreshold() *wrappers.UInt32Value {
+func (x *HealthCheck) GetUnhealthyThreshold() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.UnhealthyThreshold
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetHealthyThreshold() *wrappers.UInt32Value {
+func (x *HealthCheck) GetHealthyThreshold() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.HealthyThreshold
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetAltPort() *wrappers.UInt32Value {
+func (x *HealthCheck) GetAltPort() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.AltPort
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetReuseConnection() *wrappers.BoolValue {
+func (x *HealthCheck) GetReuseConnection() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.ReuseConnection
 	}
@@ -425,35 +425,35 @@ func (x *HealthCheck) GetCustomHealthCheck() *HealthCheck_CustomHealthCheck {
 	return nil
 }
 
-func (x *HealthCheck) GetNoTrafficInterval() *duration.Duration {
+func (x *HealthCheck) GetNoTrafficInterval() *durationpb.Duration {
 	if x != nil {
 		return x.NoTrafficInterval
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetNoTrafficHealthyInterval() *duration.Duration {
+func (x *HealthCheck) GetNoTrafficHealthyInterval() *durationpb.Duration {
 	if x != nil {
 		return x.NoTrafficHealthyInterval
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetUnhealthyInterval() *duration.Duration {
+func (x *HealthCheck) GetUnhealthyInterval() *durationpb.Duration {
 	if x != nil {
 		return x.UnhealthyInterval
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetUnhealthyEdgeInterval() *duration.Duration {
+func (x *HealthCheck) GetUnhealthyEdgeInterval() *durationpb.Duration {
 	if x != nil {
 		return x.UnhealthyEdgeInterval
 	}
 	return nil
 }
 
-func (x *HealthCheck) GetHealthyEdgeInterval() *duration.Duration {
+func (x *HealthCheck) GetHealthyEdgeInterval() *durationpb.Duration {
 	if x != nil {
 		return x.HealthyEdgeInterval
 	}
@@ -503,7 +503,7 @@ func (x *HealthCheck) GetTlsOptions() *HealthCheck_TlsOptions {
 	return nil
 }
 
-func (x *HealthCheck) GetTransportSocketMatchCriteria() *_struct.Struct {
+func (x *HealthCheck) GetTransportSocketMatchCriteria() *structpb.Struct {
 	if x != nil {
 		return x.TransportSocketMatchCriteria
 	}
@@ -654,7 +654,7 @@ type HealthCheck_HttpHealthCheck struct {
 	Receive []*HealthCheck_Payload `protobuf:"bytes,4,rep,name=receive,proto3" json:"receive,omitempty"`
 	// Specifies the size of response buffer in bytes that is used to Payload match.
 	// The default value is 1024. Setting to 0 implies that the Payload will be matched against the entire response.
-	ResponseBufferSize *wrappers.UInt64Value `protobuf:"bytes,14,opt,name=response_buffer_size,json=responseBufferSize,proto3" json:"response_buffer_size,omitempty"`
+	ResponseBufferSize *wrapperspb.UInt64Value `protobuf:"bytes,14,opt,name=response_buffer_size,json=responseBufferSize,proto3" json:"response_buffer_size,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each request that is sent to the
 	// health checked cluster. For more information, including details on header value syntax, see
 	// the documentation on :ref:`custom request headers
@@ -753,7 +753,7 @@ func (x *HealthCheck_HttpHealthCheck) GetReceive() []*HealthCheck_Payload {
 	return nil
 }
 
-func (x *HealthCheck_HttpHealthCheck) GetResponseBufferSize() *wrappers.UInt64Value {
+func (x *HealthCheck_HttpHealthCheck) GetResponseBufferSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.ResponseBufferSize
 	}
@@ -1063,7 +1063,7 @@ func (m *HealthCheck_CustomHealthCheck) GetConfigType() isHealthCheck_CustomHeal
 	return nil
 }
 
-func (x *HealthCheck_CustomHealthCheck) GetTypedConfig() *any1.Any {
+func (x *HealthCheck_CustomHealthCheck) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*HealthCheck_CustomHealthCheck_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -1075,7 +1075,7 @@ type isHealthCheck_CustomHealthCheck_ConfigType interface {
 }
 
 type HealthCheck_CustomHealthCheck_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*HealthCheck_CustomHealthCheck_TypedConfig) isHealthCheck_CustomHealthCheck_ConfigType() {}
@@ -1471,19 +1471,19 @@ var file_envoy_config_core_v3_health_check_proto_goTypes = []interface{}{
 	(*HealthCheck_GrpcHealthCheck)(nil),   // 7: envoy.config.core.v3.HealthCheck.GrpcHealthCheck
 	(*HealthCheck_CustomHealthCheck)(nil), // 8: envoy.config.core.v3.HealthCheck.CustomHealthCheck
 	(*HealthCheck_TlsOptions)(nil),        // 9: envoy.config.core.v3.HealthCheck.TlsOptions
-	(*duration.Duration)(nil),             // 10: google.protobuf.Duration
-	(*wrappers.UInt32Value)(nil),          // 11: google.protobuf.UInt32Value
-	(*wrappers.BoolValue)(nil),            // 12: google.protobuf.BoolValue
+	(*durationpb.Duration)(nil),           // 10: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),        // 11: google.protobuf.UInt32Value
+	(*wrapperspb.BoolValue)(nil),          // 12: google.protobuf.BoolValue
 	(*TypedExtensionConfig)(nil),          // 13: envoy.config.core.v3.TypedExtensionConfig
 	(*EventServiceConfig)(nil),            // 14: envoy.config.core.v3.EventServiceConfig
-	(*_struct.Struct)(nil),                // 15: google.protobuf.Struct
-	(*wrappers.UInt64Value)(nil),          // 16: google.protobuf.UInt64Value
+	(*structpb.Struct)(nil),               // 15: google.protobuf.Struct
+	(*wrapperspb.UInt64Value)(nil),        // 16: google.protobuf.UInt64Value
 	(*HeaderValueOption)(nil),             // 17: envoy.config.core.v3.HeaderValueOption
 	(*v3.Int64Range)(nil),                 // 18: envoy.type.v3.Int64Range
 	(v3.CodecClientType)(0),               // 19: envoy.type.v3.CodecClientType
 	(*v31.StringMatcher)(nil),             // 20: envoy.type.matcher.v3.StringMatcher
 	(RequestMethod)(0),                    // 21: envoy.config.core.v3.RequestMethod
-	(*any1.Any)(nil),                      // 22: google.protobuf.Any
+	(*anypb.Any)(nil),                     // 22: google.protobuf.Any
 }
 var file_envoy_config_core_v3_health_check_proto_depIdxs = []int32{
 	0,  // 0: envoy.config.core.v3.HealthStatusSet.statuses:type_name -> envoy.config.core.v3.HealthStatus

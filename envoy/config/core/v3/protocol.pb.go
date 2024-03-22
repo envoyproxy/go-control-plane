@@ -12,10 +12,10 @@ import (
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -141,13 +141,13 @@ type QuicKeepAliveSettings struct {
 	//
 	// If zero, disable keepalive probing.
 	// If absent, use the QUICHE default interval to probe.
-	MaxInterval *duration.Duration `protobuf:"bytes,1,opt,name=max_interval,json=maxInterval,proto3" json:"max_interval,omitempty"`
+	MaxInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=max_interval,json=maxInterval,proto3" json:"max_interval,omitempty"`
 	// The interval to send the first few keep-alive probing packets to prevent connection from hitting the idle timeout. Subsequent probes will be sent, each one with an interval exponentially longer than previous one, till it reaches :ref:`max_interval <envoy_v3_api_field_config.core.v3.QuicKeepAliveSettings.max_interval>`. And the probes afterwards will always use :ref:`max_interval <envoy_v3_api_field_config.core.v3.QuicKeepAliveSettings.max_interval>`.
 	//
 	// The value should be smaller than :ref:`connection idle_timeout <envoy_v3_api_field_config.listener.v3.QuicProtocolOptions.idle_timeout>` to prevent idle timeout and smaller than max_interval to take effect.
 	//
 	// If absent or zero, disable keepalive probing for a server connection. For a client connection, if :ref:`max_interval <envoy_v3_api_field_config.core.v3.QuicKeepAliveSettings.max_interval>`  is also zero, do not keepalive, otherwise use max_interval or QUICHE default to probe all the time.
-	InitialInterval *duration.Duration `protobuf:"bytes,2,opt,name=initial_interval,json=initialInterval,proto3" json:"initial_interval,omitempty"`
+	InitialInterval *durationpb.Duration `protobuf:"bytes,2,opt,name=initial_interval,json=initialInterval,proto3" json:"initial_interval,omitempty"`
 }
 
 func (x *QuicKeepAliveSettings) Reset() {
@@ -182,14 +182,14 @@ func (*QuicKeepAliveSettings) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_protocol_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *QuicKeepAliveSettings) GetMaxInterval() *duration.Duration {
+func (x *QuicKeepAliveSettings) GetMaxInterval() *durationpb.Duration {
 	if x != nil {
 		return x.MaxInterval
 	}
 	return nil
 }
 
-func (x *QuicKeepAliveSettings) GetInitialInterval() *duration.Duration {
+func (x *QuicKeepAliveSettings) GetInitialInterval() *durationpb.Duration {
 	if x != nil {
 		return x.InitialInterval
 	}
@@ -205,7 +205,7 @@ type QuicProtocolOptions struct {
 
 	// Maximum number of streams that the client can negotiate per connection. 100
 	// if not specified.
-	MaxConcurrentStreams *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
+	MaxConcurrentStreams *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
 	// `Initial stream-level flow-control receive window
 	// <https://tools.ietf.org/html/draft-ietf-quic-transport-34#section-4.1>`_ size. Valid values range from
 	// 1 to 16777216 (2^24, maximum supported by QUICHE) and defaults to 16777216 (16 * 1024 * 1024).
@@ -216,19 +216,19 @@ type QuicProtocolOptions struct {
 	// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
 	// QUIC stream send and receive buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
 	// stop the flow of data to the stream buffers.
-	InitialStreamWindowSize *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
+	InitialStreamWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
 	// Similar to “initial_stream_window_size“, but for connection-level
 	// flow-control. Valid values rage from 1 to 25165824 (24MB, maximum supported by QUICHE) and defaults
 	// to 25165824 (24 * 1024 * 1024).
 	//
 	// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
 	// window size now, so it's also the minimum.
-	InitialConnectionWindowSize *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
+	InitialConnectionWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// The number of timeouts that can occur before port migration is triggered for QUIC clients.
 	// This defaults to 4. If set to 0, port migration will not occur on path degrading.
 	// Timeout here refers to QUIC internal path degrading timeout mechanism, such as PTO.
 	// This has no effect on server sessions.
-	NumTimeoutsToTriggerPortMigration *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=num_timeouts_to_trigger_port_migration,json=numTimeoutsToTriggerPortMigration,proto3" json:"num_timeouts_to_trigger_port_migration,omitempty"`
+	NumTimeoutsToTriggerPortMigration *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=num_timeouts_to_trigger_port_migration,json=numTimeoutsToTriggerPortMigration,proto3" json:"num_timeouts_to_trigger_port_migration,omitempty"`
 	// Probes the peer at the configured interval to solicit traffic, i.e. ACK or PATH_RESPONSE, from the peer to push back connection idle timeout.
 	// If absent, use the default keepalive behavior of which a client connection sends PINGs every 15s, and a server connection doesn't do anything.
 	ConnectionKeepalive *QuicKeepAliveSettings `protobuf:"bytes,5,opt,name=connection_keepalive,json=connectionKeepalive,proto3" json:"connection_keepalive,omitempty"`
@@ -242,7 +242,7 @@ type QuicProtocolOptions struct {
 	// default 600s will be applied.
 	// For internal corporate network, a long timeout is often fine.
 	// But for client facing network, 30s is usually a good choice.
-	IdleNetworkTimeout *duration.Duration `protobuf:"bytes,8,opt,name=idle_network_timeout,json=idleNetworkTimeout,proto3" json:"idle_network_timeout,omitempty"`
+	IdleNetworkTimeout *durationpb.Duration `protobuf:"bytes,8,opt,name=idle_network_timeout,json=idleNetworkTimeout,proto3" json:"idle_network_timeout,omitempty"`
 }
 
 func (x *QuicProtocolOptions) Reset() {
@@ -277,28 +277,28 @@ func (*QuicProtocolOptions) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_protocol_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *QuicProtocolOptions) GetMaxConcurrentStreams() *wrappers.UInt32Value {
+func (x *QuicProtocolOptions) GetMaxConcurrentStreams() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxConcurrentStreams
 	}
 	return nil
 }
 
-func (x *QuicProtocolOptions) GetInitialStreamWindowSize() *wrappers.UInt32Value {
+func (x *QuicProtocolOptions) GetInitialStreamWindowSize() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.InitialStreamWindowSize
 	}
 	return nil
 }
 
-func (x *QuicProtocolOptions) GetInitialConnectionWindowSize() *wrappers.UInt32Value {
+func (x *QuicProtocolOptions) GetInitialConnectionWindowSize() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.InitialConnectionWindowSize
 	}
 	return nil
 }
 
-func (x *QuicProtocolOptions) GetNumTimeoutsToTriggerPortMigration() *wrappers.UInt32Value {
+func (x *QuicProtocolOptions) GetNumTimeoutsToTriggerPortMigration() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.NumTimeoutsToTriggerPortMigration
 	}
@@ -326,7 +326,7 @@ func (x *QuicProtocolOptions) GetClientConnectionOptions() string {
 	return ""
 }
 
-func (x *QuicProtocolOptions) GetIdleNetworkTimeout() *duration.Duration {
+func (x *QuicProtocolOptions) GetIdleNetworkTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.IdleNetworkTimeout
 	}
@@ -437,7 +437,7 @@ type AlternateProtocolsCacheOptions struct {
 	//	The implementation is approximate and enforced independently on each worker thread, thus
 	//	it is possible for the maximum entries in the cache to go slightly above the configured
 	//	value depending on timing. This is similar to how other circuit breakers work.
-	MaxEntries *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_entries,json=maxEntries,proto3" json:"max_entries,omitempty"`
+	MaxEntries *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_entries,json=maxEntries,proto3" json:"max_entries,omitempty"`
 	// Allows configuring a persistent
 	// :ref:`key value store <envoy_v3_api_msg_config.common.key_value.v3.KeyValueStoreConfig>` to flush
 	// alternate protocols entries to disk.
@@ -497,7 +497,7 @@ func (x *AlternateProtocolsCacheOptions) GetName() string {
 	return ""
 }
 
-func (x *AlternateProtocolsCacheOptions) GetMaxEntries() *wrappers.UInt32Value {
+func (x *AlternateProtocolsCacheOptions) GetMaxEntries() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxEntries
 	}
@@ -548,21 +548,21 @@ type HttpProtocolOptions struct {
 	// If the :ref:`overload action <config_overload_manager_overload_actions>` "envoy.overload_actions.reduce_timeouts"
 	// is configured, this timeout is scaled for downstream connections according to the value for
 	// :ref:`HTTP_DOWNSTREAM_CONNECTION_IDLE <envoy_v3_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_CONNECTION_IDLE>`.
-	IdleTimeout *duration.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
+	IdleTimeout *durationpb.Duration `protobuf:"bytes,1,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// The maximum duration of a connection. The duration is defined as a period since a connection
 	// was established. If not set, there is no max duration. When max_connection_duration is reached
 	// and if there are no active streams, the connection will be closed. If the connection is a
 	// downstream connection and there are any active streams, the drain sequence will kick-in,
 	// and the connection will be force-closed after the drain period. See :ref:`drain_timeout
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
-	MaxConnectionDuration *duration.Duration `protobuf:"bytes,3,opt,name=max_connection_duration,json=maxConnectionDuration,proto3" json:"max_connection_duration,omitempty"`
+	MaxConnectionDuration *durationpb.Duration `protobuf:"bytes,3,opt,name=max_connection_duration,json=maxConnectionDuration,proto3" json:"max_connection_duration,omitempty"`
 	// The maximum number of headers. If unconfigured, the default
 	// maximum number of request headers allowed is 100. Requests that exceed this limit will receive
 	// a 431 response for HTTP/1.x and cause a stream reset for HTTP/2.
-	MaxHeadersCount *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_headers_count,json=maxHeadersCount,proto3" json:"max_headers_count,omitempty"`
+	MaxHeadersCount *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_headers_count,json=maxHeadersCount,proto3" json:"max_headers_count,omitempty"`
 	// Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be
 	// reset independent of any other timeouts. If not specified, this value is not set.
-	MaxStreamDuration *duration.Duration `protobuf:"bytes,4,opt,name=max_stream_duration,json=maxStreamDuration,proto3" json:"max_stream_duration,omitempty"`
+	MaxStreamDuration *durationpb.Duration `protobuf:"bytes,4,opt,name=max_stream_duration,json=maxStreamDuration,proto3" json:"max_stream_duration,omitempty"`
 	// Action to take when a client request with a header name containing underscore characters is received.
 	// If this setting is not specified, the value defaults to ALLOW.
 	// Note: upstream responses are not affected by this setting.
@@ -573,7 +573,7 @@ type HttpProtocolOptions struct {
 	// If not specified, there is no limit.
 	// Setting this parameter to 1 will effectively disable keep alive.
 	// For HTTP/2 and HTTP/3, due to concurrent stream processing, the limit is approximate.
-	MaxRequestsPerConnection *wrappers.UInt32Value `protobuf:"bytes,6,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
+	MaxRequestsPerConnection *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
 }
 
 func (x *HttpProtocolOptions) Reset() {
@@ -608,28 +608,28 @@ func (*HttpProtocolOptions) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_protocol_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *HttpProtocolOptions) GetIdleTimeout() *duration.Duration {
+func (x *HttpProtocolOptions) GetIdleTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.IdleTimeout
 	}
 	return nil
 }
 
-func (x *HttpProtocolOptions) GetMaxConnectionDuration() *duration.Duration {
+func (x *HttpProtocolOptions) GetMaxConnectionDuration() *durationpb.Duration {
 	if x != nil {
 		return x.MaxConnectionDuration
 	}
 	return nil
 }
 
-func (x *HttpProtocolOptions) GetMaxHeadersCount() *wrappers.UInt32Value {
+func (x *HttpProtocolOptions) GetMaxHeadersCount() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxHeadersCount
 	}
 	return nil
 }
 
-func (x *HttpProtocolOptions) GetMaxStreamDuration() *duration.Duration {
+func (x *HttpProtocolOptions) GetMaxStreamDuration() *durationpb.Duration {
 	if x != nil {
 		return x.MaxStreamDuration
 	}
@@ -643,7 +643,7 @@ func (x *HttpProtocolOptions) GetHeadersWithUnderscoresAction() HttpProtocolOpti
 	return HttpProtocolOptions_ALLOW
 }
 
-func (x *HttpProtocolOptions) GetMaxRequestsPerConnection() *wrappers.UInt32Value {
+func (x *HttpProtocolOptions) GetMaxRequestsPerConnection() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxRequestsPerConnection
 	}
@@ -660,7 +660,7 @@ type Http1ProtocolOptions struct {
 	// are generally sent by clients to forward/explicit proxies. This allows clients to configure
 	// envoy as their HTTP proxy. In Unix, for example, this is typically done by setting the
 	// “http_proxy“ environment variable.
-	AllowAbsoluteUrl *wrappers.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl,proto3" json:"allow_absolute_url,omitempty"`
+	AllowAbsoluteUrl *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl,proto3" json:"allow_absolute_url,omitempty"`
 	// Handle incoming HTTP/1.0 and HTTP 0.9 requests.
 	// This is off by default, and not fully standards compliant. There is support for pre-HTTP/1.1
 	// style connect logic, dechunking, and handling lack of client host iff
@@ -703,7 +703,7 @@ type Http1ProtocolOptions struct {
 	// open where possible.
 	// If set, this overrides any HCM :ref:`stream_error_on_invalid_http_messaging
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.stream_error_on_invalid_http_message>`.
-	OverrideStreamErrorOnInvalidHttpMessage *wrappers.BoolValue `protobuf:"bytes,7,opt,name=override_stream_error_on_invalid_http_message,json=overrideStreamErrorOnInvalidHttpMessage,proto3" json:"override_stream_error_on_invalid_http_message,omitempty"`
+	OverrideStreamErrorOnInvalidHttpMessage *wrapperspb.BoolValue `protobuf:"bytes,7,opt,name=override_stream_error_on_invalid_http_message,json=overrideStreamErrorOnInvalidHttpMessage,proto3" json:"override_stream_error_on_invalid_http_message,omitempty"`
 	// Allows sending fully qualified URLs when proxying the first line of the
 	// response. By default, Envoy will only send the path components in the first line.
 	// If this is true, Envoy will create a fully qualified URI composing scheme
@@ -715,7 +715,7 @@ type Http1ProtocolOptions struct {
 	// If unset, HTTP/1 parser is selected based on
 	// envoy.reloadable_features.http1_use_balsa_parser.
 	// See issue #21245.
-	UseBalsaParser *wrappers.BoolValue `protobuf:"bytes,9,opt,name=use_balsa_parser,json=useBalsaParser,proto3" json:"use_balsa_parser,omitempty"`
+	UseBalsaParser *wrapperspb.BoolValue `protobuf:"bytes,9,opt,name=use_balsa_parser,json=useBalsaParser,proto3" json:"use_balsa_parser,omitempty"`
 	// [#not-implemented-hide:] Hiding so that field can be removed.
 	// If true, and BalsaParser is used (either `use_balsa_parser` above is true,
 	// or `envoy.reloadable_features.http1_use_balsa_parser` is true and
@@ -762,7 +762,7 @@ func (*Http1ProtocolOptions) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_protocol_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *Http1ProtocolOptions) GetAllowAbsoluteUrl() *wrappers.BoolValue {
+func (x *Http1ProtocolOptions) GetAllowAbsoluteUrl() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.AllowAbsoluteUrl
 	}
@@ -804,7 +804,7 @@ func (x *Http1ProtocolOptions) GetAllowChunkedLength() bool {
 	return false
 }
 
-func (x *Http1ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wrappers.BoolValue {
+func (x *Http1ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.OverrideStreamErrorOnInvalidHttpMessage
 	}
@@ -818,7 +818,7 @@ func (x *Http1ProtocolOptions) GetSendFullyQualifiedUrl() bool {
 	return false
 }
 
-func (x *Http1ProtocolOptions) GetUseBalsaParser() *wrappers.BoolValue {
+func (x *Http1ProtocolOptions) GetUseBalsaParser() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.UseBalsaParser
 	}
@@ -839,12 +839,12 @@ type KeepaliveSettings struct {
 
 	// Send HTTP/2 PING frames at this period, in order to test that the connection is still alive.
 	// If this is zero, interval PINGs will not be sent.
-	Interval *duration.Duration `protobuf:"bytes,1,opt,name=interval,proto3" json:"interval,omitempty"`
+	Interval *durationpb.Duration `protobuf:"bytes,1,opt,name=interval,proto3" json:"interval,omitempty"`
 	// How long to wait for a response to a keepalive PING. If a response is not received within this
 	// time period, the connection will be aborted. Note that in order to prevent the influence of
 	// Head-of-line (HOL) blocking the timeout period is extended when *any* frame is received on
 	// the connection, under the assumption that if a frame is received the connection is healthy.
-	Timeout *duration.Duration `protobuf:"bytes,2,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout *durationpb.Duration `protobuf:"bytes,2,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// A random jitter amount as a percentage of interval that will be added to each interval.
 	// A value of zero means there will be no jitter.
 	// The default value is 15%.
@@ -856,7 +856,7 @@ type KeepaliveSettings struct {
 	// interval ping will determine if the connection is dead.
 	//
 	// The same feature for HTTP/3 is given by inheritance from QUICHE which uses :ref:`connection idle_timeout <envoy_v3_api_field_config.listener.v3.QuicProtocolOptions.idle_timeout>` and the current PTO of the connection to decide whether to probe before sending a new request.
-	ConnectionIdleInterval *duration.Duration `protobuf:"bytes,4,opt,name=connection_idle_interval,json=connectionIdleInterval,proto3" json:"connection_idle_interval,omitempty"`
+	ConnectionIdleInterval *durationpb.Duration `protobuf:"bytes,4,opt,name=connection_idle_interval,json=connectionIdleInterval,proto3" json:"connection_idle_interval,omitempty"`
 }
 
 func (x *KeepaliveSettings) Reset() {
@@ -891,14 +891,14 @@ func (*KeepaliveSettings) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_protocol_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *KeepaliveSettings) GetInterval() *duration.Duration {
+func (x *KeepaliveSettings) GetInterval() *durationpb.Duration {
 	if x != nil {
 		return x.Interval
 	}
 	return nil
 }
 
-func (x *KeepaliveSettings) GetTimeout() *duration.Duration {
+func (x *KeepaliveSettings) GetTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.Timeout
 	}
@@ -912,7 +912,7 @@ func (x *KeepaliveSettings) GetIntervalJitter() *v3.Percent {
 	return nil
 }
 
-func (x *KeepaliveSettings) GetConnectionIdleInterval() *duration.Duration {
+func (x *KeepaliveSettings) GetConnectionIdleInterval() *durationpb.Duration {
 	if x != nil {
 		return x.ConnectionIdleInterval
 	}
@@ -929,7 +929,7 @@ type Http2ProtocolOptions struct {
 	// (in octets) that the encoder is permitted to use for the dynamic HPACK table. Valid values
 	// range from 0 to 4294967295 (2^32 - 1) and defaults to 4096. 0 effectively disables header
 	// compression.
-	HpackTableSize *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize,proto3" json:"hpack_table_size,omitempty"`
+	HpackTableSize *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize,proto3" json:"hpack_table_size,omitempty"`
 	// `Maximum concurrent streams <https://httpwg.org/specs/rfc7540.html#rfc.section.5.1.2>`_
 	// allowed for peer on one HTTP/2 connection. Valid values range from 1 to 2147483647 (2^31 - 1)
 	// and defaults to 2147483647.
@@ -941,7 +941,7 @@ type Http2ProtocolOptions struct {
 	// This acts as an upper bound: Envoy will lower the max concurrent streams allowed on a given
 	// connection based on upstream settings. Config dumps will reflect the configured upper bound,
 	// not the per-connection negotiated limits.
-	MaxConcurrentStreams *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
+	MaxConcurrentStreams *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
 	// `Initial stream-level flow-control window
 	// <https://httpwg.org/specs/rfc7540.html#rfc.section.6.9.2>`_ size. Valid values range from 65535
 	// (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum) and defaults to 268435456
@@ -953,10 +953,10 @@ type Http2ProtocolOptions struct {
 	// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
 	// HTTP/2 codec buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
 	// stop the flow of data to the codec buffers.
-	InitialStreamWindowSize *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
+	InitialStreamWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
 	// Similar to “initial_stream_window_size“, but for connection-level flow-control
 	// window. Currently, this has the same minimum/maximum/default as “initial_stream_window_size“.
-	InitialConnectionWindowSize *wrappers.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
+	InitialConnectionWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// Allows proxying Websocket and other upgrades over H2 connect.
 	AllowConnect bool `protobuf:"varint,5,opt,name=allow_connect,json=allowConnect,proto3" json:"allow_connect,omitempty"`
 	// [#not-implemented-hide:] Hiding until Envoy has full metadata support.
@@ -970,20 +970,20 @@ type Http2ProtocolOptions struct {
 	// be written into the socket). Exceeding this limit triggers flood mitigation and connection is
 	// terminated. The “http2.outbound_flood“ stat tracks the number of terminated connections due
 	// to flood mitigation. The default limit is 10000.
-	MaxOutboundFrames *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=max_outbound_frames,json=maxOutboundFrames,proto3" json:"max_outbound_frames,omitempty"`
+	MaxOutboundFrames *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=max_outbound_frames,json=maxOutboundFrames,proto3" json:"max_outbound_frames,omitempty"`
 	// Limit the number of pending outbound downstream frames of types PING, SETTINGS and RST_STREAM,
 	// preventing high memory utilization when receiving continuous stream of these frames. Exceeding
 	// this limit triggers flood mitigation and connection is terminated. The
 	// “http2.outbound_control_flood“ stat tracks the number of terminated connections due to flood
 	// mitigation. The default limit is 1000.
-	MaxOutboundControlFrames *wrappers.UInt32Value `protobuf:"bytes,8,opt,name=max_outbound_control_frames,json=maxOutboundControlFrames,proto3" json:"max_outbound_control_frames,omitempty"`
+	MaxOutboundControlFrames *wrapperspb.UInt32Value `protobuf:"bytes,8,opt,name=max_outbound_control_frames,json=maxOutboundControlFrames,proto3" json:"max_outbound_control_frames,omitempty"`
 	// Limit the number of consecutive inbound frames of types HEADERS, CONTINUATION and DATA with an
 	// empty payload and no end stream flag. Those frames have no legitimate use and are abusive, but
 	// might be a result of a broken HTTP/2 implementation. The `http2.inbound_empty_frames_flood“
 	// stat tracks the number of connections terminated due to flood mitigation.
 	// Setting this to 0 will terminate connection upon receiving first frame with an empty payload
 	// and no end stream flag. The default limit is 1.
-	MaxConsecutiveInboundFramesWithEmptyPayload *wrappers.UInt32Value `protobuf:"bytes,9,opt,name=max_consecutive_inbound_frames_with_empty_payload,json=maxConsecutiveInboundFramesWithEmptyPayload,proto3" json:"max_consecutive_inbound_frames_with_empty_payload,omitempty"`
+	MaxConsecutiveInboundFramesWithEmptyPayload *wrapperspb.UInt32Value `protobuf:"bytes,9,opt,name=max_consecutive_inbound_frames_with_empty_payload,json=maxConsecutiveInboundFramesWithEmptyPayload,proto3" json:"max_consecutive_inbound_frames_with_empty_payload,omitempty"`
 	// Limit the number of inbound PRIORITY frames allowed per each opened stream. If the number
 	// of PRIORITY frames received over the lifetime of connection exceeds the value calculated
 	// using this formula::
@@ -995,7 +995,7 @@ type Http2ProtocolOptions struct {
 	// “opened_streams“ is incremented when Envoy send the HEADERS frame for a new stream. The
 	// “http2.inbound_priority_frames_flood“ stat tracks
 	// the number of connections terminated due to flood mitigation. The default limit is 100.
-	MaxInboundPriorityFramesPerStream *wrappers.UInt32Value `protobuf:"bytes,10,opt,name=max_inbound_priority_frames_per_stream,json=maxInboundPriorityFramesPerStream,proto3" json:"max_inbound_priority_frames_per_stream,omitempty"`
+	MaxInboundPriorityFramesPerStream *wrapperspb.UInt32Value `protobuf:"bytes,10,opt,name=max_inbound_priority_frames_per_stream,json=maxInboundPriorityFramesPerStream,proto3" json:"max_inbound_priority_frames_per_stream,omitempty"`
 	// Limit the number of inbound WINDOW_UPDATE frames allowed per DATA frame sent. If the number
 	// of WINDOW_UPDATE frames received over the lifetime of connection exceeds the value calculated
 	// using this formula::
@@ -1010,7 +1010,7 @@ type Http2ProtocolOptions struct {
 	// flood mitigation. The default max_inbound_window_update_frames_per_data_frame_sent value is 10.
 	// Setting this to 1 should be enough to support HTTP/2 implementations with basic flow control,
 	// but more complex implementations that try to estimate available bandwidth require at least 2.
-	MaxInboundWindowUpdateFramesPerDataFrameSent *wrappers.UInt32Value `protobuf:"bytes,11,opt,name=max_inbound_window_update_frames_per_data_frame_sent,json=maxInboundWindowUpdateFramesPerDataFrameSent,proto3" json:"max_inbound_window_update_frames_per_data_frame_sent,omitempty"`
+	MaxInboundWindowUpdateFramesPerDataFrameSent *wrapperspb.UInt32Value `protobuf:"bytes,11,opt,name=max_inbound_window_update_frames_per_data_frame_sent,json=maxInboundWindowUpdateFramesPerDataFrameSent,proto3" json:"max_inbound_window_update_frames_per_data_frame_sent,omitempty"`
 	// Allows invalid HTTP messaging and headers. When this option is disabled (default), then
 	// the whole HTTP/2 connection is terminated upon receiving invalid HEADERS frame. However,
 	// when this option is enabled, only the offending stream is terminated.
@@ -1034,7 +1034,7 @@ type Http2ProtocolOptions struct {
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.stream_error_on_invalid_http_message>`
 	//
 	// See `RFC7540, sec. 8.1 <https://tools.ietf.org/html/rfc7540#section-8.1>`_ for details.
-	OverrideStreamErrorOnInvalidHttpMessage *wrappers.BoolValue `protobuf:"bytes,14,opt,name=override_stream_error_on_invalid_http_message,json=overrideStreamErrorOnInvalidHttpMessage,proto3" json:"override_stream_error_on_invalid_http_message,omitempty"`
+	OverrideStreamErrorOnInvalidHttpMessage *wrapperspb.BoolValue `protobuf:"bytes,14,opt,name=override_stream_error_on_invalid_http_message,json=overrideStreamErrorOnInvalidHttpMessage,proto3" json:"override_stream_error_on_invalid_http_message,omitempty"`
 	// [#not-implemented-hide:]
 	// Specifies SETTINGS frame parameters to be sent to the peer, with two exceptions:
 	//
@@ -1068,7 +1068,7 @@ type Http2ProtocolOptions struct {
 	// [#not-implemented-hide:] Hiding so that the field can be removed after oghttp2 is rolled out.
 	// If set, force use of a particular HTTP/2 codec: oghttp2 if true, nghttp2 if false.
 	// If unset, HTTP/2 codec is selected based on envoy.reloadable_features.http2_use_oghttp2.
-	UseOghttp2Codec *wrappers.BoolValue `protobuf:"bytes,16,opt,name=use_oghttp2_codec,json=useOghttp2Codec,proto3" json:"use_oghttp2_codec,omitempty"`
+	UseOghttp2Codec *wrapperspb.BoolValue `protobuf:"bytes,16,opt,name=use_oghttp2_codec,json=useOghttp2Codec,proto3" json:"use_oghttp2_codec,omitempty"`
 }
 
 func (x *Http2ProtocolOptions) Reset() {
@@ -1103,28 +1103,28 @@ func (*Http2ProtocolOptions) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_protocol_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *Http2ProtocolOptions) GetHpackTableSize() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetHpackTableSize() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.HpackTableSize
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetMaxConcurrentStreams() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetMaxConcurrentStreams() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxConcurrentStreams
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetInitialStreamWindowSize() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetInitialStreamWindowSize() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.InitialStreamWindowSize
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetInitialConnectionWindowSize() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetInitialConnectionWindowSize() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.InitialConnectionWindowSize
 	}
@@ -1145,35 +1145,35 @@ func (x *Http2ProtocolOptions) GetAllowMetadata() bool {
 	return false
 }
 
-func (x *Http2ProtocolOptions) GetMaxOutboundFrames() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetMaxOutboundFrames() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxOutboundFrames
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetMaxOutboundControlFrames() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetMaxOutboundControlFrames() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxOutboundControlFrames
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetMaxConsecutiveInboundFramesWithEmptyPayload() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetMaxConsecutiveInboundFramesWithEmptyPayload() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxConsecutiveInboundFramesWithEmptyPayload
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetMaxInboundPriorityFramesPerStream() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetMaxInboundPriorityFramesPerStream() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxInboundPriorityFramesPerStream
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetMaxInboundWindowUpdateFramesPerDataFrameSent() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions) GetMaxInboundWindowUpdateFramesPerDataFrameSent() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxInboundWindowUpdateFramesPerDataFrameSent
 	}
@@ -1188,7 +1188,7 @@ func (x *Http2ProtocolOptions) GetStreamErrorOnInvalidHttpMessaging() bool {
 	return false
 }
 
-func (x *Http2ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wrappers.BoolValue {
+func (x *Http2ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.OverrideStreamErrorOnInvalidHttpMessage
 	}
@@ -1209,7 +1209,7 @@ func (x *Http2ProtocolOptions) GetConnectionKeepalive() *KeepaliveSettings {
 	return nil
 }
 
-func (x *Http2ProtocolOptions) GetUseOghttp2Codec() *wrappers.BoolValue {
+func (x *Http2ProtocolOptions) GetUseOghttp2Codec() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.UseOghttp2Codec
 	}
@@ -1278,7 +1278,7 @@ type Http3ProtocolOptions struct {
 	//
 	// If set, this overrides any HCM :ref:`stream_error_on_invalid_http_messaging
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.stream_error_on_invalid_http_message>`.
-	OverrideStreamErrorOnInvalidHttpMessage *wrappers.BoolValue `protobuf:"bytes,2,opt,name=override_stream_error_on_invalid_http_message,json=overrideStreamErrorOnInvalidHttpMessage,proto3" json:"override_stream_error_on_invalid_http_message,omitempty"`
+	OverrideStreamErrorOnInvalidHttpMessage *wrapperspb.BoolValue `protobuf:"bytes,2,opt,name=override_stream_error_on_invalid_http_message,json=overrideStreamErrorOnInvalidHttpMessage,proto3" json:"override_stream_error_on_invalid_http_message,omitempty"`
 	// Allows proxying Websocket and other upgrades over HTTP/3 CONNECT using
 	// the header mechanisms from the `HTTP/2 extended connect RFC
 	// <https://datatracker.ietf.org/doc/html/rfc8441>`_
@@ -1334,7 +1334,7 @@ func (x *Http3ProtocolOptions) GetQuicProtocolOptions() *QuicProtocolOptions {
 	return nil
 }
 
-func (x *Http3ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wrappers.BoolValue {
+func (x *Http3ProtocolOptions) GetOverrideStreamErrorOnInvalidHttpMessage() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.OverrideStreamErrorOnInvalidHttpMessage
 	}
@@ -1628,9 +1628,9 @@ type Http2ProtocolOptions_SettingsParameter struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The 16 bit parameter identifier.
-	Identifier *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=identifier,proto3" json:"identifier,omitempty"`
+	Identifier *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=identifier,proto3" json:"identifier,omitempty"`
 	// The 32 bit parameter value.
-	Value *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	Value *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
 func (x *Http2ProtocolOptions_SettingsParameter) Reset() {
@@ -1665,14 +1665,14 @@ func (*Http2ProtocolOptions_SettingsParameter) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_protocol_proto_rawDescGZIP(), []int{8, 0}
 }
 
-func (x *Http2ProtocolOptions_SettingsParameter) GetIdentifier() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions_SettingsParameter) GetIdentifier() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.Identifier
 	}
 	return nil
 }
 
-func (x *Http2ProtocolOptions_SettingsParameter) GetValue() *wrappers.UInt32Value {
+func (x *Http2ProtocolOptions_SettingsParameter) GetValue() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.Value
 	}
@@ -2151,10 +2151,10 @@ var file_envoy_config_core_v3_protocol_proto_goTypes = []interface{}{
 	(*Http1ProtocolOptions_HeaderKeyFormat)(nil),                        // 14: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat
 	(*Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords)(nil),        // 15: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
 	(*Http2ProtocolOptions_SettingsParameter)(nil),                      // 16: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter
-	(*duration.Duration)(nil),                                           // 17: google.protobuf.Duration
-	(*wrappers.UInt32Value)(nil),                                        // 18: google.protobuf.UInt32Value
+	(*durationpb.Duration)(nil),                                         // 17: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),                                      // 18: google.protobuf.UInt32Value
 	(*TypedExtensionConfig)(nil),                                        // 19: envoy.config.core.v3.TypedExtensionConfig
-	(*wrappers.BoolValue)(nil),                                          // 20: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),                                        // 20: google.protobuf.BoolValue
 	(*v3.Percent)(nil),                                                  // 21: envoy.type.v3.Percent
 }
 var file_envoy_config_core_v3_protocol_proto_depIdxs = []int32{

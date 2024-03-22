@@ -12,9 +12,9 @@ import (
 	v32 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
@@ -128,7 +128,7 @@ type JwtProvider struct {
 	//
 	//	max_lifetime:
 	//	  seconds: 86400
-	MaxLifetime *duration.Duration `protobuf:"bytes,21,opt,name=max_lifetime,json=maxLifetime,proto3" json:"max_lifetime,omitempty"`
+	MaxLifetime *durationpb.Duration `protobuf:"bytes,21,opt,name=max_lifetime,json=maxLifetime,proto3" json:"max_lifetime,omitempty"`
 	// `JSON Web Key Set (JWKS) <https://tools.ietf.org/html/rfc7517#appendix-A>`_ is needed to
 	// validate signature of a JWT. This field specifies where to fetch JWKS.
 	//
@@ -364,7 +364,7 @@ func (x *JwtProvider) GetRequireExpiration() bool {
 	return false
 }
 
-func (x *JwtProvider) GetMaxLifetime() *duration.Duration {
+func (x *JwtProvider) GetMaxLifetime() *durationpb.Duration {
 	if x != nil {
 		return x.MaxLifetime
 	}
@@ -602,7 +602,7 @@ type RemoteJwks struct {
 	HttpUri *v31.HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
 	// Duration after which the cached JWKS should be expired. If not specified, default cache
 	// duration is 10 minutes.
-	CacheDuration *duration.Duration `protobuf:"bytes,2,opt,name=cache_duration,json=cacheDuration,proto3" json:"cache_duration,omitempty"`
+	CacheDuration *durationpb.Duration `protobuf:"bytes,2,opt,name=cache_duration,json=cacheDuration,proto3" json:"cache_duration,omitempty"`
 	// Fetch Jwks asynchronously in the main thread before the listener is activated.
 	// Fetched Jwks can be used by all worker threads.
 	//
@@ -686,7 +686,7 @@ func (x *RemoteJwks) GetHttpUri() *v31.HttpUri {
 	return nil
 }
 
-func (x *RemoteJwks) GetCacheDuration() *duration.Duration {
+func (x *RemoteJwks) GetCacheDuration() *durationpb.Duration {
 	if x != nil {
 		return x.CacheDuration
 	}
@@ -722,7 +722,7 @@ type JwksAsyncFetch struct {
 	// Default is false.
 	FastListener bool `protobuf:"varint,1,opt,name=fast_listener,json=fastListener,proto3" json:"fast_listener,omitempty"`
 	// The duration to refetch after a failed fetch. If not specified, default is 1 second.
-	FailedRefetchDuration *duration.Duration `protobuf:"bytes,2,opt,name=failed_refetch_duration,json=failedRefetchDuration,proto3" json:"failed_refetch_duration,omitempty"`
+	FailedRefetchDuration *durationpb.Duration `protobuf:"bytes,2,opt,name=failed_refetch_duration,json=failedRefetchDuration,proto3" json:"failed_refetch_duration,omitempty"`
 }
 
 func (x *JwksAsyncFetch) Reset() {
@@ -764,7 +764,7 @@ func (x *JwksAsyncFetch) GetFastListener() bool {
 	return false
 }
 
-func (x *JwksAsyncFetch) GetFailedRefetchDuration() *duration.Duration {
+func (x *JwksAsyncFetch) GetFailedRefetchDuration() *durationpb.Duration {
 	if x != nil {
 		return x.FailedRefetchDuration
 	}
@@ -2176,7 +2176,7 @@ var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_goTypes = []int
 	nil,                                  // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
 	nil,                                  // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
 	(*v3.StringMatcher)(nil),             // 18: envoy.type.matcher.v3.StringMatcher
-	(*duration.Duration)(nil),            // 19: google.protobuf.Duration
+	(*durationpb.Duration)(nil),          // 19: google.protobuf.Duration
 	(*v31.DataSource)(nil),               // 20: envoy.config.core.v3.DataSource
 	(*v31.HttpUri)(nil),                  // 21: envoy.config.core.v3.HttpUri
 	(*v31.RetryPolicy)(nil),              // 22: envoy.config.core.v3.RetryPolicy

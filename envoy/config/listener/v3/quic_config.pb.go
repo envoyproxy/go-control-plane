@@ -11,10 +11,10 @@ import (
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -38,11 +38,11 @@ type QuicProtocolOptions struct {
 	// no network activity.
 	//
 	// If it is less than 1ms, Envoy will use 1ms. 300000ms if not specified.
-	IdleTimeout *duration.Duration `protobuf:"bytes,2,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
+	IdleTimeout *durationpb.Duration `protobuf:"bytes,2,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// Connection timeout in milliseconds before the crypto handshake is finished.
 	//
 	// If it is less than 5000ms, Envoy will use 5000ms. 20000ms if not specified.
-	CryptoHandshakeTimeout *duration.Duration `protobuf:"bytes,3,opt,name=crypto_handshake_timeout,json=cryptoHandshakeTimeout,proto3" json:"crypto_handshake_timeout,omitempty"`
+	CryptoHandshakeTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=crypto_handshake_timeout,json=cryptoHandshakeTimeout,proto3" json:"crypto_handshake_timeout,omitempty"`
 	// Runtime flag that controls whether the listener is enabled or not. If not specified, defaults
 	// to enabled.
 	Enabled *v3.RuntimeFeatureFlag `protobuf:"bytes,4,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -53,7 +53,7 @@ type QuicProtocolOptions struct {
 	// packets to read in each read event will be 32 * N.
 	// The actual number of packets to read in total by the UDP listener is also
 	// bound by 6000, regardless of this field or how many connections there are.
-	PacketsToReadToConnectionCountRatio *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=packets_to_read_to_connection_count_ratio,json=packetsToReadToConnectionCountRatio,proto3" json:"packets_to_read_to_connection_count_ratio,omitempty"`
+	PacketsToReadToConnectionCountRatio *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=packets_to_read_to_connection_count_ratio,json=packetsToReadToConnectionCountRatio,proto3" json:"packets_to_read_to_connection_count_ratio,omitempty"`
 	// Configure which implementation of “quic::QuicCryptoClientStreamBase“ to be used for this listener.
 	// If not specified the :ref:`QUICHE default one configured by <envoy_v3_api_msg_extensions.quic.crypto_stream.v3.CryptoServerStreamConfig>` will be used.
 	// [#extension-category: envoy.quic.server.crypto_stream]
@@ -73,7 +73,7 @@ type QuicProtocolOptions struct {
 	ServerPreferredAddressConfig *v3.TypedExtensionConfig `protobuf:"bytes,9,opt,name=server_preferred_address_config,json=serverPreferredAddressConfig,proto3" json:"server_preferred_address_config,omitempty"`
 	// Configure the server to send transport parameter `disable_active_migration <https://www.rfc-editor.org/rfc/rfc9000#section-18.2-4.30.1>`_.
 	// Defaults to false (do not send this transport parameter).
-	SendDisableActiveMigration *wrappers.BoolValue `protobuf:"bytes,10,opt,name=send_disable_active_migration,json=sendDisableActiveMigration,proto3" json:"send_disable_active_migration,omitempty"`
+	SendDisableActiveMigration *wrapperspb.BoolValue `protobuf:"bytes,10,opt,name=send_disable_active_migration,json=sendDisableActiveMigration,proto3" json:"send_disable_active_migration,omitempty"`
 }
 
 func (x *QuicProtocolOptions) Reset() {
@@ -115,14 +115,14 @@ func (x *QuicProtocolOptions) GetQuicProtocolOptions() *v3.QuicProtocolOptions {
 	return nil
 }
 
-func (x *QuicProtocolOptions) GetIdleTimeout() *duration.Duration {
+func (x *QuicProtocolOptions) GetIdleTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.IdleTimeout
 	}
 	return nil
 }
 
-func (x *QuicProtocolOptions) GetCryptoHandshakeTimeout() *duration.Duration {
+func (x *QuicProtocolOptions) GetCryptoHandshakeTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.CryptoHandshakeTimeout
 	}
@@ -136,7 +136,7 @@ func (x *QuicProtocolOptions) GetEnabled() *v3.RuntimeFeatureFlag {
 	return nil
 }
 
-func (x *QuicProtocolOptions) GetPacketsToReadToConnectionCountRatio() *wrappers.UInt32Value {
+func (x *QuicProtocolOptions) GetPacketsToReadToConnectionCountRatio() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.PacketsToReadToConnectionCountRatio
 	}
@@ -171,7 +171,7 @@ func (x *QuicProtocolOptions) GetServerPreferredAddressConfig() *v3.TypedExtensi
 	return nil
 }
 
-func (x *QuicProtocolOptions) GetSendDisableActiveMigration() *wrappers.BoolValue {
+func (x *QuicProtocolOptions) GetSendDisableActiveMigration() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.SendDisableActiveMigration
 	}
@@ -296,11 +296,11 @@ var file_envoy_config_listener_v3_quic_config_proto_msgTypes = make([]protoimpl.
 var file_envoy_config_listener_v3_quic_config_proto_goTypes = []interface{}{
 	(*QuicProtocolOptions)(nil),     // 0: envoy.config.listener.v3.QuicProtocolOptions
 	(*v3.QuicProtocolOptions)(nil),  // 1: envoy.config.core.v3.QuicProtocolOptions
-	(*duration.Duration)(nil),       // 2: google.protobuf.Duration
+	(*durationpb.Duration)(nil),     // 2: google.protobuf.Duration
 	(*v3.RuntimeFeatureFlag)(nil),   // 3: envoy.config.core.v3.RuntimeFeatureFlag
-	(*wrappers.UInt32Value)(nil),    // 4: google.protobuf.UInt32Value
+	(*wrapperspb.UInt32Value)(nil),  // 4: google.protobuf.UInt32Value
 	(*v3.TypedExtensionConfig)(nil), // 5: envoy.config.core.v3.TypedExtensionConfig
-	(*wrappers.BoolValue)(nil),      // 6: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),    // 6: google.protobuf.BoolValue
 }
 var file_envoy_config_listener_v3_quic_config_proto_depIdxs = []int32{
 	1,  // 0: envoy.config.listener.v3.QuicProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions

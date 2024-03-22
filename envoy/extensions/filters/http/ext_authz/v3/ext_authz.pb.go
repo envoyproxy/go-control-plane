@@ -13,9 +13,9 @@ import (
 	v32 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -185,7 +185,7 @@ type ExtAuthz struct {
 	IncludeTlsSession bool `protobuf:"varint,18,opt,name=include_tls_session,json=includeTlsSession,proto3" json:"include_tls_session,omitempty"`
 	// Whether to increment cluster statistics (e.g. cluster.<cluster_name>.upstream_rq_*) on authorization failure.
 	// Defaults to true.
-	ChargeClusterResponseStats *wrappers.BoolValue `protobuf:"bytes,20,opt,name=charge_cluster_response_stats,json=chargeClusterResponseStats,proto3" json:"charge_cluster_response_stats,omitempty"`
+	ChargeClusterResponseStats *wrapperspb.BoolValue `protobuf:"bytes,20,opt,name=charge_cluster_response_stats,json=chargeClusterResponseStats,proto3" json:"charge_cluster_response_stats,omitempty"`
 }
 
 func (x *ExtAuthz) Reset() {
@@ -367,7 +367,7 @@ func (x *ExtAuthz) GetIncludeTlsSession() bool {
 	return false
 }
 
-func (x *ExtAuthz) GetChargeClusterResponseStats() *wrappers.BoolValue {
+func (x *ExtAuthz) GetChargeClusterResponseStats() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.ChargeClusterResponseStats
 	}
@@ -1256,7 +1256,7 @@ var file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_goTypes = []
 	(*v32.MetadataMatcher)(nil),         // 12: envoy.type.matcher.v3.MetadataMatcher
 	(*v3.RuntimeFeatureFlag)(nil),       // 13: envoy.config.core.v3.RuntimeFeatureFlag
 	(*v32.ListStringMatcher)(nil),       // 14: envoy.type.matcher.v3.ListStringMatcher
-	(*wrappers.BoolValue)(nil),          // 15: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),        // 15: google.protobuf.BoolValue
 	(*v3.HttpUri)(nil),                  // 16: envoy.config.core.v3.HttpUri
 	(*v3.HeaderValue)(nil),              // 17: envoy.config.core.v3.HeaderValue
 }

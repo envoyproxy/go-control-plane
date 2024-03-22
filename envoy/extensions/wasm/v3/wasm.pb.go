@@ -9,9 +9,9 @@ package wasmv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	any1 "github.com/golang/protobuf/ptypes/any"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -168,7 +168,7 @@ type VmConfig struct {
 	// (proxy_on_start). “google.protobuf.Struct“ is serialized as JSON before
 	// passing it to the plugin. “google.protobuf.BytesValue“ and
 	// “google.protobuf.StringValue“ are passed directly without the wrapper.
-	Configuration *any1.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
+	Configuration *anypb.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
 	// Allow the wasm file to include pre-compiled code on VMs which support it.
 	// Warning: this should only be enable for trusted sources as the precompiled code is not
 	// verified.
@@ -238,7 +238,7 @@ func (x *VmConfig) GetCode() *v3.AsyncDataSource {
 	return nil
 }
 
-func (x *VmConfig) GetConfiguration() *any1.Any {
+func (x *VmConfig) GetConfiguration() *anypb.Any {
 	if x != nil {
 		return x.Configuration
 	}
@@ -350,7 +350,7 @@ type PluginConfig struct {
 	// “google.protobuf.Struct“ is serialized as JSON before
 	// passing it to the plugin. “google.protobuf.BytesValue“ and
 	// “google.protobuf.StringValue“ are passed directly without the wrapper.
-	Configuration *any1.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
+	Configuration *anypb.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
 	// If there is a fatal error on the VM (e.g. exception, abort(), on_start or on_configure return false),
 	// then all plugins associated with the VM will either fail closed (by default), e.g. by returning an HTTP 503 error,
 	// or fail open (if 'fail_open' is set to true) by bypassing the filter. Note: when on_start or on_configure return false
@@ -421,7 +421,7 @@ func (x *PluginConfig) GetVmConfig() *VmConfig {
 	return nil
 }
 
-func (x *PluginConfig) GetConfiguration() *any1.Any {
+func (x *PluginConfig) GetConfiguration() *anypb.Any {
 	if x != nil {
 		return x.Configuration
 	}
@@ -644,7 +644,7 @@ var file_envoy_extensions_wasm_v3_wasm_proto_goTypes = []interface{}{
 	nil,                                 // 6: envoy.extensions.wasm.v3.CapabilityRestrictionConfig.AllowedCapabilitiesEntry
 	nil,                                 // 7: envoy.extensions.wasm.v3.EnvironmentVariables.KeyValuesEntry
 	(*v3.AsyncDataSource)(nil),          // 8: envoy.config.core.v3.AsyncDataSource
-	(*any1.Any)(nil),                    // 9: google.protobuf.Any
+	(*anypb.Any)(nil),                   // 9: google.protobuf.Any
 }
 var file_envoy_extensions_wasm_v3_wasm_proto_depIdxs = []int32{
 	6,  // 0: envoy.extensions.wasm.v3.CapabilityRestrictionConfig.allowed_capabilities:type_name -> envoy.extensions.wasm.v3.CapabilityRestrictionConfig.AllowedCapabilitiesEntry

@@ -11,12 +11,12 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -39,8 +39,8 @@ type TraServiceConfig struct {
 	GrpcService *v3.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 	// API version for rate limit transport protocol. This describes the rate limit gRPC endpoint and
 	// version of messages used on the wire.
-	TransportApiVersion v3.ApiVersion      `protobuf:"varint,2,opt,name=transport_api_version,json=transportApiVersion,proto3,enum=envoy.config.core.v3.ApiVersion" json:"transport_api_version,omitempty"`
-	Timeout             *duration.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	TransportApiVersion v3.ApiVersion        `protobuf:"varint,2,opt,name=transport_api_version,json=transportApiVersion,proto3,enum=envoy.config.core.v3.ApiVersion" json:"transport_api_version,omitempty"`
+	Timeout             *durationpb.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
 }
 
 func (x *TraServiceConfig) Reset() {
@@ -89,7 +89,7 @@ func (x *TraServiceConfig) GetTransportApiVersion() v3.ApiVersion {
 	return v3.ApiVersion(0)
 }
 
-func (x *TraServiceConfig) GetTimeout() *duration.Duration {
+func (x *TraServiceConfig) GetTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.Timeout
 	}
@@ -1140,30 +1140,30 @@ func file_contrib_envoy_extensions_filters_network_sip_proxy_tra_v3alpha_tra_pro
 
 var file_contrib_envoy_extensions_filters_network_sip_proxy_tra_v3alpha_tra_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_contrib_envoy_extensions_filters_network_sip_proxy_tra_v3alpha_tra_proto_goTypes = []interface{}{
-	(*TraServiceConfig)(nil),   // 0: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceConfig
-	(*TraServiceRequest)(nil),  // 1: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceRequest
-	(*TraServiceResponse)(nil), // 2: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceResponse
-	(*CreateRequest)(nil),      // 3: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateRequest
-	(*CreateResponse)(nil),     // 4: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateResponse
-	(*UpdateRequest)(nil),      // 5: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateRequest
-	(*UpdateResponse)(nil),     // 6: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateResponse
-	(*RetrieveRequest)(nil),    // 7: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveRequest
-	(*RetrieveResponse)(nil),   // 8: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveResponse
-	(*DeleteRequest)(nil),      // 9: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.DeleteRequest
-	(*DeleteResponse)(nil),     // 10: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.DeleteResponse
-	(*SubscribeRequest)(nil),   // 11: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.SubscribeRequest
-	(*SubscribeResponse)(nil),  // 12: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.SubscribeResponse
-	nil,                        // 13: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateRequest.DataEntry
-	nil,                        // 14: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateRequest.ContextEntry
-	nil,                        // 15: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateRequest.DataEntry
-	nil,                        // 16: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateRequest.ContextEntry
-	nil,                        // 17: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveRequest.ContextEntry
-	nil,                        // 18: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveResponse.DataEntry
-	nil,                        // 19: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.DeleteRequest.ContextEntry
-	nil,                        // 20: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.SubscribeResponse.DataEntry
-	(*v3.GrpcService)(nil),     // 21: envoy.config.core.v3.GrpcService
-	(v3.ApiVersion)(0),         // 22: envoy.config.core.v3.ApiVersion
-	(*duration.Duration)(nil),  // 23: google.protobuf.Duration
+	(*TraServiceConfig)(nil),    // 0: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceConfig
+	(*TraServiceRequest)(nil),   // 1: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceRequest
+	(*TraServiceResponse)(nil),  // 2: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceResponse
+	(*CreateRequest)(nil),       // 3: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateRequest
+	(*CreateResponse)(nil),      // 4: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateResponse
+	(*UpdateRequest)(nil),       // 5: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateRequest
+	(*UpdateResponse)(nil),      // 6: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateResponse
+	(*RetrieveRequest)(nil),     // 7: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveRequest
+	(*RetrieveResponse)(nil),    // 8: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveResponse
+	(*DeleteRequest)(nil),       // 9: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.DeleteRequest
+	(*DeleteResponse)(nil),      // 10: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.DeleteResponse
+	(*SubscribeRequest)(nil),    // 11: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.SubscribeRequest
+	(*SubscribeResponse)(nil),   // 12: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.SubscribeResponse
+	nil,                         // 13: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateRequest.DataEntry
+	nil,                         // 14: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.CreateRequest.ContextEntry
+	nil,                         // 15: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateRequest.DataEntry
+	nil,                         // 16: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.UpdateRequest.ContextEntry
+	nil,                         // 17: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveRequest.ContextEntry
+	nil,                         // 18: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.RetrieveResponse.DataEntry
+	nil,                         // 19: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.DeleteRequest.ContextEntry
+	nil,                         // 20: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.SubscribeResponse.DataEntry
+	(*v3.GrpcService)(nil),      // 21: envoy.config.core.v3.GrpcService
+	(v3.ApiVersion)(0),          // 22: envoy.config.core.v3.ApiVersion
+	(*durationpb.Duration)(nil), // 23: google.protobuf.Duration
 }
 var file_contrib_envoy_extensions_filters_network_sip_proxy_tra_v3alpha_tra_proto_depIdxs = []int32{
 	21, // 0: envoy.extensions.filters.network.sip_proxy.tra.v3alpha.TraServiceConfig.grpc_service:type_name -> envoy.config.core.v3.GrpcService

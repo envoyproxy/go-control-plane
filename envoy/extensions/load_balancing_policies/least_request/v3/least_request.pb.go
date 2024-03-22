@@ -12,9 +12,9 @@ import (
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/extensions/load_balancing_policies/common/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -101,7 +101,7 @@ type LeastRequest struct {
 	// The number of random healthy hosts from which the host with the fewest active requests will
 	// be chosen. Defaults to 2 so that we perform two-choice selection if the field is not set.
 	// Only applies to the “N_CHOICES“ selection method.
-	ChoiceCount *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=choice_count,json=choiceCount,proto3" json:"choice_count,omitempty"`
+	ChoiceCount *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=choice_count,json=choiceCount,proto3" json:"choice_count,omitempty"`
 	// The following formula is used to calculate the dynamic weights when hosts have different load
 	// balancing weights:
 	//
@@ -136,7 +136,7 @@ type LeastRequest struct {
 	// Unused. Replaced by the `selection_method` enum for better extensibility.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/load_balancing_policies/least_request/v3/least_request.proto.
-	EnableFullScan *wrappers.BoolValue `protobuf:"bytes,5,opt,name=enable_full_scan,json=enableFullScan,proto3" json:"enable_full_scan,omitempty"`
+	EnableFullScan *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=enable_full_scan,json=enableFullScan,proto3" json:"enable_full_scan,omitempty"`
 	// Method for selecting the host set from which to return the host with the fewest active requests.
 	//
 	// Defaults to “N_CHOICES“.
@@ -175,7 +175,7 @@ func (*LeastRequest) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_load_balancing_policies_least_request_v3_least_request_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *LeastRequest) GetChoiceCount() *wrappers.UInt32Value {
+func (x *LeastRequest) GetChoiceCount() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.ChoiceCount
 	}
@@ -204,7 +204,7 @@ func (x *LeastRequest) GetLocalityLbConfig() *v31.LocalityLbConfig {
 }
 
 // Deprecated: Marked as deprecated in envoy/extensions/load_balancing_policies/least_request/v3/least_request.proto.
-func (x *LeastRequest) GetEnableFullScan() *wrappers.BoolValue {
+func (x *LeastRequest) GetEnableFullScan() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.EnableFullScan
 	}
@@ -320,11 +320,11 @@ var file_envoy_extensions_load_balancing_policies_least_request_v3_least_request
 var file_envoy_extensions_load_balancing_policies_least_request_v3_least_request_proto_goTypes = []interface{}{
 	(LeastRequest_SelectionMethod)(0), // 0: envoy.extensions.load_balancing_policies.least_request.v3.LeastRequest.SelectionMethod
 	(*LeastRequest)(nil),              // 1: envoy.extensions.load_balancing_policies.least_request.v3.LeastRequest
-	(*wrappers.UInt32Value)(nil),      // 2: google.protobuf.UInt32Value
+	(*wrapperspb.UInt32Value)(nil),    // 2: google.protobuf.UInt32Value
 	(*v3.RuntimeDouble)(nil),          // 3: envoy.config.core.v3.RuntimeDouble
 	(*v31.SlowStartConfig)(nil),       // 4: envoy.extensions.load_balancing_policies.common.v3.SlowStartConfig
 	(*v31.LocalityLbConfig)(nil),      // 5: envoy.extensions.load_balancing_policies.common.v3.LocalityLbConfig
-	(*wrappers.BoolValue)(nil),        // 6: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),      // 6: google.protobuf.BoolValue
 }
 var file_envoy_extensions_load_balancing_policies_least_request_v3_least_request_proto_depIdxs = []int32{
 	2, // 0: envoy.extensions.load_balancing_policies.least_request.v3.LeastRequest.choice_count:type_name -> google.protobuf.UInt32Value

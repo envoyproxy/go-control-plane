@@ -9,9 +9,9 @@ package v3alpha
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -109,7 +109,7 @@ type Qatzstd struct {
 	// to default. Setting this will however eventually dynamically impact the compression
 	// parameters which have not been manually set. The manually set
 	// ones will 'stick'.
-	CompressionLevel *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=compression_level,json=compressionLevel,proto3" json:"compression_level,omitempty"`
+	CompressionLevel *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=compression_level,json=compressionLevel,proto3" json:"compression_level,omitempty"`
 	// A 32-bits checksum of content is written at end of frame. If not set, defaults to false.
 	EnableChecksum bool `protobuf:"varint,2,opt,name=enable_checksum,json=enableChecksum,proto3" json:"enable_checksum,omitempty"`
 	// The higher the value of selected strategy, the more complex it is,
@@ -118,7 +118,7 @@ type Qatzstd struct {
 	// Special: value 0 means "use default strategy".
 	Strategy Qatzstd_Strategy `protobuf:"varint,3,opt,name=strategy,proto3,enum=envoy.extensions.compression.qatzstd.compressor.v3alpha.Qatzstd_Strategy" json:"strategy,omitempty"`
 	// Value for compressor's next output buffer. If not set, defaults to 4096.
-	ChunkSize *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
+	ChunkSize *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
 	// Enable QAT to accelerate Zstd compression or not. If not set, defaults to false.
 	//
 	// This is useful in the case that users want to enable QAT for a period of time and disable QAT for another period of time,
@@ -126,7 +126,7 @@ type Qatzstd struct {
 	EnableQatZstd bool `protobuf:"varint,6,opt,name=enable_qat_zstd,json=enableQatZstd,proto3" json:"enable_qat_zstd,omitempty"`
 	// Fallback to software for Qatzstd when input size is less than this value.
 	// Valid only “enable_qat_zstd“ is “true“. 0 means no fallback at all. If not set, defaults to 4000.
-	QatZstdFallbackThreshold *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=qat_zstd_fallback_threshold,json=qatZstdFallbackThreshold,proto3" json:"qat_zstd_fallback_threshold,omitempty"`
+	QatZstdFallbackThreshold *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=qat_zstd_fallback_threshold,json=qatZstdFallbackThreshold,proto3" json:"qat_zstd_fallback_threshold,omitempty"`
 }
 
 func (x *Qatzstd) Reset() {
@@ -161,7 +161,7 @@ func (*Qatzstd) Descriptor() ([]byte, []int) {
 	return file_contrib_envoy_extensions_compression_qatzstd_compressor_v3alpha_qatzstd_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Qatzstd) GetCompressionLevel() *wrappers.UInt32Value {
+func (x *Qatzstd) GetCompressionLevel() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.CompressionLevel
 	}
@@ -182,7 +182,7 @@ func (x *Qatzstd) GetStrategy() Qatzstd_Strategy {
 	return Qatzstd_DEFAULT
 }
 
-func (x *Qatzstd) GetChunkSize() *wrappers.UInt32Value {
+func (x *Qatzstd) GetChunkSize() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.ChunkSize
 	}
@@ -196,7 +196,7 @@ func (x *Qatzstd) GetEnableQatZstd() bool {
 	return false
 }
 
-func (x *Qatzstd) GetQatZstdFallbackThreshold() *wrappers.UInt32Value {
+func (x *Qatzstd) GetQatZstdFallbackThreshold() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.QatZstdFallbackThreshold
 	}
@@ -288,9 +288,9 @@ func file_contrib_envoy_extensions_compression_qatzstd_compressor_v3alpha_qatzst
 var file_contrib_envoy_extensions_compression_qatzstd_compressor_v3alpha_qatzstd_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_contrib_envoy_extensions_compression_qatzstd_compressor_v3alpha_qatzstd_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_contrib_envoy_extensions_compression_qatzstd_compressor_v3alpha_qatzstd_proto_goTypes = []interface{}{
-	(Qatzstd_Strategy)(0),        // 0: envoy.extensions.compression.qatzstd.compressor.v3alpha.Qatzstd.Strategy
-	(*Qatzstd)(nil),              // 1: envoy.extensions.compression.qatzstd.compressor.v3alpha.Qatzstd
-	(*wrappers.UInt32Value)(nil), // 2: google.protobuf.UInt32Value
+	(Qatzstd_Strategy)(0),          // 0: envoy.extensions.compression.qatzstd.compressor.v3alpha.Qatzstd.Strategy
+	(*Qatzstd)(nil),                // 1: envoy.extensions.compression.qatzstd.compressor.v3alpha.Qatzstd
+	(*wrapperspb.UInt32Value)(nil), // 2: google.protobuf.UInt32Value
 }
 var file_contrib_envoy_extensions_compression_qatzstd_compressor_v3alpha_qatzstd_proto_depIdxs = []int32{
 	2, // 0: envoy.extensions.compression.qatzstd.compressor.v3alpha.Qatzstd.compression_level:type_name -> google.protobuf.UInt32Value

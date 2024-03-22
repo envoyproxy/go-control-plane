@@ -11,9 +11,9 @@ import (
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/load_balancing_policies/common/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -96,11 +96,11 @@ type RingHash struct {
 	// provided host) the better the request distribution will reflect the desired weights. Defaults
 	// to 1024 entries, and limited to 8M entries. See also
 	// :ref:`maximum_ring_size<envoy_v3_api_field_config.cluster.v3.Cluster.RingHashLbConfig.maximum_ring_size>`.
-	MinimumRingSize *wrappers.UInt64Value `protobuf:"bytes,2,opt,name=minimum_ring_size,json=minimumRingSize,proto3" json:"minimum_ring_size,omitempty"`
+	MinimumRingSize *wrapperspb.UInt64Value `protobuf:"bytes,2,opt,name=minimum_ring_size,json=minimumRingSize,proto3" json:"minimum_ring_size,omitempty"`
 	// Maximum hash ring size. Defaults to 8M entries, and limited to 8M entries, but can be lowered
 	// to further constrain resource use. See also
 	// :ref:`minimum_ring_size<envoy_v3_api_field_config.cluster.v3.Cluster.RingHashLbConfig.minimum_ring_size>`.
-	MaximumRingSize *wrappers.UInt64Value `protobuf:"bytes,3,opt,name=maximum_ring_size,json=maximumRingSize,proto3" json:"maximum_ring_size,omitempty"`
+	MaximumRingSize *wrapperspb.UInt64Value `protobuf:"bytes,3,opt,name=maximum_ring_size,json=maximumRingSize,proto3" json:"maximum_ring_size,omitempty"`
 	// If set to “true“, the cluster will use hostname instead of the resolved
 	// address as the key to consistently hash to an upstream host. Only valid for StrictDNS clusters with hostnames which resolve to a single IP address.
 	//
@@ -134,7 +134,7 @@ type RingHash struct {
 	//	<envoy_v3_api_field_extensions.load_balancing_policies.ring_hash.v3.RingHash.consistent_hashing_lb_config>` instead.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.
-	HashBalanceFactor *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=hash_balance_factor,json=hashBalanceFactor,proto3" json:"hash_balance_factor,omitempty"`
+	HashBalanceFactor *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=hash_balance_factor,json=hashBalanceFactor,proto3" json:"hash_balance_factor,omitempty"`
 	// Common configuration for hashing-based load balancing policies.
 	ConsistentHashingLbConfig *v3.ConsistentHashingLbConfig `protobuf:"bytes,6,opt,name=consistent_hashing_lb_config,json=consistentHashingLbConfig,proto3" json:"consistent_hashing_lb_config,omitempty"`
 	// Enable locality weighted load balancing for ring hash lb explicitly.
@@ -180,14 +180,14 @@ func (x *RingHash) GetHashFunction() RingHash_HashFunction {
 	return RingHash_DEFAULT_HASH
 }
 
-func (x *RingHash) GetMinimumRingSize() *wrappers.UInt64Value {
+func (x *RingHash) GetMinimumRingSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.MinimumRingSize
 	}
 	return nil
 }
 
-func (x *RingHash) GetMaximumRingSize() *wrappers.UInt64Value {
+func (x *RingHash) GetMaximumRingSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.MaximumRingSize
 	}
@@ -203,7 +203,7 @@ func (x *RingHash) GetUseHostnameForHashing() bool {
 }
 
 // Deprecated: Marked as deprecated in envoy/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.
-func (x *RingHash) GetHashBalanceFactor() *wrappers.UInt32Value {
+func (x *RingHash) GetHashBalanceFactor() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.HashBalanceFactor
 	}
@@ -333,8 +333,8 @@ var file_envoy_extensions_load_balancing_policies_ring_hash_v3_ring_hash_proto_m
 var file_envoy_extensions_load_balancing_policies_ring_hash_v3_ring_hash_proto_goTypes = []interface{}{
 	(RingHash_HashFunction)(0),                           // 0: envoy.extensions.load_balancing_policies.ring_hash.v3.RingHash.HashFunction
 	(*RingHash)(nil),                                     // 1: envoy.extensions.load_balancing_policies.ring_hash.v3.RingHash
-	(*wrappers.UInt64Value)(nil),                         // 2: google.protobuf.UInt64Value
-	(*wrappers.UInt32Value)(nil),                         // 3: google.protobuf.UInt32Value
+	(*wrapperspb.UInt64Value)(nil),                       // 2: google.protobuf.UInt64Value
+	(*wrapperspb.UInt32Value)(nil),                       // 3: google.protobuf.UInt32Value
 	(*v3.ConsistentHashingLbConfig)(nil),                 // 4: envoy.extensions.load_balancing_policies.common.v3.ConsistentHashingLbConfig
 	(*v3.LocalityLbConfig_LocalityWeightedLbConfig)(nil), // 5: envoy.extensions.load_balancing_policies.common.v3.LocalityLbConfig.LocalityWeightedLbConfig
 }

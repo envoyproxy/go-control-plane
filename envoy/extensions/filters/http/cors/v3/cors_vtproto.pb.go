@@ -82,6 +82,16 @@ func (m *CorsPolicy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ForwardNotMatchingPreflights != nil {
+		size, err := (*wrapperspb.BoolValue)(m.ForwardNotMatchingPreflights).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x52
+	}
 	if m.AllowPrivateNetworkAccess != nil {
 		size, err := (*wrapperspb.BoolValue)(m.AllowPrivateNetworkAccess).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -282,6 +292,10 @@ func (m *CorsPolicy) SizeVT() (n int) {
 	}
 	if m.AllowPrivateNetworkAccess != nil {
 		l = (*wrapperspb.BoolValue)(m.AllowPrivateNetworkAccess).SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.ForwardNotMatchingPreflights != nil {
+		l = (*wrapperspb.BoolValue)(m.ForwardNotMatchingPreflights).SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)

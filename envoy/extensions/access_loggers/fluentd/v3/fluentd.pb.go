@@ -10,11 +10,11 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -47,12 +47,12 @@ type FluentdAccessLogConfig struct {
 	// Interval for flushing access logs to the TCP stream. Logger will flush requests every time
 	// this interval is elapsed, or when batch size limit is hit, whichever comes first. Defaults to
 	// 1 second.
-	BufferFlushInterval *duration.Duration `protobuf:"bytes,4,opt,name=buffer_flush_interval,json=bufferFlushInterval,proto3" json:"buffer_flush_interval,omitempty"`
+	BufferFlushInterval *durationpb.Duration `protobuf:"bytes,4,opt,name=buffer_flush_interval,json=bufferFlushInterval,proto3" json:"buffer_flush_interval,omitempty"`
 	// Soft size limit in bytes for access log entries buffer. The logger will buffer requests until
 	// this limit it hit, or every time flush interval is elapsed, whichever comes first. When the buffer
 	// limit is hit, the logger will immediately flush the buffer contents. Setting it to zero effectively
 	// disables the batching. Defaults to 16384.
-	BufferSizeBytes *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=buffer_size_bytes,json=bufferSizeBytes,proto3" json:"buffer_size_bytes,omitempty"`
+	BufferSizeBytes *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=buffer_size_bytes,json=bufferSizeBytes,proto3" json:"buffer_size_bytes,omitempty"`
 	// A struct that represents the record that is sent for each log entry.
 	// https://github.com/fluent/fluentd/wiki/Forward-Protocol-Specification-v1#entry
 	// Values are rendered as strings, numbers, or boolean values as appropriate.
@@ -75,7 +75,7 @@ type FluentdAccessLogConfig struct {
 	//	  "status": 500,
 	//	  "message": "My error message"
 	//	}
-	Record *_struct.Struct `protobuf:"bytes,6,opt,name=record,proto3" json:"record,omitempty"`
+	Record *structpb.Struct `protobuf:"bytes,6,opt,name=record,proto3" json:"record,omitempty"`
 	// Optional retry, in case upstream connection has failed. If this field is not set, the default values will be applied,
 	// as specified in the :ref:`RetryOptions <envoy_v3_api_msg_extensions.access_loggers.fluentd.v3.FluentdAccessLogConfig.RetryOptions>`
 	// configuration.
@@ -139,21 +139,21 @@ func (x *FluentdAccessLogConfig) GetStatPrefix() string {
 	return ""
 }
 
-func (x *FluentdAccessLogConfig) GetBufferFlushInterval() *duration.Duration {
+func (x *FluentdAccessLogConfig) GetBufferFlushInterval() *durationpb.Duration {
 	if x != nil {
 		return x.BufferFlushInterval
 	}
 	return nil
 }
 
-func (x *FluentdAccessLogConfig) GetBufferSizeBytes() *wrappers.UInt32Value {
+func (x *FluentdAccessLogConfig) GetBufferSizeBytes() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.BufferSizeBytes
 	}
 	return nil
 }
 
-func (x *FluentdAccessLogConfig) GetRecord() *_struct.Struct {
+func (x *FluentdAccessLogConfig) GetRecord() *structpb.Struct {
 	if x != nil {
 		return x.Record
 	}
@@ -182,7 +182,7 @@ type FluentdAccessLogConfig_RetryOptions struct {
 	// The number of times the logger will attempt to connect to the upstream during reconnects.
 	// By default, there is no limit. The logger will attempt to reconnect to the upstream each time
 	// connecting to the upstream failed or the upstream connection had been closed for any reason.
-	MaxConnectAttempts *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=max_connect_attempts,json=maxConnectAttempts,proto3" json:"max_connect_attempts,omitempty"`
+	MaxConnectAttempts *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=max_connect_attempts,json=maxConnectAttempts,proto3" json:"max_connect_attempts,omitempty"`
 	// Sets the backoff strategy. If this value is not set, the default base backoff interval is 500
 	// milliseconds and the default max backoff interval is 5 seconds (10 times the base interval).
 	BackoffOptions *v3.BackoffStrategy `protobuf:"bytes,2,opt,name=backoff_options,json=backoffOptions,proto3" json:"backoff_options,omitempty"`
@@ -220,7 +220,7 @@ func (*FluentdAccessLogConfig_RetryOptions) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_access_loggers_fluentd_v3_fluentd_proto_rawDescGZIP(), []int{0, 0}
 }
 
-func (x *FluentdAccessLogConfig_RetryOptions) GetMaxConnectAttempts() *wrappers.UInt32Value {
+func (x *FluentdAccessLogConfig_RetryOptions) GetMaxConnectAttempts() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxConnectAttempts
 	}
@@ -333,9 +333,9 @@ var file_envoy_extensions_access_loggers_fluentd_v3_fluentd_proto_msgTypes = mak
 var file_envoy_extensions_access_loggers_fluentd_v3_fluentd_proto_goTypes = []interface{}{
 	(*FluentdAccessLogConfig)(nil),              // 0: envoy.extensions.access_loggers.fluentd.v3.FluentdAccessLogConfig
 	(*FluentdAccessLogConfig_RetryOptions)(nil), // 1: envoy.extensions.access_loggers.fluentd.v3.FluentdAccessLogConfig.RetryOptions
-	(*duration.Duration)(nil),                   // 2: google.protobuf.Duration
-	(*wrappers.UInt32Value)(nil),                // 3: google.protobuf.UInt32Value
-	(*_struct.Struct)(nil),                      // 4: google.protobuf.Struct
+	(*durationpb.Duration)(nil),                 // 2: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),              // 3: google.protobuf.UInt32Value
+	(*structpb.Struct)(nil),                     // 4: google.protobuf.Struct
 	(*v3.TypedExtensionConfig)(nil),             // 5: envoy.config.core.v3.TypedExtensionConfig
 	(*v3.BackoffStrategy)(nil),                  // 6: envoy.config.core.v3.BackoffStrategy
 }

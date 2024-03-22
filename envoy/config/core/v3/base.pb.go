@@ -12,11 +12,11 @@ import (
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -358,7 +358,7 @@ type BuildVersion struct {
 	Version *v3.SemanticVersion `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
 	// Free-form build information.
 	// Envoy defines several well known keys in the source/common/version/version.h file
-	Metadata *_struct.Struct `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata *structpb.Struct `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 
 func (x *BuildVersion) Reset() {
@@ -400,7 +400,7 @@ func (x *BuildVersion) GetVersion() *v3.SemanticVersion {
 	return nil
 }
 
-func (x *BuildVersion) GetMetadata() *_struct.Struct {
+func (x *BuildVersion) GetMetadata() *structpb.Struct {
 	if x != nil {
 		return x.Metadata
 	}
@@ -545,7 +545,7 @@ type Node struct {
 	Cluster string `protobuf:"bytes,2,opt,name=cluster,proto3" json:"cluster,omitempty"`
 	// Opaque metadata extending the node identifier. Envoy will pass this
 	// directly to the management server.
-	Metadata *_struct.Struct `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata *structpb.Struct `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Map from xDS resource type URL to dynamic context parameters. These may vary at runtime (unlike
 	// other fields in this message). For example, the xDS client may have a shard identifier that
 	// changes during the lifetime of the xDS client. In Envoy, this would be achieved by updating the
@@ -625,7 +625,7 @@ func (x *Node) GetCluster() string {
 	return ""
 }
 
-func (x *Node) GetMetadata() *_struct.Struct {
+func (x *Node) GetMetadata() *structpb.Struct {
 	if x != nil {
 		return x.Metadata
 	}
@@ -749,14 +749,14 @@ type Metadata struct {
 	// :ref:`typed_filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.typed_filter_metadata>`
 	// fields are present in the metadata with same keys,
 	// only “typed_filter_metadata“ field will be parsed.
-	FilterMetadata map[string]*_struct.Struct `protobuf:"bytes,1,rep,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	FilterMetadata map[string]*structpb.Struct `protobuf:"bytes,1,rep,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Key is the reverse DNS filter name, e.g. com.acme.widget. The “envoy.*“
 	// namespace is reserved for Envoy's built-in filters.
 	// The value is encoded as google.protobuf.Any.
 	// If both :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
 	// and “typed_filter_metadata“ fields are present in the metadata with same keys,
 	// only “typed_filter_metadata“ field will be parsed.
-	TypedFilterMetadata map[string]*any1.Any `protobuf:"bytes,2,rep,name=typed_filter_metadata,json=typedFilterMetadata,proto3" json:"typed_filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TypedFilterMetadata map[string]*anypb.Any `protobuf:"bytes,2,rep,name=typed_filter_metadata,json=typedFilterMetadata,proto3" json:"typed_filter_metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (x *Metadata) Reset() {
@@ -791,14 +791,14 @@ func (*Metadata) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_base_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Metadata) GetFilterMetadata() map[string]*_struct.Struct {
+func (x *Metadata) GetFilterMetadata() map[string]*structpb.Struct {
 	if x != nil {
 		return x.FilterMetadata
 	}
 	return nil
 }
 
-func (x *Metadata) GetTypedFilterMetadata() map[string]*any1.Any {
+func (x *Metadata) GetTypedFilterMetadata() map[string]*anypb.Any {
 	if x != nil {
 		return x.TypedFilterMetadata
 	}
@@ -986,7 +986,7 @@ type RuntimeFeatureFlag struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Default value if runtime value is not available.
-	DefaultValue *wrappers.BoolValue `protobuf:"bytes,1,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
+	DefaultValue *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 	// Runtime key to get value for comparison. This value is used if defined. The boolean value must
 	// be represented via its
 	// `canonical JSON encoding <https://developers.google.com/protocol-buffers/docs/proto3#json>`_.
@@ -1025,7 +1025,7 @@ func (*RuntimeFeatureFlag) Descriptor() ([]byte, []int) {
 	return file_envoy_config_core_v3_base_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *RuntimeFeatureFlag) GetDefaultValue() *wrappers.BoolValue {
+func (x *RuntimeFeatureFlag) GetDefaultValue() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.DefaultValue
 	}
@@ -1191,7 +1191,7 @@ type HeaderValueOption struct {
 	//	default value (``false``) for this field.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/core/v3/base.proto.
-	Append *wrappers.BoolValue `protobuf:"bytes,2,opt,name=append,proto3" json:"append,omitempty"`
+	Append *wrapperspb.BoolValue `protobuf:"bytes,2,opt,name=append,proto3" json:"append,omitempty"`
 	// Describes the action taken to append/overwrite the given value for an existing header
 	// or to only add this header if it's absent.
 	// Value defaults to :ref:`APPEND_IF_EXISTS_OR_ADD
@@ -1242,7 +1242,7 @@ func (x *HeaderValueOption) GetHeader() *HeaderValue {
 }
 
 // Deprecated: Marked as deprecated in envoy/config/core/v3/base.proto.
-func (x *HeaderValueOption) GetAppend() *wrappers.BoolValue {
+func (x *HeaderValueOption) GetAppend() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.Append
 	}
@@ -1488,7 +1488,7 @@ type RetryPolicy struct {
 	RetryBackOff *BackoffStrategy `protobuf:"bytes,1,opt,name=retry_back_off,json=retryBackOff,proto3" json:"retry_back_off,omitempty"`
 	// Specifies the allowed number of retries. This parameter is optional and
 	// defaults to 1.
-	NumRetries *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=num_retries,json=numRetries,proto3" json:"num_retries,omitempty"`
+	NumRetries *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=num_retries,json=numRetries,proto3" json:"num_retries,omitempty"`
 	// For details, see :ref:`retry_on <envoy_v3_api_field_config.route.v3.RetryPolicy.retry_on>`.
 	RetryOn string `protobuf:"bytes,3,opt,name=retry_on,json=retryOn,proto3" json:"retry_on,omitempty"`
 	// For details, see :ref:`retry_priority <envoy_v3_api_field_config.route.v3.RetryPolicy.retry_priority>`.
@@ -1538,7 +1538,7 @@ func (x *RetryPolicy) GetRetryBackOff() *BackoffStrategy {
 	return nil
 }
 
-func (x *RetryPolicy) GetNumRetries() *wrappers.UInt32Value {
+func (x *RetryPolicy) GetNumRetries() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.NumRetries
 	}
@@ -1791,7 +1791,7 @@ func (m *TransportSocket) GetConfigType() isTransportSocket_ConfigType {
 	return nil
 }
 
-func (x *TransportSocket) GetTypedConfig() *any1.Any {
+func (x *TransportSocket) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*TransportSocket_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -1803,7 +1803,7 @@ type isTransportSocket_ConfigType interface {
 }
 
 type TransportSocket_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*TransportSocket_TypedConfig) isTransportSocket_ConfigType() {}
@@ -1985,7 +1985,7 @@ func (m *RetryPolicy_RetryPriority) GetConfigType() isRetryPolicy_RetryPriority_
 	return nil
 }
 
-func (x *RetryPolicy_RetryPriority) GetTypedConfig() *any1.Any {
+func (x *RetryPolicy_RetryPriority) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*RetryPolicy_RetryPriority_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -1997,7 +1997,7 @@ type isRetryPolicy_RetryPriority_ConfigType interface {
 }
 
 type RetryPolicy_RetryPriority_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*RetryPolicy_RetryPriority_TypedConfig) isRetryPolicy_RetryPriority_ConfigType() {}
@@ -2061,7 +2061,7 @@ func (m *RetryPolicy_RetryHostPredicate) GetConfigType() isRetryPolicy_RetryHost
 	return nil
 }
 
-func (x *RetryPolicy_RetryHostPredicate) GetTypedConfig() *any1.Any {
+func (x *RetryPolicy_RetryHostPredicate) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*RetryPolicy_RetryHostPredicate_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -2073,7 +2073,7 @@ type isRetryPolicy_RetryHostPredicate_ConfigType interface {
 }
 
 type RetryPolicy_RetryHostPredicate_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*RetryPolicy_RetryHostPredicate_TypedConfig) isRetryPolicy_RetryHostPredicate_ConfigType() {}
@@ -2512,14 +2512,14 @@ var file_envoy_config_core_v3_base_proto_goTypes = []interface{}{
 	(*RetryPolicy_RetryPriority)(nil),         // 28: envoy.config.core.v3.RetryPolicy.RetryPriority
 	(*RetryPolicy_RetryHostPredicate)(nil),    // 29: envoy.config.core.v3.RetryPolicy.RetryHostPredicate
 	(*v3.SemanticVersion)(nil),                // 30: envoy.type.v3.SemanticVersion
-	(*_struct.Struct)(nil),                    // 31: google.protobuf.Struct
+	(*structpb.Struct)(nil),                   // 31: google.protobuf.Struct
 	(*Address)(nil),                           // 32: envoy.config.core.v3.Address
 	(*v3.Percent)(nil),                        // 33: envoy.type.v3.Percent
-	(*wrappers.BoolValue)(nil),                // 34: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),              // 34: google.protobuf.BoolValue
 	(*BackoffStrategy)(nil),                   // 35: envoy.config.core.v3.BackoffStrategy
-	(*wrappers.UInt32Value)(nil),              // 36: google.protobuf.UInt32Value
+	(*wrapperspb.UInt32Value)(nil),            // 36: google.protobuf.UInt32Value
 	(*HttpUri)(nil),                           // 37: envoy.config.core.v3.HttpUri
-	(*any1.Any)(nil),                          // 38: google.protobuf.Any
+	(*anypb.Any)(nil),                         // 38: google.protobuf.Any
 	(*v3.FractionalPercent)(nil),              // 39: envoy.type.v3.FractionalPercent
 	(*v31.ContextParams)(nil),                 // 40: xds.core.v3.ContextParams
 }

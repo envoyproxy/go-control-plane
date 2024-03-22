@@ -19,11 +19,11 @@ import (
 	v38 "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	v35 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -215,7 +215,7 @@ type Bootstrap struct {
 	// seconds). Only one of “stats_flush_interval“ or “stats_flush_on_admin“
 	// can be set.
 	// Duration must be at least 1ms and at most 5 min.
-	StatsFlushInterval *duration.Duration `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval,proto3" json:"stats_flush_interval,omitempty"`
+	StatsFlushInterval *durationpb.Duration `protobuf:"bytes,7,opt,name=stats_flush_interval,json=statsFlushInterval,proto3" json:"stats_flush_interval,omitempty"`
 	// Types that are assignable to StatsFlush:
 	//
 	//	*Bootstrap_StatsFlushOnAdmin
@@ -267,7 +267,7 @@ type Bootstrap struct {
 	// Optional proxy version which will be used to set the value of :ref:`server.version statistic
 	// <server_statistics>` if specified. Envoy will not process this value, it will be sent as is to
 	// :ref:`stats sinks <envoy_v3_api_msg_config.metrics.v3.StatsSink>`.
-	StatsServerVersionOverride *wrappers.UInt64Value `protobuf:"bytes,19,opt,name=stats_server_version_override,json=statsServerVersionOverride,proto3" json:"stats_server_version_override,omitempty"`
+	StatsServerVersionOverride *wrapperspb.UInt64Value `protobuf:"bytes,19,opt,name=stats_server_version_override,json=statsServerVersionOverride,proto3" json:"stats_server_version_override,omitempty"`
 	// Always use TCP queries instead of UDP queries for DNS lookups.
 	// This may be overridden on a per-cluster basis in cds_config,
 	// when :ref:`dns_resolvers <envoy_v3_api_field_config.cluster.v3.Cluster.dns_resolvers>` and
@@ -481,7 +481,7 @@ func (x *Bootstrap) GetStatsConfig() *v31.StatsConfig {
 	return nil
 }
 
-func (x *Bootstrap) GetStatsFlushInterval() *duration.Duration {
+func (x *Bootstrap) GetStatsFlushInterval() *durationpb.Duration {
 	if x != nil {
 		return x.StatsFlushInterval
 	}
@@ -560,7 +560,7 @@ func (x *Bootstrap) GetHeaderPrefix() string {
 	return ""
 }
 
-func (x *Bootstrap) GetStatsServerVersionOverride() *wrappers.UInt64Value {
+func (x *Bootstrap) GetStatsServerVersionOverride() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.StatsServerVersionOverride
 	}
@@ -982,25 +982,25 @@ type Watchdog struct {
 	Actions []*Watchdog_WatchdogAction `protobuf:"bytes,7,rep,name=actions,proto3" json:"actions,omitempty"`
 	// The duration after which Envoy counts a nonresponsive thread in the
 	// “watchdog_miss“ statistic. If not specified the default is 200ms.
-	MissTimeout *duration.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout,proto3" json:"miss_timeout,omitempty"`
+	MissTimeout *durationpb.Duration `protobuf:"bytes,1,opt,name=miss_timeout,json=missTimeout,proto3" json:"miss_timeout,omitempty"`
 	// The duration after which Envoy counts a nonresponsive thread in the
 	// “watchdog_mega_miss“ statistic. If not specified the default is
 	// 1000ms.
-	MegamissTimeout *duration.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout,proto3" json:"megamiss_timeout,omitempty"`
+	MegamissTimeout *durationpb.Duration `protobuf:"bytes,2,opt,name=megamiss_timeout,json=megamissTimeout,proto3" json:"megamiss_timeout,omitempty"`
 	// If a watched thread has been nonresponsive for this duration, assume a
 	// programming error and kill the entire Envoy process. Set to 0 to disable
 	// kill behavior. If not specified the default is 0 (disabled).
-	KillTimeout *duration.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout,proto3" json:"kill_timeout,omitempty"`
+	KillTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=kill_timeout,json=killTimeout,proto3" json:"kill_timeout,omitempty"`
 	// Defines the maximum jitter used to adjust the “kill_timeout“ if “kill_timeout“ is
 	// enabled. Enabling this feature would help to reduce risk of synchronized
 	// watchdog kill events across proxies due to external triggers. Set to 0 to
 	// disable. If not specified the default is 0 (disabled).
-	MaxKillTimeoutJitter *duration.Duration `protobuf:"bytes,6,opt,name=max_kill_timeout_jitter,json=maxKillTimeoutJitter,proto3" json:"max_kill_timeout_jitter,omitempty"`
+	MaxKillTimeoutJitter *durationpb.Duration `protobuf:"bytes,6,opt,name=max_kill_timeout_jitter,json=maxKillTimeoutJitter,proto3" json:"max_kill_timeout_jitter,omitempty"`
 	// If “max(2, ceil(registered_threads * Fraction(*multikill_threshold*)))“
 	// threads have been nonresponsive for at least this duration kill the entire
 	// Envoy process. Set to 0 to disable this behavior. If not specified the
 	// default is 0 (disabled).
-	MultikillTimeout *duration.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout,proto3" json:"multikill_timeout,omitempty"`
+	MultikillTimeout *durationpb.Duration `protobuf:"bytes,4,opt,name=multikill_timeout,json=multikillTimeout,proto3" json:"multikill_timeout,omitempty"`
 	// Sets the threshold for “multikill_timeout“ in terms of the percentage of
 	// nonresponsive threads required for the “multikill_timeout“.
 	// If not specified the default is 0.
@@ -1046,35 +1046,35 @@ func (x *Watchdog) GetActions() []*Watchdog_WatchdogAction {
 	return nil
 }
 
-func (x *Watchdog) GetMissTimeout() *duration.Duration {
+func (x *Watchdog) GetMissTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.MissTimeout
 	}
 	return nil
 }
 
-func (x *Watchdog) GetMegamissTimeout() *duration.Duration {
+func (x *Watchdog) GetMegamissTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.MegamissTimeout
 	}
 	return nil
 }
 
-func (x *Watchdog) GetKillTimeout() *duration.Duration {
+func (x *Watchdog) GetKillTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.KillTimeout
 	}
 	return nil
 }
 
-func (x *Watchdog) GetMaxKillTimeoutJitter() *duration.Duration {
+func (x *Watchdog) GetMaxKillTimeoutJitter() *durationpb.Duration {
 	if x != nil {
 		return x.MaxKillTimeoutJitter
 	}
 	return nil
 }
 
-func (x *Watchdog) GetMultikillTimeout() *duration.Duration {
+func (x *Watchdog) GetMultikillTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.MultikillTimeout
 	}
@@ -1173,7 +1173,7 @@ type Runtime struct {
 	// <config_runtime_layering>` by other runtime layers, e.g.
 	// disk or admin. This follows the :ref:`runtime protobuf JSON representation
 	// encoding <config_runtime_proto_json>`.
-	Base *_struct.Struct `protobuf:"bytes,4,opt,name=base,proto3" json:"base,omitempty"`
+	Base *structpb.Struct `protobuf:"bytes,4,opt,name=base,proto3" json:"base,omitempty"`
 }
 
 func (x *Runtime) Reset() {
@@ -1229,7 +1229,7 @@ func (x *Runtime) GetOverrideSubdirectory() string {
 	return ""
 }
 
-func (x *Runtime) GetBase() *_struct.Struct {
+func (x *Runtime) GetBase() *structpb.Struct {
 	if x != nil {
 		return x.Base
 	}
@@ -1300,7 +1300,7 @@ func (m *RuntimeLayer) GetLayerSpecifier() isRuntimeLayer_LayerSpecifier {
 	return nil
 }
 
-func (x *RuntimeLayer) GetStaticLayer() *_struct.Struct {
+func (x *RuntimeLayer) GetStaticLayer() *structpb.Struct {
 	if x, ok := x.GetLayerSpecifier().(*RuntimeLayer_StaticLayer); ok {
 		return x.StaticLayer
 	}
@@ -1337,7 +1337,7 @@ type RuntimeLayer_StaticLayer struct {
 	// This follows the :ref:`runtime protobuf JSON representation encoding
 	// <config_runtime_proto_json>`. Unlike static xDS resources, this static
 	// layer is overridable by later layers in the runtime virtual filesystem.
-	StaticLayer *_struct.Struct `protobuf:"bytes,2,opt,name=static_layer,json=staticLayer,proto3,oneof"`
+	StaticLayer *structpb.Struct `protobuf:"bytes,2,opt,name=static_layer,json=staticLayer,proto3,oneof"`
 }
 
 type RuntimeLayer_DiskLayer_ struct {
@@ -1772,7 +1772,7 @@ type Bootstrap_GrpcAsyncClientManagerConfig struct {
 
 	// Optional field to set the expiration time for the cached gRPC client object.
 	// The minimal value is 5s and the default is 50s.
-	MaxCachedEntryIdleDuration *duration.Duration `protobuf:"bytes,1,opt,name=max_cached_entry_idle_duration,json=maxCachedEntryIdleDuration,proto3" json:"max_cached_entry_idle_duration,omitempty"`
+	MaxCachedEntryIdleDuration *durationpb.Duration `protobuf:"bytes,1,opt,name=max_cached_entry_idle_duration,json=maxCachedEntryIdleDuration,proto3" json:"max_cached_entry_idle_duration,omitempty"`
 }
 
 func (x *Bootstrap_GrpcAsyncClientManagerConfig) Reset() {
@@ -1807,7 +1807,7 @@ func (*Bootstrap_GrpcAsyncClientManagerConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_config_bootstrap_v3_bootstrap_proto_rawDescGZIP(), []int{0, 4}
 }
 
-func (x *Bootstrap_GrpcAsyncClientManagerConfig) GetMaxCachedEntryIdleDuration() *duration.Duration {
+func (x *Bootstrap_GrpcAsyncClientManagerConfig) GetMaxCachedEntryIdleDuration() *durationpb.Duration {
 	if x != nil {
 		return x.MaxCachedEntryIdleDuration
 	}
@@ -1865,7 +1865,7 @@ func (m *Bootstrap_ApplicationLogConfig_LogFormat) GetLogFormat() isBootstrap_Ap
 	return nil
 }
 
-func (x *Bootstrap_ApplicationLogConfig_LogFormat) GetJsonFormat() *_struct.Struct {
+func (x *Bootstrap_ApplicationLogConfig_LogFormat) GetJsonFormat() *structpb.Struct {
 	if x, ok := x.GetLogFormat().(*Bootstrap_ApplicationLogConfig_LogFormat_JsonFormat); ok {
 		return x.JsonFormat
 	}
@@ -1887,7 +1887,7 @@ type Bootstrap_ApplicationLogConfig_LogFormat_JsonFormat struct {
 	// Flush application logs in JSON format. The configured JSON struct can
 	// support all the format flags specified in the :option:`--log-format`
 	// command line options section, except for the “%v“ and “%_“ flags.
-	JsonFormat *_struct.Struct `protobuf:"bytes,1,opt,name=json_format,json=jsonFormat,proto3,oneof"`
+	JsonFormat *structpb.Struct `protobuf:"bytes,1,opt,name=json_format,json=jsonFormat,proto3,oneof"`
 }
 
 type Bootstrap_ApplicationLogConfig_LogFormat_TextFormat struct {
@@ -2822,10 +2822,10 @@ var file_envoy_config_bootstrap_v3_bootstrap_proto_goTypes = []interface{}{
 	(*v3.ApiConfigSource)(nil),                       // 25: envoy.config.core.v3.ApiConfigSource
 	(*v31.StatsSink)(nil),                            // 26: envoy.config.metrics.v3.StatsSink
 	(*v31.StatsConfig)(nil),                          // 27: envoy.config.metrics.v3.StatsConfig
-	(*duration.Duration)(nil),                        // 28: google.protobuf.Duration
+	(*durationpb.Duration)(nil),                      // 28: google.protobuf.Duration
 	(*v32.Tracing)(nil),                              // 29: envoy.config.trace.v3.Tracing
 	(*v33.OverloadManager)(nil),                      // 30: envoy.config.overload.v3.OverloadManager
-	(*wrappers.UInt64Value)(nil),                     // 31: google.protobuf.UInt64Value
+	(*wrapperspb.UInt64Value)(nil),                   // 31: google.protobuf.UInt64Value
 	(*v3.DnsResolutionConfig)(nil),                   // 32: envoy.config.core.v3.DnsResolutionConfig
 	(*v3.TypedExtensionConfig)(nil),                  // 33: envoy.config.core.v3.TypedExtensionConfig
 	(*v3.ConfigSource)(nil),                          // 34: envoy.config.core.v3.ConfigSource
@@ -2834,7 +2834,7 @@ var file_envoy_config_bootstrap_v3_bootstrap_proto_goTypes = []interface{}{
 	(*v3.SocketOption)(nil),                          // 37: envoy.config.core.v3.SocketOption
 	(*v3.BindConfig)(nil),                            // 38: envoy.config.core.v3.BindConfig
 	(*v35.Percent)(nil),                              // 39: envoy.type.v3.Percent
-	(*_struct.Struct)(nil),                           // 40: google.protobuf.Struct
+	(*structpb.Struct)(nil),                          // 40: google.protobuf.Struct
 	(*v36.Listener)(nil),                             // 41: envoy.config.listener.v3.Listener
 	(*v37.Cluster)(nil),                              // 42: envoy.config.cluster.v3.Cluster
 	(*v38.Secret)(nil),                               // 43: envoy.extensions.transport_sockets.tls.v3.Secret

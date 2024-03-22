@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -206,7 +206,7 @@ func (m *JsonToMetadata_KeyValuePair) GetValueType() isJsonToMetadata_KeyValuePa
 	return nil
 }
 
-func (x *JsonToMetadata_KeyValuePair) GetValue() *_struct.Value {
+func (x *JsonToMetadata_KeyValuePair) GetValue() *structpb.Value {
 	if x, ok := x.GetValueType().(*JsonToMetadata_KeyValuePair_Value); ok {
 		return x.Value
 	}
@@ -242,7 +242,7 @@ type JsonToMetadata_KeyValuePair_Value struct {
 	// must be provided.
 	//
 	// It ignores ValueType, i.e., not type casting.
-	Value *_struct.Value `protobuf:"bytes,3,opt,name=value,proto3,oneof"`
+	Value *structpb.Value `protobuf:"bytes,3,opt,name=value,proto3,oneof"`
 }
 
 func (*JsonToMetadata_KeyValuePair_Value) isJsonToMetadata_KeyValuePair_ValueType() {}
@@ -630,7 +630,7 @@ var file_envoy_extensions_filters_http_json_to_metadata_v3_json_to_metadata_prot
 	(*JsonToMetadata_Selector)(nil),     // 3: envoy.extensions.filters.http.json_to_metadata.v3.JsonToMetadata.Selector
 	(*JsonToMetadata_Rule)(nil),         // 4: envoy.extensions.filters.http.json_to_metadata.v3.JsonToMetadata.Rule
 	(*JsonToMetadata_MatchRules)(nil),   // 5: envoy.extensions.filters.http.json_to_metadata.v3.JsonToMetadata.MatchRules
-	(*_struct.Value)(nil),               // 6: google.protobuf.Value
+	(*structpb.Value)(nil),              // 6: google.protobuf.Value
 	(*v3.RegexMatcher)(nil),             // 7: envoy.type.matcher.v3.RegexMatcher
 }
 var file_envoy_extensions_filters_http_json_to_metadata_v3_json_to_metadata_proto_depIdxs = []int32{

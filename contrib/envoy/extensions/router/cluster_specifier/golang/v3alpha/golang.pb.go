@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -50,7 +50,7 @@ type Config struct {
 	//
 	//	See the :repo:`StreamFilter API <contrib/golang/router/cluster_specifier/source/go/pkg/cluster_specifier/config.go>`
 	//	for more information about how the plugin's configuration data can be accessed.
-	Config *any1.Any `protobuf:"bytes,4,opt,name=config,proto3" json:"config,omitempty"`
+	Config *anypb.Any `protobuf:"bytes,4,opt,name=config,proto3" json:"config,omitempty"`
 }
 
 func (x *Config) Reset() {
@@ -106,7 +106,7 @@ func (x *Config) GetDefaultCluster() string {
 	return ""
 }
 
-func (x *Config) GetConfig() *any1.Any {
+func (x *Config) GetConfig() *anypb.Any {
 	if x != nil {
 		return x.Config
 	}
@@ -174,8 +174,8 @@ func file_contrib_envoy_extensions_router_cluster_specifier_golang_v3alpha_golan
 
 var file_contrib_envoy_extensions_router_cluster_specifier_golang_v3alpha_golang_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_contrib_envoy_extensions_router_cluster_specifier_golang_v3alpha_golang_proto_goTypes = []interface{}{
-	(*Config)(nil),   // 0: envoy.extensions.router.cluster_specifier.golang.v3alpha.Config
-	(*any1.Any)(nil), // 1: google.protobuf.Any
+	(*Config)(nil),    // 0: envoy.extensions.router.cluster_specifier.golang.v3alpha.Config
+	(*anypb.Any)(nil), // 1: google.protobuf.Any
 }
 var file_contrib_envoy_extensions_router_cluster_specifier_golang_v3alpha_golang_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.router.cluster_specifier.golang.v3alpha.Config.config:type_name -> google.protobuf.Any

@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -37,7 +37,7 @@ type QatPrivateKeyMethodConfig struct {
 	// quicker answers from the hardware but causes more polling loop
 	// spins, leading to potentially larger CPU usage. The duration needs
 	// to be set to a value greater than or equal to 1 millisecond.
-	PollDelay *duration.Duration `protobuf:"bytes,2,opt,name=poll_delay,json=pollDelay,proto3" json:"poll_delay,omitempty"`
+	PollDelay *durationpb.Duration `protobuf:"bytes,2,opt,name=poll_delay,json=pollDelay,proto3" json:"poll_delay,omitempty"`
 }
 
 func (x *QatPrivateKeyMethodConfig) Reset() {
@@ -79,7 +79,7 @@ func (x *QatPrivateKeyMethodConfig) GetPrivateKey() *v3.DataSource {
 	return nil
 }
 
-func (x *QatPrivateKeyMethodConfig) GetPollDelay() *duration.Duration {
+func (x *QatPrivateKeyMethodConfig) GetPollDelay() *durationpb.Duration {
 	if x != nil {
 		return x.PollDelay
 	}
@@ -148,7 +148,7 @@ var file_contrib_envoy_extensions_private_key_providers_qat_v3alpha_qat_proto_ms
 var file_contrib_envoy_extensions_private_key_providers_qat_v3alpha_qat_proto_goTypes = []interface{}{
 	(*QatPrivateKeyMethodConfig)(nil), // 0: envoy.extensions.private_key_providers.qat.v3alpha.QatPrivateKeyMethodConfig
 	(*v3.DataSource)(nil),             // 1: envoy.config.core.v3.DataSource
-	(*duration.Duration)(nil),         // 2: google.protobuf.Duration
+	(*durationpb.Duration)(nil),       // 2: google.protobuf.Duration
 }
 var file_contrib_envoy_extensions_private_key_providers_qat_v3alpha_qat_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.private_key_providers.qat.v3alpha.QatPrivateKeyMethodConfig.private_key:type_name -> envoy.config.core.v3.DataSource

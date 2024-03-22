@@ -13,10 +13,10 @@ import (
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/transport_sockets/tls/v3"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -215,12 +215,12 @@ type OAuth2Config struct {
 	// If set to true, allows automatic access token refresh using the associated refresh token (see
 	// `RFC 6749 section 6 <https://datatracker.ietf.org/doc/html/rfc6749#section-6>`_), provided that the OAuth server supports that.
 	// Default value is false.
-	UseRefreshToken *wrappers.BoolValue `protobuf:"bytes,12,opt,name=use_refresh_token,json=useRefreshToken,proto3" json:"use_refresh_token,omitempty"`
+	UseRefreshToken *wrapperspb.BoolValue `protobuf:"bytes,12,opt,name=use_refresh_token,json=useRefreshToken,proto3" json:"use_refresh_token,omitempty"`
 	// The default lifetime in seconds of the access token, if omitted by the authorization server.
 	//
 	// If this value is not set, it will default to “0s“. In this case, the expiry must be set by
 	// the authorization server or the OAuth flow will fail.
-	DefaultExpiresIn *duration.Duration `protobuf:"bytes,13,opt,name=default_expires_in,json=defaultExpiresIn,proto3" json:"default_expires_in,omitempty"`
+	DefaultExpiresIn *durationpb.Duration `protobuf:"bytes,13,opt,name=default_expires_in,json=defaultExpiresIn,proto3" json:"default_expires_in,omitempty"`
 	// Any request that matches any of the provided matchers won't be redirected to OAuth server when tokens are not valid.
 	// Automatic access token refresh will be performed for these requests, if enabled.
 	// This behavior can be useful for AJAX requests.
@@ -230,7 +230,7 @@ type OAuth2Config struct {
 	// If this value is not set, it will default to “604800s“. In this case, the cookie with the refresh token will be expired
 	// in a week.
 	// This setting is only considered if “use_refresh_token“ is set to true, otherwise the authorization server expiration or “defaul_expires_in“ is used.
-	DefaultRefreshTokenExpiresIn *duration.Duration `protobuf:"bytes,15,opt,name=default_refresh_token_expires_in,json=defaultRefreshTokenExpiresIn,proto3" json:"default_refresh_token_expires_in,omitempty"`
+	DefaultRefreshTokenExpiresIn *durationpb.Duration `protobuf:"bytes,15,opt,name=default_refresh_token_expires_in,json=defaultRefreshTokenExpiresIn,proto3" json:"default_refresh_token_expires_in,omitempty"`
 }
 
 func (x *OAuth2Config) Reset() {
@@ -342,14 +342,14 @@ func (x *OAuth2Config) GetAuthType() OAuth2Config_AuthType {
 	return OAuth2Config_URL_ENCODED_BODY
 }
 
-func (x *OAuth2Config) GetUseRefreshToken() *wrappers.BoolValue {
+func (x *OAuth2Config) GetUseRefreshToken() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.UseRefreshToken
 	}
 	return nil
 }
 
-func (x *OAuth2Config) GetDefaultExpiresIn() *duration.Duration {
+func (x *OAuth2Config) GetDefaultExpiresIn() *durationpb.Duration {
 	if x != nil {
 		return x.DefaultExpiresIn
 	}
@@ -363,7 +363,7 @@ func (x *OAuth2Config) GetDenyRedirectMatcher() []*v33.HeaderMatcher {
 	return nil
 }
 
-func (x *OAuth2Config) GetDefaultRefreshTokenExpiresIn() *duration.Duration {
+func (x *OAuth2Config) GetDefaultRefreshTokenExpiresIn() *durationpb.Duration {
 	if x != nil {
 		return x.DefaultRefreshTokenExpiresIn
 	}
@@ -692,8 +692,8 @@ var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_goTypes = []interfa
 	(*v31.HttpUri)(nil),                   // 6: envoy.config.core.v3.HttpUri
 	(*v32.PathMatcher)(nil),               // 7: envoy.type.matcher.v3.PathMatcher
 	(*v33.HeaderMatcher)(nil),             // 8: envoy.config.route.v3.HeaderMatcher
-	(*wrappers.BoolValue)(nil),            // 9: google.protobuf.BoolValue
-	(*duration.Duration)(nil),             // 10: google.protobuf.Duration
+	(*wrapperspb.BoolValue)(nil),          // 9: google.protobuf.BoolValue
+	(*durationpb.Duration)(nil),           // 10: google.protobuf.Duration
 }
 var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_depIdxs = []int32{
 	5,  // 0: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.token_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig

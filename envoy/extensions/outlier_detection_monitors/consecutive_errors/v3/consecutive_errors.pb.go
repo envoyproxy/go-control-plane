@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/outlier_detection_monitors/common/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -36,9 +36,9 @@ type ConsecutiveErrors struct {
 	// Monitor name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The number of consecutive errors before ejection occurs.
-	Threshold *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	Threshold *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
 	// The % chance that a host is actually ejected. Defaults to 100.
-	Enforcing *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=enforcing,proto3" json:"enforcing,omitempty"`
+	Enforcing *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=enforcing,proto3" json:"enforcing,omitempty"`
 	// Error buckets.
 	ErrorBuckets *v3.ErrorBuckets `protobuf:"bytes,4,opt,name=error_buckets,json=errorBuckets,proto3" json:"error_buckets,omitempty"`
 }
@@ -82,14 +82,14 @@ func (x *ConsecutiveErrors) GetName() string {
 	return ""
 }
 
-func (x *ConsecutiveErrors) GetThreshold() *wrappers.UInt32Value {
+func (x *ConsecutiveErrors) GetThreshold() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.Threshold
 	}
 	return nil
 }
 
-func (x *ConsecutiveErrors) GetEnforcing() *wrappers.UInt32Value {
+func (x *ConsecutiveErrors) GetEnforcing() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.Enforcing
 	}
@@ -176,9 +176,9 @@ func file_envoy_extensions_outlier_detection_monitors_consecutive_errors_v3_cons
 
 var file_envoy_extensions_outlier_detection_monitors_consecutive_errors_v3_consecutive_errors_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_outlier_detection_monitors_consecutive_errors_v3_consecutive_errors_proto_goTypes = []interface{}{
-	(*ConsecutiveErrors)(nil),    // 0: envoy.extensions.outlier_detection_monitors.consecutive_errors.v3.ConsecutiveErrors
-	(*wrappers.UInt32Value)(nil), // 1: google.protobuf.UInt32Value
-	(*v3.ErrorBuckets)(nil),      // 2: envoy.extensions.outlier_detection_monitors.common.v3.ErrorBuckets
+	(*ConsecutiveErrors)(nil),      // 0: envoy.extensions.outlier_detection_monitors.consecutive_errors.v3.ConsecutiveErrors
+	(*wrapperspb.UInt32Value)(nil), // 1: google.protobuf.UInt32Value
+	(*v3.ErrorBuckets)(nil),        // 2: envoy.extensions.outlier_detection_monitors.common.v3.ErrorBuckets
 }
 var file_envoy_extensions_outlier_detection_monitors_consecutive_errors_v3_consecutive_errors_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.outlier_detection_monitors.consecutive_errors.v3.ConsecutiveErrors.threshold:type_name -> google.protobuf.UInt32Value

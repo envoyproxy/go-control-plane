@@ -9,9 +9,9 @@ package tracev2
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -37,7 +37,7 @@ type DynamicOtConfig struct {
 	Library string `protobuf:"bytes,1,opt,name=library,proto3" json:"library,omitempty"`
 	// The configuration to use when creating a tracer from the given dynamic
 	// library.
-	Config *_struct.Struct `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
+	Config *structpb.Struct `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
 }
 
 func (x *DynamicOtConfig) Reset() {
@@ -79,7 +79,7 @@ func (x *DynamicOtConfig) GetLibrary() string {
 	return ""
 }
 
-func (x *DynamicOtConfig) GetConfig() *_struct.Struct {
+func (x *DynamicOtConfig) GetConfig() *structpb.Struct {
 	if x != nil {
 		return x.Config
 	}
@@ -131,7 +131,7 @@ func file_envoy_config_trace_v2_dynamic_ot_proto_rawDescGZIP() []byte {
 var file_envoy_config_trace_v2_dynamic_ot_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_config_trace_v2_dynamic_ot_proto_goTypes = []interface{}{
 	(*DynamicOtConfig)(nil), // 0: envoy.config.trace.v2.DynamicOtConfig
-	(*_struct.Struct)(nil),  // 1: google.protobuf.Struct
+	(*structpb.Struct)(nil), // 1: google.protobuf.Struct
 }
 var file_envoy_config_trace_v2_dynamic_ot_proto_depIdxs = []int32{
 	1, // 0: envoy.config.trace.v2.DynamicOtConfig.config:type_name -> google.protobuf.Struct

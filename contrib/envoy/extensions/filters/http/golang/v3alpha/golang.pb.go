@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -108,7 +108,7 @@ type Config struct {
 	//
 	//	See the :repo:`StreamFilter API <contrib/golang/common/go/api/filter.go>`
 	//	for more information about how the plugin's configuration data can be accessed.
-	PluginConfig *any1.Any `protobuf:"bytes,4,opt,name=plugin_config,json=pluginConfig,proto3" json:"plugin_config,omitempty"`
+	PluginConfig *anypb.Any `protobuf:"bytes,4,opt,name=plugin_config,json=pluginConfig,proto3" json:"plugin_config,omitempty"`
 	// Merge policy for plugin configuration.
 	//
 	// The Go plugin configuration supports three dimensions:
@@ -174,7 +174,7 @@ func (x *Config) GetPluginName() string {
 	return ""
 }
 
-func (x *Config) GetPluginConfig() *any1.Any {
+func (x *Config) GetPluginConfig() *anypb.Any {
 	if x != nil {
 		return x.PluginConfig
 	}
@@ -246,7 +246,7 @@ func (x *RouterPlugin) GetDisabled() bool {
 	return false
 }
 
-func (x *RouterPlugin) GetConfig() *any1.Any {
+func (x *RouterPlugin) GetConfig() *anypb.Any {
 	if x, ok := x.GetOverride().(*RouterPlugin_Config); ok {
 		return x.Config
 	}
@@ -266,7 +266,7 @@ type RouterPlugin_Disabled struct {
 
 type RouterPlugin_Config struct {
 	// The config field is used for setting per-route and per-virtualhost plugin config.
-	Config *any1.Any `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
+	Config *anypb.Any `protobuf:"bytes,2,opt,name=config,proto3,oneof"`
 }
 
 func (*RouterPlugin_Disabled) isRouterPlugin_Override() {}
@@ -424,7 +424,7 @@ var file_contrib_envoy_extensions_filters_http_golang_v3alpha_golang_proto_goTyp
 	(*RouterPlugin)(nil),    // 2: envoy.extensions.filters.http.golang.v3alpha.RouterPlugin
 	(*ConfigsPerRoute)(nil), // 3: envoy.extensions.filters.http.golang.v3alpha.ConfigsPerRoute
 	nil,                     // 4: envoy.extensions.filters.http.golang.v3alpha.ConfigsPerRoute.PluginsConfigEntry
-	(*any1.Any)(nil),        // 5: google.protobuf.Any
+	(*anypb.Any)(nil),       // 5: google.protobuf.Any
 }
 var file_contrib_envoy_extensions_filters_http_golang_v3alpha_golang_proto_depIdxs = []int32{
 	5, // 0: envoy.extensions.filters.http.golang.v3alpha.Config.plugin_config:type_name -> google.protobuf.Any

@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -107,7 +107,7 @@ type ZipkinConfig struct {
 	TraceId_128Bit bool `protobuf:"varint,3,opt,name=trace_id_128bit,json=traceId128bit,proto3" json:"trace_id_128bit,omitempty"`
 	// Determines whether client and server spans will share the same span context.
 	// The default value is true.
-	SharedSpanContext *wrappers.BoolValue `protobuf:"bytes,4,opt,name=shared_span_context,json=sharedSpanContext,proto3" json:"shared_span_context,omitempty"`
+	SharedSpanContext *wrapperspb.BoolValue `protobuf:"bytes,4,opt,name=shared_span_context,json=sharedSpanContext,proto3" json:"shared_span_context,omitempty"`
 	// Determines the selected collector endpoint version.
 	CollectorEndpointVersion ZipkinConfig_CollectorEndpointVersion `protobuf:"varint,5,opt,name=collector_endpoint_version,json=collectorEndpointVersion,proto3,enum=envoy.config.trace.v3.ZipkinConfig_CollectorEndpointVersion" json:"collector_endpoint_version,omitempty"`
 	// Optional hostname to use when sending spans to the collector_cluster. Useful for collectors
@@ -188,7 +188,7 @@ func (x *ZipkinConfig) GetTraceId_128Bit() bool {
 	return false
 }
 
-func (x *ZipkinConfig) GetSharedSpanContext() *wrappers.BoolValue {
+func (x *ZipkinConfig) GetSharedSpanContext() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.SharedSpanContext
 	}
@@ -307,7 +307,7 @@ var file_envoy_config_trace_v3_zipkin_proto_msgTypes = make([]protoimpl.MessageI
 var file_envoy_config_trace_v3_zipkin_proto_goTypes = []interface{}{
 	(ZipkinConfig_CollectorEndpointVersion)(0), // 0: envoy.config.trace.v3.ZipkinConfig.CollectorEndpointVersion
 	(*ZipkinConfig)(nil),                       // 1: envoy.config.trace.v3.ZipkinConfig
-	(*wrappers.BoolValue)(nil),                 // 2: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),               // 2: google.protobuf.BoolValue
 }
 var file_envoy_config_trace_v3_zipkin_proto_depIdxs = []int32{
 	2, // 0: envoy.config.trace.v3.ZipkinConfig.shared_span_context:type_name -> google.protobuf.BoolValue

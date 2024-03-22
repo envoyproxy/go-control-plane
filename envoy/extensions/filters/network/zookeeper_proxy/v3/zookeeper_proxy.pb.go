@@ -9,10 +9,10 @@ package zookeeper_proxyv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -165,7 +165,7 @@ type ZooKeeperProxy struct {
 	// https://zookeeper.apache.org/doc/r3.4.10/zookeeperAdmin.html#Unsafe+Options
 	//
 	// if that is set. If it isn't, ZooKeeper's default is also 1Mb.
-	MaxPacketBytes *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=max_packet_bytes,json=maxPacketBytes,proto3" json:"max_packet_bytes,omitempty"`
+	MaxPacketBytes *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_packet_bytes,json=maxPacketBytes,proto3" json:"max_packet_bytes,omitempty"`
 	// Whether to emit latency threshold metrics. If not set, it defaults to false.
 	// If false, setting “default_latency_threshold“ and “latency_threshold_overrides“ will not have effect.
 	EnableLatencyThresholdMetrics bool `protobuf:"varint,4,opt,name=enable_latency_threshold_metrics,json=enableLatencyThresholdMetrics,proto3" json:"enable_latency_threshold_metrics,omitempty"`
@@ -174,7 +174,7 @@ type ZooKeeperProxy struct {
 	// https://sre.google/workbook/implementing-slos/
 	//
 	// If it is not set, the default value is 100 milliseconds.
-	DefaultLatencyThreshold *duration.Duration `protobuf:"bytes,5,opt,name=default_latency_threshold,json=defaultLatencyThreshold,proto3" json:"default_latency_threshold,omitempty"`
+	DefaultLatencyThreshold *durationpb.Duration `protobuf:"bytes,5,opt,name=default_latency_threshold,json=defaultLatencyThreshold,proto3" json:"default_latency_threshold,omitempty"`
 	// List of latency threshold overrides for opcodes.
 	// If the threshold override of one opcode is not set, it will fallback to the default latency
 	// threshold.
@@ -234,7 +234,7 @@ func (x *ZooKeeperProxy) GetAccessLog() string {
 	return ""
 }
 
-func (x *ZooKeeperProxy) GetMaxPacketBytes() *wrappers.UInt32Value {
+func (x *ZooKeeperProxy) GetMaxPacketBytes() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxPacketBytes
 	}
@@ -248,7 +248,7 @@ func (x *ZooKeeperProxy) GetEnableLatencyThresholdMetrics() bool {
 	return false
 }
 
-func (x *ZooKeeperProxy) GetDefaultLatencyThreshold() *duration.Duration {
+func (x *ZooKeeperProxy) GetDefaultLatencyThreshold() *durationpb.Duration {
 	if x != nil {
 		return x.DefaultLatencyThreshold
 	}
@@ -293,7 +293,7 @@ type LatencyThresholdOverride struct {
 	// https://github.com/apache/zookeeper/blob/master/zookeeper-server/src/main/java/org/apache/zookeeper/ZooDefs.java
 	Opcode LatencyThresholdOverride_Opcode `protobuf:"varint,1,opt,name=opcode,proto3,enum=envoy.extensions.filters.network.zookeeper_proxy.v3.LatencyThresholdOverride_Opcode" json:"opcode,omitempty"`
 	// The latency threshold override of certain opcode.
-	Threshold *duration.Duration `protobuf:"bytes,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	Threshold *durationpb.Duration `protobuf:"bytes,2,opt,name=threshold,proto3" json:"threshold,omitempty"`
 }
 
 func (x *LatencyThresholdOverride) Reset() {
@@ -335,7 +335,7 @@ func (x *LatencyThresholdOverride) GetOpcode() LatencyThresholdOverride_Opcode {
 	return LatencyThresholdOverride_Connect
 }
 
-func (x *LatencyThresholdOverride) GetThreshold() *duration.Duration {
+func (x *LatencyThresholdOverride) GetThreshold() *durationpb.Duration {
 	if x != nil {
 		return x.Threshold
 	}
@@ -487,8 +487,8 @@ var file_envoy_extensions_filters_network_zookeeper_proxy_v3_zookeeper_proxy_pro
 	(LatencyThresholdOverride_Opcode)(0), // 0: envoy.extensions.filters.network.zookeeper_proxy.v3.LatencyThresholdOverride.Opcode
 	(*ZooKeeperProxy)(nil),               // 1: envoy.extensions.filters.network.zookeeper_proxy.v3.ZooKeeperProxy
 	(*LatencyThresholdOverride)(nil),     // 2: envoy.extensions.filters.network.zookeeper_proxy.v3.LatencyThresholdOverride
-	(*wrappers.UInt32Value)(nil),         // 3: google.protobuf.UInt32Value
-	(*duration.Duration)(nil),            // 4: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),       // 3: google.protobuf.UInt32Value
+	(*durationpb.Duration)(nil),          // 4: google.protobuf.Duration
 }
 var file_envoy_extensions_filters_network_zookeeper_proxy_v3_zookeeper_proxy_proto_depIdxs = []int32{
 	3, // 0: envoy.extensions.filters.network.zookeeper_proxy.v3.ZooKeeperProxy.max_packet_bytes:type_name -> google.protobuf.UInt32Value

@@ -9,9 +9,9 @@ package authv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -265,7 +265,7 @@ type AttributeContext_Request struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The timestamp when the proxy receives the first byte of the request.
-	Time *timestamp.Timestamp `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty"`
+	Time *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=time,proto3" json:"time,omitempty"`
 	// Represents an HTTP request or an HTTP-like request.
 	Http *AttributeContext_HttpRequest `protobuf:"bytes,2,opt,name=http,proto3" json:"http,omitempty"`
 }
@@ -302,7 +302,7 @@ func (*AttributeContext_Request) Descriptor() ([]byte, []int) {
 	return file_envoy_service_auth_v3_attribute_context_proto_rawDescGZIP(), []int{0, 1}
 }
 
-func (x *AttributeContext_Request) GetTime() *timestamp.Timestamp {
+func (x *AttributeContext_Request) GetTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.Time
 	}
@@ -693,7 +693,7 @@ var file_envoy_service_auth_v3_attribute_context_proto_goTypes = []interface{}{
 	nil,                                  // 7: envoy.service.auth.v3.AttributeContext.HttpRequest.HeadersEntry
 	(*v3.Metadata)(nil),                  // 8: envoy.config.core.v3.Metadata
 	(*v3.Address)(nil),                   // 9: envoy.config.core.v3.Address
-	(*timestamp.Timestamp)(nil),          // 10: google.protobuf.Timestamp
+	(*timestamppb.Timestamp)(nil),        // 10: google.protobuf.Timestamp
 }
 var file_envoy_service_auth_v3_attribute_context_proto_depIdxs = []int32{
 	1,  // 0: envoy.service.auth.v3.AttributeContext.source:type_name -> envoy.service.auth.v3.AttributeContext.Peer

@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -46,7 +46,7 @@ type CryptoMbPrivateKeyMethodConfig struct {
 	// already in the queue are processed, even if the queue is not full.
 	// In effect, this value controls the balance between latency and
 	// throughput. The duration needs to be set to a value greater than or equal to 1 millisecond.
-	PollDelay *duration.Duration `protobuf:"bytes,2,opt,name=poll_delay,json=pollDelay,proto3" json:"poll_delay,omitempty"`
+	PollDelay *durationpb.Duration `protobuf:"bytes,2,opt,name=poll_delay,json=pollDelay,proto3" json:"poll_delay,omitempty"`
 }
 
 func (x *CryptoMbPrivateKeyMethodConfig) Reset() {
@@ -88,7 +88,7 @@ func (x *CryptoMbPrivateKeyMethodConfig) GetPrivateKey() *v3.DataSource {
 	return nil
 }
 
-func (x *CryptoMbPrivateKeyMethodConfig) GetPollDelay() *duration.Duration {
+func (x *CryptoMbPrivateKeyMethodConfig) GetPollDelay() *durationpb.Duration {
 	if x != nil {
 		return x.PollDelay
 	}
@@ -159,7 +159,7 @@ var file_contrib_envoy_extensions_private_key_providers_cryptomb_v3alpha_cryptom
 var file_contrib_envoy_extensions_private_key_providers_cryptomb_v3alpha_cryptomb_proto_goTypes = []interface{}{
 	(*CryptoMbPrivateKeyMethodConfig)(nil), // 0: envoy.extensions.private_key_providers.cryptomb.v3alpha.CryptoMbPrivateKeyMethodConfig
 	(*v3.DataSource)(nil),                  // 1: envoy.config.core.v3.DataSource
-	(*duration.Duration)(nil),              // 2: google.protobuf.Duration
+	(*durationpb.Duration)(nil),            // 2: google.protobuf.Duration
 }
 var file_contrib_envoy_extensions_private_key_providers_cryptomb_v3alpha_cryptomb_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.private_key_providers.cryptomb.v3alpha.CryptoMbPrivateKeyMethodConfig.private_key:type_name -> envoy.config.core.v3.DataSource

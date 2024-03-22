@@ -12,10 +12,10 @@ import (
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -140,7 +140,7 @@ type ExternalProcessor struct {
 	// timeout when the filter is running in asynchronous mode. Zero is a valid
 	// config which means the timer will be triggered immediately. If not
 	// configured, default is 200 milliseconds.
-	MessageTimeout *duration.Duration `protobuf:"bytes,7,opt,name=message_timeout,json=messageTimeout,proto3" json:"message_timeout,omitempty"`
+	MessageTimeout *durationpb.Duration `protobuf:"bytes,7,opt,name=message_timeout,json=messageTimeout,proto3" json:"message_timeout,omitempty"`
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
 	// emitted statistics between configured *ext_proc* filters in an HTTP filter chain.
 	StatPrefix string `protobuf:"bytes,8,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
@@ -159,7 +159,7 @@ type ExternalProcessor struct {
 	// Specify the upper bound of
 	// :ref:`override_message_timeout <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.override_message_timeout>`
 	// If not specified, by default it is 0, which will effectively disable the “override_message_timeout“ API.
-	MaxMessageTimeout *duration.Duration `protobuf:"bytes,10,opt,name=max_message_timeout,json=maxMessageTimeout,proto3" json:"max_message_timeout,omitempty"`
+	MaxMessageTimeout *durationpb.Duration `protobuf:"bytes,10,opt,name=max_message_timeout,json=maxMessageTimeout,proto3" json:"max_message_timeout,omitempty"`
 	// Prevents clearing the route-cache when the
 	// :ref:`clear_route_cache <envoy_v3_api_field_service.ext_proc.v3.CommonResponse.clear_route_cache>`
 	// field is set in an external processor response.
@@ -170,7 +170,7 @@ type ExternalProcessor struct {
 	// Additional metadata to be added to the filter state for logging purposes. The metadata
 	// will be added to StreamInfo's filter state under the namespace corresponding to the
 	// ext_proc filter name.
-	FilterMetadata *_struct.Struct `protobuf:"bytes,13,opt,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty"`
+	FilterMetadata *structpb.Struct `protobuf:"bytes,13,opt,name=filter_metadata,json=filterMetadata,proto3" json:"filter_metadata,omitempty"`
 	// If “allow_mode_override“ is set to true, the filter config :ref:`processing_mode
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
 	// can be overridden by the response message from the external processing server
@@ -261,7 +261,7 @@ func (x *ExternalProcessor) GetResponseAttributes() []string {
 	return nil
 }
 
-func (x *ExternalProcessor) GetMessageTimeout() *duration.Duration {
+func (x *ExternalProcessor) GetMessageTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.MessageTimeout
 	}
@@ -282,7 +282,7 @@ func (x *ExternalProcessor) GetMutationRules() *v31.HeaderMutationRules {
 	return nil
 }
 
-func (x *ExternalProcessor) GetMaxMessageTimeout() *duration.Duration {
+func (x *ExternalProcessor) GetMaxMessageTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.MaxMessageTimeout
 	}
@@ -303,7 +303,7 @@ func (x *ExternalProcessor) GetForwardRules() *HeaderForwardingRules {
 	return nil
 }
 
-func (x *ExternalProcessor) GetFilterMetadata() *_struct.Struct {
+func (x *ExternalProcessor) GetFilterMetadata() *structpb.Struct {
 	if x != nil {
 		return x.FilterMetadata
 	}
@@ -944,9 +944,9 @@ var file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_goTypes = []in
 	(*MetadataOptions_MetadataNamespaces)(nil), // 5: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
 	(*v3.GrpcService)(nil),                     // 6: envoy.config.core.v3.GrpcService
 	(*ProcessingMode)(nil),                     // 7: envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
-	(*duration.Duration)(nil),                  // 8: google.protobuf.Duration
+	(*durationpb.Duration)(nil),                // 8: google.protobuf.Duration
 	(*v31.HeaderMutationRules)(nil),            // 9: envoy.config.common.mutation_rules.v3.HeaderMutationRules
-	(*_struct.Struct)(nil),                     // 10: google.protobuf.Struct
+	(*structpb.Struct)(nil),                    // 10: google.protobuf.Struct
 	(*v32.ListStringMatcher)(nil),              // 11: envoy.type.matcher.v3.ListStringMatcher
 	(*v3.HeaderValue)(nil),                     // 12: envoy.config.core.v3.HeaderValue
 }

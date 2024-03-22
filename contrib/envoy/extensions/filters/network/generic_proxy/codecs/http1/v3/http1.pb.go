@@ -9,9 +9,9 @@ package http1v3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -49,12 +49,12 @@ type Http1CodecConfig struct {
 	// the message body is large.
 	//
 	// Default is true.
-	SingleFrameMode *wrappers.BoolValue `protobuf:"bytes,1,opt,name=single_frame_mode,json=singleFrameMode,proto3" json:"single_frame_mode,omitempty"`
+	SingleFrameMode *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=single_frame_mode,json=singleFrameMode,proto3" json:"single_frame_mode,omitempty"`
 	// The maximum size of the HTTP1 message body in bytes. If not set, 8*1024*1024 (8MB) is used.
 	// This only makes sense when single_frame_mode is true.
 	// If the HTTP1 message body size exceeds this value, this will result in a decoding error
 	// and the generic proxy will close the connection.
-	MaxBufferSize *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=max_buffer_size,json=maxBufferSize,proto3" json:"max_buffer_size,omitempty"`
+	MaxBufferSize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_buffer_size,json=maxBufferSize,proto3" json:"max_buffer_size,omitempty"`
 }
 
 func (x *Http1CodecConfig) Reset() {
@@ -89,14 +89,14 @@ func (*Http1CodecConfig) Descriptor() ([]byte, []int) {
 	return file_contrib_envoy_extensions_filters_network_generic_proxy_codecs_http1_v3_http1_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Http1CodecConfig) GetSingleFrameMode() *wrappers.BoolValue {
+func (x *Http1CodecConfig) GetSingleFrameMode() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.SingleFrameMode
 	}
 	return nil
 }
 
-func (x *Http1CodecConfig) GetMaxBufferSize() *wrappers.UInt32Value {
+func (x *Http1CodecConfig) GetMaxBufferSize() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxBufferSize
 	}
@@ -163,9 +163,9 @@ func file_contrib_envoy_extensions_filters_network_generic_proxy_codecs_http1_v3
 
 var file_contrib_envoy_extensions_filters_network_generic_proxy_codecs_http1_v3_http1_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_contrib_envoy_extensions_filters_network_generic_proxy_codecs_http1_v3_http1_proto_goTypes = []interface{}{
-	(*Http1CodecConfig)(nil),     // 0: envoy.extensions.filters.network.generic_proxy.codecs.http1.v3.Http1CodecConfig
-	(*wrappers.BoolValue)(nil),   // 1: google.protobuf.BoolValue
-	(*wrappers.UInt32Value)(nil), // 2: google.protobuf.UInt32Value
+	(*Http1CodecConfig)(nil),       // 0: envoy.extensions.filters.network.generic_proxy.codecs.http1.v3.Http1CodecConfig
+	(*wrapperspb.BoolValue)(nil),   // 1: google.protobuf.BoolValue
+	(*wrapperspb.UInt32Value)(nil), // 2: google.protobuf.UInt32Value
 }
 var file_contrib_envoy_extensions_filters_network_generic_proxy_codecs_http1_v3_http1_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.filters.network.generic_proxy.codecs.http1.v3.Http1CodecConfig.single_frame_mode:type_name -> google.protobuf.BoolValue

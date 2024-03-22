@@ -10,10 +10,10 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	_struct "github.com/golang/protobuf/ptypes/struct"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -40,11 +40,11 @@ type Metadata struct {
 	// more information on how this value is merged with potentially existing
 	// ones if “allow_overwrite“ is configured. Only one of “value“ and
 	// “typed_value“ may be set.
-	Value *_struct.Struct `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
+	Value *structpb.Struct `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`
 	// The value to place at the namespace. If “allow_overwrite“, this will
 	// overwrite any existing values in that namespace. Only one of “value“ and
 	// “typed_value“ may be set.
-	TypedValue *any1.Any `protobuf:"bytes,4,opt,name=typed_value,json=typedValue,proto3" json:"typed_value,omitempty"`
+	TypedValue *anypb.Any `protobuf:"bytes,4,opt,name=typed_value,json=typedValue,proto3" json:"typed_value,omitempty"`
 }
 
 func (x *Metadata) Reset() {
@@ -93,14 +93,14 @@ func (x *Metadata) GetAllowOverwrite() bool {
 	return false
 }
 
-func (x *Metadata) GetValue() *_struct.Struct {
+func (x *Metadata) GetValue() *structpb.Struct {
 	if x != nil {
 		return x.Value
 	}
 	return nil
 }
 
-func (x *Metadata) GetTypedValue() *any1.Any {
+func (x *Metadata) GetTypedValue() *anypb.Any {
 	if x != nil {
 		return x.TypedValue
 	}
@@ -124,7 +124,7 @@ type Config struct {
 	// This field is deprecated; please use “metadata“ as replacement.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/set_metadata/v3/set_metadata.proto.
-	Value *_struct.Struct `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	Value *structpb.Struct `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	// Defines changes to be made to dynamic metadata.
 	Metadata []*Metadata `protobuf:"bytes,3,rep,name=metadata,proto3" json:"metadata,omitempty"`
 }
@@ -170,7 +170,7 @@ func (x *Config) GetMetadataNamespace() string {
 }
 
 // Deprecated: Marked as deprecated in envoy/extensions/filters/http/set_metadata/v3/set_metadata.proto.
-func (x *Config) GetValue() *_struct.Struct {
+func (x *Config) GetValue() *structpb.Struct {
 	if x != nil {
 		return x.Value
 	}
@@ -259,10 +259,10 @@ func file_envoy_extensions_filters_http_set_metadata_v3_set_metadata_proto_rawDe
 
 var file_envoy_extensions_filters_http_set_metadata_v3_set_metadata_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_filters_http_set_metadata_v3_set_metadata_proto_goTypes = []interface{}{
-	(*Metadata)(nil),       // 0: envoy.extensions.filters.http.set_metadata.v3.Metadata
-	(*Config)(nil),         // 1: envoy.extensions.filters.http.set_metadata.v3.Config
-	(*_struct.Struct)(nil), // 2: google.protobuf.Struct
-	(*any1.Any)(nil),       // 3: google.protobuf.Any
+	(*Metadata)(nil),        // 0: envoy.extensions.filters.http.set_metadata.v3.Metadata
+	(*Config)(nil),          // 1: envoy.extensions.filters.http.set_metadata.v3.Config
+	(*structpb.Struct)(nil), // 2: google.protobuf.Struct
+	(*anypb.Any)(nil),       // 3: google.protobuf.Any
 }
 var file_envoy_extensions_filters_http_set_metadata_v3_set_metadata_proto_depIdxs = []int32{
 	2, // 0: envoy.extensions.filters.http.set_metadata.v3.Metadata.value:type_name -> google.protobuf.Struct

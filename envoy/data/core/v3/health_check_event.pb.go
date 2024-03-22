@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -150,7 +150,7 @@ type HealthCheckEvent struct {
 	//	*HealthCheckEvent_NoLongerDegradedHost
 	Event isHealthCheckEvent_Event `protobuf_oneof:"event"`
 	// Timestamp for event.
-	Timestamp *timestamp.Timestamp `protobuf:"bytes,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Timestamp *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	// Host metadata
 	Metadata *v3.Metadata `protobuf:"bytes,10,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// Host locality
@@ -259,7 +259,7 @@ func (x *HealthCheckEvent) GetNoLongerDegradedHost() *NoLongerDegradedHost {
 	return nil
 }
 
-func (x *HealthCheckEvent) GetTimestamp() *timestamp.Timestamp {
+func (x *HealthCheckEvent) GetTimestamp() *timestamppb.Timestamp {
 	if x != nil {
 		return x.Timestamp
 	}
@@ -771,7 +771,7 @@ var file_envoy_data_core_v3_health_check_event_proto_goTypes = []interface{}{
 	(*DegradedHealthyHost)(nil),       // 7: envoy.data.core.v3.DegradedHealthyHost
 	(*NoLongerDegradedHost)(nil),      // 8: envoy.data.core.v3.NoLongerDegradedHost
 	(*v3.Address)(nil),                // 9: envoy.config.core.v3.Address
-	(*timestamp.Timestamp)(nil),       // 10: google.protobuf.Timestamp
+	(*timestamppb.Timestamp)(nil),     // 10: google.protobuf.Timestamp
 	(*v3.Metadata)(nil),               // 11: envoy.config.core.v3.Metadata
 	(*v3.Locality)(nil),               // 12: envoy.config.core.v3.Locality
 }

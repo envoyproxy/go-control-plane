@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -41,7 +41,7 @@ type ClientSSLAuth struct {
 	// authentication service. Default is 60000 (60s). The actual fetch time
 	// will be this value plus a random jittered value between
 	// 0-refresh_delay_ms milliseconds.
-	RefreshDelay *duration.Duration `protobuf:"bytes,3,opt,name=refresh_delay,json=refreshDelay,proto3" json:"refresh_delay,omitempty"`
+	RefreshDelay *durationpb.Duration `protobuf:"bytes,3,opt,name=refresh_delay,json=refreshDelay,proto3" json:"refresh_delay,omitempty"`
 	// An optional list of IP address and subnet masks that should be white
 	// listed for access by the filter. If no list is provided, there is no
 	// IP allowlist.
@@ -94,7 +94,7 @@ func (x *ClientSSLAuth) GetStatPrefix() string {
 	return ""
 }
 
-func (x *ClientSSLAuth) GetRefreshDelay() *duration.Duration {
+func (x *ClientSSLAuth) GetRefreshDelay() *durationpb.Duration {
 	if x != nil {
 		return x.RefreshDelay
 	}
@@ -183,9 +183,9 @@ func file_contrib_envoy_extensions_filters_network_client_ssl_auth_v3_client_ssl
 
 var file_contrib_envoy_extensions_filters_network_client_ssl_auth_v3_client_ssl_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_contrib_envoy_extensions_filters_network_client_ssl_auth_v3_client_ssl_auth_proto_goTypes = []interface{}{
-	(*ClientSSLAuth)(nil),     // 0: envoy.extensions.filters.network.client_ssl_auth.v3.ClientSSLAuth
-	(*duration.Duration)(nil), // 1: google.protobuf.Duration
-	(*v3.CidrRange)(nil),      // 2: envoy.config.core.v3.CidrRange
+	(*ClientSSLAuth)(nil),       // 0: envoy.extensions.filters.network.client_ssl_auth.v3.ClientSSLAuth
+	(*durationpb.Duration)(nil), // 1: google.protobuf.Duration
+	(*v3.CidrRange)(nil),        // 2: envoy.config.core.v3.CidrRange
 }
 var file_contrib_envoy_extensions_filters_network_client_ssl_auth_v3_client_ssl_auth_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.filters.network.client_ssl_auth.v3.ClientSSLAuth.refresh_delay:type_name -> google.protobuf.Duration

@@ -14,10 +14,10 @@ import (
 	v33 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -243,7 +243,7 @@ func (m *AccessLog) GetConfigType() isAccessLog_ConfigType {
 	return nil
 }
 
-func (x *AccessLog) GetTypedConfig() *any1.Any {
+func (x *AccessLog) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*AccessLog_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -255,7 +255,7 @@ type isAccessLog_ConfigType interface {
 }
 
 type AccessLog_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,4,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*AccessLog_TypedConfig) isAccessLog_ConfigType() {}
@@ -1115,7 +1115,7 @@ type MetadataFilter struct {
 	Matcher *v33.MetadataMatcher `protobuf:"bytes,1,opt,name=matcher,proto3" json:"matcher,omitempty"`
 	// Default result if the key does not exist in dynamic metadata: if unset or
 	// true, then log; if false, then don't log.
-	MatchIfKeyNotFound *wrappers.BoolValue `protobuf:"bytes,2,opt,name=match_if_key_not_found,json=matchIfKeyNotFound,proto3" json:"match_if_key_not_found,omitempty"`
+	MatchIfKeyNotFound *wrapperspb.BoolValue `protobuf:"bytes,2,opt,name=match_if_key_not_found,json=matchIfKeyNotFound,proto3" json:"match_if_key_not_found,omitempty"`
 }
 
 func (x *MetadataFilter) Reset() {
@@ -1157,7 +1157,7 @@ func (x *MetadataFilter) GetMatcher() *v33.MetadataMatcher {
 	return nil
 }
 
-func (x *MetadataFilter) GetMatchIfKeyNotFound() *wrappers.BoolValue {
+func (x *MetadataFilter) GetMatchIfKeyNotFound() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.MatchIfKeyNotFound
 	}
@@ -1286,7 +1286,7 @@ func (m *ExtensionFilter) GetConfigType() isExtensionFilter_ConfigType {
 	return nil
 }
 
-func (x *ExtensionFilter) GetTypedConfig() *any1.Any {
+func (x *ExtensionFilter) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*ExtensionFilter_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -1298,7 +1298,7 @@ type isExtensionFilter_ConfigType interface {
 }
 
 type ExtensionFilter_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*ExtensionFilter_TypedConfig) isExtensionFilter_ConfigType() {}
@@ -1638,12 +1638,12 @@ var file_envoy_config_accesslog_v3_accesslog_proto_goTypes = []interface{}{
 	(*MetadataFilter)(nil),        // 15: envoy.config.accesslog.v3.MetadataFilter
 	(*LogTypeFilter)(nil),         // 16: envoy.config.accesslog.v3.LogTypeFilter
 	(*ExtensionFilter)(nil),       // 17: envoy.config.accesslog.v3.ExtensionFilter
-	(*any1.Any)(nil),              // 18: google.protobuf.Any
+	(*anypb.Any)(nil),             // 18: google.protobuf.Any
 	(*v3.RuntimeUInt32)(nil),      // 19: envoy.config.core.v3.RuntimeUInt32
 	(*v31.FractionalPercent)(nil), // 20: envoy.type.v3.FractionalPercent
 	(*v32.HeaderMatcher)(nil),     // 21: envoy.config.route.v3.HeaderMatcher
 	(*v33.MetadataMatcher)(nil),   // 22: envoy.type.matcher.v3.MetadataMatcher
-	(*wrappers.BoolValue)(nil),    // 23: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),  // 23: google.protobuf.BoolValue
 	(v34.AccessLogType)(0),        // 24: envoy.data.accesslog.v3.AccessLogType
 }
 var file_envoy_config_accesslog_v3_accesslog_proto_depIdxs = []int32{

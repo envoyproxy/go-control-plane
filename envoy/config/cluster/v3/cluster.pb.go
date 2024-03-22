@@ -15,12 +15,12 @@ import (
 	v34 "github.com/envoyproxy/go-control-plane/envoy/type/metadata/v3"
 	v33 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -751,10 +751,10 @@ type Cluster struct {
 	EdsClusterConfig *Cluster_EdsClusterConfig `protobuf:"bytes,3,opt,name=eds_cluster_config,json=edsClusterConfig,proto3" json:"eds_cluster_config,omitempty"`
 	// The timeout for new network connections to hosts in the cluster.
 	// If not set, a default value of 5s will be used.
-	ConnectTimeout *duration.Duration `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout,proto3" json:"connect_timeout,omitempty"`
+	ConnectTimeout *durationpb.Duration `protobuf:"bytes,4,opt,name=connect_timeout,json=connectTimeout,proto3" json:"connect_timeout,omitempty"`
 	// Soft limit on size of the cluster’s connections read and write buffers. If
 	// unspecified, an implementation defined default is applied (1MiB).
-	PerConnectionBufferLimitBytes *wrappers.UInt32Value `protobuf:"bytes,5,opt,name=per_connection_buffer_limit_bytes,json=perConnectionBufferLimitBytes,proto3" json:"per_connection_buffer_limit_bytes,omitempty"`
+	PerConnectionBufferLimitBytes *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=per_connection_buffer_limit_bytes,json=perConnectionBufferLimitBytes,proto3" json:"per_connection_buffer_limit_bytes,omitempty"`
 	// The :ref:`load balancer type <arch_overview_load_balancing_types>` to use
 	// when picking a host in the cluster.
 	LbPolicy Cluster_LbPolicy `protobuf:"varint,6,opt,name=lb_policy,json=lbPolicy,proto3,enum=envoy.config.cluster.v3.Cluster_LbPolicy" json:"lb_policy,omitempty"`
@@ -784,7 +784,7 @@ type Cluster struct {
 	//	This field has been deprecated in favor of the :ref:`max_requests_per_connection <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_requests_per_connection>` field.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/cluster/v3/cluster.proto.
-	MaxRequestsPerConnection *wrappers.UInt32Value `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
+	MaxRequestsPerConnection *wrapperspb.UInt32Value `protobuf:"bytes,9,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
 	// Optional :ref:`circuit breaking <arch_overview_circuit_break>` for the cluster.
 	CircuitBreakers *CircuitBreakers `protobuf:"bytes,10,opt,name=circuit_breakers,json=circuitBreakers,proto3" json:"circuit_breakers,omitempty"`
 	// HTTP protocol options that are applied only to upstream HTTP connections.
@@ -845,7 +845,7 @@ type Cluster struct {
 	// "envoy.filters.network.thrift_proxy". See the extension's documentation for details on
 	// specific options.
 	// [#next-major-version: make this a list of typed extensions.]
-	TypedExtensionProtocolOptions map[string]*any1.Any `protobuf:"bytes,36,rep,name=typed_extension_protocol_options,json=typedExtensionProtocolOptions,proto3" json:"typed_extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TypedExtensionProtocolOptions map[string]*anypb.Any `protobuf:"bytes,36,rep,name=typed_extension_protocol_options,json=typedExtensionProtocolOptions,proto3" json:"typed_extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// If the DNS refresh rate is specified and the cluster type is either
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`,
 	// or :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`,
@@ -855,7 +855,7 @@ type Cluster struct {
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`
 	// and :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`
 	// this setting is ignored.
-	DnsRefreshRate *duration.Duration `protobuf:"bytes,16,opt,name=dns_refresh_rate,json=dnsRefreshRate,proto3" json:"dns_refresh_rate,omitempty"`
+	DnsRefreshRate *durationpb.Duration `protobuf:"bytes,16,opt,name=dns_refresh_rate,json=dnsRefreshRate,proto3" json:"dns_refresh_rate,omitempty"`
 	// If the DNS failure refresh rate is specified and the cluster type is either
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`,
 	// or :ref:`LOGICAL_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.LOGICAL_DNS>`,
@@ -918,7 +918,7 @@ type Cluster struct {
 	// or :ref:`Redis Cluster<arch_overview_redis>`.
 	// If true, cluster readiness blocks on warm-up. If false, the cluster will complete
 	// initialization whether or not warm-up has completed. Defaults to true.
-	WaitForWarmOnInit *wrappers.BoolValue `protobuf:"bytes,54,opt,name=wait_for_warm_on_init,json=waitForWarmOnInit,proto3" json:"wait_for_warm_on_init,omitempty"`
+	WaitForWarmOnInit *wrapperspb.BoolValue `protobuf:"bytes,54,opt,name=wait_for_warm_on_init,json=waitForWarmOnInit,proto3" json:"wait_for_warm_on_init,omitempty"`
 	// If specified, outlier detection will be enabled for this upstream cluster.
 	// Each of the configuration values can be overridden via
 	// :ref:`runtime values <config_cluster_manager_cluster_runtime_outlier_detection>`.
@@ -936,7 +936,7 @@ type Cluster struct {
 	// value defaults to 5000ms. For cluster types other than
 	// :ref:`ORIGINAL_DST<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.ORIGINAL_DST>`
 	// this setting is ignored.
-	CleanupInterval *duration.Duration `protobuf:"bytes,20,opt,name=cleanup_interval,json=cleanupInterval,proto3" json:"cleanup_interval,omitempty"`
+	CleanupInterval *durationpb.Duration `protobuf:"bytes,20,opt,name=cleanup_interval,json=cleanupInterval,proto3" json:"cleanup_interval,omitempty"`
 	// Optional configuration used to bind newly established upstream connections.
 	// This overrides any bind_config specified in the bootstrap proto.
 	// If the address and port are empty, no bind will be performed.
@@ -1147,14 +1147,14 @@ func (x *Cluster) GetEdsClusterConfig() *Cluster_EdsClusterConfig {
 	return nil
 }
 
-func (x *Cluster) GetConnectTimeout() *duration.Duration {
+func (x *Cluster) GetConnectTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.ConnectTimeout
 	}
 	return nil
 }
 
-func (x *Cluster) GetPerConnectionBufferLimitBytes() *wrappers.UInt32Value {
+func (x *Cluster) GetPerConnectionBufferLimitBytes() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.PerConnectionBufferLimitBytes
 	}
@@ -1183,7 +1183,7 @@ func (x *Cluster) GetHealthChecks() []*v32.HealthCheck {
 }
 
 // Deprecated: Marked as deprecated in envoy/config/cluster/v3/cluster.proto.
-func (x *Cluster) GetMaxRequestsPerConnection() *wrappers.UInt32Value {
+func (x *Cluster) GetMaxRequestsPerConnection() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.MaxRequestsPerConnection
 	}
@@ -1229,14 +1229,14 @@ func (x *Cluster) GetHttp2ProtocolOptions() *v32.Http2ProtocolOptions {
 	return nil
 }
 
-func (x *Cluster) GetTypedExtensionProtocolOptions() map[string]*any1.Any {
+func (x *Cluster) GetTypedExtensionProtocolOptions() map[string]*anypb.Any {
 	if x != nil {
 		return x.TypedExtensionProtocolOptions
 	}
 	return nil
 }
 
-func (x *Cluster) GetDnsRefreshRate() *duration.Duration {
+func (x *Cluster) GetDnsRefreshRate() *durationpb.Duration {
 	if x != nil {
 		return x.DnsRefreshRate
 	}
@@ -1295,7 +1295,7 @@ func (x *Cluster) GetTypedDnsResolverConfig() *v32.TypedExtensionConfig {
 	return nil
 }
 
-func (x *Cluster) GetWaitForWarmOnInit() *wrappers.BoolValue {
+func (x *Cluster) GetWaitForWarmOnInit() *wrapperspb.BoolValue {
 	if x != nil {
 		return x.WaitForWarmOnInit
 	}
@@ -1309,7 +1309,7 @@ func (x *Cluster) GetOutlierDetection() *OutlierDetection {
 	return nil
 }
 
-func (x *Cluster) GetCleanupInterval() *duration.Duration {
+func (x *Cluster) GetCleanupInterval() *durationpb.Duration {
 	if x != nil {
 		return x.CleanupInterval
 	}
@@ -1774,7 +1774,7 @@ type Cluster_TransportSocketMatch struct {
 	// will use the transport socket configuration specified here.
 	// The endpoint's metadata entry in “envoy.transport_socket_match“ is used to match
 	// against the values specified in this field.
-	Match *_struct.Struct `protobuf:"bytes,2,opt,name=match,proto3" json:"match,omitempty"`
+	Match *structpb.Struct `protobuf:"bytes,2,opt,name=match,proto3" json:"match,omitempty"`
 	// The configuration of the transport socket.
 	// [#extension-category: envoy.transport_sockets.upstream]
 	TransportSocket *v32.TransportSocket `protobuf:"bytes,3,opt,name=transport_socket,json=transportSocket,proto3" json:"transport_socket,omitempty"`
@@ -1819,7 +1819,7 @@ func (x *Cluster_TransportSocketMatch) GetName() string {
 	return ""
 }
 
-func (x *Cluster_TransportSocketMatch) GetMatch() *_struct.Struct {
+func (x *Cluster_TransportSocketMatch) GetMatch() *structpb.Struct {
 	if x != nil {
 		return x.Match
 	}
@@ -1844,7 +1844,7 @@ type Cluster_CustomClusterType struct {
 	// Cluster specific configuration which depends on the cluster being instantiated.
 	// See the supported cluster for further documentation.
 	// [#extension-category: envoy.clusters]
-	TypedConfig *any1.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
+	TypedConfig *anypb.Any `protobuf:"bytes,2,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 
 func (x *Cluster_CustomClusterType) Reset() {
@@ -1886,7 +1886,7 @@ func (x *Cluster_CustomClusterType) GetName() string {
 	return ""
 }
 
-func (x *Cluster_CustomClusterType) GetTypedConfig() *any1.Any {
+func (x *Cluster_CustomClusterType) GetTypedConfig() *anypb.Any {
 	if x != nil {
 		return x.TypedConfig
 	}
@@ -1973,7 +1973,7 @@ type Cluster_LbSubsetConfig struct {
 	// namespace. It is valid for no hosts to match, in which case the behavior
 	// is the same as a fallback_policy of
 	// :ref:`NO_FALLBACK<envoy_v3_api_enum_value_config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy.NO_FALLBACK>`.
-	DefaultSubset *_struct.Struct `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset,proto3" json:"default_subset,omitempty"`
+	DefaultSubset *structpb.Struct `protobuf:"bytes,2,opt,name=default_subset,json=defaultSubset,proto3" json:"default_subset,omitempty"`
 	// For each entry, LbEndpoint.Metadata's
 	// “envoy.lb“ namespace is traversed and a subset is created for each unique
 	// combination of key and value. For example:
@@ -2065,7 +2065,7 @@ func (x *Cluster_LbSubsetConfig) GetFallbackPolicy() Cluster_LbSubsetConfig_LbSu
 	return Cluster_LbSubsetConfig_NO_FALLBACK
 }
 
-func (x *Cluster_LbSubsetConfig) GetDefaultSubset() *_struct.Struct {
+func (x *Cluster_LbSubsetConfig) GetDefaultSubset() *structpb.Struct {
 	if x != nil {
 		return x.DefaultSubset
 	}
@@ -2123,7 +2123,7 @@ type Cluster_SlowStartConfig struct {
 	// Represents the size of slow start window.
 	// If set, the newly created host remains in slow start mode starting from its creation time
 	// for the duration of slow start window.
-	SlowStartWindow *duration.Duration `protobuf:"bytes,1,opt,name=slow_start_window,json=slowStartWindow,proto3" json:"slow_start_window,omitempty"`
+	SlowStartWindow *durationpb.Duration `protobuf:"bytes,1,opt,name=slow_start_window,json=slowStartWindow,proto3" json:"slow_start_window,omitempty"`
 	// This parameter controls the speed of traffic increase over the slow start window. Defaults to 1.0,
 	// so that endpoint would get linearly increasing amount of traffic.
 	// When increasing the value for this parameter, the speed of traffic ramp-up increases non-linearly.
@@ -2175,7 +2175,7 @@ func (*Cluster_SlowStartConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 4}
 }
 
-func (x *Cluster_SlowStartConfig) GetSlowStartWindow() *duration.Duration {
+func (x *Cluster_SlowStartConfig) GetSlowStartWindow() *durationpb.Duration {
 	if x != nil {
 		return x.SlowStartWindow
 	}
@@ -2254,7 +2254,7 @@ type Cluster_LeastRequestLbConfig struct {
 
 	// The number of random healthy hosts from which the host with the fewest active requests will
 	// be chosen. Defaults to 2 so that we perform two-choice selection if the field is not set.
-	ChoiceCount *wrappers.UInt32Value `protobuf:"bytes,1,opt,name=choice_count,json=choiceCount,proto3" json:"choice_count,omitempty"`
+	ChoiceCount *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=choice_count,json=choiceCount,proto3" json:"choice_count,omitempty"`
 	// The following formula is used to calculate the dynamic weights when hosts have different load
 	// balancing weights:
 	//
@@ -2317,7 +2317,7 @@ func (*Cluster_LeastRequestLbConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 6}
 }
 
-func (x *Cluster_LeastRequestLbConfig) GetChoiceCount() *wrappers.UInt32Value {
+func (x *Cluster_LeastRequestLbConfig) GetChoiceCount() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.ChoiceCount
 	}
@@ -2349,14 +2349,14 @@ type Cluster_RingHashLbConfig struct {
 	// provided host) the better the request distribution will reflect the desired weights. Defaults
 	// to 1024 entries, and limited to 8M entries. See also
 	// :ref:`maximum_ring_size<envoy_v3_api_field_config.cluster.v3.Cluster.RingHashLbConfig.maximum_ring_size>`.
-	MinimumRingSize *wrappers.UInt64Value `protobuf:"bytes,1,opt,name=minimum_ring_size,json=minimumRingSize,proto3" json:"minimum_ring_size,omitempty"`
+	MinimumRingSize *wrapperspb.UInt64Value `protobuf:"bytes,1,opt,name=minimum_ring_size,json=minimumRingSize,proto3" json:"minimum_ring_size,omitempty"`
 	// The hash function used to hash hosts onto the ketama ring. The value defaults to
 	// :ref:`XX_HASH<envoy_v3_api_enum_value_config.cluster.v3.Cluster.RingHashLbConfig.HashFunction.XX_HASH>`.
 	HashFunction Cluster_RingHashLbConfig_HashFunction `protobuf:"varint,3,opt,name=hash_function,json=hashFunction,proto3,enum=envoy.config.cluster.v3.Cluster_RingHashLbConfig_HashFunction" json:"hash_function,omitempty"`
 	// Maximum hash ring size. Defaults to 8M entries, and limited to 8M entries, but can be lowered
 	// to further constrain resource use. See also
 	// :ref:`minimum_ring_size<envoy_v3_api_field_config.cluster.v3.Cluster.RingHashLbConfig.minimum_ring_size>`.
-	MaximumRingSize *wrappers.UInt64Value `protobuf:"bytes,4,opt,name=maximum_ring_size,json=maximumRingSize,proto3" json:"maximum_ring_size,omitempty"`
+	MaximumRingSize *wrapperspb.UInt64Value `protobuf:"bytes,4,opt,name=maximum_ring_size,json=maximumRingSize,proto3" json:"maximum_ring_size,omitempty"`
 }
 
 func (x *Cluster_RingHashLbConfig) Reset() {
@@ -2391,7 +2391,7 @@ func (*Cluster_RingHashLbConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 7}
 }
 
-func (x *Cluster_RingHashLbConfig) GetMinimumRingSize() *wrappers.UInt64Value {
+func (x *Cluster_RingHashLbConfig) GetMinimumRingSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.MinimumRingSize
 	}
@@ -2405,7 +2405,7 @@ func (x *Cluster_RingHashLbConfig) GetHashFunction() Cluster_RingHashLbConfig_Ha
 	return Cluster_RingHashLbConfig_XX_HASH
 }
 
-func (x *Cluster_RingHashLbConfig) GetMaximumRingSize() *wrappers.UInt64Value {
+func (x *Cluster_RingHashLbConfig) GetMaximumRingSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.MaximumRingSize
 	}
@@ -2423,7 +2423,7 @@ type Cluster_MaglevLbConfig struct {
 	// Minimal disruption means that when the set of upstream hosts change, a connection will likely be sent to the same
 	// upstream as it was before. Increasing the table size reduces the amount of disruption.
 	// The table size must be prime number limited to 5000011. If it is not specified, the default is 65537.
-	TableSize *wrappers.UInt64Value `protobuf:"bytes,1,opt,name=table_size,json=tableSize,proto3" json:"table_size,omitempty"`
+	TableSize *wrapperspb.UInt64Value `protobuf:"bytes,1,opt,name=table_size,json=tableSize,proto3" json:"table_size,omitempty"`
 }
 
 func (x *Cluster_MaglevLbConfig) Reset() {
@@ -2458,7 +2458,7 @@ func (*Cluster_MaglevLbConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 8}
 }
 
-func (x *Cluster_MaglevLbConfig) GetTableSize() *wrappers.UInt64Value {
+func (x *Cluster_MaglevLbConfig) GetTableSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.TableSize
 	}
@@ -2492,7 +2492,7 @@ type Cluster_OriginalDstLbConfig struct {
 	HttpHeaderName string `protobuf:"bytes,2,opt,name=http_header_name,json=httpHeaderName,proto3" json:"http_header_name,omitempty"`
 	// The port to override for the original dst address. This port
 	// will take precedence over filter state and header override ports
-	UpstreamPortOverride *wrappers.UInt32Value `protobuf:"bytes,3,opt,name=upstream_port_override,json=upstreamPortOverride,proto3" json:"upstream_port_override,omitempty"`
+	UpstreamPortOverride *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=upstream_port_override,json=upstreamPortOverride,proto3" json:"upstream_port_override,omitempty"`
 	// The dynamic metadata key to override destination address.
 	// First the request metadata is considered, then the connection one.
 	MetadataKey *v34.MetadataKey `protobuf:"bytes,4,opt,name=metadata_key,json=metadataKey,proto3" json:"metadata_key,omitempty"`
@@ -2544,7 +2544,7 @@ func (x *Cluster_OriginalDstLbConfig) GetHttpHeaderName() string {
 	return ""
 }
 
-func (x *Cluster_OriginalDstLbConfig) GetUpstreamPortOverride() *wrappers.UInt32Value {
+func (x *Cluster_OriginalDstLbConfig) GetUpstreamPortOverride() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.UpstreamPortOverride
 	}
@@ -2592,7 +2592,7 @@ type Cluster_CommonLbConfig struct {
 	// Note: merging does not apply to cluster membership changes (e.g.: adds/removes); this is
 	// because merging those updates isn't currently safe. See
 	// https://github.com/envoyproxy/envoy/pull/3941.
-	UpdateMergeWindow *duration.Duration `protobuf:"bytes,4,opt,name=update_merge_window,json=updateMergeWindow,proto3" json:"update_merge_window,omitempty"`
+	UpdateMergeWindow *durationpb.Duration `protobuf:"bytes,4,opt,name=update_merge_window,json=updateMergeWindow,proto3" json:"update_merge_window,omitempty"`
 	// If set to true, Envoy will :ref:`exclude <arch_overview_load_balancing_excluded>` new hosts
 	// when computing load balancing weights until they have been health checked for the first time.
 	// This will have no effect unless active health checking is also configured.
@@ -2671,7 +2671,7 @@ func (x *Cluster_CommonLbConfig) GetLocalityWeightedLbConfig() *Cluster_CommonLb
 	return nil
 }
 
-func (x *Cluster_CommonLbConfig) GetUpdateMergeWindow() *duration.Duration {
+func (x *Cluster_CommonLbConfig) GetUpdateMergeWindow() *durationpb.Duration {
 	if x != nil {
 		return x.UpdateMergeWindow
 	}
@@ -2732,12 +2732,12 @@ type Cluster_RefreshRate struct {
 	// Specifies the base interval between refreshes. This parameter is required and must be greater
 	// than zero and less than
 	// :ref:`max_interval <envoy_v3_api_field_config.cluster.v3.Cluster.RefreshRate.max_interval>`.
-	BaseInterval *duration.Duration `protobuf:"bytes,1,opt,name=base_interval,json=baseInterval,proto3" json:"base_interval,omitempty"`
+	BaseInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=base_interval,json=baseInterval,proto3" json:"base_interval,omitempty"`
 	// Specifies the maximum interval between refreshes. This parameter is optional, but must be
 	// greater than or equal to the
 	// :ref:`base_interval <envoy_v3_api_field_config.cluster.v3.Cluster.RefreshRate.base_interval>`  if set. The default
 	// is 10 times the :ref:`base_interval <envoy_v3_api_field_config.cluster.v3.Cluster.RefreshRate.base_interval>`.
-	MaxInterval *duration.Duration `protobuf:"bytes,2,opt,name=max_interval,json=maxInterval,proto3" json:"max_interval,omitempty"`
+	MaxInterval *durationpb.Duration `protobuf:"bytes,2,opt,name=max_interval,json=maxInterval,proto3" json:"max_interval,omitempty"`
 }
 
 func (x *Cluster_RefreshRate) Reset() {
@@ -2772,14 +2772,14 @@ func (*Cluster_RefreshRate) Descriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 11}
 }
 
-func (x *Cluster_RefreshRate) GetBaseInterval() *duration.Duration {
+func (x *Cluster_RefreshRate) GetBaseInterval() *durationpb.Duration {
 	if x != nil {
 		return x.BaseInterval
 	}
 	return nil
 }
 
-func (x *Cluster_RefreshRate) GetMaxInterval() *duration.Duration {
+func (x *Cluster_RefreshRate) GetMaxInterval() *durationpb.Duration {
 	if x != nil {
 		return x.MaxInterval
 	}
@@ -2815,7 +2815,7 @@ type Cluster_PreconnectPolicy struct {
 	//
 	// This is limited somewhat arbitrarily to 3 because preconnecting too aggressively can
 	// harm latency more than the preconnecting helps.
-	PerUpstreamPreconnectRatio *wrappers.DoubleValue `protobuf:"bytes,1,opt,name=per_upstream_preconnect_ratio,json=perUpstreamPreconnectRatio,proto3" json:"per_upstream_preconnect_ratio,omitempty"`
+	PerUpstreamPreconnectRatio *wrapperspb.DoubleValue `protobuf:"bytes,1,opt,name=per_upstream_preconnect_ratio,json=perUpstreamPreconnectRatio,proto3" json:"per_upstream_preconnect_ratio,omitempty"`
 	// Indicates how many streams (rounded up) can be anticipated across a cluster for each
 	// stream, useful for low QPS services. This is currently supported for a subset of
 	// deterministic non-hash-based load-balancing algorithms (weighted round robin, random).
@@ -2838,7 +2838,7 @@ type Cluster_PreconnectPolicy struct {
 	// If both this and preconnect_ratio are set, Envoy will make sure both predicted needs are met,
 	// basically preconnecting max(predictive-preconnect, per-upstream-preconnect), for each
 	// upstream.
-	PredictivePreconnectRatio *wrappers.DoubleValue `protobuf:"bytes,2,opt,name=predictive_preconnect_ratio,json=predictivePreconnectRatio,proto3" json:"predictive_preconnect_ratio,omitempty"`
+	PredictivePreconnectRatio *wrapperspb.DoubleValue `protobuf:"bytes,2,opt,name=predictive_preconnect_ratio,json=predictivePreconnectRatio,proto3" json:"predictive_preconnect_ratio,omitempty"`
 }
 
 func (x *Cluster_PreconnectPolicy) Reset() {
@@ -2873,14 +2873,14 @@ func (*Cluster_PreconnectPolicy) Descriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 12}
 }
 
-func (x *Cluster_PreconnectPolicy) GetPerUpstreamPreconnectRatio() *wrappers.DoubleValue {
+func (x *Cluster_PreconnectPolicy) GetPerUpstreamPreconnectRatio() *wrapperspb.DoubleValue {
 	if x != nil {
 		return x.PerUpstreamPreconnectRatio
 	}
 	return nil
 }
 
-func (x *Cluster_PreconnectPolicy) GetPredictivePreconnectRatio() *wrappers.DoubleValue {
+func (x *Cluster_PreconnectPolicy) GetPredictivePreconnectRatio() *wrapperspb.DoubleValue {
 	if x != nil {
 		return x.PredictivePreconnectRatio
 	}
@@ -2997,7 +2997,7 @@ type Cluster_CommonLbConfig_ZoneAwareLbConfig struct {
 	// even if zone aware routing is configured. If not specified, the default is 6.
 	// * :ref:`runtime values <config_cluster_manager_cluster_runtime_zone_routing>`.
 	// * :ref:`Zone aware routing support <arch_overview_load_balancing_zone_aware_routing>`.
-	MinClusterSize *wrappers.UInt64Value `protobuf:"bytes,2,opt,name=min_cluster_size,json=minClusterSize,proto3" json:"min_cluster_size,omitempty"`
+	MinClusterSize *wrapperspb.UInt64Value `protobuf:"bytes,2,opt,name=min_cluster_size,json=minClusterSize,proto3" json:"min_cluster_size,omitempty"`
 	// If set to true, Envoy will not consider any hosts when the cluster is in :ref:`panic
 	// mode<arch_overview_load_balancing_panic_threshold>`. Instead, the cluster will fail all
 	// requests as if all hosts are unhealthy. This can help avoid potentially overwhelming a
@@ -3044,7 +3044,7 @@ func (x *Cluster_CommonLbConfig_ZoneAwareLbConfig) GetRoutingEnabled() *v33.Perc
 	return nil
 }
 
-func (x *Cluster_CommonLbConfig_ZoneAwareLbConfig) GetMinClusterSize() *wrappers.UInt64Value {
+func (x *Cluster_CommonLbConfig_ZoneAwareLbConfig) GetMinClusterSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.MinClusterSize
 	}
@@ -3125,7 +3125,7 @@ type Cluster_CommonLbConfig_ConsistentHashingLbConfig struct {
 	//
 	// This is an O(N) algorithm, unlike other load balancers. Using a lower “hash_balance_factor“ results in more hosts
 	// being probed, so use a higher value if you require better performance.
-	HashBalanceFactor *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=hash_balance_factor,json=hashBalanceFactor,proto3" json:"hash_balance_factor,omitempty"`
+	HashBalanceFactor *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=hash_balance_factor,json=hashBalanceFactor,proto3" json:"hash_balance_factor,omitempty"`
 }
 
 func (x *Cluster_CommonLbConfig_ConsistentHashingLbConfig) Reset() {
@@ -3167,7 +3167,7 @@ func (x *Cluster_CommonLbConfig_ConsistentHashingLbConfig) GetUseHostnameForHash
 	return false
 }
 
-func (x *Cluster_CommonLbConfig_ConsistentHashingLbConfig) GetHashBalanceFactor() *wrappers.UInt32Value {
+func (x *Cluster_CommonLbConfig_ConsistentHashingLbConfig) GetHashBalanceFactor() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.HashBalanceFactor
 	}
@@ -3232,7 +3232,7 @@ type UpstreamConnectionOptions_HappyEyeballsConfig struct {
 	FirstAddressFamilyVersion UpstreamConnectionOptions_FirstAddressFamilyVersion `protobuf:"varint,1,opt,name=first_address_family_version,json=firstAddressFamilyVersion,proto3,enum=envoy.config.cluster.v3.UpstreamConnectionOptions_FirstAddressFamilyVersion" json:"first_address_family_version,omitempty"`
 	// Specify the number of addresses of the first_address_family_version being
 	// attempted for connection before the other address family.
-	FirstAddressFamilyCount *wrappers.UInt32Value `protobuf:"bytes,2,opt,name=first_address_family_count,json=firstAddressFamilyCount,proto3" json:"first_address_family_count,omitempty"`
+	FirstAddressFamilyCount *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=first_address_family_count,json=firstAddressFamilyCount,proto3" json:"first_address_family_count,omitempty"`
 }
 
 func (x *UpstreamConnectionOptions_HappyEyeballsConfig) Reset() {
@@ -3274,7 +3274,7 @@ func (x *UpstreamConnectionOptions_HappyEyeballsConfig) GetFirstAddressFamilyVer
 	return UpstreamConnectionOptions_DEFAULT
 }
 
-func (x *UpstreamConnectionOptions_HappyEyeballsConfig) GetFirstAddressFamilyCount() *wrappers.UInt32Value {
+func (x *UpstreamConnectionOptions_HappyEyeballsConfig) GetFirstAddressFamilyCount() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.FirstAddressFamilyCount
 	}
@@ -4150,8 +4150,8 @@ var file_envoy_config_cluster_v3_cluster_proto_goTypes = []interface{}{
 	(*LoadBalancingPolicy_Policy)(nil),                                          // 32: envoy.config.cluster.v3.LoadBalancingPolicy.Policy
 	(*UpstreamConnectionOptions_HappyEyeballsConfig)(nil),                       // 33: envoy.config.cluster.v3.UpstreamConnectionOptions.HappyEyeballsConfig
 	(*v3.CollectionEntry)(nil),                                                  // 34: xds.core.v3.CollectionEntry
-	(*duration.Duration)(nil),                                                   // 35: google.protobuf.Duration
-	(*wrappers.UInt32Value)(nil),                                                // 36: google.protobuf.UInt32Value
+	(*durationpb.Duration)(nil),                                                 // 35: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),                                              // 36: google.protobuf.UInt32Value
 	(*v31.ClusterLoadAssignment)(nil),                                           // 37: envoy.config.endpoint.v3.ClusterLoadAssignment
 	(*v32.HealthCheck)(nil),                                                     // 38: envoy.config.core.v3.HealthCheck
 	(*CircuitBreakers)(nil),                                                     // 39: envoy.config.cluster.v3.CircuitBreakers
@@ -4162,7 +4162,7 @@ var file_envoy_config_cluster_v3_cluster_proto_goTypes = []interface{}{
 	(*v32.Address)(nil),                                                         // 44: envoy.config.core.v3.Address
 	(*v32.DnsResolutionConfig)(nil),                                             // 45: envoy.config.core.v3.DnsResolutionConfig
 	(*v32.TypedExtensionConfig)(nil),                                            // 46: envoy.config.core.v3.TypedExtensionConfig
-	(*wrappers.BoolValue)(nil),                                                  // 47: google.protobuf.BoolValue
+	(*wrapperspb.BoolValue)(nil),                                                // 47: google.protobuf.BoolValue
 	(*OutlierDetection)(nil),                                                    // 48: envoy.config.cluster.v3.OutlierDetection
 	(*v32.BindConfig)(nil),                                                      // 49: envoy.config.core.v3.BindConfig
 	(*v32.TransportSocket)(nil),                                                 // 50: envoy.config.core.v3.TransportSocket
@@ -4170,14 +4170,14 @@ var file_envoy_config_cluster_v3_cluster_proto_goTypes = []interface{}{
 	(*Filter)(nil),                                                              // 52: envoy.config.cluster.v3.Filter
 	(*v32.ConfigSource)(nil),                                                    // 53: envoy.config.core.v3.ConfigSource
 	(*v32.TcpKeepalive)(nil),                                                    // 54: envoy.config.core.v3.TcpKeepalive
-	(*_struct.Struct)(nil),                                                      // 55: google.protobuf.Struct
-	(*any1.Any)(nil),                                                            // 56: google.protobuf.Any
+	(*structpb.Struct)(nil),                                                     // 55: google.protobuf.Struct
+	(*anypb.Any)(nil),                                                           // 56: google.protobuf.Any
 	(*v32.RuntimeDouble)(nil),                                                   // 57: envoy.config.core.v3.RuntimeDouble
 	(*v33.Percent)(nil),                                                         // 58: envoy.type.v3.Percent
-	(*wrappers.UInt64Value)(nil),                                                // 59: google.protobuf.UInt64Value
+	(*wrapperspb.UInt64Value)(nil),                                              // 59: google.protobuf.UInt64Value
 	(*v34.MetadataKey)(nil),                                                     // 60: envoy.type.metadata.v3.MetadataKey
 	(*v32.HealthStatusSet)(nil),                                                 // 61: envoy.config.core.v3.HealthStatusSet
-	(*wrappers.DoubleValue)(nil),                                                // 62: google.protobuf.DoubleValue
+	(*wrapperspb.DoubleValue)(nil),                                              // 62: google.protobuf.DoubleValue
 }
 var file_envoy_config_cluster_v3_cluster_proto_depIdxs = []int32{
 	34, // 0: envoy.config.cluster.v3.ClusterCollection.entries:type_name -> xds.core.v3.CollectionEntry

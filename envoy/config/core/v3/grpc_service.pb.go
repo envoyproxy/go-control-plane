@@ -9,13 +9,13 @@ package corev3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	any1 "github.com/golang/protobuf/ptypes/any"
-	duration "github.com/golang/protobuf/ptypes/duration"
-	_struct "github.com/golang/protobuf/ptypes/struct"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	anypb "google.golang.org/protobuf/types/known/anypb"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -42,7 +42,7 @@ type GrpcService struct {
 	TargetSpecifier isGrpcService_TargetSpecifier `protobuf_oneof:"target_specifier"`
 	// The timeout for the gRPC request. This is the timeout for a specific
 	// request.
-	Timeout *duration.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout *durationpb.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// Additional metadata to include in streams initiated to the GrpcService. This can be used for
 	// scenarios in which additional ad hoc authorization headers (e.g. “x-foo-bar: baz-key“) are to
 	// be injected. For more information, including details on header value syntax, see the
@@ -107,7 +107,7 @@ func (x *GrpcService) GetGoogleGrpc() *GrpcService_GoogleGrpc {
 	return nil
 }
 
-func (x *GrpcService) GetTimeout() *duration.Duration {
+func (x *GrpcService) GetTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.Timeout
 	}
@@ -253,10 +253,10 @@ type GrpcService_GoogleGrpc struct {
 	CredentialsFactoryName string `protobuf:"bytes,5,opt,name=credentials_factory_name,json=credentialsFactoryName,proto3" json:"credentials_factory_name,omitempty"`
 	// Additional configuration for site-specific customizations of the Google
 	// gRPC library.
-	Config *_struct.Struct `protobuf:"bytes,6,opt,name=config,proto3" json:"config,omitempty"`
+	Config *structpb.Struct `protobuf:"bytes,6,opt,name=config,proto3" json:"config,omitempty"`
 	// How many bytes each stream can buffer internally.
 	// If not set an implementation defined default is applied (1MiB).
-	PerStreamBufferLimitBytes *wrappers.UInt32Value `protobuf:"bytes,7,opt,name=per_stream_buffer_limit_bytes,json=perStreamBufferLimitBytes,proto3" json:"per_stream_buffer_limit_bytes,omitempty"`
+	PerStreamBufferLimitBytes *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=per_stream_buffer_limit_bytes,json=perStreamBufferLimitBytes,proto3" json:"per_stream_buffer_limit_bytes,omitempty"`
 	// Custom channels args.
 	ChannelArgs *GrpcService_GoogleGrpc_ChannelArgs `protobuf:"bytes,8,opt,name=channel_args,json=channelArgs,proto3" json:"channel_args,omitempty"`
 }
@@ -328,14 +328,14 @@ func (x *GrpcService_GoogleGrpc) GetCredentialsFactoryName() string {
 	return ""
 }
 
-func (x *GrpcService_GoogleGrpc) GetConfig() *_struct.Struct {
+func (x *GrpcService_GoogleGrpc) GetConfig() *structpb.Struct {
 	if x != nil {
 		return x.Config
 	}
 	return nil
 }
 
-func (x *GrpcService_GoogleGrpc) GetPerStreamBufferLimitBytes() *wrappers.UInt32Value {
+func (x *GrpcService_GoogleGrpc) GetPerStreamBufferLimitBytes() *wrapperspb.UInt32Value {
 	if x != nil {
 		return x.PerStreamBufferLimitBytes
 	}
@@ -951,7 +951,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) G
 	return nil
 }
 
-func (x *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) GetTypedConfig() *any1.Any {
+func (x *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin) GetTypedConfig() *anypb.Any {
 	if x, ok := x.GetConfigType().(*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_TypedConfig); ok {
 		return x.TypedConfig
 	}
@@ -963,7 +963,7 @@ type isGrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_Conf
 }
 
 type GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_TypedConfig struct {
-	TypedConfig *any1.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
+	TypedConfig *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3,oneof"`
 }
 
 func (*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_TypedConfig) isGrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_ConfigType() {
@@ -1526,15 +1526,15 @@ var file_envoy_config_core_v3_grpc_service_proto_goTypes = []interface{}{
 	(*GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin)(nil),      // 10: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.MetadataCredentialsFromPlugin
 	(*GrpcService_GoogleGrpc_CallCredentials_StsService)(nil),                         // 11: envoy.config.core.v3.GrpcService.GoogleGrpc.CallCredentials.StsService
 	(*GrpcService_GoogleGrpc_ChannelArgs_Value)(nil),                                  // 12: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.Value
-	nil,                          // 13: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.ArgsEntry
-	(*duration.Duration)(nil),    // 14: google.protobuf.Duration
-	(*HeaderValue)(nil),          // 15: envoy.config.core.v3.HeaderValue
-	(*RetryPolicy)(nil),          // 16: envoy.config.core.v3.RetryPolicy
-	(*_struct.Struct)(nil),       // 17: google.protobuf.Struct
-	(*wrappers.UInt32Value)(nil), // 18: google.protobuf.UInt32Value
-	(*DataSource)(nil),           // 19: envoy.config.core.v3.DataSource
-	(*emptypb.Empty)(nil),        // 20: google.protobuf.Empty
-	(*any1.Any)(nil),             // 21: google.protobuf.Any
+	nil,                            // 13: envoy.config.core.v3.GrpcService.GoogleGrpc.ChannelArgs.ArgsEntry
+	(*durationpb.Duration)(nil),    // 14: google.protobuf.Duration
+	(*HeaderValue)(nil),            // 15: envoy.config.core.v3.HeaderValue
+	(*RetryPolicy)(nil),            // 16: envoy.config.core.v3.RetryPolicy
+	(*structpb.Struct)(nil),        // 17: google.protobuf.Struct
+	(*wrapperspb.UInt32Value)(nil), // 18: google.protobuf.UInt32Value
+	(*DataSource)(nil),             // 19: envoy.config.core.v3.DataSource
+	(*emptypb.Empty)(nil),          // 20: google.protobuf.Empty
+	(*anypb.Any)(nil),              // 21: google.protobuf.Any
 }
 var file_envoy_config_core_v3_grpc_service_proto_depIdxs = []int32{
 	1,  // 0: envoy.config.core.v3.GrpcService.envoy_grpc:type_name -> envoy.config.core.v3.GrpcService.EnvoyGrpc

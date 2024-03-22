@@ -10,9 +10,9 @@ import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/type/matcher/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -284,7 +284,7 @@ type AwsRequestSigning_QueryString struct {
 	// Optional expiration time for the query string parameters. As query string parameter based requests are replayable, in effect representing
 	// an API call that has already been authenticated, it is recommended to keep this expiration time as short as feasible.
 	// This value will default to 5 seconds and has a maximum value of 3600 seconds (1 hour).
-	ExpirationTime *duration.Duration `protobuf:"bytes,1,opt,name=expiration_time,json=expirationTime,proto3" json:"expiration_time,omitempty"`
+	ExpirationTime *durationpb.Duration `protobuf:"bytes,1,opt,name=expiration_time,json=expirationTime,proto3" json:"expiration_time,omitempty"`
 }
 
 func (x *AwsRequestSigning_QueryString) Reset() {
@@ -319,7 +319,7 @@ func (*AwsRequestSigning_QueryString) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_aws_request_signing_v3_aws_request_signing_proto_rawDescGZIP(), []int{0, 0}
 }
 
-func (x *AwsRequestSigning_QueryString) GetExpirationTime() *duration.Duration {
+func (x *AwsRequestSigning_QueryString) GetExpirationTime() *durationpb.Duration {
 	if x != nil {
 		return x.ExpirationTime
 	}
@@ -443,7 +443,7 @@ var file_envoy_extensions_filters_http_aws_request_signing_v3_aws_request_signin
 	(*AwsRequestSigningPerRoute)(nil),       // 2: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigningPerRoute
 	(*AwsRequestSigning_QueryString)(nil),   // 3: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.QueryString
 	(*v3.StringMatcher)(nil),                // 4: envoy.type.matcher.v3.StringMatcher
-	(*duration.Duration)(nil),               // 5: google.protobuf.Duration
+	(*durationpb.Duration)(nil),             // 5: google.protobuf.Duration
 }
 var file_envoy_extensions_filters_http_aws_request_signing_v3_aws_request_signing_proto_depIdxs = []int32{
 	4, // 0: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.match_excluded_headers:type_name -> envoy.type.matcher.v3.StringMatcher

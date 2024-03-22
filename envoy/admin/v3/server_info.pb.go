@@ -9,9 +9,9 @@ package adminv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	duration "github.com/golang/protobuf/ptypes/duration"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -238,9 +238,9 @@ type ServerInfo struct {
 	// State of the server.
 	State ServerInfo_State `protobuf:"varint,2,opt,name=state,proto3,enum=envoy.admin.v3.ServerInfo_State" json:"state,omitempty"`
 	// Uptime since current epoch was started.
-	UptimeCurrentEpoch *duration.Duration `protobuf:"bytes,3,opt,name=uptime_current_epoch,json=uptimeCurrentEpoch,proto3" json:"uptime_current_epoch,omitempty"`
+	UptimeCurrentEpoch *durationpb.Duration `protobuf:"bytes,3,opt,name=uptime_current_epoch,json=uptimeCurrentEpoch,proto3" json:"uptime_current_epoch,omitempty"`
 	// Uptime since the start of the first epoch.
-	UptimeAllEpochs *duration.Duration `protobuf:"bytes,4,opt,name=uptime_all_epochs,json=uptimeAllEpochs,proto3" json:"uptime_all_epochs,omitempty"`
+	UptimeAllEpochs *durationpb.Duration `protobuf:"bytes,4,opt,name=uptime_all_epochs,json=uptimeAllEpochs,proto3" json:"uptime_all_epochs,omitempty"`
 	// Hot restart version.
 	HotRestartVersion string `protobuf:"bytes,5,opt,name=hot_restart_version,json=hotRestartVersion,proto3" json:"hot_restart_version,omitempty"`
 	// Command line options the server is currently running with.
@@ -295,14 +295,14 @@ func (x *ServerInfo) GetState() ServerInfo_State {
 	return ServerInfo_LIVE
 }
 
-func (x *ServerInfo) GetUptimeCurrentEpoch() *duration.Duration {
+func (x *ServerInfo) GetUptimeCurrentEpoch() *durationpb.Duration {
 	if x != nil {
 		return x.UptimeCurrentEpoch
 	}
 	return nil
 }
 
-func (x *ServerInfo) GetUptimeAllEpochs() *duration.Duration {
+func (x *ServerInfo) GetUptimeAllEpochs() *durationpb.Duration {
 	if x != nil {
 		return x.UptimeAllEpochs
 	}
@@ -375,13 +375,13 @@ type CommandLineOptions struct {
 	// See :option:`--service-zone` for details.
 	ServiceZone string `protobuf:"bytes,15,opt,name=service_zone,json=serviceZone,proto3" json:"service_zone,omitempty"`
 	// See :option:`--file-flush-interval-msec` for details.
-	FileFlushInterval *duration.Duration `protobuf:"bytes,16,opt,name=file_flush_interval,json=fileFlushInterval,proto3" json:"file_flush_interval,omitempty"`
+	FileFlushInterval *durationpb.Duration `protobuf:"bytes,16,opt,name=file_flush_interval,json=fileFlushInterval,proto3" json:"file_flush_interval,omitempty"`
 	// See :option:`--drain-time-s` for details.
-	DrainTime *duration.Duration `protobuf:"bytes,17,opt,name=drain_time,json=drainTime,proto3" json:"drain_time,omitempty"`
+	DrainTime *durationpb.Duration `protobuf:"bytes,17,opt,name=drain_time,json=drainTime,proto3" json:"drain_time,omitempty"`
 	// See :option:`--drain-strategy` for details.
 	DrainStrategy CommandLineOptions_DrainStrategy `protobuf:"varint,33,opt,name=drain_strategy,json=drainStrategy,proto3,enum=envoy.admin.v3.CommandLineOptions_DrainStrategy" json:"drain_strategy,omitempty"`
 	// See :option:`--parent-shutdown-time-s` for details.
-	ParentShutdownTime *duration.Duration `protobuf:"bytes,18,opt,name=parent_shutdown_time,json=parentShutdownTime,proto3" json:"parent_shutdown_time,omitempty"`
+	ParentShutdownTime *durationpb.Duration `protobuf:"bytes,18,opt,name=parent_shutdown_time,json=parentShutdownTime,proto3" json:"parent_shutdown_time,omitempty"`
 	// See :option:`--mode` for details.
 	Mode CommandLineOptions_Mode `protobuf:"varint,19,opt,name=mode,proto3,enum=envoy.admin.v3.CommandLineOptions_Mode" json:"mode,omitempty"`
 	// See :option:`--disable-hot-restart` for details.
@@ -571,14 +571,14 @@ func (x *CommandLineOptions) GetServiceZone() string {
 	return ""
 }
 
-func (x *CommandLineOptions) GetFileFlushInterval() *duration.Duration {
+func (x *CommandLineOptions) GetFileFlushInterval() *durationpb.Duration {
 	if x != nil {
 		return x.FileFlushInterval
 	}
 	return nil
 }
 
-func (x *CommandLineOptions) GetDrainTime() *duration.Duration {
+func (x *CommandLineOptions) GetDrainTime() *durationpb.Duration {
 	if x != nil {
 		return x.DrainTime
 	}
@@ -592,7 +592,7 @@ func (x *CommandLineOptions) GetDrainStrategy() CommandLineOptions_DrainStrategy
 	return CommandLineOptions_Gradual
 }
 
-func (x *CommandLineOptions) GetParentShutdownTime() *duration.Duration {
+func (x *CommandLineOptions) GetParentShutdownTime() *durationpb.Duration {
 	if x != nil {
 		return x.ParentShutdownTime
 	}
@@ -873,7 +873,7 @@ var file_envoy_admin_v3_server_info_proto_goTypes = []interface{}{
 	(CommandLineOptions_DrainStrategy)(0), // 3: envoy.admin.v3.CommandLineOptions.DrainStrategy
 	(*ServerInfo)(nil),                    // 4: envoy.admin.v3.ServerInfo
 	(*CommandLineOptions)(nil),            // 5: envoy.admin.v3.CommandLineOptions
-	(*duration.Duration)(nil),             // 6: google.protobuf.Duration
+	(*durationpb.Duration)(nil),           // 6: google.protobuf.Duration
 	(*v3.Node)(nil),                       // 7: envoy.config.core.v3.Node
 }
 var file_envoy_admin_v3_server_info_proto_depIdxs = []int32{
