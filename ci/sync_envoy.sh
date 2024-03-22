@@ -25,6 +25,7 @@ build_protos () {
     cd "${ENVOY_SRC_DIR}" || exit 1
     ./ci/do_ci.sh api.go
     cd - || exit 1
+    go mod tidy
 }
 
 get_last_envoy_sha () {
