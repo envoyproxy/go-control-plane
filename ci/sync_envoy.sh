@@ -25,7 +25,6 @@ build_protos () {
     cd "${ENVOY_SRC_DIR}" || exit 1
     ./ci/do_ci.sh api.go
     cd - || exit 1
-    go mod tidy
 }
 
 get_last_envoy_sha () {
@@ -46,6 +45,8 @@ sync_protos () {
         cp -a "$envoy_src" "$src"
         git add "$src"
     done
+    go mod tidy
+    git add go.mod go.sum
 }
 
 commit_changes () {
