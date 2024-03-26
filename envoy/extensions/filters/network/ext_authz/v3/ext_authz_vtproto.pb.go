@@ -48,6 +48,16 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.IncludeTlsSession {
+		i--
+		if m.IncludeTlsSession {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
 	if len(m.BootstrapMetadataLabelsKey) > 0 {
 		i -= len(m.BootstrapMetadataLabelsKey)
 		copy(dAtA[i:], m.BootstrapMetadataLabelsKey)
@@ -187,6 +197,9 @@ func (m *ExtAuthz) SizeVT() (n int) {
 	l = len(m.BootstrapMetadataLabelsKey)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
+	}
+	if m.IncludeTlsSession {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

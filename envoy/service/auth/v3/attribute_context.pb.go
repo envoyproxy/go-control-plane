@@ -66,8 +66,12 @@ type AttributeContext struct {
 	// Metadata associated with the selected route.
 	RouteMetadataContext *v3.Metadata `protobuf:"bytes,13,opt,name=route_metadata_context,json=routeMetadataContext,proto3" json:"route_metadata_context,omitempty"`
 	// TLS session details of the underlying connection.
-	// This is not populated by default and will be populated if ext_authz filter's
-	// :ref:`include_tls_session <config_http_filters_ext_authz>` is set to true.
+	// This is not populated by default and will be populated only if the ext_authz filter has
+	// been specifically configured to include this information.
+	// For HTTP ext_authz, that requires :ref:`include_tls_session <config_http_filters_ext_authz>`
+	// to be set to true.
+	// For network ext_authz, that requires :ref:`include_tls_session <config_network_filters_ext_authz>`
+	// to be set to true.
 	TlsSession *AttributeContext_TLSSession `protobuf:"bytes,12,opt,name=tls_session,json=tlsSession,proto3" json:"tls_session,omitempty"`
 }
 
