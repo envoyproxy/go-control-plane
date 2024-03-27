@@ -290,6 +290,8 @@ func (m *ExtAuthz) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for EncodeRawHeaders
+
 	switch v := m.Services.(type) {
 	case *ExtAuthz_GrpcService:
 		if v == nil {

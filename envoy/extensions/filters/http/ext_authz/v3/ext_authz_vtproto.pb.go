@@ -49,6 +49,18 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EncodeRawHeaders {
+		i--
+		if m.EncodeRawHeaders {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb8
+	}
 	if len(m.RouteTypedMetadataContextNamespaces) > 0 {
 		for iNdEx := len(m.RouteTypedMetadataContextNamespaces) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.RouteTypedMetadataContextNamespaces[iNdEx])
@@ -1009,6 +1021,9 @@ func (m *ExtAuthz) SizeVT() (n int) {
 			l = len(s)
 			n += 2 + l + sov(uint64(l))
 		}
+	}
+	if m.EncodeRawHeaders {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n

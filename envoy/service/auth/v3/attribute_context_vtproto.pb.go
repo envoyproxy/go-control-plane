@@ -197,6 +197,28 @@ func (m *AttributeContext_HttpRequest) MarshalToSizedBufferVTStrict(dAtA []byte)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.HeaderMap != nil {
+		if vtmsg, ok := interface{}(m.HeaderMap).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.HeaderMap)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = encodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x6a
+	}
 	if len(m.RawBody) > 0 {
 		i -= len(m.RawBody)
 		copy(dAtA[i:], m.RawBody)
@@ -594,6 +616,16 @@ func (m *AttributeContext_HttpRequest) SizeVT() (n int) {
 	}
 	l = len(m.RawBody)
 	if l > 0 {
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.HeaderMap != nil {
+		if size, ok := interface{}(m.HeaderMap).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.HeaderMap)
+		}
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
