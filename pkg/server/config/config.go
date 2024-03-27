@@ -1,15 +1,19 @@
 package config
 
+import "github.com/envoyproxy/go-control-plane/pkg/cache/types"
+
 // Opts for individual xDS implementations that can be
 // utilized through the functional opts pattern.
 type Opts struct {
 	// If true respond to ADS requests with a guaranteed resource ordering
-	Ordered bool
+	Ordered               bool
+	DistinctResourceTypes int
 }
 
 func NewOpts() Opts {
 	return Opts{
-		Ordered: false,
+		Ordered:               false,
+		DistinctResourceTypes: int(types.UnknownType),
 	}
 }
 
