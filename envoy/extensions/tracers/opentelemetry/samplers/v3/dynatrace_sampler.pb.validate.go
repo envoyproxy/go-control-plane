@@ -63,11 +63,11 @@ func (m *DynatraceSamplerConfig) validate(all bool) error {
 	// no validation rules for ClusterId
 
 	if all {
-		switch v := interface{}(m.GetHttpUri()).(type) {
+		switch v := interface{}(m.GetHttpService()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, DynatraceSamplerConfigValidationError{
-					field:  "HttpUri",
+					field:  "HttpService",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -75,23 +75,21 @@ func (m *DynatraceSamplerConfig) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, DynatraceSamplerConfigValidationError{
-					field:  "HttpUri",
+					field:  "HttpService",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetHttpUri()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetHttpService()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DynatraceSamplerConfigValidationError{
-				field:  "HttpUri",
+				field:  "HttpService",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
-
-	// no validation rules for Token
 
 	// no validation rules for RootSpansPerMinute
 

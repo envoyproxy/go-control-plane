@@ -50,17 +50,10 @@ func (m *DynatraceSamplerConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 	if m.RootSpansPerMinute != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.RootSpansPerMinute))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x20
 	}
-	if len(m.Token) > 0 {
-		i -= len(m.Token)
-		copy(dAtA[i:], m.Token)
-		i = encodeVarint(dAtA, i, uint64(len(m.Token)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.HttpUri != nil {
-		if vtmsg, ok := interface{}(m.HttpUri).(interface {
+	if m.HttpService != nil {
+		if vtmsg, ok := interface{}(m.HttpService).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
 		}); ok {
 			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -70,7 +63,7 @@ func (m *DynatraceSamplerConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 			i -= size
 			i = encodeVarint(dAtA, i, uint64(size))
 		} else {
-			encoded, err := proto.Marshal(m.HttpUri)
+			encoded, err := proto.Marshal(m.HttpService)
 			if err != nil {
 				return 0, err
 			}
@@ -109,18 +102,14 @@ func (m *DynatraceSamplerConfig) SizeVT() (n int) {
 	if m.ClusterId != 0 {
 		n += 1 + sov(uint64(m.ClusterId))
 	}
-	if m.HttpUri != nil {
-		if size, ok := interface{}(m.HttpUri).(interface {
+	if m.HttpService != nil {
+		if size, ok := interface{}(m.HttpService).(interface {
 			SizeVT() int
 		}); ok {
 			l = size.SizeVT()
 		} else {
-			l = proto.Size(m.HttpUri)
+			l = proto.Size(m.HttpService)
 		}
-		n += 1 + l + sov(uint64(l))
-	}
-	l = len(m.Token)
-	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
 	if m.RootSpansPerMinute != 0 {
