@@ -87,6 +87,17 @@ func (m *BasicAuth) validate(all bool) error {
 		}
 	}
 
+	if !_BasicAuth_ForwardUsernameHeader_Pattern.MatchString(m.GetForwardUsernameHeader()) {
+		err := BasicAuthValidationError{
+			field:  "ForwardUsernameHeader",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return BasicAuthMultiError(errors)
 	}
@@ -163,3 +174,5 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = BasicAuthValidationError{}
+
+var _BasicAuth_ForwardUsernameHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")

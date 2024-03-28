@@ -48,6 +48,13 @@ func (m *BasicAuth) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ForwardUsernameHeader) > 0 {
+		i -= len(m.ForwardUsernameHeader)
+		copy(dAtA[i:], m.ForwardUsernameHeader)
+		i = encodeVarint(dAtA, i, uint64(len(m.ForwardUsernameHeader)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.Users != nil {
 		if vtmsg, ok := interface{}(m.Users).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -98,6 +105,10 @@ func (m *BasicAuth) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.Users)
 		}
+		n += 1 + l + sov(uint64(l))
+	}
+	l = len(m.ForwardUsernameHeader)
+	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
