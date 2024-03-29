@@ -18,6 +18,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 )
 
 // ensure the imports are used
@@ -34,6 +36,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = v3.ProxyProtocolConfig_Version(0)
 )
 
 // Validate checks the field values on ProxyProtocol with the rules defined in

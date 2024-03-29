@@ -143,6 +143,27 @@ func (m *ProxyProtocol) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.DisallowedVersions) > 0 {
+		var pksize2 int
+		for _, num := range m.DisallowedVersions {
+			pksize2 += sov(uint64(num))
+		}
+		i -= pksize2
+		j1 := i
+		for _, num1 := range m.DisallowedVersions {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA[j1] = uint8(num)
+			j1++
+		}
+		i = encodeVarint(dAtA, i, uint64(pksize2))
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.PassThroughTlvs != nil {
 		if vtmsg, ok := interface{}(m.PassThroughTlvs).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -260,6 +281,13 @@ func (m *ProxyProtocol) SizeVT() (n int) {
 			l = proto.Size(m.PassThroughTlvs)
 		}
 		n += 1 + l + sov(uint64(l))
+	}
+	if len(m.DisallowedVersions) > 0 {
+		l = 0
+		for _, e := range m.DisallowedVersions {
+			l += sov(uint64(e))
+		}
+		n += 1 + sov(uint64(l)) + l
 	}
 	n += len(m.unknownFields)
 	return n
