@@ -335,7 +335,7 @@ type JsonToMetadata_Rule struct {
 	//
 	// The value in the KeyValuePair must be set.
 	OnMissing *JsonToMetadata_KeyValuePair `protobuf:"bytes,3,opt,name=on_missing,json=onMissing,proto3" json:"on_missing,omitempty"`
-	// If the body is too large or fail to parse, apply this metadata KeyValuePair.
+	// If the body is too large or fail to parse or content-type is mismatched, apply this metadata KeyValuePair.
 	//
 	// The value in the KeyValuePair must be set.
 	OnError *JsonToMetadata_KeyValuePair `protobuf:"bytes,4,opt,name=on_error,json=onError,proto3" json:"on_error,omitempty"`
