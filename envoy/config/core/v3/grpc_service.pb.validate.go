@@ -422,6 +422,35 @@ func (m *GrpcService_EnvoyGrpc) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetMaxReceiveMessageLength()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GrpcService_EnvoyGrpcValidationError{
+					field:  "MaxReceiveMessageLength",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GrpcService_EnvoyGrpcValidationError{
+					field:  "MaxReceiveMessageLength",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMaxReceiveMessageLength()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GrpcService_EnvoyGrpcValidationError{
+				field:  "MaxReceiveMessageLength",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return GrpcService_EnvoyGrpcMultiError(errors)
 	}

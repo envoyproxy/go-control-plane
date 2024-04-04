@@ -51,6 +51,16 @@ func (m *GrpcService_EnvoyGrpc) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxReceiveMessageLength != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxReceiveMessageLength).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.RetryPolicy != nil {
 		size, err := m.RetryPolicy.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1111,6 +1121,10 @@ func (m *GrpcService_EnvoyGrpc) SizeVT() (n int) {
 	}
 	if m.RetryPolicy != nil {
 		l = m.RetryPolicy.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
+	if m.MaxReceiveMessageLength != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxReceiveMessageLength).SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
 	n += len(m.unknownFields)
