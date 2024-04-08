@@ -50,6 +50,16 @@ func (m *ProcessingRequest) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ObservabilityMode {
+		i--
+		if m.ObservabilityMode {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
 	if len(m.Attributes) > 0 {
 		for k := range m.Attributes {
 			v := m.Attributes[k]
@@ -135,16 +145,6 @@ func (m *ProcessingRequest) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 			return 0, err
 		}
 		i -= size
-	}
-	if m.AsyncMode {
-		i--
-		if m.AsyncMode {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -1219,9 +1219,6 @@ func (m *ProcessingRequest) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.AsyncMode {
-		n += 2
-	}
 	if vtmsg, ok := m.Request.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
 	}
@@ -1247,6 +1244,9 @@ func (m *ProcessingRequest) SizeVT() (n int) {
 			mapEntrySize := 1 + len(k) + sov(uint64(len(k))) + l
 			n += mapEntrySize + 1 + sov(uint64(mapEntrySize))
 		}
+	}
+	if m.ObservabilityMode {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

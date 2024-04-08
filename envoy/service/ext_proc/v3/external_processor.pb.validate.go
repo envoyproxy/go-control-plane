@@ -58,8 +58,6 @@ func (m *ProcessingRequest) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for AsyncMode
-
 	if all {
 		switch v := interface{}(m.GetMetadataContext()).(type) {
 		case interface{ ValidateAll() error }:
@@ -134,6 +132,8 @@ func (m *ProcessingRequest) validate(all bool) error {
 
 		}
 	}
+
+	// no validation rules for ObservabilityMode
 
 	oneofRequestPresent := false
 	switch v := m.Request.(type) {

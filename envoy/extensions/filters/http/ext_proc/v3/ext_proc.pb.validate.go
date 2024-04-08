@@ -129,8 +129,6 @@ func (m *ExternalProcessor) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for AsyncMode
-
 	if d := m.GetMessageTimeout(); d != nil {
 		dur, err := d.AsDuration(), d.CheckValid()
 		if err != nil {
@@ -316,6 +314,8 @@ func (m *ExternalProcessor) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for ObservabilityMode
 
 	if len(errors) > 0 {
 		return ExternalProcessorMultiError(errors)

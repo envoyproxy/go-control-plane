@@ -49,6 +49,18 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ObservabilityMode {
+		i--
+		if m.ObservabilityMode {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x88
+	}
 	if m.MetadataOptions != nil {
 		size, err := m.MetadataOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -177,16 +189,6 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 			i--
 			dAtA[i] = 0x2a
 		}
-	}
-	if m.AsyncMode {
-		i--
-		if m.AsyncMode {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x20
 	}
 	if m.ProcessingMode != nil {
 		size, err := m.ProcessingMode.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -647,9 +649,6 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 		l = m.ProcessingMode.SizeVT()
 		n += 1 + l + sov(uint64(l))
 	}
-	if m.AsyncMode {
-		n += 2
-	}
 	if len(m.RequestAttributes) > 0 {
 		for _, s := range m.RequestAttributes {
 			l = len(s)
@@ -704,6 +703,9 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 	if m.MetadataOptions != nil {
 		l = m.MetadataOptions.SizeVT()
 		n += 2 + l + sov(uint64(l))
+	}
+	if m.ObservabilityMode {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
