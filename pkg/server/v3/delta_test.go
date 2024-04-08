@@ -12,6 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"go.uber.org/goleak"
+
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
@@ -103,6 +105,7 @@ type mockDeltaStream struct {
 	nonce     int
 	sendError bool
 	grpc.ServerStream
+	cancel func()
 }
 
 func (stream *mockDeltaStream) Context() context.Context {
@@ -146,11 +149,13 @@ func (stream *mockDeltaStream) Recv() (*discovery.DeltaDiscoveryRequest, error) 
 }
 
 func makeMockDeltaStream(t *testing.T) *mockDeltaStream {
+	ctx, cancel := context.WithCancel(context.Background())
 	return &mockDeltaStream{
-		t:    t,
-		ctx:  context.Background(),
-		sent: make(chan *discovery.DeltaDiscoveryResponse, 10),
-		recv: make(chan *discovery.DeltaDiscoveryRequest, 10),
+		t:      t,
+		ctx:    ctx,
+		sent:   make(chan *discovery.DeltaDiscoveryResponse, 10),
+		recv:   make(chan *discovery.DeltaDiscoveryRequest, 10),
+		cancel: cancel,
 	}
 }
 
@@ -614,5 +619,36 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 			ResourceNamesUnsubscribe: []string{"endpoints2", "endpoints4"}, // endpoints4 does not exist
 		}
 		validateResponse(t, resp.sent, []string{"endpoints2"}, []string{"endpoints4"})
+	})
+}
+
+func TestDeltaMultipleStreams(t *testing.T) {
+	// Unit test for issue identified in https://github.com/envoyproxy/go-control-plane/issues/913
+	t.Run("return error to delta stream request; multiple streams.", func(t *testing.T) {
+		config := makeMockConfigWatcher()
+		resp := makeMockDeltaStream(t)
+		defer close(resp.recv)
+		s := server.NewServer(
+			context.Background(),
+			config,
+			server.CallbackFuncs{
+				StreamDeltaRequestFunc: func(int64, *discovery.DeltaDiscoveryRequest) error {
+					return fmt.Errorf("error")
+				},
+			},
+		)
+
+		for i := 0; i < 2; i++ {
+			resp.recv <- &discovery.DeltaDiscoveryRequest{
+				Node:                   node,
+				TypeUrl:                rsrc.EndpointType,
+				ResourceNamesSubscribe: []string{"*"},
+			}
+		}
+
+		err := s.DeltaAggregatedResources(resp)
+		require.Error(t, err)
+		resp.cancel()
+		defer goleak.VerifyNone(t)
 	})
 }
