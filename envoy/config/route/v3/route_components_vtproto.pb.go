@@ -6132,7 +6132,7 @@ func (m *Route_Route) SizeVT() (n int) {
 		l = m.Route.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6146,7 +6146,7 @@ func (m *Route_Redirect) SizeVT() (n int) {
 		l = m.Redirect.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6160,7 +6160,7 @@ func (m *Route_DirectResponse) SizeVT() (n int) {
 		l = m.DirectResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6479,7 +6479,7 @@ func (m *RouteMatch_SafeRegex) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6493,7 +6493,7 @@ func (m *RouteMatch_ConnectMatcher_) SizeVT() (n int) {
 		l = m.ConnectMatcher.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6523,7 +6523,7 @@ func (m *RouteMatch_PathMatchPolicy) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6606,7 +6606,7 @@ func (m *CorsPolicy_FilterEnabled) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6779,7 +6779,7 @@ func (m *RouteAction_HashPolicy_Header_) SizeVT() (n int) {
 		l = m.Header.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6793,7 +6793,7 @@ func (m *RouteAction_HashPolicy_Cookie_) SizeVT() (n int) {
 		l = m.Cookie.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6807,7 +6807,7 @@ func (m *RouteAction_HashPolicy_ConnectionProperties_) SizeVT() (n int) {
 		l = m.ConnectionProperties.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6821,7 +6821,7 @@ func (m *RouteAction_HashPolicy_QueryParameter_) SizeVT() (n int) {
 		l = m.QueryParameter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -6835,7 +6835,7 @@ func (m *RouteAction_HashPolicy_FilterState_) SizeVT() (n int) {
 		l = m.FilterState.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7080,7 +7080,7 @@ func (m *RouteAction_WeightedClusters) SizeVT() (n int) {
 		l = m.WeightedClusters.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7104,7 +7104,7 @@ func (m *RouteAction_AutoHostRewrite) SizeVT() (n int) {
 		l = (*wrapperspb.BoolValue)(m.AutoHostRewrite).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7189,7 +7189,7 @@ func (m *RetryPolicy_RetryPriority_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7220,7 +7220,7 @@ func (m *RetryPolicy_RetryHostPredicate_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7468,7 +7468,7 @@ func (m *RedirectAction_RegexRewrite) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7823,7 +7823,7 @@ func (m *RateLimit_Action_SourceCluster_) SizeVT() (n int) {
 		l = m.SourceCluster.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7837,7 +7837,7 @@ func (m *RateLimit_Action_DestinationCluster_) SizeVT() (n int) {
 		l = m.DestinationCluster.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7851,7 +7851,7 @@ func (m *RateLimit_Action_RequestHeaders_) SizeVT() (n int) {
 		l = m.RequestHeaders.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7865,7 +7865,7 @@ func (m *RateLimit_Action_RemoteAddress_) SizeVT() (n int) {
 		l = m.RemoteAddress.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7879,7 +7879,7 @@ func (m *RateLimit_Action_GenericKey_) SizeVT() (n int) {
 		l = m.GenericKey.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7893,7 +7893,7 @@ func (m *RateLimit_Action_HeaderValueMatch_) SizeVT() (n int) {
 		l = m.HeaderValueMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7907,7 +7907,7 @@ func (m *RateLimit_Action_DynamicMetadata) SizeVT() (n int) {
 		l = m.DynamicMetadata.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7921,7 +7921,7 @@ func (m *RateLimit_Action_Metadata) SizeVT() (n int) {
 		l = m.Metadata.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7941,7 +7941,7 @@ func (m *RateLimit_Action_Extension) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7955,7 +7955,7 @@ func (m *RateLimit_Action_MaskedRemoteAddress_) SizeVT() (n int) {
 		l = m.MaskedRemoteAddress.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -7969,7 +7969,7 @@ func (m *RateLimit_Action_QueryParameterValueMatch_) SizeVT() (n int) {
 		l = m.QueryParameterValueMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -8016,7 +8016,7 @@ func (m *RateLimit_Override_DynamicMetadata_) SizeVT() (n int) {
 		l = m.DynamicMetadata.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -8097,7 +8097,7 @@ func (m *HeaderMatcher_RangeMatch) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -8146,7 +8146,7 @@ func (m *HeaderMatcher_SafeRegexMatch) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -8176,7 +8176,7 @@ func (m *HeaderMatcher_StringMatch) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -8213,7 +8213,7 @@ func (m *QueryParameterMatcher_StringMatch) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

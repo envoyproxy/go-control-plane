@@ -1064,7 +1064,7 @@ func (m *GrpcService_GoogleGrpc_ChannelCredentials_SslCredentials) SizeVT() (n i
 		l = m.SslCredentials.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1078,7 +1078,7 @@ func (m *GrpcService_GoogleGrpc_ChannelCredentials_GoogleDefault) SizeVT() (n in
 		l = (*emptypb.Empty)(m.GoogleDefault).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1092,7 +1092,7 @@ func (m *GrpcService_GoogleGrpc_ChannelCredentials_LocalCredentials) SizeVT() (n
 		l = m.LocalCredentials.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1158,7 +1158,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_Co
 		l = (*structpb.Struct)(m.Config).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1172,7 +1172,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_MetadataCredentialsFromPlugin_Ty
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1255,7 +1255,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_GoogleComputeEngine) SizeVT() (n
 		l = (*emptypb.Empty)(m.GoogleComputeEngine).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1279,7 +1279,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_ServiceAccountJwtAccess) SizeVT(
 		l = m.ServiceAccountJwtAccess.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1293,7 +1293,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_GoogleIam) SizeVT() (n int) {
 		l = m.GoogleIam.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1307,7 +1307,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_FromPlugin) SizeVT() (n int) {
 		l = m.FromPlugin.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1321,7 +1321,7 @@ func (m *GrpcService_GoogleGrpc_CallCredentials_StsService_) SizeVT() (n int) {
 		l = m.StsService.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1394,7 +1394,7 @@ func (m *GrpcService_EnvoyGrpc_) SizeVT() (n int) {
 		l = m.EnvoyGrpc.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1408,7 +1408,7 @@ func (m *GrpcService_GoogleGrpc_) SizeVT() (n int) {
 		l = m.GoogleGrpc.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

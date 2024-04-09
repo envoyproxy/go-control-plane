@@ -789,7 +789,7 @@ func (m *Filter_Config) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.Config).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -803,7 +803,7 @@ func (m *Filter_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -976,7 +976,7 @@ func (m *ListenerFilterChainMatchPredicate_OrMatch) SizeVT() (n int) {
 		l = m.OrMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -990,7 +990,7 @@ func (m *ListenerFilterChainMatchPredicate_AndMatch) SizeVT() (n int) {
 		l = m.AndMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1004,7 +1004,7 @@ func (m *ListenerFilterChainMatchPredicate_NotMatch) SizeVT() (n int) {
 		l = m.NotMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1033,7 +1033,7 @@ func (m *ListenerFilterChainMatchPredicate_DestinationPortRange) SizeVT() (n int
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1068,7 +1068,7 @@ func (m *ListenerFilter_Config) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.Config).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1082,7 +1082,7 @@ func (m *ListenerFilter_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

@@ -335,7 +335,7 @@ func (m *DubboProxy_Drds) SizeVT() (n int) {
 		l = m.Drds.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -349,7 +349,7 @@ func (m *DubboProxy_MultipleRouteConfig) SizeVT() (n int) {
 		l = m.MultipleRouteConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

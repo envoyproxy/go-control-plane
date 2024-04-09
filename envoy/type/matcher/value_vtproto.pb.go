@@ -348,7 +348,7 @@ func (m *ValueMatcher_NullMatch_) SizeVT() (n int) {
 		l = m.NullMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -362,7 +362,7 @@ func (m *ValueMatcher_DoubleMatch) SizeVT() (n int) {
 		l = m.DoubleMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -376,7 +376,7 @@ func (m *ValueMatcher_StringMatch) SizeVT() (n int) {
 		l = m.StringMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -408,7 +408,7 @@ func (m *ValueMatcher_ListMatch) SizeVT() (n int) {
 		l = m.ListMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -435,7 +435,7 @@ func (m *ListMatcher_OneOf) SizeVT() (n int) {
 		l = m.OneOf.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

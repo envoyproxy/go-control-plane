@@ -700,7 +700,7 @@ func (m *ResourceMonitor_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -760,7 +760,7 @@ func (m *Trigger_Threshold) SizeVT() (n int) {
 		l = m.Threshold.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -774,7 +774,7 @@ func (m *Trigger_Scaled) SizeVT() (n int) {
 		l = m.Scaled.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -804,7 +804,7 @@ func (m *ScaleTimersOverloadActionConfig_ScaleTimer_MinTimeout) SizeVT() (n int)
 		l = (*durationpb.Duration)(m.MinTimeout).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -824,7 +824,7 @@ func (m *ScaleTimersOverloadActionConfig_ScaleTimer_MinScale) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

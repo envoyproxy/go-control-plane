@@ -740,7 +740,7 @@ func (m *LbEndpoint_Endpoint) SizeVT() (n int) {
 		l = m.Endpoint.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -844,7 +844,7 @@ func (m *LocalityLbEndpoints_LoadBalancerEndpoints) SizeVT() (n int) {
 		l = m.LoadBalancerEndpoints.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -858,7 +858,7 @@ func (m *LocalityLbEndpoints_LedsClusterLocalityConfig) SizeVT() (n int) {
 		l = m.LedsClusterLocalityConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

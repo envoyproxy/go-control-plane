@@ -3006,7 +3006,7 @@ func (m *HttpConnectionManager_Rds) SizeVT() (n int) {
 		l = m.Rds.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -3026,7 +3026,7 @@ func (m *HttpConnectionManager_RouteConfig) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -3239,7 +3239,7 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_Eleme
 		l = m.Element.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -3266,7 +3266,7 @@ func (m *ScopedRoutes_ScopeKeyBuilder_FragmentBuilder_HeaderValueExtractor_) Siz
 		l = m.HeaderValueExtractor.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -3327,7 +3327,7 @@ func (m *ScopedRoutes_ScopedRouteConfigurationsList) SizeVT() (n int) {
 		l = m.ScopedRouteConfigurationsList.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -3341,7 +3341,7 @@ func (m *ScopedRoutes_ScopedRds) SizeVT() (n int) {
 		l = m.ScopedRds.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -3402,7 +3402,7 @@ func (m *HttpFilter_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -3422,7 +3422,7 @@ func (m *HttpFilter_ConfigDiscovery) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

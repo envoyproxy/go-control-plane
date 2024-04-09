@@ -912,7 +912,7 @@ func (m *JwtProvider_RemoteJwks) SizeVT() (n int) {
 		l = m.RemoteJwks.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -932,7 +932,7 @@ func (m *JwtProvider_LocalJwks) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1031,7 +1031,7 @@ func (m *JwtRequirement_ProviderAndAudiences) SizeVT() (n int) {
 		l = m.ProviderAndAudiences.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1045,7 +1045,7 @@ func (m *JwtRequirement_RequiresAny) SizeVT() (n int) {
 		l = m.RequiresAny.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1059,7 +1059,7 @@ func (m *JwtRequirement_RequiresAll) SizeVT() (n int) {
 		l = m.RequiresAll.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1073,7 +1073,7 @@ func (m *JwtRequirement_AllowMissingOrFailed) SizeVT() (n int) {
 		l = (*emptypb.Empty)(m.AllowMissingOrFailed).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1087,7 +1087,7 @@ func (m *JwtRequirement_AllowMissing) SizeVT() (n int) {
 		l = (*emptypb.Empty)(m.AllowMissing).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

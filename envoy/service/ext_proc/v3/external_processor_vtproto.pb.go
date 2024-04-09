@@ -1304,7 +1304,7 @@ func (m *ProcessingRequest_RequestHeaders) SizeVT() (n int) {
 		l = m.RequestHeaders.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1318,7 +1318,7 @@ func (m *ProcessingRequest_ResponseHeaders) SizeVT() (n int) {
 		l = m.ResponseHeaders.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1332,7 +1332,7 @@ func (m *ProcessingRequest_RequestBody) SizeVT() (n int) {
 		l = m.RequestBody.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1346,7 +1346,7 @@ func (m *ProcessingRequest_ResponseBody) SizeVT() (n int) {
 		l = m.ResponseBody.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1360,7 +1360,7 @@ func (m *ProcessingRequest_RequestTrailers) SizeVT() (n int) {
 		l = m.RequestTrailers.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1374,7 +1374,7 @@ func (m *ProcessingRequest_ResponseTrailers) SizeVT() (n int) {
 		l = m.ResponseTrailers.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1419,7 +1419,7 @@ func (m *ProcessingResponse_RequestHeaders) SizeVT() (n int) {
 		l = m.RequestHeaders.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1433,7 +1433,7 @@ func (m *ProcessingResponse_ResponseHeaders) SizeVT() (n int) {
 		l = m.ResponseHeaders.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1447,7 +1447,7 @@ func (m *ProcessingResponse_RequestBody) SizeVT() (n int) {
 		l = m.RequestBody.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1461,7 +1461,7 @@ func (m *ProcessingResponse_ResponseBody) SizeVT() (n int) {
 		l = m.ResponseBody.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1475,7 +1475,7 @@ func (m *ProcessingResponse_RequestTrailers) SizeVT() (n int) {
 		l = m.RequestTrailers.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1489,7 +1489,7 @@ func (m *ProcessingResponse_ResponseTrailers) SizeVT() (n int) {
 		l = m.ResponseTrailers.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1503,7 +1503,7 @@ func (m *ProcessingResponse_ImmediateResponse) SizeVT() (n int) {
 		l = m.ImmediateResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

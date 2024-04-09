@@ -1196,7 +1196,7 @@ func (m *HealthCheck_CustomHealthCheck_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1322,7 +1322,7 @@ func (m *HealthCheck_HttpHealthCheck_) SizeVT() (n int) {
 		l = m.HttpHealthCheck.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1336,7 +1336,7 @@ func (m *HealthCheck_TcpHealthCheck_) SizeVT() (n int) {
 		l = m.TcpHealthCheck.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1350,7 +1350,7 @@ func (m *HealthCheck_GrpcHealthCheck_) SizeVT() (n int) {
 		l = m.GrpcHealthCheck.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1364,7 +1364,7 @@ func (m *HealthCheck_CustomHealthCheck_) SizeVT() (n int) {
 		l = m.CustomHealthCheck.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

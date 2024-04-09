@@ -493,7 +493,7 @@ func (m *RateLimitResponse_Quota_ValidUntil) SizeVT() (n int) {
 		l = (*timestamppb.Timestamp)(m.ValidUntil).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

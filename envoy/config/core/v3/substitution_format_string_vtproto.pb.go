@@ -278,7 +278,7 @@ func (m *SubstitutionFormatString_JsonFormat) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.JsonFormat).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -292,7 +292,7 @@ func (m *SubstitutionFormatString_TextFormatSource) SizeVT() (n int) {
 		l = m.TextFormatSource.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

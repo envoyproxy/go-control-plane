@@ -527,7 +527,7 @@ func (m *SocketEvent_Read_) SizeVT() (n int) {
 		l = m.Read.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -541,7 +541,7 @@ func (m *SocketEvent_Write_) SizeVT() (n int) {
 		l = m.Write.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -555,7 +555,7 @@ func (m *SocketEvent_Closed_) SizeVT() (n int) {
 		l = m.Closed.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -614,7 +614,7 @@ func (m *SocketStreamedTraceSegment_Connection) SizeVT() (n int) {
 		l = m.Connection.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -628,7 +628,7 @@ func (m *SocketStreamedTraceSegment_Event) SizeVT() (n int) {
 		l = m.Event.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

@@ -912,7 +912,7 @@ func (m *HealthCheckRequestOrEndpointHealthResponse_HealthCheckRequest) SizeVT()
 		l = m.HealthCheckRequest.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -926,7 +926,7 @@ func (m *HealthCheckRequestOrEndpointHealthResponse_EndpointHealthResponse) Size
 		l = m.EndpointHealthResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

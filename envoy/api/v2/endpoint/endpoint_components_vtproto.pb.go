@@ -435,7 +435,7 @@ func (m *LbEndpoint_Endpoint) SizeVT() (n int) {
 		l = m.Endpoint.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

@@ -939,7 +939,7 @@ func (m *DownstreamTlsContext_SessionTicketKeys) SizeVT() (n int) {
 		l = m.SessionTicketKeys.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -953,7 +953,7 @@ func (m *DownstreamTlsContext_SessionTicketKeysSdsSecretConfig) SizeVT() (n int)
 		l = m.SessionTicketKeysSdsSecretConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1037,7 +1037,7 @@ func (m *CommonTlsContext_CertificateProvider_TypedConfig) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1156,7 +1156,7 @@ func (m *CommonTlsContext_ValidationContext) SizeVT() (n int) {
 		l = m.ValidationContext.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1170,7 +1170,7 @@ func (m *CommonTlsContext_ValidationContextSdsSecretConfig) SizeVT() (n int) {
 		l = m.ValidationContextSdsSecretConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1184,7 +1184,7 @@ func (m *CommonTlsContext_CombinedValidationContext) SizeVT() (n int) {
 		l = m.CombinedValidationContext.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1198,7 +1198,7 @@ func (m *CommonTlsContext_ValidationContextCertificateProvider) SizeVT() (n int)
 		l = m.ValidationContextCertificateProvider.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1212,7 +1212,7 @@ func (m *CommonTlsContext_ValidationContextCertificateProviderInstance) SizeVT()
 		l = m.ValidationContextCertificateProviderInstance.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

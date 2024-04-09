@@ -869,7 +869,7 @@ func (m *MatchPredicate_OrMatch) SizeVT() (n int) {
 		l = m.OrMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -883,7 +883,7 @@ func (m *MatchPredicate_AndMatch) SizeVT() (n int) {
 		l = m.AndMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -897,7 +897,7 @@ func (m *MatchPredicate_NotMatch) SizeVT() (n int) {
 		l = m.NotMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -920,7 +920,7 @@ func (m *MatchPredicate_HttpRequestHeadersMatch) SizeVT() (n int) {
 		l = m.HttpRequestHeadersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -934,7 +934,7 @@ func (m *MatchPredicate_HttpRequestTrailersMatch) SizeVT() (n int) {
 		l = m.HttpRequestTrailersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -948,7 +948,7 @@ func (m *MatchPredicate_HttpResponseHeadersMatch) SizeVT() (n int) {
 		l = m.HttpResponseHeadersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -962,7 +962,7 @@ func (m *MatchPredicate_HttpResponseTrailersMatch) SizeVT() (n int) {
 		l = m.HttpResponseTrailersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1041,7 +1041,7 @@ func (m *OutputSink_StreamingAdmin) SizeVT() (n int) {
 		l = m.StreamingAdmin.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1055,7 +1055,7 @@ func (m *OutputSink_FilePerTap) SizeVT() (n int) {
 		l = m.FilePerTap.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1069,7 +1069,7 @@ func (m *OutputSink_StreamingGrpc) SizeVT() (n int) {
 		l = m.StreamingGrpc.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

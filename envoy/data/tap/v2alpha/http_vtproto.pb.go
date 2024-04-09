@@ -517,7 +517,7 @@ func (m *HttpStreamedTraceSegment_RequestHeaders) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -531,7 +531,7 @@ func (m *HttpStreamedTraceSegment_RequestBodyChunk) SizeVT() (n int) {
 		l = m.RequestBodyChunk.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -551,7 +551,7 @@ func (m *HttpStreamedTraceSegment_RequestTrailers) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -571,7 +571,7 @@ func (m *HttpStreamedTraceSegment_ResponseHeaders) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -585,7 +585,7 @@ func (m *HttpStreamedTraceSegment_ResponseBodyChunk) SizeVT() (n int) {
 		l = m.ResponseBodyChunk.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -605,7 +605,7 @@ func (m *HttpStreamedTraceSegment_ResponseTrailers) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

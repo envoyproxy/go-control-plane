@@ -367,7 +367,7 @@ func (m *Secret_TlsCertificate) SizeVT() (n int) {
 		l = m.TlsCertificate.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -381,7 +381,7 @@ func (m *Secret_SessionTicketKeys) SizeVT() (n int) {
 		l = m.SessionTicketKeys.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -395,7 +395,7 @@ func (m *Secret_ValidationContext) SizeVT() (n int) {
 		l = m.ValidationContext.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -409,7 +409,7 @@ func (m *Secret_GenericSecret) SizeVT() (n int) {
 		l = m.GenericSecret.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

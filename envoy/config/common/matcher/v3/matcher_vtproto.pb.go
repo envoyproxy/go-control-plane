@@ -1451,7 +1451,7 @@ func (m *Matcher_OnMatch_Matcher) SizeVT() (n int) {
 		l = m.Matcher.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1471,7 +1471,7 @@ func (m *Matcher_OnMatch_Action) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1514,7 +1514,7 @@ func (m *Matcher_MatcherList_Predicate_SinglePredicate_ValueMatch) SizeVT() (n i
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1534,7 +1534,7 @@ func (m *Matcher_MatcherList_Predicate_SinglePredicate_CustomMatch) SizeVT() (n 
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1577,7 +1577,7 @@ func (m *Matcher_MatcherList_Predicate_SinglePredicate_) SizeVT() (n int) {
 		l = m.SinglePredicate.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1591,7 +1591,7 @@ func (m *Matcher_MatcherList_Predicate_OrMatcher) SizeVT() (n int) {
 		l = m.OrMatcher.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1605,7 +1605,7 @@ func (m *Matcher_MatcherList_Predicate_AndMatcher) SizeVT() (n int) {
 		l = m.AndMatcher.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1619,7 +1619,7 @@ func (m *Matcher_MatcherList_Predicate_NotMatcher) SizeVT() (n int) {
 		l = m.NotMatcher.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1713,7 +1713,7 @@ func (m *Matcher_MatcherTree_ExactMatchMap) SizeVT() (n int) {
 		l = m.ExactMatchMap.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1727,7 +1727,7 @@ func (m *Matcher_MatcherTree_PrefixMatchMap) SizeVT() (n int) {
 		l = m.PrefixMatchMap.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1747,7 +1747,7 @@ func (m *Matcher_MatcherTree_CustomMatch) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1778,7 +1778,7 @@ func (m *Matcher_MatcherList_) SizeVT() (n int) {
 		l = m.MatcherList.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1792,7 +1792,7 @@ func (m *Matcher_MatcherTree_) SizeVT() (n int) {
 		l = m.MatcherTree.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1835,7 +1835,7 @@ func (m *MatchPredicate_OrMatch) SizeVT() (n int) {
 		l = m.OrMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1849,7 +1849,7 @@ func (m *MatchPredicate_AndMatch) SizeVT() (n int) {
 		l = m.AndMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1863,7 +1863,7 @@ func (m *MatchPredicate_NotMatch) SizeVT() (n int) {
 		l = m.NotMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1886,7 +1886,7 @@ func (m *MatchPredicate_HttpRequestHeadersMatch) SizeVT() (n int) {
 		l = m.HttpRequestHeadersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1900,7 +1900,7 @@ func (m *MatchPredicate_HttpRequestTrailersMatch) SizeVT() (n int) {
 		l = m.HttpRequestTrailersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1914,7 +1914,7 @@ func (m *MatchPredicate_HttpResponseHeadersMatch) SizeVT() (n int) {
 		l = m.HttpResponseHeadersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1928,7 +1928,7 @@ func (m *MatchPredicate_HttpResponseTrailersMatch) SizeVT() (n int) {
 		l = m.HttpResponseTrailersMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1942,7 +1942,7 @@ func (m *MatchPredicate_HttpRequestGenericBodyMatch) SizeVT() (n int) {
 		l = m.HttpRequestGenericBodyMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1956,7 +1956,7 @@ func (m *MatchPredicate_HttpResponseGenericBodyMatch) SizeVT() (n int) {
 		l = m.HttpResponseGenericBodyMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

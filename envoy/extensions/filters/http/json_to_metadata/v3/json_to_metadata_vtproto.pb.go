@@ -417,7 +417,7 @@ func (m *JsonToMetadata_KeyValuePair_Value) SizeVT() (n int) {
 		l = (*structpb.Value)(m.Value).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

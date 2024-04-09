@@ -508,7 +508,7 @@ func (m *CustomTag_Literal_) SizeVT() (n int) {
 		l = m.Literal.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -522,7 +522,7 @@ func (m *CustomTag_Environment_) SizeVT() (n int) {
 		l = m.Environment.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -536,7 +536,7 @@ func (m *CustomTag_RequestHeader) SizeVT() (n int) {
 		l = m.RequestHeader.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -550,7 +550,7 @@ func (m *CustomTag_Metadata_) SizeVT() (n int) {
 		l = m.Metadata.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

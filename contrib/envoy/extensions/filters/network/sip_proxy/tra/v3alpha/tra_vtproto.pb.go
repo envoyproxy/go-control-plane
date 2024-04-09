@@ -1032,7 +1032,7 @@ func (m *TraServiceRequest_CreateRequest) SizeVT() (n int) {
 		l = m.CreateRequest.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1046,7 +1046,7 @@ func (m *TraServiceRequest_UpdateRequest) SizeVT() (n int) {
 		l = m.UpdateRequest.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1060,7 +1060,7 @@ func (m *TraServiceRequest_RetrieveRequest) SizeVT() (n int) {
 		l = m.RetrieveRequest.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1074,7 +1074,7 @@ func (m *TraServiceRequest_DeleteRequest) SizeVT() (n int) {
 		l = m.DeleteRequest.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1088,7 +1088,7 @@ func (m *TraServiceRequest_SubscribeRequest) SizeVT() (n int) {
 		l = m.SubscribeRequest.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1126,7 +1126,7 @@ func (m *TraServiceResponse_CreateResponse) SizeVT() (n int) {
 		l = m.CreateResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1140,7 +1140,7 @@ func (m *TraServiceResponse_UpdateResponse) SizeVT() (n int) {
 		l = m.UpdateResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1154,7 +1154,7 @@ func (m *TraServiceResponse_RetrieveResponse) SizeVT() (n int) {
 		l = m.RetrieveResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1168,7 +1168,7 @@ func (m *TraServiceResponse_DeleteResponse) SizeVT() (n int) {
 		l = m.DeleteResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1182,7 +1182,7 @@ func (m *TraServiceResponse_SubscribeResponse) SizeVT() (n int) {
 		l = m.SubscribeResponse.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

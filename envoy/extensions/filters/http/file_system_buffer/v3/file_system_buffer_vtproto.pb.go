@@ -599,7 +599,7 @@ func (m *BufferBehavior_StreamWhenPossible_) SizeVT() (n int) {
 		l = m.StreamWhenPossible.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -613,7 +613,7 @@ func (m *BufferBehavior_Bypass_) SizeVT() (n int) {
 		l = m.Bypass.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -627,7 +627,7 @@ func (m *BufferBehavior_InjectContentLengthIfNecessary_) SizeVT() (n int) {
 		l = m.InjectContentLengthIfNecessary.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -641,7 +641,7 @@ func (m *BufferBehavior_FullyBufferAndAlwaysInjectContentLength_) SizeVT() (n in
 		l = m.FullyBufferAndAlwaysInjectContentLength.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -655,7 +655,7 @@ func (m *BufferBehavior_FullyBuffer_) SizeVT() (n int) {
 		l = m.FullyBuffer.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

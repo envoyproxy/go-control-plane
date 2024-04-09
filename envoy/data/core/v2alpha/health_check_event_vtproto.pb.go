@@ -486,7 +486,7 @@ func (m *HealthCheckEvent_EjectUnhealthyEvent) SizeVT() (n int) {
 		l = m.EjectUnhealthyEvent.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -500,7 +500,7 @@ func (m *HealthCheckEvent_AddHealthyEvent) SizeVT() (n int) {
 		l = m.AddHealthyEvent.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -514,7 +514,7 @@ func (m *HealthCheckEvent_HealthCheckFailureEvent) SizeVT() (n int) {
 		l = m.HealthCheckFailureEvent.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -528,7 +528,7 @@ func (m *HealthCheckEvent_DegradedHealthyHost) SizeVT() (n int) {
 		l = m.DegradedHealthyHost.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -542,7 +542,7 @@ func (m *HealthCheckEvent_NoLongerDegradedHost) SizeVT() (n int) {
 		l = m.NoLongerDegradedHost.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

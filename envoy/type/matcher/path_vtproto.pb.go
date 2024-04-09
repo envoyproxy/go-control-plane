@@ -104,7 +104,7 @@ func (m *PathMatcher_Path) SizeVT() (n int) {
 		l = m.Path.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

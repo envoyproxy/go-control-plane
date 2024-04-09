@@ -285,7 +285,7 @@ func (m *FilterConfig_DnsCacheConfig) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -299,7 +299,7 @@ func (m *FilterConfig_SubClusterConfig) SizeVT() (n int) {
 		l = m.SubClusterConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

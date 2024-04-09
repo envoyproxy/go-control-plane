@@ -1289,7 +1289,7 @@ func (m *AccessLog_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1316,7 +1316,7 @@ func (m *AccessLogFilter_StatusCodeFilter) SizeVT() (n int) {
 		l = m.StatusCodeFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1330,7 +1330,7 @@ func (m *AccessLogFilter_DurationFilter) SizeVT() (n int) {
 		l = m.DurationFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1344,7 +1344,7 @@ func (m *AccessLogFilter_NotHealthCheckFilter) SizeVT() (n int) {
 		l = m.NotHealthCheckFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1358,7 +1358,7 @@ func (m *AccessLogFilter_TraceableFilter) SizeVT() (n int) {
 		l = m.TraceableFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1372,7 +1372,7 @@ func (m *AccessLogFilter_RuntimeFilter) SizeVT() (n int) {
 		l = m.RuntimeFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1386,7 +1386,7 @@ func (m *AccessLogFilter_AndFilter) SizeVT() (n int) {
 		l = m.AndFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1400,7 +1400,7 @@ func (m *AccessLogFilter_OrFilter) SizeVT() (n int) {
 		l = m.OrFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1414,7 +1414,7 @@ func (m *AccessLogFilter_HeaderFilter) SizeVT() (n int) {
 		l = m.HeaderFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1428,7 +1428,7 @@ func (m *AccessLogFilter_ResponseFlagFilter) SizeVT() (n int) {
 		l = m.ResponseFlagFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1442,7 +1442,7 @@ func (m *AccessLogFilter_GrpcStatusFilter) SizeVT() (n int) {
 		l = m.GrpcStatusFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1456,7 +1456,7 @@ func (m *AccessLogFilter_ExtensionFilter) SizeVT() (n int) {
 		l = m.ExtensionFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1470,7 +1470,7 @@ func (m *AccessLogFilter_MetadataFilter) SizeVT() (n int) {
 		l = m.MetadataFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1484,7 +1484,7 @@ func (m *AccessLogFilter_LogTypeFilter) SizeVT() (n int) {
 		l = m.LogTypeFilter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1745,7 +1745,7 @@ func (m *ExtensionFilter_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

@@ -640,7 +640,7 @@ func (m *HttpProtocolOptions_ExplicitHttpConfig_HttpProtocolOptions) SizeVT() (n
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -660,7 +660,7 @@ func (m *HttpProtocolOptions_ExplicitHttpConfig_Http2ProtocolOptions) SizeVT() (
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -680,7 +680,7 @@ func (m *HttpProtocolOptions_ExplicitHttpConfig_Http3ProtocolOptions) SizeVT() (
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -839,7 +839,7 @@ func (m *HttpProtocolOptions_ExplicitHttpConfig_) SizeVT() (n int) {
 		l = m.ExplicitHttpConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -853,7 +853,7 @@ func (m *HttpProtocolOptions_UseDownstreamProtocolConfig) SizeVT() (n int) {
 		l = m.UseDownstreamProtocolConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -867,7 +867,7 @@ func (m *HttpProtocolOptions_AutoConfig) SizeVT() (n int) {
 		l = m.AutoConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

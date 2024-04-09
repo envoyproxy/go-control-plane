@@ -210,7 +210,7 @@ func (m *FilterConfig_IndividualMethodStatsAllowlist) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -224,7 +224,7 @@ func (m *FilterConfig_StatsForAllMethods) SizeVT() (n int) {
 		l = (*wrapperspb.BoolValue)(m.StatsForAllMethods).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

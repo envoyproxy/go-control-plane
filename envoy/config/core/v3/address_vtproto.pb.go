@@ -808,7 +808,7 @@ func (m *Address_SocketAddress) SizeVT() (n int) {
 		l = m.SocketAddress.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -822,7 +822,7 @@ func (m *Address_Pipe) SizeVT() (n int) {
 		l = m.Pipe.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -836,7 +836,7 @@ func (m *Address_EnvoyInternalAddress) SizeVT() (n int) {
 		l = m.EnvoyInternalAddress.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

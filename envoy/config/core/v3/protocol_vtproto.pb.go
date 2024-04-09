@@ -1456,7 +1456,7 @@ func (m *Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords_) SizeVT() (n int)
 		l = m.ProperCaseWords.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1470,7 +1470,7 @@ func (m *Http1ProtocolOptions_HeaderKeyFormat_StatefulFormatter) SizeVT() (n int
 		l = m.StatefulFormatter.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

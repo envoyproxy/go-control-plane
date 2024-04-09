@@ -531,7 +531,7 @@ func (m *ConfigSource_ApiConfigSource) SizeVT() (n int) {
 		l = m.ApiConfigSource.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -545,7 +545,7 @@ func (m *ConfigSource_Ads) SizeVT() (n int) {
 		l = m.Ads.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -559,7 +559,7 @@ func (m *ConfigSource_Self) SizeVT() (n int) {
 		l = m.Self.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

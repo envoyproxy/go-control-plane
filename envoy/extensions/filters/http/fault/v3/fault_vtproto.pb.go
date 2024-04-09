@@ -437,7 +437,7 @@ func (m *FaultAbort_HeaderAbort_) SizeVT() (n int) {
 		l = m.HeaderAbort.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

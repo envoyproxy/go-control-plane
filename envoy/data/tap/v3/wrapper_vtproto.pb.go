@@ -194,7 +194,7 @@ func (m *TraceWrapper_HttpBufferedTrace) SizeVT() (n int) {
 		l = m.HttpBufferedTrace.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -208,7 +208,7 @@ func (m *TraceWrapper_HttpStreamedTraceSegment) SizeVT() (n int) {
 		l = m.HttpStreamedTraceSegment.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -222,7 +222,7 @@ func (m *TraceWrapper_SocketBufferedTrace) SizeVT() (n int) {
 		l = m.SocketBufferedTrace.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -236,7 +236,7 @@ func (m *TraceWrapper_SocketStreamedTraceSegment) SizeVT() (n int) {
 		l = m.SocketStreamedTraceSegment.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

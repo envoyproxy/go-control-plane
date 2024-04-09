@@ -922,7 +922,7 @@ func (m *RateLimitQuotaBucketSettings_NoAssignmentBehavior_FallbackRateLimit) Si
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -969,7 +969,7 @@ func (m *RateLimitQuotaBucketSettings_ExpiredAssignmentBehavior_FallbackRateLimi
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -983,7 +983,7 @@ func (m *RateLimitQuotaBucketSettings_ExpiredAssignmentBehavior_ReuseLastAssignm
 		l = m.ReuseLastAssignment.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1072,7 +1072,7 @@ func (m *RateLimitQuotaBucketSettings_BucketIdBuilder_ValueBuilder_CustomValue) 
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

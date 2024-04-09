@@ -286,7 +286,7 @@ func (m *StringMatcher_SafeRegex) SizeVT() (n int) {
 		l = m.SafeRegex.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

@@ -422,7 +422,7 @@ func (m *LocalityLbConfig_ZoneAwareLbConfig_) SizeVT() (n int) {
 		l = m.ZoneAwareLbConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -436,7 +436,7 @@ func (m *LocalityLbConfig_LocalityWeightedLbConfig_) SizeVT() (n int) {
 		l = m.LocalityWeightedLbConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

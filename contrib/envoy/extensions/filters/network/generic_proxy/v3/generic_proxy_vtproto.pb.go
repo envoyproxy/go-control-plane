@@ -344,7 +344,7 @@ func (m *GenericProxy_GenericRds) SizeVT() (n int) {
 		l = m.GenericRds.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -358,7 +358,7 @@ func (m *GenericProxy_RouteConfig) SizeVT() (n int) {
 		l = m.RouteConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

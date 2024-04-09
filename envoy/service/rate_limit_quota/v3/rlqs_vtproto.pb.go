@@ -538,7 +538,7 @@ func (m *RateLimitQuotaResponse_BucketAction_QuotaAssignmentAction_) SizeVT() (n
 		l = m.QuotaAssignmentAction.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -552,7 +552,7 @@ func (m *RateLimitQuotaResponse_BucketAction_AbandonAction_) SizeVT() (n int) {
 		l = m.AbandonAction.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

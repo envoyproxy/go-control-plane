@@ -1393,7 +1393,7 @@ func (m *DynamicParameterConstraints_SingleConstraint_Exists_) SizeVT() (n int) 
 		l = m.Exists.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1436,7 +1436,7 @@ func (m *DynamicParameterConstraints_Constraint) SizeVT() (n int) {
 		l = m.Constraint.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1450,7 +1450,7 @@ func (m *DynamicParameterConstraints_OrConstraints) SizeVT() (n int) {
 		l = m.OrConstraints.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1464,7 +1464,7 @@ func (m *DynamicParameterConstraints_AndConstraints) SizeVT() (n int) {
 		l = m.AndConstraints.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1478,7 +1478,7 @@ func (m *DynamicParameterConstraints_NotConstraints) SizeVT() (n int) {
 		l = m.NotConstraints.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

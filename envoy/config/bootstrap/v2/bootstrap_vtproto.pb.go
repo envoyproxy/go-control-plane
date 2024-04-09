@@ -1714,7 +1714,7 @@ func (m *RuntimeLayer_StaticLayer) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.StaticLayer).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1728,7 +1728,7 @@ func (m *RuntimeLayer_DiskLayer_) SizeVT() (n int) {
 		l = m.DiskLayer.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1742,7 +1742,7 @@ func (m *RuntimeLayer_AdminLayer_) SizeVT() (n int) {
 		l = m.AdminLayer.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1756,7 +1756,7 @@ func (m *RuntimeLayer_RtdsLayer_) SizeVT() (n int) {
 		l = m.RtdsLayer.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

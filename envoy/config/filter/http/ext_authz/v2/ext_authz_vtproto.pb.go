@@ -755,7 +755,7 @@ func (m *ExtAuthz_GrpcService) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -769,7 +769,7 @@ func (m *ExtAuthz_HttpService) SizeVT() (n int) {
 		l = m.HttpService.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -915,7 +915,7 @@ func (m *ExtAuthzPerRoute_CheckSettings) SizeVT() (n int) {
 		l = m.CheckSettings.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

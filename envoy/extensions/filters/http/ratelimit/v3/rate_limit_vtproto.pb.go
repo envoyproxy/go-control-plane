@@ -1345,7 +1345,7 @@ func (m *RateLimitConfig_Action_SourceCluster_) SizeVT() (n int) {
 		l = m.SourceCluster.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1359,7 +1359,7 @@ func (m *RateLimitConfig_Action_DestinationCluster_) SizeVT() (n int) {
 		l = m.DestinationCluster.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1373,7 +1373,7 @@ func (m *RateLimitConfig_Action_RequestHeaders_) SizeVT() (n int) {
 		l = m.RequestHeaders.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1387,7 +1387,7 @@ func (m *RateLimitConfig_Action_RemoteAddress_) SizeVT() (n int) {
 		l = m.RemoteAddress.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1401,7 +1401,7 @@ func (m *RateLimitConfig_Action_GenericKey_) SizeVT() (n int) {
 		l = m.GenericKey.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1415,7 +1415,7 @@ func (m *RateLimitConfig_Action_HeaderValueMatch_) SizeVT() (n int) {
 		l = m.HeaderValueMatch.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1429,7 +1429,7 @@ func (m *RateLimitConfig_Action_Metadata) SizeVT() (n int) {
 		l = m.Metadata.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1449,7 +1449,7 @@ func (m *RateLimitConfig_Action_Extension) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1496,7 +1496,7 @@ func (m *RateLimitConfig_Override_DynamicMetadata_) SizeVT() (n int) {
 		l = m.DynamicMetadata.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

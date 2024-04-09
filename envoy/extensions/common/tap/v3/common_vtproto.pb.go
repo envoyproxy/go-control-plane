@@ -187,7 +187,7 @@ func (m *CommonExtensionConfig_AdminConfig) SizeVT() (n int) {
 		l = m.AdminConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -207,7 +207,7 @@ func (m *CommonExtensionConfig_StaticConfig) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

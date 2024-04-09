@@ -397,7 +397,7 @@ func (m *FaultDelay_FixedDelay) SizeVT() (n int) {
 		l = (*durationpb.Duration)(m.FixedDelay).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -411,7 +411,7 @@ func (m *FaultDelay_HeaderDelay_) SizeVT() (n int) {
 		l = m.HeaderDelay.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -471,7 +471,7 @@ func (m *FaultRateLimit_FixedLimit_) SizeVT() (n int) {
 		l = m.FixedLimit.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -485,7 +485,7 @@ func (m *FaultRateLimit_HeaderLimit_) SizeVT() (n int) {
 		l = m.HeaderLimit.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

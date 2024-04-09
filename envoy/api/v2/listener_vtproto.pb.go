@@ -555,7 +555,7 @@ func (m *Listener_ConnectionBalanceConfig_ExactBalance_) SizeVT() (n int) {
 		l = m.ExactBalance.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

@@ -579,7 +579,7 @@ func (m *PluginConfig_VmConfig) SizeVT() (n int) {
 		l = m.VmConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

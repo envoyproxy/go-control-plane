@@ -265,7 +265,7 @@ func (m *PathTransformation_Operation_NormalizePathRfc_3986) SizeVT() (n int) {
 		l = m.NormalizePathRfc_3986.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -279,7 +279,7 @@ func (m *PathTransformation_Operation_MergeSlashes_) SizeVT() (n int) {
 		l = m.MergeSlashes.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

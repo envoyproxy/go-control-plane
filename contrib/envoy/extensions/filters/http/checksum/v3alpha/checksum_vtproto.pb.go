@@ -189,7 +189,7 @@ func (m *ChecksumConfig_Checksum_PathMatcher) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

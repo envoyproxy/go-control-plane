@@ -462,7 +462,7 @@ func (m *AdaptiveConcurrency_GradientControllerConfig) SizeVT() (n int) {
 		l = m.GradientControllerConfig.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

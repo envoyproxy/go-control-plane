@@ -1377,7 +1377,7 @@ func (m *Node_UserAgentBuildVersion) SizeVT() (n int) {
 		l = m.UserAgentBuildVersion.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1614,7 +1614,7 @@ func (m *AsyncDataSource_Local) SizeVT() (n int) {
 		l = m.Local.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1628,7 +1628,7 @@ func (m *AsyncDataSource_Remote) SizeVT() (n int) {
 		l = m.Remote.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1659,7 +1659,7 @@ func (m *TransportSocket_Config) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.Config).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -1673,7 +1673,7 @@ func (m *TransportSocket_TypedConfig) SizeVT() (n int) {
 		l = (*anypb.Any)(m.TypedConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

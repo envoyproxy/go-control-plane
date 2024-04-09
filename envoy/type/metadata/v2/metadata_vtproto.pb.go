@@ -515,7 +515,7 @@ func (m *MetadataKind_Request_) SizeVT() (n int) {
 		l = m.Request.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -529,7 +529,7 @@ func (m *MetadataKind_Route_) SizeVT() (n int) {
 		l = m.Route.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -543,7 +543,7 @@ func (m *MetadataKind_Cluster_) SizeVT() (n int) {
 		l = m.Cluster.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -557,7 +557,7 @@ func (m *MetadataKind_Host_) SizeVT() (n int) {
 		l = m.Host.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }

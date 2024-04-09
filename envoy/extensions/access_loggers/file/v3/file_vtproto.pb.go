@@ -220,7 +220,7 @@ func (m *FileAccessLog_JsonFormat) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.JsonFormat).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -234,7 +234,7 @@ func (m *FileAccessLog_TypedJsonFormat) SizeVT() (n int) {
 		l = (*structpb.Struct)(m.TypedJsonFormat).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
@@ -254,7 +254,7 @@ func (m *FileAccessLog_LogFormat) SizeVT() (n int) {
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
-		n += 3
+		n += 2
 	}
 	return n
 }
