@@ -71,9 +71,9 @@ func (m *CredentialInjector) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i--
 		dAtA[i] = 0x1a
 	}
-	if m.FailIfNotPresent {
+	if m.AllowRequestWithoutCredential {
 		i--
-		if m.FailIfNotPresent {
+		if m.AllowRequestWithoutCredential {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -103,7 +103,7 @@ func (m *CredentialInjector) SizeVT() (n int) {
 	if m.Overwrite {
 		n += 2
 	}
-	if m.FailIfNotPresent {
+	if m.AllowRequestWithoutCredential {
 		n += 2
 	}
 	if m.Credential != nil {

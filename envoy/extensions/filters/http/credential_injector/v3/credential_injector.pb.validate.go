@@ -60,7 +60,7 @@ func (m *CredentialInjector) validate(all bool) error {
 
 	// no validation rules for Overwrite
 
-	// no validation rules for FailIfNotPresent
+	// no validation rules for AllowRequestWithoutCredential
 
 	if m.GetCredential() == nil {
 		err := CredentialInjectorValidationError{
