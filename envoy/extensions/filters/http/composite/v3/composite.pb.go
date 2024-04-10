@@ -143,9 +143,11 @@ type ExecuteFilterAction struct {
 	// Only one of “typed_config“ or “dynamic_config“ can be set.
 	// [#extension-category: envoy.filters.http]
 	TypedConfig *v3.TypedExtensionConfig `protobuf:"bytes,1,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
-	// Dynamic configuration of filter obtained via extension configuration discovery
-	// service.
+	// Dynamic configuration of filter obtained via extension configuration discovery service.
 	// Only one of “typed_config“ or “dynamic_config“ can be set.
+	// When composite filter is in upstream filter chain, the “dynamic_config“
+	// can not be set. TBD: Refactor cluster manager init sequence to Support this.
+	// Please check https://github.com/envoyproxy/envoy/issues/33218 for details.
 	DynamicConfig *DynamicConfig `protobuf:"bytes,2,opt,name=dynamic_config,json=dynamicConfig,proto3" json:"dynamic_config,omitempty"`
 }
 
