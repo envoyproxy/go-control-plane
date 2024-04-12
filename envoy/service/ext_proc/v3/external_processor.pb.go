@@ -891,7 +891,8 @@ type CommonResponse struct {
 	Trailers *v3.HeaderMap `protobuf:"bytes,4,opt,name=trailers,proto3" json:"trailers,omitempty"`
 	// Clear the route cache for the current client request. This is necessary
 	// if the remote server modified headers that are used to calculate the route.
-	// This field is ignored in the response direction.
+	// This field is ignored in the response direction. This field is also ignored
+	// if the Envoy ext_proc filter is in the upstream filter chain.
 	ClearRouteCache bool `protobuf:"varint,5,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 }
 
