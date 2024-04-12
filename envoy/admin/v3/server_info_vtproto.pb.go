@@ -154,6 +154,18 @@ func (m *CommandLineOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SkipHotRestartOnNoParent {
+		i--
+		if m.SkipHotRestartOnNoParent {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xb8
+	}
 	if len(m.StatsTag) > 0 {
 		for iNdEx := len(m.StatsTag) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.StatsTag[iNdEx])
@@ -635,6 +647,9 @@ func (m *CommandLineOptions) SizeVT() (n int) {
 			l = len(s)
 			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.SkipHotRestartOnNoParent {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
