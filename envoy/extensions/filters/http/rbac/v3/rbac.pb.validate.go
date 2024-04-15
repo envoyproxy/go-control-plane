@@ -177,6 +177,8 @@ func (m *RBAC) validate(all bool) error {
 
 	// no validation rules for ShadowRulesStatPrefix
 
+	// no validation rules for TrackPerRuleStats
+
 	if len(errors) > 0 {
 		return RBACMultiError(errors)
 	}

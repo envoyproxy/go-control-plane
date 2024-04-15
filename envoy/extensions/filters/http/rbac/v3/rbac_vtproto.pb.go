@@ -49,6 +49,16 @@ func (m *RBAC) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TrackPerRuleStats {
+		i--
+		if m.TrackPerRuleStats {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x38
+	}
 	if len(m.RulesStatPrefix) > 0 {
 		i -= len(m.RulesStatPrefix)
 		copy(dAtA[i:], m.RulesStatPrefix)
@@ -250,6 +260,9 @@ func (m *RBAC) SizeVT() (n int) {
 	l = len(m.RulesStatPrefix)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.TrackPerRuleStats {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
