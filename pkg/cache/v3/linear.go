@@ -519,9 +519,7 @@ func (cache *LinearCache) CreateWatch(request *Request, sub Subscription, value 
 	// We could optimize the reconnection case here if:
 	//  - we take the assumption that clients will not start requesting wildcard while providing a version. We could then ignore requests providing the resources.
 	//  - we use the version as some form of hash of resources known, and we can then consider it as a way to correctly verify whether all resources are unchanged.
-	// For now it is not done as:
-	//  - for the first case, while the protocol documentation does not explicitly mention the case, it does not mark it impossible and explicitly references unsubscribing from wildcard.
-	//  - for the second one we could likely do it with little difficulty if need be, but if users rely on the current monotonic version it could impact their callbacks implementations.
+	// When using the `WithSotwStableVersions` option, this optimization is activated and avoids resending all the dataset on wildcard watch resumption if no change has occurred.
 	watch := ResponseWatch{
 		Request:             request,
 		Response:            value,
@@ -541,10 +539,14 @@ func (cache *LinearCache) CreateWatch(request *Request, sub Subscription, value 
 	if response != nil {
 		// If the request
 		//  - is the first
+		//  - is wildcard
 		//  - provides a non-empty version, matching the version prefix
 		// and the cache uses stable versions, if the generated versions are the same as the previous one, we do not return the response.
 		// This avoids resending all data if the new subscription is just a resumption of the previous one.
-		if cache.useStableVersionsInSotw && request.GetResponseNonce() == "" && !replyEvenIfEmpty {
+		// This optimization is only done on wildcard as we cannot track if a subscription is "new" at this stage and needs to be returned.
+		// In the context of wildcard it could be incorrect if the subscription is newly wildcard, and we already returned all objects,
+		// but as of Q1-2024 there are no known usecases of a subscription becoming wildcard (in envoy of xds-grpc).
+		if cache.useStableVersionsInSotw && sub.IsWildcard() && request.GetResponseNonce() == "" && !replyEvenIfEmpty {
 			if request.GetVersionInfo() != response.GetResponseVersion() {
 				// The response has a different returned version map as the request
 				shouldReply = true
