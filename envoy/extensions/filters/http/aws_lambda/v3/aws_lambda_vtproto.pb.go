@@ -48,6 +48,13 @@ func (m *Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.CredentialsProfile) > 0 {
+		i -= len(m.CredentialsProfile)
+		copy(dAtA[i:], m.CredentialsProfile)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.CredentialsProfile)))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if len(m.HostRewrite) > 0 {
 		i -= len(m.HostRewrite)
 		copy(dAtA[i:], m.HostRewrite)
@@ -140,6 +147,10 @@ func (m *Config) SizeVT() (n int) {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.InvocationMode))
 	}
 	l = len(m.HostRewrite)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.CredentialsProfile)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}

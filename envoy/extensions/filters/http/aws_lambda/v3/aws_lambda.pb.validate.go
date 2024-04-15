@@ -83,6 +83,8 @@ func (m *Config) validate(all bool) error {
 
 	// no validation rules for HostRewrite
 
+	// no validation rules for CredentialsProfile
+
 	if len(errors) > 0 {
 		return ConfigMultiError(errors)
 	}
