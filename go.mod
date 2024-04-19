@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/census-instrumentation/opencensus-proto v0.4.1
-	github.com/cncf/xds/go v0.0.0-20231128003011-0fa0005c9caa
+	github.com/cncf/xds/go v0.0.0-20240329184929-0c46c01016dc
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/google/go-cmp v0.6.0
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10
@@ -13,12 +13,13 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0
 	go.uber.org/goleak v1.3.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240123012728-ef4313101c80
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
 )
 
 require (
+	cel.dev/expr v0.15.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
