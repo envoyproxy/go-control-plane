@@ -7,16 +7,12 @@
 package ext_procv3
 
 import (
-	context "context"
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ext_proc/v3"
 	v32 "github.com/envoyproxy/go-control-plane/envoy/type/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	grpc "google.golang.org/grpc"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
@@ -1807,124 +1803,4 @@ func file_envoy_service_ext_proc_v3_external_processor_proto_init() {
 	file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = nil
 	file_envoy_service_ext_proc_v3_external_processor_proto_goTypes = nil
 	file_envoy_service_ext_proc_v3_external_processor_proto_depIdxs = nil
-}
-
-// Reference imports to suppress errors if they are not otherwise used.
-var _ context.Context
-var _ grpc.ClientConnInterface
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion6
-
-// ExternalProcessorClient is the client API for ExternalProcessor service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ExternalProcessorClient interface {
-	// This begins the bidirectional stream that Envoy will use to
-	// give the server control over what the filter does. The actual
-	// protocol is described by the ProcessingRequest and ProcessingResponse
-	// messages below.
-	Process(ctx context.Context, opts ...grpc.CallOption) (ExternalProcessor_ProcessClient, error)
-}
-
-type externalProcessorClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewExternalProcessorClient(cc grpc.ClientConnInterface) ExternalProcessorClient {
-	return &externalProcessorClient{cc}
-}
-
-func (c *externalProcessorClient) Process(ctx context.Context, opts ...grpc.CallOption) (ExternalProcessor_ProcessClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_ExternalProcessor_serviceDesc.Streams[0], "/envoy.service.ext_proc.v3.ExternalProcessor/Process", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &externalProcessorProcessClient{stream}
-	return x, nil
-}
-
-type ExternalProcessor_ProcessClient interface {
-	Send(*ProcessingRequest) error
-	Recv() (*ProcessingResponse, error)
-	grpc.ClientStream
-}
-
-type externalProcessorProcessClient struct {
-	grpc.ClientStream
-}
-
-func (x *externalProcessorProcessClient) Send(m *ProcessingRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *externalProcessorProcessClient) Recv() (*ProcessingResponse, error) {
-	m := new(ProcessingResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// ExternalProcessorServer is the server API for ExternalProcessor service.
-type ExternalProcessorServer interface {
-	// This begins the bidirectional stream that Envoy will use to
-	// give the server control over what the filter does. The actual
-	// protocol is described by the ProcessingRequest and ProcessingResponse
-	// messages below.
-	Process(ExternalProcessor_ProcessServer) error
-}
-
-// UnimplementedExternalProcessorServer can be embedded to have forward compatible implementations.
-type UnimplementedExternalProcessorServer struct {
-}
-
-func (*UnimplementedExternalProcessorServer) Process(ExternalProcessor_ProcessServer) error {
-	return status.Errorf(codes.Unimplemented, "method Process not implemented")
-}
-
-func RegisterExternalProcessorServer(s *grpc.Server, srv ExternalProcessorServer) {
-	s.RegisterService(&_ExternalProcessor_serviceDesc, srv)
-}
-
-func _ExternalProcessor_Process_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ExternalProcessorServer).Process(&externalProcessorProcessServer{stream})
-}
-
-type ExternalProcessor_ProcessServer interface {
-	Send(*ProcessingResponse) error
-	Recv() (*ProcessingRequest, error)
-	grpc.ServerStream
-}
-
-type externalProcessorProcessServer struct {
-	grpc.ServerStream
-}
-
-func (x *externalProcessorProcessServer) Send(m *ProcessingResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *externalProcessorProcessServer) Recv() (*ProcessingRequest, error) {
-	m := new(ProcessingRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-var _ExternalProcessor_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "envoy.service.ext_proc.v3.ExternalProcessor",
-	HandlerType: (*ExternalProcessorServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "Process",
-			Handler:       _ExternalProcessor_Process_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
-	},
-	Metadata: "envoy/service/ext_proc/v3/external_processor.proto",
 }
