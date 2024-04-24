@@ -860,14 +860,11 @@ type CertificateValidationContext struct {
 	// can be treated as trust anchor as well. It allows verification with building valid partial chain instead
 	// of a full chain.
 	//
-	// Only one of “trusted_ca“ and “ca_certificate_provider_instance“ may be specified.
-	//
-	// [#next-major-version: This field and watched_directory below should ideally be moved into a
-	// separate sub-message, since there's no point in specifying the latter field without this one.]
+	// If “ca_certificate_provider_instance“ is set, it takes precedence over “trusted_ca“.
 	TrustedCa *v3.DataSource `protobuf:"bytes,1,opt,name=trusted_ca,json=trustedCa,proto3" json:"trusted_ca,omitempty"`
 	// Certificate provider instance for fetching TLS certificates.
 	//
-	// Only one of “trusted_ca“ and “ca_certificate_provider_instance“ may be specified.
+	// If set, takes precedence over “trusted_ca“.
 	// [#not-implemented-hide:]
 	CaCertificateProviderInstance *CertificateProviderPluginInstance `protobuf:"bytes,13,opt,name=ca_certificate_provider_instance,json=caCertificateProviderInstance,proto3" json:"ca_certificate_provider_instance,omitempty"`
 	// If specified, updates of a file-based “trusted_ca“ source will be triggered
