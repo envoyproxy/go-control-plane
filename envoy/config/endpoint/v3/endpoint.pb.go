@@ -144,6 +144,12 @@ type ClusterLoadAssignment_Policy struct {
 	//
 	// Envoy supports only one element and will NACK if more than one element is present.
 	// Other xDS-capable data planes will not necessarily have this limitation.
+	//
+	// In Envoy, this “drop_overloads“ config can be overridden by a runtime key
+	// "load_balancing_policy.drop_overload_limit" setting. This runtime key can be set to
+	// any integer number between 0 and 100. 0 means drop 0%. 100 means drop 100%.
+	// When both “drop_overloads“ config and "load_balancing_policy.drop_overload_limit"
+	// setting are in place, the min of these two wins.
 	DropOverloads []*ClusterLoadAssignment_Policy_DropOverload `protobuf:"bytes,2,rep,name=drop_overloads,json=dropOverloads,proto3" json:"drop_overloads,omitempty"`
 	// Priority levels and localities are considered overprovisioned with this
 	// factor (in percentage). This means that we don't consider a priority
