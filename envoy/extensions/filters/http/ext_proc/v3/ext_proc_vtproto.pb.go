@@ -51,6 +51,13 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RouteCacheAction != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.RouteCacheAction))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x90
+	}
 	if m.ObservabilityMode {
 		i--
 		if m.ObservabilityMode {
@@ -712,6 +719,9 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 	}
 	if m.ObservabilityMode {
 		n += 3
+	}
+	if m.RouteCacheAction != 0 {
+		n += 2 + protohelpers.SizeOfVarint(uint64(m.RouteCacheAction))
 	}
 	n += len(m.unknownFields)
 	return n

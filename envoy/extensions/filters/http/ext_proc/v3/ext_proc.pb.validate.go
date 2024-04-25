@@ -222,8 +222,6 @@ func (m *ExternalProcessor) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for DisableClearRouteCache
-
 	if all {
 		switch v := interface{}(m.GetForwardRules()).(type) {
 		case interface{ ValidateAll() error }:
@@ -316,6 +314,10 @@ func (m *ExternalProcessor) validate(all bool) error {
 	}
 
 	// no validation rules for ObservabilityMode
+
+	// no validation rules for DisableClearRouteCache
+
+	// no validation rules for RouteCacheAction
 
 	if len(errors) > 0 {
 		return ExternalProcessorMultiError(errors)
