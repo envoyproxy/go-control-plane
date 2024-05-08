@@ -137,6 +137,8 @@ func (m *ExtAuthz) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ValidateMutations
+
 	if all {
 		switch v := interface{}(m.GetFilterEnabled()).(type) {
 		case interface{ ValidateAll() error }:

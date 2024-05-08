@@ -50,6 +50,18 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ValidateMutations {
+		i--
+		if m.ValidateMutations {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc0
+	}
 	if m.EncodeRawHeaders {
 		i--
 		if m.EncodeRawHeaders {
@@ -1025,6 +1037,9 @@ func (m *ExtAuthz) SizeVT() (n int) {
 		}
 	}
 	if m.EncodeRawHeaders {
+		n += 3
+	}
+	if m.ValidateMutations {
 		n += 3
 	}
 	n += len(m.unknownFields)
