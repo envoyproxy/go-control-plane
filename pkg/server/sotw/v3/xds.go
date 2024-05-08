@@ -26,9 +26,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 		node:      &core.Node{}, // node may only be set on the first discovery request
 
 		// a collection of stack allocated watches per request type.
-		watches:                newWatches(),
-		streamState:            stream.NewStreamState(false, map[string]string{}),
-		lastDiscoveryResponses: make(map[string]lastDiscoveryResponse),
+		watches: newWatches(),
 	}
 
 	// cleanup once our stream has ended.
@@ -38,6 +36,22 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 		if err := s.callbacks.OnStreamOpen(str.Context(), sw.ID, defaultTypeURL); err != nil {
 			return err
 		}
+	}
+
+	// type URL is required for ADS but is implicit for xDS
+	if defaultTypeURL == resource.AnyType && s.opts.Ordered {
+		// When using ADS we need to order responses.
+		// This is guaranteed in the xDS protocol specification
+		// as ADS is required to be eventually consistent.
+		// More details can be found here if interested:
+		// https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#eventual-consistency-considerations
+
+		// Trigger a different code path specifically for ADS.
+		// We want resource ordering so things don't get sent before they should.
+		// This is a blocking call and will exit the process function
+		// on successful completion.
+		s.opts.Logger.Debugf("[sotw] Switching to ordered ADS implementation for stream %d", sw.ID)
+		return s.processADS(&sw, reqCh, defaultTypeURL)
 	}
 
 	// do an initial recompute so we can load the first 2 channels:
@@ -76,35 +90,10 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				req.Node = sw.node
 			}
 
-			// nonces can be reused across streams; we verify nonce only if nonce is not initialized
-			nonce := req.GetResponseNonce()
-
 			// type URL is required for ADS but is implicit for xDS
 			if defaultTypeURL == resource.AnyType {
 				if req.GetTypeUrl() == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
-				}
-
-				// When using ADS we need to order responses.
-				// This is guaranteed in the xDS protocol specification
-				// as ADS is required to be eventually consistent.
-				// More details can be found here if interested:
-				// https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#eventual-consistency-considerations
-				if s.opts.Ordered {
-					// send our first request on the stream again so it doesn't get
-					// lost in processing on the new control loop
-					// There's a risk (albeit very limited) that we'd end up handling requests in the wrong order here.
-					// If envoy is using ADS for endpoints, and clusters are added in short sequence,
-					// the following request might include a new cluster and be discarded as the previous one will be handled after.
-					go func() {
-						reqCh <- req
-					}()
-
-					// Trigger a different code path specifically for ADS.
-					// We want resource ordering so things don't get sent before they should.
-					// This is a blocking call and will exit the process function
-					// on successful completion.
-					return s.processADS(&sw, reqCh, defaultTypeURL)
 				}
 			} else if req.GetTypeUrl() == "" {
 				req.TypeUrl = defaultTypeURL
@@ -116,34 +105,43 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 				}
 			}
 
-			if lastResponse, ok := sw.lastDiscoveryResponses[req.GetTypeUrl()]; ok {
-				if lastResponse.nonce == "" || lastResponse.nonce == nonce {
-					// Let's record Resource names that a client has received.
-					sw.streamState.SetKnownResourceNames(req.GetTypeUrl(), lastResponse.resources)
-				}
-			}
-
 			typeURL := req.GetTypeUrl()
-			responder := make(chan cache.Response, 1)
-			if w, ok := sw.watches.responders[typeURL]; ok {
-				// We've found a pre-existing watch, lets check and update if needed.
-				// If these requirements aren't satisfied, leave an open watch.
-				if w.nonce == "" || w.nonce == nonce {
-					w.close()
-
-					sw.watches.addWatch(typeURL, &watch{
-						cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
-						response: responder,
-					})
+			var subscription stream.Subscription
+			w, ok := sw.watches.responders[typeURL]
+			if ok {
+				if w.nonce != "" && req.GetResponseNonce() != w.nonce {
+					// The request does not match the stream nonce, ignore it as per
+					// https://www.envoyproxy.io/docs/envoy/v1.28.0/api-docs/xds_protocol#resource-updates
+					// Ignore this request and wait for the next one
+					// This behavior is being discussed in https://github.com/envoyproxy/envoy/issues/10363
+					// as it might create a race in edge cases, but it matches the current protocol defintion
+					s.opts.Logger.Debugf("[sotw ads] Skipping request as nonce is stale for %s", typeURL)
+					break
 				}
+
+				// We found an existing watch
+				// Close it to ensure the Cache will not reply to it while we modify the subscription state
+				w.close()
+
+				subscription = w.sub
 			} else {
-				// No pre-existing watch exists, let's create one.
-				// We need to precompute the watches first then open a watch in the cache.
-				sw.watches.addWatch(typeURL, &watch{
-					cancel:   s.cache.CreateWatch(req, sw.streamState, responder),
-					response: responder,
-				})
+				s.opts.Logger.Debugf("[sotw] New subscription for type %s and stream %d", typeURL, sw.ID)
+				subscription = stream.NewSubscription(len(req.ResourceNames) == 0, nil)
 			}
+
+			subscription.SetResourceSubscription(req.GetResourceNames())
+
+			responder := make(chan cache.Response, 1)
+
+			cancel, err := s.cache.CreateWatch(req, subscription, responder)
+			if err != nil {
+				return err
+			}
+			sw.watches.addWatch(typeURL, &watch{
+				cancel:   cancel,
+				response: responder,
+				sub:      subscription,
+			})
 
 			// Recompute the dynamic select cases for this stream.
 			sw.watches.recompute(s.ctx, reqCh)
@@ -155,12 +153,10 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 			}
 
 			res := value.Interface().(cache.Response)
-			nonce, err := sw.send(res)
+			err := sw.send(res)
 			if err != nil {
 				return err
 			}
-
-			sw.watches.responders[res.GetRequest().GetTypeUrl()].nonce = nonce
 		}
 	}
 }

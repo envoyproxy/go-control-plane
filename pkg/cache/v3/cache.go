@@ -26,7 +26,6 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 )
@@ -36,6 +35,34 @@ type Request = discovery.DiscoveryRequest
 
 // DeltaRequest is an alias for the delta discovery request type.
 type DeltaRequest = discovery.DeltaDiscoveryRequest
+
+// Subscription stores the server view of the client state for a given resource type.
+// This allows proper implementation of stateful aspects of the protocol (e.g. returning only some updated resources).
+// Though the methods may return mutable parts of the state for performance reasons,
+// the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation.
+type Subscription interface {
+	// ReturnedResources returns a list of resources that clients have ACK'd and their associated version.
+	// The versions are:
+	//  - delta protocol: version of the specific resource set in the response
+	//  - sotw protocol: version of the global response when the resource was last ACKed
+	ReturnedResources() map[string]string
+
+	// SubscribedResources returns the list of resources currently subscribed to by the client for the type.
+	// For delta it keeps track of subscription updates across requests
+	// For sotw it is a normalized view of the last request resources
+	SubscribedResources() map[string]struct{}
+
+	// IsWildcard returns whether the client has a wildcard watch.
+	// This considers subtleties related to the current migration of wildcard definitions within the protocol.
+	// More details on the behavior of wildcard are present at https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#how-the-client-specifies-what-resources-to-return
+	IsWildcard() bool
+
+	// WatchesResources returns whether at least one of the resources provided is currently being watched by the subscription.
+	// It is currently only applicable to delta-xds.
+	// If the request is wildcard, it will always return true,
+	// otherwise it will compare the provided resources to the list of resources currently subscribed
+	WatchesResources(resourceNames map[string]struct{}) bool
+}
 
 // ConfigWatcher requests watches for configuration resources by a node, last
 // applied version identifier, and resource names hint. The watch should send
@@ -54,7 +81,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateWatch(*Request, stream.StreamState, chan Response) (cancel func())
+	CreateWatch(*Request, Subscription, chan Response) (cancel func(), err error)
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
 	// This is the entrypoint to propagate configuration changes the
@@ -66,7 +93,7 @@ type ConfigWatcher interface {
 	//
 	// Cancel is an optional function to release resources in the producer. If
 	// provided, the consumer may call this function multiple times.
-	CreateDeltaWatch(*DeltaRequest, stream.StreamState, chan DeltaResponse) (cancel func())
+	CreateDeltaWatch(*DeltaRequest, Subscription, chan DeltaResponse) (cancel func(), err error)
 }
 
 // ConfigFetcher fetches configuration resources from cache
