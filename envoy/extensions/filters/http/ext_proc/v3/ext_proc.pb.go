@@ -262,7 +262,6 @@ type ExternalProcessor struct {
 	// Only one of “disable_clear_route_cache“ or “route_cache_action“ can be set.
 	// It is recommended to set “route_cache_action“ which supersedes “disable_clear_route_cache“.
 	DisableClearRouteCache bool `protobuf:"varint,11,opt,name=disable_clear_route_cache,json=disableClearRouteCache,proto3" json:"disable_clear_route_cache,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies the action to be taken when an external processor response is
 	// received in response to request headers. It is recommended to set this field than set
 	// :ref:`disable_clear_route_cache <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.disable_clear_route_cache>`.
