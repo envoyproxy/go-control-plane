@@ -50,6 +50,30 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DisallowedHeaders != nil {
+		if vtmsg, ok := interface{}(m.DisallowedHeaders).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.DisallowedHeaders)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xca
+	}
 	if m.ValidateMutations {
 		i--
 		if m.ValidateMutations {
@@ -1041,6 +1065,16 @@ func (m *ExtAuthz) SizeVT() (n int) {
 	}
 	if m.ValidateMutations {
 		n += 3
+	}
+	if m.DisallowedHeaders != nil {
+		if size, ok := interface{}(m.DisallowedHeaders).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.DisallowedHeaders)
+		}
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
