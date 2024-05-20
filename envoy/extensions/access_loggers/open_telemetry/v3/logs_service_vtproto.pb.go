@@ -49,6 +49,13 @@ func (m *OpenTelemetryAccessLogConfig) MarshalToSizedBufferVTStrict(dAtA []byte)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.StatPrefix) > 0 {
+		i -= len(m.StatPrefix)
+		copy(dAtA[i:], m.StatPrefix)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.StatPrefix)))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.DisableBuiltinLabels {
 		i--
 		if m.DisableBuiltinLabels {
@@ -198,6 +205,10 @@ func (m *OpenTelemetryAccessLogConfig) SizeVT() (n int) {
 	}
 	if m.DisableBuiltinLabels {
 		n += 2
+	}
+	l = len(m.StatPrefix)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
