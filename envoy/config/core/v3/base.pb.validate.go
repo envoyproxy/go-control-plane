@@ -2228,6 +2228,35 @@ func (m *DataSource) validate(all bool) error {
 
 	var errors []error
 
+	if all {
+		switch v := interface{}(m.GetWatchedDirectory()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DataSourceValidationError{
+					field:  "WatchedDirectory",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DataSourceValidationError{
+					field:  "WatchedDirectory",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWatchedDirectory()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DataSourceValidationError{
+				field:  "WatchedDirectory",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	oneofSpecifierPresent := false
 	switch v := m.Specifier.(type) {
 	case *DataSource_Filename:

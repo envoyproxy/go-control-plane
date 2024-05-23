@@ -982,6 +982,16 @@ func (m *DataSource) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.WatchedDirectory != nil {
+		size, err := m.WatchedDirectory.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if msg, ok := m.Specifier.(*DataSource_EnvironmentVariable); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -2010,6 +2020,10 @@ func (m *DataSource) SizeVT() (n int) {
 	_ = l
 	if vtmsg, ok := m.Specifier.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
+	}
+	if m.WatchedDirectory != nil {
+		l = m.WatchedDirectory.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
