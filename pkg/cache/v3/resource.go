@@ -205,8 +205,8 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 		getListenerReferencesFromChain(chain, routes)
 	}
 
-	if src.DefaultFilterChain != nil {
-		getListenerReferencesFromChain(src.DefaultFilterChain, routes)
+	if src.GetDefaultFilterChain() != nil {
+		getListenerReferencesFromChain(src.GetDefaultFilterChain(), routes)
 	}
 
 	if len(routes) > 0 {
