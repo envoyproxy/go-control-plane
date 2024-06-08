@@ -131,7 +131,7 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version {
 					t.Errorf("got version %q, want %q", gotVersion, fixture.version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
+				if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTTL(typ))
 				}
 				// Update streamState
@@ -162,11 +162,11 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 					if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version {
 						t.Errorf("got version %q, want %q", gotVersion, fixture.version)
 					}
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
+					if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
 						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
-					if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
+					if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)) {
 						t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
 					}
 
@@ -235,7 +235,7 @@ func TestSnapshotCache(t *testing.T) {
 				if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version {
 					t.Errorf("got version %q, want %q", gotVersion, fixture.version)
 				}
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
+				if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
 				}
 			case <-time.After(time.Second):
@@ -295,7 +295,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 					t.Errorf("got version %q, want %q", gotVersion, fixture.version)
 				}
 				snapshot := fixture.snapshot()
-				if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
+				if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)) {
 					t.Errorf("get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
 				}
 				streamState.SetKnownResourceNamesAsList(typ, out.GetRequest().GetResourceNames())
@@ -317,7 +317,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// set partially-versioned snapshot
 	snapshot2 := fixture.snapshot()
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2.Resources[types.Endpoint] = mustNewResources(t, fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -331,7 +331,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 		if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version2 {
 			t.Errorf("got version %q, want %q", gotVersion, fixture.version2)
 		}
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
+		if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
 			t.Errorf("got resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
 	case <-time.After(time.Second):
@@ -349,7 +349,7 @@ func TestConcurrentSetWatch(t *testing.T) {
 			value := make(chan cache.Response, 1)
 			if i < 25 {
 				snap := cache.Snapshot{}
-				snap.Resources[types.Endpoint] = cache.NewResources(fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+				snap.Resources[types.Endpoint] = mustNewResources(t, fmt.Sprintf("v%d", i), []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
 				if err := c.SetSnapshot(context.Background(), id, &snap); err != nil {
 					t.Fatalf("failed to set snapshot %q: %s", id, err)
 				}
@@ -460,7 +460,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 			t.Errorf("got version %q, want %q", gotVersion, fixture.version)
 		}
 		want := map[string]types.ResourceWithTTL{clusterName: snapshot2.Resources[types.Endpoint].Items[clusterName]}
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), want) {
+		if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), want) {
 			t.Errorf("got resources %v, want %v", out.(*cache.RawResponse).Resources, want)
 		}
 	case <-time.After(time.Second):
@@ -482,7 +482,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 		if gotVersion, _ := out.GetVersion(); gotVersion != fixture.version {
 			t.Errorf("got version %q, want %q", gotVersion, fixture.version)
 		}
-		if !reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
+		if !reflect.DeepEqual(mustIndexResourcesByName(t, out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items) {
 			t.Errorf("got resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
 		}
 	case <-time.After(time.Second):

@@ -1,5 +1,11 @@
 # Changelog
 
+## Release v0.13.0
+
+### Changed
+
+- Error out on duplicated names instead of silently overwriting.
+
 ## Release v0.11.0
 
 ### Added

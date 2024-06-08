@@ -217,7 +217,7 @@ func TestGetResourceReferences(t *testing.T) {
 		},
 	}
 	for _, cs := range cases {
-		names := cache.GetResourceReferences(cache.IndexResourcesByName([]types.ResourceWithTTL{{Resource: cs.in}}))
+		names := cache.GetResourceReferences(mustIndexResourcesByName(t, []types.ResourceWithTTL{{Resource: cs.in}}))
 		if !reflect.DeepEqual(names, cs.out) {
 			t.Errorf("GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
 		}
@@ -231,14 +231,40 @@ func TestGetAllResourceReferencesReturnsExpectedRefs(t *testing.T) {
 	}
 
 	resources := [types.UnknownType]cache.Resources{}
-	resources[types.Endpoint] = cache.NewResources("1", []types.Resource{testEndpoint})
-	resources[types.Cluster] = cache.NewResources("1", []types.Resource{testCluster})
-	resources[types.Route] = cache.NewResources("1", []types.Resource{testRoute})
-	resources[types.Listener] = cache.NewResources("1", []types.Resource{testListener, testScopedListener})
-	resources[types.ScopedRoute] = cache.NewResources("1", []types.Resource{testScopedRoute})
+	resources[types.Endpoint] = mustNewResources(t, "1", []types.Resource{testEndpoint})
+	resources[types.Cluster] = mustNewResources(t, "1", []types.Resource{testCluster})
+	resources[types.Route] = mustNewResources(t, "1", []types.Resource{testRoute})
+	resources[types.Listener] = mustNewResources(t, "1", []types.Resource{testListener, testScopedListener})
+	resources[types.ScopedRoute] = mustNewResources(t, "1", []types.Resource{testScopedRoute})
 	actual := cache.GetAllResourceReferences(resources)
 
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("GetAllResourceReferences(%v) => got %v, want %v", resources, actual, expected)
 	}
+}
+
+func mustNewResources(t *testing.T, version string, items []types.Resource) cache.Resources {
+	t.Helper()
+	v, err := cache.NewResources(version, items)
+	require.NoError(t, err)
+
+	return v
+}
+
+func mustIndexResourcesByName(t *testing.T, items []types.ResourceWithTTL) map[string]types.ResourceWithTTL {
+	t.Helper()
+
+	v, err := cache.IndexResourcesByName(items)
+	require.NoError(t, err)
+
+	return v
+}
+
+func mustIndexRawResourcesByName(t *testing.T, items []types.Resource) map[string]types.Resource {
+	t.Helper()
+
+	v, err := cache.IndexRawResourcesByName(items)
+	require.NoError(t, err)
+
+	return v
 }

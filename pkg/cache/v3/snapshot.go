@@ -45,10 +45,15 @@ func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
 		if index == types.UnknownType {
-			return nil, errors.New("unknown resource type: " + typ)
+			return nil, fmt.Errorf("unknown resource type: %q", typ)
 		}
 
-		out.Resources[index] = NewResources(version, resource)
+		versionedResource, err := NewResources(version, resource)
+		if err != nil {
+			return nil, fmt.Errorf("creating resources for resource type: %q", index)
+		}
+
+		out.Resources[index] = versionedResource
 	}
 
 	return &out, nil
@@ -62,10 +67,15 @@ func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.Res
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
 		if index == types.UnknownType {
-			return nil, errors.New("unknown resource type: " + typ)
+			return nil, fmt.Errorf("unknown resource type: %q", typ)
 		}
 
-		out.Resources[index] = NewResourcesWithTTL(version, resource)
+		versionedResource, err := NewResourcesWithTTL(version, resource)
+		if err != nil {
+			return nil, fmt.Errorf("creating resources for resource type: %q", index)
+		}
+
+		out.Resources[index] = versionedResource
 	}
 
 	return &out, nil
