@@ -6,3 +6,7 @@ coverage:
 	go test ./... -race -covermode=atomic -coverprofile=coverage.out
 coverage_html: coverage
 	go tool cover -html=coverage.out
+
+.PHONY: tidy
+tidy:
+	go mod tidy

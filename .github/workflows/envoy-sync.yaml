@@ -22,14 +22,14 @@ jobs:
       }}
     steps:
     - id: appauth
-      uses: envoyproxy/toolshed/gh-actions/appauth@actions-v0.1.2
+      uses: envoyproxy/toolshed/gh-actions/appauth@5ef04d5f8144dc3a1a8c05bd81b0ef267c0849f5  # actions-v0.1.83
       with:
         key: ${{ secrets.ENVOY_CI_UPDATE_BOT_KEY }}
         app_id: ${{ secrets.ENVOY_CI_UPDATE_APP_ID }}
 
     # Checkout the repo
     - name: 'Checkout Repository'
-      uses: actions/checkout@v4
+      uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
       with:
         ref: main
         fetch-depth: 0
@@ -37,7 +37,7 @@ jobs:
 
     # Checkout the Envoy repo
     - name: 'Checkout Repository'
-      uses: actions/checkout@v4
+      uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
       with:
         repository: envoyproxy/envoy
         ref: main

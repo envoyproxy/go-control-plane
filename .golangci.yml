@@ -1,28 +1,28 @@
 issues:
-  fix: true
   exclude-rules:
-    - linters:
-        - gosec
-      text: 'G101'
-      path: 'pkg/test/resource/v3/secret.go'
+  - linters:
+    - gosec
+    text: 'G101'
+    path: 'pkg/test/resource/v3/secret.go'
   max-issues-per-linter: 0
   max-same-issues: 0
 
 linters:
   enable:
-    - bodyclose
-    - contextcheck
-    - errcheck
-    - errorlint
-    - gofumpt
-    - goimports
-    - gosec
-    - misspell
-    - revive
-    - unconvert
-    - unparam
-    - unused
-    - whitespace
+  - bodyclose
+  - contextcheck
+  - errcheck
+  - errorlint
+  - gofumpt
+  - goimports
+  - gosec
+  - misspell
+  - revive
+  - testifylint
+  - unconvert
+  - unparam
+  - unused
+  - whitespace
 
 linters-settings:
   exhaustive:
@@ -33,6 +33,22 @@ linters-settings:
     local-prefixes: github.com/envoyproxy/go-control-plane
   misspell:
     locale: US
+  testifylint:
+    disable:
+    - float-compare
+    - go-require
+    enable:
+    - bool-compare
+    - compares
+    - empty
+    - error-is-as
+    - error-nil
+    - expected-actual
+    - len
+    - require-error
+    - suite-dont-use-pkg
+    - suite-extra-assert-call
+
   unparam:
     check-exported: false
 
