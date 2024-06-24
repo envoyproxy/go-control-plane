@@ -53,6 +53,21 @@ func (m *UpstreamLocalityStats) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TotalFailConnections != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.TotalFailConnections))
+		i--
+		dAtA[i] = 0x58
+	}
+	if m.TotalNewConnections != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.TotalNewConnections))
+		i--
+		dAtA[i] = 0x50
+	}
+	if m.TotalActiveConnections != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.TotalActiveConnections))
+		i--
+		dAtA[i] = 0x48
+	}
 	if m.TotalIssuedRequests != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.TotalIssuedRequests))
 		i--
@@ -448,6 +463,15 @@ func (m *UpstreamLocalityStats) SizeVT() (n int) {
 	}
 	if m.TotalIssuedRequests != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.TotalIssuedRequests))
+	}
+	if m.TotalActiveConnections != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.TotalActiveConnections))
+	}
+	if m.TotalNewConnections != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.TotalNewConnections))
+	}
+	if m.TotalFailConnections != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.TotalFailConnections))
 	}
 	n += len(m.unknownFields)
 	return n

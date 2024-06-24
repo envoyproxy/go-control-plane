@@ -95,6 +95,12 @@ func (m *UpstreamLocalityStats) validate(all bool) error {
 
 	// no validation rules for TotalIssuedRequests
 
+	// no validation rules for TotalActiveConnections
+
+	// no validation rules for TotalNewConnections
+
+	// no validation rules for TotalFailConnections
+
 	for idx, item := range m.GetLoadMetricStats() {
 		_, _ = idx, item
 
