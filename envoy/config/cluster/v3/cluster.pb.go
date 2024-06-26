@@ -678,12 +678,14 @@ type Cluster struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Configuration to use different transport sockets for different endpoints.
-	// The entry of “envoy.transport_socket_match“ in the
-	// :ref:`LbEndpoint.Metadata <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>`
-	// is used to match against the transport sockets as they appear in the list. The first
-	// :ref:`match <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>` is used.
-	// For example, with the following match
+	// Configuration to use different transport sockets for different endpoints.  The entry of
+	// “envoy.transport_socket_match“ in the :ref:`LbEndpoint.Metadata
+	// <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>` is used to match against the
+	// transport sockets as they appear in the list. If a match is not found, the search continues in
+	// :ref:`LocalityLbEndpoints.Metadata
+	// <envoy_v3_api_field_config.endpoint.v3.LocalityLbEndpoints.metadata>`.  The first :ref:`match
+	// <envoy_v3_api_msg_config.cluster.v3.Cluster.TransportSocketMatch>` is used.  For example, with
+	// the following match
 	//
 	// .. code-block:: yaml
 	//
@@ -707,8 +709,9 @@ type Cluster struct {
 	// socket match in case above.
 	//
 	// If an endpoint metadata's value under “envoy.transport_socket_match“ does not match any
-	// “TransportSocketMatch“, socket configuration fallbacks to use the “tls_context“ or
-	// “transport_socket“ specified in this cluster.
+	// “TransportSocketMatch“, the locality metadata is then checked for a match. Barring any
+	// matches in the endpoint or locality metadata, the socket configuration fallbacks to use the
+	// “tls_context“ or “transport_socket“ specified in this cluster.
 	//
 	// This field allows gradual and flexible transport socket configuration changes.
 	//
@@ -1769,7 +1772,7 @@ type Cluster_TransportSocketMatch struct {
 
 	// The name of the match, used in stats generation.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Optional endpoint metadata match criteria.
+	// Optional metadata match criteria.
 	// The connection to the endpoint with metadata matching what is set in this field
 	// will use the transport socket configuration specified here.
 	// The endpoint's metadata entry in “envoy.transport_socket_match“ is used to match
