@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	"google.golang.org/protobuf/proto"
@@ -55,3 +56,33 @@ const (
 	RateLimitConfig
 	UnknownType // token to count the total number of supported types
 )
+
+// String returns the string representation of the ResponseType.
+func (rt ResponseType) String() string {
+	switch rt {
+	case Cluster:
+		return "Cluster"
+	case Endpoint:
+		return "Endpoint"
+	case Listener:
+		return "Listener"
+	case Route:
+		return "Route"
+	case ScopedRoute:
+		return "ScopedRoute"
+	case VirtualHost:
+		return "VirtualHost"
+	case Secret:
+		return "Secret"
+	case Runtime:
+		return "Runtime"
+	case ExtensionConfig:
+		return "ExtensionConfig"
+	case RateLimitConfig:
+		return "RateLimitConfig"
+	case UnknownType:
+		return "UnknownType"
+	}
+
+	panic(fmt.Sprintf("unknown response type: %d", int(rt)))
+}

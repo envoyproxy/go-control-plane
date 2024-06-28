@@ -55,7 +55,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
 				snapshot := fixture.snapshot()
-				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
+				assertResourceMapEqual(t, mustIndexRawResourcesByName(t, out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
 				vMap := out.GetNextVersionMap()
 				versionMap[typ] = vMap
 			case <-time.After(time.Second):
@@ -87,7 +87,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 
 	// set partially-versioned snapshot
 	snapshot2 := fixture.snapshot()
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2.Resources[types.Endpoint] = mustNewResources(t, fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -99,8 +99,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	select {
 	case out := <-watches[testTypes[0]]:
 		snapshot2 := fixture.snapshot()
-		snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		snapshot2.Resources[types.Endpoint] = mustNewResources(t, fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+		assertResourceMapEqual(t, mustIndexRawResourcesByName(t, out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
 		vMap := out.GetNextVersionMap()
 		versionMap[testTypes[0]] = vMap
 	case <-time.After(time.Second):
@@ -136,7 +136,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
 				snapshot := fixture.snapshot()
-				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
+				assertResourceMapEqual(t, mustIndexRawResourcesByName(t, out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
 				nextVersionMap := out.GetNextVersionMap()
 				streams[typ].SetResourceVersions(nextVersionMap)
 			case <-time.After(time.Second):
@@ -163,7 +163,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 	// set a partially versioned snapshot with no endpoints
 	snapshot2 := fixture.snapshot()
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
+	snapshot2.Resources[types.Endpoint] = mustNewResources(t, fixture.version2, []types.Resource{})
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -172,8 +172,8 @@ func TestDeltaRemoveResources(t *testing.T) {
 	select {
 	case out := <-watches[testTypes[0]]:
 		snapshot2 := fixture.snapshot()
-		snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		snapshot2.Resources[types.Endpoint] = mustNewResources(t, fixture.version2, []types.Resource{})
+		assertResourceMapEqual(t, mustIndexRawResourcesByName(t, out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
 		nextVersionMap := out.GetNextVersionMap()
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
@@ -199,7 +199,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 					if err != nil {
 						t.Fatal(err)
 					}
-					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
+					snap.Resources[types.Endpoint] = mustNewResources(t, version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
 					if err := c.SetSnapshot(context.Background(), key, snap); err != nil {
 						t.Fatalf("snapshot failed: %s", err)
 					}
