@@ -233,6 +233,18 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DisableIdTokenSetCookie {
+		i--
+		if m.DisableIdTokenSetCookie {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x88
+	}
 	if m.PreserveAuthorizationHeader {
 		i--
 		if m.PreserveAuthorizationHeader {
@@ -676,6 +688,9 @@ func (m *OAuth2Config) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.PreserveAuthorizationHeader {
+		n += 3
+	}
+	if m.DisableIdTokenSetCookie {
 		n += 3
 	}
 	n += len(m.unknownFields)

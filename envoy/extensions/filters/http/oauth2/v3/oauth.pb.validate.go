@@ -650,6 +650,8 @@ func (m *OAuth2Config) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for DisableIdTokenSetCookie
+
 	if len(errors) > 0 {
 		return OAuth2ConfigMultiError(errors)
 	}
