@@ -267,7 +267,6 @@ type ExternalProcessor struct {
 	// :ref:`disable_clear_route_cache <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.disable_clear_route_cache>`.
 	// Only one of “disable_clear_route_cache“ or “route_cache_action“ can be set.
 	RouteCacheAction ExternalProcessor_RouteCacheAction `protobuf:"varint,18,opt,name=route_cache_action,json=routeCacheAction,proto3,enum=envoy.extensions.filters.http.ext_proc.v3.ExternalProcessor_RouteCacheAction" json:"route_cache_action,omitempty"`
-	// [#not-implemented-hide:]
 	// Specifies the deferred closure timeout for gRPC stream that connects to external processor. Currently, the deferred stream closure
 	// is only used in :ref:`observability_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.observability_mode>`.
 	// In observability mode, gRPC streams may be held open to the external processor longer than the lifetime of the regular client to
