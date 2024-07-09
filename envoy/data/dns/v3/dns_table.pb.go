@@ -586,7 +586,15 @@ type DnsTable_DnsVirtualDomain struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// A domain name for which Envoy will respond to query requests
+	// A domain name for which Envoy will respond to query requests.
+	// Wildcard records are supported on the first label only, e.g. “*.example.com“ or “*.subdomain.example.com“.
+	// Names such as “*example.com“, “subdomain.*.example.com“, “*subdomain.example.com“, etc
+	// are not valid wildcard names and asterisk will be interpreted as a literal “*“ character.
+	// Wildcard records match subdomains on any levels, e.g. “*.example.com“ will match
+	// “foo.example.com“, “bar.foo.example.com“, “baz.bar.foo.example.com“, etc. In case there are multiple
+	// wildcard records, the longest wildcard match will be used, e.g. if there are wildcard records for
+	// “*.example.com“ and “*.foo.example.com“ and the query is for “bar.foo.example.com“, the latter will be used.
+	// Specific records will always take precedence over wildcard records.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The configuration containing the method to determine the address of this endpoint
 	Endpoint *DnsTable_DnsEndpoint `protobuf:"bytes,2,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
