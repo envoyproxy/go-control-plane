@@ -452,9 +452,10 @@ type HttpConnectionManager struct {
 	// race with the final GOAWAY frame. During this grace period, Envoy will
 	// continue to accept new streams. After the grace period, a final GOAWAY
 	// frame is sent and Envoy will start refusing new streams. Draining occurs
-	// both when a connection hits the idle timeout or during general server
-	// draining. The default grace period is 5000 milliseconds (5 seconds) if this
-	// option is not specified.
+	// either when a connection hits the idle timeout, when :ref:`max_connection_duration
+	// <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_connection_duration>`
+	// is reached, or during general server draining. The default grace period is
+	// 5000 milliseconds (5 seconds) if this option is not specified.
 	DrainTimeout *durationpb.Duration `protobuf:"bytes,12,opt,name=drain_timeout,json=drainTimeout,proto3" json:"drain_timeout,omitempty"`
 	// The delayed close timeout is for downstream connections managed by the HTTP connection manager.
 	// It is defined as a grace period after connection close processing has been locally initiated
