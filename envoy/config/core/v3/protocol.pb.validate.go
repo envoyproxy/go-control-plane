@@ -569,6 +569,8 @@ func (m *UpstreamHttpProtocolOptions) validate(all bool) error {
 
 	}
 
+	// no validation rules for AutoSniFromUpstream
+
 	if len(errors) > 0 {
 		return UpstreamHttpProtocolOptionsMultiError(errors)
 	}
