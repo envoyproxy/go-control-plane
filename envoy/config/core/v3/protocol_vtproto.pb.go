@@ -244,16 +244,6 @@ func (m *UpstreamHttpProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.AutoSniFromUpstream {
-		i--
-		if m.AutoSniFromUpstream {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x20
-	}
 	if len(m.OverrideAutoSniHeader) > 0 {
 		i -= len(m.OverrideAutoSniHeader)
 		copy(dAtA[i:], m.OverrideAutoSniHeader)
@@ -1354,9 +1344,6 @@ func (m *UpstreamHttpProtocolOptions) SizeVT() (n int) {
 	l = len(m.OverrideAutoSniHeader)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
-	}
-	if m.AutoSniFromUpstream {
-		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
