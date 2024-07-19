@@ -1295,11 +1295,11 @@ func (m *Cluster) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.LrsReportEndpointMetric) > 0 {
-		for iNdEx := len(m.LrsReportEndpointMetric) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.LrsReportEndpointMetric[iNdEx])
-			copy(dAtA[i:], m.LrsReportEndpointMetric[iNdEx])
-			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.LrsReportEndpointMetric[iNdEx])))
+	if len(m.LrsReportEndpointMetrics) > 0 {
+		for iNdEx := len(m.LrsReportEndpointMetrics) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.LrsReportEndpointMetrics[iNdEx])
+			copy(dAtA[i:], m.LrsReportEndpointMetrics[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.LrsReportEndpointMetrics[iNdEx])))
 			i--
 			dAtA[i] = 0x3
 			i--
@@ -3236,8 +3236,8 @@ func (m *Cluster) SizeVT() (n int) {
 		}
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
-	if len(m.LrsReportEndpointMetric) > 0 {
-		for _, s := range m.LrsReportEndpointMetric {
+	if len(m.LrsReportEndpointMetrics) > 0 {
+		for _, s := range m.LrsReportEndpointMetrics {
 			l = len(s)
 			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
