@@ -131,6 +131,16 @@ func (m *DownstreamTlsContext) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.PreferClientCiphers {
+		i--
+		if m.PreferClientCiphers {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x58
+	}
 	if m.DisableStatefulSessionResumption {
 		i--
 		if m.DisableStatefulSessionResumption {
@@ -923,6 +933,9 @@ func (m *DownstreamTlsContext) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.DisableStatefulSessionResumption {
+		n += 2
+	}
+	if m.PreferClientCiphers {
 		n += 2
 	}
 	n += len(m.unknownFields)

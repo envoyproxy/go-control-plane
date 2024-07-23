@@ -420,6 +420,8 @@ func (m *DownstreamTlsContext) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PreferClientCiphers
+
 	switch v := m.SessionTicketKeysType.(type) {
 	case *DownstreamTlsContext_SessionTicketKeys:
 		if v == nil {
