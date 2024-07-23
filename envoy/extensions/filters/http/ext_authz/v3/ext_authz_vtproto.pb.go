@@ -8,6 +8,7 @@ package ext_authzv3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	structpb "github.com/planetscale/vtprotobuf/types/known/structpb"
 	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -49,6 +50,18 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.FilterMetadata != nil {
+		size, err := (*structpb.Struct)(m.FilterMetadata).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xe2
 	}
 	if m.EnableDynamicMetadataIngestion != nil {
 		size, err := (*wrapperspb.BoolValue)(m.EnableDynamicMetadataIngestion).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -1124,6 +1137,10 @@ func (m *ExtAuthz) SizeVT() (n int) {
 	}
 	if m.EnableDynamicMetadataIngestion != nil {
 		l = (*wrapperspb.BoolValue)(m.EnableDynamicMetadataIngestion).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.FilterMetadata != nil {
+		l = (*structpb.Struct)(m.FilterMetadata).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
