@@ -928,6 +928,35 @@ func (m *CommonTlsContext) validate(all bool) error {
 	}
 
 	if all {
+		switch v := interface{}(m.GetCustomTlsCertificateSelector()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CommonTlsContextValidationError{
+					field:  "CustomTlsCertificateSelector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CommonTlsContextValidationError{
+					field:  "CustomTlsCertificateSelector",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCustomTlsCertificateSelector()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CommonTlsContextValidationError{
+				field:  "CustomTlsCertificateSelector",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
 		switch v := interface{}(m.GetTlsCertificateCertificateProvider()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
