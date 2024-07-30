@@ -10,7 +10,7 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10
 	github.com/prometheus/client_model v0.6.0
 	github.com/stretchr/testify v1.9.0
-	go.opentelemetry.io/proto/otlp v1.0.0
+	go.opentelemetry.io/proto/otlp v1.3.1
 	go.uber.org/goleak v1.3.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157
