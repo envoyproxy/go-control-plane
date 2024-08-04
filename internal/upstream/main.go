@@ -32,7 +32,7 @@ func main() {
 	flag.Parse()
 
 	log.Printf("upstream listening HTTP/1.1 on %d\n", upstreamPort)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		if _, err := w.Write([]byte(hello)); err != nil {
 			log.Println(err)
 		}

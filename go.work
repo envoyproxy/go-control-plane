@@ -1,10 +1,9 @@
-go 1.20
+go 1.21
 
 use (
 	./
 	./contrib
 	./envoy
 	./ratelimit
-	./examples/dyplomat
 	./xdsmatcher
 )

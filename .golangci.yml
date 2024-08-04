@@ -1,34 +1,56 @@
-run:
-  timeout: 10m
+issues:
+  exclude-rules:
+  - linters:
+    - gosec
+    text: 'G101'
+    path: 'pkg/test/resource/v3/secret.go'
+  max-issues-per-linter: 0
+  max-same-issues: 0
 
 linters:
-  presets:
-  - bugs
-
   enable:
   - bodyclose
-  - gofmt
+  - contextcheck
+  - errcheck
+  - errorlint
+  - gofumpt
   - goimports
   - gosec
   - misspell
   - revive
+  - testifylint
   - unconvert
   - unparam
-
-  disable:
-  - scopelint # deprecated but still enabled in the bugs preset
+  - unused
+  - whitespace
 
 linters-settings:
-  misspell:
-    locale: US
-  gofmt:
-    simplify: true
-  unparam:
-    check-exported: false
-  goimports:
-    local-prefixes: github.com/envoyproxy/go-control-plane
   exhaustive:
     default-signifies-exhaustive: true
+  gofumpt:
+    extra-rules: true
+  goimports:
+    local-prefixes: github.com/envoyproxy/go-control-plane
+  misspell:
+    locale: US
+  testifylint:
+    disable:
+    - float-compare
+    - go-require
+    enable:
+    - bool-compare
+    - compares
+    - empty
+    - error-is-as
+    - error-nil
+    - expected-actual
+    - len
+    - require-error
+    - suite-dont-use-pkg
+    - suite-extra-assert-call
 
-issues:
-  fix: true
+  unparam:
+    check-exported: false
+
+run:
+  timeout: 10m

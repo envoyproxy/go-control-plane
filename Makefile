@@ -44,7 +44,7 @@ lint:
 		--rm \
 		--volume $$(pwd):/src \
 		--workdir /src \
-		golangci/golangci-lint:v1.52.2 \
+		golangci/golangci-lint:latest \
 	golangci-lint -v run
 
 #-----------------
@@ -93,4 +93,11 @@ example: $(BINDIR)/example
 .PHONY: docker_tests
 docker_tests:
 	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
-	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/scripts/do_ci.sh
+	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_ci.sh
+
+.PHONY: tidy-all
+tidy-all:
+	go mod tidy
+	make -C ratelimit tidy
+	make -C ratelimit tidy
+	make -C xdsmatcher tidy

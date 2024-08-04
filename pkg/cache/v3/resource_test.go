@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
@@ -50,6 +51,7 @@ var (
 	testScopedRoute     = resource.MakeScopedRouteConfig(scopedRouteName, routeName, []string{"1.2.3.4"})
 	testVirtualHost     = resource.MakeVirtualHost(virtualHostName, clusterName)
 	testListener        = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testListenerDefault = resource.MakeRouteHTTPListenerDefaultFilterChain(resource.Ads, listenerName, 80, routeName)
 	testScopedListener  = resource.MakeScopedRouteHTTPListenerForRoute(resource.Ads, scopedListenerName, 80, embeddedRouteName)
 	testRuntime         = resource.MakeRuntime(runtimeName)
 	testSecret          = resource.MakeSecrets(tlsName, rootName)
@@ -57,15 +59,15 @@ var (
 )
 
 func TestValidate(t *testing.T) {
-	assert.NoError(t, testEndpoint.Validate())
-	assert.NoError(t, testCluster.Validate())
-	assert.NoError(t, testRoute.Validate())
-	assert.NoError(t, testScopedRoute.Validate())
-	assert.NoError(t, testVirtualHost.Validate())
-	assert.NoError(t, testListener.Validate())
-	assert.NoError(t, testScopedListener.Validate())
-	assert.NoError(t, testRuntime.Validate())
-	assert.NoError(t, testExtensionConfig.Validate())
+	require.NoError(t, testEndpoint.Validate())
+	require.NoError(t, testCluster.Validate())
+	require.NoError(t, testRoute.Validate())
+	require.NoError(t, testScopedRoute.Validate())
+	require.NoError(t, testVirtualHost.Validate())
+	require.NoError(t, testListener.Validate())
+	require.NoError(t, testScopedListener.Validate())
+	require.NoError(t, testRuntime.Validate())
+	require.NoError(t, testExtensionConfig.Validate())
 
 	invalidRoute := &route.RouteConfiguration{
 		Name: "test",
@@ -78,7 +80,7 @@ func TestValidate(t *testing.T) {
 	if err := invalidRoute.Validate(); err == nil {
 		t.Error("expected an error")
 	}
-	if err := invalidRoute.VirtualHosts[0].Validate(); err == nil {
+	if err := invalidRoute.GetVirtualHosts()[0].Validate(); err == nil {
 		t.Error("expected an error")
 	}
 }
@@ -136,8 +138,8 @@ func TestGetResourceNames(t *testing.T) {
 		},
 		{
 			name:  "many",
-			input: []types.Resource{testRuntime, testListener, testVirtualHost},
-			want:  []string{runtimeName, listenerName, virtualHostName},
+			input: []types.Resource{testRuntime, testListener, testListenerDefault, testVirtualHost},
+			want:  []string{runtimeName, listenerName, listenerName, virtualHostName},
 		},
 	}
 	for _, test := range tests {
@@ -163,8 +165,10 @@ func TestGetResourceReferences(t *testing.T) {
 			out: map[rsrc.Type]map[string]bool{rsrc.EndpointType: {clusterName: true}},
 		},
 		{
-			in: &cluster.Cluster{Name: clusterName, ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
-				EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{ServiceName: "test"}},
+			in: &cluster.Cluster{
+				Name: clusterName, ClusterDiscoveryType: &cluster.Cluster_Type{Type: cluster.Cluster_EDS},
+				EdsClusterConfig: &cluster.Cluster_EdsClusterConfig{ServiceName: "test"},
+			},
 			out: map[rsrc.Type]map[string]bool{rsrc.EndpointType: {"test": true}},
 		},
 		{
@@ -177,6 +181,10 @@ func TestGetResourceReferences(t *testing.T) {
 		},
 		{
 			in:  resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName),
+			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+		},
+		{
+			in:  resource.MakeRouteHTTPListenerDefaultFilterChain(resource.Ads, listenerName, 80, routeName),
 			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
 		},
 		{
@@ -215,6 +223,7 @@ func TestGetResourceReferences(t *testing.T) {
 		}
 	}
 }
+
 func TestGetAllResourceReferencesReturnsExpectedRefs(t *testing.T) {
 	expected := map[rsrc.Type]map[string]bool{
 		rsrc.RouteType:    {routeName: true, embeddedRouteName: true},

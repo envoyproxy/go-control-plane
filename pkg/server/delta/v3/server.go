@@ -31,7 +31,7 @@ type Callbacks interface {
 	// OnStreamDeltaRequest is called once a request is received on a stream.
 	// Returning an error will end processing and close the stream. OnStreamClosed will still be called.
 	OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error
-	// OnStreamDelatResponse is called immediately prior to sending a response on a stream.
+	// OnStreamDeltaResponse is called immediately prior to sending a response on a stream.
 	OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse)
 }
 
@@ -74,7 +74,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 	// a collection of stack allocated watches per request type
 	watches := newWatches()
 
-	var node = &core.Node{}
+	node := &core.Node{}
 
 	defer func() {
 		watches.Cancel()
@@ -83,7 +83,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		}
 	}()
 
-	// Sends a response, returns the new stream nonce
+	// sends a response, returns the new stream nonce
 	send := func(resp cache.DeltaResponse) (string, error) {
 		if resp == nil {
 			return "", errors.New("missing response")
@@ -94,13 +94,51 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			return "", err
 		}
 
-		streamNonce = streamNonce + 1
+		streamNonce++
 		response.Nonce = strconv.FormatInt(streamNonce, 10)
 		if s.callbacks != nil {
 			s.callbacks.OnStreamDeltaResponse(streamID, resp.GetDeltaRequest(), response)
 		}
 
-		return response.Nonce, str.Send(response)
+		return response.GetNonce(), str.Send(response)
+	}
+
+	// process a single delta response
+	process := func(resp cache.DeltaResponse) error {
+		typ := resp.GetDeltaRequest().GetTypeUrl()
+		if resp == deltaErrorResponse {
+			return status.Errorf(codes.Unavailable, typ+" watch failed")
+		}
+
+		nonce, err := send(resp)
+		if err != nil {
+			return err
+		}
+
+		watch := watches.deltaWatches[typ]
+		watch.nonce = nonce
+
+		watch.state.SetResourceVersions(resp.GetNextVersionMap())
+		watches.deltaWatches[typ] = watch
+		return nil
+	}
+
+	// processAll purges the deltaMuxedResponses channel
+	processAll := func() error {
+		for {
+			select {
+			// We watch the multiplexed channel for incoming responses.
+			case resp, more := <-watches.deltaMuxedResponses:
+				if !more {
+					break
+				}
+				if err := process(resp); err != nil {
+					return err
+				}
+			default:
+				return nil
+			}
+		}
 	}
 
 	if s.callbacks != nil {
@@ -113,33 +151,29 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		select {
 		case <-s.ctx.Done():
 			return nil
+		// We watch the multiplexed channel for incoming responses.
 		case resp, more := <-watches.deltaMuxedResponses:
+			// input stream ended or errored out
 			if !more {
 				break
 			}
 
-			typ := resp.GetDeltaRequest().GetTypeUrl()
-			if resp == deltaErrorResponse {
-				return status.Errorf(codes.Unavailable, typ+" watch failed")
-			}
-
-			nonce, err := send(resp)
-			if err != nil {
+			if err := process(resp); err != nil {
 				return err
 			}
-
-			watch := watches.deltaWatches[typ]
-			watch.nonce = nonce
-
-			watch.state.SetResourceVersions(resp.GetNextVersionMap())
-			watches.deltaWatches[typ] = watch
 		case req, more := <-reqCh:
 			// input stream ended or errored out
 			if !more {
 				return nil
 			}
+
 			if req == nil {
 				return status.Errorf(codes.Unavailable, "empty request")
+			}
+
+			// make sure all existing responses are processed prior to new requests to avoid deadlock
+			if err := processAll(); err != nil {
+				return err
 			}
 
 			if s.callbacks != nil {
@@ -150,18 +184,18 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 
 			// The node information might only be set on the first incoming delta discovery request, so store it here so we can
 			// reset it on subsequent requests that omit it.
-			if req.Node != nil {
-				node = req.Node
+			if req.GetNode() != nil {
+				node = req.GetNode()
 			} else {
 				req.Node = node
 			}
 
 			// type URL is required for ADS but is implicit for any other xDS stream
 			if defaultTypeURL == resource.AnyType {
-				if req.TypeUrl == "" {
+				if req.GetTypeUrl() == "" {
 					return status.Errorf(codes.InvalidArgument, "type URL is required for ADS")
 				}
-			} else if req.TypeUrl == "" {
+			} else if req.GetTypeUrl() == "" {
 				req.TypeUrl = defaultTypeURL
 			}
 
@@ -184,16 +218,8 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 			s.subscribe(req.GetResourceNamesSubscribe(), &watch.state)
 			s.unsubscribe(req.GetResourceNamesUnsubscribe(), &watch.state)
 
-			watch.responses = make(chan cache.DeltaResponse, 1)
-			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watch.responses)
+			watch.cancel = s.cache.CreateDeltaWatch(req, watch.state, watches.deltaMuxedResponses)
 			watches.deltaWatches[typeURL] = watch
-
-			go func() {
-				resp, more := <-watch.responses
-				if more {
-					watches.deltaMuxedResponses <- resp
-				}
-			}()
 		}
 	}
 }
@@ -204,23 +230,21 @@ func (s *server) DeltaStreamHandler(str stream.DeltaStream, typeURL string) erro
 
 	// we need to concurrently handle incoming requests since we kick off processDelta as a return
 	go func() {
+		defer close(reqCh)
 		for {
-			select {
-			case <-str.Context().Done():
-				close(reqCh)
+			req, err := str.Recv()
+			if err != nil {
 				return
-			default:
-				req, err := str.Recv()
-				if err != nil {
-					close(reqCh)
-					return
-				}
-
-				reqCh <- req
+			}
+			select {
+			case reqCh <- req:
+			case <-str.Context().Done():
+				return
+			case <-s.ctx.Done():
+				return
 			}
 		}
 	}()
-
 	return s.processDelta(str, reqCh, typeURL)
 }
 

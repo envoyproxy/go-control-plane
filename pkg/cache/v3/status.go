@@ -37,7 +37,7 @@ func (IDHash) ID(node *core.Node) string {
 	if node == nil {
 		return ""
 	}
-	return node.Id
+	return node.GetId()
 }
 
 var _ NodeHash = IDHash{}
@@ -70,7 +70,8 @@ type statusInfo struct {
 	orderedWatches keys
 
 	// deltaWatches are indexed channels for the delta response watches and the original requests
-	deltaWatches map[int64]DeltaResponseWatch
+	deltaWatches        map[int64]DeltaResponseWatch
+	orderedDeltaWatches keys
 
 	// the timestamp of the last watch request
 	lastWatchRequestTime time.Time
@@ -168,7 +169,7 @@ func (info *statusInfo) orderResponseWatches() {
 	for id, watch := range info.watches {
 		info.orderedWatches[index] = key{
 			ID:      id,
-			TypeURL: watch.Request.TypeUrl,
+			TypeURL: watch.Request.GetTypeUrl(),
 		}
 		index++
 	}
@@ -176,4 +177,23 @@ func (info *statusInfo) orderResponseWatches() {
 	// Sort our list which we can use in the SetSnapshot functions.
 	// This is only run when we enable ADS on the cache.
 	sort.Sort(info.orderedWatches)
+}
+
+// orderResponseDeltaWatches will track a list of delta watch keys and order them if
+// true is passed.
+func (info *statusInfo) orderResponseDeltaWatches() {
+	info.orderedDeltaWatches = make(keys, len(info.deltaWatches))
+
+	var index int
+	for id, deltaWatch := range info.deltaWatches {
+		info.orderedDeltaWatches[index] = key{
+			ID:      id,
+			TypeURL: deltaWatch.Request.GetTypeUrl(),
+		}
+		index++
+	}
+
+	// Sort our list which we can use in the SetSnapshot functions.
+	// This is only run when we enable ADS on the cache.
+	sort.Sort(info.orderedDeltaWatches)
 }
