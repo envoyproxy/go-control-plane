@@ -2,8 +2,15 @@ module github.com/envoyproxy/go-control-plane/examples/dyplomat
 
 go 1.21
 
+replace (
+	github.com/envoyproxy/go-control-plane => ../..
+	github.com/envoyproxy/go-control-plane/envoy => ../../envoy
+	github.com/envoyproxy/go-control-plane/ratelimit => ../../ratelimit
+)
+
 require (
 	github.com/envoyproxy/go-control-plane v0.12.0
+	github.com/envoyproxy/go-control-plane/envoy v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.65.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.28.2
@@ -21,6 +28,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20240423153145-555b57ec207b // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
+	github.com/envoyproxy/go-control-plane/ratelimit v0.0.0-00010101000000-000000000000 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
