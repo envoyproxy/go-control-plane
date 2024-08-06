@@ -43,6 +43,13 @@ type StreamState struct { // nolint:golint,revive
 
 	// Ordered indicates whether we want an ordered ADS stream or not
 	ordered bool
+
+	// ForcePush indicates if should push the response even when the version is the same
+	// This is required in the situation:
+	// 1) There is a Cluster change and control plane responds with CDS
+	// 2) Envoy has a cluster in the warming phase until there is a EDS response, if endpoints haven't changed
+	//    there is no EDS send and changes to the clusters are blocked
+	forcePush bool
 }
 
 // NewStreamState initializes a stream state.
@@ -97,6 +104,10 @@ func (s *StreamState) SetWildcard(wildcard bool) {
 	s.wildcard = wildcard
 }
 
+func (s *StreamState) SetForcePush(forcePush bool) {
+	s.forcePush = forcePush
+}
+
 // GetResourceVersions returns a map of current resources grouped by type URL.
 func (s *StreamState) GetResourceVersions() map[string]string {
 	return s.resourceVersions
@@ -117,6 +128,10 @@ func (s *StreamState) IsFirst() bool {
 // IsWildcard returns whether or not an xDS client requested in wildcard mode on the initial request.
 func (s *StreamState) IsWildcard() bool {
 	return s.wildcard
+}
+
+func (s *StreamState) ShouldForcePush() bool {
+	return s.forcePush
 }
 
 // GetKnownResourceNames returns the current known list of resources on a SOTW stream.
