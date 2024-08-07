@@ -1,0 +1,9 @@
+go 1.21
+
+use (
+	./
+	./contrib
+	./envoy
+	./ratelimit
+	./xdsmatcher
+)

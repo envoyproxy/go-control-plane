@@ -28,7 +28,7 @@ test:
 
 .PHONY: cover
 cover:
-	@build/coverage.sh
+	@scripts/coverage.sh
 
 .PHONY: format
 format:
@@ -62,22 +62,22 @@ $(BINDIR)/test:
 integration: integration.xds integration.ads integration.rest integration.xds.mux integration.xds.delta integration.ads.delta
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=ads build/integration.sh
+	env XDS=ads scripts/integration.sh
 
 integration.xds: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds build/integration.sh
+	env XDS=xds scripts/integration.sh
 
 integration.rest: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=rest build/integration.sh
+	env XDS=rest scripts/integration.sh
 
 integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds build/integration.sh -mux
+	env XDS=xds scripts/integration.sh -mux
 
 integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta build/integration.sh
+	env XDS=delta scripts/integration.sh
 
 integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta-ads build/integration.sh
+	env XDS=delta-ads scripts/integration.sh
 
 #--------------------------------------
 #-- example xDS control plane server
@@ -88,7 +88,7 @@ $(BINDIR)/example:
 	@go build -race -o $@ internal/example/main/main.go
 
 example: $(BINDIR)/example
-	@build/example.sh
+	@scripts/example.sh
 
 .PHONY: docker_tests
 docker_tests:
@@ -98,5 +98,6 @@ docker_tests:
 .PHONY: tidy-all
 tidy-all:
 	go mod tidy
-	make -C examples/dyplomat tidy
+	make -C ratelimit tidy
+	make -C ratelimit tidy
 	make -C xdsmatcher tidy
