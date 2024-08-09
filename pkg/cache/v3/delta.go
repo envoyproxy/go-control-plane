@@ -47,7 +47,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 			version := resources.versionMap[name]
 			nextVersionMap[name] = version
 			prevVersion, found := state.GetResourceVersions()[name]
-			if !found || (prevVersion != version) {
+			if !found || (prevVersion != version) || state.ShouldForcePush() {
 				filtered = append(filtered, r)
 			}
 		}
@@ -67,7 +67,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, state stream.St
 			prevVersion, found := state.GetResourceVersions()[name]
 			if r, ok := resources.resourceMap[name]; ok {
 				nextVersion := resources.versionMap[name]
-				if prevVersion != nextVersion {
+				if prevVersion != nextVersion || state.ShouldForcePush() {
 					filtered = append(filtered, r)
 				}
 				nextVersionMap[name] = nextVersion
