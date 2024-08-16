@@ -1031,6 +1031,8 @@ type Cluster struct {
 	// [#not-implemented-hide:]
 	// A list of metric names from ORCA load reports to propagate to LRS.
 	//
+	// If not specified, then ORCA load reports will not be propagated to LRS.
+	//
 	// For map fields in the ORCA proto, the string will be of the form “<map_field_name>.<map_key>“.
 	// For example, the string “named_metrics.foo“ will mean to look for the key “foo“ in the ORCA
 	// “named_metrics“ field.
