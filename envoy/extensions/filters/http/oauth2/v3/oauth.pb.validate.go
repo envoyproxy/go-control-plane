@@ -138,6 +138,8 @@ func (m *OAuth2Credentials) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for CookieDomain
+
 	oneofTokenFormationPresent := false
 	switch v := m.TokenFormation.(type) {
 	case *OAuth2Credentials_HmacSecret:

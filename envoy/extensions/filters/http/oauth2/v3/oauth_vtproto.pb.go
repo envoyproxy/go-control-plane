@@ -119,6 +119,13 @@ func (m *OAuth2Credentials) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.CookieDomain) > 0 {
+		i -= len(m.CookieDomain)
+		copy(dAtA[i:], m.CookieDomain)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.CookieDomain)))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if m.CookieNames != nil {
 		size, err := m.CookieNames.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -559,6 +566,10 @@ func (m *OAuth2Credentials) SizeVT() (n int) {
 	}
 	if m.CookieNames != nil {
 		l = m.CookieNames.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.CookieDomain)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
