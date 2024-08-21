@@ -48,9 +48,8 @@ const (
 	// (Envoy does not require HTTP/2 to take place over TLS or to use ALPN.
 	// Prior knowledge is allowed).
 	HttpConnectionManager_HTTP2 HttpConnectionManager_CodecType = 2
-	// [#not-implemented-hide:] QUIC implementation is not production ready yet. Use this enum with
-	// caution to prevent accidental execution of QUIC code. I.e. `!= HTTP2` is no longer sufficient
-	// to distinguish HTTP1 and HTTP2 traffic.
+	// The connection manager will assume that the client is speaking HTTP/3.
+	// This needs to be consistent with listener and transport socket config.
 	HttpConnectionManager_HTTP3 HttpConnectionManager_CodecType = 3
 )
 
@@ -394,7 +393,6 @@ type HttpConnectionManager struct {
 	// Additional HTTP/2 settings that are passed directly to the HTTP/2 codec.
 	Http2ProtocolOptions *v3.Http2ProtocolOptions `protobuf:"bytes,9,opt,name=http2_protocol_options,json=http2ProtocolOptions,proto3" json:"http2_protocol_options,omitempty"`
 	// Additional HTTP/3 settings that are passed directly to the HTTP/3 codec.
-	// [#not-implemented-hide:]
 	Http3ProtocolOptions *v3.Http3ProtocolOptions `protobuf:"bytes,44,opt,name=http3_protocol_options,json=http3ProtocolOptions,proto3" json:"http3_protocol_options,omitempty"`
 	// An optional override that the connection manager will write to the server
 	// header in responses. If not set, the default is “envoy“.
