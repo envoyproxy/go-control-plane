@@ -366,6 +366,8 @@ func (m *ExternalProcessor) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for SendBodyWithoutWaitingForHeaderResponse
+
 	if len(errors) > 0 {
 		return ExternalProcessorMultiError(errors)
 	}

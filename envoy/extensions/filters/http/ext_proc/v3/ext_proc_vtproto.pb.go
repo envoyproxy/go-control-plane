@@ -51,6 +51,18 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SendBodyWithoutWaitingForHeaderResponse {
+		i--
+		if m.SendBodyWithoutWaitingForHeaderResponse {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa8
+	}
 	if m.HttpService != nil {
 		size, err := m.HttpService.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -809,6 +821,9 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 	if m.HttpService != nil {
 		l = m.HttpService.SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.SendBodyWithoutWaitingForHeaderResponse {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
