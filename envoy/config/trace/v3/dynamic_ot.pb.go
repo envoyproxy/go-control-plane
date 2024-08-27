@@ -24,10 +24,10 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// DynamicOtConfig was used to dynamically load a tracer from a shared library
+// DynamicOtConfig is used to dynamically load a tracer from a shared library
 // that implements the `OpenTracing dynamic loading API
 // <https://github.com/opentracing/opentracing-cpp>`_.
-// [#not-implemented-hide:]
+// [#extension: envoy.tracers.dynamic_ot]
 type DynamicOtConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

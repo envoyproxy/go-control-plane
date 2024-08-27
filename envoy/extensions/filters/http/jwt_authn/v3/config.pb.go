@@ -286,13 +286,11 @@ type JwtProvider struct {
 	// Specify the claim name you want to copy in which HTTP header. For examples, following config:
 	// The claim must be of type; string, int, double, bool. Array type claims are not supported
 	//
-	// .. literalinclude:: /_configs/repo/jwt_authn.yaml
+	// .. code-block:: yaml
 	//
-	//	:language: yaml
-	//	:lines: 44-48
-	//	:linenos:
-	//	:lineno-start: 44
-	//	:caption: :download:`jwt_authn.yaml </_configs/repo/jwt_authn.yaml>`
+	//	claim_to_headers:
+	//	  - name: x-jwt-claim-nested-claim
+	//	    claim: claim.nested.key
 	//
 	// This header is only reserved for jwt claim; any other value will be overwritten.
 	ClaimToHeaders []*JwtClaimToHeader `protobuf:"bytes,15,rep,name=claim_to_headers,json=claimToHeaders,proto3" json:"claim_to_headers,omitempty"`

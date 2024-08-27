@@ -493,30 +493,23 @@ type HttpConnectionManager struct {
 	// Configuration for :ref:`HTTP access logs <arch_overview_access_logs>`
 	// emitted by the connection manager.
 	AccessLog []*v31.AccessLog `protobuf:"bytes,13,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
-	// The interval to flush the above access logs.
-	//
 	// .. attention::
-	//
-	//	This field is deprecated in favor of
-	//	:ref:`access_log_flush_interval
-	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.access_log_flush_interval>`.
-	//	Note that if both this field and :ref:`access_log_flush_interval
-	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.access_log_flush_interval>`
-	//	are specified, the former (deprecated field) is ignored.
+	// This field is deprecated in favor of
+	// :ref:`access_log_flush_interval
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.access_log_flush_interval>`.
+	// Note that if both this field and :ref:`access_log_flush_interval
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.access_log_flush_interval>`
+	// are specified, the former (deprecated field) is ignored.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto.
 	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,54,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
-	// If set to true, HCM will flush an access log once when a new HTTP request is received, after the request
-	// headers have been evaluated, and before iterating through the HTTP filter chain.
-	//
 	// .. attention::
-	//
-	//	This field is deprecated in favor of
-	//	:ref:`flush_access_log_on_new_request
-	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.flush_access_log_on_new_request>`.
-	//	Note that if both this field and :ref:`flush_access_log_on_new_request
-	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.flush_access_log_on_new_request>`
-	//	are specified, the former (deprecated field) is ignored.
+	// This field is deprecated in favor of
+	// :ref:`flush_access_log_on_new_request
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.flush_access_log_on_new_request>`.
+	// Note that if both this field and :ref:`flush_access_log_on_new_request
+	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.HcmAccessLogOptions.flush_access_log_on_new_request>`
+	// are specified, the former (deprecated field) is ignored.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto.
 	FlushAccessLogOnNewRequest bool `protobuf:"varint,55,opt,name=flush_access_log_on_new_request,json=flushAccessLogOnNewRequest,proto3" json:"flush_access_log_on_new_request,omitempty"`

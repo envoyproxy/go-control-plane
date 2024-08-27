@@ -234,7 +234,7 @@ type OAuth2Config struct {
 	//
 	// If this value is not set, it will default to “604800s“. In this case, the cookie with the refresh token will be expired
 	// in a week.
-	// This setting is only considered if “use_refresh_token“ is set to true, otherwise the authorization server expiration or “default_expires_in“ is used.
+	// This setting is only considered if “use_refresh_token“ is set to true, otherwise the authorization server expiration or “defaul_expires_in“ is used.
 	DefaultRefreshTokenExpiresIn *durationpb.Duration `protobuf:"bytes,15,opt,name=default_refresh_token_expires_in,json=defaultRefreshTokenExpiresIn,proto3" json:"default_refresh_token_expires_in,omitempty"`
 	// If set to true, Envoy will not set a cookie for ID Token even if one is received from the Identity Provider. This may be useful in cases where the ID
 	// Token is too large for HTTP cookies (longer than 4096 characters). Enabling this option will only disable setting the cookie response header, the filter
