@@ -7,6 +7,8 @@
 package getaddrinfov3
 
 import (
+	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -47,6 +49,16 @@ func (m *GetAddrInfoDnsResolverConfig) MarshalToSizedBufferVTStrict(dAtA []byte)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.NumRetries != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.NumRetries).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -56,6 +68,10 @@ func (m *GetAddrInfoDnsResolverConfig) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.NumRetries != nil {
+		l = (*wrapperspb.UInt32Value)(m.NumRetries).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
