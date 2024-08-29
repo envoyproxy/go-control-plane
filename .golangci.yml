@@ -31,6 +31,9 @@ linters-settings:
     extra-rules: true
   goimports:
     local-prefixes: github.com/envoyproxy/go-control-plane
+  gosec:
+    excludes:
+      - G115
   misspell:
     locale: US
   testifylint:
