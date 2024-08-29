@@ -373,7 +373,7 @@ func TestSnapshotCacheDeltaWatchWithForceEDS(t *testing.T) {
 		snapshot2.Resources[types.Cluster] = cache.NewResources(fixture.version2, []types.Resource{cluster})
 		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.ClusterType))
 		vMap := out.GetNextVersionMap()
-		versionMap[testTypes[0]] = vMap
+		versionMap[testTypes[1]] = vMap
 	case out := <-watches[testTypes[0]]:
 		snapshot2 := fixture.snapshot()
 		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
