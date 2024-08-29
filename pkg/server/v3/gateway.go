@@ -73,7 +73,7 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 	out := &discovery.DiscoveryRequest{}
 	err = protojson.Unmarshal(body, out)
 	if err != nil {
-		return nil, http.StatusBadRequest, fmt.Errorf("cannot parse JSON body: " + err.Error())
+		return nil, http.StatusBadRequest, fmt.Errorf("cannot parse JSON body: %w", err)
 	}
 	out.TypeUrl = typeURL
 
@@ -86,12 +86,12 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 		if ok := errors.As(err, &skip); ok {
 			return nil, http.StatusNotModified, nil
 		}
-		return nil, http.StatusInternalServerError, fmt.Errorf("fetch error: " + err.Error())
+		return nil, http.StatusInternalServerError, fmt.Errorf("fetch error: %w", err)
 	}
 
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(res)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("marshal error: " + err.Error())
+		return nil, http.StatusInternalServerError, fmt.Errorf("marshal error: %w", err)
 	}
 
 	return b, http.StatusOK, nil
