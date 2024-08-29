@@ -45,6 +45,7 @@ type StreamState struct { // nolint:golint,revive
 	ordered bool
 
 	// ForcePush indicates if should push the response even when the version is the same
+	// https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#resource-warming
 	// This is required in the situation:
 	// 1) There is a Cluster change and control plane responds with CDS
 	// 2) Envoy has a cluster in the warming phase until there is a EDS response, if endpoints haven't changed
@@ -61,6 +62,7 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		first:                   true,
 		knownResourceNames:      map[string]map[string]struct{}{},
 		ordered:                 false, // Ordered comes from the first request since that's when we discover if they want ADS
+		forcePush:               false,
 	}
 
 	if initialResourceVersions == nil {

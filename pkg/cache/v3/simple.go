@@ -303,12 +303,13 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 	// of maps are randomized order when ranged over.
 	if cache.ads {
 		info.orderResponseDeltaWatches()
-		forcePushEDS := false
+		forcePush := map[types.ResponseType]bool{
+			types.Endpoint: false,
+			types.Route:    false,
+		}
 		for _, key := range info.orderedDeltaWatches {
 			watch := info.deltaWatches[key.ID]
-			if types.Endpoint == GetResponseType(watch.Request.TypeUrl) {
-				watch.StreamState.SetForcePush(forcePushEDS)
-			}
+			watch.StreamState.SetForcePush(forcePush[GetResponseType(watch.Request.TypeUrl)])
 			res, err := cache.respondDelta(
 				ctx,
 				snapshot,
@@ -323,17 +324,13 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 			// so we don't want to respond or remove any existing resource watches
 			if res != nil {
 				delete(info.deltaWatches, key.ID)
-				if types.Cluster == GetResponseType(watch.Request.TypeUrl) {
-					forcePushEDS = true
+				if typ, ok := shouldForcePushDependentType(GetResponseType(watch.Request.TypeUrl)); ok {
+					forcePush[typ] = true
 				}
 			}
 		}
 	} else {
-		forcePushEDS := false
 		for id, watch := range info.deltaWatches {
-			if types.Endpoint == GetResponseType(watch.Request.TypeUrl) {
-				watch.StreamState.SetForcePush(forcePushEDS)
-			}
 			res, err := cache.respondDelta(
 				ctx,
 				snapshot,
@@ -348,9 +345,6 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 			// so we don't want to respond or remove any existing resource watches
 			if res != nil {
 				delete(info.deltaWatches, id)
-				if types.Cluster == GetResponseType(watch.Request.TypeUrl) {
-					forcePushEDS = true
-				}
 			}
 		}
 	}
@@ -507,6 +501,17 @@ func (cache *snapshotCache) respond(ctx context.Context, request *Request, value
 		return nil
 	case <-ctx.Done():
 		return context.Canceled
+	}
+}
+
+func shouldForcePushDependentType(typ types.ResponseType) (types.ResponseType, bool) {
+	switch typ {
+	case types.Cluster:
+		return types.Endpoint, true
+	case types.Listener:
+		return types.Route, true
+	default:
+		return types.UnknownType, false
 	}
 }
 
