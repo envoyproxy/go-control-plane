@@ -45,6 +45,8 @@ sync_protos () {
         cp -a "$envoy_src" "$src"
         git add "$src"
     done
+    make tidy-all
+    git add $(find -type f -name 'go.sum' -o -name 'go.mod')
 }
 
 commit_changes () {

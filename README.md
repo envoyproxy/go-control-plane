@@ -1,6 +1,6 @@
 # control-plane
 
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/envoyproxy/go-control-plane/badge)](https://api.securityscorecards.dev/projects/github.com/envoyproxy/go-control-plane)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/envoyproxy/go-control-plane/badge)](https://securityscorecards.dev/viewer/?uri=github.com/envoyproxy/go-control-plane)
 ![CI Status](https://github.com/envoyproxy/go-control-plane/actions/workflows/ci.yaml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
 [![GoDoc](https://pkg.go.dev/badge/github.com/envoyproxy/go-control-plane.svg)](https://pkg.go.dev/github.com/envoyproxy/go-control-plane)
@@ -45,7 +45,7 @@ feedback, we might decide to revisit this aspect at a later point in time.
 
 ## Requirements
 
-1. Go 1.17+
+1. Go 1.21+
 
 ## Quick start
 

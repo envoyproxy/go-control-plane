@@ -54,6 +54,7 @@ var (
 	testScopedRoute     = resource.MakeScopedRouteConfig(scopedRouteName, routeName, []string{"1.2.3.4"})
 	testVirtualHost     = resource.MakeVirtualHost(virtualHostName, clusterName)
 	testListener        = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
+	testListenerDefault = resource.MakeRouteHTTPListenerDefaultFilterChain(resource.Ads, listenerName, 80, routeName)
 	testScopedListener  = resource.MakeScopedRouteHTTPListenerForRoute(resource.Ads, scopedListenerName, 80, embeddedRouteName)
 	testRuntime         = resource.MakeRuntime(runtimeName)
 	testSecret          = resource.MakeSecrets(tlsName, rootName)
@@ -140,8 +141,8 @@ func TestGetResourceNames(t *testing.T) {
 		},
 		{
 			name:  "many",
-			input: []types.Resource{testRuntime, testListener, testVirtualHost},
-			want:  []string{runtimeName, listenerName, virtualHostName},
+			input: []types.Resource{testRuntime, testListener, testListenerDefault, testVirtualHost},
+			want:  []string{runtimeName, listenerName, listenerName, virtualHostName},
 		},
 	}
 	for _, test := range tests {
@@ -183,6 +184,10 @@ func TestGetResourceReferences(t *testing.T) {
 		},
 		{
 			in:  resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName),
+			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
+		},
+		{
+			in:  resource.MakeRouteHTTPListenerDefaultFilterChain(resource.Ads, listenerName, 80, routeName),
 			out: map[rsrc.Type]map[string]bool{rsrc.RouteType: {routeName: true}},
 		},
 		{
