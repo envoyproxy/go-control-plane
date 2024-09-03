@@ -22,7 +22,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
-func assertResourceMapEqual(t *testing.T, want map[string]types.Resource, got map[string]types.Resource) {
+func assertResourceMapEqual(t *testing.T, want, got map[string]types.Resource) {
 	t.Helper()
 
 	if !cmp.Equal(want, got, protocmp.Transform()) {
@@ -298,7 +298,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 	}
 }
 
-func TestSnapshotCacheDeltaWatchWithForceEDS(t *testing.T) {
+func TestSnapshotCacheDeltaWatchWithForceEDSOfRelevantEndpoints(t *testing.T) {
 	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
 	watches := make(map[string]chan cache.DeltaResponse)
 
@@ -314,7 +314,7 @@ func TestSnapshotCacheDeltaWatchWithForceEDS(t *testing.T) {
 		}, stream.NewStreamState(true, nil), watches[typ])
 	}
 
-	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, fixture.snapshotTwoClusters()); err != nil {
 		t.Fatal(err)
 	}
 
@@ -323,7 +323,7 @@ func TestSnapshotCacheDeltaWatchWithForceEDS(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				snapshot := fixture.snapshot()
+				snapshot := fixture.snapshotTwoClusters()
 				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
 				vMap := out.GetNextVersionMap()
 				versionMap[typ] = vMap
@@ -355,28 +355,30 @@ func TestSnapshotCacheDeltaWatchWithForceEDS(t *testing.T) {
 	}
 
 	// set partially-versioned snapshot
-	snapshot2 := fixture.snapshot()
-	cluster := resource.MakeCluster(resource.Ads, "cluster0")
+	snapshot2 := fixture.snapshotTwoClusters()
+	cluster := resource.MakeCluster(resource.Ads, clusterName)
 	cluster.ConnectTimeout = durationpb.New(99 * time.Second)
-	snapshot2.Resources[types.Cluster] = cache.NewResources(fixture.version2, []types.Resource{cluster})
+	snapshot2.Resources[types.Cluster] = cache.NewResources(fixture.version2, []types.Resource{cluster, anotherTestCluster})
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-2 {
-		t.Errorf("watches should be preserved for all but one, got: %d open watches instead of the expected %d open watches", count, len(testTypes)-1)
+		t.Errorf("watches should be preserved for all but two, got: %d open watches instead of the expected %d open watches", count, len(testTypes)-1)
 	}
 
 	// validate response for endpoints
 	select {
 	case out := <-watches[testTypes[1]]:
-		snapshot2 := fixture.snapshot()
+		snapshot2 := fixture.snapshotTwoClusters()
 		snapshot2.Resources[types.Cluster] = cache.NewResources(fixture.version2, []types.Resource{cluster})
 		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.ClusterType))
 		vMap := out.GetNextVersionMap()
 		versionMap[testTypes[1]] = vMap
 	case out := <-watches[testTypes[0]]:
-		snapshot2 := fixture.snapshot()
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		for _, resource := range out.(*cache.RawDeltaResponse).Resources {
+			// should send only endpoint of the changed cluster
+			assert.Equal(t, resource, testEndpoint)
+		}
 		vMap := out.GetNextVersionMap()
 		versionMap[testTypes[0]] = vMap
 	case <-time.After(time.Second):

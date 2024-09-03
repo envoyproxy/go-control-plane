@@ -50,7 +50,7 @@ type StreamState struct { // nolint:golint,revive
 	// 1) There is a Cluster change and control plane responds with CDS
 	// 2) Envoy has a cluster in the warming phase until there is a EDS response, if endpoints haven't changed
 	//    there is no EDS send and changes to the clusters are blocked
-	forcePush bool
+	forcePushResource map[string]bool
 }
 
 // NewStreamState initializes a stream state.
@@ -62,7 +62,7 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		first:                   true,
 		knownResourceNames:      map[string]map[string]struct{}{},
 		ordered:                 false, // Ordered comes from the first request since that's when we discover if they want ADS
-		forcePush:               false,
+		forcePushResource:       map[string]bool{},
 	}
 
 	if initialResourceVersions == nil {
@@ -106,8 +106,10 @@ func (s *StreamState) SetWildcard(wildcard bool) {
 	s.wildcard = wildcard
 }
 
-func (s *StreamState) SetForcePush(forcePush bool) {
-	s.forcePush = forcePush
+func (s *StreamState) SetForcePushResource(forcePushResources []string) {
+	for _, resName := range forcePushResources {
+		s.forcePushResource[resName] = true
+	}
 }
 
 // GetResourceVersions returns a map of current resources grouped by type URL.
@@ -132,8 +134,8 @@ func (s *StreamState) IsWildcard() bool {
 	return s.wildcard
 }
 
-func (s *StreamState) ShouldForcePush() bool {
-	return s.forcePush
+func (s *StreamState) ShouldForcePushResource(resourceName string) bool {
+	return s.forcePushResource[resourceName]
 }
 
 // GetKnownResourceNames returns the current known list of resources on a SOTW stream.
