@@ -1038,14 +1038,13 @@ type Cluster struct {
 	// maybe by allowing LRS to go on the ADS stream, or maybe by moving some of the negotiation
 	// from the LRS stream here.]
 	LrsServer *v32.ConfigSource `protobuf:"bytes,42,opt,name=lrs_server,json=lrsServer,proto3" json:"lrs_server,omitempty"`
-	// [#not-implemented-hide:]
-	// A list of metric names from ORCA load reports to propagate to LRS.
+	// A list of metric names from :ref:`ORCA load reports <envoy_v3_api_msg_.xds.data.orca.v3.OrcaLoadReport>` to propagate to LRS.
 	//
 	// If not specified, then ORCA load reports will not be propagated to LRS.
 	//
 	// For map fields in the ORCA proto, the string will be of the form “<map_field_name>.<map_key>“.
 	// For example, the string “named_metrics.foo“ will mean to look for the key “foo“ in the ORCA
-	// “named_metrics“ field.
+	// :ref:`named_metrics <envoy_v3_api_field_.xds.data.orca.v3.OrcaLoadReport.named_metrics>` field.
 	//
 	// The special map key “*“ means to report all entries in the map (e.g., “named_metrics.*“ means to
 	// report all entries in the ORCA named_metrics field). Note that this should be used only with trusted
