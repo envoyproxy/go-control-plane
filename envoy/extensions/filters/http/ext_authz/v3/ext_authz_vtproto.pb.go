@@ -51,6 +51,18 @@ func (m *ExtAuthz) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EmitFilterStateStats {
+		i--
+		if m.EmitFilterStateStats {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xe8
+	}
 	if m.FilterMetadata != nil {
 		size, err := (*structpb.Struct)(m.FilterMetadata).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1142,6 +1154,9 @@ func (m *ExtAuthz) SizeVT() (n int) {
 	if m.FilterMetadata != nil {
 		l = (*structpb.Struct)(m.FilterMetadata).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EmitFilterStateStats {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
