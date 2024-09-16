@@ -51,6 +51,13 @@ func (m *OAuth2Credentials_CookieNames) MarshalToSizedBufferVTStrict(dAtA []byte
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.OauthNonce) > 0 {
+		i -= len(m.OauthNonce)
+		copy(dAtA[i:], m.OauthNonce)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.OauthNonce)))
+		i--
+		dAtA[i] = 0x32
+	}
 	if len(m.RefreshToken) > 0 {
 		i -= len(m.RefreshToken)
 		copy(dAtA[i:], m.RefreshToken)
@@ -558,6 +565,10 @@ func (m *OAuth2Credentials_CookieNames) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	l = len(m.RefreshToken)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.OauthNonce)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
