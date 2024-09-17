@@ -408,6 +408,8 @@ func (m *QuicProtocolOptions) validate(all bool) error {
 
 	}
 
+	// no validation rules for RejectNewConnections
+
 	if len(errors) > 0 {
 		return QuicProtocolOptionsMultiError(errors)
 	}

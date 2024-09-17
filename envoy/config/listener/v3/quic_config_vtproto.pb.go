@@ -51,6 +51,16 @@ func (m *QuicProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RejectNewConnections {
+		i--
+		if m.RejectNewConnections {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x68
+	}
 	if len(m.SaveCmsgConfig) > 0 {
 		for iNdEx := len(m.SaveCmsgConfig) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.SaveCmsgConfig[iNdEx]).(interface {
@@ -375,6 +385,9 @@ func (m *QuicProtocolOptions) SizeVT() (n int) {
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.RejectNewConnections {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
