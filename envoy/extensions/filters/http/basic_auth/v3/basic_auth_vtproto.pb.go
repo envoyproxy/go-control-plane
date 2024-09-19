@@ -49,6 +49,13 @@ func (m *BasicAuth) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.AuthenticationHeader) > 0 {
+		i -= len(m.AuthenticationHeader)
+		copy(dAtA[i:], m.AuthenticationHeader)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.AuthenticationHeader)))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if len(m.ForwardUsernameHeader) > 0 {
 		i -= len(m.ForwardUsernameHeader)
 		copy(dAtA[i:], m.ForwardUsernameHeader)
@@ -153,6 +160,10 @@ func (m *BasicAuth) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	l = len(m.ForwardUsernameHeader)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.AuthenticationHeader)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
