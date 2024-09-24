@@ -247,6 +247,30 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DisableRefreshTokenSetCookie {
+		i--
+		if m.DisableRefreshTokenSetCookie {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa0
+	}
+	if m.DisableAccessTokenSetCookie {
+		i--
+		if m.DisableAccessTokenSetCookie {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x98
+	}
 	if m.RetryPolicy != nil {
 		if vtmsg, ok := interface{}(m.RetryPolicy).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -748,6 +772,12 @@ func (m *OAuth2Config) SizeVT() (n int) {
 			l = proto.Size(m.RetryPolicy)
 		}
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.DisableAccessTokenSetCookie {
+		n += 3
+	}
+	if m.DisableRefreshTokenSetCookie {
+		n += 3
 	}
 	n += len(m.unknownFields)
 	return n
