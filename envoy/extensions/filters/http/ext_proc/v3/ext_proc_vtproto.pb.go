@@ -51,6 +51,20 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.AllowedOverrideModes) > 0 {
+		for iNdEx := len(m.AllowedOverrideModes) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.AllowedOverrideModes[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0xb2
+		}
+	}
 	if m.SendBodyWithoutWaitingForHeaderResponse {
 		i--
 		if m.SendBodyWithoutWaitingForHeaderResponse {
@@ -824,6 +838,12 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 	}
 	if m.SendBodyWithoutWaitingForHeaderResponse {
 		n += 3
+	}
+	if len(m.AllowedOverrideModes) > 0 {
+		for _, e := range m.AllowedOverrideModes {
+			l = e.SizeVT()
+			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
