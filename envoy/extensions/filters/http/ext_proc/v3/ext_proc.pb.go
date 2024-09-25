@@ -281,19 +281,20 @@ type ExternalProcessor struct {
 	// backend stream lifetime. In this case, Envoy will eventually timeout the external processor stream according to this time limit.
 	// The default value is 5000 milliseconds (5 seconds) if not specified.
 	DeferredCloseTimeout *durationpb.Duration `protobuf:"bytes,19,opt,name=deferred_close_timeout,json=deferredCloseTimeout,proto3" json:"deferred_close_timeout,omitempty"`
-	// [#not-implemented-hide:]
 	// Send body to the side stream server once it arrives without waiting for the header response from that server.
 	// It only works for STREAMED body processing mode. For any other body processing modes, it is ignored.
-	//
 	// The server has two options upon receiving a header request:
-	//  1. Instant Response: Send the header response as soon as the header request is received.
-	//  2. Delayed Response: Wait for the body before sending any response.
-	//     If the server chooses the second option, it has two further choices:
-	//     2.1 Separate Responses: Send the header response first, followed by separate body responses.
-	//     2.2 Combined Response: Include both the header response and the first chunk of the body response
-	//     in a single body response message, followed by the remaining body responses.
+	//
+	// 1. Instant Response: send the header response as soon as the header request is received.
+	//
+	// 2. Delayed Response: wait for the body before sending any response.
 	//
 	// In all scenarios, the header-body ordering must always be maintained.
+	//
+	// If enabled Envoy will ignore the
+	// :ref:`mode_override <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>`
+	// value that the server sends in the header response. This is because Envoy may have already
+	// sent the body to the server, prior to processing the header response.
 	SendBodyWithoutWaitingForHeaderResponse bool `protobuf:"varint,21,opt,name=send_body_without_waiting_for_header_response,json=sendBodyWithoutWaitingForHeaderResponse,proto3" json:"send_body_without_waiting_for_header_response,omitempty"`
 	// When :ref:`allow_mode_override
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.allow_mode_override>` is enabled and

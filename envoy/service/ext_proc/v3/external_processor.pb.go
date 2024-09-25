@@ -323,7 +323,10 @@ type ProcessingResponse struct {
 	// It is also ignored by Envoy when the ext_proc filter config
 	// :ref:`allow_mode_override
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.allow_mode_override>`
-	// is set to false.
+	// is set to false, or
+	// :ref:`send_body_without_waiting_for_header_response
+	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.send_body_without_waiting_for_header_response>`
+	// is set to true.
 	ModeOverride *v31.ProcessingMode `protobuf:"bytes,9,opt,name=mode_override,json=modeOverride,proto3" json:"mode_override,omitempty"`
 	// When ext_proc server receives a request message, in case it needs more
 	// time to process the message, it sends back a ProcessingResponse message
@@ -857,9 +860,6 @@ type CommonResponse struct {
 	// Instructions on how to manipulate the headers. When responding to an
 	// HttpBody request, header mutations will only take effect if
 	// the current processing mode for the body is BUFFERED.
-	// [#comment:TODO(yanjunxiang-google) rephrase last sentence once send_body_without_waiting_for_header_response is not hidden:
-	// the current processing mode for the body is: 1) BUFFERED; 2) or STREAMED and
-	// the :ref:`send_body_without_waiting_for_header_response <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.send_body_without_waiting_for_header_response>` is enabled.]
 	HeaderMutation *HeaderMutation `protobuf:"bytes,2,opt,name=header_mutation,json=headerMutation,proto3" json:"header_mutation,omitempty"`
 	// Replace the body of the last message sent to the remote server on this
 	// stream. If responding to an HttpBody request, simply replace or clear
