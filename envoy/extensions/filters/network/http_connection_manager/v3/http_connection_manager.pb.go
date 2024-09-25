@@ -408,6 +408,11 @@ type HttpConnectionManager struct {
 	// The maximum request headers size for incoming connections.
 	// If unconfigured, the default max request headers allowed is 60 KiB.
 	// Requests that exceed this limit will receive a 431 response.
+	//
+	// Note: currently some protocol codecs impose limits on the maximum size of a single header:
+	//
+	//	HTTP/2 (when using nghttp2) limits a single header to around 100kb.
+	//	HTTP/3 limits a single header to around 1024kb.
 	MaxRequestHeadersKb *wrapperspb.UInt32Value `protobuf:"bytes,29,opt,name=max_request_headers_kb,json=maxRequestHeadersKb,proto3" json:"max_request_headers_kb,omitempty"`
 	// The stream idle timeout for connections managed by the connection manager.
 	// If not specified, this defaults to 5 minutes. The default value was selected

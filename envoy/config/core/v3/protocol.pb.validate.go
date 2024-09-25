@@ -968,6 +968,21 @@ func (m *HttpProtocolOptions) validate(all bool) error {
 
 	}
 
+	if wrapper := m.GetMaxResponseHeadersKb(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val <= 0 || val > 8192 {
+			err := HttpProtocolOptionsValidationError{
+				field:  "MaxResponseHeadersKb",
+				reason: "value must be inside range (0, 8192]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if all {
 		switch v := interface{}(m.GetMaxStreamDuration()).(type) {
 		case interface{ ValidateAll() error }:
