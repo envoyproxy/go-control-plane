@@ -407,6 +407,7 @@ type HttpConnectionManager struct {
 	SchemeHeaderTransformation *v3.SchemeHeaderTransformation `protobuf:"bytes,48,opt,name=scheme_header_transformation,json=schemeHeaderTransformation,proto3" json:"scheme_header_transformation,omitempty"`
 	// The maximum request headers size for incoming connections.
 	// If unconfigured, the default max request headers allowed is 60 KiB.
+	// The default value can be overridden by setting runtime key “envoy.reloadable_features.max_request_headers_size_kb“.
 	// Requests that exceed this limit will receive a 431 response.
 	//
 	// Note: currently some protocol codecs impose limits on the maximum size of a single header:
