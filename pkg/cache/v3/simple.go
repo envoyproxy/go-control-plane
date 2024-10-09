@@ -303,8 +303,14 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 	// of maps are randomized order when ranged over.
 	if cache.ads {
 		info.orderResponseDeltaWatches()
+		forcePushResources := map[types.ResponseType][]string{}
 		for _, key := range info.orderedDeltaWatches {
 			watch := info.deltaWatches[key.ID]
+			responseType := GetResponseType(watch.Request.TypeUrl)
+			if resources, found := forcePushResources[responseType]; found {
+				watch.StreamState.SetForcePushResource(resources)
+			}
+
 			res, err := cache.respondDelta(
 				ctx,
 				snapshot,
@@ -319,6 +325,9 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 			// so we don't want to respond or remove any existing resource watches
 			if res != nil {
 				delete(info.deltaWatches, key.ID)
+				if indexed, typ, ok := getForcePushEdsResourcesNames(responseType, res); ok {
+					forcePushResources[typ] = indexed
+				}
 			}
 		}
 	} else {
@@ -493,6 +502,15 @@ func (cache *snapshotCache) respond(ctx context.Context, request *Request, value
 		return nil
 	case <-ctx.Done():
 		return context.Canceled
+	}
+}
+
+func getForcePushEdsResourcesNames(typ types.ResponseType, response *RawDeltaResponse) ([]string, types.ResponseType, bool) {
+	switch typ {
+	case types.Cluster:
+		return GetResourceNames(response.Resources), types.Endpoint, true
+	default:
+		return []string{}, types.UnknownType, false
 	}
 }
 

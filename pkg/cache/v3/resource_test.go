@@ -31,6 +31,7 @@ import (
 
 const (
 	clusterName         = "cluster0"
+	anotherClusterName  = "cluster1"
 	routeName           = "route0"
 	embeddedRouteName   = "embeddedRoute0"
 	scopedRouteName     = "scopedRoute0"
@@ -45,7 +46,9 @@ const (
 
 var (
 	testEndpoint        = resource.MakeEndpoint(clusterName, 8080)
+	anotherTestEndpoint = resource.MakeEndpoint(anotherClusterName, 9090)
 	testCluster         = resource.MakeCluster(resource.Ads, clusterName)
+	anotherTestCluster  = resource.MakeCluster(resource.Ads, anotherClusterName)
 	testRoute           = resource.MakeRouteConfig(routeName, clusterName)
 	testEmbeddedRoute   = resource.MakeRouteConfig(embeddedRouteName, clusterName)
 	testScopedRoute     = resource.MakeScopedRouteConfig(scopedRouteName, routeName, []string{"1.2.3.4"})

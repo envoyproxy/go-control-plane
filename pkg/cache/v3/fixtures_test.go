@@ -37,3 +37,25 @@ func (f *fixtureGenerator) snapshot() *cache.Snapshot {
 
 	return snapshot
 }
+
+func (f *fixtureGenerator) snapshotTwoClusters() *cache.Snapshot {
+	snapshot, err := cache.NewSnapshot(
+		f.version,
+		map[rsrc.Type][]types.Resource{
+			rsrc.EndpointType:        {testEndpoint, anotherTestEndpoint},
+			rsrc.ClusterType:         {testCluster, anotherTestCluster},
+			rsrc.RouteType:           {testRoute, testEmbeddedRoute},
+			rsrc.ScopedRouteType:     {testScopedRoute},
+			rsrc.VirtualHostType:     {testVirtualHost},
+			rsrc.ListenerType:        {testScopedListener, testListener},
+			rsrc.RuntimeType:         {testRuntime},
+			rsrc.SecretType:          {testSecret[0]},
+			rsrc.ExtensionConfigType: {testExtensionConfig},
+		},
+	)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return snapshot
+}
