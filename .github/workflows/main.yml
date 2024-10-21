@@ -45,6 +45,6 @@ jobs:
         path: upstream
 
     - run: mv upstream ../envoy
-    - run: sudo ci/sync_envoy.sh
+    - run: ci/sync_envoy.sh
       env:
         ENVOY_SRC_DIR: ../envoy
