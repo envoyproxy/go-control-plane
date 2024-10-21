@@ -93,6 +93,28 @@ func (m *AwsRequestSigning) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.CredentialProvider != nil {
+		if vtmsg, ok := interface{}(m.CredentialProvider).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.CredentialProvider)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x42
+	}
 	if m.QueryString != nil {
 		size, err := m.QueryString.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -268,6 +290,16 @@ func (m *AwsRequestSigning) SizeVT() (n int) {
 	}
 	if m.QueryString != nil {
 		l = m.QueryString.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.CredentialProvider != nil {
+		if size, ok := interface{}(m.CredentialProvider).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.CredentialProvider)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
