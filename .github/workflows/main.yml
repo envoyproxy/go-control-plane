@@ -31,7 +31,7 @@ jobs:
     - name: 'Checkout Repository'
       uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
       with:
-        ref: v0.11.0
+        ref: v0.12.0
         fetch-depth: 0
         token: ${{ steps.appauth.outputs.token }}
 
@@ -40,7 +40,7 @@ jobs:
       uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
       with:
         repository: fish123123/envoy
-        ref: release/v1.27
+        ref: release/v1.31
         fetch-depth: 0
         path: upstream
 
