@@ -39,13 +39,13 @@ jobs:
     - name: 'Checkout Repository'
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
       with:
-        repository: fish123123/envoy-test
+        repository: envoyproxy/envoy
         ref: main
         fetch-depth: 0
         path: upstream
 
     - run: mv upstream ../envoy
-    - run: chmod 777 -R ../envoy/
+   # - run: chmod 777 -R ../envoy/
     - run: ci/sync_envoy.sh
       env:
         ENVOY_SRC_DIR: ../envoy
