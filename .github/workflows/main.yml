@@ -39,8 +39,8 @@ jobs:
     - name: 'Checkout Repository'
       uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
       with:
-        repository: envoyproxy/envoy
-        ref: main
+        repository: fish123123/envoy
+        ref: v1.27.3
         fetch-depth: 0
         path: upstream
 
