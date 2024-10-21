@@ -31,7 +31,7 @@ jobs:
     - name: 'Checkout Repository'
       uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
       with:
-        ref: main
+        ref: v0.11.0
         fetch-depth: 0
         token: ${{ steps.appauth.outputs.token }}
 
