@@ -40,11 +40,11 @@ jobs:
       uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
       with:
         repository: fish123123/envoy
-        ref: main
+        ref: v1.27.3
         fetch-depth: 0
         path: upstream
 
     - run: mv upstream ../envoy
-    - run: ci/sync_envoy.sh
+    - run: sudo ./ci/sync_envoy.sh
       env:
         ENVOY_SRC_DIR: ../envoy
