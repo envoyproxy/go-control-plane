@@ -48,9 +48,9 @@ type TcpProxy struct {
 	// and
 	// :ref:`TcpProxy.weighted_clusters <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.weighted_clusters>`.
 	OnDemand *TcpProxy_OnDemand `protobuf:"bytes,14,opt,name=on_demand,json=onDemand,proto3" json:"on_demand,omitempty"`
-	// Optional endpoint metadata match criteria. Only endpoints in the upstream
-	// cluster with metadata matching that set in metadata_match will be
-	// considered. The filter name should be specified as “envoy.lb“.
+	// Optional endpoint metadata match criteria used by the subset load balancer. Only endpoints
+	// in the upstream cluster with metadata matching what is set in this field will be considered
+	// for load balancing. The filter name should be specified as “envoy.lb“.
 	MetadataMatch *v3.Metadata `protobuf:"bytes,9,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
 	// The idle timeout for connections managed by the TCP proxy filter. The idle timeout
 	// is defined as the period in which there are no bytes sent or received on either
