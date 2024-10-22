@@ -58,17 +58,6 @@ func (m *CaresDnsResolverConfig) validate(all bool) error {
 
 	var errors []error
 
-	if len(m.GetResolvers()) < 1 {
-		err := CaresDnsResolverConfigValidationError{
-			field:  "Resolvers",
-			reason: "value must contain at least 1 item(s)",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	for idx, item := range m.GetResolvers() {
 		_, _ = idx, item
 
