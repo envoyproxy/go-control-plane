@@ -28,15 +28,13 @@ import (
 
 // Tests the snapshot defined in simple_test.go to ensure it is consistent.
 func TestTestSnapshotIsConsistent(t *testing.T) {
-	snapshot := fixture.snapshot()
-
 	if err := snapshot.Consistent(); err != nil {
 		t.Errorf("got inconsistent snapshot for %#v\nerr=%s", snapshot, err.Error())
 	}
 }
 
 func TestSnapshotWithOnlyEndpointIsInconsistent(t *testing.T) {
-	if snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.EndpointType: {testEndpoint},
 	}); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
@@ -44,7 +42,7 @@ func TestSnapshotWithOnlyEndpointIsInconsistent(t *testing.T) {
 }
 
 func TestClusterWithMissingEndpointIsInconsistent(t *testing.T) {
-	if snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.EndpointType: {resource.MakeEndpoint("missing", 8080)},
 		rsrc.ClusterType:  {testCluster},
 	}); snap.Consistent() == nil {
@@ -53,16 +51,16 @@ func TestClusterWithMissingEndpointIsInconsistent(t *testing.T) {
 }
 
 func TestListenerWithMissingRoutesIsInconsistent(t *testing.T) {
-	if snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
-		rsrc.ListenerType: {testListener},
-	}); snap.Consistent() == nil {
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+		rsrc.ListenerType: {testListener}},
+	); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
 	}
 }
 
 func TestListenerWithUnidentifiedRouteIsInconsistent(t *testing.T) {
-	if snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
-		rsrc.RouteType:    {resource.MakeRouteConfig("test", clusterName)},
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+		rsrc.RouteType:    {resource.MakeRoute("test", clusterName)},
 		rsrc.ListenerType: {testListener},
 	}); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
@@ -70,12 +68,12 @@ func TestListenerWithUnidentifiedRouteIsInconsistent(t *testing.T) {
 }
 
 func TestRouteListenerWithRouteIsConsistent(t *testing.T) {
-	snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
 			resource.MakeRouteHTTPListener(resource.Xds, "listener1", 80, "testRoute0"),
 		},
 		rsrc.RouteType: {
-			resource.MakeRouteConfig("testRoute0", clusterName),
+			resource.MakeRoute("testRoute0", clusterName),
 		},
 	})
 
@@ -85,12 +83,12 @@ func TestRouteListenerWithRouteIsConsistent(t *testing.T) {
 }
 
 func TestScopedRouteListenerWithScopedRouteOnlyIsInconsistent(t *testing.T) {
-	if snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	if snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
+			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80, "scopedRoute0"),
 		},
 		rsrc.ScopedRouteType: {
-			resource.MakeScopedRouteConfig("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
+			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
 		},
 	}); snap.Consistent() == nil {
 		t.Errorf("got consistent snapshot %#v", snap)
@@ -98,61 +96,63 @@ func TestScopedRouteListenerWithScopedRouteOnlyIsInconsistent(t *testing.T) {
 }
 
 func TestScopedRouteListenerWithScopedRouteAndRouteIsConsistent(t *testing.T) {
-	snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
+			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80, "scopedRoute0"),
 		},
 		rsrc.ScopedRouteType: {
-			resource.MakeScopedRouteConfig("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
+			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
 		},
 		rsrc.RouteType: {
-			resource.MakeRouteConfig("testRoute0", clusterName),
+			resource.MakeRoute("testRoute0", clusterName),
 		},
 	})
 
-	require.NoError(t, snap.Consistent(), "got inconsistent snapshot %#v", snap)
+	if err := snap.Consistent(); err != nil {
+		t.Errorf("got inconsistent snapshot %s, %#v", err.Error(), snap)
+	}
 }
 
 func TestScopedRouteListenerWithInlineScopedRouteAndRouteIsConsistent(t *testing.T) {
-	snap, err := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "testRoute0"),
+			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "scopedRoute0", "testRoute0"),
 		},
 		rsrc.RouteType: {
-			resource.MakeRouteConfig("testRoute0", clusterName),
+			resource.MakeRoute("testRoute0", clusterName),
 		},
 	})
 
 	require.NoError(t, err)
-	require.NoError(t, snap.Consistent())
+	assert.NoError(t, snap.Consistent())
 }
 
 func TestScopedRouteListenerWithInlineScopedRouteAndNoRouteIsInconsistent(t *testing.T) {
-	snap, err := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "testRoute0"),
+			resource.MakeScopedRouteHTTPListenerForRoute(resource.Xds, "listener0", 80, "scopedRoute0", "testRoute0"),
 		},
 		rsrc.RouteType: {
-			resource.MakeRouteConfig("testRoute1", clusterName),
+			resource.MakeRoute("testRoute1", clusterName),
 		},
 	})
 
 	require.NoError(t, err)
-	require.Error(t, snap.Consistent())
+	assert.Error(t, snap.Consistent())
 }
 
 func TestMultipleListenersWithScopedRouteAndRouteIsConsistent(t *testing.T) {
-	snap, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	snap, _ := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		rsrc.ListenerType: {
-			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80),
+			resource.MakeScopedRouteHTTPListener(resource.Xds, "listener0", 80, "scopedRoute0"),
 			resource.MakeRouteHTTPListener(resource.Xds, "listener1", 80, "testRoute1"),
 		},
 		rsrc.ScopedRouteType: {
-			resource.MakeScopedRouteConfig("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
+			resource.MakeScopedRoute("scopedRoute0", "testRoute0", []string{"1.2.3.4"}),
 		},
 		rsrc.RouteType: {
-			resource.MakeRouteConfig("testRoute0", clusterName),
-			resource.MakeRouteConfig("testRoute1", clusterName),
+			resource.MakeRoute("testRoute0", clusterName),
+			resource.MakeRoute("testRoute1", clusterName),
 		},
 	})
 
@@ -172,8 +172,6 @@ func TestSnapshotGetters(t *testing.T) {
 	if out := nilsnap.GetVersion(rsrc.EndpointType); out != "" {
 		t.Errorf("got non-empty version for nil snapshot: %#v", out)
 	}
-
-	snapshot := fixture.snapshot()
 	if out := snapshot.GetResources("not a type"); out != nil {
 		t.Errorf("got non-empty resources for unknown type: %#v", out)
 	}
@@ -183,11 +181,11 @@ func TestSnapshotGetters(t *testing.T) {
 }
 
 func TestNewSnapshotBadType(t *testing.T) {
-	snap, err := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
+	snap, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
 		"random.type": nil,
 	})
 
 	// Should receive an error from an unknown type
-	require.Error(t, err)
-	assert.Nil(t, snap)
+	assert.Error(t, err)
+	assert.Equal(t, cache.Snapshot{}, snap)
 }

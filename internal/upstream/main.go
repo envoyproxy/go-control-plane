@@ -11,7 +11,6 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-
 package main
 
 import (
@@ -32,13 +31,11 @@ func main() {
 	flag.Parse()
 
 	log.Printf("upstream listening HTTP/1.1 on %d\n", upstreamPort)
-	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := w.Write([]byte(hello)); err != nil {
 			log.Println(err)
 		}
 	})
-	// Ignore: G114: Use of net/http serve function that has no support for setting timeouts
-	// nolint:gosec
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", upstreamPort), nil); err != nil {
 		log.Println(err)
 	}

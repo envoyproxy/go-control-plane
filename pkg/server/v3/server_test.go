@@ -25,15 +25,11 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
@@ -43,18 +39,18 @@ type mockConfigWatcher struct {
 	counts         map[string]int
 	deltaCounts    map[string]int
 	responses      map[string][]cache.Response
-	deltaResources map[string]map[string]types.Resource
+	deltaResponses map[string][]cache.DeltaResponse
 	watches        int
 	deltaWatches   int
 
 	mu *sync.RWMutex
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ stream.StreamState, out chan cache.Response) func() {
-	config.counts[req.GetTypeUrl()] = config.counts[req.GetTypeUrl()] + 1
-	if len(config.responses[req.GetTypeUrl()]) > 0 {
-		out <- config.responses[req.GetTypeUrl()][0]
-		config.responses[req.GetTypeUrl()] = config.responses[req.GetTypeUrl()][1:]
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, state stream.StreamState, out chan cache.Response) func() {
+	config.counts[req.TypeUrl] = config.counts[req.TypeUrl] + 1
+	if len(config.responses[req.TypeUrl]) > 0 {
+		out <- config.responses[req.TypeUrl][0]
+		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
 	} else {
 		config.watches++
 		return func() {
@@ -64,10 +60,10 @@ func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ 
 	return nil
 }
 
-func (config *mockConfigWatcher) Fetch(_ context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
-	if len(config.responses[req.GetTypeUrl()]) > 0 {
-		out := config.responses[req.GetTypeUrl()][0]
-		config.responses[req.GetTypeUrl()] = config.responses[req.GetTypeUrl()][1:]
+func (config *mockConfigWatcher) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
+	if len(config.responses[req.TypeUrl]) > 0 {
+		out := config.responses[req.TypeUrl][0]
+		config.responses[req.TypeUrl] = config.responses[req.TypeUrl][1:]
 		return out, nil
 	}
 	return nil, errors.New("missing")
@@ -97,19 +93,27 @@ func (stream *mockStream) Context() context.Context {
 
 func (stream *mockStream) Send(resp *discovery.DiscoveryResponse) error {
 	// check that nonce is monotonically incrementing
-	stream.nonce++
-	assert.Equal(stream.t, resp.GetNonce(), fmt.Sprintf("%d", stream.nonce))
-	// check that version is set
-	assert.NotEmpty(stream.t, resp.GetVersionInfo())
-	// check resources are non-empty
-	assert.NotEmpty(stream.t, resp.GetResources())
-	// check that type URL matches in resources
-	assert.NotEmpty(stream.t, resp.GetTypeUrl())
-
-	for _, res := range resp.GetResources() {
-		assert.Equal(stream.t, res.GetTypeUrl(), resp.GetTypeUrl())
+	stream.nonce = stream.nonce + 1
+	if resp.Nonce != fmt.Sprintf("%d", stream.nonce) {
+		stream.t.Errorf("Nonce => got %q, want %d", resp.Nonce, stream.nonce)
 	}
-
+	// check that version is set
+	if resp.VersionInfo == "" {
+		stream.t.Error("VersionInfo => got none, want non-empty")
+	}
+	// check resources are non-empty
+	if len(resp.Resources) == 0 {
+		stream.t.Error("Resources => got none, want non-empty")
+	}
+	// check that type URL matches in resources
+	if resp.TypeUrl == "" {
+		stream.t.Error("TypeUrl => got none, want non-empty")
+	}
+	for _, res := range resp.Resources {
+		if res.TypeUrl != resp.TypeUrl {
+			stream.t.Errorf("TypeUrl => got %q, want %q", res.TypeUrl, resp.TypeUrl)
+		}
+	}
 	stream.sent <- resp
 	if stream.sendError {
 		return errors.New("send error")
@@ -138,7 +142,6 @@ const (
 	clusterName         = "cluster0"
 	routeName           = "route0"
 	scopedRouteName     = "scopedRoute0"
-	virtualHostName     = "virtualHost0"
 	listenerName        = "listener0"
 	scopedListenerName  = "scopedListener0"
 	secretName          = "secret0"
@@ -153,11 +156,10 @@ var (
 	}
 	endpoint           = resource.MakeEndpoint(clusterName, 8080)
 	cluster            = resource.MakeCluster(resource.Ads, clusterName)
-	route              = resource.MakeRouteConfig(routeName, clusterName)
-	scopedRoute        = resource.MakeScopedRouteConfig(scopedRouteName, routeName, []string{"127.0.0.1"})
-	virtualHost        = resource.MakeVirtualHost(virtualHostName, clusterName)
+	route              = resource.MakeRoute(routeName, clusterName)
+	scopedRoute        = resource.MakeScopedRoute(scopedRouteName, routeName, []string{"127.0.0.1"})
 	httpListener       = resource.MakeRouteHTTPListener(resource.Ads, listenerName, 80, routeName)
-	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80)
+	httpScopedListener = resource.MakeScopedRouteHTTPListener(resource.Ads, scopedListenerName, 80, scopedRouteName)
 	secret             = resource.MakeSecrets(secretName, "test")[0]
 	runtime            = resource.MakeRuntime(runtimeName)
 	extensionConfig    = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
@@ -206,37 +208,30 @@ func makeResponses() map[string][]cache.Response {
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ScopedRouteType},
 			},
 		},
-		rsrc.VirtualHostType: {
-			&cache.RawResponse{
-				Version:   "5",
-				Resources: []types.ResourceWithTTL{{Resource: virtualHost}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.VirtualHostType},
-			},
-		},
 		rsrc.ListenerType: {
 			&cache.RawResponse{
-				Version:   "6",
+				Version:   "5",
 				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
 			},
 		},
 		rsrc.SecretType: {
 			&cache.RawResponse{
-				Version:   "7",
+				Version:   "6",
 				Resources: []types.ResourceWithTTL{{Resource: secret}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
 			},
 		},
 		rsrc.RuntimeType: {
 			&cache.RawResponse{
-				Version:   "8",
+				Version:   "7",
 				Resources: []types.ResourceWithTTL{{Resource: runtime}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
 			},
 		},
 		rsrc.ExtensionConfigType: {
 			&cache.RawResponse{
-				Version:   "9",
+				Version:   "8",
 				Resources: []types.ResourceWithTTL{{Resource: extensionConfig}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
 			},
@@ -244,7 +239,7 @@ func makeResponses() map[string][]cache.Response {
 		// Pass-through type (xDS does not exist for this type)
 		opaqueType: {
 			&cache.RawResponse{
-				Version:   "10",
+				Version:   "9",
 				Resources: []types.ResourceWithTTL{{Resource: opaque}},
 				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
 			},
@@ -308,17 +303,13 @@ func TestServerShutdown(t *testing.T) {
 func TestResponseHandlers(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
-			done := make(chan struct{})
-			ctx, cancel := context.WithCancel(context.Background())
-
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(ctx, config, server.CallbackFuncs{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 
 			// make a request
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{Node: node, TypeUrl: typ}
-
 			go func(rType string) {
 				var err error
 				switch rType {
@@ -341,8 +332,9 @@ func TestResponseHandlers(t *testing.T) {
 				case opaqueType:
 					err = s.StreamAggregatedResources(resp)
 				}
-				require.NoError(t, err)
-				close(done)
+				if err != nil {
+					t.Errorf("Stream() => got %v, want no error", err)
+				}
 			}(typ)
 
 			// check a response
@@ -355,9 +347,6 @@ func TestResponseHandlers(t *testing.T) {
 			case <-time.After(1 * time.Second):
 				t.Fatalf("got no response")
 			}
-
-			cancel()
-			<-done
 		})
 	}
 }
@@ -371,112 +360,118 @@ func TestFetch(t *testing.T) {
 	callbackError := false
 
 	cb := server.CallbackFuncs{
-		StreamOpenFunc: func(context.Context, int64, string) error {
+		StreamOpenFunc: func(ctx context.Context, i int64, s string) error {
 			if callbackError {
 				return errors.New("stream open error")
 			}
 			return nil
 		},
-		FetchRequestFunc: func(context.Context, *discovery.DiscoveryRequest) error {
+		FetchRequestFunc: func(ctx context.Context, request *discovery.DiscoveryRequest) error {
 			if callbackError {
 				return errors.New("fetch request error")
 			}
 			requestCount++
 			return nil
 		},
-		FetchResponseFunc: func(*discovery.DiscoveryRequest, *discovery.DiscoveryResponse) {
+		FetchResponseFunc: func(request *discovery.DiscoveryRequest, response *discovery.DiscoveryResponse) {
 			responseCount++
 		},
 	}
 
 	s := server.NewServer(context.Background(), config, cb)
-	out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.NotNil(t, out)
-	require.NoError(t, err)
-
-	out, err = s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.NotNil(t, out)
-	require.NoError(t, err)
-
-	out, err = s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.NotNil(t, out)
-	require.NoError(t, err)
-
-	out, err = s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.NotNil(t, out)
-	require.NoError(t, err)
-
-	out, err = s.FetchSecrets(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.NotNil(t, out)
-	require.NoError(t, err)
-
-	out, err = s.FetchRuntime(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.NotNil(t, out)
-	require.NoError(t, err)
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for endpoints: %v", err)
+	}
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for clusters: %v", err)
+	}
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for routes: %v", err)
+	}
+	if out, err := s.FetchScopedRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for scopedRoutes: %v", err)
+	}
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for listeners: %v", err)
+	}
+	if out, err := s.FetchSecrets(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for secrets: %v", err)
+	}
+	if out, err := s.FetchRuntime(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for runtime: %v", err)
+	}
+	if out, err := s.FetchExtensionConfigs(context.Background(), &discovery.DiscoveryRequest{Node: node}); out == nil || err != nil {
+		t.Errorf("unexpected empty or error for extensionConfigs: %v", err)
+	}
 
 	// try again and expect empty results
-	out, err = s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node})
-	assert.Nil(t, out)
-	require.Error(t, err)
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		t.Errorf("expected empty or error for endpoints: %v", err)
+	}
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		t.Errorf("expected empty or error for clusters: %v", err)
+	}
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		t.Errorf("expected empty or error for routes: %v", err)
+	}
+	if out, err := s.FetchScopedRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		t.Errorf("expected empty or error for routes: %v", err)
+	}
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil {
+		t.Errorf("expected empty or error for listeners: %v", err)
+	}
 
 	// try empty requests: not valid in a real gRPC server
-	out, err = s.FetchEndpoints(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchClusters(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchRoutes(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchListeners(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchSecrets(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchRuntime(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
+	if out, err := s.FetchEndpoints(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchClusters(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchRoutes(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchScopedRoutes(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchListeners(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchSecrets(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchRuntime(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
+	if out, err := s.FetchExtensionConfigs(context.Background(), nil); out != nil {
+		t.Errorf("expected empty on empty request: %v", err)
+	}
 
 	// send error from callback
 	callbackError = true
-	out, err = s.FetchEndpoints(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchClusters(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchRoutes(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
-
-	out, err = s.FetchListeners(context.Background(), nil)
-	assert.Nil(t, out)
-	require.Error(t, err)
+	if out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchScopedRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
+	if out, err := s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node}); out != nil || err == nil {
+		t.Errorf("expected empty or error due to callback error")
+	}
 
 	// verify fetch callbacks
-	assert.Equal(t, 10, requestCount)
-	assert.Equal(t, 6, responseCount)
+	if want := 13; requestCount != want {
+		t.Errorf("unexpected number of fetch requests: got %d, want %d", requestCount, want)
+	}
+	if want := 8; responseCount != want {
+		t.Errorf("unexpected number of fetch responses: got %d, want %d", responseCount, want)
+	}
 }
 
 func TestSendError(t *testing.T) {
@@ -495,8 +490,9 @@ func TestSendError(t *testing.T) {
 			}
 
 			// check that response fails since send returns error
-			err := s.StreamAggregatedResources(resp)
-			require.Error(t, err)
+			if err := s.StreamAggregatedResources(resp); err == nil {
+				t.Error("Stream() => got no error, want send error")
+			}
 
 			close(resp.recv)
 		})
@@ -517,10 +513,13 @@ func TestStaleNonce(t *testing.T) {
 			}
 			stop := make(chan struct{})
 			go func() {
-				err := s.StreamAggregatedResources(resp)
-				require.NoError(t, err)
+				if err := s.StreamAggregatedResources(resp); err != nil {
+					t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+				}
 				// should be two watches called
-				assert.True(t, reflect.DeepEqual(map[string]int{typ: 2}, config.counts))
+				if want := map[string]int{typ: 2}; !reflect.DeepEqual(want, config.counts) {
+					t.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}
 				close(stop)
 			}()
 			select {
@@ -569,49 +568,39 @@ func TestAggregatedHandlers(t *testing.T) {
 		ResourceNames: []string{routeName},
 	}
 	resp.recv <- &discovery.DiscoveryRequest{
-		TypeUrl:       rsrc.ExtensionConfigType,
-		ResourceNames: []string{extensionConfigName},
-	}
-	resp.recv <- &discovery.DiscoveryRequest{
 		TypeUrl:       rsrc.ScopedRouteType,
 		ResourceNames: []string{scopedRouteName},
 	}
-	resp.recv <- &discovery.DiscoveryRequest{
-		TypeUrl:       rsrc.VirtualHostType,
-		ResourceNames: []string{virtualHostName},
-	}
 
-	// We create the server with the optional ordered ADS flag so we guarantee resource
-	// ordering over the stream.
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithOrderedADS())
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	go func() {
-		err := s.StreamAggregatedResources(resp)
-		require.NoError(t, err)
+		if err := s.StreamAggregatedResources(resp); err != nil {
+			t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+		}
 	}()
 
 	count := 0
-	expectedCount := 7
 	for {
 		select {
 		case <-resp.sent:
 			count++
-			if count >= expectedCount {
+			if count >= 5 {
 				close(resp.recv)
-				assert.True(t, reflect.DeepEqual(map[string]int{
-					rsrc.EndpointType:        1,
-					rsrc.ClusterType:         1,
-					rsrc.RouteType:           1,
-					rsrc.ScopedRouteType:     1,
-					rsrc.VirtualHostType:     1,
-					rsrc.ListenerType:        1,
-					rsrc.ExtensionConfigType: 1,
-				}, config.counts))
+				if want := map[string]int{
+					rsrc.EndpointType:    1,
+					rsrc.ClusterType:     1,
+					rsrc.RouteType:       1,
+					rsrc.ScopedRouteType: 1,
+					rsrc.ListenerType:    1,
+				}; !reflect.DeepEqual(want, config.counts) {
+					t.Errorf("watch counts => got %v, want %v", config.counts, want)
+				}
 
 				// got all messages
 				return
 			}
 		case <-time.After(1 * time.Second):
-			t.Fatalf("got %d messages on the stream, not %d", count, expectedCount)
+			t.Fatalf("got %d messages on the stream, not 4", count)
 		}
 	}
 }
@@ -621,8 +610,9 @@ func TestAggregateRequestType(t *testing.T) {
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
-	err := s.StreamAggregatedResources(resp)
-	require.Error(t, err)
+	if err := s.StreamAggregatedResources(resp); err == nil {
+		t.Error("StreamAggregatedResources() => got nil, want an error")
+	}
 }
 
 func TestCancellations(t *testing.T) {
@@ -636,9 +626,12 @@ func TestCancellations(t *testing.T) {
 	}
 	close(resp.recv)
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
-	err := s.StreamAggregatedResources(resp)
-	require.NoError(t, err)
-	assert.Equal(t, 0, config.watches)
+	if err := s.StreamAggregatedResources(resp); err != nil {
+		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+	}
+	if config.watches != 0 {
+		t.Errorf("Expect all watches canceled, got %q", config.watches)
+	}
 }
 
 func TestOpaqueRequestsChannelMuxing(t *testing.T) {
@@ -654,9 +647,12 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 	}
 	close(resp.recv)
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
-	err := s.StreamAggregatedResources(resp)
-	require.NoError(t, err)
-	assert.Equal(t, 0, config.watches)
+	if err := s.StreamAggregatedResources(resp); err != nil {
+		t.Errorf("StreamAggregatedResources() => got %v, want no error", err)
+	}
+	if config.watches != 0 {
+		t.Errorf("Expect all watches canceled, got %q", config.watches)
+	}
 }
 
 func TestCallbackError(t *testing.T) {
@@ -666,7 +662,7 @@ func TestCallbackError(t *testing.T) {
 			config.responses = makeResponses()
 
 			s := server.NewServer(context.Background(), config, server.CallbackFuncs{
-				StreamOpenFunc: func(context.Context, int64, string) error {
+				StreamOpenFunc: func(ctx context.Context, i int64, s string) error {
 					return errors.New("stream open error")
 				},
 			})
@@ -679,8 +675,9 @@ func TestCallbackError(t *testing.T) {
 			}
 
 			// check that response fails since stream open returns error
-			err := s.StreamAggregatedResources(resp)
-			require.Error(t, err)
+			if err := s.StreamAggregatedResources(resp); err == nil {
+				t.Error("Stream() => got no error, want error")
+			}
 
 			close(resp.recv)
 		})

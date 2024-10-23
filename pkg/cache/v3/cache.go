@@ -44,10 +44,6 @@ type DeltaRequest = discovery.DeltaDiscoveryRequest
 // ConfigWatcher implementation must be thread-safe.
 type ConfigWatcher interface {
 	// CreateWatch returns a new open watch from a non-empty request.
-	// This is the entrypoint to propagate configuration changes the
-	// provided Response channel. State from the gRPC server is utilized
-	// to make sure consuming cache implementations can see what the server has sent to clients.
-	//
 	// An individual consumer normally issues a single open watch by each type URL.
 	//
 	// The provided channel produces requested resources as responses, once they are available.
@@ -57,9 +53,6 @@ type ConfigWatcher interface {
 	CreateWatch(*Request, stream.StreamState, chan Response) (cancel func())
 
 	// CreateDeltaWatch returns a new open incremental xDS watch.
-	// This is the entrypoint to propagate configuration changes the
-	// provided DeltaResponse channel. State from the gRPC server is utilized
-	// to make sure consuming cache implementations can see what the server has sent to clients.
 	//
 	// The provided channel produces requested resources as responses, or spontaneous updates in accordance
 	// with the incremental xDS specification.
@@ -167,10 +160,8 @@ type RawDeltaResponse struct {
 	marshaledResponse atomic.Value
 }
 
-var (
-	_ Response      = &RawResponse{}
-	_ DeltaResponse = &RawDeltaResponse{}
-)
+var _ Response = &RawResponse{}
+var _ DeltaResponse = &RawDeltaResponse{}
 
 // PassthroughResponse is a pre constructed xDS response that need not go through marshaling transformations.
 type PassthroughResponse struct {
@@ -197,10 +188,8 @@ type DeltaPassthroughResponse struct {
 	ctx context.Context
 }
 
-var (
-	_ Response      = &PassthroughResponse{}
-	_ DeltaResponse = &DeltaPassthroughResponse{}
-)
+var _ Response = &PassthroughResponse{}
+var _ DeltaResponse = &DeltaPassthroughResponse{}
 
 // GetDiscoveryResponse performs the marshaling the first time its called and uses the cached response subsequently.
 // This is necessary because the marshaled response does not change across the calls.
@@ -229,7 +218,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 		marshaledResponse = &discovery.DiscoveryResponse{
 			VersionInfo: r.Version,
 			Resources:   marshaledResources,
-			TypeUrl:     r.GetRequest().GetTypeUrl(),
+			TypeUrl:     r.Request.TypeUrl,
 		}
 
 		r.marshaledResponse.Store(marshaledResponse)
@@ -260,7 +249,7 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 			marshaledResources[i] = &discovery.Resource{
 				Name: name,
 				Resource: &anypb.Any{
-					TypeUrl: r.GetDeltaRequest().GetTypeUrl(),
+					TypeUrl: r.DeltaRequest.TypeUrl,
 					Value:   marshaledResource,
 				},
 				Version: version,
@@ -270,7 +259,7 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 		marshaledResponse = &discovery.DeltaDiscoveryResponse{
 			Resources:         marshaledResources,
 			RemovedResources:  r.RemovedResources,
-			TypeUrl:           r.GetDeltaRequest().GetTypeUrl(),
+			TypeUrl:           r.DeltaRequest.TypeUrl,
 			SystemVersionInfo: r.SystemVersionInfo,
 		}
 		r.marshaledResponse.Store(marshaledResponse)
@@ -322,18 +311,18 @@ func (r *RawResponse) maybeCreateTTLResource(resource types.ResourceWithTTL) (ty
 		}
 
 		if !r.Heartbeat {
-			rsrc, err := anypb.New(resource.Resource)
+			any, err := anypb.New(resource.Resource)
 			if err != nil {
 				return nil, "", err
 			}
-			rsrc.TypeUrl = r.GetRequest().GetTypeUrl()
-			wrappedResource.Resource = rsrc
+			any.TypeUrl = r.Request.TypeUrl
+			wrappedResource.Resource = any
 		}
 
 		return wrappedResource, deltaResourceTypeURL, nil
 	}
 
-	return resource.Resource, r.GetRequest().GetTypeUrl(), nil
+	return resource.Resource, r.Request.TypeUrl, nil
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
@@ -358,22 +347,19 @@ func (r *DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRe
 
 // GetVersion returns the response version.
 func (r *PassthroughResponse) GetVersion() (string, error) {
-	discoveryResponse, _ := r.GetDiscoveryResponse()
-	if discoveryResponse != nil {
-		return discoveryResponse.GetVersionInfo(), nil
+	if r.DiscoveryResponse != nil {
+		return r.DiscoveryResponse.VersionInfo, nil
 	}
 	return "", fmt.Errorf("DiscoveryResponse is nil")
 }
-
 func (r *PassthroughResponse) GetContext() context.Context {
 	return r.ctx
 }
 
 // GetSystemVersion returns the response version.
 func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
-	deltaDiscoveryResponse, _ := r.GetDeltaDiscoveryResponse()
-	if deltaDiscoveryResponse != nil {
-		return deltaDiscoveryResponse.GetSystemVersionInfo(), nil
+	if r.DeltaDiscoveryResponse != nil {
+		return r.DeltaDiscoveryResponse.SystemVersionInfo, nil
 	}
 	return "", fmt.Errorf("DeltaDiscoveryResponse is nil")
 }

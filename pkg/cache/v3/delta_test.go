@@ -7,10 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/testing/protocmp"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -20,14 +17,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
-
-func assertResourceMapEqual(t *testing.T, want, got map[string]types.Resource) {
-	t.Helper()
-
-	if !cmp.Equal(want, got, protocmp.Transform()) {
-		t.Errorf("got resources %v, want %v", got, want)
-	}
-}
 
 func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
@@ -45,7 +34,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		}, stream.NewStreamState(true, nil), watches[typ])
 	}
 
-	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
@@ -54,8 +43,9 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				snapshot := fixture.snapshot()
-				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
+				if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
+				}
 				vMap := out.GetNextVersionMap()
 				versionMap[typ] = vMap
 			case <-time.After(time.Second):
@@ -68,17 +58,13 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// all resources as well as individual resource removals
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
-		state := stream.NewStreamState(false, versionMap[typ])
-		for resource := range versionMap[typ] {
-			state.GetSubscribedResourceNames()[resource] = struct{}{}
-		}
 		c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: "node",
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, state, watches[typ])
+		}, stream.NewStreamState(false, versionMap[typ]), watches[typ])
 	}
 
 	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
@@ -86,8 +72,8 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	}
 
 	// set partially-versioned snapshot
-	snapshot2 := fixture.snapshot()
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2 := snapshot
+	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -98,9 +84,9 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// validate response for endpoints
 	select {
 	case out := <-watches[testTypes[0]]:
-		snapshot2 := fixture.snapshot()
-		snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType)) {
+			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.GetResources(rsrc.EndpointType))
+		}
 		vMap := out.GetNextVersionMap()
 		versionMap[testTypes[0]] = vMap
 	case <-time.After(time.Second):
@@ -127,7 +113,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 		}, *streams[typ], watches[typ])
 	}
 
-	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
+	if err := c.SetSnapshot(context.Background(), key, snapshot); err != nil {
 		t.Fatal(err)
 	}
 
@@ -135,8 +121,9 @@ func TestDeltaRemoveResources(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			select {
 			case out := <-watches[typ]:
-				snapshot := fixture.snapshot()
-				assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ))
+				if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot.GetResources(typ)) {
+					t.Errorf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot.GetResources(typ))
+				}
 				nextVersionMap := out.GetNextVersionMap()
 				streams[typ].SetResourceVersions(nextVersionMap)
 			case <-time.After(time.Second):
@@ -162,8 +149,8 @@ func TestDeltaRemoveResources(t *testing.T) {
 	}
 
 	// set a partially versioned snapshot with no endpoints
-	snapshot2 := fixture.snapshot()
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
+	snapshot2 := snapshot
+	snapshot2.Resources[types.Endpoint] = cache.NewResources(version2, []types.Resource{})
 	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
 		t.Fatal(err)
 	}
@@ -171,9 +158,9 @@ func TestDeltaRemoveResources(t *testing.T) {
 	// validate response for endpoints
 	select {
 	case out := <-watches[testTypes[0]]:
-		snapshot2 := fixture.snapshot()
-		snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
-		assertResourceMapEqual(t, cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType))
+		if !reflect.DeepEqual(cache.IndexRawResourcesByName(out.(*cache.RawDeltaResponse).Resources), snapshot2.GetResources(rsrc.EndpointType)) {
+			t.Fatalf("got resources %v, want %v", out.(*cache.RawDeltaResponse).Resources, snapshot2.GetResources(rsrc.EndpointType))
+		}
 		nextVersionMap := out.GetNextVersionMap()
 
 		// make sure the version maps are different since we no longer are tracking any endpoint resources
@@ -226,22 +213,20 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.DeltaResponse)
-	state := stream.NewStreamState(false, nil)
-	state.SetSubscribedResourceNames(map[string]struct{}{names[rsrc.EndpointType][0]: {}})
 	c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 		Node: &core.Node{
 			Id: key,
 		},
 		TypeUrl:                rsrc.EndpointType,
 		ResourceNamesSubscribe: names[rsrc.EndpointType],
-	}, state, watchCh)
+	}, stream.NewStreamState(false, map[string]string{names[rsrc.EndpointType][0]: ""}), watchCh)
 
 	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
 	defer cancel()
 
-	err := c.SetSnapshot(ctx, key, fixture.snapshot())
-	require.EqualError(t, err, context.Canceled.Error())
+	err := c.SetSnapshot(ctx, key, snapshot)
+	assert.EqualError(t, err, context.Canceled.Error())
 
 	// Now reset the snapshot with a consuming channel. This verifies that if setting the snapshot fails,
 	// we can retry by setting the same snapshot. In other words, we keep the watch open even if we failed
@@ -253,14 +238,14 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 		close(watchTriggeredCh)
 	}()
 
-	err = c.SetSnapshot(context.WithValue(context.Background(), testKey{}, "bar"), key, fixture.snapshot())
-	require.NoError(t, err)
+	err = c.SetSnapshot(context.WithValue(context.Background(), testKey{}, "bar"), key, snapshot)
+	assert.NoError(t, err)
 
 	// The channel should get closed due to the watch trigger.
 	select {
 	case response := <-watchTriggeredCh:
 		// Verify that we pass the context through.
-		assert.Equal(t, "bar", response.GetContext().Value(testKey{}))
+		assert.Equal(t, response.GetContext().Value(testKey{}), "bar")
 	case <-time.After(time.Second):
 		t.Fatalf("timed out")
 	}

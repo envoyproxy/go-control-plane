@@ -17,12 +17,6 @@ type ResourceWithTTL struct {
 	TTL      *time.Duration
 }
 
-// ResourceWithName provides a name for out-of-tree resources.
-type ResourceWithName interface {
-	proto.Message
-	GetName() string
-}
-
 // MarshaledResource is an alias for the serialized binary array.
 type MarshaledResource = []byte
 
@@ -38,20 +32,14 @@ func (e SkipFetchError) Error() string {
 // ResponseType enumeration of supported response types
 type ResponseType int
 
-// NOTE: The order of this enum MATTERS!
-// https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#aggregated-discovery-service
-// ADS expects things to be returned in a specific order.
-// See the following issue for details: https://github.com/envoyproxy/go-control-plane/issues/526
 const (
-	Cluster ResponseType = iota
-	Endpoint
-	Listener
+	Endpoint ResponseType = iota
+	Cluster
 	Route
 	ScopedRoute
-	VirtualHost
+	Listener
 	Secret
 	Runtime
 	ExtensionConfig
-	RateLimitConfig
 	UnknownType // token to count the total number of supported types
 )

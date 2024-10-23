@@ -1,6 +1,3 @@
-permissions:
-  contents: read
-
 on:
   workflow_dispatch:
   schedule:
@@ -8,15 +5,12 @@ on:
 
 jobs:
   prune_stale:
-    permissions:
-      issues: write  # for actions/stale to close stale issues
-      pull-requests: write  # for actions/stale to close stale PRs
     name: Prune Stale
     runs-on: ubuntu-latest
 
     steps:
     - name: Prune Stale
-      uses: actions/stale@28ca1036281a5e5922ead5184a1bbf96e5fc984e  # v9.0.0
+      uses: actions/stale@v3.0.14
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         # Different amounts of days for issues/PRs are not currently supported but there is a PR

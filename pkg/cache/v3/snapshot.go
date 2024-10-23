@@ -35,40 +35,38 @@ type Snapshot struct {
 	VersionMap map[string]map[string]string
 }
 
-var _ ResourceSnapshot = &Snapshot{}
-
 // NewSnapshot creates a snapshot from response types and a version.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
-func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (*Snapshot, error) {
+func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (Snapshot, error) {
 	out := Snapshot{}
 
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
 		if index == types.UnknownType {
-			return nil, errors.New("unknown resource type: " + typ)
+			return out, errors.New("unknown resource type: " + typ)
 		}
 
 		out.Resources[index] = NewResources(version, resource)
 	}
 
-	return &out, nil
+	return out, nil
 }
 
 // NewSnapshotWithTTLs creates a snapshot of ResourceWithTTLs.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
-func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.ResourceWithTTL) (*Snapshot, error) {
+func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.ResourceWithTTL) (Snapshot, error) {
 	out := Snapshot{}
 
 	for typ, resource := range resources {
 		index := GetResponseType(typ)
 		if index == types.UnknownType {
-			return nil, errors.New("unknown resource type: " + typ)
+			return out, errors.New("unknown resource type: " + typ)
 		}
 
 		out.Resources[index] = NewResourcesWithTTL(version, resource)
 	}
 
-	return &out, nil
+	return out, nil
 }
 
 // Consistent check verifies that the dependent resources are exactly listed in the
@@ -89,11 +87,13 @@ func (s *Snapshot) Consistent() error {
 
 	// Loop through each referenced resource.
 	referencedResponseTypes := map[types.ResponseType]struct{}{
-		types.Endpoint: {},
-		types.Route:    {},
+		types.Endpoint:    {},
+		types.ScopedRoute: {},
+		types.Route:       {},
 	}
 
 	for idx, items := range s.Resources {
+
 		// We only want to check resource types that are expected to be referenced by another resource type.
 		// Basically, if the consistency relationship is modeled as a DAG, we only want
 		// to check nodes that are expected to have edges pointing to it.
@@ -106,13 +106,12 @@ func (s *Snapshot) Consistent() error {
 			referenceSet := referencedResources[typeURL]
 
 			if len(referenceSet) != len(items.Items) {
-				return fmt.Errorf("mismatched %q reference and resource lengths: len(%v) != %d",
-					typeURL, referenceSet, len(items.Items))
+				return fmt.Errorf("mismatched reference and resource lengths: len(%v) != %d", referenceSet, len(items.Items))
 			}
 
 			// Check superset.
 			if err := superset(referenceSet, items.Items); err != nil {
-				return fmt.Errorf("inconsistent %q reference: %w", typeURL, err)
+				return err
 			}
 		}
 	}
@@ -184,7 +183,7 @@ func (s *Snapshot) ConstructVersionMap() error {
 			return err
 		}
 		if _, ok := s.VersionMap[typeURL]; !ok {
-			s.VersionMap[typeURL] = make(map[string]string, len(resources.Items))
+			s.VersionMap[typeURL] = make(map[string]string)
 		}
 
 		for _, r := range resources.Items {
@@ -195,7 +194,7 @@ func (s *Snapshot) ConstructVersionMap() error {
 			}
 			v := HashResource(marshaledResource)
 			if v == "" {
-				return fmt.Errorf("failed to build resource version: %w", err)
+				return fmt.Errorf("failed to build resource version: %v", err)
 			}
 
 			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v

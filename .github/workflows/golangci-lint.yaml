@@ -1,24 +1,18 @@
 name: golangci-lint
 
-permissions:
-  contents: read
-
 on: [push, pull_request]
-
+  
 jobs:
   golangci:
-    permissions:
-      contents: read  # for actions/checkout to fetch code
-      pull-requests: read  # for golangci/golangci-lint-action to fetch pull requests
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29  # v4.1.6
+      - uses: actions/checkout@v2
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@aaa42aa0628b4ae2578232a66b541047968fac86  # v6.1.0
+        uses: golangci/golangci-lint-action@v2
         with:
           version: latest
-          only-new-issues: false
+          only-new-issues: true
           
           # Optional: golangci-lint command line arguments.
-          args: --verbose
+          args: --timeout=10m0s

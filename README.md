@@ -1,19 +1,13 @@
 # control-plane
 
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/envoyproxy/go-control-plane/badge)](https://securityscorecards.dev/viewer/?uri=github.com/envoyproxy/go-control-plane)
-![CI Status](https://github.com/envoyproxy/go-control-plane/actions/workflows/ci.yaml/badge.svg)
+![example workflow](https://github.com/envoyproxy/go-control-plane/actions/workflows/ci.yaml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/envoyproxy/go-control-plane)](https://goreportcard.com/report/github.com/envoyproxy/go-control-plane)
-[![GoDoc](https://pkg.go.dev/badge/github.com/envoyproxy/go-control-plane.svg)](https://pkg.go.dev/github.com/envoyproxy/go-control-plane)
+[![GoDoc](https://godoc.org/github.com/envoyproxy/go-control-plane?status.svg)](https://godoc.org/github.com/envoyproxy/go-control-plane)
 
 This repository contains a Go-based implementation of an API server that
 implements the discovery service APIs defined in
 [data-plane-api](https://github.com/envoyproxy/data-plane-api).
 
-## Proto files
-
-The Go proto files are synced from the upstream Envoy repository (https://github.com/envoyproxy/envoy) on every upstream commit.
-
-Synchronization is triggered using the `envoy-sync.yaml` workflow.
 
 ## Scope
 
@@ -41,11 +35,11 @@ pre-defined hash function whose keys are based on the
 At this moment, this repository will not tackle translating platform
 specific representation of resources (e.g., services, instances of
 services, etc.) into Envoy-style configuration. Based on usage and
-feedback, we might decide to revisit this aspect at a later point in time.
+feedback, we might decided to revisit this aspect at a later point in time.
 
 ## Requirements
 
-1. Go 1.21+
+1. Go 1.11+
 
 ## Quick start
 
@@ -67,8 +61,8 @@ The Envoy xDS APIs follow a well defined [versioning scheme](https://www.envoypr
 
 ### Deprecated
 
-`V2` control-plane code has been removed and will no longer be supported. For previous conversations on support for various xDS versions, see here:
-- [here](https://docs.google.com/document/d/1ZkHpz6DwEUmAlG0kb2Mgu4iaeQC2Bbb0egMbECoNNKY/edit?ts=5e602993#heading=h.15nsmgmjaaml)
+`V2` control-plane code has been removed and will no longer be supported. For previous conversations on support for various xDS versions, see here: 
+- [here](https://docs.google.com/document/d/1ZkHpz6DwEUmAlG0kb2Mgu4iaeQC2Bbb0egMbECoNNKY/edit?ts=5e602993#heading=h.15nsmgmjaaml) 
 - [here](https://envoyproxy.slack.com/archives/C7LDJTM6Z/p1582925082005300)
 
 *Note*: It is recommended to use a previous SHA if there is still a need for `V2`.

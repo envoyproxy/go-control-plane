@@ -15,9 +15,8 @@
 package server
 
 import (
-	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"path"
 
@@ -64,7 +63,7 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 		return nil, http.StatusBadRequest, fmt.Errorf("empty body")
 	}
 
-	body, err := io.ReadAll(req.Body)
+	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return nil, http.StatusBadRequest, fmt.Errorf("cannot read body")
 	}
@@ -73,7 +72,7 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 	out := &discovery.DiscoveryRequest{}
 	err = protojson.Unmarshal(body, out)
 	if err != nil {
-		return nil, http.StatusBadRequest, fmt.Errorf("cannot parse JSON body: %w", err)
+		return nil, http.StatusBadRequest, fmt.Errorf("cannot parse JSON body: " + err.Error())
 	}
 	out.TypeUrl = typeURL
 
@@ -82,16 +81,15 @@ func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
 	if err != nil {
 		// SkipFetchErrors will return a 304 which will signify to the envoy client that
 		// it is already at the latest version; all other errors will 500 with a message.
-		var skip *types.SkipFetchError
-		if ok := errors.As(err, &skip); ok {
+		if _, ok := err.(*types.SkipFetchError); ok {
 			return nil, http.StatusNotModified, nil
 		}
-		return nil, http.StatusInternalServerError, fmt.Errorf("fetch error: %w", err)
+		return nil, http.StatusInternalServerError, fmt.Errorf("fetch error: " + err.Error())
 	}
 
 	b, err := protojson.MarshalOptions{UseProtoNames: true}.Marshal(res)
 	if err != nil {
-		return nil, http.StatusInternalServerError, fmt.Errorf("marshal error: %w", err)
+		return nil, http.StatusInternalServerError, fmt.Errorf("marshal error: " + err.Error())
 	}
 
 	return b, http.StatusOK, nil

@@ -21,15 +21,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/envoyproxy/go-control-plane/pkg/server/config"
 	"github.com/envoyproxy/go-control-plane/pkg/server/delta/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/rest/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
 	extensionconfigservice "github.com/envoyproxy/go-control-plane/envoy/service/extension/v3"
 	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
@@ -38,7 +37,6 @@ import (
 	secretservice "github.com/envoyproxy/go-control-plane/envoy/service/secret/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	rlsconfigservice "github.com/envoyproxy/go-control-plane/ratelimit/service/ratelimit/v3"
 )
 
 // Server is a collection of handlers for streaming discovery requests.
@@ -47,13 +45,11 @@ type Server interface {
 	clusterservice.ClusterDiscoveryServiceServer
 	routeservice.RouteDiscoveryServiceServer
 	routeservice.ScopedRoutesDiscoveryServiceServer
-	routeservice.VirtualHostDiscoveryServiceServer
 	listenerservice.ListenerDiscoveryServiceServer
-	discovery.AggregatedDiscoveryServiceServer
+	discoverygrpc.AggregatedDiscoveryServiceServer
 	secretservice.SecretDiscoveryServiceServer
 	runtimeservice.RuntimeDiscoveryServiceServer
 	extensionconfigservice.ExtensionConfigDiscoveryServiceServer
-	rlsconfigservice.RateLimitConfigDiscoveryServiceServer
 
 	rest.Server
 	sotw.Server
@@ -71,9 +67,9 @@ type Callbacks interface {
 // CallbackFuncs is a convenience type for implementing the Callbacks interface.
 type CallbackFuncs struct {
 	StreamOpenFunc          func(context.Context, int64, string) error
-	StreamClosedFunc        func(int64, *core.Node)
+	StreamClosedFunc        func(int64)
 	DeltaStreamOpenFunc     func(context.Context, int64, string) error
-	DeltaStreamClosedFunc   func(int64, *core.Node)
+	DeltaStreamClosedFunc   func(int64)
 	StreamRequestFunc       func(int64, *discovery.DiscoveryRequest) error
 	StreamResponseFunc      func(context.Context, int64, *discovery.DiscoveryRequest, *discovery.DiscoveryResponse)
 	StreamDeltaRequestFunc  func(int64, *discovery.DeltaDiscoveryRequest) error
@@ -94,9 +90,9 @@ func (c CallbackFuncs) OnStreamOpen(ctx context.Context, streamID int64, typeURL
 }
 
 // OnStreamClosed invokes StreamClosedFunc.
-func (c CallbackFuncs) OnStreamClosed(streamID int64, node *core.Node) {
+func (c CallbackFuncs) OnStreamClosed(streamID int64) {
 	if c.StreamClosedFunc != nil {
-		c.StreamClosedFunc(streamID, node)
+		c.StreamClosedFunc(streamID)
 	}
 }
 
@@ -110,9 +106,9 @@ func (c CallbackFuncs) OnDeltaStreamOpen(ctx context.Context, streamID int64, ty
 }
 
 // OnDeltaStreamClosed invokes DeltaStreamClosedFunc.
-func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64, node *core.Node) {
+func (c CallbackFuncs) OnDeltaStreamClosed(streamID int64) {
 	if c.DeltaStreamClosedFunc != nil {
-		c.DeltaStreamClosedFunc(streamID, node)
+		c.DeltaStreamClosedFunc(streamID)
 	}
 }
 
@@ -165,10 +161,10 @@ func (c CallbackFuncs) OnFetchResponse(req *discovery.DiscoveryRequest, resp *di
 }
 
 // NewServer creates handlers from a config watcher and callbacks.
-func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks, opts ...config.XDSOption) Server {
+func NewServer(ctx context.Context, config cache.Cache, callbacks Callbacks) Server {
 	return NewServerAdvanced(rest.NewServer(config, callbacks),
-		sotw.NewServer(ctx, config, callbacks, opts...),
-		delta.NewServer(ctx, config, callbacks, opts...),
+		sotw.NewServer(ctx, config, callbacks),
+		delta.NewServer(ctx, config, callbacks),
 	)
 }
 
@@ -182,11 +178,11 @@ type server struct {
 	delta delta.Server
 }
 
-func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
+func (s *server) StreamHandler(stream sotw.Stream, typeURL string) error {
 	return s.sotw.StreamHandler(stream, typeURL)
 }
 
-func (s *server) StreamAggregatedResources(stream discovery.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
+func (s *server) StreamAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_StreamAggregatedResourcesServer) error {
 	return s.StreamHandler(stream, resource.AnyType)
 }
 
@@ -221,12 +217,6 @@ func (s *server) StreamRuntime(stream runtimeservice.RuntimeDiscoveryService_Str
 func (s *server) StreamExtensionConfigs(stream extensionconfigservice.ExtensionConfigDiscoveryService_StreamExtensionConfigsServer) error {
 	return s.StreamHandler(stream, resource.ExtensionConfigType)
 }
-
-func (s *server) StreamRlsConfigs(stream rlsconfigservice.RateLimitConfigDiscoveryService_StreamRlsConfigsServer) error {
-	return s.StreamHandler(stream, resource.RateLimitConfigType)
-}
-
-// VHDS doesn't support SOTW requests, so no handler for it exists.
 
 // Fetch is the universal fetch method.
 func (s *server) Fetch(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
@@ -297,21 +287,11 @@ func (s *server) FetchExtensionConfigs(ctx context.Context, req *discovery.Disco
 	return s.Fetch(ctx, req)
 }
 
-func (s *server) FetchRlsConfigs(ctx context.Context, req *discovery.DiscoveryRequest) (*discovery.DiscoveryResponse, error) {
-	if req == nil {
-		return nil, status.Errorf(codes.Unavailable, "empty request")
-	}
-	req.TypeUrl = resource.RateLimitConfigType
-	return s.Fetch(ctx, req)
-}
-
-// VHDS doesn't support REST requests, so no handler exists for this.
-
 func (s *server) DeltaStreamHandler(stream stream.DeltaStream, typeURL string) error {
 	return s.delta.DeltaStreamHandler(stream, typeURL)
 }
 
-func (s *server) DeltaAggregatedResources(stream discovery.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
+func (s *server) DeltaAggregatedResources(stream discoverygrpc.AggregatedDiscoveryService_DeltaAggregatedResourcesServer) error {
 	return s.DeltaStreamHandler(stream, resource.AnyType)
 }
 
@@ -345,8 +325,4 @@ func (s *server) DeltaRuntime(stream runtimeservice.RuntimeDiscoveryService_Delt
 
 func (s *server) DeltaExtensionConfigs(stream extensionconfigservice.ExtensionConfigDiscoveryService_DeltaExtensionConfigsServer) error {
 	return s.DeltaStreamHandler(stream, resource.ExtensionConfigType)
-}
-
-func (s *server) DeltaVirtualHosts(stream routeservice.VirtualHostDiscoveryService_DeltaVirtualHostsServer) error {
-	return s.DeltaStreamHandler(stream, resource.VirtualHostType)
 }

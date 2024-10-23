@@ -6,20 +6,17 @@ import (
 	"net"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-
 	"google.golang.org/grpc"
 
-	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	endpointv3 "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
-	clusterservice "github.com/envoyproxy/go-control-plane/envoy/service/cluster/v3"
-	discoverygrpc "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	endpointservice "github.com/envoyproxy/go-control-plane/envoy/service/endpoint/v3"
-	listenerservice "github.com/envoyproxy/go-control-plane/envoy/service/listener/v3"
-	routeservice "github.com/envoyproxy/go-control-plane/envoy/service/route/v3"
+	api "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v2"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
-	xds "github.com/envoyproxy/go-control-plane/pkg/server/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/v2"
+	xds "github.com/envoyproxy/go-control-plane/pkg/server/v2"
+
+	endpoint "github.com/envoyproxy/go-control-plane/envoy/api/v2"
+	core "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
+	endpointv2 "github.com/envoyproxy/go-control-plane/envoy/api/v2/endpoint"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/informers"
@@ -46,11 +43,11 @@ func main() {
 	grpcServer := grpc.NewServer()
 	lis, _ := net.Listen("tcp", ":8080")
 
-	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
-	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
-	clusterservice.RegisterClusterDiscoveryServiceServer(grpcServer, server)
-	routeservice.RegisterRouteDiscoveryServiceServer(grpcServer, server)
-	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)
+	discovery.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
+	api.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	api.RegisterClusterDiscoveryServiceServer(grpcServer, server)
+	api.RegisterRouteDiscoveryServiceServer(grpcServer, server)
+	api.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 
 	clusters, _ := CreateBootstrapClients()
 
@@ -72,7 +69,7 @@ func main() {
 	}
 
 	if err := grpcServer.Serve(lis); err != nil {
-		fmt.Printf("%v", err)
+		fmt.Errorf("", err)
 	}
 }
 
@@ -109,38 +106,29 @@ func HandleEndpointsUpdate(oldObj, newObj interface{}) {
 		edsEndpoints = append(edsEndpoints, MakeEndpointsForCluster(envoyCluster))
 	}
 
-	snapshot, err := cache.NewSnapshot(fmt.Sprintf("%v.0", version), map[resource.Type][]types.Resource{
-		resource.EndpointType: edsEndpoints,
-	})
+	snapshot := cache.NewSnapshot(fmt.Sprintf("%v.0", version), edsEndpoints, nil, nil, nil, nil)
+
+	err := snapshotCache.SetSnapshot("mesh", snapshot)
 	if err != nil {
 		fmt.Printf("%v", err)
-		return
-	}
-
-	IDs := snapshotCache.GetStatusKeys()
-	for _, id := range IDs {
-		err = snapshotCache.SetSnapshot(context.Background(), id, snapshot)
-		if err != nil {
-			fmt.Printf("%v", err)
-		}
 	}
 
 	version++
 }
 
-func MakeEndpointsForCluster(service *EnvoyCluster) *endpointv3.ClusterLoadAssignment {
+func MakeEndpointsForCluster(service *EnvoyCluster) *endpoint.ClusterLoadAssignment {
 	fmt.Printf("Updating endpoints for cluster %s: %v\n", service.name, service.endpoints)
-	cla := &endpointv3.ClusterLoadAssignment{
+	cla := &endpoint.ClusterLoadAssignment{
 		ClusterName: service.name,
-		Endpoints:   []*endpointv3.LocalityLbEndpoints{},
+		Endpoints:   []*endpointv2.LocalityLbEndpoints{},
 	}
 
 	for _, endpoint := range service.endpoints {
 		cla.Endpoints = append(cla.Endpoints,
-			&endpointv3.LocalityLbEndpoints{
-				LbEndpoints: []*endpointv3.LbEndpoint{{
-					HostIdentifier: &endpointv3.LbEndpoint_Endpoint{
-						Endpoint: &endpointv3.Endpoint{
+			&endpointv2.LocalityLbEndpoints{
+				LbEndpoints: []*endpointv2.LbEndpoint{{
+					HostIdentifier: &endpointv2.LbEndpoint_Endpoint{
+						Endpoint: &endpointv2.Endpoint{
 							Address: &core.Address{
 								Address: &core.Address_SocketAddress{
 									SocketAddress: &core.SocketAddress{

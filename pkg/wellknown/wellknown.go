@@ -13,11 +13,6 @@
 //   limitations under the License.
 
 // Package wellknown contains common names for filters, listeners, etc.
-//
-// Deprecated. Envoy no longer requires specific names when configuring
-// filters or other properties, since it inspects the Protobuf type URL
-// to decide how to the decode a message. Because of this, no new names
-// are being added to this package.
 package wellknown
 
 // HTTP filter names
@@ -56,8 +51,6 @@ const (
 	HTTPRoleBasedAccessControl = "envoy.filters.http.rbac"
 	// HTTPGRPCStats HTTP filter
 	HTTPGRPCStats = "envoy.filters.http.grpc_stats"
-	// HTTP WASM filter
-	HTTPWasm = "envoy.extensions.filters.http.wasm.v3.Wasm"
 )
 
 // Network filter names
@@ -100,8 +93,6 @@ const (
 	HttpInspector = "envoy.filters.listener.http_inspector" // nolint:golint,revive
 	// HTTPInspector listener filter
 	HTTPInspector = "envoy.filters.listener.http_inspector"
-	// OriginalSource listener filter
-	OriginalSource = "envoy.filters.listener.original_src"
 )
 
 // Tracing provider names
