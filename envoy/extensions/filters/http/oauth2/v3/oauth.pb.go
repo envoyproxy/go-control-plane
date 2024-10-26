@@ -232,7 +232,7 @@ type OAuth2Config struct {
 	AuthType OAuth2Config_AuthType `protobuf:"varint,11,opt,name=auth_type,json=authType,proto3,enum=envoy.extensions.filters.http.oauth2.v3.OAuth2Config_AuthType" json:"auth_type,omitempty"`
 	// If set to true, allows automatic access token refresh using the associated refresh token (see
 	// `RFC 6749 section 6 <https://datatracker.ietf.org/doc/html/rfc6749#section-6>`_), provided that the OAuth server supports that.
-	// Default value is false.
+	// Default value is true.
 	UseRefreshToken *wrapperspb.BoolValue `protobuf:"bytes,12,opt,name=use_refresh_token,json=useRefreshToken,proto3" json:"use_refresh_token,omitempty"`
 	// The default lifetime in seconds of the access token, if omitted by the authorization server.
 	//
