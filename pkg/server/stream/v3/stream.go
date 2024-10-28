@@ -43,6 +43,10 @@ type StreamState struct { // nolint:golint,revive
 
 	// Ordered indicates whether we want an ordered ADS stream or not
 	ordered bool
+
+	// hasWarmingCluster means there's at least one cluster warming up, send EDS even if there's no update
+	// see https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#resource-warming
+	hasWarmingCluster bool
 }
 
 // NewStreamState initializes a stream state.
@@ -54,6 +58,7 @@ func NewStreamState(wildcard bool, initialResourceVersions map[string]string) St
 		first:                   true,
 		knownResourceNames:      map[string]map[string]struct{}{},
 		ordered:                 false, // Ordered comes from the first request since that's when we discover if they want ADS
+		hasWarmingCluster:       false,
 	}
 
 	if initialResourceVersions == nil {
@@ -136,4 +141,12 @@ func (s *StreamState) SetKnownResourceNamesAsList(url string, names []string) {
 		m[name] = struct{}{}
 	}
 	s.knownResourceNames[url] = m
+}
+
+func (s *StreamState) HasWarmingCluster() bool {
+	return s.hasWarmingCluster
+}
+
+func (s *StreamState) SetClusterWarming(val bool) {
+	s.hasWarmingCluster = val
 }
