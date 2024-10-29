@@ -149,11 +149,13 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 			sw.watches.recompute(s.ctx, reqCh)
 		default:
 			// Channel n -> these are the dynamic list of responders that correspond to the stream request typeURL
-			if !ok {
+			// nil is used to close the streams in the caches
+			if value.IsNil() || !ok {
 				// Receiver channel was closed. TODO(jpeach): probably cancel the watch or something?
 				return status.Errorf(codes.Unavailable, "resource watch %d -> failed", index)
 			}
 
+			// If a non cache.Response arrived here, there are serious issues
 			res := value.Interface().(cache.Response)
 			nonce, err := sw.send(res)
 			if err != nil {
