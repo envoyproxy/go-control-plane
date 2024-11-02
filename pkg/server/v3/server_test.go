@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -52,6 +53,11 @@ type mockConfigWatcher struct {
 
 func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ stream.StreamState, out chan cache.Response) func() {
 	config.counts[req.GetTypeUrl()] = config.counts[req.GetTypeUrl()] + 1
+
+	if strings.Contains(req.GetTypeUrl(), nilType) {
+		out <- nil
+	}
+
 	if len(config.responses[req.GetTypeUrl()]) > 0 {
 		out <- config.responses[req.GetTypeUrl()][0]
 		config.responses[req.GetTypeUrl()] = config.responses[req.GetTypeUrl()][1:]
@@ -163,6 +169,7 @@ var (
 	extensionConfig    = resource.MakeExtensionConfig(resource.Ads, extensionConfigName, routeName)
 	opaque             = &core.Address{}
 	opaqueType         = "unknown-type"
+	nilType            = "nil-stream-type" // This type will force the close of the connection
 	testTypes          = []string{
 		rsrc.EndpointType,
 		rsrc.ClusterType,
@@ -656,6 +663,24 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
 	err := s.StreamAggregatedResources(resp)
 	require.NoError(t, err)
+	assert.Equal(t, 0, config.watches)
+}
+
+func TestNilPropagationOverResponseChannelShouldCloseTheStream(t *testing.T) {
+	config := makeMockConfigWatcher()
+	resp := makeMockStream(t)
+	for i := 0; i < 10; i++ {
+		resp.recv <- &discovery.DiscoveryRequest{
+			Node:    node,
+			TypeUrl: nilType,
+			// each subsequent request is assumed to supercede the previous request
+			ResourceNames: []string{fmt.Sprintf("%d", i)},
+		}
+	}
+	close(resp.recv)
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	err := s.StreamAggregatedResources(resp)
+	require.Error(t, err)
 	assert.Equal(t, 0, config.watches)
 }
 
