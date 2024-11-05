@@ -1,6 +1,6 @@
 module github.com/envoyproxy/go-control-plane/xdsmatcher
 
-go 1.21
+go 1.23.2
 
 require (
 	github.com/cncf/xds/go v0.0.0-20240423153145-555b57ec207b
