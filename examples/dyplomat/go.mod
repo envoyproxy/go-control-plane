@@ -1,6 +1,6 @@
 module github.com/envoyproxy/go-control-plane/examples/dyplomat
 
-go 1.23.2
+go 1.22.8
 
 require (
 	github.com/envoyproxy/go-control-plane v0.13.0

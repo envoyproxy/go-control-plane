@@ -1,6 +1,6 @@
 module github.com/envoyproxy/go-control-plane
 
-go 1.23.2
+go 1.22.8
 
 require (
 	github.com/census-instrumentation/opencensus-proto v0.4.1
