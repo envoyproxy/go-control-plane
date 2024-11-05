@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -437,12 +438,12 @@ func TestLinearConcurrentSetWatch(t *testing.T) {
 		func(i int) {
 			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
 				t.Parallel()
-				id := fmt.Sprintf("%d", i)
+				id := strconv.Itoa(i)
 				if i%2 == 0 {
 					t.Logf("update resource %q", id)
 					require.NoError(t, c.UpdateResource(id, testResource(id)))
 				} else {
-					id2 := fmt.Sprintf("%d", i-1)
+					id2 := strconv.Itoa(i - 1)
 					t.Logf("request resources %q and %q", id, id2)
 					value := make(chan Response, 1)
 					c.CreateWatch(&Request{

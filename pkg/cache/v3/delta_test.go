@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -192,7 +193,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 		func(i int) {
 			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
 				t.Parallel()
-				id := fmt.Sprintf("%d", i%2)
+				id := strconv.Itoa(i % 2)
 				responses := make(chan cache.DeltaResponse, 1)
 				if i < 25 {
 					snap, err := cache.NewSnapshot("", map[rsrc.Type][]types.Resource{})
