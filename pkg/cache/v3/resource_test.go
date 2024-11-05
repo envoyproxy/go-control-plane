@@ -77,12 +77,10 @@ func TestValidate(t *testing.T) {
 		}},
 	}
 
-	if err := invalidRoute.Validate(); err == nil {
-		t.Error("expected an error")
-	}
-	if err := invalidRoute.GetVirtualHosts()[0].Validate(); err == nil {
-		t.Error("expected an error")
-	}
+	err := invalidRoute.Validate()
+	require.Errorf(t, err, "expected an error")
+	err = invalidRoute.GetVirtualHosts()[0].Validate()
+	assert.Errorf(t, err, "expected an error")
 }
 
 type customResource struct {
@@ -96,33 +94,24 @@ func (cs *customResource) GetName() string { return customName }
 var _ types.ResourceWithName = &customResource{}
 
 func TestGetResourceName(t *testing.T) {
-	if name := cache.GetResourceName(testEndpoint); name != clusterName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", testEndpoint, name, clusterName)
-	}
-	if name := cache.GetResourceName(testCluster); name != clusterName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", testCluster, name, clusterName)
-	}
-	if name := cache.GetResourceName(testRoute); name != routeName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", testRoute, name, routeName)
-	}
-	if name := cache.GetResourceName(testScopedRoute); name != scopedRouteName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", testScopedRoute, name, scopedRouteName)
-	}
-	if name := cache.GetResourceName(testVirtualHost); name != virtualHostName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", testVirtualHost, name, virtualHostName)
-	}
-	if name := cache.GetResourceName(testListener); name != listenerName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", testListener, name, listenerName)
-	}
-	if name := cache.GetResourceName(testRuntime); name != runtimeName {
-		t.Errorf("GetResourceName(%v) => got %q, want %q", testRuntime, name, runtimeName)
-	}
-	if name := cache.GetResourceName(&customResource{}); name != customName {
-		t.Errorf("GetResourceName(nil) => got %q, want %q", name, customName)
-	}
-	if name := cache.GetResourceName(nil); name != "" {
-		t.Errorf("GetResourceName(nil) => got %q, want none", name)
-	}
+	name := cache.GetResourceName(testEndpoint)
+	assert.Equalf(t, clusterName, name, "GetResourceName(%v) => got %q, want %q", testEndpoint, name, clusterName)
+	name = cache.GetResourceName(testCluster)
+	assert.Equalf(t, clusterName, name, "GetResourceName(%v) => got %q, want %q", testCluster, name, clusterName)
+	name = cache.GetResourceName(testRoute)
+	assert.Equalf(t, routeName, name, "GetResourceName(%v) => got %q, want %q", testRoute, name, routeName)
+	name = cache.GetResourceName(testScopedRoute)
+	assert.Equalf(t, scopedRouteName, name, "GetResourceName(%v) => got %q, want %q", testScopedRoute, name, scopedRouteName)
+	name = cache.GetResourceName(testVirtualHost)
+	assert.Equalf(t, virtualHostName, name, "GetResourceName(%v) => got %q, want %q", testVirtualHost, name, virtualHostName)
+	name = cache.GetResourceName(testListener)
+	assert.Equalf(t, listenerName, name, "GetResourceName(%v) => got %q, want %q", testListener, name, listenerName)
+	name = cache.GetResourceName(testRuntime)
+	assert.Equalf(t, runtimeName, name, "GetResourceName(%v) => got %q, want %q", testRuntime, name, runtimeName)
+	name = cache.GetResourceName(&customResource{})
+	assert.Equalf(t, customName, name, "GetResourceName(nil) => got %q, want %q", name, customName)
+	name = cache.GetResourceName(nil)
+	assert.Emptyf(t, name, "GetResourceName(nil) => got %q, want none", name)
 }
 
 func TestGetResourceNames(t *testing.T) {
@@ -218,9 +207,7 @@ func TestGetResourceReferences(t *testing.T) {
 	}
 	for _, cs := range cases {
 		names := cache.GetResourceReferences(cache.IndexResourcesByName([]types.ResourceWithTTL{{Resource: cs.in}}))
-		if !reflect.DeepEqual(names, cs.out) {
-			t.Errorf("GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
-		}
+		assert.Truef(t, reflect.DeepEqual(names, cs.out), "GetResourceReferences(%v) => got %v, want %v", cs.in, names, cs.out)
 	}
 }
 
@@ -238,7 +225,5 @@ func TestGetAllResourceReferencesReturnsExpectedRefs(t *testing.T) {
 	resources[types.ScopedRoute] = cache.NewResources("1", []types.Resource{testScopedRoute})
 	actual := cache.GetAllResourceReferences(resources)
 
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("GetAllResourceReferences(%v) => got %v, want %v", resources, actual, expected)
-	}
+	assert.Truef(t, reflect.DeepEqual(actual, expected), "GetAllResourceReferences(%v) => got %v, want %v", resources, actual, expected)
 }

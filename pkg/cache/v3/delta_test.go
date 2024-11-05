@@ -45,9 +45,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		}, stream.NewStreamState(true, nil), watches[typ])
 	}
 
-	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(context.Background(), key, fixture.snapshot()))
 
 	versionMap := make(map[string]map[string]string)
 	for _, typ := range testTypes {
@@ -81,19 +79,15 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 		}, state, watches[typ])
 	}
 
-	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-		t.Errorf("watches should be created for the latest version, saw %d watches expected %d", count, len(testTypes))
-	}
+	count := c.GetStatusInfo(key).GetNumDeltaWatches()
+	assert.Lenf(t, testTypes, count, "watches should be created for the latest version, saw %d watches expected %d", count, len(testTypes))
 
 	// set partially-versioned snapshot
 	snapshot2 := fixture.snapshot()
 	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
-	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
-		t.Fatal(err)
-	}
-	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes)-1 {
-		t.Errorf("watches should be preserved for all but one, got: %d open watches instead of the expected %d open watches", count, len(testTypes)-1)
-	}
+	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot2))
+	count = c.GetStatusInfo(key).GetNumDeltaWatches()
+	assert.Equalf(t, count, len(testTypes)-1, "watches should be preserved for all but one, got: %d open watches instead of the expected %d open watches", count, len(testTypes)-1)
 
 	// validate response for endpoints
 	select {
@@ -127,9 +121,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 		}, *streams[typ], watches[typ])
 	}
 
-	if err := c.SetSnapshot(context.Background(), key, fixture.snapshot()); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(context.Background(), key, fixture.snapshot()))
 
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
@@ -157,16 +149,13 @@ func TestDeltaRemoveResources(t *testing.T) {
 		}, *streams[typ], watches[typ])
 	}
 
-	if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count != len(testTypes) {
-		t.Errorf("watches should be created for the latest version, saw %d watches expected %d", count, len(testTypes))
-	}
+	count := c.GetStatusInfo(key).GetNumDeltaWatches()
+	assert.Lenf(t, testTypes, count, "watches should be created for the latest version, saw %d watches expected %d", count, len(testTypes))
 
 	// set a partially versioned snapshot with no endpoints
 	snapshot2 := fixture.snapshot()
 	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{})
-	if err := c.SetSnapshot(context.Background(), key, snapshot2); err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot2))
 
 	// validate response for endpoints
 	select {
@@ -196,13 +185,10 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 				responses := make(chan cache.DeltaResponse, 1)
 				if i < 25 {
 					snap, err := cache.NewSnapshot("", map[rsrc.Type][]types.Resource{})
-					if err != nil {
-						t.Fatal(err)
-					}
+					require.NoError(t, err)
 					snap.Resources[types.Endpoint] = cache.NewResources(version, []types.Resource{resource.MakeEndpoint(clusterName, uint32(i))})
-					if err := c.SetSnapshot(context.Background(), key, snap); err != nil {
-						t.Fatalf("snapshot failed: %s", err)
-					}
+					err = c.SetSnapshot(context.Background(), key, snap)
+					require.NoErrorf(t, err, "snapshot failed")
 				} else {
 					cancel := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 						Node: &core.Node{
@@ -282,17 +268,14 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 		cancel()
 	}
 	// c.GetStatusKeys() should return at least 1 because we register a node ID with the above watch creations
-	if keys := c.GetStatusKeys(); len(keys) == 0 {
-		t.Errorf("expected to see a status info registered for watch, saw %d entries", len(keys))
-	}
+	keys := c.GetStatusKeys()
+	assert.NotEmptyf(t, keys, "expected to see a status info registered for watch, saw %d entries", len(keys))
 
 	for _, typ := range testTypes {
-		if count := c.GetStatusInfo(key).GetNumDeltaWatches(); count > 0 {
-			t.Errorf("watches should be released for %s", typ)
-		}
+		count := c.GetStatusInfo(key).GetNumDeltaWatches()
+		assert.LessOrEqualf(t, count, 0, "watches should be released for %s", typ)
 	}
 
-	if s := c.GetStatusInfo("missing"); s != nil {
-		t.Errorf("should not return a status for unknown key: got %#v", s)
-	}
+	s := c.GetStatusInfo("missing")
+	assert.Nilf(t, s, "should not return a status for unknown key: got %#v", s)
 }
