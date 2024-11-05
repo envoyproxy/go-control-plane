@@ -71,6 +71,38 @@ func (m *KafkaBroker) validate(all bool) error {
 
 	// no validation rules for ForceResponseRewrite
 
+	for idx, item := range m.GetApiKeysAllowed() {
+		_, _ = idx, item
+
+		if val := item; val < 0 || val > 32767 {
+			err := KafkaBrokerValidationError{
+				field:  fmt.Sprintf("ApiKeysAllowed[%v]", idx),
+				reason: "value must be inside range [0, 32767]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	for idx, item := range m.GetApiKeysDenied() {
+		_, _ = idx, item
+
+		if val := item; val < 0 || val > 32767 {
+			err := KafkaBrokerValidationError{
+				field:  fmt.Sprintf("ApiKeysDenied[%v]", idx),
+				reason: "value must be inside range [0, 32767]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	switch v := m.BrokerAddressRewriteSpec.(type) {
 	case *KafkaBroker_IdBasedBrokerAddressRewriteSpec:
 		if v == nil {

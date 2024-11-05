@@ -48,6 +48,46 @@ func (m *KafkaBroker) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.ApiKeysDenied) > 0 {
+		var pksize2 int
+		for _, num := range m.ApiKeysDenied {
+			pksize2 += protohelpers.SizeOfVarint(uint64(num))
+		}
+		i -= pksize2
+		j1 := i
+		for _, num := range m.ApiKeysDenied {
+			for num >= 1<<7 {
+				dAtA[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA[j1] = uint8(num)
+			j1++
+		}
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(pksize2))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.ApiKeysAllowed) > 0 {
+		var pksize4 int
+		for _, num := range m.ApiKeysAllowed {
+			pksize4 += protohelpers.SizeOfVarint(uint64(num))
+		}
+		i -= pksize4
+		j3 := i
+		for _, num := range m.ApiKeysAllowed {
+			for num >= 1<<7 {
+				dAtA[j3] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j3++
+			}
+			dAtA[j3] = uint8(num)
+			j3++
+		}
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(pksize4))
+		i--
+		dAtA[i] = 0x22
+	}
 	if msg, ok := m.BrokerAddressRewriteSpec.(*KafkaBroker_IdBasedBrokerAddressRewriteSpec); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -208,6 +248,20 @@ func (m *KafkaBroker) SizeVT() (n int) {
 	}
 	if vtmsg, ok := m.BrokerAddressRewriteSpec.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
+	}
+	if len(m.ApiKeysAllowed) > 0 {
+		l = 0
+		for _, e := range m.ApiKeysAllowed {
+			l += protohelpers.SizeOfVarint(uint64(e))
+		}
+		n += 1 + protohelpers.SizeOfVarint(uint64(l)) + l
+	}
+	if len(m.ApiKeysDenied) > 0 {
+		l = 0
+		for _, e := range m.ApiKeysDenied {
+			l += protohelpers.SizeOfVarint(uint64(e))
+		}
+		n += 1 + protohelpers.SizeOfVarint(uint64(l)) + l
 	}
 	n += len(m.unknownFields)
 	return n
