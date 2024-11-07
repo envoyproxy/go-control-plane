@@ -50,6 +50,26 @@ func (m *CaresDnsResolverConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.QueryTries != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.QueryTries).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if m.QueryTimeoutSeconds != nil {
+		size, err := (*wrapperspb.UInt64Value)(m.QueryTimeoutSeconds).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.UdpMaxQueries != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.UdpMaxQueries).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -165,6 +185,14 @@ func (m *CaresDnsResolverConfig) SizeVT() (n int) {
 	}
 	if m.UdpMaxQueries != nil {
 		l = (*wrapperspb.UInt32Value)(m.UdpMaxQueries).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.QueryTimeoutSeconds != nil {
+		l = (*wrapperspb.UInt64Value)(m.QueryTimeoutSeconds).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.QueryTries != nil {
+		l = (*wrapperspb.UInt32Value)(m.QueryTries).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
