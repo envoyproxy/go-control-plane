@@ -1,0 +1,77 @@
+name: 'Sync with Upstream'
+
+on:
+  schedule:
+   - cron:  '0 6 * * *'
+    #scheduled at 06:00 everyday
+  workflow_dispatch: {}
+
+permissions:
+  actions: write
+  contents: write
+
+env:
+  GH_USER: "github-actions[bot]"
+  GH_EMAIL: "<41898282+github-actions[bot]@users.noreply.github.com>"
+
+jobs:
+  sync-with-upstream-main:
+    runs-on: ubuntu-latest
+    name: Sync with upstream main
+    steps:
+    - name: Generate GitHub app token
+      id: github-app-token
+      uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1.11.0
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      with:
+        fetch-depth: 0
+        token: ${{ steps.github-app-token.outputs.token }}
+    - name: Generate GitHub app token
+      id: github-app-token
+      uses: actions/create-github-app-token@5d869da34e18e7287c1daad50e0b8ea0f506ce69 # v1.11.0
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+    - name: Sync upstream changes
+      id: sync
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
+      with:
+        target_sync_branch: main
+        target_repo_token: ${{ steps.github-app-token.outputs.token }}
+        target_branch_push_args: "-f --tags"
+        upstream_sync_branch: main
+        upstream_sync_repo: envoyproxy/go-control-plane
+        upstream_pull_args: "--tags"
+        test_mode: false
+        git_config_pull_rebase: true
+    - name: New commits found
+      if: steps.sync.outputs.has_new_commits == 'true'
+      run: echo "New commits were found to sync."
+    - name: No new commits
+      if: steps.sync.outputs.has_new_commits == 'false'
+      run: echo "There were no new commits."
+    - name: Get new version tag
+      id: new-version-tag
+      if: steps.sync.outputs.has_new_commits == 'true'
+      shell: bash
+      run: ".github/scripts/get-version-tags.sh"
+    - name: Print tags
+      run: |
+        echo ${{ steps.new-version-tag.outputs.released_tag }}
+        echo ${{ steps.new-version-tag.outputs.main_tag }}
+        echo ${{ steps.new-version-tag.outputs.new_tag }}
+    - name: Release new version
+      if: steps.new-version-tag.outputs.released_tag != steps.new-version-tag.outputs.main_tag
+      run: |
+        git remote -v
+        git config user.name "${GH_USER}"
+        git config user.email "${GH_EMAIL}"
+        git checkout release
+        git pull
+        git rebase --onto  ${{ steps.new-version-tag.outputs.main_tag }} ${{ steps.new-version-tag.outputs.released_tag }} release
+        git tag ${{ steps.new-version-tag.outputs.new_tag }}
+        git push origin release --tags -f
+        
