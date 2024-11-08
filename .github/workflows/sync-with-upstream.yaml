@@ -74,4 +74,3 @@ jobs:
         git rebase --onto  ${{ steps.new-version-tag.outputs.main_tag }} ${{ steps.new-version-tag.outputs.released_tag }} release
         git tag ${{ steps.new-version-tag.outputs.new_tag }}
         git push origin release --tags -f
-        
