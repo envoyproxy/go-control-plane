@@ -1174,8 +1174,68 @@ func (x *HeaderMutation) GetRemoveHeaders() []string {
 	return nil
 }
 
-// Replace the entire message body chunk received in the corresponding
-// HttpBody message with this new body, or clear the body.
+// [#not-implemented-hide:]
+// The body response message corresponding to FULL_DUPLEX_STREAMED body mode.
+type StreamedBodyResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// The body response chunk that will be passed to the upstream/downstream by Envoy.
+	Body []byte `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
+	// The server sets this flag to true if it has received a body request with
+	// :ref:`end_of_stream <envoy_v3_api_field_service.ext_proc.v3.HttpBody.end_of_stream>` set to true,
+	// and this is the last chunk of body responses.
+	EndOfStream bool `protobuf:"varint,2,opt,name=end_of_stream,json=endOfStream,proto3" json:"end_of_stream,omitempty"`
+}
+
+func (x *StreamedBodyResponse) Reset() {
+	*x = StreamedBodyResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StreamedBodyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamedBodyResponse) ProtoMessage() {}
+
+func (x *StreamedBodyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamedBodyResponse.ProtoReflect.Descriptor instead.
+func (*StreamedBodyResponse) Descriptor() ([]byte, []int) {
+	return file_envoy_service_ext_proc_v3_external_processor_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *StreamedBodyResponse) GetBody() []byte {
+	if x != nil {
+		return x.Body
+	}
+	return nil
+}
+
+func (x *StreamedBodyResponse) GetEndOfStream() bool {
+	if x != nil {
+		return x.EndOfStream
+	}
+	return false
+}
+
+// This message specifies the body mutation the server sends to Envoy.
 type BodyMutation struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1187,13 +1247,14 @@ type BodyMutation struct {
 	//
 	//	*BodyMutation_Body
 	//	*BodyMutation_ClearBody
+	//	*BodyMutation_StreamedResponse
 	Mutation isBodyMutation_Mutation `protobuf_oneof:"mutation"`
 }
 
 func (x *BodyMutation) Reset() {
 	*x = BodyMutation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[12]
+		mi := &file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1206,7 +1267,7 @@ func (x *BodyMutation) String() string {
 func (*BodyMutation) ProtoMessage() {}
 
 func (x *BodyMutation) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[12]
+	mi := &file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1219,7 +1280,7 @@ func (x *BodyMutation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BodyMutation.ProtoReflect.Descriptor instead.
 func (*BodyMutation) Descriptor() ([]byte, []int) {
-	return file_envoy_service_ext_proc_v3_external_processor_proto_rawDescGZIP(), []int{12}
+	return file_envoy_service_ext_proc_v3_external_processor_proto_rawDescGZIP(), []int{13}
 }
 
 func (m *BodyMutation) GetMutation() isBodyMutation_Mutation {
@@ -1243,23 +1304,47 @@ func (x *BodyMutation) GetClearBody() bool {
 	return false
 }
 
+func (x *BodyMutation) GetStreamedResponse() *StreamedBodyResponse {
+	if x, ok := x.GetMutation().(*BodyMutation_StreamedResponse); ok {
+		return x.StreamedResponse
+	}
+	return nil
+}
+
 type isBodyMutation_Mutation interface {
 	isBodyMutation_Mutation()
 }
 
 type BodyMutation_Body struct {
 	// The entire body to replace.
+	// Should only be used when the corresponding “BodySendMode“ in the
+	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
+	// is not set to “FULL_DUPLEX_STREAMED“.
 	Body []byte `protobuf:"bytes,1,opt,name=body,proto3,oneof"`
 }
 
 type BodyMutation_ClearBody struct {
 	// Clear the corresponding body chunk.
+	// Should only be used when the corresponding “BodySendMode“ in the
+	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
+	// is not set to “FULL_DUPLEX_STREAMED“.
+	// Clear the corresponding body chunk.
 	ClearBody bool `protobuf:"varint,2,opt,name=clear_body,json=clearBody,proto3,oneof"`
+}
+
+type BodyMutation_StreamedResponse struct {
+	// [#not-implemented-hide:]
+	// Must be used when the corresponding “BodySendMode“ in the
+	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
+	// is set to “FULL_DUPLEX_STREAMED“.
+	StreamedResponse *StreamedBodyResponse `protobuf:"bytes,3,opt,name=streamed_response,json=streamedResponse,proto3,oneof"`
 }
 
 func (*BodyMutation_Body) isBodyMutation_Mutation() {}
 
 func (*BodyMutation_ClearBody) isBodyMutation_Mutation() {}
+
+func (*BodyMutation_StreamedResponse) isBodyMutation_Mutation() {}
 
 var File_envoy_service_ext_proc_v3_external_processor_proto protoreflect.FileDescriptor
 
@@ -1496,31 +1581,42 @@ var file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = []byte{
 	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0a, 0x73, 0x65, 0x74, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73,
 	0x12, 0x25, 0x0a, 0x0e, 0x72, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x5f, 0x68, 0x65, 0x61, 0x64, 0x65,
 	0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0d, 0x72, 0x65, 0x6d, 0x6f, 0x76, 0x65,
-	0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x22, 0x51, 0x0a, 0x0c, 0x42, 0x6f, 0x64, 0x79, 0x4d,
-	0x75, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0c, 0x48, 0x00, 0x52, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x12, 0x1f, 0x0a,
-	0x0a, 0x63, 0x6c, 0x65, 0x61, 0x72, 0x5f, 0x62, 0x6f, 0x64, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x08, 0x48, 0x00, 0x52, 0x09, 0x63, 0x6c, 0x65, 0x61, 0x72, 0x42, 0x6f, 0x64, 0x79, 0x42, 0x0a,
-	0x0a, 0x08, 0x6d, 0x75, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x32, 0x81, 0x01, 0x0a, 0x11, 0x45,
-	0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f, 0x72,
-	0x12, 0x6c, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x12, 0x2c, 0x2e, 0x65, 0x6e,
-	0x76, 0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x65, 0x78, 0x74, 0x5f,
-	0x70, 0x72, 0x6f, 0x63, 0x2e, 0x76, 0x33, 0x2e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x69,
-	0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2d, 0x2e, 0x65, 0x6e, 0x76, 0x6f,
-	0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x65, 0x78, 0x74, 0x5f, 0x70, 0x72,
-	0x6f, 0x63, 0x2e, 0x76, 0x33, 0x2e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x69, 0x6e, 0x67,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x42, 0x98,
-	0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x0a, 0x27, 0x69, 0x6f, 0x2e, 0x65, 0x6e,
-	0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x65, 0x78, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x63, 0x2e,
-	0x76, 0x33, 0x42, 0x16, 0x45, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x50, 0x72, 0x6f, 0x63,
-	0x65, 0x73, 0x73, 0x6f, 0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x4b, 0x67, 0x69,
-	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72,
-	0x6f, 0x78, 0x79, 0x2f, 0x67, 0x6f, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x2d, 0x70,
-	0x6c, 0x61, 0x6e, 0x65, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2f, 0x65, 0x78, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x63, 0x2f, 0x76, 0x33, 0x3b, 0x65,
-	0x78, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x63, 0x76, 0x33, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x73, 0x22, 0x4e, 0x0a, 0x14, 0x53, 0x74, 0x72, 0x65, 0x61,
+	0x6d, 0x65, 0x64, 0x42, 0x6f, 0x64, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x12, 0x0a, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x62,
+	0x6f, 0x64, 0x79, 0x12, 0x22, 0x0a, 0x0d, 0x65, 0x6e, 0x64, 0x5f, 0x6f, 0x66, 0x5f, 0x73, 0x74,
+	0x72, 0x65, 0x61, 0x6d, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0b, 0x65, 0x6e, 0x64, 0x4f,
+	0x66, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x22, 0xb1, 0x01, 0x0a, 0x0c, 0x42, 0x6f, 0x64, 0x79,
+	0x4d, 0x75, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x04, 0x62, 0x6f, 0x64, 0x79,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x48, 0x00, 0x52, 0x04, 0x62, 0x6f, 0x64, 0x79, 0x12, 0x1f,
+	0x0a, 0x0a, 0x63, 0x6c, 0x65, 0x61, 0x72, 0x5f, 0x62, 0x6f, 0x64, 0x79, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x08, 0x48, 0x00, 0x52, 0x09, 0x63, 0x6c, 0x65, 0x61, 0x72, 0x42, 0x6f, 0x64, 0x79, 0x12,
+	0x5e, 0x0a, 0x11, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x65, 0x64, 0x5f, 0x72, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2f, 0x2e, 0x65, 0x6e, 0x76,
+	0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x65, 0x78, 0x74, 0x5f, 0x70,
+	0x72, 0x6f, 0x63, 0x2e, 0x76, 0x33, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x65, 0x64, 0x42,
+	0x6f, 0x64, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48, 0x00, 0x52, 0x10, 0x73,
+	0x74, 0x72, 0x65, 0x61, 0x6d, 0x65, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42,
+	0x0a, 0x0a, 0x08, 0x6d, 0x75, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x32, 0x81, 0x01, 0x0a, 0x11,
+	0x45, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x6f,
+	0x72, 0x12, 0x6c, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x12, 0x2c, 0x2e, 0x65,
+	0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x65, 0x78, 0x74,
+	0x5f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x76, 0x33, 0x2e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73,
+	0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2d, 0x2e, 0x65, 0x6e, 0x76,
+	0x6f, 0x79, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x65, 0x78, 0x74, 0x5f, 0x70,
+	0x72, 0x6f, 0x63, 0x2e, 0x76, 0x33, 0x2e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x69, 0x6e,
+	0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28, 0x01, 0x30, 0x01, 0x42,
+	0x98, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x0a, 0x27, 0x69, 0x6f, 0x2e, 0x65,
+	0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x65, 0x78, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x63,
+	0x2e, 0x76, 0x33, 0x42, 0x16, 0x45, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x50, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x6f, 0x72, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x4b, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x70,
+	0x72, 0x6f, 0x78, 0x79, 0x2f, 0x67, 0x6f, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x2d,
+	0x70, 0x6c, 0x61, 0x6e, 0x65, 0x2f, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2f, 0x73, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x2f, 0x65, 0x78, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x63, 0x2f, 0x76, 0x33, 0x3b,
+	0x65, 0x78, 0x74, 0x5f, 0x70, 0x72, 0x6f, 0x63, 0x76, 0x33, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -1536,7 +1632,7 @@ func file_envoy_service_ext_proc_v3_external_processor_proto_rawDescGZIP() []byt
 }
 
 var file_envoy_service_ext_proc_v3_external_processor_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_envoy_service_ext_proc_v3_external_processor_proto_goTypes = []interface{}{
 	(CommonResponse_ResponseStatus)(0), // 0: envoy.service.ext_proc.v3.CommonResponse.ResponseStatus
 	(*ProcessingRequest)(nil),          // 1: envoy.service.ext_proc.v3.ProcessingRequest
@@ -1551,16 +1647,17 @@ var file_envoy_service_ext_proc_v3_external_processor_proto_goTypes = []interfac
 	(*ImmediateResponse)(nil),          // 10: envoy.service.ext_proc.v3.ImmediateResponse
 	(*GrpcStatus)(nil),                 // 11: envoy.service.ext_proc.v3.GrpcStatus
 	(*HeaderMutation)(nil),             // 12: envoy.service.ext_proc.v3.HeaderMutation
-	(*BodyMutation)(nil),               // 13: envoy.service.ext_proc.v3.BodyMutation
-	nil,                                // 14: envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry
-	nil,                                // 15: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
-	(*v3.Metadata)(nil),                // 16: envoy.config.core.v3.Metadata
-	(*structpb.Struct)(nil),            // 17: google.protobuf.Struct
-	(*v31.ProcessingMode)(nil),         // 18: envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
-	(*durationpb.Duration)(nil),        // 19: google.protobuf.Duration
-	(*v3.HeaderMap)(nil),               // 20: envoy.config.core.v3.HeaderMap
-	(*v32.HttpStatus)(nil),             // 21: envoy.type.v3.HttpStatus
-	(*v3.HeaderValueOption)(nil),       // 22: envoy.config.core.v3.HeaderValueOption
+	(*StreamedBodyResponse)(nil),       // 13: envoy.service.ext_proc.v3.StreamedBodyResponse
+	(*BodyMutation)(nil),               // 14: envoy.service.ext_proc.v3.BodyMutation
+	nil,                                // 15: envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry
+	nil,                                // 16: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
+	(*v3.Metadata)(nil),                // 17: envoy.config.core.v3.Metadata
+	(*structpb.Struct)(nil),            // 18: google.protobuf.Struct
+	(*v31.ProcessingMode)(nil),         // 19: envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
+	(*durationpb.Duration)(nil),        // 20: google.protobuf.Duration
+	(*v3.HeaderMap)(nil),               // 21: envoy.config.core.v3.HeaderMap
+	(*v32.HttpStatus)(nil),             // 22: envoy.type.v3.HttpStatus
+	(*v3.HeaderValueOption)(nil),       // 23: envoy.config.core.v3.HeaderValueOption
 }
 var file_envoy_service_ext_proc_v3_external_processor_proto_depIdxs = []int32{
 	3,  // 0: envoy.service.ext_proc.v3.ProcessingRequest.request_headers:type_name -> envoy.service.ext_proc.v3.HttpHeaders
@@ -1569,8 +1666,8 @@ var file_envoy_service_ext_proc_v3_external_processor_proto_depIdxs = []int32{
 	4,  // 3: envoy.service.ext_proc.v3.ProcessingRequest.response_body:type_name -> envoy.service.ext_proc.v3.HttpBody
 	5,  // 4: envoy.service.ext_proc.v3.ProcessingRequest.request_trailers:type_name -> envoy.service.ext_proc.v3.HttpTrailers
 	5,  // 5: envoy.service.ext_proc.v3.ProcessingRequest.response_trailers:type_name -> envoy.service.ext_proc.v3.HttpTrailers
-	16, // 6: envoy.service.ext_proc.v3.ProcessingRequest.metadata_context:type_name -> envoy.config.core.v3.Metadata
-	14, // 7: envoy.service.ext_proc.v3.ProcessingRequest.attributes:type_name -> envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry
+	17, // 6: envoy.service.ext_proc.v3.ProcessingRequest.metadata_context:type_name -> envoy.config.core.v3.Metadata
+	15, // 7: envoy.service.ext_proc.v3.ProcessingRequest.attributes:type_name -> envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry
 	6,  // 8: envoy.service.ext_proc.v3.ProcessingResponse.request_headers:type_name -> envoy.service.ext_proc.v3.HeadersResponse
 	6,  // 9: envoy.service.ext_proc.v3.ProcessingResponse.response_headers:type_name -> envoy.service.ext_proc.v3.HeadersResponse
 	7,  // 10: envoy.service.ext_proc.v3.ProcessingResponse.request_body:type_name -> envoy.service.ext_proc.v3.BodyResponse
@@ -1578,32 +1675,33 @@ var file_envoy_service_ext_proc_v3_external_processor_proto_depIdxs = []int32{
 	8,  // 12: envoy.service.ext_proc.v3.ProcessingResponse.request_trailers:type_name -> envoy.service.ext_proc.v3.TrailersResponse
 	8,  // 13: envoy.service.ext_proc.v3.ProcessingResponse.response_trailers:type_name -> envoy.service.ext_proc.v3.TrailersResponse
 	10, // 14: envoy.service.ext_proc.v3.ProcessingResponse.immediate_response:type_name -> envoy.service.ext_proc.v3.ImmediateResponse
-	17, // 15: envoy.service.ext_proc.v3.ProcessingResponse.dynamic_metadata:type_name -> google.protobuf.Struct
-	18, // 16: envoy.service.ext_proc.v3.ProcessingResponse.mode_override:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
-	19, // 17: envoy.service.ext_proc.v3.ProcessingResponse.override_message_timeout:type_name -> google.protobuf.Duration
-	20, // 18: envoy.service.ext_proc.v3.HttpHeaders.headers:type_name -> envoy.config.core.v3.HeaderMap
-	15, // 19: envoy.service.ext_proc.v3.HttpHeaders.attributes:type_name -> envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
-	20, // 20: envoy.service.ext_proc.v3.HttpTrailers.trailers:type_name -> envoy.config.core.v3.HeaderMap
+	18, // 15: envoy.service.ext_proc.v3.ProcessingResponse.dynamic_metadata:type_name -> google.protobuf.Struct
+	19, // 16: envoy.service.ext_proc.v3.ProcessingResponse.mode_override:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
+	20, // 17: envoy.service.ext_proc.v3.ProcessingResponse.override_message_timeout:type_name -> google.protobuf.Duration
+	21, // 18: envoy.service.ext_proc.v3.HttpHeaders.headers:type_name -> envoy.config.core.v3.HeaderMap
+	16, // 19: envoy.service.ext_proc.v3.HttpHeaders.attributes:type_name -> envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry
+	21, // 20: envoy.service.ext_proc.v3.HttpTrailers.trailers:type_name -> envoy.config.core.v3.HeaderMap
 	9,  // 21: envoy.service.ext_proc.v3.HeadersResponse.response:type_name -> envoy.service.ext_proc.v3.CommonResponse
 	9,  // 22: envoy.service.ext_proc.v3.BodyResponse.response:type_name -> envoy.service.ext_proc.v3.CommonResponse
 	12, // 23: envoy.service.ext_proc.v3.TrailersResponse.header_mutation:type_name -> envoy.service.ext_proc.v3.HeaderMutation
 	0,  // 24: envoy.service.ext_proc.v3.CommonResponse.status:type_name -> envoy.service.ext_proc.v3.CommonResponse.ResponseStatus
 	12, // 25: envoy.service.ext_proc.v3.CommonResponse.header_mutation:type_name -> envoy.service.ext_proc.v3.HeaderMutation
-	13, // 26: envoy.service.ext_proc.v3.CommonResponse.body_mutation:type_name -> envoy.service.ext_proc.v3.BodyMutation
-	20, // 27: envoy.service.ext_proc.v3.CommonResponse.trailers:type_name -> envoy.config.core.v3.HeaderMap
-	21, // 28: envoy.service.ext_proc.v3.ImmediateResponse.status:type_name -> envoy.type.v3.HttpStatus
+	14, // 26: envoy.service.ext_proc.v3.CommonResponse.body_mutation:type_name -> envoy.service.ext_proc.v3.BodyMutation
+	21, // 27: envoy.service.ext_proc.v3.CommonResponse.trailers:type_name -> envoy.config.core.v3.HeaderMap
+	22, // 28: envoy.service.ext_proc.v3.ImmediateResponse.status:type_name -> envoy.type.v3.HttpStatus
 	12, // 29: envoy.service.ext_proc.v3.ImmediateResponse.headers:type_name -> envoy.service.ext_proc.v3.HeaderMutation
 	11, // 30: envoy.service.ext_proc.v3.ImmediateResponse.grpc_status:type_name -> envoy.service.ext_proc.v3.GrpcStatus
-	22, // 31: envoy.service.ext_proc.v3.HeaderMutation.set_headers:type_name -> envoy.config.core.v3.HeaderValueOption
-	17, // 32: envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry.value:type_name -> google.protobuf.Struct
-	17, // 33: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry.value:type_name -> google.protobuf.Struct
-	1,  // 34: envoy.service.ext_proc.v3.ExternalProcessor.Process:input_type -> envoy.service.ext_proc.v3.ProcessingRequest
-	2,  // 35: envoy.service.ext_proc.v3.ExternalProcessor.Process:output_type -> envoy.service.ext_proc.v3.ProcessingResponse
-	35, // [35:36] is the sub-list for method output_type
-	34, // [34:35] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	23, // 31: envoy.service.ext_proc.v3.HeaderMutation.set_headers:type_name -> envoy.config.core.v3.HeaderValueOption
+	13, // 32: envoy.service.ext_proc.v3.BodyMutation.streamed_response:type_name -> envoy.service.ext_proc.v3.StreamedBodyResponse
+	18, // 33: envoy.service.ext_proc.v3.ProcessingRequest.AttributesEntry.value:type_name -> google.protobuf.Struct
+	18, // 34: envoy.service.ext_proc.v3.HttpHeaders.AttributesEntry.value:type_name -> google.protobuf.Struct
+	1,  // 35: envoy.service.ext_proc.v3.ExternalProcessor.Process:input_type -> envoy.service.ext_proc.v3.ProcessingRequest
+	2,  // 36: envoy.service.ext_proc.v3.ExternalProcessor.Process:output_type -> envoy.service.ext_proc.v3.ProcessingResponse
+	36, // [36:37] is the sub-list for method output_type
+	35, // [35:36] is the sub-list for method input_type
+	35, // [35:35] is the sub-list for extension type_name
+	35, // [35:35] is the sub-list for extension extendee
+	0,  // [0:35] is the sub-list for field type_name
 }
 
 func init() { file_envoy_service_ext_proc_v3_external_processor_proto_init() }
@@ -1757,6 +1855,18 @@ func file_envoy_service_ext_proc_v3_external_processor_proto_init() {
 			}
 		}
 		file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StreamedBodyResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BodyMutation); i {
 			case 0:
 				return &v.state
@@ -1786,9 +1896,10 @@ func file_envoy_service_ext_proc_v3_external_processor_proto_init() {
 		(*ProcessingResponse_ResponseTrailers)(nil),
 		(*ProcessingResponse_ImmediateResponse)(nil),
 	}
-	file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[12].OneofWrappers = []interface{}{
+	file_envoy_service_ext_proc_v3_external_processor_proto_msgTypes[13].OneofWrappers = []interface{}{
 		(*BodyMutation_Body)(nil),
 		(*BodyMutation_ClearBody)(nil),
+		(*BodyMutation_StreamedResponse)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1796,7 +1907,7 @@ func file_envoy_service_ext_proc_v3_external_processor_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   15,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
