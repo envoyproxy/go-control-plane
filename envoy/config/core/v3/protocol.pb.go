@@ -353,12 +353,18 @@ type UpstreamHttpProtocolOptions struct {
 	// header when :ref:`override_auto_sni_header <envoy_v3_api_field_config.core.v3.UpstreamHttpProtocolOptions.override_auto_sni_header>`
 	// is set, as seen by the :ref:`router filter <config_http_filters_router>`.
 	// Does nothing if a filter before the http router filter sets the corresponding metadata.
+	//
+	// See :ref:`SNI configuration <start_quick_start_securing_sni_client>` for details on how this
+	// interacts with other validation options.
 	AutoSni bool `protobuf:"varint,1,opt,name=auto_sni,json=autoSni,proto3" json:"auto_sni,omitempty"`
 	// Automatic validate upstream presented certificate for new upstream connections based on the
 	// downstream HTTP host/authority header or any other arbitrary header when :ref:`override_auto_sni_header <envoy_v3_api_field_config.core.v3.UpstreamHttpProtocolOptions.override_auto_sni_header>`
 	// is set, as seen by the :ref:`router filter <config_http_filters_router>`.
 	// This field is intended to be set with “auto_sni“ field.
 	// Does nothing if a filter before the http router filter sets the corresponding metadata.
+	//
+	// See :ref:`validation configuration <start_quick_start_securing_validation>` for how this interacts with
+	// other validation options.
 	AutoSanValidation bool `protobuf:"varint,2,opt,name=auto_san_validation,json=autoSanValidation,proto3" json:"auto_san_validation,omitempty"`
 	// An optional alternative to the host/authority header to be used for setting the SNI value.
 	// It should be a valid downstream HTTP header, as seen by the
