@@ -50,6 +50,16 @@ func (m *CaresDnsResolverConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RotateNameservers {
+		i--
+		if m.RotateNameservers {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x40
+	}
 	if m.QueryTries != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.QueryTries).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -194,6 +204,9 @@ func (m *CaresDnsResolverConfig) SizeVT() (n int) {
 	if m.QueryTries != nil {
 		l = (*wrapperspb.UInt32Value)(m.QueryTries).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RotateNameservers {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

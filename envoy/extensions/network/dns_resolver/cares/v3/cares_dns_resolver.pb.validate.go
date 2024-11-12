@@ -184,6 +184,8 @@ func (m *CaresDnsResolverConfig) validate(all bool) error {
 
 	}
 
+	// no validation rules for RotateNameservers
+
 	if len(errors) > 0 {
 		return CaresDnsResolverConfigMultiError(errors)
 	}
