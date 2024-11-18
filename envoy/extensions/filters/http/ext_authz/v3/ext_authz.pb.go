@@ -270,6 +270,9 @@ type ExtAuthz struct {
 	//
 	// If this is false the filter will not emit stats, but filter_metadata will still be respected if
 	// it has a value.
+	//
+	// Field “latency_us“ is exposed for CEL and logging when using gRPC or HTTP service.
+	// Fields “bytesSent“ and “bytesReceived“ are exposed for CEL and logging only when using gRPC service.
 	EmitFilterStateStats bool `protobuf:"varint,29,opt,name=emit_filter_state_stats,json=emitFilterStateStats,proto3" json:"emit_filter_state_stats,omitempty"`
 }
 
