@@ -127,6 +127,10 @@ func (m *ProxyProtocolUpstreamTransport) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for AllowUnspecifiedAddress
+
+	// no validation rules for TlvAsPoolKey
+
 	if len(errors) > 0 {
 		return ProxyProtocolUpstreamTransportMultiError(errors)
 	}
