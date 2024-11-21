@@ -49,6 +49,16 @@ func (m *FilterConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.SaveUpstreamAddress {
+		i--
+		if m.SaveUpstreamAddress {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if msg, ok := m.PortSpecifier.(*FilterConfig_PortValue); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -111,6 +121,9 @@ func (m *FilterConfig) SizeVT() (n int) {
 	}
 	if vtmsg, ok := m.PortSpecifier.(interface{ SizeVT() int }); ok {
 		n += vtmsg.SizeVT()
+	}
+	if m.SaveUpstreamAddress {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
