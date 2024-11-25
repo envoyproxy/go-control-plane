@@ -28,13 +28,15 @@ type StatefulSession struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Specific implementation of session state. This session state will be used to store and
-	// get address of the upstream host to which the session is assigned.
+	// Specifies the implementation of session state. This session state is used to store and retrieve the address of the
+	// upstream host assigned to the session.
 	//
 	// [#extension-category: envoy.http.stateful_session]
 	SessionState *v3.TypedExtensionConfig `protobuf:"bytes,1,opt,name=session_state,json=sessionState,proto3" json:"session_state,omitempty"`
-	// If set to True, the HTTP request must be routed to the requested destination.
-	// If the requested destination is not available, Envoy returns 503. Defaults to False.
+	// Determines whether the HTTP request must be strictly routed to the requested destination. When set to “true“,
+	// if the requested destination is unavailable, Envoy will return a 503 status code. The default value is “false“,
+	// which allows Envoy to fall back to its load balancing mechanism. In this case, if the requested destination is not
+	// found, the request will be routed according to the load balancing algorithm.
 	Strict bool `protobuf:"varint,2,opt,name=strict,proto3" json:"strict,omitempty"`
 }
 
