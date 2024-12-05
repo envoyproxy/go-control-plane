@@ -16,7 +16,6 @@ require (
 	cel.dev/expr v0.16.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.213 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20240723142845-024c85f92f20 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

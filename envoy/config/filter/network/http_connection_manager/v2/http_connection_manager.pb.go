@@ -1307,15 +1307,6 @@ type HttpConnectionManager_Tracing struct {
 	CustomTags []*v22.CustomTag `protobuf:"bytes,8,rep,name=custom_tags,json=customTags,proto3" json:"custom_tags,omitempty"`
 	// Configuration for an external tracing provider.
 	// If not specified, no tracing will be performed.
-	//
-	// .. attention::
-	//
-	//	Please be aware that *envoy.tracers.opencensus* provider can only be configured once
-	//	in Envoy lifetime.
-	//	Any attempts to reconfigure it or to use different configurations for different HCM filters
-	//	will be rejected.
-	//	Such a constraint is inherent to OpenCensus itself. It cannot be overcome without changes
-	//	on OpenCensus side.
 	Provider *v23.Tracing_Http `protobuf:"bytes,9,opt,name=provider,proto3" json:"provider,omitempty"`
 }
 

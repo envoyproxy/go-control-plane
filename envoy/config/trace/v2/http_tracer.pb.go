@@ -99,7 +99,6 @@ type Tracing_Http struct {
 	// - *envoy.tracers.zipkin*
 	// - *envoy.tracers.dynamic_ot*
 	// - *envoy.tracers.datadog*
-	// - *envoy.tracers.opencensus*
 	// - *envoy.tracers.xray*
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Trace driver specific configuration which depends on the driver being instantiated.
@@ -109,7 +108,6 @@ type Tracing_Http struct {
 	// - :ref:`ZipkinConfig <envoy_api_msg_config.trace.v2.ZipkinConfig>`
 	// - :ref:`DynamicOtConfig <envoy_api_msg_config.trace.v2.DynamicOtConfig>`
 	// - :ref:`DatadogConfig <envoy_api_msg_config.trace.v2.DatadogConfig>`
-	// - :ref:`OpenCensusConfig <envoy_api_msg_config.trace.v2.OpenCensusConfig>`
 	// - :ref:`AWS X-Ray <envoy_api_msg_config.trace.v2alpha.XRayConfig>`
 	//
 	// Types that are assignable to ConfigType:

@@ -3,7 +3,6 @@ module github.com/envoyproxy/go-control-plane
 go 1.21
 
 require (
-	github.com/census-instrumentation/opencensus-proto v0.4.1
 	github.com/cncf/xds/go v0.0.0-20240423153145-555b57ec207b
 	github.com/envoyproxy/protoc-gen-validate v1.1.0
 	github.com/google/go-cmp v0.6.0
