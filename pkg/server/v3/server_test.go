@@ -293,9 +293,7 @@ func TestServerShutdown(t *testing.T) {
 				case opaqueType:
 					err = s.StreamAggregatedResources(resp)
 				}
-				if err != nil {
-					t.Errorf("Stream() => got %v, want no error", err)
-				}
+				assert.NoErrorf(t, err, "Stream() => got %v, want no error", err)
 				shutdown <- true
 			}(typ)
 
@@ -356,9 +354,8 @@ func TestResponseHandlers(t *testing.T) {
 			select {
 			case <-resp.sent:
 				close(resp.recv)
-				if want := map[string]int{typ: 1}; !reflect.DeepEqual(want, config.counts) {
-					t.Errorf("watch counts => got %v, want %v", config.counts, want)
-				}
+				want := map[string]int{typ: 1}
+				assert.Truef(t, reflect.DeepEqual(want, config.counts), "watch counts => got %v, want %v", config.counts, want)
 			case <-time.After(1 * time.Second):
 				t.Fatalf("got no response")
 			}
