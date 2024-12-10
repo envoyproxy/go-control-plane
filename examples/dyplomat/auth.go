@@ -150,7 +150,7 @@ func (rt *TokenRoundtripper) RoundTrip(req *http.Request) (*http.Response, error
 
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token.Token))
+	req.Header.Set("Authorization", "Bearer "+token.Token)
 	return rt.RoundTripper.RoundTrip(req)
 }
 
