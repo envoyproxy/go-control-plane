@@ -36,76 +36,109 @@ var (
 	_ = sort.Sort
 )
 
-// Validate checks the field values on APIKeyAuth with the rules defined in the
+// Validate checks the field values on ApiKeyAuth with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *APIKeyAuth) Validate() error {
+func (m *ApiKeyAuth) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on APIKeyAuth with the rules defined in
+// ValidateAll checks the field values on ApiKeyAuth with the rules defined in
 // the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in APIKeyAuthMultiError, or
+// result is a list of violation errors wrapped in ApiKeyAuthMultiError, or
 // nil if none found.
-func (m *APIKeyAuth) ValidateAll() error {
+func (m *ApiKeyAuth) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *APIKeyAuth) validate(all bool) error {
+func (m *ApiKeyAuth) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
-	if all {
-		switch v := interface{}(m.GetKeys()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, APIKeyAuthValidationError{
-					field:  "Keys",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	for idx, item := range m.GetCredentials() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ApiKeyAuthValidationError{
+						field:  fmt.Sprintf("Credentials[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ApiKeyAuthValidationError{
+						field:  fmt.Sprintf("Credentials[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
 			}
-		case interface{ Validate() error }:
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, APIKeyAuthValidationError{
-					field:  "Keys",
+				return ApiKeyAuthValidationError{
+					field:  fmt.Sprintf("Credentials[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetKeys()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return APIKeyAuthValidationError{
-				field:  "Keys",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
+
 	}
 
-	// no validation rules for AuthenticationHeader
+	for idx, item := range m.GetKeySources() {
+		_, _ = idx, item
 
-	// no validation rules for AuthenticationQuery
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ApiKeyAuthValidationError{
+						field:  fmt.Sprintf("KeySources[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ApiKeyAuthValidationError{
+						field:  fmt.Sprintf("KeySources[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ApiKeyAuthValidationError{
+					field:  fmt.Sprintf("KeySources[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
 
-	// no validation rules for AuthenticationCookie
+	}
 
 	if len(errors) > 0 {
-		return APIKeyAuthMultiError(errors)
+		return ApiKeyAuthMultiError(errors)
 	}
 
 	return nil
 }
 
-// APIKeyAuthMultiError is an error wrapping multiple validation errors
-// returned by APIKeyAuth.ValidateAll() if the designated constraints aren't met.
-type APIKeyAuthMultiError []error
+// ApiKeyAuthMultiError is an error wrapping multiple validation errors
+// returned by ApiKeyAuth.ValidateAll() if the designated constraints aren't met.
+type ApiKeyAuthMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m APIKeyAuthMultiError) Error() string {
+func (m ApiKeyAuthMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -114,11 +147,11 @@ func (m APIKeyAuthMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m APIKeyAuthMultiError) AllErrors() []error { return m }
+func (m ApiKeyAuthMultiError) AllErrors() []error { return m }
 
-// APIKeyAuthValidationError is the validation error returned by
-// APIKeyAuth.Validate if the designated constraints aren't met.
-type APIKeyAuthValidationError struct {
+// ApiKeyAuthValidationError is the validation error returned by
+// ApiKeyAuth.Validate if the designated constraints aren't met.
+type ApiKeyAuthValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -126,22 +159,22 @@ type APIKeyAuthValidationError struct {
 }
 
 // Field function returns field value.
-func (e APIKeyAuthValidationError) Field() string { return e.field }
+func (e ApiKeyAuthValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e APIKeyAuthValidationError) Reason() string { return e.reason }
+func (e ApiKeyAuthValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e APIKeyAuthValidationError) Cause() error { return e.cause }
+func (e ApiKeyAuthValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e APIKeyAuthValidationError) Key() bool { return e.key }
+func (e ApiKeyAuthValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e APIKeyAuthValidationError) ErrorName() string { return "APIKeyAuthValidationError" }
+func (e ApiKeyAuthValidationError) ErrorName() string { return "ApiKeyAuthValidationError" }
 
 // Error satisfies the builtin error interface
-func (e APIKeyAuthValidationError) Error() string {
+func (e ApiKeyAuthValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -153,14 +186,14 @@ func (e APIKeyAuthValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAPIKeyAuth.%s: %s%s",
+		"invalid %sApiKeyAuth.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = APIKeyAuthValidationError{}
+var _ error = ApiKeyAuthValidationError{}
 
 var _ interface {
 	Field() string
@@ -168,4 +201,461 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = APIKeyAuthValidationError{}
+} = ApiKeyAuthValidationError{}
+
+// Validate checks the field values on ApiKeyAuthPerRoute with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ApiKeyAuthPerRoute) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ApiKeyAuthPerRoute with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ApiKeyAuthPerRouteMultiError, or nil if none found.
+func (m *ApiKeyAuthPerRoute) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ApiKeyAuthPerRoute) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetCredentials() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ApiKeyAuthPerRouteValidationError{
+						field:  fmt.Sprintf("Credentials[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ApiKeyAuthPerRouteValidationError{
+						field:  fmt.Sprintf("Credentials[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ApiKeyAuthPerRouteValidationError{
+					field:  fmt.Sprintf("Credentials[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetKeySources() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ApiKeyAuthPerRouteValidationError{
+						field:  fmt.Sprintf("KeySources[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ApiKeyAuthPerRouteValidationError{
+						field:  fmt.Sprintf("KeySources[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ApiKeyAuthPerRouteValidationError{
+					field:  fmt.Sprintf("KeySources[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ApiKeyAuthPerRouteMultiError(errors)
+	}
+
+	return nil
+}
+
+// ApiKeyAuthPerRouteMultiError is an error wrapping multiple validation errors
+// returned by ApiKeyAuthPerRoute.ValidateAll() if the designated constraints
+// aren't met.
+type ApiKeyAuthPerRouteMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ApiKeyAuthPerRouteMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ApiKeyAuthPerRouteMultiError) AllErrors() []error { return m }
+
+// ApiKeyAuthPerRouteValidationError is the validation error returned by
+// ApiKeyAuthPerRoute.Validate if the designated constraints aren't met.
+type ApiKeyAuthPerRouteValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ApiKeyAuthPerRouteValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ApiKeyAuthPerRouteValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ApiKeyAuthPerRouteValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ApiKeyAuthPerRouteValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ApiKeyAuthPerRouteValidationError) ErrorName() string {
+	return "ApiKeyAuthPerRouteValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ApiKeyAuthPerRouteValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sApiKeyAuthPerRoute.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ApiKeyAuthPerRouteValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ApiKeyAuthPerRouteValidationError{}
+
+// Validate checks the field values on Credential with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Credential) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Credential with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CredentialMultiError, or
+// nil if none found.
+func (m *Credential) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Credential) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetKey()) < 1 {
+		err := CredentialValidationError{
+			field:  "Key",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetClient()) < 1 {
+		err := CredentialValidationError{
+			field:  "Client",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return CredentialMultiError(errors)
+	}
+
+	return nil
+}
+
+// CredentialMultiError is an error wrapping multiple validation errors
+// returned by Credential.ValidateAll() if the designated constraints aren't met.
+type CredentialMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CredentialMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CredentialMultiError) AllErrors() []error { return m }
+
+// CredentialValidationError is the validation error returned by
+// Credential.Validate if the designated constraints aren't met.
+type CredentialValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CredentialValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CredentialValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CredentialValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CredentialValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CredentialValidationError) ErrorName() string { return "CredentialValidationError" }
+
+// Error satisfies the builtin error interface
+func (e CredentialValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCredential.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CredentialValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CredentialValidationError{}
+
+// Validate checks the field values on KeySource with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *KeySource) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on KeySource with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in KeySourceMultiError, or nil
+// if none found.
+func (m *KeySource) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *KeySource) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetHeader() != "" {
+
+		if utf8.RuneCountInString(m.GetHeader()) > 1024 {
+			err := KeySourceValidationError{
+				field:  "Header",
+				reason: "value length must be at most 1024 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if !_KeySource_Header_Pattern.MatchString(m.GetHeader()) {
+			err := KeySourceValidationError{
+				field:  "Header",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if utf8.RuneCountInString(m.GetQuery()) > 1024 {
+		err := KeySourceValidationError{
+			field:  "Query",
+			reason: "value length must be at most 1024 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetCookie() != "" {
+
+		if utf8.RuneCountInString(m.GetCookie()) > 1024 {
+			err := KeySourceValidationError{
+				field:  "Cookie",
+				reason: "value length must be at most 1024 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if !_KeySource_Cookie_Pattern.MatchString(m.GetCookie()) {
+			err := KeySourceValidationError{
+				field:  "Cookie",
+				reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return KeySourceMultiError(errors)
+	}
+
+	return nil
+}
+
+// KeySourceMultiError is an error wrapping multiple validation errors returned
+// by KeySource.ValidateAll() if the designated constraints aren't met.
+type KeySourceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m KeySourceMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m KeySourceMultiError) AllErrors() []error { return m }
+
+// KeySourceValidationError is the validation error returned by
+// KeySource.Validate if the designated constraints aren't met.
+type KeySourceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e KeySourceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e KeySourceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e KeySourceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e KeySourceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e KeySourceValidationError) ErrorName() string { return "KeySourceValidationError" }
+
+// Error satisfies the builtin error interface
+func (e KeySourceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sKeySource.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = KeySourceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = KeySourceValidationError{}
+
+var _KeySource_Header_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _KeySource_Cookie_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
