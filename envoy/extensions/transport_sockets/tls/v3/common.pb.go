@@ -519,12 +519,13 @@ type TlsCertificate struct {
 	// <sds_key_rotation>` documentation for further details.
 	WatchedDirectory *v3.WatchedDirectory `protobuf:"bytes,7,opt,name=watched_directory,json=watchedDirectory,proto3" json:"watched_directory,omitempty"`
 	// BoringSSL private key method provider. This is an alternative to :ref:`private_key
-	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` field. This can't be
-	// marked as “oneof“ due to API compatibility reasons. Setting both :ref:`private_key
-	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` and
-	// :ref:`private_key_provider
-	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key_provider>` fields will result in an
-	// error.
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` field.
+	// When both :ref:`private_key <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key>` and
+	// :ref:`private_key_provider <envoy_v3_api_field_extensions.transport_sockets.tls.v3.TlsCertificate.private_key_provider>` fields are set,
+	// “private_key_provider“ takes precedence.
+	// If “private_key_provider“ is unavailable and :ref:`fallback
+	// <envoy_v3_api_field_extensions.transport_sockets.tls.v3.PrivateKeyProvider.fallback>`
+	// is enabled, “private_key“ will be used.
 	PrivateKeyProvider *PrivateKeyProvider `protobuf:"bytes,6,opt,name=private_key_provider,json=privateKeyProvider,proto3" json:"private_key_provider,omitempty"`
 	// The password to decrypt the TLS private key. If this field is not set, it is assumed that the
 	// TLS private key is not password encrypted.
