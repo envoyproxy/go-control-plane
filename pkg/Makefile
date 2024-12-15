@@ -1,3 +1,1 @@
-.PHONY: build
-build:
-	@go build ./...
+include ../Makefile.common

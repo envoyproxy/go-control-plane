@@ -8,10 +8,14 @@ SHELL 	:= /bin/bash
 BINDIR	:= bin
 PKG 	:= github.com/envoyproxy/go-control-plane
 
+include ./Makefile.common
+
 .PHONY: build
 build:
-	@make -C pkg build
-	@make -C envoy build
+	@make -C pkg common/build
+	@make -C envoy common/build
+	@make -C ratelimit common/build
+	@make -C xdsmatcher common/build 
 
 .PHONY: clean
 clean:
@@ -93,7 +97,30 @@ docker_tests:
 	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/scripts/do_ci.sh
 
 .PHONY: tidy-all
-tidy-all:
-	go mod tidy
-	make -C examples/dyplomat tidy
-	make -C xdsmatcher tidy
+tidy-all: common/tidy
+	make -C contrib common/tidy
+	make -C envoy common/tidy
+	make -C examples/dyplomat common/tidy
+	make -C ratelimit common/tidy
+	make -C xdsmatcher common/tidy
+
+.PHONY: multimod/verify
+multimod/verify: $(MULTIMOD)
+	@echo "Validating versions.yaml"
+	$(MULTIMOD) verify
+
+MODSET?=envoy
+.PHONY: multimod/prerelease
+multimod/prerelease: $(MULTIMOD)
+	$(MULTIMOD) prerelease -s=true -b=false -v ./versions.yaml -m ${MODSET}
+	$(MAKE) tidy-all
+
+COMMIT?=HEAD
+REMOTE?=git@github.com:envoyproxy/go-control-plane.git
+.PHONY: push-tags
+push-tags: $(MULTIMOD)
+	$(MULTIMOD) verify
+	set -e; for tag in `$(MULTIMOD) tag -m ${MODSET} -c ${COMMIT} --print-tags | grep -v "Using" `; do \
+		echo "pushing tag $${tag}"; \
+		git push ${REMOTE} $${tag}; \
+	done;
