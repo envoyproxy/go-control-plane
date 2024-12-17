@@ -431,6 +431,16 @@ func (m *RemoteJwks) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RefetchJwksOnKidMismatch {
+		i--
+		if m.RefetchJwksOnKidMismatch {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.RetryPolicy != nil {
 		if vtmsg, ok := interface{}(m.RetryPolicy).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -1549,6 +1559,9 @@ func (m *RemoteJwks) SizeVT() (n int) {
 			l = proto.Size(m.RetryPolicy)
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RefetchJwksOnKidMismatch {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

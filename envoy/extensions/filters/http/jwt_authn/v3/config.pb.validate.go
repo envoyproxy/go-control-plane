@@ -703,6 +703,8 @@ func (m *RemoteJwks) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for RefetchJwksOnKidMismatch
+
 	if len(errors) > 0 {
 		return RemoteJwksMultiError(errors)
 	}
