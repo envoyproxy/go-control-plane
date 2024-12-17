@@ -18,40 +18,35 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 )
 
 func TestIDHash(t *testing.T) {
 	node := &core.Node{Id: "test"}
-	if got := (IDHash{}).ID(node); got != "test" {
-		t.Errorf("IDHash.ID(%v) => got %s, want %s", node, got, node.GetId())
-	}
-	if got := (IDHash{}).ID(nil); got != "" {
-		t.Errorf("IDHash.ID(nil) => got %s, want empty", got)
-	}
+	got := (IDHash{}).ID(node)
+	assert.Equalf(t, "test", got, "IDHash.ID(%v) => got %s, want %s", node, got, node.GetId())
+	got = (IDHash{}).ID(nil)
+	assert.Emptyf(t, got, "IDHash.ID(nil) => got %s, want empty", got)
 }
 
 func TestNewStatusInfo(t *testing.T) {
 	node := &core.Node{Id: "test"}
 	info := newStatusInfo(node)
 
-	if got := info.GetNode(); !reflect.DeepEqual(got, node) {
-		t.Errorf("GetNode() => got %#v, want %#v", got, node)
-	}
+	gotNode := info.GetNode()
+	assert.Truef(t, reflect.DeepEqual(gotNode, node), "GetNode() => got %#v, want %#v", gotNode, node)
 
-	if got := info.GetNumWatches(); got != 0 {
-		t.Errorf("GetNumWatches() => got %d, want 0", got)
-	}
+	gotNumWatches := info.GetNumWatches()
+	assert.Equalf(t, 0, gotNumWatches, "GetNumWatches() => got %d, want 0", gotNumWatches)
 
-	if got := info.GetLastWatchRequestTime(); !got.IsZero() {
-		t.Errorf("GetLastWatchRequestTime() => got %v, want zero time", got)
-	}
+	gotLastWatchRequestTime := info.GetLastWatchRequestTime()
+	assert.Truef(t, gotLastWatchRequestTime.IsZero(), "GetLastWatchRequestTime() => got %v, want zero time", gotLastWatchRequestTime)
 
-	if got := info.GetNumDeltaWatches(); got != 0 {
-		t.Errorf("GetNumDeltaWatches() => got %d, want 0", got)
-	}
+	gotNumDeltaWatches := info.GetNumDeltaWatches()
+	assert.Equalf(t, 0, gotNumDeltaWatches, "GetNumDeltaWatches() => got %d, want 0", gotNumDeltaWatches)
 
-	if got := info.GetLastDeltaWatchRequestTime(); !got.IsZero() {
-		t.Errorf("GetLastDeltaWatchRequestTime() => got %v, want zero time", got)
-	}
+	gotLastDeltaWatchRequestTime := info.GetLastDeltaWatchRequestTime()
+	assert.Truef(t, gotLastDeltaWatchRequestTime.IsZero(), "GetLastDeltaWatchRequestTime() => got %v, want zero time", gotLastDeltaWatchRequestTime)
 }
