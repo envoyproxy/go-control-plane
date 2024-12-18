@@ -651,8 +651,7 @@ type RemoteJwks struct {
 	// Refetch JWKS if extracted JWT has no KID or a KID that does not match any cached JWKS's KID.
 	//
 	// In envoy, if :ref:`async JWKS fetching <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.RemoteJwks.async_fetch>`
-	//
-	//	is enabled along with this field, then KID mismatch will trigger a new async fetch after appropriate backoff delay.
+	// is enabled along with this field, then KID mismatch will trigger a new async fetch after appropriate backoff delay.
 	//
 	// If async fetching is disabled, new JWKS is fetched on demand and the cache is isolated to the fetched worker thread.
 	//
