@@ -8,6 +8,7 @@ package ratelimitv3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -138,6 +139,16 @@ func (m *RateLimitDescriptor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.HitsAddend != nil {
+		size, err := (*wrapperspb.UInt64Value)(m.HitsAddend).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.Limit != nil {
 		size, err := m.Limit.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -312,6 +323,10 @@ func (m *RateLimitDescriptor) SizeVT() (n int) {
 	}
 	if m.Limit != nil {
 		l = m.Limit.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.HitsAddend != nil {
+		l = (*wrapperspb.UInt64Value)(m.HitsAddend).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
