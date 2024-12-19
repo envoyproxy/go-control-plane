@@ -189,7 +189,6 @@ type RateLimitDescriptor struct {
 	Limit *RateLimitDescriptor_RateLimitOverride `protobuf:"bytes,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	// Optional hits_addend for the rate limit descriptor. If set the value will override the
 	// request level hits_addend.
-	// [#not-implemented-hide:]
 	HitsAddend *wrapperspb.UInt64Value `protobuf:"bytes,3,opt,name=hits_addend,json=hitsAddend,proto3" json:"hits_addend,omitempty"`
 }
 
