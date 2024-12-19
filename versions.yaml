@@ -1,0 +1,15 @@
+module-sets:
+  base:
+    version: v0.13.1
+    modules:
+      - github.com/envoyproxy/go-control-plane/contrib
+      - github.com/envoyproxy/go-control-plane/ratelimit
+      - github.com/envoyproxy/go-control-plane/xdsmatcher
+      - github.com/envoyproxy/go-control-plane
+  envoy:
+    version: v1.32.2
+    modules:
+      - github.com/envoyproxy/go-control-plane/envoy
+excluded-modules:
+  - github.com/envoyproxy/go-control-plane/examples/dyplomat
+  - github.com/envoyproxy/go-control-plane/internal/tools
