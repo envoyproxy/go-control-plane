@@ -1,0 +1,39 @@
+SHELL = /bin/bash
+.SHELLFLAGS = -o pipefail -c
+
+SRC_ROOT := $(shell git rev-parse --show-toplevel)
+
+GOCMD?= go
+
+TOOLS_MOD_DIR    := $(SRC_ROOT)/internal/tools
+TOOLS_MOD_REGEX  := "\s+_\s+\".*\""
+TOOLS_PKG_NAMES  := $(shell grep -E $(TOOLS_MOD_REGEX) < $(TOOLS_MOD_DIR)/tools.go | tr -d " _\"")
+TOOLS_BIN_DIR    := $(SRC_ROOT)/.tools
+TOOLS_BIN_NAMES  := $(addprefix $(TOOLS_BIN_DIR)/, $(notdir $(TOOLS_PKG_NAMES)))
+
+$(TOOLS_BIN_DIR):
+	mkdir -p $@
+
+$(TOOLS_BIN_NAMES): $(TOOLS_BIN_DIR) $(TOOLS_MOD_DIR)/go.mod
+	cd $(TOOLS_MOD_DIR) && GOOS="" GOARCH="" $(GOCMD) build -o $@ -trimpath $(filter %/$(notdir $@),$(TOOLS_PKG_NAMES))
+
+MULTIMOD            := $(TOOLS_BIN_DIR)/multimod
+GOLANGCI_LINT       := $(TOOLS_BIN_DIR)/golangci-lint
+
+.PHONY: common/build
+common/build:
+	@go build ./...
+
+.PHONY: common/coverage
+common/coverage:
+	$(GOCMD) test ./... -race -covermode=atomic -coverprofile=coverage.out
+common/coverage_html: common/coverage
+	$(GOCMD) tool cover -html=coverage.out
+
+.PHONY: common/test
+common/test:
+	$(GOCMD) test ./... -race
+
+.PHONY: common/tidy
+common/tidy:
+	$(GOCMD) mod tidy
