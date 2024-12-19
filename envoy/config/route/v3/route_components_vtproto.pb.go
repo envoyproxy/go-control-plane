@@ -5300,6 +5300,16 @@ func (m *RateLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ApplyOnStreamDone {
+		i--
+		if m.ApplyOnStreamDone {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
 	if m.HitsAddend != nil {
 		size, err := m.HitsAddend.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -8138,6 +8148,9 @@ func (m *RateLimit) SizeVT() (n int) {
 	if m.HitsAddend != nil {
 		l = m.HitsAddend.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ApplyOnStreamDone {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
