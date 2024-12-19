@@ -6,7 +6,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20240423153145-555b57ec207b
 	github.com/envoyproxy/go-control-plane v0.12.0
 	github.com/stretchr/testify v1.10.0
-	google.golang.org/protobuf v1.35.2
+	google.golang.org/protobuf v1.36.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
