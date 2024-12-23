@@ -109,7 +109,6 @@ multimod/verify: $(MULTIMOD)
 	@echo "Validating versions.yaml"
 	$(MULTIMOD) verify
 
-MODSET?=envoy
 .PHONY: multimod/prerelease
 multimod/prerelease: $(MULTIMOD)
 	$(MULTIMOD) prerelease -s=true -b=false -v ./versions.yaml -m ${MODSET}
@@ -117,8 +116,15 @@ multimod/prerelease: $(MULTIMOD)
 
 COMMIT?=HEAD
 REMOTE?=git@github.com:envoyproxy/go-control-plane.git
+.PHONY: multimod/tag
+multimod/tag: $(MULTIMOD)
+	$(MULTIMOD) verify
+	$(MULTIMOD) tag -m ${MODSET} -c ${COMMIT} --print-tags
+
+COMMIT?=HEAD
+REMOTE?=git@github.com:envoyproxy/go-control-plane.git
 .PHONY: push-tags
-push-tags: $(MULTIMOD)
+multimod/push-tags: $(MULTIMOD)
 	$(MULTIMOD) verify
 	set -e; for tag in `$(MULTIMOD) tag -m ${MODSET} -c ${COMMIT} --print-tags | grep -v "Using" `; do \
 		echo "pushing tag $${tag}"; \
