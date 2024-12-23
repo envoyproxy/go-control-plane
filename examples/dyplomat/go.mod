@@ -10,7 +10,7 @@ replace (
 
 require (
 	github.com/envoyproxy/go-control-plane v0.13.0
-	github.com/envoyproxy/go-control-plane/envoy v0.0.0-00010101000000-000000000000
+	github.com/envoyproxy/go-control-plane/envoy v1.32.2
 	google.golang.org/grpc v1.67.1
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.28.2
@@ -27,7 +27,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20240723142845-024c85f92f20 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.9.0 // indirect
-	github.com/envoyproxy/go-control-plane/ratelimit v0.0.0-00010101000000-000000000000 // indirect
+	github.com/envoyproxy/go-control-plane/ratelimit v0.1.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.1.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-openapi/jsonpointer v0.19.6 // indirect
