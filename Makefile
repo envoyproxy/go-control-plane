@@ -8,9 +8,14 @@ SHELL 	:= /bin/bash
 BINDIR	:= bin
 PKG 	:= github.com/envoyproxy/go-control-plane
 
+include ./Makefile.common
+
 .PHONY: build
 build:
-	@go build ./pkg/... ./envoy/...
+	@make -C pkg common/build
+	@make -C envoy common/build
+	@make -C ratelimit common/build
+	@make -C xdsmatcher common/build 
 
 .PHONY: clean
 clean:
@@ -28,7 +33,7 @@ test:
 
 .PHONY: cover
 cover:
-	@build/coverage.sh
+	@scripts/coverage.sh
 
 .PHONY: examples
 examples:
@@ -58,22 +63,22 @@ $(BINDIR)/test:
 integration: integration.xds integration.ads integration.rest integration.xds.mux integration.xds.delta integration.ads.delta
 
 integration.ads: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=ads build/integration.sh
+	env XDS=ads scripts/integration.sh
 
 integration.xds: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds build/integration.sh
+	env XDS=xds scripts/integration.sh
 
 integration.rest: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=rest build/integration.sh
+	env XDS=rest scripts/integration.sh
 
 integration.xds.mux: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=xds build/integration.sh -mux
+	env XDS=xds scripts/integration.sh -mux
 
 integration.xds.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta build/integration.sh
+	env XDS=delta scripts/integration.sh
 
 integration.ads.delta: $(BINDIR)/test $(BINDIR)/upstream
-	env XDS=delta-ads build/integration.sh
+	env XDS=delta-ads scripts/integration.sh
 
 #--------------------------------------
 #-- example xDS control plane server
@@ -84,15 +89,44 @@ $(BINDIR)/example:
 	@go build -race -o $@ internal/example/main/main.go
 
 example: $(BINDIR)/example
-	@build/example.sh
+	@scripts/example.sh
 
 .PHONY: docker_tests
 docker_tests:
 	docker build --pull -f Dockerfile.ci . -t gcp_ci && \
-	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/build/do_ci.sh
+	docker run -v $$(pwd):/go-control-plane $$(tty -s && echo "-it" || echo) gcp_ci /bin/bash -c /go-control-plane/scripts/do_ci.sh
 
 .PHONY: tidy-all
-tidy-all:
-	go mod tidy
-	make -C examples/dyplomat tidy
-	make -C xdsmatcher tidy
+tidy-all: common/tidy
+	make -C contrib common/tidy
+	make -C envoy common/tidy
+	make -C examples/dyplomat common/tidy
+	make -C ratelimit common/tidy
+	make -C xdsmatcher common/tidy
+
+.PHONY: multimod/verify
+multimod/verify: $(MULTIMOD)
+	@echo "Validating versions.yaml"
+	$(MULTIMOD) verify
+
+.PHONY: multimod/prerelease
+multimod/prerelease: $(MULTIMOD)
+	$(MULTIMOD) prerelease -s=true -b=false -v ./versions.yaml -m ${MODSET}
+	$(MAKE) tidy-all
+
+COMMIT?=HEAD
+REMOTE?=git@github.com:envoyproxy/go-control-plane.git
+.PHONY: multimod/tag
+multimod/tag: $(MULTIMOD)
+	$(MULTIMOD) verify
+	$(MULTIMOD) tag -m ${MODSET} -c ${COMMIT} --print-tags
+
+COMMIT?=HEAD
+REMOTE?=git@github.com:envoyproxy/go-control-plane.git
+.PHONY: push-tags
+multimod/push-tags: $(MULTIMOD)
+	$(MULTIMOD) verify
+	set -e; for tag in `$(MULTIMOD) tag -m ${MODSET} -c ${COMMIT} --print-tags | grep -v "Using" `; do \
+		echo "pushing tag $${tag}"; \
+		git push ${REMOTE} $${tag}; \
+	done;

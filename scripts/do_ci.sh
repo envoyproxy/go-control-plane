@@ -14,7 +14,7 @@ make examples
 make test
 make integration
 
-make -C xdsmatcher test
+make -C xdsmatcher common/test
 # TODO(snowp): Output coverage in CI
 
-make -C examples/dyplomat test
+make -C examples/dyplomat common/test

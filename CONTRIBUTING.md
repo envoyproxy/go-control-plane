@@ -198,3 +198,26 @@ re-run all the CI tasks. Consider adding an alias into your `.gitconfig` file:
 
 Once you add this alias you can issue the command `git kick-ci` and the PR
 will be sent back for a retest.
+
+# Releasing
+
+The repository is split in multiple packages, themselves using distinct versions:
+ - envoy API
+    - `github.com/envoyproxy/go-control-plane/envoy`, including envoy API generated protobuf files
+    - `github.com/envoyproxy/go-control-plane/contrib`, including envoy API contrib generated protobuf files
+ - ratelimit
+    - `github.com/envoyproxy/go-control-plane/ratelimit`, including generated files for envoy RLS (https://github.com/envoyproxy/ratelimit)
+ - go-control-plane
+    - `github.com/envoyproxy/go-control-plane`
+    - `github.com/envoyproxy/go-control-plane/xdsmatcher`
+
+To create a new release, from a clean branch:
+ - update the version for the desired part in `versions.yaml` and commit
+ - run the following command to update all mod files
+```
+make multimod/prerelease MODSET={part to release}
+```
+ - push the resulting branch to get merged in, then create tags with 
+ ```
+make multimod/push-tags MODSET={part to release}
+ ```
