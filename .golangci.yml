@@ -17,6 +17,7 @@ linters:
   - goimports
   - gosec
   - misspell
+  - perfsprint
   - revive
   - testifylint
   - unconvert
@@ -36,6 +37,17 @@ linters-settings:
       - G115
   misspell:
     locale: US
+  perfsprint:
+    # Optimizes even if it requires an int or uint type cast.
+    int-conversion: true
+    # Optimizes into `err.Error()` even if it is only equivalent for non-nil errors.
+    err-error: true
+    # Optimizes `fmt.Errorf`.
+    errorf: true
+    # Optimizes `fmt.Sprintf` with only one argument.
+    sprintf1: true
+    # Optimizes into strings concatenation.
+    strconcat: true
   testifylint:
     disable:
     - float-compare
