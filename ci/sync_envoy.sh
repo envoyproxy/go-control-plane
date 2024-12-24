@@ -40,7 +40,7 @@ sync_protos () {
     echo "Syncing go protos ..."
     for src in "${SRCS[@]}"; do
         envoy_src="${ENVOY_SRC_DIR}/build_go/${src}"
-        rm -rf "$src"
+        find "${src}" ! -name "${src}" -maxdepth 1 -type d -exec rm -rf {} +
         echo "Copying ${envoy_src} -> ${src}"
         cp -a "$envoy_src" "$src"
         git add "$src"

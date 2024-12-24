@@ -2,8 +2,6 @@ module github.com/envoyproxy/go-control-plane/contrib
 
 go 1.22.8
 
-toolchain go1.23.3
-
 replace github.com/envoyproxy/go-control-plane/envoy => ../envoy
 
 require (
