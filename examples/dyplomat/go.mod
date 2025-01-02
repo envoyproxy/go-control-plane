@@ -1,6 +1,6 @@
 module github.com/envoyproxy/go-control-plane/examples/dyplomat
 
-go 1.22.8
+go 1.22
 
 replace (
 	github.com/envoyproxy/go-control-plane => ../..

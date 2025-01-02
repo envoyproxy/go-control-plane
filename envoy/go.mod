@@ -1,6 +1,6 @@
 module github.com/envoyproxy/go-control-plane/envoy
 
-go 1.21
+go 1.22
 
 require (
 	github.com/cncf/xds/go v0.0.0-20240723142845-024c85f92f20
