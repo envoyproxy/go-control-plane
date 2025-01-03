@@ -59,11 +59,11 @@ func (m *AwsCredentialProvider) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetAssumeRoleWithWebIdentity()).(type) {
+		switch v := interface{}(m.GetAssumeRoleWithWebIdentityProvider()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, AwsCredentialProviderValidationError{
-					field:  "AssumeRoleWithWebIdentity",
+					field:  "AssumeRoleWithWebIdentityProvider",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -71,16 +71,16 @@ func (m *AwsCredentialProvider) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, AwsCredentialProviderValidationError{
-					field:  "AssumeRoleWithWebIdentity",
+					field:  "AssumeRoleWithWebIdentityProvider",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetAssumeRoleWithWebIdentity()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetAssumeRoleWithWebIdentityProvider()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return AwsCredentialProviderValidationError{
-				field:  "AssumeRoleWithWebIdentity",
+				field:  "AssumeRoleWithWebIdentityProvider",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -115,6 +115,37 @@ func (m *AwsCredentialProvider) validate(all bool) error {
 			}
 		}
 	}
+
+	if all {
+		switch v := interface{}(m.GetCredentialsFileProvider()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AwsCredentialProviderValidationError{
+					field:  "CredentialsFileProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AwsCredentialProviderValidationError{
+					field:  "CredentialsFileProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCredentialsFileProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AwsCredentialProviderValidationError{
+				field:  "CredentialsFileProvider",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for CustomCredentialProviderChain
 
 	if len(errors) > 0 {
 		return AwsCredentialProviderMultiError(errors)
@@ -346,6 +377,35 @@ func (m *AssumeRoleWithWebIdentityCredentialProvider) validate(all bool) error {
 
 	var errors []error
 
+	if all {
+		switch v := interface{}(m.GetWebIdentityTokenDataSource()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AssumeRoleWithWebIdentityCredentialProviderValidationError{
+					field:  "WebIdentityTokenDataSource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AssumeRoleWithWebIdentityCredentialProviderValidationError{
+					field:  "WebIdentityTokenDataSource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWebIdentityTokenDataSource()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AssumeRoleWithWebIdentityCredentialProviderValidationError{
+				field:  "WebIdentityTokenDataSource",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if utf8.RuneCountInString(m.GetRoleArn()) < 1 {
 		err := AssumeRoleWithWebIdentityCredentialProviderValidationError{
 			field:  "RoleArn",
@@ -357,16 +417,7 @@ func (m *AssumeRoleWithWebIdentityCredentialProvider) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if utf8.RuneCountInString(m.GetWebIdentityToken()) < 1 {
-		err := AssumeRoleWithWebIdentityCredentialProviderValidationError{
-			field:  "WebIdentityToken",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for RoleSessionName
 
 	if len(errors) > 0 {
 		return AssumeRoleWithWebIdentityCredentialProviderMultiError(errors)
@@ -449,3 +500,139 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AssumeRoleWithWebIdentityCredentialProviderValidationError{}
+
+// Validate checks the field values on CredentialsFileCredentialProvider with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *CredentialsFileCredentialProvider) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CredentialsFileCredentialProvider
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// CredentialsFileCredentialProviderMultiError, or nil if none found.
+func (m *CredentialsFileCredentialProvider) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CredentialsFileCredentialProvider) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetCredentialsDataSource()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CredentialsFileCredentialProviderValidationError{
+					field:  "CredentialsDataSource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CredentialsFileCredentialProviderValidationError{
+					field:  "CredentialsDataSource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCredentialsDataSource()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CredentialsFileCredentialProviderValidationError{
+				field:  "CredentialsDataSource",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Profile
+
+	if len(errors) > 0 {
+		return CredentialsFileCredentialProviderMultiError(errors)
+	}
+
+	return nil
+}
+
+// CredentialsFileCredentialProviderMultiError is an error wrapping multiple
+// validation errors returned by
+// CredentialsFileCredentialProvider.ValidateAll() if the designated
+// constraints aren't met.
+type CredentialsFileCredentialProviderMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CredentialsFileCredentialProviderMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CredentialsFileCredentialProviderMultiError) AllErrors() []error { return m }
+
+// CredentialsFileCredentialProviderValidationError is the validation error
+// returned by CredentialsFileCredentialProvider.Validate if the designated
+// constraints aren't met.
+type CredentialsFileCredentialProviderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CredentialsFileCredentialProviderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CredentialsFileCredentialProviderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CredentialsFileCredentialProviderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CredentialsFileCredentialProviderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CredentialsFileCredentialProviderValidationError) ErrorName() string {
+	return "CredentialsFileCredentialProviderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CredentialsFileCredentialProviderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCredentialsFileCredentialProvider.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CredentialsFileCredentialProviderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CredentialsFileCredentialProviderValidationError{}
