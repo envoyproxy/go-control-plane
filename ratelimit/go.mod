@@ -5,7 +5,7 @@ go 1.22
 replace github.com/envoyproxy/go-control-plane/envoy => ../envoy
 
 require (
-	github.com/envoyproxy/go-control-plane/envoy v1.32.2
+	github.com/envoyproxy/go-control-plane/envoy v1.32.3
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.35.2
 )
