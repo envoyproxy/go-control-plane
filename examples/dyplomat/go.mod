@@ -9,7 +9,7 @@ replace (
 )
 
 require (
-	github.com/envoyproxy/go-control-plane v0.13.1
+	github.com/envoyproxy/go-control-plane v0.13.3
 	github.com/envoyproxy/go-control-plane/envoy v1.32.2
 	google.golang.org/grpc v1.69.2
 	gopkg.in/yaml.v2 v2.4.0
