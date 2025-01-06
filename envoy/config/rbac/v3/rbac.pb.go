@@ -423,6 +423,7 @@ func (x *Policy) GetCheckedCondition() *v1alpha1.CheckedExpr {
 // metadata should be sourced from, rather than only matching against dynamic metadata.
 //
 // The matcher can be configured to look up metadata from:
+//
 // * Dynamic metadata: Runtime metadata added by filters during request processing
 // * Route metadata: Static metadata configured on the route entry
 type SourcedMetadata struct {
