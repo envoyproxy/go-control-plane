@@ -8,6 +8,7 @@ package rbacv3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -48,6 +49,16 @@ func (m *RBAC) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.DelayDeny != nil {
+		size, err := (*durationpb.Duration)(m.DelayDeny).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x42
 	}
 	if m.ShadowMatcher != nil {
 		if vtmsg, ok := interface{}(m.ShadowMatcher).(interface {
@@ -214,6 +225,10 @@ func (m *RBAC) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.ShadowMatcher)
 		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.DelayDeny != nil {
+		l = (*durationpb.Duration)(m.DelayDeny).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
