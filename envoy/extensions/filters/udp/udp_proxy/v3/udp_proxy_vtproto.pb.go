@@ -295,6 +295,28 @@ func (m *UdpProxyConfig_UdpTunnelingConfig_RetryOptions) MarshalToSizedBufferVTS
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.BackoffOptions != nil {
+		if vtmsg, ok := interface{}(m.BackoffOptions).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.BackoffOptions)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.MaxConnectAttempts != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.MaxConnectAttempts).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -860,6 +882,16 @@ func (m *UdpProxyConfig_UdpTunnelingConfig_RetryOptions) SizeVT() (n int) {
 	_ = l
 	if m.MaxConnectAttempts != nil {
 		l = (*wrapperspb.UInt32Value)(m.MaxConnectAttempts).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.BackoffOptions != nil {
+		if size, ok := interface{}(m.BackoffOptions).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.BackoffOptions)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
