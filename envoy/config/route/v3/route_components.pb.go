@@ -4390,7 +4390,10 @@ type RouteAction_RequestMirrorPolicy struct {
 	// number is <= the value of the numerator N, or if the key is not present, the default
 	// value, the request will be mirrored.
 	RuntimeFraction *v31.RuntimeFractionalPercent `protobuf:"bytes,3,opt,name=runtime_fraction,json=runtimeFraction,proto3" json:"runtime_fraction,omitempty"`
-	// Determines if the trace span should be sampled. Defaults to true.
+	// Specifies whether the trace span for the shadow request should be sampled. If this field is not explicitly set,
+	// the shadow request will inherit the sampling decision of its parent span. This ensures consistency with the trace
+	// sampling policy of the original request and prevents oversampling, especially in scenarios where runtime sampling
+	// is disabled.
 	TraceSampled *wrapperspb.BoolValue `protobuf:"bytes,4,opt,name=trace_sampled,json=traceSampled,proto3" json:"trace_sampled,omitempty"`
 	// Disables appending the “-shadow“ suffix to the shadowed “Host“ header. Defaults to “false“.
 	DisableShadowHostSuffixAppend bool `protobuf:"varint,6,opt,name=disable_shadow_host_suffix_append,json=disableShadowHostSuffixAppend,proto3" json:"disable_shadow_host_suffix_append,omitempty"`
