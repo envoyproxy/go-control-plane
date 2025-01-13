@@ -165,7 +165,6 @@ type ExternalProcessor struct {
 	// Only one of “grpc_service“ or “http_service“ can be set.
 	// It is required that one of them must be set.
 	GrpcService *v3.GrpcService `protobuf:"bytes,1,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
-	// [#not-implemented-hide:]
 	// Configuration for the HTTP service that the filter will communicate with.
 	// Only one of “http_service“ or
 	// :ref:`grpc_service <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.grpc_service>`.
