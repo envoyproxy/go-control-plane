@@ -6092,9 +6092,17 @@ type RateLimit_Action_RequestHeaders struct {
 	HeaderName string `protobuf:"bytes,1,opt,name=header_name,json=headerName,proto3" json:"header_name,omitempty"`
 	// The key to use in the descriptor entry.
 	DescriptorKey string `protobuf:"bytes,2,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
-	// If set to true, Envoy skips the descriptor while calling rate limiting service
-	// when header is not present in the request. By default it skips calling the
-	// rate limiting service if this header is not present in the request.
+	// Controls the behavior when the specified header is not present in the request.
+	//
+	// If set to “false“ (default):
+	//
+	// * Envoy does **NOT** call the rate limiting service for this descriptor.
+	// * Useful if the header is optional and you prefer to skip rate limiting when it's absent.
+	//
+	// If set to “true“:
+	//
+	// * Envoy calls the rate limiting service but omits this descriptor if the header is missing.
+	// * Useful if you want Envoy to enforce rate limiting even when the header is not present.
 	SkipIfAbsent bool `protobuf:"varint,3,opt,name=skip_if_absent,json=skipIfAbsent,proto3" json:"skip_if_absent,omitempty"`
 }
 
@@ -6170,13 +6178,15 @@ type RateLimit_Action_QueryParameters struct {
 	DescriptorKey string `protobuf:"bytes,2,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
 	// Controls the behavior when the specified query parameter is not present in the request.
 	//
-	// If set to “true“ (default is “false“):
-	// - The rate limiting service will **NOT** be called for this descriptor.
-	// - Useful when the query parameter is optional and you want to skip rate limiting.
+	// If set to “false“ (default):
 	//
-	// If set to “false“:
-	// - The rate limiting service will be called.
-	// - Useful when you want to enforce rate limiting even if the query parameter is missing.
+	// * Envoy does **NOT** call the rate limiting service for this descriptor.
+	// * Useful if the query parameter is optional and you prefer to skip rate limiting when it's absent.
+	//
+	// If set to “true“:
+	//
+	// * Envoy calls the rate limiting service but omits this descriptor if the query parameter is missing.
+	// * Useful if you want Envoy to enforce rate limiting even when the query parameter is not present.
 	SkipIfAbsent bool `protobuf:"varint,3,opt,name=skip_if_absent,json=skipIfAbsent,proto3" json:"skip_if_absent,omitempty"`
 }
 
@@ -6599,9 +6609,18 @@ type RateLimit_Action_MetaData struct {
 	DefaultValue string `protobuf:"bytes,3,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 	// Source of metadata
 	Source RateLimit_Action_MetaData_Source `protobuf:"varint,4,opt,name=source,proto3,enum=envoy.config.route.v3.RateLimit_Action_MetaData_Source" json:"source,omitempty"`
-	// If set to true, Envoy skips the descriptor while calling rate limiting service
-	// when “metadata_key“ is empty and “default_value“ is not set. By default it skips calling the
-	// rate limiting service in that case.
+	// Controls the behavior when the specified “metadata_key“ is empty and “default_value“ is not set.
+	//
+	// If set to “false“ (default):
+	//
+	// * Envoy does **NOT** call the rate limiting service for this descriptor.
+	// * Useful if the metadata is optional and you prefer to skip rate limiting when it's absent.
+	//
+	// If set to “true“:
+	//
+	//   - Envoy calls the rate limiting service but omits this descriptor if the “metadata_key“ is empty and
+	//     “default_value“ is missing.
+	//   - Useful if you want Envoy to enforce rate limiting even when the metadata is not present.
 	SkipIfAbsent bool `protobuf:"varint,5,opt,name=skip_if_absent,json=skipIfAbsent,proto3" json:"skip_if_absent,omitempty"`
 }
 
