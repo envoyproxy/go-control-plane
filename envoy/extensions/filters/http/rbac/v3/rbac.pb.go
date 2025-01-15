@@ -31,34 +31,38 @@ type RBAC struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Specify the RBAC rules to be applied globally.
-	// If absent, no enforcing RBAC policy will be applied.
-	// If present and empty, DENY.
-	// If both rules and matcher are configured, rules will be ignored.
+	// The primary RBAC policy which will be applied globally, to all the incoming requests.
+	//
+	// * If absent, no RBAC enforcement occurs.
+	// * If set but empty, all requests are denied.
+	//
+	// .. note::
+	//
+	//	When both ``rules`` and ``matcher`` are configured, ``rules`` will be ignored.
 	Rules *v3.RBAC `protobuf:"bytes,1,opt,name=rules,proto3" json:"rules,omitempty"`
 	// If specified, rules will emit stats with the given prefix.
-	// This is useful to distinguish the stat when there are more than 1 RBAC filter configured with
-	// rules.
+	// This is useful for distinguishing metrics when multiple RBAC filters are configured.
 	RulesStatPrefix string `protobuf:"bytes,6,opt,name=rules_stat_prefix,json=rulesStatPrefix,proto3" json:"rules_stat_prefix,omitempty"`
-	// The match tree to use when resolving RBAC action for incoming requests. Requests do not
-	// match any matcher will be denied.
-	// If absent, no enforcing RBAC matcher will be applied.
-	// If present and empty, deny all requests.
+	// Match tree for evaluating RBAC actions on incoming requests. Requests not matching any matcher will be denied.
+	//
+	// * If absent, no RBAC enforcement occurs.
+	// * If set but empty, all requests are denied.
 	Matcher *v31.Matcher `protobuf:"bytes,4,opt,name=matcher,proto3" json:"matcher,omitempty"`
-	// Shadow rules are not enforced by the filter (i.e., returning a 403)
-	// but will emit stats and logs and can be used for rule testing.
-	// If absent, no shadow RBAC policy will be applied.
-	// If both shadow rules and shadow matcher are configured, shadow rules will be ignored.
+	// Shadow policy for testing RBAC rules without enforcing them. These rules generate stats and logs but do not deny
+	// requests. If absent, no shadow RBAC policy will be applied.
+	//
+	// .. note::
+	//
+	//	When both ``shadow_rules`` and ``shadow_matcher`` are configured, ``shadow_rules`` will be ignored.
 	ShadowRules *v3.RBAC `protobuf:"bytes,2,opt,name=shadow_rules,json=shadowRules,proto3" json:"shadow_rules,omitempty"`
-	// The match tree to use for emitting stats and logs which can be used for rule testing for
-	// incoming requests.
 	// If absent, no shadow matcher will be applied.
+	// Match tree for testing RBAC rules through stats and logs without enforcing them.
+	// If absent, no shadow matching occurs.
 	ShadowMatcher *v31.Matcher `protobuf:"bytes,5,opt,name=shadow_matcher,json=shadowMatcher,proto3" json:"shadow_matcher,omitempty"`
 	// If specified, shadow rules will emit stats with the given prefix.
-	// This is useful to distinguish the stat when there are more than 1 RBAC filter configured with
-	// shadow rules.
+	// This is useful for distinguishing metrics when multiple RBAC filters use shadow rules.
 	ShadowRulesStatPrefix string `protobuf:"bytes,3,opt,name=shadow_rules_stat_prefix,json=shadowRulesStatPrefix,proto3" json:"shadow_rules_stat_prefix,omitempty"`
-	// If track_per_rule_stats is true, counters will be published for each rule and shadow rule.
+	// If “track_per_rule_stats“ is “true“, counters will be published for each rule and shadow rule.
 	TrackPerRuleStats bool `protobuf:"varint,7,opt,name=track_per_rule_stats,json=trackPerRuleStats,proto3" json:"track_per_rule_stats,omitempty"`
 }
 
@@ -148,8 +152,8 @@ type RBACPerRoute struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Override the global configuration of the filter with this new config.
-	// If absent, the global RBAC policy will be disabled for this route.
+	// Per-route specific RBAC configuration that overrides the global RBAC configuration.
+	// If absent, RBAC policy will be disabled for this route.
 	Rbac *RBAC `protobuf:"bytes,2,opt,name=rbac,proto3" json:"rbac,omitempty"`
 }
 
