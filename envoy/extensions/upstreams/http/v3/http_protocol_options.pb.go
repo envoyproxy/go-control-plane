@@ -203,7 +203,6 @@ type isHttpProtocolOptions_UpstreamProtocolOptions interface {
 
 type HttpProtocolOptions_ExplicitHttpConfig_ struct {
 	// To explicitly configure either HTTP/1 or HTTP/2 (but not both!) use “explicit_http_config“.
-	// If the “explicit_http_config“ is empty, HTTP/1.1 is used.
 	ExplicitHttpConfig *HttpProtocolOptions_ExplicitHttpConfig `protobuf:"bytes,3,opt,name=explicit_http_config,json=explicitHttpConfig,proto3,oneof"`
 }
 
