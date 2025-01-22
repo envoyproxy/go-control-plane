@@ -235,13 +235,14 @@ type HealthCheck struct {
 	//
 	// The default value for "healthy edge interval" is the same as the default interval.
 	HealthyEdgeInterval *durationpb.Duration `protobuf:"bytes,16,opt,name=healthy_edge_interval,json=healthyEdgeInterval,proto3" json:"healthy_edge_interval,omitempty"`
-	// .. attention::
-	// This field is deprecated in favor of the extension
-	// :ref:`event_logger <envoy_v3_api_field_config.core.v3.HealthCheck.event_logger>` and
-	// :ref:`event_log_path <envoy_v3_api_field_extensions.health_check.event_sinks.file.v3.HealthCheckEventFileSink.event_log_path>`
-	// in the file sink extension.
-	//
 	// Specifies the path to the :ref:`health check event log <arch_overview_health_check_logging>`.
+	//
+	// .. attention::
+	//
+	//	This field is deprecated in favor of the extension
+	//	:ref:`event_logger <envoy_v3_api_field_config.core.v3.HealthCheck.event_logger>` and
+	//	:ref:`event_log_path <envoy_v3_api_field_extensions.health_check.event_sinks.file.v3.HealthCheckEventFileSink.event_log_path>`
+	//	in the file sink extension.
 	//
 	// Deprecated: Marked as deprecated in envoy/config/core/v3/health_check.proto.
 	EventLogPath string `protobuf:"bytes,17,opt,name=event_log_path,json=eventLogPath,proto3" json:"event_log_path,omitempty"`

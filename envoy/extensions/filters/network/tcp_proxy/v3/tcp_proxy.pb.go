@@ -92,23 +92,27 @@ type TcpProxy struct {
 	// was established. If not set, there is no max duration. When max_downstream_connection_duration
 	// is reached the connection will be closed. Duration must be at least 1ms.
 	MaxDownstreamConnectionDuration *durationpb.Duration `protobuf:"bytes,13,opt,name=max_downstream_connection_duration,json=maxDownstreamConnectionDuration,proto3" json:"max_downstream_connection_duration,omitempty"`
-	// .. attention::
-	// This field is deprecated in favor of
-	// :ref:`access_log_flush_interval
-	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.access_log_flush_interval>`.
 	// Note that if both this field and :ref:`access_log_flush_interval
 	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.access_log_flush_interval>`
 	// are specified, the former (deprecated field) is ignored.
 	//
+	// .. attention::
+	//
+	//	This field is deprecated in favor of
+	//	:ref:`access_log_flush_interval
+	//	<envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.access_log_flush_interval>`.
+	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto.
 	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,15,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
-	// .. attention::
-	// This field is deprecated in favor of
-	// :ref:`flush_access_log_on_connected
-	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.flush_access_log_on_connected>`.
 	// Note that if both this field and :ref:`flush_access_log_on_connected
 	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.flush_access_log_on_connected>`
 	// are specified, the former (deprecated field) is ignored.
+	//
+	// .. attention::
+	//
+	//	This field is deprecated in favor of
+	//	:ref:`flush_access_log_on_connected
+	//	<envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.flush_access_log_on_connected>`.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto.
 	FlushAccessLogOnConnected bool `protobuf:"varint,16,opt,name=flush_access_log_on_connected,json=flushAccessLogOnConnected,proto3" json:"flush_access_log_on_connected,omitempty"`
