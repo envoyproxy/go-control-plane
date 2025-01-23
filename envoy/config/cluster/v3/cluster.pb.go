@@ -848,6 +848,7 @@ type Cluster struct {
 	// "envoy.filters.network.thrift_proxy". See the extension's documentation for details on
 	// specific options.
 	// [#next-major-version: make this a list of typed extensions.]
+	// [#extension-category: envoy.upstream_options]
 	TypedExtensionProtocolOptions map[string]*anypb.Any `protobuf:"bytes,36,rep,name=typed_extension_protocol_options,json=typedExtensionProtocolOptions,proto3" json:"typed_extension_protocol_options,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// If the DNS refresh rate is specified and the cluster type is either
 	// :ref:`STRICT_DNS<envoy_v3_api_enum_value_config.cluster.v3.Cluster.DiscoveryType.STRICT_DNS>`,
