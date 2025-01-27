@@ -8,7 +8,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20240723142845-024c85f92f20
 	github.com/envoyproxy/go-control-plane/envoy v1.32.3
 	github.com/stretchr/testify v1.10.0
-	google.golang.org/protobuf v1.36.2
+	google.golang.org/protobuf v1.36.4
 	gopkg.in/yaml.v2 v2.4.0
 )
 
