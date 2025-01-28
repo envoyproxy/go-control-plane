@@ -94,6 +94,16 @@ func (m *DnsCacheConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DisableDnsRefreshOnFailure {
+		i--
+		if m.DisableDnsRefreshOnFailure {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x78
+	}
 	if m.DnsMinRefreshRate != nil {
 		size, err := (*durationpb.Duration)(m.DnsMinRefreshRate).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -396,6 +406,9 @@ func (m *DnsCacheConfig) SizeVT() (n int) {
 	if m.DnsMinRefreshRate != nil {
 		l = (*durationpb.Duration)(m.DnsMinRefreshRate).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.DisableDnsRefreshOnFailure {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

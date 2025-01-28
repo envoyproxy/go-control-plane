@@ -320,6 +320,8 @@ func (m *DnsCacheConfig) validate(all bool) error {
 
 	}
 
+	// no validation rules for DisableDnsRefreshOnFailure
+
 	if all {
 		switch v := interface{}(m.GetDnsFailureRefreshRate()).(type) {
 		case interface{ ValidateAll() error }:
