@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -115,7 +116,7 @@ func (stream *mockDeltaStream) Context() context.Context {
 func (stream *mockDeltaStream) Send(resp *discovery.DeltaDiscoveryResponse) error {
 	// Check that nonce is incremented by one
 	stream.nonce++
-	if resp.GetNonce() != fmt.Sprintf("%d", stream.nonce) {
+	if resp.GetNonce() != strconv.Itoa(stream.nonce) {
 		stream.t.Errorf("Nonce => got %q, want %d", resp.GetNonce(), stream.nonce)
 	}
 	// Check that resources are non-empty
@@ -434,7 +435,7 @@ func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
 		resp.recv <- &discovery.DeltaDiscoveryRequest{
 			Node:                   node,
 			TypeUrl:                fmt.Sprintf("%s%d", opaqueType, i%2),
-			ResourceNamesSubscribe: []string{fmt.Sprintf("%d", i)},
+			ResourceNamesSubscribe: []string{strconv.Itoa(i)},
 		}
 	}
 	close(resp.recv)
@@ -651,7 +652,7 @@ func TestDeltaMultipleStreams(t *testing.T) {
 			config,
 			server.CallbackFuncs{
 				StreamDeltaRequestFunc: func(int64, *discovery.DeltaDiscoveryRequest) error {
-					return fmt.Errorf("error")
+					return errors.New("error")
 				},
 			},
 		)

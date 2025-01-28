@@ -18,7 +18,6 @@ package cache
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync/atomic"
 
 	"google.golang.org/protobuf/proto"
@@ -362,7 +361,7 @@ func (r *PassthroughResponse) GetVersion() (string, error) {
 	if discoveryResponse != nil {
 		return discoveryResponse.GetVersionInfo(), nil
 	}
-	return "", fmt.Errorf("DiscoveryResponse is nil")
+	return "", errors.New("DiscoveryResponse is nil")
 }
 
 func (r *PassthroughResponse) GetContext() context.Context {
@@ -375,7 +374,7 @@ func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 	if deltaDiscoveryResponse != nil {
 		return deltaDiscoveryResponse.GetSystemVersionInfo(), nil
 	}
-	return "", fmt.Errorf("DeltaDiscoveryResponse is nil")
+	return "", errors.New("DeltaDiscoveryResponse is nil")
 }
 
 // NextVersionMap returns the version map from a DeltaPassthroughResponse

@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -104,7 +105,7 @@ func (stream *mockStream) Context() context.Context {
 func (stream *mockStream) Send(resp *discovery.DiscoveryResponse) error {
 	// check that nonce is monotonically incrementing
 	stream.nonce++
-	assert.Equal(stream.t, resp.GetNonce(), fmt.Sprintf("%d", stream.nonce))
+	assert.Equal(stream.t, resp.GetNonce(), strconv.Itoa(stream.nonce))
 	// check that version is set
 	assert.NotEmpty(stream.t, resp.GetVersionInfo())
 	// check resources are non-empty
@@ -653,7 +654,7 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 			Node:    node,
 			TypeUrl: fmt.Sprintf("%s%d", opaqueType, i%2),
 			// each subsequent request is assumed to supercede the previous request
-			ResourceNames: []string{fmt.Sprintf("%d", i)},
+			ResourceNames: []string{strconv.Itoa(i)},
 		}
 	}
 	close(resp.recv)
@@ -671,7 +672,7 @@ func TestNilPropagationOverResponseChannelShouldCloseTheStream(t *testing.T) {
 			Node:    node,
 			TypeUrl: nilType,
 			// each subsequent request is assumed to supercede the previous request
-			ResourceNames: []string{fmt.Sprintf("%d", i)},
+			ResourceNames: []string{strconv.Itoa(i)},
 		}
 	}
 	close(resp.recv)
