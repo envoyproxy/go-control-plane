@@ -31,6 +31,8 @@ updates:
             - "k8s.io/*"
   - package-ecosystem: gomod
     directory: /internal/tools
+    allow:
+      - dependency-type: direct
     schedule:
       interval: weekly
   - package-ecosystem: gomod
