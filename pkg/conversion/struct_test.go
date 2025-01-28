@@ -18,6 +18,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
@@ -32,9 +34,7 @@ func TestConversion(t *testing.T) {
 		Node:        &core.Node{Id: "proxy"},
 	}
 	st, err := conversion.MessageToStruct(pb)
-	if err != nil {
-		t.Fatalf("unexpected error %v", err)
-	}
+	require.NoErrorf(t, err, "unexpected error")
 	pbst := map[string]*structpb.Value{
 		"version_info": {Kind: &structpb.Value_StringValue{StringValue: "test"}},
 		"node": {Kind: &structpb.Value_StructValue{StructValue: &structpb.Struct{
@@ -48,19 +48,13 @@ func TestConversion(t *testing.T) {
 	}
 
 	out := &discovery.DiscoveryRequest{}
-	err = conversion.StructToMessage(st, out)
-	if err != nil {
-		t.Fatalf("unexpected error %v", err)
-	}
+	require.NoErrorf(t, conversion.StructToMessage(st, out), "unexpected error")
 	if !cmp.Equal(pb, out, cmp.Comparer(proto.Equal)) {
 		t.Errorf("StructToMessage(%v) => got %v, want %v", st, out, pb)
 	}
 
-	if _, err = conversion.MessageToStruct(nil); err == nil {
-		t.Error("MessageToStruct(nil) => got no error")
-	}
+	_, err = conversion.MessageToStruct(nil)
+	require.Errorf(t, err, "MessageToStruct(nil) => got no error")
 
-	if err = conversion.StructToMessage(nil, &discovery.DiscoveryRequest{}); err == nil {
-		t.Error("StructToMessage(nil) => got no error")
-	}
+	assert.Errorf(t, conversion.StructToMessage(nil, &discovery.DiscoveryRequest{}), "StructToMessage(nil) => got no error")
 }

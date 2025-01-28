@@ -41,28 +41,17 @@ func testResource(s string) types.Resource {
 func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	t.Helper()
 	r := <-ch
-	if r.GetRequest().GetTypeUrl() != testType {
-		t.Errorf("unexpected empty request type URL: %q", r.GetRequest().GetTypeUrl())
-	}
-	if r.GetContext() == nil {
-		t.Errorf("unexpected empty response context")
-	}
+	assert.Equalf(t, testType, r.GetRequest().GetTypeUrl(), "unexpected empty request type URL: %q", r.GetRequest().GetTypeUrl())
+	assert.NotNilf(t, r.GetContext(), "unexpected empty response context")
 	out, err := r.GetDiscoveryResponse()
-	if err != nil {
-		t.Fatal(err)
+	require.NoError(t, err)
+	assert.NotEqualf(t, "", out.GetVersionInfo(), "unexpected response empty version")
+	n := len(out.GetResources())
+	assert.Equalf(t, n, num, "unexpected number of responses: got %d, want %d", n, num)
+	if version != "" {
+		assert.Equalf(t, out.GetVersionInfo(), version, "unexpected version: got %q, want %q", out.GetVersionInfo(), version)
 	}
-	if out.GetVersionInfo() == "" {
-		t.Error("unexpected response empty version")
-	}
-	if n := len(out.GetResources()); n != num {
-		t.Errorf("unexpected number of responses: got %d, want %d", n, num)
-	}
-	if version != "" && out.GetVersionInfo() != version {
-		t.Errorf("unexpected version: got %q, want %q", out.GetVersionInfo(), version)
-	}
-	if out.GetTypeUrl() != testType {
-		t.Errorf("unexpected type URL: %q", out.GetTypeUrl())
-	}
+	assert.Equalf(t, testType, out.GetTypeUrl(), "unexpected type URL: %q", out.GetTypeUrl())
 }
 
 type resourceInfo struct {
@@ -73,16 +62,10 @@ type resourceInfo struct {
 func validateDeltaResponse(t *testing.T, resp DeltaResponse, resources []resourceInfo, deleted []string) {
 	t.Helper()
 
-	if resp.GetDeltaRequest().GetTypeUrl() != testType {
-		t.Errorf("unexpected empty request type URL: %q", resp.GetDeltaRequest().GetTypeUrl())
-	}
+	assert.Equalf(t, testType, resp.GetDeltaRequest().GetTypeUrl(), "unexpected empty request type URL: %q", resp.GetDeltaRequest().GetTypeUrl())
 	out, err := resp.GetDeltaDiscoveryResponse()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(out.GetResources()) != len(resources) {
-		t.Errorf("unexpected number of responses: got %d, want %d", len(out.GetResources()), len(resources))
-	}
+	require.NoError(t, err)
+	assert.Equalf(t, len(out.GetResources()), len(resources), "unexpected number of responses: got %d, want %d", len(out.GetResources()), len(resources))
 	for _, r := range resources {
 		found := false
 		for _, r1 := range out.GetResources() {
@@ -95,16 +78,10 @@ func validateDeltaResponse(t *testing.T, resp DeltaResponse, resources []resourc
 				break
 			}
 		}
-		if !found {
-			t.Errorf("resource with name %q not found in response", r.name)
-		}
+		assert.Truef(t, found, "resource with name %q not found in response", r.name)
 	}
-	if out.GetTypeUrl() != testType {
-		t.Errorf("unexpected type URL: %q", out.GetTypeUrl())
-	}
-	if len(out.GetRemovedResources()) != len(deleted) {
-		t.Errorf("unexpected number of removed resurces: got %d, want %d", len(out.GetRemovedResources()), len(deleted))
-	}
+	assert.Equalf(t, testType, out.GetTypeUrl(), "unexpected type URL: %q", out.GetTypeUrl())
+	assert.Equalf(t, len(out.GetRemovedResources()), len(deleted), "unexpected number of removed resurces: got %d, want %d", len(out.GetRemovedResources()), len(deleted))
 	for _, r := range deleted {
 		found := false
 		for _, rr := range out.GetRemovedResources() {
@@ -113,9 +90,7 @@ func validateDeltaResponse(t *testing.T, resp DeltaResponse, resources []resourc
 				break
 			}
 		}
-		if !found {
-			t.Errorf("Expected resource %s to be deleted", r)
-		}
+		assert.Truef(t, found, "Expected resource %s to be deleted", r)
 	}
 }
 
@@ -134,32 +109,25 @@ func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []reso
 
 func checkWatchCount(t *testing.T, c *LinearCache, name string, count int) {
 	t.Helper()
-	if i := c.NumWatches(name); i != count {
-		t.Errorf("unexpected number of watches for %q: got %d, want %d", name, i, count)
-	}
+	i := c.NumWatches(name)
+	assert.Equalf(t, i, count, "unexpected number of watches for %q: got %d, want %d", name, i, count)
 }
 
 func checkDeltaWatchCount(t *testing.T, c *LinearCache, count int) {
 	t.Helper()
-	if i := c.NumDeltaWatches(); i != count {
-		t.Errorf("unexpected number of delta watches: got %d, want %d", i, count)
-	}
+	i := c.NumDeltaWatches()
+	assert.Equalf(t, i, count, "unexpected number of delta watches: got %d, want %d", i, count)
 }
 
 func checkVersionMapNotSet(t *testing.T, c *LinearCache) {
 	t.Helper()
-	if c.versionMap != nil {
-		t.Errorf("version map is set on the cache with %d elements", len(c.versionMap))
-	}
+	assert.Nilf(t, c.versionMap, "version map is set on the cache with %d elements", len(c.versionMap))
 }
 
 func checkVersionMapSet(t *testing.T, c *LinearCache) {
 	t.Helper()
-	if c.versionMap == nil {
-		t.Errorf("version map is not set on the cache")
-	} else if len(c.versionMap) != len(c.resources) {
-		t.Errorf("version map has the wrong number of elements: %d instead of %d expected", len(c.versionMap), len(c.resources))
-	}
+	assert.NotNilf(t, c.versionMap, "version map is not set on the cache")
+	assert.Equalf(t, len(c.versionMap), len(c.resources), "version map has the wrong number of elements: %d instead of %d expected", len(c.versionMap), len(c.resources))
 }
 
 func mustBlock(t *testing.T, w <-chan Response) {
@@ -180,9 +148,7 @@ func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
 
 func hashResource(t *testing.T, resource types.Resource) string {
 	marshaledResource, err := MarshalResource(resource)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	v := HashResource(marshaledResource)
 	if v == "" {
 		t.Fatal(errors.New("failed to build resource version"))
@@ -213,17 +179,13 @@ func TestLinearCornerCases(t *testing.T) {
 	streamState := stream.NewStreamState(false, map[string]string{})
 	c := NewLinearCache(testType)
 	err := c.UpdateResource("a", nil)
-	if err == nil {
-		t.Error("expected error on nil resource")
-	}
+	require.Errorf(t, err, "expected error on nil resource")
 	// create an incorrect type URL request
 	w := make(chan Response, 1)
 	c.CreateWatch(&Request{TypeUrl: "test"}, streamState, w)
 	select {
 	case r := <-w:
-		if r != nil {
-			t.Error("response should be nil")
-		}
+		assert.Nilf(t, r, "response should be nil")
 	default:
 		t.Error("should receive nil response")
 	}
@@ -325,9 +287,7 @@ func TestLinearGetResources(t *testing.T) {
 
 	resources := c.GetResources()
 
-	if !reflect.DeepEqual(expectedResources, resources) {
-		t.Errorf("resources are not equal. got: %v want: %v", resources, expectedResources)
-	}
+	assert.Truef(t, reflect.DeepEqual(expectedResources, resources), "resources are not equal. got: %v want: %v", resources, expectedResources)
 }
 
 func TestLinearVersionPrefix(t *testing.T) {
