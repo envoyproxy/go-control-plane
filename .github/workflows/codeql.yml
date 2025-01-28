@@ -23,12 +23,6 @@ jobs:
       contents: read
       security-events: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language:
-        - go
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
@@ -36,12 +30,12 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@17a820bf2e43b47be2c72b39cc905417bc1ab6d0  # v3.28.6
       with:
-        languages: ${{ matrix.language }}
+        languages: go
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@17a820bf2e43b47be2c72b39cc905417bc1ab6d0  # v3.28.6
+    - name: Build
+      run: make build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@17a820bf2e43b47be2c72b39cc905417bc1ab6d0  # v3.28.6
       with:
-        category: "/language:${{matrix.language}}"
+        category: "/language:go"
