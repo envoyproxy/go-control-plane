@@ -17,6 +17,14 @@ updates:
     directory: /
     schedule:
       interval: weekly
+  - package-ecosystem: gomod
+    directory: /contrib
+    schedule:
+      interval: weekly
+  - package-ecosystem: gomod
+    directory: /envoy
+    schedule:
+      interval: weekly
   - package-ecosystem: docker
     directory: /examples/dyplomat
     schedule:
@@ -33,6 +41,10 @@ updates:
     directory: /internal/tools
     allow:
       - dependency-type: direct
+    schedule:
+      interval: weekly
+  - package-ecosystem: gomod
+    directory: /ratelimit
     schedule:
       interval: weekly
   - package-ecosystem: gomod
