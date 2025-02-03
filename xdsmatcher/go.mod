@@ -6,7 +6,7 @@ replace github.com/envoyproxy/go-control-plane/envoy => ../envoy
 
 require (
 	github.com/cncf/xds/go v0.0.0-20240905190251-b4127c9b8d78
-	github.com/envoyproxy/go-control-plane/envoy v1.32.3
+	github.com/envoyproxy/go-control-plane/envoy v1.32.4
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/protobuf v1.36.4
 	gopkg.in/yaml.v2 v2.4.0
