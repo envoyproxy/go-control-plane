@@ -38,7 +38,7 @@ const (
 // * issuer: the principal that issues the JWT. If specified, it has to match the “iss“ field in JWT.
 // * allowed audiences: the ones in the token have to be listed here.
 // * how to fetch public key JWKS to verify the token signature.
-// * how to extract JWT token in the request.
+// * how to extract the JWT in the request.
 // * how to pass successfully verified token payload.
 //
 // Example:
@@ -155,7 +155,7 @@ type JwtProvider struct {
 	// Multiple JWTs can be verified for a request. Each JWT has to be extracted from the locations
 	// its provider specified or from the default locations.
 	//
-	// Specify the HTTP headers to extract JWT token. For examples, following config:
+	// Specify the HTTP headers to extract the JWT. For examples, following config:
 	//
 	// .. code-block:: yaml
 	//
@@ -280,7 +280,7 @@ type JwtProvider struct {
 	// such as “exp“, and “nbf“. If not specified, default is 60 seconds.
 	ClockSkewSeconds uint32 `protobuf:"varint,10,opt,name=clock_skew_seconds,json=clockSkewSeconds,proto3" json:"clock_skew_seconds,omitempty"`
 	// Enables JWT cache, its size is specified by “jwt_cache_size“.
-	// Only valid JWT tokens are cached.
+	// Only valid JWTs are cached.
 	JwtCacheConfig *JwtCacheConfig `protobuf:"bytes,12,opt,name=jwt_cache_config,json=jwtCacheConfig,proto3" json:"jwt_cache_config,omitempty"`
 	// Add JWT claim to HTTP Header
 	// Specify the claim name you want to copy in which HTTP header. For examples, following config:
@@ -296,7 +296,7 @@ type JwtProvider struct {
 	//
 	// This header is only reserved for jwt claim; any other value will be overwritten.
 	ClaimToHeaders []*JwtClaimToHeader `protobuf:"bytes,15,rep,name=claim_to_headers,json=claimToHeaders,proto3" json:"claim_to_headers,omitempty"`
-	// Clears route cache in order to allow JWT token to correctly affect
+	// Clears route cache in order to allow the JWT to correctly affect
 	// routing decisions. Filter clears all cached routes when:
 	//
 	// 1. The field is set to “true“.
@@ -544,7 +544,7 @@ type JwtCacheConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The unit is number of JWT tokens, default to 100.
+	// The unit is number of JWTs, default to 100.
 	JwtCacheSize uint32 `protobuf:"varint,1,opt,name=jwt_cache_size,json=jwtCacheSize,proto3" json:"jwt_cache_size,omitempty"`
 }
 
@@ -773,7 +773,7 @@ func (x *JwksAsyncFetch) GetFailedRefetchDuration() *durationpb.Duration {
 	return nil
 }
 
-// This message specifies a header location to extract JWT token.
+// This message specifies a header location to extract the JWT.
 type JwtHeader struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1075,7 +1075,7 @@ type JwtRequirement_AllowMissingOrFailed struct {
 	// The requirement is always satisfied even if JWT is missing or the JWT
 	// verification fails. A typical usage is: this filter is used to only verify
 	// JWTs and pass the verified JWT payloads to another filter, the other filter
-	// will make decision. In this mode, all JWT tokens will be verified.
+	// will make decision. In this mode, all JWTs will be verified.
 	AllowMissingOrFailed *emptypb.Empty `protobuf:"bytes,5,opt,name=allow_missing_or_failed,json=allowMissingOrFailed,proto3,oneof"`
 }
 

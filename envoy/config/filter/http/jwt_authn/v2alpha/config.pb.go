@@ -37,7 +37,7 @@ const (
 // * issuer: the principal that issues the JWT. It has to match the one from the token.
 // * allowed audiences: the ones in the token have to be listed here.
 // * how to fetch public key JWKS to verify the token signature.
-// * how to extract JWT token in the request.
+// * how to extract the JWT in the request.
 // * how to pass successfully verified token payload.
 //
 // Example:
@@ -104,7 +104,7 @@ type JwtProvider struct {
 	// Multiple JWTs can be verified for a request. Each JWT has to be extracted from the locations
 	// its provider specified or from the default locations.
 	//
-	// Specify the HTTP headers to extract JWT token. For examples, following config:
+	// Specify the HTTP headers to extract the JWT. For examples, following config:
 	//
 	// .. code-block:: yaml
 	//
@@ -365,7 +365,7 @@ func (x *RemoteJwks) GetCacheDuration() *durationpb.Duration {
 	return nil
 }
 
-// This message specifies a header location to extract JWT token.
+// This message specifies a header location to extract JWT.
 type JwtHeader struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -667,7 +667,7 @@ type JwtRequirement_AllowMissingOrFailed struct {
 	// The requirement is always satisfied even if JWT is missing or the JWT
 	// verification fails. A typical usage is: this filter is used to only verify
 	// JWTs and pass the verified JWT payloads to another filter, the other filter
-	// will make decision. In this mode, all JWT tokens will be verified.
+	// will make decision. In this mode, all JWTs will be verified.
 	AllowMissingOrFailed *emptypb.Empty `protobuf:"bytes,5,opt,name=allow_missing_or_failed,json=allowMissingOrFailed,proto3,oneof"`
 }
 
