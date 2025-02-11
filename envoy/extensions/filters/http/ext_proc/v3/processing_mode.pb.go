@@ -174,8 +174,8 @@ type ProcessingMode struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// How to handle the request header. Default is "SEND". A value of "DEFAULT" (unset) should be used
-	// with :ref:`mode_override
+	// How to handle the request header. Default is "SEND".
+	// Note this field is ignored in :ref:`mode_override
 	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>`, since mode
 	// overrides can only affect messages exchanged after the request header is processed.
 	RequestHeaderMode ProcessingMode_HeaderSendMode `protobuf:"varint,1,opt,name=request_header_mode,json=requestHeaderMode,proto3,enum=envoy.extensions.filters.http.ext_proc.v3.ProcessingMode_HeaderSendMode" json:"request_header_mode,omitempty"`

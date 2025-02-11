@@ -331,6 +331,7 @@ type ExternalProcessor struct {
 	// can only be overridden by the response message from the external processing server iff the
 	// :ref:`mode_override <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.mode_override>` is allowed by
 	// the “allowed_override_modes“ allow-list below.
+	// Since request_header_mode is not applicable in any way, it's ignored in comparison.
 	AllowedOverrideModes []*ProcessingMode `protobuf:"bytes,22,rep,name=allowed_override_modes,json=allowedOverrideModes,proto3" json:"allowed_override_modes,omitempty"`
 }
 
