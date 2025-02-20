@@ -51,6 +51,30 @@ func (m *ExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.OnProcessingResponse != nil {
+		if vtmsg, ok := interface{}(m.OnProcessingResponse).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.OnProcessingResponse)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xba
+	}
 	if len(m.AllowedOverrideModes) > 0 {
 		for iNdEx := len(m.AllowedOverrideModes) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.AllowedOverrideModes[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -844,6 +868,16 @@ func (m *ExternalProcessor) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.OnProcessingResponse != nil {
+		if size, ok := interface{}(m.OnProcessingResponse).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.OnProcessingResponse)
+		}
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
