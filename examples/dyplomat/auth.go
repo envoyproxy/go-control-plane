@@ -69,7 +69,10 @@ func (t *heptioTokenProvider) refresh() error {
 		fmt.Printf("heptio authenticator error %v", err)
 		return err
 	}
-	rawToken, err := gen.Get(t.clusterName)
+	rawToken, err := gen.GetWithOptions(
+		&heptiotoken.GetTokenOptions{
+			ClusterID: t.clusterName,
+		})
 
 	if err != nil {
 		fmt.Printf("token data invalid %v", err)
