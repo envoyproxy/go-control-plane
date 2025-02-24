@@ -8,6 +8,7 @@ package dynamic_modulesv3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	anypb "github.com/planetscale/vtprotobuf/types/known/anypb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -49,10 +50,13 @@ func (m *DynamicModuleFilter) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.FilterConfig) > 0 {
-		i -= len(m.FilterConfig)
-		copy(dAtA[i:], m.FilterConfig)
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.FilterConfig)))
+	if m.FilterConfig != nil {
+		size, err := (*anypb.Any)(m.FilterConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -108,8 +112,8 @@ func (m *DynamicModuleFilter) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
-	l = len(m.FilterConfig)
-	if l > 0 {
+	if m.FilterConfig != nil {
+		l = (*anypb.Any)(m.FilterConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
