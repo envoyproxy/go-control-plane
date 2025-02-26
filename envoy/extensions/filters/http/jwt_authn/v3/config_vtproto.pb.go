@@ -393,6 +393,11 @@ func (m *JwtCacheConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.JwtMaxTokenSize != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.JwtMaxTokenSize))
+		i--
+		dAtA[i] = 0x10
+	}
 	if m.JwtCacheSize != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.JwtCacheSize))
 		i--
@@ -1511,6 +1516,9 @@ func (m *JwtCacheConfig) SizeVT() (n int) {
 	_ = l
 	if m.JwtCacheSize != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.JwtCacheSize))
+	}
+	if m.JwtMaxTokenSize != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.JwtMaxTokenSize))
 	}
 	n += len(m.unknownFields)
 	return n

@@ -474,6 +474,8 @@ func (m *JwtCacheConfig) validate(all bool) error {
 
 	// no validation rules for JwtCacheSize
 
+	// no validation rules for JwtMaxTokenSize
+
 	if len(errors) > 0 {
 		return JwtCacheConfigMultiError(errors)
 	}
