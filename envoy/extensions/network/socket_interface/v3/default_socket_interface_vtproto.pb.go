@@ -7,6 +7,8 @@
 package socket_interfacev3
 
 import (
+	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -47,6 +49,56 @@ func (m *DefaultSocketInterface) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.IoUringWriteTimeoutMs != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.IoUringWriteTimeoutMs).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.IoUringReadBufferSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.IoUringReadBufferSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.EnableIoUringSubmissionQueuePolling {
+		i--
+		if m.EnableIoUringSubmissionQueuePolling {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.IoUringSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.IoUringSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.EnableIoUring {
+		i--
+		if m.EnableIoUring {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -56,6 +108,24 @@ func (m *DefaultSocketInterface) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.EnableIoUring {
+		n += 2
+	}
+	if m.IoUringSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.IoUringSize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableIoUringSubmissionQueuePolling {
+		n += 2
+	}
+	if m.IoUringReadBufferSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.IoUringReadBufferSize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.IoUringWriteTimeoutMs != nil {
+		l = (*wrapperspb.UInt32Value)(m.IoUringWriteTimeoutMs).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }

@@ -58,6 +58,97 @@ func (m *DefaultSocketInterface) validate(all bool) error {
 
 	var errors []error
 
+	// no validation rules for EnableIoUring
+
+	if all {
+		switch v := interface{}(m.GetIoUringSize()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DefaultSocketInterfaceValidationError{
+					field:  "IoUringSize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DefaultSocketInterfaceValidationError{
+					field:  "IoUringSize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIoUringSize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultSocketInterfaceValidationError{
+				field:  "IoUringSize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for EnableIoUringSubmissionQueuePolling
+
+	if all {
+		switch v := interface{}(m.GetIoUringReadBufferSize()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DefaultSocketInterfaceValidationError{
+					field:  "IoUringReadBufferSize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DefaultSocketInterfaceValidationError{
+					field:  "IoUringReadBufferSize",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIoUringReadBufferSize()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultSocketInterfaceValidationError{
+				field:  "IoUringReadBufferSize",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetIoUringWriteTimeoutMs()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DefaultSocketInterfaceValidationError{
+					field:  "IoUringWriteTimeoutMs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DefaultSocketInterfaceValidationError{
+					field:  "IoUringWriteTimeoutMs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIoUringWriteTimeoutMs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DefaultSocketInterfaceValidationError{
+				field:  "IoUringWriteTimeoutMs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return DefaultSocketInterfaceMultiError(errors)
 	}
