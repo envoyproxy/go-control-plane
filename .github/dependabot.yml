@@ -6,7 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: docker
-    directory: /
+    directories: 
+      - /
+      - /examples/dyplomat
     schedule:
       interval: weekly
   - package-ecosystem: github-actions
@@ -14,23 +16,13 @@ updates:
     schedule:
       interval: weekly
   - package-ecosystem: gomod
-    directory: /
-    schedule:
-      interval: weekly
-  - package-ecosystem: gomod
-    directory: /contrib
-    schedule:
-      interval: weekly
-  - package-ecosystem: gomod
-    directory: /envoy
-    schedule:
-      interval: weekly
-  - package-ecosystem: docker
-    directory: /examples/dyplomat
-    schedule:
-      interval: weekly
-  - package-ecosystem: gomod
-    directory: /examples/dyplomat
+    directories: 
+      - /
+      - /contrib
+      - /envoy
+      - /examples/dyplomat
+      - /ratelimit
+      - /xdsmatcher
     schedule:
       interval: weekly
     groups:
@@ -41,13 +33,5 @@ updates:
     directory: /internal/tools
     allow:
       - dependency-type: direct
-    schedule:
-      interval: weekly
-  - package-ecosystem: gomod
-    directory: /ratelimit
-    schedule:
-      interval: weekly
-  - package-ecosystem: gomod
-    directory: /xdsmatcher
     schedule:
       interval: weekly
