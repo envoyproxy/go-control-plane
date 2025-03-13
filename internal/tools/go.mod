@@ -1,6 +1,7 @@
 module github.com/envoyproxy/go-control-plane/internal/tools
 
 go 1.23
+
 toolchain go1.23.6
 
 require (
