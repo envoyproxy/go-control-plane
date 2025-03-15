@@ -566,6 +566,15 @@ func (m *RedisProxy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.CustomCommands) > 0 {
+		for iNdEx := len(m.CustomCommands) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.CustomCommands[iNdEx])
+			copy(dAtA[i:], m.CustomCommands[iNdEx])
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.CustomCommands[iNdEx])))
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
 	if m.ExternalAuthProvider != nil {
 		size, err := m.ExternalAuthProvider.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1096,6 +1105,12 @@ func (m *RedisProxy) SizeVT() (n int) {
 	if m.ExternalAuthProvider != nil {
 		l = m.ExternalAuthProvider.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if len(m.CustomCommands) > 0 {
+		for _, s := range m.CustomCommands {
+			l = len(s)
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n
