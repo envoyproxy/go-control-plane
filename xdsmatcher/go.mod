@@ -1,6 +1,6 @@
 module github.com/envoyproxy/go-control-plane/xdsmatcher
 
-go 1.23
+go 1.23.0
 
 toolchain go1.23.6
 
