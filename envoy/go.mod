@@ -1,8 +1,8 @@
 module github.com/envoyproxy/go-control-plane/envoy
 
-go 1.23
+go 1.23.0
 
-toolchain go1.23.6
+toolchain go1.24.1
 
 // Used to resolve import issues related to go-control-plane package split (https://github.com/envoyproxy/go-control-plane/issues/1074)
 replace github.com/envoyproxy/go-control-plane@v0.13.4 => ../
@@ -22,7 +22,7 @@ require (
 
 require (
 	cel.dev/expr v0.19.1 // indirect
-	golang.org/x/net v0.34.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/text v0.22.0 // indirect
 )
