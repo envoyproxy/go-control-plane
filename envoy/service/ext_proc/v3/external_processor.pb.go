@@ -205,7 +205,6 @@ type ProcessingRequest struct {
 	//     responses will be ignored. However, it may still close the stream to indicate that no more messages
 	//     are needed.
 	ObservabilityMode bool `protobuf:"varint,10,opt,name=observability_mode,json=observabilityMode,proto3" json:"observability_mode,omitempty"`
-	// [#not-implemented-hide:]
 	// Specify the filter protocol configurations to be sent to the server.
 	// “protocol_config“ is only encoded in the first “ProcessingRequest“ message from the client to the server.
 	ProtocolConfig *ProtocolConfiguration `protobuf:"bytes,11,opt,name=protocol_config,json=protocolConfig,proto3" json:"protocol_config,omitempty"`
