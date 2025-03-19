@@ -29,6 +29,11 @@ const (
 // <envoy_v3_api_field_extensions.http.ext_proc.response_processors.save_processing_response.v3.SaveProcessingResponse.filter_state_name>`].
 // This extension supports saving of request and response headers and trailers,
 // and immediate response.
+//
+// .. note::
+//
+//	Response processors are currently in alpha.
+//
 // [#next-free-field: 7]
 type SaveProcessingResponse struct {
 	state         protoimpl.MessageState
