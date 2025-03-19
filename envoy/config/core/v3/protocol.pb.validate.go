@@ -1271,6 +1271,40 @@ func (m *Http1ProtocolOptions) validate(all bool) error {
 
 	// no validation rules for AllowCustomMethods
 
+	for idx, item := range m.GetIgnoreHttp_11Upgrade() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, Http1ProtocolOptionsValidationError{
+						field:  fmt.Sprintf("IgnoreHttp_11Upgrade[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, Http1ProtocolOptionsValidationError{
+						field:  fmt.Sprintf("IgnoreHttp_11Upgrade[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return Http1ProtocolOptionsValidationError{
+					field:  fmt.Sprintf("IgnoreHttp_11Upgrade[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return Http1ProtocolOptionsMultiError(errors)
 	}
