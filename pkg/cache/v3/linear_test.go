@@ -46,7 +46,7 @@ func verifyResponse(t *testing.T, ch <-chan Response, version string, num int) {
 	assert.NotNilf(t, r.GetContext(), "unexpected empty response context")
 	out, err := r.GetDiscoveryResponse()
 	require.NoError(t, err)
-	assert.NotEqualf(t, "", out.GetVersionInfo(), "unexpected response empty version")
+	assert.NotEmptyf(t, out.GetVersionInfo(), "unexpected response empty version")
 	n := len(out.GetResources())
 	assert.Equalf(t, n, num, "unexpected number of responses: got %d, want %d", n, num)
 	if version != "" {
@@ -66,7 +66,7 @@ func validateDeltaResponse(t *testing.T, resp DeltaResponse, resources []resourc
 	assert.Equalf(t, testType, resp.GetDeltaRequest().GetTypeUrl(), "unexpected empty request type URL: %q", resp.GetDeltaRequest().GetTypeUrl())
 	out, err := resp.GetDeltaDiscoveryResponse()
 	require.NoError(t, err)
-	assert.Equalf(t, len(out.GetResources()), len(resources), "unexpected number of responses: got %d, want %d", len(out.GetResources()), len(resources))
+	assert.Lenf(t, out.GetResources(), len(resources), "unexpected number of responses: got %d, want %d", len(out.GetResources()), len(resources))
 	for _, r := range resources {
 		found := false
 		for _, r1 := range out.GetResources() {
@@ -82,7 +82,7 @@ func validateDeltaResponse(t *testing.T, resp DeltaResponse, resources []resourc
 		assert.Truef(t, found, "resource with name %q not found in response", r.name)
 	}
 	assert.Equalf(t, testType, out.GetTypeUrl(), "unexpected type URL: %q", out.GetTypeUrl())
-	assert.Equalf(t, len(out.GetRemovedResources()), len(deleted), "unexpected number of removed resurces: got %d, want %d", len(out.GetRemovedResources()), len(deleted))
+	assert.Lenf(t, out.GetRemovedResources(), len(deleted), "unexpected number of removed resurces: got %d, want %d", len(out.GetRemovedResources()), len(deleted))
 	for _, r := range deleted {
 		found := false
 		for _, rr := range out.GetRemovedResources() {
@@ -128,7 +128,7 @@ func checkVersionMapNotSet(t *testing.T, c *LinearCache) {
 func checkVersionMapSet(t *testing.T, c *LinearCache) {
 	t.Helper()
 	assert.NotNilf(t, c.versionMap, "version map is not set on the cache")
-	assert.Equalf(t, len(c.versionMap), len(c.resources), "version map has the wrong number of elements: %d instead of %d expected", len(c.versionMap), len(c.resources))
+	assert.Lenf(t, c.versionMap, len(c.resources), "version map has the wrong number of elements: %d instead of %d expected", len(c.versionMap), len(c.resources))
 }
 
 func mustBlock(t *testing.T, w <-chan Response) {
