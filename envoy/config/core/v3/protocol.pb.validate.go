@@ -2267,6 +2267,8 @@ func (m *Http3ProtocolOptions) validate(all bool) error {
 
 	// no validation rules for AllowMetadata
 
+	// no validation rules for DisableQpack
+
 	if len(errors) > 0 {
 		return Http3ProtocolOptionsMultiError(errors)
 	}

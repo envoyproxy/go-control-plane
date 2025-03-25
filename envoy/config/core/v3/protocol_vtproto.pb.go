@@ -1208,6 +1208,16 @@ func (m *Http3ProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.DisableQpack {
+		i--
+		if m.DisableQpack {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x38
+	}
 	if m.AllowMetadata {
 		i--
 		if m.AllowMetadata {
@@ -1764,6 +1774,9 @@ func (m *Http3ProtocolOptions) SizeVT() (n int) {
 		n += 2
 	}
 	if m.AllowMetadata {
+		n += 2
+	}
+	if m.DisableQpack {
 		n += 2
 	}
 	n += len(m.unknownFields)
