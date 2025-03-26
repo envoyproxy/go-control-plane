@@ -1,71 +1,80 @@
-issues:
-  exclude-rules:
-  - linters:
-    - gosec
-    text: 'G101'
-    path: 'pkg/test/resource/v3/secret.go'
-  max-issues-per-linter: 0
-  max-same-issues: 0
-
+version: "2"
 linters:
   enable:
-  - bodyclose
-  - contextcheck
-  - errcheck
-  - errorlint
-  - gofumpt
-  - goimports
-  - gosec
-  - misspell
-  - perfsprint
-  - revive
-  - testifylint
-  - unconvert
-  - unparam
-  - unused
-  - whitespace
-
-linters-settings:
-  exhaustive:
-    default-signifies-exhaustive: true
-  gofumpt:
-    extra-rules: true
-  goimports:
-    local-prefixes: github.com/envoyproxy/go-control-plane
-  gosec:
-    excludes:
-      - G115
-  misspell:
-    locale: US
-  perfsprint:
-    # Optimizes even if it requires an int or uint type cast.
-    int-conversion: true
-    # Optimizes into `err.Error()` even if it is only equivalent for non-nil errors.
-    err-error: true
-    # Optimizes `fmt.Errorf`.
-    errorf: true
-    # Optimizes `fmt.Sprintf` with only one argument.
-    sprintf1: true
-    # Optimizes into strings concatenation.
-    strconcat: true
-  testifylint:
-    disable:
-    - float-compare
-    - go-require
-    enable:
-    - bool-compare
-    - compares
-    - empty
-    - error-is-as
-    - error-nil
-    - expected-actual
-    - len
-    - require-error
-    - suite-dont-use-pkg
-    - suite-extra-assert-call
-
-  unparam:
-    check-exported: false
-
-run:
-  timeout: 10m
+    - bodyclose
+    - contextcheck
+    - errorlint
+    - gosec
+    - misspell
+    - perfsprint
+    - revive
+    - testifylint
+    - unconvert
+    - unparam
+    - whitespace
+  settings:
+    exhaustive:
+      default-signifies-exhaustive: true
+    gosec:
+      excludes:
+        - G115
+    misspell:
+      locale: US
+    perfsprint:
+      int-conversion: true
+      err-error: true
+      errorf: true
+      sprintf1: true
+      strconcat: true
+    testifylint:
+      enable:
+        - bool-compare
+        - compares
+        - empty
+        - error-is-as
+        - error-nil
+        - expected-actual
+        - len
+        - require-error
+        - suite-dont-use-pkg
+        - suite-extra-assert-call
+      disable:
+        - float-compare
+        - go-require
+    unparam:
+      check-exported: false
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - gosec
+        path: pkg/test/resource/v3/secret.go
+        text: G101
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    gofumpt:
+      extra-rules: true
+    goimports:
+      local-prefixes:
+        - github.com/envoyproxy/go-control-plane
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

@@ -495,7 +495,7 @@ func TestDeltaWildcardSubscriptions(t *testing.T) {
 		select {
 		case response := <-replies:
 			assert.Equal(t, rsrc.EndpointType, response.GetTypeUrl())
-			if assert.Equal(t, len(expectedResources), len(response.GetResources())) {
+			if assert.Len(t, response.GetResources(), len(expectedResources)) {
 				var names []string
 				for _, resource := range response.GetResources() {
 					names = append(names, resource.GetName())
