@@ -379,8 +379,16 @@ func (*ProcessingRequest_RequestTrailers) isProcessingRequest_Request() {}
 
 func (*ProcessingRequest_ResponseTrailers) isProcessingRequest_Request() {}
 
-// For every ProcessingRequest received by the server with the “observability_mode“ field
-// set to false, the server must send back exactly one ProcessingResponse message.
+// This represents the different types of messages the server may send back to Envoy
+// when the “observability_mode“ field in the received ProcessingRequest is set to false.
+//
+//   - If the corresponding “BodySendMode“ in the
+//     :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
+//     is not set to “FULL_DUPLEX_STREAMED“, then for every received ProcessingRequest,
+//     the server must send back exactly one ProcessingResponse message.
+//   - If it is set to “FULL_DUPLEX_STREAMED“, the server must follow the API defined
+//     for this mode to send the ProcessingResponse messages.
+//
 // [#next-free-field: 11]
 type ProcessingResponse struct {
 	state         protoimpl.MessageState
