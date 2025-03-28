@@ -1769,7 +1769,7 @@ type TrackClusterStats struct {
 	TimeoutBudgets bool `protobuf:"varint,1,opt,name=timeout_budgets,json=timeoutBudgets,proto3" json:"timeout_budgets,omitempty"`
 	// If request_response_sizes is true, then the :ref:`histograms
 	// <config_cluster_manager_cluster_stats_request_response_sizes>`  tracking header and body sizes
-	// of requests and responses will be published.
+	// of requests and responses will be published. Additionally, number of headers in the requests and responses will be tracked.
 	RequestResponseSizes bool `protobuf:"varint,2,opt,name=request_response_sizes,json=requestResponseSizes,proto3" json:"request_response_sizes,omitempty"`
 	// If true, some stats will be emitted per-endpoint, similar to the stats in admin “/clusters“
 	// output.
