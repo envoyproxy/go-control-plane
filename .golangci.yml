@@ -1,4 +1,18 @@
-version: "2"
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+  settings:
+    gofumpt:
+      extra-rules: true
+    goimports:
+      local-prefixes:
+        - github.com/envoyproxy/go-control-plane
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
 linters:
   enable:
     - bodyclose
@@ -12,6 +26,18 @@ linters:
     - unconvert
     - unparam
     - whitespace
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - gosec
+        path: pkg/test/resource/v3/secret.go
+        text: G101
   settings:
     exhaustive:
       default-signifies-exhaustive: true
@@ -27,54 +53,10 @@ linters:
       sprintf1: true
       strconcat: true
     testifylint:
-      enable:
-        - bool-compare
-        - compares
-        - empty
-        - error-is-as
-        - error-nil
-        - expected-actual
-        - len
-        - require-error
-        - suite-dont-use-pkg
-        - suite-extra-assert-call
       disable:
         - float-compare
         - go-require
+      enable-all: true
     unparam:
       check-exported: false
-  exclusions:
-    generated: lax
-    presets:
-      - comments
-      - common-false-positives
-      - legacy
-      - std-error-handling
-    rules:
-      - linters:
-          - gosec
-        path: pkg/test/resource/v3/secret.go
-        text: G101
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
-issues:
-  max-issues-per-linter: 0
-  max-same-issues: 0
-formatters:
-  enable:
-    - gofumpt
-    - goimports
-  settings:
-    gofumpt:
-      extra-rules: true
-    goimports:
-      local-prefixes:
-        - github.com/envoyproxy/go-control-plane
-  exclusions:
-    generated: lax
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
+version: "2"
