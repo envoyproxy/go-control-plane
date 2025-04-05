@@ -1144,6 +1144,13 @@ func (m *JwtAuthentication) MarshalToSizedBufferVTStrict(dAtA []byte) (int, erro
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.StatPrefix) > 0 {
+		i -= len(m.StatPrefix)
+		copy(dAtA[i:], m.StatPrefix)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.StatPrefix)))
+		i--
+		dAtA[i] = 0x3a
+	}
 	if m.StripFailureResponse {
 		i--
 		if m.StripFailureResponse {
@@ -1863,6 +1870,10 @@ func (m *JwtAuthentication) SizeVT() (n int) {
 	}
 	if m.StripFailureResponse {
 		n += 2
+	}
+	l = len(m.StatPrefix)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

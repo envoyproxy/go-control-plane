@@ -2316,6 +2316,8 @@ func (m *JwtAuthentication) validate(all bool) error {
 
 	// no validation rules for StripFailureResponse
 
+	// no validation rules for StatPrefix
+
 	if len(errors) > 0 {
 		return JwtAuthenticationMultiError(errors)
 	}
