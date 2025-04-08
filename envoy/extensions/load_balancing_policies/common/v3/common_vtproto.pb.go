@@ -51,6 +51,16 @@ func (m *LocalityLbConfig_ZoneAwareLbConfig) MarshalToSizedBufferVTStrict(dAtA [
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ForceLocalityDirectRouting {
+		i--
+		if m.ForceLocalityDirectRouting {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.FailTrafficOnPanic {
 		i--
 		if m.FailTrafficOnPanic {
@@ -383,6 +393,9 @@ func (m *LocalityLbConfig_ZoneAwareLbConfig) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.FailTrafficOnPanic {
+		n += 2
+	}
+	if m.ForceLocalityDirectRouting {
 		n += 2
 	}
 	n += len(m.unknownFields)

@@ -625,6 +625,8 @@ func (m *LocalityLbConfig_ZoneAwareLbConfig) validate(all bool) error {
 
 	// no validation rules for FailTrafficOnPanic
 
+	// no validation rules for ForceLocalityDirectRouting
+
 	if len(errors) > 0 {
 		return LocalityLbConfig_ZoneAwareLbConfigMultiError(errors)
 	}
