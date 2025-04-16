@@ -408,6 +408,11 @@ type Listener struct {
 	// accepted in later event loop iterations.
 	// If no value is provided Envoy will accept all connections pending accept
 	// from the kernel.
+	//
+	// .. note::
+	//
+	//	It is recommended to lower this value for better overload management and reduced per-event cost.
+	//	Setting it to 1 is a viable option with no noticeable impact on performance.
 	MaxConnectionsToAcceptPerSocketEvent *wrapperspb.UInt32Value `protobuf:"bytes,34,opt,name=max_connections_to_accept_per_socket_event,json=maxConnectionsToAcceptPerSocketEvent,proto3" json:"max_connections_to_accept_per_socket_event,omitempty"`
 	// Whether the listener should bind to the port. A listener that doesn't
 	// bind can only receive connections redirected from other listeners that set
