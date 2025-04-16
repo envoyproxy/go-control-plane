@@ -23,7 +23,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 // “GrpcJsonReverseTranscoder“ is the filter configuration for the gRPC JSON
 // reverse transcoder. The reverse transcoder acts as a bridge between a gRPC
 // client and an HTTP/JSON server, converting the gRPC request into HTTP/JSON
@@ -64,6 +64,10 @@ type GrpcJsonReverseTranscoder struct {
 	MaxResponseBodySize *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=max_response_body_size,json=maxResponseBodySize,proto3" json:"max_response_body_size,omitempty"`
 	// The name of the header field that has the API version of the request.
 	ApiVersionHeader string `protobuf:"bytes,5,opt,name=api_version_header,json=apiVersionHeader,proto3" json:"api_version_header,omitempty"`
+	// Control options for upstream request JSON. These options are passed directly to
+	// `JsonPrintOptions <https://developers.google.com/protocol-buffers/docs/reference/cpp/
+	// google.protobuf.util.json_util#JsonPrintOptions>`_.
+	RequestJsonPrintOptions *GrpcJsonReverseTranscoder_PrintOptions `protobuf:"bytes,6,opt,name=request_json_print_options,json=requestJsonPrintOptions,proto3" json:"request_json_print_options,omitempty"`
 }
 
 func (x *GrpcJsonReverseTranscoder) Reset() {
@@ -133,6 +137,129 @@ func (x *GrpcJsonReverseTranscoder) GetApiVersionHeader() string {
 	return ""
 }
 
+func (x *GrpcJsonReverseTranscoder) GetRequestJsonPrintOptions() *GrpcJsonReverseTranscoder_PrintOptions {
+	if x != nil {
+		return x.RequestJsonPrintOptions
+	}
+	return nil
+}
+
+type GrpcJsonReverseTranscoder_PrintOptions struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Whether to always print primitive fields. By default primitive
+	// fields with default values will be omitted in JSON output. For
+	// example, an int32 field set to 0 will be omitted. Setting this flag to
+	// true will override the default behavior and print primitive fields
+	// regardless of their values. Defaults to false.
+	AlwaysPrintPrimitiveFields bool `protobuf:"varint,1,opt,name=always_print_primitive_fields,json=alwaysPrintPrimitiveFields,proto3" json:"always_print_primitive_fields,omitempty"`
+	// Whether to always print enums as ints. By default they are rendered
+	// as strings. Defaults to false.
+	AlwaysPrintEnumsAsInts bool `protobuf:"varint,2,opt,name=always_print_enums_as_ints,json=alwaysPrintEnumsAsInts,proto3" json:"always_print_enums_as_ints,omitempty"`
+	// Whether to convert the proto field names to “json_name“ annotation value, or lower camel case,
+	// in absence of “json_name“. By default the field names will be preserved after conversion.
+	// Setting this flag will convert the field names to their canonical form. Defaults to false.
+	//
+	// Example:
+	//
+	// .. code-block:: proto
+	//
+	//	message Author {
+	//	  int64 id = 1;
+	//	  enum Gender {
+	//	    UNKNOWN = 0;
+	//	    MALE = 1;
+	//	    FEMALE = 2;
+	//	  };
+	//	  Gender gender = 2;
+	//	  string first_name = 3;
+	//	  string last_name = 4 [json_name = "lname"];
+	//	}
+	//
+	// The above proto message after being transcoded to JSON with
+	// “use_canonical_field_names“ set to “false“ will have the
+	// field names same as in the proto message, as follows:
+	//
+	// .. code-block:: json
+	//
+	//	{
+	//	  "id": "12345",
+	//	  "gender": "MALE",
+	//	  "first_name": "John",
+	//	  "last_name": "Doe"
+	//	}
+	//
+	// and with the “use_canonical_field_names“ set to “true“, the
+	// transcoded JSON will have “first_name“ converted to camelCase
+	// and “last_name“ converted to its “json_name“ annotation value,
+	// as follows:
+	//
+	// .. code-block:: json
+	//
+	//	{
+	//	  "id": "12345",
+	//	  "gender": "MALE",
+	//	  "firstName": "John",
+	//	  "lname": "Doe"
+	//	}
+	UseCanonicalFieldNames bool `protobuf:"varint,3,opt,name=use_canonical_field_names,json=useCanonicalFieldNames,proto3" json:"use_canonical_field_names,omitempty"`
+}
+
+func (x *GrpcJsonReverseTranscoder_PrintOptions) Reset() {
+	*x = GrpcJsonReverseTranscoder_PrintOptions{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GrpcJsonReverseTranscoder_PrintOptions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrpcJsonReverseTranscoder_PrintOptions) ProtoMessage() {}
+
+func (x *GrpcJsonReverseTranscoder_PrintOptions) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrpcJsonReverseTranscoder_PrintOptions.ProtoReflect.Descriptor instead.
+func (*GrpcJsonReverseTranscoder_PrintOptions) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *GrpcJsonReverseTranscoder_PrintOptions) GetAlwaysPrintPrimitiveFields() bool {
+	if x != nil {
+		return x.AlwaysPrintPrimitiveFields
+	}
+	return false
+}
+
+func (x *GrpcJsonReverseTranscoder_PrintOptions) GetAlwaysPrintEnumsAsInts() bool {
+	if x != nil {
+		return x.AlwaysPrintEnumsAsInts
+	}
+	return false
+}
+
+func (x *GrpcJsonReverseTranscoder_PrintOptions) GetUseCanonicalFieldNames() bool {
+	if x != nil {
+		return x.UseCanonicalFieldNames
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto protoreflect.FileDescriptor
 
 var file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_rawDesc = []byte{
@@ -150,7 +277,7 @@ var file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcode
 	0x1d, 0x75, 0x64, 0x70, 0x61, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e,
 	0x73, 0x2f, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x17,
 	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x65, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
-	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xd5, 0x02, 0x0a, 0x19, 0x47, 0x72, 0x70, 0x63,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xc5, 0x05, 0x0a, 0x19, 0x47, 0x72, 0x70, 0x63,
 	0x4a, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x76, 0x65, 0x72, 0x73, 0x65, 0x54, 0x72, 0x61, 0x6e, 0x73,
 	0x63, 0x6f, 0x64, 0x65, 0x72, 0x12, 0x27, 0x0a, 0x0f, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70,
 	0x74, 0x6f, 0x72, 0x5f, 0x70, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e,
@@ -171,7 +298,30 @@ var file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcode
 	0x78, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x6f, 0x64, 0x79, 0x53, 0x69, 0x7a,
 	0x65, 0x12, 0x2c, 0x0a, 0x12, 0x61, 0x70, 0x69, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
 	0x5f, 0x68, 0x65, 0x61, 0x64, 0x65, 0x72, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x61,
-	0x70, 0x69, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x42,
+	0x70, 0x69, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x61, 0x64, 0x65, 0x72, 0x12,
+	0xa2, 0x01, 0x0a, 0x1a, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x5f, 0x6a, 0x73, 0x6f, 0x6e,
+	0x5f, 0x70, 0x72, 0x69, 0x6e, 0x74, 0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x06,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x65, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e, 0x65, 0x78, 0x74,
+	0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x73, 0x2e,
+	0x68, 0x74, 0x74, 0x70, 0x2e, 0x67, 0x72, 0x70, 0x63, 0x5f, 0x6a, 0x73, 0x6f, 0x6e, 0x5f, 0x72,
+	0x65, 0x76, 0x65, 0x72, 0x73, 0x65, 0x5f, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x63, 0x6f, 0x64, 0x65,
+	0x72, 0x2e, 0x76, 0x33, 0x2e, 0x47, 0x72, 0x70, 0x63, 0x4a, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x76,
+	0x65, 0x72, 0x73, 0x65, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x63, 0x6f, 0x64, 0x65, 0x72, 0x2e, 0x50,
+	0x72, 0x69, 0x6e, 0x74, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x17, 0x72, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x4a, 0x73, 0x6f, 0x6e, 0x50, 0x72, 0x69, 0x6e, 0x74, 0x4f, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x1a, 0xc8, 0x01, 0x0a, 0x0c, 0x50, 0x72, 0x69, 0x6e, 0x74, 0x4f, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x41, 0x0a, 0x1d, 0x61, 0x6c, 0x77, 0x61, 0x79, 0x73, 0x5f,
+	0x70, 0x72, 0x69, 0x6e, 0x74, 0x5f, 0x70, 0x72, 0x69, 0x6d, 0x69, 0x74, 0x69, 0x76, 0x65, 0x5f,
+	0x66, 0x69, 0x65, 0x6c, 0x64, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x1a, 0x61, 0x6c,
+	0x77, 0x61, 0x79, 0x73, 0x50, 0x72, 0x69, 0x6e, 0x74, 0x50, 0x72, 0x69, 0x6d, 0x69, 0x74, 0x69,
+	0x76, 0x65, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x73, 0x12, 0x3a, 0x0a, 0x1a, 0x61, 0x6c, 0x77, 0x61,
+	0x79, 0x73, 0x5f, 0x70, 0x72, 0x69, 0x6e, 0x74, 0x5f, 0x65, 0x6e, 0x75, 0x6d, 0x73, 0x5f, 0x61,
+	0x73, 0x5f, 0x69, 0x6e, 0x74, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x16, 0x61, 0x6c,
+	0x77, 0x61, 0x79, 0x73, 0x50, 0x72, 0x69, 0x6e, 0x74, 0x45, 0x6e, 0x75, 0x6d, 0x73, 0x41, 0x73,
+	0x49, 0x6e, 0x74, 0x73, 0x12, 0x39, 0x0a, 0x19, 0x75, 0x73, 0x65, 0x5f, 0x63, 0x61, 0x6e, 0x6f,
+	0x6e, 0x69, 0x63, 0x61, 0x6c, 0x5f, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x16, 0x75, 0x73, 0x65, 0x43, 0x61, 0x6e, 0x6f,
+	0x6e, 0x69, 0x63, 0x61, 0x6c, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x42,
 	0xee, 0x01, 0xba, 0x80, 0xc8, 0xd1, 0x06, 0x02, 0x10, 0x02, 0x0a, 0x4b, 0x69, 0x6f, 0x2e, 0x65,
 	0x6e, 0x76, 0x6f, 0x79, 0x70, 0x72, 0x6f, 0x78, 0x79, 0x2e, 0x65, 0x6e, 0x76, 0x6f, 0x79, 0x2e,
 	0x65, 0x78, 0x74, 0x65, 0x6e, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x66, 0x69, 0x6c, 0x74, 0x65,
@@ -202,19 +352,21 @@ func file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcod
 	return file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_goTypes = []interface{}{
-	(*GrpcJsonReverseTranscoder)(nil), // 0: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder
-	(*wrapperspb.UInt32Value)(nil),    // 1: google.protobuf.UInt32Value
+	(*GrpcJsonReverseTranscoder)(nil),              // 0: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder
+	(*GrpcJsonReverseTranscoder_PrintOptions)(nil), // 1: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder.PrintOptions
+	(*wrapperspb.UInt32Value)(nil),                 // 2: google.protobuf.UInt32Value
 }
 var file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_depIdxs = []int32{
-	1, // 0: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	1, // 1: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder.max_response_body_size:type_name -> google.protobuf.UInt32Value
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	2, // 1: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder.max_response_body_size:type_name -> google.protobuf.UInt32Value
+	1, // 2: envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder.request_json_print_options:type_name -> envoy.extensions.filters.http.grpc_json_reverse_transcoder.v3.GrpcJsonReverseTranscoder.PrintOptions
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() {
@@ -237,6 +389,18 @@ func file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcod
 				return nil
 			}
 		}
+		file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GrpcJsonReverseTranscoder_PrintOptions); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -244,7 +408,7 @@ func file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcod
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_envoy_extensions_filters_http_grpc_json_reverse_transcoder_v3_transcoder_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

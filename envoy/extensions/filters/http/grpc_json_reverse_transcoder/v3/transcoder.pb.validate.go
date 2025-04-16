@@ -94,6 +94,35 @@ func (m *GrpcJsonReverseTranscoder) validate(all bool) error {
 
 	// no validation rules for ApiVersionHeader
 
+	if all {
+		switch v := interface{}(m.GetRequestJsonPrintOptions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GrpcJsonReverseTranscoderValidationError{
+					field:  "RequestJsonPrintOptions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GrpcJsonReverseTranscoderValidationError{
+					field:  "RequestJsonPrintOptions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequestJsonPrintOptions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GrpcJsonReverseTranscoderValidationError{
+				field:  "RequestJsonPrintOptions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return GrpcJsonReverseTranscoderMultiError(errors)
 	}
@@ -173,3 +202,115 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GrpcJsonReverseTranscoderValidationError{}
+
+// Validate checks the field values on GrpcJsonReverseTranscoder_PrintOptions
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *GrpcJsonReverseTranscoder_PrintOptions) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// GrpcJsonReverseTranscoder_PrintOptions with the rules defined in the proto
+// definition for this message. If any rules are violated, the result is a
+// list of violation errors wrapped in
+// GrpcJsonReverseTranscoder_PrintOptionsMultiError, or nil if none found.
+func (m *GrpcJsonReverseTranscoder_PrintOptions) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GrpcJsonReverseTranscoder_PrintOptions) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AlwaysPrintPrimitiveFields
+
+	// no validation rules for AlwaysPrintEnumsAsInts
+
+	// no validation rules for UseCanonicalFieldNames
+
+	if len(errors) > 0 {
+		return GrpcJsonReverseTranscoder_PrintOptionsMultiError(errors)
+	}
+
+	return nil
+}
+
+// GrpcJsonReverseTranscoder_PrintOptionsMultiError is an error wrapping
+// multiple validation errors returned by
+// GrpcJsonReverseTranscoder_PrintOptions.ValidateAll() if the designated
+// constraints aren't met.
+type GrpcJsonReverseTranscoder_PrintOptionsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GrpcJsonReverseTranscoder_PrintOptionsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GrpcJsonReverseTranscoder_PrintOptionsMultiError) AllErrors() []error { return m }
+
+// GrpcJsonReverseTranscoder_PrintOptionsValidationError is the validation
+// error returned by GrpcJsonReverseTranscoder_PrintOptions.Validate if the
+// designated constraints aren't met.
+type GrpcJsonReverseTranscoder_PrintOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GrpcJsonReverseTranscoder_PrintOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GrpcJsonReverseTranscoder_PrintOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GrpcJsonReverseTranscoder_PrintOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GrpcJsonReverseTranscoder_PrintOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GrpcJsonReverseTranscoder_PrintOptionsValidationError) ErrorName() string {
+	return "GrpcJsonReverseTranscoder_PrintOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GrpcJsonReverseTranscoder_PrintOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGrpcJsonReverseTranscoder_PrintOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GrpcJsonReverseTranscoder_PrintOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GrpcJsonReverseTranscoder_PrintOptionsValidationError{}
