@@ -1,9 +1,6 @@
 module github.com/envoyproxy/go-control-plane/examples/dyplomat
 
 go 1.23.4
-
-toolchain go1.23.6
-
 replace (
 	github.com/envoyproxy/go-control-plane => ../..
 	github.com/envoyproxy/go-control-plane/envoy => ../../envoy
@@ -18,14 +15,14 @@ require (
 	k8s.io/api v0.32.3
 	k8s.io/apimachinery v0.32.3
 	k8s.io/client-go v0.32.3
-	sigs.k8s.io/aws-iam-authenticator v0.6.31
+	sigs.k8s.io/aws-iam-authenticator v0.7.1
 )
 
 require (
 	cel.dev/expr v0.20.0 // indirect
-	github.com/aws/aws-sdk-go v1.55.5 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.32.7 // indirect
-	github.com/aws/smithy-go v1.22.1 // indirect
+	github.com/aws/aws-sdk-go v1.55.6 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
+	github.com/aws/smithy-go v1.22.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
