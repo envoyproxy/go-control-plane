@@ -1185,6 +1185,8 @@ type ClusterSpecifierPlugin struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The name of the plugin and its opaque configuration.
+	//
+	// [#extension-category: envoy.router.cluster_specifier_plugin]
 	Extension *v31.TypedExtensionConfig `protobuf:"bytes,1,opt,name=extension,proto3" json:"extension,omitempty"`
 	// If is_optional is not set or is set to false and the plugin defined by this message is not a
 	// supported type, the containing resource is NACKed. If is_optional is set to true, the resource
