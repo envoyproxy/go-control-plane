@@ -79,9 +79,10 @@ func (ProcessingMode_DataSendMode) EnumDescriptor() ([]byte, []int) {
 // this filter operates at the L4 (transport) layer, giving access to raw network traffic.
 //
 // The filter communicates with an external gRPC service that can:
-// * Inspect traffic in both directions
-// * Modify the network traffic
-// * Control connection lifecycle (continue, close, or reset)
+//
+// 1. Inspect traffic in both directions
+// 2. Modify the network traffic
+// 3. Control connection lifecycle (continue, close, or reset)
 //
 // By using the filter's processing mode, you can selectively choose which data
 // directions to process (read, write or both), allowing for efficient processing.
