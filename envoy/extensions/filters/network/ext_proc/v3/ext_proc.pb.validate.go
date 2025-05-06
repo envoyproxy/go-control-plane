@@ -149,6 +149,17 @@ func (m *NetworkExternalProcessor) validate(all bool) error {
 		}
 	}
 
+	if utf8.RuneCountInString(m.GetStatPrefix()) < 1 {
+		err := NetworkExternalProcessorValidationError{
+			field:  "StatPrefix",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return NetworkExternalProcessorMultiError(errors)
 	}
