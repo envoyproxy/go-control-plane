@@ -147,6 +147,35 @@ func (m *AwsCredentialProvider) validate(all bool) error {
 
 	// no validation rules for CustomCredentialProviderChain
 
+	if all {
+		switch v := interface{}(m.GetIamRolesAnywhereCredentialProvider()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AwsCredentialProviderValidationError{
+					field:  "IamRolesAnywhereCredentialProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AwsCredentialProviderValidationError{
+					field:  "IamRolesAnywhereCredentialProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIamRolesAnywhereCredentialProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AwsCredentialProviderValidationError{
+				field:  "IamRolesAnywhereCredentialProvider",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return AwsCredentialProviderMultiError(errors)
 	}
@@ -636,3 +665,283 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CredentialsFileCredentialProviderValidationError{}
+
+// Validate checks the field values on IAMRolesAnywhereCredentialProvider with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *IAMRolesAnywhereCredentialProvider) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IAMRolesAnywhereCredentialProvider
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// IAMRolesAnywhereCredentialProviderMultiError, or nil if none found.
+func (m *IAMRolesAnywhereCredentialProvider) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IAMRolesAnywhereCredentialProvider) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetRoleArn()) < 1 {
+		err := IAMRolesAnywhereCredentialProviderValidationError{
+			field:  "RoleArn",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetCertificate() == nil {
+		err := IAMRolesAnywhereCredentialProviderValidationError{
+			field:  "Certificate",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetCertificate()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IAMRolesAnywhereCredentialProviderValidationError{
+					field:  "Certificate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IAMRolesAnywhereCredentialProviderValidationError{
+					field:  "Certificate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCertificate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IAMRolesAnywhereCredentialProviderValidationError{
+				field:  "Certificate",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCertificateChain()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IAMRolesAnywhereCredentialProviderValidationError{
+					field:  "CertificateChain",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IAMRolesAnywhereCredentialProviderValidationError{
+					field:  "CertificateChain",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCertificateChain()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IAMRolesAnywhereCredentialProviderValidationError{
+				field:  "CertificateChain",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.GetPrivateKey() == nil {
+		err := IAMRolesAnywhereCredentialProviderValidationError{
+			field:  "PrivateKey",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetPrivateKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IAMRolesAnywhereCredentialProviderValidationError{
+					field:  "PrivateKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IAMRolesAnywhereCredentialProviderValidationError{
+					field:  "PrivateKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPrivateKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IAMRolesAnywhereCredentialProviderValidationError{
+				field:  "PrivateKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if utf8.RuneCountInString(m.GetTrustAnchorArn()) < 1 {
+		err := IAMRolesAnywhereCredentialProviderValidationError{
+			field:  "TrustAnchorArn",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetProfileArn()) < 1 {
+		err := IAMRolesAnywhereCredentialProviderValidationError{
+			field:  "ProfileArn",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for RoleSessionName
+
+	if d := m.GetSessionDuration(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = IAMRolesAnywhereCredentialProviderValidationError{
+				field:  "SessionDuration",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			lte := time.Duration(43200*time.Second + 0*time.Nanosecond)
+			gte := time.Duration(900*time.Second + 0*time.Nanosecond)
+
+			if dur < gte || dur > lte {
+				err := IAMRolesAnywhereCredentialProviderValidationError{
+					field:  "SessionDuration",
+					reason: "value must be inside range [15m0s, 12h0m0s]",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return IAMRolesAnywhereCredentialProviderMultiError(errors)
+	}
+
+	return nil
+}
+
+// IAMRolesAnywhereCredentialProviderMultiError is an error wrapping multiple
+// validation errors returned by
+// IAMRolesAnywhereCredentialProvider.ValidateAll() if the designated
+// constraints aren't met.
+type IAMRolesAnywhereCredentialProviderMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IAMRolesAnywhereCredentialProviderMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IAMRolesAnywhereCredentialProviderMultiError) AllErrors() []error { return m }
+
+// IAMRolesAnywhereCredentialProviderValidationError is the validation error
+// returned by IAMRolesAnywhereCredentialProvider.Validate if the designated
+// constraints aren't met.
+type IAMRolesAnywhereCredentialProviderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IAMRolesAnywhereCredentialProviderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IAMRolesAnywhereCredentialProviderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IAMRolesAnywhereCredentialProviderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IAMRolesAnywhereCredentialProviderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IAMRolesAnywhereCredentialProviderValidationError) ErrorName() string {
+	return "IAMRolesAnywhereCredentialProviderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IAMRolesAnywhereCredentialProviderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIAMRolesAnywhereCredentialProvider.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IAMRolesAnywhereCredentialProviderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IAMRolesAnywhereCredentialProviderValidationError{}
