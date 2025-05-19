@@ -13,7 +13,7 @@ replace (
 require (
 	github.com/envoyproxy/go-control-plane v0.13.4
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4
-	google.golang.org/grpc v1.72.0
+	google.golang.org/grpc v1.72.1
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.32.3
 	k8s.io/apimachinery v0.32.3
