@@ -793,6 +793,8 @@ func (m *OAuth2Config) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for EndSessionEndpoint
+
 	if m.GetCredentials() == nil {
 		err := OAuth2ConfigValidationError{
 			field:  "Credentials",
