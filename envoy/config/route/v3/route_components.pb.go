@@ -1795,6 +1795,18 @@ type RouteAction struct {
 	RegexRewrite *v32.RegexMatchAndSubstitute `protobuf:"bytes,32,opt,name=regex_rewrite,json=regexRewrite,proto3" json:"regex_rewrite,omitempty"`
 	// [#extension-category: envoy.path.rewrite]
 	PathRewritePolicy *v31.TypedExtensionConfig `protobuf:"bytes,41,opt,name=path_rewrite_policy,json=pathRewritePolicy,proto3" json:"path_rewrite_policy,omitempty"`
+	// If one of the host rewrite specifiers is set and the
+	// :ref:`suppress_envoy_headers
+	// <envoy_v3_api_field_extensions.filters.http.router.v3.Router.suppress_envoy_headers>` flag is not
+	// set to true, the router filter will place the original host header value before
+	// rewriting into the :ref:`x-envoy-original-host
+	// <config_http_filters_router_x-envoy-original-host>` header.
+	//
+	// And if the
+	// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
+	// is set to true, the original host value will also be appended to the
+	// :ref:`config_http_conn_man_headers_x-forwarded-host` header.
+	//
 	// Types that are assignable to HostRewriteSpecifier:
 	//
 	//	*RouteAction_HostRewriteLiteral
@@ -2326,10 +2338,7 @@ type isRouteAction_HostRewriteSpecifier interface {
 
 type RouteAction_HostRewriteLiteral struct {
 	// Indicates that during forwarding, the host header will be swapped with
-	// this value. Using this option will append the
-	// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-	// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-	// is set.
+	// this value.
 	HostRewriteLiteral string `protobuf:"bytes,6,opt,name=host_rewrite_literal,json=hostRewriteLiteral,proto3,oneof"`
 }
 
@@ -2340,20 +2349,14 @@ type RouteAction_AutoHostRewrite struct {
 	// type “strict_dns“ or “logical_dns“,
 	// or when :ref:`hostname <envoy_v3_api_field_config.endpoint.v3.Endpoint.hostname>`
 	// field is not empty. Setting this to true with other cluster types
-	// has no effect. Using this option will append the
-	// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-	// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-	// is set.
+	// has no effect.
 	AutoHostRewrite *wrapperspb.BoolValue `protobuf:"bytes,7,opt,name=auto_host_rewrite,json=autoHostRewrite,proto3,oneof"`
 }
 
 type RouteAction_HostRewriteHeader struct {
 	// Indicates that during forwarding, the host header will be swapped with the content of given
 	// downstream or :ref:`custom <config_http_conn_man_headers_custom_request_headers>` header.
-	// If header value is empty, host header is left intact. Using this option will append the
-	// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-	// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-	// is set.
+	// If header value is empty, host header is left intact.
 	//
 	// .. attention::
 	//
@@ -2370,10 +2373,6 @@ type RouteAction_HostRewritePathRegex struct {
 	// Indicates that during forwarding, the host header will be swapped with
 	// the result of the regex substitution executed on path value with query and fragment removed.
 	// This is useful for transitioning variable content between path segment and subdomain.
-	// Using this option will append the
-	// :ref:`config_http_conn_man_headers_x-forwarded-host` header if
-	// :ref:`append_x_forwarded_host <envoy_v3_api_field_config.route.v3.RouteAction.append_x_forwarded_host>`
-	// is set.
 	//
 	// For example with the following config:
 	//
