@@ -13,16 +13,16 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v1.2.1
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10
 	github.com/prometheus/client_model v0.6.2
-	go.opentelemetry.io/proto/otlp v1.6.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20250428153025-10db94c68c34
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34
+	go.opentelemetry.io/proto/otlp v1.7.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20250528174236-200df99c418a
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a
 	google.golang.org/grpc v1.72.2
 	google.golang.org/protobuf v1.36.6
 )
 
 require (
 	cel.dev/expr v0.20.0 // indirect
-	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 )
