@@ -247,9 +247,21 @@ type SocketAddress struct {
 	// allow both IPv4 and IPv6 connections, with peer IPv4 addresses mapped into
 	// IPv6 space as “::FFFF:<IPv4-address>“.
 	Ipv4Compat bool `protobuf:"varint,6,opt,name=ipv4_compat,json=ipv4Compat,proto3" json:"ipv4_compat,omitempty"`
-	// The Linux network namespace to bind the socket to. If this is set, Envoy will
-	// create the socket in the specified network namespace. Only supported on Linux.
-	// [#not-implemented-hide:]
+	// Filepath that specifies the Linux network namespace this socket will be created in (see “man 7
+	// network_namespaces“).  If this field is set, Envoy will create the socket in the specified
+	// network namespace.
+	//
+	// .. note::
+	//
+	//	Setting this parameter requires Envoy to run with the ``CAP_NET_ADMIN`` capability.
+	//
+	// .. note::
+	//
+	//	Currently only used for Listener sockets.
+	//
+	// .. attention::
+	//
+	//	Network namespaces are only configurable on Linux. Otherwise, this field has no effect.
 	NetworkNamespaceFilepath string `protobuf:"bytes,7,opt,name=network_namespace_filepath,json=networkNamespaceFilepath,proto3" json:"network_namespace_filepath,omitempty"`
 }
 
