@@ -376,21 +376,21 @@ type HttpConnectionManager struct {
 	// <envoy_v3_api_msg_config.trace.v3.Tracing>`.
 	Tracing *HttpConnectionManager_Tracing `protobuf:"bytes,7,opt,name=tracing,proto3" json:"tracing,omitempty"`
 	// Additional settings for HTTP requests handled by the connection manager. These will be
-	// applicable to both HTTP1 and HTTP2 requests.
+	// applicable to both HTTP/1.1 and HTTP/2 requests.
 	CommonHttpProtocolOptions *v3.HttpProtocolOptions `protobuf:"bytes,35,opt,name=common_http_protocol_options,json=commonHttpProtocolOptions,proto3" json:"common_http_protocol_options,omitempty"`
-	// If set to true, Envoy will not start a drain timer for downstream HTTP1 connections after
-	// :ref:`common_http_protocol_options.max_connection_duration
-	// <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_connection_duration>` passes.
-	// Instead, Envoy will wait for the next downstream request, add connection:close to the response
-	// headers, then close the connection after the stream ends.
+	// If set to “true“, Envoy will not initiate an immediate drain timer for downstream HTTP/1 connections
+	// once :ref:`common_http_protocol_options.max_connection_duration
+	// <envoy_v3_api_field_config.core.v3.HttpProtocolOptions.max_connection_duration>` is exceeded.
+	// Instead, Envoy will wait until the next downstream request arrives, add a “connection: close“ header
+	// to the response, and then gracefully close the connection once the stream has completed.
 	//
-	// This behavior is compliant with `RFC 9112 section 9.6 <https://www.rfc-editor.org/rfc/rfc9112#name-tear-down>`_
+	// This behavior adheres to `RFC 9112, Section 9.6 <https://www.rfc-editor.org/rfc/rfc9112#name-tear-down>`_.
 	//
-	// If set to false, “max_connection_duration“ will cause Envoy to enter the normal drain
-	// sequence for HTTP1 with Envoy eventually closing the connection (once there are no active
-	// streams).
+	// If set to “false“, exceeding “max_connection_duration“ triggers Envoy's default drain behavior for HTTP/1,
+	// where the connection is eventually closed after all active streams finish.
 	//
-	// Has no effect if “max_connection_duration“ is unset. Defaults to false.
+	// This option has no effect if “max_connection_duration“ is not configured.
+	// Defaults to “false“.
 	Http1SafeMaxConnectionDuration bool `protobuf:"varint,58,opt,name=http1_safe_max_connection_duration,json=http1SafeMaxConnectionDuration,proto3" json:"http1_safe_max_connection_duration,omitempty"`
 	// Additional HTTP/1 settings that are passed to the HTTP/1 codec.
 	// [#comment:TODO: The following fields are ignored when the
@@ -501,7 +501,7 @@ type HttpConnectionManager struct {
 	// Delaying Envoy's connection close and giving the peer the opportunity to initiate the close
 	// sequence mitigates a race condition that exists when downstream clients do not drain/process
 	// data in a connection's receive buffer after a remote close has been detected via a socket
-	// write(). This race leads to such clients failing to process the response code sent by Envoy,
+	// “write()“. This race leads to such clients failing to process the response code sent by Envoy,
 	// which could result in erroneous downstream processing.
 	//
 	// If the timeout triggers, Envoy will close the connection's socket.
@@ -516,7 +516,7 @@ type HttpConnectionManager struct {
 	//
 	// .. warning::
 	//
-	//	A value of 0 will completely disable delayed close processing. When disabled, the downstream
+	//	A value of ``0`` will completely disable delayed close processing. When disabled, the downstream
 	//	connection's socket will be closed immediately after the write flush is completed or will
 	//	never close if the write flush does not complete.
 	DelayedCloseTimeout *durationpb.Duration `protobuf:"bytes,26,opt,name=delayed_close_timeout,json=delayedCloseTimeout,proto3" json:"delayed_close_timeout,omitempty"`
@@ -566,21 +566,20 @@ type HttpConnectionManager struct {
 	// is not specified. See the documentation for
 	// :ref:`config_http_conn_man_headers_x-forwarded-for` for more information.
 	XffNumTrustedHops uint32 `protobuf:"varint,19,opt,name=xff_num_trusted_hops,json=xffNumTrustedHops,proto3" json:"xff_num_trusted_hops,omitempty"`
-	// The configuration for the original IP detection extensions.
+	// Configuration for original IP detection extensions.
 	//
-	// When configured the extensions will be called along with the request headers
-	// and information about the downstream connection, such as the directly connected address.
-	// Each extension will then use these parameters to decide the request's effective remote address.
-	// If an extension fails to detect the original IP address and isn't configured to reject
-	// the request, the HCM will try the remaining extensions until one succeeds or rejects
-	// the request. If the request isn't rejected nor any extension succeeds, the HCM will
-	// fallback to using the remote address.
+	// When these extensions are configured, Envoy will invoke them with the incoming request headers and
+	// details about the downstream connection, including the directly connected address. Each extension uses
+	// this information to determine the effective remote IP address for the request. If an extension cannot
+	// identify the original IP address and isn't set to reject the request, Envoy will sequentially attempt
+	// the remaining extensions until one successfully determines the IP or explicitly rejects the request.
+	// If all extensions fail without rejection, Envoy defaults to using the directly connected remote address.
 	//
 	// .. warning::
 	//
-	//	Extensions cannot be used in conjunction with :ref:`use_remote_address
+	//	These extensions cannot be configured simultaneously with :ref:`use_remote_address
 	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.use_remote_address>`
-	//	nor :ref:`xff_num_trusted_hops
+	//	or :ref:`xff_num_trusted_hops
 	//	<envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.xff_num_trusted_hops>`.
 	//
 	// [#extension-category: envoy.http.original_ip_detection]
