@@ -248,7 +248,7 @@ type SocketAddress struct {
 	// IPv6 space as “::FFFF:<IPv4-address>“.
 	Ipv4Compat bool `protobuf:"varint,6,opt,name=ipv4_compat,json=ipv4Compat,proto3" json:"ipv4_compat,omitempty"`
 	// Filepath that specifies the Linux network namespace this socket will be created in (see “man 7
-	// network_namespaces“).  If this field is set, Envoy will create the socket in the specified
+	// network_namespaces“). If this field is set, Envoy will create the socket in the specified
 	// network namespace.
 	//
 	// .. note::
