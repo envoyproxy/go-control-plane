@@ -200,11 +200,12 @@ type PerRouteConfig_HostRewriteLiteral struct {
 	// this value. If not set or empty, the original host header value
 	// will be used and no rewrite will happen.
 	//
-	// Note: this rewrite affects both DNS lookup and host header forwarding. However, this
-	// option shouldn't be used with
-	// :ref:`HCM host rewrite <envoy_v3_api_field_config.route.v3.RouteAction.host_rewrite_literal>` given that the
-	// value set here would be used for DNS lookups whereas the value set in the HCM would be used
-	// for host header forwarding which is not the desired outcome.
+	// .. note::
+	//
+	//	This rewrite affects both DNS lookup and host header forwarding. However, this option shouldn't be used with
+	//	:ref:`HCM host rewrite header <envoy_v3_api_field_config.route.v3.RouteAction.auto_host_rewrite>` given that
+	//	the value set here would be used for DNS lookups whereas the value set in the HCM would be used for host
+	//	header forwarding which might not be the desired outcome.
 	HostRewriteLiteral string `protobuf:"bytes,1,opt,name=host_rewrite_literal,json=hostRewriteLiteral,proto3,oneof"`
 }
 
@@ -213,11 +214,12 @@ type PerRouteConfig_HostRewriteHeader struct {
 	// the value of this header. If not set or empty, the original host header
 	// value will be used and no rewrite will happen.
 	//
-	// Note: this rewrite affects both DNS lookup and host header forwarding. However, this
-	// option shouldn't be used with
-	// :ref:`HCM host rewrite header <envoy_v3_api_field_config.route.v3.RouteAction.auto_host_rewrite>`
-	// given that the value set here would be used for DNS lookups whereas the value set in the HCM
-	// would be used for host header forwarding which is not the desired outcome.
+	// .. note::
+	//
+	//	This rewrite affects both DNS lookup and host header forwarding. However, this option shouldn't be used with
+	//	:ref:`HCM host rewrite header <envoy_v3_api_field_config.route.v3.RouteAction.auto_host_rewrite>` given that
+	//	the value set here would be used for DNS lookups whereas the value set in the HCM would be used for host
+	//	header forwarding which might not be the desired outcome.
 	//
 	// .. note::
 	//
@@ -234,7 +236,7 @@ type SubClusterConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The timeout used for sub cluster initialization. Defaults to 5s if not set.
+	// The timeout used for sub cluster initialization. Defaults to **5s** if not set.
 	ClusterInitTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=cluster_init_timeout,json=clusterInitTimeout,proto3" json:"cluster_init_timeout,omitempty"`
 }
 
