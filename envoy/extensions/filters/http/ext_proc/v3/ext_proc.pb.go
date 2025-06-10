@@ -198,7 +198,11 @@ type ExternalProcessor struct {
 	// 4. It then sends an HTTP response back to Envoy with status code as “"200"“,
 	// “content-type“ as “"application/json"“ and sets the JSON text as the body.
 	HttpService *ExtProcHttpService `protobuf:"bytes,20,opt,name=http_service,json=httpService,proto3" json:"http_service,omitempty"`
-	// By default, if the gRPC stream cannot be established, or if it is closed
+	// If the “BodySendMode“ in the
+	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
+	// is set to “FULL_DUPLEX_STREAMED“, “failure_mode_allow“ can not be set to true.
+	//
+	// Otherwise, by default, if the gRPC stream cannot be established, or if it is closed
 	// prematurely with an error, the filter will fail. Specifically, if the
 	// response headers have not yet been delivered, then it will return a 500
 	// error downstream. If they have been delivered, then instead the HTTP stream to the
