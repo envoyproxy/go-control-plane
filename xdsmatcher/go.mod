@@ -7,7 +7,7 @@ toolchain go1.23.6
 replace github.com/envoyproxy/go-control-plane/envoy => ../envoy
 
 require (
-	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42
+	github.com/cncf/xds/go v0.0.0-20250326154945-ae57f3c0d45f
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/protobuf v1.36.6
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	cel.dev/expr v0.20.0 // indirect
+	cel.dev/expr v0.23.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
