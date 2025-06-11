@@ -132,6 +132,8 @@ const (
 	FileAccessLog = "envoy.access_loggers.file"
 	// HTTPGRPCAccessLog sink for the HTTP gRPC access log service
 	HTTPGRPCAccessLog = "envoy.access_loggers.http_grpc"
+	// OpenTelemetryAccessLog sink for the OTel access log service
+	OpenTelemetryAccessLog = "envoy.access_loggers.open_telemetry"
 )
 
 // Transport socket names
