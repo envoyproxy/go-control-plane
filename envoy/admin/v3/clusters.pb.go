@@ -263,8 +263,8 @@ type HostStatus struct {
 	//
 	// .. note::
 	//
-	//	The message will be missing if the host didn't receive enough traffic to compute a success rate, or if the
-	//	cluster didn't have enough hosts to perform outlier ejection based on success rate.
+	//	The message will be missing if the host didn’t receive enough traffic to compute a success rate, or if the
+	//	cluster didn’t have enough hosts to perform outlier ejection based on success rate.
 	LocalOriginSuccessRate *v3.Percent `protobuf:"bytes,8,opt,name=local_origin_success_rate,json=localOriginSuccessRate,proto3" json:"local_origin_success_rate,omitempty"`
 	// locality of the host.
 	Locality *v32.Locality `protobuf:"bytes,9,opt,name=locality,proto3" json:"locality,omitempty"`
@@ -381,19 +381,15 @@ type HostHealthStatus struct {
 	// The host has been removed from service discovery, but is being stabilized due to active
 	// health checking.
 	PendingDynamicRemoval bool `protobuf:"varint,5,opt,name=pending_dynamic_removal,json=pendingDynamicRemoval,proto3" json:"pending_dynamic_removal,omitempty"`
-	// The host is awaiting first health check.
+	// The host has not yet been health checked.
 	PendingActiveHc bool `protobuf:"varint,6,opt,name=pending_active_hc,json=pendingActiveHc,proto3" json:"pending_active_hc,omitempty"`
 	// The host should be excluded from panic, spillover, etc. calculations because it was explicitly
 	// taken out of rotation via protocol signal and is not meant to be routed to.
 	ExcludedViaImmediateHcFail bool `protobuf:"varint,7,opt,name=excluded_via_immediate_hc_fail,json=excludedViaImmediateHcFail,proto3" json:"excluded_via_immediate_hc_fail,omitempty"`
-	// The host failed active health check due to timeout.
+	// The host failed active HC due to timeout.
 	ActiveHcTimeout bool `protobuf:"varint,8,opt,name=active_hc_timeout,json=activeHcTimeout,proto3" json:"active_hc_timeout,omitempty"`
-	// Health status as reported by EDS.
-	//
-	// .. note::
-	//
-	//	Currently, only ``HEALTHY`` and ``UNHEALTHY`` are supported.
-	//
+	// Health status as reported by EDS. Note: only HEALTHY and UNHEALTHY are currently supported
+	// here.
 	// [#comment:TODO(mrice32): pipe through remaining EDS health status possibilities.]
 	EdsHealthStatus v32.HealthStatus `protobuf:"varint,3,opt,name=eds_health_status,json=edsHealthStatus,proto3,enum=envoy.config.core.v3.HealthStatus" json:"eds_health_status,omitempty"`
 }

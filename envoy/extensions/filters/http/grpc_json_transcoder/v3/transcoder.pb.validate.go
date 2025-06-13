@@ -475,8 +475,6 @@ func (m *GrpcJsonTranscoder_PrintOptions) validate(all bool) error {
 
 	// no validation rules for StreamNewlineDelimited
 
-	// no validation rules for StreamSseStyleDelimited
-
 	if len(errors) > 0 {
 		return GrpcJsonTranscoder_PrintOptionsMultiError(errors)
 	}

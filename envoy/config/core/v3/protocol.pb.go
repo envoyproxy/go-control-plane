@@ -211,11 +211,8 @@ type QuicProtocolOptions struct {
 	// <https://tools.ietf.org/html/draft-ietf-quic-transport-34#section-4.1>`_ size. Valid values range from
 	// 1 to 16777216 (2^24, maximum supported by QUICHE) and defaults to 16777216 (16 * 1024 * 1024).
 	//
-	// .. note::
-	//
-	//	16384 (2^14) is the minimum window size supported in Google QUIC. If configured smaller than it, we will use
-	//	16384 instead. QUICHE IETF Quic implementation supports 1 bytes window. We only support increasing the default
-	//	window size now, so it's also the minimum.
+	// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. If configured smaller than it, we will use 16384 instead.
+	// QUICHE IETF Quic implementation supports 1 bytes window. We only support increasing the default window size now, so it's also the minimum.
 	//
 	// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
 	// QUIC stream send and receive buffers. Once the buffer reaches this pointer, watermark callbacks will fire to
@@ -225,10 +222,8 @@ type QuicProtocolOptions struct {
 	// flow-control. Valid values rage from 1 to 25165824 (24MB, maximum supported by QUICHE) and defaults
 	// to 25165824 (24 * 1024 * 1024).
 	//
-	// .. note::
-	//
-	//	16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
-	//	window size now, so it's also the minimum.
+	// NOTE: 16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
+	// window size now, so it's also the minimum.
 	InitialConnectionWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// The number of timeouts that can occur before port migration is triggered for QUIC clients.
 	// This defaults to 4. If set to 0, port migration will not occur on path degrading.
@@ -595,27 +590,19 @@ type HttpProtocolOptions struct {
 	// :ref:`HTTP Connection Manager
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.common_http_protocol_options>`.
 	//
-	// .. note::
+	// Note: currently some protocol codecs impose limits on the maximum size of a single header:
 	//
-	//	Currently some protocol codecs impose limits on the maximum size of a single header.
-	//
-	//	* HTTP/2 (when using nghttp2) limits a single header to around 100kb.
-	//	* HTTP/3 limits a single header to around 1024kb.
+	//	HTTP/2 (when using nghttp2) limits a single header to around 100kb.
+	//	HTTP/3 limits a single header to around 1024kb.
 	MaxResponseHeadersKb *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=max_response_headers_kb,json=maxResponseHeadersKb,proto3" json:"max_response_headers_kb,omitempty"`
 	// Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be
 	// reset independent of any other timeouts. If not specified, this value is not set.
 	MaxStreamDuration *durationpb.Duration `protobuf:"bytes,4,opt,name=max_stream_duration,json=maxStreamDuration,proto3" json:"max_stream_duration,omitempty"`
 	// Action to take when a client request with a header name containing underscore characters is received.
 	// If this setting is not specified, the value defaults to ALLOW.
-	//
-	// .. note::
-	//
-	//	Upstream responses are not affected by this setting.
-	//
-	// .. note::
-	//
-	//	This only affects client headers. It does not affect headers added by Envoy filters and does not have any
-	//	impact if added to cluster config.
+	// Note: upstream responses are not affected by this setting.
+	// Note: this only affects client headers. It does not affect headers added
+	// by Envoy filters and does not have any impact if added to cluster config.
 	HeadersWithUnderscoresAction HttpProtocolOptions_HeadersWithUnderscoresAction `protobuf:"varint,5,opt,name=headers_with_underscores_action,json=headersWithUnderscoresAction,proto3,enum=envoy.config.core.v3.HttpProtocolOptions_HeadersWithUnderscoresAction" json:"headers_with_underscores_action,omitempty"`
 	// Optional maximum requests for both upstream and downstream connections.
 	// If not specified, there is no limit.
@@ -1016,10 +1003,8 @@ type Http2ProtocolOptions struct {
 	// (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum) and defaults to 268435456
 	// (256 * 1024 * 1024).
 	//
-	// .. note::
-	//
-	//	65535 is the initial window size from HTTP/2 spec. We only support increasing the default window size now,
-	//	so it's also the minimum.
+	// NOTE: 65535 is the initial window size from HTTP/2 spec. We only support increasing the default
+	// window size now, so it's also the minimum.
 	//
 	// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
 	// HTTP/2 codec buffers. Once the buffer reaches this pointer, watermark callbacks will fire to

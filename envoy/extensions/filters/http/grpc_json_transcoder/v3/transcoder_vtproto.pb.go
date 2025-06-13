@@ -49,16 +49,6 @@ func (m *GrpcJsonTranscoder_PrintOptions) MarshalToSizedBufferVTStrict(dAtA []by
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.StreamSseStyleDelimited {
-		i--
-		if m.StreamSseStyleDelimited {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x30
-	}
 	if m.StreamNewlineDelimited {
 		i--
 		if m.StreamNewlineDelimited {
@@ -513,9 +503,6 @@ func (m *GrpcJsonTranscoder_PrintOptions) SizeVT() (n int) {
 		n += 2
 	}
 	if m.StreamNewlineDelimited {
-		n += 2
-	}
-	if m.StreamSseStyleDelimited {
 		n += 2
 	}
 	n += len(m.unknownFields)

@@ -670,13 +670,10 @@ type Permission_Any struct {
 }
 
 type Permission_Header struct {
-	// A header (or pseudo-header such as “:path“ or “:method“) on the incoming HTTP request. Only available
-	// for HTTP request.
-	//
-	// .. note::
-	//
-	//	The pseudo-header ``:path`` includes the query and fragment string. Use the ``url_path`` field if you
-	//	want to match the URL path without the query and fragment string.
+	// A header (or pseudo-header such as :path or :method) on the incoming HTTP request. Only
+	// available for HTTP request.
+	// Note: the pseudo-header :path includes the query and fragment string. Use the “url_path“
+	// field if you want to match the URL path without the query and fragment string.
 	Header *v31.HeaderMatcher `protobuf:"bytes,4,opt,name=header,proto3,oneof"`
 }
 
@@ -716,7 +713,8 @@ type Permission_NotRule struct {
 }
 
 type Permission_RequestedServerName struct {
-	// The request server from the client's connection request. This is typically TLS SNI.
+	// The request server from the client's connection request. This is
+	// typically TLS SNI.
 	//
 	// .. attention::
 	//
@@ -733,7 +731,8 @@ type Permission_RequestedServerName struct {
 	//	* A :ref:`listener filter <arch_overview_listener_filters>` may
 	//	  overwrite a connection's requested server name within Envoy.
 	//
-	// Please refer to :ref:`this FAQ entry <faq_how_to_setup_sni>` to learn how to setup SNI.
+	// Please refer to :ref:`this FAQ entry <faq_how_to_setup_sni>` to learn to
+	// setup SNI.
 	RequestedServerName *v3.StringMatcher `protobuf:"bytes,9,opt,name=requested_server_name,json=requestedServerName,proto3,oneof"`
 }
 
@@ -954,12 +953,14 @@ type isPrincipal_Identifier interface {
 }
 
 type Principal_AndIds struct {
-	// A set of identifiers that all must match in order to define the downstream.
+	// A set of identifiers that all must match in order to define the
+	// downstream.
 	AndIds *Principal_Set `protobuf:"bytes,1,opt,name=and_ids,json=andIds,proto3,oneof"`
 }
 
 type Principal_OrIds struct {
-	// A set of identifiers at least one must match in order to define the downstream.
+	// A set of identifiers at least one must match in order to define the
+	// downstream.
 	OrIds *Principal_Set `protobuf:"bytes,2,opt,name=or_ids,json=orIds,proto3,oneof"`
 }
 
@@ -992,34 +993,28 @@ type Principal_SourceIp struct {
 
 type Principal_DirectRemoteIp struct {
 	// A CIDR block that describes the downstream remote/origin address.
-	//
-	// .. note::
-	//
-	//	This is always the physical peer even if the
-	//	:ref:`remote_ip <envoy_v3_api_field_config.rbac.v3.Principal.remote_ip>` is inferred from the
-	//	x-forwarder-for header, the proxy protocol, etc.
+	// Note: This is always the physical peer even if the
+	// :ref:`remote_ip <envoy_v3_api_field_config.rbac.v3.Principal.remote_ip>` is
+	// inferred from for example the x-forwarder-for header, proxy protocol,
+	// etc.
 	DirectRemoteIp *v32.CidrRange `protobuf:"bytes,10,opt,name=direct_remote_ip,json=directRemoteIp,proto3,oneof"`
 }
 
 type Principal_RemoteIp struct {
 	// A CIDR block that describes the downstream remote/origin address.
-	//
-	// .. note::
-	//
-	//	This may not be the physical peer and could be different from the :ref:`direct_remote_ip
-	//	<envoy_v3_api_field_config.rbac.v3.Principal.direct_remote_ip>`. E.g, if the remote ip is inferred from
-	//	the x-forwarder-for header, the proxy protocol, etc.
+	// Note: This may not be the physical peer and could be different from the
+	// :ref:`direct_remote_ip
+	// <envoy_v3_api_field_config.rbac.v3.Principal.direct_remote_ip>`. E.g, if the
+	// remote ip is inferred from for example the x-forwarder-for header, proxy
+	// protocol, etc.
 	RemoteIp *v32.CidrRange `protobuf:"bytes,11,opt,name=remote_ip,json=remoteIp,proto3,oneof"`
 }
 
 type Principal_Header struct {
-	// A header (or pseudo-header such as “:path“ or “:method“) on the incoming HTTP request. Only available
-	// for HTTP request.
-	//
-	// .. note::
-	//
-	//	The pseudo-header ``:path`` includes the query and fragment string. Use the ``url_path`` field if you
-	//	want to match the URL path without the query and fragment string.
+	// A header (or pseudo-header such as :path or :method) on the incoming HTTP
+	// request. Only available for HTTP request. Note: the pseudo-header :path
+	// includes the query and fragment string. Use the “url_path“ field if you
+	// want to match the URL path without the query and fragment string.
 	Header *v31.HeaderMatcher `protobuf:"bytes,6,opt,name=header,proto3,oneof"`
 }
 
@@ -1099,7 +1094,7 @@ type Action struct {
 	// The action to take if the matcher matches. Every action either allows or denies a request,
 	// and can also carry out action-specific operations.
 	//
-	// **Actions:**
+	// Actions:
 	//
 	//   - “ALLOW“: If the request gets matched on ALLOW, it is permitted.
 	//   - “DENY“: If the request gets matched on DENY, it is not permitted.
@@ -1108,7 +1103,7 @@ type Action struct {
 	//     “envoy.common“ will be set to the value “true“.
 	//   - If the request cannot get matched, it will fallback to “DENY“.
 	//
-	// **Log behavior:**
+	// Log behavior:
 	//
 	//	If the RBAC matcher contains at least one LOG action, the dynamic
 	//	metadata key ``access_log_hint`` will be set based on if the request

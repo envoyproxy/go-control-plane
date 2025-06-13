@@ -293,6 +293,7 @@ func (m *LuaPerRoute) validate(all bool) error {
 		}
 	}
 
+	oneofOverridePresent := false
 	switch v := m.Override.(type) {
 	case *LuaPerRoute_Disabled:
 		if v == nil {
@@ -305,6 +306,7 @@ func (m *LuaPerRoute) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
+		oneofOverridePresent = true
 
 		if m.GetDisabled() != true {
 			err := LuaPerRouteValidationError{
@@ -328,6 +330,7 @@ func (m *LuaPerRoute) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
+		oneofOverridePresent = true
 
 		if utf8.RuneCountInString(m.GetName()) < 1 {
 			err := LuaPerRouteValidationError{
@@ -351,6 +354,7 @@ func (m *LuaPerRoute) validate(all bool) error {
 			}
 			errors = append(errors, err)
 		}
+		oneofOverridePresent = true
 
 		if all {
 			switch v := interface{}(m.GetSourceCode()).(type) {
@@ -383,6 +387,16 @@ func (m *LuaPerRoute) validate(all bool) error {
 
 	default:
 		_ = v // ensures v is used
+	}
+	if !oneofOverridePresent {
+		err := LuaPerRouteValidationError{
+			field:  "Override",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if len(errors) > 0 {

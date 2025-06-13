@@ -50,23 +50,6 @@ func (m *NetworkExternalProcessor) MarshalToSizedBufferVTStrict(dAtA []byte) (in
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if m.MetadataOptions != nil {
-		size, err := m.MetadataOptions.MarshalToSizedBufferVTStrict(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0x32
-	}
-	if len(m.StatPrefix) > 0 {
-		i -= len(m.StatPrefix)
-		copy(dAtA[i:], m.StatPrefix)
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.StatPrefix)))
-		i--
-		dAtA[i] = 0x2a
-	}
 	if m.MessageTimeout != nil {
 		size, err := (*durationpb.Duration)(m.MessageTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -165,100 +148,6 @@ func (m *ProcessingMode) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
-func (m *MetadataOptions_MetadataNamespaces) MarshalVTStrict() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MetadataOptions_MetadataNamespaces) MarshalToVTStrict(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
-}
-
-func (m *MetadataOptions_MetadataNamespaces) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if len(m.Typed) > 0 {
-		for iNdEx := len(m.Typed) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Typed[iNdEx])
-			copy(dAtA[i:], m.Typed[iNdEx])
-			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Typed[iNdEx])))
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.Untyped) > 0 {
-		for iNdEx := len(m.Untyped) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Untyped[iNdEx])
-			copy(dAtA[i:], m.Untyped[iNdEx])
-			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Untyped[iNdEx])))
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MetadataOptions) MarshalVTStrict() (dAtA []byte, err error) {
-	if m == nil {
-		return nil, nil
-	}
-	size := m.SizeVT()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MetadataOptions) MarshalToVTStrict(dAtA []byte) (int, error) {
-	size := m.SizeVT()
-	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
-}
-
-func (m *MetadataOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
-	if m == nil {
-		return 0, nil
-	}
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.unknownFields != nil {
-		i -= len(m.unknownFields)
-		copy(dAtA[i:], m.unknownFields)
-	}
-	if m.ForwardingNamespaces != nil {
-		size, err := m.ForwardingNamespaces.MarshalToSizedBufferVTStrict(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *NetworkExternalProcessor) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -286,14 +175,6 @@ func (m *NetworkExternalProcessor) SizeVT() (n int) {
 		l = (*durationpb.Duration)(m.MessageTimeout).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
-	l = len(m.StatPrefix)
-	if l > 0 {
-		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
-	}
-	if m.MetadataOptions != nil {
-		l = m.MetadataOptions.SizeVT()
-		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
-	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -309,42 +190,6 @@ func (m *ProcessingMode) SizeVT() (n int) {
 	}
 	if m.ProcessWrite != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.ProcessWrite))
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *MetadataOptions_MetadataNamespaces) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Untyped) > 0 {
-		for _, s := range m.Untyped {
-			l = len(s)
-			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
-		}
-	}
-	if len(m.Typed) > 0 {
-		for _, s := range m.Typed {
-			l = len(s)
-			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
-		}
-	}
-	n += len(m.unknownFields)
-	return n
-}
-
-func (m *MetadataOptions) SizeVT() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.ForwardingNamespaces != nil {
-		l = m.ForwardingNamespaces.SizeVT()
-		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
