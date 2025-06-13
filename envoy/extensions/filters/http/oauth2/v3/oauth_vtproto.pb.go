@@ -395,15 +395,6 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.EndSessionEndpoint) > 0 {
-		i -= len(m.EndSessionEndpoint)
-		copy(dAtA[i:], m.EndSessionEndpoint)
-		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.EndSessionEndpoint)))
-		i--
-		dAtA[i] = 0x1
-		i--
-		dAtA[i] = 0xba
-	}
 	if len(m.StatPrefix) > 0 {
 		i -= len(m.StatPrefix)
 		copy(dAtA[i:], m.StatPrefix)
@@ -1017,10 +1008,6 @@ func (m *OAuth2Config) SizeVT() (n int) {
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	l = len(m.StatPrefix)
-	if l > 0 {
-		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
-	}
-	l = len(m.EndSessionEndpoint)
 	if l > 0 {
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}

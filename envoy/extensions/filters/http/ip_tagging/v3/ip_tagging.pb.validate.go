@@ -69,17 +69,6 @@ func (m *IPTagging) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if len(m.GetIpTags()) < 1 {
-		err := IPTaggingValidationError{
-			field:  "IpTags",
-			reason: "value must contain at least 1 item(s)",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	for idx, item := range m.GetIpTags() {
 		_, _ = idx, item
 
@@ -137,6 +126,35 @@ func (m *IPTagging) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return IPTaggingValidationError{
 				field:  "IpTagHeader",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetIpTagsFileProvider()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IPTaggingValidationError{
+					field:  "IpTagsFileProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IPTaggingValidationError{
+					field:  "IpTagsFileProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIpTagsFileProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IPTaggingValidationError{
+				field:  "IpTagsFileProvider",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -356,6 +374,142 @@ var _ interface {
 	ErrorName() string
 } = IPTagging_IPTagValidationError{}
 
+// Validate checks the field values on IPTagging_IPTagFile with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *IPTagging_IPTagFile) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IPTagging_IPTagFile with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IPTagging_IPTagFileMultiError, or nil if none found.
+func (m *IPTagging_IPTagFile) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IPTagging_IPTagFile) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetIpTags() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, IPTagging_IPTagFileValidationError{
+						field:  fmt.Sprintf("IpTags[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, IPTagging_IPTagFileValidationError{
+						field:  fmt.Sprintf("IpTags[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return IPTagging_IPTagFileValidationError{
+					field:  fmt.Sprintf("IpTags[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return IPTagging_IPTagFileMultiError(errors)
+	}
+
+	return nil
+}
+
+// IPTagging_IPTagFileMultiError is an error wrapping multiple validation
+// errors returned by IPTagging_IPTagFile.ValidateAll() if the designated
+// constraints aren't met.
+type IPTagging_IPTagFileMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IPTagging_IPTagFileMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IPTagging_IPTagFileMultiError) AllErrors() []error { return m }
+
+// IPTagging_IPTagFileValidationError is the validation error returned by
+// IPTagging_IPTagFile.Validate if the designated constraints aren't met.
+type IPTagging_IPTagFileValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IPTagging_IPTagFileValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IPTagging_IPTagFileValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IPTagging_IPTagFileValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IPTagging_IPTagFileValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IPTagging_IPTagFileValidationError) ErrorName() string {
+	return "IPTagging_IPTagFileValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IPTagging_IPTagFileValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIPTagging_IPTagFile.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IPTagging_IPTagFileValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IPTagging_IPTagFileValidationError{}
+
 // Validate checks the field values on IPTagging_IpTagHeader with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
@@ -483,3 +637,165 @@ var _ interface {
 } = IPTagging_IpTagHeaderValidationError{}
 
 var _IPTagging_IpTagHeader_Header_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+// Validate checks the field values on IPTagging_IpTagsFileProvider with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *IPTagging_IpTagsFileProvider) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IPTagging_IpTagsFileProvider with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IPTagging_IpTagsFileProviderMultiError, or nil if none found.
+func (m *IPTagging_IpTagsFileProvider) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IPTagging_IpTagsFileProvider) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetIpTagsDatasource()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IPTagging_IpTagsFileProviderValidationError{
+					field:  "IpTagsDatasource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IPTagging_IpTagsFileProviderValidationError{
+					field:  "IpTagsDatasource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIpTagsDatasource()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IPTagging_IpTagsFileProviderValidationError{
+				field:  "IpTagsDatasource",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if d := m.GetIpTagsRefreshRate(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = IPTagging_IpTagsFileProviderValidationError{
+				field:  "IpTagsRefreshRate",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gt := time.Duration(0*time.Second + 0*time.Nanosecond)
+
+			if dur <= gt {
+				err := IPTagging_IpTagsFileProviderValidationError{
+					field:  "IpTagsRefreshRate",
+					reason: "value must be greater than 0s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return IPTagging_IpTagsFileProviderMultiError(errors)
+	}
+
+	return nil
+}
+
+// IPTagging_IpTagsFileProviderMultiError is an error wrapping multiple
+// validation errors returned by IPTagging_IpTagsFileProvider.ValidateAll() if
+// the designated constraints aren't met.
+type IPTagging_IpTagsFileProviderMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IPTagging_IpTagsFileProviderMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IPTagging_IpTagsFileProviderMultiError) AllErrors() []error { return m }
+
+// IPTagging_IpTagsFileProviderValidationError is the validation error returned
+// by IPTagging_IpTagsFileProvider.Validate if the designated constraints
+// aren't met.
+type IPTagging_IpTagsFileProviderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IPTagging_IpTagsFileProviderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IPTagging_IpTagsFileProviderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IPTagging_IpTagsFileProviderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IPTagging_IpTagsFileProviderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IPTagging_IpTagsFileProviderValidationError) ErrorName() string {
+	return "IPTagging_IpTagsFileProviderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IPTagging_IpTagsFileProviderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIPTagging_IpTagsFileProvider.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IPTagging_IpTagsFileProviderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IPTagging_IpTagsFileProviderValidationError{}
