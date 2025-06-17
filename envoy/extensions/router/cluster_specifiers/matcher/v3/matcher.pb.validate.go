@@ -36,6 +36,117 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on ClusterAction with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ClusterAction) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ClusterAction with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ClusterActionMultiError, or
+// nil if none found.
+func (m *ClusterAction) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ClusterAction) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetCluster()) < 1 {
+		err := ClusterActionValidationError{
+			field:  "Cluster",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ClusterActionMultiError(errors)
+	}
+
+	return nil
+}
+
+// ClusterActionMultiError is an error wrapping multiple validation errors
+// returned by ClusterAction.ValidateAll() if the designated constraints
+// aren't met.
+type ClusterActionMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ClusterActionMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ClusterActionMultiError) AllErrors() []error { return m }
+
+// ClusterActionValidationError is the validation error returned by
+// ClusterAction.Validate if the designated constraints aren't met.
+type ClusterActionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClusterActionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClusterActionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClusterActionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClusterActionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClusterActionValidationError) ErrorName() string { return "ClusterActionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ClusterActionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClusterAction.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClusterActionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClusterActionValidationError{}
+
 // Validate checks the field values on MatcherClusterSpecifier with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
