@@ -47,7 +47,6 @@ type AwsCredentialProvider struct {
 	// This has no effect if inline_credential is provided.
 	CustomCredentialProviderChain bool `protobuf:"varint,4,opt,name=custom_credential_provider_chain,json=customCredentialProviderChain,proto3" json:"custom_credential_provider_chain,omitempty"`
 	// The option to use `IAM Roles Anywhere <https://docs.aws.amazon.com/rolesanywhere/latest/userguide/introduction.html>`_.
-	// [#not-implemented-hide:]
 	IamRolesAnywhereCredentialProvider *IAMRolesAnywhereCredentialProvider `protobuf:"bytes,5,opt,name=iam_roles_anywhere_credential_provider,json=iamRolesAnywhereCredentialProvider,proto3" json:"iam_roles_anywhere_credential_provider,omitempty"`
 	// The option to use credentials sourced from standard 'AWS configuration files <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html>'_.
 	ConfigCredentialProvider *ConfigCredentialProvider `protobuf:"bytes,6,opt,name=config_credential_provider,json=configCredentialProvider,proto3" json:"config_credential_provider,omitempty"`
@@ -354,7 +353,6 @@ func (x *CredentialsFileCredentialProvider) GetProfile() string {
 // Configuration to use `IAM Roles Anywhere <https://docs.aws.amazon.com/rolesanywhere/latest/userguide/introduction.html>`_
 // to retrieve AWS credentials.
 // [#next-free-field: 9]
-// [#not-implemented-hide:]
 type IAMRolesAnywhereCredentialProvider struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
