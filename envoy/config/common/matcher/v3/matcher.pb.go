@@ -44,8 +44,8 @@ type Matcher struct {
 	//	*Matcher_MatcherList_
 	//	*Matcher_MatcherTree_
 	MatcherType isMatcher_MatcherType `protobuf_oneof:"matcher_type"`
-	// Optional OnMatch to use if the matcher failed.
-	// If specified, the OnMatch is used, and the matcher is considered
+	// Optional “OnMatch“ to use if the matcher failed.
+	// If specified, the “OnMatch“ is used, and the matcher is considered
 	// to have matched.
 	// If not specified, the matcher is considered not to have matched.
 	OnNoMatch *Matcher_OnMatch `protobuf:"bytes,3,opt,name=on_no_match,json=onNoMatch,proto3" json:"on_no_match,omitempty"`
@@ -393,9 +393,9 @@ func (x *HttpHeadersMatch) GetHeaders() []*v3.HeaderMatcher {
 //
 // .. attention::
 //
-//	Searching for patterns in HTTP body is potentially cpu intensive. For each specified pattern, http body is scanned byte by byte to find a match.
+//	Searching for patterns in HTTP body is potentially CPU-intensive. For each specified pattern, HTTP body is scanned byte by byte to find a match.
 //	If multiple patterns are specified, the process is repeated for each pattern. If location of a pattern is known, ``bytes_limit`` should be specified
-//	to scan only part of the http body.
+//	to scan only part of the HTTP body.
 type HttpGenericBodyMatch struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -821,7 +821,7 @@ type Matcher_MatcherList_Predicate_AndMatcher struct {
 }
 
 type Matcher_MatcherList_Predicate_NotMatcher struct {
-	// The invert of a predicate
+	// The inverse of a predicate
 	NotMatcher *Matcher_MatcherList_Predicate `protobuf:"bytes,4,opt,name=not_matcher,json=notMatcher,proto3,oneof"`
 }
 
