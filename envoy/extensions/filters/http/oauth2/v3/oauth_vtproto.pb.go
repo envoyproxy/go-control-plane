@@ -395,6 +395,30 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.CodeVerifierTokenExpiresIn != nil {
+		size, err := (*durationpb.Duration)(m.CodeVerifierTokenExpiresIn).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xca
+	}
+	if m.CsrfTokenExpiresIn != nil {
+		size, err := (*durationpb.Duration)(m.CsrfTokenExpiresIn).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc2
+	}
 	if len(m.EndSessionEndpoint) > 0 {
 		i -= len(m.EndSessionEndpoint)
 		copy(dAtA[i:], m.EndSessionEndpoint)
@@ -1022,6 +1046,14 @@ func (m *OAuth2Config) SizeVT() (n int) {
 	}
 	l = len(m.EndSessionEndpoint)
 	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.CsrfTokenExpiresIn != nil {
+		l = (*durationpb.Duration)(m.CsrfTokenExpiresIn).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.CodeVerifierTokenExpiresIn != nil {
+		l = (*durationpb.Duration)(m.CodeVerifierTokenExpiresIn).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
