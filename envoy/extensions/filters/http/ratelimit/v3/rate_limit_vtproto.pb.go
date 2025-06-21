@@ -50,6 +50,30 @@ func (m *RateLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.FailureModeDenyPercent != nil {
+		if vtmsg, ok := interface{}(m.FailureModeDenyPercent).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.FailureModeDenyPercent)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
+	}
 	if m.FilterEnforced != nil {
 		if vtmsg, ok := interface{}(m.FilterEnforced).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -430,6 +454,16 @@ func (m *RateLimit) SizeVT() (n int) {
 			l = proto.Size(m.FilterEnforced)
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.FailureModeDenyPercent != nil {
+		if size, ok := interface{}(m.FailureModeDenyPercent).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.FailureModeDenyPercent)
+		}
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
