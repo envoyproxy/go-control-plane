@@ -136,6 +136,13 @@ func (m *SocketTapConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.StatsPrefix) > 0 {
+		i -= len(m.StatsPrefix)
+		copy(dAtA[i:], m.StatsPrefix)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.StatsPrefix)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.SetConnectionPerEvent {
 		i--
 		if m.SetConnectionPerEvent {
@@ -191,6 +198,10 @@ func (m *SocketTapConfig) SizeVT() (n int) {
 	_ = l
 	if m.SetConnectionPerEvent {
 		n += 2
+	}
+	l = len(m.StatsPrefix)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

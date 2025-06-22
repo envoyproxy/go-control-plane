@@ -267,6 +267,8 @@ func (m *SocketTapConfig) validate(all bool) error {
 
 	// no validation rules for SetConnectionPerEvent
 
+	// no validation rules for StatsPrefix
+
 	if len(errors) > 0 {
 		return SocketTapConfigMultiError(errors)
 	}
