@@ -584,7 +584,7 @@ type HttpProtocolOptions struct {
 	// The default value for responses can be overridden by setting runtime key “envoy.reloadable_features.max_response_headers_count“.
 	// Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and cause a stream
 	// reset for HTTP/2.
-	// Upstream responses that exceed this limit will result in a 503 response.
+	// Upstream responses that exceed this limit will result in a 502 response.
 	MaxHeadersCount *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_headers_count,json=maxHeadersCount,proto3" json:"max_headers_count,omitempty"`
 	// The maximum size of response headers.
 	// If unconfigured, the default is 60 KiB, except for HTTP/1 response headers which have a default
