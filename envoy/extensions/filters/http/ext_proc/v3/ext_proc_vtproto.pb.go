@@ -10,6 +10,7 @@ import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
 	structpb "github.com/planetscale/vtprotobuf/types/known/structpb"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -671,6 +672,16 @@ func (m *ExtProcOverrides) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.FailureModeAllow != nil {
+		size, err := (*wrapperspb.BoolValue)(m.FailureModeAllow).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x42
+	}
 	if len(m.GrpcInitialMetadata) > 0 {
 		for iNdEx := len(m.GrpcInitialMetadata) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.GrpcInitialMetadata[iNdEx]).(interface {
@@ -1059,6 +1070,10 @@ func (m *ExtProcOverrides) SizeVT() (n int) {
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.FailureModeAllow != nil {
+		l = (*wrapperspb.BoolValue)(m.FailureModeAllow).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
