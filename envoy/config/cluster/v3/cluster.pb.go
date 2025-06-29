@@ -738,12 +738,15 @@ type Cluster struct {
 	// Any “:“ in the cluster name will be converted to “_“ when emitting statistics.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// An optional alternative to the cluster name to be used for observability. This name is used
-	// emitting stats for the cluster and access logging the cluster name. This will appear as
+	// for emitting stats for the cluster and access logging the cluster name. This will appear as
 	// additional information in configuration dumps of a cluster's current status as
 	// :ref:`observability_name <envoy_v3_api_field_admin.v3.ClusterStatus.observability_name>`
-	// and as an additional tag "upstream_cluster.name" while tracing. Note: Any “:“ in the name
-	// will be converted to “_“ when emitting statistics. This should not be confused with
-	// :ref:`Router Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
+	// and as an additional tag "upstream_cluster.name" while tracing.
+	//
+	// .. note::
+	//
+	//	Any ``:`` in the name will be converted to ``_`` when emitting statistics. This should not be confused with
+	//	:ref:`Router Filter Header <config_http_filters_router_x-envoy-upstream-alt-stat-name>`.
 	AltStatName string `protobuf:"bytes,28,opt,name=alt_stat_name,json=altStatName,proto3" json:"alt_stat_name,omitempty"`
 	// Types that are assignable to ClusterDiscoveryType:
 	//
@@ -2669,9 +2672,11 @@ type Cluster_CommonLbConfig struct {
 	// If this is not set, we default to a merge window of 1000ms. To disable it, set the merge
 	// window to 0.
 	//
-	// Note: merging does not apply to cluster membership changes (e.g.: adds/removes); this is
-	// because merging those updates isn't currently safe. See
-	// https://github.com/envoyproxy/envoy/pull/3941.
+	// .. note::
+	//
+	//	Merging does not apply to cluster membership changes (e.g.: adds/removes); this is
+	//	because merging those updates isn't currently safe. See
+	//	https://github.com/envoyproxy/envoy/pull/3941.
 	UpdateMergeWindow *durationpb.Duration `protobuf:"bytes,4,opt,name=update_merge_window,json=updateMergeWindow,proto3" json:"update_merge_window,omitempty"`
 	// If set to true, Envoy will :ref:`exclude <arch_overview_load_balancing_excluded>` new hosts
 	// when computing load balancing weights until they have been health checked for the first time.

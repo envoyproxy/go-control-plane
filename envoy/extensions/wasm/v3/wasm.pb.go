@@ -24,13 +24,13 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// If there is a fatal error on the VM (e.g. exception, abort()), then the policy will be applied.
+// If there is a fatal error on the VM (e.g. exception, “abort()“), then the policy will be applied.
 type FailurePolicy int32
 
 const (
 	// No policy is specified. The default policy will be used. The default policy is “FAIL_CLOSED“.
 	FailurePolicy_UNSPECIFIED FailurePolicy = 0
-	// New plugin instance will be created for the new request if the VM is failed. Note this only
+	// New plugin instance will be created for the new request if the VM is failed. Note this will only
 	// be applied to the following failures:
 	//
 	// * “proxy_wasm::FailState::RuntimeError“
@@ -197,7 +197,9 @@ func (x *CapabilityRestrictionConfig) GetAllowedCapabilities() map[string]*Sanit
 
 // Configuration for sanitization of inputs to an allowed capability.
 //
-// NOTE: This is currently unimplemented.
+// .. note::
+//
+//	This is currently unimplemented.
 type SanitizationConfig struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -278,13 +280,16 @@ type VmConfig struct {
 	// The Wasm code that Envoy will execute.
 	Code *v3.AsyncDataSource `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
 	// The Wasm configuration used in initialization of a new VM
-	// (proxy_on_start). “google.protobuf.Struct“ is serialized as JSON before
+	// (“proxy_on_start“). “google.protobuf.Struct“ is serialized as JSON before
 	// passing it to the plugin. “google.protobuf.BytesValue“ and
 	// “google.protobuf.StringValue“ are passed directly without the wrapper.
 	Configuration *anypb.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
 	// Allow the wasm file to include pre-compiled code on VMs which support it.
-	// Warning: this should only be enable for trusted sources as the precompiled code is not
-	// verified.
+	//
+	// .. warning::
+	//
+	//	This should only be enabled for trusted sources as the precompiled code is not
+	//	verified.
 	AllowPrecompiled bool `protobuf:"varint,5,opt,name=allow_precompiled,json=allowPrecompiled,proto3" json:"allow_precompiled,omitempty"`
 	// If true and the code needs to be remotely fetched and it is not in the cache then NACK the configuration
 	// update and do a background fetch to fill the cache, otherwise fetch the code asynchronously and enter
@@ -295,7 +300,10 @@ type VmConfig struct {
 	// are generally called implicitly by your language's standard library. Therefore, you do not
 	// need to call them directly. You can access environment variables in the same way you would
 	// on native platforms.
-	// Warning: Envoy rejects the configuration if there's conflict of key space.
+	//
+	// .. warning::
+	//
+	//	Envoy rejects the configuration if there's conflict of key space.
 	EnvironmentVariables *EnvironmentVariables `protobuf:"bytes,7,opt,name=environment_variables,json=environmentVariables,proto3" json:"environment_variables,omitempty"`
 }
 
@@ -465,11 +473,15 @@ type PluginConfig struct {
 	// passing it to the plugin. “google.protobuf.BytesValue“ and
 	// “google.protobuf.StringValue“ are passed directly without the wrapper.
 	Configuration *anypb.Any `protobuf:"bytes,4,opt,name=configuration,proto3" json:"configuration,omitempty"`
-	// If there is a fatal error on the VM (e.g. exception, abort(), on_start or on_configure return false),
+	// If there is a fatal error on the VM (e.g. exception, “abort()“, “on_start“ or “on_configure“ return false),
 	// then all plugins associated with the VM will either fail closed (by default), e.g. by returning an HTTP 503 error,
-	// or fail open (if 'fail_open' is set to true) by bypassing the filter. Note: when on_start or on_configure return false
-	// during xDS updates the xDS configuration will be rejected and when on_start or on_configuration return false on initial
-	// startup the proxy will not start.
+	// or fail open (if 'fail_open' is set to true) by bypassing the filter.
+	//
+	// .. note::
+	//
+	//	When ``on_start`` or ``on_configure`` return ``false`` during xDS updates the xDS configuration will be rejected and when ``on_start`` or ``on_configure`` return ``false`` on
+	//	initial startup the proxy will not start.
+	//
 	// This field is deprecated in favor of the “failure_policy“ field.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/wasm/v3/wasm.proto.
