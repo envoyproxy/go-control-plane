@@ -2269,6 +2269,8 @@ func (m *Http3ProtocolOptions) validate(all bool) error {
 
 	// no validation rules for DisableQpack
 
+	// no validation rules for DisableConnectionFlowControlForStreams
+
 	if len(errors) > 0 {
 		return Http3ProtocolOptionsMultiError(errors)
 	}
