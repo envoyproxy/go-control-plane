@@ -50,6 +50,16 @@ func (m *AwsCredentialProvider) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.AssumeRoleCredentialProvider != nil {
+		size, err := m.AssumeRoleCredentialProvider.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x52
+	}
 	if m.InstanceProfileCredentialProvider != nil {
 		size, err := m.InstanceProfileCredentialProvider.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -597,6 +607,80 @@ func (m *InstanceProfileCredentialProvider) MarshalToSizedBufferVTStrict(dAtA []
 	return len(dAtA) - i, nil
 }
 
+func (m *AssumeRoleCredentialProvider) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AssumeRoleCredentialProvider) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *AssumeRoleCredentialProvider) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.CredentialProvider != nil {
+		size, err := m.CredentialProvider.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.SessionDuration != nil {
+		size, err := (*durationpb.Duration)(m.SessionDuration).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.ExternalId) > 0 {
+		i -= len(m.ExternalId)
+		copy(dAtA[i:], m.ExternalId)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ExternalId)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.RoleSessionName) > 0 {
+		i -= len(m.RoleSessionName)
+		copy(dAtA[i:], m.RoleSessionName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.RoleSessionName)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.RoleArn) > 0 {
+		i -= len(m.RoleArn)
+		copy(dAtA[i:], m.RoleArn)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.RoleArn)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *AwsCredentialProvider) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -636,6 +720,10 @@ func (m *AwsCredentialProvider) SizeVT() (n int) {
 	}
 	if m.InstanceProfileCredentialProvider != nil {
 		l = m.InstanceProfileCredentialProvider.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.AssumeRoleCredentialProvider != nil {
+		l = m.AssumeRoleCredentialProvider.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
@@ -812,6 +900,36 @@ func (m *InstanceProfileCredentialProvider) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *AssumeRoleCredentialProvider) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RoleArn)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.RoleSessionName)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ExternalId)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.SessionDuration != nil {
+		l = (*durationpb.Duration)(m.SessionDuration).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.CredentialProvider != nil {
+		l = m.CredentialProvider.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }

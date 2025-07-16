@@ -292,6 +292,35 @@ func (m *AwsCredentialProvider) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetAssumeRoleCredentialProvider()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AwsCredentialProviderValidationError{
+					field:  "AssumeRoleCredentialProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AwsCredentialProviderValidationError{
+					field:  "AssumeRoleCredentialProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAssumeRoleCredentialProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AwsCredentialProviderValidationError{
+				field:  "AssumeRoleCredentialProvider",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return AwsCredentialProviderMultiError(errors)
 	}
@@ -1474,3 +1503,181 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = InstanceProfileCredentialProviderValidationError{}
+
+// Validate checks the field values on AssumeRoleCredentialProvider with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AssumeRoleCredentialProvider) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AssumeRoleCredentialProvider with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AssumeRoleCredentialProviderMultiError, or nil if none found.
+func (m *AssumeRoleCredentialProvider) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AssumeRoleCredentialProvider) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetRoleArn()) < 1 {
+		err := AssumeRoleCredentialProviderValidationError{
+			field:  "RoleArn",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for RoleSessionName
+
+	// no validation rules for ExternalId
+
+	if d := m.GetSessionDuration(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = AssumeRoleCredentialProviderValidationError{
+				field:  "SessionDuration",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			lte := time.Duration(43200*time.Second + 0*time.Nanosecond)
+			gte := time.Duration(900*time.Second + 0*time.Nanosecond)
+
+			if dur < gte || dur > lte {
+				err := AssumeRoleCredentialProviderValidationError{
+					field:  "SessionDuration",
+					reason: "value must be inside range [15m0s, 12h0m0s]",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCredentialProvider()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AssumeRoleCredentialProviderValidationError{
+					field:  "CredentialProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AssumeRoleCredentialProviderValidationError{
+					field:  "CredentialProvider",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCredentialProvider()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AssumeRoleCredentialProviderValidationError{
+				field:  "CredentialProvider",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return AssumeRoleCredentialProviderMultiError(errors)
+	}
+
+	return nil
+}
+
+// AssumeRoleCredentialProviderMultiError is an error wrapping multiple
+// validation errors returned by AssumeRoleCredentialProvider.ValidateAll() if
+// the designated constraints aren't met.
+type AssumeRoleCredentialProviderMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AssumeRoleCredentialProviderMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AssumeRoleCredentialProviderMultiError) AllErrors() []error { return m }
+
+// AssumeRoleCredentialProviderValidationError is the validation error returned
+// by AssumeRoleCredentialProvider.Validate if the designated constraints
+// aren't met.
+type AssumeRoleCredentialProviderValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AssumeRoleCredentialProviderValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AssumeRoleCredentialProviderValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AssumeRoleCredentialProviderValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AssumeRoleCredentialProviderValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AssumeRoleCredentialProviderValidationError) ErrorName() string {
+	return "AssumeRoleCredentialProviderValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AssumeRoleCredentialProviderValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAssumeRoleCredentialProvider.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AssumeRoleCredentialProviderValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AssumeRoleCredentialProviderValidationError{}
