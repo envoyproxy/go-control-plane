@@ -48,15 +48,15 @@ type AwsCredentialProvider struct {
 	CustomCredentialProviderChain bool `protobuf:"varint,4,opt,name=custom_credential_provider_chain,json=customCredentialProviderChain,proto3" json:"custom_credential_provider_chain,omitempty"`
 	// The option to use `IAM Roles Anywhere <https://docs.aws.amazon.com/rolesanywhere/latest/userguide/introduction.html>`_.
 	IamRolesAnywhereCredentialProvider *IAMRolesAnywhereCredentialProvider `protobuf:"bytes,5,opt,name=iam_roles_anywhere_credential_provider,json=iamRolesAnywhereCredentialProvider,proto3" json:"iam_roles_anywhere_credential_provider,omitempty"`
-	// The option to use credentials sourced from standard 'AWS configuration files <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html>'_.
+	// The option to use credentials sourced from standard `AWS configuration files <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html>`_.
 	ConfigCredentialProvider *ConfigCredentialProvider `protobuf:"bytes,6,opt,name=config_credential_provider,json=configCredentialProvider,proto3" json:"config_credential_provider,omitempty"`
-	// The option to use credentials sourced from 'container environment variables <https://docs.aws.amazon.com/sdkref/latest/guide/feature-container-credentials.html>'_.
+	// The option to use credentials sourced from `container environment variables <https://docs.aws.amazon.com/sdkref/latest/guide/feature-container-credentials.html>`_.
 	ContainerCredentialProvider *ContainerCredentialProvider `protobuf:"bytes,7,opt,name=container_credential_provider,json=containerCredentialProvider,proto3" json:"container_credential_provider,omitempty"`
-	// The option to use credentials sourced from 'environment variables <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html>'_.
+	// The option to use credentials sourced from `environment variables <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html>`_.
 	EnvironmentCredentialProvider *EnvironmentCredentialProvider `protobuf:"bytes,8,opt,name=environment_credential_provider,json=environmentCredentialProvider,proto3" json:"environment_credential_provider,omitempty"`
-	// The option to use credentials sourced from an EC2 'Instance Profile <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html>'_.
+	// The option to use credentials sourced from an EC2 `Instance Profile <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html>`_.
 	InstanceProfileCredentialProvider *InstanceProfileCredentialProvider `protobuf:"bytes,9,opt,name=instance_profile_credential_provider,json=instanceProfileCredentialProvider,proto3" json:"instance_profile_credential_provider,omitempty"`
-	// The option to use 'STS:AssumeRole aka Role Chaining <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>'_.
+	// The option to use `STS:AssumeRole aka Role Chaining <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_.
 	AssumeRoleCredentialProvider *AssumeRoleCredentialProvider `protobuf:"bytes,10,opt,name=assume_role_credential_provider,json=assumeRoleCredentialProvider,proto3" json:"assume_role_credential_provider,omitempty"`
 }
 
@@ -638,7 +638,7 @@ func (*InstanceProfileCredentialProvider) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_common_aws_v3_credential_provider_proto_rawDescGZIP(), []int{8}
 }
 
-// Configuration to use `AssumeRole <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>“ for retrieving new credentials, via role chaining.
+// Configuration to use `AssumeRole <https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html>`_ for retrieving new credentials, via role chaining.
 // [#next-free-field: 6]
 type AssumeRoleCredentialProvider struct {
 	state         protoimpl.MessageState
@@ -651,7 +651,8 @@ type AssumeRoleCredentialProvider struct {
 	RoleSessionName string `protobuf:"bytes,2,opt,name=role_session_name,json=roleSessionName,proto3" json:"role_session_name,omitempty"`
 	// Optional string value to use as the externalId
 	ExternalId string `protobuf:"bytes,3,opt,name=external_id,json=externalId,proto3" json:"external_id,omitempty"`
-	// The duration, in seconds, of the role session.
+	// An optional duration, in seconds, of the role session. Minimum role duration is 900s (5 minutes) and maximum is 43200s (12 hours).
+	// If the session duration is not provided, the default will be determined using the `table described here <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_manage-assume.html>`_.
 	SessionDuration *durationpb.Duration `protobuf:"bytes,4,opt,name=session_duration,json=sessionDuration,proto3" json:"session_duration,omitempty"`
 	// The credential provider for signing the AssumeRole request. This is optional and if not set,
 	// it will be retrieved from the procedure described in :ref:`config_http_filters_aws_request_signing`.
