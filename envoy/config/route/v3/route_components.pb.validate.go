@@ -583,6 +583,35 @@ func (m *VirtualHost) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetRequestBodyBufferLimit()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, VirtualHostValidationError{
+					field:  "RequestBodyBufferLimit",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, VirtualHostValidationError{
+					field:  "RequestBodyBufferLimit",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequestBodyBufferLimit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VirtualHostValidationError{
+				field:  "RequestBodyBufferLimit",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	for idx, item := range m.GetRequestMirrorPolicies() {
 		_, _ = idx, item
 
@@ -1360,6 +1389,35 @@ func (m *Route) validate(all bool) error {
 	}
 
 	// no validation rules for StatPrefix
+
+	if all {
+		switch v := interface{}(m.GetRequestBodyBufferLimit()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, RouteValidationError{
+					field:  "RequestBodyBufferLimit",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, RouteValidationError{
+					field:  "RequestBodyBufferLimit",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRequestBodyBufferLimit()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return RouteValidationError{
+				field:  "RequestBodyBufferLimit",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	oneofActionPresent := false
 	switch v := m.Action.(type) {
