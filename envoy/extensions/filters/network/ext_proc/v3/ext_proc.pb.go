@@ -100,17 +100,14 @@ type NetworkExternalProcessor struct {
 	// prematurely with an error, the filter will fail, leading to the close of connection.
 	// With this parameter set to true, however, then if the gRPC stream is prematurely closed
 	// or could not be opened, processing continues without error.
-	// [#not-implemented-hide:]
 	FailureModeAllow bool `protobuf:"varint,2,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
 	// Options for controlling processing behavior.
-	// [#not-implemented-hide:]
 	ProcessingMode *ProcessingMode `protobuf:"bytes,3,opt,name=processing_mode,json=processingMode,proto3" json:"processing_mode,omitempty"`
 	// Specifies the timeout for each individual message sent on the stream and
 	// when the filter is running in synchronous mode. Whenever
 	// the proxy sends a message on the stream that requires a response, it will
 	// reset this timer, and will stop processing and return an error (subject
 	// to the processing mode) if the timer expires. Default is 200 ms.
-	// [#not-implemented-hide:]
 	MessageTimeout *durationpb.Duration `protobuf:"bytes,4,opt,name=message_timeout,json=messageTimeout,proto3" json:"message_timeout,omitempty"`
 	StatPrefix     string               `protobuf:"bytes,5,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Options related to the sending and receiving of dynamic metadata.
