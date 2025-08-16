@@ -49,6 +49,11 @@ func (m *ZipkinConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TraceContextOption != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.TraceContextOption))
+		i--
+		dAtA[i] = 0x40
+	}
 	if m.SplitSpansForRequest {
 		i--
 		if m.SplitSpansForRequest {
@@ -138,6 +143,9 @@ func (m *ZipkinConfig) SizeVT() (n int) {
 	}
 	if m.SplitSpansForRequest {
 		n += 2
+	}
+	if m.TraceContextOption != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.TraceContextOption))
 	}
 	n += len(m.unknownFields)
 	return n

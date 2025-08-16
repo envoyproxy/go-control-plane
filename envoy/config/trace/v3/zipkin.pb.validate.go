@@ -117,6 +117,8 @@ func (m *ZipkinConfig) validate(all bool) error {
 
 	// no validation rules for SplitSpansForRequest
 
+	// no validation rules for TraceContextOption
+
 	if len(errors) > 0 {
 		return ZipkinConfigMultiError(errors)
 	}
