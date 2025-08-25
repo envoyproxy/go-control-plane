@@ -431,9 +431,16 @@ type OverloadAction struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The name of the overload action. This is just a well-known string that listeners can
-	// use for registering callbacks. Custom overload actions should be named using reverse
-	// DNS to ensure uniqueness.
+	// The name of the overload action. This is just a well-known string that
+	// listeners can use for registering callbacks.
+	// Valid known overload actions include:
+	// - envoy.overload_actions.stop_accepting_requests
+	// - envoy.overload_actions.disable_http_keepalive
+	// - envoy.overload_actions.stop_accepting_connections
+	// - envoy.overload_actions.reject_incoming_connections
+	// - envoy.overload_actions.shrink_heap
+	// - envoy.overload_actions.reduce_timeouts
+	// - envoy.overload_actions.reset_high_memory_stream
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A set of triggers for this action. The state of the action is the maximum
 	// state of all triggers, which can be scalar values between 0 and 1 or
@@ -443,7 +450,7 @@ type OverloadAction struct {
 	// <envoy_v3_api_field_config.overload.v3.Trigger.name>` must be unique
 	// in this list.
 	Triggers []*Trigger `protobuf:"bytes,2,rep,name=triggers,proto3" json:"triggers,omitempty"`
-	// Configuration for the action being instantiated.
+	// Configuration for the action being instantiated if applicable.
 	TypedConfig *anypb.Any `protobuf:"bytes,3,opt,name=typed_config,json=typedConfig,proto3" json:"typed_config,omitempty"`
 }
 
