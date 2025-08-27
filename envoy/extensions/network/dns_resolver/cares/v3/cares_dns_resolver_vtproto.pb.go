@@ -50,6 +50,16 @@ func (m *CaresDnsResolverConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.Edns0MaxPayloadSize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.Edns0MaxPayloadSize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x4a
+	}
 	if m.RotateNameservers {
 		i--
 		if m.RotateNameservers {
@@ -207,6 +217,10 @@ func (m *CaresDnsResolverConfig) SizeVT() (n int) {
 	}
 	if m.RotateNameservers {
 		n += 2
+	}
+	if m.Edns0MaxPayloadSize != nil {
+		l = (*wrapperspb.UInt32Value)(m.Edns0MaxPayloadSize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

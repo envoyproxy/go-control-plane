@@ -186,6 +186,21 @@ func (m *CaresDnsResolverConfig) validate(all bool) error {
 
 	// no validation rules for RotateNameservers
 
+	if wrapper := m.GetEdns0MaxPayloadSize(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 512 || val > 4096 {
+			err := CaresDnsResolverConfigValidationError{
+				field:  "Edns0MaxPayloadSize",
+				reason: "value must be inside range [512, 4096]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return CaresDnsResolverConfigMultiError(errors)
 	}
