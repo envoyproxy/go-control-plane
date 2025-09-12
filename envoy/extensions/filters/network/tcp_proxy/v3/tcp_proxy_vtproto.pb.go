@@ -163,6 +163,28 @@ func (m *TcpProxy_TunnelingConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (in
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RequestIdExtension != nil {
+		if vtmsg, ok := interface{}(m.RequestIdExtension).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.RequestIdExtension)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
 	if m.PropagateResponseTrailers {
 		i--
 		if m.PropagateResponseTrailers {
@@ -751,6 +773,16 @@ func (m *TcpProxy_TunnelingConfig) SizeVT() (n int) {
 	}
 	if m.PropagateResponseTrailers {
 		n += 2
+	}
+	if m.RequestIdExtension != nil {
+		if size, ok := interface{}(m.RequestIdExtension).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.RequestIdExtension)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
