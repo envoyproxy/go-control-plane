@@ -1005,7 +1005,7 @@ type Http2ProtocolOptions struct {
 	HpackTableSize *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize,proto3" json:"hpack_table_size,omitempty"`
 	// `Maximum concurrent streams <https://httpwg.org/specs/rfc7540.html#rfc.section.5.1.2>`_
 	// allowed for peer on one HTTP/2 connection. Valid values range from 1 to 2147483647 (2^31 - 1)
-	// and defaults to 2147483647.
+	// and defaults to 1024 for safety and should be sufficient for most use cases.
 	//
 	// For upstream connections, this also limits how many streams Envoy will initiate concurrently
 	// on a single connection. If the limit is reached, Envoy may queue requests or establish
@@ -1017,8 +1017,8 @@ type Http2ProtocolOptions struct {
 	MaxConcurrentStreams *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
 	// `Initial stream-level flow-control window
 	// <https://httpwg.org/specs/rfc7540.html#rfc.section.6.9.2>`_ size. Valid values range from 65535
-	// (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum) and defaults to 268435456
-	// (256 * 1024 * 1024).
+	// (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum) and defaults to
+	// 16MiB (16 * 1024 * 1024).
 	//
 	// .. note::
 	//
@@ -1030,7 +1030,7 @@ type Http2ProtocolOptions struct {
 	// stop the flow of data to the codec buffers.
 	InitialStreamWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
 	// Similar to “initial_stream_window_size“, but for connection-level flow-control
-	// window. Currently, this has the same minimum/maximum/default as “initial_stream_window_size“.
+	// window. The default is 24MiB (24 * 1024 * 1024).
 	InitialConnectionWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// Allows proxying Websocket and other upgrades over H2 connect.
 	AllowConnect bool `protobuf:"varint,5,opt,name=allow_connect,json=allowConnect,proto3" json:"allow_connect,omitempty"`
