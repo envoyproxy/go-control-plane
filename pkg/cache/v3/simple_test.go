@@ -95,14 +95,17 @@ func (log logger) Debugf(format string, args ...interface{}) {
 	log.t.Helper()
 	log.t.Logf(format, args...)
 }
+
 func (log logger) Infof(format string, args ...interface{}) {
 	log.t.Helper()
 	log.t.Logf(format, args...)
 }
+
 func (log logger) Warnf(format string, args ...interface{}) {
 	log.t.Helper()
 	log.t.Logf(format, args...)
 }
+
 func (log logger) Errorf(format string, args ...interface{}) {
 	log.t.Helper()
 	log.t.Logf(format, args...)
