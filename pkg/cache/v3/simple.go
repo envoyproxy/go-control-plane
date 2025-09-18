@@ -411,11 +411,23 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 	if exists {
 		knownResourceNames := streamState.GetKnownResourceNames(request.GetTypeUrl())
 		diff := []string{}
+		subscribed := make(map[string]bool)
 		for _, r := range request.GetResourceNames() {
+			subscribed[r] = true
 			if _, ok := knownResourceNames[r]; !ok {
 				diff = append(diff, r)
 			}
 		}
+		// Remove any known resources that are not subscribed anymore, and
+		// update corresponding stream state. This will ensure that if a
+		// resource that was unsubscribed is resubscribed later, it will be sent
+		// again to the client.
+		for k := range knownResourceNames {
+			if _, ok := subscribed[k]; !ok {
+				delete(knownResourceNames, k)
+			}
+		}
+		streamState.SetKnownResourceNames(request.GetTypeUrl(), knownResourceNames)
 
 		cache.log.Debugf("nodeID %q requested %s%v and known %v. Diff %v", nodeID,
 			request.GetTypeUrl(), request.GetResourceNames(), knownResourceNames, diff)

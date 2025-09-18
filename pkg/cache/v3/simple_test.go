@@ -91,10 +91,22 @@ type logger struct {
 	t *testing.T
 }
 
-func (log logger) Debugf(format string, args ...interface{}) { log.t.Logf(format, args...) }
-func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
+func (log logger) Debugf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+func (log logger) Infof(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+func (log logger) Warnf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
+func (log logger) Errorf(format string, args ...interface{}) {
+	log.t.Helper()
+	log.t.Logf(format, args...)
+}
 
 func TestSnapshotCacheWithTTL(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -442,6 +454,177 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 		t.Fatal("Should create a watch")
 	} else {
 		cancel()
+	}
+}
+
+// Tests the scenario where an Envoy client unsubscribes from a resource by
+// omitting it from the ResourceNames in a DiscoveryRequest, then later
+// resubscribes to it by including it again in ResourceNames.
+func TestSnapshotCreateWatch_UnsubscribeFollowedByResubscribe(t *testing.T) {
+	const (
+		listenerName1 = "listenerName1"
+		listenerName2 = "listenerName2"
+		routeName1    = "routeName1"
+		routeName2    = "routeName2"
+		version       = "1"
+	)
+	node := &core.Node{Id: t.Name()}
+
+	// Create a snapshot with two listener resources, each with its own route
+	// configuration.
+	snapshot, err := cache.NewSnapshot(version, map[rsrc.Type][]types.Resource{
+		rsrc.ListenerType: {
+			resource.MakeRouteHTTPListener(resource.Ads, listenerName1, 80, routeName1),
+			resource.MakeRouteHTTPListener(resource.Ads, listenerName2, 80, routeName2),
+		},
+	})
+	if err != nil {
+		t.Fatalf("Failed to create snapshot: %v", err)
+	}
+
+	// Create a cache and set the snapshot.
+	c := cache.NewSnapshotCache(false, cache.IDHash{}, logger{t: t})
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := c.SetSnapshot(ctx, node.GetId(), snapshot); err != nil {
+		t.Fatalf("Failed to set snapshot: %v", err)
+	}
+
+	// Create a watchResponseCh for both listeners.
+	watchResponseCh := make(chan cache.Response, 1)
+	streamState := stream.NewStreamState(false, map[string]string{})
+	req := &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.ListenerType,
+		ResourceNames: []string{listenerName1, listenerName2},
+		Node:          node,
+	}
+	c.CreateWatch(req, streamState, watchResponseCh)
+
+	// Wait for the initial response with both listeners.
+	var gotWatchResponse cache.Response
+	var gotDiscoveryResponse *discovery.DiscoveryResponse
+	select {
+	case gotWatchResponse = <-watchResponseCh:
+		var err error
+		gotDiscoveryResponse, err = gotWatchResponse.GetDiscoveryResponse()
+		if err != nil {
+			t.Fatalf("Failed to get discovery response: %v", err)
+		}
+	case <-ctx.Done():
+		t.Fatal("Test timed out when waiting for a response from the watch")
+	}
+
+	// Validate the initial response.
+	gotVersion := gotDiscoveryResponse.GetVersionInfo()
+	if gotVersion != version {
+		t.Fatalf("Got version %q, want %q", gotVersion, version)
+	}
+	wantResources := map[string]types.ResourceWithTTL{
+		listenerName1: snapshot.Resources[types.Listener].Items[listenerName1],
+		listenerName2: snapshot.Resources[types.Listener].Items[listenerName2],
+	}
+	gotResources := cache.IndexResourcesByName(gotWatchResponse.(*cache.RawResponse).Resources)
+	if diff := cmp.Diff(wantResources, gotResources, protocmp.Transform()); diff != "" {
+		t.Fatalf("Response resources (-want +got):\n%s", diff)
+	}
+
+	// Simulate an ACK from Envoy by creating a watch for the same set of
+	// resources, but with the updated version and nonce from the initial
+	// response. The set of known resource names in the stream state is actually
+	// updated by the server implementation when it sees the ACK, before it
+	// recreates the watch.
+	streamState.SetKnownResourceNamesAsList(rsrc.ListenerType, []string{listenerName1, listenerName2})
+	req = &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.ListenerType,
+		ResourceNames: []string{listenerName1, listenerName2},
+		VersionInfo:   gotVersion,
+		ResponseNonce: gotDiscoveryResponse.GetNonce(),
+		Node:          node,
+	}
+	c.CreateWatch(req, streamState, watchResponseCh)
+
+	// Wait for the ACK to be processed. Rely on the stream state being updated
+	// with the known resource names.
+	wantKnownResourceNames := map[string]struct{}{
+		listenerName1: {},
+		listenerName2: {},
+	}
+	var gotKnownResourceNames map[string]struct{}
+	for ; ctx.Err() == nil; <-time.After(10 * time.Millisecond) {
+		gotKnownResourceNames = streamState.GetKnownResourceNames(rsrc.ListenerType)
+		if diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames); diff == "" {
+			break
+		}
+	}
+	if ctx.Err() != nil {
+		diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames)
+		t.Fatalf("Test timed out when waiting for the ACK to be processed\nKnown resource names (-want +got):\n%s", diff)
+	}
+
+	// Now simulate unsubscribing from listenerName2 by creating a watch for
+	// just listenerName1, with the current version and nonce.
+	req = &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.ListenerType,
+		ResourceNames: []string{listenerName1},
+		VersionInfo:   gotVersion,
+		ResponseNonce: gotDiscoveryResponse.GetNonce(),
+		Node:          node,
+	}
+	c.CreateWatch(req, streamState, watchResponseCh)
+
+	// Ensure there is no response from the cache after a short wait, since
+	// listenerName1 is already known at the current version.
+	sCtx, sCancel := context.WithTimeout(ctx, 100*time.Millisecond)
+	defer sCancel()
+	select {
+	case <-watchResponseCh:
+		t.Fatalf("Received unexpected response when unsubscribing from a resource")
+	case <-sCtx.Done():
+	}
+
+	// Wait for the stream state to be updated with just listenerName1 as the
+	// known resource name, indicating that the unsubscribe has been processed.
+	wantKnownResourceNames = map[string]struct{}{listenerName1: {}}
+	for ; ctx.Err() == nil; <-time.After(10 * time.Millisecond) {
+		gotKnownResourceNames = streamState.GetKnownResourceNames(rsrc.ListenerType)
+		if diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames); diff == "" {
+			break
+		}
+	}
+	if ctx.Err() != nil {
+		diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames)
+		t.Fatalf("Test timed out when waiting for the unsubscribe to be processed\nKnown resource names (-want +got):\n%s", diff)
+	}
+
+	// Now simulate resubscribing to listenerName2 by creating a watch for
+	// both listenerName1 and listenerName2, with the current version and nonce.
+	req = &discovery.DiscoveryRequest{
+		TypeUrl:       rsrc.ListenerType,
+		ResourceNames: []string{listenerName1, listenerName2},
+		VersionInfo:   gotVersion,
+		ResponseNonce: gotDiscoveryResponse.GetNonce(),
+		Node:          node,
+	}
+	c.CreateWatch(req, streamState, watchResponseCh)
+
+	// Wait for the response with both listeners.
+	select {
+	case gotWatchResponse = <-watchResponseCh:
+	case <-ctx.Done():
+		t.Fatal("Test timed out when waiting for a response from the watch")
+	}
+
+	// Validate the initial response.
+	if gotVersion = gotDiscoveryResponse.GetVersionInfo(); gotVersion != version {
+		t.Fatalf("Got version %q, want %q", gotVersion, version)
+	}
+	wantResources = map[string]types.ResourceWithTTL{
+		listenerName1: snapshot.Resources[types.Listener].Items[listenerName1],
+		listenerName2: snapshot.Resources[types.Listener].Items[listenerName2],
+	}
+	gotResources = cache.IndexResourcesByName(gotWatchResponse.(*cache.RawResponse).Resources)
+	if diff := cmp.Diff(wantResources, gotResources, protocmp.Transform()); diff != "" {
+		t.Fatalf("Response resources (-want +got):\n%s", diff)
 	}
 }
 
