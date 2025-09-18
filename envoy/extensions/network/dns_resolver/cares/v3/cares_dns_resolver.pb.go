@@ -80,10 +80,13 @@ type CaresDnsResolverConfig struct {
 	//
 	//	This setting overrides any system configuration for name server rotation.
 	RotateNameservers bool `protobuf:"varint,8,opt,name=rotate_nameservers,json=rotateNameservers,proto3" json:"rotate_nameservers,omitempty"`
+	// Maximum EDNS0 UDP payload size in bytes.
+	// If set, c-ares will include EDNS0 in DNS queries and use this value as the maximum UDP response size.
+	//
 	// Recommended values:
 	//
-	//   - 1232: Safe default (avoids fragmentation)
-	//   - 4096: Maximum allowed
+	// * **1232**: Safe default (avoids fragmentation).
+	// * **4096**: Maximum allowed.
 	//
 	// If unset, c-ares uses its internal default (usually 1232).
 	Edns0MaxPayloadSize *wrapperspb.UInt32Value `protobuf:"bytes,9,opt,name=edns0_max_payload_size,json=edns0MaxPayloadSize,proto3" json:"edns0_max_payload_size,omitempty"`
