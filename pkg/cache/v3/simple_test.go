@@ -546,22 +546,15 @@ func TestSnapshotCreateWatch_UnsubscribeFollowedByResubscribe(t *testing.T) {
 	}
 	c.CreateWatch(req, streamState, watchResponseCh)
 
-	// Wait for the ACK to be processed. Rely on the stream state being updated
-	// with the known resource names.
+	// Processing of the ACK results in the stream state being updated with the
+	// resources known by the client.
 	wantKnownResourceNames := map[string]struct{}{
 		listenerName1: {},
 		listenerName2: {},
 	}
-	var gotKnownResourceNames map[string]struct{}
-	for ; ctx.Err() == nil; <-time.After(10 * time.Millisecond) {
-		gotKnownResourceNames = streamState.GetKnownResourceNames(rsrc.ListenerType)
-		if diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames); diff == "" {
-			break
-		}
-	}
-	if ctx.Err() != nil {
-		diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames)
-		t.Fatalf("Test timed out when waiting for the ACK to be processed\nKnown resource names (-want +got):\n%s", diff)
+	gotKnownResourceNames := streamState.GetKnownResourceNames(rsrc.ListenerType)
+	if diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames); diff != "" {
+		t.Fatalf("Known resource names (-want +got):\n%s", diff)
 	}
 
 	// Now simulate unsubscribing from listenerName2 by creating a watch for
@@ -585,18 +578,12 @@ func TestSnapshotCreateWatch_UnsubscribeFollowedByResubscribe(t *testing.T) {
 	case <-sCtx.Done():
 	}
 
-	// Wait for the stream state to be updated with just listenerName1 as the
-	// known resource name, indicating that the unsubscribe has been processed.
+	// Processing of the unsubscribe request results in the stream state being
+	// updated with just listenerName1 as the resources known by the client.
 	wantKnownResourceNames = map[string]struct{}{listenerName1: {}}
-	for ; ctx.Err() == nil; <-time.After(10 * time.Millisecond) {
-		gotKnownResourceNames = streamState.GetKnownResourceNames(rsrc.ListenerType)
-		if diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames); diff == "" {
-			break
-		}
-	}
-	if ctx.Err() != nil {
-		diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames)
-		t.Fatalf("Test timed out when waiting for the unsubscribe to be processed\nKnown resource names (-want +got):\n%s", diff)
+	gotKnownResourceNames = streamState.GetKnownResourceNames(rsrc.ListenerType)
+	if diff := cmp.Diff(wantKnownResourceNames, gotKnownResourceNames); diff != "" {
+		t.Fatalf("Known resource names (-want +got):\n%s", diff)
 	}
 
 	// Now simulate resubscribing to listenerName2 by creating a watch for
