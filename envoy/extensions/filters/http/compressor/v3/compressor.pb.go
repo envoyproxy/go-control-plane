@@ -36,56 +36,64 @@ type Compressor struct {
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
 	ContentLength *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=content_length,json=contentLength,proto3" json:"content_length,omitempty"`
 	// Set of strings that allows specifying which mime-types yield compression; e.g.,
-	// application/json, text/html, etc. When this field is not defined, compression will be applied
-	// to the following mime-types: "application/javascript", "application/json",
-	// "application/xhtml+xml", "image/svg+xml", "text/css", "text/html", "text/plain", "text/xml"
-	// and their synonyms.
+	// “application/json“, “text/html“, etc.
+	//
+	// When this field is not specified, compression will be applied to these following mime-types
+	// and their synonyms:
+	//
+	// * “application/javascript“
+	// * “application/json“
+	// * “application/xhtml+xml“
+	// * “image/svg+xml“
+	// * “text/css“
+	// * “text/html“
+	// * “text/plain“
+	// * “text/xml“
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
 	ContentType []string `protobuf:"bytes,2,rep,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
-	// If true, disables compression when the response contains an etag header. When it is false, the
-	// filter will preserve weak etags and remove the ones that require strong validation.
+	// When this field is “true“, disables compression when the response contains an “ETag“ header.
+	// When this field is “false“, the filter will preserve weak “ETag“ values and remove those that
+	// require strong validation.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
 	DisableOnEtagHeader bool `protobuf:"varint,3,opt,name=disable_on_etag_header,json=disableOnEtagHeader,proto3" json:"disable_on_etag_header,omitempty"`
-	// If true, removes accept-encoding from the request headers before dispatching it to the upstream
-	// so that responses do not get compressed before reaching the filter.
+	// When this field is “true“, removes “Accept-Encoding“ from the request headers before dispatching
+	// the request to the upstream so that responses do not get compressed before reaching the filter.
 	//
 	// .. attention::
 	//
-	//	To avoid interfering with other compression filters in the same chain use this option in
+	//	To avoid interfering with other compression filters in the same chain, use this option in
 	//	the filter closest to the upstream.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
 	RemoveAcceptEncodingHeader bool `protobuf:"varint,4,opt,name=remove_accept_encoding_header,json=removeAcceptEncodingHeader,proto3" json:"remove_accept_encoding_header,omitempty"`
-	// Runtime flag that controls whether the filter is enabled or not. If set to false, the
-	// filter will operate as a pass-through filter, unless overridden by
-	// CompressorPerRoute. If not specified, defaults to enabled.
+	// Runtime flag that controls whether the filter is enabled. When this field is “false“, the
+	// filter will operate as a pass-through filter, unless overridden by “CompressorPerRoute“.
+	// If this field is not specified, the filter is enabled by default.
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/compressor/v3/compressor.proto.
 	RuntimeEnabled *v3.RuntimeFeatureFlag `protobuf:"bytes,5,opt,name=runtime_enabled,json=runtimeEnabled,proto3" json:"runtime_enabled,omitempty"`
-	// A compressor library to use for compression. Currently only
-	// :ref:`envoy.compression.gzip.compressor<envoy_v3_api_msg_extensions.compression.gzip.compressor.v3.Gzip>`
-	// is included in Envoy.
+	// A compressor library to use for compression.
 	// [#extension-category: envoy.compression.compressor]
 	CompressorLibrary *v3.TypedExtensionConfig `protobuf:"bytes,6,opt,name=compressor_library,json=compressorLibrary,proto3" json:"compressor_library,omitempty"`
-	// Configuration for request compression. Compression is disabled by default if left empty.
+	// Configuration for request compression. If this field is not specified, request compression is disabled.
 	RequestDirectionConfig *Compressor_RequestDirectionConfig `protobuf:"bytes,7,opt,name=request_direction_config,json=requestDirectionConfig,proto3" json:"request_direction_config,omitempty"`
-	// Configuration for response compression. Compression is enabled by default if left empty.
+	// Configuration for response compression. If this field is not specified, response compression is enabled.
 	//
 	// .. attention::
 	//
-	//	If the field is not empty then the duplicate deprecated fields of the ``Compressor`` message,
+	//	When this field is set, duplicate deprecated fields of the ``Compressor`` message,
 	//	such as ``content_length``, ``content_type``, ``disable_on_etag_header``,
-	//	``remove_accept_encoding_header`` and ``runtime_enabled``, are ignored.
+	//	``remove_accept_encoding_header``, and ``runtime_enabled``, are ignored.
 	//
-	//	Also all the statistics related to response compression will be rooted in
+	//	Additionally, all statistics related to response compression will be rooted in
 	//	``<stat_prefix>.compressor.<compressor_library.name>.<compressor_library_stat_prefix>.response.*``
 	//	instead of
 	//	``<stat_prefix>.compressor.<compressor_library.name>.<compressor_library_stat_prefix>.*``.
 	ResponseDirectionConfig *Compressor_ResponseDirectionConfig `protobuf:"bytes,8,opt,name=response_direction_config,json=responseDirectionConfig,proto3" json:"response_direction_config,omitempty"`
-	// If true, chooses this compressor first to do compression when the q-values in “Accept-Encoding“ are same.
-	// The last compressor which enables choose_first will be chosen if multiple compressor filters in the chain have choose_first as true.
+	// When this field is “true“, this compressor is preferred when q-values in “Accept-Encoding“ are equal.
+	// If multiple compressor filters set “choose_first“ to “true“, the last one in the filter chain is chosen.
 	ChooseFirst bool `protobuf:"varint,9,opt,name=choose_first,json=chooseFirst,proto3" json:"choose_first,omitempty"`
 }
 
@@ -362,7 +370,7 @@ type isCompressorPerRoute_Override interface {
 
 type CompressorPerRoute_Disabled struct {
 	// If set, the filter will operate as a pass-through filter.
-	// Overrides Compressor.runtime_enabled and CommonDirectionConfig.enabled.
+	// Overrides “Compressor.runtime_enabled“ and “CommonDirectionConfig.enabled“.
 	Disabled bool `protobuf:"varint,1,opt,name=disabled,proto3,oneof"`
 }
 
@@ -380,19 +388,28 @@ type Compressor_CommonDirectionConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Runtime flag that controls whether compression is enabled or not for the direction this
-	// common config is put in. If set to false, the filter will operate as a pass-through filter
-	// in the chosen direction, unless overridden by CompressorPerRoute.
-	// If the field is omitted, the filter will be enabled.
+	// Runtime flag that controls whether compression is enabled for the direction this
+	// common config is applied to. When this field is “false“, the filter will operate as a
+	// pass-through filter in the chosen direction, unless overridden by “CompressorPerRoute“.
+	// If this field is not specified, the filter will be enabled.
 	Enabled *v3.RuntimeFeatureFlag `protobuf:"bytes,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	// Minimum value of Content-Length header of request or response messages (depending on the direction
-	// this common config is put in), in bytes, which will trigger compression. The default value is 30.
+	// Minimum value of the “Content-Length“ header in request or response messages (depending on the
+	// direction this common config is applied to), in bytes, that will trigger compression. Defaults to 30.
 	MinContentLength *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=min_content_length,json=minContentLength,proto3" json:"min_content_length,omitempty"`
 	// Set of strings that allows specifying which mime-types yield compression; e.g.,
-	// application/json, text/html, etc. When this field is not defined, compression will be applied
-	// to the following mime-types: "application/javascript", "application/json",
-	// "application/xhtml+xml", "image/svg+xml", "text/css", "text/html", "text/plain", "text/xml"
-	// and their synonyms.
+	// “application/json“, “text/html“, etc.
+	//
+	// When this field is not specified, compression will be applied to these following mime-types
+	// and their synonyms:
+	//
+	// * “application/javascript“
+	// * “application/json“
+	// * “application/xhtml+xml“
+	// * “image/svg+xml“
+	// * “text/css“
+	// * “text/html“
+	// * “text/plain“
+	// * “text/xml“
 	ContentType []string `protobuf:"bytes,3,rep,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 }
 
@@ -504,18 +521,19 @@ type Compressor_ResponseDirectionConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	CommonConfig *Compressor_CommonDirectionConfig `protobuf:"bytes,1,opt,name=common_config,json=commonConfig,proto3" json:"common_config,omitempty"`
-	// If true, disables compression when the response contains an etag header. When it is false, the
-	// filter will preserve weak etags and remove the ones that require strong validation.
+	// When this field is “true“, disables compression when the response contains an “ETag“ header.
+	// When this field is “false“, the filter will preserve weak “ETag“ values and remove those that
+	// require strong validation.
 	DisableOnEtagHeader bool `protobuf:"varint,2,opt,name=disable_on_etag_header,json=disableOnEtagHeader,proto3" json:"disable_on_etag_header,omitempty"`
-	// If true, removes accept-encoding from the request headers before dispatching it to the upstream
-	// so that responses do not get compressed before reaching the filter.
+	// When this field is “true“, removes “Accept-Encoding“ from the request headers before dispatching
+	// the request to the upstream so that responses do not get compressed before reaching the filter.
 	//
 	// .. attention::
 	//
-	//	To avoid interfering with other compression filters in the same chain use this option in
+	//	To avoid interfering with other compression filters in the same chain, use this option in
 	//	the filter closest to the upstream.
 	RemoveAcceptEncodingHeader bool `protobuf:"varint,3,opt,name=remove_accept_encoding_header,json=removeAcceptEncodingHeader,proto3" json:"remove_accept_encoding_header,omitempty"`
-	// Set of response codes for which compression is disabled, e.g. 206 Partial Content should not
+	// Set of response codes for which compression is disabled; e.g., 206 Partial Content should not
 	// be compressed.
 	UncompressibleResponseCodes []uint32 `protobuf:"varint,4,rep,packed,name=uncompressible_response_codes,json=uncompressibleResponseCodes,proto3" json:"uncompressible_response_codes,omitempty"`
 }
