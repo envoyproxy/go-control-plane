@@ -411,6 +411,30 @@ func (m *TcpProxy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxDownstreamConnectionDurationJitterPercentage != nil {
+		if vtmsg, ok := interface{}(m.MaxDownstreamConnectionDurationJitterPercentage).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.MaxDownstreamConnectionDurationJitterPercentage)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa2
+	}
 	if len(m.ProxyProtocolTlvs) > 0 {
 		for iNdEx := len(m.ProxyProtocolTlvs) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.ProxyProtocolTlvs[iNdEx]).(interface {
@@ -940,6 +964,16 @@ func (m *TcpProxy) SizeVT() (n int) {
 			}
 			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.MaxDownstreamConnectionDurationJitterPercentage != nil {
+		if size, ok := interface{}(m.MaxDownstreamConnectionDurationJitterPercentage).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.MaxDownstreamConnectionDurationJitterPercentage)
+		}
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
