@@ -36,8 +36,8 @@ type TlsInspector struct {
 	EnableJa4Fingerprinting *wrapperspb.BoolValue `protobuf:"bytes,3,opt,name=enable_ja4_fingerprinting,json=enableJa4Fingerprinting,proto3" json:"enable_ja4_fingerprinting,omitempty"`
 	// The size in bytes of the initial buffer requested by the tls_inspector.
 	// If the filter needs to read additional bytes from the socket, the
-	// filter will double the buffer up to it's default maximum of 64KiB.
-	// If this size is not defined, defaults to maximum 64KiB that the
+	// filter will double the buffer up to it's default maximum of 16KiB.
+	// If this size is not defined, defaults to maximum 16KiB that the
 	// tls inspector will consume.
 	InitialReadBufferSize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=initial_read_buffer_size,json=initialReadBufferSize,proto3" json:"initial_read_buffer_size,omitempty"`
 }
