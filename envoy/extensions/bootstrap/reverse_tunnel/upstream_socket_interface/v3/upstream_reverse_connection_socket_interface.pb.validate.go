@@ -62,6 +62,21 @@ func (m *UpstreamReverseConnectionSocketInterface) validate(all bool) error {
 
 	// no validation rules for StatPrefix
 
+	if wrapper := m.GetPingFailureThreshold(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
+			err := UpstreamReverseConnectionSocketInterfaceValidationError{
+				field:  "PingFailureThreshold",
+				reason: "value must be greater than or equal to 1",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return UpstreamReverseConnectionSocketInterfaceMultiError(errors)
 	}

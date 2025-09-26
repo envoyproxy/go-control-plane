@@ -8,6 +8,7 @@ package upstream_socket_interfacev3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -48,6 +49,16 @@ func (m *UpstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStrict(
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.PingFailureThreshold != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.PingFailureThreshold).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
 	if len(m.StatPrefix) > 0 {
 		i -= len(m.StatPrefix)
 		copy(dAtA[i:], m.StatPrefix)
@@ -66,6 +77,10 @@ func (m *UpstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 	_ = l
 	l = len(m.StatPrefix)
 	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.PingFailureThreshold != nil {
+		l = (*wrapperspb.UInt32Value)(m.PingFailureThreshold).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
