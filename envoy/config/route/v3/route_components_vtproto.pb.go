@@ -1043,6 +1043,13 @@ func (m *WeightedCluster) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if msg, ok := m.RandomValueSpecifier.(*WeightedCluster_UseHashPolicy); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if msg, ok := m.RandomValueSpecifier.(*WeightedCluster_HeaderName); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1094,6 +1101,29 @@ func (m *WeightedCluster_HeaderName) MarshalToSizedBufferVTStrict(dAtA []byte) (
 	i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.HeaderName)))
 	i--
 	dAtA[i] = 0x22
+	return len(dAtA) - i, nil
+}
+func (m *WeightedCluster_UseHashPolicy) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *WeightedCluster_UseHashPolicy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.UseHashPolicy != nil {
+		size, err := (*wrapperspb.BoolValue)(m.UseHashPolicy).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	} else {
+		i = protohelpers.EncodeVarint(dAtA, i, 0)
+		i--
+		dAtA[i] = 0x2a
+	}
 	return len(dAtA) - i, nil
 }
 func (m *ClusterSpecifierPlugin) MarshalVTStrict() (dAtA []byte, err error) {
@@ -6558,6 +6588,20 @@ func (m *WeightedCluster_HeaderName) SizeVT() (n int) {
 	_ = l
 	l = len(m.HeaderName)
 	n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	return n
+}
+func (m *WeightedCluster_UseHashPolicy) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.UseHashPolicy != nil {
+		l = (*wrapperspb.BoolValue)(m.UseHashPolicy).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	} else {
+		n += 2
+	}
 	return n
 }
 func (m *ClusterSpecifierPlugin) SizeVT() (n int) {
