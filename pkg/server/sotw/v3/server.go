@@ -121,17 +121,7 @@ func (s *streamWrapper) send(resp cache.Response) error {
 	}
 
 	// Track in the type subcription the nonce and objects returned to the client.
-	version, err := resp.GetVersion()
-	if err != nil {
-		return err
-	}
-	// ToDo(valerian-roche): properly return the resources actually sent to the client
-	// Currently we set all resources requested, which is non-descriptive when using wildcard.
-	resources := make(map[string]string, len(resp.GetRequest().GetResourceNames()))
-	for _, r := range resp.GetRequest().GetResourceNames() {
-		resources[r] = version
-	}
-	w.sub.SetReturnedResources(resources)
+	w.sub.SetReturnedResources(resp.GetReturnedResources())
 	w.nonce = out.Nonce
 
 	// Register with the callbacks provided that we are sending the response.
