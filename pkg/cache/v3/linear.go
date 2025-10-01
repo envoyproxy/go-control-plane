@@ -17,6 +17,7 @@ package cache
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,7 +25,6 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 type watches = map[ResponseWatch]struct{}
@@ -178,11 +178,11 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 		}
 
 		for id, watch := range cache.deltaWatches {
-			if !watch.StreamState.WatchesResources(modified) {
+			if !watch.subscription.WatchesResources(modified) {
 				continue
 			}
 
-			res := cache.respondDelta(watch.Request, watch.Response, watch.StreamState)
+			res := cache.respondDelta(watch.Request, watch.Response, watch.subscription)
 			if res != nil {
 				delete(cache.deltaWatches, id)
 			}
@@ -190,8 +190,8 @@ func (cache *LinearCache) notifyAll(modified map[string]struct{}) {
 	}
 }
 
-func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) *RawDeltaResponse {
-	resp := createDeltaResponse(context.Background(), request, state, resourceContainer{
+func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaResponse, sub Subscription) *RawDeltaResponse {
+	resp := createDeltaResponse(context.Background(), request, sub, resourceContainer{
 		resourceMap:   cache.resources,
 		versionMap:    cache.versionMap,
 		systemVersion: cache.getVersion(),
@@ -200,10 +200,10 @@ func (cache *LinearCache) respondDelta(request *DeltaRequest, value chan DeltaRe
 	// Only send a response if there were changes
 	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
 	// otherwise, envoy won't complete initialization
-	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFirst()) {
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (sub.IsWildcard() && request.ResponseNonce == "") {
 		if cache.log != nil {
 			cache.log.Debugf("[linear cache] node: %s, sending delta response for typeURL %s with resources: %v removed resources: %v with wildcard: %t",
-				request.GetNode().GetId(), request.GetTypeUrl(), GetResourceNames(resp.Resources), resp.RemovedResources, state.IsWildcard())
+				request.GetNode().GetId(), request.GetTypeUrl(), GetResourceNames(resp.Resources), resp.RemovedResources, sub.IsWildcard())
 		}
 		value <- resp
 		return resp
@@ -314,10 +314,9 @@ func (cache *LinearCache) GetResources() map[string]types.Resource {
 	return resources
 }
 
-func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, value chan Response) func() {
+func (cache *LinearCache) CreateWatch(request *Request, _ Subscription, value chan Response) (func(), error) {
 	if request.GetTypeUrl() != cache.typeURL {
-		value <- nil
-		return nil
+		return nil, fmt.Errorf("request type %s does not match cache type %s", request.GetTypeUrl(), cache.typeURL)
 	}
 	// If the version is not up to date, check whether any requested resource has
 	// been updated between the last version and the current version. This avoids the problem
@@ -363,7 +362,7 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 	}
 	if stale {
 		cache.respond(watch, staleResources)
-		return nil
+		return nil, nil
 	}
 	// Create open watches since versions are up to date.
 	if len(request.GetResourceNames()) == 0 {
@@ -373,7 +372,7 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 			cache.mu.Lock()
 			defer cache.mu.Unlock()
 			delete(cache.watchAll, watch)
-		}
+		}, nil
 	}
 
 	cache.log.Infof("[linear cache] open watch for %s resources %v, system version %q", cache.typeURL, request.ResourceNames, cache.getVersion())
@@ -389,7 +388,7 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 		cache.mu.Lock()
 		defer cache.mu.Unlock()
 		cache.removeWatch(watch)
-	}
+	}, nil
 }
 
 // Must be called under lock
@@ -405,7 +404,7 @@ func (cache *LinearCache) removeWatch(watch ResponseWatch) {
 	}
 }
 
-func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
+func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, sub Subscription, value chan DeltaResponse) (func(), error) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
@@ -422,7 +421,7 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 			cache.log.Errorf("failed to update version map: %v", err)
 		}
 	}
-	response := cache.respondDelta(request, value, state)
+	response := cache.respondDelta(request, value, sub)
 
 	// if respondDelta returns nil this means that there is no change in any resource version
 	// create a new watch accordingly
@@ -430,15 +429,15 @@ func (cache *LinearCache) CreateDeltaWatch(request *DeltaRequest, state stream.S
 		watchID := cache.nextDeltaWatchID()
 		if cache.log != nil {
 			cache.log.Infof("[linear cache] open delta watch ID:%d for %s Resources:%v, system version %q", watchID,
-				cache.typeURL, state.GetSubscribedResourceNames(), cache.getVersion())
+				cache.typeURL, sub.SubscribedResources(), cache.getVersion())
 		}
 
-		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, StreamState: state}
+		cache.deltaWatches[watchID] = DeltaResponseWatch{Request: request, Response: value, subscription: sub}
 
-		return cache.cancelDeltaWatch(watchID)
+		return cache.cancelDeltaWatch(watchID), nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (cache *LinearCache) updateVersionMap(modified map[string]struct{}) error {
