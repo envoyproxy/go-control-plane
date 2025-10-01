@@ -17,6 +17,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
@@ -31,7 +32,7 @@ func assertResourceMapEqual(t *testing.T, want, got map[string]types.Resource) {
 }
 
 func TestSnapshotCacheDeltaWatch(t *testing.T) {
-	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
 	watches := make(map[string]chan cache.DeltaResponse)
 	subscriptions := make(map[string]stream.Subscription)
 
@@ -113,7 +114,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 }
 
 func TestDeltaRemoveResources(t *testing.T) {
-	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
 	watches := make(map[string]chan cache.DeltaResponse)
 	subscriptions := make(map[string]*stream.Subscription)
 
@@ -188,7 +189,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 }
 
 func TestConcurrentSetDeltaWatch(t *testing.T) {
-	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
 	for i := 0; i < 50; i++ {
 		version := fmt.Sprintf("v%d", i)
 		func(i int) {
@@ -222,7 +223,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 type testKey struct{}
 
 func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.DeltaResponse)
@@ -267,7 +268,7 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 }
 
 func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 	for _, typ := range testTypes {
 		responses := make(chan cache.DeltaResponse, 1)
 		cancel, err := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
