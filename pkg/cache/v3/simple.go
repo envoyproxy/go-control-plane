@@ -206,8 +206,8 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			if len(resourcesWithTTL) == 0 {
 				continue
 			}
-			cache.log.Debugf("respond open watch %d%v with heartbeat for version %q", id, watch.Request.GetResourceNames(), version)
-			err := cache.respond(ctx, watch.Request, watch.Response, resourcesWithTTL, version, true)
+			cache.log.Debugf("respond open watch %d %v with heartbeat for version %q", id, watch.Request.GetResourceNames(), version)
+			err := cache.respond(ctx, watch, resourcesWithTTL, version, true)
 			if err != nil {
 				cache.log.Errorf("received error when attempting to respond to watches: %v", err)
 			}
@@ -250,9 +250,9 @@ func (cache *snapshotCache) respondSOTWWatches(ctx context.Context, info *status
 	respond := func(watch ResponseWatch, id int64) error {
 		version := snapshot.GetVersion(watch.Request.GetTypeUrl())
 		if version != watch.Request.GetVersionInfo() {
-			cache.log.Debugf("respond open watch %d %s%v with new version %q", id, watch.Request.GetTypeUrl(), watch.Request.GetResourceNames(), version)
+			cache.log.Debugf("respond open watch %d %s %v with new version %q", id, watch.Request.GetTypeUrl(), watch.Request.GetResourceNames(), version)
 			resources := snapshot.GetResourcesAndTTL(watch.Request.GetTypeUrl())
-			err := cache.respond(ctx, watch.Request, watch.Response, resources, version, false)
+			err := cache.respond(ctx, watch, resources, version, false)
 			if err != nil {
 				return err
 			}
@@ -402,54 +402,58 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 	info.lastWatchRequestTime = time.Now()
 	info.mu.Unlock()
 
-	var version string
-	snapshot, exists := cache.snapshots[nodeID]
-	if exists {
-		version = snapshot.GetVersion(request.GetTypeUrl())
+	createWatch := func(watch ResponseWatch) func() {
+		watchID := cache.nextWatchID()
+		cache.log.Debugf("open watch %d for %s %v from nodeID %q, version %q", watchID, request.GetTypeUrl(), sub.SubscribedResources(), nodeID, request.GetVersionInfo())
+		info.mu.Lock()
+		info.watches[watchID] = watch
+		info.mu.Unlock()
+		return cache.cancelWatch(nodeID, watchID)
 	}
 
-	if exists {
+	watch := ResponseWatch{Request: request, Response: value, subscription: sub}
+
+	snapshot, exists := cache.snapshots[nodeID]
+	if !exists {
+		return createWatch(watch), nil
+	}
+
+	version := snapshot.GetVersion(request.GetTypeUrl())
+	resources := snapshot.GetResourcesAndTTL(request.GetTypeUrl())
+
+	if request.GetVersionInfo() == version {
+		// Retrieve whether there are resources in the cache requested and currently unknown to the client.
 		knownResourceNames := sub.ReturnedResources()
-		diff := []string{}
-		for _, r := range request.GetResourceNames() {
-			if _, ok := knownResourceNames[r]; !ok {
-				diff = append(diff, r)
+		diff := false
+		if !sub.IsWildcard() {
+			// Check if a resource requested is currently not returned,
+			// for instance if it is newly subscribed
+			for r := range sub.SubscribedResources() {
+				if _, ok := knownResourceNames[r]; !ok {
+					diff = true
+					break
+				}
 			}
-		}
-
-		cache.log.Debugf("nodeID %q requested %s%v and known %v. Diff %v", nodeID,
-			request.GetTypeUrl(), request.GetResourceNames(), knownResourceNames, diff)
-
-		if len(diff) > 0 {
-			resources := snapshot.GetResourcesAndTTL(request.GetTypeUrl())
-			for _, name := range diff {
-				if _, exists := resources[name]; exists {
-					if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
-						cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.GetTypeUrl(),
-							request.GetResourceNames(), nodeID, err)
-						return nil, fmt.Errorf("failed to send the response: %w", err)
-					}
-					return func() {}, nil
+		} else {
+			// Check if a resource present in the snapshot is currently not returned,
+			// for instance if the subscription is newly wildcard.
+			for r := range snapshot.GetResources(request.GetTypeUrl()) {
+				if _, ok := knownResourceNames[r]; !ok {
+					diff = true
+					break
 				}
 			}
 		}
+		// The version has not changed, and the client already has all requested resources.
+		if !diff {
+			return createWatch(watch), nil
+		}
 	}
 
-	// if the requested version is up-to-date or missing a response, leave an open watch
-	if !exists || request.GetVersionInfo() == version {
-		watchID := cache.nextWatchID()
-		cache.log.Debugf("open watch %d for %s%v from nodeID %q, version %q", watchID, request.GetTypeUrl(), request.GetResourceNames(), nodeID, request.GetVersionInfo())
-		info.mu.Lock()
-		info.watches[watchID] = ResponseWatch{Request: request, Response: value}
-		info.mu.Unlock()
-		return cache.cancelWatch(nodeID, watchID), nil
-	}
-
-	// otherwise, the watch may be responded immediately
-	resources := snapshot.GetResourcesAndTTL(request.GetTypeUrl())
-	if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
+	// The version is different, or the client is subscribed to resources not yet returned to it.
+	if err := cache.respond(context.Background(), watch, resources, version, false); err != nil {
 		cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.GetTypeUrl(),
-			request.GetResourceNames(), nodeID, err)
+			sub.SubscribedResources(), nodeID, err)
 		return nil, fmt.Errorf("failed to send the response: %w", err)
 	}
 
@@ -476,12 +480,13 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 
 // Respond to a watch with the snapshot value. The value channel should have capacity not to block.
 // TODO(kuat) do not respond always, see issue https://github.com/envoyproxy/go-control-plane/issues/46
-func (cache *snapshotCache) respond(ctx context.Context, request *Request, value chan Response, resources map[string]types.ResourceWithTTL, version string, heartbeat bool) error {
+func (cache *snapshotCache) respond(ctx context.Context, watch ResponseWatch, resources map[string]types.ResourceWithTTL, version string, heartbeat bool) error {
+	request := watch.Request
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if len(request.GetResourceNames()) != 0 && cache.ads {
 		if err := superset(nameSet(request.GetResourceNames()), resources); err != nil {
-			cache.log.Warnf("ADS mode: not responding to request %s%v: %v", request.GetTypeUrl(), request.GetResourceNames(), err)
+			cache.log.Warnf("ADS mode: not responding to request %s %v: %v", request.GetTypeUrl(), request.GetResourceNames(), err)
 			return nil
 		}
 	}
@@ -489,7 +494,7 @@ func (cache *snapshotCache) respond(ctx context.Context, request *Request, value
 	cache.log.Debugf("respond %s%v version %q with version %q", request.GetTypeUrl(), request.GetResourceNames(), request.GetVersionInfo(), version)
 
 	select {
-	case value <- createResponse(ctx, request, resources, version, heartbeat):
+	case watch.Response <- createResponse(ctx, request, resources, version, heartbeat):
 		return nil
 	case <-ctx.Done():
 		return context.Canceled
@@ -498,6 +503,7 @@ func (cache *snapshotCache) respond(ctx context.Context, request *Request, value
 
 func createResponse(ctx context.Context, request *Request, resources map[string]types.ResourceWithTTL, version string, heartbeat bool) Response {
 	filtered := make([]types.ResourceWithTTL, 0, len(resources))
+	returnedResources := make(map[string]string, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
 	// individually in a separate stream. It is ok to reply with the same version
@@ -507,20 +513,23 @@ func createResponse(ctx context.Context, request *Request, resources map[string]
 		for name, resource := range resources {
 			if set[name] {
 				filtered = append(filtered, resource)
+				returnedResources[name] = version
 			}
 		}
 	} else {
-		for _, resource := range resources {
+		for name, resource := range resources {
 			filtered = append(filtered, resource)
+			returnedResources[name] = version
 		}
 	}
 
 	return &RawResponse{
-		Request:   request,
-		Version:   version,
-		Resources: filtered,
-		Heartbeat: heartbeat,
-		Ctx:       ctx,
+		Request:           request,
+		Version:           version,
+		Resources:         filtered,
+		ReturnedResources: returnedResources,
+		Heartbeat:         heartbeat,
+		Ctx:               ctx,
 	}
 }
 

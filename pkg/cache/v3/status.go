@@ -90,6 +90,9 @@ type ResponseWatch struct {
 
 	// Response is the channel to push responses to.
 	Response chan Response
+
+	// Subscription stores the current client subscription state.
+	subscription Subscription
 }
 
 // DeltaResponseWatch is a watch record keeping both the delta request and an open channel for the delta response.

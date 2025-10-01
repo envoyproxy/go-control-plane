@@ -34,6 +34,7 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
@@ -50,6 +51,19 @@ func (group) ID(node *core.Node) string {
 		return node.GetId()
 	}
 	return key
+}
+
+func subFromRequest(req *cache.Request) stream.Subscription {
+	return stream.NewSotwSubscription(req.GetResourceNames())
+}
+
+// This method represents the expected behavior of client and servers regarding the request and the subscription.
+// For edge cases it should ignore those
+func updateFromSotwResponse(resp cache.Response, sub *stream.Subscription, req *cache.Request) {
+	sub.SetReturnedResources(resp.GetReturnedResources())
+	// Never returns an error when not using passthrough responses
+	version, _ := resp.GetVersion()
+	req.VersionInfo = version
 }
 
 var (
@@ -87,34 +101,10 @@ var (
 	}
 )
 
-type logger struct {
-	t *testing.T
-}
-
-func (log logger) Debugf(format string, args ...interface{}) {
-	log.t.Helper()
-	log.t.Logf(format, args...)
-}
-
-func (log logger) Infof(format string, args ...interface{}) {
-	log.t.Helper()
-	log.t.Logf(format, args...)
-}
-
-func (log logger) Warnf(format string, args ...interface{}) {
-	log.t.Helper()
-	log.t.Logf(format, args...)
-}
-
-func (log logger) Errorf(format string, args ...interface{}) {
-	log.t.Helper()
-	log.t.Logf(format, args...)
-}
-
 func TestSnapshotCacheWithTTL(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	c := cache.NewSnapshotCacheWithHeartbeating(ctx, true, group{}, logger{t: t}, time.Second)
+	c := cache.NewSnapshotCacheWithHeartbeating(ctx, true, group{}, log.NewTestLogger(t), time.Second)
 
 	_, err := c.GetSnapshot(key)
 	require.Errorf(t, err, "unexpected snapshot found for key %q", key)
@@ -129,12 +119,13 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 	// All the resources should respond immediately when version is not up to date.
 	subs := map[string]stream.Subscription{}
 	for _, typ := range testTypes {
-		sub := stream.NewSotwSubscription(names[typ])
 		wg.Add(1)
 		t.Run(typ, func(t *testing.T) {
 			defer wg.Done()
+			req := &discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}
+			sub := subFromRequest(req)
 			value := make(chan cache.Response, 1)
-			_, err = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, sub, value)
+			_, err = c.CreateWatch(req, sub, value)
 			require.NoError(t, err)
 			select {
 			case out := <-value:
@@ -142,12 +133,7 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 				assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
 				assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTTL(typ))
 
-				returnedResources := make(map[string]string)
-				// Update sub to track what was returned
-				for _, resource := range out.GetRequest().GetResourceNames() {
-					returnedResources[resource] = fixture.version
-				}
-				sub.SetReturnedResources(returnedResources)
+				updateFromSotwResponse(out, &sub, req)
 				subs[typ] = sub
 			case <-time.After(2 * time.Second):
 				t.Errorf("failed to receive snapshot response")
@@ -205,7 +191,7 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 }
 
 func TestSnapshotCache(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 
 	_, err := c.GetSnapshot(key)
 	require.Errorf(t, err, "unexpected snapshot found for key %q", key)
@@ -219,9 +205,9 @@ func TestSnapshotCache(t *testing.T) {
 	// try to get endpoints with incorrect list of names
 	// should not receive response
 	value := make(chan cache.Response, 1)
-	sub := stream.NewSotwSubscription([]string{"none"})
-	_, err = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}},
-		sub, value)
+	req := &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{"none"}}
+	sub := subFromRequest(req)
+	_, err = c.CreateWatch(req, sub, value)
 	require.NoError(t, err)
 	select {
 	case out := <-value:
@@ -232,9 +218,9 @@ func TestSnapshotCache(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			value := make(chan cache.Response, 1)
-			sub := stream.NewSotwSubscription(names[typ])
-			_, err = c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]},
-				sub, value)
+			req := &discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}
+			sub := subFromRequest(req)
+			_, err = c.CreateWatch(req, sub, value)
 			require.NoError(t, err)
 			select {
 			case out := <-value:
@@ -250,7 +236,7 @@ func TestSnapshotCache(t *testing.T) {
 }
 
 func TestSnapshotCacheFetch(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 	require.NoError(t, c.SetSnapshot(context.Background(), key, fixture.snapshot()))
 
 	for _, typ := range testTypes {
@@ -277,14 +263,15 @@ func TestSnapshotCacheFetch(t *testing.T) {
 }
 
 func TestSnapshotCacheWatch(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 	watches := make(map[string]chan cache.Response)
 	subs := map[string]stream.Subscription{}
 	for _, typ := range testTypes {
-		sub := stream.NewSotwSubscription(names[typ])
+		req := &discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}
+		sub := subFromRequest(req)
 		subs[typ] = sub
 		watches[typ] = make(chan cache.Response, 1)
-		_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, sub, watches[typ])
+		_, err := c.CreateWatch(req, sub, watches[typ])
 		require.NoError(t, err)
 	}
 
@@ -303,7 +290,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 					returnedResources[resource] = fixture.version
 				}
 				sub := subs[typ]
-				sub.SetReturnedResources(returnedResources)
+				updateFromSotwResponse(out, &sub, out.GetRequest())
 				subs[typ] = sub
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
@@ -340,7 +327,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 }
 
 func TestConcurrentSetWatch(t *testing.T) {
-	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
 	for i := 0; i < 50; i++ {
 		i := i
 		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
@@ -353,11 +340,11 @@ func TestConcurrentSetWatch(t *testing.T) {
 				err := c.SetSnapshot(context.Background(), id, &snap)
 				require.NoErrorf(t, err, "failed to set snapshot %q", id)
 			} else {
-				sub := stream.NewSotwSubscription(nil)
-				cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{
+				req := &discovery.DiscoveryRequest{
 					Node:    &core.Node{Id: id},
 					TypeUrl: rsrc.EndpointType,
-				}, sub, value)
+				}
+				cancel, err := c.CreateWatch(req, subFromRequest(req), value)
 				require.NoError(t, err)
 				defer cancel()
 			}
@@ -366,11 +353,11 @@ func TestConcurrentSetWatch(t *testing.T) {
 }
 
 func TestSnapshotCacheWatchCancel(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 	for _, typ := range testTypes {
-		sub := stream.NewSotwSubscription(names[typ])
+		req := &discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}
 		value := make(chan cache.Response, 1)
-		cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: typ, ResourceNames: names[typ]}, sub, value)
+		cancel, err := c.CreateWatch(req, subFromRequest(req), value)
 		require.NoError(t, err)
 		cancel()
 	}
@@ -387,13 +374,13 @@ func TestSnapshotCacheWatchCancel(t *testing.T) {
 }
 
 func TestSnapshotCacheWatchTimeout(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.Response)
-	sub := stream.NewSotwSubscription(names[rsrc.EndpointType])
-	_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]},
-		sub, watchCh)
+	req := &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: names[rsrc.EndpointType]}
+	sub := subFromRequest(req)
+	_, err := c.CreateWatch(req, sub, watchCh)
 	require.NoError(t, err)
 
 	// The first time we set the snapshot without consuming from the blocking channel, so this should time out.
@@ -430,7 +417,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	clusterName2 := "clusterName2"
 	routeName2 := "routeName2"
 	listenerName2 := "listenerName2"
-	c := cache.NewSnapshotCache(false, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
 
 	snapshot2, _ := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
 		rsrc.EndpointType:        {testEndpoint, resource.MakeEndpoint(clusterName2, 8080)},
@@ -446,8 +433,8 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 
 	// Request resource with name=ClusterName
 	go func() {
-		_, err := c.CreateWatch(&discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{clusterName}},
-			stream.NewSotwSubscription([]string{clusterName}), watch)
+		req := &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{clusterName}}
+		_, err := c.CreateWatch(req, subFromRequest(req), watch)
 		require.NoError(t, err)
 	}()
 
@@ -463,12 +450,13 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 
 	// Request additional resource with name=clusterName2 for same version
 	go func() {
-		sub := stream.NewSotwSubscription([]string{clusterName, clusterName2})
-		sub.SetReturnedResources(map[string]string{clusterName: fixture.version})
-		_, err := c.CreateWatch(&discovery.DiscoveryRequest{
+		req := &discovery.DiscoveryRequest{
 			TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
 			ResourceNames: []string{clusterName, clusterName2},
-		}, sub, watch)
+		}
+		sub := subFromRequest(req)
+		sub.SetReturnedResources(map[string]string{clusterName: fixture.version})
+		_, err := c.CreateWatch(req, sub, watch)
 		require.NoError(t, err)
 	}()
 
@@ -482,12 +470,13 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	}
 
 	// Repeat request for with same version and make sure a watch is created
-	sub := stream.NewSotwSubscription([]string{clusterName, clusterName2})
-	sub.SetReturnedResources(map[string]string{clusterName: fixture.version, clusterName2: fixture.version})
-	cancel, err := c.CreateWatch(&discovery.DiscoveryRequest{
+	req := &discovery.DiscoveryRequest{
 		TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
 		ResourceNames: []string{clusterName, clusterName2},
-	}, sub, watch)
+	}
+	sub := subFromRequest(req)
+	sub.SetReturnedResources(map[string]string{clusterName: fixture.version, clusterName2: fixture.version})
+	cancel, err := c.CreateWatch(req, sub, watch)
 	require.NoError(t, err)
 	if cancel == nil {
 		t.Fatal("Should create a watch")
@@ -497,8 +486,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 }
 
 func TestSnapshotClear(t *testing.T) {
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
-
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 	require.NoError(t, c.SetSnapshot(context.Background(), key, fixture.snapshot()))
 	c.ClearSnapshot(key)
 	assert.Nilf(t, c.GetStatusInfo(key), "cache should be cleared")
@@ -574,7 +562,7 @@ func TestSnapshotSingleResourceFetch(t *testing.T) {
 		return dst
 	}
 
-	c := cache.NewSnapshotCache(true, group{}, logger{t: t})
+	c := cache.NewSnapshotCache(true, group{}, log.NewTestLogger(t))
 	require.NoError(t, c.SetSnapshot(context.Background(), key, &singleResourceSnapshot{
 		version:  "version-one",
 		typeurl:  durationTypeURL,
