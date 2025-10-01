@@ -403,6 +403,35 @@ func (m *ExternalProcessor) validate(all bool) error {
 	}
 
 	if all {
+		switch v := interface{}(m.GetProcessingRequestModifier()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "ProcessingRequestModifier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExternalProcessorValidationError{
+					field:  "ProcessingRequestModifier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProcessingRequestModifier()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExternalProcessorValidationError{
+				field:  "ProcessingRequestModifier",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
 		switch v := interface{}(m.GetOnProcessingResponse()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
@@ -1339,6 +1368,35 @@ func (m *ExtProcOverrides) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ExtProcOverridesValidationError{
 				field:  "FailureModeAllow",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetProcessingRequestModifier()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ExtProcOverridesValidationError{
+					field:  "ProcessingRequestModifier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ExtProcOverridesValidationError{
+					field:  "ProcessingRequestModifier",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetProcessingRequestModifier()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtProcOverridesValidationError{
+				field:  "ProcessingRequestModifier",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
