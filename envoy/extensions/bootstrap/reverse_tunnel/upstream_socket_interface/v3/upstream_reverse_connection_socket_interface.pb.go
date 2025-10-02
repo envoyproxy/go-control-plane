@@ -29,7 +29,7 @@ type UpstreamReverseConnectionSocketInterface struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Stat prefix to be used for upstream reverse connection socket interface stats.
+	// Stat prefix for upstream reverse connection socket interface stats.
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Number of consecutive ping failures before an idle reverse connection socket is marked dead.
 	// Defaults to 3 if unset. Must be at least 1.
