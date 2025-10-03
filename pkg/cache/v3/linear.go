@@ -367,7 +367,7 @@ func (cache *LinearCache) CreateWatch(request *Request, _ stream.StreamState, va
 	}
 	// Create open watches since versions are up to date.
 	if len(request.GetResourceNames()) == 0 {
-		cache.log.Infof("[linear cache] open watch for %s all resources, system version %q", cache.typeURL, cache.getVersion())
+		cache.log.Infof("[linear cache] open watch for all %s resources, system version %q", cache.typeURL, cache.getVersion())
 		cache.watchAll[watch] = struct{}{}
 		return func() {
 			cache.mu.Lock()
