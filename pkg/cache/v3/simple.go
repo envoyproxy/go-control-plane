@@ -23,7 +23,6 @@ import (
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // ResourceSnapshot is an abstract snapshot of a collection of resources that
@@ -225,6 +224,7 @@ func (cache *snapshotCache) SetSnapshot(ctx context.Context, node string, snapsh
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
+	cache.log.Debugf("setting snapshot for node %s", node)
 	// update the existing entry
 	cache.snapshots[node] = snapshot
 
@@ -310,7 +310,7 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 				snapshot,
 				watch.Request,
 				watch.Response,
-				watch.StreamState,
+				watch.subscription,
 			)
 			if err != nil {
 				return err
@@ -328,7 +328,7 @@ func (cache *snapshotCache) respondDeltaWatches(ctx context.Context, info *statu
 				snapshot,
 				watch.Request,
 				watch.Response,
-				watch.StreamState,
+				watch.subscription,
 			)
 			if err != nil {
 				return err
@@ -385,7 +385,7 @@ func superset(names map[string]bool, resources map[string]types.ResourceWithTTL)
 
 // CreateWatch returns a watch for an xDS request.  A nil function may be
 // returned if an error occurs.
-func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.StreamState, value chan Response) func() {
+func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, value chan Response) (func(), error) {
 	nodeID := cache.hash.ID(request.GetNode())
 
 	cache.mu.Lock()
@@ -409,7 +409,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 	}
 
 	if exists {
-		knownResourceNames := streamState.GetKnownResourceNames(request.GetTypeUrl())
+		knownResourceNames := sub.ReturnedResources()
 		diff := []string{}
 		for _, r := range request.GetResourceNames() {
 			if _, ok := knownResourceNames[r]; !ok {
@@ -427,9 +427,9 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 					if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
 						cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.GetTypeUrl(),
 							request.GetResourceNames(), nodeID, err)
-						return nil
+						return nil, fmt.Errorf("failed to send the response: %w", err)
 					}
-					return func() {}
+					return func() {}, nil
 				}
 			}
 		}
@@ -442,7 +442,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 		info.mu.Lock()
 		info.watches[watchID] = ResponseWatch{Request: request, Response: value}
 		info.mu.Unlock()
-		return cache.cancelWatch(nodeID, watchID)
+		return cache.cancelWatch(nodeID, watchID), nil
 	}
 
 	// otherwise, the watch may be responded immediately
@@ -450,10 +450,10 @@ func (cache *snapshotCache) CreateWatch(request *Request, streamState stream.Str
 	if err := cache.respond(context.Background(), request, value, resources, version, false); err != nil {
 		cache.log.Errorf("failed to send a response for %s%v to nodeID %q: %s", request.GetTypeUrl(),
 			request.GetResourceNames(), nodeID, err)
-		return nil
+		return nil, fmt.Errorf("failed to send the response: %w", err)
 	}
 
-	return func() {}
+	return func() {}, nil
 }
 
 func (cache *snapshotCache) nextWatchID() int64 {
@@ -525,7 +525,7 @@ func createResponse(ctx context.Context, request *Request, resources map[string]
 }
 
 // CreateDeltaWatch returns a watch for a delta xDS request which implements the Simple SnapshotCache.
-func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream.StreamState, value chan DeltaResponse) func() {
+func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sub Subscription, value chan DeltaResponse) (func(), error) {
 	nodeID := cache.hash.ID(request.GetNode())
 	t := request.GetTypeUrl()
 
@@ -554,7 +554,7 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		if err != nil {
 			cache.log.Errorf("failed to compute version for snapshot resources inline: %s", err)
 		}
-		response, err := cache.respondDelta(context.Background(), snapshot, request, value, state)
+		response, err := cache.respondDelta(context.Background(), snapshot, request, value, sub)
 		if err != nil {
 			cache.log.Errorf("failed to respond with delta response: %s", err)
 		}
@@ -566,21 +566,21 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, state stream
 		watchID := cache.nextDeltaWatchID()
 
 		if exists {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q,  version %q", watchID, t, state.GetSubscribedResourceNames(), nodeID, snapshot.GetVersion(t))
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q,  version %q", watchID, t, sub.SubscribedResources(), nodeID, snapshot.GetVersion(t))
 		} else {
-			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q", watchID, t, state.GetSubscribedResourceNames(), nodeID)
+			cache.log.Infof("open delta watch ID:%d for %s Resources:%v from nodeID: %q", watchID, t, sub.SubscribedResources(), nodeID)
 		}
 
-		info.setDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, StreamState: state})
-		return cache.cancelDeltaWatch(nodeID, watchID)
+		info.setDeltaResponseWatch(watchID, DeltaResponseWatch{Request: request, Response: value, subscription: sub})
+		return cache.cancelDeltaWatch(nodeID, watchID), nil
 	}
 
-	return nil
+	return nil, nil
 }
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
-func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceSnapshot, request *DeltaRequest, value chan DeltaResponse, state stream.StreamState) (*RawDeltaResponse, error) {
-	resp := createDeltaResponse(ctx, request, state, resourceContainer{
+func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceSnapshot, request *DeltaRequest, value chan DeltaResponse, sub Subscription) (*RawDeltaResponse, error) {
+	resp := createDeltaResponse(ctx, request, sub, resourceContainer{
 		resourceMap:   snapshot.GetResources(request.GetTypeUrl()),
 		versionMap:    snapshot.GetVersionMap(request.GetTypeUrl()),
 		systemVersion: snapshot.GetVersion(request.GetTypeUrl()),
@@ -589,10 +589,10 @@ func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceS
 	// Only send a response if there were changes
 	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
 	// otherwise, envoy won't complete initialization
-	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (state.IsWildcard() && state.IsFirst()) {
+	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (sub.IsWildcard() && request.ResponseNonce == "") {
 		if cache.log != nil {
 			cache.log.Debugf("node: %s, sending delta response for typeURL %s with resources: %v removed resources: %v with wildcard: %t",
-				request.GetNode().GetId(), request.GetTypeUrl(), GetResourceNames(resp.Resources), resp.RemovedResources, state.IsWildcard())
+				request.GetNode().GetId(), request.GetTypeUrl(), GetResourceNames(resp.Resources), resp.RemovedResources, sub.IsWildcard())
 		}
 		select {
 		case value <- resp:

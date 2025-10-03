@@ -20,7 +20,6 @@ import (
 	"time"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
 // NodeHash computes string identifiers for Envoy nodes.
@@ -101,8 +100,8 @@ type DeltaResponseWatch struct {
 	// Response is the channel to push the delta responses to
 	Response chan DeltaResponse
 
-	// VersionMap for the stream
-	StreamState stream.StreamState
+	// Subscription stores the current client subscription state.
+	subscription Subscription
 }
 
 // newStatusInfo initializes a status info data structure.
