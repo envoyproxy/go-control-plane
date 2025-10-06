@@ -40,6 +40,140 @@ var (
 	_ = v3.RequestMethod(0)
 )
 
+// Validate checks the field values on Validation with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Validation) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Validation with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ValidationMultiError, or
+// nil if none found.
+func (m *Validation) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Validation) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetNodeIdFormat()) > 1024 {
+		err := ValidationValidationError{
+			field:  "NodeIdFormat",
+			reason: "value length must be at most 1024 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetClusterIdFormat()) > 1024 {
+		err := ValidationValidationError{
+			field:  "ClusterIdFormat",
+			reason: "value length must be at most 1024 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for EmitDynamicMetadata
+
+	if utf8.RuneCountInString(m.GetDynamicMetadataNamespace()) > 255 {
+		err := ValidationValidationError{
+			field:  "DynamicMetadataNamespace",
+			reason: "value length must be at most 255 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ValidationMultiError(errors)
+	}
+
+	return nil
+}
+
+// ValidationMultiError is an error wrapping multiple validation errors
+// returned by Validation.ValidateAll() if the designated constraints aren't met.
+type ValidationMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ValidationMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ValidationMultiError) AllErrors() []error { return m }
+
+// ValidationValidationError is the validation error returned by
+// Validation.Validate if the designated constraints aren't met.
+type ValidationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ValidationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ValidationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ValidationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ValidationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ValidationValidationError) ErrorName() string { return "ValidationValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ValidationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sValidation.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ValidationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ValidationValidationError{}
+
 // Validate checks the field values on ReverseTunnel with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -119,6 +253,35 @@ func (m *ReverseTunnel) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetValidation()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ReverseTunnelValidationError{
+					field:  "Validation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ReverseTunnelValidationError{
+					field:  "Validation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetValidation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ReverseTunnelValidationError{
+				field:  "Validation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {

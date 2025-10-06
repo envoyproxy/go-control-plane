@@ -19,6 +19,70 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+func (m *Validation) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Validation) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Validation) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.DynamicMetadataNamespace) > 0 {
+		i -= len(m.DynamicMetadataNamespace)
+		copy(dAtA[i:], m.DynamicMetadataNamespace)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.DynamicMetadataNamespace)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.EmitDynamicMetadata {
+		i--
+		if m.EmitDynamicMetadata {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.ClusterIdFormat) > 0 {
+		i -= len(m.ClusterIdFormat)
+		copy(dAtA[i:], m.ClusterIdFormat)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ClusterIdFormat)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.NodeIdFormat) > 0 {
+		i -= len(m.NodeIdFormat)
+		copy(dAtA[i:], m.NodeIdFormat)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.NodeIdFormat)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *ReverseTunnel) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -48,6 +112,16 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Validation != nil {
+		size, err := m.Validation.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if m.RequestMethod != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.RequestMethod))
@@ -84,6 +158,31 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Validation) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.NodeIdFormat)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ClusterIdFormat)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EmitDynamicMetadata {
+		n += 2
+	}
+	l = len(m.DynamicMetadataNamespace)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *ReverseTunnel) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -103,6 +202,10 @@ func (m *ReverseTunnel) SizeVT() (n int) {
 	}
 	if m.RequestMethod != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.RequestMethod))
+	}
+	if m.Validation != nil {
+		l = m.Validation.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
