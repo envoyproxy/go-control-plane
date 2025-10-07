@@ -9,7 +9,7 @@ replace github.com/envoyproxy/go-control-plane/envoy => ../envoy
 require (
 	github.com/envoyproxy/go-control-plane/envoy v1.35.0
 	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/protobuf v1.36.10
 )
 
 require (
