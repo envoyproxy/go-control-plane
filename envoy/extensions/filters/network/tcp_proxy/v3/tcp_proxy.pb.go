@@ -53,17 +53,15 @@ type TcpProxy struct {
 	// in the upstream cluster with metadata matching what is set in this field will be considered
 	// for load balancing. The filter name should be specified as “envoy.lb“.
 	MetadataMatch *v3.Metadata `protobuf:"bytes,9,opt,name=metadata_match,json=metadataMatch,proto3" json:"metadata_match,omitempty"`
-	// The idle timeout for connections managed by the TCP proxy filter. The idle timeout
-	// is defined as the period in which there are no bytes sent or received on either
-	// the upstream or downstream connection. If not set, the default idle timeout is 1 hour. If set
-	// to 0s, the timeout will be disabled.
-	// It is possible to dynamically override this configuration by setting a per-connection filter
-	// state object for the key “envoy.tcp_proxy.per_connection_idle_timeout_ms“.
+	// The idle timeout for connections managed by the TCP proxy filter. The idle timeout is defined as the
+	// period in which there are no bytes sent or received on either the upstream or downstream connection.
+	// If not set, the default idle timeout is 1 hour. If set to “0s“, the timeout is disabled.
+	// It is possible to dynamically override this configuration by setting a per-connection filter state
+	// object for the key “envoy.tcp_proxy.per_connection_idle_timeout_ms“.
 	//
 	// .. warning::
 	//
-	//	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP
-	//	FIN packets, etc.
+	//	Disabling this timeout is likely to yield connection leaks due to lost TCP FIN packets, etc.
 	IdleTimeout *durationpb.Duration `protobuf:"bytes,8,opt,name=idle_timeout,json=idleTimeout,proto3" json:"idle_timeout,omitempty"`
 	// [#not-implemented-hide:] The idle timeout for connections managed by the TCP proxy
 	// filter. The idle timeout is defined as the period in which there is no
@@ -74,8 +72,7 @@ type TcpProxy struct {
 	DownstreamIdleTimeout *durationpb.Duration `protobuf:"bytes,3,opt,name=downstream_idle_timeout,json=downstreamIdleTimeout,proto3" json:"downstream_idle_timeout,omitempty"`
 	// [#not-implemented-hide:]
 	UpstreamIdleTimeout *durationpb.Duration `protobuf:"bytes,4,opt,name=upstream_idle_timeout,json=upstreamIdleTimeout,proto3" json:"upstream_idle_timeout,omitempty"`
-	// Configuration for :ref:`access logs <arch_overview_access_logs>`
-	// emitted by the this tcp_proxy.
+	// Configuration for :ref:`access logs <arch_overview_access_logs>` emitted by this TCP proxy.
 	AccessLog []*v31.AccessLog `protobuf:"bytes,5,rep,name=access_log,json=accessLog,proto3" json:"access_log,omitempty"`
 	// The maximum number of unsuccessful connection attempts that will be made before
 	// giving up. If the parameter is not specified, 1 connection attempt will be made.
@@ -86,21 +83,21 @@ type TcpProxy struct {
 	// load balancing algorithms will select a host randomly. Currently the number of hash policies is
 	// limited to 1.
 	HashPolicy []*v32.HashPolicy `protobuf:"bytes,11,rep,name=hash_policy,json=hashPolicy,proto3" json:"hash_policy,omitempty"`
-	// If set, this configures tunneling, e.g. configuration options to tunnel TCP payload over
-	// HTTP CONNECT. If this message is absent, the payload will be proxied upstream as per usual.
-	// It is possible to dynamically override this configuration and disable tunneling per connection,
-	// by setting a per-connection filter state object for the key “envoy.tcp_proxy.disable_tunneling“.
+	// If set, this configures tunneling, for example configuration options to tunnel TCP payload over
+	// HTTP CONNECT. If this message is absent, the payload is proxied upstream as usual.
+	// It is possible to dynamically override this configuration and disable tunneling per connection by
+	// setting a per-connection filter state object for the key “envoy.tcp_proxy.disable_tunneling“.
 	TunnelingConfig *TcpProxy_TunnelingConfig `protobuf:"bytes,12,opt,name=tunneling_config,json=tunnelingConfig,proto3" json:"tunneling_config,omitempty"`
-	// The maximum duration of a connection. The duration is defined as the period since a connection
-	// was established. If not set, there is no max duration. When max_downstream_connection_duration
-	// is reached the connection will be closed. Duration must be at least 1ms.
+	// The maximum duration of a connection. The duration is defined as the period since a connection was
+	// established. If not set, there is no maximum duration. When “max_downstream_connection_duration“ is
+	// reached, the connection is closed. The duration must be at least “1ms“.
 	MaxDownstreamConnectionDuration *durationpb.Duration `protobuf:"bytes,13,opt,name=max_downstream_connection_duration,json=maxDownstreamConnectionDuration,proto3" json:"max_downstream_connection_duration,omitempty"`
-	// Percentage-based jitter for max_downstream_connection_duration. The jitter will increase
-	// the max_downstream_connection_duration by some random duration up to the provided percentage.
-	// This field is ignored if max_downstream_connection_duration is not set.
-	// If not set, no jitter will be added.
+	// Percentage-based jitter for “max_downstream_connection_duration“. The jitter increases the
+	// “max_downstream_connection_duration“ by a random duration up to the provided percentage.
+	// This field is ignored if “max_downstream_connection_duration“ is not set. If not set, no jitter
+	// is added.
 	MaxDownstreamConnectionDurationJitterPercentage *v32.Percent `protobuf:"bytes,20,opt,name=max_downstream_connection_duration_jitter_percentage,json=maxDownstreamConnectionDurationJitterPercentage,proto3" json:"max_downstream_connection_duration_jitter_percentage,omitempty"`
-	// Note that if both this field and :ref:`access_log_flush_interval
+	// If both this field and :ref:`access_log_flush_interval
 	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.access_log_flush_interval>`
 	// are specified, the former (deprecated field) is ignored.
 	//
@@ -112,7 +109,7 @@ type TcpProxy struct {
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto.
 	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,15,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
-	// Note that if both this field and :ref:`flush_access_log_on_connected
+	// If both this field and :ref:`flush_access_log_on_connected
 	// <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TcpAccessLogOptions.flush_access_log_on_connected>`
 	// are specified, the former (deprecated field) is ignored.
 	//
@@ -124,21 +121,22 @@ type TcpProxy struct {
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto.
 	FlushAccessLogOnConnected bool `protobuf:"varint,16,opt,name=flush_access_log_on_connected,json=flushAccessLogOnConnected,proto3" json:"flush_access_log_on_connected,omitempty"`
-	// Additional access log options for TCP Proxy.
+	// Additional access log options for the TCP proxy.
 	AccessLogOptions *TcpProxy_TcpAccessLogOptions `protobuf:"bytes,17,opt,name=access_log_options,json=accessLogOptions,proto3" json:"access_log_options,omitempty"`
-	// If set, the specified PROXY protocol TLVs (Type-Length-Value) will be added to the PROXY protocol
-	// state created by the TCP proxy filter. These TLVs will be sent in the PROXY protocol v2 header
-	// to upstream.
+	// If set, the specified “PROXY“ protocol TLVs (Type-Length-Value) are added to the “PROXY“ protocol state
+	// created by the TCP proxy filter. These TLVs are sent in the PROXY protocol v2 header to the upstream.
 	//
-	// This field only takes effect when the TCP proxy filter is creating new PROXY protocol
-	// state and there is an upstream proxy protocol transport socket configured in the cluster.
-	// If the connection already contains PROXY protocol state (including any TLVs) parsed by a
-	// downstream proxy protocol listener filter, the TLVs specified here are ignored.
+	// This field only takes effect when the TCP proxy filter is creating new “PROXY“ protocol state and an
+	// upstream proxy protocol transport socket is configured in the cluster. If the connection already
+	// contains “PROXY“ protocol state (including any TLVs) parsed by a downstream proxy protocol listener
+	// upstream proxy protocol transport socket is configured in the cluster. If the connection already
+	// contains PROXY protocol state (including any TLVs) parsed by a downstream proxy protocol listener
+	// filter, the TLVs specified here are ignored.
 	//
 	// .. note::
 	//
-	//	To ensure specified TLVs are allowed in the upstream PROXY protocol header, you must also
-	//	configure the passthrough TLVs on the upstream proxy protocol transport. See
+	//	To ensure the specified TLVs are allowed in the upstream ``PROXY`` protocol header, you must also
+	//	configure passthrough TLVs on the upstream proxy protocol transport. See
 	//	:ref:`core.v3.ProxyProtocolConfig.pass_through_tlvs <envoy_v3_api_field_config.core.v3.ProxyProtocolConfig.pass_through_tlvs>`
 	//	for details.
 	ProxyProtocolTlvs []*v3.TlvEntry `protobuf:"bytes,19,rep,name=proxy_protocol_tlvs,json=proxyProtocolTlvs,proto3" json:"proxy_protocol_tlvs,omitempty"`
@@ -328,9 +326,8 @@ type TcpProxy_Cluster struct {
 }
 
 type TcpProxy_WeightedClusters struct {
-	// Multiple upstream clusters can be specified for a given route. The
-	// request is routed to one of the upstream clusters based on weights
-	// assigned to each cluster.
+	// Multiple upstream clusters can be specified. The request is routed to one of the upstream clusters
+	// based on the weights assigned to each cluster.
 	WeightedClusters *TcpProxy_WeightedCluster `protobuf:"bytes,10,opt,name=weighted_clusters,json=weightedClusters,proto3,oneof"`
 }
 
@@ -338,15 +335,14 @@ func (*TcpProxy_Cluster) isTcpProxy_ClusterSpecifier() {}
 
 func (*TcpProxy_WeightedClusters) isTcpProxy_ClusterSpecifier() {}
 
-// Allows for specification of multiple upstream clusters along with weights
-// that indicate the percentage of traffic to be forwarded to each cluster.
-// The router selects an upstream cluster based on these weights.
+// Allows specification of multiple upstream clusters along with weights indicating the percentage of
+// traffic forwarded to each cluster. The cluster selection is based on these weights.
 type TcpProxy_WeightedCluster struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Specifies one or more upstream clusters associated with the route.
+	// Specifies the upstream clusters associated with this configuration.
 	Clusters []*TcpProxy_WeightedCluster_ClusterWeight `protobuf:"bytes,1,rep,name=clusters,proto3" json:"clusters,omitempty"`
 }
 
@@ -390,7 +386,7 @@ func (x *TcpProxy_WeightedCluster) GetClusters() []*TcpProxy_WeightedCluster_Clu
 }
 
 // Configuration for tunneling TCP over other transports or application layers.
-// Tunneling is supported over both HTTP/1.1 and HTTP/2. Upstream protocol is
+// Tunneling is supported over HTTP/1.1 and HTTP/2. The upstream protocol is
 // determined by the cluster configuration.
 // [#next-free-field: 8]
 type TcpProxy_TunnelingConfig struct {
@@ -399,41 +395,41 @@ type TcpProxy_TunnelingConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The hostname to send in the synthesized CONNECT headers to the upstream proxy.
-	// This field evaluates command operators if set, otherwise returns hostname as is.
+	// This field evaluates command operators if present; otherwise, the value is used as-is.
 	//
-	// Example: dynamically set hostname using downstream SNI
+	// For example, dynamically set the hostname using downstream SNI:
 	//
 	// .. code-block:: yaml
 	//
 	//	tunneling_config:
 	//	  hostname: "%REQUESTED_SERVER_NAME%:443"
 	//
-	// Example: dynamically set hostname using dynamic metadata
+	// For example, dynamically set the hostname using dynamic metadata:
 	//
 	// .. code-block:: yaml
 	//
 	//	tunneling_config:
 	//	  hostname: "%DYNAMIC_METADATA(tunnel:address)%"
 	Hostname string `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	// Use POST method instead of CONNECT method to tunnel the TCP stream.
-	// The 'protocol: bytestream' header is also NOT set for HTTP/2 to comply with the spec.
+	// Use the “POST“ method instead of the “CONNECT“ method to tunnel the TCP stream.
+	// The “protocol: bytestream“ header is not set for HTTP/2 to comply with the specification.
 	//
-	// The upstream proxy is expected to convert POST payload as raw TCP.
+	// The upstream proxy is expected to interpret the POST payload as raw TCP.
 	UsePost bool `protobuf:"varint,2,opt,name=use_post,json=usePost,proto3" json:"use_post,omitempty"`
-	// Additional request headers to upstream proxy. This is mainly used to
-	// trigger upstream to convert POST requests back to CONNECT requests.
+	// Additional request headers to send to the upstream proxy. This is mainly used to
+	// trigger the upstream to convert POST requests back to CONNECT requests.
 	//
-	// Neither “:-prefixed“ pseudo-headers nor the Host: header can be overridden.
+	// Neither “:“-prefixed pseudo-headers like “:path“ nor the “host“ header can be overridden.
 	HeadersToAdd []*v3.HeaderValueOption `protobuf:"bytes,3,rep,name=headers_to_add,json=headersToAdd,proto3" json:"headers_to_add,omitempty"`
-	// Save the response headers to the downstream info filter state for consumption
-	// by the network filters. The filter state key is “envoy.tcp_proxy.propagate_response_headers“.
+	// Save response headers to the downstream connection's filter state for consumption
+	// by network filters. The filter state key is “envoy.tcp_proxy.propagate_response_headers“.
 	PropagateResponseHeaders bool `protobuf:"varint,4,opt,name=propagate_response_headers,json=propagateResponseHeaders,proto3" json:"propagate_response_headers,omitempty"`
-	// The path used with POST method. Default path is “/“. If post path is specified and
+	// The path used with the POST method. The default path is “/“. If this field is specified and
 	// :ref:`use_post field <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TunnelingConfig.use_post>`
-	// isn't true, it will be rejected.
+	// is not set to true, the configuration will be rejected.
 	PostPath string `protobuf:"bytes,5,opt,name=post_path,json=postPath,proto3" json:"post_path,omitempty"`
-	// Save the response trailers to the downstream info filter state for consumption
-	// by the network filters. The filter state key is “envoy.tcp_proxy.propagate_response_trailers“.
+	// Save response trailers to the downstream connection's filter state for consumption
+	// by network filters. The filter state key is “envoy.tcp_proxy.propagate_response_trailers“.
 	PropagateResponseTrailers bool `protobuf:"varint,6,opt,name=propagate_response_trailers,json=propagateResponseTrailers,proto3" json:"propagate_response_trailers,omitempty"`
 	// The configuration of the request ID extension used for generation, validation, and
 	// associated tracing operations when tunneling.
@@ -535,17 +531,15 @@ type TcpProxy_OnDemand struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// An optional configuration for on-demand cluster discovery
-	// service. If not specified, the on-demand cluster discovery will
-	// be disabled. When it's specified, the filter will pause a request
-	// to an unknown cluster and will begin a cluster discovery
-	// process. When the discovery is finished (successfully or not),
-	// the request will be resumed.
+	// Optional configuration for the on-demand cluster discovery service.
+	// If not specified, on-demand cluster discovery is disabled. When specified, the filter pauses a request
+	// to an unknown cluster and begins a cluster discovery process. When discovery completes (successfully
+	// or not), the request is resumed.
 	OdcdsConfig *v3.ConfigSource `protobuf:"bytes,1,opt,name=odcds_config,json=odcdsConfig,proto3" json:"odcds_config,omitempty"`
 	// xdstp:// resource locator for on-demand cluster collection.
 	// [#not-implemented-hide:]
 	ResourcesLocator string `protobuf:"bytes,2,opt,name=resources_locator,json=resourcesLocator,proto3" json:"resources_locator,omitempty"`
-	// The timeout for on demand cluster lookup. If the CDS cannot return the required cluster,
+	// The timeout for on-demand cluster lookup. If the CDS cannot return the required cluster,
 	// the downstream request will be closed with the error code detail NO_CLUSTER_FOUND.
 	// [#not-implemented-hide:]
 	Timeout *durationpb.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
@@ -609,13 +603,13 @@ type TcpProxy_TcpAccessLogOptions struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// The interval to flush access log. The TCP proxy will flush only one access log when the connection
-	// is closed by default. If this field is set, the TCP proxy will flush access log periodically with
-	// the specified interval.
+	// The interval for flushing access logs. By default, the TCP proxy flushes a single access log when the
+	// connection is closed. If this field is set, the TCP proxy flushes access logs periodically at the
+	// specified interval.
 	// The interval must be at least 1ms.
 	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
-	// If set to true, access log will be flushed when the TCP proxy has successfully established a
-	// connection with the upstream. If the connection failed, the access log will not be flushed.
+	// If set to true, the access log is flushed when the TCP proxy successfully establishes a
+	// connection with the upstream. If the connection fails, the access log is not flushed.
 	FlushAccessLogOnConnected bool `protobuf:"varint,2,opt,name=flush_access_log_on_connected,json=flushAccessLogOnConnected,proto3" json:"flush_access_log_on_connected,omitempty"`
 }
 
