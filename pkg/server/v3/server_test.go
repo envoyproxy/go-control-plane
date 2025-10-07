@@ -34,9 +34,9 @@ import (
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/log"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/sotw/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/server/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -52,29 +52,31 @@ type mockConfigWatcher struct {
 	mu *sync.RWMutex
 }
 
-func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ stream.StreamState, out chan cache.Response) func() {
-	config.counts[req.GetTypeUrl()] = config.counts[req.GetTypeUrl()] + 1
+func (config *mockConfigWatcher) CreateWatch(req *discovery.DiscoveryRequest, _ cache.Subscription, out chan cache.Response) (func(), error) {
+	typ := req.GetTypeUrl()
+	config.counts[typ]++
 
-	if strings.Contains(req.GetTypeUrl(), nilType) {
+	if strings.Contains(typ, nilType) {
 		out <- nil
 	}
 
-	if len(config.responses[req.GetTypeUrl()]) > 0 {
-		out <- config.responses[req.GetTypeUrl()][0]
-		config.responses[req.GetTypeUrl()] = config.responses[req.GetTypeUrl()][1:]
+	if len(config.responses[typ]) > 0 {
+		out <- config.responses[typ][0]
+		config.responses[typ] = config.responses[typ][1:]
 	} else {
 		config.watches++
 		return func() {
 			config.watches--
-		}
+		}, nil
 	}
-	return nil
+	return nil, nil
 }
 
 func (config *mockConfigWatcher) Fetch(_ context.Context, req *discovery.DiscoveryRequest) (cache.Response, error) {
-	if len(config.responses[req.GetTypeUrl()]) > 0 {
-		out := config.responses[req.GetTypeUrl()][0]
-		config.responses[req.GetTypeUrl()] = config.responses[req.GetTypeUrl()][1:]
+	typ := req.GetTypeUrl()
+	if len(config.responses[typ]) > 0 {
+		out := config.responses[typ][0]
+		config.responses[typ] = config.responses[typ][1:]
 		return out, nil
 	}
 	return nil, errors.New("missing")
@@ -267,7 +269,7 @@ func TestServerShutdown(t *testing.T) {
 			config.responses = makeResponses()
 			shutdown := make(chan bool)
 			ctx, cancel := context.WithCancel(context.Background())
-			s := server.NewServer(ctx, config, server.CallbackFuncs{})
+			s := server.NewServer(ctx, config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			// make a request
 			resp := makeMockStream(t)
@@ -319,7 +321,7 @@ func TestResponseHandlers(t *testing.T) {
 
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(ctx, config, server.CallbackFuncs{})
+			s := server.NewServer(ctx, config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			// make a request
 			resp := makeMockStream(t)
@@ -394,7 +396,7 @@ func TestFetch(t *testing.T) {
 		},
 	}
 
-	s := server.NewServer(context.Background(), config, cb)
+	s := server.NewServer(context.Background(), config, cb, sotw.WithLogger(log.NewTestLogger(t)))
 	out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node})
 	assert.NotNil(t, out)
 	require.NoError(t, err)
@@ -489,7 +491,7 @@ func TestSendError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			// make a request
 			resp := makeMockStream(t)
@@ -513,7 +515,7 @@ func TestStaleNonce(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{
@@ -525,11 +527,11 @@ func TestStaleNonce(t *testing.T) {
 				err := s.StreamAggregatedResources(resp)
 				require.NoError(t, err)
 				// should be two watches called
-				assert.True(t, reflect.DeepEqual(map[string]int{typ: 2}, config.counts))
+				assert.True(t, reflect.DeepEqual(map[string]int{typ: 2}, config.counts), config.counts)
 				close(stop)
 			}()
 			select {
-			case <-resp.sent:
+			case res := <-resp.sent:
 				// stale request
 				resp.recv <- &discovery.DiscoveryRequest{
 					Node:          node,
@@ -538,10 +540,10 @@ func TestStaleNonce(t *testing.T) {
 				}
 				// fresh request
 				resp.recv <- &discovery.DiscoveryRequest{
-					VersionInfo:   "1",
+					VersionInfo:   res.VersionInfo,
 					Node:          node,
 					TypeUrl:       typ,
-					ResponseNonce: "1",
+					ResponseNonce: res.Nonce,
 				}
 				close(resp.recv)
 			case <-time.After(1 * time.Second):
@@ -588,7 +590,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 	// We create the server with the optional ordered ADS flag so we guarantee resource
 	// ordering over the stream.
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithOrderedADS())
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithOrderedADS(), sotw.WithLogger(log.NewTestLogger(t)))
 	go func() {
 		err := s.StreamAggregatedResources(resp)
 		require.NoError(t, err)
@@ -623,7 +625,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	err := s.StreamAggregatedResources(resp)
@@ -640,7 +642,7 @@ func TestCancellations(t *testing.T) {
 		}
 	}
 	close(resp.recv)
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 	err := s.StreamAggregatedResources(resp)
 	require.NoError(t, err)
 	assert.Equal(t, 0, config.watches)
@@ -658,7 +660,7 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 		}
 	}
 	close(resp.recv)
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 	err := s.StreamAggregatedResources(resp)
 	require.NoError(t, err)
 	assert.Equal(t, 0, config.watches)
