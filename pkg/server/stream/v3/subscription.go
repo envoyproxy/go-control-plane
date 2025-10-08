@@ -102,7 +102,7 @@ func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVers
 func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []string) {
 	// Handles legacy wildcard behavior first to exit if we are still in this behavior
 	if s.allowLegacyWildcard {
-		// The protocol (as of v1.29.0) only references subscribed as triggering
+		// The protocol (as of v1.36.0) only references subscribed as triggering
 		// exiting legacy wildcard behavior, so we currently not check unsubscribed
 		if len(subscribed) == 0 {
 			// We were wildcard based on legacy behavior and still don't request any resource
