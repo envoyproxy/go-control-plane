@@ -1,8 +1,6 @@
 module github.com/envoyproxy/go-control-plane/envoy
 
-go 1.23.0
-
-toolchain go1.23.6
+go 1.24.0
 
 // Used to resolve import issues related to go-control-plane package split (https://github.com/envoyproxy/go-control-plane/issues/1074)
 replace github.com/envoyproxy/go-control-plane@v0.13.4 => ../
@@ -14,9 +12,9 @@ require (
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10
 	github.com/prometheus/client_model v0.6.2
 	go.opentelemetry.io/proto/otlp v1.7.1
-	google.golang.org/genproto/googleapis/api v0.0.0-20250728155136-f173205681a0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0
-	google.golang.org/grpc v1.75.1
+	google.golang.org/genproto/googleapis/api v0.0.0-20250804133106-a7a43d27e69b
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b
+	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
 )
 
