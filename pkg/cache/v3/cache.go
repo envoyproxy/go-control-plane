@@ -40,15 +40,17 @@ type DeltaRequest = discovery.DeltaDiscoveryRequest
 // Though the methods may return mutable parts of the state for performance reasons,
 // the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation.
 type Subscription interface {
-	// ReturnedResources returns a list of resources that were sent to the client and their associated versions.
+	// ReturnedResources returns the list of resources the client currently knows and their associated versions.
 	// The versions are:
 	//  - delta protocol: version of the specific resource set in the response.
 	//  - sotw protocol: version of the global response when the resource was last sent.
+	// The returned map must not be altered by the Cache.
 	ReturnedResources() map[string]string
 
 	// SubscribedResources returns the list of resources currently subscribed to by the client for the type.
 	// For delta it keeps track of subscription updates across requests
 	// For sotw it is a normalized view of the last request resources
+	// The returned map must not be altered by the Cache.
 	SubscribedResources() map[string]struct{}
 
 	// IsWildcard returns whether the client has a wildcard watch.
