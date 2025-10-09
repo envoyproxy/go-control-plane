@@ -7559,6 +7559,62 @@ func (m *RouteAction_RequestMirrorPolicy) validate(all bool) error {
 
 	// no validation rules for DisableShadowHostSuffixAppend
 
+	if len(m.GetRequestHeadersMutations()) > 1000 {
+		err := RouteAction_RequestMirrorPolicyValidationError{
+			field:  "RequestHeadersMutations",
+			reason: "value must contain no more than 1000 item(s)",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	for idx, item := range m.GetRequestHeadersMutations() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, RouteAction_RequestMirrorPolicyValidationError{
+						field:  fmt.Sprintf("RequestHeadersMutations[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, RouteAction_RequestMirrorPolicyValidationError{
+						field:  fmt.Sprintf("RequestHeadersMutations[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return RouteAction_RequestMirrorPolicyValidationError{
+					field:  fmt.Sprintf("RequestHeadersMutations[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if !_RouteAction_RequestMirrorPolicy_HostRewriteLiteral_Pattern.MatchString(m.GetHostRewriteLiteral()) {
+		err := RouteAction_RequestMirrorPolicyValidationError{
+			field:  "HostRewriteLiteral",
+			reason: "value does not match regex pattern \"^[^\\x00\\n\\r]*$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return RouteAction_RequestMirrorPolicyMultiError(errors)
 	}
@@ -7641,6 +7697,8 @@ var _ interface {
 } = RouteAction_RequestMirrorPolicyValidationError{}
 
 var _RouteAction_RequestMirrorPolicy_ClusterHeader_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
+
+var _RouteAction_RequestMirrorPolicy_HostRewriteLiteral_Pattern = regexp.MustCompile("^[^\x00\n\r]*$")
 
 // Validate checks the field values on RouteAction_HashPolicy with the rules
 // defined in the proto definition for this message. If any rules are

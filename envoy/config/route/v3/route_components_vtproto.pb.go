@@ -1855,6 +1855,37 @@ func (m *RouteAction_RequestMirrorPolicy) MarshalToSizedBufferVTStrict(dAtA []by
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.HostRewriteLiteral) > 0 {
+		i -= len(m.HostRewriteLiteral)
+		copy(dAtA[i:], m.HostRewriteLiteral)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.HostRewriteLiteral)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.RequestHeadersMutations) > 0 {
+		for iNdEx := len(m.RequestHeadersMutations) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.RequestHeadersMutations[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.RequestHeadersMutations[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
 	if m.DisableShadowHostSuffixAppend {
 		i--
 		if m.DisableShadowHostSuffixAppend {
@@ -6933,6 +6964,22 @@ func (m *RouteAction_RequestMirrorPolicy) SizeVT() (n int) {
 	}
 	if m.DisableShadowHostSuffixAppend {
 		n += 2
+	}
+	if len(m.RequestHeadersMutations) > 0 {
+		for _, e := range m.RequestHeadersMutations {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	l = len(m.HostRewriteLiteral)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
