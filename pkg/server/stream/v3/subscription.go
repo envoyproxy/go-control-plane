@@ -74,6 +74,17 @@ func (s *Subscription) SetResourceSubscription(subscribed []string) {
 		}
 	}
 
+	if !explicitWildcardSet {
+		// Cleanup resources no longer subscribed to.
+		// This ensures later subscriptions will trigger responses,
+		// even if the version has not changed
+		for resource := range s.returnedResources {
+			if _, ok := subscribedResources[resource]; !ok {
+				delete(s.returnedResources, resource)
+			}
+		}
+	}
+
 	// Explicit subscription to wildcard as we are not in legacy wildcard behavior
 	s.wildcard = explicitWildcardSet
 	s.subscribedResourceNames = subscribedResources
@@ -91,7 +102,7 @@ func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVers
 func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []string) {
 	// Handles legacy wildcard behavior first to exit if we are still in this behavior
 	if s.allowLegacyWildcard {
-		// The protocol (as of v1.29.0) only references subscribed as triggering
+		// The protocol (as of v1.36.0) only references subscribed as triggering
 		// exiting legacy wildcard behavior, so we currently not check unsubscribed
 		if len(subscribed) == 0 {
 			// We were wildcard based on legacy behavior and still don't request any resource
@@ -132,6 +143,10 @@ func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []st
 			// * detect the version change, and return the resource (as an update)
 			// * detect the resource deletion, and set it as removed in the response
 			s.returnedResources[resource] = ""
+		} else {
+			// Cleanup unsubscribed resources. This avoids returning a response
+			// if the versions have not changed
+			delete(s.returnedResources, resource)
 		}
 		delete(s.subscribedResourceNames, resource)
 	}

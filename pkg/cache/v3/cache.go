@@ -40,15 +40,17 @@ type DeltaRequest = discovery.DeltaDiscoveryRequest
 // Though the methods may return mutable parts of the state for performance reasons,
 // the cache is expected to consider this state as immutable and thread safe between a watch creation and its cancellation.
 type Subscription interface {
-	// ReturnedResources returns a list of resources that were sent to the client and their associated versions.
+	// ReturnedResources returns the list of resources the client currently knows and their associated versions.
 	// The versions are:
 	//  - delta protocol: version of the specific resource set in the response.
 	//  - sotw protocol: version of the global response when the resource was last sent.
+	// The returned map must not be altered by the Cache.
 	ReturnedResources() map[string]string
 
 	// SubscribedResources returns the list of resources currently subscribed to by the client for the type.
 	// For delta it keeps track of subscription updates across requests
 	// For sotw it is a normalized view of the last request resources
+	// The returned map must not be altered by the Cache.
 	SubscribedResources() map[string]struct{}
 
 	// IsWildcard returns whether the client has a wildcard watch.
@@ -118,6 +120,11 @@ type Response interface {
 	// Get the version in the Response.
 	GetVersion() (string, error)
 
+	// GetReturnedResources returns the map of resources and their versions returned in the subscription.
+	// It may include more resources than directly set in the response to consider the full state of the client.
+	// The caller is expected to provide this unchanged to the next call to CreateWatch as part of the subscription.
+	GetReturnedResources() map[string]string
+
 	// Get the context provided during response creation.
 	GetContext() context.Context
 }
@@ -154,6 +161,12 @@ type RawResponse struct {
 
 	// Resources to be included in the response.
 	Resources []types.ResourceWithTTL
+
+	// ReturnedResources tracks the resources returned for the subscription and the version when it was last returned,
+	// including previously returned ones when using non-full state resources.
+	// It allows the cache to know what the client knows. The server will transparently forward this
+	// across requests, and the cache is responsible for its interpretation.
+	ReturnedResources map[string]string
 
 	// Whether this is a heartbeat response. For xDS versions that support TTL, this
 	// will be converted into a response that doesn't contain the actual resource protobuf.
@@ -207,6 +220,12 @@ type PassthroughResponse struct {
 	DiscoveryResponse *discovery.DiscoveryResponse
 
 	ctx context.Context
+
+	// ReturnedResources tracks the resources returned for the subscription and the version when it was last returned,
+	// including previously returned ones when using non-full state resources.
+	// It allows the cache to know what the client knows. The server will transparently forward this
+	// across requests, and the cache is responsible for its interpretation.
+	ReturnedResources map[string]string
 }
 
 // DeltaPassthroughResponse is a pre constructed xDS response that need not go through marshaling transformations.
@@ -262,6 +281,10 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 	}
 
 	return marshaledResponse.(*discovery.DiscoveryResponse), nil
+}
+
+func (r *RawResponse) GetReturnedResources() map[string]string {
+	return r.ReturnedResources
 }
 
 // GetDeltaDiscoveryResponse performs the marshaling the first time its called and uses the cached response subsequently.
@@ -365,6 +388,10 @@ func (r *RawResponse) maybeCreateTTLResource(resource types.ResourceWithTTL) (ty
 // GetDiscoveryResponse returns the final passthrough Discovery Response.
 func (r *PassthroughResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	return r.DiscoveryResponse, nil
+}
+
+func (r *PassthroughResponse) GetReturnedResources() map[string]string {
+	return r.ReturnedResources
 }
 
 // GetDeltaDiscoveryResponse returns the final passthrough Delta Discovery Response.
