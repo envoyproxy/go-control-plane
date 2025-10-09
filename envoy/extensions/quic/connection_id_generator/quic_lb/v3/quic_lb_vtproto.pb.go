@@ -113,9 +113,9 @@ func (m *Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.UnsafeUnencryptedTestingMode {
+	if m.UnencryptedMode {
 		i--
-		if m.UnsafeUnencryptedTestingMode {
+		if m.UnencryptedMode {
 			dAtA[i] = 1
 		} else {
 			dAtA[i] = 0
@@ -132,7 +132,7 @@ func (m *Config) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.UnsafeUnencryptedTestingMode {
+	if m.UnencryptedMode {
 		n += 2
 	}
 	if m.ServerId != nil {

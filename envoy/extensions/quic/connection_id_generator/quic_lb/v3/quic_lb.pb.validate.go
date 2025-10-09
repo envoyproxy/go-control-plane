@@ -57,8 +57,6 @@ func (m *Config) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for UnsafeUnencryptedTestingMode
-
 	if m.GetServerId() == nil {
 		err := ConfigValidationError{
 			field:  "ServerId",
@@ -162,6 +160,8 @@ func (m *Config) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for UnencryptedMode
 
 	if len(errors) > 0 {
 		return ConfigMultiError(errors)
