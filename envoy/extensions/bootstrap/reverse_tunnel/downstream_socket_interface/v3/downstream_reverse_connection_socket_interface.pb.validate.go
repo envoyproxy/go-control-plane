@@ -62,6 +62,8 @@ func (m *DownstreamReverseConnectionSocketInterface) validate(all bool) error {
 
 	// no validation rules for StatPrefix
 
+	// no validation rules for EnableDetailedStats
+
 	if len(errors) > 0 {
 		return DownstreamReverseConnectionSocketInterfaceMultiError(errors)
 	}

@@ -49,6 +49,16 @@ func (m *UpstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStrict(
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableDetailedStats {
+		i--
+		if m.EnableDetailedStats {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.PingFailureThreshold != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.PingFailureThreshold).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -82,6 +92,9 @@ func (m *UpstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 	if m.PingFailureThreshold != nil {
 		l = (*wrapperspb.UInt32Value)(m.PingFailureThreshold).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableDetailedStats {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

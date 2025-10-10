@@ -77,6 +77,8 @@ func (m *UpstreamReverseConnectionSocketInterface) validate(all bool) error {
 
 	}
 
+	// no validation rules for EnableDetailedStats
+
 	if len(errors) > 0 {
 		return UpstreamReverseConnectionSocketInterfaceMultiError(errors)
 	}
