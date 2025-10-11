@@ -930,6 +930,10 @@ func (m *TcpProxy_TunnelingConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for RequestIdHeader
+
+	// no validation rules for RequestIdMetadataKey
+
 	if len(errors) > 0 {
 		return TcpProxy_TunnelingConfigMultiError(errors)
 	}
