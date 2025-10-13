@@ -3798,9 +3798,10 @@ type HeaderMatcher_PresentMatch struct {
 
 type HeaderMatcher_PrefixMatch struct {
 	// If specified, header match will be performed based on the prefix of the header value.
+	//
 	// .. note::
 	//
-	//	Empty prefix is not allowed; please use ``present_match`` instead.
+	//	Empty prefix is not allowed. Please use ``present_match`` instead.
 	//
 	// .. attention::
 	//
@@ -3816,9 +3817,10 @@ type HeaderMatcher_PrefixMatch struct {
 
 type HeaderMatcher_SuffixMatch struct {
 	// If specified, header match will be performed based on the suffix of the header value.
+	//
 	// .. note::
 	//
-	//	Empty suffix is not allowed; please use ``present_match`` instead.
+	//	Empty suffix is not allowed. Please use ``present_match`` instead.
 	//
 	// .. attention::
 	//
@@ -3835,9 +3837,10 @@ type HeaderMatcher_SuffixMatch struct {
 type HeaderMatcher_ContainsMatch struct {
 	// If specified, header match will be performed based on whether the header value contains
 	// the given value or not.
+	//
 	// .. note::
 	//
-	//	Empty contains match is not allowed; please use ``present_match`` instead.
+	//	Empty contains match is not allowed. Please use ``present_match`` instead.
 	//
 	// .. attention::
 	//
