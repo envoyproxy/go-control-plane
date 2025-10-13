@@ -578,6 +578,28 @@ func (m *HttpService) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RetryPolicy != nil {
+		if vtmsg, ok := interface{}(m.RetryPolicy).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.RetryPolicy)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
 	if m.AuthorizationResponse != nil {
 		size, err := m.AuthorizationResponse.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1323,6 +1345,16 @@ func (m *HttpService) SizeVT() (n int) {
 	}
 	if m.AuthorizationResponse != nil {
 		l = m.AuthorizationResponse.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.RetryPolicy != nil {
+		if size, ok := interface{}(m.RetryPolicy).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.RetryPolicy)
+		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
