@@ -167,6 +167,16 @@ func (m *Compressor_ResponseDirectionConfig) MarshalToSizedBufferVTStrict(dAtA [
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.StatusHeaderEnabled {
+		i--
+		if m.StatusHeaderEnabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x28
+	}
 	if len(m.UncompressibleResponseCodes) > 0 {
 		var pksize2 int
 		for _, num := range m.UncompressibleResponseCodes {
@@ -627,6 +637,9 @@ func (m *Compressor_ResponseDirectionConfig) SizeVT() (n int) {
 			l += protohelpers.SizeOfVarint(uint64(e))
 		}
 		n += 1 + protohelpers.SizeOfVarint(uint64(l)) + l
+	}
+	if m.StatusHeaderEnabled {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

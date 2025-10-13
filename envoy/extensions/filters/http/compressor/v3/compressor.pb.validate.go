@@ -1156,6 +1156,8 @@ func (m *Compressor_ResponseDirectionConfig) validate(all bool) error {
 
 	}
 
+	// no validation rules for StatusHeaderEnabled
+
 	if len(errors) > 0 {
 		return Compressor_ResponseDirectionConfigMultiError(errors)
 	}
