@@ -163,21 +163,6 @@ func (s Subscription) IsWildcard() bool {
 	return s.wildcard
 }
 
-// WatchesResources returns whether at least one of the resources provided is currently being watched by the subscription.
-// If the request is wildcard, it will always return true,
-// otherwise it will compare the provided resources to the list of resources currently subscribed
-func (s Subscription) WatchesResources(resourceNames map[string]struct{}) bool {
-	if s.wildcard {
-		return true
-	}
-	for resourceName := range resourceNames {
-		if _, ok := s.subscribedResourceNames[resourceName]; ok {
-			return true
-		}
-	}
-	return false
-}
-
 // ReturnedResources returns the list of resources returned to the client
 // and their version
 func (s Subscription) ReturnedResources() map[string]string {

@@ -15,7 +15,6 @@
 package cache
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -161,7 +160,7 @@ func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []reso
 	var r DeltaResponse
 	select {
 	case r = <-ch:
-	case <-time.After(5 * time.Second):
+	case <-time.After(1 * time.Second):
 		t.Error("timeout waiting for delta response")
 		return nil
 	}
@@ -171,7 +170,7 @@ func verifyDeltaResponse(t *testing.T, ch <-chan DeltaResponse, resources []reso
 
 func checkWatchCount(t *testing.T, c *LinearCache, name string, count int) {
 	t.Helper()
-	i := c.NumWatches(name)
+	i := c.NumSotwWatches(name)
 	assert.Equalf(t, count, i, "unexpected number of watches for %q: got %d, want %d", name, i, count)
 }
 
@@ -181,15 +180,18 @@ func checkDeltaWatchCount(t *testing.T, c *LinearCache, count int) {
 	assert.Equalf(t, count, i, "unexpected number of delta watches: got %d, want %d", i, count)
 }
 
-func checkVersionMapNotSet(t *testing.T, c *LinearCache) {
+func checkStableVersionsAreNotComputed(t *testing.T, c *LinearCache, resources ...string) {
 	t.Helper()
-	assert.Nilf(t, c.versionMap, "version map is set on the cache with %d elements", len(c.versionMap))
+	for _, res := range resources {
+		assert.Empty(t, c.resources[res].stableVersion, "stable version not set on resource %s", res)
+	}
 }
 
-func checkVersionMapSet(t *testing.T, c *LinearCache) {
+func checkStableVersionsAreComputed(t *testing.T, c *LinearCache, resources ...string) {
 	t.Helper()
-	assert.NotNilf(t, c.versionMap, "version map is not set on the cache")
-	assert.Lenf(t, c.versionMap, len(c.resources), "version map has the wrong number of elements: %d instead of %d expected", len(c.versionMap), len(c.resources))
+	for _, res := range resources {
+		assert.NotEmpty(t, c.resources[res].stableVersion, "stable version not set on resource %s", res)
+	}
 }
 
 func mustBlock(t *testing.T, w <-chan Response) {
@@ -214,11 +216,7 @@ func hashResource(t *testing.T, resource types.Resource) string {
 	t.Helper()
 	marshaledResource, err := MarshalResource(resource)
 	require.NoError(t, err)
-	v := HashResource(marshaledResource)
-	if v == "" {
-		t.Fatal(errors.New("failed to build resource version"))
-	}
-	return v
+	return HashResource(marshaledResource)
 }
 
 func createWildcardDeltaWatch(t *testing.T, initialReq bool, c *LinearCache, w chan DeltaResponse) {
@@ -267,7 +265,6 @@ func TestLinearInitialResources(t *testing.T) {
 	_, err = c.CreateWatch(req, sub, w)
 	require.NoError(t, err)
 	verifyResponse(t, w, "0", 2)
-	checkVersionMapNotSet(t, c)
 }
 
 func TestLinearCornerCases(t *testing.T) {
@@ -292,7 +289,6 @@ func TestLinearBasic(t *testing.T) {
 	_, err := c.CreateWatch(req1, sub1, w1)
 	require.NoError(t, err)
 	mustBlock(t, w1)
-	checkVersionMapNotSet(t, c)
 
 	w2 := make(chan Response, 1)
 	req2 := &Request{TypeUrl: testType, VersionInfo: "0"}
@@ -339,8 +335,6 @@ func TestLinearBasic(t *testing.T) {
 	_, err = c.CreateWatch(req2, sub2, w2)
 	require.NoError(t, err)
 	verifyResponse(t, w2, "3", 2)
-	// Ensure the version map was not created as we only ever used stow watches
-	checkVersionMapNotSet(t, c)
 }
 
 func TestLinearSetResources(t *testing.T) {
@@ -447,7 +441,7 @@ func TestLinearVersionPrefix(t *testing.T) {
 
 func TestLinearDeletion(t *testing.T) {
 	t.Run("non full-state resource", func(t *testing.T) {
-		c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}))
+		c := NewLinearCache(testType, WithInitialResources(map[string]types.Resource{"a": testResource("a"), "b": testResource("b")}), WithLogger(log.NewTestLogger(t)))
 		w := make(chan Response, 1)
 		req := &Request{ResourceNames: []string{"a"}, TypeUrl: testType, VersionInfo: "0"}
 		sub := subFromRequest(req)
@@ -479,7 +473,7 @@ func TestLinearDeletion(t *testing.T) {
 		require.NoError(t, err)
 		// b is watched by wildcard, but for non-full-state resources we cannot report deletions
 		mustBlock(t, w)
-		assert.Len(t, c.watchAll, 1)
+		assert.Len(t, c.wildcardWatches.sotw, 1)
 	})
 
 	t.Run("full-state resource", func(t *testing.T) {
@@ -681,7 +675,7 @@ func TestLinearDeltaWildcard(t *testing.T) {
 }
 
 func TestLinearDeltaExistingResources(t *testing.T) {
-	c := NewLinearCache(testType)
+	c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hashA := hashResource(t, a)
 	err := c.UpdateResource("a", a)
@@ -708,7 +702,7 @@ func TestLinearDeltaExistingResources(t *testing.T) {
 }
 
 func TestLinearDeltaInitialResourcesVersionSet(t *testing.T) {
-	c := NewLinearCache(testType)
+	c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hashA := hashResource(t, a)
 	err := c.UpdateResource("a", a)
@@ -750,7 +744,7 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	err = c.UpdateResource("b", b)
 	require.NoError(t, err)
 	// There is currently no delta watch
-	checkVersionMapNotSet(t, c)
+	checkStableVersionsAreNotComputed(t, c, "a", "b")
 
 	req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"a", "b"}}
 	w := make(chan DeltaResponse, 1)
@@ -758,7 +752,7 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	require.NoError(t, err)
 	checkDeltaWatchCount(t, c, 0)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"a", hashA}}, nil)
-	checkVersionMapSet(t, c)
+	checkStableVersionsAreComputed(t, c, "a", "b")
 
 	req = &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"a", "b"}, InitialResourceVersions: map[string]string{"a": hashA, "b": hashB}}
 	w = make(chan DeltaResponse, 1)
@@ -774,7 +768,7 @@ func TestLinearDeltaResourceUpdate(t *testing.T) {
 	err = c.UpdateResource("a", a)
 	require.NoError(t, err)
 	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, nil)
-	checkVersionMapSet(t, c)
+	checkStableVersionsAreComputed(t, c, "a")
 }
 
 func TestLinearDeltaResourceDelete(t *testing.T) {
@@ -814,7 +808,6 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	c := NewLinearCache(testType)
 
 	w := make(chan DeltaResponse, 1)
-	checkVersionMapNotSet(t, c)
 	assert.Equal(t, 0, c.NumResources())
 
 	// Initial update
@@ -824,8 +817,6 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	require.NoError(t, err)
 	mustBlockDelta(t, w)
 	checkDeltaWatchCount(t, c, 1)
-	// The version map should now be created, even if empty
-	checkVersionMapSet(t, c)
 	a := &endpoint.ClusterLoadAssignment{ClusterName: "a"}
 	hashA := hashResource(t, a)
 	b := &endpoint.ClusterLoadAssignment{ClusterName: "b"}
@@ -834,7 +825,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	require.NoError(t, err)
 	resp := <-w
 	validateDeltaResponse(t, resp, []resourceInfo{{"a", hashA}, {"b", hashB}}, nil)
-	checkVersionMapSet(t, c)
+	checkStableVersionsAreComputed(t, c, "a", "b")
 	assert.Equal(t, 2, c.NumResources())
 
 	sub.SetReturnedResources(resp.GetNextVersionMap())
@@ -857,7 +848,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	require.NoError(t, err)
 	resp = <-w
 	validateDeltaResponse(t, resp, []resourceInfo{{"a", hashA}, {"b", hashB}}, nil)
-	checkVersionMapSet(t, c)
+	checkStableVersionsAreComputed(t, c, "a", "b")
 	assert.Equal(t, 2, c.NumResources())
 	sub.SetReturnedResources(resp.GetNextVersionMap())
 
@@ -877,7 +868,9 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	assert.NotContains(t, c.resources, "b", "resource with name b was found in cache")
 	resp = <-w
 	validateDeltaResponse(t, resp, []resourceInfo{{"a", hashA}}, []string{"b"})
-	checkVersionMapSet(t, c)
+	checkStableVersionsAreComputed(t, c, "a")
+	// d is not watched currently
+	checkStableVersionsAreNotComputed(t, c, "d")
 	assert.Equal(t, 2, c.NumResources())
 	sub.SetReturnedResources(resp.GetNextVersionMap())
 
@@ -894,7 +887,7 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	assert.NotContains(t, c.resources, "d", "resource with name d was found in cache")
 	resp = <-w
 	validateDeltaResponse(t, resp, []resourceInfo{{"b", hashB}}, nil) // d is not watched and should not be returned
-	checkVersionMapSet(t, c)
+	checkStableVersionsAreComputed(t, c, "b")
 	assert.Equal(t, 2, c.NumResources())
 	sub.SetReturnedResources(resp.GetNextVersionMap())
 
@@ -911,7 +904,8 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	err = c.UpdateResources(map[string]types.Resource{"b": b, "d": d}, nil)
 	require.NoError(t, err)
 	verifyDeltaResponse(t, w, []resourceInfo{{"b", hashB}, {"d", hashD}}, nil)
-	checkVersionMapSet(t, c)
+	// d is now watched and should be returned
+	checkStableVersionsAreComputed(t, c, "b", "d")
 	assert.Equal(t, 3, c.NumResources())
 
 	// Wildcard update/delete
@@ -928,8 +922,6 @@ func TestLinearDeltaMultiResourceUpdates(t *testing.T) {
 	verifyDeltaResponse(t, w, []resourceInfo{{"a", hashA}}, []string{"d"})
 
 	checkDeltaWatchCount(t, c, 0)
-	// Confirm that the map is still set even though there is currently no watch
-	checkVersionMapSet(t, c)
 	assert.Equal(t, 2, c.NumResources())
 }
 
@@ -951,7 +943,8 @@ func TestLinearMixedWatches(t *testing.T) {
 	_, err = c.CreateWatch(sotwReq, sotwSub, w)
 	require.NoError(t, err)
 	mustBlock(t, w)
-	checkVersionMapNotSet(t, c)
+	// Only sotw watches, should not have triggered stable resource computation
+	checkStableVersionsAreNotComputed(t, c, "a", "b")
 
 	a = &endpoint.ClusterLoadAssignment{ClusterName: "a", Endpoints: []*endpoint.LocalityLbEndpoints{ // resource update
 		{Priority: 25},
@@ -962,13 +955,13 @@ func TestLinearMixedWatches(t *testing.T) {
 	// This behavior is currently invalid for cds and lds, but due to a current limitation of linear cache sotw implementation
 	resp := verifyResponseResources(t, w, resource.EndpointType, c.getVersion(), "a")
 	updateFromSotwResponse(resp, &sotwSub, sotwReq)
-	checkVersionMapNotSet(t, c)
+	checkStableVersionsAreNotComputed(t, c, "a", "b")
 
 	sotwReq.VersionInfo = c.getVersion()
 	_, err = c.CreateWatch(sotwReq, sotwSub, w)
 	require.NoError(t, err)
 	mustBlock(t, w)
-	checkVersionMapNotSet(t, c)
+	checkStableVersionsAreNotComputed(t, c, "a", "b")
 
 	deltaReq := &DeltaRequest{TypeUrl: resource.EndpointType, ResourceNamesSubscribe: []string{"a", "b"}, InitialResourceVersions: map[string]string{"a": hashA, "b": hashB}}
 	wd := make(chan DeltaResponse, 1)
@@ -978,11 +971,10 @@ func TestLinearMixedWatches(t *testing.T) {
 	require.NoError(t, err)
 	mustBlockDelta(t, wd)
 	checkDeltaWatchCount(t, c, 1)
-	checkVersionMapSet(t, c)
+	checkStableVersionsAreComputed(t, c, "a", "b")
 
 	err = c.UpdateResources(nil, []string{"b"})
 	require.NoError(t, err)
-	checkVersionMapSet(t, c)
 	mustBlock(t, w) // For sotw with non full-state resources, we don't report deletions
 	verifyDeltaResponse(t, wd, nil, []string{"b"}, responseType(resource.EndpointType))
 }
@@ -1009,11 +1001,10 @@ func TestLinearSotwWatches(t *testing.T) {
 		_, err = cache.CreateWatch(sotwReq, sotwSub, w)
 		require.NoError(t, err)
 		mustBlock(t, w)
-		checkVersionMapNotSet(t, cache)
 
-		assert.Len(t, cache.watches["a"], 1)
-		assert.Len(t, cache.watches["b"], 1)
-		assert.Len(t, cache.watches["c"], 1)
+		assert.Len(t, cache.resourceWatches["a"].sotw, 1)
+		assert.Len(t, cache.resourceWatches["b"].sotw, 1)
+		assert.Len(t, cache.resourceWatches["c"].sotw, 1)
 
 		// Update a and c without touching b
 		a = &endpoint.ClusterLoadAssignment{ClusterName: "a", Endpoints: []*endpoint.LocalityLbEndpoints{ // resource update
@@ -1023,11 +1014,10 @@ func TestLinearSotwWatches(t *testing.T) {
 		require.NoError(t, err)
 		resp := verifyResponseResources(t, w, testType, cache.getVersion(), "a")
 		updateFromSotwResponse(resp, &sotwSub, sotwReq)
-		checkVersionMapNotSet(t, cache)
 
-		assert.Empty(t, cache.watches["a"])
-		assert.Empty(t, cache.watches["b"])
-		assert.Empty(t, cache.watches["c"])
+		assert.Empty(t, cache.resourceWatches["a"].sotw)
+		assert.Empty(t, cache.resourceWatches["b"].sotw)
+		assert.Empty(t, cache.resourceWatches["c"].sotw)
 
 		// c no longer watched
 		w = make(chan Response, 1)
@@ -1036,21 +1026,19 @@ func TestLinearSotwWatches(t *testing.T) {
 		_, err = cache.CreateWatch(sotwReq, sotwSub, w)
 		require.NoError(t, err)
 		mustBlock(t, w)
-		checkVersionMapNotSet(t, cache)
 
 		b = &endpoint.ClusterLoadAssignment{ClusterName: "b", Endpoints: []*endpoint.LocalityLbEndpoints{ // resource update
 			{Priority: 15},
 		}}
 		err = cache.UpdateResources(map[string]types.Resource{"b": b}, nil)
 
-		assert.Empty(t, cache.watches["a"])
-		assert.Empty(t, cache.watches["b"])
-		assert.Empty(t, cache.watches["c"])
+		assert.Empty(t, cache.resourceWatches["a"].sotw)
+		assert.Empty(t, cache.resourceWatches["b"].sotw)
+		assert.Empty(t, cache.resourceWatches["c"].sotw)
 
 		require.NoError(t, err)
 		resp = verifyResponseResources(t, w, testType, cache.getVersion(), "b")
 		updateFromSotwResponse(resp, &sotwSub, sotwReq)
-		checkVersionMapNotSet(t, cache)
 
 		w = make(chan Response, 1)
 		sotwReq.ResourceNames = []string{"c"}
@@ -1058,7 +1046,6 @@ func TestLinearSotwWatches(t *testing.T) {
 		_, err = cache.CreateWatch(sotwReq, sotwSub, w)
 		require.NoError(t, err)
 		mustBlock(t, w)
-		checkVersionMapNotSet(t, cache)
 
 		c := &endpoint.ClusterLoadAssignment{ClusterName: "c", Endpoints: []*endpoint.LocalityLbEndpoints{ // resource update
 			{Priority: 15},
@@ -1066,11 +1053,10 @@ func TestLinearSotwWatches(t *testing.T) {
 		err = cache.UpdateResources(map[string]types.Resource{"c": c}, nil)
 		require.NoError(t, err)
 		verifyResponseResources(t, w, testType, cache.getVersion(), "c")
-		checkVersionMapNotSet(t, cache)
 
-		assert.Empty(t, cache.watches["a"])
-		assert.Empty(t, cache.watches["b"])
-		assert.Empty(t, cache.watches["c"])
+		assert.Empty(t, cache.resourceWatches["a"].sotw)
+		assert.Empty(t, cache.resourceWatches["b"].sotw)
+		assert.Empty(t, cache.resourceWatches["c"].sotw)
 	})
 
 	t.Run("watches return full state for types requesting it", func(t *testing.T) {
@@ -1093,7 +1079,6 @@ func TestLinearSotwWatches(t *testing.T) {
 		_, err := cache.CreateWatch(nonWildcardReq, nonWildcardSub, w1)
 		require.NoError(t, err)
 		mustBlock(t, w1)
-		checkVersionMapNotSet(t, cache)
 
 		// wildcard request
 		wildcardReq := &Request{ResourceNames: nil, TypeUrl: resource.ClusterType, VersionInfo: cache.getVersion()}
@@ -1103,7 +1088,6 @@ func TestLinearSotwWatches(t *testing.T) {
 		_, err = cache.CreateWatch(wildcardReq, wildcardSub, w2)
 		require.NoError(t, err)
 		mustBlock(t, w2)
-		checkVersionMapNotSet(t, cache)
 
 		// request not requesting b
 		otherReq := &Request{ResourceNames: []string{"a", "c", "d"}, TypeUrl: resource.ClusterType, VersionInfo: cache.getVersion()}
@@ -1113,7 +1097,6 @@ func TestLinearSotwWatches(t *testing.T) {
 		_, err = cache.CreateWatch(otherReq, otherSub, w3)
 		require.NoError(t, err)
 		mustBlock(t, w3)
-		checkVersionMapNotSet(t, cache)
 
 		b.AltStatName = "othername"
 		err = cache.UpdateResources(map[string]types.Resource{"b": b}, nil)
@@ -1283,12 +1266,12 @@ func TestLinearSotwNonWildcard(t *testing.T) {
 		checkPendingWatch(4)
 
 		// Cancel two watches to change resources
-		assert.Len(t, cache.watches["c"], 2)
+		assert.Len(t, cache.resourceWatches["c"].sotw, 2)
 		c2()
-		assert.Len(t, cache.watches["c"], 1)
-		assert.Len(t, cache.watches["b"], 1)
+		assert.Len(t, cache.resourceWatches["c"].sotw, 1)
+		assert.Len(t, cache.resourceWatches["b"].sotw, 1)
 		c3()
-		assert.Empty(t, cache.watches["b"])
+		assert.Empty(t, cache.resourceWatches["b"].sotw)
 
 		// Remove a resource from 2 (was a, c, d)
 		updateReqResources(2, []string{"a", "d"})
@@ -1409,12 +1392,12 @@ func TestLinearSotwNonWildcard(t *testing.T) {
 		checkPendingWatch(4)
 
 		// Cancel two watches to change resources
-		assert.Len(t, cache.watches["c"], 2)
+		assert.Len(t, cache.resourceWatches["c"].sotw, 2)
 		c2()
-		assert.Len(t, cache.watches["c"], 1)
-		assert.Len(t, cache.watches["b"], 1)
+		assert.Len(t, cache.resourceWatches["c"].sotw, 1)
+		assert.Len(t, cache.resourceWatches["b"].sotw, 1)
 		c3()
-		assert.Empty(t, cache.watches["b"])
+		assert.Empty(t, cache.resourceWatches["b"].sotw)
 
 		// Remove a resource from 2 (was a, c, d)
 		updateReqResources(2, []string{"a", "d"})
