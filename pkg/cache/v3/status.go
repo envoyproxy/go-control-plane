@@ -15,11 +15,13 @@
 package cache
 
 import (
+	"context"
 	"sort"
 	"sync"
 	"time"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
 // NodeHash computes string identifiers for Envoy nodes.
@@ -83,6 +85,11 @@ type statusInfo struct {
 	mu sync.RWMutex
 }
 
+type WatchResponse interface {
+	GetReturnedResources() map[string]string
+	GetResponseVersion() string
+}
+
 // ResponseWatch is a watch record keeping both the request and an open channel for the response.
 type ResponseWatch struct {
 	// Request is the original request for the watch.
@@ -93,6 +100,39 @@ type ResponseWatch struct {
 
 	// Subscription stores the current client subscription state.
 	subscription Subscription
+
+	// fullStateResponses requires that all resources matching the request, with no regards to which ones actually updated, must be provided in the response.
+	fullStateResponses bool
+}
+
+func (w ResponseWatch) isDelta() bool {
+	return false
+}
+
+func (w ResponseWatch) useStableVersion() bool {
+	return false
+}
+
+func (w ResponseWatch) buildResponse(updatedResources []types.ResourceWithTTL, _ []string, returnedVersions map[string]string, version string) WatchResponse {
+	return &RawResponse{
+		Request:           w.Request,
+		Resources:         updatedResources,
+		ReturnedResources: returnedVersions,
+		Version:           version,
+		Ctx:               context.Background(),
+	}
+}
+
+func (w ResponseWatch) sendFullStateResponses() bool {
+	return w.fullStateResponses
+}
+
+func (w ResponseWatch) getSubscription() Subscription {
+	return w.subscription
+}
+
+func (w ResponseWatch) sendResponse(resp WatchResponse) {
+	w.Response <- resp.(*RawResponse)
 }
 
 // DeltaResponseWatch is a watch record keeping both the delta request and an open channel for the delta response.
@@ -105,6 +145,37 @@ type DeltaResponseWatch struct {
 
 	// Subscription stores the current client subscription state.
 	subscription Subscription
+}
+
+func (w DeltaResponseWatch) isDelta() bool {
+	return true
+}
+
+func (w DeltaResponseWatch) useStableVersion() bool {
+	return true
+}
+
+func (w DeltaResponseWatch) sendFullStateResponses() bool {
+	return false
+}
+
+func (w DeltaResponseWatch) getSubscription() Subscription {
+	return w.subscription
+}
+
+func (w DeltaResponseWatch) buildResponse(updatedResources []types.ResourceWithTTL, removedResources []string, returnedVersions map[string]string, version string) WatchResponse {
+	return &RawDeltaResponse{
+		DeltaRequest:      w.Request,
+		Resources:         updatedResources,
+		RemovedResources:  removedResources,
+		NextVersionMap:    returnedVersions,
+		SystemVersionInfo: version,
+		Ctx:               context.Background(),
+	}
+}
+
+func (w DeltaResponseWatch) sendResponse(resp WatchResponse) {
+	w.Response <- resp.(*RawDeltaResponse)
 }
 
 // newStatusInfo initializes a status info data structure.
