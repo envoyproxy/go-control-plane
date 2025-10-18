@@ -17,6 +17,8 @@ package cache
 import (
 	"context"
 	"fmt"
+	"maps"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -424,14 +426,16 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 	if request.GetVersionInfo() == version {
 		// Retrieve whether there are resources in the cache requested and currently unknown to the client.
 		knownResourceNames := sub.ReturnedResources()
-		diff := false
+		shouldRespond := false
 		if !sub.IsWildcard() {
-			// Check if a resource requested is currently not returned,
-			// for instance if it is newly subscribed
+			// Check if there is a subscribed resource available and not yet returned,
+			// for instance if it is newly subscribed.
 			for r := range sub.SubscribedResources() {
 				if _, ok := knownResourceNames[r]; !ok {
-					diff = true
-					break
+					if _, ok := resources[r]; ok {
+						shouldRespond = true
+						break
+					}
 				}
 			}
 		} else {
@@ -439,13 +443,13 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 			// for instance if the subscription is newly wildcard.
 			for r := range snapshot.GetResources(request.GetTypeUrl()) {
 				if _, ok := knownResourceNames[r]; !ok {
-					diff = true
+					shouldRespond = true
 					break
 				}
 			}
 		}
-		// The version has not changed, and the client already has all requested resources.
-		if !diff {
+		// The version has not changed, and the client already has all existing requested resources.
+		if !shouldRespond {
 			return createWatch(watch), nil
 		}
 	}
@@ -491,10 +495,11 @@ func (cache *snapshotCache) respond(ctx context.Context, watch ResponseWatch, re
 		}
 	}
 
-	cache.log.Debugf("respond %s%v version %q with version %q", request.GetTypeUrl(), request.GetResourceNames(), request.GetVersionInfo(), version)
+	resp := createResponse(ctx, request, resources, version, heartbeat)
+	cache.log.Debugf("respond %s (requested %v) version %q with version %q and resources %v", request.GetTypeUrl(), request.GetResourceNames(), request.GetVersionInfo(), version, slices.Collect(maps.Keys(resp.GetReturnedResources())))
 
 	select {
-	case watch.Response <- createResponse(ctx, request, resources, version, heartbeat):
+	case watch.Response <- resp:
 		return nil
 	case <-ctx.Done():
 		return context.Canceled
