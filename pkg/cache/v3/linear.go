@@ -27,62 +27,20 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
 
-// cachedResource is used to track resources added by the user in the cache.
-// It contains the resource itself and its associated version (currently in two different modes).
-type cachedResource struct {
-	types.Resource
-
-	// cacheVersion is the version of the cache at the time of last update, used in sotw.
-	cacheVersion string
-	// stableVersion is the version of the resource itself (a hash of its content after deterministic marshaling).
-	// It is lazy initialized and should be accessed through getStableVersion.
-	stableVersion string
-}
-
-func newCachedResource(res types.Resource, cacheVersion string) *cachedResource {
-	return &cachedResource{
-		Resource:     res,
-		cacheVersion: cacheVersion,
-	}
-}
-
-func (c *cachedResource) getStableVersion() (string, error) {
-	if c.stableVersion != "" {
-		return c.stableVersion, nil
-	}
-
-	// TODO(valerian-roche): store serialized resource as part of the cachedResource
-	// to reuse it when marshaling the responses instead of remarshaling and recomputing the version then.
-	marshaledResource, err := MarshalResource(c.Resource)
-	if err != nil {
-		return "", err
-	}
-	c.stableVersion = HashResource(marshaledResource)
-	return c.stableVersion, nil
-}
-
-func (c *cachedResource) getVersion(useStableVersion bool) (string, error) {
-	if !useStableVersion {
-		return c.cacheVersion, nil
-	}
-
-	return c.getStableVersion()
-}
-
 type watch interface {
 	// isDelta indicates whether the watch is a delta one.
 	// It should not be used to take functional decisions, but is still currently used pending final changes.
 	// It can be used to generate statistics.
 	isDelta() bool
-	// useStableVersion indicates whether versions returned in the response are built using stable versions instead of cache update versions.
-	useStableVersion() bool
+	// useResourceVersion indicates whether versions returned in the response are built using resource versions instead of cache update versions.
+	useResourceVersion() bool
 	// sendFullStateResponses requires that all resources matching the request, with no regards to which ones actually updated, must be provided in the response.
 	// As a consequence, sending a response with no resources has a functional meaning of no matching resources available.
 	sendFullStateResponses() bool
 
 	getSubscription() Subscription
 	// buildResponse computes the actual WatchResponse object to be sent on the watch.
-	buildResponse(updatedResources []types.ResourceWithTTL, removedResources []string, returnedVersions map[string]string, version string) WatchResponse
+	buildResponse(updatedResources []*cachedResource, removedResources []string, returnedVersions map[string]string, version string) WatchResponse
 	// sendResponse sends the response for the watch.
 	// It must be called at most once.
 	sendResponse(resp WatchResponse)
@@ -148,9 +106,7 @@ func WithVersionPrefix(prefix string) LinearCacheOption {
 func WithInitialResources(resources map[string]types.Resource) LinearCacheOption {
 	return func(cache *LinearCache) {
 		for name, resource := range resources {
-			cache.resources[name] = &cachedResource{
-				Resource: resource,
-			}
+			cache.resources[name] = newCachedResource(name, resource, "")
 		}
 	}
 }
@@ -184,10 +140,10 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 // computeResourceChange compares the subscription known resources and the cache current state to compute the list of resources
 // which have changed and should be notified to the user.
 //
-// The useStableVersion argument defines what version type to use for resources:
+// The useResourceVersion argument defines what version type to use for resources:
 //   - if set to false versions are based on when resources were updated in the cache.
 //   - if set to true versions are a stable property of the resource, with no regard to when it was added to the cache.
-func (cache *LinearCache) computeResourceChange(sub Subscription, useStableVersion bool) (updated, removed []string, err error) {
+func (cache *LinearCache) computeResourceChange(sub Subscription, useResourceVersion bool) (updated, removed []string, err error) {
 	var changedResources []string
 	var removedResources []string
 
@@ -200,7 +156,7 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useStableVersi
 				// This resource is not yet known by the client (new resource added in the cache or newly subscribed).
 				changedResources = append(changedResources, resourceName)
 			} else {
-				resourceVersion, err := resource.getVersion(useStableVersion)
+				resourceVersion, err := resource.getVersion(useResourceVersion)
 				if err != nil {
 					return nil, nil, fmt.Errorf("failed to compute version of %s: %w", resourceName, err)
 				}
@@ -236,7 +192,7 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useStableVersi
 				// This resource is not yet known by the client (new resource added in the cache or newly subscribed).
 				changedResources = append(changedResources, resourceName)
 			} else {
-				resourceVersion, err := res.getVersion(useStableVersion)
+				resourceVersion, err := res.getVersion(useResourceVersion)
 				if err != nil {
 					return nil, nil, fmt.Errorf("failed to compute version of %s: %w", resourceName, err)
 				}
@@ -261,7 +217,7 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useStableVersi
 
 func (cache *LinearCache) computeResponse(watch watch, replyEvenIfEmpty bool) (WatchResponse, error) {
 	sub := watch.getSubscription()
-	changedResources, removedResources, err := cache.computeResourceChange(sub, watch.useStableVersion())
+	changedResources, removedResources, err := cache.computeResourceChange(sub, watch.useResourceVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -314,11 +270,11 @@ func (cache *LinearCache) computeResponse(watch watch, replyEvenIfEmpty bool) (W
 	// Clone the current returned versions. The cache should not alter the subscription
 	returnedVersions := maps.Clone(sub.ReturnedResources())
 
-	resources := make([]types.ResourceWithTTL, 0, len(resourcesToReturn))
+	resources := make([]*cachedResource, 0, len(resourcesToReturn))
 	for _, resourceName := range resourcesToReturn {
 		cachedResource := cache.resources[resourceName]
-		resources = append(resources, types.ResourceWithTTL{Resource: cachedResource.Resource})
-		version, err := cachedResource.getVersion(watch.useStableVersion())
+		resources = append(resources, cachedResource)
+		version, err := cachedResource.getVersion(watch.useResourceVersion())
 		if err != nil {
 			return nil, fmt.Errorf("failed to compute version of %s: %w", resourceName, err)
 		}
@@ -383,7 +339,7 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	defer cache.mu.Unlock()
 
 	cache.version++
-	cache.resources[name] = newCachedResource(res, cache.getVersion())
+	cache.resources[name] = newCachedResource(name, res, cache.getVersion())
 
 	return cache.notifyAll([]string{name})
 }
@@ -410,7 +366,7 @@ func (cache *LinearCache) UpdateResources(toUpdate map[string]types.Resource, to
 	version := cache.getVersion()
 	modified := make([]string, 0, len(toUpdate)+len(toDelete))
 	for name, resource := range toUpdate {
-		cache.resources[name] = newCachedResource(resource, version)
+		cache.resources[name] = newCachedResource(name, resource, version)
 		modified = append(modified, name)
 	}
 	for _, name := range toDelete {
@@ -422,7 +378,8 @@ func (cache *LinearCache) UpdateResources(toUpdate map[string]types.Resource, to
 }
 
 // SetResources replaces current resources with a new set of resources.
-// If only some resources are to be updated, UpdateResources is more efficient.
+// Given the use of lazy serialization, if most resources are actually the same
+// using UpdateResources instead will be much more efficient.
 func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
@@ -442,7 +399,7 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	// We assume all resources passed to SetResources are changed.
 	// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
 	for name, resource := range resources {
-		cache.resources[name] = newCachedResource(resource, version)
+		cache.resources[name] = newCachedResource(name, resource, version)
 		modified = append(modified, name)
 	}
 
@@ -460,7 +417,7 @@ func (cache *LinearCache) GetResources() map[string]types.Resource {
 	// involving mutations of our backing map
 	resources := make(map[string]types.Resource, len(cache.resources))
 	for k, v := range cache.resources {
-		resources[k] = v.Resource
+		resources[k] = v.resource
 	}
 	return resources
 }
@@ -561,7 +518,7 @@ func (cache *LinearCache) trackWatch(watch watch) func() {
 	sub := watch.getSubscription()
 
 	if sub.IsWildcard() {
-		cache.log.Infof("[linear cache] open watch %d for %s all resources", watchID, cache.typeURL)
+		cache.log.Infof("[linear cache] open watch %d (delta: %t) for %s all resources", watchID, watch.isDelta(), cache.typeURL)
 		cache.log.Debugf("[linear cache] subscription details for watch %d: known versions %v, system version %q", watchID, sub.ReturnedResources(), cache.getVersion())
 		cache.wildcardWatches[watchID] = watch
 		return func() {
@@ -571,7 +528,7 @@ func (cache *LinearCache) trackWatch(watch watch) func() {
 		}
 	}
 
-	cache.log.Infof("[linear cache] open watch %d for %s resources %v", watchID, cache.typeURL, sub.SubscribedResources())
+	cache.log.Infof("[linear cache] open watch %d (delta: %t) for %s resources %v", watchID, watch.isDelta(), cache.typeURL, sub.SubscribedResources())
 	cache.log.Debugf("[linear cache] subscription details for watch %d: known versions %v, system version %q", watchID, sub.ReturnedResources(), cache.getVersion())
 	for name := range sub.SubscribedResources() {
 		watches, exists := cache.resourceWatches[name]

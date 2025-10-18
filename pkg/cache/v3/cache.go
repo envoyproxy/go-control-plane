@@ -18,6 +18,7 @@ package cache
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync/atomic"
 
 	"google.golang.org/protobuf/proto"
@@ -179,14 +180,14 @@ type RawResponse struct {
 	// Proxy responds with this version as an acknowledgement.
 	Version string
 
-	// Resources to be included in the response.
-	Resources []types.ResourceWithTTL
+	// resources to be included in the response.
+	resources []*cachedResource
 
-	// ReturnedResources tracks the resources returned for the subscription and the version when it was last returned,
+	// returnedResources tracks the resources returned for the subscription and the version when it was last returned,
 	// including previously returned ones when using non-full state resources.
 	// It allows the cache to know what the client knows. The server will transparently forward this
 	// across requests, and the cache is responsible for its interpretation.
-	ReturnedResources map[string]string
+	returnedResources map[string]string
 
 	// Whether this is a heartbeat response. For xDS versions that support TTL, this
 	// will be converted into a response that doesn't contain the actual resource protobuf.
@@ -198,7 +199,7 @@ type RawResponse struct {
 	Ctx context.Context
 
 	// marshaledResponse holds an atomic reference to the serialized discovery response.
-	marshaledResponse atomic.Value
+	marshaledResponse atomic.Pointer[discovery.DiscoveryResponse]
 }
 
 // RawDeltaResponse is a pre-serialized xDS response that utilizes the delta discovery request/response objects.
@@ -209,21 +210,24 @@ type RawDeltaResponse struct {
 	// SystemVersionInfo holds the currently applied response system version and should be used for debugging purposes only.
 	SystemVersionInfo string
 
-	// Resources to be included in the response.
-	Resources []types.ResourceWithTTL
+	// resources to be included in the response.
+	resources []*cachedResource
 
-	// RemovedResources is a list of resource aliases which should be dropped by the consuming client.
-	RemovedResources []string
+	// removedResources is a list of resource aliases which should be dropped by the consuming client.
+	removedResources []string
 
-	// NextVersionMap consists of updated version mappings after this response is applied.
-	NextVersionMap map[string]string
+	// returnedResources tracks the resources returned for the subscription and the version when it was last returned,
+	// including previously returned ones when using non-full state resources.
+	// It allows the cache to know what the client knows. The server will transparently forward this
+	// across requests, and the cache is responsible for its interpretation.
+	returnedResources map[string]string
 
 	// Context provided at the time of response creation. This allows associating additional
 	// information with a generated response.
 	Ctx context.Context
 
 	// Marshaled Resources to be included in the response.
-	marshaledResponse atomic.Value
+	marshaledResponse atomic.Pointer[discovery.DeltaDiscoveryResponse]
 }
 
 var (
@@ -267,44 +271,76 @@ var (
 	_ DeltaResponse = &DeltaPassthroughResponse{}
 )
 
+func NewTestRawResponse(req *discovery.DiscoveryRequest, version string, resources []types.ResourceWithTTL) *RawResponse {
+	cachedRes := []*cachedResource{}
+	for _, res := range resources {
+		newRes := newCachedResource(GetResourceName(res.Resource), res.Resource, version)
+		newRes.ttl = res.TTL
+		cachedRes = append(cachedRes, newRes)
+	}
+	return &RawResponse{
+		Request:   req,
+		Version:   version,
+		resources: cachedRes,
+	}
+}
+
+func NewTestRawDeltaResponse(req *discovery.DeltaDiscoveryRequest, version string, resources []types.ResourceWithTTL, removedResources []string, nextVersionMap map[string]string) *RawDeltaResponse {
+	cachedRes := []*cachedResource{}
+	for _, res := range resources {
+		name := GetResourceName(res.Resource)
+		newRes := newCachedResource(name, res.Resource, nextVersionMap[name])
+		newRes.ttl = res.TTL
+		cachedRes = append(cachedRes, newRes)
+	}
+	return &RawDeltaResponse{
+		DeltaRequest:      req,
+		SystemVersionInfo: version,
+		resources:         cachedRes,
+		removedResources:  removedResources,
+		returnedResources: nextVersionMap,
+	}
+}
+
 // GetDiscoveryResponse performs the marshaling the first time its called and uses the cached response subsequently.
 // This is necessary because the marshaled response does not change across the calls.
 // This caching behavior is important in high throughput scenarios because grpc marshaling has a cost and it drives the cpu utilization under load.
 func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, error) {
 	marshaledResponse := r.marshaledResponse.Load()
-
-	if marshaledResponse == nil {
-		marshaledResources := make([]*anypb.Any, len(r.Resources))
-
-		for i, resource := range r.Resources {
-			maybeTtldResource, resourceType, err := r.maybeCreateTTLResource(resource)
-			if err != nil {
-				return nil, err
-			}
-			marshaledResource, err := MarshalResource(maybeTtldResource)
-			if err != nil {
-				return nil, err
-			}
-			marshaledResources[i] = &anypb.Any{
-				TypeUrl: resourceType,
-				Value:   marshaledResource,
-			}
-		}
-
-		marshaledResponse = &discovery.DiscoveryResponse{
-			VersionInfo: r.Version,
-			Resources:   marshaledResources,
-			TypeUrl:     r.GetRequest().GetTypeUrl(),
-		}
-
-		r.marshaledResponse.Store(marshaledResponse)
+	if marshaledResponse != nil {
+		return marshaledResponse, nil
 	}
 
-	return marshaledResponse.(*discovery.DiscoveryResponse), nil
+	marshaledResources := make([]*anypb.Any, 0, len(r.resources))
+	for _, resource := range r.resources {
+		marshaledResource, err := r.marshalTTLResource(resource)
+		if err != nil {
+			return nil, fmt.Errorf("processing %s: %w", GetResourceName(resource.resource), err)
+		}
+		marshaledResources = append(marshaledResources, marshaledResource)
+	}
+
+	marshaledResponse = &discovery.DiscoveryResponse{
+		VersionInfo: r.Version,
+		Resources:   marshaledResources,
+		TypeUrl:     r.GetRequest().GetTypeUrl(),
+	}
+	r.marshaledResponse.Store(marshaledResponse)
+
+	return marshaledResponse, nil
+}
+
+// GetRawResources is used internally within go-control-plane. Its interface and content may change
+func (r *RawResponse) GetRawResources() []types.ResourceWithTTL {
+	resources := make([]types.ResourceWithTTL, 0, len(r.resources))
+	for _, res := range r.resources {
+		resources = append(resources, types.ResourceWithTTL{Resource: res.resource, TTL: res.ttl})
+	}
+	return resources
 }
 
 func (r *RawResponse) GetReturnedResources() map[string]string {
-	return r.ReturnedResources
+	return r.returnedResources
 }
 
 // GetDeltaDiscoveryResponse performs the marshaling the first time its called and uses the cached response subsequently.
@@ -312,40 +348,48 @@ func (r *RawResponse) GetReturnedResources() map[string]string {
 // This caching behavior is important in high throughput scenarios because grpc marshaling has a cost and it drives the cpu utilization under load.
 func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscoveryResponse, error) {
 	marshaledResponse := r.marshaledResponse.Load()
-
-	if marshaledResponse == nil {
-		marshaledResources := make([]*discovery.Resource, len(r.Resources))
-
-		for i, resource := range r.Resources {
-			name := GetResourceName(resource.Resource)
-			marshaledResource, err := MarshalResource(resource.Resource)
-			if err != nil {
-				return nil, err
-			}
-			version := HashResource(marshaledResource)
-			if version == "" {
-				return nil, errors.New("failed to create a resource hash")
-			}
-			marshaledResources[i] = &discovery.Resource{
-				Name: name,
-				Resource: &anypb.Any{
-					TypeUrl: r.GetDeltaRequest().GetTypeUrl(),
-					Value:   marshaledResource,
-				},
-				Version: version,
-			}
-		}
-
-		marshaledResponse = &discovery.DeltaDiscoveryResponse{
-			Resources:         marshaledResources,
-			RemovedResources:  r.RemovedResources,
-			TypeUrl:           r.GetDeltaRequest().GetTypeUrl(),
-			SystemVersionInfo: r.SystemVersionInfo,
-		}
-		r.marshaledResponse.Store(marshaledResponse)
+	if marshaledResponse != nil {
+		return marshaledResponse, nil
 	}
 
-	return marshaledResponse.(*discovery.DeltaDiscoveryResponse), nil
+	marshaledResources := make([]*discovery.Resource, 0, len(r.resources))
+	for _, resource := range r.resources {
+		marshaledResource, err := resource.getMarshaledResource()
+		if err != nil {
+			return nil, fmt.Errorf("processing %s: %w", resource.name, err)
+		}
+		version, err := resource.getResourceVersion()
+		if err != nil {
+			return nil, fmt.Errorf("processing version of %s: %w", resource.name, err)
+		}
+		marshaledResources = append(marshaledResources, &discovery.Resource{
+			Name: resource.name,
+			Resource: &anypb.Any{
+				TypeUrl: r.GetDeltaRequest().GetTypeUrl(),
+				Value:   marshaledResource,
+			},
+			Version: version,
+		})
+	}
+
+	marshaledResponse = &discovery.DeltaDiscoveryResponse{
+		Resources:         marshaledResources,
+		RemovedResources:  r.removedResources,
+		TypeUrl:           r.GetDeltaRequest().GetTypeUrl(),
+		SystemVersionInfo: r.SystemVersionInfo,
+	}
+	r.marshaledResponse.Store(marshaledResponse)
+
+	return marshaledResponse, nil
+}
+
+// GetRawResources is used internally within go-control-plane. Its interface and content may change
+func (r *RawDeltaResponse) GetRawResources() []types.ResourceWithTTL {
+	resources := make([]types.ResourceWithTTL, 0, len(r.resources))
+	for _, res := range r.resources {
+		resources = append(resources, types.ResourceWithTTL{Resource: res.resource, TTL: res.ttl})
+	}
+	return resources
 }
 
 // GetRequest returns the original Discovery Request.
@@ -392,7 +436,7 @@ func (r *RawDeltaResponse) GetNextVersionMap() map[string]string {
 
 // GetReturnedResources returns the version map which consists of updated version mappings after this response is applied.
 func (r *RawDeltaResponse) GetReturnedResources() map[string]string {
-	return r.NextVersionMap
+	return r.returnedResources
 }
 
 func (r *RawDeltaResponse) GetContext() context.Context {
@@ -401,26 +445,44 @@ func (r *RawDeltaResponse) GetContext() context.Context {
 
 var deltaResourceTypeURL = "type.googleapis.com/" + string(proto.MessageName(&discovery.Resource{}))
 
-func (r *RawResponse) maybeCreateTTLResource(resource types.ResourceWithTTL) (types.Resource, string, error) {
-	if resource.TTL != nil {
-		wrappedResource := &discovery.Resource{
-			Name: GetResourceName(resource.Resource),
-			Ttl:  durationpb.New(*resource.TTL),
+func (r *RawResponse) marshalTTLResource(resource *cachedResource) (*anypb.Any, error) {
+	buildResource := func() (*anypb.Any, error) {
+		marshaled, err := resource.getMarshaledResource()
+		if err != nil {
+			return nil, fmt.Errorf("marshaling: %w", err)
 		}
-
-		if !r.Heartbeat {
-			rsrc, err := anypb.New(resource.Resource)
-			if err != nil {
-				return nil, "", err
-			}
-			rsrc.TypeUrl = r.GetRequest().GetTypeUrl()
-			wrappedResource.Resource = rsrc
-		}
-
-		return wrappedResource, deltaResourceTypeURL, nil
+		return &anypb.Any{
+			TypeUrl: r.GetRequest().GetTypeUrl(),
+			Value:   marshaled,
+		}, nil
 	}
 
-	return resource.Resource, r.GetRequest().GetTypeUrl(), nil
+	if resource.ttl == nil {
+		return buildResource()
+	}
+
+	wrappedResource := &discovery.Resource{
+		Name: GetResourceName(resource.resource),
+		Ttl:  durationpb.New(*resource.ttl),
+	}
+
+	if !r.Heartbeat {
+		rsrc, err := buildResource()
+		if err != nil {
+			return nil, err
+		}
+		wrappedResource.Resource = rsrc
+	}
+
+	marshaled, err := MarshalResource(wrappedResource)
+	if err != nil {
+		return nil, fmt.Errorf("marshaling discovery resource: %w", err)
+	}
+
+	return &anypb.Any{
+		TypeUrl: deltaResourceTypeURL,
+		Value:   marshaled,
+	}, nil
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.

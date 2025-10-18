@@ -21,7 +21,6 @@ import (
 	"time"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 )
 
 // NodeHash computes string identifiers for Envoy nodes.
@@ -109,15 +108,15 @@ func (w ResponseWatch) isDelta() bool {
 	return false
 }
 
-func (w ResponseWatch) useStableVersion() bool {
+func (w ResponseWatch) useResourceVersion() bool {
 	return false
 }
 
-func (w ResponseWatch) buildResponse(updatedResources []types.ResourceWithTTL, _ []string, returnedVersions map[string]string, version string) WatchResponse {
+func (w ResponseWatch) buildResponse(updatedResources []*cachedResource, _ []string, returnedVersions map[string]string, version string) WatchResponse {
 	return &RawResponse{
 		Request:           w.Request,
-		Resources:         updatedResources,
-		ReturnedResources: returnedVersions,
+		resources:         updatedResources,
+		returnedResources: returnedVersions,
 		Version:           version,
 		Ctx:               context.Background(),
 	}
@@ -151,7 +150,7 @@ func (w DeltaResponseWatch) isDelta() bool {
 	return true
 }
 
-func (w DeltaResponseWatch) useStableVersion() bool {
+func (w DeltaResponseWatch) useResourceVersion() bool {
 	return true
 }
 
@@ -163,12 +162,12 @@ func (w DeltaResponseWatch) getSubscription() Subscription {
 	return w.subscription
 }
 
-func (w DeltaResponseWatch) buildResponse(updatedResources []types.ResourceWithTTL, removedResources []string, returnedVersions map[string]string, version string) WatchResponse {
+func (w DeltaResponseWatch) buildResponse(updatedResources []*cachedResource, removedResources []string, returnedVersions map[string]string, version string) WatchResponse {
 	return &RawDeltaResponse{
 		DeltaRequest:      w.Request,
-		Resources:         updatedResources,
-		RemovedResources:  removedResources,
-		NextVersionMap:    returnedVersions,
+		resources:         updatedResources,
+		removedResources:  removedResources,
+		returnedResources: returnedVersions,
 		SystemVersionInfo: version,
 		Ctx:               context.Background(),
 	}

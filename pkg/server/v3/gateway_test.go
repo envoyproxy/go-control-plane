@@ -36,25 +36,25 @@ func TestGateway(t *testing.T) {
 	config := makeMockConfigWatcher()
 	config.responses = map[string][]cache.Response{
 		resource.ClusterType: {
-			&cache.RawResponse{
-				Version:   "2",
-				Resources: []types.ResourceWithTTL{{Resource: cluster}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: resource.ClusterType},
-			},
+			cache.NewTestRawResponse(
+				&discovery.DiscoveryRequest{TypeUrl: resource.ClusterType},
+				"2",
+				[]types.ResourceWithTTL{{Resource: cluster}},
+			),
 		},
 		resource.RouteType: {
-			&cache.RawResponse{
-				Version:   "3",
-				Resources: []types.ResourceWithTTL{{Resource: route}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
-			},
+			cache.NewTestRawResponse(
+				&discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
+				"3",
+				[]types.ResourceWithTTL{{Resource: route}},
+			),
 		},
 		resource.ListenerType: {
-			&cache.RawResponse{
-				Version:   "4",
-				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: resource.ListenerType},
-			},
+			cache.NewTestRawResponse(
+				&discovery.DiscoveryRequest{TypeUrl: resource.ListenerType},
+				"4",
+				[]types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
+			),
 		},
 	}
 	gtw := server.HTTPGateway{Server: server.NewServer(context.Background(), config, nil)}

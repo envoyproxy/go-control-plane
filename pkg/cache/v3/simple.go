@@ -507,7 +507,7 @@ func (cache *snapshotCache) respond(ctx context.Context, watch ResponseWatch, re
 }
 
 func createResponse(ctx context.Context, request *Request, resources map[string]types.ResourceWithTTL, version string, heartbeat bool) Response {
-	filtered := make([]types.ResourceWithTTL, 0, len(resources))
+	filtered := make([]*cachedResource, 0, len(resources))
 	returnedResources := make(map[string]string, len(resources))
 
 	// Reply only with the requested resources. Envoy may ask each resource
@@ -517,13 +517,13 @@ func createResponse(ctx context.Context, request *Request, resources map[string]
 		set := nameSet(request.GetResourceNames())
 		for name, resource := range resources {
 			if set[name] {
-				filtered = append(filtered, resource)
+				filtered = append(filtered, newCachedResourceWithTTL(name, resource, version))
 				returnedResources[name] = version
 			}
 		}
 	} else {
 		for name, resource := range resources {
-			filtered = append(filtered, resource)
+			filtered = append(filtered, newCachedResourceWithTTL(name, resource, version))
 			returnedResources[name] = version
 		}
 	}
@@ -531,8 +531,8 @@ func createResponse(ctx context.Context, request *Request, resources map[string]
 	return &RawResponse{
 		Request:           request,
 		Version:           version,
-		Resources:         filtered,
-		ReturnedResources: returnedResources,
+		resources:         filtered,
+		returnedResources: returnedResources,
 		Heartbeat:         heartbeat,
 		Ctx:               ctx,
 	}
@@ -602,10 +602,10 @@ func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceS
 	// Only send a response if there were changes
 	// We want to respond immediately for the first wildcard request in a stream, even if the response is empty
 	// otherwise, envoy won't complete initialization
-	if len(resp.Resources) > 0 || len(resp.RemovedResources) > 0 || (sub.IsWildcard() && request.ResponseNonce == "") {
+	if len(resp.resources) > 0 || len(resp.removedResources) > 0 || (sub.IsWildcard() && request.ResponseNonce == "") {
 		if cache.log != nil {
 			cache.log.Debugf("node: %s, sending delta response for typeURL %s with resources: %v removed resources: %v with wildcard: %t",
-				request.GetNode().GetId(), request.GetTypeUrl(), GetResourceNames(resp.Resources), resp.RemovedResources, sub.IsWildcard())
+				request.GetNode().GetId(), request.GetTypeUrl(), getCachedResourceNames(resp.resources), resp.removedResources, sub.IsWildcard())
 		}
 		select {
 		case value <- resp:

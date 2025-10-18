@@ -124,6 +124,15 @@ func GetResourceNames(resources []types.ResourceWithTTL) []string {
 	return out
 }
 
+// getCachedResourceNames returns the resource names for a list of valid xDS response types.
+func getCachedResourceNames(resources []*cachedResource) []string {
+	out := make([]string, len(resources))
+	for i, r := range resources {
+		out[i] = GetResourceName(r.resource)
+	}
+	return out
+}
+
 // MarshalResource converts the Resource to MarshaledResource.
 func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
 	return proto.MarshalOptions{Deterministic: true}.Marshal(resource)
