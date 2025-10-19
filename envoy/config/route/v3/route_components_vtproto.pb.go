@@ -2657,6 +2657,22 @@ func (m *RouteAction) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.PathRewrite) > 0 {
+		i -= len(m.PathRewrite)
+		copy(dAtA[i:], m.PathRewrite)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PathRewrite)))
+		i--
+		dAtA[i] = 0x2
+		i--
+		dAtA[i] = 0xea
+	}
+	if msg, ok := m.HostRewriteSpecifier.(*RouteAction_HostRewrite); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+	}
 	if m.FlushTimeout != nil {
 		size, err := (*durationpb.Duration)(m.FlushTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -3241,6 +3257,22 @@ func (m *RouteAction_InlineClusterSpecifierPlugin) MarshalToSizedBufferVTStrict(
 		i--
 		dAtA[i] = 0xba
 	}
+	return len(dAtA) - i, nil
+}
+func (m *RouteAction_HostRewrite) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *RouteAction_HostRewrite) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.HostRewrite)
+	copy(dAtA[i:], m.HostRewrite)
+	i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.HostRewrite)))
+	i--
+	dAtA[i] = 0x2
+	i--
+	dAtA[i] = 0xe2
 	return len(dAtA) - i, nil
 }
 func (m *RetryPolicy_RetryPriority) MarshalVTStrict() (dAtA []byte, err error) {
@@ -7393,6 +7425,10 @@ func (m *RouteAction) SizeVT() (n int) {
 		l = (*durationpb.Duration)(m.FlushTimeout).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	l = len(m.PathRewrite)
+	if l > 0 {
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -7507,6 +7543,16 @@ func (m *RouteAction_InlineClusterSpecifierPlugin) SizeVT() (n int) {
 	} else {
 		n += 3
 	}
+	return n
+}
+func (m *RouteAction_HostRewrite) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.HostRewrite)
+	n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	return n
 }
 func (m *RetryPolicy_RetryPriority) SizeVT() (n int) {
