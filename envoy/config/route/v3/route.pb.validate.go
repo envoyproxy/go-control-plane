@@ -391,6 +391,8 @@ func (m *RouteConfiguration) validate(all bool) error {
 
 	// no validation rules for IgnorePortInHostMatching
 
+	// no validation rules for VhostHeader
+
 	// no validation rules for IgnorePathParametersInPathMatching
 
 	{
