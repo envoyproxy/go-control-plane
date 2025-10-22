@@ -410,6 +410,21 @@ func (m *QuicProtocolOptions) validate(all bool) error {
 
 	// no validation rules for RejectNewConnections
 
+	if wrapper := m.GetMaxSessionsPerEventLoop(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			err := QuicProtocolOptionsValidationError{
+				field:  "MaxSessionsPerEventLoop",
+				reason: "value must be greater than 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return QuicProtocolOptionsMultiError(errors)
 	}
