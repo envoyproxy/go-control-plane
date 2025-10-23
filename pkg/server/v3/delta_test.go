@@ -34,14 +34,14 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 		versionMap[name] = cache.HashResource(marshaledResource)
 	}
 	var nextVersionMap map[string]string
-	var filtered []types.Resource
+	var filtered []types.ResourceWithTTL
 	var toRemove []string
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case sub.IsWildcard():
 		if len(sub.ReturnedResources()) == 0 {
-			filtered = make([]types.Resource, 0, len(resourceMap))
+			filtered = make([]types.ResourceWithTTL, 0, len(resourceMap))
 		}
 		nextVersionMap = make(map[string]string, len(resourceMap))
 		for name, r := range resourceMap {
@@ -51,7 +51,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			nextVersionMap[name] = version
 			prevVersion, found := sub.ReturnedResources()[name]
 			if !found || (prevVersion != version) {
-				filtered = append(filtered, r)
+				filtered = append(filtered, types.ResourceWithTTL{Resource: r})
 			}
 		}
 
@@ -70,7 +70,7 @@ func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryR
 			if r, ok := resourceMap[name]; ok {
 				nextVersion := versionMap[name]
 				if prevVersion != nextVersion {
-					filtered = append(filtered, r)
+					filtered = append(filtered, types.ResourceWithTTL{Resource: r})
 				}
 				nextVersionMap[name] = nextVersion
 			} else if found {
