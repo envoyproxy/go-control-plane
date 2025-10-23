@@ -1,5 +1,7 @@
 package stream
 
+import "github.com/envoyproxy/go-control-plane/pkg/server/config"
+
 const (
 	explicitWildcard = "*"
 )
@@ -9,10 +11,10 @@ type Subscription struct {
 	// wildcard indicates if the subscription currently has a wildcard watch.
 	wildcard bool
 
-	// allowLegacyWildcard indicates that the stream never provided any resource
-	// and is de facto wildcard.
-	// As soon as a resource or an explicit subscription to wildcard is provided,
-	// this flag will be set to false
+	// allowLegacyWildcard indicates that an empty request should be treated as a wildcard request.
+	// If in the stream at some point subscribes explicitly a resource or a explicitly makes wildcard
+	// request, then subsequent empty requests should not be treated as wildcard and so this
+	// flag will be set to false.
 	allowLegacyWildcard bool
 
 	// subscribedResourceNames provides the resources explicitly requested by the client
@@ -24,10 +26,26 @@ type Subscription struct {
 }
 
 // newSubscription initializes a subscription state.
-func newSubscription(wildcard bool, initialResourceVersions map[string]string) Subscription {
+func newSubscription(emptyRequest bool, initialResourceVersions map[string]string, opts config.Opts, typeURL string) Subscription {
+	allowLegacyWildcard := emptyRequest
+
+	if opts.LegacyWildcardDeactivated() {
+		allowLegacyWildcard = false
+	} else if typeMap := opts.LegacyWildcardDeactivatedTypes(); len(typeMap) > 0 {
+		if _, found := typeMap[typeURL]; found {
+			allowLegacyWildcard = false
+		}
+	}
+
+	// By default we set the subscription as a wildcard only if the request was empty
+	// and in legacy mode. Later on when we actually process the request, if the request
+	// was non-empty, it may have an explicit wildcard subscription, in which case
+	// we will set the wildcard field on the subscription accordingly.
+	wildcard := emptyRequest && allowLegacyWildcard
+
 	state := Subscription{
 		wildcard:                wildcard,
-		allowLegacyWildcard:     wildcard,
+		allowLegacyWildcard:     allowLegacyWildcard,
 		subscribedResourceNames: map[string]struct{}{},
 		returnedResources:       initialResourceVersions,
 	}
@@ -39,8 +57,8 @@ func newSubscription(wildcard bool, initialResourceVersions map[string]string) S
 	return state
 }
 
-func NewSotwSubscription(subscribed []string) Subscription {
-	sub := newSubscription(len(subscribed) == 0, nil)
+func NewSotwSubscription(subscribed []string, opts config.Opts, typeURL string) Subscription {
+	sub := newSubscription(len(subscribed) == 0, nil, opts, typeURL)
 	sub.SetResourceSubscription(subscribed)
 	return sub
 }
@@ -90,8 +108,8 @@ func (s *Subscription) SetResourceSubscription(subscribed []string) {
 	s.subscribedResourceNames = subscribedResources
 }
 
-func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVersions map[string]string) Subscription {
-	sub := newSubscription(len(subscribed) == 0, initialResourceVersions)
+func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVersions map[string]string, opts config.Opts, typeURL string) Subscription {
+	sub := newSubscription(len(subscribed) == 0, initialResourceVersions, opts, typeURL)
 	sub.UpdateResourceSubscriptions(subscribed, unsubscribed)
 	return sub
 }

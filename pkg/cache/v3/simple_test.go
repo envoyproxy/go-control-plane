@@ -36,6 +36,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/config"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -54,7 +55,7 @@ func (group) ID(node *core.Node) string {
 }
 
 func subFromRequest(req *cache.Request) stream.Subscription {
-	return stream.NewSotwSubscription(req.GetResourceNames())
+	return stream.NewSotwSubscription(req.GetResourceNames(), config.NewOpts(), req.GetTypeUrl())
 }
 
 // This method represents the expected behavior of client and servers regarding the request and the subscription.
@@ -601,7 +602,7 @@ func TestAvertPanicForWatchOnNonExistentSnapshot(t *testing.T) {
 		ResourceNames: []string{"rtds"},
 		TypeUrl:       rsrc.RuntimeType,
 	}
-	ss := stream.NewSotwSubscription([]string{"rtds"})
+	ss := stream.NewSotwSubscription([]string{"rtds"}, config.NewOpts(), rsrc.RuntimeType)
 	ss.SetReturnedResources(map[string]string{"cluster": "abcdef"})
 	responder := make(chan cache.Response)
 	_, err := c.CreateWatch(req, ss, responder)
