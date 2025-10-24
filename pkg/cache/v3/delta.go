@@ -29,14 +29,14 @@ type resourceContainer struct {
 func createDeltaResponse(ctx context.Context, req *DeltaRequest, sub Subscription, resources resourceContainer, cacheVersion string) *RawDeltaResponse {
 	// variables to build our response with
 	var nextVersionMap map[string]string
-	var filtered []types.ResourceWithTTL
+	var filtered []*cachedResource
 	var toRemove []string
 
 	// If we are handling a wildcard request, we want to respond with all resources
 	switch {
 	case sub.IsWildcard():
 		if len(sub.ReturnedResources()) == 0 {
-			filtered = make([]types.ResourceWithTTL, 0, len(resources.resourceMap))
+			filtered = make([]*cachedResource, 0, len(resources.resourceMap))
 		}
 		nextVersionMap = make(map[string]string, len(resources.resourceMap))
 		for name, r := range resources.resourceMap {
@@ -46,7 +46,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, sub Subscriptio
 			nextVersionMap[name] = version
 			prevVersion, found := sub.ReturnedResources()[name]
 			if !found || (prevVersion != version) {
-				filtered = append(filtered, types.ResourceWithTTL{Resource: r})
+				filtered = append(filtered, newCachedResource(name, r, version))
 			}
 		}
 
@@ -66,7 +66,7 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, sub Subscriptio
 			if r, ok := resources.resourceMap[name]; ok {
 				nextVersion := resources.versionMap[name]
 				if prevVersion != nextVersion {
-					filtered = append(filtered, types.ResourceWithTTL{Resource: r})
+					filtered = append(filtered, newCachedResource(name, r, nextVersion))
 				}
 				nextVersionMap[name] = nextVersion
 			} else if found {
@@ -77,9 +77,9 @@ func createDeltaResponse(ctx context.Context, req *DeltaRequest, sub Subscriptio
 
 	return &RawDeltaResponse{
 		DeltaRequest:      req,
-		Resources:         filtered,
-		RemovedResources:  toRemove,
-		NextVersionMap:    nextVersionMap,
+		resources:         filtered,
+		removedResources:  toRemove,
+		returnedResources: nextVersionMap,
 		SystemVersionInfo: cacheVersion,
 		Ctx:               ctx,
 	}

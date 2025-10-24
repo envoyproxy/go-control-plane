@@ -187,79 +187,65 @@ var (
 )
 
 func makeResponses() map[string][]cache.Response {
-	return map[string][]cache.Response{
-		rsrc.EndpointType: {
-			&cache.RawResponse{
-				Version:   "1",
-				Resources: []types.ResourceWithTTL{{Resource: endpoint}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType},
-			},
+	testTypes := []struct {
+		typeURL   string
+		resources []types.Resource
+	}{
+		{
+			typeURL:   rsrc.EndpointType,
+			resources: []types.Resource{endpoint},
 		},
-		rsrc.ClusterType: {
-			&cache.RawResponse{
-				Version:   "2",
-				Resources: []types.ResourceWithTTL{{Resource: cluster}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType},
-			},
+		{
+			typeURL:   rsrc.ClusterType,
+			resources: []types.Resource{cluster},
 		},
-		rsrc.RouteType: {
-			&cache.RawResponse{
-				Version:   "3",
-				Resources: []types.ResourceWithTTL{{Resource: route}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RouteType},
-			},
+		{
+			typeURL:   rsrc.RouteType,
+			resources: []types.Resource{route},
 		},
-		rsrc.ScopedRouteType: {
-			&cache.RawResponse{
-				Version:   "4",
-				Resources: []types.ResourceWithTTL{{Resource: scopedRoute}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ScopedRouteType},
-			},
+		{
+			typeURL:   rsrc.ScopedRouteType,
+			resources: []types.Resource{scopedRoute},
 		},
-		rsrc.VirtualHostType: {
-			&cache.RawResponse{
-				Version:   "5",
-				Resources: []types.ResourceWithTTL{{Resource: virtualHost}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.VirtualHostType},
-			},
+		{
+			typeURL:   rsrc.VirtualHostType,
+			resources: []types.Resource{virtualHost},
 		},
-		rsrc.ListenerType: {
-			&cache.RawResponse{
-				Version:   "6",
-				Resources: []types.ResourceWithTTL{{Resource: httpListener}, {Resource: httpScopedListener}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ListenerType},
-			},
+		{
+			typeURL:   rsrc.ListenerType,
+			resources: []types.Resource{httpListener, httpScopedListener},
 		},
-		rsrc.SecretType: {
-			&cache.RawResponse{
-				Version:   "7",
-				Resources: []types.ResourceWithTTL{{Resource: secret}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.SecretType},
-			},
+		{
+			typeURL:   rsrc.SecretType,
+			resources: []types.Resource{secret},
 		},
-		rsrc.RuntimeType: {
-			&cache.RawResponse{
-				Version:   "8",
-				Resources: []types.ResourceWithTTL{{Resource: runtime}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.RuntimeType},
-			},
+		{
+			typeURL:   rsrc.RuntimeType,
+			resources: []types.Resource{runtime},
 		},
-		rsrc.ExtensionConfigType: {
-			&cache.RawResponse{
-				Version:   "9",
-				Resources: []types.ResourceWithTTL{{Resource: extensionConfig}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: rsrc.ExtensionConfigType},
-			},
+		{
+			typeURL:   rsrc.ExtensionConfigType,
+			resources: []types.Resource{extensionConfig},
 		},
-		// Pass-through type (xDS does not exist for this type)
-		opaqueType: {
-			&cache.RawResponse{
-				Version:   "10",
-				Resources: []types.ResourceWithTTL{{Resource: opaque}},
-				Request:   &discovery.DiscoveryRequest{TypeUrl: opaqueType},
-			},
+		{
+			typeURL:   opaqueType,
+			resources: []types.Resource{opaque},
 		},
 	}
+
+	responses := map[string][]cache.Response{}
+	for i, res := range testTypes {
+		resWithTTL := []types.ResourceWithTTL{}
+		for _, r := range res.resources {
+			resWithTTL = append(resWithTTL, types.ResourceWithTTL{Resource: r})
+		}
+		responses[res.typeURL] = []cache.Response{cache.NewTestRawResponse(
+			&discovery.DiscoveryRequest{TypeUrl: res.typeURL},
+			strconv.Itoa(i+1),
+			resWithTTL,
+		)}
+	}
+	return responses
 }
 
 func TestServerShutdown(t *testing.T) {

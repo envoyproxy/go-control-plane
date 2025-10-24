@@ -131,7 +131,7 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 			case out := <-value:
 				gotVersion, _ := out.GetVersion()
 				assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
-				assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResourcesAndTTL(typ))
+				assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshotWithTTL.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshotWithTTL.GetResourcesAndTTL(typ))
 
 				updateFromSotwResponse(out, &sub, req)
 				subs[typ] = sub
@@ -162,9 +162,9 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 				case out := <-value:
 					gotVersion, _ := out.GetVersion()
 					assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
-					assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
+					assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshotWithTTL.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshotWithTTL.GetResources(typ))
 
-					assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshotWithTTL.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshotWithTTL.GetResources(typ))
+					assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshotWithTTL.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshotWithTTL.GetResources(typ))
 
 					updatesByType[typ]++
 
@@ -227,7 +227,7 @@ func TestSnapshotCache(t *testing.T) {
 				snapshot := fixture.snapshot()
 				gotVersion, _ := out.GetVersion()
 				assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
-				assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
+				assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot.GetResourcesAndTTL(typ))
 			case <-time.After(time.Second):
 				t.Fatal("failed to receive snapshot response")
 			}
@@ -283,7 +283,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 				gotVersion, _ := out.GetVersion()
 				assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
 				snapshot := fixture.snapshot()
-				assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot.GetResourcesAndTTL(typ))
+				assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot.GetResourcesAndTTL(typ)), "get resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot.GetResourcesAndTTL(typ))
 				returnedResources := make(map[string]string)
 				// Update sub to track what was returned
 				for _, resource := range out.GetRequest().GetResourceNames() {
@@ -320,7 +320,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 	case out := <-watches[rsrc.EndpointType]:
 		gotVersion, _ := out.GetVersion()
 		assert.Equalf(t, gotVersion, fixture.version2, "got version %q, want %q", gotVersion, fixture.version2)
-		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items), "got resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
+		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot2.Resources[types.Endpoint].Items), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot2.Resources[types.Endpoint].Items)
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
 	}
@@ -443,7 +443,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 		gotVersion, _ := out.GetVersion()
 		assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
 		want := map[string]types.ResourceWithTTL{clusterName: snapshot2.Resources[types.Endpoint].Items[clusterName]}
-		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), want), "got resources %v, want %v", out.(*cache.RawResponse).Resources, want)
+		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), want), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), want)
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
 	}
@@ -464,7 +464,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	case out := <-watch:
 		gotVersion, _ := out.GetVersion()
 		assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
-		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).Resources), snapshot2.Resources[types.Endpoint].Items), "got resources %v, want %v", out.(*cache.RawResponse).Resources, snapshot2.Resources[types.Endpoint].Items)
+		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot2.Resources[types.Endpoint].Items), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot2.Resources[types.Endpoint].Items)
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
 	}
