@@ -31,6 +31,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/server/config"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
@@ -207,7 +208,7 @@ func hashResource(t *testing.T, resource types.Resource) string {
 
 func createWildcardDeltaWatch(t *testing.T, initialReq bool, c *LinearCache, w chan DeltaResponse) {
 	t.Helper()
-	sub := stream.NewDeltaSubscription(nil, nil, nil)
+	sub := stream.NewDeltaSubscription(nil, nil, nil, config.NewOpts(), testType)
 	req := &DeltaRequest{TypeUrl: testType}
 	if !initialReq {
 		req.ResponseNonce = "1"
@@ -221,7 +222,7 @@ func createWildcardDeltaWatch(t *testing.T, initialReq bool, c *LinearCache, w c
 }
 
 func subFromRequest(req *Request) stream.Subscription {
-	return stream.NewSotwSubscription(req.GetResourceNames())
+	return stream.NewSotwSubscription(req.GetResourceNames(), config.NewOpts(), req.GetTypeUrl())
 }
 
 // This method represents the expected behavior of client and servers regarding the request and the subscription.
@@ -234,7 +235,7 @@ func updateFromSotwResponse(resp Response, sub *stream.Subscription, req *Reques
 }
 
 func subFromDeltaRequest(req *DeltaRequest) stream.Subscription {
-	return stream.NewDeltaSubscription(req.GetResourceNamesSubscribe(), req.GetResourceNamesUnsubscribe(), req.GetInitialResourceVersions())
+	return stream.NewDeltaSubscription(req.GetResourceNamesSubscribe(), req.GetResourceNamesUnsubscribe(), req.GetInitialResourceVersions(), config.NewOpts(), req.GetTypeUrl())
 }
 
 func TestLinearInitialResources(t *testing.T) {
