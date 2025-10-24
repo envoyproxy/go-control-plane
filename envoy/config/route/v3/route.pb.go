@@ -110,8 +110,11 @@ type RouteConfiguration struct {
 	RequestMirrorPolicies []*RouteAction_RequestMirrorPolicy `protobuf:"bytes,13,rep,name=request_mirror_policies,json=requestMirrorPolicies,proto3" json:"request_mirror_policies,omitempty"`
 	// By default, port in :authority header (if any) is used in host matching.
 	// With this option enabled, Envoy will ignore the port number in the :authority header (if any) when picking VirtualHost.
-	// NOTE: this option will not strip the port number (if any) contained in route config
-	// :ref:`envoy_v3_api_msg_config.route.v3.VirtualHost`.domains field.
+	//
+	// .. note::
+	//
+	//	This option will not strip the port number (if any) contained in route config
+	//	:ref:`envoy_v3_api_msg_config.route.v3.VirtualHost`.domains field.
 	IgnorePortInHostMatching bool `protobuf:"varint,14,opt,name=ignore_port_in_host_matching,json=ignorePortInHostMatching,proto3" json:"ignore_port_in_host_matching,omitempty"`
 	// Normally, virtual host matching is done using the :authority (or
 	// Host: in HTTP < 2) HTTP header. Setting this will instead, use a

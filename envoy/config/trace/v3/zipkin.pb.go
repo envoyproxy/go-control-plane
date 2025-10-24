@@ -150,15 +150,23 @@ type ZipkinConfig struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The cluster manager cluster that hosts the Zipkin collectors.
-	// Note: This field will be deprecated in future releases in favor of
-	// :ref:`collector_service <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_service>`.
-	// Either this field or collector_service must be specified.
+	//
+	// .. note::
+	//
+	//	This field will be deprecated in future releases in favor of
+	//	:ref:`collector_service <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_service>`.
+	//
+	//	Either this field or ``collector_service`` must be specified.
 	CollectorCluster string `protobuf:"bytes,1,opt,name=collector_cluster,json=collectorCluster,proto3" json:"collector_cluster,omitempty"`
 	// The API endpoint of the Zipkin service where the spans will be sent. When
 	// using a standard Zipkin installation.
-	// Note: This field will be deprecated in future releases in favor of
-	// :ref:`collector_service <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_service>`.
-	// Required when using collector_cluster.
+	//
+	// .. note::
+	//
+	//	This field will be deprecated in future releases in favor of
+	//	:ref:`collector_service <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_service>`.
+	//
+	//	Required when using ``collector_cluster``.
 	CollectorEndpoint string `protobuf:"bytes,2,opt,name=collector_endpoint,json=collectorEndpoint,proto3" json:"collector_endpoint,omitempty"`
 	// Determines whether a 128bit trace id will be used when creating a new
 	// trace instance. The default value is false, which will result in a 64 bit trace id being used.
@@ -170,8 +178,11 @@ type ZipkinConfig struct {
 	CollectorEndpointVersion ZipkinConfig_CollectorEndpointVersion `protobuf:"varint,5,opt,name=collector_endpoint_version,json=collectorEndpointVersion,proto3,enum=envoy.config.trace.v3.ZipkinConfig_CollectorEndpointVersion" json:"collector_endpoint_version,omitempty"`
 	// Optional hostname to use when sending spans to the collector_cluster. Useful for collectors
 	// that require a specific hostname. Defaults to :ref:`collector_cluster <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_cluster>` above.
-	// Note: This field will be deprecated in future releases in favor of
-	// :ref:`collector_service <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_service>`.
+	//
+	// .. note::
+	//
+	//	This field will be deprecated in future releases in favor of
+	//	:ref:`collector_service <envoy_v3_api_field_config.trace.v3.ZipkinConfig.collector_service>`.
 	CollectorHostname string `protobuf:"bytes,6,opt,name=collector_hostname,json=collectorHostname,proto3" json:"collector_hostname,omitempty"`
 	// If this is set to true, then Envoy will be treated as an independent hop in trace chain. A complete span pair will be created for a single
 	// request. Server span will be created for the downstream request and client span will be created for the related upstream request.

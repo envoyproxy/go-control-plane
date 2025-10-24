@@ -69,17 +69,21 @@ type JwtProvider struct {
 	// It is optional. If specified, it has to match the “iss“ field in JWT,
 	// otherwise the JWT “iss“ field is not checked.
 	//
-	// Note: “JwtRequirement“ :ref:`allow_missing <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing>`
-	// and :ref:`allow_missing_or_failed <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed>`
-	// are implemented differently than other “JwtRequirements“. Hence the usage of this field
-	// is different as follows if “allow_missing“ or “allow_missing_or_failed“ is used:
+	// .. note::
 	//
-	// * If a JWT has “iss“ field, it needs to be specified by this field in one of “JwtProviders“.
-	// * If a JWT doesn't have “iss“ field, one of “JwtProviders“ should fill this field empty.
-	// * Multiple “JwtProviders“ should not have same value in this field.
+	//	``JwtRequirement`` :ref:`allow_missing <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing>`
+	//	and :ref:`allow_missing_or_failed <envoy_v3_api_field_extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed>`
+	//	are implemented differently than other ``JwtRequirements``. Hence the usage of this field
+	//	is different as follows if ``allow_missing`` or ``allow_missing_or_failed`` is used:
 	//
-	// Example: https://securetoken.google.com
-	// Example: 1234567-compute@developer.gserviceaccount.com
+	//	* If a JWT has ``iss`` field, it needs to be specified by this field in one of ``JwtProviders``.
+	//	* If a JWT doesn't have ``iss`` field, one of ``JwtProviders`` should fill this field empty.
+	//	* Multiple ``JwtProviders`` should not have same value in this field.
+	//
+	// Examples:
+	//
+	// * https://securetoken.google.com
+	// * Example: 1234567-compute@developer.gserviceaccount.com
 	Issuer string `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
 	// The list of JWT `audiences <https://tools.ietf.org/html/rfc7519#section-4.1.3>`_ are
 	// allowed to access. A JWT containing any of these audiences will be accepted. If not specified,
