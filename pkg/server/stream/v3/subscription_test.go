@@ -202,6 +202,10 @@ func TestSotwSubscriptionsWithDeactivatedLegacyWildcardForTypes(t *testing.T) {
 		subEndpoint.SetResourceSubscription([]string{})
 		assert.False(t, subEndpoint.IsWildcard())
 
+		// Can still explicitly subscribe to wildcard
+		subEndpoint.SetResourceSubscription([]string{"*"})
+		assert.True(t, subEndpoint.IsWildcard())
+
 		// Route should still have legacy wildcard enabled
 		subRoute := NewSotwSubscription([]string{}, opts, routeType)
 		subRoute.SetResourceSubscription([]string{})
@@ -251,6 +255,10 @@ func TestDeltaSubscriptionsWithDeactivatedLegacyWildcardForTypes(t *testing.T) {
 		subEndpoint := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts, endpointType)
 		subEndpoint.UpdateResourceSubscriptions(nil, nil)
 		assert.False(t, subEndpoint.IsWildcard())
+
+		// Can still explicitly subscribe to wildcard
+		subEndpoint.UpdateResourceSubscriptions([]string{"*"}, nil)
+		assert.True(t, subEndpoint.IsWildcard())
 
 		// Route should still have legacy wildcard enabled
 		subRoute := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts, routeType)
