@@ -38,8 +38,9 @@ func newSubscription(emptyRequest bool, initialResourceVersions map[string]strin
 	}
 
 	// By default we set the subscription as a wildcard only if the request was empty
-	// and in legacy mode. Later on when we actually process the request, if the request
-	// was non-empty, it may have an explicit wildcard subscription, in which case
+	// and in legacy mode. Later on, outside of this constructor, when we actually 
+	// process the request, if the request was non-empty, it may have an 
+	// explicit wildcard subscription, in which case
 	// we will set the wildcard field on the subscription accordingly.
 	wildcard := emptyRequest && allowLegacyWildcard
 
