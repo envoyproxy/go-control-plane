@@ -570,7 +570,7 @@ func (cache *LinearCache) getVersion() string {
 }
 
 func (cache *LinearCache) Fetch(context.Context, *Request) (Response, error) {
-	return nil, errors.New("Fetch is not implemented by LinearCache")
+	return nil, errors.New("fetch is not implemented by LinearCache")
 }
 
 // NumResources returns the number of resources currently in the cache.
