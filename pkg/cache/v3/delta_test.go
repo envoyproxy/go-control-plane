@@ -19,7 +19,6 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	rsrc "github.com/envoyproxy/go-control-plane/pkg/resource/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/server/config"
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
@@ -40,7 +39,7 @@ func TestSnapshotCacheDeltaWatch(t *testing.T) {
 	// Make our initial request as a wildcard to get all resources and make sure the wildcard requesting works as intended
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
-		subscriptions[typ] = stream.NewDeltaSubscription(nil, nil, nil, config.NewOpts(), typ)
+		subscriptions[typ] = stream.NewDeltaSubscription(nil, nil, nil, true)
 		_, err := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 			Node: &core.Node{
 				Id: "node",
@@ -121,7 +120,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 	for _, typ := range testTypes {
 		watches[typ] = make(chan cache.DeltaResponse, 1)
-		sub := stream.NewDeltaSubscription(nil, nil, nil, config.NewOpts(), typ)
+		sub := stream.NewDeltaSubscription(nil, nil, nil, true)
 		subscriptions[typ] = &sub
 		// We don't specify any resource name subscriptions here because we want to make sure we test wildcard
 		// functionality. This means we should receive all resources back without requesting a subscription by name.
@@ -211,7 +210,7 @@ func TestConcurrentSetDeltaWatch(t *testing.T) {
 						},
 						TypeUrl:                rsrc.EndpointType,
 						ResourceNamesSubscribe: []string{clusterName},
-					}, stream.NewDeltaSubscription([]string{clusterName}, nil, nil, config.NewOpts(), rsrc.EndpointType), responses)
+					}, stream.NewDeltaSubscription([]string{clusterName}, nil, nil, true), responses)
 
 					require.NoError(t, err)
 					defer cancel()
@@ -228,7 +227,7 @@ func TestSnapshotDeltaCacheWatchTimeout(t *testing.T) {
 
 	// Create a non-buffered channel that will block sends.
 	watchCh := make(chan cache.DeltaResponse)
-	sub := stream.NewDeltaSubscription(names[rsrc.EndpointType], nil, nil, config.NewOpts(), rsrc.EndpointType)
+	sub := stream.NewDeltaSubscription(names[rsrc.EndpointType], nil, nil, true)
 	_, err := c.CreateDeltaWatch(&discovery.DeltaDiscoveryRequest{
 		Node: &core.Node{
 			Id: key,
@@ -278,7 +277,7 @@ func TestSnapshotCacheDeltaWatchCancel(t *testing.T) {
 			},
 			TypeUrl:                typ,
 			ResourceNamesSubscribe: names[typ],
-		}, stream.NewDeltaSubscription(names[typ], nil, nil, config.NewOpts(), typ), responses)
+		}, stream.NewDeltaSubscription(names[typ], nil, nil, true), responses)
 		require.NoError(t, err)
 
 		// Cancel the watch

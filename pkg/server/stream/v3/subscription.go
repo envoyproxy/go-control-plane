@@ -1,7 +1,5 @@
 package stream
 
-import "github.com/envoyproxy/go-control-plane/pkg/server/config"
-
 const (
 	explicitWildcard = "*"
 )
@@ -48,8 +46,8 @@ func newSubscription(emptyRequest, allowLegacyWildcard bool, initialResourceVers
 	return state
 }
 
-func NewSotwSubscription(subscribed []string, opts config.Opts, typeURL string) Subscription {
-	sub := newSubscription(len(subscribed) == 0, opts.IsLegacyWildcardActive(typeURL), nil)
+func NewSotwSubscription(subscribed []string, allowLegacyWildcard bool) Subscription {
+	sub := newSubscription(len(subscribed) == 0, allowLegacyWildcard, nil)
 	sub.SetResourceSubscription(subscribed)
 	return sub
 }
@@ -99,8 +97,8 @@ func (s *Subscription) SetResourceSubscription(subscribed []string) {
 	s.subscribedResourceNames = subscribedResources
 }
 
-func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVersions map[string]string, opts config.Opts, typeURL string) Subscription {
-	sub := newSubscription(len(subscribed) == 0, opts.IsLegacyWildcardActive(typeURL), initialResourceVersions)
+func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVersions map[string]string, allowLegacyWildcard bool) Subscription {
+	sub := newSubscription(len(subscribed) == 0, allowLegacyWildcard, initialResourceVersions)
 	sub.UpdateResourceSubscriptions(subscribed, unsubscribed)
 	return sub
 }

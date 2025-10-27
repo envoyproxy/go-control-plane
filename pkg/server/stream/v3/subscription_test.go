@@ -10,7 +10,7 @@ import (
 
 func TestSotwSubscriptions(t *testing.T) {
 	t.Run("legacy mode properly handled", func(t *testing.T) {
-		sub := NewSotwSubscription([]string{}, config.NewOpts(), "")
+		sub := NewSotwSubscription([]string{}, true)
 		assert.True(t, sub.IsWildcard())
 
 		// Requests always set empty in legacy mode
@@ -37,7 +37,7 @@ func TestSotwSubscriptions(t *testing.T) {
 
 	t.Run("new wildcard mode from start", func(t *testing.T) {
 		// A resource is provided so the subscription was created in wildcard
-		sub := NewSotwSubscription([]string{"*"}, config.NewOpts(), "")
+		sub := NewSotwSubscription([]string{"*"}, true)
 		assert.True(t, sub.IsWildcard())
 		assert.Empty(t, sub.SubscribedResources())
 
@@ -75,7 +75,7 @@ func TestSotwSubscriptions(t *testing.T) {
 
 func TestDeltaSubscriptions(t *testing.T) {
 	t.Run("legacy mode properly handled", func(t *testing.T) {
-		sub := NewDeltaSubscription([]string{}, []string{}, map[string]string{"resource": "version"}, config.NewOpts(), "")
+		sub := NewDeltaSubscription([]string{}, []string{}, map[string]string{"resource": "version"}, true)
 		assert.True(t, sub.IsWildcard())
 		assert.Empty(t, sub.SubscribedResources())
 		assert.Equal(t, map[string]string{"resource": "version"}, sub.ReturnedResources())
@@ -104,7 +104,7 @@ func TestDeltaSubscriptions(t *testing.T) {
 
 	t.Run("new wildcard mode", func(t *testing.T) {
 		// A resource is provided so the subscription was created in wildcard
-		sub := NewDeltaSubscription([]string{"*"}, []string{}, map[string]string{"resource": "version"}, config.NewOpts(), "")
+		sub := NewDeltaSubscription([]string{"*"}, []string{}, map[string]string{"resource": "version"}, true)
 		assert.True(t, sub.IsWildcard())
 		assert.Empty(t, sub.SubscribedResources())
 
@@ -166,8 +166,9 @@ func TestSotwSubscriptionsWithDeactivatedLegacyWildcard(t *testing.T) {
 		deactivateOpt := config.DeactivateLegacyWildcard()
 		deactivateOpt(&opts)
 
+		typeURL := "type.googleapis.com/envoy.config.cluster.v3.Cluster"
 		// Create subscription with empty resource list (would normally be legacy wildcard)
-		sub := NewSotwSubscription([]string{}, opts, "type.googleapis.com/envoy.config.cluster.v3.Cluster")
+		sub := NewSotwSubscription([]string{}, opts.IsLegacyWildcardActive(typeURL))
 
 		// With deactivated legacy wildcard, subscription should NOT be wildcard initially
 		// because allowLegacyWildcard=false means empty list doesn't trigger legacy behavior
@@ -194,11 +195,11 @@ func TestSotwSubscriptionsWithDeactivatedLegacyWildcardForTypes(t *testing.T) {
 		deactivateOpt(&opts)
 
 		// Both cluster and endpoint should have legacy wildcard deactivated
-		subCluster := NewSotwSubscription([]string{}, opts, clusterType)
+		subCluster := NewSotwSubscription([]string{}, opts.IsLegacyWildcardActive(clusterType))
 		subCluster.SetResourceSubscription([]string{})
 		assert.False(t, subCluster.IsWildcard())
 
-		subEndpoint := NewSotwSubscription([]string{}, opts, endpointType)
+		subEndpoint := NewSotwSubscription([]string{}, opts.IsLegacyWildcardActive(endpointType))
 		subEndpoint.SetResourceSubscription([]string{})
 		assert.False(t, subEndpoint.IsWildcard())
 
@@ -207,7 +208,7 @@ func TestSotwSubscriptionsWithDeactivatedLegacyWildcardForTypes(t *testing.T) {
 		assert.True(t, subEndpoint.IsWildcard())
 
 		// Route should still have legacy wildcard enabled
-		subRoute := NewSotwSubscription([]string{}, opts, routeType)
+		subRoute := NewSotwSubscription([]string{}, opts.IsLegacyWildcardActive(routeType))
 		subRoute.SetResourceSubscription([]string{})
 		assert.True(t, subRoute.IsWildcard())
 	})
@@ -219,8 +220,9 @@ func TestDeltaSubscriptionsWithDeactivatedLegacyWildcard(t *testing.T) {
 		deactivateOpt := config.DeactivateLegacyWildcard()
 		deactivateOpt(&opts)
 
+		typeURL := "type.googleapis.com/envoy.config.cluster.v3.Cluster"
 		// Create subscription with empty resource list (would normally be legacy wildcard)
-		sub := NewDeltaSubscription([]string{}, []string{}, map[string]string{"resource": "version"}, opts, "type.googleapis.com/envoy.config.cluster.v3.Cluster")
+		sub := NewDeltaSubscription([]string{}, []string{}, map[string]string{"resource": "version"}, opts.IsLegacyWildcardActive(typeURL))
 
 		// With deactivated legacy wildcard, subscription should NOT be wildcard initially
 		assert.False(t, sub.IsWildcard())
@@ -248,11 +250,11 @@ func TestDeltaSubscriptionsWithDeactivatedLegacyWildcardForTypes(t *testing.T) {
 		deactivateOpt(&opts)
 
 		// Both cluster and endpoint should have legacy wildcard deactivated
-		subCluster := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts, clusterType)
+		subCluster := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts.IsLegacyWildcardActive(clusterType))
 		subCluster.UpdateResourceSubscriptions(nil, nil)
 		assert.False(t, subCluster.IsWildcard())
 
-		subEndpoint := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts, endpointType)
+		subEndpoint := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts.IsLegacyWildcardActive(endpointType))
 		subEndpoint.UpdateResourceSubscriptions(nil, nil)
 		assert.False(t, subEndpoint.IsWildcard())
 
@@ -261,7 +263,7 @@ func TestDeltaSubscriptionsWithDeactivatedLegacyWildcardForTypes(t *testing.T) {
 		assert.True(t, subEndpoint.IsWildcard())
 
 		// Route should still have legacy wildcard enabled
-		subRoute := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts, routeType)
+		subRoute := NewDeltaSubscription([]string{}, []string{}, map[string]string{}, opts.IsLegacyWildcardActive(routeType))
 		subRoute.UpdateResourceSubscriptions(nil, nil)
 		assert.True(t, subRoute.IsWildcard())
 	})
