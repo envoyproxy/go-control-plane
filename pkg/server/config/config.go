@@ -24,14 +24,18 @@ func NewOpts() Opts {
 	}
 }
 
-// LegacyWildcardDeactivated returns whether legacy wildcard mode is deactivated for all resource types
-func (o Opts) LegacyWildcardDeactivated() bool {
-	return o.legacyWildcardDeactivated
-}
-
-// LegacyWildcardDeactivatedTypes returns the set of resource types for which legacy wildcard mode is deactivated
-func (o Opts) LegacyWildcardDeactivatedTypes() map[string]struct{} {
-	return o.legacyWildcardDeactivatedTypes
+// IsLegacyWildcardActive returns whether legacy wildcard mode is active for the given resource type.
+// Returns true if legacy wildcard mode is active, false if it has been deactivated.
+func (o Opts) IsLegacyWildcardActive(typeURL string) bool {
+	if o.legacyWildcardDeactivated {
+		return false
+	}
+	if len(o.legacyWildcardDeactivatedTypes) > 0 {
+		if _, found := o.legacyWildcardDeactivatedTypes[typeURL]; found {
+			return false
+		}
+	}
+	return true
 }
 
 // Each xDS implementation should implement their own functional opts.
