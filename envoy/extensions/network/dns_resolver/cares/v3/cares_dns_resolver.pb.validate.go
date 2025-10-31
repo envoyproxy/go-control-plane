@@ -231,6 +231,8 @@ func (m *CaresDnsResolverConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ReinitChannelOnTimeout
+
 	if len(errors) > 0 {
 		return CaresDnsResolverConfigMultiError(errors)
 	}
