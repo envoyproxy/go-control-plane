@@ -414,6 +414,8 @@ func (m *ExtAuthz) validate(all bool) error {
 
 	// no validation rules for MaxDeniedResponseBodyBytes
 
+	// no validation rules for EnforceResponseHeaderLimits
+
 	switch v := m.Services.(type) {
 	case *ExtAuthz_GrpcService:
 		if v == nil {
