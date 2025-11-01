@@ -57,6 +57,17 @@ func (m *Mcp) validate(all bool) error {
 
 	var errors []error
 
+	if _, ok := Mcp_TrafficMode_name[int32(m.GetTrafficMode())]; !ok {
+		err := McpValidationError{
+			field:  "TrafficMode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return McpMultiError(errors)
 	}
@@ -155,6 +166,17 @@ func (m *McpOverride) validate(all bool) error {
 	}
 
 	var errors []error
+
+	if _, ok := Mcp_TrafficMode_name[int32(m.GetTrafficMode())]; !ok {
+		err := McpOverrideValidationError{
+			field:  "TrafficMode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	if len(errors) > 0 {
 		return McpOverrideMultiError(errors)

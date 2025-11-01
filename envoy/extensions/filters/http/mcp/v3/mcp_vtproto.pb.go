@@ -7,6 +7,7 @@
 package mcpv3
 
 import (
+	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -47,6 +48,11 @@ func (m *Mcp) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TrafficMode != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.TrafficMode))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -80,6 +86,11 @@ func (m *McpOverride) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TrafficMode != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.TrafficMode))
+		i--
+		dAtA[i] = 0x8
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -89,6 +100,9 @@ func (m *Mcp) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.TrafficMode != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.TrafficMode))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -99,6 +113,9 @@ func (m *McpOverride) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.TrafficMode != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.TrafficMode))
+	}
 	n += len(m.unknownFields)
 	return n
 }
