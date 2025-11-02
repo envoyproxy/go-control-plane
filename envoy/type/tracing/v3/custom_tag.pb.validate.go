@@ -239,6 +239,19 @@ func (m *CustomTag) validate(all bool) error {
 			}
 		}
 
+	case *CustomTag_Value:
+		if v == nil {
+			err := CustomTagValidationError{
+				field:  "Type",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		oneofTypePresent = true
+		// no validation rules for Value
 	default:
 		_ = v // ensures v is used
 	}
