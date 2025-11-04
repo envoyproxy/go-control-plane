@@ -207,6 +207,12 @@ type Listener struct {
 	// that is governed by the bind rules of the OS. E.g., multiple listeners can listen on port 0 on
 	// Linux as the actual port will be allocated by the OS.
 	// Required unless “api_listener“ or “listener_specifier“ is populated.
+	//
+	// When the address contains a network namespace filepath (via
+	// :ref:`network_namespace_filepath <envoy_v3_api_field_config.core.v3.SocketAddress.network_namespace_filepath>`),
+	// Envoy automatically populates the filter state with key “envoy.network.network_namespace“
+	// when a connection is accepted. This provides read-only access to the network namespace for
+	// filters, access logs, and other components.
 	Address *v3.Address `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 	// The additional addresses the listener should listen on. The addresses must be unique across all
 	// listeners. Multiple addresses with port 0 can be supplied. When using multiple addresses in a single listener,
