@@ -1,11 +1,11 @@
 module-sets:
   go-control-plane:
-    version: v0.13.4
+    version: v0.14.0
     modules:
       - github.com/envoyproxy/go-control-plane
       - github.com/envoyproxy/go-control-plane/xdsmatcher
   envoy:
-    version: v1.35.0
+    version: v1.36.0
     modules:
       - github.com/envoyproxy/go-control-plane/envoy
       - github.com/envoyproxy/go-control-plane/contrib
