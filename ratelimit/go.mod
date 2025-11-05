@@ -1,8 +1,8 @@
 module github.com/envoyproxy/go-control-plane/ratelimit
 
-go 1.23.0
+go 1.24.0
 
-toolchain go1.23.6
+toolchain go1.24.9
 
 replace github.com/envoyproxy/go-control-plane/envoy => ../envoy
 

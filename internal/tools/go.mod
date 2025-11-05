@@ -1,8 +1,8 @@
 module github.com/envoyproxy/go-control-plane/internal/tools
 
-go 1.23.0
+go 1.24.0
 
-toolchain go1.23.6
+toolchain go1.24.9
 
 require (
 	github.com/golangci/golangci-lint/v2 v2.3.1

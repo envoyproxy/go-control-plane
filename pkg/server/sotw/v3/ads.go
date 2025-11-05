@@ -49,7 +49,7 @@ func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRe
 		// We only watch the multiplexed channel since we don't use per watch channels.
 		case res := <-respChan:
 			if err := sw.send(res); err != nil {
-				return status.Errorf(codes.Unavailable, err.Error())
+				return status.Errorf(codes.Unavailable, "%s", err.Error())
 			}
 		case req, ok := <-reqCh:
 			// Input stream ended or failed.
