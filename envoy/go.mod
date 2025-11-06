@@ -1,8 +1,8 @@
 module github.com/envoyproxy/go-control-plane/envoy
 
-go 1.23.0
+go 1.24.0
 
-toolchain go1.23.6
+toolchain go1.24.9
 
 // Used to resolve import issues related to go-control-plane package split (https://github.com/envoyproxy/go-control-plane/issues/1074)
 replace github.com/envoyproxy/go-control-plane@v0.13.4 => ../
