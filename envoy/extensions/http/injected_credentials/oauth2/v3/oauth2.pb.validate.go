@@ -198,7 +198,7 @@ type OAuth2MultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2MultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -351,7 +351,7 @@ type OAuth2_ClientCredentialsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2_ClientCredentialsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

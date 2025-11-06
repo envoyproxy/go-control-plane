@@ -170,7 +170,7 @@ type ResourceMonitorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ResourceMonitorMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -281,7 +281,7 @@ type ThresholdTriggerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ThresholdTriggerMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -448,7 +448,7 @@ type TriggerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TriggerMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -604,7 +604,7 @@ type OverloadActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OverloadActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -812,7 +812,7 @@ type OverloadManagerMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OverloadManagerMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

@@ -137,7 +137,7 @@ type GrpcJsonReverseTranscoderMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GrpcJsonReverseTranscoderMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -248,7 +248,7 @@ type GrpcJsonReverseTranscoder_PrintOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GrpcJsonReverseTranscoder_PrintOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

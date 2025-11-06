@@ -139,7 +139,7 @@ type GeoipMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GeoipMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -241,7 +241,7 @@ type Geoip_XffConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m Geoip_XffConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

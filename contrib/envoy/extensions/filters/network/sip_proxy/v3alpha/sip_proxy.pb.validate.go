@@ -174,7 +174,7 @@ type SipProxyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SipProxyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -330,7 +330,7 @@ type SipFilterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SipFilterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -463,7 +463,7 @@ type SipProtocolOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SipProtocolOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -601,7 +601,7 @@ type CustomizedAffinityMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CustomizedAffinityMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -740,7 +740,7 @@ type CustomizedAffinityEntryMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CustomizedAffinityEntryMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -844,7 +844,7 @@ type CacheMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CacheMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -947,7 +947,7 @@ type LocalServiceMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m LocalServiceMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1141,7 +1141,7 @@ type SipProxy_SipSettingsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SipProxy_SipSettingsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

@@ -134,7 +134,7 @@ type DynamicModuleFilterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DynamicModuleFilterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -296,7 +296,7 @@ type DynamicModuleFilterPerRouteMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DynamicModuleFilterPerRouteMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

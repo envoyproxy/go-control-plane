@@ -132,7 +132,7 @@ type ProtoApiScrubberConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProtoApiScrubberConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -263,7 +263,7 @@ type DescriptorSetMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DescriptorSetMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -408,7 +408,7 @@ type RestrictionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RestrictionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -600,7 +600,7 @@ type MethodRestrictionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m MethodRestrictionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -731,7 +731,7 @@ type RestrictionConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RestrictionConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

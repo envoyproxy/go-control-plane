@@ -421,7 +421,7 @@ type TcpProxyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TcpProxyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -566,7 +566,7 @@ type TcpProxy_DeprecatedV1MultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TcpProxy_DeprecatedV1MultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -713,7 +713,7 @@ type TcpProxy_WeightedClusterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TcpProxy_WeightedClusterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -826,7 +826,7 @@ type TcpProxy_TunnelingConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TcpProxy_TunnelingConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1011,7 +1011,7 @@ type TcpProxy_DeprecatedV1_TCPRouteMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TcpProxy_DeprecatedV1_TCPRouteMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1168,7 +1168,7 @@ type TcpProxy_WeightedCluster_ClusterWeightMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TcpProxy_WeightedCluster_ClusterWeightMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

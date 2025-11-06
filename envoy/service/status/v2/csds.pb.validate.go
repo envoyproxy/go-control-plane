@@ -106,7 +106,7 @@ type ClientStatusRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClientStatusRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -378,7 +378,7 @@ type PerXdsConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PerXdsConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -540,7 +540,7 @@ type ClientConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClientConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -674,7 +674,7 @@ type ClientStatusResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClientStatusResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

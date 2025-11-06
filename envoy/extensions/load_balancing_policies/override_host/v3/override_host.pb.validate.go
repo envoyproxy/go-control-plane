@@ -156,7 +156,7 @@ type OverrideHostMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OverrideHostMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -296,7 +296,7 @@ type OverrideHost_OverrideHostSourceMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OverrideHost_OverrideHostSourceMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

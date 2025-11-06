@@ -177,7 +177,7 @@ type ConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -358,7 +358,7 @@ type RouterPluginMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouterPluginMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -504,7 +504,7 @@ type ConfigsPerRouteMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ConfigsPerRouteMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

@@ -267,7 +267,7 @@ type SinkConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SinkConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -403,7 +403,7 @@ type SinkConfig_ConversionActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SinkConfig_ConversionActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -506,7 +506,7 @@ type SinkConfig_DropActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SinkConfig_DropActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

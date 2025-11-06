@@ -222,7 +222,7 @@ type JwtProviderMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JwtProviderMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -379,7 +379,7 @@ type RemoteJwksMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RemoteJwksMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -491,7 +491,7 @@ type JwtHeaderMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JwtHeaderMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -593,7 +593,7 @@ type ProviderWithAudiencesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProviderWithAudiencesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -917,7 +917,7 @@ type JwtRequirementMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JwtRequirementMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1062,7 +1062,7 @@ type JwtRequirementOrListMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JwtRequirementOrListMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1209,7 +1209,7 @@ type JwtRequirementAndListMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JwtRequirementAndListMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1380,7 +1380,7 @@ type RequirementRuleMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RequirementRuleMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1537,7 +1537,7 @@ type FilterStateRuleMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterStateRuleMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1748,7 +1748,7 @@ type JwtAuthenticationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m JwtAuthenticationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

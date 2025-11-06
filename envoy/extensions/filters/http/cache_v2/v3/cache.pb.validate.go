@@ -199,7 +199,7 @@ type CacheV2ConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CacheV2ConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -371,7 +371,7 @@ type CacheV2Config_KeyCreatorParamsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CacheV2Config_KeyCreatorParamsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

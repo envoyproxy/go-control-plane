@@ -688,7 +688,7 @@ type VirtualHostMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m VirtualHostMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -822,7 +822,7 @@ type FilterActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -955,7 +955,7 @@ type RouteListMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteListMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1658,7 +1658,7 @@ type RouteMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1907,7 +1907,7 @@ type WeightedClusterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m WeightedClusterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2051,7 +2051,7 @@ type ClusterSpecifierPluginMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ClusterSpecifierPluginMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2607,7 +2607,7 @@ type RouteMatchMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteMatchMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2912,7 +2912,7 @@ type CorsPolicyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CorsPolicyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -3995,7 +3995,7 @@ type RouteActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -4416,7 +4416,7 @@ type RetryPolicyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RetryPolicyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -4561,7 +4561,7 @@ type HedgePolicyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m HedgePolicyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -4807,7 +4807,7 @@ type RedirectActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RedirectActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -4953,7 +4953,7 @@ type DirectResponseActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DirectResponseActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -5055,7 +5055,7 @@ type NonForwardingActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m NonForwardingActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -5196,7 +5196,7 @@ type DecoratorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DecoratorMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -5415,7 +5415,7 @@ type TracingMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TracingMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -5560,7 +5560,7 @@ type VirtualClusterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m VirtualClusterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -5781,7 +5781,7 @@ type RateLimitMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimitMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -6128,7 +6128,7 @@ type HeaderMatcherMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m HeaderMatcherMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -6321,7 +6321,7 @@ type QueryParameterMatcherMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m QueryParameterMatcherMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -6530,7 +6530,7 @@ type InternalRedirectPolicyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m InternalRedirectPolicyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -6666,7 +6666,7 @@ type FilterConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -7033,7 +7033,7 @@ type WeightedCluster_ClusterWeightMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m WeightedCluster_ClusterWeightMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -7146,7 +7146,7 @@ type RouteMatch_GrpcRouteMatchOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteMatch_GrpcRouteMatchOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -7309,7 +7309,7 @@ type RouteMatch_TlsContextMatchOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteMatch_TlsContextMatchOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -7412,7 +7412,7 @@ type RouteMatch_ConnectMatcherMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteMatch_ConnectMatcherMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -7643,7 +7643,7 @@ type RouteAction_RequestMirrorPolicyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_RequestMirrorPolicyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -7978,7 +7978,7 @@ type RouteAction_HashPolicyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_HashPolicyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -8160,7 +8160,7 @@ type RouteAction_UpgradeConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_UpgradeConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -8351,7 +8351,7 @@ type RouteAction_MaxStreamDurationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_MaxStreamDurationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -8505,7 +8505,7 @@ type RouteAction_HashPolicy_HeaderMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_HashPolicy_HeaderMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -8668,7 +8668,7 @@ type RouteAction_HashPolicy_CookieAttributeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_HashPolicy_CookieAttributeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -8851,7 +8851,7 @@ type RouteAction_HashPolicy_CookieMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_HashPolicy_CookieMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -8959,7 +8959,7 @@ type RouteAction_HashPolicy_ConnectionPropertiesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_HashPolicy_ConnectionPropertiesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -9075,7 +9075,7 @@ type RouteAction_HashPolicy_QueryParameterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_HashPolicy_QueryParameterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -9191,7 +9191,7 @@ type RouteAction_HashPolicy_FilterStateMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_HashPolicy_FilterStateMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -9328,7 +9328,7 @@ type RouteAction_UpgradeConfig_ConnectConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RouteAction_UpgradeConfig_ConnectConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -9488,7 +9488,7 @@ type RetryPolicy_RetryPriorityMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RetryPolicy_RetryPriorityMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -9647,7 +9647,7 @@ type RetryPolicy_RetryHostPredicateMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RetryPolicy_RetryHostPredicateMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -9821,7 +9821,7 @@ type RetryPolicy_RetryBackOffMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RetryPolicy_RetryBackOffMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -9956,7 +9956,7 @@ type RetryPolicy_ResetHeaderMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RetryPolicy_ResetHeaderMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -10137,7 +10137,7 @@ type RetryPolicy_RateLimitedRetryBackOffMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RetryPolicy_RateLimitedRetryBackOffMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -10760,7 +10760,7 @@ type RateLimit_ActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_ActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -10918,7 +10918,7 @@ type RateLimit_OverrideMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_OverrideMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11061,7 +11061,7 @@ type RateLimit_HitsAddendMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_HitsAddendMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11163,7 +11163,7 @@ type RateLimit_Action_SourceClusterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_SourceClusterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11268,7 +11268,7 @@ type RateLimit_Action_DestinationClusterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_DestinationClusterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11406,7 +11406,7 @@ type RateLimit_Action_RequestHeadersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_RequestHeadersMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11537,7 +11537,7 @@ type RateLimit_Action_QueryParametersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_QueryParametersMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11640,7 +11640,7 @@ type RateLimit_Action_RemoteAddressMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_RemoteAddressMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11775,7 +11775,7 @@ type RateLimit_Action_MaskedRemoteAddressMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_MaskedRemoteAddressMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -11891,7 +11891,7 @@ type RateLimit_Action_GenericKeyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_GenericKeyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -12083,7 +12083,7 @@ type RateLimit_Action_HeaderValueMatchMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_HeaderValueMatchMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -12241,7 +12241,7 @@ type RateLimit_Action_DynamicMetaDataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_DynamicMetaDataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -12410,7 +12410,7 @@ type RateLimit_Action_MetaDataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_MetaDataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -12602,7 +12602,7 @@ type RateLimit_Action_QueryParameterValueMatchMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Action_QueryParameterValueMatchMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -12747,7 +12747,7 @@ type RateLimit_Override_DynamicMetadataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m RateLimit_Override_DynamicMetadataMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

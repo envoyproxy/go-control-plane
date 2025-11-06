@@ -163,7 +163,7 @@ type KafkaMeshMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m KafkaMeshMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -300,7 +300,7 @@ type KafkaClusterDefinitionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m KafkaClusterDefinitionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -421,7 +421,7 @@ type ForwardingRuleMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ForwardingRuleMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

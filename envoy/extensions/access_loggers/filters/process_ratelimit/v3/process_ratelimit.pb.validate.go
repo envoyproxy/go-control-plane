@@ -101,7 +101,7 @@ type ProcessRateLimitFilterMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProcessRateLimitFilterMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -254,7 +254,7 @@ type DynamicTokenBucketMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DynamicTokenBucketMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

@@ -219,7 +219,7 @@ type SaveProcessingResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SaveProcessingResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -327,7 +327,7 @@ type SaveProcessingResponse_SaveOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m SaveProcessingResponse_SaveOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

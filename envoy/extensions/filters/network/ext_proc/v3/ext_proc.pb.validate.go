@@ -203,7 +203,7 @@ type NetworkExternalProcessorMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m NetworkExternalProcessorMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -309,7 +309,7 @@ type ProcessingModeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProcessingModeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -438,7 +438,7 @@ type MetadataOptionsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m MetadataOptionsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -540,7 +540,7 @@ type MetadataOptions_MetadataNamespacesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m MetadataOptions_MetadataNamespacesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

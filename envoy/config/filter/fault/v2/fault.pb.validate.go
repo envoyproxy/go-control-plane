@@ -203,7 +203,7 @@ type FaultDelayMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FaultDelayMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -432,7 +432,7 @@ type FaultRateLimitMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FaultRateLimitMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -532,7 +532,7 @@ type FaultDelay_HeaderDelayMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FaultDelay_HeaderDelayMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -645,7 +645,7 @@ type FaultRateLimit_FixedLimitMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FaultRateLimit_FixedLimitMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -747,7 +747,7 @@ type FaultRateLimit_HeaderLimitMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FaultRateLimit_HeaderLimitMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

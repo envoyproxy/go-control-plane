@@ -82,7 +82,7 @@ type CookieConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CookieConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -385,7 +385,7 @@ type CookieConfigsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CookieConfigsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -636,7 +636,7 @@ type OAuth2CredentialsMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2CredentialsMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1206,7 +1206,7 @@ type OAuth2ConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2ConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1333,7 +1333,7 @@ type OAuth2MultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2MultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1538,7 +1538,7 @@ type OAuth2Credentials_CookieNamesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m OAuth2Credentials_CookieNamesMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

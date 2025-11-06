@@ -175,7 +175,7 @@ type DnsFilterConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DnsFilterConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -377,7 +377,7 @@ type DnsFilterConfig_ServerContextConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DnsFilterConfig_ServerContextConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -615,7 +615,7 @@ type DnsFilterConfig_ClientContextConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DnsFilterConfig_ClientContextConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

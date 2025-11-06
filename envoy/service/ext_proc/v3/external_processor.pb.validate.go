@@ -100,7 +100,7 @@ type ProtocolConfigurationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProtocolConfigurationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -576,7 +576,7 @@ type ProcessingRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProcessingRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1075,7 +1075,7 @@ type ProcessingResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ProcessingResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1253,7 +1253,7 @@ type HttpHeadersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m HttpHeadersMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1356,7 +1356,7 @@ type HttpBodyMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m HttpBodyMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1484,7 +1484,7 @@ type HttpTrailersMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m HttpTrailersMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1613,7 +1613,7 @@ type HeadersResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m HeadersResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1741,7 +1741,7 @@ type BodyResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m BodyResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1870,7 +1870,7 @@ type TrailersResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m TrailersResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2070,7 +2070,7 @@ type CommonResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CommonResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2272,7 +2272,7 @@ type ImmediateResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ImmediateResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2375,7 +2375,7 @@ type GrpcStatusMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GrpcStatusMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2509,7 +2509,7 @@ type HeaderMutationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m HeaderMutationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2613,7 +2613,7 @@ type StreamedBodyResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m StreamedBodyResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -2784,7 +2784,7 @@ type BodyMutationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m BodyMutationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}

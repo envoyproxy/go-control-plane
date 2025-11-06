@@ -71,7 +71,7 @@ type CompositeMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CompositeMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -205,7 +205,7 @@ type FilterChainConfigurationMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m FilterChainConfigurationMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -347,7 +347,7 @@ type DynamicConfigMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DynamicConfigMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -563,7 +563,7 @@ type ExecuteFilterActionMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ExecuteFilterActionMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
