@@ -92,7 +92,7 @@ func (HistogramEmitMode) EnumDescriptor() ([]byte, []int) {
 //	      "@type": type.googleapis.com/envoy.config.metrics.v3.MetricsServiceConfig
 //
 // [#extension: envoy.stat_sinks.metrics_service]
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type MetricsServiceConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The upstream gRPC cluster that hosts the metrics service.
@@ -111,8 +111,14 @@ type MetricsServiceConfig struct {
 	EmitTagsAsLabels bool `protobuf:"varint,4,opt,name=emit_tags_as_labels,json=emitTagsAsLabels,proto3" json:"emit_tags_as_labels,omitempty"`
 	// Specify which metrics types to emit for histograms. Defaults to SUMMARY_AND_HISTOGRAM.
 	HistogramEmitMode HistogramEmitMode `protobuf:"varint,5,opt,name=histogram_emit_mode,json=histogramEmitMode,proto3,enum=envoy.config.metrics.v3.HistogramEmitMode" json:"histogram_emit_mode,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// The maximum number of metrics to send in a single gRPC message. If not set or set to 0,
+	// all metrics will be sent in a single message (current behavior). When set to a positive value,
+	// metrics will be batched into multiple messages, with each message containing at most batch_size
+	// metric families. This helps avoid hitting gRPC message size limits (typically 4MB) when sending
+	// large numbers of metrics.
+	BatchSize     uint32 `protobuf:"varint,6,opt,name=batch_size,json=batchSize,proto3" json:"batch_size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MetricsServiceConfig) Reset() {
@@ -180,17 +186,26 @@ func (x *MetricsServiceConfig) GetHistogramEmitMode() HistogramEmitMode {
 	return HistogramEmitMode_SUMMARY_AND_HISTOGRAM
 }
 
+func (x *MetricsServiceConfig) GetBatchSize() uint32 {
+	if x != nil {
+		return x.BatchSize
+	}
+	return 0
+}
+
 var File_envoy_config_metrics_v3_metrics_service_proto protoreflect.FileDescriptor
 
 const file_envoy_config_metrics_v3_metrics_service_proto_rawDesc = "" +
 	"\n" +
-	"-envoy/config/metrics/v3/metrics_service.proto\x12\x17envoy.config.metrics.v3\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe7\x03\n" +
+	"-envoy/config/metrics/v3/metrics_service.proto\x12\x17envoy.config.metrics.v3\x1a(envoy/config/core/v3/config_source.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x8f\x04\n" +
 	"\x14MetricsServiceConfig\x12N\n" +
 	"\fgrpc_service\x18\x01 \x01(\v2!.envoy.config.core.v3.GrpcServiceB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vgrpcService\x12^\n" +
 	"\x15transport_api_version\x18\x03 \x01(\x0e2 .envoy.config.core.v3.ApiVersionB\b\xfaB\x05\x82\x01\x02\x10\x01R\x13transportApiVersion\x12U\n" +
 	"\x19report_counters_as_deltas\x18\x02 \x01(\v2\x1a.google.protobuf.BoolValueR\x16reportCountersAsDeltas\x12-\n" +
 	"\x13emit_tags_as_labels\x18\x04 \x01(\bR\x10emitTagsAsLabels\x12d\n" +
-	"\x13histogram_emit_mode\x18\x05 \x01(\x0e2*.envoy.config.metrics.v3.HistogramEmitModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x11histogramEmitMode:3\x9aň\x1e.\n" +
+	"\x13histogram_emit_mode\x18\x05 \x01(\x0e2*.envoy.config.metrics.v3.HistogramEmitModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x11histogramEmitMode\x12&\n" +
+	"\n" +
+	"batch_size\x18\x06 \x01(\rB\a\xfaB\x04*\x02(\x00R\tbatchSize:3\x9aň\x1e.\n" +
 	",envoy.config.metrics.v2.MetricsServiceConfig*J\n" +
 	"\x11HistogramEmitMode\x12\x19\n" +
 	"\x15SUMMARY_AND_HISTOGRAM\x10\x00\x12\v\n" +
