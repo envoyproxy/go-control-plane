@@ -8,8 +8,9 @@ package httpv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	v32 "github.com/envoyproxy/go-control-plane/envoy/config/common/matcher/v3"
+	v33 "github.com/envoyproxy/go-control-plane/envoy/config/common/matcher/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	v32 "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -68,7 +69,7 @@ const (
 //	            max_concurrent_streams: 100
 //	     .... [further cluster config]
 //
-// [#next-free-field: 9]
+// [#next-free-field: 10]
 type HttpProtocolOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// This contains options common across HTTP/1 and HTTP/2
@@ -108,8 +109,16 @@ type HttpProtocolOptions struct {
 	HeaderValidationConfig *v3.TypedExtensionConfig `protobuf:"bytes,7,opt,name=header_validation_config,json=headerValidationConfig,proto3" json:"header_validation_config,omitempty"`
 	// Defines http specific outlier detection parameters.
 	OutlierDetection *HttpProtocolOptions_OutlierDetection `protobuf:"bytes,8,opt,name=outlier_detection,json=outlierDetection,proto3" json:"outlier_detection,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Specifies a list of HTTP-level mirroring policies for requests routed to this cluster.
+	// Cluster-level policies override route-level policies when they both are configured.
+	//
+	// .. note::
+	//
+	//	Mirroring will not be triggered if the :ref:`primary cluster
+	//	<envoy_v3_api_field_config.route.v3.RouteAction.cluster>` does not exist.
+	RequestMirrorPolicies []*v32.RouteAction_RequestMirrorPolicy `protobuf:"bytes,9,rep,name=request_mirror_policies,json=requestMirrorPolicies,proto3" json:"request_mirror_policies,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *HttpProtocolOptions) Reset() {
@@ -207,6 +216,13 @@ func (x *HttpProtocolOptions) GetHeaderValidationConfig() *v3.TypedExtensionConf
 func (x *HttpProtocolOptions) GetOutlierDetection() *HttpProtocolOptions_OutlierDetection {
 	if x != nil {
 		return x.OutlierDetection
+	}
+	return nil
+}
+
+func (x *HttpProtocolOptions) GetRequestMirrorPolicies() []*v32.RouteAction_RequestMirrorPolicy {
+	if x != nil {
+		return x.RequestMirrorPolicies
 	}
 	return nil
 }
@@ -513,7 +529,7 @@ type HttpProtocolOptions_OutlierDetection struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// If specified, only responses matching the matcher will be treated by outlier detection as errors.
 	// If not specified, only 5xx codes are treated by outlier detection as errors.
-	ErrorMatcher  *v32.MatchPredicate `protobuf:"bytes,1,opt,name=error_matcher,json=errorMatcher,proto3" json:"error_matcher,omitempty"`
+	ErrorMatcher  *v33.MatchPredicate `protobuf:"bytes,1,opt,name=error_matcher,json=errorMatcher,proto3" json:"error_matcher,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -548,7 +564,7 @@ func (*HttpProtocolOptions_OutlierDetection) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_upstreams_http_v3_http_protocol_options_proto_rawDescGZIP(), []int{0, 3}
 }
 
-func (x *HttpProtocolOptions_OutlierDetection) GetErrorMatcher() *v32.MatchPredicate {
+func (x *HttpProtocolOptions_OutlierDetection) GetErrorMatcher() *v33.MatchPredicate {
 	if x != nil {
 		return x.ErrorMatcher
 	}
@@ -559,7 +575,7 @@ var File_envoy_extensions_upstreams_http_v3_http_protocol_options_proto protoref
 
 const file_envoy_extensions_upstreams_http_v3_http_protocol_options_proto_rawDesc = "" +
 	"\n" +
-	">envoy/extensions/upstreams/http/v3/http_protocol_options.proto\x12\"envoy.extensions.upstreams.http.v3\x1a,envoy/config/common/matcher/v3/matcher.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xac\x11\n" +
+	">envoy/extensions/upstreams/http/v3/http_protocol_options.proto\x12\"envoy.extensions.upstreams.http.v3\x1a,envoy/config/common/matcher/v3/matcher.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a,envoy/config/route/v3/route_components.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x9c\x12\n" +
 	"\x13HttpProtocolOptions\x12j\n" +
 	"\x1ccommon_http_protocol_options\x18\x01 \x01(\v2).envoy.config.core.v3.HttpProtocolOptionsR\x19commonHttpProtocolOptions\x12v\n" +
 	"\x1eupstream_http_protocol_options\x18\x02 \x01(\v21.envoy.config.core.v3.UpstreamHttpProtocolOptionsR\x1bupstreamHttpProtocolOptions\x12~\n" +
@@ -569,7 +585,8 @@ const file_envoy_extensions_upstreams_http_v3_http_protocol_options_proto_rawDes
 	"autoConfig\x12j\n" +
 	"\fhttp_filters\x18\x06 \x03(\v2G.envoy.extensions.filters.network.http_connection_manager.v3.HttpFilterR\vhttpFilters\x12d\n" +
 	"\x18header_validation_config\x18\a \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x16headerValidationConfig\x12u\n" +
-	"\x11outlier_detection\x18\b \x01(\v2H.envoy.extensions.upstreams.http.v3.HttpProtocolOptions.OutlierDetectionR\x10outlierDetection\x1a\xd6\x02\n" +
+	"\x11outlier_detection\x18\b \x01(\v2H.envoy.extensions.upstreams.http.v3.HttpProtocolOptions.OutlierDetectionR\x10outlierDetection\x12n\n" +
+	"\x17request_mirror_policies\x18\t \x03(\v26.envoy.config.route.v3.RouteAction.RequestMirrorPolicyR\x15requestMirrorPolicies\x1a\xd6\x02\n" +
 	"\x12ExplicitHttpConfig\x12`\n" +
 	"\x15http_protocol_options\x18\x01 \x01(\v2*.envoy.config.core.v3.Http1ProtocolOptionsH\x00R\x13httpProtocolOptions\x12b\n" +
 	"\x16http2_protocol_options\x18\x02 \x01(\v2*.envoy.config.core.v3.Http2ProtocolOptionsH\x00R\x14http2ProtocolOptions\x12b\n" +
@@ -612,11 +629,12 @@ var file_envoy_extensions_upstreams_http_v3_http_protocol_options_proto_goTypes 
 	(*v3.UpstreamHttpProtocolOptions)(nil),              // 6: envoy.config.core.v3.UpstreamHttpProtocolOptions
 	(*v31.HttpFilter)(nil),                              // 7: envoy.extensions.filters.network.http_connection_manager.v3.HttpFilter
 	(*v3.TypedExtensionConfig)(nil),                     // 8: envoy.config.core.v3.TypedExtensionConfig
-	(*v3.Http1ProtocolOptions)(nil),                     // 9: envoy.config.core.v3.Http1ProtocolOptions
-	(*v3.Http2ProtocolOptions)(nil),                     // 10: envoy.config.core.v3.Http2ProtocolOptions
-	(*v3.Http3ProtocolOptions)(nil),                     // 11: envoy.config.core.v3.Http3ProtocolOptions
-	(*v3.AlternateProtocolsCacheOptions)(nil),           // 12: envoy.config.core.v3.AlternateProtocolsCacheOptions
-	(*v32.MatchPredicate)(nil),                          // 13: envoy.config.common.matcher.v3.MatchPredicate
+	(*v32.RouteAction_RequestMirrorPolicy)(nil),         // 9: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	(*v3.Http1ProtocolOptions)(nil),                     // 10: envoy.config.core.v3.Http1ProtocolOptions
+	(*v3.Http2ProtocolOptions)(nil),                     // 11: envoy.config.core.v3.Http2ProtocolOptions
+	(*v3.Http3ProtocolOptions)(nil),                     // 12: envoy.config.core.v3.Http3ProtocolOptions
+	(*v3.AlternateProtocolsCacheOptions)(nil),           // 13: envoy.config.core.v3.AlternateProtocolsCacheOptions
+	(*v33.MatchPredicate)(nil),                          // 14: envoy.config.common.matcher.v3.MatchPredicate
 }
 var file_envoy_extensions_upstreams_http_v3_http_protocol_options_proto_depIdxs = []int32{
 	5,  // 0: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.common_http_protocol_options:type_name -> envoy.config.core.v3.HttpProtocolOptions
@@ -627,22 +645,23 @@ var file_envoy_extensions_upstreams_http_v3_http_protocol_options_proto_depIdxs 
 	7,  // 5: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.http_filters:type_name -> envoy.extensions.filters.network.http_connection_manager.v3.HttpFilter
 	8,  // 6: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.header_validation_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
 	4,  // 7: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.outlier_detection:type_name -> envoy.extensions.upstreams.http.v3.HttpProtocolOptions.OutlierDetection
-	9,  // 8: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.ExplicitHttpConfig.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
-	10, // 9: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.ExplicitHttpConfig.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	11, // 10: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.ExplicitHttpConfig.http3_protocol_options:type_name -> envoy.config.core.v3.Http3ProtocolOptions
-	9,  // 11: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.UseDownstreamHttpConfig.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
-	10, // 12: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.UseDownstreamHttpConfig.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	11, // 13: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.UseDownstreamHttpConfig.http3_protocol_options:type_name -> envoy.config.core.v3.Http3ProtocolOptions
-	9,  // 14: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
-	10, // 15: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	11, // 16: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.http3_protocol_options:type_name -> envoy.config.core.v3.Http3ProtocolOptions
-	12, // 17: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.alternate_protocols_cache_options:type_name -> envoy.config.core.v3.AlternateProtocolsCacheOptions
-	13, // 18: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.OutlierDetection.error_matcher:type_name -> envoy.config.common.matcher.v3.MatchPredicate
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	9,  // 8: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	10, // 9: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.ExplicitHttpConfig.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
+	11, // 10: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.ExplicitHttpConfig.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	12, // 11: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.ExplicitHttpConfig.http3_protocol_options:type_name -> envoy.config.core.v3.Http3ProtocolOptions
+	10, // 12: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.UseDownstreamHttpConfig.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
+	11, // 13: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.UseDownstreamHttpConfig.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	12, // 14: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.UseDownstreamHttpConfig.http3_protocol_options:type_name -> envoy.config.core.v3.Http3ProtocolOptions
+	10, // 15: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.http_protocol_options:type_name -> envoy.config.core.v3.Http1ProtocolOptions
+	11, // 16: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	12, // 17: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.http3_protocol_options:type_name -> envoy.config.core.v3.Http3ProtocolOptions
+	13, // 18: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.AutoHttpConfig.alternate_protocols_cache_options:type_name -> envoy.config.core.v3.AlternateProtocolsCacheOptions
+	14, // 19: envoy.extensions.upstreams.http.v3.HttpProtocolOptions.OutlierDetection.error_matcher:type_name -> envoy.config.common.matcher.v3.MatchPredicate
+	20, // [20:20] is the sub-list for method output_type
+	20, // [20:20] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_upstreams_http_v3_http_protocol_options_proto_init() }
