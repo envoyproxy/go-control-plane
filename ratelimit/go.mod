@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
+	github.com/cncf/xds/go v0.0.0-20251110193048-8bfbf64dc13e // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
 	golang.org/x/net v0.43.0 // indirect
