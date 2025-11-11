@@ -7,7 +7,7 @@ toolchain go1.24.9
 replace github.com/envoyproxy/go-control-plane/envoy => ../envoy
 
 require (
-	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443
+	github.com/cncf/xds/go v0.0.0-20251110193048-8bfbf64dc13e
 	github.com/envoyproxy/go-control-plane/envoy v1.36.0
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/protobuf v1.36.10
