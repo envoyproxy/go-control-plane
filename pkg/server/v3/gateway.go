@@ -16,10 +16,12 @@ package server
 
 import (
 	"errors"
+	"path/filepath"
 	"fmt"
 	"io"
 	"net/http"
 	"path"
+	"strings"
 
 	"google.golang.org/protobuf/encoding/protojson"
 
@@ -36,7 +38,7 @@ type HTTPGateway struct {
 }
 
 func (h *HTTPGateway) ServeHTTP(req *http.Request) ([]byte, int, error) {
-	p := path.Clean(req.URL.Path)
+	p := filepath.FromSlash(path.Clean("/" + strings.Trim(req.URL.Path, "/")))
 
 	typeURL := ""
 	switch p {
