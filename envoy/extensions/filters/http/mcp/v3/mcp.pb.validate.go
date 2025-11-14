@@ -68,6 +68,8 @@ func (m *Mcp) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for ClearRouteCache
+
 	if len(errors) > 0 {
 		return McpMultiError(errors)
 	}

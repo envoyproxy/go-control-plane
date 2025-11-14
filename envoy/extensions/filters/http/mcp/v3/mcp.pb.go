@@ -81,9 +81,13 @@ func (Mcp_TrafficMode) EnumDescriptor() ([]byte, []int) {
 type Mcp struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configures how the filter handles non-MCP traffic.
-	TrafficMode   Mcp_TrafficMode `protobuf:"varint,1,opt,name=traffic_mode,json=trafficMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_TrafficMode" json:"traffic_mode,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	TrafficMode Mcp_TrafficMode `protobuf:"varint,1,opt,name=traffic_mode,json=trafficMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_TrafficMode" json:"traffic_mode,omitempty"`
+	// When set to true, the filter will clear the route cache after setting dynamic metadata.
+	// This allows the route to be re-selected based on the MCP metadata (e.g., method, params).
+	// Defaults to false.
+	ClearRouteCache bool `protobuf:"varint,2,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Mcp) Reset() {
@@ -121,6 +125,13 @@ func (x *Mcp) GetTrafficMode() Mcp_TrafficMode {
 		return x.TrafficMode
 	}
 	return Mcp_PASS_THROUGH
+}
+
+func (x *Mcp) GetClearRouteCache() bool {
+	if x != nil {
+		return x.ClearRouteCache
+	}
+	return false
 }
 
 // McpOverride for MCP filter
@@ -173,9 +184,10 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x9d\x01\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc9\x01\n" +
 	"\x03Mcp\x12b\n" +
-	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\"2\n" +
+	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
+	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\"2\n" +
 	"\vTrafficMode\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x00\x12\x11\n" +
 	"\rREJECT_NO_MCP\x10\x01\"q\n" +
