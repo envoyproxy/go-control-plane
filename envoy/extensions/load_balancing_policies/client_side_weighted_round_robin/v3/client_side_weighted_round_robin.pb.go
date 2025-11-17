@@ -88,7 +88,6 @@ type ClientSideWeightedRoundRobin struct {
 	MetricNamesForComputingUtilization []string `protobuf:"bytes,7,rep,name=metric_names_for_computing_utilization,json=metricNamesForComputingUtilization,proto3" json:"metric_names_for_computing_utilization,omitempty"`
 	// Configuration for slow start mode.
 	// If this configuration is not set, slow start will not be not enabled.
-	// [#not-implemented-hide:]
 	SlowStartConfig *v3.SlowStartConfig `protobuf:"bytes,8,opt,name=slow_start_config,json=slowStartConfig,proto3" json:"slow_start_config,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
