@@ -290,8 +290,7 @@ type ExtAuthz struct {
 	// denied response body will be forwarded.
 	MaxDeniedResponseBodyBytes uint32 `protobuf:"varint,30,opt,name=max_denied_response_body_bytes,json=maxDeniedResponseBodyBytes,proto3" json:"max_denied_response_body_bytes,omitempty"`
 	// When set to “true“, the filter will enforce the response header map's count and size limits
-	// by dropping headers added by the external auth service. Enabling this may break applications
-	// relying on those headers!
+	// by sending a local reply when those limits are violated.
 	//
 	// When set to “false“, the filter will ignore the response header map's limits and add / set
 	// all response headers as specified by the external auth service.
