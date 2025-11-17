@@ -618,15 +618,21 @@ func (x *ExtProcHttpService) GetHttpService() *v3.HttpService {
 // metadata returned by the server may be written, and how that metadata may be written.
 type MetadataOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Describes which typed or untyped dynamic metadata namespaces to forward to
+	// Describes which typed or untyped filter dynamic metadata namespaces to forward to
 	// the external processing server.
 	ForwardingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,1,opt,name=forwarding_namespaces,json=forwardingNamespaces,proto3" json:"forwarding_namespaces,omitempty"`
-	// Describes which typed or untyped dynamic metadata namespaces to accept from
+	// Describes which typed or untyped filter dynamic metadata namespaces to accept from
 	// the external processing server. Set to empty or leave unset to disallow writing
 	// any received dynamic metadata. Receiving of typed metadata is not supported.
 	ReceivingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,2,opt,name=receiving_namespaces,json=receivingNamespaces,proto3" json:"receiving_namespaces,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Describes which cluster metadata namespaces to forward to
+	// the external processing server.
+	// .. note::
+	// This is the least specific metadata. Should there be any namespace collision,
+	// cluster level metadata can be overridden by filter metadata.
+	ClusterMetadataForwardingNamespaces *MetadataOptions_MetadataNamespaces `protobuf:"bytes,3,opt,name=cluster_metadata_forwarding_namespaces,json=clusterMetadataForwardingNamespaces,proto3" json:"cluster_metadata_forwarding_namespaces,omitempty"`
+	unknownFields                       protoimpl.UnknownFields
+	sizeCache                           protoimpl.SizeCache
 }
 
 func (x *MetadataOptions) Reset() {
@@ -669,6 +675,13 @@ func (x *MetadataOptions) GetForwardingNamespaces() *MetadataOptions_MetadataNam
 func (x *MetadataOptions) GetReceivingNamespaces() *MetadataOptions_MetadataNamespaces {
 	if x != nil {
 		return x.ReceivingNamespaces
+	}
+	return nil
+}
+
+func (x *MetadataOptions) GetClusterMetadataForwardingNamespaces() *MetadataOptions_MetadataNamespaces {
+	if x != nil {
+		return x.ClusterMetadataForwardingNamespaces
 	}
 	return nil
 }
@@ -1069,10 +1082,11 @@ const file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_rawDesc = ""
 	"\x06RETAIN\x10\x02J\x04\b\x04\x10\x05R\n" +
 	"async_mode\"Z\n" +
 	"\x12ExtProcHttpService\x12D\n" +
-	"\fhttp_service\x18\x01 \x01(\v2!.envoy.config.core.v3.HttpServiceR\vhttpService\"\xdf\x02\n" +
+	"\fhttp_service\x18\x01 \x01(\v2!.envoy.config.core.v3.HttpServiceR\vhttpService\"\x84\x04\n" +
 	"\x0fMetadataOptions\x12\x82\x01\n" +
 	"\x15forwarding_namespaces\x18\x01 \x01(\v2M.envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x14forwardingNamespaces\x12\x80\x01\n" +
-	"\x14receiving_namespaces\x18\x02 \x01(\v2M.envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x13receivingNamespaces\x1aD\n" +
+	"\x14receiving_namespaces\x18\x02 \x01(\v2M.envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespacesR\x13receivingNamespaces\x12\xa2\x01\n" +
+	"&cluster_metadata_forwarding_namespaces\x18\x03 \x01(\v2M.envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespacesR#clusterMetadataForwardingNamespaces\x1aD\n" +
 	"\x12MetadataNamespaces\x12\x18\n" +
 	"\auntyped\x18\x01 \x03(\tR\auntyped\x12\x14\n" +
 	"\x05typed\x18\x02 \x03(\tR\x05typed\"\xc3\x01\n" +
@@ -1150,20 +1164,21 @@ var file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_depIdxs = []in
 	15, // 15: envoy.extensions.filters.http.ext_proc.v3.ExtProcHttpService.http_service:type_name -> envoy.config.core.v3.HttpService
 	7,  // 16: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.forwarding_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
 	7,  // 17: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.receiving_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
-	16, // 18: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	16, // 19: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.disallowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
-	6,  // 20: envoy.extensions.filters.http.ext_proc.v3.ExtProcPerRoute.overrides:type_name -> envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides
-	9,  // 21: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
-	8,  // 22: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_service:type_name -> envoy.config.core.v3.GrpcService
-	3,  // 23: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.metadata_options:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions
-	17, // 24: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_initial_metadata:type_name -> envoy.config.core.v3.HeaderValue
-	18, // 25: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.failure_mode_allow:type_name -> google.protobuf.BoolValue
-	13, // 26: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_request_modifier:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	27, // [27:27] is the sub-list for method output_type
-	27, // [27:27] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	7,  // 18: envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.cluster_metadata_forwarding_namespaces:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions.MetadataNamespaces
+	16, // 19: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.allowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	16, // 20: envoy.extensions.filters.http.ext_proc.v3.HeaderForwardingRules.disallowed_headers:type_name -> envoy.type.matcher.v3.ListStringMatcher
+	6,  // 21: envoy.extensions.filters.http.ext_proc.v3.ExtProcPerRoute.overrides:type_name -> envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides
+	9,  // 22: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_mode:type_name -> envoy.extensions.filters.http.ext_proc.v3.ProcessingMode
+	8,  // 23: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_service:type_name -> envoy.config.core.v3.GrpcService
+	3,  // 24: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.metadata_options:type_name -> envoy.extensions.filters.http.ext_proc.v3.MetadataOptions
+	17, // 25: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.grpc_initial_metadata:type_name -> envoy.config.core.v3.HeaderValue
+	18, // 26: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.failure_mode_allow:type_name -> google.protobuf.BoolValue
+	13, // 27: envoy.extensions.filters.http.ext_proc.v3.ExtProcOverrides.processing_request_modifier:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_ext_proc_v3_ext_proc_proto_init() }
