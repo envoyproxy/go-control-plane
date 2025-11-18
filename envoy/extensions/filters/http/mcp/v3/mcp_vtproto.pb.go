@@ -8,6 +8,7 @@ package mcpv3
 
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
@@ -47,6 +48,16 @@ func (m *Mcp) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.MaxRequestBodySize != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxRequestBodySize).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.ClearRouteCache {
 		i--
@@ -115,6 +126,10 @@ func (m *Mcp) SizeVT() (n int) {
 	}
 	if m.ClearRouteCache {
 		n += 2
+	}
+	if m.MaxRequestBodySize != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxRequestBodySize).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

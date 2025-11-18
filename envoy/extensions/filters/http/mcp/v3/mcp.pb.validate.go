@@ -70,6 +70,21 @@ func (m *Mcp) validate(all bool) error {
 
 	// no validation rules for ClearRouteCache
 
+	if wrapper := m.GetMaxRequestBodySize(); wrapper != nil {
+
+		if wrapper.GetValue() > 10485760 {
+			err := McpValidationError{
+				field:  "MaxRequestBodySize",
+				reason: "value must be less than or equal to 10485760",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return McpMultiError(errors)
 	}

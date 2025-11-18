@@ -12,6 +12,7 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -86,8 +87,16 @@ type Mcp struct {
 	// This allows the route to be re-selected based on the MCP metadata (e.g., method, params).
 	// Defaults to false.
 	ClearRouteCache bool `protobuf:"varint,2,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Maximum size of the request body to buffer for JSON-RPC validation.
+	// If the request body exceeds this size, the request is rejected with “413 Payload Too Large“.
+	// This limit applies to both “REJECT_NO_MCP“ and “PASS_THROUGH“ modes to prevent unbounded buffering.
+	//
+	// It defaults to 8KB (8192 bytes) and the maximum allowed value is 10MB (10485760 bytes).
+	//
+	// Setting it to 0 would disable the limit. It is not recommended to do so in production.
+	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Mcp) Reset() {
@@ -132,6 +141,13 @@ func (x *Mcp) GetClearRouteCache() bool {
 		return x.ClearRouteCache
 	}
 	return false
+}
+
+func (x *Mcp) GetMaxRequestBodySize() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.MaxRequestBodySize
+	}
+	return nil
 }
 
 // McpOverride for MCP filter
@@ -184,10 +200,12 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc9\x01\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa6\x02\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
-	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\"2\n" +
+	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12[\n" +
+	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
+	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\"2\n" +
 	"\vTrafficMode\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x00\x12\x11\n" +
 	"\rREJECT_NO_MCP\x10\x01\"q\n" +
@@ -210,18 +228,20 @@ func file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescGZIP() []byte {
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_goTypes = []any{
-	(Mcp_TrafficMode)(0), // 0: envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	(*Mcp)(nil),          // 1: envoy.extensions.filters.http.mcp.v3.Mcp
-	(*McpOverride)(nil),  // 2: envoy.extensions.filters.http.mcp.v3.McpOverride
+	(Mcp_TrafficMode)(0),           // 0: envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
+	(*Mcp)(nil),                    // 1: envoy.extensions.filters.http.mcp.v3.Mcp
+	(*McpOverride)(nil),            // 2: envoy.extensions.filters.http.mcp.v3.McpOverride
+	(*wrapperspb.UInt32Value)(nil), // 3: google.protobuf.UInt32Value
 }
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_depIdxs = []int32{
 	0, // 0: envoy.extensions.filters.http.mcp.v3.Mcp.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	0, // 1: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 1: envoy.extensions.filters.http.mcp.v3.Mcp.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	0, // 2: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() }
