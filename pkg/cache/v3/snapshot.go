@@ -290,34 +290,18 @@ func (s *Snapshot) IsResourceWildcard(typeURL resource.Type, resourceName string
 // If wildcardMap is nil, all resources are returned (backward compatibility).
 // If wildcardMap is not nil, only resources marked as wildcard are returned.
 func (s *Snapshot) GetWildcardResources(typeURL resource.Type) map[string]types.Resource {
-	if s == nil {
+	resources := s.GetWildcardResourcesAndTTL(typeURL)
+	if resources == nil {
 		return nil
 	}
 
-	allResources := s.GetResources(typeURL)
-	if allResources == nil {
-		return nil
+	withoutTTL := make(map[string]types.Resource, len(resources))
+
+	for k, v := range resources {
+		withoutTTL[k] = v.Resource
 	}
 
-	// Nil wildcardMap means all resources are wildcard (backward compatibility)
-	if s.wildcardMap == nil {
-		return allResources
-	}
-
-	wildcardSet, ok := s.wildcardMap[typeURL]
-	if !ok {
-		// No entry for this type means no resources are wildcard
-		return make(map[string]types.Resource)
-	}
-
-	// Filter to only wildcard resources
-	filtered := make(map[string]types.Resource, len(wildcardSet))
-	for name := range wildcardSet {
-		if resource, exists := allResources[name]; exists {
-			filtered[name] = resource
-		}
-	}
-	return filtered
+	return withoutTTL
 }
 
 // GetWildcardResourcesAndTTL returns only the resources with TTL that should be sent for wildcard requests.
