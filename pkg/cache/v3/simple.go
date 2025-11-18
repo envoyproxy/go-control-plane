@@ -54,6 +54,15 @@ type ResourceSnapshot interface {
 	// GetVersionMap returns a map of resource name to resource version for
 	// all the resources of type indicated by typeURL.
 	GetVersionMap(typeURL string) map[string]string
+
+	// GetWildcardResources returns only the resources that should be sent for wildcard requests.
+	// This is used for ODCDS (On-Demand CDS) support where some resources should only be
+	// sent when explicitly requested by name, not proactively pushed via wildcard.
+	GetWildcardResources(typeURL string) map[string]types.Resource
+
+	// GetWildcardResourcesAndTTL returns only the resources with TTL that should be sent for wildcard requests.
+	// Similar to GetWildcardResources but includes TTL information.
+	GetWildcardResourcesAndTTL(typeURL string) map[string]types.ResourceWithTTL
 }
 
 // SnapshotCache is a snapshot-based cache that maintains a single versioned
@@ -195,7 +204,13 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 		for id, watch := range info.watches {
 			// Respond with the current version regardless of whether the version has changed.
 			version := snapshot.GetVersion(watch.Request.GetTypeUrl())
-			resources := snapshot.GetResourcesAndTTL(watch.Request.GetTypeUrl())
+			// For wildcard requests, only include wildcard-eligible resources (ODCDS support)
+			var resources map[string]types.ResourceWithTTL
+			if watch.subscription.IsWildcard() {
+				resources = snapshot.GetWildcardResourcesAndTTL(watch.Request.GetTypeUrl())
+			} else {
+				resources = snapshot.GetResourcesAndTTL(watch.Request.GetTypeUrl())
+			}
 
 			// TODO(snowp): Construct this once per type instead of once per watch.
 			resourcesWithTTL := map[string]types.ResourceWithTTL{}
@@ -253,7 +268,14 @@ func (cache *snapshotCache) respondSOTWWatches(ctx context.Context, info *status
 		version := snapshot.GetVersion(watch.Request.GetTypeUrl())
 		if version != watch.Request.GetVersionInfo() {
 			cache.log.Debugf("respond open watch %d %s %v with new version %q", id, watch.Request.GetTypeUrl(), watch.Request.GetResourceNames(), version)
-			resources := snapshot.GetResourcesAndTTL(watch.Request.GetTypeUrl())
+			// For wildcard requests, only include wildcard-eligible resources
+			// For named requests, include all resources so they can be fetched on-demand
+			var resources map[string]types.ResourceWithTTL
+			if watch.subscription.IsWildcard() {
+				resources = snapshot.GetWildcardResourcesAndTTL(watch.Request.GetTypeUrl())
+			} else {
+				resources = snapshot.GetResourcesAndTTL(watch.Request.GetTypeUrl())
+			}
 			err := cache.respond(ctx, watch, resources, version, false)
 			if err != nil {
 				return err
@@ -421,7 +443,14 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 	}
 
 	version := snapshot.GetVersion(request.GetTypeUrl())
-	resources := snapshot.GetResourcesAndTTL(request.GetTypeUrl())
+	// For wildcard requests, only include wildcard-eligible resources
+	// For named requests, include all resources so they can be fetched on-demand
+	var resources map[string]types.ResourceWithTTL
+	if sub.IsWildcard() {
+		resources = snapshot.GetWildcardResourcesAndTTL(request.GetTypeUrl())
+	} else {
+		resources = snapshot.GetResourcesAndTTL(request.GetTypeUrl())
+	}
 
 	if request.GetVersionInfo() == version {
 		// Retrieve whether there are resources in the cache requested and currently unknown to the client.
@@ -439,9 +468,10 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 				}
 			}
 		} else {
-			// Check if a resource present in the snapshot is currently not returned,
+			// Check if a wildcard-eligible resource present in the snapshot is currently not returned,
 			// for instance if the subscription is newly wildcard.
-			for r := range snapshot.GetResources(request.GetTypeUrl()) {
+			// Only check wildcard resources for wildcard subscriptions
+			for r := range snapshot.GetWildcardResources(request.GetTypeUrl()) {
 				if _, ok := knownResourceNames[r]; !ok {
 					shouldRespond = true
 					break
@@ -594,8 +624,17 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sub Subscrip
 
 // Respond to a delta watch with the provided snapshot value. If the response is nil, there has been no state change.
 func (cache *snapshotCache) respondDelta(ctx context.Context, snapshot ResourceSnapshot, request *DeltaRequest, value chan DeltaResponse, sub Subscription) (*RawDeltaResponse, error) {
+	// For wildcard requests, only include wildcard-eligible resources (ODCDS support)
+	// For named requests, include all resources so they can be fetched on-demand
+	var resourceMap map[string]types.Resource
+	if sub.IsWildcard() {
+		resourceMap = snapshot.GetWildcardResources(request.GetTypeUrl())
+	} else {
+		resourceMap = snapshot.GetResources(request.GetTypeUrl())
+	}
+
 	resp := createDeltaResponse(ctx, request, sub, resourceContainer{
-		resourceMap: snapshot.GetResources(request.GetTypeUrl()),
+		resourceMap: resourceMap,
 		versionMap:  snapshot.GetVersionMap(request.GetTypeUrl()),
 	}, snapshot.GetVersion(request.GetTypeUrl()))
 

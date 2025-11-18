@@ -33,6 +33,23 @@ type Snapshot struct {
 	// instantiated by calling ConstructVersionMap().
 	// VersionMap is only to be used with delta xDS.
 	VersionMap map[string]map[string]string
+
+	// wildcardMap tracks which resources should be returned for wildcard requests.
+	// If nil, all resources are treated as wildcard-eligible (backward compatibility).
+	// If not nil, only resources in this map are returned for wildcard requests.
+	wildcardMap map[resource.Type]map[string]struct{}
+}
+
+// SnapshotResource contains a resource with metadata about wildcard eligibility.
+// The Wildcard field indicates whether this resource should be returned as part
+// of wildcard requests. This is particularly useful for ODCDS (On-Demand CDS)
+// where some clusters should only be sent when explicitly requested by name.
+type SnapshotResource struct {
+	Resource types.ResourceWithTTL
+	// Wildcard indicates if this resource should be returned for wildcard requests.
+	// true = include in wildcard responses (proactively pushed)
+	// false = only send when explicitly requested by name (on-demand)
+	Wildcard bool
 }
 
 var _ ResourceSnapshot = &Snapshot{}
@@ -49,6 +66,47 @@ func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (
 		}
 
 		out.Resources[index] = NewResources(version, resource)
+	}
+
+	return &out, nil
+}
+
+// NewSnapshotWithExplicitWildcard creates a Snapshot where each resource
+// explicitly specifies whether it should be returned as part of wildcard requests.
+func NewSnapshotWithExplicitWildcard(
+	version string,
+	resources map[resource.Type][]SnapshotResource,
+) (*Snapshot, error) {
+	out := Snapshot{
+		wildcardMap: make(map[resource.Type]map[string]struct{}),
+	}
+
+	for typ, snapshotResources := range resources {
+		index := GetResponseType(typ)
+		if index == types.UnknownType {
+			return nil, errors.New("unknown resource type: " + typ)
+		}
+
+		// Extract resources and track wildcard ones
+		rawResources := make([]types.ResourceWithTTL, 0, len(snapshotResources))
+		wildcardSet := make(map[string]struct{})
+
+		for _, sr := range snapshotResources {
+			rawResources = append(rawResources, sr.Resource)
+
+			if sr.Wildcard {
+				resourceName := GetResourceName(sr.Resource.Resource)
+				wildcardSet[resourceName] = struct{}{}
+			}
+		}
+
+		out.Resources[index] = NewResourcesWithTTL(version, rawResources)
+
+		// Only store wildcard map entry if there are resources of this type
+		// An empty set means no resources are wildcard for this type
+		if len(snapshotResources) > 0 {
+			out.wildcardMap[typ] = wildcardSet
+		}
 	}
 
 	return &out, nil
@@ -203,4 +261,94 @@ func (s *Snapshot) ConstructVersionMap() error {
 	}
 
 	return nil
+}
+
+// IsResourceWildcard checks if a specific resource should be returned for wildcard requests.
+// If wildcardMap is nil, all resources are considered wildcard-eligible (backward compatibility).
+// If wildcardMap is not nil, only resources explicitly marked as wildcard are eligible.
+func (s *Snapshot) IsResourceWildcard(typeURL resource.Type, resourceName string) bool {
+	if s == nil {
+		return false
+	}
+
+	// Nil wildcardMap means all resources are wildcard (backward compatibility)
+	if s.wildcardMap == nil {
+		return true
+	}
+
+	wildcardSet, ok := s.wildcardMap[typeURL]
+	if !ok {
+		// No entry for this type means no resources are wildcard
+		return false
+	}
+
+	_, isWildcard := wildcardSet[resourceName]
+	return isWildcard
+}
+
+// GetWildcardResources returns only the resources that should be sent for wildcard requests.
+// If wildcardMap is nil, all resources are returned (backward compatibility).
+// If wildcardMap is not nil, only resources marked as wildcard are returned.
+func (s *Snapshot) GetWildcardResources(typeURL resource.Type) map[string]types.Resource {
+	if s == nil {
+		return nil
+	}
+
+	allResources := s.GetResources(typeURL)
+	if allResources == nil {
+		return nil
+	}
+
+	// Nil wildcardMap means all resources are wildcard (backward compatibility)
+	if s.wildcardMap == nil {
+		return allResources
+	}
+
+	wildcardSet, ok := s.wildcardMap[typeURL]
+	if !ok {
+		// No entry for this type means no resources are wildcard
+		return make(map[string]types.Resource)
+	}
+
+	// Filter to only wildcard resources
+	filtered := make(map[string]types.Resource, len(wildcardSet))
+	for name := range wildcardSet {
+		if resource, exists := allResources[name]; exists {
+			filtered[name] = resource
+		}
+	}
+	return filtered
+}
+
+// GetWildcardResourcesAndTTL returns only the resources with TTL that should be sent for wildcard requests.
+// Similar to GetWildcardResources but includes TTL information.
+func (s *Snapshot) GetWildcardResourcesAndTTL(typeURL resource.Type) map[string]types.ResourceWithTTL {
+	if s == nil {
+		return nil
+	}
+
+	allResources := s.GetResourcesAndTTL(typeURL)
+	if allResources == nil {
+		return nil
+	}
+
+	// Nil wildcardMap means all resources are wildcard (backward compatibility)
+	if s.wildcardMap == nil {
+		return allResources
+	}
+
+	wildcardSet, ok := s.wildcardMap[typeURL]
+	if !ok {
+		// No entry for this type means no resources are wildcard
+		return make(map[string]types.ResourceWithTTL)
+	}
+
+	// Filter to only wildcard resources
+	filtered := make(map[string]types.ResourceWithTTL, len(wildcardSet))
+	for name := range wildcardSet {
+		if resource, exists := allResources[name]; exists {
+			filtered[name] = resource
+		}
+	}
+	return filtered
 }
