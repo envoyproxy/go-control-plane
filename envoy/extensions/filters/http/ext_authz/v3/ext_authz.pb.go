@@ -45,17 +45,17 @@ type ExtAuthz struct {
 	TransportApiVersion v3.ApiVersion `protobuf:"varint,12,opt,name=transport_api_version,json=transportApiVersion,proto3,enum=envoy.config.core.v3.ApiVersion" json:"transport_api_version,omitempty"`
 	// Changes the filter's behavior on errors:
 	//
-	// #. When set to “true“, the filter will “accept“ the client request even if communication with
+	//   - When set to “true“, the filter will “accept“ the client request even if communication with
+	//     the authorization service has failed, or if the authorization service has returned an HTTP 5xx
+	//     error.
 	//
-	//	the authorization service has failed, or if the authorization service has returned an HTTP 5xx
-	//	error.
-	//
-	// #. When set to “false“, the filter will “reject“ client requests and return “Forbidden“
-	//
-	//	if communication with the authorization service has failed, or if the authorization service
-	//	has returned an HTTP 5xx error.
+	//   - When set to “false“, the filter will “reject“ client requests and return “Forbidden“
+	//     if communication with the authorization service has failed, or if the authorization service
+	//     has returned an HTTP 5xx error.
 	//
 	// Errors can always be tracked in the :ref:`stats <config_http_filters_ext_authz_stats>`.
+	//
+	// Defaults to “false“.
 	FailureModeAllow bool `protobuf:"varint,2,opt,name=failure_mode_allow,json=failureModeAllow,proto3" json:"failure_mode_allow,omitempty"`
 	// When “failure_mode_allow“ and “failure_mode_allow_header_add“ are both set to “true“,
 	// “x-envoy-auth-failure-mode-allowed: true“ will be added to request headers if the communication
@@ -67,23 +67,24 @@ type ExtAuthz struct {
 	// request indicating whether the body data is partial.
 	WithRequestBody *BufferSettings `protobuf:"bytes,5,opt,name=with_request_body,json=withRequestBody,proto3" json:"with_request_body,omitempty"`
 	// Clears the route cache in order to allow the external authorization service to correctly affect
-	// routing decisions. The filter clears all cached routes when:
+	// routing decisions. The filter clears all cached routes when all of the following holds:
 	//
-	// #. The field is set to “true“.
+	//   - This field is set to “true“.
+	//   - The status returned from the authorization service is an HTTP 200 or gRPC 0.
+	//   - At least one “authorization response header“ is added to the client request, or is used to
+	//     alter another client request header.
 	//
-	// #. The status returned from the authorization service is an HTTP 200 or gRPC 0.
-	//
-	// #. At least one “authorization response header“ is added to the client request, or is used to
-	//
-	//	alter another client request header.
+	// Defaults to “false“.
 	ClearRouteCache bool `protobuf:"varint,6,opt,name=clear_route_cache,json=clearRouteCache,proto3" json:"clear_route_cache,omitempty"`
 	// Sets the HTTP status that is returned to the client when the authorization server returns an error
-	// or cannot be reached. The default status is HTTP 403 Forbidden.
+	// or cannot be reached.
+	//
+	// The default status is “HTTP 403 Forbidden“.
 	StatusOnError *v31.HttpStatus `protobuf:"bytes,7,opt,name=status_on_error,json=statusOnError,proto3" json:"status_on_error,omitempty"`
-	// When this is set to “true“, the filter will check the :ref:`ext_authz response
+	// When set to “true“, the filter will check the :ref:`ext_authz response
 	// <envoy_v3_api_msg_service.auth.v3.CheckResponse>` for invalid header and
-	// query parameter mutations. If the side stream response is invalid, it will send a local reply
-	// to the downstream request with status HTTP 500 Internal Server Error.
+	// query parameter mutations. If the response is invalid, the filter will send a local reply
+	// to the downstream request with status “HTTP 500 Internal Server Error“.
 	//
 	// .. note::
 	//
@@ -94,6 +95,8 @@ type ExtAuthz struct {
 	// unexpected behavior.
 	//
 	// If you are using ext_authz with an untrusted ext_authz server, you should set this to “true“.
+	//
+	// Defaults to “false“.
 	ValidateMutations bool `protobuf:"varint,24,opt,name=validate_mutations,json=validateMutations,proto3" json:"validate_mutations,omitempty"`
 	// Specifies a list of metadata namespaces whose values, if present, will be passed to the
 	// ext_authz service. The :ref:`filter_metadata <envoy_v3_api_field_config.core.v3.Metadata.filter_metadata>`
@@ -237,19 +240,19 @@ type ExtAuthz struct {
 	// It is set to “false“ by default for backwards compatibility.
 	EncodeRawHeaders bool `protobuf:"varint,23,opt,name=encode_raw_headers,json=encodeRawHeaders,proto3" json:"encode_raw_headers,omitempty"`
 	// Rules for what modifications an ext_authz server may make to the request headers before
-	// continuing decoding / forwarding upstream.
+	// continuing decoding or forwarding upstream.
 	//
-	// If set to anything, enables header mutation checking against configured rules. Note that
+	// If set, enables header mutation checking against the configured rules. Note that
 	// :ref:`HeaderMutationRules <envoy_v3_api_msg_config.common.mutation_rules.v3.HeaderMutationRules>`
-	// has defaults that change ext_authz behavior. Also note that if this field is set to anything,
-	// ext_authz can no longer append to :-prefixed headers.
+	// has defaults that change ext_authz behavior. Also note that if this field is set,
+	// ext_authz can no longer append to “:“-prefixed headers.
 	//
-	// If empty, header mutation rule checking is completely disabled.
+	// If unset, header mutation rule checking is completely disabled.
 	//
-	// Regardless of what is configured here, ext_authz cannot remove :-prefixed headers.
+	// Regardless of what is configured here, ext_authz cannot remove “:“-prefixed headers.
 	//
 	// This field and “validate_mutations“ have different use cases. “validate_mutations“ enables
-	// correctness checks for all header / query parameter mutations (e.g. for invalid characters).
+	// correctness checks for all header and query parameter mutations (for example, invalid characters).
 	// This field allows the filter to reject mutations to specific headers.
 	DecoderHeaderMutationRules *v33.HeaderMutationRules `protobuf:"bytes,26,opt,name=decoder_header_mutation_rules,json=decoderHeaderMutationRules,proto3" json:"decoder_header_mutation_rules,omitempty"`
 	// Enable or disable ingestion of dynamic metadata from the ext_authz service.
@@ -270,8 +273,11 @@ type ExtAuthz struct {
 	// key will be the same as the filter name.
 	//
 	// If using Envoy gRPC, emits latency, bytes sent / received, upstream info, and upstream cluster
-	// info. If not using Envoy gRPC, emits only latency. Note that stats are ONLY added to filter
-	// state if a check request is actually made to an ext_authz service.
+	// info. If not using Envoy gRPC, emits only latency.
+	//
+	// .. note::
+	//
+	//	Stats are ONLY added to filter state if a check request is actually made to an ext_authz service.
 	//
 	// If this is “false“ the filter will not emit stats, but filter_metadata will still be respected if
 	// it has a value.
@@ -293,12 +299,12 @@ type ExtAuthz struct {
 	// by sending a local reply when those limits are violated.
 	//
 	// When set to “false“, the filter will ignore the response header map's limits and add / set
-	// all response headers as specified by the external auth service.
+	// all response headers as specified by the external authorization service.
 	//
 	// Recommendation: enable if the external authorization service is not trusted. Otherwise, leave
-	// false.
+	// it “false“.
 	//
-	// Defaults to false.
+	// Defaults to “false“.
 	EnforceResponseHeaderLimits bool `protobuf:"varint,31,opt,name=enforce_response_header_limits,json=enforceResponseHeaderLimits,proto3" json:"enforce_response_header_limits,omitempty"`
 	unknownFields               protoimpl.UnknownFields
 	sizeCache                   protoimpl.SizeCache
@@ -578,12 +584,18 @@ type BufferSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Sets the maximum size of a message body that the filter will hold in memory. Envoy will return
 	// “HTTP 413“ and will *not* initiate the authorization process when the buffer reaches the size
-	// set in this field. Note that this setting will have precedence over :ref:`failure_mode_allow
-	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.failure_mode_allow>`.
+	// set in this field.
+	//
+	// .. note::
+	//
+	//	This setting will have precedence over :ref:`failure_mode_allow
+	//	<envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.failure_mode_allow>`.
 	MaxRequestBytes uint32 `protobuf:"varint,1,opt,name=max_request_bytes,json=maxRequestBytes,proto3" json:"max_request_bytes,omitempty"`
 	// When this field is “true“, Envoy will buffer the message until “max_request_bytes“ is reached.
 	// The authorization request will be dispatched and no 413 HTTP error will be returned by the
 	// filter.
+	//
+	// Defaults to “false“.
 	AllowPartialMessage bool `protobuf:"varint,2,opt,name=allow_partial_message,json=allowPartialMessage,proto3" json:"allow_partial_message,omitempty"`
 	// If “true“, the body sent to the external authorization service is set as raw bytes and populates
 	// :ref:`raw_body<envoy_v3_api_field_service.auth.v3.AttributeContext.HttpRequest.raw_body>`
@@ -595,6 +607,8 @@ type BufferSettings struct {
 	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.grpc_service>`. In configurations that use
 	// an :ref:`http_service <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.http_service>`, this
 	// has no effect.
+	//
+	// Defaults to “false“.
 	PackAsBytes   bool `protobuf:"varint,3,opt,name=pack_as_bytes,json=packAsBytes,proto3" json:"pack_as_bytes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -654,8 +668,11 @@ func (x *BufferSettings) GetPackAsBytes() bool {
 // HttpService is used for raw HTTP communication between the filter and the authorization service.
 // When configured, the filter will parse the client request and use these attributes to call the
 // authorization server. Depending on the response, the filter may reject or accept the client
-// request. Note that in any of these events, metadata can be added, removed or overridden by the
-// filter:
+// request.
+//
+// .. note::
+//
+//	In any of these events, metadata can be added, removed or overridden by the filter:
 //
 // On authorization request, a list of allowed request headers may be supplied. See
 // :ref:`allowed_headers
@@ -787,8 +804,11 @@ type AuthorizationRequest struct {
 	//
 	// Deprecated: Marked as deprecated in envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto.
 	AllowedHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
-	// Sets a list of headers that will be included in the request to the authorization service. Note that
-	// client request headers with the same key will be overridden.
+	// Sets a list of headers that will be included in the request to the authorization service.
+	//
+	// .. note::
+	//
+	//	Client request headers with the same key will be overridden.
 	HeadersToAdd  []*v3.HeaderValue `protobuf:"bytes,2,rep,name=headers_to_add,json=headersToAdd,proto3" json:"headers_to_add,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -844,17 +864,27 @@ type AuthorizationResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the original client request.
-	// Note that coexistent headers will be overridden.
+	//
+	// .. note::
+	//
+	//	Existing headers will be overridden.
 	AllowedUpstreamHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_upstream_headers,json=allowedUpstreamHeaders,proto3" json:"allowed_upstream_headers,omitempty"`
 	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the original client request.
-	// Note that coexistent headers will be appended.
+	//
+	// .. note::
+	//
+	//	Existing headers will be appended.
 	AllowedUpstreamHeadersToAppend *v32.ListStringMatcher `protobuf:"bytes,3,opt,name=allowed_upstream_headers_to_append,json=allowedUpstreamHeadersToAppend,proto3" json:"allowed_upstream_headers_to_append,omitempty"`
 	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
-	// response headers that have a correspondent match will be added to the client's response. Note
-	// that when this list is *not* set, all the authorization response headers, except “Authority
-	// (Host)“ will be in the response to the client. When a header is included in this list, “Path“,
-	// “Status“, “Content-Length“, “WWWAuthenticate“ and “Location“ are automatically added.
+	// response headers that have a correspondent match will be added to the client's response.
+	// When a header is included in this list, “Path“, “Status“, “Content-Length“, “WWW-Authenticate“ and
+	// “Location“ are automatically added.
+	//
+	// .. note::
+	//
+	//	When this list is *not* set, all the authorization response headers, except
+	//	``Authority (Host)``, will be in the response to the client.
 	AllowedClientHeaders *v32.ListStringMatcher `protobuf:"bytes,2,opt,name=allowed_client_headers,json=allowedClientHeaders,proto3" json:"allowed_client_headers,omitempty"`
 	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
 	// response headers that have a correspondent match will be added to the client's response when
