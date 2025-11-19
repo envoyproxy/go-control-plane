@@ -8,7 +8,6 @@ package rbacv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v31 "github.com/cncf/xds/go/xds/type/matcher/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/rbac/v3"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -195,13 +194,13 @@ var File_envoy_extensions_filters_http_rbac_v3_rbac_proto protoreflect.FileDescr
 
 const file_envoy_extensions_filters_http_rbac_v3_rbac_proto_rawDesc = "" +
 	"\n" +
-	"0envoy/extensions/filters/http/rbac/v3/rbac.proto\x12%envoy.extensions.filters.http.rbac.v3\x1a\x1fenvoy/config/rbac/v3/rbac.proto\x1a\x1fxds/annotations/v3/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\"\xb2\x04\n" +
+	"0envoy/extensions/filters/http/rbac/v3/rbac.proto\x12%envoy.extensions.filters.http.rbac.v3\x1a\x1fenvoy/config/rbac/v3/rbac.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\"\xaa\x04\n" +
 	"\x04RBAC\x12I\n" +
 	"\x05rules\x18\x01 \x01(\v2\x1a.envoy.config.rbac.v3.RBACB\x17\xf2\x98\xfe\x8f\x05\x11\x12\x0frules_specifierR\x05rules\x12*\n" +
 	"\x11rules_stat_prefix\x18\x06 \x01(\tR\x0frulesStatPrefix\x12O\n" +
 	"\amatcher\x18\x04 \x01(\v2\x1c.xds.type.matcher.v3.MatcherB\x17\xf2\x98\xfe\x8f\x05\x11\x12\x0frules_specifierR\amatcher\x12]\n" +
-	"\fshadow_rules\x18\x02 \x01(\v2\x1a.envoy.config.rbac.v3.RBACB\x1e\xf2\x98\xfe\x8f\x05\x18\x12\x16shadow_rules_specifierR\vshadowRules\x12k\n" +
-	"\x0eshadow_matcher\x18\x05 \x01(\v2\x1c.xds.type.matcher.v3.MatcherB&\xf2\x98\xfe\x8f\x05\x18\x12\x16shadow_rules_specifier\xd2Ƥ\xe1\x06\x02\b\x01R\rshadowMatcher\x127\n" +
+	"\fshadow_rules\x18\x02 \x01(\v2\x1a.envoy.config.rbac.v3.RBACB\x1e\xf2\x98\xfe\x8f\x05\x18\x12\x16shadow_rules_specifierR\vshadowRules\x12c\n" +
+	"\x0eshadow_matcher\x18\x05 \x01(\v2\x1c.xds.type.matcher.v3.MatcherB\x1e\xf2\x98\xfe\x8f\x05\x18\x12\x16shadow_rules_specifierR\rshadowMatcher\x127\n" +
 	"\x18shadow_rules_stat_prefix\x18\x03 \x01(\tR\x15shadowRulesStatPrefix\x12/\n" +
 	"\x14track_per_rule_stats\x18\a \x01(\bR\x11trackPerRuleStats:,\x9aň\x1e'\n" +
 	"%envoy.config.filter.http.rbac.v2.RBAC\"\x8b\x01\n" +

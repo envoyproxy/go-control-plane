@@ -8,7 +8,6 @@ package listenerv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v31 "github.com/cncf/xds/go/xds/core/v3"
 	v32 "github.com/cncf/xds/go/xds/type/matcher/v3"
 	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
@@ -1144,12 +1143,12 @@ var File_envoy_config_listener_v3_listener_proto protoreflect.FileDescriptor
 
 const file_envoy_config_listener_v3_listener_proto_rawDesc = "" +
 	"\n" +
-	"'envoy/config/listener/v3/listener.proto\x12\x18envoy.config.listener.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a+envoy/config/listener/v3/api_listener.proto\x1a2envoy/config/listener/v3/listener_components.proto\x1a2envoy/config/listener/v3/udp_listener_config.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\"xds/core/v3/collection_entry.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xa0\x01\n" +
+	"'envoy/config/listener/v3/listener.proto\x12\x18envoy.config.listener.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a+envoy/config/listener/v3/api_listener.proto\x1a2envoy/config/listener/v3/listener_components.proto\x1a2envoy/config/listener/v3/udp_listener_config.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xa0\x01\n" +
 	"\x11AdditionalAddress\x127\n" +
 	"\aaddress\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.AddressR\aaddress\x12R\n" +
 	"\x0esocket_options\x18\x02 \x01(\v2+.envoy.config.core.v3.SocketOptionsOverrideR\rsocketOptions\"L\n" +
 	"\x12ListenerCollection\x126\n" +
-	"\aentries\x18\x01 \x03(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xf9\x19\n" +
+	"\aentries\x18\x01 \x03(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xef\x19\n" +
 	"\bListener\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x127\n" +
 	"\aaddress\x18\x02 \x01(\v2\x1d.envoy.config.core.v3.AddressR\aaddress\x12^\n" +
@@ -1158,8 +1157,8 @@ const file_envoy_config_listener_v3_listener_proto_rawDesc = "" +
 	"statPrefix\x12J\n" +
 	"\rfilter_chains\x18\x03 \x03(\v2%.envoy.config.listener.v3.FilterChainR\ffilterChains\x12N\n" +
 	"\vfcds_config\x18$ \x01(\v2-.envoy.config.listener.v3.Listener.FcdsConfigR\n" +
-	"fcdsConfig\x12X\n" +
-	"\x14filter_chain_matcher\x18  \x01(\v2\x1c.xds.type.matcher.v3.MatcherB\b\xd2Ƥ\xe1\x06\x02\b\x01R\x12filterChainMatcher\x12D\n" +
+	"fcdsConfig\x12N\n" +
+	"\x14filter_chain_matcher\x18  \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\x12filterChainMatcher\x12D\n" +
 	"\x10use_original_dst\x18\x04 \x01(\v2\x1a.google.protobuf.BoolValueR\x0euseOriginalDst\x12W\n" +
 	"\x14default_filter_chain\x18\x19 \x01(\v2%.envoy.config.listener.v3.FilterChainR\x12defaultFilterChain\x12o\n" +
 	"!per_connection_buffer_limit_bytes\x18\x05 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\x8a\x93\xb7*\x02\b\x01R\x1dperConnectionBufferLimitBytes\x12:\n" +
