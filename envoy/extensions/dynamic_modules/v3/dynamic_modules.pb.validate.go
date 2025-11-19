@@ -71,6 +71,8 @@ func (m *DynamicModuleConfig) validate(all bool) error {
 
 	// no validation rules for DoNotClose
 
+	// no validation rules for LoadGlobally
+
 	if len(errors) > 0 {
 		return DynamicModuleConfigMultiError(errors)
 	}

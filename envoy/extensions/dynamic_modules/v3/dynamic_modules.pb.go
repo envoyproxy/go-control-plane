@@ -50,7 +50,19 @@ type DynamicModuleConfig struct {
 	// This is useful for modules that have global state that should not be unloaded.
 	// A module is closed when no more references to it exist in the process. For example,
 	// no HTTP filters are using the module (e.g. after configuration update).
-	DoNotClose    bool `protobuf:"varint,3,opt,name=do_not_close,json=doNotClose,proto3" json:"do_not_close,omitempty"`
+	DoNotClose bool `protobuf:"varint,3,opt,name=do_not_close,json=doNotClose,proto3" json:"do_not_close,omitempty"`
+	// The dynamic module is loaded with “RTLD_LOCAL“ flag to avoid symbol conflicts when multiple
+	// modules are loaded by default. Set this to true to load the module with “RTLD_GLOBAL“ flag.
+	// This is useful for modules that need to share symbols with other dynamic libraries. For
+	// example, a module X may load another shared library Y that depends on some symbols defined
+	// in module X. In this case, module X must be loaded with “RTLD_GLOBAL“ flag so that the
+	// symbols defined in module X are visible to library Y.
+	//
+	// .. warning::
+	//
+	//	Use this option with caution as it may lead to symbol conflicts and undefined behavior
+	//	if multiple modules define the same symbols and are loaded globally.
+	LoadGlobally  bool `protobuf:"varint,4,opt,name=load_globally,json=loadGlobally,proto3" json:"load_globally,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -99,15 +111,23 @@ func (x *DynamicModuleConfig) GetDoNotClose() bool {
 	return false
 }
 
+func (x *DynamicModuleConfig) GetLoadGlobally() bool {
+	if x != nil {
+		return x.LoadGlobally
+	}
+	return false
+}
+
 var File_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"T\n" +
+	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"y\n" +
 	"\x13DynamicModuleConfig\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12 \n" +
 	"\fdo_not_close\x18\x03 \x01(\bR\n" +
-	"doNotCloseB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"doNotClose\x12#\n" +
+	"\rload_globally\x18\x04 \x01(\bR\floadGloballyB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"1io.envoyproxy.envoy.extensions.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Z\\github.com/envoyproxy/go-control-plane/envoy/extensions/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (

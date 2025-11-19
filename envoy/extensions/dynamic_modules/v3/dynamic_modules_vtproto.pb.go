@@ -48,6 +48,16 @@ func (m *DynamicModuleConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.LoadGlobally {
+		i--
+		if m.LoadGlobally {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.DoNotClose {
 		i--
 		if m.DoNotClose {
@@ -79,6 +89,9 @@ func (m *DynamicModuleConfig) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.DoNotClose {
+		n += 2
+	}
+	if m.LoadGlobally {
 		n += 2
 	}
 	n += len(m.unknownFields)
