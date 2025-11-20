@@ -75,7 +75,7 @@ func (AwsRequestSigning_SigningAlgorithm) EnumDescriptor() ([]byte, []int) {
 }
 
 // Top level configuration for the AWS request signing filter.
-// [#next-free-field: 9]
+// [#next-free-field: 10]
 type AwsRequestSigning struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The `service namespace
@@ -90,14 +90,14 @@ type AwsRequestSigning struct {
 	// When signing_algorithm is set to “AWS_SIGV4“ the region is a standard AWS `region <https://docs.aws.amazon.com/general/latest/gr/rande.html>`_ string for the service
 	// hosting the HTTP endpoint.
 	//
-	// Example: us-west-2
+	// Example: “us-west-2“
 	//
 	// When signing_algorithm is set to “AWS_SIGV4A“ the region is used as a region set.
 	//
 	// A region set is a comma separated list of AWS regions, such as “us-east-1,us-east-2“ or wildcard “*“
 	// or even region strings containing wildcards such as “us-east-*“
 	//
-	// Example: '*'
+	// Example: “'*'“
 	//
 	// By configuring a region set, a SigV4A signed request can be sent to multiple regions, rather than being
 	// valid for only a single region destination.
@@ -122,11 +122,15 @@ type AwsRequestSigning struct {
 	// any patterns defined in the StringMatcher proto (e.g. exact string, prefix, regex, etc).
 	//
 	// Example:
-	// match_excluded_headers:
-	// - prefix: x-envoy
-	// - exact: foo
-	// - exact: bar
-	// When applied, all headers that start with "x-envoy" and headers "foo" and "bar" will not be signed.
+	//
+	// .. code-block:: yaml
+	//
+	//	match_excluded_headers:
+	//	- prefix: x-envoy
+	//	- exact: foo
+	//	- exact: bar
+	//
+	// When applied, all headers that start with “x-envoy“ and headers “foo“ and “bar“ will not be signed.
 	MatchExcludedHeaders []*v3.StringMatcher `protobuf:"bytes,5,rep,name=match_excluded_headers,json=matchExcludedHeaders,proto3" json:"match_excluded_headers,omitempty"`
 	// Optional Signing algorithm specifier, either “AWS_SIGV4“ or “AWS_SIGV4A“, defaulting to “AWS_SIGV4“.
 	SigningAlgorithm AwsRequestSigning_SigningAlgorithm `protobuf:"varint,6,opt,name=signing_algorithm,json=signingAlgorithm,proto3,enum=envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning_SigningAlgorithm" json:"signing_algorithm,omitempty"`
@@ -139,8 +143,24 @@ type AwsRequestSigning struct {
 	// The credential provider for signing the request. This is optional and if not set,
 	// it will be retrieved using the procedure described in :ref:`config_http_filters_aws_request_signing`.
 	CredentialProvider *v31.AwsCredentialProvider `protobuf:"bytes,8,opt,name=credential_provider,json=credentialProvider,proto3" json:"credential_provider,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// A list of request header string matchers that will be included during signing. The included header can be matched by
+	// any patterns defined in the StringMatcher proto (e.g. exact string, prefix, regex, etc).
+	// match_included_headers takes precedence over match_excluded_headers - if match_included_headers is set, only those headers will be signed and match_excluded_headers will be ignored.
+	// Required headers for signing such as “host“ will always be signed regardless of this setting. The required headers are determined via “CanonicalHeaders“ section in the AWS documentation `here <https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_sigv-create-signed-request.html#create-canonical-request>`_.
+	//
+	// Example:
+	//
+	// .. code-block:: yaml
+	//
+	//	match_included_headers:
+	//	- prefix: x-envoy
+	//	- exact: foo
+	//	- exact: bar
+	//
+	// When applied, all headers that start with “x-envoy“ and headers “foo“ and “bar“ will be signed and all other headers will be excluded from signing except required headers.
+	MatchIncludedHeaders []*v3.StringMatcher `protobuf:"bytes,9,rep,name=match_included_headers,json=matchIncludedHeaders,proto3" json:"match_included_headers,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *AwsRequestSigning) Reset() {
@@ -225,6 +245,13 @@ func (x *AwsRequestSigning) GetQueryString() *AwsRequestSigning_QueryString {
 func (x *AwsRequestSigning) GetCredentialProvider() *v31.AwsCredentialProvider {
 	if x != nil {
 		return x.CredentialProvider
+	}
+	return nil
+}
+
+func (x *AwsRequestSigning) GetMatchIncludedHeaders() []*v3.StringMatcher {
+	if x != nil {
+		return x.MatchIncludedHeaders
 	}
 	return nil
 }
@@ -335,7 +362,7 @@ var File_envoy_extensions_filters_http_aws_request_signing_v3_aws_request_signin
 
 const file_envoy_extensions_filters_http_aws_request_signing_v3_aws_request_signing_proto_rawDesc = "" +
 	"\n" +
-	"Nenvoy/extensions/filters/http/aws_request_signing/v3/aws_request_signing.proto\x124envoy.extensions.filters.http.aws_request_signing.v3\x1a8envoy/extensions/common/aws/v3/credential_provider.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xd6\x06\n" +
+	"Nenvoy/extensions/filters/http/aws_request_signing/v3/aws_request_signing.proto\x124envoy.extensions.filters.http.aws_request_signing.v3\x1a8envoy/extensions/common/aws/v3/credential_provider.proto\x1a\"envoy/type/matcher/v3/string.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb2\a\n" +
 	"\x11AwsRequestSigning\x12*\n" +
 	"\fservice_name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vserviceName\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12!\n" +
@@ -344,7 +371,8 @@ const file_envoy_extensions_filters_http_aws_request_signing_v3_aws_request_sign
 	"\x16match_excluded_headers\x18\x05 \x03(\v2$.envoy.type.matcher.v3.StringMatcherR\x14matchExcludedHeaders\x12\x85\x01\n" +
 	"\x11signing_algorithm\x18\x06 \x01(\x0e2X.envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.SigningAlgorithmR\x10signingAlgorithm\x12v\n" +
 	"\fquery_string\x18\a \x01(\v2S.envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.QueryStringR\vqueryString\x12f\n" +
-	"\x13credential_provider\x18\b \x01(\v25.envoy.extensions.common.aws.v3.AwsCredentialProviderR\x12credentialProvider\x1ab\n" +
+	"\x13credential_provider\x18\b \x01(\v25.envoy.extensions.common.aws.v3.AwsCredentialProviderR\x12credentialProvider\x12Z\n" +
+	"\x16match_included_headers\x18\t \x03(\v2$.envoy.type.matcher.v3.StringMatcherR\x14matchIncludedHeaders\x1ab\n" +
 	"\vQueryString\x12S\n" +
 	"\x0fexpiration_time\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\x0f\xfaB\f\xaa\x01\t\"\x03\b\x90\x1c2\x02\b\x01R\x0eexpirationTime\"1\n" +
 	"\x10SigningAlgorithm\x12\r\n" +
@@ -386,13 +414,14 @@ var file_envoy_extensions_filters_http_aws_request_signing_v3_aws_request_signin
 	0, // 1: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.signing_algorithm:type_name -> envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.SigningAlgorithm
 	3, // 2: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.query_string:type_name -> envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.QueryString
 	5, // 3: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.credential_provider:type_name -> envoy.extensions.common.aws.v3.AwsCredentialProvider
-	1, // 4: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigningPerRoute.aws_request_signing:type_name -> envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning
-	6, // 5: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.QueryString.expiration_time:type_name -> google.protobuf.Duration
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	4, // 4: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.match_included_headers:type_name -> envoy.type.matcher.v3.StringMatcher
+	1, // 5: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigningPerRoute.aws_request_signing:type_name -> envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning
+	6, // 6: envoy.extensions.filters.http.aws_request_signing.v3.AwsRequestSigning.QueryString.expiration_time:type_name -> google.protobuf.Duration
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() {

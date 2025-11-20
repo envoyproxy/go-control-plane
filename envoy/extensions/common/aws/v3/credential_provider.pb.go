@@ -230,8 +230,10 @@ func (x *InlineCredentialProvider) GetSessionToken() string {
 type AssumeRoleWithWebIdentityCredentialProvider struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Data source for a web identity token that is provided by the identity provider to assume the role.
-	// When using this data source, even if a “watched_directory“ is provided, the token file will only be re-read when the credentials
-	// returned from AssumeRoleWithWebIdentity expire.
+	// If a “watched_directory“ is not provided, one will be automatically inferred from the directory of the token file. This is to ensure
+	// that if the token file is rotated, the new token will be picked up. This behaviour differs from the standard envoy data source behavior, which does not
+	// automatically watch the directory of a file data source.
+	// Even when file rotation occurs, current credentials will continue to be used until they expire, at which point new credentials will be retrieved using the new token.
 	WebIdentityTokenDataSource *v3.DataSource `protobuf:"bytes,1,opt,name=web_identity_token_data_source,json=webIdentityTokenDataSource,proto3" json:"web_identity_token_data_source,omitempty"`
 	// The ARN of the role to assume.
 	RoleArn string `protobuf:"bytes,2,opt,name=role_arn,json=roleArn,proto3" json:"role_arn,omitempty"`
