@@ -188,8 +188,15 @@ type Restrictions struct {
 	// Key - Fully qualified method name e.g., “endpoints.examples.bookstore.BookStore/GetShelf“.
 	// Value - Method restrictions.
 	MethodRestrictions map[string]*MethodRestrictions `protobuf:"bytes,1,rep,name=method_restrictions,json=methodRestrictions,proto3" json:"method_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Specifies the message restrictions.
+	// Key - Fully qualified message name e.g.,
+	//
+	//	``endpoints.examples.bookstore.Book``.
+	//
+	// Value - Message restrictions.
+	MessageRestrictions map[string]*MessageRestrictions `protobuf:"bytes,2,rep,name=message_restrictions,json=messageRestrictions,proto3" json:"message_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *Restrictions) Reset() {
@@ -229,6 +236,13 @@ func (x *Restrictions) GetMethodRestrictions() map[string]*MethodRestrictions {
 	return nil
 }
 
+func (x *Restrictions) GetMessageRestrictions() map[string]*MessageRestrictions {
+	if x != nil {
+		return x.MessageRestrictions
+	}
+	return nil
+}
+
 // Contains the method restrictions which include the field level restrictions
 // for the request and response fields.
 type MethodRestrictions struct {
@@ -243,8 +257,16 @@ type MethodRestrictions struct {
 	// Value - Restrictions map containing the mapping from restriction name to
 	// the restriction values.
 	ResponseFieldRestrictions map[string]*RestrictionConfig `protobuf:"bytes,2,rep,name=response_field_restrictions,json=responseFieldRestrictions,proto3" json:"response_field_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	// Optional restriction that applies to the entire method. If present, this
+	// rule takes precedence for the method itself over field-level or
+	// message-level rules. The 'matcher' within RestrictionConfig will determine
+	// if the method is denied/scrubbed. If the matcher evaluates to true:
+	//   - The request is **denied**, and further processing is stopped.
+	//   - The implementation should generate an immediate error response
+	//     (e.g., an HTTP 403 Forbidden status) and send it to the client.
+	MethodRestriction *RestrictionConfig `protobuf:"bytes,3,opt,name=method_restriction,json=methodRestriction,proto3" json:"method_restriction,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *MethodRestrictions) Reset() {
@@ -291,6 +313,61 @@ func (x *MethodRestrictions) GetResponseFieldRestrictions() map[string]*Restrict
 	return nil
 }
 
+func (x *MethodRestrictions) GetMethodRestriction() *RestrictionConfig {
+	if x != nil {
+		return x.MethodRestriction
+	}
+	return nil
+}
+
+// Contains message-level restrictions.
+type MessageRestrictions struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The core restriction to apply to this message type.
+	// The 'matcher' within RestrictionConfig will determine if the message is
+	// scrubbed/denied/allowed.
+	Config        *RestrictionConfig `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MessageRestrictions) Reset() {
+	*x = MessageRestrictions{}
+	mi := &file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MessageRestrictions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MessageRestrictions) ProtoMessage() {}
+
+func (x *MessageRestrictions) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MessageRestrictions.ProtoReflect.Descriptor instead.
+func (*MessageRestrictions) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *MessageRestrictions) GetConfig() *RestrictionConfig {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
 // The restriction configuration.
 type RestrictionConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -304,7 +381,7 @@ type RestrictionConfig struct {
 
 func (x *RestrictionConfig) Reset() {
 	*x = RestrictionConfig{}
-	mi := &file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -316,7 +393,7 @@ func (x *RestrictionConfig) String() string {
 func (*RestrictionConfig) ProtoMessage() {}
 
 func (x *RestrictionConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -329,7 +406,7 @@ func (x *RestrictionConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestrictionConfig.ProtoReflect.Descriptor instead.
 func (*RestrictionConfig) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDescGZIP(), []int{4}
+	return file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RestrictionConfig) GetMatcher() *v31.Matcher {
@@ -352,21 +429,28 @@ const file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawD
 	"\bOVERRIDE\x10\x00\"R\n" +
 	"\rDescriptorSet\x12A\n" +
 	"\vdata_source\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceR\n" +
-	"dataSource\"\xac\x02\n" +
+	"dataSource\"\xcf\x04\n" +
 	"\fRestrictions\x12\x8a\x01\n" +
-	"\x13method_restrictions\x18\x01 \x03(\v2Y.envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntryR\x12methodRestrictions\x1a\x8e\x01\n" +
+	"\x13method_restrictions\x18\x01 \x03(\v2Y.envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntryR\x12methodRestrictions\x12\x8d\x01\n" +
+	"\x14message_restrictions\x18\x02 \x03(\v2Z.envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MessageRestrictionsEntryR\x13messageRestrictions\x1a\x8e\x01\n" +
 	"\x17MethodRestrictionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12]\n" +
-	"\x05value\x18\x02 \x01(\v2G.envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictionsR\x05value:\x028\x01\"\x90\x05\n" +
+	"\x05value\x18\x02 \x01(\v2G.envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictionsR\x05value:\x028\x01\x1a\x90\x01\n" +
+	"\x18MessageRestrictionsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12^\n" +
+	"\x05value\x18\x02 \x01(\v2H.envoy.extensions.filters.http.proto_api_scrubber.v3.MessageRestrictionsR\x05value:\x028\x01\"\x87\x06\n" +
 	"\x12MethodRestrictions\x12\xa3\x01\n" +
 	"\x1arequest_field_restrictions\x18\x01 \x03(\v2e.envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.RequestFieldRestrictionsEntryR\x18requestFieldRestrictions\x12\xa6\x01\n" +
-	"\x1bresponse_field_restrictions\x18\x02 \x03(\v2f.envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntryR\x19responseFieldRestrictions\x1a\x93\x01\n" +
+	"\x1bresponse_field_restrictions\x18\x02 \x03(\v2f.envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntryR\x19responseFieldRestrictions\x12u\n" +
+	"\x12method_restriction\x18\x03 \x01(\v2F.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfigR\x11methodRestriction\x1a\x93\x01\n" +
 	"\x1dRequestFieldRestrictionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\\\n" +
 	"\x05value\x18\x02 \x01(\v2F.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfigR\x05value:\x028\x01\x1a\x94\x01\n" +
 	"\x1eResponseFieldRestrictionsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\\\n" +
-	"\x05value\x18\x02 \x01(\v2F.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfigR\x05value:\x028\x01\"K\n" +
+	"\x05value\x18\x02 \x01(\v2F.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfigR\x05value:\x028\x01\"u\n" +
+	"\x13MessageRestrictions\x12^\n" +
+	"\x06config\x18\x01 \x01(\v2F.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfigR\x06config\"K\n" +
 	"\x11RestrictionConfig\x126\n" +
 	"\amatcher\x18\x01 \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\amatcherB\xd3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"Aio.envoyproxy.envoy.extensions.filters.http.proto_api_scrubber.v3B\vConfigProtoP\x01Zogithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/proto_api_scrubber/v3;proto_api_scrubberv3b\x06proto3"
@@ -384,37 +468,43 @@ func file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDe
 }
 
 var file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_goTypes = []any{
 	(ProtoApiScrubberConfig_FilteringMode)(0), // 0: envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig.FilteringMode
 	(*ProtoApiScrubberConfig)(nil),            // 1: envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig
 	(*DescriptorSet)(nil),                     // 2: envoy.extensions.filters.http.proto_api_scrubber.v3.DescriptorSet
 	(*Restrictions)(nil),                      // 3: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions
 	(*MethodRestrictions)(nil),                // 4: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions
-	(*RestrictionConfig)(nil),                 // 5: envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
-	nil,                                       // 6: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntry
-	nil,                                       // 7: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.RequestFieldRestrictionsEntry
-	nil,                                       // 8: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntry
-	(*v3.DataSource)(nil),                     // 9: envoy.config.core.v3.DataSource
-	(*v31.Matcher)(nil),                       // 10: xds.type.matcher.v3.Matcher
+	(*MessageRestrictions)(nil),               // 5: envoy.extensions.filters.http.proto_api_scrubber.v3.MessageRestrictions
+	(*RestrictionConfig)(nil),                 // 6: envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
+	nil,                                       // 7: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntry
+	nil,                                       // 8: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MessageRestrictionsEntry
+	nil,                                       // 9: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.RequestFieldRestrictionsEntry
+	nil,                                       // 10: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntry
+	(*v3.DataSource)(nil),                     // 11: envoy.config.core.v3.DataSource
+	(*v31.Matcher)(nil),                       // 12: xds.type.matcher.v3.Matcher
 }
 var file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_depIdxs = []int32{
 	2,  // 0: envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig.descriptor_set:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.DescriptorSet
 	3,  // 1: envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig.restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions
 	0,  // 2: envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig.filtering_mode:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig.FilteringMode
-	9,  // 3: envoy.extensions.filters.http.proto_api_scrubber.v3.DescriptorSet.data_source:type_name -> envoy.config.core.v3.DataSource
-	6,  // 4: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.method_restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntry
-	7,  // 5: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.request_field_restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.RequestFieldRestrictionsEntry
-	8,  // 6: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.response_field_restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntry
-	10, // 7: envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig.matcher:type_name -> xds.type.matcher.v3.Matcher
-	4,  // 8: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntry.value:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions
-	5,  // 9: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.RequestFieldRestrictionsEntry.value:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
-	5,  // 10: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntry.value:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 3: envoy.extensions.filters.http.proto_api_scrubber.v3.DescriptorSet.data_source:type_name -> envoy.config.core.v3.DataSource
+	7,  // 4: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.method_restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntry
+	8,  // 5: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.message_restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MessageRestrictionsEntry
+	9,  // 6: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.request_field_restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.RequestFieldRestrictionsEntry
+	10, // 7: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.response_field_restrictions:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntry
+	6,  // 8: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.method_restriction:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
+	6,  // 9: envoy.extensions.filters.http.proto_api_scrubber.v3.MessageRestrictions.config:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
+	12, // 10: envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig.matcher:type_name -> xds.type.matcher.v3.Matcher
+	4,  // 11: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MethodRestrictionsEntry.value:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions
+	5,  // 12: envoy.extensions.filters.http.proto_api_scrubber.v3.Restrictions.MessageRestrictionsEntry.value:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.MessageRestrictions
+	6,  // 13: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.RequestFieldRestrictionsEntry.value:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
+	6,  // 14: envoy.extensions.filters.http.proto_api_scrubber.v3.MethodRestrictions.ResponseFieldRestrictionsEntry.value:type_name -> envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfig
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_init() }
@@ -428,7 +518,7 @@ func file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_init(
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDesc), len(file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

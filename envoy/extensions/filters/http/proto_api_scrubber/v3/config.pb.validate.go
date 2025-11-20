@@ -395,6 +395,52 @@ func (m *Restrictions) validate(all bool) error {
 		}
 	}
 
+	{
+		sorted_keys := make([]string, len(m.GetMessageRestrictions()))
+		i := 0
+		for key := range m.GetMessageRestrictions() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetMessageRestrictions()[key]
+			_ = val
+
+			// no validation rules for MessageRestrictions[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, RestrictionsValidationError{
+							field:  fmt.Sprintf("MessageRestrictions[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, RestrictionsValidationError{
+							field:  fmt.Sprintf("MessageRestrictions[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return RestrictionsValidationError{
+						field:  fmt.Sprintf("MessageRestrictions[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return RestrictionsMultiError(errors)
 	}
@@ -586,6 +632,35 @@ func (m *MethodRestrictions) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetMethodRestriction()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, MethodRestrictionsValidationError{
+					field:  "MethodRestriction",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, MethodRestrictionsValidationError{
+					field:  "MethodRestriction",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMethodRestriction()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MethodRestrictionsValidationError{
+				field:  "MethodRestriction",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return MethodRestrictionsMultiError(errors)
 	}
@@ -665,6 +740,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MethodRestrictionsValidationError{}
+
+// Validate checks the field values on MessageRestrictions with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MessageRestrictions) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MessageRestrictions with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MessageRestrictionsMultiError, or nil if none found.
+func (m *MessageRestrictions) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MessageRestrictions) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, MessageRestrictionsValidationError{
+					field:  "Config",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, MessageRestrictionsValidationError{
+					field:  "Config",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return MessageRestrictionsValidationError{
+				field:  "Config",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return MessageRestrictionsMultiError(errors)
+	}
+
+	return nil
+}
+
+// MessageRestrictionsMultiError is an error wrapping multiple validation
+// errors returned by MessageRestrictions.ValidateAll() if the designated
+// constraints aren't met.
+type MessageRestrictionsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MessageRestrictionsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MessageRestrictionsMultiError) AllErrors() []error { return m }
+
+// MessageRestrictionsValidationError is the validation error returned by
+// MessageRestrictions.Validate if the designated constraints aren't met.
+type MessageRestrictionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MessageRestrictionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MessageRestrictionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MessageRestrictionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MessageRestrictionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MessageRestrictionsValidationError) ErrorName() string {
+	return "MessageRestrictionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MessageRestrictionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMessageRestrictions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MessageRestrictionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MessageRestrictionsValidationError{}
 
 // Validate checks the field values on RestrictionConfig with the rules defined
 // in the proto definition for this message. If any rules are violated, the
