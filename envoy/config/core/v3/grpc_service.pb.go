@@ -47,8 +47,18 @@ type GrpcService struct {
 	// documentation on :ref:`custom request headers
 	// <config_http_conn_man_headers_custom_request_headers>`.
 	InitialMetadata []*HeaderValue `protobuf:"bytes,5,rep,name=initial_metadata,json=initialMetadata,proto3" json:"initial_metadata,omitempty"`
-	// Optional default retry policy for streams toward the service.
-	// If an async stream doesn't have retry policy configured in its stream options, this retry policy is used.
+	// Optional default retry policy for RPCs or streams initiated toward this gRPC service.
+	//
+	// If an async stream does not have a retry policy configured in its per‑stream options, this
+	// policy is used as the default.
+	//
+	// .. note::
+	//
+	//	This field is only applied by Envoy gRPC (``envoy_grpc``) clients. Google gRPC
+	//	(``google_grpc``) clients currently ignore this field.
+	//
+	// If not specified, no default retry policy is applied at the client level and retries only occur
+	// when explicitly configured in per‑stream options.
 	RetryPolicy   *RetryPolicy `protobuf:"bytes,6,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -162,10 +172,20 @@ type GrpcService_EnvoyGrpc struct {
 	// The “:authority“ header in the grpc request. If this field is not set, the authority header value will be “cluster_name“.
 	// Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster.
 	Authority string `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
-	// Indicates the retry policy for re-establishing the gRPC stream
-	// This field is optional. If max interval is not provided, it will be set to ten times the provided base interval.
-	// Currently only supported for xDS gRPC streams.
-	// If not set, xDS gRPC streams default base interval:500ms, maximum interval:30s will be applied.
+	// Specifies the retry backoff policy for re-establishing long‑lived xDS gRPC streams.
+	//
+	// This field is optional. If “retry_back_off.max_interval“ is not provided, it will be set to
+	// ten times the configured “retry_back_off.base_interval“.
+	//
+	// .. note::
+	//
+	//	This field is only honored for management‑plane xDS gRPC streams created from
+	//	:ref:`ApiConfigSource <envoy_v3_api_msg_config.core.v3.ApiConfigSource>` that use
+	//	``envoy_grpc``. Data‑plane gRPC clients (for example external authorization or external
+	//	processing filters) must use :ref:`GrpcService.retry_policy
+	//	<envoy_v3_api_field_config.core.v3.GrpcService.retry_policy>` instead.
+	//
+	// If not set, xDS gRPC streams default to a base interval of 500ms and a maximum interval of 30s.
 	RetryPolicy *RetryPolicy `protobuf:"bytes,3,opt,name=retry_policy,json=retryPolicy,proto3" json:"retry_policy,omitempty"`
 	// Maximum gRPC message size that is allowed to be received.
 	// If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.
