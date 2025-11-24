@@ -520,6 +520,32 @@ func (m *TcpProxy) validate(all bool) error {
 
 	}
 
+	if _, ok := UpstreamConnectMode_name[int32(m.GetUpstreamConnectMode())]; !ok {
+		err := TcpProxyValidationError{
+			field:  "UpstreamConnectMode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if wrapper := m.GetMaxEarlyDataBytes(); wrapper != nil {
+
+		if wrapper.GetValue() > 1048576 {
+			err := TcpProxyValidationError{
+				field:  "MaxEarlyDataBytes",
+				reason: "value must be less than or equal to 1048576",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	oneofClusterSpecifierPresent := false
 	switch v := m.ClusterSpecifier.(type) {
 	case *TcpProxy_Cluster:
