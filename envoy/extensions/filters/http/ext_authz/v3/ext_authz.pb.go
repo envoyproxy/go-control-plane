@@ -183,7 +183,7 @@ type ExtAuthz struct {
 	// The labels will be read from :ref:`metadata<envoy_v3_api_msg_config.core.v3.Node>` with the specified key.
 	BootstrapMetadataLabelsKey string `protobuf:"bytes,15,opt,name=bootstrap_metadata_labels_key,json=bootstrapMetadataLabelsKey,proto3" json:"bootstrap_metadata_labels_key,omitempty"`
 	// Check request to authorization server will include the client request headers that have a correspondent match
-	// in the :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`. If this option isn't specified, then
+	// in the list. If this option isn't specified, then
 	// all client request headers are included in the check request to a gRPC authorization server, whereas no client request headers
 	// (besides the ones allowed by default - see note below) are included in the check request to an HTTP authorization server.
 	// This inconsistency between gRPC and HTTP servers is to maintain backwards compatibility with legacy behavior.
@@ -785,7 +785,7 @@ func (x *HttpService) GetRetryPolicy() *v3.RetryPolicy {
 type AuthorizationRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Authorization request includes the client request headers that have a corresponding match
-	// in the :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>`.
+	// in the list.
 	// This field has been deprecated in favor of :ref:`allowed_headers
 	// <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.ExtAuthz.allowed_headers>`.
 	//
@@ -862,21 +862,21 @@ func (x *AuthorizationRequest) GetHeadersToAdd() []*v3.HeaderValue {
 // [#next-free-field: 6]
 type AuthorizationResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
+	// When this list is set, authorization
 	// response headers that have a correspondent match will be added to the original client request.
 	//
 	// .. note::
 	//
 	//	Existing headers will be overridden.
 	AllowedUpstreamHeaders *v32.ListStringMatcher `protobuf:"bytes,1,opt,name=allowed_upstream_headers,json=allowedUpstreamHeaders,proto3" json:"allowed_upstream_headers,omitempty"`
-	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
+	// When this list is set, authorization
 	// response headers that have a correspondent match will be added to the original client request.
 	//
 	// .. note::
 	//
 	//	Existing headers will be appended.
 	AllowedUpstreamHeadersToAppend *v32.ListStringMatcher `protobuf:"bytes,3,opt,name=allowed_upstream_headers_to_append,json=allowedUpstreamHeadersToAppend,proto3" json:"allowed_upstream_headers_to_append,omitempty"`
-	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
+	// When this list is set, authorization
 	// response headers that have a correspondent match will be added to the client's response.
 	// When a header is included in this list, “Path“, “Status“, “Content-Length“, “WWW-Authenticate“ and
 	// “Location“ are automatically added.
@@ -886,12 +886,12 @@ type AuthorizationResponse struct {
 	//	When this list is *not* set, all the authorization response headers, except
 	//	``Authority (Host)``, will be in the response to the client.
 	AllowedClientHeaders *v32.ListStringMatcher `protobuf:"bytes,2,opt,name=allowed_client_headers,json=allowedClientHeaders,proto3" json:"allowed_client_headers,omitempty"`
-	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
+	// When this list is set, authorization
 	// response headers that have a correspondent match will be added to the client's response when
 	// the authorization response itself is successful, i.e. not failed or denied. When this list is
 	// *not* set, no additional headers will be added to the client's response on success.
 	AllowedClientHeadersOnSuccess *v32.ListStringMatcher `protobuf:"bytes,4,opt,name=allowed_client_headers_on_success,json=allowedClientHeadersOnSuccess,proto3" json:"allowed_client_headers_on_success,omitempty"`
-	// When this :ref:`list <envoy_v3_api_msg_type.matcher.v3.ListStringMatcher>` is set, authorization
+	// When this list is set, authorization
 	// response headers that have a correspondent match will be emitted as dynamic metadata to be consumed
 	// by the next filter. This metadata lives in a namespace specified by the canonical name of extension filter
 	// that requires it:
