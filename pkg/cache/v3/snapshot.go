@@ -110,9 +110,9 @@ func (s *Snapshot) Consistent() error {
 					typeURL, referenceSet, len(items.Items))
 			}
 
-			// Check superset.
-			if err := superset(referenceSet, items.Items); err != nil {
-				return fmt.Errorf("inconsistent %q reference: %w", typeURL, err)
+			// Check difference.
+			if missing := difference(items.Items, referenceSet); len(missing) > 0 {
+				return fmt.Errorf("inconsistent %q reference: missing resources %v", typeURL, missing)
 			}
 		}
 	}
