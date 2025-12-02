@@ -21,6 +21,7 @@ import (
 	"time"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
 )
 
 // NodeHash computes string identifiers for Envoy nodes.
@@ -112,7 +113,7 @@ func (w ResponseWatch) useResourceVersion() bool {
 	return false
 }
 
-func (w ResponseWatch) buildResponse(updatedResources []*cachedResource, _ []string, returnedVersions map[string]string, version string) WatchResponse {
+func (w ResponseWatch) buildResponse(updatedResources []*internal.CachedResource, _ []string, returnedVersions map[string]string, version string) WatchResponse {
 	return &RawResponse{
 		Request:           w.Request,
 		resources:         updatedResources,
@@ -162,7 +163,7 @@ func (w DeltaResponseWatch) getSubscription() Subscription {
 	return w.subscription
 }
 
-func (w DeltaResponseWatch) buildResponse(updatedResources []*cachedResource, removedResources []string, returnedVersions map[string]string, version string) WatchResponse {
+func (w DeltaResponseWatch) buildResponse(updatedResources []*internal.CachedResource, removedResources []string, returnedVersions map[string]string, version string) WatchResponse {
 	return &RawDeltaResponse{
 		DeltaRequest:      w.Request,
 		resources:         updatedResources,

@@ -2,13 +2,17 @@ package server_test
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"maps"
 	"strconv"
 	"testing"
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,77 +27,63 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/test/resource/v3"
 )
 
+// Does not need to match actual cache implementation.
+func getVersion(res types.Resource) string {
+	s, _ := proto.MarshalOptions{Deterministic: true}.Marshal(res)
+	hasher := sha256.New()
+	hasher.Write(s)
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+// This function replicates far too much logic from the cache.
+// TODO: rework the associated tests to test actual behavior of server and not of the cache.
 func (config *mockConfigWatcher) CreateDeltaWatch(req *discovery.DeltaDiscoveryRequest, sub cache.Subscription, out chan cache.DeltaResponse) (func(), error) {
 	config.deltaCounts[req.GetTypeUrl()] = config.deltaCounts[req.GetTypeUrl()] + 1
 
-	// This is duplicated from pkg/cache/v3/delta.go as private there
-	resourceMap := config.deltaResources[req.GetTypeUrl()]
-	versionMap := map[string]string{}
-	for name, resource := range resourceMap {
-		marshaledResource, _ := cache.MarshalResource(resource)
-		versionMap[name] = cache.HashResource(marshaledResource)
-	}
-	var nextVersionMap map[string]string
-	var filtered []types.ResourceWithTTL
-	var toRemove []string
-
-	// If we are handling a wildcard request, we want to respond with all resources
-	switch {
-	case sub.IsWildcard():
-		if len(sub.ReturnedResources()) == 0 {
-			filtered = make([]types.ResourceWithTTL, 0, len(resourceMap))
-		}
-		nextVersionMap = make(map[string]string, len(resourceMap))
-		for name, r := range resourceMap {
-			// Since we've already precomputed the version hashes of the new snapshot,
-			// we can just set it here to be used for comparison later
-			version := versionMap[name]
-			nextVersionMap[name] = version
-			prevVersion, found := sub.ReturnedResources()[name]
-			if !found || (prevVersion != version) {
-				filtered = append(filtered, types.ResourceWithTTL{Resource: r})
-			}
-		}
-
-		// Compute resources for removal
-		for name := range sub.ReturnedResources() {
-			if _, ok := resourceMap[name]; !ok {
-				toRemove = append(toRemove, name)
-			}
-		}
-	default:
-		nextVersionMap = make(map[string]string, len(sub.SubscribedResources()))
-		// state.GetResourceVersions() may include resources no longer subscribed
-		// In the current code this gets silently cleaned when updating the version map
-		for name := range sub.SubscribedResources() {
-			prevVersion, found := sub.ReturnedResources()[name]
-			if r, ok := resourceMap[name]; ok {
-				nextVersion := versionMap[name]
-				if prevVersion != nextVersion {
-					filtered = append(filtered, types.ResourceWithTTL{Resource: r})
-				}
-				nextVersionMap[name] = nextVersion
-			} else if found {
-				toRemove = append(toRemove, name)
-			}
-		}
-	}
-
-	if len(filtered)+len(toRemove) > 0 {
-		out <- cache.NewTestRawDeltaResponse(
-			req,
-			"",
-			filtered,
-			toRemove,
-			nextVersionMap,
-		)
-	} else {
-		config.deltaWatches++
+	resourceMap, ok := config.deltaResources[req.GetTypeUrl()]
+	if !ok {
+		config.watches++
 		return func() {
-			config.deltaWatches--
+			config.watches--
 		}, nil
 	}
 
+	resources := []types.ResourceWithTTL{}
+	versionMap := maps.Clone(sub.ReturnedResources())
+	for name, res := range resourceMap {
+		knownVersion := sub.ReturnedResources()[name]
+		resVersion := getVersion(res)
+		if knownVersion == resVersion {
+			continue
+		}
+
+		if sub.IsWildcard() {
+			resources = append(resources, types.ResourceWithTTL{Resource: res})
+			versionMap[name] = resVersion
+			continue
+		}
+		if _, ok := sub.SubscribedResources()[name]; ok {
+			resources = append(resources, types.ResourceWithTTL{Resource: res})
+			versionMap[name] = resVersion
+			continue
+		}
+	}
+
+	var removedResources []string
+	for name := range sub.ReturnedResources() {
+		if _, ok := resourceMap[name]; !ok {
+			removedResources = append(removedResources, name)
+			delete(versionMap, name)
+		}
+	}
+
+	out <- cache.NewTestRawDeltaResponse(
+		req,
+		"",
+		resources,
+		removedResources,
+		versionMap,
+	)
 	return nil, nil
 }
 

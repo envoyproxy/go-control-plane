@@ -36,12 +36,8 @@ func newSubscription(emptyRequest, allowLegacyWildcard bool, initialResourceVers
 		wildcard:                wildcard,
 		allowLegacyWildcard:     allowLegacyWildcard,
 		subscribedResourceNames: map[string]struct{}{},
-		returnedResources:       initialResourceVersions,
 	}
-
-	if initialResourceVersions == nil {
-		state.returnedResources = make(map[string]string)
-	}
+	state.SetReturnedResources(initialResourceVersions)
 
 	return state
 }
@@ -179,5 +175,8 @@ func (s Subscription) ReturnedResources() map[string]string {
 // SetReturnedResources sets a list of resource versions currently known by the client
 // The cache can use this state to compute resources added/updated/deleted.
 func (s *Subscription) SetReturnedResources(resourceVersions map[string]string) {
+	if resourceVersions == nil {
+		resourceVersions = make(map[string]string)
+	}
 	s.returnedResources = resourceVersions
 }
