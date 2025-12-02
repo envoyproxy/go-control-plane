@@ -1,30 +1,22 @@
 package types //nolint:revive // var-naming: avoid meaningless package names
 
 import (
-	"time"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
 
 	"google.golang.org/protobuf/proto"
 )
 
 // Resource is the base interface for the xDS payload.
-type Resource interface {
-	proto.Message
-}
+type Resource = internal.Resource
 
 // ResourceWithTTL is a Resource with an optional TTL.
-type ResourceWithTTL struct {
-	Resource Resource
-	TTL      *time.Duration
-}
+type ResourceWithTTL = internal.ResourceWithTTL
 
 // ResourceWithName provides a name for out-of-tree resources.
 type ResourceWithName interface {
 	proto.Message
 	GetName() string
 }
-
-// MarshaledResource is an alias for the serialized binary array.
-type MarshaledResource = []byte
 
 // SkipFetchError is the error returned when the cache fetch is short
 // circuited due to the client's version already being up-to-date.
