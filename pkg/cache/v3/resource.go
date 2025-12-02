@@ -15,17 +15,14 @@
 package cache
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-
-	"google.golang.org/protobuf/proto"
 
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
@@ -125,17 +122,12 @@ func GetResourceNames(resources []types.ResourceWithTTL) []string {
 }
 
 // getCachedResourceNames returns the resource names for a list of valid xDS response types.
-func getCachedResourceNames(resources []*cachedResource) []string {
+func getCachedResourceNames(resources []*internal.CachedResource) []string {
 	out := make([]string, len(resources))
 	for i, r := range resources {
-		out[i] = GetResourceName(r.resource)
+		out[i] = r.Name
 	}
 	return out
-}
-
-// MarshalResource converts the Resource to MarshaledResource.
-func MarshalResource(resource types.Resource) (types.MarshaledResource, error) {
-	return proto.MarshalOptions{Deterministic: true}.Marshal(resource)
 }
 
 // GetResourceReferences returns a map of dependent resources keyed by resource type, given a map of resources.
@@ -277,12 +269,4 @@ func getScopedRouteReferences(src *route.ScopedRouteConfiguration, out map[resou
 
 		mapMerge(out[resource.RouteType], routes)
 	}
-}
-
-// HashResource will take a resource and create a SHA256 hash sum out of the marshaled bytes
-func HashResource(resource []byte) string {
-	hasher := sha256.New()
-	hasher.Write(resource)
-
-	return hex.EncodeToString(hasher.Sum(nil))
 }

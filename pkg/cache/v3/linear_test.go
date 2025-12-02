@@ -28,6 +28,7 @@ import (
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
@@ -105,7 +106,7 @@ func verifyResponseResources(t *testing.T, ch <-chan Response, expectedType, exp
 	out := r.(*RawResponse)
 	resourceNames := []string{}
 	for _, res := range out.resources {
-		resourceNames = append(resourceNames, GetResourceName(res.resource))
+		resourceNames = append(resourceNames, res.Name)
 	}
 	assert.ElementsMatch(t, resourceNames, expectedResources)
 	return r
@@ -200,9 +201,10 @@ func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
 
 func hashResource(t *testing.T, resource types.Resource) string {
 	t.Helper()
-	marshaledResource, err := MarshalResource(resource)
+	cachedResource := internal.NewCachedResource("", "", resource)
+	marshaledResource, err := cachedResource.GetDeltaResource()
 	require.NoError(t, err)
-	return HashResource(marshaledResource)
+	return marshaledResource.Version
 }
 
 func createWildcardDeltaWatch(t *testing.T, initialReq bool, c *LinearCache, w chan DeltaResponse) {
