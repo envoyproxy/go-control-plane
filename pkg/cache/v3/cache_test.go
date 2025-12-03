@@ -2,6 +2,7 @@ package cache
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -21,7 +22,7 @@ const (
 )
 
 func TestResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []*internal.CachedResource{internal.NewCachedResource(resourceName, resource.RouteType, &route.RouteConfiguration{Name: resourceName}, internal.WithCacheVersion("v"))}
+	routes := []*internal.CachedResource{internal.NewCachedResource(resourceName, &route.RouteConfiguration{Name: resourceName}, internal.WithCacheVersion("v"))}
 	resp := RawResponse{
 		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",
@@ -70,7 +71,8 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 }
 
 func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []*internal.CachedResource{internal.NewCachedResource(resourceName, resource.RouteType, &route.RouteConfiguration{Name: resourceName}, internal.WithCacheVersion("v"))}
+	ttl := 1 * time.Second
+	routes := []*internal.CachedResource{internal.NewCachedResource(resourceName, &route.RouteConfiguration{Name: resourceName}, internal.WithCacheVersion("v"), internal.WithResourceTTL(&ttl))}
 	resp := RawResponse{
 		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",
@@ -88,10 +90,12 @@ func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
 	require.NoError(t, err)
 	assert.Same(t, discoveryResponse, cachedResponse)
 
-	r := &route.RouteConfiguration{}
-	err = anypb.UnmarshalTo(discoveryResponse.GetResources()[0], r, proto.UnmarshalOptions{})
+	wrapped := &discovery.Resource{}
+	err = discoveryResponse.GetResources()[0].UnmarshalTo(wrapped)
 	require.NoError(t, err)
-	assert.Equal(t, resourceName, r.GetName())
+	assert.Equal(t, resourceName, wrapped.GetName())
+	assert.Equal(t, ttl, wrapped.GetTtl().AsDuration())
+	assert.Nil(t, wrapped.GetResource())
 }
 
 func isTTLResource(resource *anypb.Any) bool {

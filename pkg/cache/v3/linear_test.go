@@ -201,7 +201,7 @@ func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
 
 func hashResource(t *testing.T, resource types.Resource) string {
 	t.Helper()
-	cachedResource := internal.NewCachedResource("", "", resource)
+	cachedResource := internal.NewCachedResource("", resource)
 	marshaledResource, err := cachedResource.GetDeltaResource()
 	require.NoError(t, err)
 	return marshaledResource.Version

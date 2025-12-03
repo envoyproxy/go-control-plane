@@ -273,7 +273,7 @@ var (
 func NewTestRawResponse(req *discovery.DiscoveryRequest, version string, resources []types.ResourceWithTTL) *RawResponse {
 	cachedRes := []*internal.CachedResource{}
 	for _, res := range resources {
-		newRes := internal.NewCachedResource(GetResourceName(res.Resource), req.GetTypeUrl(), res.Resource, internal.WithCacheVersion(version), internal.WithResourceTTL(res.TTL))
+		newRes := internal.NewCachedResource(GetResourceName(res.Resource), res.Resource, internal.WithCacheVersion(version), internal.WithResourceTTL(res.TTL))
 		cachedRes = append(cachedRes, newRes)
 	}
 	return &RawResponse{
@@ -287,7 +287,7 @@ func NewTestRawDeltaResponse(req *discovery.DeltaDiscoveryRequest, version strin
 	cachedRes := []*internal.CachedResource{}
 	for _, res := range resources {
 		name := GetResourceName(res.Resource)
-		newRes := internal.NewCachedResource(name, req.GetTypeUrl(), res.Resource, internal.WithCacheVersion(version), internal.WithResourceTTL(res.TTL))
+		newRes := internal.NewCachedResource(name, res.Resource, internal.WithCacheVersion(version), internal.WithResourceTTL(res.TTL))
 		cachedRes = append(cachedRes, newRes)
 	}
 	return &RawDeltaResponse{
