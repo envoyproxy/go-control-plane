@@ -192,15 +192,14 @@ func TestNewSnapshotBadType(t *testing.T) {
 	assert.Nil(t, snap)
 }
 
-func TestDeprecatedSnapshotDefaultWildcard(t *testing.T) {
-	// Test that deprecated Snapshot type defaults all resources to wildcard=true for backward compatibility
+func TestDeprecatedSnapshotDefaultOnDemandOnly(t *testing.T) {
+	// Test that deprecated Snapshot type defaults all resources to on-demand only=false for backward compatibility
 	snapshot := &cache.Snapshot{}
 	snapshot.Resources[types.Cluster] = cache.NewResources("v1", []types.Resource{testCluster})
 
 	typeSnapshot := snapshot.GetTypeSnapshot(rsrc.ClusterType)
 	resources := typeSnapshot.GetResources()
 
-	// Deprecated Snapshot should default all resources to wildcard-eligible for backward compatibility
 	require.Len(t, resources, 1)
 	assert.False(t, resources[clusterName].IsOnDemandOnly()) // false = wildcard-eligible
 }

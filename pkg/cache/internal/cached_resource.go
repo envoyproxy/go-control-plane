@@ -88,8 +88,6 @@ func WithResourceTTL(ttl *time.Duration) CachedResourceOption {
 }
 
 // WithOnDemandOnly marks the resource as on-demand only (for ODCDS support).
-// When false (default), resource is sent to wildcard subscriptions.
-// When true, resource is only sent when explicitly requested by name.
 func WithOnDemandOnly(onDemandOnly bool) CachedResourceOption {
 	return func(r *CachedResource) { r.onDemandOnly = onDemandOnly }
 }
