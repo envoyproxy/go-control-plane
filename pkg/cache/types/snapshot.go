@@ -1,6 +1,7 @@
 package types //nolint:revive // var-naming: avoid meaningless package names
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
@@ -12,27 +13,43 @@ import (
 type SnapshotResource struct {
 	// Mandatory
 	Name string
-	// Mandatory
-	Resource Resource
 	// Optional
 	TTL *time.Duration
 
-	// Optional
+	// Raw protobuf message. If unset, calls to `GetRawResource` methods on snapshot are undefined behavior.
+	// One of Resource or Serialized must be set.
+	Resource Resource
+	// Serialized protobuf message. Allows the user to provide a totally opaque content.
+	// For control-plane and data-plane efficiency, it is critical for the serialization to be consisten
+	// (e.g. beware the anypb default marshaling), or the version below should be provided.
+	// One of Resource or Serialized must be set. If both are set only Serialized will be sent to the data-plane.
 	Serialized *anypb.Any
-	// Optional
+
+	// Resource-intrisic version. This version MUST change if the underlying resource changes to be sent to the data-plane.
+	// Optional, if not set a version will be computed from the marshaled representation of the resource.
 	Version string
 }
 
-func (r *SnapshotResource) asCachedResource(typeURL, cacheVersion string) *internal.CachedResource {
-	var serialized []byte
-	if r.Serialized != nil {
-		serialized = r.Serialized.Value
-	}
-	return internal.NewCachedResource(r.Name, typeURL, r.Resource,
+func (r *SnapshotResource) AsCachedResource(cacheVersion string) *internal.CachedResource {
+	return internal.NewCachedResource(r.Name, r.Resource,
 		internal.WithCacheVersion(cacheVersion),
 		internal.WithResourceTTL(r.TTL),
 		internal.WithResourceVersion(r.Version),
-		internal.WithMarshaledResource(serialized))
+		internal.WithMarshaledResource(r.Serialized))
+}
+
+// From anypb code.
+const urlPrefix = "type.googleapis.com/"
+
+// TypeURL returns the type of the included resources
+func (r *SnapshotResource) TypeURL() string {
+	if r.Serialized != nil {
+		return r.Serialized.GetTypeUrl()
+	}
+	if r.Resource == nil {
+		return ""
+	}
+	return urlPrefix + string(r.Resource.ProtoReflect().Descriptor().FullName())
 }
 
 // TypeSnapshot represents the resources for a given type, associated with an opaque version.
@@ -44,16 +61,19 @@ type TypeSnapshot struct {
 	resources map[string]*internal.CachedResource
 }
 
-func NewTypeSnapshot(typeURL, version string, resources []SnapshotResource) TypeSnapshot {
+func NewTypeSnapshot(typeURL, version string, resources []SnapshotResource) (TypeSnapshot, error) {
 	s := TypeSnapshot{
 		typeURL:   typeURL,
 		version:   version,
 		resources: make(map[string]*internal.CachedResource, len(resources)),
 	}
 	for _, res := range resources {
-		s.resources[res.Name] = res.asCachedResource(typeURL, version)
+		if res.TypeURL() != typeURL {
+			return TypeSnapshot{}, fmt.Errorf("resource %s has wrong type: expected %s and received %s", res.Name, typeURL, res.Serialized.GetTypeUrl())
+		}
+		s.resources[res.Name] = res.AsCachedResource(version)
 	}
-	return s
+	return s, nil
 }
 
 // GetVersion returns the version of the snapshot.
@@ -83,7 +103,11 @@ func NewSnapshot(version string, resources map[string][]SnapshotResource) (*Snap
 		resources:      make(map[string]TypeSnapshot, len(resources)),
 	}
 	for typeURL, res := range resources {
-		s.resources[typeURL] = NewTypeSnapshot(typeURL, version, res)
+		snap, err := NewTypeSnapshot(typeURL, version, res)
+		if err != nil {
+			return nil, fmt.Errorf("building snapshot for type %s: %w", typeURL, err)
+		}
+		s.resources[typeURL] = snap
 	}
 	return s, nil
 }

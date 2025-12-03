@@ -123,7 +123,9 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 		for _, res := range resources {
 			snapRes = append(snapRes, srfrt(res))
 		}
-		snapshots = append(snapshots, types.NewTypeSnapshot(typeURL, fixture.version, snapRes))
+		snap, err := types.NewTypeSnapshot(typeURL, fixture.version, snapRes)
+		require.NoError(t, err)
+		snapshots = append(snapshots, snap)
 	}
 	snapshotWithTTL, err := types.NewSnapshotFromTypeSnapshots(fixture.version, snapshots)
 	require.NoError(t, err)
@@ -461,7 +463,9 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 		for _, res := range resources {
 			snapRes = append(snapRes, srfrt(res))
 		}
-		snapshots = append(snapshots, types.NewTypeSnapshot(typeURL, fixture.version, snapRes))
+		snap, err := types.NewTypeSnapshot(typeURL, fixture.version, snapRes)
+		require.NoError(t, err)
+		snapshots = append(snapshots, snap)
 	}
 	snapshot2, err := types.NewSnapshotFromTypeSnapshots(fixture.version, snapshots)
 	require.NoError(t, err)
@@ -579,7 +583,8 @@ func (s *singleResourceSnapshot) GetTypeSnapshot(typeURL string) types.TypeSnaps
 		Resource: s.resource,
 		TTL:      &ttl,
 	}
-	return types.NewTypeSnapshot(typeURL, s.version, []types.SnapshotResource{res})
+	snapshot, _ := types.NewTypeSnapshot(typeURL, s.version, []types.SnapshotResource{res})
+	return snapshot
 }
 
 // TestSnapshotSingleResourceFetch is a basic test to verify that simple

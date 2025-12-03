@@ -3,6 +3,7 @@ package internal
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -29,8 +30,7 @@ type ResourceWithTTL struct {
 // It contains the resource itself and its associated version (currently in two different modes).
 // It should not be altered once created, to allow concurrent access.
 type CachedResource struct {
-	Name    string
-	typeURL string
+	Name string
 
 	resource Resource
 	ttl      *time.Duration
@@ -38,7 +38,7 @@ type CachedResource struct {
 	// cacheVersion is the version of the cache at the time of last update, used in sotw.
 	cacheVersion string
 
-	marshalFunc                func() ([]byte, error)
+	marshalFunc                func() (*anypb.Any, error)
 	computeResourceVersionFunc func() (string, error)
 }
 
@@ -49,15 +49,19 @@ func WithCacheVersion(version string) CachedResourceOption {
 	return func(r *CachedResource) { r.cacheVersion = version }
 }
 
-// WithMarshaledResource enables the user to provide the already marshaled bytes if they have them.
-// Those bytes should strive at being consistent if the object has not changed (beware protobuf non-deterministic marshaling)
+// WithMarshaledResource enables the user to provide the already marshaled resource if they have them.
+// This serialization should strive at being consistent if the object has not changed (beware protobuf non-deterministic marshaling through anypb.New)
 // or alternatively the resource version should also then be set.
 // By default it is computed by performing a deterministic protobuf marshaling.
-func WithMarshaledResource(bytes []byte) CachedResourceOption {
-	if len(bytes) == 0 {
-		return func(*CachedResource) {}
+func WithMarshaledResource(res *anypb.Any) CachedResourceOption {
+	if res == nil {
+		return func(r *CachedResource) {
+			r.marshalFunc = nil
+		}
 	}
-	return func(r *CachedResource) { r.marshalFunc = func() ([]byte, error) { return bytes, nil } }
+	return func(r *CachedResource) {
+		r.marshalFunc = func() (*anypb.Any, error) { return res, nil }
+	}
 }
 
 // WithResourceVersion enables the user to provide the resource version to be used.
@@ -65,7 +69,9 @@ func WithMarshaledResource(bytes []byte) CachedResourceOption {
 // By default it is computed by hashing the serialized version of the resource.
 func WithResourceVersion(version string) CachedResourceOption {
 	if version == "" {
-		return func(*CachedResource) {}
+		return func(r *CachedResource) {
+			r.computeResourceVersionFunc = nil
+		}
 	}
 	return func(r *CachedResource) { r.computeResourceVersionFunc = func() (string, error) { return version, nil } }
 }
@@ -75,17 +81,17 @@ func WithResourceTTL(ttl *time.Duration) CachedResourceOption {
 	return func(r *CachedResource) { r.ttl = ttl }
 }
 
-func NewCachedResource(name, typeURL string, res Resource, opts ...CachedResourceOption) *CachedResource {
+func NewCachedResource(name string, res Resource, opts ...CachedResourceOption) *CachedResource {
 	cachedRes := &CachedResource{
 		Name:     name,
-		typeURL:  typeURL,
 		resource: res,
 	}
 	for _, opt := range opts {
 		opt(cachedRes)
 	}
+
 	if cachedRes.marshalFunc == nil {
-		cachedRes.marshalFunc = sync.OnceValues(func() ([]byte, error) {
+		cachedRes.marshalFunc = sync.OnceValues(func() (*anypb.Any, error) {
 			return marshalResource(res)
 		})
 	}
@@ -95,7 +101,7 @@ func NewCachedResource(name, typeURL string, res Resource, opts ...CachedResourc
 			if err != nil {
 				return "", fmt.Errorf("marshaling resource: %w", err)
 			}
-			return hashResource(marshaled), nil
+			return hashResource(marshaled.Value), nil
 		})
 	}
 	return cachedRes
@@ -114,7 +120,7 @@ func (c *CachedResource) HasTTL() bool {
 }
 
 // getMarshaledResource lazily marshals the resource and returns the bytes.
-func (c *CachedResource) getMarshaledResource() ([]byte, error) {
+func (c *CachedResource) getMarshaledResource() (*anypb.Any, error) {
 	return c.marshalFunc()
 }
 
@@ -143,50 +149,36 @@ func (c *CachedResource) GetRawResource() ResourceWithTTL {
 	}
 }
 
-var deltaResourceTypeURL = "type.googleapis.com/" + string(proto.MessageName(&discovery.Resource{}))
-
-// getResourceVersion lazily hashes the resource and returns the stable hash used to track version changes.
+// GetSotwResource returns the resource as is to be wrapped in a sotw response (i.e. DiscoveryResponse).
+// If the response is a heartbeat the underlying resource is not included.
 func (c *CachedResource) GetSotwResource(isHeartbeat bool) (*anypb.Any, error) {
-	buildResource := func() (*anypb.Any, error) {
-		marshaled, err := c.getMarshaledResource()
-		if err != nil {
-			return nil, fmt.Errorf("marshaling: %w", err)
-		}
-		return &anypb.Any{
-			TypeUrl: c.typeURL,
-			Value:   marshaled,
-		}, nil
+	if isHeartbeat && c.ttl == nil {
+		return nil, errors.New("heartbeat requested without ttl set")
 	}
 
 	if c.ttl == nil {
-		return buildResource()
+		// No TTL set, directly return the anypb format of the resource.
+		return c.getMarshaledResource()
 	}
 
+	// A TTL is set, wrapped the resource into a discovery resource.
 	wrappedResource := &discovery.Resource{
 		Name: c.Name,
 		Ttl:  durationpb.New(*c.ttl),
 	}
 
 	if !isHeartbeat {
-		rsrc, err := buildResource()
+		rsrc, err := c.getMarshaledResource()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("marshaling resource: %w", err)
 		}
 		wrappedResource.Resource = rsrc
 	}
 
-	marshaled, err := marshalResource(wrappedResource)
-	if err != nil {
-		return nil, fmt.Errorf("marshaling discovery resource: %w", err)
-	}
-
-	return &anypb.Any{
-		TypeUrl: deltaResourceTypeURL,
-		Value:   marshaled,
-	}, nil
+	return marshalResource(wrappedResource)
 }
 
-// getResourceVersion lazily hashes the resource and returns the stable hash used to track version changes.
+// GetDeltaResource returns the resource as is to be wrapped in a delta response (i.e. DeltaDiscoveryResponse).
 func (c *CachedResource) GetDeltaResource() (*discovery.Resource, error) {
 	marshaled, err := c.getMarshaledResource()
 	if err != nil {
@@ -197,12 +189,9 @@ func (c *CachedResource) GetDeltaResource() (*discovery.Resource, error) {
 		return nil, fmt.Errorf("computing version: %w", err)
 	}
 	return &discovery.Resource{
-		Name: c.Name,
-		Resource: &anypb.Any{
-			TypeUrl: c.typeURL,
-			Value:   marshaled,
-		},
-		Version: version,
+		Name:     c.Name,
+		Resource: marshaled,
+		Version:  version,
 	}, nil
 }
 
@@ -213,7 +202,9 @@ func hashResource(resource []byte) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-// marshalResource converts the Resource to MarshaledResource.
-func marshalResource(resource Resource) ([]byte, error) {
-	return proto.MarshalOptions{Deterministic: true}.Marshal(resource)
+// marshalResource performs the same operation as anypb.New but using deterministic marshaling.
+func marshalResource(resource Resource) (*anypb.Any, error) {
+	ret := new(anypb.Any)
+	err := anypb.MarshalFrom(ret, resource, proto.MarshalOptions{Deterministic: true})
+	return ret, err
 }
