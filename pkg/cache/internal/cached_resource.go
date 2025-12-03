@@ -38,7 +38,13 @@ type CachedResource struct {
 	// cacheVersion is the version of the cache at the time of last update, used in sotw.
 	cacheVersion string
 
-	marshalFunc                func() (*anypb.Any, error)
+	marshalFunc func() (*anypb.Any, error)
+
+	// onDemandOnly indicates if this resource is only sent when explicitly requested (ODCDS support).
+	// When false (default), resource is sent to wildcard subscriptions.
+	// When true, resource is only sent when explicitly requested by name.
+	onDemandOnly bool
+
 	computeResourceVersionFunc func() (string, error)
 }
 
@@ -81,10 +87,18 @@ func WithResourceTTL(ttl *time.Duration) CachedResourceOption {
 	return func(r *CachedResource) { r.ttl = ttl }
 }
 
+// WithOnDemandOnly marks the resource as on-demand only (for ODCDS support).
+// When false (default), resource is sent to wildcard subscriptions.
+// When true, resource is only sent when explicitly requested by name.
+func WithOnDemandOnly(onDemandOnly bool) CachedResourceOption {
+	return func(r *CachedResource) { r.onDemandOnly = onDemandOnly }
+}
+
 func NewCachedResource(name string, res Resource, opts ...CachedResourceOption) *CachedResource {
 	cachedRes := &CachedResource{
-		Name:     name,
-		resource: res,
+		Name:         name,
+		resource:     res,
+		onDemandOnly: false, // Default to wildcard-eligible
 	}
 	for _, opt := range opts {
 		opt(cachedRes)
@@ -117,6 +131,11 @@ func (c *CachedResource) SetCacheVersion(version string) {
 // HasTTL returns whether the resource has a TTL set.
 func (c *CachedResource) HasTTL() bool {
 	return c.ttl != nil
+}
+
+// IsOnDemandOnly returns whether the resource is on-demand only.
+func (c *CachedResource) IsOnDemandOnly() bool {
+	return c.onDemandOnly
 }
 
 // getMarshaledResource lazily marshals the resource and returns the bytes.

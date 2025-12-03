@@ -667,3 +667,136 @@ func TestAvertPanicForWatchOnNonExistentSnapshot(t *testing.T) {
 
 	<-responder
 }
+
+func TestSotwSnapshotCacheWithODCDS(t *testing.T) {
+	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
+
+	// Create snapshot with mixed wildcard eligibility (ODCDS)
+	wildcardCluster := resource.MakeCluster(resource.Ads, "wildcard-cluster")
+	onDemandCluster := resource.MakeCluster(resource.Ads, "on-demand-cluster")
+	onDemandCluster2 := resource.MakeCluster(resource.Ads, "on-demand-cluster2")
+
+	snapshot, err := types.NewSnapshot("v1", map[string][]types.SnapshotResource{
+		rsrc.ClusterType: {
+			{Name: "wildcard-cluster", Resource: wildcardCluster, OnDemandOnly: false},
+			{Name: "on-demand-cluster", Resource: onDemandCluster, OnDemandOnly: true},
+			{Name: "on-demand-cluster2", Resource: onDemandCluster2, OnDemandOnly: true},
+		},
+	})
+	require.NoError(t, err)
+	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot))
+
+	t.Run("wildcard subscription only returns wildcard resources", func(t *testing.T) {
+		value := make(chan cache.Response, 1)
+		req := &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, ResourceNames: []string{"*"}}
+		sub := stream.NewSotwSubscription([]string{"*"}, false)
+		_, err := c.CreateWatch(req, sub, value)
+		require.NoError(t, err)
+
+		select {
+		case out := <-value:
+			resources := out.(*cache.RawResponse).GetRawResources()
+			require.Len(t, resources, 1)
+			assert.Equal(t, "wildcard-cluster", cache.GetResourceName(resources[0].Resource))
+		case <-time.After(time.Second):
+			t.Fatal("timeout waiting for response")
+		}
+	})
+
+	t.Run("ODCDS: wildcard + explicit returns union", func(t *testing.T) {
+		value := make(chan cache.Response, 1)
+		req := &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, ResourceNames: []string{"*", "on-demand-cluster"}}
+		sub := stream.NewSotwSubscription([]string{"*", "on-demand-cluster"}, false)
+		_, err := c.CreateWatch(req, sub, value)
+		require.NoError(t, err)
+
+		select {
+		case out := <-value:
+			resources := out.(*cache.RawResponse).GetRawResources()
+			require.Len(t, resources, 2)
+			names := []string{cache.GetResourceName(resources[0].Resource), cache.GetResourceName(resources[1].Resource)}
+			assert.ElementsMatch(t, []string{"wildcard-cluster", "on-demand-cluster"}, names)
+		case <-time.After(time.Second):
+			t.Fatal("timeout waiting for response")
+		}
+	})
+
+	t.Run("explicit only returns requested resource", func(t *testing.T) {
+		value := make(chan cache.Response, 1)
+		req := &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, ResourceNames: []string{"on-demand-cluster2"}}
+		sub := stream.NewSotwSubscription([]string{"on-demand-cluster2"}, false)
+		_, err := c.CreateWatch(req, sub, value)
+		require.NoError(t, err)
+
+		select {
+		case out := <-value:
+			resources := out.(*cache.RawResponse).GetRawResources()
+			require.Len(t, resources, 1)
+			assert.Equal(t, "on-demand-cluster2", cache.GetResourceName(resources[0].Resource))
+		case <-time.After(time.Second):
+			t.Fatal("timeout waiting for response")
+		}
+	})
+}
+
+func TestSnapshotCacheDeltaWithODCDS(t *testing.T) {
+	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
+
+	// Create snapshot with mixed wildcard eligibility (ODCDS)
+	wildcardCluster := resource.MakeCluster(resource.Ads, "wildcard-cluster")
+	onDemandCluster := resource.MakeCluster(resource.Ads, "on-demand-cluster")
+	onDemandCluster2 := resource.MakeCluster(resource.Ads, "on-demand-cluster2")
+
+	snapshot, err := types.NewSnapshot("v1", map[string][]types.SnapshotResource{
+		rsrc.ClusterType: {
+			{Name: "wildcard-cluster", Resource: wildcardCluster, OnDemandOnly: false},
+			{Name: "on-demand-cluster", Resource: onDemandCluster, OnDemandOnly: true},
+			{Name: "on-demand-cluster2", Resource: onDemandCluster2, OnDemandOnly: true},
+		},
+	})
+	require.NoError(t, err)
+	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot))
+
+	t.Run("delta wildcard subscription only returns wildcard resources", func(t *testing.T) {
+		value := make(chan cache.DeltaResponse, 1)
+		req := &discovery.DeltaDiscoveryRequest{
+			TypeUrl:                rsrc.ClusterType,
+			ResourceNamesSubscribe: []string{"*"},
+			Node:                   &core.Node{Id: key},
+		}
+		sub := stream.NewDeltaSubscription([]string{"*"}, nil, nil, false)
+		_, err := c.CreateDeltaWatch(req, sub, value)
+		require.NoError(t, err)
+
+		select {
+		case out := <-value:
+			resources := out.(*cache.RawDeltaResponse).GetRawResources()
+			require.Len(t, resources, 1)
+			assert.Equal(t, "wildcard-cluster", cache.GetResourceName(resources[0].Resource))
+		case <-time.After(time.Second):
+			t.Fatal("timeout waiting for response")
+		}
+	})
+
+	t.Run("delta ODCDS: wildcard + explicit returns union", func(t *testing.T) {
+		value := make(chan cache.DeltaResponse, 1)
+		req := &discovery.DeltaDiscoveryRequest{
+			TypeUrl:                rsrc.ClusterType,
+			ResourceNamesSubscribe: []string{"*", "on-demand-cluster"},
+			Node:                   &core.Node{Id: key},
+		}
+		sub := stream.NewDeltaSubscription([]string{"*", "on-demand-cluster"}, nil, nil, false)
+		_, err := c.CreateDeltaWatch(req, sub, value)
+		require.NoError(t, err)
+
+		select {
+		case out := <-value:
+			resources := out.(*cache.RawDeltaResponse).GetRawResources()
+			require.Len(t, resources, 2)
+			names := []string{cache.GetResourceName(resources[0].Resource), cache.GetResourceName(resources[1].Resource)}
+			assert.ElementsMatch(t, []string{"wildcard-cluster", "on-demand-cluster"}, names)
+		case <-time.After(time.Second):
+			t.Fatal("timeout waiting for response")
+		}
+	})
+}

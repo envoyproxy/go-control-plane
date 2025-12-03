@@ -28,6 +28,11 @@ type SnapshotResource struct {
 	// Resource-intrisic version. This version MUST change if the underlying resource changes to be sent to the data-plane.
 	// Optional, if not set a version will be computed from the marshaled representation of the resource.
 	Version string
+
+	// Optional - marks resource as on-demand only for ODCDS (On-Demand CDS).
+	// When false (default), this resource is sent to all clients with wildcard subscriptions.
+	// When true, this resource is only sent when explicitly requested by name.
+	OnDemandOnly bool
 }
 
 func (r *SnapshotResource) AsCachedResource(cacheVersion string) *internal.CachedResource {
@@ -35,7 +40,9 @@ func (r *SnapshotResource) AsCachedResource(cacheVersion string) *internal.Cache
 		internal.WithCacheVersion(cacheVersion),
 		internal.WithResourceTTL(r.TTL),
 		internal.WithResourceVersion(r.Version),
-		internal.WithMarshaledResource(r.Serialized))
+		internal.WithMarshaledResource(r.Serialized),
+		internal.WithOnDemandOnly(r.OnDemandOnly),
+	)
 }
 
 // From anypb code.

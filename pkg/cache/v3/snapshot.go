@@ -171,9 +171,10 @@ func (s *Snapshot) GetTypeSnapshot(typeURL string) types.TypeSnapshot {
 	resources := make([]types.SnapshotResource, 0, len(items))
 	for name, res := range items {
 		resources = append(resources, types.SnapshotResource{
-			Name:     name,
-			Resource: res.Resource,
-			TTL:      res.TTL,
+			Name:         name,
+			Resource:     res.Resource,
+			TTL:          res.TTL,
+			OnDemandOnly: false, // default to wildcard-eligible (backward compatibility with deprecated Snapshot)
 		})
 	}
 	// Error is only on wrong serialized resource type, which cannot occur here.
