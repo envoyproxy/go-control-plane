@@ -212,7 +212,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 				resourcesToReturn = make(map[string]*internal.CachedResource, len(resources))
 				for _, res := range resources {
 					// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
-					if !res.IsOnDemandOnly() {
+					if !res.OnDemandOnly() {
 						addResource(res)
 					}
 				}
@@ -522,7 +522,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 			changedResources = make(map[string]struct{}, len(resources))
 			for name, res := range resources {
 				// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
-				if !res.IsOnDemandOnly() {
+				if !res.OnDemandOnly() {
 					if _, known := knownResources[name]; !known {
 						changedResources[name] = struct{}{}
 					}
@@ -559,7 +559,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 
 			if watch.subscription.IsWildcard() {
 				// For wildcard subscriptions: delete if resource is on-demand only AND not explicitly subscribed
-				if res.IsOnDemandOnly() {
+				if res.OnDemandOnly() {
 					if _, explicitlySubscribed := subscribedResources[name]; !explicitlySubscribed {
 						deletedResources = append(deletedResources, name)
 					}
@@ -588,7 +588,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 			returnedResources = make(map[string]string, len(resources))
 			for name, resource := range resources {
 				// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
-				if !resource.IsOnDemandOnly() {
+				if !resource.OnDemandOnly() {
 					resourcesToReturn = append(resourcesToReturn, resource)
 					returnedResources[name] = version
 				}
@@ -735,7 +735,7 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 	if watch.subscription.IsWildcard() {
 		for _, res := range resources {
 			// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
-			if !res.IsOnDemandOnly() {
+			if !res.OnDemandOnly() {
 				if err := addIfChanged(res); err != nil {
 					return nil, fmt.Errorf("failed to compute resource version for %s: %w", res.Name, err)
 				}
@@ -763,7 +763,7 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 
 		if watch.subscription.IsWildcard() {
 			// For wildcard subscriptions: delete if resource is on-demand only AND not explicitly subscribed
-			if res.IsOnDemandOnly() {
+			if res.OnDemandOnly() {
 				if _, explicitlySubscribed := subscribed[name]; !explicitlySubscribed {
 					deletedResources = append(deletedResources, name)
 					delete(returnedResources, name)

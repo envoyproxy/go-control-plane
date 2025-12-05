@@ -87,8 +87,8 @@ func WithResourceTTL(ttl *time.Duration) CachedResourceOption {
 	return func(r *CachedResource) { r.ttl = ttl }
 }
 
-// WithOnDemandOnly marks the resource as on-demand only (for ODCDS support).
-func WithOnDemandOnly(onDemandOnly bool) CachedResourceOption {
+// OnDemandOnly marks the resource as on-demand only (for ODCDS support).
+func OnDemandOnly(onDemandOnly bool) CachedResourceOption {
 	return func(r *CachedResource) { r.onDemandOnly = onDemandOnly }
 }
 
@@ -131,8 +131,8 @@ func (c *CachedResource) HasTTL() bool {
 	return c.ttl != nil
 }
 
-// IsOnDemandOnly returns whether the resource is on-demand only.
-func (c *CachedResource) IsOnDemandOnly() bool {
+// OnDemandOnly returns whether the resource should be ignored by wildcard watches if not explicitly requested.
+func (c *CachedResource) OnDemandOnly() bool {
 	return c.onDemandOnly
 }
 

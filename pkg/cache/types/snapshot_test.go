@@ -28,8 +28,8 @@ func TestSnapshotWithWildcardFilter(t *testing.T) {
 	resources := typeSnapshot.GetResources()
 
 	require.Len(t, resources, 2)
-	assert.False(t, resources["wildcard-cluster"].IsOnDemandOnly())
-	assert.True(t, resources["on-demand-cluster"].IsOnDemandOnly())
+	assert.False(t, resources["wildcard-cluster"].OnDemandOnly())
+	assert.True(t, resources["on-demand-cluster"].OnDemandOnly())
 }
 
 func TestSnapshotResourceDefaultWildcard(t *testing.T) {
@@ -47,5 +47,5 @@ func TestSnapshotResourceDefaultWildcard(t *testing.T) {
 	resources := typeSnapshot.GetResources()
 
 	require.Len(t, resources, 1)
-	assert.False(t, resources["test-cluster"].IsOnDemandOnly())
+	assert.False(t, resources["test-cluster"].OnDemandOnly())
 }

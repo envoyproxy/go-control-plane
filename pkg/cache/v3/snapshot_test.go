@@ -201,5 +201,5 @@ func TestDeprecatedSnapshotDefaultOnDemandOnly(t *testing.T) {
 	resources := typeSnapshot.GetResources()
 
 	require.Len(t, resources, 1)
-	assert.False(t, resources[clusterName].IsOnDemandOnly()) // false = wildcard-eligible
+	assert.False(t, resources[clusterName].OnDemandOnly()) // false = wildcard-eligible
 }
