@@ -211,7 +211,7 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			if watch.subscription.IsWildcard() {
 				resourcesToReturn = make(map[string]*internal.CachedResource, len(resources))
 				for _, res := range resources {
-					// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
+					// Include wildcard-eligible resources for wildcard subscriptions
 					if !res.OnDemandOnly() {
 						addResource(res)
 					}
@@ -521,7 +521,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 		if watch.subscription.IsWildcard() {
 			changedResources = make(map[string]struct{}, len(resources))
 			for name, res := range resources {
-				// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
+				// Include wildcard-eligible resources for wildcard subscriptions
 				if res.OnDemandOnly() {
 					continue
 				}
@@ -559,20 +559,12 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 				continue
 			}
 
-			if watch.subscription.IsWildcard() {
-				// For wildcard subscriptions: delete if resource is on-demand only AND not explicitly subscribed
-				if !res.OnDemandOnly() {
-					continue
-				}
+			if watch.subscription.IsWildcard() && !res.OnDemandOnly() {
+				continue
+			}
 
-				if _, explicitlySubscribed := subscribedResources[name]; !explicitlySubscribed {
-					deletedResources = append(deletedResources, name)
-				}
-			} else {
-				// For non-wildcard subscriptions, check if resource is no longer watched
-				if _, explicitlySubscribed := subscribedResources[name]; !explicitlySubscribed {
-					deletedResources = append(deletedResources, name)
-				}
+			if _, explicitlySubscribed := subscribedResources[name]; !explicitlySubscribed {
+				deletedResources = append(deletedResources, name)
 			}
 		}
 
@@ -591,7 +583,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 			resourcesToReturn = make([]*internal.CachedResource, 0, len(resources))
 			returnedResources = make(map[string]string, len(resources))
 			for name, resource := range resources {
-				// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
+				// Include wildcard-eligible resources for wildcard subscriptions
 				if !resource.OnDemandOnly() {
 					resourcesToReturn = append(resourcesToReturn, resource)
 					returnedResources[name] = version
@@ -606,7 +598,6 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 			if !ok {
 				continue
 			}
-			// Check if already added (for ODCDS: wildcard + explicit subscriptions)
 			if _, alreadyAdded := returnedResources[name]; !alreadyAdded {
 				resourcesToReturn = append(resourcesToReturn, resource)
 				returnedResources[name] = version
@@ -738,7 +729,7 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 
 	if watch.subscription.IsWildcard() {
 		for _, res := range resources {
-			// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
+			// Include wildcard-eligible resources for wildcard subscriptions
 			if !res.OnDemandOnly() {
 				if err := addIfChanged(res); err != nil {
 					return nil, fmt.Errorf("failed to compute resource version for %s: %w", res.Name, err)

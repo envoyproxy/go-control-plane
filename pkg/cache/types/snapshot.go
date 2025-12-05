@@ -29,7 +29,7 @@ type SnapshotResource struct {
 	// Optional, if not set a version will be computed from the marshaled representation of the resource.
 	Version string
 
-	// Optional - marks resource as on-demand only (e.g. for OdCDS).
+	// Optional - marks resource as on-demand only.
 	// Only supported for the snapshot cache.
 	// When false (default), this resource is sent to all clients with wildcard subscriptions.
 	// When true, this resource is only sent when explicitly requested by name.

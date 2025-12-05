@@ -40,7 +40,7 @@ type CachedResource struct {
 
 	marshalFunc func() (*anypb.Any, error)
 
-	// onDemandOnly indicates if this resource is only sent when explicitly requested (ODCDS support).
+	// onDemandOnly indicates if this resource is only sent when explicitly requested.
 	// When false (default), resource is sent to wildcard subscriptions.
 	// When true, resource is only sent when explicitly requested by name.
 	onDemandOnly bool
@@ -87,7 +87,7 @@ func WithResourceTTL(ttl *time.Duration) CachedResourceOption {
 	return func(r *CachedResource) { r.ttl = ttl }
 }
 
-// OnDemandOnly marks the resource as on-demand only (for ODCDS support).
+// OnDemandOnly marks the resource as on-demand only.
 func OnDemandOnly(onDemandOnly bool) CachedResourceOption {
 	return func(r *CachedResource) { r.onDemandOnly = onDemandOnly }
 }
