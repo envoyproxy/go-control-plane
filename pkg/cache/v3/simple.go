@@ -522,10 +522,12 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 			changedResources = make(map[string]struct{}, len(resources))
 			for name, res := range resources {
 				// Include wildcard-eligible resources for wildcard subscriptions (ODCDS support)
-				if !res.OnDemandOnly() {
-					if _, known := knownResources[name]; !known {
-						changedResources[name] = struct{}{}
-					}
+				if res.OnDemandOnly() {
+					continue
+				}
+
+				if _, known := knownResources[name]; !known {
+					changedResources[name] = struct{}{}
 				}
 			}
 		} else {
@@ -559,10 +561,12 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 
 			if watch.subscription.IsWildcard() {
 				// For wildcard subscriptions: delete if resource is on-demand only AND not explicitly subscribed
-				if res.OnDemandOnly() {
-					if _, explicitlySubscribed := subscribedResources[name]; !explicitlySubscribed {
-						deletedResources = append(deletedResources, name)
-					}
+				if !res.OnDemandOnly() {
+					continue
+				}
+
+				if _, explicitlySubscribed := subscribedResources[name]; !explicitlySubscribed {
+					deletedResources = append(deletedResources, name)
 				}
 			} else {
 				// For non-wildcard subscriptions, check if resource is no longer watched
@@ -761,20 +765,13 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 			continue
 		}
 
-		if watch.subscription.IsWildcard() {
-			// For wildcard subscriptions: delete if resource is on-demand only AND not explicitly subscribed
-			if res.OnDemandOnly() {
-				if _, explicitlySubscribed := subscribed[name]; !explicitlySubscribed {
-					deletedResources = append(deletedResources, name)
-					delete(returnedResources, name)
-				}
-			}
-		} else {
-			// For non-wildcard subscriptions, check if resource is no longer watched
-			if _, watched := subscribed[name]; !watched {
-				deletedResources = append(deletedResources, name)
-				delete(returnedResources, name)
-			}
+		if watch.subscription.IsWildcard() && !res.OnDemandOnly() {
+			continue
+		}
+
+		if _, explicitlySubscribed := subscribed[name]; !explicitlySubscribed {
+			deletedResources = append(deletedResources, name)
+			delete(returnedResources, name)
 		}
 	}
 
