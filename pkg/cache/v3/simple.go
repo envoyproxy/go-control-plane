@@ -117,17 +117,6 @@ type snapshotCache struct {
 	mu sync.RWMutex
 }
 
-// missingRequestResource is returned when the request is specifically dropped due to the resources in the request not matching the snapshot content.
-// This error is not returned to the user.
-// TODO(valerian-roche): remove this check which is very likely no longer needed
-type missingRequestResource struct {
-	resources []string
-}
-
-func (e missingRequestResource) Error() string {
-	return fmt.Sprintf("missing resources in request: %v", e.resources)
-}
-
 // NewSnapshotCache initializes a simple cache.
 //
 // ADS flag forces a delay in responding to streaming requests until all
@@ -296,10 +285,7 @@ func (cache *snapshotCache) respondSOTWWatches(ctx context.Context, info *status
 		}
 
 		cache.log.Debugf("consider open watch %d %s %v with new version %q", id, watch.Request.GetTypeUrl(), watch.Request.GetResourceNames(), version)
-		resp, err := createResponse(snapshot, watch, cache.ads)
-		if errors.As(err, &missingRequestResource{}) {
-			return nil
-		}
+		resp, err := createResponse(snapshot, watch)
 		if err != nil {
 			return err
 		}
@@ -445,13 +431,7 @@ func (cache *snapshotCache) CreateWatch(request *Request, sub Subscription, valu
 		return createWatch(watch), nil
 	}
 
-	resp, err := createResponse(snapshot, watch, cache.ads)
-	// Specific legacy case. We explicitly drop the request (and therefore do not reply or track the watch) while keeping the stream opened.
-	// TODO(valerian-roche): this is likely unneeded now, to be cleaned
-	if errors.As(err, &missingRequestResource{}) {
-		cache.log.Warnf("ADS mode: not responding to request %s %v: %v", request.GetTypeUrl(), request.GetResourceNames(), err)
-		return func() {}, nil
-	}
+	resp, err := createResponse(snapshot, watch)
 	if err != nil {
 		return func() {}, fmt.Errorf("failed to create response: %w", err)
 	}
@@ -485,32 +465,13 @@ func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 	}
 }
 
-// difference returns the names present in resources but not in names.
-func difference[T any](resources map[string]types.ResourceWithTTL, names map[string]T) []string {
-	var diff []string
-	for resourceName := range resources {
-		if _, exists := names[resourceName]; !exists {
-			diff = append(diff, resourceName)
-		}
-	}
-	return diff
-}
-
 // createResponse evaluates the provided watch against the given snapshot to build the response to return.
 // It may return a nil response to indicate the watch is up-to-date for the given snapshot.
 // It is currently inefficient as not evaluating known resources intrisic versions, but only the snapshot one.
 // Further work may be performed to optimize this.
-func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*RawResponse, error) {
+func createResponse(snapshot ResourceSnapshot, watch ResponseWatch) (*RawResponse, error) {
 	typeURL := watch.Request.TypeUrl
 	resources := snapshot.GetResourcesAndTTL(typeURL)
-
-	// for ADS, the request names must match the snapshot names
-	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
-	if !watch.subscription.IsWildcard() && ads {
-		if missing := difference(resources, watch.subscription.SubscribedResources()); len(missing) > 0 {
-			return nil, missingRequestResource{missing}
-		}
-	}
 
 	// This implementation can seem more complex than needed, as it does not blindly rely on the request version.
 	// This allows for a more generic implemenentation when considering wildcard + subscribed, or partial replies.

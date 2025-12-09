@@ -71,6 +71,17 @@ func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.Res
 	return &out, nil
 }
 
+// difference returns the names present in resources but not in names.
+func difference[T any](resources map[string]types.ResourceWithTTL, names map[string]T) []string {
+	var diff []string
+	for resourceName := range resources {
+		if _, exists := names[resourceName]; !exists {
+			diff = append(diff, resourceName)
+		}
+	}
+	return diff
+}
+
 // Consistent check verifies that the dependent resources are exactly listed in the
 // snapshot:
 // - all EDS resources are listed by name in CDS resources
