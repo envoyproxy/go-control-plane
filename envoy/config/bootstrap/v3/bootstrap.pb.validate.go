@@ -1288,6 +1288,40 @@ func (m *Admin) validate(all bool) error {
 
 	// no validation rules for IgnoreGlobalConnLimit
 
+	for idx, item := range m.GetAllowPaths() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AdminValidationError{
+						field:  fmt.Sprintf("AllowPaths[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AdminValidationError{
+						field:  fmt.Sprintf("AllowPaths[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AdminValidationError{
+					field:  fmt.Sprintf("AllowPaths[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return AdminMultiError(errors)
 	}

@@ -60,6 +60,8 @@ func (m *MappedAttributeBuilder) validate(all bool) error {
 
 	// no validation rules for MappedRequestAttributes
 
+	// no validation rules for MappedResponseAttributes
+
 	if len(errors) > 0 {
 		return MappedAttributeBuilderMultiError(errors)
 	}

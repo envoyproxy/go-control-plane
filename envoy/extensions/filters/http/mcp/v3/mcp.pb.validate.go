@@ -85,6 +85,35 @@ func (m *Mcp) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetParserConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "ParserConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "ParserConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParserConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpValidationError{
+				field:  "ParserConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return McpMultiError(errors)
 	}
@@ -162,6 +191,139 @@ var _ interface {
 	ErrorName() string
 } = McpValidationError{}
 
+// Validate checks the field values on ParserConfig with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ParserConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ParserConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ParserConfigMultiError, or
+// nil if none found.
+func (m *ParserConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ParserConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetMethods() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ParserConfigValidationError{
+						field:  fmt.Sprintf("Methods[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ParserConfigValidationError{
+						field:  fmt.Sprintf("Methods[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ParserConfigValidationError{
+					field:  fmt.Sprintf("Methods[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ParserConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// ParserConfigMultiError is an error wrapping multiple validation errors
+// returned by ParserConfig.ValidateAll() if the designated constraints aren't met.
+type ParserConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ParserConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ParserConfigMultiError) AllErrors() []error { return m }
+
+// ParserConfigValidationError is the validation error returned by
+// ParserConfig.Validate if the designated constraints aren't met.
+type ParserConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ParserConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ParserConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ParserConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ParserConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ParserConfigValidationError) ErrorName() string { return "ParserConfigValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ParserConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sParserConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ParserConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ParserConfigValidationError{}
+
 // Validate checks the field values on McpOverride with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -193,6 +355,21 @@ func (m *McpOverride) validate(all bool) error {
 			return err
 		}
 		errors = append(errors, err)
+	}
+
+	if wrapper := m.GetMaxRequestBodySize(); wrapper != nil {
+
+		if wrapper.GetValue() > 10485760 {
+			err := McpOverrideValidationError{
+				field:  "MaxRequestBodySize",
+				reason: "value must be less than or equal to 10485760",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
 	}
 
 	if len(errors) > 0 {
@@ -271,3 +448,266 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = McpOverrideValidationError{}
+
+// Validate checks the field values on ParserConfig_AttributeExtractionRule
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *ParserConfig_AttributeExtractionRule) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ParserConfig_AttributeExtractionRule
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// ParserConfig_AttributeExtractionRuleMultiError, or nil if none found.
+func (m *ParserConfig_AttributeExtractionRule) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ParserConfig_AttributeExtractionRule) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetPath()) < 1 {
+		err := ParserConfig_AttributeExtractionRuleValidationError{
+			field:  "Path",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ParserConfig_AttributeExtractionRuleMultiError(errors)
+	}
+
+	return nil
+}
+
+// ParserConfig_AttributeExtractionRuleMultiError is an error wrapping multiple
+// validation errors returned by
+// ParserConfig_AttributeExtractionRule.ValidateAll() if the designated
+// constraints aren't met.
+type ParserConfig_AttributeExtractionRuleMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ParserConfig_AttributeExtractionRuleMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ParserConfig_AttributeExtractionRuleMultiError) AllErrors() []error { return m }
+
+// ParserConfig_AttributeExtractionRuleValidationError is the validation error
+// returned by ParserConfig_AttributeExtractionRule.Validate if the designated
+// constraints aren't met.
+type ParserConfig_AttributeExtractionRuleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ParserConfig_AttributeExtractionRuleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ParserConfig_AttributeExtractionRuleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ParserConfig_AttributeExtractionRuleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ParserConfig_AttributeExtractionRuleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ParserConfig_AttributeExtractionRuleValidationError) ErrorName() string {
+	return "ParserConfig_AttributeExtractionRuleValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ParserConfig_AttributeExtractionRuleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sParserConfig_AttributeExtractionRule.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ParserConfig_AttributeExtractionRuleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ParserConfig_AttributeExtractionRuleValidationError{}
+
+// Validate checks the field values on ParserConfig_MethodConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ParserConfig_MethodConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ParserConfig_MethodConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ParserConfig_MethodConfigMultiError, or nil if none found.
+func (m *ParserConfig_MethodConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ParserConfig_MethodConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetMethod()) < 1 {
+		err := ParserConfig_MethodConfigValidationError{
+			field:  "Method",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	for idx, item := range m.GetExtractionRules() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ParserConfig_MethodConfigValidationError{
+						field:  fmt.Sprintf("ExtractionRules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ParserConfig_MethodConfigValidationError{
+						field:  fmt.Sprintf("ExtractionRules[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ParserConfig_MethodConfigValidationError{
+					field:  fmt.Sprintf("ExtractionRules[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ParserConfig_MethodConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// ParserConfig_MethodConfigMultiError is an error wrapping multiple validation
+// errors returned by ParserConfig_MethodConfig.ValidateAll() if the
+// designated constraints aren't met.
+type ParserConfig_MethodConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ParserConfig_MethodConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ParserConfig_MethodConfigMultiError) AllErrors() []error { return m }
+
+// ParserConfig_MethodConfigValidationError is the validation error returned by
+// ParserConfig_MethodConfig.Validate if the designated constraints aren't met.
+type ParserConfig_MethodConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ParserConfig_MethodConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ParserConfig_MethodConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ParserConfig_MethodConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ParserConfig_MethodConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ParserConfig_MethodConfigValidationError) ErrorName() string {
+	return "ParserConfig_MethodConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ParserConfig_MethodConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sParserConfig_MethodConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ParserConfig_MethodConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ParserConfig_MethodConfigValidationError{}

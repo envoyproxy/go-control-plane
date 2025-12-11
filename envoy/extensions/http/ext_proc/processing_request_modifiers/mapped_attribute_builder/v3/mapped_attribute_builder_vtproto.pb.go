@@ -48,6 +48,25 @@ func (m *MappedAttributeBuilder) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.MappedResponseAttributes) > 0 {
+		for k := range m.MappedResponseAttributes {
+			v := m.MappedResponseAttributes[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
 	if len(m.MappedRequestAttributes) > 0 {
 		for k := range m.MappedRequestAttributes {
 			v := m.MappedRequestAttributes[k]
@@ -78,6 +97,14 @@ func (m *MappedAttributeBuilder) SizeVT() (n int) {
 	_ = l
 	if len(m.MappedRequestAttributes) > 0 {
 		for k, v := range m.MappedRequestAttributes {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + protohelpers.SizeOfVarint(uint64(len(k))) + 1 + len(v) + protohelpers.SizeOfVarint(uint64(len(v)))
+			n += mapEntrySize + 1 + protohelpers.SizeOfVarint(uint64(mapEntrySize))
+		}
+	}
+	if len(m.MappedResponseAttributes) > 0 {
+		for k, v := range m.MappedResponseAttributes {
 			_ = k
 			_ = v
 			mapEntrySize := 1 + len(k) + protohelpers.SizeOfVarint(uint64(len(k))) + 1 + len(v) + protohelpers.SizeOfVarint(uint64(len(v)))

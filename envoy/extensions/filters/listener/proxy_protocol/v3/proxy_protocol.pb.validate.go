@@ -129,6 +129,8 @@ func (m *ProxyProtocol) validate(all bool) error {
 
 	// no validation rules for StatPrefix
 
+	// no validation rules for TlvLocation
+
 	if len(errors) > 0 {
 		return ProxyProtocolMultiError(errors)
 	}

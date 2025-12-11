@@ -347,6 +347,54 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) MarshalToSizedBuffer
 	return len(dAtA) - i, nil
 }
 
+func (m *HttpConnectionManager_ForwardClientCertConfig) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *HttpConnectionManager_ForwardClientCertConfig) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *HttpConnectionManager_ForwardClientCertConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.SetCurrentClientCertDetails != nil {
+		size, err := m.SetCurrentClientCertDetails.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.ForwardClientCertDetails != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ForwardClientCertDetails))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *HttpConnectionManager_UpgradeConfig) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -696,6 +744,30 @@ func (m *HttpConnectionManager) MarshalToSizedBufferVTStrict(dAtA []byte) (int, 
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.ForwardClientCertMatcher != nil {
+		if vtmsg, ok := interface{}(m.ForwardClientCertMatcher).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.ForwardClientCertMatcher)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x3
+		i--
+		dAtA[i] = 0xe2
 	}
 	if m.StreamFlushTimeout != nil {
 		size, err := (*durationpb.Duration)(m.StreamFlushTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -2634,6 +2706,23 @@ func (m *HttpConnectionManager_SetCurrentClientCertDetails) SizeVT() (n int) {
 	return n
 }
 
+func (m *HttpConnectionManager_ForwardClientCertConfig) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.ForwardClientCertDetails != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.ForwardClientCertDetails))
+	}
+	if m.SetCurrentClientCertDetails != nil {
+		l = m.SetCurrentClientCertDetails.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *HttpConnectionManager_UpgradeConfig) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -3021,6 +3110,16 @@ func (m *HttpConnectionManager) SizeVT() (n int) {
 	}
 	if m.StreamFlushTimeout != nil {
 		l = (*durationpb.Duration)(m.StreamFlushTimeout).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ForwardClientCertMatcher != nil {
+		if size, ok := interface{}(m.ForwardClientCertMatcher).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.ForwardClientCertMatcher)
+		}
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

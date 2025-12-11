@@ -51,6 +51,13 @@ func (m *CookieConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.Path) > 0 {
+		i -= len(m.Path)
+		copy(dAtA[i:], m.Path)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Path)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if m.SameSite != 0 {
 		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.SameSite))
 		i--
@@ -788,6 +795,10 @@ func (m *CookieConfig) SizeVT() (n int) {
 	_ = l
 	if m.SameSite != 0 {
 		n += 1 + protohelpers.SizeOfVarint(uint64(m.SameSite))
+	}
+	l = len(m.Path)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

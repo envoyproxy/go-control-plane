@@ -133,6 +133,21 @@ func (m *TlsInspector) validate(all bool) error {
 
 	// no validation rules for CloseConnectionOnClientHelloParsingErrors
 
+	if wrapper := m.GetMaxClientHelloSize(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val <= 255 || val > 16384 {
+			err := TlsInspectorValidationError{
+				field:  "MaxClientHelloSize",
+				reason: "value must be inside range (255, 16384]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return TlsInspectorMultiError(errors)
 	}
