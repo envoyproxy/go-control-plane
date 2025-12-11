@@ -45,6 +45,12 @@ jobs:
         path: upstream
 
     - run: mv upstream ../envoy
+
+    - name: Install libtinfo5
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libtinfo5
+
     - run: ci/sync_envoy.sh
       env:
         ENVOY_SRC_DIR: ../envoy
