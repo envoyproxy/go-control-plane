@@ -194,11 +194,11 @@ func (m *McpRouter_McpBackend) validate(all bool) error {
 	// no validation rules for Name
 
 	if all {
-		switch v := interface{}(m.GetHttpUri()).(type) {
+		switch v := interface{}(m.GetMcpCluster()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, McpRouter_McpBackendValidationError{
-					field:  "HttpUri",
+					field:  "McpCluster",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -206,16 +206,16 @@ func (m *McpRouter_McpBackend) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, McpRouter_McpBackendValidationError{
-					field:  "HttpUri",
+					field:  "McpCluster",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetHttpUri()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetMcpCluster()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return McpRouter_McpBackendValidationError{
-				field:  "HttpUri",
+				field:  "McpCluster",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -301,3 +301,149 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = McpRouter_McpBackendValidationError{}
+
+// Validate checks the field values on McpRouter_McpCluster with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *McpRouter_McpCluster) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on McpRouter_McpCluster with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// McpRouter_McpClusterMultiError, or nil if none found.
+func (m *McpRouter_McpCluster) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *McpRouter_McpCluster) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetCluster()) < 1 {
+		err := McpRouter_McpClusterValidationError{
+			field:  "Cluster",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Path
+
+	if all {
+		switch v := interface{}(m.GetTimeout()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpRouter_McpClusterValidationError{
+					field:  "Timeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpRouter_McpClusterValidationError{
+					field:  "Timeout",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimeout()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpRouter_McpClusterValidationError{
+				field:  "Timeout",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for HostRewriteLiteral
+
+	if len(errors) > 0 {
+		return McpRouter_McpClusterMultiError(errors)
+	}
+
+	return nil
+}
+
+// McpRouter_McpClusterMultiError is an error wrapping multiple validation
+// errors returned by McpRouter_McpCluster.ValidateAll() if the designated
+// constraints aren't met.
+type McpRouter_McpClusterMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m McpRouter_McpClusterMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m McpRouter_McpClusterMultiError) AllErrors() []error { return m }
+
+// McpRouter_McpClusterValidationError is the validation error returned by
+// McpRouter_McpCluster.Validate if the designated constraints aren't met.
+type McpRouter_McpClusterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e McpRouter_McpClusterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e McpRouter_McpClusterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e McpRouter_McpClusterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e McpRouter_McpClusterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e McpRouter_McpClusterValidationError) ErrorName() string {
+	return "McpRouter_McpClusterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e McpRouter_McpClusterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMcpRouter_McpCluster.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = McpRouter_McpClusterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = McpRouter_McpClusterValidationError{}

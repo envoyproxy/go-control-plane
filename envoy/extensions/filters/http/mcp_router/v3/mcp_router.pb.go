@@ -9,9 +9,10 @@ package mcp_routerv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
-	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -87,11 +88,14 @@ func (x *McpRouter) GetServers() []*McpRouter_McpBackend {
 // Specification of the MCP server.
 type McpRouter_McpBackend struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// User visible name of the server for logging or error messages. If the name is empty the
-	// :ref:`URI <envoy_v3_api_field_config.core.v3.HttpUri.uri>` value is used.
+	// Unique name for this backend. Used for:
+	// - Tool name prefixing (e.g., "time__get_current_time")
+	// - Session ID composition
+	// - Logging and error messages.
+	// Default will be the cluster name if not specified.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Specification of the remote MCP server.
-	HttpUri       *v3.HttpUri `protobuf:"bytes,2,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
+	// Backend target specification.
+	McpCluster    *McpRouter_McpCluster `protobuf:"bytes,2,opt,name=mcp_cluster,json=mcpCluster,proto3" json:"mcp_cluster,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,24 +137,106 @@ func (x *McpRouter_McpBackend) GetName() string {
 	return ""
 }
 
-func (x *McpRouter_McpBackend) GetHttpUri() *v3.HttpUri {
+func (x *McpRouter_McpBackend) GetMcpCluster() *McpRouter_McpCluster {
 	if x != nil {
-		return x.HttpUri
+		return x.McpCluster
 	}
 	return nil
+}
+
+// Cluster-based backend configuration.
+type McpRouter_McpCluster struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Cluster name to route requests to.
+	Cluster string `protobuf:"bytes,1,opt,name=cluster,proto3" json:"cluster,omitempty"`
+	// Path to use for MCP requests. Defaults to "/mcp".
+	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	// Request timeout.
+	// If not set, uses cluster's timeout configuration.
+	Timeout *durationpb.Duration `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// Indicates that during forwarding, the host header will be swapped with
+	// this value.
+	HostRewriteLiteral string `protobuf:"bytes,4,opt,name=host_rewrite_literal,json=hostRewriteLiteral,proto3" json:"host_rewrite_literal,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *McpRouter_McpCluster) Reset() {
+	*x = McpRouter_McpCluster{}
+	mi := &file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *McpRouter_McpCluster) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*McpRouter_McpCluster) ProtoMessage() {}
+
+func (x *McpRouter_McpCluster) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use McpRouter_McpCluster.ProtoReflect.Descriptor instead.
+func (*McpRouter_McpCluster) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *McpRouter_McpCluster) GetCluster() string {
+	if x != nil {
+		return x.Cluster
+	}
+	return ""
+}
+
+func (x *McpRouter_McpCluster) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *McpRouter_McpCluster) GetTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.Timeout
+	}
+	return nil
+}
+
+func (x *McpRouter_McpCluster) GetHostRewriteLiteral() string {
+	if x != nil {
+		return x.HostRewriteLiteral
+	}
+	return ""
 }
 
 var File_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDesc = "" +
 	"\n" +
-	"<envoy/extensions/filters/http/mcp_router/v3/mcp_router.proto\x12+envoy.extensions.filters.http.mcp_router.v3\x1a#envoy/config/core/v3/http_uri.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\xc4\x01\n" +
+	"<envoy/extensions/filters/http/mcp_router/v3/mcp_router.proto\x12+envoy.extensions.filters.http.mcp_router.v3\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x9c\x03\n" +
 	"\tMcpRouter\x12[\n" +
-	"\aservers\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackendR\aservers\x1aZ\n" +
+	"\aservers\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackendR\aservers\x1a\x84\x01\n" +
 	"\n" +
 	"McpBackend\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x128\n" +
-	"\bhttp_uri\x18\x02 \x01(\v2\x1d.envoy.config.core.v3.HttpUriR\ahttpUriB\xbe\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12b\n" +
+	"\vmcp_cluster\x18\x02 \x01(\v2A.envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpClusterR\n" +
+	"mcpCluster\x1a\xaa\x01\n" +
+	"\n" +
+	"McpCluster\x12!\n" +
+	"\acluster\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\acluster\x12\x12\n" +
+	"\x04path\x18\x02 \x01(\tR\x04path\x123\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x120\n" +
+	"\x14host_rewrite_literal\x18\x04 \x01(\tR\x12hostRewriteLiteralB\xbe\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"9io.envoyproxy.envoy.extensions.filters.http.mcp_router.v3B\x0eMcpRouterProtoP\x01Z_github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/mcp_router/v3;mcp_routerv3b\x06proto3"
 
 var (
@@ -165,20 +251,22 @@ func file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDescGZ
 	return file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_goTypes = []any{
 	(*McpRouter)(nil),            // 0: envoy.extensions.filters.http.mcp_router.v3.McpRouter
 	(*McpRouter_McpBackend)(nil), // 1: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend
-	(*v3.HttpUri)(nil),           // 2: envoy.config.core.v3.HttpUri
+	(*McpRouter_McpCluster)(nil), // 2: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster
+	(*durationpb.Duration)(nil),  // 3: google.protobuf.Duration
 }
 var file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.filters.http.mcp_router.v3.McpRouter.servers:type_name -> envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend
-	2, // 1: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 1: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpBackend.mcp_cluster:type_name -> envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster
+	3, // 2: envoy.extensions.filters.http.mcp_router.v3.McpRouter.McpCluster.timeout:type_name -> google.protobuf.Duration
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_init() }
@@ -192,7 +280,7 @@ func file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDesc), len(file_envoy_extensions_filters_http_mcp_router_v3_mcp_router_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
