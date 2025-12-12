@@ -145,6 +145,24 @@ type ExtAuthz struct {
 	FilterEnabled *v3.RuntimeFractionalPercent `protobuf:"bytes,9,opt,name=filter_enabled,json=filterEnabled,proto3" json:"filter_enabled,omitempty"`
 	// Specifies if the filter is enabled with metadata matcher.
 	// If this field is not specified, the filter will be enabled for all requests.
+	//
+	// .. note::
+	//
+	//	This field is only evaluated if the filter is instantiated. If the filter is marked with
+	//	``disabled: true`` in the :ref:`HttpFilter
+	//	<envoy_v3_api_msg_extensions.filters.network.http_connection_manager.v3.HttpFilter>`
+	//	configuration or in per-route configuration via :ref:`ExtAuthzPerRoute
+	//	<envoy_v3_api_msg_extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute>`,
+	//	the filter will not be instantiated and this field will have no effect.
+	//
+	// .. tip::
+	//
+	//	For dynamic filter activation based on metadata (such as metadata set by a preceding
+	//	filter), consider using :ref:`ExtensionWithMatcher
+	//	<envoy_v3_api_msg_extensions.common.matching.v3.ExtensionWithMatcher>` instead. This
+	//	provides a more flexible matching framework that can evaluate conditions before filter
+	//	instantiation. See the :ref:`ext_authz filter documentation
+	//	<config_http_filters_ext_authz>` for examples.
 	FilterEnabledMetadata *v32.MetadataMatcher `protobuf:"bytes,14,opt,name=filter_enabled_metadata,json=filterEnabledMetadata,proto3" json:"filter_enabled_metadata,omitempty"`
 	// Specifies whether to deny the requests when the filter is disabled.
 	// If :ref:`runtime_key <envoy_v3_api_field_config.core.v3.RuntimeFeatureFlag.runtime_key>` is specified,
