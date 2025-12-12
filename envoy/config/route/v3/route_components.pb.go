@@ -3307,6 +3307,7 @@ func (x *Decorator) GetPropagate() *wrapperspb.BoolValue {
 	return nil
 }
 
+// [#next-free-field: 7]
 type Tracing struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Target percentage of requests managed by this HTTP connection manager that will be force
@@ -3337,9 +3338,35 @@ type Tracing struct {
 	// configured in the HTTP connection manager. If two tags with the same name are configured
 	// each in the HTTP connection manager and the route level, the one configured here takes
 	// priority.
-	CustomTags    []*v34.CustomTag `protobuf:"bytes,4,rep,name=custom_tags,json=customTags,proto3" json:"custom_tags,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	CustomTags []*v34.CustomTag `protobuf:"bytes,4,rep,name=custom_tags,json=customTags,proto3" json:"custom_tags,omitempty"`
+	// The operation name of the span which will be used for tracing.
+	//
+	// The same :ref:`format specifier <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` applies here, however
+	// unknown specifier values are replaced with the empty string instead of “-“.
+	//
+	// This field will take precedence over and make following settings ineffective:
+	//
+	//   - :ref:`route decorator <envoy_v3_api_field_config.route.v3.Route.decorator>`.
+	//   - :ref:`x-envoy-decorator-operation <config_http_filters_router_x-envoy-decorator-operation>`.
+	//   - :ref:`HCM tracing operation
+	//     <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.operation>`.
+	Operation string `protobuf:"bytes,5,opt,name=operation,proto3" json:"operation,omitempty"`
+	// The operation name of the upstream span which will be used for tracing.
+	// This only takes effect when “spawn_upstream_span“ is set to true and the upstream
+	// span is created.
+	//
+	// The same :ref:`format specifier <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` applies here, however
+	// unknown specifier values are replaced with the empty string instead of “-“.
+	//
+	// This field will take precedence over and make following settings ineffective:
+	//
+	//   - :ref:`HCM tracing upstream operation
+	//     <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.Tracing.upstream_operation>`
+	UpstreamOperation string `protobuf:"bytes,6,opt,name=upstream_operation,json=upstreamOperation,proto3" json:"upstream_operation,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Tracing) Reset() {
@@ -3398,6 +3425,20 @@ func (x *Tracing) GetCustomTags() []*v34.CustomTag {
 		return x.CustomTags
 	}
 	return nil
+}
+
+func (x *Tracing) GetOperation() string {
+	if x != nil {
+		return x.Operation
+	}
+	return ""
+}
+
+func (x *Tracing) GetUpstreamOperation() string {
+	if x != nil {
+		return x.UpstreamOperation
+	}
+	return ""
 }
 
 // A virtual cluster is a way of specifying a regex matching rule against
@@ -7408,13 +7449,15 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\tDecorator\x12%\n" +
 	"\toperation\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\toperation\x128\n" +
 	"\tpropagate\x18\x02 \x01(\v2\x1a.google.protobuf.BoolValueR\tpropagate:#\x9aň\x1e\x1e\n" +
-	"\x1cenvoy.api.v2.route.Decorator\"\xd2\x02\n" +
+	"\x1cenvoy.api.v2.route.Decorator\"\x9f\x03\n" +
 	"\aTracing\x12I\n" +
 	"\x0fclient_sampling\x18\x01 \x01(\v2 .envoy.type.v3.FractionalPercentR\x0eclientSampling\x12I\n" +
 	"\x0frandom_sampling\x18\x02 \x01(\v2 .envoy.type.v3.FractionalPercentR\x0erandomSampling\x12K\n" +
 	"\x10overall_sampling\x18\x03 \x01(\v2 .envoy.type.v3.FractionalPercentR\x0foverallSampling\x12A\n" +
 	"\vcustom_tags\x18\x04 \x03(\v2 .envoy.type.tracing.v3.CustomTagR\n" +
-	"customTags:!\x9aň\x1e\x1c\n" +
+	"customTags\x12\x1c\n" +
+	"\toperation\x18\x05 \x01(\tR\toperation\x12-\n" +
+	"\x12upstream_operation\x18\x06 \x01(\tR\x11upstreamOperation:!\x9aň\x1e\x1c\n" +
 	"\x1aenvoy.api.v2.route.Tracing\"\xb4\x01\n" +
 	"\x0eVirtualCluster\x12>\n" +
 	"\aheaders\x18\x04 \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\aheaders\x12\x1b\n" +

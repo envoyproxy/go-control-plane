@@ -52,6 +52,20 @@ func (m *HttpConnectionManager_Tracing) MarshalToSizedBufferVTStrict(dAtA []byte
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.UpstreamOperation) > 0 {
+		i -= len(m.UpstreamOperation)
+		copy(dAtA[i:], m.UpstreamOperation)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.UpstreamOperation)))
+		i--
+		dAtA[i] = 0x62
+	}
+	if len(m.Operation) > 0 {
+		i -= len(m.Operation)
+		copy(dAtA[i:], m.Operation)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Operation)))
+		i--
+		dAtA[i] = 0x5a
+	}
 	if m.SpawnUpstreamSpan != nil {
 		size, err := (*wrapperspb.BoolValue)(m.SpawnUpstreamSpan).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -2649,6 +2663,14 @@ func (m *HttpConnectionManager_Tracing) SizeVT() (n int) {
 	}
 	if m.SpawnUpstreamSpan != nil {
 		l = (*wrapperspb.BoolValue)(m.SpawnUpstreamSpan).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.Operation)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.UpstreamOperation)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

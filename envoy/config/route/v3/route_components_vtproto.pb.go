@@ -4212,6 +4212,20 @@ func (m *Tracing) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.UpstreamOperation) > 0 {
+		i -= len(m.UpstreamOperation)
+		copy(dAtA[i:], m.UpstreamOperation)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.UpstreamOperation)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Operation) > 0 {
+		i -= len(m.Operation)
+		copy(dAtA[i:], m.Operation)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Operation)))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if len(m.CustomTags) > 0 {
 		for iNdEx := len(m.CustomTags) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.CustomTags[iNdEx]).(interface {
@@ -7995,6 +8009,14 @@ func (m *Tracing) SizeVT() (n int) {
 			}
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	l = len(m.Operation)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.UpstreamOperation)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

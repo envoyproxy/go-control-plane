@@ -3209,6 +3209,10 @@ func (m *HttpConnectionManager_Tracing) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Operation
+
+	// no validation rules for UpstreamOperation
+
 	if len(errors) > 0 {
 		return HttpConnectionManager_TracingMultiError(errors)
 	}

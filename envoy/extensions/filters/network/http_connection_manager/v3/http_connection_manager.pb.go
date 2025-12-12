@@ -299,6 +299,8 @@ func (HttpConnectionManager_PathWithEscapedSlashesAction) EnumDescriptor() ([]by
 	return file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDescGZIP(), []int{0, 3}
 }
 
+// This OperationName makes no sense and is unnecessary in the current tracing API.
+// [#not-implemented-hide:]
 type HttpConnectionManager_Tracing_OperationName int32
 
 const (
@@ -2030,7 +2032,7 @@ func (x *EnvoyMobileHttpConnectionManager) GetConfig() *HttpConnectionManager {
 	return nil
 }
 
-// [#next-free-field: 11]
+// [#next-free-field: 13]
 type HttpConnectionManager_Tracing struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Target percentage of requests managed by this HTTP connection manager that will be force
@@ -2087,6 +2089,26 @@ type HttpConnectionManager_Tracing struct {
 	//
 	// The default value is false for now for backward compatibility.
 	SpawnUpstreamSpan *wrapperspb.BoolValue `protobuf:"bytes,10,opt,name=spawn_upstream_span,json=spawnUpstreamSpan,proto3" json:"spawn_upstream_span,omitempty"`
+	// The operation name of the span which will be used for tracing.
+	//
+	// The same :ref:`format specifier <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` applies here, however
+	// unknown specifier values are replaced with the empty string instead of “-“.
+	//
+	// This field will take precedence over and make following settings ineffective:
+	//
+	//   - :ref:`route decorator <envoy_v3_api_field_config.route.v3.Route.decorator>` and
+	//   - :ref:`x-envoy-decorator-operation <config_http_filters_router_x-envoy-decorator-operation>`
+	//     header will be ignored.
+	Operation string `protobuf:"bytes,11,opt,name=operation,proto3" json:"operation,omitempty"`
+	// The operation name of the upstream span which will be used for tracing.
+	// This only takes effect when “spawn_upstream_span“ is set to true and the upstream
+	// span is created.
+	//
+	// The same :ref:`format specifier <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` applies here, however
+	// unknown specifier values are replaced with the empty string instead of “-“.
+	UpstreamOperation string `protobuf:"bytes,12,opt,name=upstream_operation,json=upstreamOperation,proto3" json:"upstream_operation,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -2175,6 +2197,20 @@ func (x *HttpConnectionManager_Tracing) GetSpawnUpstreamSpan() *wrapperspb.BoolV
 		return x.SpawnUpstreamSpan
 	}
 	return nil
+}
+
+func (x *HttpConnectionManager_Tracing) GetOperation() string {
+	if x != nil {
+		return x.Operation
+	}
+	return ""
+}
+
+func (x *HttpConnectionManager_Tracing) GetUpstreamOperation() string {
+	if x != nil {
+		return x.UpstreamOperation
+	}
+	return ""
 }
 
 type HttpConnectionManager_InternalAddressConfig struct {
@@ -3080,7 +3116,7 @@ var File_envoy_extensions_filters_network_http_connection_manager_v3_http_connec
 
 const file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDesc = "" +
 	"\n" +
-	"Yenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x12;envoy.extensions.filters.network.http_connection_manager.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a!envoy/config/route/v3/route.proto\x1a(envoy/config/route/v3/scoped_route.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a,envoy/type/http/v3/path_transformation.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xc8F\n" +
+	"Yenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x12;envoy.extensions.filters.network.http_connection_manager.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a!envoy/config/route/v3/route.proto\x1a(envoy/config/route/v3/scoped_route.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a,envoy/type/http/v3/path_transformation.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x95G\n" +
 	"\x15HttpConnectionManager\x12\x85\x01\n" +
 	"\n" +
 	"codec_type\x18\x01 \x01(\x0e2\\.envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.CodecTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\tcodecType\x12(\n" +
@@ -3145,7 +3181,7 @@ const file_envoy_extensions_filters_network_http_connection_manager_v3_http_conn
 	"\x1etyped_header_validation_config\x182 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x1btypedHeaderValidationConfig\x125\n" +
 	"\x17append_x_forwarded_port\x183 \x01(\bR\x14appendXForwardedPort\x122\n" +
 	"\x15append_local_overload\x189 \x01(\bR\x13appendLocalOverload\x12h\n" +
-	"#add_proxy_protocol_connection_state\x185 \x01(\v2\x1a.google.protobuf.BoolValueR\x1faddProxyProtocolConnectionState\x1a\xc2\x05\n" +
+	"#add_proxy_protocol_connection_state\x185 \x01(\v2\x1a.google.protobuf.BoolValueR\x1faddProxyProtocolConnectionState\x1a\x8f\x06\n" +
 	"\aTracing\x12?\n" +
 	"\x0fclient_sampling\x18\x03 \x01(\v2\x16.envoy.type.v3.PercentR\x0eclientSampling\x12?\n" +
 	"\x0frandom_sampling\x18\x04 \x01(\v2\x16.envoy.type.v3.PercentR\x0erandomSampling\x12A\n" +
@@ -3156,7 +3192,9 @@ const file_envoy_extensions_filters_network_http_connection_manager_v3_http_conn
 	"customTags\x12?\n" +
 	"\bprovider\x18\t \x01(\v2#.envoy.config.trace.v3.Tracing.HttpR\bprovider\x12J\n" +
 	"\x13spawn_upstream_span\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.BoolValueR\x11spawnUpstreamSpan\"(\n" +
+	" \x01(\v2\x1a.google.protobuf.BoolValueR\x11spawnUpstreamSpan\x12\x1c\n" +
+	"\toperation\x18\v \x01(\tR\toperation\x12-\n" +
+	"\x12upstream_operation\x18\f \x01(\tR\x11upstreamOperation\"(\n" +
 	"\rOperationName\x12\v\n" +
 	"\aINGRESS\x10\x00\x12\n" +
 	"\n" +

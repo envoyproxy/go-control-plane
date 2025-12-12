@@ -5431,6 +5431,10 @@ func (m *Tracing) validate(all bool) error {
 
 	}
 
+	// no validation rules for Operation
+
+	// no validation rules for UpstreamOperation
+
 	if len(errors) > 0 {
 		return TracingMultiError(errors)
 	}
