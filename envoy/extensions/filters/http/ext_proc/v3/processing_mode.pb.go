@@ -121,6 +121,24 @@ const (
 	// up to the buffer limit will be sent.
 	ProcessingMode_BUFFERED_PARTIAL     ProcessingMode_BodySendMode = 3
 	ProcessingMode_FULL_DUPLEX_STREAMED ProcessingMode_BodySendMode = 4
+	// [#not-implemented-hide:]
+	// A mode for gRPC traffic. This is similar to “FULL_DUPLEX_STREAMED“,
+	// except that instead of sending raw chunks of the HTTP/2 DATA frames,
+	// the ext_proc client will de-frame the individual gRPC messages inside
+	// the HTTP/2 DATA frames, and as each message is de-framed, it will be
+	// sent to the ext_proc server as a :ref:`request_body
+	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingRequest.request_body>`
+	// or :ref:`response_body
+	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingRequest.response_body>`.
+	// The ext_proc server will stream back individual gRPC messages in the
+	// :ref:`StreamedBodyResponse <envoy_v3_api_msg_service.ext_proc.v3.StreamedBodyResponse>`
+	// field, but the number of messages sent by the ext_proc server
+	// does not need to equal the number of messages sent by the data
+	// plane.  This allows the ext_proc server to change the number of
+	// messages sent on the stream.
+	// In this mode, the client will send body and trailers to the server as
+	// they arrive.
+	ProcessingMode_GRPC ProcessingMode_BodySendMode = 5
 )
 
 // Enum value maps for ProcessingMode_BodySendMode.
@@ -131,6 +149,7 @@ var (
 		2: "BUFFERED",
 		3: "BUFFERED_PARTIAL",
 		4: "FULL_DUPLEX_STREAMED",
+		5: "GRPC",
 	}
 	ProcessingMode_BodySendMode_value = map[string]int32{
 		"NONE":                 0,
@@ -138,6 +157,7 @@ var (
 		"BUFFERED":             2,
 		"BUFFERED_PARTIAL":     3,
 		"FULL_DUPLEX_STREAMED": 4,
+		"GRPC":                 5,
 	}
 )
 
@@ -266,7 +286,7 @@ var File_envoy_extensions_filters_http_ext_proc_v3_processing_mode_proto protore
 
 const file_envoy_extensions_filters_http_ext_proc_v3_processing_mode_proto_rawDesc = "" +
 	"\n" +
-	"?envoy/extensions/filters/http/ext_proc/v3/processing_mode.proto\x12)envoy.extensions.filters.http.ext_proc.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc3\a\n" +
+	"?envoy/extensions/filters/http/ext_proc/v3/processing_mode.proto\x12)envoy.extensions.filters.http.ext_proc.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xcd\a\n" +
 	"\x0eProcessingMode\x12\x82\x01\n" +
 	"\x13request_header_mode\x18\x01 \x01(\x0e2H.envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.HeaderSendModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x11requestHeaderMode\x12\x84\x01\n" +
 	"\x14response_header_mode\x18\x02 \x01(\x0e2H.envoy.extensions.filters.http.ext_proc.v3.ProcessingMode.HeaderSendModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12responseHeaderMode\x12|\n" +
@@ -277,13 +297,14 @@ const file_envoy_extensions_filters_http_ext_proc_v3_processing_mode_proto_rawDe
 	"\x0eHeaderSendMode\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\b\n" +
 	"\x04SEND\x10\x01\x12\b\n" +
-	"\x04SKIP\x10\x02\"d\n" +
+	"\x04SKIP\x10\x02\"n\n" +
 	"\fBodySendMode\x12\b\n" +
 	"\x04NONE\x10\x00\x12\f\n" +
 	"\bSTREAMED\x10\x01\x12\f\n" +
 	"\bBUFFERED\x10\x02\x12\x14\n" +
 	"\x10BUFFERED_PARTIAL\x10\x03\x12\x18\n" +
-	"\x14FULL_DUPLEX_STREAMED\x10\x04B\xb5\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x14FULL_DUPLEX_STREAMED\x10\x04\x12\b\n" +
+	"\x04GRPC\x10\x05B\xb5\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"7io.envoyproxy.envoy.extensions.filters.http.ext_proc.v3B\x13ProcessingModeProtoP\x01Z[github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/ext_proc/v3;ext_procv3b\x06proto3"
 
 var (
