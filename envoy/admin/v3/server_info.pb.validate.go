@@ -352,6 +352,8 @@ func (m *CommandLineOptions) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for FileFlushMinSize
+
 	if all {
 		switch v := interface{}(m.GetDrainTime()).(type) {
 		case interface{ ValidateAll() error }:
