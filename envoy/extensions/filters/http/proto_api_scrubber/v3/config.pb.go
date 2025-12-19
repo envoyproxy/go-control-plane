@@ -372,8 +372,6 @@ func (x *MessageRestrictions) GetConfig() *RestrictionConfig {
 type RestrictionConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Matcher tree for matching requests and responses with the configured restrictions.
-	// NOTE: Currently, only CEL expressions are supported for matching. Support for more
-	// matchers will be added incrementally overtime.
 	Matcher       *v31.Matcher `protobuf:"bytes,1,opt,name=matcher,proto3" json:"matcher,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
