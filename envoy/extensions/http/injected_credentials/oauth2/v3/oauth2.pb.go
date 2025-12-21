@@ -80,6 +80,7 @@ func (OAuth2_AuthType) EnumDescriptor() ([]byte, []int) {
 // proxied requests.
 // Currently, only the Client Credentials Grant flow is supported.
 // The access token will be injected into the request headers using the “Authorization“ header as a bearer token.
+// [#next-free-field: 6]
 type OAuth2 struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Endpoint on the authorization server to retrieve the access token from.
@@ -95,8 +96,11 @@ type OAuth2 struct {
 	// The interval between two successive retries to fetch token from Identity Provider. Default is 2 secs.
 	// The interval must be at least 1 second.
 	TokenFetchRetryInterval *durationpb.Duration `protobuf:"bytes,4,opt,name=token_fetch_retry_interval,json=tokenFetchRetryInterval,proto3" json:"token_fetch_retry_interval,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// Optional list of additional parameters to send to the token endpoint.
+	// These parameters will be URL-encoded and included in the token request body.
+	EndpointParams []*OAuth2_EndpointParameter `protobuf:"bytes,5,rep,name=endpoint_params,json=endpointParams,proto3" json:"endpoint_params,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *OAuth2) Reset() {
@@ -162,6 +166,13 @@ func (x *OAuth2) GetClientCredentials() *OAuth2_ClientCredentials {
 func (x *OAuth2) GetTokenFetchRetryInterval() *durationpb.Duration {
 	if x != nil {
 		return x.TokenFetchRetryInterval
+	}
+	return nil
+}
+
+func (x *OAuth2) GetEndpointParams() []*OAuth2_EndpointParameter {
+	if x != nil {
+		return x.EndpointParams
 	}
 	return nil
 }
@@ -246,21 +257,82 @@ func (x *OAuth2_ClientCredentials) GetAuthType() OAuth2_AuthType {
 	return OAuth2_BASIC_AUTH
 }
 
+// Optional additional parameters to include in the token endpoint request body.
+// These parameters will be URL-encoded and added to the request body along with the standard OAuth2 parameters.
+// Refer to your authorization server's documentation for supported parameters.
+type OAuth2_EndpointParameter struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Parameter name.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Parameter value.
+	Value         string `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2_EndpointParameter) Reset() {
+	*x = OAuth2_EndpointParameter{}
+	mi := &file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2_EndpointParameter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2_EndpointParameter) ProtoMessage() {}
+
+func (x *OAuth2_EndpointParameter) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2_EndpointParameter.ProtoReflect.Descriptor instead.
+func (*OAuth2_EndpointParameter) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_rawDescGZIP(), []int{0, 1}
+}
+
+func (x *OAuth2_EndpointParameter) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *OAuth2_EndpointParameter) GetValue() string {
+	if x != nil {
+		return x.Value
+	}
+	return ""
+}
+
 var File_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_rawDesc = "" +
 	"\n" +
-	"Aenvoy/extensions/http/injected_credentials/oauth2/v3/oauth2.proto\x124envoy.extensions.http.injected_credentials.oauth2.v3\x1a#envoy/config/core/v3/http_uri.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa4\x05\n" +
+	"Aenvoy/extensions/http/injected_credentials/oauth2/v3/oauth2.proto\x124envoy.extensions.http.injected_credentials.oauth2.v3\x1a#envoy/config/core/v3/http_uri.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xe5\x06\n" +
 	"\x06OAuth2\x12N\n" +
 	"\x0etoken_endpoint\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriB\b\xfaB\x05\x8a\x01\x02\x10\x01R\rtokenEndpoint\x12\x16\n" +
 	"\x06scopes\x18\x02 \x03(\tR\x06scopes\x12\x7f\n" +
 	"\x12client_credentials\x18\x03 \x01(\v2N.envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentialsH\x00R\x11clientCredentials\x12b\n" +
 	"\x1atoken_fetch_retry_interval\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\n" +
-	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x17tokenFetchRetryInterval\x1a\x88\x02\n" +
+	"\xfaB\a\xaa\x01\x042\x02\b\x01R\x17tokenFetchRetryInterval\x12w\n" +
+	"\x0fendpoint_params\x18\x05 \x03(\v2N.envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.EndpointParameterR\x0eendpointParams\x1a\x88\x02\n" +
 	"\x11ClientCredentials\x12$\n" +
 	"\tclient_id\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\bclientId\x12i\n" +
 	"\rclient_secret\x18\x02 \x01(\v2:.envoy.extensions.transport_sockets.tls.v3.SdsSecretConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\fclientSecret\x12b\n" +
-	"\tauth_type\x18\x03 \x01(\x0e2E.envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.AuthTypeR\bauthType\"0\n" +
+	"\tauth_type\x18\x03 \x01(\x0e2E.envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.AuthTypeR\bauthType\x1aF\n" +
+	"\x11EndpointParameter\x12\x1b\n" +
+	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value\"0\n" +
 	"\bAuthType\x12\x0e\n" +
 	"\n" +
 	"BASIC_AUTH\x10\x00\x12\x14\n" +
@@ -281,26 +353,28 @@ func file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_rawD
 }
 
 var file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_goTypes = []any{
 	(OAuth2_AuthType)(0),             // 0: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.AuthType
 	(*OAuth2)(nil),                   // 1: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2
 	(*OAuth2_ClientCredentials)(nil), // 2: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentials
-	(*v3.HttpUri)(nil),               // 3: envoy.config.core.v3.HttpUri
-	(*durationpb.Duration)(nil),      // 4: google.protobuf.Duration
-	(*v31.SdsSecretConfig)(nil),      // 5: envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	(*OAuth2_EndpointParameter)(nil), // 3: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.EndpointParameter
+	(*v3.HttpUri)(nil),               // 4: envoy.config.core.v3.HttpUri
+	(*durationpb.Duration)(nil),      // 5: google.protobuf.Duration
+	(*v31.SdsSecretConfig)(nil),      // 6: envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
 }
 var file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_depIdxs = []int32{
-	3, // 0: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.token_endpoint:type_name -> envoy.config.core.v3.HttpUri
+	4, // 0: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.token_endpoint:type_name -> envoy.config.core.v3.HttpUri
 	2, // 1: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.client_credentials:type_name -> envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentials
-	4, // 2: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.token_fetch_retry_interval:type_name -> google.protobuf.Duration
-	5, // 3: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentials.client_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	0, // 4: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentials.auth_type:type_name -> envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.AuthType
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	5, // 2: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.token_fetch_retry_interval:type_name -> google.protobuf.Duration
+	3, // 3: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.endpoint_params:type_name -> envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.EndpointParameter
+	6, // 4: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentials.client_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	0, // 5: envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.ClientCredentials.auth_type:type_name -> envoy.extensions.http.injected_credentials.oauth2.v3.OAuth2.AuthType
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_init() }
@@ -317,7 +391,7 @@ func file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_init
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_rawDesc), len(file_envoy_extensions_http_injected_credentials_oauth2_v3_oauth2_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
