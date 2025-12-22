@@ -17,6 +17,7 @@ package cache
 import (
 	"errors"
 	"fmt"
+	"maps"
 
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
@@ -25,20 +26,16 @@ import (
 // Snapshot is an internally consistent snapshot of xDS resources.
 // Consistency is important for the convergence as different resource types
 // from the snapshot may be delivered to the proxy in arbitrary order.
+// Deprecated: use types.Snapshot instead.
 type Snapshot struct {
 	Resources [types.UnknownType]Resources
-
-	// VersionMap holds the current hash map of all resources in the snapshot.
-	// This field should remain nil until it is used, at which point should be
-	// instantiated by calling ConstructVersionMap().
-	// VersionMap is only to be used with delta xDS.
-	VersionMap map[string]map[string]string
 }
 
 var _ ResourceSnapshot = &Snapshot{}
 
 // NewSnapshot creates a snapshot from response types and a version.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
+// Deprecated: use types.NewSnapshot or types.NewSnapshotFromTypeSnapshots instead.
 func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (*Snapshot, error) {
 	out := Snapshot{}
 
@@ -56,6 +53,7 @@ func NewSnapshot(version string, resources map[resource.Type][]types.Resource) (
 
 // NewSnapshotWithTTLs creates a snapshot of ResourceWithTTLs.
 // The resources map is keyed off the type URL of a resource, followed by the slice of resource objects.
+// Deprecated: use types.NewSnapshot or types.NewSnapshotFromTypeSnapshots instead.
 func NewSnapshotWithTTLs(version string, resources map[resource.Type][]types.ResourceWithTTL) (*Snapshot, error) {
 	out := Snapshot{}
 
@@ -111,7 +109,7 @@ func (s *Snapshot) Consistent() error {
 			}
 
 			// Check superset.
-			if missing := difference(items.Items, referenceSet); len(missing) > 0 {
+			if missing := difference(maps.Keys(items.Items), referenceSet); len(missing) > 0 {
 				return fmt.Errorf("inconsistent %q reference: missing resources %v", typeURL, missing)
 			}
 		}
@@ -160,47 +158,23 @@ func (s *Snapshot) GetVersion(typeURL resource.Type) string {
 	return s.Resources[typ].Version
 }
 
-// GetVersionMap will return the internal version map of the currently applied snapshot.
-func (s *Snapshot) GetVersionMap(typeURL string) map[string]string {
-	return s.VersionMap[typeURL]
-}
-
-// ConstructVersionMap will construct a version map based on the current state of a snapshot
-func (s *Snapshot) ConstructVersionMap() error {
+func (s *Snapshot) GetTypeSnapshot(typeURL string) types.TypeSnapshot {
 	if s == nil {
-		return errors.New("missing snapshot")
+		return types.TypeSnapshot{}
+	}
+	typ := GetResponseType(typeURL)
+	if typ == types.UnknownType {
+		return types.TypeSnapshot{}
 	}
 
-	// The snapshot resources never change, so no need to ever rebuild.
-	if s.VersionMap != nil {
-		return nil
+	items := s.Resources[typ].Items
+	resources := make([]types.SnapshotResource, 0, len(items))
+	for name, res := range items {
+		resources = append(resources, types.SnapshotResource{
+			Name:     name,
+			Resource: res.Resource,
+			TTL:      res.TTL,
+		})
 	}
-
-	s.VersionMap = make(map[string]map[string]string)
-
-	for i, resources := range s.Resources {
-		typeURL, err := GetResponseTypeURL(types.ResponseType(i))
-		if err != nil {
-			return err
-		}
-		if _, ok := s.VersionMap[typeURL]; !ok {
-			s.VersionMap[typeURL] = make(map[string]string, len(resources.Items))
-		}
-
-		for _, r := range resources.Items {
-			// Hash our version in here and build the version map.
-			marshaledResource, err := MarshalResource(r.Resource)
-			if err != nil {
-				return err
-			}
-			v := HashResource(marshaledResource)
-			if v == "" {
-				return fmt.Errorf("failed to build resource version: %w", err)
-			}
-
-			s.VersionMap[typeURL][GetResourceName(r.Resource)] = v
-		}
-	}
-
-	return nil
+	return types.NewTypeSnapshot(typeURL, s.GetVersion(typeURL), resources)
 }
