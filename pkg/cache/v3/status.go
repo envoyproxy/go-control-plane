@@ -218,6 +218,13 @@ func (info *statusInfo) GetLastDeltaWatchRequestTime() time.Time {
 	return info.lastDeltaWatchRequestTime
 }
 
+// setLastWatchRequestTime will set the current time of the last sotw discovery watch request.
+func (info *statusInfo) setLastWatchRequestTime(t time.Time) {
+	info.mu.Lock()
+	defer info.mu.Unlock()
+	info.lastWatchRequestTime = t
+}
+
 // setLastDeltaWatchRequestTime will set the current time of the last delta discovery watch request.
 func (info *statusInfo) setLastDeltaWatchRequestTime(t time.Time) {
 	info.mu.Lock()
