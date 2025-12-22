@@ -24,7 +24,7 @@ const (
 )
 
 // Event in a socket trace.
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type SocketEvent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Timestamp for event.
@@ -38,7 +38,9 @@ type SocketEvent struct {
 	//	*SocketEvent_Closed_
 	EventSelector isSocketEvent_EventSelector `protobuf_oneof:"event_selector"`
 	// Connection information per event
-	Connection    *Connection `protobuf:"bytes,5,opt,name=connection,proto3" json:"connection,omitempty"`
+	Connection *Connection `protobuf:"bytes,5,opt,name=connection,proto3" json:"connection,omitempty"`
+	// Data sequence number
+	SeqNum        uint64 `protobuf:"varint,6,opt,name=seq_num,json=seqNum,proto3" json:"seq_num,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -119,6 +121,13 @@ func (x *SocketEvent) GetConnection() *Connection {
 		return x.Connection
 	}
 	return nil
+}
+
+func (x *SocketEvent) GetSeqNum() uint64 {
+	if x != nil {
+		return x.SeqNum
+	}
+	return 0
 }
 
 type isSocketEvent_EventSelector interface {
@@ -528,7 +537,7 @@ var File_envoy_data_tap_v3_transport_proto protoreflect.FileDescriptor
 
 const file_envoy_data_tap_v3_transport_proto_rawDesc = "" +
 	"\n" +
-	"!envoy/data/tap/v3/transport.proto\x12\x11envoy.data.tap.v3\x1a\x1eenvoy/data/tap/v3/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\"\xa5\x05\n" +
+	"!envoy/data/tap/v3/transport.proto\x12\x11envoy.data.tap.v3\x1a\x1eenvoy/data/tap/v3/common.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\"\xbe\x05\n" +
 	"\vSocketEvent\x128\n" +
 	"\ttimestamp\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x129\n" +
 	"\x04read\x18\x02 \x01(\v2#.envoy.data.tap.v3.SocketEvent.ReadH\x00R\x04read\x12<\n" +
@@ -536,7 +545,8 @@ const file_envoy_data_tap_v3_transport_proto_rawDesc = "" +
 	"\x06closed\x18\x04 \x01(\v2%.envoy.data.tap.v3.SocketEvent.ClosedH\x00R\x06closed\x12=\n" +
 	"\n" +
 	"connection\x18\x05 \x01(\v2\x1d.envoy.data.tap.v3.ConnectionR\n" +
-	"connection\x1ac\n" +
+	"connection\x12\x17\n" +
+	"\aseq_num\x18\x06 \x01(\x04R\x06seqNum\x1ac\n" +
 	"\x04Read\x12+\n" +
 	"\x04data\x18\x01 \x01(\v2\x17.envoy.data.tap.v3.BodyR\x04data:.\x9aň\x1e)\n" +
 	"'envoy.data.tap.v2alpha.SocketEvent.Read\x1a\x84\x01\n" +
