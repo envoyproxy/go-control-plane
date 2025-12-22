@@ -194,7 +194,7 @@ type ExecuteFilterAction struct {
 	// Ignored if “filter_chain“ is set.
 	DynamicConfig *DynamicConfig `protobuf:"bytes,2,opt,name=dynamic_config,json=dynamicConfig,proto3" json:"dynamic_config,omitempty"`
 	// An inlined list of filter configurations. The specified filters will be executed in order.
-	// [#not-implemented-hide:]
+	// If this field is set, “typed_config“ and “dynamic_config“ are ignored.
 	FilterChain *FilterChainConfiguration `protobuf:"bytes,4,opt,name=filter_chain,json=filterChain,proto3" json:"filter_chain,omitempty"`
 	// Probability of the action execution. If not specified, this is 100%.
 	// This allows sampling behavior for the configured actions.
