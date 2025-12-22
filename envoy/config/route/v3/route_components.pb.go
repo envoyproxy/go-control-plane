@@ -6657,8 +6657,37 @@ func (x *RateLimit_Action_MaskedRemoteAddress) GetV6PrefixMaskLen() *wrapperspb.
 //	("generic_key", "<descriptor_value>")
 type RateLimit_Action_GenericKey struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The value to use in the descriptor entry.
+	// Descriptor value of entry.
+	//
+	// The same :ref:`format specifier <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` applies here, however
+	// unknown specifier values are replaced with the empty string instead of “-“.
+	//
+	// .. note::
+	//
+	//	Formatter parsing is controlled by the runtime feature flag
+	//	``envoy.reloadable_features.enable_formatter_for_ratelimit_action_descriptor_value``
+	//	(disabled by default).
+	//
+	//	When enabled: The format string can contain multiple valid substitution
+	//	fields. If multiple substitution fields are present, their results will be concatenated
+	//	to form the final descriptor value. If it contains no substitution fields, the value
+	//	will be used as is. If the final concatenated result is empty and ``default_value`` is set,
+	//	the ``default_value`` will be used. If ``default_value`` is not set and the result is
+	//	empty, this descriptor will be skipped and not included in the rate limit call.
+	//
+	//	When disabled (default): The descriptor_value is used as a literal string without any formatter
+	//	parsing or substitution.
+	//
+	// For example, “static_value“ will be used as is since there are no substitution fields.
+	// “%REQ(:method)%“ will be replaced with the HTTP method, and
+	// “%REQ(:method)%%REQ(:path)%“ will be replaced with the concatenation of the HTTP method and path.
+	// “%CEL(request.headers['user-id'])%“ will use CEL to extract the user ID from request headers.
 	DescriptorValue string `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue,proto3" json:"descriptor_value,omitempty"`
+	// An optional value to use if the final concatenated “descriptor_value“ result is empty.
+	// Only applicable when formatter parsing is enabled by the runtime feature flag
+	// “envoy.reloadable_features.enable_formatter_for_ratelimit_action_descriptor_value“ (disabled by default).
+	DefaultValue string `protobuf:"bytes,3,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 	// An optional key to use in the descriptor entry. If not set it defaults
 	// to 'generic_key' as the descriptor key.
 	DescriptorKey string `protobuf:"bytes,2,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
@@ -6703,6 +6732,13 @@ func (x *RateLimit_Action_GenericKey) GetDescriptorValue() string {
 	return ""
 }
 
+func (x *RateLimit_Action_GenericKey) GetDefaultValue() string {
+	if x != nil {
+		return x.DefaultValue
+	}
+	return ""
+}
+
 func (x *RateLimit_Action_GenericKey) GetDescriptorKey() string {
 	if x != nil {
 		return x.DescriptorKey
@@ -6715,21 +6751,53 @@ func (x *RateLimit_Action_GenericKey) GetDescriptorKey() string {
 // .. code-block:: cpp
 //
 //	("header_match", "<descriptor_value>")
+//
+// [#next-free-field: 6]
 type RateLimit_Action_HeaderValueMatch struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Descriptor value of entry.
+	//
+	// The same :ref:`format specifier <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` applies here, however
+	// unknown specifier values are replaced with the empty string instead of “-“.
+	//
+	// .. note::
+	//
+	//	Formatter parsing is controlled by the runtime feature flag
+	//	``envoy.reloadable_features.enable_formatter_for_ratelimit_action_descriptor_value``
+	//	(disabled by default).
+	//
+	//	When enabled: The format string can contain multiple valid substitution
+	//	fields. If multiple substitution fields are present, their results will be concatenated
+	//	to form the final descriptor value. If it contains no substitution fields, the value
+	//	will be used as is. All substitution fields will be evaluated and their results
+	//	concatenated. If the final concatenated result is empty and ``default_value`` is set,
+	//	the ``default_value`` will be used. If ``default_value`` is not set and the result is
+	//	empty, this descriptor will be skipped and not included in the rate limit call.
+	//
+	//	When disabled (default): The descriptor_value is used as a literal string without any formatter
+	//	parsing or substitution.
+	//
+	// For example, “static_value“ will be used as is since there are no substitution fields.
+	// “%REQ(:method)%“ will be replaced with the HTTP method, and
+	// “%REQ(:method)%%REQ(:path)%“ will be replaced with the concatenation of the HTTP method and path.
+	// “%CEL(request.headers['user-id'])%“ will use CEL to extract the user ID from request headers.
+	DescriptorValue string `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue,proto3" json:"descriptor_value,omitempty"`
+	// An optional value to use if the final concatenated “descriptor_value“ result is empty.
+	// Only applicable when formatter parsing is enabled by the runtime feature flag
+	// “envoy.reloadable_features.enable_formatter_for_ratelimit_action_descriptor_value“ (disabled by default).
+	DefaultValue string `protobuf:"bytes,5,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 	// The key to use in the descriptor entry.
 	//
 	// Defaults to “header_match“.
 	DescriptorKey string `protobuf:"bytes,4,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
-	// The value to use in the descriptor entry.
-	DescriptorValue string `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue,proto3" json:"descriptor_value,omitempty"`
 	// If set to true, the action will append a descriptor entry when the
 	// request matches the headers. If set to false, the action will append a
 	// descriptor entry when the request does not match the headers. The
 	// default value is true.
 	ExpectMatch *wrapperspb.BoolValue `protobuf:"bytes,2,opt,name=expect_match,json=expectMatch,proto3" json:"expect_match,omitempty"`
 	// Specifies a set of headers that the rate limit action should match
-	// on. The action will check the request’s headers against all the
+	// on. The action will check the request's headers against all the
 	// specified headers in the config. A match will happen if all the
 	// headers in the config are present in the request with the same values
 	// (or based on presence if the value field is not in the config).
@@ -6768,16 +6836,23 @@ func (*RateLimit_Action_HeaderValueMatch) Descriptor() ([]byte, []int) {
 	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{17, 0, 7}
 }
 
-func (x *RateLimit_Action_HeaderValueMatch) GetDescriptorKey() string {
+func (x *RateLimit_Action_HeaderValueMatch) GetDescriptorValue() string {
 	if x != nil {
-		return x.DescriptorKey
+		return x.DescriptorValue
 	}
 	return ""
 }
 
-func (x *RateLimit_Action_HeaderValueMatch) GetDescriptorValue() string {
+func (x *RateLimit_Action_HeaderValueMatch) GetDefaultValue() string {
 	if x != nil {
-		return x.DescriptorValue
+		return x.DefaultValue
+	}
+	return ""
+}
+
+func (x *RateLimit_Action_HeaderValueMatch) GetDescriptorKey() string {
+	if x != nil {
+		return x.DescriptorKey
 	}
 	return ""
 }
@@ -6978,21 +7053,53 @@ func (x *RateLimit_Action_MetaData) GetSkipIfAbsent() bool {
 // .. code-block:: cpp
 //
 //	("query_match", "<descriptor_value>")
+//
+// [#next-free-field: 6]
 type RateLimit_Action_QueryParameterValueMatch struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Descriptor value of entry.
+	//
+	// The same :ref:`format specifier <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` applies here, however
+	// unknown specifier values are replaced with the empty string instead of “-“.
+	//
+	// .. note::
+	//
+	//	Formatter parsing is controlled by the runtime feature flag
+	//	``envoy.reloadable_features.enable_formatter_for_ratelimit_action_descriptor_value``
+	//	(disabled by default).
+	//
+	//	When enabled: The format string can contain multiple valid substitution
+	//	fields. If multiple substitution fields are present, their results will be concatenated
+	//	to form the final descriptor value. If it contains no substitution fields, the value
+	//	will be used as is. All substitution fields will be evaluated and their results
+	//	concatenated. If the final concatenated result is empty and ``default_value`` is set,
+	//	the ``default_value`` will be used. If ``default_value`` is not set and the result is
+	//	empty, this descriptor will be skipped and not included in the rate limit call.
+	//
+	//	When disabled (default): The descriptor_value is used as a literal string without any formatter
+	//	parsing or substitution.
+	//
+	// For example, “static_value“ will be used as is since there are no substitution fields.
+	// “%REQ(:method)%“ will be replaced with the HTTP method, and
+	// “%REQ(:method)%%REQ(:path)%“ will be replaced with the concatenation of the HTTP method and path.
+	// “%CEL(request.headers['user-id'])%“ will use CEL to extract the user ID from request headers.
+	DescriptorValue string `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue,proto3" json:"descriptor_value,omitempty"`
+	// An optional value to use if the final concatenated “descriptor_value“ result is empty.
+	// Only applicable when formatter parsing is enabled by the runtime feature flag
+	// “envoy.reloadable_features.enable_formatter_for_ratelimit_action_descriptor_value“ (disabled by default).
+	DefaultValue string `protobuf:"bytes,5,opt,name=default_value,json=defaultValue,proto3" json:"default_value,omitempty"`
 	// The key to use in the descriptor entry.
 	//
 	// Defaults to “query_match“.
 	DescriptorKey string `protobuf:"bytes,4,opt,name=descriptor_key,json=descriptorKey,proto3" json:"descriptor_key,omitempty"`
-	// The value to use in the descriptor entry.
-	DescriptorValue string `protobuf:"bytes,1,opt,name=descriptor_value,json=descriptorValue,proto3" json:"descriptor_value,omitempty"`
 	// If set to true, the action will append a descriptor entry when the
 	// request matches the headers. If set to false, the action will append a
 	// descriptor entry when the request does not match the headers. The
 	// default value is true.
 	ExpectMatch *wrapperspb.BoolValue `protobuf:"bytes,2,opt,name=expect_match,json=expectMatch,proto3" json:"expect_match,omitempty"`
 	// Specifies a set of query parameters that the rate limit action should match
-	// on. The action will check the request’s query parameters against all the
+	// on. The action will check the request's query parameters against all the
 	// specified query parameters in the config. A match will happen if all the
 	// query parameters in the config are present in the request with the same values
 	// (or based on presence if the value field is not in the config).
@@ -7031,16 +7138,23 @@ func (*RateLimit_Action_QueryParameterValueMatch) Descriptor() ([]byte, []int) {
 	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{17, 0, 10}
 }
 
-func (x *RateLimit_Action_QueryParameterValueMatch) GetDescriptorKey() string {
+func (x *RateLimit_Action_QueryParameterValueMatch) GetDescriptorValue() string {
 	if x != nil {
-		return x.DescriptorKey
+		return x.DescriptorValue
 	}
 	return ""
 }
 
-func (x *RateLimit_Action_QueryParameterValueMatch) GetDescriptorValue() string {
+func (x *RateLimit_Action_QueryParameterValueMatch) GetDefaultValue() string {
 	if x != nil {
-		return x.DescriptorValue
+		return x.DefaultValue
+	}
+	return ""
+}
+
+func (x *RateLimit_Action_QueryParameterValueMatch) GetDescriptorKey() string {
+	if x != nil {
+		return x.DescriptorKey
 	}
 	return ""
 }
@@ -7462,7 +7576,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x0eVirtualCluster\x12>\n" +
 	"\aheaders\x18\x04 \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\aheaders\x12\x1b\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name:(\x9aň\x1e#\n" +
-	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\xcc \n" +
+	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\xbb!\n" +
 	"\tRateLimit\x12;\n" +
 	"\x05stage\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02\x18\n" +
 	"R\x05stage\x12\x1f\n" +
@@ -7472,7 +7586,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x05limit\x18\x04 \x01(\v2).envoy.config.route.v3.RateLimit.OverrideR\x05limit\x12L\n" +
 	"\vhits_addend\x18\x05 \x01(\v2+.envoy.config.route.v3.RateLimit.HitsAddendR\n" +
 	"hitsAddend\x12/\n" +
-	"\x14apply_on_stream_done\x18\x06 \x01(\bR\x11applyOnStreamDone\x1a\xc0\x1a\n" +
+	"\x14apply_on_stream_done\x18\x06 \x01(\bR\x11applyOnStreamDone\x1a\xaf\x1b\n" +
 	"\x06Action\x12^\n" +
 	"\x0esource_cluster\x18\x01 \x01(\v25.envoy.config.route.v3.RateLimit.Action.SourceClusterH\x00R\rsourceCluster\x12m\n" +
 	"\x13destination_cluster\x18\x02 \x01(\v2:.envoy.config.route.v3.RateLimit.Action.DestinationClusterH\x00R\x12destinationCluster\x12a\n" +
@@ -7507,15 +7621,17 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"1envoy.api.v2.route.RateLimit.Action.RemoteAddress\x1a\xbe\x01\n" +
 	"\x13MaskedRemoteAddress\x12R\n" +
 	"\x12v4_prefix_mask_len\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02\x18 R\x0fv4PrefixMaskLen\x12S\n" +
-	"\x12v6_prefix_mask_len\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\b\xfaB\x05*\x03\x18\x80\x01R\x0fv6PrefixMaskLen\x1a\x9e\x01\n" +
+	"\x12v6_prefix_mask_len\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\b\xfaB\x05*\x03\x18\x80\x01R\x0fv6PrefixMaskLen\x1a\xc3\x01\n" +
 	"\n" +
 	"GenericKey\x122\n" +
-	"\x10descriptor_value\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fdescriptorValue\x12%\n" +
+	"\x10descriptor_value\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fdescriptorValue\x12#\n" +
+	"\rdefault_value\x18\x03 \x01(\tR\fdefaultValue\x12%\n" +
 	"\x0edescriptor_key\x18\x02 \x01(\tR\rdescriptorKey:5\x9aň\x1e0\n" +
-	".envoy.api.v2.route.RateLimit.Action.GenericKey\x1a\xb3\x02\n" +
-	"\x10HeaderValueMatch\x12%\n" +
-	"\x0edescriptor_key\x18\x04 \x01(\tR\rdescriptorKey\x122\n" +
-	"\x10descriptor_value\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fdescriptorValue\x12=\n" +
+	".envoy.api.v2.route.RateLimit.Action.GenericKey\x1a\xd8\x02\n" +
+	"\x10HeaderValueMatch\x122\n" +
+	"\x10descriptor_value\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fdescriptorValue\x12#\n" +
+	"\rdefault_value\x18\x05 \x01(\tR\fdefaultValue\x12%\n" +
+	"\x0edescriptor_key\x18\x04 \x01(\tR\rdescriptorKey\x12=\n" +
 	"\fexpect_match\x18\x02 \x01(\v2\x1a.google.protobuf.BoolValueR\vexpectMatch\x12H\n" +
 	"\aheaders\x18\x03 \x03(\v2$.envoy.config.route.v3.HeaderMatcherB\b\xfaB\x05\x92\x01\x02\b\x01R\aheaders:;\x9aň\x1e6\n" +
 	"4envoy.api.v2.route.RateLimit.Action.HeaderValueMatch\x1a\xb8\x01\n" +
@@ -7531,10 +7647,11 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x0eskip_if_absent\x18\x05 \x01(\bR\fskipIfAbsent\"&\n" +
 	"\x06Source\x12\v\n" +
 	"\aDYNAMIC\x10\x00\x12\x0f\n" +
-	"\vROUTE_ENTRY\x10\x01\x1a\x97\x02\n" +
-	"\x18QueryParameterValueMatch\x12%\n" +
-	"\x0edescriptor_key\x18\x04 \x01(\tR\rdescriptorKey\x122\n" +
-	"\x10descriptor_value\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fdescriptorValue\x12=\n" +
+	"\vROUTE_ENTRY\x10\x01\x1a\xbc\x02\n" +
+	"\x18QueryParameterValueMatch\x122\n" +
+	"\x10descriptor_value\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fdescriptorValue\x12#\n" +
+	"\rdefault_value\x18\x05 \x01(\tR\fdefaultValue\x12%\n" +
+	"\x0edescriptor_key\x18\x04 \x01(\tR\rdescriptorKey\x12=\n" +
 	"\fexpect_match\x18\x02 \x01(\v2\x1a.google.protobuf.BoolValueR\vexpectMatch\x12a\n" +
 	"\x10query_parameters\x18\x03 \x03(\v2,.envoy.config.route.v3.QueryParameterMatcherB\b\xfaB\x05\x92\x01\x02\b\x01R\x0fqueryParameters:*\x9aň\x1e%\n" +
 	"#envoy.api.v2.route.RateLimit.ActionB\x17\n" +
