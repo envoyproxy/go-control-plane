@@ -176,5 +176,7 @@ func (s *Snapshot) GetTypeSnapshot(typeURL string) types.TypeSnapshot {
 			TTL:      res.TTL,
 		})
 	}
-	return types.NewTypeSnapshot(typeURL, s.GetVersion(typeURL), resources)
+	// Error is only on wrong serialized resource type, which cannot occur here.
+	snapshot, _ := types.NewTypeSnapshot(typeURL, s.GetVersion(typeURL), resources)
+	return snapshot
 }

@@ -107,7 +107,7 @@ func WithVersionPrefix(prefix string) LinearCacheOption {
 func WithInitialResources(resources map[string]types.Resource) LinearCacheOption {
 	return func(cache *LinearCache) {
 		for name, resource := range resources {
-			cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, resource)
+			cache.resources[name] = internal.NewCachedResource(name, resource)
 		}
 	}
 }
@@ -332,6 +332,13 @@ func (cache *LinearCache) notifyAll(modified []string) error {
 	return nil
 }
 
+func (cache *LinearCache) isResourceAllowed(res types.SnapshotResource) error {
+	if res.TypeURL() != cache.typeURL {
+		return fmt.Errorf("resource %s has wrong type: expected %s and received %s", res.Name, cache.typeURL, res.Serialized.GetTypeUrl())
+	}
+	return nil
+}
+
 // UpdateResource updates a resource in the collection.
 func (cache *LinearCache) UpdateResource(name string, res types.Resource) error {
 	if res == nil {
@@ -341,9 +348,23 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	defer cache.mu.Unlock()
 
 	cache.version++
-	cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, res, internal.WithCacheVersion(cache.getVersion()))
+	cache.resources[name] = internal.NewCachedResource(name, res, internal.WithCacheVersion(cache.getVersion()))
 
 	return cache.notifyAll([]string{name})
+}
+
+// UpdateSnapshotResource updates a resource in the collection.
+func (cache *LinearCache) UpdateSnapshotResource(res types.SnapshotResource) error {
+	if err := cache.isResourceAllowed(res); err != nil {
+		return err
+	}
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	cache.version++
+	cache.resources[res.Name] = res.AsCachedResource(cache.getVersion())
+
+	return cache.notifyAll([]string{res.Name})
 }
 
 // DeleteResource removes a resource in the collection.
@@ -368,8 +389,37 @@ func (cache *LinearCache) UpdateResources(toUpdate map[string]types.Resource, to
 	version := cache.getVersion()
 	modified := make([]string, 0, len(toUpdate)+len(toDelete))
 	for name, resource := range toUpdate {
-		cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, resource, internal.WithCacheVersion(version))
+		cache.resources[name] = internal.NewCachedResource(name, resource, internal.WithCacheVersion(version))
 		modified = append(modified, name)
+	}
+	for _, name := range toDelete {
+		delete(cache.resources, name)
+		modified = append(modified, name)
+	}
+
+	return cache.notifyAll(modified)
+}
+
+// UpdateSnapshotResources updates/deletes a list of resources in the cache.
+// Calling UpdateSnapshotResources instead of iterating on UpdateSnapshotResource and DeleteResource
+// is significantly more efficient when using delta or wildcard watches.
+func (cache *LinearCache) UpdateSnapshotResources(toUpdate []types.SnapshotResource, toDelete []string) error {
+	// Do a validation pass beforehand to not leave the cache in a half state.
+	for _, res := range toUpdate {
+		if err := cache.isResourceAllowed(res); err != nil {
+			return err
+		}
+	}
+
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	cache.version++
+	version := cache.getVersion()
+	modified := make([]string, 0, len(toUpdate)+len(toDelete))
+	for _, res := range toUpdate {
+		cache.resources[res.Name] = res.AsCachedResource(version)
+		modified = append(modified, res.Name)
 	}
 	for _, name := range toDelete {
 		delete(cache.resources, name)
@@ -401,13 +451,46 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	// We assume all resources passed to SetResources are changed.
 	// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
 	for name, resource := range resources {
-		cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, resource, internal.WithCacheVersion(version))
+		cache.resources[name] = internal.NewCachedResource(name, resource, internal.WithCacheVersion(version))
 		modified = append(modified, name)
 	}
 
 	if err := cache.notifyAll(modified); err != nil {
 		cache.log.Errorf("Failed to notify watches: %s", err.Error())
 	}
+}
+
+// SetSnapshotResources replaces current resources with a new set of resources.
+// Given the use of lazy serialization, if most resources are actually the same
+// using UpdateResources instead will be much more efficient.
+func (cache *LinearCache) SetSnapshotResources(resources []types.SnapshotResource) error {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
+
+	cache.version++
+	version := cache.getVersion()
+
+	modified := make([]string, 0, len(resources))
+	newResources := make(map[string]*internal.CachedResource, len(resources))
+	// We assume all resources passed to SetSnapshotResources are changed.
+	// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
+	for _, res := range resources {
+		if err := cache.isResourceAllowed(res); err != nil {
+			return err
+		}
+		newResources[res.Name] = res.AsCachedResource(version)
+		modified = append(modified, res.Name)
+	}
+
+	// Collect deleted resource names.
+	for name := range cache.resources {
+		if _, found := newResources[name]; !found {
+			modified = append(modified, name)
+		}
+	}
+
+	cache.resources = newResources
+	return cache.notifyAll(modified)
 }
 
 // GetResources returns current resources stored in the cache
