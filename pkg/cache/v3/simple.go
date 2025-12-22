@@ -211,7 +211,10 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			if watch.subscription.IsWildcard() {
 				resourcesToReturn = make(map[string]*internal.CachedResource, len(resources))
 				for _, res := range resources {
-					addResource(res)
+					// Include wildcard-eligible resources for wildcard subscriptions
+					if !res.OnDemandOnly() {
+						addResource(res)
+					}
 				}
 			}
 			for name := range watch.subscription.SubscribedResources() {
@@ -517,12 +520,15 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 		// Check if a resource was not previously returned (e.g. if the watch is newly wildcard).
 		if watch.subscription.IsWildcard() {
 			changedResources = make(map[string]struct{}, len(resources))
-			for name := range resources {
-				_, known := knownResources[name]
-				if known {
+			for name, res := range resources {
+				// Include wildcard-eligible resources for wildcard subscriptions
+				if res.OnDemandOnly() {
 					continue
 				}
-				changedResources[name] = struct{}{}
+
+				if _, known := knownResources[name]; !known {
+					changedResources[name] = struct{}{}
+				}
 			}
 		} else {
 			changedResources = make(map[string]struct{}, len(subscribedResources))
@@ -547,20 +553,18 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 		}
 
 		for name := range knownResources {
-			_, exist := resources[name]
+			res, exist := resources[name]
 			if !exist {
 				deletedResources = append(deletedResources, name)
 				continue
 			}
 
-			if watch.subscription.IsWildcard() {
+			if watch.subscription.IsWildcard() && !res.OnDemandOnly() {
 				continue
 			}
-			_, watched := subscribedResources[name]
-			if !watched {
-				// Resource is no longer watched.
+
+			if _, explicitlySubscribed := subscribedResources[name]; !explicitlySubscribed {
 				deletedResources = append(deletedResources, name)
-				continue
 			}
 		}
 
@@ -579,8 +583,11 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 			resourcesToReturn = make([]*internal.CachedResource, 0, len(resources))
 			returnedResources = make(map[string]string, len(resources))
 			for name, resource := range resources {
-				resourcesToReturn = append(resourcesToReturn, resource)
-				returnedResources[name] = version
+				// Include wildcard-eligible resources for wildcard subscriptions
+				if !resource.OnDemandOnly() {
+					resourcesToReturn = append(resourcesToReturn, resource)
+					returnedResources[name] = version
+				}
 			}
 		} else {
 			resourcesToReturn = make([]*internal.CachedResource, 0, len(subscribedResources))
@@ -591,8 +598,10 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 			if !ok {
 				continue
 			}
-			resourcesToReturn = append(resourcesToReturn, resource)
-			returnedResources[name] = version
+			if _, alreadyAdded := returnedResources[name]; !alreadyAdded {
+				resourcesToReturn = append(resourcesToReturn, resource)
+				returnedResources[name] = version
+			}
 		}
 	} else {
 		// Same version and not full state, only return newly subscribed resources.
@@ -720,8 +729,11 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 
 	if watch.subscription.IsWildcard() {
 		for _, res := range resources {
-			if err := addIfChanged(res); err != nil {
-				return nil, fmt.Errorf("failed to compute resource version for %s: %w", res.Name, err)
+			// Include wildcard-eligible resources for wildcard subscriptions
+			if !res.OnDemandOnly() {
+				if err := addIfChanged(res); err != nil {
+					return nil, fmt.Errorf("failed to compute resource version for %s: %w", res.Name, err)
+				}
 			}
 		}
 	}
@@ -737,18 +749,18 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 	}
 
 	for name := range returnedResources {
-		_, exist := resources[name]
+		res, exist := resources[name]
 		if !exist {
 			deletedResources = append(deletedResources, name)
 			delete(returnedResources, name)
 			continue
 		}
 
-		if watch.subscription.IsWildcard() {
+		if watch.subscription.IsWildcard() && !res.OnDemandOnly() {
 			continue
 		}
-		if _, watched := subscribed[name]; !watched {
-			// Resource is no longer watched.
+
+		if _, explicitlySubscribed := subscribed[name]; !explicitlySubscribed {
 			deletedResources = append(deletedResources, name)
 			delete(returnedResources, name)
 		}
