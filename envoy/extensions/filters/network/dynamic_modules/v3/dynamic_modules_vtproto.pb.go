@@ -50,6 +50,16 @@ func (m *DynamicModuleNetworkFilter) MarshalToSizedBufferVTStrict(dAtA []byte) (
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.TerminalFilter {
+		i--
+		if m.TerminalFilter {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.FilterConfig != nil {
 		size, err := (*anypb.Any)(m.FilterConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -115,6 +125,9 @@ func (m *DynamicModuleNetworkFilter) SizeVT() (n int) {
 	if m.FilterConfig != nil {
 		l = (*anypb.Any)(m.FilterConfig).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.TerminalFilter {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

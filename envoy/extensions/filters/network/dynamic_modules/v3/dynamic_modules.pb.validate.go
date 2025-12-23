@@ -118,6 +118,8 @@ func (m *DynamicModuleNetworkFilter) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for TerminalFilter
+
 	if len(errors) > 0 {
 		return DynamicModuleNetworkFilterMultiError(errors)
 	}

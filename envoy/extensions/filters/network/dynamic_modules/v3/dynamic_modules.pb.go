@@ -71,9 +71,13 @@ type DynamicModuleNetworkFilter struct {
 	//	filter_config:
 	//	  "@type": "type.googleapis.com/google.protobuf.BytesValue"
 	//	  value: aGVsbG8=  # echo -n "hello" | base64
-	FilterConfig  *anypb.Any `protobuf:"bytes,3,opt,name=filter_config,json=filterConfig,proto3" json:"filter_config,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	FilterConfig *anypb.Any `protobuf:"bytes,3,opt,name=filter_config,json=filterConfig,proto3" json:"filter_config,omitempty"`
+	// Set true if the dynamic module is a terminal filter to use without an upstream connection.
+	// The dynamic module is responsible for creating and sending the response to downstream.
+	// If not specified, defaults to false.
+	TerminalFilter bool `protobuf:"varint,4,opt,name=terminal_filter,json=terminalFilter,proto3" json:"terminal_filter,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *DynamicModuleNetworkFilter) Reset() {
@@ -127,16 +131,24 @@ func (x *DynamicModuleNetworkFilter) GetFilterConfig() *anypb.Any {
 	return nil
 }
 
+func (x *DynamicModuleNetworkFilter) GetTerminalFilter() bool {
+	if x != nil {
+		return x.TerminalFilter
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"Ienvoy/extensions/filters/network/dynamic_modules/v3/dynamic_modules.proto\x123envoy.extensions.filters.network.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\"\xe6\x01\n" +
+	"Ienvoy/extensions/filters/network/dynamic_modules/v3/dynamic_modules.proto\x123envoy.extensions.filters.network.dynamic_modules.v3\x1a9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x1a\x19google/protobuf/any.proto\x1a\x1dudpa/annotations/status.proto\"\x8f\x02\n" +
 	"\x1aDynamicModuleNetworkFilter\x12l\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigR\x13dynamicModuleConfig\x12\x1f\n" +
 	"\vfilter_name\x18\x02 \x01(\tR\n" +
 	"filterName\x129\n" +
-	"\rfilter_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\ffilterConfigB\xd0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\rfilter_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\ffilterConfig\x12'\n" +
+	"\x0fterminal_filter\x18\x04 \x01(\bR\x0eterminalFilterB\xd0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Aio.envoyproxy.envoy.extensions.filters.network.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Zlgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
