@@ -24,15 +24,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Configuration of the network filter for dynamic modules. This filter allows loading shared object
-// files that can be loaded via dlopen by the network filter.
+// Configuration for the Dynamic Modules network filter. This filter allows loading shared object
+// files that can be loaded via “dlopen“ to extend the network filter chain.
 //
-// A module can be loaded by multiple network filters, hence the program can be structured in a way
-// that the module is loaded only once and shared across multiple filters providing multiple
-// functionalities.
+// A module can be loaded by multiple network filters; the module is loaded only once and shared
+// across multiple filters.
 //
-// Unlike HTTP filters which operate on structured headers, body, and trailers, network filters
-// work with raw TCP byte streams. The filter can:
+// Unlike HTTP filters which operate on structured headers, body, and trailers, network filters work
+// with raw TCP byte streams. The filter can:
 //
 // * Inspect, modify, or inject data into the downstream connection.
 // * Access connection-level information such as addresses and TLS status.
@@ -41,20 +40,23 @@ type DynamicModuleNetworkFilter struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Specifies the shared-object level configuration.
 	DynamicModuleConfig *v3.DynamicModuleConfig `protobuf:"bytes,1,opt,name=dynamic_module_config,json=dynamicModuleConfig,proto3" json:"dynamic_module_config,omitempty"`
-	// The name for this filter configuration. This can be used to distinguish between different
-	// filter implementations inside a dynamic module. For example, a module can have completely
-	// different filter implementations. When Envoy receives this configuration, it passes the
-	// “filter_name“ to the dynamic module's network filter config init function together with
-	// the “filter_config“. That way a module can decide which in-module filter implementation
-	// to use based on the name at load time.
+	// The name for this filter configuration.
+	//
+	// This can be used to distinguish between different filter implementations inside a dynamic
+	// module. For example, a module can have completely different filter implementations. When Envoy
+	// receives this configuration, it passes the “filter_name“ to the dynamic module's network
+	// filter config init function together with the “filter_config“. That way a module can decide
+	// which in-module filter implementation to use based on the name at load time.
 	FilterName string `protobuf:"bytes,2,opt,name=filter_name,json=filterName,proto3" json:"filter_name,omitempty"`
-	// The configuration for the filter chosen by “filter_name“. This is passed to the module's
-	// network filter initialization function. Together with the “filter_name“, the module can
-	// decide which in-module filter implementation to use and fine-tune the behavior of the filter.
+	// The configuration for the filter chosen by “filter_name“.
+	//
+	// This is passed to the module's network filter initialization function. Together with the
+	// “filter_name“, the module can decide which in-module filter implementation to use and
+	// fine-tune the behavior of the filter.
 	//
 	// For example, if a module has two filter implementations, one for echo and one for rate
-	// limiting, “filter_name“ is used to choose either echo or rate limiting. The “filter_config“
-	// can be used to configure the echo behavior or the rate limiting parameters.
+	// limiting, “filter_name“ is used to choose either echo or rate limiting. The
+	// “filter_config“ can be used to configure the echo behavior or the rate limiting parameters.
 	//
 	// “google.protobuf.Struct“ is serialized as JSON before passing it to the module.
 	// “google.protobuf.BytesValue“ and “google.protobuf.StringValue“ are passed directly
@@ -72,9 +74,11 @@ type DynamicModuleNetworkFilter struct {
 	//	  "@type": "type.googleapis.com/google.protobuf.BytesValue"
 	//	  value: aGVsbG8=  # echo -n "hello" | base64
 	FilterConfig *anypb.Any `protobuf:"bytes,3,opt,name=filter_config,json=filterConfig,proto3" json:"filter_config,omitempty"`
-	// Set true if the dynamic module is a terminal filter to use without an upstream connection.
+	// If “true“, the dynamic module is a terminal filter to use without an upstream connection.
+	//
 	// The dynamic module is responsible for creating and sending the response to downstream.
-	// If not specified, defaults to false.
+	//
+	// Defaults to “false“.
 	TerminalFilter bool `protobuf:"varint,4,opt,name=terminal_filter,json=terminalFilter,proto3" json:"terminal_filter,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
