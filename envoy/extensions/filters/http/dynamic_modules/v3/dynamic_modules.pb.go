@@ -181,7 +181,13 @@ type DynamicModuleFilterPerRoute struct {
 	//	filter_config:
 	//	  "@type": "type.googleapis.com/google.protobuf.BytesValue"
 	//	  value: aGVsbG8= # echo -n "hello" | base64
-	FilterConfig  *anypb.Any `protobuf:"bytes,3,opt,name=filter_config,json=filterConfig,proto3" json:"filter_config,omitempty"`
+	FilterConfig *anypb.Any `protobuf:"bytes,3,opt,name=filter_config,json=filterConfig,proto3" json:"filter_config,omitempty"`
+	// Disable the filter for this particular vhost or route.
+	// If this field is specified in multiple per-filter-configs, the most specific
+	// one will be used.
+	//
+	// If this field is not specified, the filter would remain enabled.
+	Disabled      bool `protobuf:"varint,4,opt,name=disabled,proto3" json:"disabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -237,6 +243,13 @@ func (x *DynamicModuleFilterPerRoute) GetFilterConfig() *anypb.Any {
 	return nil
 }
 
+func (x *DynamicModuleFilterPerRoute) GetDisabled() bool {
+	if x != nil {
+		return x.Disabled
+	}
+	return false
+}
+
 var File_envoy_extensions_filters_http_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
@@ -247,11 +260,12 @@ const file_envoy_extensions_filters_http_dynamic_modules_v3_dynamic_modules_prot
 	"\vfilter_name\x18\x02 \x01(\tR\n" +
 	"filterName\x129\n" +
 	"\rfilter_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\ffilterConfig\x12'\n" +
-	"\x0fterminal_filter\x18\x04 \x01(\bR\x0eterminalFilter\"\xf9\x01\n" +
+	"\x0fterminal_filter\x18\x04 \x01(\bR\x0eterminalFilter\"\x95\x02\n" +
 	"\x1bDynamicModuleFilterPerRoute\x12l\n" +
 	"\x15dynamic_module_config\x18\x01 \x01(\v28.envoy.extensions.dynamic_modules.v3.DynamicModuleConfigR\x13dynamicModuleConfig\x121\n" +
 	"\x15per_route_config_name\x18\x02 \x01(\tR\x12perRouteConfigName\x129\n" +
-	"\rfilter_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\ffilterConfigB\xca\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\rfilter_config\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\ffilterConfig\x12\x1a\n" +
+	"\bdisabled\x18\x04 \x01(\bR\bdisabledB\xca\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	">io.envoyproxy.envoy.extensions.filters.http.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Zigithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
