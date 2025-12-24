@@ -980,7 +980,7 @@ func (x *KeepaliveSettings) GetConnectionIdleInterval() *durationpb.Duration {
 	return nil
 }
 
-// [#next-free-field: 18]
+// [#next-free-field: 19]
 type Http2ProtocolOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// `Maximum table size <https://httpwg.org/specs/rfc7541.html#rfc.section.4.2>`_
@@ -1133,8 +1133,13 @@ type Http2ProtocolOptions struct {
 	UseOghttp2Codec *wrapperspb.BoolValue `protobuf:"bytes,16,opt,name=use_oghttp2_codec,json=useOghttp2Codec,proto3" json:"use_oghttp2_codec,omitempty"`
 	// Configure the maximum amount of metadata than can be handled per stream. Defaults to “1 MB“.
 	MaxMetadataSize *wrapperspb.UInt64Value `protobuf:"bytes,17,opt,name=max_metadata_size,json=maxMetadataSize,proto3" json:"max_metadata_size,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Controls whether to encode headers using huffman encoding.
+	// This can be useful in cases where the cpu spent encoding the headers isn't
+	// worth the network bandwidth saved e.g. for localhost.
+	// If unset, uses the data plane's default value.
+	EnableHuffmanEncoding *wrapperspb.BoolValue `protobuf:"bytes,18,opt,name=enable_huffman_encoding,json=enableHuffmanEncoding,proto3" json:"enable_huffman_encoding,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *Http2ProtocolOptions) Reset() {
@@ -1283,6 +1288,13 @@ func (x *Http2ProtocolOptions) GetUseOghttp2Codec() *wrapperspb.BoolValue {
 func (x *Http2ProtocolOptions) GetMaxMetadataSize() *wrapperspb.UInt64Value {
 	if x != nil {
 		return x.MaxMetadataSize
+	}
+	return nil
+}
+
+func (x *Http2ProtocolOptions) GetEnableHuffmanEncoding() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.EnableHuffmanEncoding
 	}
 	return nil
 }
@@ -1854,7 +1866,7 @@ const file_envoy_config_core_v3_protocol_proto_rawDesc = "" +
 	"\binterval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\binterval\x12C\n" +
 	"\atimeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x0e\xfaB\v\xaa\x01\b\b\x012\x04\x10\xc0\x84=R\atimeout\x12?\n" +
 	"\x0finterval_jitter\x18\x03 \x01(\v2\x16.envoy.type.v3.PercentR\x0eintervalJitter\x12a\n" +
-	"\x18connection_idle_interval\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16connectionIdleInterval\"\x9a\x0f\n" +
+	"\x18connection_idle_interval\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16connectionIdleInterval\"\xee\x0f\n" +
 	"\x14Http2ProtocolOptions\x12F\n" +
 	"\x10hpack_table_size\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x0ehpackTableSize\x12a\n" +
 	"\x16max_concurrent_streams\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\r\xfaB\n" +
@@ -1876,7 +1888,8 @@ const file_envoy_config_core_v3_protocol_proto_rawDesc = "" +
 	"\x1acustom_settings_parameters\x18\r \x03(\v2<.envoy.config.core.v3.Http2ProtocolOptions.SettingsParameterR\x18customSettingsParameters\x12Z\n" +
 	"\x14connection_keepalive\x18\x0f \x01(\v2'.envoy.config.core.v3.KeepaliveSettingsR\x13connectionKeepalive\x12P\n" +
 	"\x11use_oghttp2_codec\x18\x10 \x01(\v2\x1a.google.protobuf.BoolValueB\b\xd2Ƥ\xe1\x06\x02\b\x01R\x0fuseOghttp2Codec\x12H\n" +
-	"\x11max_metadata_size\x18\x11 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x0fmaxMetadataSize\x1a\xe2\x01\n" +
+	"\x11max_metadata_size\x18\x11 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x0fmaxMetadataSize\x12R\n" +
+	"\x17enable_huffman_encoding\x18\x12 \x01(\v2\x1a.google.protobuf.BoolValueR\x15enableHuffmanEncoding\x1a\xe2\x01\n" +
 	"\x11SettingsParameter\x12N\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\x10\xfaB\r\x8a\x01\x02\x10\x01*\x06\x18\xff\xff\x03(\x00R\n" +
@@ -1983,18 +1996,19 @@ var file_envoy_config_core_v3_protocol_proto_depIdxs = []int32{
 	8,  // 39: envoy.config.core.v3.Http2ProtocolOptions.connection_keepalive:type_name -> envoy.config.core.v3.KeepaliveSettings
 	21, // 40: envoy.config.core.v3.Http2ProtocolOptions.use_oghttp2_codec:type_name -> google.protobuf.BoolValue
 	19, // 41: envoy.config.core.v3.Http2ProtocolOptions.max_metadata_size:type_name -> google.protobuf.UInt64Value
-	9,  // 42: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	3,  // 43: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
-	21, // 44: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	15, // 45: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
-	20, // 46: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	18, // 47: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
-	18, // 48: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
-	49, // [49:49] is the sub-list for method output_type
-	49, // [49:49] is the sub-list for method input_type
-	49, // [49:49] is the sub-list for extension type_name
-	49, // [49:49] is the sub-list for extension extendee
-	0,  // [0:49] is the sub-list for field type_name
+	21, // 42: envoy.config.core.v3.Http2ProtocolOptions.enable_huffman_encoding:type_name -> google.protobuf.BoolValue
+	9,  // 43: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	3,  // 44: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
+	21, // 45: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	15, // 46: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
+	20, // 47: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	18, // 48: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
+	18, // 49: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
+	50, // [50:50] is the sub-list for method output_type
+	50, // [50:50] is the sub-list for method input_type
+	50, // [50:50] is the sub-list for extension type_name
+	50, // [50:50] is the sub-list for extension extendee
+	0,  // [0:50] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_protocol_proto_init() }
