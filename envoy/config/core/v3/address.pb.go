@@ -370,14 +370,16 @@ type TcpKeepalive struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Maximum number of keepalive probes to send without response before deciding
 	// the connection is dead. Default is to use the OS level configuration (unless
-	// overridden, Linux defaults to 9.)
+	// overridden, Linux defaults to 9.) Setting this to “0“ disables TCP keepalive.
 	KeepaliveProbes *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=keepalive_probes,json=keepaliveProbes,proto3" json:"keepalive_probes,omitempty"`
 	// The number of seconds a connection needs to be idle before keep-alive probes
 	// start being sent. Default is to use the OS level configuration (unless
-	// overridden, Linux defaults to 7200s (i.e., 2 hours.)
+	// overridden, Linux defaults to 7200s (i.e., 2 hours.) Setting this to “0“ disables
+	// TCP keepalive.
 	KeepaliveTime *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=keepalive_time,json=keepaliveTime,proto3" json:"keepalive_time,omitempty"`
 	// The number of seconds between keep-alive probes. Default is to use the OS
-	// level configuration (unless overridden, Linux defaults to 75s.)
+	// level configuration (unless overridden, Linux defaults to 75s.) Setting this to
+	// “0“ disables TCP keepalive.
 	KeepaliveInterval *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=keepalive_interval,json=keepaliveInterval,proto3" json:"keepalive_interval,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache

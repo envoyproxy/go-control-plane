@@ -93,6 +93,13 @@ type AdditionalAddress struct {
 	// or an empty list of :ref:`socket_options <envoy_v3_api_field_config.core.v3.SocketOptionsOverride.socket_options>`,
 	// it means no socket option will apply.
 	SocketOptions *v3.SocketOptionsOverride `protobuf:"bytes,2,opt,name=socket_options,json=socketOptions,proto3" json:"socket_options,omitempty"`
+	// Configures TCP keepalive settings for the additional address.
+	// If not set, the listener :ref:`tcp_keepalive <envoy_v3_api_field_config.listener.v3.Listener.tcp_keepalive>`
+	// configuration is inherited. You can explicitly disable TCP keepalive for the additional address by setting any keepalive field
+	// (:ref:`keepalive_probes <envoy_v3_api_field_config.core.v3.TcpKeepalive.keepalive_probes>`,
+	// :ref:`keepalive_time <envoy_v3_api_field_config.core.v3.TcpKeepalive.keepalive_time>`, or
+	// :ref:`keepalive_interval <envoy_v3_api_field_config.core.v3.TcpKeepalive.keepalive_interval>`) to “0“.
+	TcpKeepalive  *v3.TcpKeepalive `protobuf:"bytes,3,opt,name=tcp_keepalive,json=tcpKeepalive,proto3" json:"tcp_keepalive,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -137,6 +144,13 @@ func (x *AdditionalAddress) GetAddress() *v3.Address {
 func (x *AdditionalAddress) GetSocketOptions() *v3.SocketOptionsOverride {
 	if x != nil {
 		return x.SocketOptions
+	}
+	return nil
+}
+
+func (x *AdditionalAddress) GetTcpKeepalive() *v3.TcpKeepalive {
+	if x != nil {
+		return x.TcpKeepalive
 	}
 	return nil
 }
@@ -187,7 +201,7 @@ func (x *ListenerCollection) GetEntries() []*v31.CollectionEntry {
 	return nil
 }
 
-// [#next-free-field: 37]
+// [#next-free-field: 38]
 type Listener struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The unique name by which this listener is known. If no name is provided,
@@ -435,8 +449,13 @@ type Listener struct {
 	IgnoreGlobalConnLimit bool `protobuf:"varint,31,opt,name=ignore_global_conn_limit,json=ignoreGlobalConnLimit,proto3" json:"ignore_global_conn_limit,omitempty"`
 	// Whether the listener bypasses configured overload manager actions.
 	BypassOverloadManager bool `protobuf:"varint,35,opt,name=bypass_overload_manager,json=bypassOverloadManager,proto3" json:"bypass_overload_manager,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// If set, TCP keepalive settings are configured for the listener address and inherited by
+	// additional addresses. If not set, TCP keepalive settings are not configured for the
+	// listener address and additional addresses by default. See :ref:`tcp_keepalive <envoy_v3_api_field_config.listener.v3.AdditionalAddress.tcp_keepalive>`
+	// to explicitly configure TCP keepalive settings for individual additional addresses.
+	TcpKeepalive  *v3.TcpKeepalive `protobuf:"bytes,37,opt,name=tcp_keepalive,json=tcpKeepalive,proto3" json:"tcp_keepalive,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Listener) Reset() {
@@ -716,6 +735,13 @@ func (x *Listener) GetBypassOverloadManager() bool {
 		return x.BypassOverloadManager
 	}
 	return false
+}
+
+func (x *Listener) GetTcpKeepalive() *v3.TcpKeepalive {
+	if x != nil {
+		return x.TcpKeepalive
+	}
+	return nil
 }
 
 type isListener_ListenerSpecifier interface {
@@ -1143,12 +1169,13 @@ var File_envoy_config_listener_v3_listener_proto protoreflect.FileDescriptor
 
 const file_envoy_config_listener_v3_listener_proto_rawDesc = "" +
 	"\n" +
-	"'envoy/config/listener/v3/listener.proto\x12\x18envoy.config.listener.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a+envoy/config/listener/v3/api_listener.proto\x1a2envoy/config/listener/v3/listener_components.proto\x1a2envoy/config/listener/v3/udp_listener_config.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xa0\x01\n" +
+	"'envoy/config/listener/v3/listener.proto\x12\x18envoy.config.listener.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a(envoy/config/core/v3/socket_option.proto\x1a+envoy/config/listener/v3/api_listener.proto\x1a2envoy/config/listener/v3/listener_components.proto\x1a2envoy/config/listener/v3/udp_listener_config.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\"xds/core/v3/collection_entry.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe9\x01\n" +
 	"\x11AdditionalAddress\x127\n" +
 	"\aaddress\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.AddressR\aaddress\x12R\n" +
-	"\x0esocket_options\x18\x02 \x01(\v2+.envoy.config.core.v3.SocketOptionsOverrideR\rsocketOptions\"L\n" +
+	"\x0esocket_options\x18\x02 \x01(\v2+.envoy.config.core.v3.SocketOptionsOverrideR\rsocketOptions\x12G\n" +
+	"\rtcp_keepalive\x18\x03 \x01(\v2\".envoy.config.core.v3.TcpKeepaliveR\ftcpKeepalive\"L\n" +
 	"\x12ListenerCollection\x126\n" +
-	"\aentries\x18\x01 \x03(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xef\x19\n" +
+	"\aentries\x18\x01 \x03(\v2\x1c.xds.core.v3.CollectionEntryR\aentries\"\xb8\x1a\n" +
 	"\bListener\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x127\n" +
 	"\aaddress\x18\x02 \x01(\v2\x1d.envoy.config.core.v3.AddressR\aaddress\x12^\n" +
@@ -1190,7 +1217,8 @@ const file_envoy_config_listener_v3_listener_proto_rawDesc = "" +
 	"\x11internal_listener\x18\x1b \x01(\v29.envoy.config.listener.v3.Listener.InternalListenerConfigH\x00R\x10internalListener\x12!\n" +
 	"\fenable_mptcp\x18\x1e \x01(\bR\venableMptcp\x127\n" +
 	"\x18ignore_global_conn_limit\x18\x1f \x01(\bR\x15ignoreGlobalConnLimit\x126\n" +
-	"\x17bypass_overload_manager\x18# \x01(\bR\x15bypassOverloadManager\x1aw\n" +
+	"\x17bypass_overload_manager\x18# \x01(\bR\x15bypassOverloadManager\x12G\n" +
+	"\rtcp_keepalive\x18% \x01(\v2\".envoy.config.core.v3.TcpKeepaliveR\ftcpKeepalive\x1aw\n" +
 	"\fDeprecatedV1\x12<\n" +
 	"\fbind_to_port\x18\x01 \x01(\v2\x1a.google.protobuf.BoolValueR\n" +
 	"bindToPort:)\x9aň\x1e$\n" +
@@ -1246,62 +1274,65 @@ var file_envoy_config_listener_v3_listener_proto_goTypes = []any{
 	(*Listener_ConnectionBalanceConfig_ExactBalance)(nil), // 11: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.ExactBalance
 	(*v3.Address)(nil),                                    // 12: envoy.config.core.v3.Address
 	(*v3.SocketOptionsOverride)(nil),                      // 13: envoy.config.core.v3.SocketOptionsOverride
-	(*v31.CollectionEntry)(nil),                           // 14: xds.core.v3.CollectionEntry
-	(*FilterChain)(nil),                                   // 15: envoy.config.listener.v3.FilterChain
-	(*v32.Matcher)(nil),                                   // 16: xds.type.matcher.v3.Matcher
-	(*wrapperspb.BoolValue)(nil),                          // 17: google.protobuf.BoolValue
-	(*wrapperspb.UInt32Value)(nil),                        // 18: google.protobuf.UInt32Value
-	(*v3.Metadata)(nil),                                   // 19: envoy.config.core.v3.Metadata
-	(*ListenerFilter)(nil),                                // 20: envoy.config.listener.v3.ListenerFilter
-	(*durationpb.Duration)(nil),                           // 21: google.protobuf.Duration
-	(*v3.SocketOption)(nil),                               // 22: envoy.config.core.v3.SocketOption
-	(v3.TrafficDirection)(0),                              // 23: envoy.config.core.v3.TrafficDirection
-	(*UdpListenerConfig)(nil),                             // 24: envoy.config.listener.v3.UdpListenerConfig
-	(*ApiListener)(nil),                                   // 25: envoy.config.listener.v3.ApiListener
-	(*v33.AccessLog)(nil),                                 // 26: envoy.config.accesslog.v3.AccessLog
-	(*v3.TypedExtensionConfig)(nil),                       // 27: envoy.config.core.v3.TypedExtensionConfig
-	(*v3.ConfigSource)(nil),                               // 28: envoy.config.core.v3.ConfigSource
+	(*v3.TcpKeepalive)(nil),                               // 14: envoy.config.core.v3.TcpKeepalive
+	(*v31.CollectionEntry)(nil),                           // 15: xds.core.v3.CollectionEntry
+	(*FilterChain)(nil),                                   // 16: envoy.config.listener.v3.FilterChain
+	(*v32.Matcher)(nil),                                   // 17: xds.type.matcher.v3.Matcher
+	(*wrapperspb.BoolValue)(nil),                          // 18: google.protobuf.BoolValue
+	(*wrapperspb.UInt32Value)(nil),                        // 19: google.protobuf.UInt32Value
+	(*v3.Metadata)(nil),                                   // 20: envoy.config.core.v3.Metadata
+	(*ListenerFilter)(nil),                                // 21: envoy.config.listener.v3.ListenerFilter
+	(*durationpb.Duration)(nil),                           // 22: google.protobuf.Duration
+	(*v3.SocketOption)(nil),                               // 23: envoy.config.core.v3.SocketOption
+	(v3.TrafficDirection)(0),                              // 24: envoy.config.core.v3.TrafficDirection
+	(*UdpListenerConfig)(nil),                             // 25: envoy.config.listener.v3.UdpListenerConfig
+	(*ApiListener)(nil),                                   // 26: envoy.config.listener.v3.ApiListener
+	(*v33.AccessLog)(nil),                                 // 27: envoy.config.accesslog.v3.AccessLog
+	(*v3.TypedExtensionConfig)(nil),                       // 28: envoy.config.core.v3.TypedExtensionConfig
+	(*v3.ConfigSource)(nil),                               // 29: envoy.config.core.v3.ConfigSource
 }
 var file_envoy_config_listener_v3_listener_proto_depIdxs = []int32{
 	12, // 0: envoy.config.listener.v3.AdditionalAddress.address:type_name -> envoy.config.core.v3.Address
 	13, // 1: envoy.config.listener.v3.AdditionalAddress.socket_options:type_name -> envoy.config.core.v3.SocketOptionsOverride
-	14, // 2: envoy.config.listener.v3.ListenerCollection.entries:type_name -> xds.core.v3.CollectionEntry
-	12, // 3: envoy.config.listener.v3.Listener.address:type_name -> envoy.config.core.v3.Address
-	1,  // 4: envoy.config.listener.v3.Listener.additional_addresses:type_name -> envoy.config.listener.v3.AdditionalAddress
-	15, // 5: envoy.config.listener.v3.Listener.filter_chains:type_name -> envoy.config.listener.v3.FilterChain
-	10, // 6: envoy.config.listener.v3.Listener.fcds_config:type_name -> envoy.config.listener.v3.Listener.FcdsConfig
-	16, // 7: envoy.config.listener.v3.Listener.filter_chain_matcher:type_name -> xds.type.matcher.v3.Matcher
-	17, // 8: envoy.config.listener.v3.Listener.use_original_dst:type_name -> google.protobuf.BoolValue
-	15, // 9: envoy.config.listener.v3.Listener.default_filter_chain:type_name -> envoy.config.listener.v3.FilterChain
-	18, // 10: envoy.config.listener.v3.Listener.per_connection_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
-	19, // 11: envoy.config.listener.v3.Listener.metadata:type_name -> envoy.config.core.v3.Metadata
-	7,  // 12: envoy.config.listener.v3.Listener.deprecated_v1:type_name -> envoy.config.listener.v3.Listener.DeprecatedV1
-	0,  // 13: envoy.config.listener.v3.Listener.drain_type:type_name -> envoy.config.listener.v3.Listener.DrainType
-	20, // 14: envoy.config.listener.v3.Listener.listener_filters:type_name -> envoy.config.listener.v3.ListenerFilter
-	21, // 15: envoy.config.listener.v3.Listener.listener_filters_timeout:type_name -> google.protobuf.Duration
-	17, // 16: envoy.config.listener.v3.Listener.transparent:type_name -> google.protobuf.BoolValue
-	17, // 17: envoy.config.listener.v3.Listener.freebind:type_name -> google.protobuf.BoolValue
-	22, // 18: envoy.config.listener.v3.Listener.socket_options:type_name -> envoy.config.core.v3.SocketOption
-	18, // 19: envoy.config.listener.v3.Listener.tcp_fast_open_queue_length:type_name -> google.protobuf.UInt32Value
-	23, // 20: envoy.config.listener.v3.Listener.traffic_direction:type_name -> envoy.config.core.v3.TrafficDirection
-	24, // 21: envoy.config.listener.v3.Listener.udp_listener_config:type_name -> envoy.config.listener.v3.UdpListenerConfig
-	25, // 22: envoy.config.listener.v3.Listener.api_listener:type_name -> envoy.config.listener.v3.ApiListener
-	8,  // 23: envoy.config.listener.v3.Listener.connection_balance_config:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig
-	17, // 24: envoy.config.listener.v3.Listener.enable_reuse_port:type_name -> google.protobuf.BoolValue
-	26, // 25: envoy.config.listener.v3.Listener.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
-	18, // 26: envoy.config.listener.v3.Listener.tcp_backlog_size:type_name -> google.protobuf.UInt32Value
-	18, // 27: envoy.config.listener.v3.Listener.max_connections_to_accept_per_socket_event:type_name -> google.protobuf.UInt32Value
-	17, // 28: envoy.config.listener.v3.Listener.bind_to_port:type_name -> google.protobuf.BoolValue
-	9,  // 29: envoy.config.listener.v3.Listener.internal_listener:type_name -> envoy.config.listener.v3.Listener.InternalListenerConfig
-	17, // 30: envoy.config.listener.v3.Listener.DeprecatedV1.bind_to_port:type_name -> google.protobuf.BoolValue
-	11, // 31: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.exact_balance:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig.ExactBalance
-	27, // 32: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.extend_balance:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	28, // 33: envoy.config.listener.v3.Listener.FcdsConfig.config_source:type_name -> envoy.config.core.v3.ConfigSource
-	34, // [34:34] is the sub-list for method output_type
-	34, // [34:34] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	14, // 2: envoy.config.listener.v3.AdditionalAddress.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
+	15, // 3: envoy.config.listener.v3.ListenerCollection.entries:type_name -> xds.core.v3.CollectionEntry
+	12, // 4: envoy.config.listener.v3.Listener.address:type_name -> envoy.config.core.v3.Address
+	1,  // 5: envoy.config.listener.v3.Listener.additional_addresses:type_name -> envoy.config.listener.v3.AdditionalAddress
+	16, // 6: envoy.config.listener.v3.Listener.filter_chains:type_name -> envoy.config.listener.v3.FilterChain
+	10, // 7: envoy.config.listener.v3.Listener.fcds_config:type_name -> envoy.config.listener.v3.Listener.FcdsConfig
+	17, // 8: envoy.config.listener.v3.Listener.filter_chain_matcher:type_name -> xds.type.matcher.v3.Matcher
+	18, // 9: envoy.config.listener.v3.Listener.use_original_dst:type_name -> google.protobuf.BoolValue
+	16, // 10: envoy.config.listener.v3.Listener.default_filter_chain:type_name -> envoy.config.listener.v3.FilterChain
+	19, // 11: envoy.config.listener.v3.Listener.per_connection_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	20, // 12: envoy.config.listener.v3.Listener.metadata:type_name -> envoy.config.core.v3.Metadata
+	7,  // 13: envoy.config.listener.v3.Listener.deprecated_v1:type_name -> envoy.config.listener.v3.Listener.DeprecatedV1
+	0,  // 14: envoy.config.listener.v3.Listener.drain_type:type_name -> envoy.config.listener.v3.Listener.DrainType
+	21, // 15: envoy.config.listener.v3.Listener.listener_filters:type_name -> envoy.config.listener.v3.ListenerFilter
+	22, // 16: envoy.config.listener.v3.Listener.listener_filters_timeout:type_name -> google.protobuf.Duration
+	18, // 17: envoy.config.listener.v3.Listener.transparent:type_name -> google.protobuf.BoolValue
+	18, // 18: envoy.config.listener.v3.Listener.freebind:type_name -> google.protobuf.BoolValue
+	23, // 19: envoy.config.listener.v3.Listener.socket_options:type_name -> envoy.config.core.v3.SocketOption
+	19, // 20: envoy.config.listener.v3.Listener.tcp_fast_open_queue_length:type_name -> google.protobuf.UInt32Value
+	24, // 21: envoy.config.listener.v3.Listener.traffic_direction:type_name -> envoy.config.core.v3.TrafficDirection
+	25, // 22: envoy.config.listener.v3.Listener.udp_listener_config:type_name -> envoy.config.listener.v3.UdpListenerConfig
+	26, // 23: envoy.config.listener.v3.Listener.api_listener:type_name -> envoy.config.listener.v3.ApiListener
+	8,  // 24: envoy.config.listener.v3.Listener.connection_balance_config:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig
+	18, // 25: envoy.config.listener.v3.Listener.enable_reuse_port:type_name -> google.protobuf.BoolValue
+	27, // 26: envoy.config.listener.v3.Listener.access_log:type_name -> envoy.config.accesslog.v3.AccessLog
+	19, // 27: envoy.config.listener.v3.Listener.tcp_backlog_size:type_name -> google.protobuf.UInt32Value
+	19, // 28: envoy.config.listener.v3.Listener.max_connections_to_accept_per_socket_event:type_name -> google.protobuf.UInt32Value
+	18, // 29: envoy.config.listener.v3.Listener.bind_to_port:type_name -> google.protobuf.BoolValue
+	9,  // 30: envoy.config.listener.v3.Listener.internal_listener:type_name -> envoy.config.listener.v3.Listener.InternalListenerConfig
+	14, // 31: envoy.config.listener.v3.Listener.tcp_keepalive:type_name -> envoy.config.core.v3.TcpKeepalive
+	18, // 32: envoy.config.listener.v3.Listener.DeprecatedV1.bind_to_port:type_name -> google.protobuf.BoolValue
+	11, // 33: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.exact_balance:type_name -> envoy.config.listener.v3.Listener.ConnectionBalanceConfig.ExactBalance
+	28, // 34: envoy.config.listener.v3.Listener.ConnectionBalanceConfig.extend_balance:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	29, // 35: envoy.config.listener.v3.Listener.FcdsConfig.config_source:type_name -> envoy.config.core.v3.ConfigSource
+	36, // [36:36] is the sub-list for method output_type
+	36, // [36:36] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_listener_v3_listener_proto_init() }

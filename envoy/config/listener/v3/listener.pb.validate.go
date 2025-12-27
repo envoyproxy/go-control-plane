@@ -120,6 +120,35 @@ func (m *AdditionalAddress) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetTcpKeepalive()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, AdditionalAddressValidationError{
+					field:  "TcpKeepalive",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, AdditionalAddressValidationError{
+					field:  "TcpKeepalive",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTcpKeepalive()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AdditionalAddressValidationError{
+				field:  "TcpKeepalive",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return AdditionalAddressMultiError(errors)
 	}
@@ -1082,6 +1111,35 @@ func (m *Listener) validate(all bool) error {
 	// no validation rules for IgnoreGlobalConnLimit
 
 	// no validation rules for BypassOverloadManager
+
+	if all {
+		switch v := interface{}(m.GetTcpKeepalive()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListenerValidationError{
+					field:  "TcpKeepalive",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListenerValidationError{
+					field:  "TcpKeepalive",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTcpKeepalive()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListenerValidationError{
+				field:  "TcpKeepalive",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	switch v := m.ListenerSpecifier.(type) {
 	case *Listener_InternalListener:
