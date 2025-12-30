@@ -99,6 +99,8 @@ func (m *Geoip) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ClientIp
+
 	if len(errors) > 0 {
 		return GeoipMultiError(errors)
 	}

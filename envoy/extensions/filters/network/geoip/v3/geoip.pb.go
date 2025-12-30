@@ -41,7 +41,27 @@ type Geoip struct {
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Geoip driver specific configuration which depends on the driver being instantiated.
 	// [#extension-category: envoy.geoip_providers]
-	Provider      *v3.TypedExtensionConfig `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
+	Provider *v3.TypedExtensionConfig `protobuf:"bytes,2,opt,name=provider,proto3" json:"provider,omitempty"`
+	// Configuration for dynamically extracting the client IP address used for geolocation lookups.
+	//
+	// This field accepts the same :ref:`format specifiers <config_access_log_format>` as used for
+	// :ref:`HTTP access logging <config_access_log>` to extract the client IP.
+	// The formatted result must be a valid IPv4 or IPv6 address string. For example:
+	//
+	// * “%FILTER_STATE(my.custom.client.ip:PLAIN)%“ - Read from filter state populated by a preceding filter.
+	// * “%DYNAMIC_METADATA(namespace:key)%“ - Read from dynamic metadata.
+	// * “%REQ(X-Forwarded-For)%“ - Extract from request header (if applicable in context).
+	//
+	// If not specified, defaults to the downstream connection's remote address.
+	// If specified but the result is empty, “-“, or not a valid IP address, the filter
+	// falls back to the downstream connection's remote address.
+	//
+	// Example reading from filter state:
+	//
+	// .. code-block:: yaml
+	//
+	//	client_ip: "%FILTER_STATE(my.custom.client.ip:PLAIN)%"
+	ClientIp      string `protobuf:"bytes,3,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -90,15 +110,23 @@ func (x *Geoip) GetProvider() *v3.TypedExtensionConfig {
 	return nil
 }
 
+func (x *Geoip) GetClientIp() string {
+	if x != nil {
+		return x.ClientIp
+	}
+	return ""
+}
+
 var File_envoy_extensions_filters_network_geoip_v3_geoip_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_geoip_v3_geoip_proto_rawDesc = "" +
 	"\n" +
-	"5envoy/extensions/filters/network/geoip/v3/geoip.proto\x12)envoy.extensions.filters.network.geoip.v3\x1a$envoy/config/core/v3/extension.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"z\n" +
+	"5envoy/extensions/filters/network/geoip/v3/geoip.proto\x12)envoy.extensions.filters.network.geoip.v3\x1a$envoy/config/core/v3/extension.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x97\x01\n" +
 	"\x05Geoip\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x12P\n" +
-	"\bprovider\x18\x02 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\bproviderB\xb1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\bprovider\x18\x02 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\bprovider\x12\x1b\n" +
+	"\tclient_ip\x18\x03 \x01(\tR\bclientIpB\xb1\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"7io.envoyproxy.envoy.extensions.filters.network.geoip.v3B\n" +
 	"GeoipProtoP\x01ZXgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/geoip/v3;geoipv3b\x06proto3"
 
