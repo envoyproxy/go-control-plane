@@ -8,7 +8,6 @@ package proto_api_scrubberv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v31 "github.com/cncf/xds/go/xds/type/matcher/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -189,10 +188,7 @@ type Restrictions struct {
 	// Value - Method restrictions.
 	MethodRestrictions map[string]*MethodRestrictions `protobuf:"bytes,1,rep,name=method_restrictions,json=methodRestrictions,proto3" json:"method_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Specifies the message restrictions.
-	// Key - Fully qualified message name e.g.,
-	//
-	//	``endpoints.examples.bookstore.Book``.
-	//
+	// Key - Fully qualified message name e.g., “endpoints.examples.bookstore.Book“.
 	// Value - Message restrictions.
 	MessageRestrictions map[string]*MessageRestrictions `protobuf:"bytes,2,rep,name=message_restrictions,json=messageRestrictions,proto3" json:"message_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields       protoimpl.UnknownFields
@@ -248,12 +244,12 @@ func (x *Restrictions) GetMessageRestrictions() map[string]*MessageRestrictions 
 type MethodRestrictions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Restrictions that apply to request fields of the method.
-	// Key - field mask like path of the field eg, foo.bar.baz
+	// Key - field mask like path of the field e.g., foo.bar.baz
 	// Value - Restrictions map containing the mapping from restriction name to
 	// the restriction values.
 	RequestFieldRestrictions map[string]*RestrictionConfig `protobuf:"bytes,1,rep,name=request_field_restrictions,json=requestFieldRestrictions,proto3" json:"request_field_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Restrictions that apply to response fields of the method.
-	// Key - field mask like path of the field eg, foo.bar.baz
+	// Key - field mask like path of the field e.g., foo.bar.baz
 	// Value - Restrictions map containing the mapping from restriction name to
 	// the restriction values.
 	ResponseFieldRestrictions map[string]*RestrictionConfig `protobuf:"bytes,2,rep,name=response_field_restrictions,json=responseFieldRestrictions,proto3" json:"response_field_restrictions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -261,6 +257,7 @@ type MethodRestrictions struct {
 	// rule takes precedence for the method itself over field-level or
 	// message-level rules. The 'matcher' within RestrictionConfig will determine
 	// if the method is denied/scrubbed. If the matcher evaluates to true:
+	//
 	//   - The request is **denied**, and further processing is stopped.
 	//   - The implementation should generate an immediate error response
 	//     (e.g., an HTTP 403 Forbidden status) and send it to the client.
@@ -429,7 +426,7 @@ var File_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto protor
 
 const file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDesc = "" +
 	"\n" +
-	"@envoy/extensions/filters/http/proto_api_scrubber/v3/config.proto\x123envoy.extensions.filters.http.proto_api_scrubber.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1fxds/annotations/v3/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\"\x8c\x03\n" +
+	"@envoy/extensions/filters/http/proto_api_scrubber/v3/config.proto\x123envoy.extensions.filters.http.proto_api_scrubber.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\"\x8c\x03\n" +
 	"\x16ProtoApiScrubberConfig\x12i\n" +
 	"\x0edescriptor_set\x18\x01 \x01(\v2B.envoy.extensions.filters.http.proto_api_scrubber.v3.DescriptorSetR\rdescriptorSet\x12e\n" +
 	"\frestrictions\x18\x02 \x01(\v2A.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionsR\frestrictions\x12\x80\x01\n" +
@@ -465,7 +462,7 @@ const file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawD
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\\\n" +
 	"\x05value\x18\x02 \x01(\v2F.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionConfigR\x05value:\x028\x01\"K\n" +
 	"\x11RestrictionConfig\x126\n" +
-	"\amatcher\x18\x01 \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\amatcherB\xd3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\amatcher\x18\x01 \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\amatcherB\xcb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Aio.envoyproxy.envoy.extensions.filters.http.proto_api_scrubber.v3B\vConfigProtoP\x01Zogithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/proto_api_scrubber/v3;proto_api_scrubberv3b\x06proto3"
 
 var (
