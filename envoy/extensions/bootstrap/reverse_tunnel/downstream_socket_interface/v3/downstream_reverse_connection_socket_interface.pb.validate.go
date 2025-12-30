@@ -64,6 +64,35 @@ func (m *DownstreamReverseConnectionSocketInterface) validate(all bool) error {
 
 	// no validation rules for EnableDetailedStats
 
+	if all {
+		switch v := interface{}(m.GetHttpHandshake()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DownstreamReverseConnectionSocketInterfaceValidationError{
+					field:  "HttpHandshake",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DownstreamReverseConnectionSocketInterfaceValidationError{
+					field:  "HttpHandshake",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetHttpHandshake()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DownstreamReverseConnectionSocketInterfaceValidationError{
+				field:  "HttpHandshake",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return DownstreamReverseConnectionSocketInterfaceMultiError(errors)
 	}
@@ -145,3 +174,123 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DownstreamReverseConnectionSocketInterfaceValidationError{}
+
+// Validate checks the field values on
+// DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError,
+// or nil if none found.
+func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RequestPath
+
+	if len(errors) > 0 {
+		return DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError is
+// an error wrapping multiple validation errors returned by
+// DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig.ValidateAll()
+// if the designated constraints aren't met.
+type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigMultiError) AllErrors() []error {
+	return m
+}
+
+// DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError
+// is the validation error returned by
+// DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig.Validate if
+// the designated constraints aren't met.
+type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError) Key() bool {
+	return e.key
+}
+
+// ErrorName returns error name.
+func (e DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError) ErrorName() string {
+	return "DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDownstreamReverseConnectionSocketInterface_HttpHandshakeConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DownstreamReverseConnectionSocketInterface_HttpHandshakeConfigValidationError{}
