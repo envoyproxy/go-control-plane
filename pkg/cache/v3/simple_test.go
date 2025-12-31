@@ -310,17 +310,17 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 	// set partially-versioned snapshot
 	snapshot2 := fixture.snapshot()
-	snapshot2.Resources[types.Endpoint] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeEndpoint(clusterName, 9090)})
+	snapshot2.Resources[types.Cluster] = cache.NewResources(fixture.version2, []types.Resource{resource.MakeCluster(resource.Ads, clusterName)})
 	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot2))
 	count = c.GetStatusInfo(key).GetNumWatches()
 	assert.Equalf(t, count, len(testTypes)-1, "watches should be preserved for all but one: %d", count)
 
 	// validate response for endpoints
 	select {
-	case out := <-watches[rsrc.EndpointType]:
+	case out := <-watches[rsrc.ClusterType]:
 		gotVersion, _ := out.GetVersion()
 		assert.Equalf(t, gotVersion, fixture.version2, "got version %q, want %q", gotVersion, fixture.version2)
-		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot2.Resources[types.Endpoint].Items), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot2.Resources[types.Endpoint].Items)
+		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot2.Resources[types.Cluster].Items), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot2.Resources[types.Endpoint].Items)
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
 	}
@@ -433,7 +433,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 
 	// Request resource with name=ClusterName
 	go func() {
-		req := &discovery.DiscoveryRequest{TypeUrl: rsrc.EndpointType, ResourceNames: []string{clusterName}}
+		req := &discovery.DiscoveryRequest{TypeUrl: rsrc.ClusterType, ResourceNames: []string{clusterName}}
 		_, err := c.CreateWatch(req, subFromRequest(req), watch)
 		require.NoError(t, err)
 	}()
@@ -442,7 +442,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	case out := <-watch:
 		gotVersion, _ := out.GetVersion()
 		assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
-		want := map[string]types.ResourceWithTTL{clusterName: snapshot2.Resources[types.Endpoint].Items[clusterName]}
+		want := map[string]types.ResourceWithTTL{clusterName: snapshot2.Resources[types.Cluster].Items[clusterName]}
 		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), want), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), want)
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
@@ -451,8 +451,9 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	// Request additional resource with name=clusterName2 for same version
 	go func() {
 		req := &discovery.DiscoveryRequest{
-			TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
+			TypeUrl: rsrc.ClusterType, VersionInfo: fixture.version,
 			ResourceNames: []string{clusterName, clusterName2},
+			ResponseNonce: "1",
 		}
 		sub := subFromRequest(req)
 		sub.SetReturnedResources(map[string]string{clusterName: fixture.version})
@@ -464,15 +465,16 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 	case out := <-watch:
 		gotVersion, _ := out.GetVersion()
 		assert.Equalf(t, gotVersion, fixture.version, "got version %q, want %q", gotVersion, fixture.version)
-		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot2.Resources[types.Endpoint].Items), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot2.Resources[types.Endpoint].Items)
+		assert.Truef(t, reflect.DeepEqual(cache.IndexResourcesByName(out.(*cache.RawResponse).GetRawResources()), snapshot2.Resources[types.Cluster].Items), "got resources %v, want %v", out.(*cache.RawResponse).GetRawResources(), snapshot2.Resources[types.Endpoint].Items)
 	case <-time.After(time.Second):
 		t.Fatal("failed to receive snapshot response")
 	}
 
 	// Repeat request for with same version and make sure a watch is created
 	req := &discovery.DiscoveryRequest{
-		TypeUrl: rsrc.EndpointType, VersionInfo: fixture.version,
+		TypeUrl: rsrc.ClusterType, VersionInfo: fixture.version,
 		ResourceNames: []string{clusterName, clusterName2},
+		ResponseNonce: "2",
 	}
 	sub := subFromRequest(req)
 	sub.SetReturnedResources(map[string]string{clusterName: fixture.version, clusterName2: fixture.version})
