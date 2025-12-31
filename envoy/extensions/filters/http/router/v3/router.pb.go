@@ -28,7 +28,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// [#next-free-field: 10]
+// [#next-free-field: 11]
 type Router struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Whether the router generates dynamic cluster statistics. Defaults to
@@ -105,8 +105,13 @@ type Router struct {
 	// upstream HTTP filters will count as a final response if hedging is configured.
 	// [#extension-category: envoy.filters.http.upstream]
 	UpstreamHttpFilters []*v31.HttpFilter `protobuf:"bytes,8,rep,name=upstream_http_filters,json=upstreamHttpFilters,proto3" json:"upstream_http_filters,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// If set to true, Envoy will reject “CONNECT“ requests that send data before
+	// receiving a “200“ response from the upstream. This early data behavior
+	// is common for latency reduction but can cause issues with some upstreams.
+	// Defaults to false to allow early data and be compatible with common behavior.
+	RejectConnectRequestEarlyData *wrapperspb.BoolValue `protobuf:"bytes,10,opt,name=reject_connect_request_early_data,json=rejectConnectRequestEarlyData,proto3" json:"reject_connect_request_early_data,omitempty"`
+	unknownFields                 protoimpl.UnknownFields
+	sizeCache                     protoimpl.SizeCache
 }
 
 func (x *Router) Reset() {
@@ -203,6 +208,13 @@ func (x *Router) GetUpstreamHttpFilters() []*v31.HttpFilter {
 	return nil
 }
 
+func (x *Router) GetRejectConnectRequestEarlyData() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.RejectConnectRequestEarlyData
+	}
+	return nil
+}
+
 type Router_UpstreamAccessLogOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// If set to true, an upstream access log will be recorded when an upstream stream is
@@ -269,7 +281,7 @@ var File_envoy_extensions_filters_http_router_v3_router_proto protoreflect.FileD
 
 const file_envoy_extensions_filters_http_router_v3_router_proto_rawDesc = "" +
 	"\n" +
-	"4envoy/extensions/filters/http/router/v3/router.proto\x12'envoy.extensions.filters.http.router.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xe0\b\n" +
+	"4envoy/extensions/filters/http/router/v3/router.proto\x12'envoy.extensions.filters.http.router.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xc6\t\n" +
 	"\x06Router\x12?\n" +
 	"\rdynamic_stats\x18\x01 \x01(\v2\x1a.google.protobuf.BoolValueR\fdynamicStats\x125\n" +
 	"\x10start_child_span\x18\x02 \x01(\bB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\x0estartChildSpan\x12G\n" +
@@ -279,7 +291,9 @@ const file_envoy_extensions_filters_http_router_v3_router_proto_rawDesc = "" +
 	"\x14strict_check_headers\x18\x05 \x03(\tB\x94\x01\xfaB\x90\x01\x92\x01\x8c\x01\"\x89\x01r\x86\x01R\x1ex-envoy-upstream-rq-timeout-msR&x-envoy-upstream-rq-per-try-timeout-msR\x13x-envoy-max-retriesR\x15x-envoy-retry-grpc-onR\x10x-envoy-retry-onR\x12strictCheckHeaders\x12=\n" +
 	"\x1brespect_expected_rq_timeout\x18\x06 \x01(\bR\x18respectExpectedRqTimeout\x12U\n" +
 	"(suppress_grpc_request_failure_code_stats\x18\a \x01(\bR#suppressGrpcRequestFailureCodeStats\x12{\n" +
-	"\x15upstream_http_filters\x18\b \x03(\v2G.envoy.extensions.filters.network.http_connection_manager.v3.HttpFilterR\x13upstreamHttpFilters\x1a\xd3\x01\n" +
+	"\x15upstream_http_filters\x18\b \x03(\v2G.envoy.extensions.filters.network.http_connection_manager.v3.HttpFilterR\x13upstreamHttpFilters\x12d\n" +
+	"!reject_connect_request_early_data\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.BoolValueR\x1drejectConnectRequestEarlyData\x1a\xd3\x01\n" +
 	"\x18UpstreamAccessLogOptions\x12O\n" +
 	"%flush_upstream_log_on_upstream_stream\x18\x01 \x01(\bR flushUpstreamLogOnUpstreamStream\x12f\n" +
 	"\x1bupstream_log_flush_interval\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x18upstreamLogFlushInterval:0\x9aň\x1e+\n" +
@@ -312,12 +326,13 @@ var file_envoy_extensions_filters_http_router_v3_router_proto_depIdxs = []int32{
 	3, // 1: envoy.extensions.filters.http.router.v3.Router.upstream_log:type_name -> envoy.config.accesslog.v3.AccessLog
 	1, // 2: envoy.extensions.filters.http.router.v3.Router.upstream_log_options:type_name -> envoy.extensions.filters.http.router.v3.Router.UpstreamAccessLogOptions
 	4, // 3: envoy.extensions.filters.http.router.v3.Router.upstream_http_filters:type_name -> envoy.extensions.filters.network.http_connection_manager.v3.HttpFilter
-	5, // 4: envoy.extensions.filters.http.router.v3.Router.UpstreamAccessLogOptions.upstream_log_flush_interval:type_name -> google.protobuf.Duration
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	2, // 4: envoy.extensions.filters.http.router.v3.Router.reject_connect_request_early_data:type_name -> google.protobuf.BoolValue
+	5, // 5: envoy.extensions.filters.http.router.v3.Router.UpstreamAccessLogOptions.upstream_log_flush_interval:type_name -> google.protobuf.Duration
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_router_v3_router_proto_init() }
