@@ -4234,8 +4234,6 @@ type FilterConfig struct {
 	//	And if the request is mutated later and re-match to another route, the disabled filter by the
 	//	initial route will not be added back to the filter chain because the filter chain is already
 	//	created and it is too late to change the chain.
-	//
-	//	This field only make sense for the downstream HTTP filters for now.
 	Disabled      bool `protobuf:"varint,3,opt,name=disabled,proto3" json:"disabled,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
