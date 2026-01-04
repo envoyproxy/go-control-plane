@@ -28,8 +28,14 @@ type Config struct {
 	// A sequence of the filter state values to apply in the specified order
 	// when a new connection is received.
 	OnNewConnection []*v3.FilterStateValue `protobuf:"bytes,1,rep,name=on_new_connection,json=onNewConnection,proto3" json:"on_new_connection,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// A sequence of the filter state values to apply in the specified order
+	// when the downstream TLS handshake is complete.
+	//
+	// For non-TLS downstream connections (where there is no TLS handshake), this
+	// list is applied when a new connection is received.
+	OnDownstreamTlsHandshake []*v3.FilterStateValue `protobuf:"bytes,2,rep,name=on_downstream_tls_handshake,json=onDownstreamTlsHandshake,proto3" json:"on_downstream_tls_handshake,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *Config) Reset() {
@@ -69,13 +75,21 @@ func (x *Config) GetOnNewConnection() []*v3.FilterStateValue {
 	return nil
 }
 
+func (x *Config) GetOnDownstreamTlsHandshake() []*v3.FilterStateValue {
+	if x != nil {
+		return x.OnDownstreamTlsHandshake
+	}
+	return nil
+}
+
 var File_envoy_extensions_filters_network_set_filter_state_v3_set_filter_state_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_network_set_filter_state_v3_set_filter_state_proto_rawDesc = "" +
 	"\n" +
-	"Kenvoy/extensions/filters/network/set_filter_state/v3/set_filter_state.proto\x124envoy.extensions.filters.network.set_filter_state.v3\x1a?envoy/extensions/filters/common/set_filter_state/v3/value.proto\x1a\x1dudpa/annotations/status.proto\"{\n" +
+	"Kenvoy/extensions/filters/network/set_filter_state/v3/set_filter_state.proto\x124envoy.extensions.filters.network.set_filter_state.v3\x1a?envoy/extensions/filters/common/set_filter_state/v3/value.proto\x1a\x1dudpa/annotations/status.proto\"\x82\x02\n" +
 	"\x06Config\x12q\n" +
-	"\x11on_new_connection\x18\x01 \x03(\v2E.envoy.extensions.filters.common.set_filter_state.v3.FilterStateValueR\x0fonNewConnectionB\xd3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x11on_new_connection\x18\x01 \x03(\v2E.envoy.extensions.filters.common.set_filter_state.v3.FilterStateValueR\x0fonNewConnection\x12\x84\x01\n" +
+	"\x1bon_downstream_tls_handshake\x18\x02 \x03(\v2E.envoy.extensions.filters.common.set_filter_state.v3.FilterStateValueR\x18onDownstreamTlsHandshakeB\xd3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Bio.envoyproxy.envoy.extensions.filters.network.set_filter_state.v3B\x13SetFilterStateProtoP\x01Zngithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/set_filter_state/v3;set_filter_statev3b\x06proto3"
 
 var (
@@ -97,11 +111,12 @@ var file_envoy_extensions_filters_network_set_filter_state_v3_set_filter_state_p
 }
 var file_envoy_extensions_filters_network_set_filter_state_v3_set_filter_state_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.filters.network.set_filter_state.v3.Config.on_new_connection:type_name -> envoy.extensions.filters.common.set_filter_state.v3.FilterStateValue
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	1, // 1: envoy.extensions.filters.network.set_filter_state.v3.Config.on_downstream_tls_handshake:type_name -> envoy.extensions.filters.common.set_filter_state.v3.FilterStateValue
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_network_set_filter_state_v3_set_filter_state_proto_init() }
