@@ -119,7 +119,7 @@ func (x *Config) GetAdditionalLabels() []string {
 }
 
 // DEPRECATED.
-// This method uses `baggage` header encoding.
+// This method uses “baggage“ header encoding.
 type Config_Baggage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -162,7 +162,7 @@ func (*Config_Baggage) Descriptor() ([]byte, []int) {
 //
 //   - If the upstream host address is an IP, this IP is used as the lookup key;
 //   - If the upstream host address is internal, uses the
-//     "filter_metadata.tunnel.destination" dynamic metadata value as the lookup key.
+//     “filter_metadata.tunnel.destination“ dynamic metadata value as the lookup key.
 type Config_WorkloadDiscovery struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -199,11 +199,11 @@ func (*Config_WorkloadDiscovery) Descriptor() ([]byte, []int) {
 	return file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDescGZIP(), []int{0, 1}
 }
 
-// This method uses Istio HTTP metadata exchange headers, e.g. `x-envoy-peer-metadata`. Removes these headers if found.
+// This method uses Istio HTTP metadata exchange headers, e.g. “x-envoy-peer-metadata“. Removes these headers if found.
 type Config_IstioHeaders struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Strip x-envoy-peer-metadata and x-envoy-peer-metadata-id headers on HTTP requests to services outside the mesh.
-	// Detects upstream clusters with `istio` and `external` filter metadata fields
+	// Strip “x-envoy-peer-metadata“ and “x-envoy-peer-metadata-id“ headers on HTTP requests to services outside the mesh.
+	// Detects upstream clusters with “istio“ and “external“ filter metadata fields
 	SkipExternalClusters bool `protobuf:"varint,1,opt,name=skip_external_clusters,json=skipExternalClusters,proto3" json:"skip_external_clusters,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache

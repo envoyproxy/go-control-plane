@@ -276,7 +276,7 @@ func (ApplicationTunnel_Protocol) EnumDescriptor() ([]byte, []int) {
 
 // Workload represents a workload - an endpoint (or collection behind a hostname).
 // The xds primary key is "uid" as defined on the workload below.
-// Secondary (alias) keys are the unique `network/IP` pairs that the workload can be reached at.
+// Secondary (alias) keys are the unique “network/IP“ pairs that the workload can be reached at.
 // [#next-free-field: 26]
 type Workload struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -355,7 +355,7 @@ type Workload struct {
 	// A list of authorization policies applicable to this workload.
 	// NOTE: this *only* includes Selector based policies. Namespace and global polices
 	// are returned out of band.
-	// Authorization policies are only valid for workloads with `addresses` rather than `hostname`.
+	// Authorization policies are only valid for workloads with “addresses“ rather than “hostname“.
 	AuthorizationPolicies []string       `protobuf:"bytes,16,rep,name=authorization_policies,json=authorizationPolicies,proto3" json:"authorization_policies,omitempty"`
 	Status                WorkloadStatus `protobuf:"varint,17,opt,name=status,proto3,enum=istio.workload.WorkloadStatus" json:"status,omitempty"`
 	// The cluster ID that the workload instance belongs to

@@ -285,7 +285,7 @@ type PluginConfig struct {
 	// header originates outsides the mesh, like at ingress.
 	DisableHostHeaderFallback bool `protobuf:"varint,6,opt,name=disable_host_header_fallback,json=disableHostHeaderFallback,proto3" json:"disable_host_header_fallback,omitempty"`
 	// Optional. Allows configuration of the time between calls out to for TCP
-	// metrics reporting. The default duration is `5s`.
+	// metrics reporting. The default duration is “5s“.
 	TcpReportingDuration *durationpb.Duration `protobuf:"bytes,7,opt,name=tcp_reporting_duration,json=tcpReportingDuration,proto3" json:"tcp_reporting_duration,omitempty"`
 	// Metric overrides.
 	Metrics []*MetricConfig `protobuf:"bytes,8,rep,name=metrics,proto3" json:"metrics,omitempty"`
