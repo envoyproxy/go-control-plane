@@ -116,6 +116,8 @@ func (m *SocketEvent) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for SeqNum
+
 	switch v := m.EventSelector.(type) {
 	case *SocketEvent_Read_:
 		if v == nil {

@@ -381,6 +381,16 @@ func (m *ProcessingResponse) MarshalToSizedBufferVTStrict(dAtA []byte) (int, err
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.RequestDrain {
+		i--
+		if m.RequestDrain {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x58
+	}
 	if m.OverrideMessageTimeout != nil {
 		size, err := (*durationpb.Duration)(m.OverrideMessageTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -752,6 +762,26 @@ func (m *HttpBody) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.GrpcMessageCompressed {
+		i--
+		if m.GrpcMessageCompressed {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.EndOfStreamWithoutMessage {
+		i--
+		if m.EndOfStreamWithoutMessage {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
 	}
 	if m.EndOfStream {
 		i--
@@ -1270,6 +1300,26 @@ func (m *StreamedBodyResponse) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.GrpcMessageCompressed {
+		i--
+		if m.GrpcMessageCompressed {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.EndOfStreamWithoutMessage {
+		i--
+		if m.EndOfStreamWithoutMessage {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.EndOfStream {
 		i--
 		if m.EndOfStream {
@@ -1571,6 +1621,9 @@ func (m *ProcessingResponse) SizeVT() (n int) {
 		l = (*durationpb.Duration)(m.OverrideMessageTimeout).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	if m.RequestDrain {
+		n += 2
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -1720,6 +1773,12 @@ func (m *HttpBody) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.EndOfStream {
+		n += 2
+	}
+	if m.EndOfStreamWithoutMessage {
+		n += 2
+	}
+	if m.GrpcMessageCompressed {
 		n += 2
 	}
 	n += len(m.unknownFields)
@@ -1910,6 +1969,12 @@ func (m *StreamedBodyResponse) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.EndOfStream {
+		n += 2
+	}
+	if m.EndOfStreamWithoutMessage {
+		n += 2
+	}
+	if m.GrpcMessageCompressed {
 		n += 2
 	}
 	n += len(m.unknownFields)

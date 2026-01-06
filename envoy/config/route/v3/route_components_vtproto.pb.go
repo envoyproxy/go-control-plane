@@ -4667,6 +4667,13 @@ func (m *RateLimit_Action_GenericKey) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.DefaultValue) > 0 {
+		i -= len(m.DefaultValue)
+		copy(dAtA[i:], m.DefaultValue)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.DefaultValue)))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if len(m.DescriptorKey) > 0 {
 		i -= len(m.DescriptorKey)
 		copy(dAtA[i:], m.DescriptorKey)
@@ -4713,6 +4720,13 @@ func (m *RateLimit_Action_HeaderValueMatch) MarshalToSizedBufferVTStrict(dAtA []
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.DefaultValue) > 0 {
+		i -= len(m.DefaultValue)
+		copy(dAtA[i:], m.DefaultValue)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.DefaultValue)))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if len(m.DescriptorKey) > 0 {
 		i -= len(m.DescriptorKey)
@@ -4935,6 +4949,13 @@ func (m *RateLimit_Action_QueryParameterValueMatch) MarshalToSizedBufferVTStrict
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.DefaultValue) > 0 {
+		i -= len(m.DefaultValue)
+		copy(dAtA[i:], m.DefaultValue)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.DefaultValue)))
+		i--
+		dAtA[i] = 0x2a
 	}
 	if len(m.DescriptorKey) > 0 {
 		i -= len(m.DescriptorKey)
@@ -8146,6 +8167,10 @@ func (m *RateLimit_Action_GenericKey) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	l = len(m.DefaultValue)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	n += len(m.unknownFields)
 	return n
 }
@@ -8171,6 +8196,10 @@ func (m *RateLimit_Action_HeaderValueMatch) SizeVT() (n int) {
 		}
 	}
 	l = len(m.DescriptorKey)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.DefaultValue)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
@@ -8261,6 +8290,10 @@ func (m *RateLimit_Action_QueryParameterValueMatch) SizeVT() (n int) {
 		}
 	}
 	l = len(m.DescriptorKey)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.DefaultValue)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}

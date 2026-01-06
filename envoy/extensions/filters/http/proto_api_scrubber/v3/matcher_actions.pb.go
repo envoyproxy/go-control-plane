@@ -8,7 +8,6 @@ package proto_api_scrubberv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -65,8 +64,8 @@ var File_envoy_extensions_filters_http_proto_api_scrubber_v3_matcher_actions_pro
 
 const file_envoy_extensions_filters_http_proto_api_scrubber_v3_matcher_actions_proto_rawDesc = "" +
 	"\n" +
-	"Ienvoy/extensions/filters/http/proto_api_scrubber/v3/matcher_actions.proto\x123envoy.extensions.filters.http.proto_api_scrubber.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\"\x13\n" +
-	"\x11RemoveFieldActionB\xdb\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"Ienvoy/extensions/filters/http/proto_api_scrubber/v3/matcher_actions.proto\x123envoy.extensions.filters.http.proto_api_scrubber.v3\x1a\x1dudpa/annotations/status.proto\"\x13\n" +
+	"\x11RemoveFieldActionB\xd3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Aio.envoyproxy.envoy.extensions.filters.http.proto_api_scrubber.v3B\x13MatcherActionsProtoP\x01Zogithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/proto_api_scrubber/v3;proto_api_scrubberv3b\x06proto3"
 
 var (

@@ -112,6 +112,8 @@ func (m *Generic) validate(all bool) error {
 
 	}
 
+	// no validation rules for HeaderValuePrefix
+
 	if len(errors) > 0 {
 		return GenericMultiError(errors)
 	}

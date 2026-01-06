@@ -35,9 +35,15 @@ type Generic struct {
 	Credential *v3.SdsSecretConfig `protobuf:"bytes,1,opt,name=credential,proto3" json:"credential,omitempty"`
 	// The header that will be injected to the HTTP request with the provided credential.
 	// If not set, filter will default to: “Authorization“
-	Header        string `protobuf:"bytes,2,opt,name=header,proto3" json:"header,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Header string `protobuf:"bytes,2,opt,name=header,proto3" json:"header,omitempty"`
+	// The prefix to prepend to the credential value before injecting it into the header.
+	// This is useful for adding a scheme such as “Bearer “ or “Basic “ to the credential.
+	// For example, if the credential is “xyz123“ and the prefix is “Bearer “, the
+	// final header value will be “Bearer xyz123“.
+	// If not set, the raw credential value will be injected without any prefix.
+	HeaderValuePrefix string `protobuf:"bytes,3,opt,name=header_value_prefix,json=headerValuePrefix,proto3" json:"header_value_prefix,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Generic) Reset() {
@@ -84,16 +90,24 @@ func (x *Generic) GetHeader() string {
 	return ""
 }
 
+func (x *Generic) GetHeaderValuePrefix() string {
+	if x != nil {
+		return x.HeaderValuePrefix
+	}
+	return ""
+}
+
 var File_envoy_extensions_http_injected_credentials_generic_v3_generic_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_http_injected_credentials_generic_v3_generic_proto_rawDesc = "" +
 	"\n" +
-	"Cenvoy/extensions/http/injected_credentials/generic/v3/generic.proto\x125envoy.extensions.http.injected_credentials.generic.v3\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x94\x01\n" +
+	"Cenvoy/extensions/http/injected_credentials/generic/v3/generic.proto\x125envoy.extensions.http.injected_credentials.generic.v3\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc4\x01\n" +
 	"\aGeneric\x12d\n" +
 	"\n" +
 	"credential\x18\x01 \x01(\v2:.envoy.extensions.transport_sockets.tls.v3.SdsSecretConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\n" +
 	"credential\x12#\n" +
-	"\x06header\x18\x02 \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\x06headerB\xc5\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x06header\x18\x02 \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\x06header\x12.\n" +
+	"\x13header_value_prefix\x18\x03 \x01(\tR\x11headerValuePrefixB\xc5\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Cio.envoyproxy.envoy.extensions.http.injected_credentials.generic.v3B\fGenericProtoP\x01Zfgithub.com/envoyproxy/go-control-plane/envoy/extensions/http/injected_credentials/generic/v3;genericv3b\x06proto3"
 
 var (

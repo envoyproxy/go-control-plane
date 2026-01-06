@@ -23,45 +23,59 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Configuration of a dynamic module. A dynamic module is a shared object file that can be loaded via dlopen
-// by various Envoy extension points. Currently, only HTTP filter (envoy.filters.http.dynamic_modules) is supported.
+// Configuration of a dynamic module. A dynamic module is a shared object file that can be loaded via
+// “dlopen“ by various Envoy extension points.
 //
-// How a module is loaded is determined by the extension point that uses it. For example, the HTTP filter
-// loads the module with dlopen when Envoy receives a configuration that references the module at load time.
-// If loading the module fails, the configuration will be rejected.
+// How a module is loaded is determined by the extension point that uses it. For example, the HTTP
+// filter loads the module when Envoy receives a configuration that references the module. If loading
+// the module fails, the configuration will be rejected.
 //
-// Whether or not the shared object is the same is determined by the file path as well as the file's inode depending
-// on the platform. Notably, if the file path and the content of the file are the same, the shared object will be reused.
+// A module is uniquely identified by its file path and the file's inode, depending on the platform.
+// Notably, if the file path and the content of the file are the same, the shared object will be
+// reused.
 //
-// A module must be compatible with the ABI specified in :repo:`abi.h <source/extensions/dynamic_modules/abi.h>`.
-// Currently, compatibility is only guaranteed by an exact version match between the Envoy
-// codebase and the dynamic module SDKs. In the future, after the ABI is stabilized, we will revisit
-// this restriction and hopefully provide a wider compatibility guarantee. Until then, Envoy
-// checks the hash of the ABI header files to ensure that the dynamic modules are built against the
-// same version of the ABI.
+// A module must be compatible with the ABI specified in :repo:`abi.h
+// <source/extensions/dynamic_modules/abi.h>`. Currently, compatibility is only guaranteed by an
+// exact version match between the Envoy codebase and the dynamic module SDKs. In the future, after
+// the ABI is stabilized, this restriction will be revisited. Until then, Envoy checks the hash of
+// the ABI header files to ensure that the dynamic modules are built against the same version of the
+// ABI.
 type DynamicModuleConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The name of the dynamic module. The client is expected to have some configuration indicating where to search for the module.
-	// In Envoy, the search path can only be configured via the environment variable “ENVOY_DYNAMIC_MODULES_SEARCH_PATH“.
-	// The actual search path is “${ENVOY_DYNAMIC_MODULES_SEARCH_PATH}/lib${name}.so“. TODO: make the search path configurable via
-	// command line options.
+	// The name of the dynamic module.
+	//
+	// The client is expected to have some configuration indicating where to search for the module. In
+	// Envoy, the search path can only be configured via the environment variable
+	// “ENVOY_DYNAMIC_MODULES_SEARCH_PATH“. The actual search path is
+	// “${ENVOY_DYNAMIC_MODULES_SEARCH_PATH}/lib${name}.so“.
+	//
+	// .. note::
+	//
+	//	There is some remaining work to make the search path configurable via command line options.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Set true to prevent the module from being unloaded with dlclose.
-	// This is useful for modules that have global state that should not be unloaded.
-	// A module is closed when no more references to it exist in the process. For example,
-	// no HTTP filters are using the module (e.g. after configuration update).
+	// If true, prevents the module from being unloaded with “dlclose“.
+	//
+	// This is useful for modules that have global state that should not be unloaded. A module is
+	// closed when no more references to it exist in the process. For example, no HTTP filters are
+	// using the module (e.g. after configuration update).
+	//
+	// Defaults to “false“.
 	DoNotClose bool `protobuf:"varint,3,opt,name=do_not_close,json=doNotClose,proto3" json:"do_not_close,omitempty"`
-	// The dynamic module is loaded with “RTLD_LOCAL“ flag to avoid symbol conflicts when multiple
-	// modules are loaded by default. Set this to true to load the module with “RTLD_GLOBAL“ flag.
-	// This is useful for modules that need to share symbols with other dynamic libraries. For
-	// example, a module X may load another shared library Y that depends on some symbols defined
-	// in module X. In this case, module X must be loaded with “RTLD_GLOBAL“ flag so that the
-	// symbols defined in module X are visible to library Y.
+	// If true, the dynamic module is loaded with the “RTLD_GLOBAL“ flag.
+	//
+	// The dynamic module is loaded with the “RTLD_LOCAL“ flag by default to avoid symbol conflicts
+	// when multiple modules are loaded. Set this to “true“ to load the module with the
+	// “RTLD_GLOBAL“ flag. This is useful for modules that need to share symbols with other dynamic
+	// libraries. For example, a module X may load another shared library Y that depends on some
+	// symbols defined in module X. In this case, module X must be loaded with the “RTLD_GLOBAL“
+	// flag so that the symbols defined in module X are visible to library Y.
 	//
 	// .. warning::
 	//
-	//	Use this option with caution as it may lead to symbol conflicts and undefined behavior
-	//	if multiple modules define the same symbols and are loaded globally.
+	//	Use this option with caution as it may lead to symbol conflicts and undefined behavior if
+	//	multiple modules define the same symbols and are loaded globally.
+	//
+	// Defaults to “false“.
 	LoadGlobally  bool `protobuf:"varint,4,opt,name=load_globally,json=loadGlobally,proto3" json:"load_globally,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

@@ -118,8 +118,10 @@ func (ExternalProcessor_RouteCacheAction) EnumDescriptor() ([]byte, []int) {
 //   - Request body: If the body is present, the behavior depends on the
 //     body send mode. In “BUFFERED“ or “BUFFERED_PARTIAL“ mode, the body is sent to the external
 //     processor in a single message. In “STREAMED“ or “FULL_DUPLEX_STREAMED“ mode, the body will
-//     be split across multiple messages sent to the external processor. In “NONE“ mode, the body
-//     will not be sent to the external processor.
+//     be split across multiple messages sent to the external processor. In “GRPC“ mode, as each
+//     gRPC message arrives, it will be sent to the external processor (there will be exactly one
+//     gRPC message in each message sent to the external processor). In “NONE“ mode, the body will
+//     not be sent to the external processor.
 //   - Request trailers: Delivered if they are present and if the trailer mode is set
 //     to “SEND“.
 //   - Response headers: Contains the headers from the HTTP response. Keep in mind
@@ -233,9 +235,9 @@ type ExternalProcessor struct {
 	// an error (subject to the processing mode) if the timer expires before a
 	// matching response is received. There is no timeout when the filter is
 	// running in observability mode or when the body send mode is
-	// “FULL_DUPLEX_STREAMED“. Zero is a valid config which means the timer
-	// will be triggered immediately. If not configured, default is 200
-	// milliseconds.
+	// “FULL_DUPLEX_STREAMED“ or “GRPC“. Zero is a valid config which means
+	// the timer will be triggered immediately. If not configured, default is
+	// 200 milliseconds.
 	MessageTimeout *durationpb.Duration `protobuf:"bytes,7,opt,name=message_timeout,json=messageTimeout,proto3" json:"message_timeout,omitempty"`
 	// Optional additional prefix to use when emitting statistics. This allows to distinguish
 	// emitted statistics between configured “ext_proc“ filters in an HTTP filter chain.
@@ -282,8 +284,8 @@ type ExternalProcessor struct {
 	// without pausing on filter chain iteration. It is "Send and Go" mode that can be used
 	// by external processor to observe the request's data and status. In this mode:
 	//
-	// 1. Only “STREAMED“ and “NONE“ body processing modes are supported; for any other body
-	// processing mode, the body will not be sent.
+	// 1. Only “STREAMED“, “GRPC“, and “NONE“ body processing modes are supported; for any
+	// other body processing mode, the body will not be sent.
 	//
 	// 2. External processor should not send back processing response, as any responses will be ignored.
 	// This also means that

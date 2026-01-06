@@ -50,6 +50,8 @@ const (
 	//
 	// In other words, this response makes it possible to turn an HTTP GET
 	// into a POST, PUT, or PATCH.
+	//
+	// Not supported if the body send mode is “GRPC“.
 	CommonResponse_CONTINUE_AND_REPLACE CommonResponse_ResponseStatus = 1
 )
 
@@ -396,7 +398,7 @@ func (*ProcessingRequest_ResponseTrailers) isProcessingRequest_Request() {}
 //   - If it is set to “FULL_DUPLEX_STREAMED“, the server must follow the API defined
 //     for this mode to send the ProcessingResponse messages.
 //
-// [#next-free-field: 11]
+// [#next-free-field: 12]
 type ProcessingResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The response type that is sent by the server.
@@ -429,6 +431,18 @@ type ProcessingResponse struct {
 	// <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.send_body_without_waiting_for_header_response>`
 	// is set to true.
 	ModeOverride *v3.ProcessingMode `protobuf:"bytes,9,opt,name=mode_override,json=modeOverride,proto3" json:"mode_override,omitempty"`
+	// [#not-implemented-hide:]
+	// Used only in “FULL_DUPLEX_STREAMED“ and “GRPC“ body send modes.
+	// Instructs the data plane to stop sending body data and to send a
+	// half-close on the ext_proc stream. The ext_proc server should then echo
+	// back all subsequent body contents as-is until it sees the client's
+	// half-close, at which point the ext_proc server can terminate the stream
+	// with an OK status. This provides a safe way for the ext_proc server
+	// to indicate that it does not need to see the rest of the stream;
+	// without this, the ext_proc server could not terminate the stream
+	// early, because it would wind up dropping any body contents that the
+	// client had already sent before it saw the ext_proc stream termination.
+	RequestDrain bool `protobuf:"varint,11,opt,name=request_drain,json=requestDrain,proto3" json:"request_drain,omitempty"`
 	// When ext_proc server receives a request message, in case it needs more
 	// time to process the message, it sends back a ProcessingResponse message
 	// with a new timeout value. When the data plane receives this response
@@ -559,6 +573,13 @@ func (x *ProcessingResponse) GetModeOverride() *v3.ProcessingMode {
 		return x.ModeOverride
 	}
 	return nil
+}
+
+func (x *ProcessingResponse) GetRequestDrain() bool {
+	if x != nil {
+		return x.RequestDrain
+	}
+	return false
 }
 
 func (x *ProcessingResponse) GetOverrideMessageTimeout() *durationpb.Duration {
@@ -714,12 +735,26 @@ type HttpBody struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The contents of the body in the HTTP request/response. Note that in
 	// streaming mode multiple “HttpBody“ messages may be sent.
+	//
+	// In “GRPC“ body send mode, a separate “HttpBody“ message will be
+	// sent for each message in the gRPC stream.
 	Body []byte `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
 	// If “true“, this will be the last “HttpBody“ message that will be sent and no
 	// trailers will be sent for the current request/response.
-	EndOfStream   bool `protobuf:"varint,2,opt,name=end_of_stream,json=endOfStream,proto3" json:"end_of_stream,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	EndOfStream bool `protobuf:"varint,2,opt,name=end_of_stream,json=endOfStream,proto3" json:"end_of_stream,omitempty"`
+	// This field is used in “GRPC“ body send mode when “end_of_stream“ is
+	// true and “body“ is empty. Those values would normally indicate an
+	// empty message on the stream with the end-of-stream bit set.
+	// However, if the half-close happens after the last message on the
+	// stream was already sent, then this field will be true to indicate an
+	// end-of-stream with *no* message (as opposed to an empty message).
+	EndOfStreamWithoutMessage bool `protobuf:"varint,3,opt,name=end_of_stream_without_message,json=endOfStreamWithoutMessage,proto3" json:"end_of_stream_without_message,omitempty"`
+	// This field is used in “GRPC“ body send mode to indicate whether
+	// the message is compressed. This will never be set to true by gRPC
+	// but may be set to true by a proxy like Envoy.
+	GrpcMessageCompressed bool `protobuf:"varint,4,opt,name=grpc_message_compressed,json=grpcMessageCompressed,proto3" json:"grpc_message_compressed,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *HttpBody) Reset() {
@@ -762,6 +797,20 @@ func (x *HttpBody) GetBody() []byte {
 func (x *HttpBody) GetEndOfStream() bool {
 	if x != nil {
 		return x.EndOfStream
+	}
+	return false
+}
+
+func (x *HttpBody) GetEndOfStreamWithoutMessage() bool {
+	if x != nil {
+		return x.EndOfStreamWithoutMessage
+	}
+	return false
+}
+
+func (x *HttpBody) GetGrpcMessageCompressed() bool {
+	if x != nil {
+		return x.GrpcMessageCompressed
 	}
 	return false
 }
@@ -1256,17 +1305,34 @@ func (x *HeaderMutation) GetRemoveHeaders() []string {
 	return nil
 }
 
-// The body response message corresponding to FULL_DUPLEX_STREAMED body mode.
+// The body response message corresponding to “FULL_DUPLEX_STREAMED“ or “GRPC“ body modes.
 type StreamedBodyResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The body response chunk that will be passed to the upstream/downstream by the data plane.
+	// In “FULL_DUPLEX_STREAMED“ body send mode, contains the body response chunk that will be
+	// passed to the upstream/downstream by the data plane. In “GRPC“ body send mode, contains
+	// a serialized gRPC message to be passed to the upstream/downstream by the data plane.
 	Body []byte `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
 	// The server sets this flag to true if it has received a body request with
 	// :ref:`end_of_stream <envoy_v3_api_field_service.ext_proc.v3.HttpBody.end_of_stream>` set to true,
 	// and this is the last chunk of body responses.
-	EndOfStream   bool `protobuf:"varint,2,opt,name=end_of_stream,json=endOfStream,proto3" json:"end_of_stream,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Note that in “GRPC“ body send mode, this allows the ext_proc
+	// server to tell the data plane to send a half close after a client
+	// message, which will result in discarding any other messages sent by
+	// the client application.
+	EndOfStream bool `protobuf:"varint,2,opt,name=end_of_stream,json=endOfStream,proto3" json:"end_of_stream,omitempty"`
+	// This field is used in “GRPC“ body send mode when “end_of_stream“ is
+	// true and “body“ is empty. Those values would normally indicate an
+	// empty message on the stream with the end-of-stream bit set.
+	// However, if the half-close happens after the last message on the
+	// stream was already sent, then this field will be true to indicate an
+	// end-of-stream with *no* message (as opposed to an empty message).
+	EndOfStreamWithoutMessage bool `protobuf:"varint,3,opt,name=end_of_stream_without_message,json=endOfStreamWithoutMessage,proto3" json:"end_of_stream_without_message,omitempty"`
+	// This field is used in “GRPC“ body send mode to indicate whether
+	// the message is compressed. This will never be set to true by gRPC
+	// but may be set to true by a proxy like Envoy.
+	GrpcMessageCompressed bool `protobuf:"varint,4,opt,name=grpc_message_compressed,json=grpcMessageCompressed,proto3" json:"grpc_message_compressed,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *StreamedBodyResponse) Reset() {
@@ -1309,6 +1375,20 @@ func (x *StreamedBodyResponse) GetBody() []byte {
 func (x *StreamedBodyResponse) GetEndOfStream() bool {
 	if x != nil {
 		return x.EndOfStream
+	}
+	return false
+}
+
+func (x *StreamedBodyResponse) GetEndOfStreamWithoutMessage() bool {
+	if x != nil {
+		return x.EndOfStreamWithoutMessage
+	}
+	return false
+}
+
+func (x *StreamedBodyResponse) GetGrpcMessageCompressed() bool {
+	if x != nil {
+		return x.GrpcMessageCompressed
 	}
 	return false
 }
@@ -1400,7 +1480,7 @@ type BodyMutation_Body struct {
 	// The entire body to replace.
 	// Should only be used when the corresponding “BodySendMode“ in the
 	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
-	// is not set to “FULL_DUPLEX_STREAMED“.
+	// is not set to “FULL_DUPLEX_STREAMED“ or “GRPC“.
 	Body []byte `protobuf:"bytes,1,opt,name=body,proto3,oneof"`
 }
 
@@ -1408,7 +1488,7 @@ type BodyMutation_ClearBody struct {
 	// Clear the corresponding body chunk.
 	// Should only be used when the corresponding “BodySendMode“ in the
 	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
-	// is not set to “FULL_DUPLEX_STREAMED“.
+	// is not set to “FULL_DUPLEX_STREAMED“ or “GRPC“.
 	// Clear the corresponding body chunk.
 	ClearBody bool `protobuf:"varint,2,opt,name=clear_body,json=clearBody,proto3,oneof"`
 }
@@ -1416,7 +1496,7 @@ type BodyMutation_ClearBody struct {
 type BodyMutation_StreamedResponse struct {
 	// Must be used when the corresponding “BodySendMode“ in the
 	// :ref:`processing_mode <envoy_v3_api_field_extensions.filters.http.ext_proc.v3.ExternalProcessor.processing_mode>`
-	// is set to “FULL_DUPLEX_STREAMED“.
+	// is set to “FULL_DUPLEX_STREAMED“ or “GRPC“.
 	StreamedResponse *StreamedBodyResponse `protobuf:"bytes,3,opt,name=streamed_response,json=streamedResponse,proto3,oneof"`
 }
 
@@ -1453,7 +1533,7 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12-\n" +
 	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01B\x0e\n" +
 	"\arequest\x12\x03\xf8B\x01J\x04\b\x01\x10\x02R\n" +
-	"async_mode\"\x81\a\n" +
+	"async_mode\"\xa6\a\n" +
 	"\x12ProcessingResponse\x12U\n" +
 	"\x0frequest_headers\x18\x01 \x01(\v2*.envoy.service.ext_proc.v3.HeadersResponseH\x00R\x0erequestHeaders\x12W\n" +
 	"\x10response_headers\x18\x02 \x01(\v2*.envoy.service.ext_proc.v3.HeadersResponseH\x00R\x0fresponseHeaders\x12L\n" +
@@ -1463,7 +1543,8 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x11response_trailers\x18\x06 \x01(\v2+.envoy.service.ext_proc.v3.TrailersResponseH\x00R\x10responseTrailers\x12]\n" +
 	"\x12immediate_response\x18\a \x01(\v2,.envoy.service.ext_proc.v3.ImmediateResponseH\x00R\x11immediateResponse\x12B\n" +
 	"\x10dynamic_metadata\x18\b \x01(\v2\x17.google.protobuf.StructR\x0fdynamicMetadata\x12^\n" +
-	"\rmode_override\x18\t \x01(\v29.envoy.extensions.filters.http.ext_proc.v3.ProcessingModeR\fmodeOverride\x12S\n" +
+	"\rmode_override\x18\t \x01(\v29.envoy.extensions.filters.http.ext_proc.v3.ProcessingModeR\fmodeOverride\x12#\n" +
+	"\rrequest_drain\x18\v \x01(\bR\frequestDrain\x12S\n" +
 	"\x18override_message_timeout\x18\n" +
 	" \x01(\v2\x19.google.protobuf.DurationR\x16overrideMessageTimeoutB\x0f\n" +
 	"\bresponse\x12\x03\xf8B\x01\"\xa9\x02\n" +
@@ -1475,10 +1556,12 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\rend_of_stream\x18\x03 \x01(\bR\vendOfStream\x1aV\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12-\n" +
-	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01\"B\n" +
+	"\x05value\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05value:\x028\x01\"\xbc\x01\n" +
 	"\bHttpBody\x12\x12\n" +
 	"\x04body\x18\x01 \x01(\fR\x04body\x12\"\n" +
-	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\"K\n" +
+	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\x12@\n" +
+	"\x1dend_of_stream_without_message\x18\x03 \x01(\bR\x19endOfStreamWithoutMessage\x126\n" +
+	"\x17grpc_message_compressed\x18\x04 \x01(\bR\x15grpcMessageCompressed\"K\n" +
 	"\fHttpTrailers\x12;\n" +
 	"\btrailers\x18\x01 \x01(\v2\x1f.envoy.config.core.v3.HeaderMapR\btrailers\"X\n" +
 	"\x0fHeadersResponse\x12E\n" +
@@ -1509,10 +1592,12 @@ const file_envoy_service_ext_proc_v3_external_processor_proto_rawDesc = "" +
 	"\x0eHeaderMutation\x12H\n" +
 	"\vset_headers\x18\x01 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\n" +
 	"setHeaders\x12%\n" +
-	"\x0eremove_headers\x18\x02 \x03(\tR\rremoveHeaders\"N\n" +
+	"\x0eremove_headers\x18\x02 \x03(\tR\rremoveHeaders\"\xc8\x01\n" +
 	"\x14StreamedBodyResponse\x12\x12\n" +
 	"\x04body\x18\x01 \x01(\fR\x04body\x12\"\n" +
-	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\"\xbb\x01\n" +
+	"\rend_of_stream\x18\x02 \x01(\bR\vendOfStream\x12@\n" +
+	"\x1dend_of_stream_without_message\x18\x03 \x01(\bR\x19endOfStreamWithoutMessage\x126\n" +
+	"\x17grpc_message_compressed\x18\x04 \x01(\bR\x15grpcMessageCompressed\"\xbb\x01\n" +
 	"\fBodyMutation\x12\x14\n" +
 	"\x04body\x18\x01 \x01(\fH\x00R\x04body\x12\x1f\n" +
 	"\n" +

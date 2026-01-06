@@ -18,6 +18,46 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.RequestPath) > 0 {
+		i -= len(m.RequestPath)
+		copy(dAtA[i:], m.RequestPath)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.RequestPath)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *DownstreamReverseConnectionSocketInterface) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -48,6 +88,16 @@ func (m *DownstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStric
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.HttpHandshake != nil {
+		size, err := m.HttpHandshake.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	}
 	if m.EnableDetailedStats {
 		i--
 		if m.EnableDetailedStats {
@@ -68,6 +118,20 @@ func (m *DownstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStric
 	return len(dAtA) - i, nil
 }
 
+func (m *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RequestPath)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *DownstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -80,6 +144,10 @@ func (m *DownstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 	}
 	if m.EnableDetailedStats {
 		n += 2
+	}
+	if m.HttpHandshake != nil {
+		l = m.HttpHandshake.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n

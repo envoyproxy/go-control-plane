@@ -11908,6 +11908,8 @@ func (m *RateLimit_Action_GenericKey) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for DefaultValue
+
 	// no validation rules for DescriptorKey
 
 	if len(errors) > 0 {
@@ -12014,8 +12016,6 @@ func (m *RateLimit_Action_HeaderValueMatch) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for DescriptorKey
-
 	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
 		err := RateLimit_Action_HeaderValueMatchValidationError{
 			field:  "DescriptorValue",
@@ -12026,6 +12026,10 @@ func (m *RateLimit_Action_HeaderValueMatch) validate(all bool) error {
 		}
 		errors = append(errors, err)
 	}
+
+	// no validation rules for DefaultValue
+
+	// no validation rules for DescriptorKey
 
 	if all {
 		switch v := interface{}(m.GetExpectMatch()).(type) {
@@ -12533,8 +12537,6 @@ func (m *RateLimit_Action_QueryParameterValueMatch) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for DescriptorKey
-
 	if utf8.RuneCountInString(m.GetDescriptorValue()) < 1 {
 		err := RateLimit_Action_QueryParameterValueMatchValidationError{
 			field:  "DescriptorValue",
@@ -12545,6 +12547,10 @@ func (m *RateLimit_Action_QueryParameterValueMatch) validate(all bool) error {
 		}
 		errors = append(errors, err)
 	}
+
+	// no validation rules for DefaultValue
+
+	// no validation rules for DescriptorKey
 
 	if all {
 		switch v := interface{}(m.GetExpectMatch()).(type) {

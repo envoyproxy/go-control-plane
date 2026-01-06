@@ -39,13 +39,13 @@ type HttpProtocolOptions_HeadersWithUnderscoresAction int32
 const (
 	// Allow headers with underscores. This is the default behavior.
 	HttpProtocolOptions_ALLOW HttpProtocolOptions_HeadersWithUnderscoresAction = 0
-	// Reject client request. HTTP/1 requests are rejected with the 400 status. HTTP/2 requests
-	// end with the stream reset. The "httpN.requests_rejected_with_underscores_in_headers" counter
+	// Reject client request. HTTP/1 requests are rejected with “HTTP 400“ status. HTTP/2 requests
+	// end with the stream reset. The “httpN.requests_rejected_with_underscores_in_headers“ counter
 	// is incremented for each rejected request.
 	HttpProtocolOptions_REJECT_REQUEST HttpProtocolOptions_HeadersWithUnderscoresAction = 1
 	// Drop the client header with name containing underscores. The header is dropped before the filter chain is
 	// invoked and as such filters will not see dropped headers. The
-	// "httpN.dropped_headers_with_underscores" is incremented for each dropped header.
+	// “httpN.dropped_headers_with_underscores“ is incremented for each dropped header.
 	HttpProtocolOptions_DROP_HEADER HttpProtocolOptions_HeadersWithUnderscoresAction = 2
 )
 
@@ -128,11 +128,14 @@ func (*TcpProtocolOptions) Descriptor() ([]byte, []int) {
 }
 
 // Config for keepalive probes in a QUIC connection.
-// Note that QUIC keep-alive probing packets work differently from HTTP/2 keep-alive PINGs in a sense that the probing packet
-// itself doesn't timeout waiting for a probing response. Quic has a shorter idle timeout than TCP, so it doesn't rely on such probing to discover dead connections. If the peer fails to respond, the connection will idle timeout eventually. Thus, they are configured differently from :ref:`connection_keepalive <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.connection_keepalive>`.
+//
+// .. note::
+//
+//	QUIC keep-alive probing packets work differently from HTTP/2 keep-alive PINGs in a sense that the probing packet
+//	itself doesn't timeout waiting for a probing response. QUIC has a shorter idle timeout than TCP, so it doesn't rely on such probing to discover dead connections. If the peer fails to respond, the connection will idle timeout eventually. Thus, they are configured differently from :ref:`connection_keepalive <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.connection_keepalive>`.
 type QuicKeepAliveSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The max interval for a connection to send keep-alive probing packets (with PING or PATH_RESPONSE). The value should be smaller than :ref:`connection idle_timeout <envoy_v3_api_field_config.listener.v3.QuicProtocolOptions.idle_timeout>` to prevent idle timeout while not less than 1s to avoid throttling the connection or flooding the peer with probes.
+	// The max interval for a connection to send keep-alive probing packets (with “PING“ or “PATH_RESPONSE“). The value should be smaller than :ref:`connection idle_timeout <envoy_v3_api_field_config.listener.v3.QuicProtocolOptions.idle_timeout>` to prevent idle timeout while not less than “1s“ to avoid throttling the connection or flooding the peer with probes.
 	//
 	// If :ref:`initial_interval <envoy_v3_api_field_config.core.v3.QuicKeepAliveSettings.initial_interval>` is absent or zero, a client connection will use this value to start probing.
 	//
@@ -197,17 +200,17 @@ func (x *QuicKeepAliveSettings) GetInitialInterval() *durationpb.Duration {
 // [#next-free-field: 10]
 type QuicProtocolOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Maximum number of streams that the client can negotiate per connection. 100
+	// Maximum number of streams that the client can negotiate per connection. “100“
 	// if not specified.
 	MaxConcurrentStreams *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
 	// `Initial stream-level flow-control receive window
 	// <https://tools.ietf.org/html/draft-ietf-quic-transport-34#section-4.1>`_ size. Valid values range from
-	// 1 to 16777216 (2^24, maximum supported by QUICHE) and defaults to 16777216 (16 * 1024 * 1024).
+	// “1“ to “16777216“ (“2^24“, maximum supported by QUICHE) and defaults to “16777216“ (“16 * 1024 * 1024“).
 	//
 	// .. note::
 	//
-	//	16384 (2^14) is the minimum window size supported in Google QUIC. If configured smaller than it, we will use
-	//	16384 instead. QUICHE IETF Quic implementation supports 1 bytes window. We only support increasing the default
+	//	``16384`` (``2^14``) is the minimum window size supported in Google QUIC. If configured smaller than it, we will use
+	//	``16384`` instead. QUICHE IETF QUIC implementation supports ``1`` byte window. We only support increasing the default
 	//	window size now, so it's also the minimum.
 	//
 	// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
@@ -215,21 +218,21 @@ type QuicProtocolOptions struct {
 	// stop the flow of data to the stream buffers.
 	InitialStreamWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
 	// Similar to “initial_stream_window_size“, but for connection-level
-	// flow-control. Valid values range from 1 to 25165824 (24MB, maximum supported by QUICHE) and defaults
-	// to 25165824 (24 * 1024 * 1024).
+	// flow-control. Valid values range from “1“ to “25165824“ (“24MB“, maximum supported by QUICHE) and defaults
+	// to “25165824“ (“24 * 1024 * 1024“).
 	//
 	// .. note::
 	//
-	//	16384 (2^14) is the minimum window size supported in Google QUIC. We only support increasing the default
+	//	``16384`` (``2^14``) is the minimum window size supported in Google QUIC. We only support increasing the default
 	//	window size now, so it's also the minimum.
 	InitialConnectionWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// The number of timeouts that can occur before port migration is triggered for QUIC clients.
-	// This defaults to 4. If set to 0, port migration will not occur on path degrading.
-	// Timeout here refers to QUIC internal path degrading timeout mechanism, such as PTO.
+	// This defaults to “4“. If set to “0“, port migration will not occur on path degrading.
+	// Timeout here refers to QUIC internal path degrading timeout mechanism, such as “PTO“.
 	// This has no effect on server sessions.
 	NumTimeoutsToTriggerPortMigration *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=num_timeouts_to_trigger_port_migration,json=numTimeoutsToTriggerPortMigration,proto3" json:"num_timeouts_to_trigger_port_migration,omitempty"`
-	// Probes the peer at the configured interval to solicit traffic, i.e. ACK or PATH_RESPONSE, from the peer to push back connection idle timeout.
-	// If absent, use the default keepalive behavior of which a client connection sends PINGs every 15s, and a server connection doesn't do anything.
+	// Probes the peer at the configured interval to solicit traffic, i.e. “ACK“ or “PATH_RESPONSE“, from the peer to push back connection idle timeout.
+	// If absent, use the default keepalive behavior of which a client connection sends “PING“s every “15s“, and a server connection doesn't do anything.
 	ConnectionKeepalive *QuicKeepAliveSettings `protobuf:"bytes,5,opt,name=connection_keepalive,json=connectionKeepalive,proto3" json:"connection_keepalive,omitempty"`
 	// A comma-separated list of strings representing QUIC connection options defined in
 	// `QUICHE <https://github.com/google/quiche/blob/main/quiche/quic/core/crypto/crypto_protocol.h>`_ and to be sent by upstream connections.
@@ -238,10 +241,10 @@ type QuicProtocolOptions struct {
 	// `QUICHE <https://github.com/google/quiche/blob/main/quiche/quic/core/crypto/crypto_protocol.h>`_ and to be sent by upstream connections.
 	ClientConnectionOptions string `protobuf:"bytes,7,opt,name=client_connection_options,json=clientConnectionOptions,proto3" json:"client_connection_options,omitempty"`
 	// The duration that a QUIC connection stays idle before it closes itself. If this field is not present, QUICHE
-	// default 600s will be applied.
+	// default “600s“ will be applied.
 	// For internal corporate network, a long timeout is often fine.
-	// But for client facing network, 30s is usually a good choice.
-	// Do not add an upper bound here. A long idle timeout is useful for maintaining warm connections at non-front-line proxy for low QPS services."
+	// But for client facing network, “30s“ is usually a good choice.
+	// Do not add an upper bound here. A long idle timeout is useful for maintaining warm connections at non-front-line proxy for low QPS services.
 	IdleNetworkTimeout *durationpb.Duration `protobuf:"bytes,8,opt,name=idle_network_timeout,json=idleNetworkTimeout,proto3" json:"idle_network_timeout,omitempty"`
 	// Maximum packet length for QUIC connections. It refers to the largest size of a QUIC packet that can be transmitted over the connection.
 	// If not specified, one of the `default values in QUICHE <https://github.com/google/quiche/blob/main/quiche/quic/core/quic_constants.h>`_ is used.
@@ -440,9 +443,9 @@ type AlternateProtocolsCacheOptions struct {
 	// referenced from different configuration components. Configuration will fail to load if this is
 	// not the case.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The maximum number of entries that the cache will hold. If not specified defaults to 1024.
+	// The maximum number of entries that the cache will hold. If not specified defaults to “1024“.
 	//
-	// .. note:
+	// .. note::
 	//
 	//	The implementation is approximate and enforced independently on each worker thread, thus
 	//	it is possible for the maximum entries in the cache to go slightly above the configured
@@ -544,8 +547,12 @@ type HttpProtocolOptions struct {
 	// downstream connection a drain sequence will occur prior to closing the connection, see
 	// :ref:`drain_timeout
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.drain_timeout>`.
-	// Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.
-	// If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.
+	//
+	// .. note::
+	//
+	//	Request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.
+	//
+	// If not specified, this defaults to “1 hour“. To disable idle timeouts explicitly set this to “0“.
 	//
 	// .. warning::
 	//
@@ -564,18 +571,18 @@ type HttpProtocolOptions struct {
 	MaxConnectionDuration *durationpb.Duration `protobuf:"bytes,3,opt,name=max_connection_duration,json=maxConnectionDuration,proto3" json:"max_connection_duration,omitempty"`
 	// The maximum number of headers (request headers if configured on HttpConnectionManager,
 	// response headers when configured on a cluster).
-	// If unconfigured, the default maximum number of headers allowed is 100.
+	// If unconfigured, the default maximum number of headers allowed is “100“.
 	// The default value for requests can be overridden by setting runtime key “envoy.reloadable_features.max_request_headers_count“.
 	// The default value for responses can be overridden by setting runtime key “envoy.reloadable_features.max_response_headers_count“.
-	// Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and cause a stream
+	// Downstream requests that exceed this limit will receive a “HTTP 431“ response for HTTP/1.x and cause a stream
 	// reset for HTTP/2.
-	// Upstream responses that exceed this limit will result in a 502 response.
+	// Upstream responses that exceed this limit will result in a “HTTP 502“ response.
 	MaxHeadersCount *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_headers_count,json=maxHeadersCount,proto3" json:"max_headers_count,omitempty"`
 	// The maximum size of response headers.
-	// If unconfigured, the default is 60 KiB, except for HTTP/1 response headers which have a default
-	// of 80KiB.
+	// If unconfigured, the default is “60 KiB“, except for HTTP/1 response headers which have a default
+	// of “80 KiB“.
 	// The default value can be overridden by setting runtime key “envoy.reloadable_features.max_response_headers_size_kb“.
-	// Responses that exceed this limit will result in a 503 response.
+	// Responses that exceed this limit will result in a “HTTP 503“ response.
 	// In Envoy, this setting is only valid when configured on an upstream cluster, not on the
 	// :ref:`HTTP Connection Manager
 	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.common_http_protocol_options>`.
@@ -584,14 +591,14 @@ type HttpProtocolOptions struct {
 	//
 	//	Currently some protocol codecs impose limits on the maximum size of a single header.
 	//
-	//	* HTTP/2 (when using nghttp2) limits a single header to around 100kb.
-	//	* HTTP/3 limits a single header to around 1024kb.
+	//	* HTTP/2 (when using ``nghttp2``) limits a single header to around ``100kb``.
+	//	* HTTP/3 limits a single header to around ``1024kb``.
 	MaxResponseHeadersKb *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=max_response_headers_kb,json=maxResponseHeadersKb,proto3" json:"max_response_headers_kb,omitempty"`
 	// Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be
 	// reset independent of any other timeouts. If not specified, this value is not set.
 	MaxStreamDuration *durationpb.Duration `protobuf:"bytes,4,opt,name=max_stream_duration,json=maxStreamDuration,proto3" json:"max_stream_duration,omitempty"`
 	// Action to take when a client request with a header name containing underscore characters is received.
-	// If this setting is not specified, the value defaults to ALLOW.
+	// If this setting is not specified, the value defaults to “ALLOW“.
 	//
 	// .. note::
 	//
@@ -604,7 +611,7 @@ type HttpProtocolOptions struct {
 	HeadersWithUnderscoresAction HttpProtocolOptions_HeadersWithUnderscoresAction `protobuf:"varint,5,opt,name=headers_with_underscores_action,json=headersWithUnderscoresAction,proto3,enum=envoy.config.core.v3.HttpProtocolOptions_HeadersWithUnderscoresAction" json:"headers_with_underscores_action,omitempty"`
 	// Optional maximum requests for both upstream and downstream connections.
 	// If not specified, there is no limit.
-	// Setting this parameter to 1 will effectively disable keep alive.
+	// Setting this parameter to “1“ will effectively disable keep alive.
 	// For HTTP/2 and HTTP/3, due to concurrent stream processing, the limit is approximate.
 	MaxRequestsPerConnection *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=max_requests_per_connection,json=maxRequestsPerConnection,proto3" json:"max_requests_per_connection,omitempty"`
 	unknownFields            protoimpl.UnknownFields
@@ -698,7 +705,7 @@ type Http1ProtocolOptions struct {
 	// envoy as their HTTP proxy. In Unix, for example, this is typically done by setting the
 	// “http_proxy“ environment variable.
 	AllowAbsoluteUrl *wrapperspb.BoolValue `protobuf:"bytes,1,opt,name=allow_absolute_url,json=allowAbsoluteUrl,proto3" json:"allow_absolute_url,omitempty"`
-	// Handle incoming HTTP/1.0 and HTTP 0.9 requests.
+	// Handle incoming HTTP/1.0 and HTTP/0.9 requests.
 	// This is off by default, and not fully standards compliant. There is support for pre-HTTP/1.1
 	// style connect logic, dechunking, and handling lack of client host iff
 	// “default_host_for_http_10“ is configured.
@@ -714,15 +721,15 @@ type Http1ProtocolOptions struct {
 	//
 	// .. attention::
 	//
-	//	Note that this only happens when Envoy is chunk encoding which occurs when:
+	//	This only happens when Envoy is chunk encoding which occurs when:
 	//	- The request is HTTP/1.1.
-	//	- Is neither a HEAD only request nor a HTTP Upgrade.
-	//	- Not a response to a HEAD request.
-	//	- The content length header is not present.
+	//	- Is neither a ``HEAD`` only request nor a HTTP Upgrade.
+	//	- Not a response to a ``HEAD`` request.
+	//	- The ``Content-Length`` header is not present.
 	EnableTrailers bool `protobuf:"varint,5,opt,name=enable_trailers,json=enableTrailers,proto3" json:"enable_trailers,omitempty"`
 	// Allows Envoy to process requests/responses with both “Content-Length“ and “Transfer-Encoding“
 	// headers set. By default such messages are rejected, but if option is enabled - Envoy will
-	// remove Content-Length header and process message.
+	// remove “Content-Length“ header and process message.
 	// See `RFC7230, sec. 3.3.3 <https://tools.ietf.org/html/rfc7230#section-3.3.3>`_ for details.
 	//
 	// .. attention::
@@ -892,13 +899,16 @@ type KeepaliveSettings struct {
 	// If this is zero, interval PINGs will not be sent.
 	Interval *durationpb.Duration `protobuf:"bytes,1,opt,name=interval,proto3" json:"interval,omitempty"`
 	// How long to wait for a response to a keepalive PING. If a response is not received within this
-	// time period, the connection will be aborted. Note that in order to prevent the influence of
-	// Head-of-line (HOL) blocking the timeout period is extended when *any* frame is received on
-	// the connection, under the assumption that if a frame is received the connection is healthy.
+	// time period, the connection will be aborted.
+	//
+	// .. note::
+	//
+	//	In order to prevent the influence of Head-of-line (HOL) blocking the timeout period is extended when *any* frame is received on
+	//	the connection, under the assumption that if a frame is received the connection is healthy.
 	Timeout *durationpb.Duration `protobuf:"bytes,2,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	// A random jitter amount as a percentage of interval that will be added to each interval.
 	// A value of zero means there will be no jitter.
-	// The default value is 15%.
+	// The default value is “15%“.
 	IntervalJitter *v31.Percent `protobuf:"bytes,3,opt,name=interval_jitter,json=intervalJitter,proto3" json:"interval_jitter,omitempty"`
 	// If the connection has been idle for this duration, send a HTTP/2 ping ahead
 	// of new stream creation, to quickly detect dead connections.
@@ -970,17 +980,17 @@ func (x *KeepaliveSettings) GetConnectionIdleInterval() *durationpb.Duration {
 	return nil
 }
 
-// [#next-free-field: 18]
+// [#next-free-field: 19]
 type Http2ProtocolOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// `Maximum table size <https://httpwg.org/specs/rfc7541.html#rfc.section.4.2>`_
 	// (in octets) that the encoder is permitted to use for the dynamic HPACK table. Valid values
-	// range from 0 to 4294967295 (2^32 - 1) and defaults to 4096. 0 effectively disables header
+	// range from “0“ to “4294967295“ (“2^32 - 1“) and defaults to “4096“. “0“ effectively disables header
 	// compression.
 	HpackTableSize *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=hpack_table_size,json=hpackTableSize,proto3" json:"hpack_table_size,omitempty"`
 	// `Maximum concurrent streams <https://httpwg.org/specs/rfc7540.html#rfc.section.5.1.2>`_
-	// allowed for peer on one HTTP/2 connection. Valid values range from 1 to 2147483647 (2^31 - 1)
-	// and defaults to 1024 for safety and should be sufficient for most use cases.
+	// allowed for peer on one HTTP/2 connection. Valid values range from “1“ to “2147483647“ (“2^31 - 1“)
+	// and defaults to “1024“ for safety and should be sufficient for most use cases.
 	//
 	// For upstream connections, this also limits how many streams Envoy will initiate concurrently
 	// on a single connection. If the limit is reached, Envoy may queue requests or establish
@@ -991,13 +1001,13 @@ type Http2ProtocolOptions struct {
 	// not the per-connection negotiated limits.
 	MaxConcurrentStreams *wrapperspb.UInt32Value `protobuf:"bytes,2,opt,name=max_concurrent_streams,json=maxConcurrentStreams,proto3" json:"max_concurrent_streams,omitempty"`
 	// `Initial stream-level flow-control window
-	// <https://httpwg.org/specs/rfc7540.html#rfc.section.6.9.2>`_ size. Valid values range from 65535
-	// (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum) and defaults to
-	// 16MiB (16 * 1024 * 1024).
+	// <https://httpwg.org/specs/rfc7540.html#rfc.section.6.9.2>`_ size. Valid values range from “65535“
+	// (“2^16 - 1“, HTTP/2 default) to “2147483647“ (“2^31 - 1“, HTTP/2 maximum) and defaults to
+	// “16MiB“ (“16 * 1024 * 1024“).
 	//
 	// .. note::
 	//
-	//	65535 is the initial window size from HTTP/2 spec. We only support increasing the default window size now,
+	//	``65535`` is the initial window size from HTTP/2 spec. We only support increasing the default window size now,
 	//	so it's also the minimum.
 	//
 	// This field also acts as a soft limit on the number of bytes Envoy will buffer per-stream in the
@@ -1005,7 +1015,7 @@ type Http2ProtocolOptions struct {
 	// stop the flow of data to the codec buffers.
 	InitialStreamWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=initial_stream_window_size,json=initialStreamWindowSize,proto3" json:"initial_stream_window_size,omitempty"`
 	// Similar to “initial_stream_window_size“, but for connection-level flow-control
-	// window. The default is 24MiB (24 * 1024 * 1024).
+	// window. The default is “24MiB“ (“24 * 1024 * 1024“).
 	InitialConnectionWindowSize *wrapperspb.UInt32Value `protobuf:"bytes,4,opt,name=initial_connection_window_size,json=initialConnectionWindowSize,proto3" json:"initial_connection_window_size,omitempty"`
 	// Allows proxying Websocket and other upgrades over H2 connect.
 	AllowConnect bool `protobuf:"varint,5,opt,name=allow_connect,json=allowConnect,proto3" json:"allow_connect,omitempty"`
@@ -1019,47 +1029,47 @@ type Http2ProtocolOptions struct {
 	// Limit the number of pending outbound downstream frames of all types (frames that are waiting to
 	// be written into the socket). Exceeding this limit triggers flood mitigation and connection is
 	// terminated. The “http2.outbound_flood“ stat tracks the number of terminated connections due
-	// to flood mitigation. The default limit is 10000.
+	// to flood mitigation. The default limit is “10000“.
 	MaxOutboundFrames *wrapperspb.UInt32Value `protobuf:"bytes,7,opt,name=max_outbound_frames,json=maxOutboundFrames,proto3" json:"max_outbound_frames,omitempty"`
-	// Limit the number of pending outbound downstream frames of types PING, SETTINGS and RST_STREAM,
+	// Limit the number of pending outbound downstream frames of types “PING“, “SETTINGS“ and “RST_STREAM“,
 	// preventing high memory utilization when receiving continuous stream of these frames. Exceeding
 	// this limit triggers flood mitigation and connection is terminated. The
 	// “http2.outbound_control_flood“ stat tracks the number of terminated connections due to flood
-	// mitigation. The default limit is 1000.
+	// mitigation. The default limit is “1000“.
 	MaxOutboundControlFrames *wrapperspb.UInt32Value `protobuf:"bytes,8,opt,name=max_outbound_control_frames,json=maxOutboundControlFrames,proto3" json:"max_outbound_control_frames,omitempty"`
-	// Limit the number of consecutive inbound frames of types HEADERS, CONTINUATION and DATA with an
+	// Limit the number of consecutive inbound frames of types “HEADERS“, “CONTINUATION“ and “DATA“ with an
 	// empty payload and no end stream flag. Those frames have no legitimate use and are abusive, but
-	// might be a result of a broken HTTP/2 implementation. The `http2.inbound_empty_frames_flood“
+	// might be a result of a broken HTTP/2 implementation. The “http2.inbound_empty_frames_flood“
 	// stat tracks the number of connections terminated due to flood mitigation.
-	// Setting this to 0 will terminate connection upon receiving first frame with an empty payload
-	// and no end stream flag. The default limit is 1.
+	// Setting this to “0“ will terminate connection upon receiving first frame with an empty payload
+	// and no end stream flag. The default limit is “1“.
 	MaxConsecutiveInboundFramesWithEmptyPayload *wrapperspb.UInt32Value `protobuf:"bytes,9,opt,name=max_consecutive_inbound_frames_with_empty_payload,json=maxConsecutiveInboundFramesWithEmptyPayload,proto3" json:"max_consecutive_inbound_frames_with_empty_payload,omitempty"`
-	// Limit the number of inbound PRIORITY frames allowed per each opened stream. If the number
-	// of PRIORITY frames received over the lifetime of connection exceeds the value calculated
+	// Limit the number of inbound “PRIORITY“ frames allowed per each opened stream. If the number
+	// of “PRIORITY“ frames received over the lifetime of connection exceeds the value calculated
 	// using this formula::
 	//
 	//	``max_inbound_priority_frames_per_stream`` * (1 + ``opened_streams``)
 	//
 	// the connection is terminated. For downstream connections the “opened_streams“ is incremented when
 	// Envoy receives complete response headers from the upstream server. For upstream connection the
-	// “opened_streams“ is incremented when Envoy send the HEADERS frame for a new stream. The
+	// “opened_streams“ is incremented when Envoy sends the “HEADERS“ frame for a new stream. The
 	// “http2.inbound_priority_frames_flood“ stat tracks
-	// the number of connections terminated due to flood mitigation. The default limit is 100.
+	// the number of connections terminated due to flood mitigation. The default limit is “100“.
 	MaxInboundPriorityFramesPerStream *wrapperspb.UInt32Value `protobuf:"bytes,10,opt,name=max_inbound_priority_frames_per_stream,json=maxInboundPriorityFramesPerStream,proto3" json:"max_inbound_priority_frames_per_stream,omitempty"`
-	// Limit the number of inbound WINDOW_UPDATE frames allowed per DATA frame sent. If the number
-	// of WINDOW_UPDATE frames received over the lifetime of connection exceeds the value calculated
+	// Limit the number of inbound “WINDOW_UPDATE“ frames allowed per “DATA“ frame sent. If the number
+	// of “WINDOW_UPDATE“ frames received over the lifetime of connection exceeds the value calculated
 	// using this formula::
 	//
-	//	5 + 2 * (``opened_streams`` +
-	//	         ``max_inbound_window_update_frames_per_data_frame_sent`` * ``outbound_data_frames``)
+	//	``5 + 2 * (opened_streams +
+	//	         max_inbound_window_update_frames_per_data_frame_sent * outbound_data_frames)``
 	//
 	// the connection is terminated. For downstream connections the “opened_streams“ is incremented when
 	// Envoy receives complete response headers from the upstream server. For upstream connections the
-	// “opened_streams“ is incremented when Envoy sends the HEADERS frame for a new stream. The
+	// “opened_streams“ is incremented when Envoy sends the “HEADERS“ frame for a new stream. The
 	// “http2.inbound_priority_frames_flood“ stat tracks the number of connections terminated due to
-	// flood mitigation. The default max_inbound_window_update_frames_per_data_frame_sent value is 10.
-	// Setting this to 1 should be enough to support HTTP/2 implementations with basic flow control,
-	// but more complex implementations that try to estimate available bandwidth require at least 2.
+	// flood mitigation. The default “max_inbound_window_update_frames_per_data_frame_sent“ value is “10“.
+	// Setting this to “1“ should be enough to support HTTP/2 implementations with basic flow control,
+	// but more complex implementations that try to estimate available bandwidth require at least “2“.
 	MaxInboundWindowUpdateFramesPerDataFrameSent *wrapperspb.UInt32Value `protobuf:"bytes,11,opt,name=max_inbound_window_update_frames_per_data_frame_sent,json=maxInboundWindowUpdateFramesPerDataFrameSent,proto3" json:"max_inbound_window_update_frames_per_data_frame_sent,omitempty"`
 	// Allows invalid HTTP messaging and headers. When this option is disabled (default), then
 	// the whole HTTP/2 connection is terminated upon receiving invalid HEADERS frame. However,
@@ -1094,8 +1104,10 @@ type Http2ProtocolOptions struct {
 	// 2. SETTINGS_ENABLE_CONNECT_PROTOCOL (0x8) is only configurable through the named field
 	// 'allow_connect'.
 	//
-	// Note that custom parameters specified through this field can not also be set in the
-	// corresponding named parameters:
+	// .. note::
+	//
+	//	Custom parameters specified through this field can not also be set in the
+	//	corresponding named parameters:
 	//
 	// .. code-block:: text
 	//
@@ -1119,10 +1131,15 @@ type Http2ProtocolOptions struct {
 	// If set, force use of a particular HTTP/2 codec: oghttp2 if true, nghttp2 if false.
 	// If unset, HTTP/2 codec is selected based on envoy.reloadable_features.http2_use_oghttp2.
 	UseOghttp2Codec *wrapperspb.BoolValue `protobuf:"bytes,16,opt,name=use_oghttp2_codec,json=useOghttp2Codec,proto3" json:"use_oghttp2_codec,omitempty"`
-	// Configure the maximum amount of metadata than can be handled per stream. Defaults to 1 MB.
+	// Configure the maximum amount of metadata than can be handled per stream. Defaults to “1 MB“.
 	MaxMetadataSize *wrapperspb.UInt64Value `protobuf:"bytes,17,opt,name=max_metadata_size,json=maxMetadataSize,proto3" json:"max_metadata_size,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Controls whether to encode headers using huffman encoding.
+	// This can be useful in cases where the cpu spent encoding the headers isn't
+	// worth the network bandwidth saved e.g. for localhost.
+	// If unset, uses the data plane's default value.
+	EnableHuffmanEncoding *wrapperspb.BoolValue `protobuf:"bytes,18,opt,name=enable_huffman_encoding,json=enableHuffmanEncoding,proto3" json:"enable_huffman_encoding,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *Http2ProtocolOptions) Reset() {
@@ -1275,6 +1292,13 @@ func (x *Http2ProtocolOptions) GetMaxMetadataSize() *wrapperspb.UInt64Value {
 	return nil
 }
 
+func (x *Http2ProtocolOptions) GetEnableHuffmanEncoding() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.EnableHuffmanEncoding
+	}
+	return nil
+}
+
 // [#not-implemented-hide:]
 type GrpcProtocolOptions struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
@@ -1337,7 +1361,10 @@ type Http3ProtocolOptions struct {
 	// <https://datatracker.ietf.org/doc/html/rfc8441>`_
 	// and settings `proposed for HTTP/3
 	// <https://datatracker.ietf.org/doc/draft-ietf-httpbis-h3-websockets/>`_
-	// Note that HTTP/3 CONNECT is not yet an RFC.
+	//
+	// .. note::
+	//
+	//	HTTP/3 CONNECT is not yet an RFC.
 	AllowExtendedConnect bool `protobuf:"varint,5,opt,name=allow_extended_connect,json=allowExtendedConnect,proto3" json:"allow_extended_connect,omitempty"`
 	// [#not-implemented-hide:] Hiding until Envoy has full metadata support.
 	// Still under implementation. DO NOT USE.
@@ -1350,7 +1377,7 @@ type Http3ProtocolOptions struct {
 	// Still under implementation. DO NOT USE.
 	//
 	// Disables QPACK compression related features for HTTP/3 including:
-	// No huffman encoding, zero dynamic table capacity and no cookie crumbing.
+	// No huffman encoding, zero dynamic table capacity and no cookie crumbling.
 	// This can be useful for trading off CPU vs bandwidth when an upstream HTTP/3 connection multiplexes multiple downstream connections.
 	DisableQpack bool `protobuf:"varint,7,opt,name=disable_qpack,json=disableQpack,proto3" json:"disable_qpack,omitempty"`
 	// Disables connection level flow control for HTTP/3 streams. This is useful in situations where the streams share the same connection
@@ -1440,9 +1467,9 @@ type SchemeHeaderTransformation struct {
 	//	*SchemeHeaderTransformation_SchemeToOverwrite
 	Transformation isSchemeHeaderTransformation_Transformation `protobuf_oneof:"transformation"`
 	// Set the Scheme header to match the upstream transport protocol. For example, should a
-	// request be sent to the upstream over TLS, the scheme header will be set to "https". Should the
-	// request be sent over plaintext, the scheme header will be set to "http".
-	// If scheme_to_overwrite is set, this field is not used.
+	// request be sent to the upstream over TLS, the scheme header will be set to “"https"“. Should the
+	// request be sent over plaintext, the scheme header will be set to “"http"“.
+	// If “scheme_to_overwrite“ is set, this field is not used.
 	MatchUpstream bool `protobuf:"varint,2,opt,name=match_upstream,json=matchUpstream,proto3" json:"match_upstream,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1507,7 +1534,7 @@ type isSchemeHeaderTransformation_Transformation interface {
 
 type SchemeHeaderTransformation_SchemeToOverwrite struct {
 	// Overwrite any Scheme header with the contents of this string.
-	// If set, takes precedence over match_upstream.
+	// If set, takes precedence over “match_upstream“.
 	SchemeToOverwrite string `protobuf:"bytes,1,opt,name=scheme_to_overwrite,json=schemeToOverwrite,proto3,oneof"`
 }
 
@@ -1650,9 +1677,12 @@ type isHttp1ProtocolOptions_HeaderKeyFormat_HeaderFormat interface {
 type Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords_ struct {
 	// Formats the header by proper casing words: the first character and any character following
 	// a special character will be capitalized if it's an alpha character. For example,
-	// "content-type" becomes "Content-Type", and "foo$b#$are" becomes "Foo$B#$Are".
-	// Note that while this results in most headers following conventional casing, certain headers
-	// are not covered. For example, the "TE" header will be formatted as "Te".
+	// “"content-type"“ becomes “"Content-Type"“, and “"foo$b#$are"“ becomes “"Foo$B#$Are"“.
+	//
+	// .. note::
+	//
+	//	While this results in most headers following conventional casing, certain headers
+	//	are not covered. For example, the ``"TE"`` header will be formatted as ``"Te"``.
 	ProperCaseWords *Http1ProtocolOptions_HeaderKeyFormat_ProperCaseWords `protobuf:"bytes,1,opt,name=proper_case_words,json=properCaseWords,proto3,oneof"`
 }
 
@@ -1836,7 +1866,7 @@ const file_envoy_config_core_v3_protocol_proto_rawDesc = "" +
 	"\binterval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\binterval\x12C\n" +
 	"\atimeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x0e\xfaB\v\xaa\x01\b\b\x012\x04\x10\xc0\x84=R\atimeout\x12?\n" +
 	"\x0finterval_jitter\x18\x03 \x01(\v2\x16.envoy.type.v3.PercentR\x0eintervalJitter\x12a\n" +
-	"\x18connection_idle_interval\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16connectionIdleInterval\"\x9a\x0f\n" +
+	"\x18connection_idle_interval\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16connectionIdleInterval\"\xee\x0f\n" +
 	"\x14Http2ProtocolOptions\x12F\n" +
 	"\x10hpack_table_size\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x0ehpackTableSize\x12a\n" +
 	"\x16max_concurrent_streams\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\r\xfaB\n" +
@@ -1858,7 +1888,8 @@ const file_envoy_config_core_v3_protocol_proto_rawDesc = "" +
 	"\x1acustom_settings_parameters\x18\r \x03(\v2<.envoy.config.core.v3.Http2ProtocolOptions.SettingsParameterR\x18customSettingsParameters\x12Z\n" +
 	"\x14connection_keepalive\x18\x0f \x01(\v2'.envoy.config.core.v3.KeepaliveSettingsR\x13connectionKeepalive\x12P\n" +
 	"\x11use_oghttp2_codec\x18\x10 \x01(\v2\x1a.google.protobuf.BoolValueB\b\xd2Ƥ\xe1\x06\x02\b\x01R\x0fuseOghttp2Codec\x12H\n" +
-	"\x11max_metadata_size\x18\x11 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x0fmaxMetadataSize\x1a\xe2\x01\n" +
+	"\x11max_metadata_size\x18\x11 \x01(\v2\x1c.google.protobuf.UInt64ValueR\x0fmaxMetadataSize\x12R\n" +
+	"\x17enable_huffman_encoding\x18\x12 \x01(\v2\x1a.google.protobuf.BoolValueR\x15enableHuffmanEncoding\x1a\xe2\x01\n" +
 	"\x11SettingsParameter\x12N\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\x10\xfaB\r\x8a\x01\x02\x10\x01*\x06\x18\xff\xff\x03(\x00R\n" +
@@ -1965,18 +1996,19 @@ var file_envoy_config_core_v3_protocol_proto_depIdxs = []int32{
 	8,  // 39: envoy.config.core.v3.Http2ProtocolOptions.connection_keepalive:type_name -> envoy.config.core.v3.KeepaliveSettings
 	21, // 40: envoy.config.core.v3.Http2ProtocolOptions.use_oghttp2_codec:type_name -> google.protobuf.BoolValue
 	19, // 41: envoy.config.core.v3.Http2ProtocolOptions.max_metadata_size:type_name -> google.protobuf.UInt64Value
-	9,  // 42: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
-	3,  // 43: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
-	21, // 44: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
-	15, // 45: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
-	20, // 46: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	18, // 47: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
-	18, // 48: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
-	49, // [49:49] is the sub-list for method output_type
-	49, // [49:49] is the sub-list for method input_type
-	49, // [49:49] is the sub-list for extension type_name
-	49, // [49:49] is the sub-list for extension extendee
-	0,  // [0:49] is the sub-list for field type_name
+	21, // 42: envoy.config.core.v3.Http2ProtocolOptions.enable_huffman_encoding:type_name -> google.protobuf.BoolValue
+	9,  // 43: envoy.config.core.v3.GrpcProtocolOptions.http2_protocol_options:type_name -> envoy.config.core.v3.Http2ProtocolOptions
+	3,  // 44: envoy.config.core.v3.Http3ProtocolOptions.quic_protocol_options:type_name -> envoy.config.core.v3.QuicProtocolOptions
+	21, // 45: envoy.config.core.v3.Http3ProtocolOptions.override_stream_error_on_invalid_http_message:type_name -> google.protobuf.BoolValue
+	15, // 46: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.proper_case_words:type_name -> envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.ProperCaseWords
+	20, // 47: envoy.config.core.v3.Http1ProtocolOptions.HeaderKeyFormat.stateful_formatter:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	18, // 48: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.identifier:type_name -> google.protobuf.UInt32Value
+	18, // 49: envoy.config.core.v3.Http2ProtocolOptions.SettingsParameter.value:type_name -> google.protobuf.UInt32Value
+	50, // [50:50] is the sub-list for method output_type
+	50, // [50:50] is the sub-list for method input_type
+	50, // [50:50] is the sub-list for extension type_name
+	50, // [50:50] is the sub-list for extension extendee
+	0,  // [0:50] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_core_v3_protocol_proto_init() }

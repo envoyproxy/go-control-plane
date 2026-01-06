@@ -517,6 +517,7 @@ type CommonTlsContext struct {
 	// Select TLS certificate based on TLS client hello.
 	// If empty, defaults to native TLS certificate selection behavior:
 	// DNS SANs or Subject Common Name in TLS certificates is extracted as server name pattern to match SNI.
+	// [#extension-category: envoy.tls.certificate_selectors]
 	CustomTlsCertificateSelector *v3.TypedExtensionConfig `protobuf:"bytes,16,opt,name=custom_tls_certificate_selector,json=customTlsCertificateSelector,proto3" json:"custom_tls_certificate_selector,omitempty"`
 	// Certificate provider for fetching TLS certificates.
 	// [#not-implemented-hide:]

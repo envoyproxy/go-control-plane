@@ -31,10 +31,13 @@ type DownstreamReverseConnectionSocketInterface struct {
 	StatPrefix string `protobuf:"bytes,1,opt,name=stat_prefix,json=statPrefix,proto3" json:"stat_prefix,omitempty"`
 	// Enable detailed per-host and per-cluster statistics.
 	// When enabled, emits hidden statistics for individual hosts and clusters.
-	// Defaults to false.
+	// Defaults to “false“.
 	EnableDetailedStats bool `protobuf:"varint,2,opt,name=enable_detailed_stats,json=enableDetailedStats,proto3" json:"enable_detailed_stats,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Optional HTTP handshake configuration. When unset, the initiator envoy uses the defaults
+	// provided by “HttpHandshakeConfig“.
+	HttpHandshake *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig `protobuf:"bytes,3,opt,name=http_handshake,json=httpHandshake,proto3" json:"http_handshake,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DownstreamReverseConnectionSocketInterface) Reset() {
@@ -81,15 +84,72 @@ func (x *DownstreamReverseConnectionSocketInterface) GetEnableDetailedStats() bo
 	return false
 }
 
+func (x *DownstreamReverseConnectionSocketInterface) GetHttpHandshake() *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig {
+	if x != nil {
+		return x.HttpHandshake
+	}
+	return nil
+}
+
+// HTTP handshake settings for initiator envoy initiated reverse tunnels.
+type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Request path used when issuing the HTTP reverse-connection handshake. Defaults to
+	// "/reverse_connections/request".
+	RequestPath   string `protobuf:"bytes,1,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Reset() {
+	*x = DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig{}
+	mi := &file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) ProtoMessage() {}
+
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig.ProtoReflect.Descriptor instead.
+func (*DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetRequestPath() string {
+	if x != nil {
+		return x.RequestPath
+	}
+	return ""
+}
+
 var File_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a\x1dudpa/annotations/status.proto\"\x81\x01\n" +
+	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a\x1dudpa/annotations/status.proto\"\xee\x02\n" +
 	"*DownstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x122\n" +
-	"\x15enable_detailed_stats\x18\x02 \x01(\bR\x13enableDetailedStatsB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x15enable_detailed_stats\x18\x02 \x01(\bR\x13enableDetailedStats\x12\xb0\x01\n" +
+	"\x0ehttp_handshake\x18\x03 \x01(\v2\x88\x01.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfigR\rhttpHandshake\x1a8\n" +
+	"\x13HttpHandshakeConfig\x12!\n" +
+	"\frequest_path\x18\x01 \x01(\tR\vrequestPathB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Vio.envoyproxy.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3B/DownstreamReverseConnectionSocketInterfaceProtoP\x01Z\x8d\x01github.com/envoyproxy/go-control-plane/envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3;downstream_socket_interfacev3b\x06proto3"
 
 var (
@@ -104,16 +164,18 @@ func file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_
 	return file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDescData
 }
 
-var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_goTypes = []any{
-	(*DownstreamReverseConnectionSocketInterface)(nil), // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface
+	(*DownstreamReverseConnectionSocketInterface)(nil),                     // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface
+	(*DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig)(nil), // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
 }
 var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.http_handshake:type_name -> envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() {
@@ -129,7 +191,7 @@ func file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc), len(file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

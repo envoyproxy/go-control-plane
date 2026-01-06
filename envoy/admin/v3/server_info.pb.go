@@ -328,7 +328,7 @@ func (x *ServerInfo) GetNode() *v3.Node {
 	return nil
 }
 
-// [#next-free-field: 42]
+// [#next-free-field: 43]
 type CommandLineOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// See :option:`--base-id` for details.
@@ -377,6 +377,8 @@ type CommandLineOptions struct {
 	ServiceZone string `protobuf:"bytes,15,opt,name=service_zone,json=serviceZone,proto3" json:"service_zone,omitempty"`
 	// See :option:`--file-flush-interval-msec` for details.
 	FileFlushInterval *durationpb.Duration `protobuf:"bytes,16,opt,name=file_flush_interval,json=fileFlushInterval,proto3" json:"file_flush_interval,omitempty"`
+	// See :option:`--file-flush-min-size-kb` for details.
+	FileFlushMinSize uint32 `protobuf:"varint,42,opt,name=file_flush_min_size,json=fileFlushMinSize,proto3" json:"file_flush_min_size,omitempty"`
 	// See :option:`--drain-time-s` for details.
 	DrainTime *durationpb.Duration `protobuf:"bytes,17,opt,name=drain_time,json=drainTime,proto3" json:"drain_time,omitempty"`
 	// See :option:`--drain-strategy` for details.
@@ -600,6 +602,13 @@ func (x *CommandLineOptions) GetFileFlushInterval() *durationpb.Duration {
 	return nil
 }
 
+func (x *CommandLineOptions) GetFileFlushMinSize() uint32 {
+	if x != nil {
+		return x.FileFlushMinSize
+	}
+	return 0
+}
+
 func (x *CommandLineOptions) GetDrainTime() *durationpb.Duration {
 	if x != nil {
 		return x.DrainTime
@@ -717,7 +726,7 @@ const file_envoy_admin_v3_server_info_proto_rawDesc = "" +
 	"\bDRAINING\x10\x01\x12\x14\n" +
 	"\x10PRE_INITIALIZING\x10\x02\x12\x10\n" +
 	"\fINITIALIZING\x10\x03:%\x9aň\x1e \n" +
-	"\x1eenvoy.admin.v2alpha.ServerInfo\"\x90\x10\n" +
+	"\x1eenvoy.admin.v2alpha.ServerInfo\"\xbf\x10\n" +
 	"\x12CommandLineOptions\x12\x17\n" +
 	"\abase_id\x18\x01 \x01(\x04R\x06baseId\x12-\n" +
 	"\x13use_dynamic_base_id\x18\x1f \x01(\bR\x10useDynamicBaseId\x12?\n" +
@@ -746,7 +755,8 @@ const file_envoy_admin_v3_server_info_proto_rawDesc = "" +
 	"\x0fservice_cluster\x18\r \x01(\tR\x0eserviceCluster\x12!\n" +
 	"\fservice_node\x18\x0e \x01(\tR\vserviceNode\x12!\n" +
 	"\fservice_zone\x18\x0f \x01(\tR\vserviceZone\x12I\n" +
-	"\x13file_flush_interval\x18\x10 \x01(\v2\x19.google.protobuf.DurationR\x11fileFlushInterval\x128\n" +
+	"\x13file_flush_interval\x18\x10 \x01(\v2\x19.google.protobuf.DurationR\x11fileFlushInterval\x12-\n" +
+	"\x13file_flush_min_size\x18* \x01(\rR\x10fileFlushMinSize\x128\n" +
 	"\n" +
 	"drain_time\x18\x11 \x01(\v2\x19.google.protobuf.DurationR\tdrainTime\x12W\n" +
 	"\x0edrain_strategy\x18! \x01(\x0e20.envoy.admin.v3.CommandLineOptions.DrainStrategyR\rdrainStrategy\x12K\n" +
