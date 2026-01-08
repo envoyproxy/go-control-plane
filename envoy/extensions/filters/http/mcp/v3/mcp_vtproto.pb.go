@@ -166,8 +166,15 @@ func (m *ParserConfig_MethodConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 			i -= size
 			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
 			i--
-			dAtA[i] = 0x12
+			dAtA[i] = 0x1a
 		}
+	}
+	if len(m.Group) > 0 {
+		i -= len(m.Group)
+		copy(dAtA[i:], m.Group)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Group)))
+		i--
+		dAtA[i] = 0x12
 	}
 	if len(m.Method) > 0 {
 		i -= len(m.Method)
@@ -208,6 +215,13 @@ func (m *ParserConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.GroupMetadataKey) > 0 {
+		i -= len(m.GroupMetadataKey)
+		copy(dAtA[i:], m.GroupMetadataKey)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.GroupMetadataKey)))
+		i--
+		dAtA[i] = 0x12
 	}
 	if len(m.Methods) > 0 {
 		for iNdEx := len(m.Methods) - 1; iNdEx >= 0; iNdEx-- {
@@ -320,6 +334,10 @@ func (m *ParserConfig_MethodConfig) SizeVT() (n int) {
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
+	l = len(m.Group)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
 	if len(m.ExtractionRules) > 0 {
 		for _, e := range m.ExtractionRules {
 			l = e.SizeVT()
@@ -341,6 +359,10 @@ func (m *ParserConfig) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	l = len(m.GroupMetadataKey)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
 	return n
