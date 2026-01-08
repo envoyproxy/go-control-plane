@@ -474,6 +474,64 @@ func (m *QuicProtocolOptions) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetClientPacketWriter()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuicProtocolOptionsValidationError{
+					field:  "ClientPacketWriter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuicProtocolOptionsValidationError{
+					field:  "ClientPacketWriter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetClientPacketWriter()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuicProtocolOptionsValidationError{
+				field:  "ClientPacketWriter",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetConnectionMigration()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuicProtocolOptionsValidationError{
+					field:  "ConnectionMigration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuicProtocolOptionsValidationError{
+					field:  "ConnectionMigration",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConnectionMigration()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuicProtocolOptionsValidationError{
+				field:  "ConnectionMigration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return QuicProtocolOptionsMultiError(errors)
 	}
@@ -2515,6 +2573,325 @@ var _SchemeHeaderTransformation_SchemeToOverwrite_InLookup = map[string]struct{}
 	"http":  {},
 	"https": {},
 }
+
+// Validate checks the field values on
+// QuicProtocolOptions_ConnectionMigrationSettings with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *QuicProtocolOptions_ConnectionMigrationSettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// QuicProtocolOptions_ConnectionMigrationSettings with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in
+// QuicProtocolOptions_ConnectionMigrationSettingsMultiError, or nil if none found.
+func (m *QuicProtocolOptions_ConnectionMigrationSettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QuicProtocolOptions_ConnectionMigrationSettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetMigrateIdleConnections()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, QuicProtocolOptions_ConnectionMigrationSettingsValidationError{
+					field:  "MigrateIdleConnections",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, QuicProtocolOptions_ConnectionMigrationSettingsValidationError{
+					field:  "MigrateIdleConnections",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetMigrateIdleConnections()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return QuicProtocolOptions_ConnectionMigrationSettingsValidationError{
+				field:  "MigrateIdleConnections",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if d := m.GetMaxTimeOnNonDefaultNetwork(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = QuicProtocolOptions_ConnectionMigrationSettingsValidationError{
+				field:  "MaxTimeOnNonDefaultNetwork",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(1*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := QuicProtocolOptions_ConnectionMigrationSettingsValidationError{
+					field:  "MaxTimeOnNonDefaultNetwork",
+					reason: "value must be greater than or equal to 1s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return QuicProtocolOptions_ConnectionMigrationSettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// QuicProtocolOptions_ConnectionMigrationSettingsMultiError is an error
+// wrapping multiple validation errors returned by
+// QuicProtocolOptions_ConnectionMigrationSettings.ValidateAll() if the
+// designated constraints aren't met.
+type QuicProtocolOptions_ConnectionMigrationSettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QuicProtocolOptions_ConnectionMigrationSettingsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QuicProtocolOptions_ConnectionMigrationSettingsMultiError) AllErrors() []error { return m }
+
+// QuicProtocolOptions_ConnectionMigrationSettingsValidationError is the
+// validation error returned by
+// QuicProtocolOptions_ConnectionMigrationSettings.Validate if the designated
+// constraints aren't met.
+type QuicProtocolOptions_ConnectionMigrationSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QuicProtocolOptions_ConnectionMigrationSettingsValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e QuicProtocolOptions_ConnectionMigrationSettingsValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e QuicProtocolOptions_ConnectionMigrationSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e QuicProtocolOptions_ConnectionMigrationSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e QuicProtocolOptions_ConnectionMigrationSettingsValidationError) ErrorName() string {
+	return "QuicProtocolOptions_ConnectionMigrationSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QuicProtocolOptions_ConnectionMigrationSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQuicProtocolOptions_ConnectionMigrationSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QuicProtocolOptions_ConnectionMigrationSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QuicProtocolOptions_ConnectionMigrationSettingsValidationError{}
+
+// Validate checks the field values on
+// QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the first error encountered is returned, or nil if
+// there are no violations.
+func (m *QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on
+// QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsMultiError,
+// or nil if none found.
+func (m *QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if d := m.GetMaxIdleTimeBeforeMigration(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError{
+				field:  "MaxIdleTimeBeforeMigration",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(1*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError{
+					field:  "MaxIdleTimeBeforeMigration",
+					reason: "value must be greater than or equal to 1s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
+	if len(errors) > 0 {
+		return QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsMultiError
+// is an error wrapping multiple validation errors returned by
+// QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings.ValidateAll()
+// if the designated constraints aren't met.
+type QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsMultiError) AllErrors() []error {
+	return m
+}
+
+// QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError
+// is the validation error returned by
+// QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings.Validate
+// if the designated constraints aren't met.
+type QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError) Field() string {
+	return e.field
+}
+
+// Reason function returns reason value.
+func (e QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError) Reason() string {
+	return e.reason
+}
+
+// Cause function returns cause value.
+func (e QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError) Cause() error {
+	return e.cause
+}
+
+// Key function returns key value.
+func (e QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError) Key() bool {
+	return e.key
+}
+
+// ErrorName returns error name.
+func (e QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError) ErrorName() string {
+	return "QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sQuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = QuicProtocolOptions_ConnectionMigrationSettings_MigrateIdleConnectionSettingsValidationError{}
 
 // Validate checks the field values on
 // AlternateProtocolsCacheOptions_AlternateProtocolsCacheEntry with the rules

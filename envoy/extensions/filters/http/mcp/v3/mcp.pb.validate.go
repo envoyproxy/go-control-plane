@@ -247,6 +247,8 @@ func (m *ParserConfig) validate(all bool) error {
 
 	}
 
+	// no validation rules for GroupMetadataKey
+
 	if len(errors) > 0 {
 		return ParserConfigMultiError(errors)
 	}
@@ -597,6 +599,8 @@ func (m *ParserConfig_MethodConfig) validate(all bool) error {
 		}
 		errors = append(errors, err)
 	}
+
+	// no validation rules for Group
 
 	for idx, item := range m.GetExtractionRules() {
 		_, _ = idx, item

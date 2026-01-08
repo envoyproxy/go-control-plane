@@ -36,6 +36,711 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on HeaderSource with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *HeaderSource) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on HeaderSource with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in HeaderSourceMultiError, or
+// nil if none found.
+func (m *HeaderSource) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *HeaderSource) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetName()) < 1 {
+		err := HeaderSourceValidationError{
+			field:  "Name",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if !_HeaderSource_Name_Pattern.MatchString(m.GetName()) {
+		err := HeaderSourceValidationError{
+			field:  "Name",
+			reason: "value does not match regex pattern \"^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$\"",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return HeaderSourceMultiError(errors)
+	}
+
+	return nil
+}
+
+// HeaderSourceMultiError is an error wrapping multiple validation errors
+// returned by HeaderSource.ValidateAll() if the designated constraints aren't met.
+type HeaderSourceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m HeaderSourceMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m HeaderSourceMultiError) AllErrors() []error { return m }
+
+// HeaderSourceValidationError is the validation error returned by
+// HeaderSource.Validate if the designated constraints aren't met.
+type HeaderSourceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e HeaderSourceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e HeaderSourceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e HeaderSourceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e HeaderSourceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e HeaderSourceValidationError) ErrorName() string { return "HeaderSourceValidationError" }
+
+// Error satisfies the builtin error interface
+func (e HeaderSourceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sHeaderSource.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = HeaderSourceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = HeaderSourceValidationError{}
+
+var _HeaderSource_Name_Pattern = regexp.MustCompile("^:?[0-9a-zA-Z!#$%&'*+-.^_|~`]+$")
+
+// Validate checks the field values on DynamicMetadataSource with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DynamicMetadataSource) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DynamicMetadataSource with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DynamicMetadataSourceMultiError, or nil if none found.
+func (m *DynamicMetadataSource) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DynamicMetadataSource) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetKey() == nil {
+		err := DynamicMetadataSourceValidationError{
+			field:  "Key",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, DynamicMetadataSourceValidationError{
+					field:  "Key",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, DynamicMetadataSourceValidationError{
+					field:  "Key",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DynamicMetadataSourceValidationError{
+				field:  "Key",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return DynamicMetadataSourceMultiError(errors)
+	}
+
+	return nil
+}
+
+// DynamicMetadataSourceMultiError is an error wrapping multiple validation
+// errors returned by DynamicMetadataSource.ValidateAll() if the designated
+// constraints aren't met.
+type DynamicMetadataSourceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DynamicMetadataSourceMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DynamicMetadataSourceMultiError) AllErrors() []error { return m }
+
+// DynamicMetadataSourceValidationError is the validation error returned by
+// DynamicMetadataSource.Validate if the designated constraints aren't met.
+type DynamicMetadataSourceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DynamicMetadataSourceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DynamicMetadataSourceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DynamicMetadataSourceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DynamicMetadataSourceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DynamicMetadataSourceValidationError) ErrorName() string {
+	return "DynamicMetadataSourceValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DynamicMetadataSourceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDynamicMetadataSource.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DynamicMetadataSourceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DynamicMetadataSourceValidationError{}
+
+// Validate checks the field values on IdentityExtractor with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *IdentityExtractor) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on IdentityExtractor with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// IdentityExtractorMultiError, or nil if none found.
+func (m *IdentityExtractor) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *IdentityExtractor) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetHeader()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IdentityExtractorValidationError{
+					field:  "Header",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IdentityExtractorValidationError{
+					field:  "Header",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetHeader()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdentityExtractorValidationError{
+				field:  "Header",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetDynamicMetadata()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, IdentityExtractorValidationError{
+					field:  "DynamicMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, IdentityExtractorValidationError{
+					field:  "DynamicMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDynamicMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return IdentityExtractorValidationError{
+				field:  "DynamicMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return IdentityExtractorMultiError(errors)
+	}
+
+	return nil
+}
+
+// IdentityExtractorMultiError is an error wrapping multiple validation errors
+// returned by IdentityExtractor.ValidateAll() if the designated constraints
+// aren't met.
+type IdentityExtractorMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m IdentityExtractorMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m IdentityExtractorMultiError) AllErrors() []error { return m }
+
+// IdentityExtractorValidationError is the validation error returned by
+// IdentityExtractor.Validate if the designated constraints aren't met.
+type IdentityExtractorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IdentityExtractorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IdentityExtractorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IdentityExtractorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IdentityExtractorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IdentityExtractorValidationError) ErrorName() string {
+	return "IdentityExtractorValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IdentityExtractorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIdentityExtractor.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IdentityExtractorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IdentityExtractorValidationError{}
+
+// Validate checks the field values on ValidationPolicy with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ValidationPolicy) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ValidationPolicy with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ValidationPolicyMultiError, or nil if none found.
+func (m *ValidationPolicy) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ValidationPolicy) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if _, ok := ValidationPolicy_Mode_name[int32(m.GetMode())]; !ok {
+		err := ValidationPolicyValidationError{
+			field:  "Mode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ValidationPolicyMultiError(errors)
+	}
+
+	return nil
+}
+
+// ValidationPolicyMultiError is an error wrapping multiple validation errors
+// returned by ValidationPolicy.ValidateAll() if the designated constraints
+// aren't met.
+type ValidationPolicyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ValidationPolicyMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ValidationPolicyMultiError) AllErrors() []error { return m }
+
+// ValidationPolicyValidationError is the validation error returned by
+// ValidationPolicy.Validate if the designated constraints aren't met.
+type ValidationPolicyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ValidationPolicyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ValidationPolicyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ValidationPolicyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ValidationPolicyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ValidationPolicyValidationError) ErrorName() string { return "ValidationPolicyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ValidationPolicyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sValidationPolicy.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ValidationPolicyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ValidationPolicyValidationError{}
+
+// Validate checks the field values on SessionIdentity with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *SessionIdentity) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SessionIdentity with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SessionIdentityMultiError, or nil if none found.
+func (m *SessionIdentity) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SessionIdentity) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetIdentity() == nil {
+		err := SessionIdentityValidationError{
+			field:  "Identity",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetIdentity()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SessionIdentityValidationError{
+					field:  "Identity",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SessionIdentityValidationError{
+					field:  "Identity",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetIdentity()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SessionIdentityValidationError{
+				field:  "Identity",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetValidation()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SessionIdentityValidationError{
+					field:  "Validation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SessionIdentityValidationError{
+					field:  "Validation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetValidation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SessionIdentityValidationError{
+				field:  "Validation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return SessionIdentityMultiError(errors)
+	}
+
+	return nil
+}
+
+// SessionIdentityMultiError is an error wrapping multiple validation errors
+// returned by SessionIdentity.ValidateAll() if the designated constraints
+// aren't met.
+type SessionIdentityMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SessionIdentityMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SessionIdentityMultiError) AllErrors() []error { return m }
+
+// SessionIdentityValidationError is the validation error returned by
+// SessionIdentity.Validate if the designated constraints aren't met.
+type SessionIdentityValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SessionIdentityValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SessionIdentityValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SessionIdentityValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SessionIdentityValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SessionIdentityValidationError) ErrorName() string { return "SessionIdentityValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SessionIdentityValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSessionIdentity.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SessionIdentityValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SessionIdentityValidationError{}
+
 // Validate checks the field values on McpRouter with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -90,6 +795,35 @@ func (m *McpRouter) validate(all bool) error {
 			}
 		}
 
+	}
+
+	if all {
+		switch v := interface{}(m.GetSessionIdentity()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpRouterValidationError{
+					field:  "SessionIdentity",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpRouterValidationError{
+					field:  "SessionIdentity",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSessionIdentity()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpRouterValidationError{
+				field:  "SessionIdentity",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	if len(errors) > 0 {
