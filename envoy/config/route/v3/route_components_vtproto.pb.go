@@ -1340,6 +1340,20 @@ func (m *RouteMatch) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.Cookies) > 0 {
+		for iNdEx := len(m.Cookies) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.Cookies[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x8a
+		}
+	}
 	if len(m.FilterState) > 0 {
 		for iNdEx := len(m.FilterState) - 1; iNdEx >= 0; iNdEx-- {
 			if vtmsg, ok := interface{}(m.FilterState[iNdEx]).(interface {
@@ -6061,6 +6075,78 @@ func (m *QueryParameterMatcher_PresentMatch) MarshalToSizedBufferVTStrict(dAtA [
 	dAtA[i] = 0x30
 	return len(dAtA) - i, nil
 }
+func (m *CookieMatcher) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CookieMatcher) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *CookieMatcher) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.InvertMatch {
+		i--
+		if m.InvertMatch {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.StringMatch != nil {
+		if vtmsg, ok := interface{}(m.StringMatch).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.StringMatch)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *InternalRedirectPolicy) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -6849,6 +6935,12 @@ func (m *RouteMatch) SizeVT() (n int) {
 			} else {
 				l = proto.Size(e)
 			}
+			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.Cookies) > 0 {
+		for _, e := range m.Cookies {
+			l = e.SizeVT()
 			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
 	}
@@ -8766,6 +8858,33 @@ func (m *QueryParameterMatcher_PresentMatch) SizeVT() (n int) {
 	n += 2
 	return n
 }
+func (m *CookieMatcher) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.StringMatch != nil {
+		if size, ok := interface{}(m.StringMatch).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.StringMatch)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.InvertMatch {
+		n += 2
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *InternalRedirectPolicy) SizeVT() (n int) {
 	if m == nil {
 		return 0

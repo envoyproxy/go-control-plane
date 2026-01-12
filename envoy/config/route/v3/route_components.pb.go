@@ -1331,7 +1331,7 @@ func (x *ClusterSpecifierPlugin) GetIsOptional() bool {
 	return false
 }
 
-// [#next-free-field: 17]
+// [#next-free-field: 18]
 type RouteMatch struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to PathSpecifier:
@@ -1384,6 +1384,10 @@ type RouteMatch struct {
 	//	URL-encoded, but the message fields are not. For example, if a query
 	//	parameter is "foo%20bar", the message field will be "foo bar".
 	QueryParameters []*QueryParameterMatcher `protobuf:"bytes,7,rep,name=query_parameters,json=queryParameters,proto3" json:"query_parameters,omitempty"`
+	// Specifies a set of cookies on which the route should match. The router parses the “Cookie“
+	// header and evaluates the named cookie against each matcher. If the number of specified cookie
+	// matchers is nonzero, they all must match for the route to be selected.
+	Cookies []*CookieMatcher `protobuf:"bytes,17,rep,name=cookies,proto3" json:"cookies,omitempty"`
 	// If specified, only gRPC requests will be matched. The router will check
 	// that the “Content-Type“ header has “application/grpc“ or one of the various
 	// “application/grpc+“ values.
@@ -1522,6 +1526,13 @@ func (x *RouteMatch) GetHeaders() []*HeaderMatcher {
 func (x *RouteMatch) GetQueryParameters() []*QueryParameterMatcher {
 	if x != nil {
 		return x.QueryParameters
+	}
+	return nil
+}
+
+func (x *RouteMatch) GetCookies() []*CookieMatcher {
+	if x != nil {
+		return x.Cookies
 	}
 	return nil
 }
@@ -4110,6 +4121,72 @@ func (*QueryParameterMatcher_StringMatch) isQueryParameterMatcher_QueryParameter
 
 func (*QueryParameterMatcher_PresentMatch) isQueryParameterMatcher_QueryParameterMatchSpecifier() {}
 
+// Cookie matching inspects individual name/value pairs parsed from the “Cookie“ header.
+type CookieMatcher struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Specifies the cookie name to evaluate.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Match the cookie value using :ref:`StringMatcher
+	// <envoy_v3_api_msg_type.matcher.v3.StringMatcher>` semantics.
+	StringMatch *v32.StringMatcher `protobuf:"bytes,2,opt,name=string_match,json=stringMatch,proto3" json:"string_match,omitempty"`
+	// Invert the match result. If the cookie is not present, the match result is false, so
+	// “invert_match“ will cause the matcher to succeed when the cookie is absent.
+	InvertMatch   bool `protobuf:"varint,3,opt,name=invert_match,json=invertMatch,proto3" json:"invert_match,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CookieMatcher) Reset() {
+	*x = CookieMatcher{}
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CookieMatcher) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CookieMatcher) ProtoMessage() {}
+
+func (x *CookieMatcher) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CookieMatcher.ProtoReflect.Descriptor instead.
+func (*CookieMatcher) Descriptor() ([]byte, []int) {
+	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *CookieMatcher) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CookieMatcher) GetStringMatch() *v32.StringMatcher {
+	if x != nil {
+		return x.StringMatch
+	}
+	return nil
+}
+
+func (x *CookieMatcher) GetInvertMatch() bool {
+	if x != nil {
+		return x.InvertMatch
+	}
+	return false
+}
+
 // HTTP Internal Redirect :ref:`architecture overview <arch_overview_internal_redirects>`.
 // [#next-free-field: 6]
 type InternalRedirectPolicy struct {
@@ -4145,7 +4222,7 @@ type InternalRedirectPolicy struct {
 
 func (x *InternalRedirectPolicy) Reset() {
 	*x = InternalRedirectPolicy{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[20]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4157,7 +4234,7 @@ func (x *InternalRedirectPolicy) String() string {
 func (*InternalRedirectPolicy) ProtoMessage() {}
 
 func (x *InternalRedirectPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[20]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4170,7 +4247,7 @@ func (x *InternalRedirectPolicy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InternalRedirectPolicy.ProtoReflect.Descriptor instead.
 func (*InternalRedirectPolicy) Descriptor() ([]byte, []int) {
-	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{20}
+	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *InternalRedirectPolicy) GetMaxInternalRedirects() *wrapperspb.UInt32Value {
@@ -4241,7 +4318,7 @@ type FilterConfig struct {
 
 func (x *FilterConfig) Reset() {
 	*x = FilterConfig{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[21]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4253,7 +4330,7 @@ func (x *FilterConfig) String() string {
 func (*FilterConfig) ProtoMessage() {}
 
 func (x *FilterConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[21]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4266,7 +4343,7 @@ func (x *FilterConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FilterConfig.ProtoReflect.Descriptor instead.
 func (*FilterConfig) Descriptor() ([]byte, []int) {
-	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{21}
+	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *FilterConfig) GetConfig() *anypb.Any {
@@ -4367,7 +4444,7 @@ type WeightedCluster_ClusterWeight struct {
 
 func (x *WeightedCluster_ClusterWeight) Reset() {
 	*x = WeightedCluster_ClusterWeight{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[24]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4379,7 +4456,7 @@ func (x *WeightedCluster_ClusterWeight) String() string {
 func (*WeightedCluster_ClusterWeight) ProtoMessage() {}
 
 func (x *WeightedCluster_ClusterWeight) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[24]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4495,7 +4572,7 @@ type RouteMatch_GrpcRouteMatchOptions struct {
 
 func (x *RouteMatch_GrpcRouteMatchOptions) Reset() {
 	*x = RouteMatch_GrpcRouteMatchOptions{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[26]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4507,7 +4584,7 @@ func (x *RouteMatch_GrpcRouteMatchOptions) String() string {
 func (*RouteMatch_GrpcRouteMatchOptions) ProtoMessage() {}
 
 func (x *RouteMatch_GrpcRouteMatchOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[26]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4547,7 +4624,7 @@ type RouteMatch_TlsContextMatchOptions struct {
 
 func (x *RouteMatch_TlsContextMatchOptions) Reset() {
 	*x = RouteMatch_TlsContextMatchOptions{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[27]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4559,7 +4636,7 @@ func (x *RouteMatch_TlsContextMatchOptions) String() string {
 func (*RouteMatch_TlsContextMatchOptions) ProtoMessage() {}
 
 func (x *RouteMatch_TlsContextMatchOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[27]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4598,7 +4675,7 @@ type RouteMatch_ConnectMatcher struct {
 
 func (x *RouteMatch_ConnectMatcher) Reset() {
 	*x = RouteMatch_ConnectMatcher{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[28]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4610,7 +4687,7 @@ func (x *RouteMatch_ConnectMatcher) String() string {
 func (*RouteMatch_ConnectMatcher) ProtoMessage() {}
 
 func (x *RouteMatch_ConnectMatcher) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[28]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4700,7 +4777,7 @@ type RouteAction_RequestMirrorPolicy struct {
 
 func (x *RouteAction_RequestMirrorPolicy) Reset() {
 	*x = RouteAction_RequestMirrorPolicy{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[29]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4712,7 +4789,7 @@ func (x *RouteAction_RequestMirrorPolicy) String() string {
 func (*RouteAction_RequestMirrorPolicy) ProtoMessage() {}
 
 func (x *RouteAction_RequestMirrorPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[29]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4816,7 +4893,7 @@ type RouteAction_HashPolicy struct {
 
 func (x *RouteAction_HashPolicy) Reset() {
 	*x = RouteAction_HashPolicy{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[30]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4828,7 +4905,7 @@ func (x *RouteAction_HashPolicy) String() string {
 func (*RouteAction_HashPolicy) ProtoMessage() {}
 
 func (x *RouteAction_HashPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[30]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4969,7 +5046,7 @@ type RouteAction_UpgradeConfig struct {
 
 func (x *RouteAction_UpgradeConfig) Reset() {
 	*x = RouteAction_UpgradeConfig{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[31]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4981,7 +5058,7 @@ func (x *RouteAction_UpgradeConfig) String() string {
 func (*RouteAction_UpgradeConfig) ProtoMessage() {}
 
 func (x *RouteAction_UpgradeConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[31]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5047,7 +5124,7 @@ type RouteAction_MaxStreamDuration struct {
 
 func (x *RouteAction_MaxStreamDuration) Reset() {
 	*x = RouteAction_MaxStreamDuration{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[32]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5059,7 +5136,7 @@ func (x *RouteAction_MaxStreamDuration) String() string {
 func (*RouteAction_MaxStreamDuration) ProtoMessage() {}
 
 func (x *RouteAction_MaxStreamDuration) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[32]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5110,7 +5187,7 @@ type RouteAction_HashPolicy_Header struct {
 
 func (x *RouteAction_HashPolicy_Header) Reset() {
 	*x = RouteAction_HashPolicy_Header{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[33]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5122,7 +5199,7 @@ func (x *RouteAction_HashPolicy_Header) String() string {
 func (*RouteAction_HashPolicy_Header) ProtoMessage() {}
 
 func (x *RouteAction_HashPolicy_Header) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[33]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5165,7 +5242,7 @@ type RouteAction_HashPolicy_CookieAttribute struct {
 
 func (x *RouteAction_HashPolicy_CookieAttribute) Reset() {
 	*x = RouteAction_HashPolicy_CookieAttribute{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[34]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5177,7 +5254,7 @@ func (x *RouteAction_HashPolicy_CookieAttribute) String() string {
 func (*RouteAction_HashPolicy_CookieAttribute) ProtoMessage() {}
 
 func (x *RouteAction_HashPolicy_CookieAttribute) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[34]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5242,7 +5319,7 @@ type RouteAction_HashPolicy_Cookie struct {
 
 func (x *RouteAction_HashPolicy_Cookie) Reset() {
 	*x = RouteAction_HashPolicy_Cookie{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[35]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5254,7 +5331,7 @@ func (x *RouteAction_HashPolicy_Cookie) String() string {
 func (*RouteAction_HashPolicy_Cookie) ProtoMessage() {}
 
 func (x *RouteAction_HashPolicy_Cookie) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[35]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5308,7 +5385,7 @@ type RouteAction_HashPolicy_ConnectionProperties struct {
 
 func (x *RouteAction_HashPolicy_ConnectionProperties) Reset() {
 	*x = RouteAction_HashPolicy_ConnectionProperties{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[36]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5320,7 +5397,7 @@ func (x *RouteAction_HashPolicy_ConnectionProperties) String() string {
 func (*RouteAction_HashPolicy_ConnectionProperties) ProtoMessage() {}
 
 func (x *RouteAction_HashPolicy_ConnectionProperties) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[36]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5356,7 +5433,7 @@ type RouteAction_HashPolicy_QueryParameter struct {
 
 func (x *RouteAction_HashPolicy_QueryParameter) Reset() {
 	*x = RouteAction_HashPolicy_QueryParameter{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[37]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5368,7 +5445,7 @@ func (x *RouteAction_HashPolicy_QueryParameter) String() string {
 func (*RouteAction_HashPolicy_QueryParameter) ProtoMessage() {}
 
 func (x *RouteAction_HashPolicy_QueryParameter) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[37]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5403,7 +5480,7 @@ type RouteAction_HashPolicy_FilterState struct {
 
 func (x *RouteAction_HashPolicy_FilterState) Reset() {
 	*x = RouteAction_HashPolicy_FilterState{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[38]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5415,7 +5492,7 @@ func (x *RouteAction_HashPolicy_FilterState) String() string {
 func (*RouteAction_HashPolicy_FilterState) ProtoMessage() {}
 
 func (x *RouteAction_HashPolicy_FilterState) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[38]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5452,7 +5529,7 @@ type RouteAction_UpgradeConfig_ConnectConfig struct {
 
 func (x *RouteAction_UpgradeConfig_ConnectConfig) Reset() {
 	*x = RouteAction_UpgradeConfig_ConnectConfig{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[39]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5464,7 +5541,7 @@ func (x *RouteAction_UpgradeConfig_ConnectConfig) String() string {
 func (*RouteAction_UpgradeConfig_ConnectConfig) ProtoMessage() {}
 
 func (x *RouteAction_UpgradeConfig_ConnectConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[39]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5509,7 +5586,7 @@ type RetryPolicy_RetryPriority struct {
 
 func (x *RetryPolicy_RetryPriority) Reset() {
 	*x = RetryPolicy_RetryPriority{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[40]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5521,7 +5598,7 @@ func (x *RetryPolicy_RetryPriority) String() string {
 func (*RetryPolicy_RetryPriority) ProtoMessage() {}
 
 func (x *RetryPolicy_RetryPriority) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[40]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5585,7 +5662,7 @@ type RetryPolicy_RetryHostPredicate struct {
 
 func (x *RetryPolicy_RetryHostPredicate) Reset() {
 	*x = RetryPolicy_RetryHostPredicate{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[41]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5597,7 +5674,7 @@ func (x *RetryPolicy_RetryHostPredicate) String() string {
 func (*RetryPolicy_RetryHostPredicate) ProtoMessage() {}
 
 func (x *RetryPolicy_RetryHostPredicate) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[41]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5664,7 +5741,7 @@ type RetryPolicy_RetryBackOff struct {
 
 func (x *RetryPolicy_RetryBackOff) Reset() {
 	*x = RetryPolicy_RetryBackOff{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[42]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5676,7 +5753,7 @@ func (x *RetryPolicy_RetryBackOff) String() string {
 func (*RetryPolicy_RetryBackOff) ProtoMessage() {}
 
 func (x *RetryPolicy_RetryBackOff) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[42]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5722,7 +5799,7 @@ type RetryPolicy_ResetHeader struct {
 
 func (x *RetryPolicy_ResetHeader) Reset() {
 	*x = RetryPolicy_ResetHeader{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[43]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5734,7 +5811,7 @@ func (x *RetryPolicy_ResetHeader) String() string {
 func (*RetryPolicy_ResetHeader) ProtoMessage() {}
 
 func (x *RetryPolicy_ResetHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[43]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5826,7 +5903,7 @@ type RetryPolicy_RateLimitedRetryBackOff struct {
 
 func (x *RetryPolicy_RateLimitedRetryBackOff) Reset() {
 	*x = RetryPolicy_RateLimitedRetryBackOff{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[44]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5838,7 +5915,7 @@ func (x *RetryPolicy_RateLimitedRetryBackOff) String() string {
 func (*RetryPolicy_RateLimitedRetryBackOff) ProtoMessage() {}
 
 func (x *RetryPolicy_RateLimitedRetryBackOff) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[44]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5892,7 +5969,7 @@ type RateLimit_Action struct {
 
 func (x *RateLimit_Action) Reset() {
 	*x = RateLimit_Action{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[45]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5904,7 +5981,7 @@ func (x *RateLimit_Action) String() string {
 func (*RateLimit_Action) ProtoMessage() {}
 
 func (x *RateLimit_Action) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[45]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6149,7 +6226,7 @@ type RateLimit_Override struct {
 
 func (x *RateLimit_Override) Reset() {
 	*x = RateLimit_Override{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[46]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6161,7 +6238,7 @@ func (x *RateLimit_Override) String() string {
 func (*RateLimit_Override) ProtoMessage() {}
 
 func (x *RateLimit_Override) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[46]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6235,7 +6312,7 @@ type RateLimit_HitsAddend struct {
 
 func (x *RateLimit_HitsAddend) Reset() {
 	*x = RateLimit_HitsAddend{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[47]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6247,7 +6324,7 @@ func (x *RateLimit_HitsAddend) String() string {
 func (*RateLimit_HitsAddend) ProtoMessage() {}
 
 func (x *RateLimit_HitsAddend) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[47]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6292,7 +6369,7 @@ type RateLimit_Action_SourceCluster struct {
 
 func (x *RateLimit_Action_SourceCluster) Reset() {
 	*x = RateLimit_Action_SourceCluster{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[48]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6304,7 +6381,7 @@ func (x *RateLimit_Action_SourceCluster) String() string {
 func (*RateLimit_Action_SourceCluster) ProtoMessage() {}
 
 func (x *RateLimit_Action_SourceCluster) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[48]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6344,7 +6421,7 @@ type RateLimit_Action_DestinationCluster struct {
 
 func (x *RateLimit_Action_DestinationCluster) Reset() {
 	*x = RateLimit_Action_DestinationCluster{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[49]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6356,7 +6433,7 @@ func (x *RateLimit_Action_DestinationCluster) String() string {
 func (*RateLimit_Action_DestinationCluster) ProtoMessage() {}
 
 func (x *RateLimit_Action_DestinationCluster) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[49]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6404,7 +6481,7 @@ type RateLimit_Action_RequestHeaders struct {
 
 func (x *RateLimit_Action_RequestHeaders) Reset() {
 	*x = RateLimit_Action_RequestHeaders{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[50]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6416,7 +6493,7 @@ func (x *RateLimit_Action_RequestHeaders) String() string {
 func (*RateLimit_Action_RequestHeaders) ProtoMessage() {}
 
 func (x *RateLimit_Action_RequestHeaders) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[50]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6485,7 +6562,7 @@ type RateLimit_Action_QueryParameters struct {
 
 func (x *RateLimit_Action_QueryParameters) Reset() {
 	*x = RateLimit_Action_QueryParameters{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[51]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6497,7 +6574,7 @@ func (x *RateLimit_Action_QueryParameters) String() string {
 func (*RateLimit_Action_QueryParameters) ProtoMessage() {}
 
 func (x *RateLimit_Action_QueryParameters) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[51]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6548,7 +6625,7 @@ type RateLimit_Action_RemoteAddress struct {
 
 func (x *RateLimit_Action_RemoteAddress) Reset() {
 	*x = RateLimit_Action_RemoteAddress{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[52]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6560,7 +6637,7 @@ func (x *RateLimit_Action_RemoteAddress) String() string {
 func (*RateLimit_Action_RemoteAddress) ProtoMessage() {}
 
 func (x *RateLimit_Action_RemoteAddress) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[52]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6606,7 +6683,7 @@ type RateLimit_Action_MaskedRemoteAddress struct {
 
 func (x *RateLimit_Action_MaskedRemoteAddress) Reset() {
 	*x = RateLimit_Action_MaskedRemoteAddress{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[53]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6618,7 +6695,7 @@ func (x *RateLimit_Action_MaskedRemoteAddress) String() string {
 func (*RateLimit_Action_MaskedRemoteAddress) ProtoMessage() {}
 
 func (x *RateLimit_Action_MaskedRemoteAddress) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[53]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6695,7 +6772,7 @@ type RateLimit_Action_GenericKey struct {
 
 func (x *RateLimit_Action_GenericKey) Reset() {
 	*x = RateLimit_Action_GenericKey{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[54]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6707,7 +6784,7 @@ func (x *RateLimit_Action_GenericKey) String() string {
 func (*RateLimit_Action_GenericKey) ProtoMessage() {}
 
 func (x *RateLimit_Action_GenericKey) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[54]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6806,7 +6883,7 @@ type RateLimit_Action_HeaderValueMatch struct {
 
 func (x *RateLimit_Action_HeaderValueMatch) Reset() {
 	*x = RateLimit_Action_HeaderValueMatch{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[55]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6818,7 +6895,7 @@ func (x *RateLimit_Action_HeaderValueMatch) String() string {
 func (*RateLimit_Action_HeaderValueMatch) ProtoMessage() {}
 
 func (x *RateLimit_Action_HeaderValueMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[55]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6895,7 +6972,7 @@ type RateLimit_Action_DynamicMetaData struct {
 
 func (x *RateLimit_Action_DynamicMetaData) Reset() {
 	*x = RateLimit_Action_DynamicMetaData{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[56]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6907,7 +6984,7 @@ func (x *RateLimit_Action_DynamicMetaData) String() string {
 func (*RateLimit_Action_DynamicMetaData) ProtoMessage() {}
 
 func (x *RateLimit_Action_DynamicMetaData) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[56]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6983,7 +7060,7 @@ type RateLimit_Action_MetaData struct {
 
 func (x *RateLimit_Action_MetaData) Reset() {
 	*x = RateLimit_Action_MetaData{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[57]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -6995,7 +7072,7 @@ func (x *RateLimit_Action_MetaData) String() string {
 func (*RateLimit_Action_MetaData) ProtoMessage() {}
 
 func (x *RateLimit_Action_MetaData) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[57]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7108,7 +7185,7 @@ type RateLimit_Action_QueryParameterValueMatch struct {
 
 func (x *RateLimit_Action_QueryParameterValueMatch) Reset() {
 	*x = RateLimit_Action_QueryParameterValueMatch{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[58]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7120,7 +7197,7 @@ func (x *RateLimit_Action_QueryParameterValueMatch) String() string {
 func (*RateLimit_Action_QueryParameterValueMatch) ProtoMessage() {}
 
 func (x *RateLimit_Action_QueryParameterValueMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[58]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7185,7 +7262,7 @@ type RateLimit_Override_DynamicMetadata struct {
 
 func (x *RateLimit_Override_DynamicMetadata) Reset() {
 	*x = RateLimit_Override_DynamicMetadata{}
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[59]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -7197,7 +7274,7 @@ func (x *RateLimit_Override_DynamicMetadata) String() string {
 func (*RateLimit_Override_DynamicMetadata) ProtoMessage() {}
 
 func (x *RateLimit_Override_DynamicMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[59]
+	mi := &file_envoy_config_route_v3_route_components_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7327,7 +7404,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x16ClusterSpecifierPlugin\x12R\n" +
 	"\textension\x18\x01 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\textension\x12\x1f\n" +
 	"\vis_optional\x18\x02 \x01(\bR\n" +
-	"isOptional\"\x93\v\n" +
+	"isOptional\"\xd3\v\n" +
 	"\n" +
 	"RouteMatch\x12\x18\n" +
 	"\x06prefix\x18\x01 \x01(\tH\x00R\x06prefix\x12\x14\n" +
@@ -7341,7 +7418,8 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x0ecase_sensitive\x18\x04 \x01(\v2\x1a.google.protobuf.BoolValueR\rcaseSensitive\x12Y\n" +
 	"\x10runtime_fraction\x18\t \x01(\v2..envoy.config.core.v3.RuntimeFractionalPercentR\x0fruntimeFraction\x12>\n" +
 	"\aheaders\x18\x06 \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\aheaders\x12W\n" +
-	"\x10query_parameters\x18\a \x03(\v2,.envoy.config.route.v3.QueryParameterMatcherR\x0fqueryParameters\x12K\n" +
+	"\x10query_parameters\x18\a \x03(\v2,.envoy.config.route.v3.QueryParameterMatcherR\x0fqueryParameters\x12>\n" +
+	"\acookies\x18\x11 \x03(\v2$.envoy.config.route.v3.CookieMatcherR\acookies\x12K\n" +
 	"\x04grpc\x18\b \x01(\v27.envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptionsR\x04grpc\x12Y\n" +
 	"\vtls_context\x18\v \x01(\v28.envoy.config.route.v3.RouteMatch.TlsContextMatchOptionsR\n" +
 	"tlsContext\x12Q\n" +
@@ -7688,7 +7766,12 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\fstring_match\x18\x05 \x01(\v2$.envoy.type.matcher.v3.StringMatcherB\b\xfaB\x05\x8a\x01\x02\x10\x01H\x00R\vstringMatch\x12%\n" +
 	"\rpresent_match\x18\x06 \x01(\bH\x00R\fpresentMatch:/\x9aň\x1e*\n" +
 	"(envoy.api.v2.route.QueryParameterMatcherB!\n" +
-	"\x1fquery_parameter_match_specifierJ\x04\b\x03\x10\x04J\x04\b\x04\x10\x05R\x05valueR\x05regex\"\x86\x03\n" +
+	"\x1fquery_parameter_match_specifierJ\x04\b\x03\x10\x04J\x04\b\x04\x10\x05R\x05valueR\x05regex\"\xa5\x01\n" +
+	"\rCookieMatcher\x12\x1e\n" +
+	"\x04name\x18\x01 \x01(\tB\n" +
+	"\xfaB\ar\x05\x10\x01(\x80\bR\x04name\x12Q\n" +
+	"\fstring_match\x18\x02 \x01(\v2$.envoy.type.matcher.v3.StringMatcherB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vstringMatch\x12!\n" +
+	"\finvert_match\x18\x03 \x01(\bR\vinvertMatch\"\x86\x03\n" +
 	"\x16InternalRedirectPolicy\x12R\n" +
 	"\x16max_internal_redirects\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueR\x14maxInternalRedirects\x12@\n" +
 	"\x17redirect_response_codes\x18\x02 \x03(\rB\b\xfaB\x05\x92\x01\x02\x10\x05R\x15redirectResponseCodes\x12J\n" +
@@ -7717,7 +7800,7 @@ func file_envoy_config_route_v3_route_components_proto_rawDescGZIP() []byte {
 }
 
 var file_envoy_config_route_v3_route_components_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_envoy_config_route_v3_route_components_proto_msgTypes = make([]protoimpl.MessageInfo, 60)
+var file_envoy_config_route_v3_route_components_proto_msgTypes = make([]protoimpl.MessageInfo, 61)
 var file_envoy_config_route_v3_route_components_proto_goTypes = []any{
 	(VirtualHost_TlsRequirementType)(0),                 // 0: envoy.config.route.v3.VirtualHost.TlsRequirementType
 	(RouteAction_ClusterNotFoundResponseCode)(0),        // 1: envoy.config.route.v3.RouteAction.ClusterNotFoundResponseCode
@@ -7745,89 +7828,90 @@ var file_envoy_config_route_v3_route_components_proto_goTypes = []any{
 	(*RateLimit)(nil),                                   // 23: envoy.config.route.v3.RateLimit
 	(*HeaderMatcher)(nil),                               // 24: envoy.config.route.v3.HeaderMatcher
 	(*QueryParameterMatcher)(nil),                       // 25: envoy.config.route.v3.QueryParameterMatcher
-	(*InternalRedirectPolicy)(nil),                      // 26: envoy.config.route.v3.InternalRedirectPolicy
-	(*FilterConfig)(nil),                                // 27: envoy.config.route.v3.FilterConfig
-	nil,                                                 // 28: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
-	nil,                                                 // 29: envoy.config.route.v3.Route.TypedPerFilterConfigEntry
-	(*WeightedCluster_ClusterWeight)(nil),               // 30: envoy.config.route.v3.WeightedCluster.ClusterWeight
-	nil,                                                 // 31: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
-	(*RouteMatch_GrpcRouteMatchOptions)(nil),            // 32: envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
-	(*RouteMatch_TlsContextMatchOptions)(nil),           // 33: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
-	(*RouteMatch_ConnectMatcher)(nil),                   // 34: envoy.config.route.v3.RouteMatch.ConnectMatcher
-	(*RouteAction_RequestMirrorPolicy)(nil),             // 35: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	(*RouteAction_HashPolicy)(nil),                      // 36: envoy.config.route.v3.RouteAction.HashPolicy
-	(*RouteAction_UpgradeConfig)(nil),                   // 37: envoy.config.route.v3.RouteAction.UpgradeConfig
-	(*RouteAction_MaxStreamDuration)(nil),               // 38: envoy.config.route.v3.RouteAction.MaxStreamDuration
-	(*RouteAction_HashPolicy_Header)(nil),               // 39: envoy.config.route.v3.RouteAction.HashPolicy.Header
-	(*RouteAction_HashPolicy_CookieAttribute)(nil),      // 40: envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
-	(*RouteAction_HashPolicy_Cookie)(nil),               // 41: envoy.config.route.v3.RouteAction.HashPolicy.Cookie
-	(*RouteAction_HashPolicy_ConnectionProperties)(nil), // 42: envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
-	(*RouteAction_HashPolicy_QueryParameter)(nil),       // 43: envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
-	(*RouteAction_HashPolicy_FilterState)(nil),          // 44: envoy.config.route.v3.RouteAction.HashPolicy.FilterState
-	(*RouteAction_UpgradeConfig_ConnectConfig)(nil),     // 45: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
-	(*RetryPolicy_RetryPriority)(nil),                   // 46: envoy.config.route.v3.RetryPolicy.RetryPriority
-	(*RetryPolicy_RetryHostPredicate)(nil),              // 47: envoy.config.route.v3.RetryPolicy.RetryHostPredicate
-	(*RetryPolicy_RetryBackOff)(nil),                    // 48: envoy.config.route.v3.RetryPolicy.RetryBackOff
-	(*RetryPolicy_ResetHeader)(nil),                     // 49: envoy.config.route.v3.RetryPolicy.ResetHeader
-	(*RetryPolicy_RateLimitedRetryBackOff)(nil),         // 50: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
-	(*RateLimit_Action)(nil),                            // 51: envoy.config.route.v3.RateLimit.Action
-	(*RateLimit_Override)(nil),                          // 52: envoy.config.route.v3.RateLimit.Override
-	(*RateLimit_HitsAddend)(nil),                        // 53: envoy.config.route.v3.RateLimit.HitsAddend
-	(*RateLimit_Action_SourceCluster)(nil),              // 54: envoy.config.route.v3.RateLimit.Action.SourceCluster
-	(*RateLimit_Action_DestinationCluster)(nil),         // 55: envoy.config.route.v3.RateLimit.Action.DestinationCluster
-	(*RateLimit_Action_RequestHeaders)(nil),             // 56: envoy.config.route.v3.RateLimit.Action.RequestHeaders
-	(*RateLimit_Action_QueryParameters)(nil),            // 57: envoy.config.route.v3.RateLimit.Action.QueryParameters
-	(*RateLimit_Action_RemoteAddress)(nil),              // 58: envoy.config.route.v3.RateLimit.Action.RemoteAddress
-	(*RateLimit_Action_MaskedRemoteAddress)(nil),        // 59: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
-	(*RateLimit_Action_GenericKey)(nil),                 // 60: envoy.config.route.v3.RateLimit.Action.GenericKey
-	(*RateLimit_Action_HeaderValueMatch)(nil),           // 61: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
-	(*RateLimit_Action_DynamicMetaData)(nil),            // 62: envoy.config.route.v3.RateLimit.Action.DynamicMetaData
-	(*RateLimit_Action_MetaData)(nil),                   // 63: envoy.config.route.v3.RateLimit.Action.MetaData
-	(*RateLimit_Action_QueryParameterValueMatch)(nil),   // 64: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
-	(*RateLimit_Override_DynamicMetadata)(nil),          // 65: envoy.config.route.v3.RateLimit.Override.DynamicMetadata
-	(*v3.Matcher)(nil),                                  // 66: xds.type.matcher.v3.Matcher
-	(*v31.HeaderValueOption)(nil),                       // 67: envoy.config.core.v3.HeaderValueOption
-	(*anypb.Any)(nil),                                   // 68: google.protobuf.Any
-	(*wrapperspb.UInt32Value)(nil),                      // 69: google.protobuf.UInt32Value
-	(*wrapperspb.UInt64Value)(nil),                      // 70: google.protobuf.UInt64Value
-	(*v31.Metadata)(nil),                                // 71: envoy.config.core.v3.Metadata
-	(*wrapperspb.BoolValue)(nil),                        // 72: google.protobuf.BoolValue
-	(*v31.TypedExtensionConfig)(nil),                    // 73: envoy.config.core.v3.TypedExtensionConfig
-	(*v32.RegexMatcher)(nil),                            // 74: envoy.type.matcher.v3.RegexMatcher
-	(*v31.RuntimeFractionalPercent)(nil),                // 75: envoy.config.core.v3.RuntimeFractionalPercent
-	(*v32.MetadataMatcher)(nil),                         // 76: envoy.type.matcher.v3.MetadataMatcher
-	(*v32.FilterStateMatcher)(nil),                      // 77: envoy.type.matcher.v3.FilterStateMatcher
-	(*v32.StringMatcher)(nil),                           // 78: envoy.type.matcher.v3.StringMatcher
-	(*v32.RegexMatchAndSubstitute)(nil),                 // 79: envoy.type.matcher.v3.RegexMatchAndSubstitute
-	(*durationpb.Duration)(nil),                         // 80: google.protobuf.Duration
-	(v31.RoutingPriority)(0),                            // 81: envoy.config.core.v3.RoutingPriority
-	(*v33.FractionalPercent)(nil),                       // 82: envoy.type.v3.FractionalPercent
-	(*v31.DataSource)(nil),                              // 83: envoy.config.core.v3.DataSource
-	(*v31.SubstitutionFormatString)(nil),                // 84: envoy.config.core.v3.SubstitutionFormatString
-	(*v34.CustomTag)(nil),                               // 85: envoy.type.tracing.v3.CustomTag
-	(*v33.Int64Range)(nil),                              // 86: envoy.type.v3.Int64Range
-	(*v35.HeaderMutation)(nil),                          // 87: envoy.config.common.mutation_rules.v3.HeaderMutation
-	(*v31.ProxyProtocolConfig)(nil),                     // 88: envoy.config.core.v3.ProxyProtocolConfig
-	(*v36.MetadataKey)(nil),                             // 89: envoy.type.metadata.v3.MetadataKey
+	(*CookieMatcher)(nil),                               // 26: envoy.config.route.v3.CookieMatcher
+	(*InternalRedirectPolicy)(nil),                      // 27: envoy.config.route.v3.InternalRedirectPolicy
+	(*FilterConfig)(nil),                                // 28: envoy.config.route.v3.FilterConfig
+	nil,                                                 // 29: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
+	nil,                                                 // 30: envoy.config.route.v3.Route.TypedPerFilterConfigEntry
+	(*WeightedCluster_ClusterWeight)(nil),               // 31: envoy.config.route.v3.WeightedCluster.ClusterWeight
+	nil,                                                 // 32: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
+	(*RouteMatch_GrpcRouteMatchOptions)(nil),            // 33: envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
+	(*RouteMatch_TlsContextMatchOptions)(nil),           // 34: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
+	(*RouteMatch_ConnectMatcher)(nil),                   // 35: envoy.config.route.v3.RouteMatch.ConnectMatcher
+	(*RouteAction_RequestMirrorPolicy)(nil),             // 36: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	(*RouteAction_HashPolicy)(nil),                      // 37: envoy.config.route.v3.RouteAction.HashPolicy
+	(*RouteAction_UpgradeConfig)(nil),                   // 38: envoy.config.route.v3.RouteAction.UpgradeConfig
+	(*RouteAction_MaxStreamDuration)(nil),               // 39: envoy.config.route.v3.RouteAction.MaxStreamDuration
+	(*RouteAction_HashPolicy_Header)(nil),               // 40: envoy.config.route.v3.RouteAction.HashPolicy.Header
+	(*RouteAction_HashPolicy_CookieAttribute)(nil),      // 41: envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
+	(*RouteAction_HashPolicy_Cookie)(nil),               // 42: envoy.config.route.v3.RouteAction.HashPolicy.Cookie
+	(*RouteAction_HashPolicy_ConnectionProperties)(nil), // 43: envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
+	(*RouteAction_HashPolicy_QueryParameter)(nil),       // 44: envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
+	(*RouteAction_HashPolicy_FilterState)(nil),          // 45: envoy.config.route.v3.RouteAction.HashPolicy.FilterState
+	(*RouteAction_UpgradeConfig_ConnectConfig)(nil),     // 46: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
+	(*RetryPolicy_RetryPriority)(nil),                   // 47: envoy.config.route.v3.RetryPolicy.RetryPriority
+	(*RetryPolicy_RetryHostPredicate)(nil),              // 48: envoy.config.route.v3.RetryPolicy.RetryHostPredicate
+	(*RetryPolicy_RetryBackOff)(nil),                    // 49: envoy.config.route.v3.RetryPolicy.RetryBackOff
+	(*RetryPolicy_ResetHeader)(nil),                     // 50: envoy.config.route.v3.RetryPolicy.ResetHeader
+	(*RetryPolicy_RateLimitedRetryBackOff)(nil),         // 51: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
+	(*RateLimit_Action)(nil),                            // 52: envoy.config.route.v3.RateLimit.Action
+	(*RateLimit_Override)(nil),                          // 53: envoy.config.route.v3.RateLimit.Override
+	(*RateLimit_HitsAddend)(nil),                        // 54: envoy.config.route.v3.RateLimit.HitsAddend
+	(*RateLimit_Action_SourceCluster)(nil),              // 55: envoy.config.route.v3.RateLimit.Action.SourceCluster
+	(*RateLimit_Action_DestinationCluster)(nil),         // 56: envoy.config.route.v3.RateLimit.Action.DestinationCluster
+	(*RateLimit_Action_RequestHeaders)(nil),             // 57: envoy.config.route.v3.RateLimit.Action.RequestHeaders
+	(*RateLimit_Action_QueryParameters)(nil),            // 58: envoy.config.route.v3.RateLimit.Action.QueryParameters
+	(*RateLimit_Action_RemoteAddress)(nil),              // 59: envoy.config.route.v3.RateLimit.Action.RemoteAddress
+	(*RateLimit_Action_MaskedRemoteAddress)(nil),        // 60: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
+	(*RateLimit_Action_GenericKey)(nil),                 // 61: envoy.config.route.v3.RateLimit.Action.GenericKey
+	(*RateLimit_Action_HeaderValueMatch)(nil),           // 62: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
+	(*RateLimit_Action_DynamicMetaData)(nil),            // 63: envoy.config.route.v3.RateLimit.Action.DynamicMetaData
+	(*RateLimit_Action_MetaData)(nil),                   // 64: envoy.config.route.v3.RateLimit.Action.MetaData
+	(*RateLimit_Action_QueryParameterValueMatch)(nil),   // 65: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
+	(*RateLimit_Override_DynamicMetadata)(nil),          // 66: envoy.config.route.v3.RateLimit.Override.DynamicMetadata
+	(*v3.Matcher)(nil),                                  // 67: xds.type.matcher.v3.Matcher
+	(*v31.HeaderValueOption)(nil),                       // 68: envoy.config.core.v3.HeaderValueOption
+	(*anypb.Any)(nil),                                   // 69: google.protobuf.Any
+	(*wrapperspb.UInt32Value)(nil),                      // 70: google.protobuf.UInt32Value
+	(*wrapperspb.UInt64Value)(nil),                      // 71: google.protobuf.UInt64Value
+	(*v31.Metadata)(nil),                                // 72: envoy.config.core.v3.Metadata
+	(*wrapperspb.BoolValue)(nil),                        // 73: google.protobuf.BoolValue
+	(*v31.TypedExtensionConfig)(nil),                    // 74: envoy.config.core.v3.TypedExtensionConfig
+	(*v32.RegexMatcher)(nil),                            // 75: envoy.type.matcher.v3.RegexMatcher
+	(*v31.RuntimeFractionalPercent)(nil),                // 76: envoy.config.core.v3.RuntimeFractionalPercent
+	(*v32.MetadataMatcher)(nil),                         // 77: envoy.type.matcher.v3.MetadataMatcher
+	(*v32.FilterStateMatcher)(nil),                      // 78: envoy.type.matcher.v3.FilterStateMatcher
+	(*v32.StringMatcher)(nil),                           // 79: envoy.type.matcher.v3.StringMatcher
+	(*v32.RegexMatchAndSubstitute)(nil),                 // 80: envoy.type.matcher.v3.RegexMatchAndSubstitute
+	(*durationpb.Duration)(nil),                         // 81: google.protobuf.Duration
+	(v31.RoutingPriority)(0),                            // 82: envoy.config.core.v3.RoutingPriority
+	(*v33.FractionalPercent)(nil),                       // 83: envoy.type.v3.FractionalPercent
+	(*v31.DataSource)(nil),                              // 84: envoy.config.core.v3.DataSource
+	(*v31.SubstitutionFormatString)(nil),                // 85: envoy.config.core.v3.SubstitutionFormatString
+	(*v34.CustomTag)(nil),                               // 86: envoy.type.tracing.v3.CustomTag
+	(*v33.Int64Range)(nil),                              // 87: envoy.type.v3.Int64Range
+	(*v35.HeaderMutation)(nil),                          // 88: envoy.config.common.mutation_rules.v3.HeaderMutation
+	(*v31.ProxyProtocolConfig)(nil),                     // 89: envoy.config.core.v3.ProxyProtocolConfig
+	(*v36.MetadataKey)(nil),                             // 90: envoy.type.metadata.v3.MetadataKey
 }
 var file_envoy_config_route_v3_route_components_proto_depIdxs = []int32{
 	9,   // 0: envoy.config.route.v3.VirtualHost.routes:type_name -> envoy.config.route.v3.Route
-	66,  // 1: envoy.config.route.v3.VirtualHost.matcher:type_name -> xds.type.matcher.v3.Matcher
+	67,  // 1: envoy.config.route.v3.VirtualHost.matcher:type_name -> xds.type.matcher.v3.Matcher
 	0,   // 2: envoy.config.route.v3.VirtualHost.require_tls:type_name -> envoy.config.route.v3.VirtualHost.TlsRequirementType
 	22,  // 3: envoy.config.route.v3.VirtualHost.virtual_clusters:type_name -> envoy.config.route.v3.VirtualCluster
 	23,  // 4: envoy.config.route.v3.VirtualHost.rate_limits:type_name -> envoy.config.route.v3.RateLimit
-	67,  // 5: envoy.config.route.v3.VirtualHost.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	67,  // 6: envoy.config.route.v3.VirtualHost.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	68,  // 5: envoy.config.route.v3.VirtualHost.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	68,  // 6: envoy.config.route.v3.VirtualHost.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
 	13,  // 7: envoy.config.route.v3.VirtualHost.cors:type_name -> envoy.config.route.v3.CorsPolicy
-	28,  // 8: envoy.config.route.v3.VirtualHost.typed_per_filter_config:type_name -> envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
+	29,  // 8: envoy.config.route.v3.VirtualHost.typed_per_filter_config:type_name -> envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
 	15,  // 9: envoy.config.route.v3.VirtualHost.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
-	68,  // 10: envoy.config.route.v3.VirtualHost.retry_policy_typed_config:type_name -> google.protobuf.Any
+	69,  // 10: envoy.config.route.v3.VirtualHost.retry_policy_typed_config:type_name -> google.protobuf.Any
 	16,  // 11: envoy.config.route.v3.VirtualHost.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
-	69,  // 12: envoy.config.route.v3.VirtualHost.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
-	70,  // 13: envoy.config.route.v3.VirtualHost.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
-	35,  // 14: envoy.config.route.v3.VirtualHost.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	71,  // 15: envoy.config.route.v3.VirtualHost.metadata:type_name -> envoy.config.core.v3.Metadata
-	68,  // 16: envoy.config.route.v3.FilterAction.action:type_name -> google.protobuf.Any
+	70,  // 12: envoy.config.route.v3.VirtualHost.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	71,  // 13: envoy.config.route.v3.VirtualHost.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
+	36,  // 14: envoy.config.route.v3.VirtualHost.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	72,  // 15: envoy.config.route.v3.VirtualHost.metadata:type_name -> envoy.config.core.v3.Metadata
+	69,  // 16: envoy.config.route.v3.FilterAction.action:type_name -> google.protobuf.Any
 	9,   // 17: envoy.config.route.v3.RouteList.routes:type_name -> envoy.config.route.v3.Route
 	12,  // 18: envoy.config.route.v3.Route.match:type_name -> envoy.config.route.v3.RouteMatch
 	14,  // 19: envoy.config.route.v3.Route.route:type_name -> envoy.config.route.v3.RouteAction
@@ -7835,159 +7919,161 @@ var file_envoy_config_route_v3_route_components_proto_depIdxs = []int32{
 	18,  // 21: envoy.config.route.v3.Route.direct_response:type_name -> envoy.config.route.v3.DirectResponseAction
 	7,   // 22: envoy.config.route.v3.Route.filter_action:type_name -> envoy.config.route.v3.FilterAction
 	19,  // 23: envoy.config.route.v3.Route.non_forwarding_action:type_name -> envoy.config.route.v3.NonForwardingAction
-	71,  // 24: envoy.config.route.v3.Route.metadata:type_name -> envoy.config.core.v3.Metadata
+	72,  // 24: envoy.config.route.v3.Route.metadata:type_name -> envoy.config.core.v3.Metadata
 	20,  // 25: envoy.config.route.v3.Route.decorator:type_name -> envoy.config.route.v3.Decorator
-	29,  // 26: envoy.config.route.v3.Route.typed_per_filter_config:type_name -> envoy.config.route.v3.Route.TypedPerFilterConfigEntry
-	67,  // 27: envoy.config.route.v3.Route.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	67,  // 28: envoy.config.route.v3.Route.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	30,  // 26: envoy.config.route.v3.Route.typed_per_filter_config:type_name -> envoy.config.route.v3.Route.TypedPerFilterConfigEntry
+	68,  // 27: envoy.config.route.v3.Route.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	68,  // 28: envoy.config.route.v3.Route.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
 	21,  // 29: envoy.config.route.v3.Route.tracing:type_name -> envoy.config.route.v3.Tracing
-	69,  // 30: envoy.config.route.v3.Route.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
-	70,  // 31: envoy.config.route.v3.Route.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
-	30,  // 32: envoy.config.route.v3.WeightedCluster.clusters:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight
-	69,  // 33: envoy.config.route.v3.WeightedCluster.total_weight:type_name -> google.protobuf.UInt32Value
-	72,  // 34: envoy.config.route.v3.WeightedCluster.use_hash_policy:type_name -> google.protobuf.BoolValue
-	73,  // 35: envoy.config.route.v3.ClusterSpecifierPlugin.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	74,  // 36: envoy.config.route.v3.RouteMatch.safe_regex:type_name -> envoy.type.matcher.v3.RegexMatcher
-	34,  // 37: envoy.config.route.v3.RouteMatch.connect_matcher:type_name -> envoy.config.route.v3.RouteMatch.ConnectMatcher
-	73,  // 38: envoy.config.route.v3.RouteMatch.path_match_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	72,  // 39: envoy.config.route.v3.RouteMatch.case_sensitive:type_name -> google.protobuf.BoolValue
-	75,  // 40: envoy.config.route.v3.RouteMatch.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	70,  // 30: envoy.config.route.v3.Route.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	71,  // 31: envoy.config.route.v3.Route.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
+	31,  // 32: envoy.config.route.v3.WeightedCluster.clusters:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight
+	70,  // 33: envoy.config.route.v3.WeightedCluster.total_weight:type_name -> google.protobuf.UInt32Value
+	73,  // 34: envoy.config.route.v3.WeightedCluster.use_hash_policy:type_name -> google.protobuf.BoolValue
+	74,  // 35: envoy.config.route.v3.ClusterSpecifierPlugin.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	75,  // 36: envoy.config.route.v3.RouteMatch.safe_regex:type_name -> envoy.type.matcher.v3.RegexMatcher
+	35,  // 37: envoy.config.route.v3.RouteMatch.connect_matcher:type_name -> envoy.config.route.v3.RouteMatch.ConnectMatcher
+	74,  // 38: envoy.config.route.v3.RouteMatch.path_match_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	73,  // 39: envoy.config.route.v3.RouteMatch.case_sensitive:type_name -> google.protobuf.BoolValue
+	76,  // 40: envoy.config.route.v3.RouteMatch.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
 	24,  // 41: envoy.config.route.v3.RouteMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
 	25,  // 42: envoy.config.route.v3.RouteMatch.query_parameters:type_name -> envoy.config.route.v3.QueryParameterMatcher
-	32,  // 43: envoy.config.route.v3.RouteMatch.grpc:type_name -> envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
-	33,  // 44: envoy.config.route.v3.RouteMatch.tls_context:type_name -> envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
-	76,  // 45: envoy.config.route.v3.RouteMatch.dynamic_metadata:type_name -> envoy.type.matcher.v3.MetadataMatcher
-	77,  // 46: envoy.config.route.v3.RouteMatch.filter_state:type_name -> envoy.type.matcher.v3.FilterStateMatcher
-	78,  // 47: envoy.config.route.v3.CorsPolicy.allow_origin_string_match:type_name -> envoy.type.matcher.v3.StringMatcher
-	72,  // 48: envoy.config.route.v3.CorsPolicy.allow_credentials:type_name -> google.protobuf.BoolValue
-	75,  // 49: envoy.config.route.v3.CorsPolicy.filter_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	75,  // 50: envoy.config.route.v3.CorsPolicy.shadow_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	72,  // 51: envoy.config.route.v3.CorsPolicy.allow_private_network_access:type_name -> google.protobuf.BoolValue
-	72,  // 52: envoy.config.route.v3.CorsPolicy.forward_not_matching_preflights:type_name -> google.protobuf.BoolValue
-	10,  // 53: envoy.config.route.v3.RouteAction.weighted_clusters:type_name -> envoy.config.route.v3.WeightedCluster
-	11,  // 54: envoy.config.route.v3.RouteAction.inline_cluster_specifier_plugin:type_name -> envoy.config.route.v3.ClusterSpecifierPlugin
-	1,   // 55: envoy.config.route.v3.RouteAction.cluster_not_found_response_code:type_name -> envoy.config.route.v3.RouteAction.ClusterNotFoundResponseCode
-	71,  // 56: envoy.config.route.v3.RouteAction.metadata_match:type_name -> envoy.config.core.v3.Metadata
-	79,  // 57: envoy.config.route.v3.RouteAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	73,  // 58: envoy.config.route.v3.RouteAction.path_rewrite_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	72,  // 59: envoy.config.route.v3.RouteAction.auto_host_rewrite:type_name -> google.protobuf.BoolValue
-	79,  // 60: envoy.config.route.v3.RouteAction.host_rewrite_path_regex:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	80,  // 61: envoy.config.route.v3.RouteAction.timeout:type_name -> google.protobuf.Duration
-	80,  // 62: envoy.config.route.v3.RouteAction.idle_timeout:type_name -> google.protobuf.Duration
-	80,  // 63: envoy.config.route.v3.RouteAction.flush_timeout:type_name -> google.protobuf.Duration
-	73,  // 64: envoy.config.route.v3.RouteAction.early_data_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	15,  // 65: envoy.config.route.v3.RouteAction.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
-	68,  // 66: envoy.config.route.v3.RouteAction.retry_policy_typed_config:type_name -> google.protobuf.Any
-	35,  // 67: envoy.config.route.v3.RouteAction.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	81,  // 68: envoy.config.route.v3.RouteAction.priority:type_name -> envoy.config.core.v3.RoutingPriority
-	23,  // 69: envoy.config.route.v3.RouteAction.rate_limits:type_name -> envoy.config.route.v3.RateLimit
-	72,  // 70: envoy.config.route.v3.RouteAction.include_vh_rate_limits:type_name -> google.protobuf.BoolValue
-	36,  // 71: envoy.config.route.v3.RouteAction.hash_policy:type_name -> envoy.config.route.v3.RouteAction.HashPolicy
-	13,  // 72: envoy.config.route.v3.RouteAction.cors:type_name -> envoy.config.route.v3.CorsPolicy
-	80,  // 73: envoy.config.route.v3.RouteAction.max_grpc_timeout:type_name -> google.protobuf.Duration
-	80,  // 74: envoy.config.route.v3.RouteAction.grpc_timeout_offset:type_name -> google.protobuf.Duration
-	37,  // 75: envoy.config.route.v3.RouteAction.upgrade_configs:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig
-	26,  // 76: envoy.config.route.v3.RouteAction.internal_redirect_policy:type_name -> envoy.config.route.v3.InternalRedirectPolicy
-	2,   // 77: envoy.config.route.v3.RouteAction.internal_redirect_action:type_name -> envoy.config.route.v3.RouteAction.InternalRedirectAction
-	69,  // 78: envoy.config.route.v3.RouteAction.max_internal_redirects:type_name -> google.protobuf.UInt32Value
-	16,  // 79: envoy.config.route.v3.RouteAction.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
-	38,  // 80: envoy.config.route.v3.RouteAction.max_stream_duration:type_name -> envoy.config.route.v3.RouteAction.MaxStreamDuration
-	69,  // 81: envoy.config.route.v3.RetryPolicy.num_retries:type_name -> google.protobuf.UInt32Value
-	80,  // 82: envoy.config.route.v3.RetryPolicy.per_try_timeout:type_name -> google.protobuf.Duration
-	80,  // 83: envoy.config.route.v3.RetryPolicy.per_try_idle_timeout:type_name -> google.protobuf.Duration
-	46,  // 84: envoy.config.route.v3.RetryPolicy.retry_priority:type_name -> envoy.config.route.v3.RetryPolicy.RetryPriority
-	47,  // 85: envoy.config.route.v3.RetryPolicy.retry_host_predicate:type_name -> envoy.config.route.v3.RetryPolicy.RetryHostPredicate
-	73,  // 86: envoy.config.route.v3.RetryPolicy.retry_options_predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	48,  // 87: envoy.config.route.v3.RetryPolicy.retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RetryBackOff
-	50,  // 88: envoy.config.route.v3.RetryPolicy.rate_limited_retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
-	24,  // 89: envoy.config.route.v3.RetryPolicy.retriable_headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	24,  // 90: envoy.config.route.v3.RetryPolicy.retriable_request_headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	69,  // 91: envoy.config.route.v3.HedgePolicy.initial_requests:type_name -> google.protobuf.UInt32Value
-	82,  // 92: envoy.config.route.v3.HedgePolicy.additional_request_chance:type_name -> envoy.type.v3.FractionalPercent
-	79,  // 93: envoy.config.route.v3.RedirectAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	4,   // 94: envoy.config.route.v3.RedirectAction.response_code:type_name -> envoy.config.route.v3.RedirectAction.RedirectResponseCode
-	83,  // 95: envoy.config.route.v3.DirectResponseAction.body:type_name -> envoy.config.core.v3.DataSource
-	84,  // 96: envoy.config.route.v3.DirectResponseAction.body_format:type_name -> envoy.config.core.v3.SubstitutionFormatString
-	72,  // 97: envoy.config.route.v3.Decorator.propagate:type_name -> google.protobuf.BoolValue
-	82,  // 98: envoy.config.route.v3.Tracing.client_sampling:type_name -> envoy.type.v3.FractionalPercent
-	82,  // 99: envoy.config.route.v3.Tracing.random_sampling:type_name -> envoy.type.v3.FractionalPercent
-	82,  // 100: envoy.config.route.v3.Tracing.overall_sampling:type_name -> envoy.type.v3.FractionalPercent
-	85,  // 101: envoy.config.route.v3.Tracing.custom_tags:type_name -> envoy.type.tracing.v3.CustomTag
-	24,  // 102: envoy.config.route.v3.VirtualCluster.headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	69,  // 103: envoy.config.route.v3.RateLimit.stage:type_name -> google.protobuf.UInt32Value
-	51,  // 104: envoy.config.route.v3.RateLimit.actions:type_name -> envoy.config.route.v3.RateLimit.Action
-	52,  // 105: envoy.config.route.v3.RateLimit.limit:type_name -> envoy.config.route.v3.RateLimit.Override
-	53,  // 106: envoy.config.route.v3.RateLimit.hits_addend:type_name -> envoy.config.route.v3.RateLimit.HitsAddend
-	74,  // 107: envoy.config.route.v3.HeaderMatcher.safe_regex_match:type_name -> envoy.type.matcher.v3.RegexMatcher
-	86,  // 108: envoy.config.route.v3.HeaderMatcher.range_match:type_name -> envoy.type.v3.Int64Range
-	78,  // 109: envoy.config.route.v3.HeaderMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
-	78,  // 110: envoy.config.route.v3.QueryParameterMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
-	69,  // 111: envoy.config.route.v3.InternalRedirectPolicy.max_internal_redirects:type_name -> google.protobuf.UInt32Value
-	73,  // 112: envoy.config.route.v3.InternalRedirectPolicy.predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	68,  // 113: envoy.config.route.v3.FilterConfig.config:type_name -> google.protobuf.Any
-	68,  // 114: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
-	68,  // 115: envoy.config.route.v3.Route.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
-	69,  // 116: envoy.config.route.v3.WeightedCluster.ClusterWeight.weight:type_name -> google.protobuf.UInt32Value
-	71,  // 117: envoy.config.route.v3.WeightedCluster.ClusterWeight.metadata_match:type_name -> envoy.config.core.v3.Metadata
-	67,  // 118: envoy.config.route.v3.WeightedCluster.ClusterWeight.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	67,  // 119: envoy.config.route.v3.WeightedCluster.ClusterWeight.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	31,  // 120: envoy.config.route.v3.WeightedCluster.ClusterWeight.typed_per_filter_config:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
-	68,  // 121: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
-	72,  // 122: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.presented:type_name -> google.protobuf.BoolValue
-	72,  // 123: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.validated:type_name -> google.protobuf.BoolValue
-	75,  // 124: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	72,  // 125: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.trace_sampled:type_name -> google.protobuf.BoolValue
-	87,  // 126: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.request_headers_mutations:type_name -> envoy.config.common.mutation_rules.v3.HeaderMutation
-	39,  // 127: envoy.config.route.v3.RouteAction.HashPolicy.header:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Header
-	41,  // 128: envoy.config.route.v3.RouteAction.HashPolicy.cookie:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Cookie
-	42,  // 129: envoy.config.route.v3.RouteAction.HashPolicy.connection_properties:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
-	43,  // 130: envoy.config.route.v3.RouteAction.HashPolicy.query_parameter:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
-	44,  // 131: envoy.config.route.v3.RouteAction.HashPolicy.filter_state:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.FilterState
-	72,  // 132: envoy.config.route.v3.RouteAction.UpgradeConfig.enabled:type_name -> google.protobuf.BoolValue
-	45,  // 133: envoy.config.route.v3.RouteAction.UpgradeConfig.connect_config:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
-	80,  // 134: envoy.config.route.v3.RouteAction.MaxStreamDuration.max_stream_duration:type_name -> google.protobuf.Duration
-	80,  // 135: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_max:type_name -> google.protobuf.Duration
-	80,  // 136: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_offset:type_name -> google.protobuf.Duration
-	79,  // 137: envoy.config.route.v3.RouteAction.HashPolicy.Header.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	80,  // 138: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.ttl:type_name -> google.protobuf.Duration
-	40,  // 139: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.attributes:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
-	88,  // 140: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig.proxy_protocol_config:type_name -> envoy.config.core.v3.ProxyProtocolConfig
-	68,  // 141: envoy.config.route.v3.RetryPolicy.RetryPriority.typed_config:type_name -> google.protobuf.Any
-	68,  // 142: envoy.config.route.v3.RetryPolicy.RetryHostPredicate.typed_config:type_name -> google.protobuf.Any
-	80,  // 143: envoy.config.route.v3.RetryPolicy.RetryBackOff.base_interval:type_name -> google.protobuf.Duration
-	80,  // 144: envoy.config.route.v3.RetryPolicy.RetryBackOff.max_interval:type_name -> google.protobuf.Duration
-	3,   // 145: envoy.config.route.v3.RetryPolicy.ResetHeader.format:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeaderFormat
-	49,  // 146: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.reset_headers:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeader
-	80,  // 147: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.max_interval:type_name -> google.protobuf.Duration
-	54,  // 148: envoy.config.route.v3.RateLimit.Action.source_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.SourceCluster
-	55,  // 149: envoy.config.route.v3.RateLimit.Action.destination_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.DestinationCluster
-	56,  // 150: envoy.config.route.v3.RateLimit.Action.request_headers:type_name -> envoy.config.route.v3.RateLimit.Action.RequestHeaders
-	57,  // 151: envoy.config.route.v3.RateLimit.Action.query_parameters:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameters
-	58,  // 152: envoy.config.route.v3.RateLimit.Action.remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.RemoteAddress
-	60,  // 153: envoy.config.route.v3.RateLimit.Action.generic_key:type_name -> envoy.config.route.v3.RateLimit.Action.GenericKey
-	61,  // 154: envoy.config.route.v3.RateLimit.Action.header_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
-	62,  // 155: envoy.config.route.v3.RateLimit.Action.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Action.DynamicMetaData
-	63,  // 156: envoy.config.route.v3.RateLimit.Action.metadata:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData
-	73,  // 157: envoy.config.route.v3.RateLimit.Action.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	59,  // 158: envoy.config.route.v3.RateLimit.Action.masked_remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
-	64,  // 159: envoy.config.route.v3.RateLimit.Action.query_parameter_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
-	65,  // 160: envoy.config.route.v3.RateLimit.Override.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Override.DynamicMetadata
-	70,  // 161: envoy.config.route.v3.RateLimit.HitsAddend.number:type_name -> google.protobuf.UInt64Value
-	69,  // 162: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v4_prefix_mask_len:type_name -> google.protobuf.UInt32Value
-	69,  // 163: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v6_prefix_mask_len:type_name -> google.protobuf.UInt32Value
-	72,  // 164: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.expect_match:type_name -> google.protobuf.BoolValue
-	24,  // 165: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	89,  // 166: envoy.config.route.v3.RateLimit.Action.DynamicMetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
-	89,  // 167: envoy.config.route.v3.RateLimit.Action.MetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
-	5,   // 168: envoy.config.route.v3.RateLimit.Action.MetaData.source:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData.Source
-	72,  // 169: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.expect_match:type_name -> google.protobuf.BoolValue
-	25,  // 170: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.query_parameters:type_name -> envoy.config.route.v3.QueryParameterMatcher
-	89,  // 171: envoy.config.route.v3.RateLimit.Override.DynamicMetadata.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
-	172, // [172:172] is the sub-list for method output_type
-	172, // [172:172] is the sub-list for method input_type
-	172, // [172:172] is the sub-list for extension type_name
-	172, // [172:172] is the sub-list for extension extendee
-	0,   // [0:172] is the sub-list for field type_name
+	26,  // 43: envoy.config.route.v3.RouteMatch.cookies:type_name -> envoy.config.route.v3.CookieMatcher
+	33,  // 44: envoy.config.route.v3.RouteMatch.grpc:type_name -> envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
+	34,  // 45: envoy.config.route.v3.RouteMatch.tls_context:type_name -> envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
+	77,  // 46: envoy.config.route.v3.RouteMatch.dynamic_metadata:type_name -> envoy.type.matcher.v3.MetadataMatcher
+	78,  // 47: envoy.config.route.v3.RouteMatch.filter_state:type_name -> envoy.type.matcher.v3.FilterStateMatcher
+	79,  // 48: envoy.config.route.v3.CorsPolicy.allow_origin_string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	73,  // 49: envoy.config.route.v3.CorsPolicy.allow_credentials:type_name -> google.protobuf.BoolValue
+	76,  // 50: envoy.config.route.v3.CorsPolicy.filter_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	76,  // 51: envoy.config.route.v3.CorsPolicy.shadow_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	73,  // 52: envoy.config.route.v3.CorsPolicy.allow_private_network_access:type_name -> google.protobuf.BoolValue
+	73,  // 53: envoy.config.route.v3.CorsPolicy.forward_not_matching_preflights:type_name -> google.protobuf.BoolValue
+	10,  // 54: envoy.config.route.v3.RouteAction.weighted_clusters:type_name -> envoy.config.route.v3.WeightedCluster
+	11,  // 55: envoy.config.route.v3.RouteAction.inline_cluster_specifier_plugin:type_name -> envoy.config.route.v3.ClusterSpecifierPlugin
+	1,   // 56: envoy.config.route.v3.RouteAction.cluster_not_found_response_code:type_name -> envoy.config.route.v3.RouteAction.ClusterNotFoundResponseCode
+	72,  // 57: envoy.config.route.v3.RouteAction.metadata_match:type_name -> envoy.config.core.v3.Metadata
+	80,  // 58: envoy.config.route.v3.RouteAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	74,  // 59: envoy.config.route.v3.RouteAction.path_rewrite_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	73,  // 60: envoy.config.route.v3.RouteAction.auto_host_rewrite:type_name -> google.protobuf.BoolValue
+	80,  // 61: envoy.config.route.v3.RouteAction.host_rewrite_path_regex:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	81,  // 62: envoy.config.route.v3.RouteAction.timeout:type_name -> google.protobuf.Duration
+	81,  // 63: envoy.config.route.v3.RouteAction.idle_timeout:type_name -> google.protobuf.Duration
+	81,  // 64: envoy.config.route.v3.RouteAction.flush_timeout:type_name -> google.protobuf.Duration
+	74,  // 65: envoy.config.route.v3.RouteAction.early_data_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	15,  // 66: envoy.config.route.v3.RouteAction.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
+	69,  // 67: envoy.config.route.v3.RouteAction.retry_policy_typed_config:type_name -> google.protobuf.Any
+	36,  // 68: envoy.config.route.v3.RouteAction.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	82,  // 69: envoy.config.route.v3.RouteAction.priority:type_name -> envoy.config.core.v3.RoutingPriority
+	23,  // 70: envoy.config.route.v3.RouteAction.rate_limits:type_name -> envoy.config.route.v3.RateLimit
+	73,  // 71: envoy.config.route.v3.RouteAction.include_vh_rate_limits:type_name -> google.protobuf.BoolValue
+	37,  // 72: envoy.config.route.v3.RouteAction.hash_policy:type_name -> envoy.config.route.v3.RouteAction.HashPolicy
+	13,  // 73: envoy.config.route.v3.RouteAction.cors:type_name -> envoy.config.route.v3.CorsPolicy
+	81,  // 74: envoy.config.route.v3.RouteAction.max_grpc_timeout:type_name -> google.protobuf.Duration
+	81,  // 75: envoy.config.route.v3.RouteAction.grpc_timeout_offset:type_name -> google.protobuf.Duration
+	38,  // 76: envoy.config.route.v3.RouteAction.upgrade_configs:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig
+	27,  // 77: envoy.config.route.v3.RouteAction.internal_redirect_policy:type_name -> envoy.config.route.v3.InternalRedirectPolicy
+	2,   // 78: envoy.config.route.v3.RouteAction.internal_redirect_action:type_name -> envoy.config.route.v3.RouteAction.InternalRedirectAction
+	70,  // 79: envoy.config.route.v3.RouteAction.max_internal_redirects:type_name -> google.protobuf.UInt32Value
+	16,  // 80: envoy.config.route.v3.RouteAction.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
+	39,  // 81: envoy.config.route.v3.RouteAction.max_stream_duration:type_name -> envoy.config.route.v3.RouteAction.MaxStreamDuration
+	70,  // 82: envoy.config.route.v3.RetryPolicy.num_retries:type_name -> google.protobuf.UInt32Value
+	81,  // 83: envoy.config.route.v3.RetryPolicy.per_try_timeout:type_name -> google.protobuf.Duration
+	81,  // 84: envoy.config.route.v3.RetryPolicy.per_try_idle_timeout:type_name -> google.protobuf.Duration
+	47,  // 85: envoy.config.route.v3.RetryPolicy.retry_priority:type_name -> envoy.config.route.v3.RetryPolicy.RetryPriority
+	48,  // 86: envoy.config.route.v3.RetryPolicy.retry_host_predicate:type_name -> envoy.config.route.v3.RetryPolicy.RetryHostPredicate
+	74,  // 87: envoy.config.route.v3.RetryPolicy.retry_options_predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	49,  // 88: envoy.config.route.v3.RetryPolicy.retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RetryBackOff
+	51,  // 89: envoy.config.route.v3.RetryPolicy.rate_limited_retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
+	24,  // 90: envoy.config.route.v3.RetryPolicy.retriable_headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	24,  // 91: envoy.config.route.v3.RetryPolicy.retriable_request_headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	70,  // 92: envoy.config.route.v3.HedgePolicy.initial_requests:type_name -> google.protobuf.UInt32Value
+	83,  // 93: envoy.config.route.v3.HedgePolicy.additional_request_chance:type_name -> envoy.type.v3.FractionalPercent
+	80,  // 94: envoy.config.route.v3.RedirectAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	4,   // 95: envoy.config.route.v3.RedirectAction.response_code:type_name -> envoy.config.route.v3.RedirectAction.RedirectResponseCode
+	84,  // 96: envoy.config.route.v3.DirectResponseAction.body:type_name -> envoy.config.core.v3.DataSource
+	85,  // 97: envoy.config.route.v3.DirectResponseAction.body_format:type_name -> envoy.config.core.v3.SubstitutionFormatString
+	73,  // 98: envoy.config.route.v3.Decorator.propagate:type_name -> google.protobuf.BoolValue
+	83,  // 99: envoy.config.route.v3.Tracing.client_sampling:type_name -> envoy.type.v3.FractionalPercent
+	83,  // 100: envoy.config.route.v3.Tracing.random_sampling:type_name -> envoy.type.v3.FractionalPercent
+	83,  // 101: envoy.config.route.v3.Tracing.overall_sampling:type_name -> envoy.type.v3.FractionalPercent
+	86,  // 102: envoy.config.route.v3.Tracing.custom_tags:type_name -> envoy.type.tracing.v3.CustomTag
+	24,  // 103: envoy.config.route.v3.VirtualCluster.headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	70,  // 104: envoy.config.route.v3.RateLimit.stage:type_name -> google.protobuf.UInt32Value
+	52,  // 105: envoy.config.route.v3.RateLimit.actions:type_name -> envoy.config.route.v3.RateLimit.Action
+	53,  // 106: envoy.config.route.v3.RateLimit.limit:type_name -> envoy.config.route.v3.RateLimit.Override
+	54,  // 107: envoy.config.route.v3.RateLimit.hits_addend:type_name -> envoy.config.route.v3.RateLimit.HitsAddend
+	75,  // 108: envoy.config.route.v3.HeaderMatcher.safe_regex_match:type_name -> envoy.type.matcher.v3.RegexMatcher
+	87,  // 109: envoy.config.route.v3.HeaderMatcher.range_match:type_name -> envoy.type.v3.Int64Range
+	79,  // 110: envoy.config.route.v3.HeaderMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	79,  // 111: envoy.config.route.v3.QueryParameterMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	79,  // 112: envoy.config.route.v3.CookieMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	70,  // 113: envoy.config.route.v3.InternalRedirectPolicy.max_internal_redirects:type_name -> google.protobuf.UInt32Value
+	74,  // 114: envoy.config.route.v3.InternalRedirectPolicy.predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	69,  // 115: envoy.config.route.v3.FilterConfig.config:type_name -> google.protobuf.Any
+	69,  // 116: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
+	69,  // 117: envoy.config.route.v3.Route.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
+	70,  // 118: envoy.config.route.v3.WeightedCluster.ClusterWeight.weight:type_name -> google.protobuf.UInt32Value
+	72,  // 119: envoy.config.route.v3.WeightedCluster.ClusterWeight.metadata_match:type_name -> envoy.config.core.v3.Metadata
+	68,  // 120: envoy.config.route.v3.WeightedCluster.ClusterWeight.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	68,  // 121: envoy.config.route.v3.WeightedCluster.ClusterWeight.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	32,  // 122: envoy.config.route.v3.WeightedCluster.ClusterWeight.typed_per_filter_config:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
+	69,  // 123: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
+	73,  // 124: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.presented:type_name -> google.protobuf.BoolValue
+	73,  // 125: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.validated:type_name -> google.protobuf.BoolValue
+	76,  // 126: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	73,  // 127: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.trace_sampled:type_name -> google.protobuf.BoolValue
+	88,  // 128: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.request_headers_mutations:type_name -> envoy.config.common.mutation_rules.v3.HeaderMutation
+	40,  // 129: envoy.config.route.v3.RouteAction.HashPolicy.header:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Header
+	42,  // 130: envoy.config.route.v3.RouteAction.HashPolicy.cookie:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Cookie
+	43,  // 131: envoy.config.route.v3.RouteAction.HashPolicy.connection_properties:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
+	44,  // 132: envoy.config.route.v3.RouteAction.HashPolicy.query_parameter:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
+	45,  // 133: envoy.config.route.v3.RouteAction.HashPolicy.filter_state:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.FilterState
+	73,  // 134: envoy.config.route.v3.RouteAction.UpgradeConfig.enabled:type_name -> google.protobuf.BoolValue
+	46,  // 135: envoy.config.route.v3.RouteAction.UpgradeConfig.connect_config:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
+	81,  // 136: envoy.config.route.v3.RouteAction.MaxStreamDuration.max_stream_duration:type_name -> google.protobuf.Duration
+	81,  // 137: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_max:type_name -> google.protobuf.Duration
+	81,  // 138: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_offset:type_name -> google.protobuf.Duration
+	80,  // 139: envoy.config.route.v3.RouteAction.HashPolicy.Header.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	81,  // 140: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.ttl:type_name -> google.protobuf.Duration
+	41,  // 141: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.attributes:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
+	89,  // 142: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig.proxy_protocol_config:type_name -> envoy.config.core.v3.ProxyProtocolConfig
+	69,  // 143: envoy.config.route.v3.RetryPolicy.RetryPriority.typed_config:type_name -> google.protobuf.Any
+	69,  // 144: envoy.config.route.v3.RetryPolicy.RetryHostPredicate.typed_config:type_name -> google.protobuf.Any
+	81,  // 145: envoy.config.route.v3.RetryPolicy.RetryBackOff.base_interval:type_name -> google.protobuf.Duration
+	81,  // 146: envoy.config.route.v3.RetryPolicy.RetryBackOff.max_interval:type_name -> google.protobuf.Duration
+	3,   // 147: envoy.config.route.v3.RetryPolicy.ResetHeader.format:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeaderFormat
+	50,  // 148: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.reset_headers:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeader
+	81,  // 149: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.max_interval:type_name -> google.protobuf.Duration
+	55,  // 150: envoy.config.route.v3.RateLimit.Action.source_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.SourceCluster
+	56,  // 151: envoy.config.route.v3.RateLimit.Action.destination_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.DestinationCluster
+	57,  // 152: envoy.config.route.v3.RateLimit.Action.request_headers:type_name -> envoy.config.route.v3.RateLimit.Action.RequestHeaders
+	58,  // 153: envoy.config.route.v3.RateLimit.Action.query_parameters:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameters
+	59,  // 154: envoy.config.route.v3.RateLimit.Action.remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.RemoteAddress
+	61,  // 155: envoy.config.route.v3.RateLimit.Action.generic_key:type_name -> envoy.config.route.v3.RateLimit.Action.GenericKey
+	62,  // 156: envoy.config.route.v3.RateLimit.Action.header_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
+	63,  // 157: envoy.config.route.v3.RateLimit.Action.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Action.DynamicMetaData
+	64,  // 158: envoy.config.route.v3.RateLimit.Action.metadata:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData
+	74,  // 159: envoy.config.route.v3.RateLimit.Action.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	60,  // 160: envoy.config.route.v3.RateLimit.Action.masked_remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
+	65,  // 161: envoy.config.route.v3.RateLimit.Action.query_parameter_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
+	66,  // 162: envoy.config.route.v3.RateLimit.Override.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Override.DynamicMetadata
+	71,  // 163: envoy.config.route.v3.RateLimit.HitsAddend.number:type_name -> google.protobuf.UInt64Value
+	70,  // 164: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v4_prefix_mask_len:type_name -> google.protobuf.UInt32Value
+	70,  // 165: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v6_prefix_mask_len:type_name -> google.protobuf.UInt32Value
+	73,  // 166: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.expect_match:type_name -> google.protobuf.BoolValue
+	24,  // 167: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	90,  // 168: envoy.config.route.v3.RateLimit.Action.DynamicMetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
+	90,  // 169: envoy.config.route.v3.RateLimit.Action.MetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
+	5,   // 170: envoy.config.route.v3.RateLimit.Action.MetaData.source:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData.Source
+	73,  // 171: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.expect_match:type_name -> google.protobuf.BoolValue
+	25,  // 172: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.query_parameters:type_name -> envoy.config.route.v3.QueryParameterMatcher
+	90,  // 173: envoy.config.route.v3.RateLimit.Override.DynamicMetadata.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
+	174, // [174:174] is the sub-list for method output_type
+	174, // [174:174] is the sub-list for method input_type
+	174, // [174:174] is the sub-list for extension type_name
+	174, // [174:174] is the sub-list for extension extendee
+	0,   // [0:174] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_route_v3_route_components_proto_init() }
@@ -8050,23 +8136,23 @@ func file_envoy_config_route_v3_route_components_proto_init() {
 		(*QueryParameterMatcher_StringMatch)(nil),
 		(*QueryParameterMatcher_PresentMatch)(nil),
 	}
-	file_envoy_config_route_v3_route_components_proto_msgTypes[24].OneofWrappers = []any{
+	file_envoy_config_route_v3_route_components_proto_msgTypes[25].OneofWrappers = []any{
 		(*WeightedCluster_ClusterWeight_HostRewriteLiteral)(nil),
 	}
-	file_envoy_config_route_v3_route_components_proto_msgTypes[30].OneofWrappers = []any{
+	file_envoy_config_route_v3_route_components_proto_msgTypes[31].OneofWrappers = []any{
 		(*RouteAction_HashPolicy_Header_)(nil),
 		(*RouteAction_HashPolicy_Cookie_)(nil),
 		(*RouteAction_HashPolicy_ConnectionProperties_)(nil),
 		(*RouteAction_HashPolicy_QueryParameter_)(nil),
 		(*RouteAction_HashPolicy_FilterState_)(nil),
 	}
-	file_envoy_config_route_v3_route_components_proto_msgTypes[40].OneofWrappers = []any{
+	file_envoy_config_route_v3_route_components_proto_msgTypes[41].OneofWrappers = []any{
 		(*RetryPolicy_RetryPriority_TypedConfig)(nil),
 	}
-	file_envoy_config_route_v3_route_components_proto_msgTypes[41].OneofWrappers = []any{
+	file_envoy_config_route_v3_route_components_proto_msgTypes[42].OneofWrappers = []any{
 		(*RetryPolicy_RetryHostPredicate_TypedConfig)(nil),
 	}
-	file_envoy_config_route_v3_route_components_proto_msgTypes[45].OneofWrappers = []any{
+	file_envoy_config_route_v3_route_components_proto_msgTypes[46].OneofWrappers = []any{
 		(*RateLimit_Action_SourceCluster_)(nil),
 		(*RateLimit_Action_DestinationCluster_)(nil),
 		(*RateLimit_Action_RequestHeaders_)(nil),
@@ -8080,7 +8166,7 @@ func file_envoy_config_route_v3_route_components_proto_init() {
 		(*RateLimit_Action_MaskedRemoteAddress_)(nil),
 		(*RateLimit_Action_QueryParameterValueMatch_)(nil),
 	}
-	file_envoy_config_route_v3_route_components_proto_msgTypes[46].OneofWrappers = []any{
+	file_envoy_config_route_v3_route_components_proto_msgTypes[47].OneofWrappers = []any{
 		(*RateLimit_Override_DynamicMetadata_)(nil),
 	}
 	type x struct{}
@@ -8089,7 +8175,7 @@ func file_envoy_config_route_v3_route_components_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_config_route_v3_route_components_proto_rawDesc), len(file_envoy_config_route_v3_route_components_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   60,
+			NumMessages:   61,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
