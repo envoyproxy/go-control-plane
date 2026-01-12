@@ -288,6 +288,9 @@ type ProxyProtocolConfig struct {
 	//     at the transport socket level and override them at the host level.
 	//   - Any TLV defined in the “pass_through_tlvs“ field will be overridden by either the host-level
 	//     or transport socket-level TLV.
+	//
+	// If there are multiple TLVs with the same type, only the TLVs from the highest precedence level
+	// will be used.
 	AddedTlvs     []*TlvEntry `protobuf:"bytes,3,rep,name=added_tlvs,json=addedTlvs,proto3" json:"added_tlvs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
