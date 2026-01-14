@@ -143,7 +143,19 @@ type CookieConfig struct {
 	// to support flows where the callback URL is on a different path.
 	//
 	// If not specified, defaults to “/“.
-	Path          string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	Path string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	// If true, the “Partitioned“ attribute will be set on the cookie.
+	//
+	// Modern browsers (Firefox, Chrome with third-party cookie deprecation) warn or block
+	// "foreign" cookies unless they carry the “Partitioned“ attribute alongside “SameSite=None; Secure“.
+	// When Envoy is used in a gateway/IdP flow that sets OAuth/OIDC cookies for a parent domain
+	// (e.g., “Domain=.example.com“) while running on a different host, those cookies are
+	// considered third-party and will be rejected without “Partitioned“.
+	//
+	// See `CHIPS <https://developers.google.com/privacy-sandbox/3pcd/chips>`_ for more information.
+	//
+	// Default is false.
+	Partitioned   bool `protobuf:"varint,3,opt,name=partitioned,proto3" json:"partitioned,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -190,6 +202,13 @@ func (x *CookieConfig) GetPath() string {
 		return x.Path
 	}
 	return ""
+}
+
+func (x *CookieConfig) GetPartitioned() bool {
+	if x != nil {
+		return x.Partitioned
+	}
+	return false
 }
 
 // [#next-free-field: 8]
@@ -870,10 +889,11 @@ var File_envoy_extensions_filters_http_oauth2_v3_oauth_proto protoreflect.FileDe
 
 const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\n" +
-	"3envoy/extensions/filters/http/oauth2/v3/oauth.proto\x12'envoy.extensions.filters.http.oauth2.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a,envoy/config/route/v3/route_components.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a envoy/type/matcher/v3/path.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xea\x01\n" +
+	"3envoy/extensions/filters/http/oauth2/v3/oauth.proto\x12'envoy.extensions.filters.http.oauth2.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a#envoy/config/core/v3/http_uri.proto\x1a,envoy/config/route/v3/route_components.proto\x1a6envoy/extensions/transport_sockets/tls/v3/secret.proto\x1a envoy/type/matcher/v3/path.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x8c\x02\n" +
 	"\fCookieConfig\x12e\n" +
 	"\tsame_site\x18\x01 \x01(\x0e2>.envoy.extensions.filters.http.oauth2.v3.CookieConfig.SameSiteB\b\xfaB\x05\x82\x01\x02\x10\x01R\bsameSite\x12:\n" +
-	"\x04path\x18\x02 \x01(\tB&\xfaB#r!2\x1f^$|^/[^\\x00-\\x1f\\x7f \",;<>\\\\]*$R\x04path\"7\n" +
+	"\x04path\x18\x02 \x01(\tB&\xfaB#r!2\x1f^$|^/[^\\x00-\\x1f\\x7f \",;<>\\\\]*$R\x04path\x12 \n" +
+	"\vpartitioned\x18\x03 \x01(\bR\vpartitioned\"7\n" +
 	"\bSameSite\x12\f\n" +
 	"\bDISABLED\x10\x00\x12\n" +
 	"\n" +

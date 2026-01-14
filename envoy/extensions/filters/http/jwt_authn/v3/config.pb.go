@@ -949,7 +949,7 @@ func (x *ProviderWithAudiences) GetAudiences() []string {
 //	      - allow_missing: {}
 //	  - provider_name: provider-B
 //
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type JwtRequirement struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to RequiresType:
@@ -960,6 +960,7 @@ type JwtRequirement struct {
 	//	*JwtRequirement_RequiresAll
 	//	*JwtRequirement_AllowMissingOrFailed
 	//	*JwtRequirement_AllowMissing
+	//	*JwtRequirement_ExtractOnlyWithoutValidation
 	RequiresType  isJwtRequirement_RequiresType `protobuf_oneof:"requires_type"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1056,6 +1057,15 @@ func (x *JwtRequirement) GetAllowMissing() *emptypb.Empty {
 	return nil
 }
 
+func (x *JwtRequirement) GetExtractOnlyWithoutValidation() *ExtractOnlyWithoutValidation {
+	if x != nil {
+		if x, ok := x.RequiresType.(*JwtRequirement_ExtractOnlyWithoutValidation); ok {
+			return x.ExtractOnlyWithoutValidation
+		}
+	}
+	return nil
+}
+
 type isJwtRequirement_RequiresType interface {
 	isJwtRequirement_RequiresType()
 }
@@ -1098,6 +1108,36 @@ type JwtRequirement_AllowMissing struct {
 	AllowMissing *emptypb.Empty `protobuf:"bytes,6,opt,name=allow_missing,json=allowMissing,proto3,oneof"`
 }
 
+type JwtRequirement_ExtractOnlyWithoutValidation struct {
+	// Extract JWT claims without performing signature validation.
+	// This mode will decode the JWT, extract claims, and forward them as
+	// configured (via claim_to_headers, forward_payload_header, etc.) but
+	// will NOT verify the JWT signature against JWKS.
+	//
+	// .. warning::
+	//
+	//	This mode does not verify JWT authenticity. Use only in scenarios where:
+	//
+	//	- JWTs come from a trusted source (e.g., internal service mesh)
+	//	- Signature verification is performed elsewhere in the request path
+	//	- You are in a testing period and the token issuer doesn't support JWKS yet
+	//
+	// This mode will:
+	//
+	// * Decode the JWT header and payload
+	// * Extract claims and forward them as headers
+	// * Always return success (Status::Ok) regardless of JWT validity
+	// * Log when extraction occurs
+	//
+	// This mode will NOT:
+	//
+	// * Verify the JWT signature
+	// * Validate the (issuer) claim
+	// * Validate the (audience) claim
+	// * Check not-before time (nbf claim)
+	ExtractOnlyWithoutValidation *ExtractOnlyWithoutValidation `protobuf:"bytes,7,opt,name=extract_only_without_validation,json=extractOnlyWithoutValidation,proto3,oneof"`
+}
+
 func (*JwtRequirement_ProviderName) isJwtRequirement_RequiresType() {}
 
 func (*JwtRequirement_ProviderAndAudiences) isJwtRequirement_RequiresType() {}
@@ -1109,6 +1149,44 @@ func (*JwtRequirement_RequiresAll) isJwtRequirement_RequiresType() {}
 func (*JwtRequirement_AllowMissingOrFailed) isJwtRequirement_RequiresType() {}
 
 func (*JwtRequirement_AllowMissing) isJwtRequirement_RequiresType() {}
+
+func (*JwtRequirement_ExtractOnlyWithoutValidation) isJwtRequirement_RequiresType() {}
+
+type ExtractOnlyWithoutValidation struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExtractOnlyWithoutValidation) Reset() {
+	*x = ExtractOnlyWithoutValidation{}
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExtractOnlyWithoutValidation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExtractOnlyWithoutValidation) ProtoMessage() {}
+
+func (x *ExtractOnlyWithoutValidation) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExtractOnlyWithoutValidation.ProtoReflect.Descriptor instead.
+func (*ExtractOnlyWithoutValidation) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{7}
+}
 
 // This message specifies a list of RequiredProvider.
 // Their results are OR-ed; if any one of them passes, the result is passed
@@ -1122,7 +1200,7 @@ type JwtRequirementOrList struct {
 
 func (x *JwtRequirementOrList) Reset() {
 	*x = JwtRequirementOrList{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1134,7 +1212,7 @@ func (x *JwtRequirementOrList) String() string {
 func (*JwtRequirementOrList) ProtoMessage() {}
 
 func (x *JwtRequirementOrList) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[7]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1147,7 +1225,7 @@ func (x *JwtRequirementOrList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JwtRequirementOrList.ProtoReflect.Descriptor instead.
 func (*JwtRequirementOrList) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{7}
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *JwtRequirementOrList) GetRequirements() []*JwtRequirement {
@@ -1169,7 +1247,7 @@ type JwtRequirementAndList struct {
 
 func (x *JwtRequirementAndList) Reset() {
 	*x = JwtRequirementAndList{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[8]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1181,7 +1259,7 @@ func (x *JwtRequirementAndList) String() string {
 func (*JwtRequirementAndList) ProtoMessage() {}
 
 func (x *JwtRequirementAndList) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[8]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1194,7 +1272,7 @@ func (x *JwtRequirementAndList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JwtRequirementAndList.ProtoReflect.Descriptor instead.
 func (*JwtRequirementAndList) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{8}
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *JwtRequirementAndList) GetRequirements() []*JwtRequirement {
@@ -1251,7 +1329,7 @@ type RequirementRule struct {
 
 func (x *RequirementRule) Reset() {
 	*x = RequirementRule{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[9]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1263,7 +1341,7 @@ func (x *RequirementRule) String() string {
 func (*RequirementRule) ProtoMessage() {}
 
 func (x *RequirementRule) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[9]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1276,7 +1354,7 @@ func (x *RequirementRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequirementRule.ProtoReflect.Descriptor instead.
 func (*RequirementRule) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{9}
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *RequirementRule) GetMatch() *v32.RouteMatch {
@@ -1362,7 +1440,7 @@ type FilterStateRule struct {
 
 func (x *FilterStateRule) Reset() {
 	*x = FilterStateRule{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[10]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1374,7 +1452,7 @@ func (x *FilterStateRule) String() string {
 func (*FilterStateRule) ProtoMessage() {}
 
 func (x *FilterStateRule) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[10]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1387,7 +1465,7 @@ func (x *FilterStateRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FilterStateRule.ProtoReflect.Descriptor instead.
 func (*FilterStateRule) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{10}
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *FilterStateRule) GetName() string {
@@ -1523,7 +1601,7 @@ type JwtAuthentication struct {
 
 func (x *JwtAuthentication) Reset() {
 	*x = JwtAuthentication{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[11]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1535,7 +1613,7 @@ func (x *JwtAuthentication) String() string {
 func (*JwtAuthentication) ProtoMessage() {}
 
 func (x *JwtAuthentication) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[11]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1548,7 +1626,7 @@ func (x *JwtAuthentication) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JwtAuthentication.ProtoReflect.Descriptor instead.
 func (*JwtAuthentication) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{11}
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *JwtAuthentication) GetProviders() map[string]*JwtProvider {
@@ -1614,7 +1692,7 @@ type PerRouteConfig struct {
 
 func (x *PerRouteConfig) Reset() {
 	*x = PerRouteConfig{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[12]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1626,7 +1704,7 @@ func (x *PerRouteConfig) String() string {
 func (*PerRouteConfig) ProtoMessage() {}
 
 func (x *PerRouteConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[12]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1639,7 +1717,7 @@ func (x *PerRouteConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PerRouteConfig.ProtoReflect.Descriptor instead.
 func (*PerRouteConfig) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{12}
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *PerRouteConfig) GetRequirementSpecifier() isPerRouteConfig_RequirementSpecifier {
@@ -1704,7 +1782,7 @@ type JwtClaimToHeader struct {
 
 func (x *JwtClaimToHeader) Reset() {
 	*x = JwtClaimToHeader{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[13]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1716,7 +1794,7 @@ func (x *JwtClaimToHeader) String() string {
 func (*JwtClaimToHeader) ProtoMessage() {}
 
 func (x *JwtClaimToHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[13]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1729,7 +1807,7 @@ func (x *JwtClaimToHeader) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JwtClaimToHeader.ProtoReflect.Descriptor instead.
 func (*JwtClaimToHeader) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{13}
+	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *JwtClaimToHeader) GetHeaderName() string {
@@ -1763,7 +1841,7 @@ type JwtProvider_NormalizePayload struct {
 
 func (x *JwtProvider_NormalizePayload) Reset() {
 	*x = JwtProvider_NormalizePayload{}
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[14]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1775,7 +1853,7 @@ func (x *JwtProvider_NormalizePayload) String() string {
 func (*JwtProvider_NormalizePayload) ProtoMessage() {}
 
 func (x *JwtProvider_NormalizePayload) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[14]
+	mi := &file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1855,16 +1933,18 @@ const file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc = "" 
 	"\x15ProviderWithAudiences\x12#\n" +
 	"\rprovider_name\x18\x01 \x01(\tR\fproviderName\x12\x1c\n" +
 	"\taudiences\x18\x02 \x03(\tR\taudiences:G\x9aň\x1eB\n" +
-	"@envoy.config.filter.http.jwt_authn.v2alpha.ProviderWithAudiences\"\xe4\x04\n" +
+	"@envoy.config.filter.http.jwt_authn.v2alpha.ProviderWithAudiences\"\xf8\x05\n" +
 	"\x0eJwtRequirement\x12%\n" +
 	"\rprovider_name\x18\x01 \x01(\tH\x00R\fproviderName\x12y\n" +
 	"\x16provider_and_audiences\x18\x02 \x01(\v2A.envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiencesH\x00R\x14providerAndAudiences\x12e\n" +
 	"\frequires_any\x18\x03 \x01(\v2@.envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrListH\x00R\vrequiresAny\x12f\n" +
 	"\frequires_all\x18\x04 \x01(\v2A.envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndListH\x00R\vrequiresAll\x12O\n" +
 	"\x17allow_missing_or_failed\x18\x05 \x01(\v2\x16.google.protobuf.EmptyH\x00R\x14allowMissingOrFailed\x12=\n" +
-	"\rallow_missing\x18\x06 \x01(\v2\x16.google.protobuf.EmptyH\x00R\fallowMissing:@\x9aň\x1e;\n" +
+	"\rallow_missing\x18\x06 \x01(\v2\x16.google.protobuf.EmptyH\x00R\fallowMissing\x12\x91\x01\n" +
+	"\x1fextract_only_without_validation\x18\a \x01(\v2H.envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidationH\x00R\x1cextractOnlyWithoutValidation:@\x9aň\x1e;\n" +
 	"9envoy.config.filter.http.jwt_authn.v2alpha.JwtRequirementB\x0f\n" +
-	"\rrequires_type\"\xc8\x01\n" +
+	"\rrequires_type\"\x1e\n" +
+	"\x1cExtractOnlyWithoutValidation\"\xc8\x01\n" +
 	"\x14JwtRequirementOrList\x12h\n" +
 	"\frequirements\x18\x01 \x03(\v2:.envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementB\b\xfaB\x05\x92\x01\x02\b\x02R\frequirements:F\x9aň\x1eA\n" +
 	"?envoy.config.filter.http.jwt_authn.v2alpha.JwtRequirementOrList\"\xca\x01\n" +
@@ -1924,7 +2004,7 @@ func file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescGZIP() 
 	return file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_goTypes = []any{
 	(*JwtProvider)(nil),                  // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
 	(*JwtCacheConfig)(nil),               // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
@@ -1933,61 +2013,63 @@ var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_goTypes = []any
 	(*JwtHeader)(nil),                    // 4: envoy.extensions.filters.http.jwt_authn.v3.JwtHeader
 	(*ProviderWithAudiences)(nil),        // 5: envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiences
 	(*JwtRequirement)(nil),               // 6: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	(*JwtRequirementOrList)(nil),         // 7: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
-	(*JwtRequirementAndList)(nil),        // 8: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
-	(*RequirementRule)(nil),              // 9: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
-	(*FilterStateRule)(nil),              // 10: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
-	(*JwtAuthentication)(nil),            // 11: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
-	(*PerRouteConfig)(nil),               // 12: envoy.extensions.filters.http.jwt_authn.v3.PerRouteConfig
-	(*JwtClaimToHeader)(nil),             // 13: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
-	(*JwtProvider_NormalizePayload)(nil), // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
-	nil,                                  // 15: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
-	nil,                                  // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
-	nil,                                  // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
-	(*v3.StringMatcher)(nil),             // 18: envoy.type.matcher.v3.StringMatcher
-	(*durationpb.Duration)(nil),          // 19: google.protobuf.Duration
-	(*v31.DataSource)(nil),               // 20: envoy.config.core.v3.DataSource
-	(*v31.HttpUri)(nil),                  // 21: envoy.config.core.v3.HttpUri
-	(*v31.RetryPolicy)(nil),              // 22: envoy.config.core.v3.RetryPolicy
-	(*emptypb.Empty)(nil),                // 23: google.protobuf.Empty
-	(*v32.RouteMatch)(nil),               // 24: envoy.config.route.v3.RouteMatch
+	(*ExtractOnlyWithoutValidation)(nil), // 7: envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidation
+	(*JwtRequirementOrList)(nil),         // 8: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
+	(*JwtRequirementAndList)(nil),        // 9: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
+	(*RequirementRule)(nil),              // 10: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
+	(*FilterStateRule)(nil),              // 11: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
+	(*JwtAuthentication)(nil),            // 12: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+	(*PerRouteConfig)(nil),               // 13: envoy.extensions.filters.http.jwt_authn.v3.PerRouteConfig
+	(*JwtClaimToHeader)(nil),             // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
+	(*JwtProvider_NormalizePayload)(nil), // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
+	nil,                                  // 16: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
+	nil,                                  // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
+	nil,                                  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
+	(*v3.StringMatcher)(nil),             // 19: envoy.type.matcher.v3.StringMatcher
+	(*durationpb.Duration)(nil),          // 20: google.protobuf.Duration
+	(*v31.DataSource)(nil),               // 21: envoy.config.core.v3.DataSource
+	(*v31.HttpUri)(nil),                  // 22: envoy.config.core.v3.HttpUri
+	(*v31.RetryPolicy)(nil),              // 23: envoy.config.core.v3.RetryPolicy
+	(*emptypb.Empty)(nil),                // 24: google.protobuf.Empty
+	(*v32.RouteMatch)(nil),               // 25: envoy.config.route.v3.RouteMatch
 }
 var file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_depIdxs = []int32{
-	18, // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.subjects:type_name -> envoy.type.matcher.v3.StringMatcher
-	19, // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.max_lifetime:type_name -> google.protobuf.Duration
+	19, // 0: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.subjects:type_name -> envoy.type.matcher.v3.StringMatcher
+	20, // 1: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.max_lifetime:type_name -> google.protobuf.Duration
 	2,  // 2: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.remote_jwks:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks
-	20, // 3: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.local_jwks:type_name -> envoy.config.core.v3.DataSource
+	21, // 3: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.local_jwks:type_name -> envoy.config.core.v3.DataSource
 	4,  // 4: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.from_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtHeader
-	14, // 5: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.normalize_payload_in_metadata:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
+	15, // 5: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.normalize_payload_in_metadata:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.NormalizePayload
 	1,  // 6: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.jwt_cache_config:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtCacheConfig
-	13, // 7: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.claim_to_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
-	21, // 8: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.http_uri:type_name -> envoy.config.core.v3.HttpUri
-	19, // 9: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.cache_duration:type_name -> google.protobuf.Duration
+	14, // 7: envoy.extensions.filters.http.jwt_authn.v3.JwtProvider.claim_to_headers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtClaimToHeader
+	22, // 8: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.http_uri:type_name -> envoy.config.core.v3.HttpUri
+	20, // 9: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.cache_duration:type_name -> google.protobuf.Duration
 	3,  // 10: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.async_fetch:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch
-	22, // 11: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
-	19, // 12: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch.failed_refetch_duration:type_name -> google.protobuf.Duration
+	23, // 11: envoy.extensions.filters.http.jwt_authn.v3.RemoteJwks.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	20, // 12: envoy.extensions.filters.http.jwt_authn.v3.JwksAsyncFetch.failed_refetch_duration:type_name -> google.protobuf.Duration
 	5,  // 13: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.provider_and_audiences:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ProviderWithAudiences
-	7,  // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_any:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
-	8,  // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_all:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
-	23, // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed:type_name -> google.protobuf.Empty
-	23, // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing:type_name -> google.protobuf.Empty
-	6,  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	6,  // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	24, // 20: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.match:type_name -> envoy.config.route.v3.RouteMatch
-	6,  // 21: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	15, // 22: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
-	16, // 23: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.providers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
-	9,  // 24: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
-	10, // 25: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.filter_state_rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
-	17, // 26: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
-	6,  // 27: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	0,  // 28: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
-	6,  // 29: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
-	30, // [30:30] is the sub-list for method output_type
-	30, // [30:30] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	8,  // 14: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_any:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList
+	9,  // 15: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.requires_all:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList
+	24, // 16: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing_or_failed:type_name -> google.protobuf.Empty
+	24, // 17: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.allow_missing:type_name -> google.protobuf.Empty
+	7,  // 18: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement.extract_only_without_validation:type_name -> envoy.extensions.filters.http.jwt_authn.v3.ExtractOnlyWithoutValidation
+	6,  // 19: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementOrList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	6,  // 20: envoy.extensions.filters.http.jwt_authn.v3.JwtRequirementAndList.requirements:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	25, // 21: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.match:type_name -> envoy.config.route.v3.RouteMatch
+	6,  // 22: envoy.extensions.filters.http.jwt_authn.v3.RequirementRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	16, // 23: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.requires:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry
+	17, // 24: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.providers:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry
+	10, // 25: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.RequirementRule
+	11, // 26: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.filter_state_rules:type_name -> envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule
+	18, // 27: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.requirement_map:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry
+	6,  // 28: envoy.extensions.filters.http.jwt_authn.v3.FilterStateRule.RequiresEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	0,  // 29: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.ProvidersEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtProvider
+	6,  // 30: envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication.RequirementMapEntry.value:type_name -> envoy.extensions.filters.http.jwt_authn.v3.JwtRequirement
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_init() }
@@ -2006,12 +2088,13 @@ func file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_init() {
 		(*JwtRequirement_RequiresAll)(nil),
 		(*JwtRequirement_AllowMissingOrFailed)(nil),
 		(*JwtRequirement_AllowMissing)(nil),
+		(*JwtRequirement_ExtractOnlyWithoutValidation)(nil),
 	}
-	file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[9].OneofWrappers = []any{
+	file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[10].OneofWrappers = []any{
 		(*RequirementRule_Requires)(nil),
 		(*RequirementRule_RequirementName)(nil),
 	}
-	file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[12].OneofWrappers = []any{
+	file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_msgTypes[13].OneofWrappers = []any{
 		(*PerRouteConfig_Disabled)(nil),
 		(*PerRouteConfig_RequirementName)(nil),
 	}
@@ -2021,7 +2104,7 @@ func file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc), len(file_envoy_extensions_filters_http_jwt_authn_v3_config_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

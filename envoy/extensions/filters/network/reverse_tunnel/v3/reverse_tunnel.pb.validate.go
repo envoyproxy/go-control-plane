@@ -284,6 +284,21 @@ func (m *ReverseTunnel) validate(all bool) error {
 		}
 	}
 
+	if m.GetRequiredClusterName() != "" {
+
+		if utf8.RuneCountInString(m.GetRequiredClusterName()) > 255 {
+			err := ReverseTunnelValidationError{
+				field:  "RequiredClusterName",
+				reason: "value length must be at most 255 runes",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return ReverseTunnelMultiError(errors)
 	}

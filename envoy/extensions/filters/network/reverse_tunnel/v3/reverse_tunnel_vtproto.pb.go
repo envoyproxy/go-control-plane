@@ -113,6 +113,13 @@ func (m *ReverseTunnel) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.RequiredClusterName) > 0 {
+		i -= len(m.RequiredClusterName)
+		copy(dAtA[i:], m.RequiredClusterName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.RequiredClusterName)))
+		i--
+		dAtA[i] = 0x32
+	}
 	if m.Validation != nil {
 		size, err := m.Validation.MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -205,6 +212,10 @@ func (m *ReverseTunnel) SizeVT() (n int) {
 	}
 	if m.Validation != nil {
 		l = m.Validation.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.RequiredClusterName)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

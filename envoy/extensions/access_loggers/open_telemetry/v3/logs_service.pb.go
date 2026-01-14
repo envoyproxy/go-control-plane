@@ -8,12 +8,15 @@ package open_telemetryv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
+	_ "github.com/envoyproxy/go-control-plane/envoy/annotations"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	v3 "github.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/grpc/v3"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	v32 "github.com/envoyproxy/go-control-plane/envoy/type/tracing/v3"
 	v1 "go.opentelemetry.io/proto/otlp/common/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -31,11 +34,30 @@ const (
 // populate `opentelemetry.proto.collector.v1.logs.ExportLogsServiceRequest.resource_logs <https://github.com/open-telemetry/opentelemetry-proto/blob/main/opentelemetry/proto/collector/logs/v1/logs_service.proto>`_.
 // In addition, the request start time is set in the dedicated field.
 // [#extension: envoy.access_loggers.open_telemetry]
-// [#next-free-field: 8]
+// [#next-free-field: 15]
 type OpenTelemetryAccessLogConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// [#comment:TODO(itamarkam): add 'filter_state_objects_to_log' to logs.]
+	// Deprecated. Use “grpc_service“ or “http_service“ instead.
+	//
+	// Deprecated: Marked as deprecated in envoy/extensions/access_loggers/open_telemetry/v3/logs_service.proto.
 	CommonConfig *v3.CommonGrpcAccessLogConfig `protobuf:"bytes,1,opt,name=common_config,json=commonConfig,proto3" json:"common_config,omitempty"`
+	// The upstream HTTP cluster that will receive OTLP logs via
+	// `OTLP/HTTP <https://opentelemetry.io/docs/specs/otlp/#otlphttp>`_.
+	// Note: Only one of “common_config“, “grpc_service“, or “http_service“ may be used.
+	//
+	// .. note::
+	//
+	//	The ``request_headers_to_add`` property in the OTLP HTTP exporter service
+	//	does not support the :ref:`format specifier <config_access_log_format>` as used for
+	//	:ref:`HTTP access logging <config_access_log>`.
+	//	The values configured are added as HTTP headers on the OTLP export request
+	//	without any formatting applied.
+	HttpService *v31.HttpService `protobuf:"bytes,8,opt,name=http_service,json=httpService,proto3" json:"http_service,omitempty"`
+	// The upstream gRPC cluster that will receive OTLP logs.
+	// Note: Only one of “common_config“, “grpc_service“, or “http_service“ may be used.
+	// This field is preferred over “common_config.grpc_service“.
+	GrpcService *v31.GrpcService `protobuf:"bytes,9,opt,name=grpc_service,json=grpcService,proto3" json:"grpc_service,omitempty"`
 	// If specified, Envoy will not generate built-in resource labels
 	// like “log_name“, “zone_name“, “cluster_name“, “node_name“.
 	DisableBuiltinLabels bool `protobuf:"varint,5,opt,name=disable_builtin_labels,json=disableBuiltinLabels,proto3" json:"disable_builtin_labels,omitempty"`
@@ -59,7 +81,17 @@ type OpenTelemetryAccessLogConfig struct {
 	// Specifies a collection of Formatter plugins that can be called from the access log configuration.
 	// See the formatters extensions documentation for details.
 	// [#extension-category: envoy.formatter]
-	Formatters    []*v31.TypedExtensionConfig `protobuf:"bytes,7,rep,name=formatters,proto3" json:"formatters,omitempty"`
+	Formatters []*v31.TypedExtensionConfig `protobuf:"bytes,7,rep,name=formatters,proto3" json:"formatters,omitempty"`
+	LogName    string                      `protobuf:"bytes,10,opt,name=log_name,json=logName,proto3" json:"log_name,omitempty"`
+	// The interval for flushing access logs to the transport. Default: 1 second.
+	BufferFlushInterval *durationpb.Duration `protobuf:"bytes,11,opt,name=buffer_flush_interval,json=bufferFlushInterval,proto3" json:"buffer_flush_interval,omitempty"`
+	// Soft size limit in bytes for the access log buffer. When the buffer exceeds
+	// this limit, logs will be flushed. Default: 16KB.
+	BufferSizeBytes *wrapperspb.UInt32Value `protobuf:"bytes,12,opt,name=buffer_size_bytes,json=bufferSizeBytes,proto3" json:"buffer_size_bytes,omitempty"`
+	// Additional filter state objects to log as attributes.
+	FilterStateObjectsToLog []string `protobuf:"bytes,13,rep,name=filter_state_objects_to_log,json=filterStateObjectsToLog,proto3" json:"filter_state_objects_to_log,omitempty"`
+	// Custom tags to include as log attributes.
+	CustomTags    []*v32.CustomTag `protobuf:"bytes,14,rep,name=custom_tags,json=customTags,proto3" json:"custom_tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -94,9 +126,24 @@ func (*OpenTelemetryAccessLogConfig) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto_rawDescGZIP(), []int{0}
 }
 
+// Deprecated: Marked as deprecated in envoy/extensions/access_loggers/open_telemetry/v3/logs_service.proto.
 func (x *OpenTelemetryAccessLogConfig) GetCommonConfig() *v3.CommonGrpcAccessLogConfig {
 	if x != nil {
 		return x.CommonConfig
+	}
+	return nil
+}
+
+func (x *OpenTelemetryAccessLogConfig) GetHttpService() *v31.HttpService {
+	if x != nil {
+		return x.HttpService
+	}
+	return nil
+}
+
+func (x *OpenTelemetryAccessLogConfig) GetGrpcService() *v31.GrpcService {
+	if x != nil {
+		return x.GrpcService
 	}
 	return nil
 }
@@ -143,13 +190,50 @@ func (x *OpenTelemetryAccessLogConfig) GetFormatters() []*v31.TypedExtensionConf
 	return nil
 }
 
+func (x *OpenTelemetryAccessLogConfig) GetLogName() string {
+	if x != nil {
+		return x.LogName
+	}
+	return ""
+}
+
+func (x *OpenTelemetryAccessLogConfig) GetBufferFlushInterval() *durationpb.Duration {
+	if x != nil {
+		return x.BufferFlushInterval
+	}
+	return nil
+}
+
+func (x *OpenTelemetryAccessLogConfig) GetBufferSizeBytes() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.BufferSizeBytes
+	}
+	return nil
+}
+
+func (x *OpenTelemetryAccessLogConfig) GetFilterStateObjectsToLog() []string {
+	if x != nil {
+		return x.FilterStateObjectsToLog
+	}
+	return nil
+}
+
+func (x *OpenTelemetryAccessLogConfig) GetCustomTags() []*v32.CustomTag {
+	if x != nil {
+		return x.CustomTags
+	}
+	return nil
+}
+
 var File_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto_rawDesc = "" +
 	"\n" +
-	"Denvoy/extensions/access_loggers/open_telemetry/v3/logs_service.proto\x121envoy.extensions.access_loggers.open_telemetry.v3\x1a$envoy/config/core/v3/extension.proto\x1a1envoy/extensions/access_loggers/grpc/v3/als.proto\x1a*opentelemetry/proto/common/v1/common.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x9c\x04\n" +
-	"\x1cOpenTelemetryAccessLogConfig\x12q\n" +
-	"\rcommon_config\x18\x01 \x01(\v2B.envoy.extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\fcommonConfig\x124\n" +
+	"Denvoy/extensions/access_loggers/open_telemetry/v3/logs_service.proto\x121envoy.extensions.access_loggers.open_telemetry.v3\x1a$envoy/config/core/v3/extension.proto\x1a'envoy/config/core/v3/grpc_service.proto\x1a'envoy/config/core/v3/http_service.proto\x1a1envoy/extensions/access_loggers/grpc/v3/als.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a*opentelemetry/proto/common/v1/common.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\"\xe0\a\n" +
+	"\x1cOpenTelemetryAccessLogConfig\x12t\n" +
+	"\rcommon_config\x18\x01 \x01(\v2B.envoy.extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfigB\v\x92ǆ\xd8\x04\x033.0\x18\x01R\fcommonConfig\x12D\n" +
+	"\fhttp_service\x18\b \x01(\v2!.envoy.config.core.v3.HttpServiceR\vhttpService\x12D\n" +
+	"\fgrpc_service\x18\t \x01(\v2!.envoy.config.core.v3.GrpcServiceR\vgrpcService\x124\n" +
 	"\x16disable_builtin_labels\x18\x05 \x01(\bR\x14disableBuiltinLabels\x12\\\n" +
 	"\x13resource_attributes\x18\x04 \x01(\v2+.opentelemetry.proto.common.v1.KeyValueListR\x12resourceAttributes\x12;\n" +
 	"\x04body\x18\x02 \x01(\v2'.opentelemetry.proto.common.v1.AnyValueR\x04body\x12K\n" +
@@ -160,7 +244,14 @@ const file_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto_
 	"statPrefix\x12J\n" +
 	"\n" +
 	"formatters\x18\a \x03(\v2*.envoy.config.core.v3.TypedExtensionConfigR\n" +
-	"formattersB\xc8\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"formatters\x12\x19\n" +
+	"\blog_name\x18\n" +
+	" \x01(\tR\alogName\x12M\n" +
+	"\x15buffer_flush_interval\x18\v \x01(\v2\x19.google.protobuf.DurationR\x13bufferFlushInterval\x12H\n" +
+	"\x11buffer_size_bytes\x18\f \x01(\v2\x1c.google.protobuf.UInt32ValueR\x0fbufferSizeBytes\x12<\n" +
+	"\x1bfilter_state_objects_to_log\x18\r \x03(\tR\x17filterStateObjectsToLog\x12A\n" +
+	"\vcustom_tags\x18\x0e \x03(\v2 .envoy.type.tracing.v3.CustomTagR\n" +
+	"customTagsB\xc8\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"?io.envoyproxy.envoy.extensions.access_loggers.open_telemetry.v3B\x10LogsServiceProtoP\x01Zigithub.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/open_telemetry/v3;open_telemetryv3b\x06proto3"
 
 var (
@@ -179,21 +270,31 @@ var file_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto_ms
 var file_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto_goTypes = []any{
 	(*OpenTelemetryAccessLogConfig)(nil), // 0: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig
 	(*v3.CommonGrpcAccessLogConfig)(nil), // 1: envoy.extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfig
-	(*v1.KeyValueList)(nil),              // 2: opentelemetry.proto.common.v1.KeyValueList
-	(*v1.AnyValue)(nil),                  // 3: opentelemetry.proto.common.v1.AnyValue
-	(*v31.TypedExtensionConfig)(nil),     // 4: envoy.config.core.v3.TypedExtensionConfig
+	(*v31.HttpService)(nil),              // 2: envoy.config.core.v3.HttpService
+	(*v31.GrpcService)(nil),              // 3: envoy.config.core.v3.GrpcService
+	(*v1.KeyValueList)(nil),              // 4: opentelemetry.proto.common.v1.KeyValueList
+	(*v1.AnyValue)(nil),                  // 5: opentelemetry.proto.common.v1.AnyValue
+	(*v31.TypedExtensionConfig)(nil),     // 6: envoy.config.core.v3.TypedExtensionConfig
+	(*durationpb.Duration)(nil),          // 7: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),       // 8: google.protobuf.UInt32Value
+	(*v32.CustomTag)(nil),                // 9: envoy.type.tracing.v3.CustomTag
 }
 var file_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto_depIdxs = []int32{
-	1, // 0: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.common_config:type_name -> envoy.extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfig
-	2, // 1: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.resource_attributes:type_name -> opentelemetry.proto.common.v1.KeyValueList
-	3, // 2: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.body:type_name -> opentelemetry.proto.common.v1.AnyValue
-	2, // 3: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.attributes:type_name -> opentelemetry.proto.common.v1.KeyValueList
-	4, // 4: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	1,  // 0: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.common_config:type_name -> envoy.extensions.access_loggers.grpc.v3.CommonGrpcAccessLogConfig
+	2,  // 1: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.http_service:type_name -> envoy.config.core.v3.HttpService
+	3,  // 2: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.grpc_service:type_name -> envoy.config.core.v3.GrpcService
+	4,  // 3: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.resource_attributes:type_name -> opentelemetry.proto.common.v1.KeyValueList
+	5,  // 4: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.body:type_name -> opentelemetry.proto.common.v1.AnyValue
+	4,  // 5: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.attributes:type_name -> opentelemetry.proto.common.v1.KeyValueList
+	6,  // 6: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.formatters:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	7,  // 7: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.buffer_flush_interval:type_name -> google.protobuf.Duration
+	8,  // 8: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.buffer_size_bytes:type_name -> google.protobuf.UInt32Value
+	9,  // 9: envoy.extensions.access_loggers.open_telemetry.v3.OpenTelemetryAccessLogConfig.custom_tags:type_name -> envoy.type.tracing.v3.CustomTag
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_access_loggers_open_telemetry_v3_logs_service_proto_init() }
