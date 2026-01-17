@@ -53,6 +53,8 @@ const (
 	// and negotiated parameters, which can be used for routing decisions or passed as metadata
 	// to the upstream.
 	//
+	// This mode requires “max_early_data_bytes“ to be set (can be zero to disable buffering).
+	//
 	// .. note::
 	//
 	//	This mode is only effective when the downstream connection uses TLS. For non-TLS
@@ -228,7 +230,7 @@ type TcpProxy struct {
 	// buffered and forwarded once the upstream connection is ready. When the buffer exceeds
 	// this limit, the downstream connection is read-disabled to prevent excessive memory usage.
 	//
-	// This field is required when “upstream_connect_mode“ is “ON_DOWNSTREAM_DATA“.
+	// This field is required when “upstream_connect_mode“ is not “IMMEDIATE“.
 	//
 	// .. note::
 	//
