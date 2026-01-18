@@ -23,12 +23,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Extension to save the :ref:`response
-// <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` from the external processor as
-// filter state with name
-// "envoy.http.ext_proc.response_processors.save_processing_response[.:ref:`filter_state_name_suffix
-// <envoy_v3_api_field_extensions.http.ext_proc.response_processors.save_processing_response.v3.SaveProcessingResponse.filter_state_name>`].
-// This extension supports saving of request and response headers and trailers,
+// Extension to save the
+// :ref:`ProcessingResponse <envoy_v3_api_msg_service.ext_proc.v3.ProcessingResponse>` from the
+// external processor as filter state with name
+// “envoy.http.ext_proc.response_processors.save_processing_response“. If
+// :ref:`filter_state_name_suffix <envoy_v3_api_field_extensions.http.ext_proc.response_processors.save_processing_response.v3.SaveProcessingResponse.filter_state_name_suffix>`
+// is defined, it is appended to this name.
+//
+// This extension supports saving of request and response headers, request and response trailers,
 // and immediate response.
 //
 // .. note::
@@ -39,25 +41,31 @@ const (
 type SaveProcessingResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The default filter state name is
-	// "envoy.http.ext_proc.response_processors.save_processing_response".
-	// If defined, “filter_state_name_suffix“ is appended to this.
-	// For example, setting “filter_state_name_suffix“ to "xyz" will set the
-	// filter state name to "envoy.http.ext_proc.response_processors.save_processing_response.xyz"
+	// “envoy.http.ext_proc.response_processors.save_processing_response“.
+	// If defined, “filter_state_name_suffix“ is appended to this name.
+	//
+	// For example, setting “filter_state_name_suffix“ to “xyz“ will set the filter state name
+	// to “envoy.http.ext_proc.response_processors.save_processing_response.xyz“.
 	FilterStateNameSuffix string `protobuf:"bytes,1,opt,name=filter_state_name_suffix,json=filterStateNameSuffix,proto3" json:"filter_state_name_suffix,omitempty"`
-	// Save the response to filter state when :ref:`request_headers
-	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.request_headers>` is set.
+	// Save the response to filter state when
+	// :ref:`request_headers <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.request_headers>`
+	// is set.
 	SaveRequestHeaders *SaveProcessingResponse_SaveOptions `protobuf:"bytes,2,opt,name=save_request_headers,json=saveRequestHeaders,proto3" json:"save_request_headers,omitempty"`
-	// Save the response to filter state when :ref:`response_headers
-	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.response_headers>` is set.
+	// Save the response to filter state when
+	// :ref:`response_headers <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.response_headers>`
+	// is set.
 	SaveResponseHeaders *SaveProcessingResponse_SaveOptions `protobuf:"bytes,3,opt,name=save_response_headers,json=saveResponseHeaders,proto3" json:"save_response_headers,omitempty"`
-	// Save the response to filter state when :ref:`request_trailers
-	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.request_trailers>` is set.
+	// Save the response to filter state when
+	// :ref:`request_trailers <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.request_trailers>`
+	// is set.
 	SaveRequestTrailers *SaveProcessingResponse_SaveOptions `protobuf:"bytes,4,opt,name=save_request_trailers,json=saveRequestTrailers,proto3" json:"save_request_trailers,omitempty"`
-	// Save the response to filter state when :ref:`response_trailers
-	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.response_trailers>` is set.
+	// Save the response to filter state when
+	// :ref:`response_trailers <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.response_trailers>`
+	// is set.
 	SaveResponseTrailers *SaveProcessingResponse_SaveOptions `protobuf:"bytes,5,opt,name=save_response_trailers,json=saveResponseTrailers,proto3" json:"save_response_trailers,omitempty"`
-	// Save the response to filter state when :ref:`immediate_response
-	// <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.immediate_response>` is set.
+	// Save the response to filter state when
+	// :ref:`immediate_response <envoy_v3_api_field_service.ext_proc.v3.ProcessingResponse.immediate_response>`
+	// is set.
 	SaveImmediateResponse *SaveProcessingResponse_SaveOptions `protobuf:"bytes,6,opt,name=save_immediate_response,json=saveImmediateResponse,proto3" json:"save_immediate_response,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
@@ -135,12 +143,17 @@ func (x *SaveProcessingResponse) GetSaveImmediateResponse() *SaveProcessingRespo
 	return nil
 }
 
+// Options for saving the processing response.
 type SaveProcessingResponse_SaveOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Whether or not to save the response for the response type.
+	// When set to “true“, saves the response for the corresponding response type.
+	//
+	// Defaults to “false“.
 	SaveResponse bool `protobuf:"varint,1,opt,name=save_response,json=saveResponse,proto3" json:"save_response,omitempty"`
-	// When true, saves the response if there was an error when processing
-	// the response from the external processor.
+	// When set to “true“, saves the response if there was an error when processing the response
+	// from the external processor.
+	//
+	// Defaults to “false“.
 	SaveOnError   bool `protobuf:"varint,2,opt,name=save_on_error,json=saveOnError,proto3" json:"save_on_error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
