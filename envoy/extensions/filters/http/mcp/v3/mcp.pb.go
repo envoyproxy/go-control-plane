@@ -78,7 +78,66 @@ func (Mcp_TrafficMode) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescGZIP(), []int{0, 0}
 }
 
+// Where to store parsed MCP request attributes.
+type Mcp_RequestStorageMode int32
+
+const (
+	// Unspecified. Uses default behavior (same as DYNAMIC_METADATA).
+	Mcp_MODE_UNSPECIFIED Mcp_RequestStorageMode = 0
+	// Store request attributes in dynamic metadata only.
+	// This is the default behavior.
+	Mcp_DYNAMIC_METADATA Mcp_RequestStorageMode = 1
+	// Store request attributes in filter state only.
+	Mcp_FILTER_STATE Mcp_RequestStorageMode = 2
+	// Store request attributes in both dynamic metadata and filter state.
+	Mcp_DYNAMIC_METADATA_AND_FILTER_STATE Mcp_RequestStorageMode = 3
+)
+
+// Enum value maps for Mcp_RequestStorageMode.
+var (
+	Mcp_RequestStorageMode_name = map[int32]string{
+		0: "MODE_UNSPECIFIED",
+		1: "DYNAMIC_METADATA",
+		2: "FILTER_STATE",
+		3: "DYNAMIC_METADATA_AND_FILTER_STATE",
+	}
+	Mcp_RequestStorageMode_value = map[string]int32{
+		"MODE_UNSPECIFIED":                  0,
+		"DYNAMIC_METADATA":                  1,
+		"FILTER_STATE":                      2,
+		"DYNAMIC_METADATA_AND_FILTER_STATE": 3,
+	}
+)
+
+func (x Mcp_RequestStorageMode) Enum() *Mcp_RequestStorageMode {
+	p := new(Mcp_RequestStorageMode)
+	*p = x
+	return p
+}
+
+func (x Mcp_RequestStorageMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Mcp_RequestStorageMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_http_mcp_v3_mcp_proto_enumTypes[1].Descriptor()
+}
+
+func (Mcp_RequestStorageMode) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_enumTypes[1]
+}
+
+func (x Mcp_RequestStorageMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Mcp_RequestStorageMode.Descriptor instead.
+func (Mcp_RequestStorageMode) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescGZIP(), []int{0, 1}
+}
+
 // This filter will inspect and get attributes from MCP traffic.
+// [#next-free-field: 6]
 type Mcp struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configures how the filter handles non-MCP traffic.
@@ -96,9 +155,13 @@ type Mcp struct {
 	// Setting it to 0 would disable the limit. It is not recommended to do so in production.
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
 	// Parser configuration, this provide the attribute extraction override.
-	ParserConfig  *ParserConfig `protobuf:"bytes,4,opt,name=parser_config,json=parserConfig,proto3" json:"parser_config,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ParserConfig *ParserConfig `protobuf:"bytes,4,opt,name=parser_config,json=parserConfig,proto3" json:"parser_config,omitempty"`
+	// Where to store parsed MCP request attributes.
+	// Controls whether attributes are written to dynamic metadata, filter state, or both.
+	// Default is DYNAMIC_METADATA when unspecified.
+	RequestStorageMode Mcp_RequestStorageMode `protobuf:"varint,5,opt,name=request_storage_mode,json=requestStorageMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_RequestStorageMode" json:"request_storage_mode,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *Mcp) Reset() {
@@ -157,6 +220,13 @@ func (x *Mcp) GetParserConfig() *ParserConfig {
 		return x.ParserConfig
 	}
 	return nil
+}
+
+func (x *Mcp) GetRequestStorageMode() Mcp_RequestStorageMode {
+	if x != nil {
+		return x.RequestStorageMode
+	}
+	return Mcp_MODE_UNSPECIFIED
 }
 
 // Parser configuration with method-specific rules.
@@ -396,16 +466,22 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xff\x02\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf4\x04\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
 	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12[\n" +
 	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
 	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\x12W\n" +
-	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\"2\n" +
+	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\x12x\n" +
+	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\"2\n" +
 	"\vTrafficMode\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x00\x12\x11\n" +
-	"\rREJECT_NO_MCP\x10\x01\"\x8e\x03\n" +
+	"\rREJECT_NO_MCP\x10\x01\"y\n" +
+	"\x12RequestStorageMode\x12\x14\n" +
+	"\x10MODE_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10DYNAMIC_METADATA\x10\x01\x12\x10\n" +
+	"\fFILTER_STATE\x10\x02\x12%\n" +
+	"!DYNAMIC_METADATA_AND_FILTER_STATE\x10\x03\"\x8e\x03\n" +
 	"\fParserConfig\x12Y\n" +
 	"\amethods\x18\x01 \x03(\v2?.envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfigR\amethods\x12,\n" +
 	"\x12group_metadata_key\x18\x02 \x01(\tR\x10groupMetadataKey\x1a6\n" +
@@ -433,30 +509,32 @@ func file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescGZIP() []byte {
 	return file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_goTypes = []any{
-	(Mcp_TrafficMode)(0), // 0: envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	(*Mcp)(nil),          // 1: envoy.extensions.filters.http.mcp.v3.Mcp
-	(*ParserConfig)(nil), // 2: envoy.extensions.filters.http.mcp.v3.ParserConfig
-	(*McpOverride)(nil),  // 3: envoy.extensions.filters.http.mcp.v3.McpOverride
-	(*ParserConfig_AttributeExtractionRule)(nil), // 4: envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
-	(*ParserConfig_MethodConfig)(nil),            // 5: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
-	(*wrapperspb.UInt32Value)(nil),               // 6: google.protobuf.UInt32Value
+	(Mcp_TrafficMode)(0),                         // 0: envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
+	(Mcp_RequestStorageMode)(0),                  // 1: envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
+	(*Mcp)(nil),                                  // 2: envoy.extensions.filters.http.mcp.v3.Mcp
+	(*ParserConfig)(nil),                         // 3: envoy.extensions.filters.http.mcp.v3.ParserConfig
+	(*McpOverride)(nil),                          // 4: envoy.extensions.filters.http.mcp.v3.McpOverride
+	(*ParserConfig_AttributeExtractionRule)(nil), // 5: envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
+	(*ParserConfig_MethodConfig)(nil),            // 6: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
+	(*wrapperspb.UInt32Value)(nil),               // 7: google.protobuf.UInt32Value
 }
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_depIdxs = []int32{
 	0, // 0: envoy.extensions.filters.http.mcp.v3.Mcp.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	6, // 1: envoy.extensions.filters.http.mcp.v3.Mcp.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	2, // 2: envoy.extensions.filters.http.mcp.v3.Mcp.parser_config:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig
-	5, // 3: envoy.extensions.filters.http.mcp.v3.ParserConfig.methods:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
-	0, // 4: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	6, // 5: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	4, // 6: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	7, // 1: envoy.extensions.filters.http.mcp.v3.Mcp.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	3, // 2: envoy.extensions.filters.http.mcp.v3.Mcp.parser_config:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig
+	1, // 3: envoy.extensions.filters.http.mcp.v3.Mcp.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
+	6, // 4: envoy.extensions.filters.http.mcp.v3.ParserConfig.methods:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
+	0, // 5: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
+	7, // 6: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	5, // 7: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() }
@@ -469,7 +547,7 @@ func file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc), len(file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
