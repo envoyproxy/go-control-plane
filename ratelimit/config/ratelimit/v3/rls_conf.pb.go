@@ -178,6 +178,8 @@ type RateLimitDescriptor struct {
 	ShadowMode bool `protobuf:"varint,5,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
 	// Setting the `detailed_metric: true` for a descriptor will extend the metrics that are produced.
 	DetailedMetric bool `protobuf:"varint,6,opt,name=detailed_metric,json=detailedMetric,proto3" json:"detailed_metric,omitempty"`
+	// Mark the descriptor as quota mode. When the value is true, rate limit service tracks quota usage for the descriptor.
+	QuotaMode bool `protobuf:"varint,7,opt,name=quota_mode,json=quotaMode,proto3" json:"quota_mode,omitempty"`
 }
 
 func (x *RateLimitDescriptor) Reset() {
@@ -250,6 +252,13 @@ func (x *RateLimitDescriptor) GetShadowMode() bool {
 func (x *RateLimitDescriptor) GetDetailedMetric() bool {
 	if x != nil {
 		return x.DetailedMetric
+	}
+	return false
+}
+
+func (x *RateLimitDescriptor) GetQuotaMode() bool {
+	if x != nil {
+		return x.QuotaMode
 	}
 	return false
 }
