@@ -128,6 +128,21 @@ func (m *KaePrivateKeyMethodConfig) validate(all bool) error {
 		}
 	}
 
+	if wrapper := m.GetMaxInstances(); wrapper != nil {
+
+		if wrapper.GetValue() < 1 {
+			err := KaePrivateKeyMethodConfigValidationError{
+				field:  "MaxInstances",
+				reason: "value must be greater than or equal to 1",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return KaePrivateKeyMethodConfigMultiError(errors)
 	}

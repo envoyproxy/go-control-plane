@@ -9,6 +9,7 @@ package v3alpha
 import (
 	protohelpers "github.com/planetscale/vtprotobuf/protohelpers"
 	durationpb "github.com/planetscale/vtprotobuf/types/known/durationpb"
+	wrapperspb "github.com/planetscale/vtprotobuf/types/known/wrapperspb"
 	proto "google.golang.org/protobuf/proto"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
@@ -49,6 +50,16 @@ func (m *KaePrivateKeyMethodConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (i
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.MaxInstances != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxInstances).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
 	}
 	if m.PollDelay != nil {
 		size, err := (*durationpb.Duration)(m.PollDelay).MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -103,6 +114,10 @@ func (m *KaePrivateKeyMethodConfig) SizeVT() (n int) {
 	}
 	if m.PollDelay != nil {
 		l = (*durationpb.Duration)(m.PollDelay).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxInstances != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxInstances).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

@@ -13,6 +13,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -35,7 +36,11 @@ type KaePrivateKeyMethodConfig struct {
 	// quicker answers from the hardware but causes more polling loop
 	// spins, leading to potentially larger CPU usage. The duration needs
 	// to be set to a value greater than or equal to 1 millisecond.
-	PollDelay     *durationpb.Duration `protobuf:"bytes,2,opt,name=poll_delay,json=pollDelay,proto3" json:"poll_delay,omitempty"`
+	PollDelay *durationpb.Duration `protobuf:"bytes,2,opt,name=poll_delay,json=pollDelay,proto3" json:"poll_delay,omitempty"`
+	// The number of instances to start during initialization.
+	// Too many instances may create a large number of threads, increasing resource usage and potential overhead.
+	// max_instances must be at least 1.
+	MaxInstances  *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_instances,json=maxInstances,proto3" json:"max_instances,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -84,16 +89,24 @@ func (x *KaePrivateKeyMethodConfig) GetPollDelay() *durationpb.Duration {
 	return nil
 }
 
+func (x *KaePrivateKeyMethodConfig) GetMaxInstances() *wrapperspb.UInt32Value {
+	if x != nil {
+		return x.MaxInstances
+	}
+	return nil
+}
+
 var File_contrib_envoy_extensions_private_key_providers_kae_v3alpha_kae_proto protoreflect.FileDescriptor
 
 const file_contrib_envoy_extensions_private_key_providers_kae_v3alpha_kae_proto_rawDesc = "" +
 	"\n" +
-	"Dcontrib/envoy/extensions/private_key_providers/kae/v3alpha/kae.proto\x122envoy.extensions.private_key_providers.kae.v3alpha\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1egoogle/protobuf/duration.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb0\x01\n" +
+	"Dcontrib/envoy/extensions/private_key_providers/kae/v3alpha/kae.proto\x122envoy.extensions.private_key_providers.kae.v3alpha\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a udpa/annotations/sensitive.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xfc\x01\n" +
 	"\x19KaePrivateKeyMethodConfig\x12I\n" +
 	"\vprivate_key\x18\x01 \x01(\v2 .envoy.config.core.v3.DataSourceB\x06\xb8\xb7\x8b\xa4\x02\x01R\n" +
 	"privateKey\x12H\n" +
 	"\n" +
-	"poll_delay\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x0e\xfaB\v\xaa\x01\b\b\x012\x04\x10\xc0\x84=R\tpollDelayB\xb9\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"poll_delay\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x0e\xfaB\v\xaa\x01\b\b\x012\x04\x10\xc0\x84=R\tpollDelay\x12J\n" +
+	"\rmax_instances\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\fmaxInstancesB\xb9\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"@io.envoyproxy.envoy.extensions.private_key_providers.kae.v3alphaB\bKaeProtoP\x01Zagithub.com/envoyproxy/go-control-plane/contrib/envoy/extensions/private_key_providers/kae/v3alphab\x06proto3"
 
 var (
@@ -113,15 +126,17 @@ var file_contrib_envoy_extensions_private_key_providers_kae_v3alpha_kae_proto_go
 	(*KaePrivateKeyMethodConfig)(nil), // 0: envoy.extensions.private_key_providers.kae.v3alpha.KaePrivateKeyMethodConfig
 	(*v3.DataSource)(nil),             // 1: envoy.config.core.v3.DataSource
 	(*durationpb.Duration)(nil),       // 2: google.protobuf.Duration
+	(*wrapperspb.UInt32Value)(nil),    // 3: google.protobuf.UInt32Value
 }
 var file_contrib_envoy_extensions_private_key_providers_kae_v3alpha_kae_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.private_key_providers.kae.v3alpha.KaePrivateKeyMethodConfig.private_key:type_name -> envoy.config.core.v3.DataSource
 	2, // 1: envoy.extensions.private_key_providers.kae.v3alpha.KaePrivateKeyMethodConfig.poll_delay:type_name -> google.protobuf.Duration
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: envoy.extensions.private_key_providers.kae.v3alpha.KaePrivateKeyMethodConfig.max_instances:type_name -> google.protobuf.UInt32Value
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_contrib_envoy_extensions_private_key_providers_kae_v3alpha_kae_proto_init() }
