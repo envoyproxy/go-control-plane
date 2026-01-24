@@ -352,6 +352,8 @@ func (m *LocalRateLimitDescriptor) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for ShadowMode
+
 	if len(errors) > 0 {
 		return LocalRateLimitDescriptorMultiError(errors)
 	}
