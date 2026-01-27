@@ -5613,6 +5613,11 @@ func (m *RateLimit) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.XRatelimitOption != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.XRatelimitOption))
+		i--
+		dAtA[i] = 0x38
+	}
 	if m.ApplyOnStreamDone {
 		i--
 		if m.ApplyOnStreamDone {
@@ -8675,6 +8680,9 @@ func (m *RateLimit) SizeVT() (n int) {
 	}
 	if m.ApplyOnStreamDone {
 		n += 2
+	}
+	if m.XRatelimitOption != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.XRatelimitOption))
 	}
 	n += len(m.unknownFields)
 	return n

@@ -296,6 +296,68 @@ func (RedirectAction_RedirectResponseCode) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{11, 0}
 }
 
+type RateLimit_XRateLimitOption int32
+
+const (
+	// X-RateLimit headers is not specified. When this enum is used at descriptor level,
+	// the behavior is to inherit the setting from the filter.
+	RateLimit_UNSPECIFIED RateLimit_XRateLimitOption = 0
+	// X-RateLimit headers disabled.
+	RateLimit_OFF RateLimit_XRateLimitOption = 1
+	// Use `draft RFC Version 03 <https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html>`_
+	// where 3 headers will be added:
+	//
+	//   - “X-RateLimit-Limit“ - indicates the request-quota associated to the
+	//     client in the current time-window followed by the description of the
+	//     quota policy. The value is returned by the maximum tokens of the token bucket.
+	//   - “X-RateLimit-Remaining“ - indicates the remaining requests in the
+	//     current time-window. The value is returned by the remaining tokens in the token bucket.
+	//   - “X-RateLimit-Reset“ - indicates the number of seconds until reset of
+	//     the current time-window. The value is returned by the remaining fill interval of the token bucket.
+	RateLimit_DRAFT_VERSION_03 RateLimit_XRateLimitOption = 2
+)
+
+// Enum value maps for RateLimit_XRateLimitOption.
+var (
+	RateLimit_XRateLimitOption_name = map[int32]string{
+		0: "UNSPECIFIED",
+		1: "OFF",
+		2: "DRAFT_VERSION_03",
+	}
+	RateLimit_XRateLimitOption_value = map[string]int32{
+		"UNSPECIFIED":      0,
+		"OFF":              1,
+		"DRAFT_VERSION_03": 2,
+	}
+)
+
+func (x RateLimit_XRateLimitOption) Enum() *RateLimit_XRateLimitOption {
+	p := new(RateLimit_XRateLimitOption)
+	*p = x
+	return p
+}
+
+func (x RateLimit_XRateLimitOption) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RateLimit_XRateLimitOption) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_config_route_v3_route_components_proto_enumTypes[5].Descriptor()
+}
+
+func (RateLimit_XRateLimitOption) Type() protoreflect.EnumType {
+	return &file_envoy_config_route_v3_route_components_proto_enumTypes[5]
+}
+
+func (x RateLimit_XRateLimitOption) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RateLimit_XRateLimitOption.Descriptor instead.
+func (RateLimit_XRateLimitOption) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_config_route_v3_route_components_proto_rawDescGZIP(), []int{17, 0}
+}
+
 type RateLimit_Action_MetaData_Source int32
 
 const (
@@ -328,11 +390,11 @@ func (x RateLimit_Action_MetaData_Source) String() string {
 }
 
 func (RateLimit_Action_MetaData_Source) Descriptor() protoreflect.EnumDescriptor {
-	return file_envoy_config_route_v3_route_components_proto_enumTypes[5].Descriptor()
+	return file_envoy_config_route_v3_route_components_proto_enumTypes[6].Descriptor()
 }
 
 func (RateLimit_Action_MetaData_Source) Type() protoreflect.EnumType {
-	return &file_envoy_config_route_v3_route_components_proto_enumTypes[5]
+	return &file_envoy_config_route_v3_route_components_proto_enumTypes[6]
 }
 
 func (x RateLimit_Action_MetaData_Source) Number() protoreflect.EnumNumber {
@@ -3529,7 +3591,7 @@ func (x *VirtualCluster) GetName() string {
 
 // Global rate limiting :ref:`architecture overview <arch_overview_global_rate_limit>`.
 // Also applies to Local rate limiting :ref:`using descriptors <config_http_filters_local_rate_limit_descriptors>`.
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type RateLimit struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Refers to the stage set in the filter. The rate limit configuration only
@@ -3597,8 +3659,10 @@ type RateLimit struct {
 	//
 	// Currently, this is only supported by the HTTP global rate filter.
 	ApplyOnStreamDone bool `protobuf:"varint,6,opt,name=apply_on_stream_done,json=applyOnStreamDone,proto3" json:"apply_on_stream_done,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Descriptor level X-RateLimit headers options which may override the filter level setting.
+	XRatelimitOption RateLimit_XRateLimitOption `protobuf:"varint,7,opt,name=x_ratelimit_option,json=xRatelimitOption,proto3,enum=envoy.config.route.v3.RateLimit_XRateLimitOption" json:"x_ratelimit_option,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *RateLimit) Reset() {
@@ -3671,6 +3735,13 @@ func (x *RateLimit) GetApplyOnStreamDone() bool {
 		return x.ApplyOnStreamDone
 	}
 	return false
+}
+
+func (x *RateLimit) GetXRatelimitOption() RateLimit_XRateLimitOption {
+	if x != nil {
+		return x.XRatelimitOption
+	}
+	return RateLimit_UNSPECIFIED
 }
 
 // .. attention::
@@ -7652,7 +7723,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x0eVirtualCluster\x12>\n" +
 	"\aheaders\x18\x04 \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\aheaders\x12\x1b\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name:(\x9aň\x1e#\n" +
-	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\xbb!\n" +
+	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\xe0\"\n" +
 	"\tRateLimit\x12;\n" +
 	"\x05stage\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02\x18\n" +
 	"R\x05stage\x12\x1f\n" +
@@ -7662,7 +7733,8 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x05limit\x18\x04 \x01(\v2).envoy.config.route.v3.RateLimit.OverrideR\x05limit\x12L\n" +
 	"\vhits_addend\x18\x05 \x01(\v2+.envoy.config.route.v3.RateLimit.HitsAddendR\n" +
 	"hitsAddend\x12/\n" +
-	"\x14apply_on_stream_done\x18\x06 \x01(\bR\x11applyOnStreamDone\x1a\xaf\x1b\n" +
+	"\x14apply_on_stream_done\x18\x06 \x01(\bR\x11applyOnStreamDone\x12_\n" +
+	"\x12x_ratelimit_option\x18\a \x01(\x0e21.envoy.config.route.v3.RateLimit.XRateLimitOptionR\x10xRatelimitOption\x1a\xaf\x1b\n" +
 	"\x06Action\x12^\n" +
 	"\x0esource_cluster\x18\x01 \x01(\v25.envoy.config.route.v3.RateLimit.Action.SourceClusterH\x00R\rsourceCluster\x12m\n" +
 	"\x13destination_cluster\x18\x02 \x01(\v2:.envoy.config.route.v3.RateLimit.Action.DestinationClusterH\x00R\x12destinationCluster\x12a\n" +
@@ -7740,7 +7812,11 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\n" +
 	"HitsAddend\x12A\n" +
 	"\x06number\x18\x01 \x01(\v2\x1c.google.protobuf.UInt64ValueB\v\xfaB\b2\x06\x18\x80\x94\xeb\xdc\x03R\x06number\x12&\n" +
-	"\x06format\x18\x02 \x01(\tB\x0e\xfaB\vr\t:\x01%B\x01%\xd0\x01\x01R\x06format:#\x9aň\x1e\x1e\n" +
+	"\x06format\x18\x02 \x01(\tB\x0e\xfaB\vr\t:\x01%B\x01%\xd0\x01\x01R\x06format\"B\n" +
+	"\x10XRateLimitOption\x12\x0f\n" +
+	"\vUNSPECIFIED\x10\x00\x12\a\n" +
+	"\x03OFF\x10\x01\x12\x14\n" +
+	"\x10DRAFT_VERSION_03\x10\x02:#\x9aň\x1e\x1e\n" +
 	"\x1cenvoy.api.v2.route.RateLimit\"\xe6\x05\n" +
 	"\rHeaderMatcher\x12!\n" +
 	"\x04name\x18\x01 \x01(\tB\r\xfaB\n" +
@@ -7799,7 +7875,7 @@ func file_envoy_config_route_v3_route_components_proto_rawDescGZIP() []byte {
 	return file_envoy_config_route_v3_route_components_proto_rawDescData
 }
 
-var file_envoy_config_route_v3_route_components_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_envoy_config_route_v3_route_components_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_envoy_config_route_v3_route_components_proto_msgTypes = make([]protoimpl.MessageInfo, 61)
 var file_envoy_config_route_v3_route_components_proto_goTypes = []any{
 	(VirtualHost_TlsRequirementType)(0),                 // 0: envoy.config.route.v3.VirtualHost.TlsRequirementType
@@ -7807,273 +7883,275 @@ var file_envoy_config_route_v3_route_components_proto_goTypes = []any{
 	(RouteAction_InternalRedirectAction)(0),             // 2: envoy.config.route.v3.RouteAction.InternalRedirectAction
 	(RetryPolicy_ResetHeaderFormat)(0),                  // 3: envoy.config.route.v3.RetryPolicy.ResetHeaderFormat
 	(RedirectAction_RedirectResponseCode)(0),            // 4: envoy.config.route.v3.RedirectAction.RedirectResponseCode
-	(RateLimit_Action_MetaData_Source)(0),               // 5: envoy.config.route.v3.RateLimit.Action.MetaData.Source
-	(*VirtualHost)(nil),                                 // 6: envoy.config.route.v3.VirtualHost
-	(*FilterAction)(nil),                                // 7: envoy.config.route.v3.FilterAction
-	(*RouteList)(nil),                                   // 8: envoy.config.route.v3.RouteList
-	(*Route)(nil),                                       // 9: envoy.config.route.v3.Route
-	(*WeightedCluster)(nil),                             // 10: envoy.config.route.v3.WeightedCluster
-	(*ClusterSpecifierPlugin)(nil),                      // 11: envoy.config.route.v3.ClusterSpecifierPlugin
-	(*RouteMatch)(nil),                                  // 12: envoy.config.route.v3.RouteMatch
-	(*CorsPolicy)(nil),                                  // 13: envoy.config.route.v3.CorsPolicy
-	(*RouteAction)(nil),                                 // 14: envoy.config.route.v3.RouteAction
-	(*RetryPolicy)(nil),                                 // 15: envoy.config.route.v3.RetryPolicy
-	(*HedgePolicy)(nil),                                 // 16: envoy.config.route.v3.HedgePolicy
-	(*RedirectAction)(nil),                              // 17: envoy.config.route.v3.RedirectAction
-	(*DirectResponseAction)(nil),                        // 18: envoy.config.route.v3.DirectResponseAction
-	(*NonForwardingAction)(nil),                         // 19: envoy.config.route.v3.NonForwardingAction
-	(*Decorator)(nil),                                   // 20: envoy.config.route.v3.Decorator
-	(*Tracing)(nil),                                     // 21: envoy.config.route.v3.Tracing
-	(*VirtualCluster)(nil),                              // 22: envoy.config.route.v3.VirtualCluster
-	(*RateLimit)(nil),                                   // 23: envoy.config.route.v3.RateLimit
-	(*HeaderMatcher)(nil),                               // 24: envoy.config.route.v3.HeaderMatcher
-	(*QueryParameterMatcher)(nil),                       // 25: envoy.config.route.v3.QueryParameterMatcher
-	(*CookieMatcher)(nil),                               // 26: envoy.config.route.v3.CookieMatcher
-	(*InternalRedirectPolicy)(nil),                      // 27: envoy.config.route.v3.InternalRedirectPolicy
-	(*FilterConfig)(nil),                                // 28: envoy.config.route.v3.FilterConfig
-	nil,                                                 // 29: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
-	nil,                                                 // 30: envoy.config.route.v3.Route.TypedPerFilterConfigEntry
-	(*WeightedCluster_ClusterWeight)(nil),               // 31: envoy.config.route.v3.WeightedCluster.ClusterWeight
-	nil,                                                 // 32: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
-	(*RouteMatch_GrpcRouteMatchOptions)(nil),            // 33: envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
-	(*RouteMatch_TlsContextMatchOptions)(nil),           // 34: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
-	(*RouteMatch_ConnectMatcher)(nil),                   // 35: envoy.config.route.v3.RouteMatch.ConnectMatcher
-	(*RouteAction_RequestMirrorPolicy)(nil),             // 36: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	(*RouteAction_HashPolicy)(nil),                      // 37: envoy.config.route.v3.RouteAction.HashPolicy
-	(*RouteAction_UpgradeConfig)(nil),                   // 38: envoy.config.route.v3.RouteAction.UpgradeConfig
-	(*RouteAction_MaxStreamDuration)(nil),               // 39: envoy.config.route.v3.RouteAction.MaxStreamDuration
-	(*RouteAction_HashPolicy_Header)(nil),               // 40: envoy.config.route.v3.RouteAction.HashPolicy.Header
-	(*RouteAction_HashPolicy_CookieAttribute)(nil),      // 41: envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
-	(*RouteAction_HashPolicy_Cookie)(nil),               // 42: envoy.config.route.v3.RouteAction.HashPolicy.Cookie
-	(*RouteAction_HashPolicy_ConnectionProperties)(nil), // 43: envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
-	(*RouteAction_HashPolicy_QueryParameter)(nil),       // 44: envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
-	(*RouteAction_HashPolicy_FilterState)(nil),          // 45: envoy.config.route.v3.RouteAction.HashPolicy.FilterState
-	(*RouteAction_UpgradeConfig_ConnectConfig)(nil),     // 46: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
-	(*RetryPolicy_RetryPriority)(nil),                   // 47: envoy.config.route.v3.RetryPolicy.RetryPriority
-	(*RetryPolicy_RetryHostPredicate)(nil),              // 48: envoy.config.route.v3.RetryPolicy.RetryHostPredicate
-	(*RetryPolicy_RetryBackOff)(nil),                    // 49: envoy.config.route.v3.RetryPolicy.RetryBackOff
-	(*RetryPolicy_ResetHeader)(nil),                     // 50: envoy.config.route.v3.RetryPolicy.ResetHeader
-	(*RetryPolicy_RateLimitedRetryBackOff)(nil),         // 51: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
-	(*RateLimit_Action)(nil),                            // 52: envoy.config.route.v3.RateLimit.Action
-	(*RateLimit_Override)(nil),                          // 53: envoy.config.route.v3.RateLimit.Override
-	(*RateLimit_HitsAddend)(nil),                        // 54: envoy.config.route.v3.RateLimit.HitsAddend
-	(*RateLimit_Action_SourceCluster)(nil),              // 55: envoy.config.route.v3.RateLimit.Action.SourceCluster
-	(*RateLimit_Action_DestinationCluster)(nil),         // 56: envoy.config.route.v3.RateLimit.Action.DestinationCluster
-	(*RateLimit_Action_RequestHeaders)(nil),             // 57: envoy.config.route.v3.RateLimit.Action.RequestHeaders
-	(*RateLimit_Action_QueryParameters)(nil),            // 58: envoy.config.route.v3.RateLimit.Action.QueryParameters
-	(*RateLimit_Action_RemoteAddress)(nil),              // 59: envoy.config.route.v3.RateLimit.Action.RemoteAddress
-	(*RateLimit_Action_MaskedRemoteAddress)(nil),        // 60: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
-	(*RateLimit_Action_GenericKey)(nil),                 // 61: envoy.config.route.v3.RateLimit.Action.GenericKey
-	(*RateLimit_Action_HeaderValueMatch)(nil),           // 62: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
-	(*RateLimit_Action_DynamicMetaData)(nil),            // 63: envoy.config.route.v3.RateLimit.Action.DynamicMetaData
-	(*RateLimit_Action_MetaData)(nil),                   // 64: envoy.config.route.v3.RateLimit.Action.MetaData
-	(*RateLimit_Action_QueryParameterValueMatch)(nil),   // 65: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
-	(*RateLimit_Override_DynamicMetadata)(nil),          // 66: envoy.config.route.v3.RateLimit.Override.DynamicMetadata
-	(*v3.Matcher)(nil),                                  // 67: xds.type.matcher.v3.Matcher
-	(*v31.HeaderValueOption)(nil),                       // 68: envoy.config.core.v3.HeaderValueOption
-	(*anypb.Any)(nil),                                   // 69: google.protobuf.Any
-	(*wrapperspb.UInt32Value)(nil),                      // 70: google.protobuf.UInt32Value
-	(*wrapperspb.UInt64Value)(nil),                      // 71: google.protobuf.UInt64Value
-	(*v31.Metadata)(nil),                                // 72: envoy.config.core.v3.Metadata
-	(*wrapperspb.BoolValue)(nil),                        // 73: google.protobuf.BoolValue
-	(*v31.TypedExtensionConfig)(nil),                    // 74: envoy.config.core.v3.TypedExtensionConfig
-	(*v32.RegexMatcher)(nil),                            // 75: envoy.type.matcher.v3.RegexMatcher
-	(*v31.RuntimeFractionalPercent)(nil),                // 76: envoy.config.core.v3.RuntimeFractionalPercent
-	(*v32.MetadataMatcher)(nil),                         // 77: envoy.type.matcher.v3.MetadataMatcher
-	(*v32.FilterStateMatcher)(nil),                      // 78: envoy.type.matcher.v3.FilterStateMatcher
-	(*v32.StringMatcher)(nil),                           // 79: envoy.type.matcher.v3.StringMatcher
-	(*v32.RegexMatchAndSubstitute)(nil),                 // 80: envoy.type.matcher.v3.RegexMatchAndSubstitute
-	(*durationpb.Duration)(nil),                         // 81: google.protobuf.Duration
-	(v31.RoutingPriority)(0),                            // 82: envoy.config.core.v3.RoutingPriority
-	(*v33.FractionalPercent)(nil),                       // 83: envoy.type.v3.FractionalPercent
-	(*v31.DataSource)(nil),                              // 84: envoy.config.core.v3.DataSource
-	(*v31.SubstitutionFormatString)(nil),                // 85: envoy.config.core.v3.SubstitutionFormatString
-	(*v34.CustomTag)(nil),                               // 86: envoy.type.tracing.v3.CustomTag
-	(*v33.Int64Range)(nil),                              // 87: envoy.type.v3.Int64Range
-	(*v35.HeaderMutation)(nil),                          // 88: envoy.config.common.mutation_rules.v3.HeaderMutation
-	(*v31.ProxyProtocolConfig)(nil),                     // 89: envoy.config.core.v3.ProxyProtocolConfig
-	(*v36.MetadataKey)(nil),                             // 90: envoy.type.metadata.v3.MetadataKey
+	(RateLimit_XRateLimitOption)(0),                     // 5: envoy.config.route.v3.RateLimit.XRateLimitOption
+	(RateLimit_Action_MetaData_Source)(0),               // 6: envoy.config.route.v3.RateLimit.Action.MetaData.Source
+	(*VirtualHost)(nil),                                 // 7: envoy.config.route.v3.VirtualHost
+	(*FilterAction)(nil),                                // 8: envoy.config.route.v3.FilterAction
+	(*RouteList)(nil),                                   // 9: envoy.config.route.v3.RouteList
+	(*Route)(nil),                                       // 10: envoy.config.route.v3.Route
+	(*WeightedCluster)(nil),                             // 11: envoy.config.route.v3.WeightedCluster
+	(*ClusterSpecifierPlugin)(nil),                      // 12: envoy.config.route.v3.ClusterSpecifierPlugin
+	(*RouteMatch)(nil),                                  // 13: envoy.config.route.v3.RouteMatch
+	(*CorsPolicy)(nil),                                  // 14: envoy.config.route.v3.CorsPolicy
+	(*RouteAction)(nil),                                 // 15: envoy.config.route.v3.RouteAction
+	(*RetryPolicy)(nil),                                 // 16: envoy.config.route.v3.RetryPolicy
+	(*HedgePolicy)(nil),                                 // 17: envoy.config.route.v3.HedgePolicy
+	(*RedirectAction)(nil),                              // 18: envoy.config.route.v3.RedirectAction
+	(*DirectResponseAction)(nil),                        // 19: envoy.config.route.v3.DirectResponseAction
+	(*NonForwardingAction)(nil),                         // 20: envoy.config.route.v3.NonForwardingAction
+	(*Decorator)(nil),                                   // 21: envoy.config.route.v3.Decorator
+	(*Tracing)(nil),                                     // 22: envoy.config.route.v3.Tracing
+	(*VirtualCluster)(nil),                              // 23: envoy.config.route.v3.VirtualCluster
+	(*RateLimit)(nil),                                   // 24: envoy.config.route.v3.RateLimit
+	(*HeaderMatcher)(nil),                               // 25: envoy.config.route.v3.HeaderMatcher
+	(*QueryParameterMatcher)(nil),                       // 26: envoy.config.route.v3.QueryParameterMatcher
+	(*CookieMatcher)(nil),                               // 27: envoy.config.route.v3.CookieMatcher
+	(*InternalRedirectPolicy)(nil),                      // 28: envoy.config.route.v3.InternalRedirectPolicy
+	(*FilterConfig)(nil),                                // 29: envoy.config.route.v3.FilterConfig
+	nil,                                                 // 30: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
+	nil,                                                 // 31: envoy.config.route.v3.Route.TypedPerFilterConfigEntry
+	(*WeightedCluster_ClusterWeight)(nil),               // 32: envoy.config.route.v3.WeightedCluster.ClusterWeight
+	nil,                                                 // 33: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
+	(*RouteMatch_GrpcRouteMatchOptions)(nil),            // 34: envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
+	(*RouteMatch_TlsContextMatchOptions)(nil),           // 35: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
+	(*RouteMatch_ConnectMatcher)(nil),                   // 36: envoy.config.route.v3.RouteMatch.ConnectMatcher
+	(*RouteAction_RequestMirrorPolicy)(nil),             // 37: envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	(*RouteAction_HashPolicy)(nil),                      // 38: envoy.config.route.v3.RouteAction.HashPolicy
+	(*RouteAction_UpgradeConfig)(nil),                   // 39: envoy.config.route.v3.RouteAction.UpgradeConfig
+	(*RouteAction_MaxStreamDuration)(nil),               // 40: envoy.config.route.v3.RouteAction.MaxStreamDuration
+	(*RouteAction_HashPolicy_Header)(nil),               // 41: envoy.config.route.v3.RouteAction.HashPolicy.Header
+	(*RouteAction_HashPolicy_CookieAttribute)(nil),      // 42: envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
+	(*RouteAction_HashPolicy_Cookie)(nil),               // 43: envoy.config.route.v3.RouteAction.HashPolicy.Cookie
+	(*RouteAction_HashPolicy_ConnectionProperties)(nil), // 44: envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
+	(*RouteAction_HashPolicy_QueryParameter)(nil),       // 45: envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
+	(*RouteAction_HashPolicy_FilterState)(nil),          // 46: envoy.config.route.v3.RouteAction.HashPolicy.FilterState
+	(*RouteAction_UpgradeConfig_ConnectConfig)(nil),     // 47: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
+	(*RetryPolicy_RetryPriority)(nil),                   // 48: envoy.config.route.v3.RetryPolicy.RetryPriority
+	(*RetryPolicy_RetryHostPredicate)(nil),              // 49: envoy.config.route.v3.RetryPolicy.RetryHostPredicate
+	(*RetryPolicy_RetryBackOff)(nil),                    // 50: envoy.config.route.v3.RetryPolicy.RetryBackOff
+	(*RetryPolicy_ResetHeader)(nil),                     // 51: envoy.config.route.v3.RetryPolicy.ResetHeader
+	(*RetryPolicy_RateLimitedRetryBackOff)(nil),         // 52: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
+	(*RateLimit_Action)(nil),                            // 53: envoy.config.route.v3.RateLimit.Action
+	(*RateLimit_Override)(nil),                          // 54: envoy.config.route.v3.RateLimit.Override
+	(*RateLimit_HitsAddend)(nil),                        // 55: envoy.config.route.v3.RateLimit.HitsAddend
+	(*RateLimit_Action_SourceCluster)(nil),              // 56: envoy.config.route.v3.RateLimit.Action.SourceCluster
+	(*RateLimit_Action_DestinationCluster)(nil),         // 57: envoy.config.route.v3.RateLimit.Action.DestinationCluster
+	(*RateLimit_Action_RequestHeaders)(nil),             // 58: envoy.config.route.v3.RateLimit.Action.RequestHeaders
+	(*RateLimit_Action_QueryParameters)(nil),            // 59: envoy.config.route.v3.RateLimit.Action.QueryParameters
+	(*RateLimit_Action_RemoteAddress)(nil),              // 60: envoy.config.route.v3.RateLimit.Action.RemoteAddress
+	(*RateLimit_Action_MaskedRemoteAddress)(nil),        // 61: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
+	(*RateLimit_Action_GenericKey)(nil),                 // 62: envoy.config.route.v3.RateLimit.Action.GenericKey
+	(*RateLimit_Action_HeaderValueMatch)(nil),           // 63: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
+	(*RateLimit_Action_DynamicMetaData)(nil),            // 64: envoy.config.route.v3.RateLimit.Action.DynamicMetaData
+	(*RateLimit_Action_MetaData)(nil),                   // 65: envoy.config.route.v3.RateLimit.Action.MetaData
+	(*RateLimit_Action_QueryParameterValueMatch)(nil),   // 66: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
+	(*RateLimit_Override_DynamicMetadata)(nil),          // 67: envoy.config.route.v3.RateLimit.Override.DynamicMetadata
+	(*v3.Matcher)(nil),                                  // 68: xds.type.matcher.v3.Matcher
+	(*v31.HeaderValueOption)(nil),                       // 69: envoy.config.core.v3.HeaderValueOption
+	(*anypb.Any)(nil),                                   // 70: google.protobuf.Any
+	(*wrapperspb.UInt32Value)(nil),                      // 71: google.protobuf.UInt32Value
+	(*wrapperspb.UInt64Value)(nil),                      // 72: google.protobuf.UInt64Value
+	(*v31.Metadata)(nil),                                // 73: envoy.config.core.v3.Metadata
+	(*wrapperspb.BoolValue)(nil),                        // 74: google.protobuf.BoolValue
+	(*v31.TypedExtensionConfig)(nil),                    // 75: envoy.config.core.v3.TypedExtensionConfig
+	(*v32.RegexMatcher)(nil),                            // 76: envoy.type.matcher.v3.RegexMatcher
+	(*v31.RuntimeFractionalPercent)(nil),                // 77: envoy.config.core.v3.RuntimeFractionalPercent
+	(*v32.MetadataMatcher)(nil),                         // 78: envoy.type.matcher.v3.MetadataMatcher
+	(*v32.FilterStateMatcher)(nil),                      // 79: envoy.type.matcher.v3.FilterStateMatcher
+	(*v32.StringMatcher)(nil),                           // 80: envoy.type.matcher.v3.StringMatcher
+	(*v32.RegexMatchAndSubstitute)(nil),                 // 81: envoy.type.matcher.v3.RegexMatchAndSubstitute
+	(*durationpb.Duration)(nil),                         // 82: google.protobuf.Duration
+	(v31.RoutingPriority)(0),                            // 83: envoy.config.core.v3.RoutingPriority
+	(*v33.FractionalPercent)(nil),                       // 84: envoy.type.v3.FractionalPercent
+	(*v31.DataSource)(nil),                              // 85: envoy.config.core.v3.DataSource
+	(*v31.SubstitutionFormatString)(nil),                // 86: envoy.config.core.v3.SubstitutionFormatString
+	(*v34.CustomTag)(nil),                               // 87: envoy.type.tracing.v3.CustomTag
+	(*v33.Int64Range)(nil),                              // 88: envoy.type.v3.Int64Range
+	(*v35.HeaderMutation)(nil),                          // 89: envoy.config.common.mutation_rules.v3.HeaderMutation
+	(*v31.ProxyProtocolConfig)(nil),                     // 90: envoy.config.core.v3.ProxyProtocolConfig
+	(*v36.MetadataKey)(nil),                             // 91: envoy.type.metadata.v3.MetadataKey
 }
 var file_envoy_config_route_v3_route_components_proto_depIdxs = []int32{
-	9,   // 0: envoy.config.route.v3.VirtualHost.routes:type_name -> envoy.config.route.v3.Route
-	67,  // 1: envoy.config.route.v3.VirtualHost.matcher:type_name -> xds.type.matcher.v3.Matcher
+	10,  // 0: envoy.config.route.v3.VirtualHost.routes:type_name -> envoy.config.route.v3.Route
+	68,  // 1: envoy.config.route.v3.VirtualHost.matcher:type_name -> xds.type.matcher.v3.Matcher
 	0,   // 2: envoy.config.route.v3.VirtualHost.require_tls:type_name -> envoy.config.route.v3.VirtualHost.TlsRequirementType
-	22,  // 3: envoy.config.route.v3.VirtualHost.virtual_clusters:type_name -> envoy.config.route.v3.VirtualCluster
-	23,  // 4: envoy.config.route.v3.VirtualHost.rate_limits:type_name -> envoy.config.route.v3.RateLimit
-	68,  // 5: envoy.config.route.v3.VirtualHost.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	68,  // 6: envoy.config.route.v3.VirtualHost.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	13,  // 7: envoy.config.route.v3.VirtualHost.cors:type_name -> envoy.config.route.v3.CorsPolicy
-	29,  // 8: envoy.config.route.v3.VirtualHost.typed_per_filter_config:type_name -> envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
-	15,  // 9: envoy.config.route.v3.VirtualHost.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
-	69,  // 10: envoy.config.route.v3.VirtualHost.retry_policy_typed_config:type_name -> google.protobuf.Any
-	16,  // 11: envoy.config.route.v3.VirtualHost.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
-	70,  // 12: envoy.config.route.v3.VirtualHost.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
-	71,  // 13: envoy.config.route.v3.VirtualHost.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
-	36,  // 14: envoy.config.route.v3.VirtualHost.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	72,  // 15: envoy.config.route.v3.VirtualHost.metadata:type_name -> envoy.config.core.v3.Metadata
-	69,  // 16: envoy.config.route.v3.FilterAction.action:type_name -> google.protobuf.Any
-	9,   // 17: envoy.config.route.v3.RouteList.routes:type_name -> envoy.config.route.v3.Route
-	12,  // 18: envoy.config.route.v3.Route.match:type_name -> envoy.config.route.v3.RouteMatch
-	14,  // 19: envoy.config.route.v3.Route.route:type_name -> envoy.config.route.v3.RouteAction
-	17,  // 20: envoy.config.route.v3.Route.redirect:type_name -> envoy.config.route.v3.RedirectAction
-	18,  // 21: envoy.config.route.v3.Route.direct_response:type_name -> envoy.config.route.v3.DirectResponseAction
-	7,   // 22: envoy.config.route.v3.Route.filter_action:type_name -> envoy.config.route.v3.FilterAction
-	19,  // 23: envoy.config.route.v3.Route.non_forwarding_action:type_name -> envoy.config.route.v3.NonForwardingAction
-	72,  // 24: envoy.config.route.v3.Route.metadata:type_name -> envoy.config.core.v3.Metadata
-	20,  // 25: envoy.config.route.v3.Route.decorator:type_name -> envoy.config.route.v3.Decorator
-	30,  // 26: envoy.config.route.v3.Route.typed_per_filter_config:type_name -> envoy.config.route.v3.Route.TypedPerFilterConfigEntry
-	68,  // 27: envoy.config.route.v3.Route.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	68,  // 28: envoy.config.route.v3.Route.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	21,  // 29: envoy.config.route.v3.Route.tracing:type_name -> envoy.config.route.v3.Tracing
-	70,  // 30: envoy.config.route.v3.Route.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
-	71,  // 31: envoy.config.route.v3.Route.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
-	31,  // 32: envoy.config.route.v3.WeightedCluster.clusters:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight
-	70,  // 33: envoy.config.route.v3.WeightedCluster.total_weight:type_name -> google.protobuf.UInt32Value
-	73,  // 34: envoy.config.route.v3.WeightedCluster.use_hash_policy:type_name -> google.protobuf.BoolValue
-	74,  // 35: envoy.config.route.v3.ClusterSpecifierPlugin.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	75,  // 36: envoy.config.route.v3.RouteMatch.safe_regex:type_name -> envoy.type.matcher.v3.RegexMatcher
-	35,  // 37: envoy.config.route.v3.RouteMatch.connect_matcher:type_name -> envoy.config.route.v3.RouteMatch.ConnectMatcher
-	74,  // 38: envoy.config.route.v3.RouteMatch.path_match_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	73,  // 39: envoy.config.route.v3.RouteMatch.case_sensitive:type_name -> google.protobuf.BoolValue
-	76,  // 40: envoy.config.route.v3.RouteMatch.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	24,  // 41: envoy.config.route.v3.RouteMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	25,  // 42: envoy.config.route.v3.RouteMatch.query_parameters:type_name -> envoy.config.route.v3.QueryParameterMatcher
-	26,  // 43: envoy.config.route.v3.RouteMatch.cookies:type_name -> envoy.config.route.v3.CookieMatcher
-	33,  // 44: envoy.config.route.v3.RouteMatch.grpc:type_name -> envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
-	34,  // 45: envoy.config.route.v3.RouteMatch.tls_context:type_name -> envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
-	77,  // 46: envoy.config.route.v3.RouteMatch.dynamic_metadata:type_name -> envoy.type.matcher.v3.MetadataMatcher
-	78,  // 47: envoy.config.route.v3.RouteMatch.filter_state:type_name -> envoy.type.matcher.v3.FilterStateMatcher
-	79,  // 48: envoy.config.route.v3.CorsPolicy.allow_origin_string_match:type_name -> envoy.type.matcher.v3.StringMatcher
-	73,  // 49: envoy.config.route.v3.CorsPolicy.allow_credentials:type_name -> google.protobuf.BoolValue
-	76,  // 50: envoy.config.route.v3.CorsPolicy.filter_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	76,  // 51: envoy.config.route.v3.CorsPolicy.shadow_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	73,  // 52: envoy.config.route.v3.CorsPolicy.allow_private_network_access:type_name -> google.protobuf.BoolValue
-	73,  // 53: envoy.config.route.v3.CorsPolicy.forward_not_matching_preflights:type_name -> google.protobuf.BoolValue
-	10,  // 54: envoy.config.route.v3.RouteAction.weighted_clusters:type_name -> envoy.config.route.v3.WeightedCluster
-	11,  // 55: envoy.config.route.v3.RouteAction.inline_cluster_specifier_plugin:type_name -> envoy.config.route.v3.ClusterSpecifierPlugin
+	23,  // 3: envoy.config.route.v3.VirtualHost.virtual_clusters:type_name -> envoy.config.route.v3.VirtualCluster
+	24,  // 4: envoy.config.route.v3.VirtualHost.rate_limits:type_name -> envoy.config.route.v3.RateLimit
+	69,  // 5: envoy.config.route.v3.VirtualHost.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	69,  // 6: envoy.config.route.v3.VirtualHost.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	14,  // 7: envoy.config.route.v3.VirtualHost.cors:type_name -> envoy.config.route.v3.CorsPolicy
+	30,  // 8: envoy.config.route.v3.VirtualHost.typed_per_filter_config:type_name -> envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry
+	16,  // 9: envoy.config.route.v3.VirtualHost.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
+	70,  // 10: envoy.config.route.v3.VirtualHost.retry_policy_typed_config:type_name -> google.protobuf.Any
+	17,  // 11: envoy.config.route.v3.VirtualHost.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
+	71,  // 12: envoy.config.route.v3.VirtualHost.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	72,  // 13: envoy.config.route.v3.VirtualHost.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
+	37,  // 14: envoy.config.route.v3.VirtualHost.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	73,  // 15: envoy.config.route.v3.VirtualHost.metadata:type_name -> envoy.config.core.v3.Metadata
+	70,  // 16: envoy.config.route.v3.FilterAction.action:type_name -> google.protobuf.Any
+	10,  // 17: envoy.config.route.v3.RouteList.routes:type_name -> envoy.config.route.v3.Route
+	13,  // 18: envoy.config.route.v3.Route.match:type_name -> envoy.config.route.v3.RouteMatch
+	15,  // 19: envoy.config.route.v3.Route.route:type_name -> envoy.config.route.v3.RouteAction
+	18,  // 20: envoy.config.route.v3.Route.redirect:type_name -> envoy.config.route.v3.RedirectAction
+	19,  // 21: envoy.config.route.v3.Route.direct_response:type_name -> envoy.config.route.v3.DirectResponseAction
+	8,   // 22: envoy.config.route.v3.Route.filter_action:type_name -> envoy.config.route.v3.FilterAction
+	20,  // 23: envoy.config.route.v3.Route.non_forwarding_action:type_name -> envoy.config.route.v3.NonForwardingAction
+	73,  // 24: envoy.config.route.v3.Route.metadata:type_name -> envoy.config.core.v3.Metadata
+	21,  // 25: envoy.config.route.v3.Route.decorator:type_name -> envoy.config.route.v3.Decorator
+	31,  // 26: envoy.config.route.v3.Route.typed_per_filter_config:type_name -> envoy.config.route.v3.Route.TypedPerFilterConfigEntry
+	69,  // 27: envoy.config.route.v3.Route.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	69,  // 28: envoy.config.route.v3.Route.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	22,  // 29: envoy.config.route.v3.Route.tracing:type_name -> envoy.config.route.v3.Tracing
+	71,  // 30: envoy.config.route.v3.Route.per_request_buffer_limit_bytes:type_name -> google.protobuf.UInt32Value
+	72,  // 31: envoy.config.route.v3.Route.request_body_buffer_limit:type_name -> google.protobuf.UInt64Value
+	32,  // 32: envoy.config.route.v3.WeightedCluster.clusters:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight
+	71,  // 33: envoy.config.route.v3.WeightedCluster.total_weight:type_name -> google.protobuf.UInt32Value
+	74,  // 34: envoy.config.route.v3.WeightedCluster.use_hash_policy:type_name -> google.protobuf.BoolValue
+	75,  // 35: envoy.config.route.v3.ClusterSpecifierPlugin.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	76,  // 36: envoy.config.route.v3.RouteMatch.safe_regex:type_name -> envoy.type.matcher.v3.RegexMatcher
+	36,  // 37: envoy.config.route.v3.RouteMatch.connect_matcher:type_name -> envoy.config.route.v3.RouteMatch.ConnectMatcher
+	75,  // 38: envoy.config.route.v3.RouteMatch.path_match_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	74,  // 39: envoy.config.route.v3.RouteMatch.case_sensitive:type_name -> google.protobuf.BoolValue
+	77,  // 40: envoy.config.route.v3.RouteMatch.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	25,  // 41: envoy.config.route.v3.RouteMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	26,  // 42: envoy.config.route.v3.RouteMatch.query_parameters:type_name -> envoy.config.route.v3.QueryParameterMatcher
+	27,  // 43: envoy.config.route.v3.RouteMatch.cookies:type_name -> envoy.config.route.v3.CookieMatcher
+	34,  // 44: envoy.config.route.v3.RouteMatch.grpc:type_name -> envoy.config.route.v3.RouteMatch.GrpcRouteMatchOptions
+	35,  // 45: envoy.config.route.v3.RouteMatch.tls_context:type_name -> envoy.config.route.v3.RouteMatch.TlsContextMatchOptions
+	78,  // 46: envoy.config.route.v3.RouteMatch.dynamic_metadata:type_name -> envoy.type.matcher.v3.MetadataMatcher
+	79,  // 47: envoy.config.route.v3.RouteMatch.filter_state:type_name -> envoy.type.matcher.v3.FilterStateMatcher
+	80,  // 48: envoy.config.route.v3.CorsPolicy.allow_origin_string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	74,  // 49: envoy.config.route.v3.CorsPolicy.allow_credentials:type_name -> google.protobuf.BoolValue
+	77,  // 50: envoy.config.route.v3.CorsPolicy.filter_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	77,  // 51: envoy.config.route.v3.CorsPolicy.shadow_enabled:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	74,  // 52: envoy.config.route.v3.CorsPolicy.allow_private_network_access:type_name -> google.protobuf.BoolValue
+	74,  // 53: envoy.config.route.v3.CorsPolicy.forward_not_matching_preflights:type_name -> google.protobuf.BoolValue
+	11,  // 54: envoy.config.route.v3.RouteAction.weighted_clusters:type_name -> envoy.config.route.v3.WeightedCluster
+	12,  // 55: envoy.config.route.v3.RouteAction.inline_cluster_specifier_plugin:type_name -> envoy.config.route.v3.ClusterSpecifierPlugin
 	1,   // 56: envoy.config.route.v3.RouteAction.cluster_not_found_response_code:type_name -> envoy.config.route.v3.RouteAction.ClusterNotFoundResponseCode
-	72,  // 57: envoy.config.route.v3.RouteAction.metadata_match:type_name -> envoy.config.core.v3.Metadata
-	80,  // 58: envoy.config.route.v3.RouteAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	74,  // 59: envoy.config.route.v3.RouteAction.path_rewrite_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	73,  // 60: envoy.config.route.v3.RouteAction.auto_host_rewrite:type_name -> google.protobuf.BoolValue
-	80,  // 61: envoy.config.route.v3.RouteAction.host_rewrite_path_regex:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	81,  // 62: envoy.config.route.v3.RouteAction.timeout:type_name -> google.protobuf.Duration
-	81,  // 63: envoy.config.route.v3.RouteAction.idle_timeout:type_name -> google.protobuf.Duration
-	81,  // 64: envoy.config.route.v3.RouteAction.flush_timeout:type_name -> google.protobuf.Duration
-	74,  // 65: envoy.config.route.v3.RouteAction.early_data_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	15,  // 66: envoy.config.route.v3.RouteAction.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
-	69,  // 67: envoy.config.route.v3.RouteAction.retry_policy_typed_config:type_name -> google.protobuf.Any
-	36,  // 68: envoy.config.route.v3.RouteAction.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
-	82,  // 69: envoy.config.route.v3.RouteAction.priority:type_name -> envoy.config.core.v3.RoutingPriority
-	23,  // 70: envoy.config.route.v3.RouteAction.rate_limits:type_name -> envoy.config.route.v3.RateLimit
-	73,  // 71: envoy.config.route.v3.RouteAction.include_vh_rate_limits:type_name -> google.protobuf.BoolValue
-	37,  // 72: envoy.config.route.v3.RouteAction.hash_policy:type_name -> envoy.config.route.v3.RouteAction.HashPolicy
-	13,  // 73: envoy.config.route.v3.RouteAction.cors:type_name -> envoy.config.route.v3.CorsPolicy
-	81,  // 74: envoy.config.route.v3.RouteAction.max_grpc_timeout:type_name -> google.protobuf.Duration
-	81,  // 75: envoy.config.route.v3.RouteAction.grpc_timeout_offset:type_name -> google.protobuf.Duration
-	38,  // 76: envoy.config.route.v3.RouteAction.upgrade_configs:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig
-	27,  // 77: envoy.config.route.v3.RouteAction.internal_redirect_policy:type_name -> envoy.config.route.v3.InternalRedirectPolicy
+	73,  // 57: envoy.config.route.v3.RouteAction.metadata_match:type_name -> envoy.config.core.v3.Metadata
+	81,  // 58: envoy.config.route.v3.RouteAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	75,  // 59: envoy.config.route.v3.RouteAction.path_rewrite_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	74,  // 60: envoy.config.route.v3.RouteAction.auto_host_rewrite:type_name -> google.protobuf.BoolValue
+	81,  // 61: envoy.config.route.v3.RouteAction.host_rewrite_path_regex:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	82,  // 62: envoy.config.route.v3.RouteAction.timeout:type_name -> google.protobuf.Duration
+	82,  // 63: envoy.config.route.v3.RouteAction.idle_timeout:type_name -> google.protobuf.Duration
+	82,  // 64: envoy.config.route.v3.RouteAction.flush_timeout:type_name -> google.protobuf.Duration
+	75,  // 65: envoy.config.route.v3.RouteAction.early_data_policy:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	16,  // 66: envoy.config.route.v3.RouteAction.retry_policy:type_name -> envoy.config.route.v3.RetryPolicy
+	70,  // 67: envoy.config.route.v3.RouteAction.retry_policy_typed_config:type_name -> google.protobuf.Any
+	37,  // 68: envoy.config.route.v3.RouteAction.request_mirror_policies:type_name -> envoy.config.route.v3.RouteAction.RequestMirrorPolicy
+	83,  // 69: envoy.config.route.v3.RouteAction.priority:type_name -> envoy.config.core.v3.RoutingPriority
+	24,  // 70: envoy.config.route.v3.RouteAction.rate_limits:type_name -> envoy.config.route.v3.RateLimit
+	74,  // 71: envoy.config.route.v3.RouteAction.include_vh_rate_limits:type_name -> google.protobuf.BoolValue
+	38,  // 72: envoy.config.route.v3.RouteAction.hash_policy:type_name -> envoy.config.route.v3.RouteAction.HashPolicy
+	14,  // 73: envoy.config.route.v3.RouteAction.cors:type_name -> envoy.config.route.v3.CorsPolicy
+	82,  // 74: envoy.config.route.v3.RouteAction.max_grpc_timeout:type_name -> google.protobuf.Duration
+	82,  // 75: envoy.config.route.v3.RouteAction.grpc_timeout_offset:type_name -> google.protobuf.Duration
+	39,  // 76: envoy.config.route.v3.RouteAction.upgrade_configs:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig
+	28,  // 77: envoy.config.route.v3.RouteAction.internal_redirect_policy:type_name -> envoy.config.route.v3.InternalRedirectPolicy
 	2,   // 78: envoy.config.route.v3.RouteAction.internal_redirect_action:type_name -> envoy.config.route.v3.RouteAction.InternalRedirectAction
-	70,  // 79: envoy.config.route.v3.RouteAction.max_internal_redirects:type_name -> google.protobuf.UInt32Value
-	16,  // 80: envoy.config.route.v3.RouteAction.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
-	39,  // 81: envoy.config.route.v3.RouteAction.max_stream_duration:type_name -> envoy.config.route.v3.RouteAction.MaxStreamDuration
-	70,  // 82: envoy.config.route.v3.RetryPolicy.num_retries:type_name -> google.protobuf.UInt32Value
-	81,  // 83: envoy.config.route.v3.RetryPolicy.per_try_timeout:type_name -> google.protobuf.Duration
-	81,  // 84: envoy.config.route.v3.RetryPolicy.per_try_idle_timeout:type_name -> google.protobuf.Duration
-	47,  // 85: envoy.config.route.v3.RetryPolicy.retry_priority:type_name -> envoy.config.route.v3.RetryPolicy.RetryPriority
-	48,  // 86: envoy.config.route.v3.RetryPolicy.retry_host_predicate:type_name -> envoy.config.route.v3.RetryPolicy.RetryHostPredicate
-	74,  // 87: envoy.config.route.v3.RetryPolicy.retry_options_predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	49,  // 88: envoy.config.route.v3.RetryPolicy.retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RetryBackOff
-	51,  // 89: envoy.config.route.v3.RetryPolicy.rate_limited_retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
-	24,  // 90: envoy.config.route.v3.RetryPolicy.retriable_headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	24,  // 91: envoy.config.route.v3.RetryPolicy.retriable_request_headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	70,  // 92: envoy.config.route.v3.HedgePolicy.initial_requests:type_name -> google.protobuf.UInt32Value
-	83,  // 93: envoy.config.route.v3.HedgePolicy.additional_request_chance:type_name -> envoy.type.v3.FractionalPercent
-	80,  // 94: envoy.config.route.v3.RedirectAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	71,  // 79: envoy.config.route.v3.RouteAction.max_internal_redirects:type_name -> google.protobuf.UInt32Value
+	17,  // 80: envoy.config.route.v3.RouteAction.hedge_policy:type_name -> envoy.config.route.v3.HedgePolicy
+	40,  // 81: envoy.config.route.v3.RouteAction.max_stream_duration:type_name -> envoy.config.route.v3.RouteAction.MaxStreamDuration
+	71,  // 82: envoy.config.route.v3.RetryPolicy.num_retries:type_name -> google.protobuf.UInt32Value
+	82,  // 83: envoy.config.route.v3.RetryPolicy.per_try_timeout:type_name -> google.protobuf.Duration
+	82,  // 84: envoy.config.route.v3.RetryPolicy.per_try_idle_timeout:type_name -> google.protobuf.Duration
+	48,  // 85: envoy.config.route.v3.RetryPolicy.retry_priority:type_name -> envoy.config.route.v3.RetryPolicy.RetryPriority
+	49,  // 86: envoy.config.route.v3.RetryPolicy.retry_host_predicate:type_name -> envoy.config.route.v3.RetryPolicy.RetryHostPredicate
+	75,  // 87: envoy.config.route.v3.RetryPolicy.retry_options_predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	50,  // 88: envoy.config.route.v3.RetryPolicy.retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RetryBackOff
+	52,  // 89: envoy.config.route.v3.RetryPolicy.rate_limited_retry_back_off:type_name -> envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff
+	25,  // 90: envoy.config.route.v3.RetryPolicy.retriable_headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	25,  // 91: envoy.config.route.v3.RetryPolicy.retriable_request_headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	71,  // 92: envoy.config.route.v3.HedgePolicy.initial_requests:type_name -> google.protobuf.UInt32Value
+	84,  // 93: envoy.config.route.v3.HedgePolicy.additional_request_chance:type_name -> envoy.type.v3.FractionalPercent
+	81,  // 94: envoy.config.route.v3.RedirectAction.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
 	4,   // 95: envoy.config.route.v3.RedirectAction.response_code:type_name -> envoy.config.route.v3.RedirectAction.RedirectResponseCode
-	84,  // 96: envoy.config.route.v3.DirectResponseAction.body:type_name -> envoy.config.core.v3.DataSource
-	85,  // 97: envoy.config.route.v3.DirectResponseAction.body_format:type_name -> envoy.config.core.v3.SubstitutionFormatString
-	73,  // 98: envoy.config.route.v3.Decorator.propagate:type_name -> google.protobuf.BoolValue
-	83,  // 99: envoy.config.route.v3.Tracing.client_sampling:type_name -> envoy.type.v3.FractionalPercent
-	83,  // 100: envoy.config.route.v3.Tracing.random_sampling:type_name -> envoy.type.v3.FractionalPercent
-	83,  // 101: envoy.config.route.v3.Tracing.overall_sampling:type_name -> envoy.type.v3.FractionalPercent
-	86,  // 102: envoy.config.route.v3.Tracing.custom_tags:type_name -> envoy.type.tracing.v3.CustomTag
-	24,  // 103: envoy.config.route.v3.VirtualCluster.headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	70,  // 104: envoy.config.route.v3.RateLimit.stage:type_name -> google.protobuf.UInt32Value
-	52,  // 105: envoy.config.route.v3.RateLimit.actions:type_name -> envoy.config.route.v3.RateLimit.Action
-	53,  // 106: envoy.config.route.v3.RateLimit.limit:type_name -> envoy.config.route.v3.RateLimit.Override
-	54,  // 107: envoy.config.route.v3.RateLimit.hits_addend:type_name -> envoy.config.route.v3.RateLimit.HitsAddend
-	75,  // 108: envoy.config.route.v3.HeaderMatcher.safe_regex_match:type_name -> envoy.type.matcher.v3.RegexMatcher
-	87,  // 109: envoy.config.route.v3.HeaderMatcher.range_match:type_name -> envoy.type.v3.Int64Range
-	79,  // 110: envoy.config.route.v3.HeaderMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
-	79,  // 111: envoy.config.route.v3.QueryParameterMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
-	79,  // 112: envoy.config.route.v3.CookieMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
-	70,  // 113: envoy.config.route.v3.InternalRedirectPolicy.max_internal_redirects:type_name -> google.protobuf.UInt32Value
-	74,  // 114: envoy.config.route.v3.InternalRedirectPolicy.predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	69,  // 115: envoy.config.route.v3.FilterConfig.config:type_name -> google.protobuf.Any
-	69,  // 116: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
-	69,  // 117: envoy.config.route.v3.Route.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
-	70,  // 118: envoy.config.route.v3.WeightedCluster.ClusterWeight.weight:type_name -> google.protobuf.UInt32Value
-	72,  // 119: envoy.config.route.v3.WeightedCluster.ClusterWeight.metadata_match:type_name -> envoy.config.core.v3.Metadata
-	68,  // 120: envoy.config.route.v3.WeightedCluster.ClusterWeight.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	68,  // 121: envoy.config.route.v3.WeightedCluster.ClusterWeight.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
-	32,  // 122: envoy.config.route.v3.WeightedCluster.ClusterWeight.typed_per_filter_config:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
-	69,  // 123: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
-	73,  // 124: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.presented:type_name -> google.protobuf.BoolValue
-	73,  // 125: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.validated:type_name -> google.protobuf.BoolValue
-	76,  // 126: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
-	73,  // 127: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.trace_sampled:type_name -> google.protobuf.BoolValue
-	88,  // 128: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.request_headers_mutations:type_name -> envoy.config.common.mutation_rules.v3.HeaderMutation
-	40,  // 129: envoy.config.route.v3.RouteAction.HashPolicy.header:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Header
-	42,  // 130: envoy.config.route.v3.RouteAction.HashPolicy.cookie:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Cookie
-	43,  // 131: envoy.config.route.v3.RouteAction.HashPolicy.connection_properties:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
-	44,  // 132: envoy.config.route.v3.RouteAction.HashPolicy.query_parameter:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
-	45,  // 133: envoy.config.route.v3.RouteAction.HashPolicy.filter_state:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.FilterState
-	73,  // 134: envoy.config.route.v3.RouteAction.UpgradeConfig.enabled:type_name -> google.protobuf.BoolValue
-	46,  // 135: envoy.config.route.v3.RouteAction.UpgradeConfig.connect_config:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
-	81,  // 136: envoy.config.route.v3.RouteAction.MaxStreamDuration.max_stream_duration:type_name -> google.protobuf.Duration
-	81,  // 137: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_max:type_name -> google.protobuf.Duration
-	81,  // 138: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_offset:type_name -> google.protobuf.Duration
-	80,  // 139: envoy.config.route.v3.RouteAction.HashPolicy.Header.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
-	81,  // 140: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.ttl:type_name -> google.protobuf.Duration
-	41,  // 141: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.attributes:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
-	89,  // 142: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig.proxy_protocol_config:type_name -> envoy.config.core.v3.ProxyProtocolConfig
-	69,  // 143: envoy.config.route.v3.RetryPolicy.RetryPriority.typed_config:type_name -> google.protobuf.Any
-	69,  // 144: envoy.config.route.v3.RetryPolicy.RetryHostPredicate.typed_config:type_name -> google.protobuf.Any
-	81,  // 145: envoy.config.route.v3.RetryPolicy.RetryBackOff.base_interval:type_name -> google.protobuf.Duration
-	81,  // 146: envoy.config.route.v3.RetryPolicy.RetryBackOff.max_interval:type_name -> google.protobuf.Duration
-	3,   // 147: envoy.config.route.v3.RetryPolicy.ResetHeader.format:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeaderFormat
-	50,  // 148: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.reset_headers:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeader
-	81,  // 149: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.max_interval:type_name -> google.protobuf.Duration
-	55,  // 150: envoy.config.route.v3.RateLimit.Action.source_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.SourceCluster
-	56,  // 151: envoy.config.route.v3.RateLimit.Action.destination_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.DestinationCluster
-	57,  // 152: envoy.config.route.v3.RateLimit.Action.request_headers:type_name -> envoy.config.route.v3.RateLimit.Action.RequestHeaders
-	58,  // 153: envoy.config.route.v3.RateLimit.Action.query_parameters:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameters
-	59,  // 154: envoy.config.route.v3.RateLimit.Action.remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.RemoteAddress
-	61,  // 155: envoy.config.route.v3.RateLimit.Action.generic_key:type_name -> envoy.config.route.v3.RateLimit.Action.GenericKey
-	62,  // 156: envoy.config.route.v3.RateLimit.Action.header_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
-	63,  // 157: envoy.config.route.v3.RateLimit.Action.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Action.DynamicMetaData
-	64,  // 158: envoy.config.route.v3.RateLimit.Action.metadata:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData
-	74,  // 159: envoy.config.route.v3.RateLimit.Action.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	60,  // 160: envoy.config.route.v3.RateLimit.Action.masked_remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
-	65,  // 161: envoy.config.route.v3.RateLimit.Action.query_parameter_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
-	66,  // 162: envoy.config.route.v3.RateLimit.Override.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Override.DynamicMetadata
-	71,  // 163: envoy.config.route.v3.RateLimit.HitsAddend.number:type_name -> google.protobuf.UInt64Value
-	70,  // 164: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v4_prefix_mask_len:type_name -> google.protobuf.UInt32Value
-	70,  // 165: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v6_prefix_mask_len:type_name -> google.protobuf.UInt32Value
-	73,  // 166: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.expect_match:type_name -> google.protobuf.BoolValue
-	24,  // 167: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
-	90,  // 168: envoy.config.route.v3.RateLimit.Action.DynamicMetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
-	90,  // 169: envoy.config.route.v3.RateLimit.Action.MetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
-	5,   // 170: envoy.config.route.v3.RateLimit.Action.MetaData.source:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData.Source
-	73,  // 171: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.expect_match:type_name -> google.protobuf.BoolValue
-	25,  // 172: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.query_parameters:type_name -> envoy.config.route.v3.QueryParameterMatcher
-	90,  // 173: envoy.config.route.v3.RateLimit.Override.DynamicMetadata.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
-	174, // [174:174] is the sub-list for method output_type
-	174, // [174:174] is the sub-list for method input_type
-	174, // [174:174] is the sub-list for extension type_name
-	174, // [174:174] is the sub-list for extension extendee
-	0,   // [0:174] is the sub-list for field type_name
+	85,  // 96: envoy.config.route.v3.DirectResponseAction.body:type_name -> envoy.config.core.v3.DataSource
+	86,  // 97: envoy.config.route.v3.DirectResponseAction.body_format:type_name -> envoy.config.core.v3.SubstitutionFormatString
+	74,  // 98: envoy.config.route.v3.Decorator.propagate:type_name -> google.protobuf.BoolValue
+	84,  // 99: envoy.config.route.v3.Tracing.client_sampling:type_name -> envoy.type.v3.FractionalPercent
+	84,  // 100: envoy.config.route.v3.Tracing.random_sampling:type_name -> envoy.type.v3.FractionalPercent
+	84,  // 101: envoy.config.route.v3.Tracing.overall_sampling:type_name -> envoy.type.v3.FractionalPercent
+	87,  // 102: envoy.config.route.v3.Tracing.custom_tags:type_name -> envoy.type.tracing.v3.CustomTag
+	25,  // 103: envoy.config.route.v3.VirtualCluster.headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	71,  // 104: envoy.config.route.v3.RateLimit.stage:type_name -> google.protobuf.UInt32Value
+	53,  // 105: envoy.config.route.v3.RateLimit.actions:type_name -> envoy.config.route.v3.RateLimit.Action
+	54,  // 106: envoy.config.route.v3.RateLimit.limit:type_name -> envoy.config.route.v3.RateLimit.Override
+	55,  // 107: envoy.config.route.v3.RateLimit.hits_addend:type_name -> envoy.config.route.v3.RateLimit.HitsAddend
+	5,   // 108: envoy.config.route.v3.RateLimit.x_ratelimit_option:type_name -> envoy.config.route.v3.RateLimit.XRateLimitOption
+	76,  // 109: envoy.config.route.v3.HeaderMatcher.safe_regex_match:type_name -> envoy.type.matcher.v3.RegexMatcher
+	88,  // 110: envoy.config.route.v3.HeaderMatcher.range_match:type_name -> envoy.type.v3.Int64Range
+	80,  // 111: envoy.config.route.v3.HeaderMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	80,  // 112: envoy.config.route.v3.QueryParameterMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	80,  // 113: envoy.config.route.v3.CookieMatcher.string_match:type_name -> envoy.type.matcher.v3.StringMatcher
+	71,  // 114: envoy.config.route.v3.InternalRedirectPolicy.max_internal_redirects:type_name -> google.protobuf.UInt32Value
+	75,  // 115: envoy.config.route.v3.InternalRedirectPolicy.predicates:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	70,  // 116: envoy.config.route.v3.FilterConfig.config:type_name -> google.protobuf.Any
+	70,  // 117: envoy.config.route.v3.VirtualHost.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
+	70,  // 118: envoy.config.route.v3.Route.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
+	71,  // 119: envoy.config.route.v3.WeightedCluster.ClusterWeight.weight:type_name -> google.protobuf.UInt32Value
+	73,  // 120: envoy.config.route.v3.WeightedCluster.ClusterWeight.metadata_match:type_name -> envoy.config.core.v3.Metadata
+	69,  // 121: envoy.config.route.v3.WeightedCluster.ClusterWeight.request_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	69,  // 122: envoy.config.route.v3.WeightedCluster.ClusterWeight.response_headers_to_add:type_name -> envoy.config.core.v3.HeaderValueOption
+	33,  // 123: envoy.config.route.v3.WeightedCluster.ClusterWeight.typed_per_filter_config:type_name -> envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry
+	70,  // 124: envoy.config.route.v3.WeightedCluster.ClusterWeight.TypedPerFilterConfigEntry.value:type_name -> google.protobuf.Any
+	74,  // 125: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.presented:type_name -> google.protobuf.BoolValue
+	74,  // 126: envoy.config.route.v3.RouteMatch.TlsContextMatchOptions.validated:type_name -> google.protobuf.BoolValue
+	77,  // 127: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.runtime_fraction:type_name -> envoy.config.core.v3.RuntimeFractionalPercent
+	74,  // 128: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.trace_sampled:type_name -> google.protobuf.BoolValue
+	89,  // 129: envoy.config.route.v3.RouteAction.RequestMirrorPolicy.request_headers_mutations:type_name -> envoy.config.common.mutation_rules.v3.HeaderMutation
+	41,  // 130: envoy.config.route.v3.RouteAction.HashPolicy.header:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Header
+	43,  // 131: envoy.config.route.v3.RouteAction.HashPolicy.cookie:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.Cookie
+	44,  // 132: envoy.config.route.v3.RouteAction.HashPolicy.connection_properties:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.ConnectionProperties
+	45,  // 133: envoy.config.route.v3.RouteAction.HashPolicy.query_parameter:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.QueryParameter
+	46,  // 134: envoy.config.route.v3.RouteAction.HashPolicy.filter_state:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.FilterState
+	74,  // 135: envoy.config.route.v3.RouteAction.UpgradeConfig.enabled:type_name -> google.protobuf.BoolValue
+	47,  // 136: envoy.config.route.v3.RouteAction.UpgradeConfig.connect_config:type_name -> envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig
+	82,  // 137: envoy.config.route.v3.RouteAction.MaxStreamDuration.max_stream_duration:type_name -> google.protobuf.Duration
+	82,  // 138: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_max:type_name -> google.protobuf.Duration
+	82,  // 139: envoy.config.route.v3.RouteAction.MaxStreamDuration.grpc_timeout_header_offset:type_name -> google.protobuf.Duration
+	81,  // 140: envoy.config.route.v3.RouteAction.HashPolicy.Header.regex_rewrite:type_name -> envoy.type.matcher.v3.RegexMatchAndSubstitute
+	82,  // 141: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.ttl:type_name -> google.protobuf.Duration
+	42,  // 142: envoy.config.route.v3.RouteAction.HashPolicy.Cookie.attributes:type_name -> envoy.config.route.v3.RouteAction.HashPolicy.CookieAttribute
+	90,  // 143: envoy.config.route.v3.RouteAction.UpgradeConfig.ConnectConfig.proxy_protocol_config:type_name -> envoy.config.core.v3.ProxyProtocolConfig
+	70,  // 144: envoy.config.route.v3.RetryPolicy.RetryPriority.typed_config:type_name -> google.protobuf.Any
+	70,  // 145: envoy.config.route.v3.RetryPolicy.RetryHostPredicate.typed_config:type_name -> google.protobuf.Any
+	82,  // 146: envoy.config.route.v3.RetryPolicy.RetryBackOff.base_interval:type_name -> google.protobuf.Duration
+	82,  // 147: envoy.config.route.v3.RetryPolicy.RetryBackOff.max_interval:type_name -> google.protobuf.Duration
+	3,   // 148: envoy.config.route.v3.RetryPolicy.ResetHeader.format:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeaderFormat
+	51,  // 149: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.reset_headers:type_name -> envoy.config.route.v3.RetryPolicy.ResetHeader
+	82,  // 150: envoy.config.route.v3.RetryPolicy.RateLimitedRetryBackOff.max_interval:type_name -> google.protobuf.Duration
+	56,  // 151: envoy.config.route.v3.RateLimit.Action.source_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.SourceCluster
+	57,  // 152: envoy.config.route.v3.RateLimit.Action.destination_cluster:type_name -> envoy.config.route.v3.RateLimit.Action.DestinationCluster
+	58,  // 153: envoy.config.route.v3.RateLimit.Action.request_headers:type_name -> envoy.config.route.v3.RateLimit.Action.RequestHeaders
+	59,  // 154: envoy.config.route.v3.RateLimit.Action.query_parameters:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameters
+	60,  // 155: envoy.config.route.v3.RateLimit.Action.remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.RemoteAddress
+	62,  // 156: envoy.config.route.v3.RateLimit.Action.generic_key:type_name -> envoy.config.route.v3.RateLimit.Action.GenericKey
+	63,  // 157: envoy.config.route.v3.RateLimit.Action.header_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.HeaderValueMatch
+	64,  // 158: envoy.config.route.v3.RateLimit.Action.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Action.DynamicMetaData
+	65,  // 159: envoy.config.route.v3.RateLimit.Action.metadata:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData
+	75,  // 160: envoy.config.route.v3.RateLimit.Action.extension:type_name -> envoy.config.core.v3.TypedExtensionConfig
+	61,  // 161: envoy.config.route.v3.RateLimit.Action.masked_remote_address:type_name -> envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress
+	66,  // 162: envoy.config.route.v3.RateLimit.Action.query_parameter_value_match:type_name -> envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch
+	67,  // 163: envoy.config.route.v3.RateLimit.Override.dynamic_metadata:type_name -> envoy.config.route.v3.RateLimit.Override.DynamicMetadata
+	72,  // 164: envoy.config.route.v3.RateLimit.HitsAddend.number:type_name -> google.protobuf.UInt64Value
+	71,  // 165: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v4_prefix_mask_len:type_name -> google.protobuf.UInt32Value
+	71,  // 166: envoy.config.route.v3.RateLimit.Action.MaskedRemoteAddress.v6_prefix_mask_len:type_name -> google.protobuf.UInt32Value
+	74,  // 167: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.expect_match:type_name -> google.protobuf.BoolValue
+	25,  // 168: envoy.config.route.v3.RateLimit.Action.HeaderValueMatch.headers:type_name -> envoy.config.route.v3.HeaderMatcher
+	91,  // 169: envoy.config.route.v3.RateLimit.Action.DynamicMetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
+	91,  // 170: envoy.config.route.v3.RateLimit.Action.MetaData.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
+	6,   // 171: envoy.config.route.v3.RateLimit.Action.MetaData.source:type_name -> envoy.config.route.v3.RateLimit.Action.MetaData.Source
+	74,  // 172: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.expect_match:type_name -> google.protobuf.BoolValue
+	26,  // 173: envoy.config.route.v3.RateLimit.Action.QueryParameterValueMatch.query_parameters:type_name -> envoy.config.route.v3.QueryParameterMatcher
+	91,  // 174: envoy.config.route.v3.RateLimit.Override.DynamicMetadata.metadata_key:type_name -> envoy.type.metadata.v3.MetadataKey
+	175, // [175:175] is the sub-list for method output_type
+	175, // [175:175] is the sub-list for method input_type
+	175, // [175:175] is the sub-list for extension type_name
+	175, // [175:175] is the sub-list for extension extendee
+	0,   // [0:175] is the sub-list for field type_name
 }
 
 func init() { file_envoy_config_route_v3_route_components_proto_init() }
@@ -8174,7 +8252,7 @@ func file_envoy_config_route_v3_route_components_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_config_route_v3_route_components_proto_rawDesc), len(file_envoy_config_route_v3_route_components_proto_rawDesc)),
-			NumEnums:      6,
+			NumEnums:      7,
 			NumMessages:   61,
 			NumExtensions: 0,
 			NumServices:   0,
