@@ -65,7 +65,7 @@ type DynamicModuleConfig struct {
 	//
 	// Defaults to “false“.
 	DoNotClose bool `protobuf:"varint,3,opt,name=do_not_close,json=doNotClose,proto3" json:"do_not_close,omitempty"`
-	// If true, the dynamic module is loaded with the “RTLD_GLOBAL“ flag.
+	// If “true“, the dynamic module is loaded with the “RTLD_GLOBAL“ flag.
 	//
 	// The dynamic module is loaded with the “RTLD_LOCAL“ flag by default to avoid symbol conflicts
 	// when multiple modules are loaded. Set this to “true“ to load the module with the
@@ -84,7 +84,9 @@ type DynamicModuleConfig struct {
 	// The namespace prefix for metrics emitted by this dynamic module.
 	//
 	// This allows users to customize the prefix used for all metrics created by the dynamic module.
-	// The prefix is prepended to all metric names.
+	// The prefix is prepended to all metric names. In prometheus output, metrics will appear with
+	// the standard “envoy_“ prefix followed by this namespace. For example, if this is set to
+	// “myapp“, a counter “requests“ would appear as “envoy_myapp_requests_total“.
 	//
 	// Defaults to “dynamicmodulescustom“.
 	MetricsNamespace string `protobuf:"bytes,5,opt,name=metrics_namespace,json=metricsNamespace,proto3" json:"metrics_namespace,omitempty"`
