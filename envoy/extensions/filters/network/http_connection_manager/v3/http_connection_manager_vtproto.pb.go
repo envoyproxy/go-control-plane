@@ -52,6 +52,16 @@ func (m *HttpConnectionManager_Tracing) MarshalToSizedBufferVTStrict(dAtA []byte
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.NoContextPropagation {
+		i--
+		if m.NoContextPropagation {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x68
+	}
 	if len(m.UpstreamOperation) > 0 {
 		i -= len(m.UpstreamOperation)
 		copy(dAtA[i:], m.UpstreamOperation)
@@ -2757,6 +2767,9 @@ func (m *HttpConnectionManager_Tracing) SizeVT() (n int) {
 	l = len(m.UpstreamOperation)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.NoContextPropagation {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

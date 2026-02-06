@@ -2170,7 +2170,7 @@ func (x *EnvoyMobileHttpConnectionManager) GetConfig() *HttpConnectionManager {
 	return nil
 }
 
-// [#next-free-field: 13]
+// [#next-free-field: 14]
 type HttpConnectionManager_Tracing struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Target percentage of requests managed by this HTTP connection manager that will be force
@@ -2247,8 +2247,21 @@ type HttpConnectionManager_Tracing struct {
 	// :ref:`HTTP access logging <config_access_log>` applies here, however
 	// unknown specifier values are replaced with the empty string instead of “-“.
 	UpstreamOperation string `protobuf:"bytes,12,opt,name=upstream_operation,json=upstreamOperation,proto3" json:"upstream_operation,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// If set to true, trace context propagation is disabled, meaning that trace context headers
+	// (e.g. “traceparent“, “tracestate“ for OpenTelemetry/W3C, or “X-B3-*“ headers for Zipkin)
+	// will not be injected when proxying requests to upstreams.
+	//
+	// This is useful for scenarios where you want to report spans from a proxy (e.g., an egress
+	// gateway) while preventing trace context from being propagated to external services,
+	// effectively stopping the trace at the mesh boundary.
+	//
+	// Note that span reporting is still performed when this is set to true - only context
+	// propagation is disabled.
+	//
+	// Default: false (context propagation is enabled)
+	NoContextPropagation bool `protobuf:"varint,13,opt,name=no_context_propagation,json=noContextPropagation,proto3" json:"no_context_propagation,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *HttpConnectionManager_Tracing) Reset() {
@@ -2349,6 +2362,13 @@ func (x *HttpConnectionManager_Tracing) GetUpstreamOperation() string {
 		return x.UpstreamOperation
 	}
 	return ""
+}
+
+func (x *HttpConnectionManager_Tracing) GetNoContextPropagation() bool {
+	if x != nil {
+		return x.NoContextPropagation
+	}
+	return false
 }
 
 type HttpConnectionManager_InternalAddressConfig struct {
@@ -3254,7 +3274,7 @@ var File_envoy_extensions_filters_network_http_connection_manager_v3_http_connec
 
 const file_envoy_extensions_filters_network_http_connection_manager_v3_http_connection_manager_proto_rawDesc = "" +
 	"\n" +
-	"Yenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x12;envoy.extensions.filters.network.http_connection_manager.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a!envoy/config/route/v3/route.proto\x1a(envoy/config/route/v3/scoped_route.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a,envoy/type/http/v3/path_transformation.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\x99H\n" +
+	"Yenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x12;envoy.extensions.filters.network.http_connection_manager.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/address.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a$envoy/config/core/v3/extension.proto\x1a#envoy/config/core/v3/protocol.proto\x1a5envoy/config/core/v3/substitution_format_string.proto\x1a!envoy/config/route/v3/route.proto\x1a(envoy/config/route/v3/scoped_route.proto\x1a'envoy/config/trace/v3/http_tracer.proto\x1a,envoy/type/http/v3/path_transformation.proto\x1a&envoy/type/tracing/v3/custom_tag.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1eudpa/annotations/migrate.proto\x1a\x1fudpa/annotations/security.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xcfH\n" +
 	"\x15HttpConnectionManager\x12\x85\x01\n" +
 	"\n" +
 	"codec_type\x18\x01 \x01(\x0e2\\.envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.CodecTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\tcodecType\x12(\n" +
@@ -3320,7 +3340,7 @@ const file_envoy_extensions_filters_network_http_connection_manager_v3_http_conn
 	"\x17append_x_forwarded_port\x183 \x01(\bR\x14appendXForwardedPort\x122\n" +
 	"\x15append_local_overload\x189 \x01(\bR\x13appendLocalOverload\x12h\n" +
 	"#add_proxy_protocol_connection_state\x185 \x01(\v2\x1a.google.protobuf.BoolValueR\x1faddProxyProtocolConnectionState\x12\x81\x01\n" +
-	"\x14forward_proto_config\x18= \x01(\v2O.envoy.extensions.filters.network.http_connection_manager.v3.ForwardProtoConfigR\x12forwardProtoConfig\x1a\x8f\x06\n" +
+	"\x14forward_proto_config\x18= \x01(\v2O.envoy.extensions.filters.network.http_connection_manager.v3.ForwardProtoConfigR\x12forwardProtoConfig\x1a\xc5\x06\n" +
 	"\aTracing\x12?\n" +
 	"\x0fclient_sampling\x18\x03 \x01(\v2\x16.envoy.type.v3.PercentR\x0eclientSampling\x12?\n" +
 	"\x0frandom_sampling\x18\x04 \x01(\v2\x16.envoy.type.v3.PercentR\x0erandomSampling\x12A\n" +
@@ -3333,7 +3353,8 @@ const file_envoy_extensions_filters_network_http_connection_manager_v3_http_conn
 	"\x13spawn_upstream_span\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.BoolValueR\x11spawnUpstreamSpan\x12\x1c\n" +
 	"\toperation\x18\v \x01(\tR\toperation\x12-\n" +
-	"\x12upstream_operation\x18\f \x01(\tR\x11upstreamOperation\"(\n" +
+	"\x12upstream_operation\x18\f \x01(\tR\x11upstreamOperation\x124\n" +
+	"\x16no_context_propagation\x18\r \x01(\bR\x14noContextPropagation\"(\n" +
 	"\rOperationName\x12\v\n" +
 	"\aINGRESS\x10\x00\x12\n" +
 	"\n" +
