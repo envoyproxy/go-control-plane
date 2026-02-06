@@ -46,4 +46,5 @@ func RegisterServer(grpcServer *grpc.Server, server server.Server) {
 	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)
 	secretservice.RegisterSecretDiscoveryServiceServer(grpcServer, server)
 	runtimeservice.RegisterRuntimeDiscoveryServiceServer(grpcServer, server)
+	endpointservice.RegisterLocalityEndpointDiscoveryServiceServer(grpcServer, server)
 }
