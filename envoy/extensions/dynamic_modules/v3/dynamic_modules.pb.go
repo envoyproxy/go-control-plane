@@ -35,19 +35,23 @@ const (
 // reused.
 //
 // A module must be compatible with the ABI specified in :repo:`abi.h
-// <source/extensions/dynamic_modules/abi.h>`. Currently, compatibility is only guaranteed by an
+// <source/extensions/dynamic_modules/abi/abi.h>`. Currently, compatibility is only guaranteed by an
 // exact version match between the Envoy codebase and the dynamic module SDKs. In the future, after
 // the ABI is stabilized, this restriction will be revisited. Until then, Envoy checks the hash of
 // the ABI header files to ensure that the dynamic modules are built against the same version of the
 // ABI.
+// [#next-free-field: 6]
 type DynamicModuleConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the dynamic module.
 	//
 	// The client is expected to have some configuration indicating where to search for the module. In
-	// Envoy, the search path can only be configured via the environment variable
+	// Envoy, the search path can be configured via the environment variable
 	// “ENVOY_DYNAMIC_MODULES_SEARCH_PATH“. The actual search path is
-	// “${ENVOY_DYNAMIC_MODULES_SEARCH_PATH}/lib${name}.so“.
+	// “${ENVOY_DYNAMIC_MODULES_SEARCH_PATH}/lib${name}.so“. If not set, the current working directory is
+	// used as the search path. After Envoy fails to find the module in the search path, it will also
+	// try to find the module from a standard system library path (e.g., “/usr/lib“) following the
+	// platform's default behavior for “dlopen“.
 	//
 	// .. note::
 	//
@@ -61,7 +65,7 @@ type DynamicModuleConfig struct {
 	//
 	// Defaults to “false“.
 	DoNotClose bool `protobuf:"varint,3,opt,name=do_not_close,json=doNotClose,proto3" json:"do_not_close,omitempty"`
-	// If true, the dynamic module is loaded with the “RTLD_GLOBAL“ flag.
+	// If “true“, the dynamic module is loaded with the “RTLD_GLOBAL“ flag.
 	//
 	// The dynamic module is loaded with the “RTLD_LOCAL“ flag by default to avoid symbol conflicts
 	// when multiple modules are loaded. Set this to “true“ to load the module with the
@@ -76,9 +80,18 @@ type DynamicModuleConfig struct {
 	//	multiple modules define the same symbols and are loaded globally.
 	//
 	// Defaults to “false“.
-	LoadGlobally  bool `protobuf:"varint,4,opt,name=load_globally,json=loadGlobally,proto3" json:"load_globally,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	LoadGlobally bool `protobuf:"varint,4,opt,name=load_globally,json=loadGlobally,proto3" json:"load_globally,omitempty"`
+	// The namespace prefix for metrics emitted by this dynamic module.
+	//
+	// This allows users to customize the prefix used for all metrics created by the dynamic module.
+	// The prefix is prepended to all metric names. In prometheus output, metrics will appear with
+	// the standard “envoy_“ prefix followed by this namespace. For example, if this is set to
+	// “myapp“, a counter “requests“ would appear as “envoy_myapp_requests_total“.
+	//
+	// Defaults to “dynamicmodulescustom“.
+	MetricsNamespace string `protobuf:"bytes,5,opt,name=metrics_namespace,json=metricsNamespace,proto3" json:"metrics_namespace,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *DynamicModuleConfig) Reset() {
@@ -132,16 +145,24 @@ func (x *DynamicModuleConfig) GetLoadGlobally() bool {
 	return false
 }
 
+func (x *DynamicModuleConfig) GetMetricsNamespace() string {
+	if x != nil {
+		return x.MetricsNamespace
+	}
+	return ""
+}
+
 var File_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"y\n" +
+	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa6\x01\n" +
 	"\x13DynamicModuleConfig\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12 \n" +
 	"\fdo_not_close\x18\x03 \x01(\bR\n" +
 	"doNotClose\x12#\n" +
-	"\rload_globally\x18\x04 \x01(\bR\floadGloballyB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\rload_globally\x18\x04 \x01(\bR\floadGlobally\x12+\n" +
+	"\x11metrics_namespace\x18\x05 \x01(\tR\x10metricsNamespaceB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"1io.envoyproxy.envoy.extensions.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Z\\github.com/envoyproxy/go-control-plane/envoy/extensions/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (

@@ -514,10 +514,13 @@ type CommonTlsContext struct {
 	TlsCertificateProviderInstance *CertificateProviderPluginInstance `protobuf:"bytes,14,opt,name=tls_certificate_provider_instance,json=tlsCertificateProviderInstance,proto3" json:"tls_certificate_provider_instance,omitempty"`
 	// Custom TLS certificate selector.
 	//
-	// Select TLS certificate based on TLS client hello.
-	// If empty, defaults to native TLS certificate selection behavior:
-	// DNS SANs or Subject Common Name in TLS certificates is extracted as server name pattern to match SNI.
-	// [#extension-category: envoy.tls.certificate_selectors]
+	// For the downstream TLS socket, select a TLS certificate based on TLS client hello. If empty,
+	// defaults to native TLS certificate selection behavior: DNS SANs or Subject Common Name in TLS
+	// certificates is extracted as server name pattern to match SNI.
+	//
+	// For the upstream TLS socket, select a TLS certificate based on TLS server hello and the
+	// transport socket options.
+	// [#extension-category: envoy.tls.certificate_selectors,envoy.tls.upstream_certificate_selectors]
 	CustomTlsCertificateSelector *v3.TypedExtensionConfig `protobuf:"bytes,16,opt,name=custom_tls_certificate_selector,json=customTlsCertificateSelector,proto3" json:"custom_tls_certificate_selector,omitempty"`
 	// Certificate provider for fetching TLS certificates.
 	// [#not-implemented-hide:]

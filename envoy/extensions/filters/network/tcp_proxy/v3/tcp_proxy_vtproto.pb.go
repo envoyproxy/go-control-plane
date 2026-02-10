@@ -372,6 +372,16 @@ func (m *TcpProxy_TcpAccessLogOptions) MarshalToSizedBufferVTStrict(dAtA []byte)
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.FlushAccessLogOnStart {
+		i--
+		if m.FlushAccessLogOnStart {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.FlushAccessLogOnConnected {
 		i--
 		if m.FlushAccessLogOnConnected {
@@ -892,6 +902,9 @@ func (m *TcpProxy_TcpAccessLogOptions) SizeVT() (n int) {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.FlushAccessLogOnConnected {
+		n += 2
+	}
+	if m.FlushAccessLogOnStart {
 		n += 2
 	}
 	n += len(m.unknownFields)

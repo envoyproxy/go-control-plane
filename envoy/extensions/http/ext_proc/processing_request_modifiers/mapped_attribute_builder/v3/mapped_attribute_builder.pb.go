@@ -23,17 +23,19 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Extension to build custom attributes in the :ref:`request
-// <envoy_v3_api_msg_service.ext_proc.v3.ProcessingRequest>` based on a configurable mapping. The
-// native implementation uses the CEL expression as the key, which is not always desirable. Using this
-// extension, one can re-map a CEL expression that references internal filter state into a more
-// user-friendly key that decouples the value from the underlying filter implementation.
+// Extension to build custom attributes in the
+// :ref:`ProcessingRequest <envoy_v3_api_msg_service.ext_proc.v3.ProcessingRequest>` based on a
+// configurable mapping. The native implementation uses the CEL expression as the key, which is
+// not always desirable. Using this extension, one can re-map a CEL expression that references
+// internal filter state into a more user-friendly key that decouples the value from the underlying
+// filter implementation.
 //
-// If a given CEL expression fails to eval, it will not be present in the attributes struct.
+// If a given CEL expression fails to evaluate, it will not be present in the attributes struct.
 //
-// If this extension is configured, then the original :ref:`ProcessingRequest
-// <envoy_v3_api_msg_service.ext_proc.v3.ProcessingRequest>`'s “request_attributes“ are ignored,
-// and all attributes should be explicitly set via this extension.
+// If this extension is configured, then the original
+// :ref:`ProcessingRequest <envoy_v3_api_msg_service.ext_proc.v3.ProcessingRequest>`'s
+// “request_attributes“ are ignored, and all attributes should be explicitly set via this
+// extension.
 //
 // An example configuration may look like so:
 //
@@ -43,8 +45,10 @@ const (
 //	  "request.path": "request.path"
 //	  "source.country": "metadata.filter_metadata['com.example.location_filter']['country_code']"
 //
-// In the above example, the complex filter_metadata expression is evaluated via CEL, and the value
-// is stored under the friendlier “source.country“ key. “The ProcessingRequest“ would look like:
+// In the above example, the complex “filter_metadata“ expression is evaluated via CEL, and the
+// value is stored under the friendlier “source.country“ key. The
+// :ref:`ProcessingRequest <envoy_v3_api_msg_service.ext_proc.v3.ProcessingRequest>` would look
+// like:
 //
 // .. code-block:: text
 //
@@ -71,17 +75,19 @@ const (
 //	Processing request modifiers are currently in alpha.
 type MappedAttributeBuilder struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// A map of request attributes to set in the attributes struct.
-	// The key is the attribute name, the value is the attribute value,
-	// interpretable by CEL. This allows for the re-mapping of attributes, which is not supported
-	// by the native attribute building logic.
+	// A map of request attributes to set in the
+	// :ref:`attributes <envoy_v3_api_field_service.ext_proc.v3.ProcessingRequest.attributes>` struct.
+	// The key is the attribute name, and the value is the CEL expression to evaluate. This allows
+	// for the re-mapping of attributes, which is not supported by the native attribute building
+	// logic.
 	MappedRequestAttributes map[string]string `protobuf:"bytes,1,rep,name=mapped_request_attributes,json=mappedRequestAttributes,proto3" json:"mapped_request_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Similar to “mapped_request_attributes“, but for response attributes. The
-	// response nomenclature here just indicates that the attributes, whatever they may be, are sent
-	// with a response headers, body, or trailers ext_proc call.
-	// If a value contains a request key, e.g., “request.host“, then the attribute would
-	// just be sent along in the response. This is useful if a given ext_proc extension is only
-	// enabled for response handling, e.g., “RESPONSE_HEADERS“ but the backend wants to access request
+	// Similar to “mapped_request_attributes“, but for response attributes. The "response"
+	// nomenclature here indicates that the attributes, whatever they may be, are sent with a
+	// response headers, body, or trailers ext_proc call.
+	//
+	// If a value contains a request key (e.g., “request.host“), then the attribute would just be
+	// sent along in the response. This is useful if a given ext_proc extension is only enabled for
+	// response handling (e.g., “RESPONSE_HEADERS“) but the backend wants to access request
 	// metadata.
 	MappedResponseAttributes map[string]string `protobuf:"bytes,2,rep,name=mapped_response_attributes,json=mappedResponseAttributes,proto3" json:"mapped_response_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields            protoimpl.UnknownFields

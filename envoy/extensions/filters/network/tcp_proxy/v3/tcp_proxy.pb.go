@@ -53,6 +53,8 @@ const (
 	// and negotiated parameters, which can be used for routing decisions or passed as metadata
 	// to the upstream.
 	//
+	// This mode requires “max_early_data_bytes“ to be set (can be zero to disable buffering).
+	//
 	// .. note::
 	//
 	//	This mode is only effective when the downstream connection uses TLS. For non-TLS
@@ -228,7 +230,7 @@ type TcpProxy struct {
 	// buffered and forwarded once the upstream connection is ready. When the buffer exceeds
 	// this limit, the downstream connection is read-disabled to prevent excessive memory usage.
 	//
-	// This field is required when “upstream_connect_mode“ is “ON_DOWNSTREAM_DATA“.
+	// This field is required when “upstream_connect_mode“ is not “IMMEDIATE“.
 	//
 	// .. note::
 	//
@@ -533,7 +535,7 @@ type TcpProxy_TunnelingConfig struct {
 	PropagateResponseHeaders bool `protobuf:"varint,4,opt,name=propagate_response_headers,json=propagateResponseHeaders,proto3" json:"propagate_response_headers,omitempty"`
 	// The path used with the POST method. The default path is “/“. If this field is specified and
 	// :ref:`use_post field <envoy_v3_api_field_extensions.filters.network.tcp_proxy.v3.TcpProxy.TunnelingConfig.use_post>`
-	// is not set to true, the configuration will be rejected.
+	// is not set to “true“, the configuration will be rejected.
 	PostPath string `protobuf:"bytes,5,opt,name=post_path,json=postPath,proto3" json:"post_path,omitempty"`
 	// Save response trailers to the downstream connection's filter state for consumption
 	// by network filters. The filter state key is “envoy.tcp_proxy.propagate_response_trailers“.
@@ -741,11 +743,13 @@ type TcpProxy_TcpAccessLogOptions struct {
 	// specified interval.
 	// The interval must be at least 1ms.
 	AccessLogFlushInterval *durationpb.Duration `protobuf:"bytes,1,opt,name=access_log_flush_interval,json=accessLogFlushInterval,proto3" json:"access_log_flush_interval,omitempty"`
-	// If set to true, the access log is flushed when the TCP proxy successfully establishes a
+	// If set to “true“, the access log is flushed when the TCP proxy successfully establishes a
 	// connection with the upstream. If the connection fails, the access log is not flushed.
 	FlushAccessLogOnConnected bool `protobuf:"varint,2,opt,name=flush_access_log_on_connected,json=flushAccessLogOnConnected,proto3" json:"flush_access_log_on_connected,omitempty"`
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	// If set to “true“, the access log is flushed when the TCP proxy accepts a connection.
+	FlushAccessLogOnStart bool `protobuf:"varint,3,opt,name=flush_access_log_on_start,json=flushAccessLogOnStart,proto3" json:"flush_access_log_on_start,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *TcpProxy_TcpAccessLogOptions) Reset() {
@@ -788,6 +792,13 @@ func (x *TcpProxy_TcpAccessLogOptions) GetAccessLogFlushInterval() *durationpb.D
 func (x *TcpProxy_TcpAccessLogOptions) GetFlushAccessLogOnConnected() bool {
 	if x != nil {
 		return x.FlushAccessLogOnConnected
+	}
+	return false
+}
+
+func (x *TcpProxy_TcpAccessLogOptions) GetFlushAccessLogOnStart() bool {
+	if x != nil {
+		return x.FlushAccessLogOnStart
 	}
 	return false
 }
@@ -866,7 +877,7 @@ var File_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto protorefl
 
 const file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_rawDesc = "" +
 	"\n" +
-	"=envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto\x12-envoy.extensions.filters.network.tcp_proxy.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1fenvoy/type/v3/hash_policy.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xfb\x1a\n" +
+	"=envoy/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto\x12-envoy.extensions.filters.network.tcp_proxy.v3\x1a)envoy/config/accesslog/v3/accesslog.proto\x1a\"envoy/config/core/v3/backoff.proto\x1a\x1fenvoy/config/core/v3/base.proto\x1a(envoy/config/core/v3/config_source.proto\x1a)envoy/config/core/v3/proxy_protocol.proto\x1aYenvoy/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto\x1a\x1fenvoy/type/v3/hash_policy.proto\x1a\x1benvoy/type/v3/percent.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a#envoy/annotations/deprecation.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xb5\x1b\n" +
 	"\bTcpProxy\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12\x1a\n" +
@@ -915,10 +926,11 @@ const file_envoy_extensions_filters_network_tcp_proxy_v3_tcp_proxy_proto_rawDesc
 	"\bOnDemand\x12E\n" +
 	"\fodcds_config\x18\x01 \x01(\v2\".envoy.config.core.v3.ConfigSourceR\vodcdsConfig\x12+\n" +
 	"\x11resources_locator\x18\x02 \x01(\tR\x10resourcesLocator\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x1a\xbb\x01\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x1a\xf5\x01\n" +
 	"\x13TcpAccessLogOptions\x12b\n" +
 	"\x19access_log_flush_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\f\xfaB\t\xaa\x01\x062\x04\x10\xc0\x84=R\x16accessLogFlushInterval\x12@\n" +
-	"\x1dflush_access_log_on_connected\x18\x02 \x01(\bR\x19flushAccessLogOnConnected:8\x9aň\x1e3\n" +
+	"\x1dflush_access_log_on_connected\x18\x02 \x01(\bR\x19flushAccessLogOnConnected\x128\n" +
+	"\x19flush_access_log_on_start\x18\x03 \x01(\bR\x15flushAccessLogOnStart:8\x9aň\x1e3\n" +
 	"1envoy.config.filter.network.tcp_proxy.v2.TcpProxyB\x18\n" +
 	"\x11cluster_specifier\x12\x03\xf8B\x01J\x04\b\x06\x10\aR\rdeprecated_v1*]\n" +
 	"\x13UpstreamConnectMode\x12\r\n" +

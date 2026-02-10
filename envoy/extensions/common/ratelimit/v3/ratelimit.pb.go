@@ -255,7 +255,9 @@ type LocalRateLimitDescriptor struct {
 	// Descriptor entries.
 	Entries []*RateLimitDescriptor_Entry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
 	// Token Bucket algorithm for local ratelimiting.
-	TokenBucket   *v3.TokenBucket `protobuf:"bytes,2,opt,name=token_bucket,json=tokenBucket,proto3" json:"token_bucket,omitempty"`
+	TokenBucket *v3.TokenBucket `protobuf:"bytes,2,opt,name=token_bucket,json=tokenBucket,proto3" json:"token_bucket,omitempty"`
+	// Mark the descriptor as shadow. When the values is true, envoy allow requests to the backend.
+	ShadowMode    bool `protobuf:"varint,3,opt,name=shadow_mode,json=shadowMode,proto3" json:"shadow_mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -302,6 +304,13 @@ func (x *LocalRateLimitDescriptor) GetTokenBucket() *v3.TokenBucket {
 		return x.TokenBucket
 	}
 	return nil
+}
+
+func (x *LocalRateLimitDescriptor) GetShadowMode() bool {
+	if x != nil {
+		return x.ShadowMode
+	}
+	return false
 }
 
 // Configuration used to enable local cluster level rate limiting where the token buckets
@@ -479,10 +488,12 @@ const file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDesc = "" +
 	"\x11RateLimitOverride\x12*\n" +
 	"\x11requests_per_unit\x18\x01 \x01(\rR\x0frequestsPerUnit\x12:\n" +
 	"\x04unit\x18\x02 \x01(\x0e2\x1c.envoy.type.v3.RateLimitUnitB\b\xfaB\x05\x82\x01\x02\x10\x01R\x04unit:1\x9aň\x1e,\n" +
-	"*envoy.api.v2.ratelimit.RateLimitDescriptor\"\xc8\x01\n" +
+	"*envoy.api.v2.ratelimit.RateLimitDescriptor\"\xe9\x01\n" +
 	"\x18LocalRateLimitDescriptor\x12c\n" +
 	"\aentries\x18\x01 \x03(\v2?.envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.EntryB\b\xfaB\x05\x92\x01\x02\b\x01R\aentries\x12G\n" +
-	"\ftoken_bucket\x18\x02 \x01(\v2\x1a.envoy.type.v3.TokenBucketB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vtokenBucket\"\x17\n" +
+	"\ftoken_bucket\x18\x02 \x01(\v2\x1a.envoy.type.v3.TokenBucketB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vtokenBucket\x12\x1f\n" +
+	"\vshadow_mode\x18\x03 \x01(\bR\n" +
+	"shadowMode\"\x17\n" +
 	"\x15LocalClusterRateLimit*<\n" +
 	"\x1bXRateLimitHeadersRFCVersion\x12\a\n" +
 	"\x03OFF\x10\x00\x12\x14\n" +

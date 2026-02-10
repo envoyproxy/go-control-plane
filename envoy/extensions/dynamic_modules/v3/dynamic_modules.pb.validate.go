@@ -73,6 +73,8 @@ func (m *DynamicModuleConfig) validate(all bool) error {
 
 	// no validation rules for LoadGlobally
 
+	// no validation rules for MetricsNamespace
+
 	if len(errors) > 0 {
 		return DynamicModuleConfigMultiError(errors)
 	}

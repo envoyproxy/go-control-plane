@@ -1256,6 +1256,8 @@ func (m *TcpProxy_TcpAccessLogOptions) validate(all bool) error {
 
 	// no validation rules for FlushAccessLogOnConnected
 
+	// no validation rules for FlushAccessLogOnStart
+
 	if len(errors) > 0 {
 		return TcpProxy_TcpAccessLogOptionsMultiError(errors)
 	}

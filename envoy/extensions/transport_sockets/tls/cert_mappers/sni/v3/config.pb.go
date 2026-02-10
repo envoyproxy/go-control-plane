@@ -23,7 +23,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Uses the SNI value from the TLS client hello as the secret resource name.
+// Uses the SNI value from the TLS client hello as the secret resource name in the downstream selector.
 type SNI struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The value to use as the secret name when SNI is empty or absent.

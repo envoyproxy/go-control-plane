@@ -205,6 +205,16 @@ func (m *LocalRateLimitDescriptor) MarshalToSizedBufferVTStrict(dAtA []byte) (in
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ShadowMode {
+		i--
+		if m.ShadowMode {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.TokenBucket != nil {
 		if vtmsg, ok := interface{}(m.TokenBucket).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -354,6 +364,9 @@ func (m *LocalRateLimitDescriptor) SizeVT() (n int) {
 			l = proto.Size(m.TokenBucket)
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ShadowMode {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
