@@ -497,17 +497,6 @@ func (m *OAuth2Credentials) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.GetTokenSecret() == nil {
-		err := OAuth2CredentialsValidationError{
-			field:  "TokenSecret",
-			reason: "value is required",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
 	if all {
 		switch v := interface{}(m.GetTokenSecret()).(type) {
 		case interface{ ValidateAll() error }:

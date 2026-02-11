@@ -89,6 +89,13 @@ const (
 	OAuth2Config_URL_ENCODED_BODY OAuth2Config_AuthType = 0
 	// The “client_id“ and “client_secret“ will be sent using HTTP Basic authentication scheme.
 	OAuth2Config_BASIC_AUTH OAuth2Config_AuthType = 1
+	// The client will be authenticated using mutual TLS (mTLS) with a client certificate.
+	// The “client_secret“ is not required and will not be sent in the request to the
+	// authorization server.
+	// The client certificate must be configured in the cluster used by “token_endpoint“ via
+	// transport socket configuration.
+	// This implements OAuth 2.0 Mutual-TLS Client Authentication as defined in RFC 8705.
+	OAuth2Config_TLS_CLIENT_AUTH OAuth2Config_AuthType = 2
 )
 
 // Enum value maps for OAuth2Config_AuthType.
@@ -96,10 +103,12 @@ var (
 	OAuth2Config_AuthType_name = map[int32]string{
 		0: "URL_ENCODED_BODY",
 		1: "BASIC_AUTH",
+		2: "TLS_CLIENT_AUTH",
 	}
 	OAuth2Config_AuthType_value = map[string]int32{
 		"URL_ENCODED_BODY": 0,
 		"BASIC_AUTH":       1,
+		"TLS_CLIENT_AUTH":  2,
 	}
 )
 
@@ -317,6 +326,8 @@ type OAuth2Credentials struct {
 	// The client_id to be used in the authorize calls. This value will be URL encoded when sent to the OAuth server.
 	ClientId string `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	// The secret used to retrieve the access token. This value will be URL encoded when sent to the OAuth server.
+	// This field is required unless :ref:`auth_type <envoy_v3_api_field_extensions.filters.http.oauth2.v3.OAuth2Config.auth_type>`
+	// is set to “TLS_CLIENT_AUTH“, in which case authentication is done via the client certificate.
 	TokenSecret *v3.SdsSecretConfig `protobuf:"bytes,2,opt,name=token_secret,json=tokenSecret,proto3" json:"token_secret,omitempty"`
 	// Configures how the secret token should be created.
 	//
@@ -907,10 +918,10 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\x16id_token_cookie_config\x18\x04 \x01(\v25.envoy.extensions.filters.http.oauth2.v3.CookieConfigR\x13idTokenCookieConfig\x12t\n" +
 	"\x1brefresh_token_cookie_config\x18\x05 \x01(\v25.envoy.extensions.filters.http.oauth2.v3.CookieConfigR\x18refreshTokenCookieConfig\x12p\n" +
 	"\x19oauth_nonce_cookie_config\x18\x06 \x01(\v25.envoy.extensions.filters.http.oauth2.v3.CookieConfigR\x16oauthNonceCookieConfig\x12t\n" +
-	"\x1bcode_verifier_cookie_config\x18\a \x01(\v25.envoy.extensions.filters.http.oauth2.v3.CookieConfigR\x18codeVerifierCookieConfig\"\xb2\x06\n" +
+	"\x1bcode_verifier_cookie_config\x18\a \x01(\v25.envoy.extensions.filters.http.oauth2.v3.CookieConfigR\x18codeVerifierCookieConfig\"\xa8\x06\n" +
 	"\x11OAuth2Credentials\x12$\n" +
-	"\tclient_id\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\bclientId\x12g\n" +
-	"\ftoken_secret\x18\x02 \x01(\v2:.envoy.extensions.transport_sockets.tls.v3.SdsSecretConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vtokenSecret\x12g\n" +
+	"\tclient_id\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\bclientId\x12]\n" +
+	"\ftoken_secret\x18\x02 \x01(\v2:.envoy.extensions.transport_sockets.tls.v3.SdsSecretConfigR\vtokenSecret\x12g\n" +
 	"\vhmac_secret\x18\x03 \x01(\v2:.envoy.extensions.transport_sockets.tls.v3.SdsSecretConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01H\x00R\n" +
 	"hmacSecret\x12i\n" +
 	"\fcookie_names\x18\x04 \x01(\v2F.envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNamesR\vcookieNames\x12J\n" +
@@ -925,7 +936,7 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\voauth_nonce\x18\x06 \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\n" +
 	"oauthNonce\x120\n" +
 	"\rcode_verifier\x18\a \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\fcodeVerifierB\x16\n" +
-	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xfa\x0e\n" +
+	"\x0ftoken_formation\x12\x03\xf8B\x01\"\x8f\x0f\n" +
 	"\fOAuth2Config\x12D\n" +
 	"\x0etoken_endpoint\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriR\rtokenEndpoint\x12D\n" +
 	"\fretry_policy\x18\x12 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x12>\n" +
@@ -955,11 +966,12 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"statPrefix\x12L\n" +
 	"\x15csrf_token_expires_in\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x12csrfTokenExpiresIn\x12]\n" +
 	"\x1ecode_verifier_token_expires_in\x18\x19 \x01(\v2\x19.google.protobuf.DurationR\x1acodeVerifierTokenExpiresIn\x128\n" +
-	"\x18disable_token_encryption\x18\x1a \x01(\bR\x16disableTokenEncryption\"0\n" +
+	"\x18disable_token_encryption\x18\x1a \x01(\bR\x16disableTokenEncryption\"E\n" +
 	"\bAuthType\x12\x14\n" +
 	"\x10URL_ENCODED_BODY\x10\x00\x12\x0e\n" +
 	"\n" +
-	"BASIC_AUTH\x10\x01\"W\n" +
+	"BASIC_AUTH\x10\x01\x12\x13\n" +
+	"\x0fTLS_CLIENT_AUTH\x10\x02\"W\n" +
 	"\x06OAuth2\x12M\n" +
 	"\x06config\x18\x01 \x01(\v25.envoy.extensions.filters.http.oauth2.v3.OAuth2ConfigR\x06configB\xa6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"5io.envoyproxy.envoy.extensions.filters.http.oauth2.v3B\n" +
