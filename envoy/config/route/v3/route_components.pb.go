@@ -6272,7 +6272,6 @@ type RateLimit_Action_QueryParameterValueMatch_ struct {
 }
 
 type RateLimit_Action_RemoteAddressMatch_ struct {
-	// [#not-implemented-hide:]
 	// Rate limit on remote address match.
 	RemoteAddressMatch *RateLimit_Action_RemoteAddressMatch `protobuf:"bytes,13,opt,name=remote_address_match,json=remoteAddressMatch,proto3,oneof"`
 }
@@ -7342,8 +7341,6 @@ func (x *RateLimit_Action_QueryParameterValueMatch) GetQueryParameters() []*Quer
 // .. code-block:: cpp
 //
 //	("remote_address_match", "<descriptor_value>")
-//
-// [#not-implemented-hide:]
 type RateLimit_Action_RemoteAddressMatch struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Descriptor value of entry.
@@ -7354,13 +7351,13 @@ type RateLimit_Action_RemoteAddressMatch struct {
 	//
 	// .. note::
 	//
-	//	The format string can contain multiple valid substitution fields. If multiple substitution
-	//	fields are present, their results will be concatenated to form the final descriptor value.
-	//	If it contains no substitution fields, the value will be used as is.
-	//	All substitution fields will be evaluated and their results concatenated.
-	//	If the final concatenated result is empty and ``default_value`` is set, the ``default_value`` will be used.
-	//	If ``default_value`` is not set and the result is empty, this descriptor will be skipped
-	//	and not included in the rate limit call.
+	//	The format string can contain multiple valid substitution fields. If multiple
+	//	substitution fields are present, their results will be concatenated to form the
+	//	final descriptor value. If it contains no substitution fields, the value will be
+	//	used as is. All substitution fields will be evaluated and their results concatenated.
+	//	If the final concatenated result is empty and ``default_value`` is set, the
+	//	``default_value`` will be used. If ``default_value`` is not set and the result is
+	//	empty, this descriptor will be skipped and not included in the rate limit call.
 	//
 	// For example, “static_value“ will be used as is since there are no substitution fields.
 	// “%REQ(:method)%“ will be replaced with the HTTP method, and

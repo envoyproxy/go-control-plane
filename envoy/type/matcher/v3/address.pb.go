@@ -29,8 +29,10 @@ const (
 type AddressMatcher struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	Ranges []*v3.CidrRange        `protobuf:"bytes,1,rep,name=ranges,proto3" json:"ranges,omitempty"`
-	// [#not-implemented-hide:]
 	// If true, the match result will be inverted. Defaults to false.
+	//
+	// * If set to false (default), the matcher will return true if the IP matches any of the CIDR ranges.
+	// * If set to true, the matcher will return true if the IP does NOT match any of the CIDR ranges.
 	InvertMatch   bool `protobuf:"varint,2,opt,name=invert_match,json=invertMatch,proto3" json:"invert_match,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
