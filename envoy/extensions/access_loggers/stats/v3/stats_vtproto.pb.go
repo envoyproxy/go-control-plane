@@ -233,6 +233,167 @@ func (m *Config_Counter) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) 
 	return len(dAtA) - i, nil
 }
 
+func (m *Config_Gauge_Set) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Config_Gauge_Set) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Config_Gauge_Set) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.LogType != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.LogType))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Config_Gauge_PairedAddSubtract) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Config_Gauge_PairedAddSubtract) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Config_Gauge_PairedAddSubtract) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.SubLogType != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.SubLogType))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.AddLogType != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.AddLogType))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Config_Gauge) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Config_Gauge) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Config_Gauge) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if m.Set != nil {
+		size, err := m.Set.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.AddSubtract != nil {
+		size, err := m.AddSubtract.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.ValueFixed != nil {
+		size, err := (*wrapperspb.UInt64Value)(m.ValueFixed).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.ValueFormat) > 0 {
+		i -= len(m.ValueFormat)
+		copy(dAtA[i:], m.ValueFormat)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.ValueFormat)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Stat != nil {
+		size, err := m.Stat.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *Config) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -262,6 +423,18 @@ func (m *Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.Gauges) > 0 {
+		for iNdEx := len(m.Gauges) - 1; iNdEx >= 0; iNdEx-- {
+			size, err := m.Gauges[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0x2a
+		}
 	}
 	if len(m.Counters) > 0 {
 		for iNdEx := len(m.Counters) - 1; iNdEx >= 0; iNdEx-- {
@@ -378,6 +551,65 @@ func (m *Config_Counter) SizeVT() (n int) {
 	return n
 }
 
+func (m *Config_Gauge_Set) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.LogType != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.LogType))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *Config_Gauge_PairedAddSubtract) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.AddLogType != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.AddLogType))
+	}
+	if m.SubLogType != 0 {
+		n += 1 + protohelpers.SizeOfVarint(uint64(m.SubLogType))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
+func (m *Config_Gauge) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Stat != nil {
+		l = m.Stat.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.ValueFormat)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ValueFixed != nil {
+		l = (*wrapperspb.UInt64Value)(m.ValueFixed).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.AddSubtract != nil {
+		l = m.AddSubtract.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.Set != nil {
+		l = m.Set.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *Config) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -396,6 +628,12 @@ func (m *Config) SizeVT() (n int) {
 	}
 	if len(m.Counters) > 0 {
 		for _, e := range m.Counters {
+			l = e.SizeVT()
+			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
+	}
+	if len(m.Gauges) > 0 {
+		for _, e := range m.Gauges {
 			l = e.SizeVT()
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}

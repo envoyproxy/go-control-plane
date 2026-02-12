@@ -18,6 +18,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	v3 "github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v3"
 )
 
 // ensure the imports are used
@@ -34,6 +36,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = v3.AccessLogType(0)
 )
 
 // Validate checks the field values on Config with the rules defined in the
@@ -128,6 +132,40 @@ func (m *Config) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return ConfigValidationError{
 					field:  fmt.Sprintf("Counters[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	for idx, item := range m.GetGauges() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ConfigValidationError{
+						field:  fmt.Sprintf("Gauges[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ConfigValidationError{
+						field:  fmt.Sprintf("Gauges[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ConfigValidationError{
+					field:  fmt.Sprintf("Gauges[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -842,3 +880,477 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Config_CounterValidationError{}
+
+// Validate checks the field values on Config_Gauge with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Config_Gauge) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Config_Gauge with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in Config_GaugeMultiError, or
+// nil if none found.
+func (m *Config_Gauge) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Config_Gauge) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetStat() == nil {
+		err := Config_GaugeValidationError{
+			field:  "Stat",
+			reason: "value is required",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if all {
+		switch v := interface{}(m.GetStat()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Config_GaugeValidationError{
+					field:  "Stat",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Config_GaugeValidationError{
+					field:  "Stat",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStat()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Config_GaugeValidationError{
+				field:  "Stat",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if m.GetValueFormat() != "" {
+
+		if !strings.HasPrefix(m.GetValueFormat(), "%") {
+			err := Config_GaugeValidationError{
+				field:  "ValueFormat",
+				reason: "value does not have prefix \"%\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if !strings.HasSuffix(m.GetValueFormat(), "%") {
+			err := Config_GaugeValidationError{
+				field:  "ValueFormat",
+				reason: "value does not have suffix \"%\"",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if wrapper := m.GetValueFixed(); wrapper != nil {
+
+		if wrapper.GetValue() <= 0 {
+			err := Config_GaugeValidationError{
+				field:  "ValueFixed",
+				reason: "value must be greater than 0",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
+	if all {
+		switch v := interface{}(m.GetAddSubtract()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Config_GaugeValidationError{
+					field:  "AddSubtract",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Config_GaugeValidationError{
+					field:  "AddSubtract",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAddSubtract()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Config_GaugeValidationError{
+				field:  "AddSubtract",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetSet()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Config_GaugeValidationError{
+					field:  "Set",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Config_GaugeValidationError{
+					field:  "Set",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSet()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Config_GaugeValidationError{
+				field:  "Set",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return Config_GaugeMultiError(errors)
+	}
+
+	return nil
+}
+
+// Config_GaugeMultiError is an error wrapping multiple validation errors
+// returned by Config_Gauge.ValidateAll() if the designated constraints aren't met.
+type Config_GaugeMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Config_GaugeMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Config_GaugeMultiError) AllErrors() []error { return m }
+
+// Config_GaugeValidationError is the validation error returned by
+// Config_Gauge.Validate if the designated constraints aren't met.
+type Config_GaugeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Config_GaugeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Config_GaugeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Config_GaugeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Config_GaugeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Config_GaugeValidationError) ErrorName() string { return "Config_GaugeValidationError" }
+
+// Error satisfies the builtin error interface
+func (e Config_GaugeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConfig_Gauge.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Config_GaugeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Config_GaugeValidationError{}
+
+// Validate checks the field values on Config_Gauge_Set with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *Config_Gauge_Set) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Config_Gauge_Set with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// Config_Gauge_SetMultiError, or nil if none found.
+func (m *Config_Gauge_Set) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Config_Gauge_Set) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if _, ok := v3.AccessLogType_name[int32(m.GetLogType())]; !ok {
+		err := Config_Gauge_SetValidationError{
+			field:  "LogType",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return Config_Gauge_SetMultiError(errors)
+	}
+
+	return nil
+}
+
+// Config_Gauge_SetMultiError is an error wrapping multiple validation errors
+// returned by Config_Gauge_Set.ValidateAll() if the designated constraints
+// aren't met.
+type Config_Gauge_SetMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Config_Gauge_SetMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Config_Gauge_SetMultiError) AllErrors() []error { return m }
+
+// Config_Gauge_SetValidationError is the validation error returned by
+// Config_Gauge_Set.Validate if the designated constraints aren't met.
+type Config_Gauge_SetValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Config_Gauge_SetValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Config_Gauge_SetValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Config_Gauge_SetValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Config_Gauge_SetValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Config_Gauge_SetValidationError) ErrorName() string { return "Config_Gauge_SetValidationError" }
+
+// Error satisfies the builtin error interface
+func (e Config_Gauge_SetValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConfig_Gauge_Set.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Config_Gauge_SetValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Config_Gauge_SetValidationError{}
+
+// Validate checks the field values on Config_Gauge_PairedAddSubtract with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *Config_Gauge_PairedAddSubtract) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Config_Gauge_PairedAddSubtract with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// Config_Gauge_PairedAddSubtractMultiError, or nil if none found.
+func (m *Config_Gauge_PairedAddSubtract) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Config_Gauge_PairedAddSubtract) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if _, ok := v3.AccessLogType_name[int32(m.GetAddLogType())]; !ok {
+		err := Config_Gauge_PairedAddSubtractValidationError{
+			field:  "AddLogType",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if _, ok := v3.AccessLogType_name[int32(m.GetSubLogType())]; !ok {
+		err := Config_Gauge_PairedAddSubtractValidationError{
+			field:  "SubLogType",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return Config_Gauge_PairedAddSubtractMultiError(errors)
+	}
+
+	return nil
+}
+
+// Config_Gauge_PairedAddSubtractMultiError is an error wrapping multiple
+// validation errors returned by Config_Gauge_PairedAddSubtract.ValidateAll()
+// if the designated constraints aren't met.
+type Config_Gauge_PairedAddSubtractMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Config_Gauge_PairedAddSubtractMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Config_Gauge_PairedAddSubtractMultiError) AllErrors() []error { return m }
+
+// Config_Gauge_PairedAddSubtractValidationError is the validation error
+// returned by Config_Gauge_PairedAddSubtract.Validate if the designated
+// constraints aren't met.
+type Config_Gauge_PairedAddSubtractValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Config_Gauge_PairedAddSubtractValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Config_Gauge_PairedAddSubtractValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Config_Gauge_PairedAddSubtractValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Config_Gauge_PairedAddSubtractValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Config_Gauge_PairedAddSubtractValidationError) ErrorName() string {
+	return "Config_Gauge_PairedAddSubtractValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Config_Gauge_PairedAddSubtractValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConfig_Gauge_PairedAddSubtract.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Config_Gauge_PairedAddSubtractValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Config_Gauge_PairedAddSubtractValidationError{}
