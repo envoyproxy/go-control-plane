@@ -520,6 +520,17 @@ func (m *TcpProxy) validate(all bool) error {
 
 	}
 
+	if _, ok := ProxyProtocolTlvMergePolicy_name[int32(m.GetProxyProtocolTlvMergePolicy())]; !ok {
+		err := TcpProxyValidationError{
+			field:  "ProxyProtocolTlvMergePolicy",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if _, ok := UpstreamConnectMode_name[int32(m.GetUpstreamConnectMode())]; !ok {
 		err := TcpProxyValidationError{
 			field:  "UpstreamConnectMode",

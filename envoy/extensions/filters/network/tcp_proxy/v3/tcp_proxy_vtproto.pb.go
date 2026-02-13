@@ -435,6 +435,13 @@ func (m *TcpProxy) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.ProxyProtocolTlvMergePolicy != 0 {
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(m.ProxyProtocolTlvMergePolicy))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb8
+	}
 	if m.MaxEarlyDataBytes != nil {
 		size, err := (*wrapperspb.UInt32Value)(m.MaxEarlyDataBytes).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1035,6 +1042,9 @@ func (m *TcpProxy) SizeVT() (n int) {
 	if m.MaxEarlyDataBytes != nil {
 		l = (*wrapperspb.UInt32Value)(m.MaxEarlyDataBytes).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.ProxyProtocolTlvMergePolicy != 0 {
+		n += 2 + protohelpers.SizeOfVarint(uint64(m.ProxyProtocolTlvMergePolicy))
 	}
 	n += len(m.unknownFields)
 	return n
