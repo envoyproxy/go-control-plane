@@ -36,6 +36,7 @@ const (
 	// Valid MCP requests are:
 	// - POST requests with JSON-RPC 2.0 messages
 	// - GET requests for SSE streams (with Accept: text/event-stream)
+	// - DELETE requests for session termination (with MCP-Session-Id header)
 	Mcp_REJECT_NO_MCP Mcp_TrafficMode = 1
 )
 
