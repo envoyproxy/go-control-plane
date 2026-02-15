@@ -56,6 +56,7 @@ func (s *Server) registerServer(grpcServer *grpc.Server) {
 	// register services
 	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, s.xdsserver)
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, s.xdsserver)
+	endpointservice.RegisterLocalityEndpointDiscoveryServiceServer(grpcServer, s.xdsserver)
 	clusterservice.RegisterClusterDiscoveryServiceServer(grpcServer, s.xdsserver)
 	routeservice.RegisterRouteDiscoveryServiceServer(grpcServer, s.xdsserver)
 	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, s.xdsserver)
@@ -99,6 +100,7 @@ func registerServer(grpcServer *grpc.Server, server server.Server) {
 	// register services
 	discoverygrpc.RegisterAggregatedDiscoveryServiceServer(grpcServer, server)
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
+	endpointservice.RegisterLocalityEndpointDiscoveryServiceServer(grpcServer, server)
 	clusterservice.RegisterClusterDiscoveryServiceServer(grpcServer, server)
 	routeservice.RegisterRouteDiscoveryServiceServer(grpcServer, server)
 	listenerservice.RegisterListenerDiscoveryServiceServer(grpcServer, server)

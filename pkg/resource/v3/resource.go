@@ -29,6 +29,9 @@ const (
 	// Rate Limit service
 	RateLimitConfigType = APITypePrefix + "ratelimit.config.ratelimit.v3.RateLimitConfig"
 
+	// LEDS
+	LbEndpointType = APITypePrefix + "envoy.config.endpoint.v3.LbEndpoint"
+
 	// AnyType is used only by ADS
 	AnyType = ""
 )

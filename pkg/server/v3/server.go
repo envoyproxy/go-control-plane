@@ -44,6 +44,7 @@ import (
 // Server is a collection of handlers for streaming discovery requests.
 type Server interface {
 	endpointservice.EndpointDiscoveryServiceServer
+	endpointservice.LocalityEndpointDiscoveryServiceServer
 	clusterservice.ClusterDiscoveryServiceServer
 	routeservice.RouteDiscoveryServiceServer
 	routeservice.ScopedRoutesDiscoveryServiceServer
@@ -349,4 +350,8 @@ func (s *server) DeltaExtensionConfigs(stream extensionconfigservice.ExtensionCo
 
 func (s *server) DeltaVirtualHosts(stream routeservice.VirtualHostDiscoveryService_DeltaVirtualHostsServer) error {
 	return s.DeltaStreamHandler(stream, resource.VirtualHostType)
+}
+
+func (s *server) DeltaLocalityEndpoints(stream endpointservice.LocalityEndpointDiscoveryService_DeltaLocalityEndpointsServer) error {
+	return s.DeltaStreamHandler(stream, resource.LbEndpointType)
 }
