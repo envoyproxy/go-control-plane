@@ -52,6 +52,8 @@ linters:
       errorf: true
       sprintf1: true
       strconcat: true
+    revive:
+      enable-default-rules: true
     testifylint:
       disable:
         - float-compare
