@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"sync"
@@ -70,6 +71,7 @@ func (t *heptioTokenProvider) refresh() error {
 		return err
 	}
 	rawToken, err := gen.GetWithOptions(
+		context.Background(),
 		&heptiotoken.GetTokenOptions{
 			ClusterID: t.clusterName,
 		})
