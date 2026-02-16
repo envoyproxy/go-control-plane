@@ -52,6 +52,18 @@ linters:
       errorf: true
       sprintf1: true
       strconcat: true
+    revive:
+      enable-default-rules: true
+      rules:
+        - name: var-naming
+          arguments:
+            - ["ID"] # AllowList
+            - ["VM"] # DenyList
+            - - skip-initialism-name-checks: true
+                upper-case-const: true
+                skip-package-name-checks: true
+                skip-package-name-collision-with-go-std: true
+        
     testifylint:
       disable:
         - float-compare
