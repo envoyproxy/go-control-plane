@@ -45,6 +45,7 @@ type ResponseType int
 const (
 	Cluster ResponseType = iota
 	Endpoint
+	LbEndpoint
 	Listener
 	Route
 	ScopedRoute
