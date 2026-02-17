@@ -18,6 +18,7 @@ linters:
     - bodyclose
     - contextcheck
     - errorlint
+    - gocritic
     - gosec
     - misspell
     - modernize
@@ -42,6 +43,9 @@ linters:
   settings:
     exhaustive:
       default-signifies-exhaustive: true
+    gocritic:
+      disabled-checks:
+        - appendAssign
     gosec:
       excludes:
         - G115
