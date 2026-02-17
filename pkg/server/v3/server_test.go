@@ -135,6 +135,7 @@ func (stream *mockStream) Recv() (*discovery.DiscoveryRequest, error) {
 }
 
 func makeMockStream(t *testing.T) *mockStream {
+	t.Helper()
 	return &mockStream{
 		t:    t,
 		ctx:  context.Background(),

@@ -18,9 +18,11 @@ linters:
     - bodyclose
     - contextcheck
     - errorlint
+    - exptostd
     - gocritic
     - godot
     - gosec
+    - govet
     - misspell
     - modernize
     - noctx
@@ -29,8 +31,12 @@ linters:
     - revive
     - staticcheck
     - testifylint
+    - thelper
+    - tparallel
     - unconvert
     - unparam
+    - usestdlibvars
+    - usetesting
     - whitespace
   exclusions:
     generated: lax
