@@ -38,7 +38,7 @@ func main() {
 		}
 	})
 	// Ignore: G114: Use of net/http serve function that has no support for setting timeouts
-	// nolint:gosec
+	//nolint:gosec
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", upstreamPort), nil); err != nil {
 		log.Println(err)
 	}

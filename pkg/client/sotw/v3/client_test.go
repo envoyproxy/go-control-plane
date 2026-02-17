@@ -126,7 +126,7 @@ func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.
 }
 
 func startAdsServer(ctx context.Context, snapCache cache.SnapshotCache) error {
-	lis, err := net.Listen("tcp", "127.0.0.1:18001")
+	lis, err := (&net.ListenConfig{}).Listen(ctx, "tcp", "127.0.0.1:18001")
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,3 @@
-//nolint:all
 package test
 
 import (
@@ -36,6 +35,7 @@ func (cb *Callbacks) OnStreamOpen(_ context.Context, id int64, typ string) error
 	}
 	return nil
 }
+
 func (cb *Callbacks) OnStreamClosed(id int64, node *core.Node) {
 	if cb.Debug {
 		log.Printf("stream %d of node %s closed\n", id, node.Id)
@@ -48,6 +48,7 @@ func (cb *Callbacks) OnDeltaStreamOpen(_ context.Context, id int64, typ string) 
 	}
 	return nil
 }
+
 func (cb *Callbacks) OnDeltaStreamClosed(id int64, node *core.Node) {
 	if cb.Debug {
 		log.Printf("delta stream %d of node %s closed\n", id, node.Id)
@@ -69,7 +70,7 @@ func (cb *Callbacks) OnStreamRequest(id int64, req *discovery.DiscoveryRequest) 
 	return nil
 }
 
-func (cb *Callbacks) OnStreamResponse(ctx context.Context, id int64, req *discovery.DiscoveryRequest, res *discovery.DiscoveryResponse) {
+func (cb *Callbacks) OnStreamResponse(_ context.Context, id int64, req *discovery.DiscoveryRequest, _ *discovery.DiscoveryResponse) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.Responses++
@@ -78,11 +79,12 @@ func (cb *Callbacks) OnStreamResponse(ctx context.Context, id int64, req *discov
 	}
 }
 
-func (cb *Callbacks) OnStreamDeltaResponse(id int64, req *discovery.DeltaDiscoveryRequest, res *discovery.DeltaDiscoveryResponse) {
+func (cb *Callbacks) OnStreamDeltaResponse(int64, *discovery.DeltaDiscoveryRequest, *discovery.DeltaDiscoveryResponse) {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 	cb.DeltaResponses++
 }
+
 func (cb *Callbacks) OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
@@ -94,6 +96,7 @@ func (cb *Callbacks) OnStreamDeltaRequest(int64, *discovery.DeltaDiscoveryReques
 
 	return nil
 }
+
 func (cb *Callbacks) OnFetchRequest(context.Context, *discovery.DiscoveryRequest) error {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
