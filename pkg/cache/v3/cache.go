@@ -92,7 +92,7 @@ type ConfigWatcher interface {
 	CreateDeltaWatch(*DeltaRequest, Subscription, chan DeltaResponse) (cancel func(), err error)
 }
 
-// ConfigFetcher fetches configuration resources from cache
+// ConfigFetcher fetches configuration resources from cache.
 type ConfigFetcher interface {
 	// Fetch implements the polling method of the config cache using a non-empty request.
 	Fetch(context.Context, *Request) (Response, error)
@@ -333,7 +333,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 	return marshaledResponse, nil
 }
 
-// GetRawResources is used internally within go-control-plane. Its interface and content may change
+// GetRawResources is used internally within go-control-plane. Its interface and content may change.
 func (r *RawResponse) GetRawResources() []types.ResourceWithTTL {
 	resources := make([]types.ResourceWithTTL, 0, len(r.resources))
 	for _, res := range r.resources {
@@ -386,7 +386,7 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 	return marshaledResponse, nil
 }
 
-// GetRawResources is used internally within go-control-plane. Its interface and content may change
+// GetRawResources is used internally within go-control-plane. Its interface and content may change.
 func (r *RawDeltaResponse) GetRawResources() []types.ResourceWithTTL {
 	resources := make([]types.ResourceWithTTL, 0, len(r.resources))
 	for _, res := range r.resources {
@@ -411,7 +411,7 @@ func (r *RawDeltaResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
 
 // GetVersion returns the response version.
 //
-// Deprecated: use GetResponseVersion instead
+// Deprecated: use GetResponseVersion instead.
 func (r *RawResponse) GetVersion() (string, error) {
 	return r.GetResponseVersion(), nil
 }
@@ -423,7 +423,7 @@ func (r *RawResponse) GetResponseVersion() string {
 
 // GetSystemVersion returns the raw SystemVersion.
 //
-// Deprecated: use GetResponseVersion instead
+// Deprecated: use GetResponseVersion instead.
 func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 	return r.GetResponseVersion(), nil
 }
@@ -435,7 +435,7 @@ func (r *RawDeltaResponse) GetResponseVersion() string {
 
 // GetNextVersionMap returns the version map which consists of updated version mappings after this response is applied.
 //
-// Deprecated: use GetReturnedResources instead
+// Deprecated: use GetReturnedResources instead.
 func (r *RawDeltaResponse) GetNextVersionMap() map[string]string {
 	return r.GetReturnedResources()
 }
@@ -517,7 +517,7 @@ func (r *DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRe
 
 // GetVersion returns the response version.
 //
-// Deprecated: use GetResponseVersion instead
+// Deprecated: use GetResponseVersion instead.
 func (r *PassthroughResponse) GetVersion() (string, error) {
 	discoveryResponse, _ := r.GetDiscoveryResponse()
 	if discoveryResponse != nil {
@@ -541,7 +541,7 @@ func (r *PassthroughResponse) GetContext() context.Context {
 
 // GetSystemVersion returns the response version.
 //
-// Deprecated: use GetResponseVersion instead
+// Deprecated: use GetResponseVersion instead.
 func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 	deltaDiscoveryResponse, _ := r.GetDeltaDiscoveryResponse()
 	if deltaDiscoveryResponse != nil {
@@ -561,7 +561,7 @@ func (r *DeltaPassthroughResponse) GetResponseVersion() string {
 
 // GetNextVersionMap returns the version map from a DeltaPassthroughResponse.
 //
-// Deprecated: use GetReturnedResources instead
+// Deprecated: use GetReturnedResources instead.
 func (r *DeltaPassthroughResponse) GetNextVersionMap() map[string]string {
 	return r.NextVersionMap
 }

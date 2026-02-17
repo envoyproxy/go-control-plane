@@ -30,12 +30,12 @@ type MarshaledResource = []byte
 // circuited due to the client's version already being up-to-date.
 type SkipFetchError struct{}
 
-// Error satisfies the error interface
+// Error satisfies the error interface.
 func (e SkipFetchError) Error() string {
 	return "skip fetch: version up to date"
 }
 
-// ResponseType enumeration of supported response types
+// ResponseType enumeration of supported response types.
 type ResponseType int
 
 // NOTE: The order of this enum MATTERS!

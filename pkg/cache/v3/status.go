@@ -32,7 +32,7 @@ type NodeHash interface {
 // IDHash uses ID field as the node hash.
 type IDHash struct{}
 
-// ID uses the node ID field
+// ID uses the node ID field.
 func (IDHash) ID(node *core.Node) string {
 	if node == nil {
 		return ""

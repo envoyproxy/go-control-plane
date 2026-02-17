@@ -119,7 +119,7 @@ type snapshotCache struct {
 
 // missingRequestResource is returned when the request is specifically dropped due to the resources in the request not matching the snapshot content.
 // This error is not returned to the user.
-// TODO(valerian-roche): remove this check which is very likely no longer needed
+// TODO(valerian-roche): remove this check which is very likely no longer needed.
 type missingRequestResource struct {
 	resources []string
 }
@@ -471,7 +471,7 @@ func (cache *snapshotCache) nextWatchID() int64 {
 	return atomic.AddInt64(&cache.watchCount, 1)
 }
 
-// cancellation function for cleaning stale watches
+// cancellation function for cleaning stale watches.
 func (cache *snapshotCache) cancelWatch(nodeID string, watchID int64) func() {
 	return func() {
 		// uses the cache mutex
@@ -791,7 +791,7 @@ func (cache *snapshotCache) nextDeltaWatchID() int64 {
 	return atomic.AddInt64(&cache.deltaWatchCount, 1)
 }
 
-// cancellation function for cleaning stale delta watches
+// cancellation function for cleaning stale delta watches.
 func (cache *snapshotCache) cancelDeltaWatch(nodeID string, watchID int64) func() {
 	return func() {
 		cache.mu.RLock()

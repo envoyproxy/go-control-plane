@@ -408,7 +408,7 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 	}
 }
 
-// GetResources returns current resources stored in the cache
+// GetResources returns current resources stored in the cache.
 func (cache *LinearCache) GetResources() map[string]types.Resource {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
@@ -510,7 +510,7 @@ func (cache *LinearCache) nextWatchID() uint64 {
 	return cache.currentWatchID
 }
 
-// Must be called under lock
+// Must be called under lock.
 func (cache *LinearCache) trackWatch(watch watch) func() {
 	cache.watchCount++
 
@@ -545,13 +545,13 @@ func (cache *LinearCache) trackWatch(watch watch) func() {
 	}
 }
 
-// Must be called under lock
+// Must be called under lock.
 func (cache *LinearCache) removeWildcardWatch(watchID uint64) {
 	cache.watchCount--
 	delete(cache.wildcardWatches, watchID)
 }
 
-// Must be called under lock
+// Must be called under lock.
 func (cache *LinearCache) removeWatch(watchID uint64, sub Subscription) {
 	// Make sure we clean the watch for ALL resources it might be associated with,
 	// as the channel will no longer be listened to

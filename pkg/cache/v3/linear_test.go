@@ -220,7 +220,7 @@ func subFromRequest(req *Request) stream.Subscription {
 }
 
 // This method represents the expected behavior of client and servers regarding the request and the subscription.
-// For edge cases it should ignore those
+// For edge cases it should ignore those.
 func updateFromSotwResponse(resp Response, sub *stream.Subscription, req *Request) {
 	sub.SetReturnedResources(resp.GetReturnedResources())
 	// Never returns an error when not using passthrough responses

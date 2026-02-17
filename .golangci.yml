@@ -19,6 +19,7 @@ linters:
     - contextcheck
     - errorlint
     - gocritic
+    - godot
     - gosec
     - misspell
     - modernize

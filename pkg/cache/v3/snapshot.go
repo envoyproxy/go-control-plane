@@ -165,7 +165,7 @@ func (s *Snapshot) GetVersionMap(typeURL string) map[string]string {
 	return s.VersionMap[typeURL]
 }
 
-// ConstructVersionMap will construct a version map based on the current state of a snapshot
+// ConstructVersionMap will construct a version map based on the current state of a snapshot.
 func (s *Snapshot) ConstructVersionMap() error {
 	if s == nil {
 		return errors.New("missing snapshot")

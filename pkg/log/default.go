@@ -1,10 +1,10 @@
 package log
 
 // DefaultLogger is enabled when no consuming clients provide
-// a logger to the server/cache subsystem
+// a logger to the server/cache subsystem.
 type DefaultLogger struct{}
 
-// NewDefaultLogger creates a DefaultLogger which is a no-op to maintain current functionality
+// NewDefaultLogger creates a DefaultLogger which is a no-op to maintain current functionality.
 func NewDefaultLogger() *DefaultLogger {
 	return &DefaultLogger{}
 }

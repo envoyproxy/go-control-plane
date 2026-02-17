@@ -10,7 +10,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-// watches for all xDS resource types
+// watches for all xDS resource types.
 type watches struct {
 	responders map[string]*watch
 
@@ -32,14 +32,14 @@ func (w *watches) addWatch(typeURL string, watch *watch) {
 	w.responders[typeURL] = watch
 }
 
-// close all open watches
+// close all open watches.
 func (w *watches) close() {
 	for _, watch := range w.responders {
 		watch.close()
 	}
 }
 
-// recomputeWatches rebuilds the known list of dynamic channels if needed
+// recomputeWatches rebuilds the known list of dynamic channels if needed.
 func (w *watches) recompute(ctx context.Context, req <-chan *discovery.DiscoveryRequest) {
 	w.cases = w.cases[:0] // Clear the existing cases while retaining capacity.
 
@@ -61,7 +61,7 @@ func (w *watches) recompute(ctx context.Context, req <-chan *discovery.Discovery
 	}
 }
 
-// watch contains the necessary modifiable data for receiving resource responses
+// watch contains the necessary modifiable data for receiving resource responses.
 type watch struct {
 	cancel   func()
 	response chan cache.Response
@@ -71,7 +71,7 @@ type watch struct {
 	nonce string
 }
 
-// close cancels an open watch
+// close cancels an open watch.
 func (w *watch) close() {
 	if w.cancel != nil {
 		w.cancel()

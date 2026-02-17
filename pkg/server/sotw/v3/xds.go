@@ -14,7 +14,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-// process handles a bi-di stream request
+// process handles a bi-di stream request.
 func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryRequest, defaultTypeURL string) error {
 	// create our streamWrapper which can be passed down to sub control loops.
 	// this is useful for abstracting critical information for various types of

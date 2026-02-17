@@ -105,7 +105,7 @@ func NewDeltaSubscription(subscribed, unsubscribed []string, initialResourceVers
 
 // UpdateResourceSubscriptions updates the subscribed resources (including the wildcard state)
 // based on newly subscribed or unsubscribed resources
-// Used in delta subscriptions
+// Used in delta subscriptions.
 func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []string) {
 	// Handles legacy wildcard behavior first to exit if we are still in this behavior
 	if s.allowLegacyWildcard {
@@ -160,24 +160,24 @@ func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []st
 }
 
 // SubscribedResources returns the list of resources currently explicitly subscribed to
-// If the request is set to wildcard it may be empty
+// If the request is set to wildcard it may be empty.
 func (s Subscription) SubscribedResources() map[string]struct{} {
 	return s.subscribedResourceNames
 }
 
-// IsWildcard returns whether or not the subscription currently has a wildcard watch
+// IsWildcard returns whether or not the subscription currently has a wildcard watch.
 func (s Subscription) IsWildcard() bool {
 	return s.wildcard
 }
 
 // ReturnedResources returns the list of resources returned to the client
-// and their version
+// and their version.
 func (s Subscription) ReturnedResources() map[string]string {
 	return s.returnedResources
 }
 
 // SetReturnedResources sets a list of resource versions currently known by the client
-// The cache can use this state to compute resources added/updated/deleted
+// The cache can use this state to compute resources added/updated/deleted.
 func (s *Subscription) SetReturnedResources(resourceVersions map[string]string) {
 	s.returnedResources = resourceVersions
 }
