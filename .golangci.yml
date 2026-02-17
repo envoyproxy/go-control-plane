@@ -22,8 +22,11 @@ linters:
     - gosec
     - misspell
     - modernize
+    - noctx
+    - nolintlint
     - perfsprint
     - revive
+    - staticcheck
     - testifylint
     - unconvert
     - unparam
@@ -51,6 +54,8 @@ linters:
         - G115
     misspell:
       locale: US
+    nolintlint:
+      require-specific: true
     perfsprint:
       int-conversion: true
       err-error: true
@@ -68,7 +73,10 @@ linters:
                 upper-case-const: true
                 skip-package-name-checks: true
                 skip-package-name-collision-with-go-std: true
-        
+    staticcheck:
+      checks:
+        - all
+        - -ST1003
     testifylint:
       disable:
         - float-compare

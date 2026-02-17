@@ -93,11 +93,15 @@ const (
 	// ProxyProtocol listener filter
 	ProxyProtocol = "envoy.filters.listener.proxy_protocol"
 	// TlsInspector listener filter
-	TlsInspector = "envoy.filters.listener.tls_inspector" // nolint:golint,revive
+	//
+	// Deprecated: Use TLSInspector instead.
+	TlsInspector = "envoy.filters.listener.tls_inspector" //nolint:golint
 	// TLSInspector listener filter
-	TLSInspector = "envoy.filters.listener.tls_inspector" // nolint:golint,revive
+	TLSInspector = "envoy.filters.listener.tls_inspector" //nolint:golint
 	// HttpInspector listener filter
-	HttpInspector = "envoy.filters.listener.http_inspector" // nolint:golint,revive
+	//
+	// Deprecated: Use HTTPInspector instead.
+	HttpInspector = "envoy.filters.listener.http_inspector" //nolint:golint
 	// HTTPInspector listener filter
 	HTTPInspector = "envoy.filters.listener.http_inspector"
 	// OriginalSource listener filter
@@ -143,7 +147,7 @@ const (
 	// TransportSocket RawBuffer
 	TransportSocketRawBuffer = "envoy.transport_sockets.raw_buffer"
 	// TransportSocket Tls
-	TransportSocketTls = "envoy.transport_sockets.tls" // nolint:golint,revive
+	TransportSocketTls = "envoy.transport_sockets.tls" //nolint:golint
 	// TransportSocketTLS labels the "envoy.transport_sockets.tls" filter.
 	TransportSocketTLS = "envoy.transport_sockets.tls"
 	// TransportSocket Quic

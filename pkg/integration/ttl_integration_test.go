@@ -1,7 +1,6 @@
 package integration
 
 import (
-	"context"
 	"net"
 	"testing"
 	"time"
@@ -42,7 +41,7 @@ func TestTTLResponse(t *testing.T) {
 	grpcServer := grpc.NewServer()
 	endpointservice.RegisterEndpointDiscoveryServiceServer(grpcServer, server)
 
-	l, err := net.Listen("tcp", ":9999") // nolint:gosec
+	l, err := (&net.ListenConfig{}).Listen(ctx, "tcp", ":9999")
 	require.NoError(t, err)
 
 	go func() {
@@ -75,7 +74,7 @@ func TestTTLResponse(t *testing.T) {
 		}},
 	})
 
-	err = snapshotCache.SetSnapshot(context.Background(), "test", snap)
+	err = snapshotCache.SetSnapshot(ctx, "test", snap)
 	require.NoError(t, err)
 
 	timeout := time.NewTimer(5 * time.Second)

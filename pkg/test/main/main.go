@@ -302,7 +302,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("could not create %s profile %s: %s", prof, filePath, err)
 			}
-			p.WriteTo(f, 1) // nolint:errcheck
+			p.WriteTo(f, 1) //nolint:errcheck
 			f.Close()
 		}
 	}
@@ -320,7 +320,7 @@ func callEcho() (int, int) {
 	client := http.Client{
 		Timeout: 100 * time.Millisecond,
 		Transport: &http.Transport{
-			TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true}, // nolint:gosec
+			TLSClientConfig: &cryptotls.Config{InsecureSkipVerify: true}, //nolint:gosec
 		},
 	}
 

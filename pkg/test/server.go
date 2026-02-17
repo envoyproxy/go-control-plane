@@ -37,7 +37,7 @@ type HTTPGateway struct {
 // RunAccessLogServer starts an accesslog server.
 func RunAccessLogServer(ctx context.Context, als *test.AccessLogService, alsPort uint) {
 	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", alsPort))
+	lis, err := (&net.ListenConfig{}).Listen(ctx, "tcp", fmt.Sprintf(":%d", alsPort))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func RunManagementServer(ctx context.Context, srv server.Server, port uint) {
 	)
 	grpcServer := grpc.NewServer(grpcOptions...)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	lis, err := (&net.ListenConfig{}).Listen(ctx, "tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,7 +97,7 @@ func RunManagementServer(ctx context.Context, srv server.Server, port uint) {
 func RunManagementGateway(ctx context.Context, srv server.Server, port uint) {
 	log.Printf("gateway listening HTTP/1.1 on %d\n", port)
 	// Ignore: G114: Use of net/http serve function that has no support for setting timeouts
-	// nolint:gosec
+	//nolint:gosec
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: &HTTPGateway{
