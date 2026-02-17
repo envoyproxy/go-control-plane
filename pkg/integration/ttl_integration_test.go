@@ -29,14 +29,13 @@ type logger struct {
 	t *testing.T
 }
 
-func (log logger) Debugf(format string, args ...interface{}) { log.t.Logf(format, args...) }
-func (log logger) Infof(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Warnf(format string, args ...interface{})  { log.t.Logf(format, args...) }
-func (log logger) Errorf(format string, args ...interface{}) { log.t.Logf(format, args...) }
+func (log logger) Debugf(format string, args ...any) { log.t.Logf(format, args...) }
+func (log logger) Infof(format string, args ...any)  { log.t.Logf(format, args...) }
+func (log logger) Warnf(format string, args ...any)  { log.t.Logf(format, args...) }
+func (log logger) Errorf(format string, args ...any) { log.t.Logf(format, args...) }
 
 func TestTTLResponse(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	snapshotCache := cache.NewSnapshotCacheWithHeartbeating(ctx, false, cache.IDHash{}, logger{t: t}, time.Second)
 	server := server.NewServer(ctx, snapshotCache, nil, sotw.WithLogger(log.NewTestLogger(t)))

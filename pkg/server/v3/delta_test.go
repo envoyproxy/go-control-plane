@@ -430,7 +430,7 @@ func TestDeltaOpaqueRequestsChannelMuxing(t *testing.T) {
 	config := makeMockConfigWatcher()
 	resp := makeMockDeltaStream(t)
 	defer resp.cancel()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		resp.recv <- &discovery.DeltaDiscoveryRequest{
 			Node:                   node,
 			TypeUrl:                fmt.Sprintf("%s%d", opaqueType, i%2),
@@ -656,7 +656,7 @@ func TestDeltaMultipleStreams(t *testing.T) {
 			},
 		)
 
-		for i := 0; i < 2; i++ {
+		for range 2 {
 			resp.recv <- &discovery.DeltaDiscoveryRequest{
 				Node:                   node,
 				TypeUrl:                rsrc.EndpointType,

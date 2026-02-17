@@ -20,6 +20,7 @@ linters:
     - errorlint
     - gosec
     - misspell
+    - modernize
     - perfsprint
     - revive
     - testifylint

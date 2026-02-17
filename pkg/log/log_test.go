@@ -42,10 +42,10 @@ func TestLoggerFuncs(t *testing.T) {
 	err := 0
 
 	xdsLogger := LoggerFuncs{
-		DebugFunc: func(string, ...interface{}) { debug++ },
-		InfoFunc:  func(string, ...interface{}) { info++ },
-		WarnFunc:  func(string, ...interface{}) { warn++ },
-		ErrorFunc: func(string, ...interface{}) { err++ },
+		DebugFunc: func(string, ...any) { debug++ },
+		InfoFunc:  func(string, ...any) { info++ },
+		WarnFunc:  func(string, ...any) { warn++ },
+		ErrorFunc: func(string, ...any) { err++ },
 	}
 
 	xdsLogger.Debugf("debug")

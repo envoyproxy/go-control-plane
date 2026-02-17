@@ -31,12 +31,10 @@ func TestFetch(t *testing.T) {
 
 	snapCache := cache.NewSnapshotCache(true, cache.IDHash{}, nil)
 	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		err := startAdsServer(ctx, snapCache)
 		require.NoError(t, err)
-	}()
+	})
 
 	conn, err := grpc.NewClient(":18001", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
@@ -57,10 +55,8 @@ func TestFetch(t *testing.T) {
 func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
 	return func(t *testing.T) {
 		wg := sync.WaitGroup{}
-		wg.Add(1)
 
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			// watch for configs
 			resp, err := c.Fetch()
 			require.NoError(t, err)
@@ -74,7 +70,7 @@ func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c clie
 
 			err = c.Ack()
 			require.NoError(t, err)
-		}()
+		})
 
 		snapshot, err := cache.NewSnapshot("1", map[resource.Type][]types.Resource{
 			resource.ClusterType: {
@@ -96,10 +92,8 @@ func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c clie
 func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.ADSClient) func(t *testing.T) {
 	return func(t *testing.T) {
 		wg := sync.WaitGroup{}
-		wg.Add(1)
 
-		go func() {
-			defer wg.Done()
+		wg.Go(func() {
 			// watch for configs
 			resp, err := c.Fetch()
 			require.NoError(t, err)
@@ -113,7 +107,7 @@ func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.
 
 			err = c.Ack()
 			require.NoError(t, err)
-		}()
+		})
 
 		snapshot, err := cache.NewSnapshot("2", map[resource.Type][]types.Resource{
 			resource.ClusterType: {
