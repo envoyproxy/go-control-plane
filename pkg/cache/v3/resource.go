@@ -18,6 +18,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"maps"
 
 	"google.golang.org/protobuf/proto"
 
@@ -197,12 +198,6 @@ func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[r
 	}
 }
 
-func mapMerge(dst, src map[string]bool) {
-	for k, v := range src {
-		dst[k] = v
-	}
-}
-
 // Clusters will reference either the endpoint's cluster name or ServiceName override.
 func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string]bool) {
 	endpoints := map[string]bool{}
@@ -223,7 +218,7 @@ func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string
 			out[resource.EndpointType] = map[string]bool{}
 		}
 
-		mapMerge(out[resource.EndpointType], endpoints)
+		maps.Copy(out[resource.EndpointType], endpoints)
 	}
 }
 
@@ -245,7 +240,7 @@ func getListenerReferences(src *listener.Listener, out map[resource.Type]map[str
 			out[resource.RouteType] = map[string]bool{}
 		}
 
-		mapMerge(out[resource.RouteType], routes)
+		maps.Copy(out[resource.RouteType], routes)
 	}
 }
 
@@ -279,7 +274,7 @@ func getScopedRouteReferences(src *route.ScopedRouteConfiguration, out map[resou
 			out[resource.RouteType] = map[string]bool{}
 		}
 
-		mapMerge(out[resource.RouteType], routes)
+		maps.Copy(out[resource.RouteType], routes)
 	}
 }
 

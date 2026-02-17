@@ -102,8 +102,7 @@ var (
 )
 
 func TestSnapshotCacheWithTTL(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 	c := cache.NewSnapshotCacheWithHeartbeating(ctx, true, group{}, log.NewTestLogger(t), time.Second)
 
 	_, err := c.GetSnapshot(key)
@@ -328,8 +327,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 
 func TestConcurrentSetWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
-	for i := 0; i < 50; i++ {
-		i := i
+	for i := range 50 {
 		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
 			t.Parallel()
 			id := t.Name()

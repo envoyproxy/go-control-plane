@@ -190,7 +190,7 @@ func TestDeltaRemoveResources(t *testing.T) {
 
 func TestConcurrentSetDeltaWatch(t *testing.T) {
 	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
-	for i := 0; i < 50; i++ {
+	for i := range 50 {
 		version := fmt.Sprintf("v%d", i)
 		func(i int) {
 			t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {

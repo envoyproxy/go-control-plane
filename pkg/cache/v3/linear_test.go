@@ -17,6 +17,7 @@ package cache
 import (
 	"fmt"
 	"reflect"
+	"slices"
 	"strconv"
 	"testing"
 	"time"
@@ -144,13 +145,7 @@ func validateDeltaResponse(t *testing.T, resp DeltaResponse, resources []resourc
 	assert.Equalf(t, validationCtx.expectedType, out.GetTypeUrl(), "unexpected type URL: received %s and expected %s", out.GetTypeUrl(), validationCtx.expectedType)
 	assert.Lenf(t, out.GetRemovedResources(), len(deleted), "unexpected number of removed resurces: got %d, want %d", len(out.GetRemovedResources()), len(deleted))
 	for _, r := range deleted {
-		found := false
-		for _, rr := range out.GetRemovedResources() {
-			if r == rr {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(out.GetRemovedResources(), r)
 		assert.Truef(t, found, "Expected resource %s to be deleted", r)
 	}
 }

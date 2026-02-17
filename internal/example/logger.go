@@ -26,25 +26,25 @@ type Logger struct {
 }
 
 // Log to stdout only if Debug is true.
-func (logger Logger) Debugf(format string, args ...interface{}) {
+func (logger Logger) Debugf(format string, args ...any) {
 	if logger.Debug {
 		log.Printf(format+"\n", args...)
 	}
 }
 
 // Log to stdout only if Debug is true.
-func (logger Logger) Infof(format string, args ...interface{}) {
+func (logger Logger) Infof(format string, args ...any) {
 	if logger.Debug {
 		log.Printf(format+"\n", args...)
 	}
 }
 
 // Log to stdout always.
-func (logger Logger) Warnf(format string, args ...interface{}) {
+func (logger Logger) Warnf(format string, args ...any) {
 	log.Printf(format+"\n", args...)
 }
 
 // Log to stdout always.
-func (logger Logger) Errorf(format string, args ...interface{}) {
+func (logger Logger) Errorf(format string, args ...any) {
 	log.Printf(format+"\n", args...)
 }

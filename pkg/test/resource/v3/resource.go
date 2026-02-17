@@ -610,7 +610,7 @@ func (ts *TestSnapshot) generateHTTPListeners(numListeners int, clusters []types
 		return nil, nil
 	}
 
-	for i := 0; i < numListeners; i++ {
+	for i := range numListeners {
 		listenerName := fmt.Sprintf("listener-%d", ts.currentPort-ts.BasePort)
 		routeName := fmt.Sprintf("route-%s-%d", ts.Version, ts.currentPort)
 
@@ -635,7 +635,7 @@ func (ts *TestSnapshot) generateScopedHTTPListeners(numListeners int, clusters [
 		return nil, nil, nil
 	}
 
-	for i := 0; i < numListeners; i++ {
+	for i := range numListeners {
 		listenerName := fmt.Sprintf("listener-%d", ts.currentPort-ts.BasePort)
 		scopedRouteName := fmt.Sprintf("scopedroute-%d", i)
 		routeName := fmt.Sprintf("route-%s-%d", ts.Version, ts.currentPort)
@@ -662,7 +662,7 @@ func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []t
 		return nil, nil, nil
 	}
 
-	for i := 0; i < numListeners; i++ {
+	for i := range numListeners {
 		listenerName := fmt.Sprintf("listener-%d", ts.currentPort-ts.BasePort)
 		routeName := fmt.Sprintf("route-%s-%d", ts.Version, ts.currentPort)
 		virtualHostName := fmt.Sprintf("%s/%s", routeName, ts.getPath())
@@ -687,7 +687,7 @@ func (ts *TestSnapshot) generateTCPListeners(numListeners int, clusters []types.
 		return nil
 	}
 
-	for i := 0; i < numListeners; i++ {
+	for i := range numListeners {
 		listenerName := fmt.Sprintf("listener-%d", ts.currentPort-ts.BasePort)
 
 		// Evenly distribute routes amongst current number of clusters.

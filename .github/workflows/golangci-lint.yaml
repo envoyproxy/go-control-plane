@@ -3,13 +3,17 @@ name: golangci-lint
 permissions:
   contents: read
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
-  golangci:
+  golangci-lint:
     permissions:
-      contents: read  # for actions/checkout to fetch code
-      pull-requests: read  # for golangci/golangci-lint-action to fetch pull requests
+      contents: read
+      pull-requests: read
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -19,6 +23,5 @@ jobs:
         with:
           version: latest
           only-new-issues: false
-          
           # Optional: golangci-lint command line arguments.
           args: --verbose

@@ -18,50 +18,50 @@ package log
 // Logger interface for reporting informational and warning messages.
 type Logger interface {
 	// Debugf logs a formatted debugging message.
-	Debugf(format string, args ...interface{})
+	Debugf(format string, args ...any)
 
 	// Infof logs a formatted informational message.
-	Infof(format string, args ...interface{})
+	Infof(format string, args ...any)
 
 	// Warnf logs a formatted warning message.
-	Warnf(format string, args ...interface{})
+	Warnf(format string, args ...any)
 
 	// Errorf logs a formatted error message.
-	Errorf(format string, args ...interface{})
+	Errorf(format string, args ...any)
 }
 
 // LoggerFuncs implements the Logger interface, allowing the
 // caller to specify only the logging functions that are desired.
 type LoggerFuncs struct {
-	DebugFunc func(string, ...interface{})
-	InfoFunc  func(string, ...interface{})
-	WarnFunc  func(string, ...interface{})
-	ErrorFunc func(string, ...interface{})
+	DebugFunc func(string, ...any)
+	InfoFunc  func(string, ...any)
+	WarnFunc  func(string, ...any)
+	ErrorFunc func(string, ...any)
 }
 
 // Debugf logs a formatted debugging message.
-func (f LoggerFuncs) Debugf(format string, args ...interface{}) {
+func (f LoggerFuncs) Debugf(format string, args ...any) {
 	if f.DebugFunc != nil {
 		f.DebugFunc(format, args...)
 	}
 }
 
 // Infof logs a formatted informational message.
-func (f LoggerFuncs) Infof(format string, args ...interface{}) {
+func (f LoggerFuncs) Infof(format string, args ...any) {
 	if f.InfoFunc != nil {
 		f.InfoFunc(format, args...)
 	}
 }
 
 // Warnf logs a formatted warning message.
-func (f LoggerFuncs) Warnf(format string, args ...interface{}) {
+func (f LoggerFuncs) Warnf(format string, args ...any) {
 	if f.WarnFunc != nil {
 		f.WarnFunc(format, args...)
 	}
 }
 
 // Errorf logs a formatted error message.
-func (f LoggerFuncs) Errorf(format string, args ...interface{}) {
+func (f LoggerFuncs) Errorf(format string, args ...any) {
 	if f.ErrorFunc != nil {
 		f.ErrorFunc(format, args...)
 	}

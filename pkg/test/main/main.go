@@ -343,7 +343,7 @@ func callEcho() (int, int) {
 	}
 
 	// spawn requests
-	for i := 0; i < total; i++ {
+	for i := range total {
 		go func(i int) {
 			resp, err := get(i)
 			if err != nil {

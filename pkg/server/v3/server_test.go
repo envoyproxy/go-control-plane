@@ -637,7 +637,7 @@ func TestCancellations(t *testing.T) {
 func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 	config := makeMockConfigWatcher()
 	resp := makeMockStream(t)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		resp.recv <- &discovery.DiscoveryRequest{
 			Node:    node,
 			TypeUrl: fmt.Sprintf("%s%d", opaqueType, i%2),
@@ -655,7 +655,7 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 func TestNilPropagationOverResponseChannelShouldCloseTheStream(t *testing.T) {
 	config := makeMockConfigWatcher()
 	resp := makeMockStream(t)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		resp.recv <- &discovery.DiscoveryRequest{
 			Node:    node,
 			TypeUrl: nilType,

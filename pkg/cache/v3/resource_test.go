@@ -132,7 +132,6 @@ func TestGetResourceNames(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		test := test
 		t.Run(test.name, func(t *testing.T) {
 			got := cache.GetResourceNames(test.input)
 			assert.ElementsMatch(t, test.want, got)
