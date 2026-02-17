@@ -46,10 +46,10 @@ const (
 	// XdsCluster is the cluster name for the control server (used by non-ADS set-up).
 	XdsCluster = "xds_cluster"
 
-	// AlsCluster is the clustername for gRPC access log service (ALS)
+	// AlsCluster is the clustername for gRPC access log service (ALS).
 	AlsCluster = "als_cluster"
 
-	// Ads mode for resources: one aggregated xDS service
+	// Ads mode for resources: one aggregated xDS service.
 	Ads = "ads"
 
 	// Xds mode for resources: individual xDS services.
@@ -187,7 +187,7 @@ func MakeVirtualHost(virtualHostName, clusterName string) *route.VirtualHost {
 	return ret
 }
 
-// data source configuration
+// data source configuration.
 func configSource(mode string) *core.ConfigSource {
 	source := &core.ConfigSource{}
 	source.ResourceApiVersion = resource.DefaultAPIVersion

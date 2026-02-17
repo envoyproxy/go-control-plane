@@ -26,13 +26,13 @@ const (
 	RuntimeType         = APITypePrefix + "envoy.service.runtime.v3.Runtime"
 	ThriftRouteType     = APITypePrefix + "envoy.extensions.filters.network.thrift_proxy.v3.RouteConfiguration"
 
-	// Rate Limit service
+	// Rate Limit service.
 	RateLimitConfigType = APITypePrefix + "ratelimit.config.ratelimit.v3.RateLimitConfig"
 
-	// LEDS
+	// LEDS.
 	LbEndpointType = APITypePrefix + "envoy.config.endpoint.v3.LbEndpoint"
 
-	// AnyType is used only by ADS
+	// AnyType is used only by ADS.
 	AnyType = ""
 )
 
@@ -48,7 +48,7 @@ const (
 	FetchExtensionConfigs = "/v3/discovery:extension_configs"
 )
 
-// DefaultAPIVersion is the api version
+// DefaultAPIVersion is the api version.
 const DefaultAPIVersion = core.ApiVersion_V3
 
 // GetHTTPConnectionManager creates a HttpConnectionManager

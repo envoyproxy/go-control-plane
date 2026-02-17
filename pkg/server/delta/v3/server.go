@@ -50,7 +50,7 @@ type server struct {
 	opts config.Opts
 }
 
-// WithLogger configures the server logger. Defaults to no logging
+// WithLogger configures the server logger. Defaults to no logging.
 func WithLogger(logger log.Logger) config.XDSOption {
 	return func(o *config.Opts) {
 		o.Logger = logger

@@ -67,7 +67,7 @@ func WithOrderedADS() config.XDSOption {
 	}
 }
 
-// WithLogger configures the server logger. Defaults to no logging
+// WithLogger configures the server logger. Defaults to no logging.
 func WithLogger(logger log.Logger) config.XDSOption {
 	return func(o *config.Opts) {
 		o.Logger = logger
@@ -158,7 +158,7 @@ func (s *streamWrapper) shutdown() {
 	}
 }
 
-// StreamHandler converts a blocking read call to channels and initiates stream processing
+// StreamHandler converts a blocking read call to channels and initiates stream processing.
 func (s *server) StreamHandler(stream stream.Stream, typeURL string) error {
 	// a channel for receiving incoming requests
 	reqCh := make(chan *discovery.DiscoveryRequest)

@@ -10,7 +10,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-// process handles a bi-di stream request
+// process handles a bi-di stream request.
 func (s *server) processADS(sw *streamWrapper, reqCh chan *discovery.DiscoveryRequest) error {
 	// Create a buffered multiplexed channel the size of the known resource types.
 	respChan := make(chan cache.Response, types.UnknownType)

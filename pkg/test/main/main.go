@@ -157,7 +157,7 @@ func init() {
 	flag.BoolVar(&pprofEnabled, "pprof", false, "Enable use of the pprof profiler")
 }
 
-// main returns code 1 if any of the batches failed to pass all requests
+// main returns code 1 if any of the batches failed to pass all requests.
 func main() {
 	flag.Parse()
 	ctx := context.Background()

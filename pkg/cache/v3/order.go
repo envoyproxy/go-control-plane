@@ -7,7 +7,7 @@ type key struct {
 	TypeURL string
 }
 
-// Keys implements Go's sorting.Sort interface
+// Keys implements Go's sorting.Sort interface.
 type keys []key
 
 func (k keys) Len() int {

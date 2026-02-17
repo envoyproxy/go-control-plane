@@ -71,7 +71,7 @@ type adsClient struct {
 	lastReceivedResponse *discovery.DiscoveryResponse
 }
 
-// NewADSClient returns a new ADSClient
+// NewADSClient returns a new ADSClient.
 func NewADSClient(ctx context.Context, node *core.Node, typeURL string) ADSClient {
 	return &adsClient{
 		ctx:     ctx,

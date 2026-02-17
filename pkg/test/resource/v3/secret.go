@@ -96,7 +96,7 @@ yA==
 -----END CERTIFICATE-----`
 )
 
-// MakeSecrets generates an SDS secret
+// MakeSecrets generates an SDS secret.
 func MakeSecrets(tlsName, rootName string) []*auth.Secret {
 	return []*auth.Secret{
 		{

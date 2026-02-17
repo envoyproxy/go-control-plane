@@ -6,7 +6,7 @@ import (
 	"github.com/envoyproxy/go-control-plane/pkg/server/stream/v3"
 )
 
-// watches for all delta xDS resource types
+// watches for all delta xDS resource types.
 type watches struct {
 	deltaWatches map[string]watch
 
@@ -27,7 +27,7 @@ func newWatches() watches {
 	}
 }
 
-// Cancel all watches
+// Cancel all watches.
 func (w *watches) Cancel() {
 	for _, watch := range w.deltaWatches {
 		watch.Cancel()
@@ -36,7 +36,7 @@ func (w *watches) Cancel() {
 	close(w.deltaMuxedResponses)
 }
 
-// watch contains the necessary modifiables for receiving resource responses
+// watch contains the necessary modifiables for receiving resource responses.
 type watch struct {
 	cancel func()
 	nonce  string
@@ -44,7 +44,7 @@ type watch struct {
 	subscription stream.Subscription
 }
 
-// Cancel calls terminate and cancel
+// Cancel calls terminate and cancel.
 func (w *watch) Cancel() {
 	if w.cancel != nil {
 		w.cancel()

@@ -103,7 +103,7 @@ func GetResourceName(res types.Resource) string {
 }
 
 // ResourceRequiresFullStateInSotw indicates whether when building the reply in Sotw,
-// the response must include all existing resources or can return only the modified ones
+// the response must include all existing resources or can return only the modified ones.
 func ResourceRequiresFullStateInSotw(typeURL resource.Type) bool {
 	// From https://www.envoyproxy.io/docs/envoy/v1.28.0/api-docs/xds_protocol#grouping-resources-into-responses,
 	// when using sotw the control-plane MUST return all requested resources (or simply all if wildcard)
@@ -275,7 +275,7 @@ func getScopedRouteReferences(src *route.ScopedRouteConfiguration, out map[resou
 	}
 }
 
-// HashResource will take a resource and create a SHA256 hash sum out of the marshaled bytes
+// HashResource will take a resource and create a SHA256 hash sum out of the marshaled bytes.
 func HashResource(resource []byte) string {
 	hasher := sha256.New()
 	hasher.Write(resource)

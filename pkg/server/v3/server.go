@@ -133,7 +133,7 @@ func (c CallbackFuncs) OnStreamResponse(ctx context.Context, streamID int64, req
 	}
 }
 
-// OnStreamDeltaRequest invokes StreamDeltaResponseFunc
+// OnStreamDeltaRequest invokes StreamDeltaResponseFunc.
 func (c CallbackFuncs) OnStreamDeltaRequest(streamID int64, req *discovery.DeltaDiscoveryRequest) error {
 	if c.StreamDeltaRequestFunc != nil {
 		return c.StreamDeltaRequestFunc(streamID, req)
