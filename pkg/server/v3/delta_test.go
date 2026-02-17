@@ -149,6 +149,7 @@ func (stream *mockDeltaStream) Recv() (*discovery.DeltaDiscoveryRequest, error) 
 }
 
 func makeMockDeltaStream(t *testing.T) *mockDeltaStream {
+	t.Helper()
 	ctx, cancel := context.WithCancel(context.Background())
 	return &mockDeltaStream{
 		t:      t,

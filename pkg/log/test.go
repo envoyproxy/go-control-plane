@@ -8,8 +8,9 @@ type testLogger struct {
 
 var _ Logger = testLogger{}
 
-func NewTestLogger(t testing.TB) Logger {
-	return testLogger{t}
+func NewTestLogger(tb testing.TB) Logger {
+	tb.Helper()
+	return testLogger{tb}
 }
 
 // Debugf logs a message at level debug on the test logger.

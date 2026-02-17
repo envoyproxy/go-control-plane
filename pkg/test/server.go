@@ -129,7 +129,7 @@ func (h *HTTPGateway) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if _, err = resp.Write(bytes); err != nil && h.Log != nil {
+	if _, err = resp.Write(bytes); err != nil && h.Log != nil { //nolint:gosec
 		h.Log.Errorf("gateway error: %v", err)
 	}
 }

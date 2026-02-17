@@ -326,6 +326,7 @@ func TestSnapshotCacheWatch(t *testing.T) {
 }
 
 func TestConcurrentSetWatch(t *testing.T) {
+	t.Parallel()
 	c := cache.NewSnapshotCache(false, group{}, log.NewTestLogger(t))
 	for i := range 50 {
 		t.Run(fmt.Sprintf("worker%d", i), func(t *testing.T) {
