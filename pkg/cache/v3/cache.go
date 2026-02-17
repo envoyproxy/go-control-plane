@@ -118,6 +118,7 @@ type Response interface {
 	// The version can be a property of the resources, allowing for optimizations in subsequent calls,
 	// or simply an internal property of the cache which can be used for debugging.
 	// The cache implementation should be able to determine if it can provide such optimization.
+	//
 	// Deprecated: use GetResponseVersion instead
 	GetVersion() (string, error)
 
@@ -149,6 +150,7 @@ type DeltaResponse interface {
 	// GetSystemVersion returns the version in the DeltaResponse.
 	// The version in delta response is not indicative of the resources included,
 	// but an internal property of the cache which can be used for debugging.
+	//
 	// Deprecated: use GetResponseVersion instead
 	GetSystemVersion() (string, error)
 
@@ -159,6 +161,7 @@ type DeltaResponse interface {
 
 	// GetNextVersionMap provides the version map of the internal cache.
 	// The version map consists of updated version mappings after this response is applied.
+	//
 	// Deprecated: use GetReturnedResources instead
 	GetNextVersionMap() map[string]string
 
@@ -407,6 +410,7 @@ func (r *RawDeltaResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRequest {
 }
 
 // GetVersion returns the response version.
+//
 // Deprecated: use GetResponseVersion instead
 func (r *RawResponse) GetVersion() (string, error) {
 	return r.GetResponseVersion(), nil
@@ -418,6 +422,7 @@ func (r *RawResponse) GetResponseVersion() string {
 }
 
 // GetSystemVersion returns the raw SystemVersion.
+//
 // Deprecated: use GetResponseVersion instead
 func (r *RawDeltaResponse) GetSystemVersion() (string, error) {
 	return r.GetResponseVersion(), nil
@@ -429,6 +434,7 @@ func (r *RawDeltaResponse) GetResponseVersion() string {
 }
 
 // GetNextVersionMap returns the version map which consists of updated version mappings after this response is applied.
+//
 // Deprecated: use GetReturnedResources instead
 func (r *RawDeltaResponse) GetNextVersionMap() map[string]string {
 	return r.GetReturnedResources()
@@ -510,6 +516,7 @@ func (r *DeltaPassthroughResponse) GetDeltaRequest() *discovery.DeltaDiscoveryRe
 }
 
 // GetVersion returns the response version.
+//
 // Deprecated: use GetResponseVersion instead
 func (r *PassthroughResponse) GetVersion() (string, error) {
 	discoveryResponse, _ := r.GetDiscoveryResponse()
@@ -533,6 +540,7 @@ func (r *PassthroughResponse) GetContext() context.Context {
 }
 
 // GetSystemVersion returns the response version.
+//
 // Deprecated: use GetResponseVersion instead
 func (r *DeltaPassthroughResponse) GetSystemVersion() (string, error) {
 	deltaDiscoveryResponse, _ := r.GetDeltaDiscoveryResponse()
@@ -552,6 +560,7 @@ func (r *DeltaPassthroughResponse) GetResponseVersion() string {
 }
 
 // GetNextVersionMap returns the version map from a DeltaPassthroughResponse.
+//
 // Deprecated: use GetReturnedResources instead
 func (r *DeltaPassthroughResponse) GetNextVersionMap() map[string]string {
 	return r.NextVersionMap

@@ -202,14 +202,11 @@ func getResourceReferences(resources map[string]types.ResourceWithTTL, out map[r
 func getClusterReferences(src *cluster.Cluster, out map[resource.Type]map[string]bool) {
 	endpoints := map[string]bool{}
 
-	switch typ := src.GetClusterDiscoveryType().(type) {
-	case *cluster.Cluster_Type:
-		if typ.Type == cluster.Cluster_EDS {
-			if src.GetEdsClusterConfig() != nil && src.GetEdsClusterConfig().GetServiceName() != "" {
-				endpoints[src.GetEdsClusterConfig().GetServiceName()] = true
-			} else {
-				endpoints[src.GetName()] = true
-			}
+	if typ, ok := src.GetClusterDiscoveryType().(*cluster.Cluster_Type); ok && typ.Type == cluster.Cluster_EDS {
+		if src.GetEdsClusterConfig() != nil && src.GetEdsClusterConfig().GetServiceName() != "" {
+			endpoints[src.GetEdsClusterConfig().GetServiceName()] = true
+		} else {
+			endpoints[src.GetName()] = true
 		}
 	}
 

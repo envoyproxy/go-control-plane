@@ -144,7 +144,7 @@ func (s *server) processDelta(str stream.DeltaStream, reqCh <-chan *discovery.De
 		watch := watches.deltaWatches[typ]
 		watch.nonce = nonce
 
-		watch.subscription.SetReturnedResources(resp.GetNextVersionMap())
+		watch.subscription.SetReturnedResources(resp.GetReturnedResources())
 		watches.deltaWatches[typ] = watch
 		return nil
 	}
