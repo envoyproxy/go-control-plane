@@ -72,17 +72,15 @@ func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c clie
 			require.NoError(t, err)
 		})
 
-		snapshot, err := cache.NewSnapshot("1", map[resource.Type][]types.Resource{
+		snapshot, err := types.NewSnapshot("1", map[string][]types.SnapshotResource{
 			resource.ClusterType: {
-				&clusterv3.Cluster{Name: "cluster_1"},
-				&clusterv3.Cluster{Name: "cluster_2"},
-				&clusterv3.Cluster{Name: "cluster_3"},
+				{Name: "cluster_1", Resource: &clusterv3.Cluster{Name: "cluster_1"}},
+				{Name: "cluster_2", Resource: &clusterv3.Cluster{Name: "cluster_2"}},
+				{Name: "cluster_3", Resource: &clusterv3.Cluster{Name: "cluster_3"}},
 			},
 		})
 		require.NoError(t, err)
 
-		err = snapshot.Consistent()
-		require.NoError(t, err)
 		err = snapCache.SetSnapshot(ctx, "node_1", snapshot)
 		wg.Wait()
 		require.NoError(t, err)
@@ -109,16 +107,14 @@ func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.
 			require.NoError(t, err)
 		})
 
-		snapshot, err := cache.NewSnapshot("2", map[resource.Type][]types.Resource{
+		snapshot, err := types.NewSnapshot("2", map[string][]types.SnapshotResource{
 			resource.ClusterType: {
-				&clusterv3.Cluster{Name: "cluster_2"},
-				&clusterv3.Cluster{Name: "cluster_4"},
+				{Name: "cluster_2", Resource: &clusterv3.Cluster{Name: "cluster_2"}},
+				{Name: "cluster_4", Resource: &clusterv3.Cluster{Name: "cluster_4"}},
 			},
 		})
 		require.NoError(t, err)
 
-		err = snapshot.Consistent()
-		require.NoError(t, err)
 		err = snapCache.SetSnapshot(ctx, "node_1", snapshot)
 		require.NoError(t, err)
 		wg.Wait()

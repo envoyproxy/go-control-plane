@@ -602,9 +602,9 @@ type TestSnapshot struct {
 	currentPort uint32
 }
 
-func (ts *TestSnapshot) generateHTTPListeners(numListeners int, clusters []types.Resource) ([]types.Resource, []types.Resource) {
-	listeners := []types.Resource{}
-	routeConfigs := []types.Resource{}
+func (ts *TestSnapshot) generateHTTPListeners(numListeners int, clusters []types.SnapshotResource) ([]types.SnapshotResource, []types.SnapshotResource) {
+	listeners := []types.SnapshotResource{}
+	routeConfigs := []types.SnapshotResource{}
 
 	if len(clusters) == 0 {
 		return nil, nil
@@ -615,10 +615,16 @@ func (ts *TestSnapshot) generateHTTPListeners(numListeners int, clusters []types
 		routeName := fmt.Sprintf("route-%s-%d", ts.Version, ts.currentPort)
 
 		// Evenly distribute routes amongst current number of clusters.
-		routeConfigs = append(routeConfigs, MakeRouteConfig(routeName, cache.GetResourceName(clusters[i%len(clusters)])))
+		routeConfigs = append(routeConfigs, types.SnapshotResource{
+			Name:     routeName,
+			Resource: MakeRouteConfig(routeName, cache.GetResourceName(clusters[i%len(clusters)].Resource)),
+		})
 		listener := MakeRouteHTTPListener(ts.Xds, listenerName, ts.currentPort, routeName)
 		ts.addTLS(listener)
-		listeners = append(listeners, listener)
+		listeners = append(listeners, types.SnapshotResource{
+			Name:     listenerName,
+			Resource: listener,
+		})
 
 		ts.currentPort++
 	}
@@ -626,10 +632,10 @@ func (ts *TestSnapshot) generateHTTPListeners(numListeners int, clusters []types
 	return listeners, routeConfigs
 }
 
-func (ts *TestSnapshot) generateScopedHTTPListeners(numListeners int, clusters []types.Resource) ([]types.Resource, []types.Resource, []types.Resource) {
-	listeners := []types.Resource{}
-	scopedRouteConfigs := []types.Resource{}
-	routeConfigs := []types.Resource{}
+func (ts *TestSnapshot) generateScopedHTTPListeners(numListeners int, clusters []types.SnapshotResource) ([]types.SnapshotResource, []types.SnapshotResource, []types.SnapshotResource) {
+	listeners := []types.SnapshotResource{}
+	scopedRouteConfigs := []types.SnapshotResource{}
+	routeConfigs := []types.SnapshotResource{}
 
 	if len(clusters) == 0 {
 		return nil, nil, nil
@@ -641,11 +647,20 @@ func (ts *TestSnapshot) generateScopedHTTPListeners(numListeners int, clusters [
 		routeName := fmt.Sprintf("route-%s-%d", ts.Version, ts.currentPort)
 
 		// Evenly distribute routes amongst current number of clusters.
-		routeConfigs = append(routeConfigs, MakeRouteConfig(routeName, cache.GetResourceName(clusters[i%len(clusters)])))
-		scopedRouteConfigs = append(scopedRouteConfigs, MakeScopedRouteConfig(scopedRouteName, routeName, []string{ts.getPath()}))
+		routeConfigs = append(routeConfigs, types.SnapshotResource{
+			Name:     routeName,
+			Resource: MakeRouteConfig(routeName, cache.GetResourceName(clusters[i%len(clusters)].Resource)),
+		})
+		scopedRouteConfigs = append(scopedRouteConfigs, types.SnapshotResource{
+			Name:     scopedRouteName,
+			Resource: MakeScopedRouteConfig(scopedRouteName, routeName, []string{ts.getPath()}),
+		})
 		listener := MakeScopedRouteHTTPListener(ts.Xds, listenerName, ts.currentPort)
 		ts.addTLS(listener)
-		listeners = append(listeners, listener)
+		listeners = append(listeners, types.SnapshotResource{
+			Name:     listenerName,
+			Resource: listener,
+		})
 
 		ts.currentPort++
 	}
@@ -653,10 +668,10 @@ func (ts *TestSnapshot) generateScopedHTTPListeners(numListeners int, clusters [
 	return listeners, scopedRouteConfigs, routeConfigs
 }
 
-func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []types.Resource) ([]types.Resource, []types.Resource, []types.Resource) {
-	listeners := []types.Resource{}
-	routeConfigs := []types.Resource{}
-	virtualHosts := []types.Resource{}
+func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []types.SnapshotResource) ([]types.SnapshotResource, []types.SnapshotResource, []types.SnapshotResource) {
+	listeners := []types.SnapshotResource{}
+	routeConfigs := []types.SnapshotResource{}
+	virtualHosts := []types.SnapshotResource{}
 
 	if len(clusters) == 0 {
 		return nil, nil, nil
@@ -668,11 +683,20 @@ func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []t
 		virtualHostName := fmt.Sprintf("%s/%s", routeName, ts.getPath())
 
 		// Evenly distribute routes amongst current number of clusters.
-		virtualHosts = append(virtualHosts, MakeVirtualHost(virtualHostName, cache.GetResourceName(clusters[i%len(clusters)])))
-		routeConfigs = append(routeConfigs, MakeVHDSRouteConfig(ts.Xds, routeName))
+		virtualHosts = append(virtualHosts, types.SnapshotResource{
+			Name:     virtualHostName,
+			Resource: MakeVirtualHost(virtualHostName, cache.GetResourceName(clusters[i%len(clusters)].Resource)),
+		})
+		routeConfigs = append(routeConfigs, types.SnapshotResource{
+			Name:     routeName,
+			Resource: MakeVHDSRouteConfig(ts.Xds, routeName),
+		})
 		listener := MakeRouteHTTPListener(ts.Xds, listenerName, ts.currentPort, routeName)
 		ts.addTLS(listener)
-		listeners = append(listeners, listener)
+		listeners = append(listeners, types.SnapshotResource{
+			Name:     listenerName,
+			Resource: listener,
+		})
 
 		ts.currentPort++
 	}
@@ -680,8 +704,8 @@ func (ts *TestSnapshot) generateVHDSHTTPListeners(numListeners int, clusters []t
 	return listeners, routeConfigs, virtualHosts
 }
 
-func (ts *TestSnapshot) generateTCPListeners(numListeners int, clusters []types.Resource) []types.Resource {
-	listeners := []types.Resource{}
+func (ts *TestSnapshot) generateTCPListeners(numListeners int, clusters []types.SnapshotResource) []types.SnapshotResource {
+	listeners := []types.SnapshotResource{}
 
 	if len(clusters) == 0 {
 		return nil
@@ -691,9 +715,12 @@ func (ts *TestSnapshot) generateTCPListeners(numListeners int, clusters []types.
 		listenerName := fmt.Sprintf("listener-%d", ts.currentPort-ts.BasePort)
 
 		// Evenly distribute routes amongst current number of clusters.
-		listener := MakeTCPListener(listenerName, ts.currentPort, cache.GetResourceName(clusters[i%ts.NumClusters]))
+		listener := MakeTCPListener(listenerName, ts.currentPort, cache.GetResourceName(clusters[i%ts.NumClusters].Resource))
 		ts.addTLS(listener)
-		listeners = append(listeners, listener)
+		listeners = append(listeners, types.SnapshotResource{
+			Name:     listenerName,
+			Resource: listener,
+		})
 
 		ts.currentPort++
 	}
@@ -735,15 +762,21 @@ func (ts *TestSnapshot) getPath() string {
 }
 
 // Generate produces a snapshot from the parameters.
-func (ts *TestSnapshot) Generate() *cache.Snapshot {
+func (ts *TestSnapshot) Generate() *types.Snapshot {
 	ts.currentPort = ts.BasePort
 
-	clusters := make([]types.Resource, ts.NumClusters)
-	endpoints := make([]types.Resource, ts.NumClusters)
+	clusters := make([]types.SnapshotResource, ts.NumClusters)
+	endpoints := make([]types.SnapshotResource, ts.NumClusters)
 	for i := 0; i < ts.NumClusters; i++ {
 		name := fmt.Sprintf("cluster-%s-%d", ts.Version, i)
-		clusters[i] = MakeCluster(ts.Xds, name)
-		endpoints[i] = MakeEndpoint(name, ts.UpstreamPort)
+		clusters[i] = types.SnapshotResource{
+			Name:     name,
+			Resource: MakeCluster(ts.Xds, name),
+		}
+		endpoints[i] = types.SnapshotResource{
+			Name:     name,
+			Resource: MakeEndpoint(name, ts.UpstreamPort),
+		}
 	}
 
 	l1, r1 := ts.generateHTTPListeners(ts.NumHTTPListeners, clusters)
@@ -759,27 +792,36 @@ func (ts *TestSnapshot) Generate() *cache.Snapshot {
 	routes = append(routes, r3...)
 	virtualHosts := vh1
 
-	runtimes := make([]types.Resource, ts.NumRuntimes)
+	runtimes := make([]types.SnapshotResource, ts.NumRuntimes)
 	for i := 0; i < ts.NumRuntimes; i++ {
 		name := fmt.Sprintf("runtime-%d", i)
-		runtimes[i] = MakeRuntime(name)
-	}
-
-	var secrets []types.Resource
-	if ts.TLS {
-		for _, s := range MakeSecrets(tlsName, rootName) {
-			secrets = append(secrets, s)
+		runtimes[i] = types.SnapshotResource{
+			Name:     name,
+			Resource: MakeRuntime(name),
 		}
 	}
 
-	extensions := make([]types.Resource, ts.NumExtension)
+	var secrets []types.SnapshotResource
+	if ts.TLS {
+		for _, s := range MakeSecrets(tlsName, rootName) {
+			secrets = append(secrets, types.SnapshotResource{
+				Name:     tlsName,
+				Resource: s,
+			})
+		}
+	}
+
+	extensions := make([]types.SnapshotResource, ts.NumExtension)
 	for i := 0; i < ts.NumExtension; i++ {
 		routeName := fmt.Sprintf("route-%s-%d", ts.Version, i)
 		extensionConfigName := fmt.Sprintf("extensionConfig-%d", i)
-		extensions[i] = MakeExtensionConfig(Ads, extensionConfigName, routeName)
+		extensions[i] = types.SnapshotResource{
+			Name:     extensionConfigName,
+			Resource: MakeExtensionConfig(Ads, extensionConfigName, routeName),
+		}
 	}
 
-	out, _ := cache.NewSnapshot(ts.Version, map[resource.Type][]types.Resource{
+	out, _ := types.NewSnapshot(ts.Version, map[string][]types.SnapshotResource{
 		resource.EndpointType:        endpoints,
 		resource.ClusterType:         clusters,
 		resource.RouteType:           routes,
