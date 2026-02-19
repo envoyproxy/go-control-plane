@@ -573,14 +573,16 @@ func (Cluster_RingHashLbConfig_HashFunction) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_config_cluster_v3_cluster_proto_rawDescGZIP(), []int{1, 7, 0}
 }
 
+// [#comment: Keep this list of address types in sync with api/config/core/v3/address.proto.]
 type UpstreamConnectionOptions_FirstAddressFamilyVersion int32
 
 const (
-	// respect the native ranking of destination ip addresses returned from dns
-	// resolution
-	UpstreamConnectionOptions_DEFAULT UpstreamConnectionOptions_FirstAddressFamilyVersion = 0
-	UpstreamConnectionOptions_V4      UpstreamConnectionOptions_FirstAddressFamilyVersion = 1
-	UpstreamConnectionOptions_V6      UpstreamConnectionOptions_FirstAddressFamilyVersion = 2
+	// Use the first address family encountered in the address list.
+	UpstreamConnectionOptions_DEFAULT  UpstreamConnectionOptions_FirstAddressFamilyVersion = 0
+	UpstreamConnectionOptions_V4       UpstreamConnectionOptions_FirstAddressFamilyVersion = 1
+	UpstreamConnectionOptions_V6       UpstreamConnectionOptions_FirstAddressFamilyVersion = 2
+	UpstreamConnectionOptions_PIPE     UpstreamConnectionOptions_FirstAddressFamilyVersion = 3
+	UpstreamConnectionOptions_INTERNAL UpstreamConnectionOptions_FirstAddressFamilyVersion = 4
 )
 
 // Enum value maps for UpstreamConnectionOptions_FirstAddressFamilyVersion.
@@ -589,11 +591,15 @@ var (
 		0: "DEFAULT",
 		1: "V4",
 		2: "V6",
+		3: "PIPE",
+		4: "INTERNAL",
 	}
 	UpstreamConnectionOptions_FirstAddressFamilyVersion_value = map[string]int32{
-		"DEFAULT": 0,
-		"V4":      1,
-		"V6":      2,
+		"DEFAULT":  0,
+		"V4":       1,
+		"V6":       2,
+		"PIPE":     3,
+		"INTERNAL": 4,
 	}
 )
 
@@ -3574,18 +3580,20 @@ const file_envoy_config_cluster_v3_cluster_proto_rawDesc = "" +
 	"\x06Policy\x12`\n" +
 	"\x16typed_extension_config\x18\x04 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x14typedExtensionConfig:.\x9aň\x1e)\n" +
 	"'envoy.api.v2.LoadBalancingPolicy.PolicyJ\x04\b\x02\x10\x03J\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\x06configR\x04nameR\ftyped_config:'\x9aň\x1e\"\n" +
-	" envoy.api.v2.LoadBalancingPolicy\"\xbb\x05\n" +
+	" envoy.api.v2.LoadBalancingPolicy\"\xd3\x05\n" +
 	"\x19UpstreamConnectionOptions\x12G\n" +
 	"\rtcp_keepalive\x18\x01 \x01(\v2\".envoy.config.core.v3.TcpKeepaliveR\ftcpKeepalive\x12d\n" +
 	"0set_local_interface_name_on_upstream_connections\x18\x02 \x01(\bR*setLocalInterfaceNameOnUpstreamConnections\x12z\n" +
 	"\x15happy_eyeballs_config\x18\x03 \x01(\v2F.envoy.config.cluster.v3.UpstreamConnectionOptions.HappyEyeballsConfigR\x13happyEyeballsConfig\x1a\x89\x02\n" +
 	"\x13HappyEyeballsConfig\x12\x8d\x01\n" +
 	"\x1cfirst_address_family_version\x18\x01 \x01(\x0e2L.envoy.config.cluster.v3.UpstreamConnectionOptions.FirstAddressFamilyVersionR\x19firstAddressFamilyVersion\x12b\n" +
-	"\x1afirst_address_family_count\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x17firstAddressFamilyCount\"8\n" +
+	"\x1afirst_address_family_count\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x17firstAddressFamilyCount\"P\n" +
 	"\x19FirstAddressFamilyVersion\x12\v\n" +
 	"\aDEFAULT\x10\x00\x12\x06\n" +
 	"\x02V4\x10\x01\x12\x06\n" +
-	"\x02V6\x10\x02:-\x9aň\x1e(\n" +
+	"\x02V6\x10\x02\x12\b\n" +
+	"\x04PIPE\x10\x03\x12\f\n" +
+	"\bINTERNAL\x10\x04:-\x9aň\x1e(\n" +
 	"&envoy.api.v2.UpstreamConnectionOptions\"\xa0\x01\n" +
 	"\x11TrackClusterStats\x12'\n" +
 	"\x0ftimeout_budgets\x18\x01 \x01(\bR\x0etimeoutBudgets\x124\n" +
