@@ -70,6 +70,9 @@ type LinearCache struct {
 	// It does not contain wildcard watches.
 	// It can contain resources not present in resources.
 	resourceWatches map[string]watches
+	// prefixWatches keeps track of watches for glob collection subscriptions (e.g. "collection/*").
+	// Keyed by the prefix with the trailing glob stripped but the separator kept (e.g. "collection/").
+	prefixWatches map[string]watches
 	// wildcardWatches keeps track of all wildcard watches currently opened.
 	wildcardWatches watches
 	// currentWatchID is used to index new watches.
@@ -123,6 +126,7 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 		typeURL:         typeURL,
 		resources:       make(map[string]*cachedResource),
 		resourceWatches: make(map[string]watches),
+		prefixWatches:   make(map[string]watches),
 		wildcardWatches: newWatches(),
 		version:         0,
 		currentWatchID:  0,
@@ -135,6 +139,33 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 		resource.cacheVersion = out.getVersion()
 	}
 	return out
+}
+
+const globSuffix = "/*"
+
+// isPrefixGlob returns the prefix (including the trailing separator) if name
+// is a glob collection subscription (e.g. "collection/*" → "collection/").
+func isPrefixGlob(name string) (string, bool) {
+	if strings.HasSuffix(name, globSuffix) {
+		return strings.TrimSuffix(name, "*"), true
+	}
+	return "", false
+}
+
+// isResourceMatchingSubscription checks whether resourceName is covered by any
+// entry in subscribedResources, either as an exact match or via a prefix glob.
+func isResourceMatchingSubscription(subscribedResources map[string]struct{}, resourceName string) bool {
+	if _, ok := subscribedResources[resourceName]; ok {
+		return true
+	}
+	for sub := range subscribedResources {
+		if prefix, ok := isPrefixGlob(sub); ok {
+			if strings.HasPrefix(resourceName, prefix) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // computeResourceChange compares the subscription known resources and the cache current state to compute the list of resources
@@ -177,6 +208,36 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useResourceVer
 		}
 	} else {
 		for resourceName := range sub.SubscribedResources() {
+			if prefix, ok := isPrefixGlob(resourceName); ok {
+				// Expand the prefix glob to all matching resources in the cache.
+				for cachedName, res := range cache.resources {
+					if !strings.HasPrefix(cachedName, prefix) {
+						continue
+					}
+					knownVersion, known := knownVersions[cachedName]
+					if !known {
+						changedResources = append(changedResources, cachedName)
+					} else {
+						resourceVersion, err := res.getVersion(useResourceVersion)
+						if err != nil {
+							return nil, nil, fmt.Errorf("failed to compute version of %s: %w", cachedName, err)
+						}
+						if knownVersion != resourceVersion {
+							changedResources = append(changedResources, cachedName)
+						}
+					}
+				}
+				// Detect resources previously returned under this prefix that were deleted.
+				for knownName := range knownVersions {
+					if strings.HasPrefix(knownName, prefix) {
+						if _, ok := cache.resources[knownName]; !ok {
+							removedResources = append(removedResources, knownName)
+						}
+					}
+				}
+				continue
+			}
+
 			res, exists := cache.resources[resourceName]
 			knownVersion, known := knownVersions[resourceName]
 			if !exists {
@@ -206,7 +267,7 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useResourceVer
 		for resourceName := range knownVersions {
 			// If the subscription no longer watches a resource,
 			// we mark it as unknown on the client side to ensure it will be resent to the client if subscribing again later on.
-			if _, ok := sub.SubscribedResources()[resourceName]; !ok {
+			if !isResourceMatchingSubscription(sub.SubscribedResources(), resourceName) {
 				removedResources = append(removedResources, resourceName)
 			}
 		}
@@ -260,6 +321,14 @@ func (cache *LinearCache) computeResponse(watch watch, replyEvenIfEmpty bool) (W
 		// Therefore drives on the subscription requested resources.
 		resourcesToReturn = make([]string, 0, len(requestedResources))
 		for resourceName := range requestedResources {
+			if prefix, ok := isPrefixGlob(resourceName); ok {
+				for cachedName := range cache.resources {
+					if strings.HasPrefix(cachedName, prefix) {
+						resourcesToReturn = append(resourcesToReturn, cachedName)
+					}
+				}
+				continue
+			}
 			if _, ok := cache.resources[resourceName]; ok {
 				resourcesToReturn = append(resourcesToReturn, resourceName)
 			}
@@ -293,13 +362,18 @@ func (cache *LinearCache) computeResponse(watch watch, replyEvenIfEmpty bool) (W
 
 func (cache *LinearCache) notifyAll(modified []string) error {
 	// Gather the list of watches impacted by the modified resources.
-	resourceWatches := newWatches()
+	triggeredWatches := newWatches()
 	for _, name := range modified {
-		maps.Copy(resourceWatches, cache.resourceWatches[name])
+		maps.Copy(triggeredWatches, cache.resourceWatches[name])
+		for prefix, pw := range cache.prefixWatches {
+			if strings.HasPrefix(name, prefix) {
+				maps.Copy(triggeredWatches, pw)
+			}
+		}
 	}
 
-	// non-wildcard watches
-	for watchID, watch := range resourceWatches {
+	// non-wildcard and prefix watches
+	for watchID, watch := range triggeredWatches {
 		response, err := cache.computeResponse(watch, false)
 		if err != nil {
 			return err
@@ -531,6 +605,15 @@ func (cache *LinearCache) trackWatch(watch watch) func() {
 	cache.log.Infof("[linear cache] open watch %d (delta: %t) for %s resources %v", watchID, watch.isDelta(), cache.typeURL, sub.SubscribedResources())
 	cache.log.Debugf("[linear cache] subscription details for watch %d: known versions %v, system version %q", watchID, sub.ReturnedResources(), cache.getVersion())
 	for name := range sub.SubscribedResources() {
+		if prefix, ok := isPrefixGlob(name); ok {
+			pw, exists := cache.prefixWatches[prefix]
+			if !exists {
+				pw = newWatches()
+				cache.prefixWatches[prefix] = pw
+			}
+			pw[watchID] = watch
+			continue
+		}
 		watches, exists := cache.resourceWatches[name]
 		if !exists {
 			watches = newWatches()
@@ -556,6 +639,14 @@ func (cache *LinearCache) removeWatch(watchID uint64, sub Subscription) {
 	// Make sure we clean the watch for ALL resources it might be associated with,
 	// as the channel will no longer be listened to
 	for resource := range sub.SubscribedResources() {
+		if prefix, ok := isPrefixGlob(resource); ok {
+			pw := cache.prefixWatches[prefix]
+			delete(pw, watchID)
+			if len(pw) == 0 {
+				delete(cache.prefixWatches, prefix)
+			}
+			continue
+		}
 		resourceWatches := cache.resourceWatches[resource]
 		delete(resourceWatches, watchID)
 		if len(resourceWatches) == 0 {
@@ -581,11 +672,28 @@ func (cache *LinearCache) NumResources() int {
 	return len(cache.resources)
 }
 
-// NumWatches returns the number of active watches for a resource name, including wildcard ones.
+// NumWatches returns the number of active watches for a resource name, including wildcard and prefix ones.
 func (cache *LinearCache) NumWatches(name string) int {
 	cache.mu.RLock()
 	defer cache.mu.RUnlock()
-	return len(cache.resourceWatches[name]) + len(cache.wildcardWatches)
+	count := len(cache.resourceWatches[name]) + len(cache.wildcardWatches)
+	for prefix, pw := range cache.prefixWatches {
+		if strings.HasPrefix(name, prefix) {
+			count += len(pw)
+		}
+	}
+	return count
+}
+
+// NumPrefixWatches returns the total number of active prefix watches.
+func (cache *LinearCache) NumPrefixWatches() int {
+	cache.mu.RLock()
+	defer cache.mu.RUnlock()
+	count := 0
+	for _, pw := range cache.prefixWatches {
+		count += len(pw)
+	}
+	return count
 }
 
 // NumWildcardWatches returns the number of wildcard watches.
