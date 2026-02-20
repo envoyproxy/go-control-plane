@@ -182,6 +182,49 @@ func TestSnapshotGetters(t *testing.T) {
 	}
 }
 
+func TestGetTypeSnapshot(t *testing.T) {
+	snapshot := fixture.snapshot()
+
+	t.Run("returns populated TypeSnapshot for known type", func(t *testing.T) {
+		ts := snapshot.GetTypeSnapshot(rsrc.EndpointType)
+		assert.Equal(t, fixture.version, ts.GetVersion())
+		resources := ts.GetResources()
+		require.Len(t, resources, 1)
+		assert.Contains(t, resources, clusterName)
+	})
+
+	t.Run("returns empty TypeSnapshot for unknown type", func(t *testing.T) {
+		ts := snapshot.GetTypeSnapshot("unknown.type")
+		assert.Empty(t, ts.GetVersion())
+		assert.Empty(t, ts.GetResources())
+	})
+
+	t.Run("returns empty TypeSnapshot for nil snapshot", func(t *testing.T) {
+		var nilsnap *cache.Snapshot
+		ts := nilsnap.GetTypeSnapshot(rsrc.EndpointType)
+		assert.Empty(t, ts.GetVersion())
+		assert.Empty(t, ts.GetResources())
+	})
+
+	t.Run("caches the result on subsequent calls", func(t *testing.T) {
+		snap := fixture.snapshot()
+		ts1 := snap.GetTypeSnapshot(rsrc.ClusterType)
+		ts2 := snap.GetTypeSnapshot(rsrc.ClusterType)
+		assert.Equal(t, ts1.GetVersion(), ts2.GetVersion())
+		assert.Equal(t, ts1.GetResources(), ts2.GetResources())
+	})
+
+	t.Run("returns correct resources for multiple types", func(t *testing.T) {
+		endpoints := snapshot.GetTypeSnapshot(rsrc.EndpointType)
+		clusters := snapshot.GetTypeSnapshot(rsrc.ClusterType)
+		routes := snapshot.GetTypeSnapshot(rsrc.RouteType)
+
+		assert.Len(t, endpoints.GetResources(), 1)
+		assert.Len(t, clusters.GetResources(), 1)
+		assert.Len(t, routes.GetResources(), 2) // testRoute + testEmbeddedRoute
+	})
+}
+
 func TestNewSnapshotBadType(t *testing.T) {
 	snap, err := cache.NewSnapshot(fixture.version, map[rsrc.Type][]types.Resource{
 		"random.type": nil,

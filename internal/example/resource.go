@@ -28,7 +28,6 @@ import (
 	router "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/router/v3"
 	hcm "github.com/envoyproxy/go-control-plane/envoy/extensions/filters/network/http_connection_manager/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/v3"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
 
@@ -168,12 +167,12 @@ func makeConfigSource() *core.ConfigSource {
 	return source
 }
 
-func GenerateSnapshot() *cache.Snapshot {
-	snap, _ := cache.NewSnapshot("1",
-		map[resource.Type][]types.Resource{
-			resource.ClusterType:  {makeCluster(ClusterName)},
-			resource.RouteType:    {makeRoute(RouteName, ClusterName)},
-			resource.ListenerType: {makeHTTPListener(ListenerName, RouteName)},
+func GenerateSnapshot() *types.Snapshot {
+	snap, _ := types.NewSnapshot("1",
+		map[string][]types.SnapshotResource{
+			resource.ClusterType:  {{Name: ClusterName, Resource: makeCluster(ClusterName)}},
+			resource.RouteType:    {{Name: RouteName, Resource: makeRoute(RouteName, ClusterName)}},
+			resource.ListenerType: {{Name: ListenerName, Resource: makeHTTPListener(ListenerName, RouteName)}},
 		},
 	)
 	return snap

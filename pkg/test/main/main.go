@@ -246,9 +246,6 @@ func main() {
 		log.Printf("update snapshot %v\n", snapshots.Version)
 
 		snapshot := snapshots.Generate()
-		if err := snapshot.Consistent(); err != nil {
-			log.Printf("snapshot inconsistency: %+v\n%+v\n", snapshot, err)
-		}
 
 		err := config.SetSnapshot(context.Background(), nodeID, snapshot)
 		if err != nil {
@@ -257,8 +254,8 @@ func main() {
 		}
 
 		if mux {
-			for name, res := range snapshot.GetResources(typeURL) {
-				if err := eds.UpdateResource(name, res); err != nil {
+			for name, res := range snapshot.GetTypeSnapshot(typeURL).GetResources() {
+				if err := eds.UpdateResource(name, res.GetRawResource().Resource); err != nil {
 					log.Printf("update error %q for %+v\n", err, name)
 					os.Exit(1)
 				}

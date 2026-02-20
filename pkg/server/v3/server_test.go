@@ -47,7 +47,6 @@ type mockConfigWatcher struct {
 	responses      map[string][]cache.Response
 	deltaResources map[string]map[string]types.Resource
 	watches        int
-	deltaWatches   int
 
 	mu *sync.RWMutex
 }
