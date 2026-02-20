@@ -293,14 +293,6 @@ type ExternalProcessor struct {
 	// restriction doesn't apply to this mode.
 	//
 	// 3. External processor may still close the stream to indicate that no more messages are needed.
-	//
-	// .. warning::
-	//
-	//	Flow control is a necessary mechanism to prevent the fast sender (either downstream client or upstream server)
-	//	from overwhelming the external processor when its processing speed is slower.
-	//	This protective measure is being explored and developed but has not been ready yet, so please use your own
-	//	discretion when enabling this feature.
-	//	This work is currently tracked under https://github.com/envoyproxy/envoy/issues/33319.
 	ObservabilityMode bool `protobuf:"varint,17,opt,name=observability_mode,json=observabilityMode,proto3" json:"observability_mode,omitempty"`
 	// Prevents clearing the route-cache when the
 	// :ref:`clear_route_cache <envoy_v3_api_field_service.ext_proc.v3.CommonResponse.clear_route_cache>`
