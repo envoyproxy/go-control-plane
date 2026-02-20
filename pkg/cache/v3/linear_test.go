@@ -1410,3 +1410,259 @@ func TestLinearSotwNonWildcard(t *testing.T) {
 		checkPendingWatch(4)
 	})
 }
+
+func TestLinearDeltaPrefixSubscription(t *testing.T) {
+	t.Run("initial resources", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+		a1 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.1"}
+		hashA1 := hashResource(t, a1)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.1", a1))
+		a2 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.2"}
+		hashA2 := hashResource(t, a2)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.2", a2))
+		// Resource in a different collection
+		b := &endpoint.ClusterLoadAssignment{ClusterName: "other/zone2/10.0.1.1"}
+		require.NoError(t, c.UpdateResource("other/zone2/10.0.1.1", b))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}}
+		_, err := c.CreateDeltaWatch(req, subFromDeltaRequest(req), w)
+		require.NoError(t, err)
+		checkTotalWatchCount(t, c, 0)
+
+		resp := verifyDeltaResponse(t, w, []resourceInfo{
+			{"col/zone1/10.0.0.1", hashA1},
+			{"col/zone1/10.0.0.2", hashA2},
+		}, nil)
+		// "other/zone2/10.0.1.1" should not be included
+		out, err := resp.GetDeltaDiscoveryResponse()
+		require.NoError(t, err)
+		for _, r := range out.GetResources() {
+			assert.NotEqual(t, "other/zone2/10.0.1.1", r.GetName())
+		}
+	})
+
+	t.Run("receives updates for matching resources", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+		a1 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.1"}
+		hashA1 := hashResource(t, a1)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.1", a1))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}}
+		sub := subFromDeltaRequest(req)
+		_, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		resp := verifyDeltaResponse(t, w, []resourceInfo{{"col/zone1/10.0.0.1", hashA1}}, nil)
+		sub.SetReturnedResources(resp.GetNextVersionMap())
+
+		// Recreate watch
+		req.ResponseNonce = "1"
+		_, err = c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlockDelta(t, w)
+		checkTotalWatchCount(t, c, 1)
+		assert.Equal(t, 1, c.NumPrefixWatches())
+
+		// Add a new matching resource
+		a2 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.2"}
+		hashA2 := hashResource(t, a2)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.2", a2))
+		checkTotalWatchCount(t, c, 0)
+		assert.Equal(t, 0, c.NumPrefixWatches())
+		verifyDeltaResponse(t, w, []resourceInfo{{"col/zone1/10.0.0.2", hashA2}}, nil)
+	})
+
+	t.Run("does not receive updates for non-matching resources", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}, ResponseNonce: "1"}
+		sub := subFromDeltaRequest(req)
+		_, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlockDelta(t, w)
+		checkTotalWatchCount(t, c, 1)
+
+		// Add a resource that does NOT match the prefix
+		other := &endpoint.ClusterLoadAssignment{ClusterName: "other/zone2/10.0.1.1"}
+		require.NoError(t, c.UpdateResource("other/zone2/10.0.1.1", other))
+		mustBlockDelta(t, w)
+		checkTotalWatchCount(t, c, 1) // Watch is still pending
+	})
+
+	t.Run("handles resource deletion under prefix", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+		a1 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.1"}
+		hashA1 := hashResource(t, a1)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.1", a1))
+		a2 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.2"}
+		hashA2 := hashResource(t, a2)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.2", a2))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}}
+		sub := subFromDeltaRequest(req)
+		_, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		resp := verifyDeltaResponse(t, w, []resourceInfo{
+			{"col/zone1/10.0.0.1", hashA1},
+			{"col/zone1/10.0.0.2", hashA2},
+		}, nil)
+		sub.SetReturnedResources(resp.GetNextVersionMap())
+
+		// Recreate watch and delete one resource
+		req.ResponseNonce = "1"
+		_, err = c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlockDelta(t, w)
+
+		require.NoError(t, c.DeleteResource("col/zone1/10.0.0.1"))
+		verifyDeltaResponse(t, w, nil, []string{"col/zone1/10.0.0.1"})
+	})
+
+	t.Run("handles unsubscription", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+		a1 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.1"}
+		hashA1 := hashResource(t, a1)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.1", a1))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}}
+		sub := subFromDeltaRequest(req)
+		_, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		resp := verifyDeltaResponse(t, w, []resourceInfo{{"col/zone1/10.0.0.1", hashA1}}, nil)
+		sub.SetReturnedResources(resp.GetNextVersionMap())
+
+		// Unsubscribe from the prefix
+		sub.UpdateResourceSubscriptions(nil, []string{"col/zone1/*"})
+		req.ResponseNonce = "1"
+		_, err = c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		// Unsubscribing should report the resource as removed
+		verifyDeltaResponse(t, w, nil, []string{"col/zone1/10.0.0.1"})
+		checkTotalWatchCount(t, c, 0)
+	})
+
+	t.Run("handles watch cancellation", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}, ResponseNonce: "1"}
+		sub := subFromDeltaRequest(req)
+		cancel, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlockDelta(t, w)
+		checkTotalWatchCount(t, c, 1)
+		assert.Equal(t, 1, c.NumPrefixWatches())
+
+		cancel()
+		checkTotalWatchCount(t, c, 0)
+		assert.Equal(t, 0, c.NumPrefixWatches())
+	})
+
+	t.Run("mixed prefix and exact subscriptions", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+		a1 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.1"}
+		hashA1 := hashResource(t, a1)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.1", a1))
+		exact := &endpoint.ClusterLoadAssignment{ClusterName: "exact-resource"}
+		hashExact := hashResource(t, exact)
+		require.NoError(t, c.UpdateResource("exact-resource", exact))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*", "exact-resource"}}
+		sub := subFromDeltaRequest(req)
+		_, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		checkTotalWatchCount(t, c, 0)
+		verifyDeltaResponse(t, w, []resourceInfo{
+			{"col/zone1/10.0.0.1", hashA1},
+			{"exact-resource", hashExact},
+		}, nil)
+	})
+
+	t.Run("prefix watch counts resources correctly", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}, ResponseNonce: "1"}
+		sub := subFromDeltaRequest(req)
+		_, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlockDelta(t, w)
+
+		// A resource matching the prefix should count the prefix watch
+		checkWatchCount(t, c, "col/zone1/10.0.0.1", 1)
+		// A resource not matching should not
+		assert.Empty(t, c.resourceWatches["other/zone2/10.0.0.1"])
+	})
+
+	t.Run("update matching resource triggers pending prefix watch", func(t *testing.T) {
+		c := NewLinearCache(testType, WithLogger(log.NewTestLogger(t)))
+		a1 := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.1"}
+		hashA1 := hashResource(t, a1)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.1", a1))
+
+		w := make(chan DeltaResponse, 1)
+		req := &DeltaRequest{TypeUrl: testType, ResourceNamesSubscribe: []string{"col/zone1/*"}}
+		sub := subFromDeltaRequest(req)
+		_, err := c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		resp := verifyDeltaResponse(t, w, []resourceInfo{{"col/zone1/10.0.0.1", hashA1}}, nil)
+		sub.SetReturnedResources(resp.GetNextVersionMap())
+
+		// Recreate watch
+		req.ResponseNonce = "1"
+		_, err = c.CreateDeltaWatch(req, sub, w)
+		require.NoError(t, err)
+		mustBlockDelta(t, w)
+
+		// Update the existing matching resource
+		a1Updated := &endpoint.ClusterLoadAssignment{ClusterName: "col/zone1/10.0.0.1", Endpoints: []*endpoint.LocalityLbEndpoints{{Priority: 5}}}
+		hashA1Updated := hashResource(t, a1Updated)
+		require.NoError(t, c.UpdateResource("col/zone1/10.0.0.1", a1Updated))
+		verifyDeltaResponse(t, w, []resourceInfo{{"col/zone1/10.0.0.1", hashA1Updated}}, nil)
+	})
+}
+
+func TestIsPrefixGlob(t *testing.T) {
+	tests := []struct {
+		name       string
+		input      string
+		wantPrefix string
+		wantOk     bool
+	}{
+		{"glob suffix", "col/zone1/*", "col/zone1/", true},
+		{"nested glob", "a/b/c/*", "a/b/c/", true},
+		{"just glob", "/*", "/", true},
+		{"no glob", "col/zone1/host", "", false},
+		{"star without slash", "col*", "", false},
+		{"empty", "", "", false},
+		{"star only", "*", "", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			prefix, ok := isPrefixGlob(tt.input)
+			assert.Equal(t, tt.wantOk, ok)
+			if ok {
+				assert.Equal(t, tt.wantPrefix, prefix)
+			}
+		})
+	}
+}
+
+func TestIsResourceMatchingSubscription(t *testing.T) {
+	subs := map[string]struct{}{
+		"col/zone1/*":    {},
+		"exact-resource": {},
+	}
+
+	assert.True(t, isResourceMatchingSubscription(subs, "col/zone1/10.0.0.1"))
+	assert.True(t, isResourceMatchingSubscription(subs, "col/zone1/10.0.0.2"))
+	assert.True(t, isResourceMatchingSubscription(subs, "exact-resource"))
+	assert.False(t, isResourceMatchingSubscription(subs, "other/zone2/10.0.0.1"))
+	assert.False(t, isResourceMatchingSubscription(subs, "col/zone2/10.0.0.1"))
+	assert.False(t, isResourceMatchingSubscription(subs, "unknown"))
+}
