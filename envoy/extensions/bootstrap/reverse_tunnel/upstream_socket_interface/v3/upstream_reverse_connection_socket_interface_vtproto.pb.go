@@ -50,6 +50,16 @@ func (m *UpstreamReverseConnectionSocketInterface) MarshalToSizedBufferVTStrict(
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableTenantIsolation != nil {
+		size, err := (*wrapperspb.BoolValue)(m.EnableTenantIsolation).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if m.ReporterConfig != nil {
 		if vtmsg, ok := interface{}(m.ReporterConfig).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -127,6 +137,10 @@ func (m *UpstreamReverseConnectionSocketInterface) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.ReporterConfig)
 		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableTenantIsolation != nil {
+		l = (*wrapperspb.BoolValue)(m.EnableTenantIsolation).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
