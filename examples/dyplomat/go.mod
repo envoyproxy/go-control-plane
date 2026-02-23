@@ -1,8 +1,6 @@
 module github.com/envoyproxy/go-control-plane/examples/dyplomat
 
-go 1.25.3
-
-toolchain go1.25.7
+go 1.25.7
 
 replace (
 	github.com/envoyproxy/go-control-plane => ../..
@@ -18,7 +16,7 @@ require (
 	k8s.io/api v0.35.1
 	k8s.io/apimachinery v0.35.1
 	k8s.io/client-go v0.35.1
-	sigs.k8s.io/aws-iam-authenticator v0.7.10
+	sigs.k8s.io/aws-iam-authenticator v0.7.11
 )
 
 require (
