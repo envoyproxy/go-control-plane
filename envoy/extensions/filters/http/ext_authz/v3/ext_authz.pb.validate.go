@@ -748,6 +748,8 @@ func (m *HttpService) validate(all bool) error {
 
 	// no validation rules for PathPrefix
 
+	// no validation rules for PathOverride
+
 	if all {
 		switch v := interface{}(m.GetAuthorizationRequest()).(type) {
 		case interface{ ValidateAll() error }:

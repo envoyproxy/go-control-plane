@@ -590,6 +590,13 @@ func (m *HttpService) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.PathOverride) > 0 {
+		i -= len(m.PathOverride)
+		copy(dAtA[i:], m.PathOverride)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PathOverride)))
+		i--
+		dAtA[i] = 0x52
+	}
 	if m.RetryPolicy != nil {
 		if vtmsg, ok := interface{}(m.RetryPolicy).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -1370,6 +1377,10 @@ func (m *HttpService) SizeVT() (n int) {
 		} else {
 			l = proto.Size(m.RetryPolicy)
 		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.PathOverride)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

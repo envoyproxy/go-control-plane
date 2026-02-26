@@ -713,13 +713,17 @@ func (x *BufferSettings) GetPackAsBytes() bool {
 // metadata as well as body may be added to the client's response. See :ref:`allowed_client_headers
 // <envoy_v3_api_field_extensions.filters.http.ext_authz.v3.AuthorizationResponse.allowed_client_headers>`
 // for details.
-// [#next-free-field: 10]
+// [#next-free-field: 11]
 type HttpService struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Sets the HTTP server URI which the authorization requests must be sent to.
 	ServerUri *v3.HttpUri `protobuf:"bytes,1,opt,name=server_uri,json=serverUri,proto3" json:"server_uri,omitempty"`
 	// Sets a prefix to the value of authorization request header “Path“.
+	// Only one of “path_prefix“ or “path_override“ may be set.
 	PathPrefix string `protobuf:"bytes,2,opt,name=path_prefix,json=pathPrefix,proto3" json:"path_prefix,omitempty"`
+	// Replaces the value of authorization request header “Path“ with this value.
+	// Only one of “path_prefix“ or “path_override“ may be set.
+	PathOverride string `protobuf:"bytes,10,opt,name=path_override,json=pathOverride,proto3" json:"path_override,omitempty"`
 	// Settings used for controlling authorization request metadata.
 	AuthorizationRequest *AuthorizationRequest `protobuf:"bytes,7,opt,name=authorization_request,json=authorizationRequest,proto3" json:"authorization_request,omitempty"`
 	// Settings used for controlling authorization response metadata.
@@ -775,6 +779,13 @@ func (x *HttpService) GetServerUri() *v3.HttpUri {
 func (x *HttpService) GetPathPrefix() string {
 	if x != nil {
 		return x.PathPrefix
+	}
+	return ""
+}
+
+func (x *HttpService) GetPathOverride() string {
+	if x != nil {
+		return x.PathOverride
 	}
 	return ""
 }
@@ -1262,12 +1273,14 @@ const file_envoy_extensions_filters_http_ext_authz_v3_ext_authz_proto_rawDesc = 
 	"\x11max_request_bytes\x18\x01 \x01(\rB\a\xfaB\x04*\x02 \x00R\x0fmaxRequestBytes\x122\n" +
 	"\x15allow_partial_message\x18\x02 \x01(\bR\x13allowPartialMessage\x12\"\n" +
 	"\rpack_as_bytes\x18\x03 \x01(\bR\vpackAsBytes:;\x9aň\x1e6\n" +
-	"4envoy.config.filter.http.ext_authz.v2.BufferSettings\"\xf5\x03\n" +
+	"4envoy.config.filter.http.ext_authz.v2.BufferSettings\"\x9a\x04\n" +
 	"\vHttpService\x12<\n" +
 	"\n" +
 	"server_uri\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriR\tserverUri\x12\x1f\n" +
 	"\vpath_prefix\x18\x02 \x01(\tR\n" +
-	"pathPrefix\x12u\n" +
+	"pathPrefix\x12#\n" +
+	"\rpath_override\x18\n" +
+	" \x01(\tR\fpathOverride\x12u\n" +
 	"\x15authorization_request\x18\a \x01(\v2@.envoy.extensions.filters.http.ext_authz.v3.AuthorizationRequestR\x14authorizationRequest\x12x\n" +
 	"\x16authorization_response\x18\b \x01(\v2A.envoy.extensions.filters.http.ext_authz.v3.AuthorizationResponseR\x15authorizationResponse\x12D\n" +
 	"\fretry_policy\x18\t \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy:8\x9aň\x1e3\n" +
