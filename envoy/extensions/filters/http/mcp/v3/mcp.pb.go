@@ -138,7 +138,7 @@ func (Mcp_RequestStorageMode) EnumDescriptor() ([]byte, []int) {
 }
 
 // This filter will inspect and get attributes from MCP traffic.
-// [#next-free-field: 6]
+// [#next-free-field: 8]
 type Mcp struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configures how the filter handles non-MCP traffic.
@@ -161,8 +161,23 @@ type Mcp struct {
 	// Controls whether attributes are written to dynamic metadata, filter state, or both.
 	// Default is DYNAMIC_METADATA when unspecified.
 	RequestStorageMode Mcp_RequestStorageMode `protobuf:"varint,5,opt,name=request_storage_mode,json=requestStorageMode,proto3,enum=envoy.extensions.filters.http.mcp.v3.Mcp_RequestStorageMode" json:"request_storage_mode,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// If set, extract and validate W3C trace context from the MCP request body
+	// (params._meta.traceparent & params._meta.tracestate) and propagate it in HTTP headers
+	// “traceparent“ and “tracestate“ (respectively).
+	//
+	// The traceparent and tracestate fields are validated and propagated according to the spec at
+	// “https://www.w3.org/TR/trace-context/“.
+	//
+	// If unset (default), do not extract or inject trace context.
+	PropagateTraceContext *Mcp_TraceContextPropagationConfig `protobuf:"bytes,6,opt,name=propagate_trace_context,json=propagateTraceContext,proto3" json:"propagate_trace_context,omitempty"`
+	// Note that this is independent of “propagate_trace_context“.
+	// Also note that if this is set, the downstream request's baggage header will be overwritten if
+	// the MCP request body contains a valid baggage field.
+	//
+	// If unset (default), do not extract or inject baggage.
+	PropagateBaggage *Mcp_BaggagePropagationConfig `protobuf:"bytes,7,opt,name=propagate_baggage,json=propagateBaggage,proto3" json:"propagate_baggage,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Mcp) Reset() {
@@ -228,6 +243,20 @@ func (x *Mcp) GetRequestStorageMode() Mcp_RequestStorageMode {
 		return x.RequestStorageMode
 	}
 	return Mcp_MODE_UNSPECIFIED
+}
+
+func (x *Mcp) GetPropagateTraceContext() *Mcp_TraceContextPropagationConfig {
+	if x != nil {
+		return x.PropagateTraceContext
+	}
+	return nil
+}
+
+func (x *Mcp) GetPropagateBaggage() *Mcp_BaggagePropagationConfig {
+	if x != nil {
+		return x.PropagateBaggage
+	}
+	return nil
 }
 
 // Parser configuration with method-specific rules.
@@ -347,6 +376,78 @@ func (x *McpOverride) GetMaxRequestBodySize() *wrapperspb.UInt32Value {
 	return nil
 }
 
+type Mcp_TraceContextPropagationConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Mcp_TraceContextPropagationConfig) Reset() {
+	*x = Mcp_TraceContextPropagationConfig{}
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Mcp_TraceContextPropagationConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Mcp_TraceContextPropagationConfig) ProtoMessage() {}
+
+func (x *Mcp_TraceContextPropagationConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Mcp_TraceContextPropagationConfig.ProtoReflect.Descriptor instead.
+func (*Mcp_TraceContextPropagationConfig) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescGZIP(), []int{0, 0}
+}
+
+type Mcp_BaggagePropagationConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Mcp_BaggagePropagationConfig) Reset() {
+	*x = Mcp_BaggagePropagationConfig{}
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Mcp_BaggagePropagationConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Mcp_BaggagePropagationConfig) ProtoMessage() {}
+
+func (x *Mcp_BaggagePropagationConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Mcp_BaggagePropagationConfig.ProtoReflect.Descriptor instead.
+func (*Mcp_BaggagePropagationConfig) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescGZIP(), []int{0, 1}
+}
+
 // A single attribute extraction rule.
 type ParserConfig_AttributeExtractionRule struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -360,7 +461,7 @@ type ParserConfig_AttributeExtractionRule struct {
 
 func (x *ParserConfig_AttributeExtractionRule) Reset() {
 	*x = ParserConfig_AttributeExtractionRule{}
-	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[3]
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -372,7 +473,7 @@ func (x *ParserConfig_AttributeExtractionRule) String() string {
 func (*ParserConfig_AttributeExtractionRule) ProtoMessage() {}
 
 func (x *ParserConfig_AttributeExtractionRule) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[3]
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -414,7 +515,7 @@ type ParserConfig_MethodConfig struct {
 
 func (x *ParserConfig_MethodConfig) Reset() {
 	*x = ParserConfig_MethodConfig{}
-	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -426,7 +527,7 @@ func (x *ParserConfig_MethodConfig) String() string {
 func (*ParserConfig_MethodConfig) ProtoMessage() {}
 
 func (x *ParserConfig_MethodConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -467,14 +568,18 @@ var File_envoy_extensions_filters_http_mcp_v3_mcp_proto protoreflect.FileDescrip
 
 const file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf4\x04\n" +
+	".envoy/extensions/filters/http/mcp/v3/mcp.proto\x12$envoy.extensions.filters.http.mcp.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb7\a\n" +
 	"\x03Mcp\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.mcp.v3.Mcp.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12*\n" +
 	"\x11clear_route_cache\x18\x02 \x01(\bR\x0fclearRouteCache\x12[\n" +
 	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
 	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\x12W\n" +
 	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.mcp.v3.ParserConfigR\fparserConfig\x12x\n" +
-	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\"2\n" +
+	"\x14request_storage_mode\x18\x05 \x01(\x0e2<.envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\x12requestStorageMode\x12\x7f\n" +
+	"\x17propagate_trace_context\x18\x06 \x01(\v2G.envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfigR\x15propagateTraceContext\x12o\n" +
+	"\x11propagate_baggage\x18\a \x01(\v2B.envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfigR\x10propagateBaggage\x1a)\n" +
+	"\x1dTraceContextPropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\x1a$\n" +
+	"\x18BaggagePropagationConfig:\b\xd2Ƥ\xe1\x06\x02\b\x01\"2\n" +
 	"\vTrafficMode\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x00\x12\x11\n" +
 	"\rREJECT_NO_MCP\x10\x01\"y\n" +
@@ -511,31 +616,35 @@ func file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDescGZIP() []byte {
 }
 
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_goTypes = []any{
 	(Mcp_TrafficMode)(0),                         // 0: envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
 	(Mcp_RequestStorageMode)(0),                  // 1: envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
 	(*Mcp)(nil),                                  // 2: envoy.extensions.filters.http.mcp.v3.Mcp
 	(*ParserConfig)(nil),                         // 3: envoy.extensions.filters.http.mcp.v3.ParserConfig
 	(*McpOverride)(nil),                          // 4: envoy.extensions.filters.http.mcp.v3.McpOverride
-	(*ParserConfig_AttributeExtractionRule)(nil), // 5: envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
-	(*ParserConfig_MethodConfig)(nil),            // 6: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
-	(*wrapperspb.UInt32Value)(nil),               // 7: google.protobuf.UInt32Value
+	(*Mcp_TraceContextPropagationConfig)(nil),    // 5: envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfig
+	(*Mcp_BaggagePropagationConfig)(nil),         // 6: envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfig
+	(*ParserConfig_AttributeExtractionRule)(nil), // 7: envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
+	(*ParserConfig_MethodConfig)(nil),            // 8: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
+	(*wrapperspb.UInt32Value)(nil),               // 9: google.protobuf.UInt32Value
 }
 var file_envoy_extensions_filters_http_mcp_v3_mcp_proto_depIdxs = []int32{
-	0, // 0: envoy.extensions.filters.http.mcp.v3.Mcp.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	7, // 1: envoy.extensions.filters.http.mcp.v3.Mcp.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	3, // 2: envoy.extensions.filters.http.mcp.v3.Mcp.parser_config:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig
-	1, // 3: envoy.extensions.filters.http.mcp.v3.Mcp.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
-	6, // 4: envoy.extensions.filters.http.mcp.v3.ParserConfig.methods:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
-	0, // 5: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
-	7, // 6: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	5, // 7: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	0,  // 0: envoy.extensions.filters.http.mcp.v3.Mcp.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
+	9,  // 1: envoy.extensions.filters.http.mcp.v3.Mcp.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	3,  // 2: envoy.extensions.filters.http.mcp.v3.Mcp.parser_config:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig
+	1,  // 3: envoy.extensions.filters.http.mcp.v3.Mcp.request_storage_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.RequestStorageMode
+	5,  // 4: envoy.extensions.filters.http.mcp.v3.Mcp.propagate_trace_context:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TraceContextPropagationConfig
+	6,  // 5: envoy.extensions.filters.http.mcp.v3.Mcp.propagate_baggage:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.BaggagePropagationConfig
+	8,  // 6: envoy.extensions.filters.http.mcp.v3.ParserConfig.methods:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig
+	0,  // 7: envoy.extensions.filters.http.mcp.v3.McpOverride.traffic_mode:type_name -> envoy.extensions.filters.http.mcp.v3.Mcp.TrafficMode
+	9,  // 8: envoy.extensions.filters.http.mcp.v3.McpOverride.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	7,  // 9: envoy.extensions.filters.http.mcp.v3.ParserConfig.MethodConfig.extraction_rules:type_name -> envoy.extensions.filters.http.mcp.v3.ParserConfig.AttributeExtractionRule
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() }
@@ -549,7 +658,7 @@ func file_envoy_extensions_filters_http_mcp_v3_mcp_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc), len(file_envoy_extensions_filters_http_mcp_v3_mcp_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
