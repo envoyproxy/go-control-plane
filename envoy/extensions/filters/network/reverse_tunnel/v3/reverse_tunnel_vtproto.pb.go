@@ -49,6 +49,13 @@ func (m *Validation) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.TenantIdFormat) > 0 {
+		i -= len(m.TenantIdFormat)
+		copy(dAtA[i:], m.TenantIdFormat)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.TenantIdFormat)))
+		i--
+		dAtA[i] = 0x2a
+	}
 	if len(m.DynamicMetadataNamespace) > 0 {
 		i -= len(m.DynamicMetadataNamespace)
 		copy(dAtA[i:], m.DynamicMetadataNamespace)
@@ -183,6 +190,10 @@ func (m *Validation) SizeVT() (n int) {
 		n += 2
 	}
 	l = len(m.DynamicMetadataNamespace)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.TenantIdFormat)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}

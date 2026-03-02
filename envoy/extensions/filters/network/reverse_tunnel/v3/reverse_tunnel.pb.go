@@ -26,8 +26,9 @@ const (
 )
 
 // Validation configuration for reverse tunnel identifiers.
-// Validates the node ID and cluster ID extracted from reverse tunnel handshake headers
+// Validates the node ID, cluster ID, and tenant ID extracted from reverse tunnel handshake headers
 // against expected values specified using format strings.
+// [#next-free-field: 6]
 type Validation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Format string to extract the expected node identifier for validation.
@@ -66,12 +67,23 @@ type Validation struct {
 	//
 	//	cluster_id_format: "%FILTER_STATE(expected_cluster_id)%"
 	ClusterIdFormat string `protobuf:"bytes,2,opt,name=cluster_id_format,json=clusterIdFormat,proto3" json:"cluster_id_format,omitempty"`
+	// Format string to extract the expected tenant identifier for validation.
+	// The formatted value is compared against the “x-envoy-reverse-tunnel-tenant-id“ header
+	// from the incoming handshake request. If they do not match, the connection is rejected
+	// with HTTP “403 Forbidden“.
+	//
+	// Supports the same :ref:`command operators <config_access_log_command_operators>` as
+	// “node_id_format“.
+	//
+	// If empty, tenant ID validation is skipped.
+	TenantIdFormat string `protobuf:"bytes,5,opt,name=tenant_id_format,json=tenantIdFormat,proto3" json:"tenant_id_format,omitempty"`
 	// Whether to emit validation results as dynamic metadata.
 	// When enabled, the filter emits metadata under the namespace specified by
 	// “dynamic_metadata_namespace“ containing:
 	//
 	// * “node_id“: The actual node ID from the handshake request.
 	// * “cluster_id“: The actual cluster ID from the handshake request.
+	// * “tenant_id“: The actual tenant ID from the handshake request.
 	// * “validation_result“: Either “allowed“ or “denied“.
 	//
 	// This metadata can be used by subsequent filters or for access logging.
@@ -128,6 +140,13 @@ func (x *Validation) GetClusterIdFormat() string {
 	return ""
 }
 
+func (x *Validation) GetTenantIdFormat() string {
+	if x != nil {
+		return x.TenantIdFormat
+	}
+	return ""
+}
+
 func (x *Validation) GetEmitDynamicMetadata() bool {
 	if x != nil {
 		return x.EmitDynamicMetadata
@@ -164,10 +183,11 @@ type ReverseTunnel struct {
 	// HTTP method to match for reverse tunnel requests.
 	// If not specified (“METHOD_UNSPECIFIED“), this defaults to “GET“.
 	RequestMethod v3.RequestMethod `protobuf:"varint,4,opt,name=request_method,json=requestMethod,proto3,enum=envoy.config.core.v3.RequestMethod" json:"request_method,omitempty"`
-	// Optional validation configuration for node and cluster identifiers.
-	// If specified, the filter validates the “x-envoy-reverse-tunnel-node-id“ and
-	// “x-envoy-reverse-tunnel-cluster-id“ headers against expected values extracted
-	// using format strings. Requests that fail validation are rejected with HTTP “403 Forbidden“.
+	// Optional validation configuration for node, cluster, and tenant identifiers.
+	// If specified, the filter validates the “x-envoy-reverse-tunnel-node-id“,
+	// “x-envoy-reverse-tunnel-cluster-id“, and “x-envoy-reverse-tunnel-tenant-id“ headers
+	// against expected values extracted using format strings. Requests that fail validation
+	// are rejected with HTTP “403 Forbidden“.
 	Validation *Validation `protobuf:"bytes,5,opt,name=validation,proto3" json:"validation,omitempty"`
 	// Required cluster name for validating reverse tunnel connection initiations.
 	// When set, the filter validates that the upstream cluster of the initiator envoy matches this name
@@ -254,11 +274,12 @@ var File_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto
 
 const file_envoy_extensions_filters_network_reverse_tunnel_v3_reverse_tunnel_proto_rawDesc = "" +
 	"\n" +
-	"Genvoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xee\x01\n" +
+	"Genvoy/extensions/filters/network/reverse_tunnel/v3/reverse_tunnel.proto\x122envoy.extensions.filters.network.reverse_tunnel.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa2\x02\n" +
 	"\n" +
 	"Validation\x12.\n" +
 	"\x0enode_id_format\x18\x01 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\fnodeIdFormat\x124\n" +
 	"\x11cluster_id_format\x18\x02 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0fclusterIdFormat\x122\n" +
+	"\x10tenant_id_format\x18\x05 \x01(\tB\b\xfaB\x05r\x03\x18\x80\bR\x0etenantIdFormat\x122\n" +
 	"\x15emit_dynamic_metadata\x18\x03 \x01(\bR\x13emitDynamicMetadata\x12F\n" +
 	"\x1adynamic_metadata_namespace\x18\x04 \x01(\tB\b\xfaB\x05r\x03\x18\xff\x01R\x18dynamicMetadataNamespace\"\xc1\x03\n" +
 	"\rReverseTunnel\x12Q\n" +
