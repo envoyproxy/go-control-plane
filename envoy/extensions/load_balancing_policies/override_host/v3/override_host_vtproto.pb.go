@@ -133,6 +133,28 @@ func (m *OverrideHost) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
+	if m.SelectedHostKey != nil {
+		if vtmsg, ok := interface{}(m.SelectedHostKey).(interface {
+			MarshalToSizedBufferVTStrict([]byte) (int, error)
+		}); ok {
+			size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		} else {
+			encoded, err := proto.Marshal(m.SelectedHostKey)
+			if err != nil {
+				return 0, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
 	if len(m.OverrideHostSources) > 0 {
 		for iNdEx := len(m.OverrideHostSources) - 1; iNdEx >= 0; iNdEx-- {
 			size, err := m.OverrideHostSources[iNdEx].MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -183,6 +205,16 @@ func (m *OverrideHost) SizeVT() (n int) {
 			l = e.SizeVT()
 			n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 		}
+	}
+	if m.SelectedHostKey != nil {
+		if size, ok := interface{}(m.SelectedHostKey).(interface {
+			SizeVT() int
+		}); ok {
+			l = size.SizeVT()
+		} else {
+			l = proto.Size(m.SelectedHostKey)
+		}
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	if m.FallbackPolicy != nil {
 		if size, ok := interface{}(m.FallbackPolicy).(interface {
