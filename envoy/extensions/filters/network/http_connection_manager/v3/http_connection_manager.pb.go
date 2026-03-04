@@ -423,8 +423,10 @@ type HttpConnectionManager struct {
 	//
 	//	Currently some protocol codecs impose limits on the maximum size of a single header.
 	//
-	//	* HTTP/2 (when using nghttp2) limits a single header to around 100kb.
-	//	* HTTP/3 limits a single header to around 1024kb.
+	//	* HTTP/2 (when using nghttp2) limits a single header to around 100 KB by default. This can be
+	//	  adjusted via :ref:`max_header_field_size_kb
+	//	  <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.max_header_field_size_kb>`.
+	//	* HTTP/3 limits a single header to around 1024 KB.
 	MaxRequestHeadersKb *wrapperspb.UInt32Value `protobuf:"bytes,29,opt,name=max_request_headers_kb,json=maxRequestHeadersKb,proto3" json:"max_request_headers_kb,omitempty"`
 	// The stream idle timeout for connections managed by the connection manager.
 	// If not specified, this defaults to “5 minutes“. The default value was selected

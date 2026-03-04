@@ -1072,6 +1072,18 @@ func (m *Http2ProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.MaxHeaderFieldSizeKb != nil {
+		size, err := (*wrapperspb.UInt32Value)(m.MaxHeaderFieldSizeKb).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x9a
+	}
 	if m.EnableHuffmanEncoding != nil {
 		size, err := (*wrapperspb.BoolValue)(m.EnableHuffmanEncoding).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1918,6 +1930,10 @@ func (m *Http2ProtocolOptions) SizeVT() (n int) {
 	}
 	if m.EnableHuffmanEncoding != nil {
 		l = (*wrapperspb.BoolValue)(m.EnableHuffmanEncoding).SizeVT()
+		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.MaxHeaderFieldSizeKb != nil {
+		l = (*wrapperspb.UInt32Value)(m.MaxHeaderFieldSizeKb).SizeVT()
 		n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
