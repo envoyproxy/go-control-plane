@@ -9,7 +9,8 @@ package statsv3
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
 	_ "github.com/cncf/xds/go/xds/annotations/v3"
-	v3 "github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v3"
+	v3 "github.com/cncf/xds/go/xds/type/matcher/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -162,8 +163,15 @@ type Config_Tag struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the tag.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The value of the tag, using :ref:`command operators <config_access_log_command_operators>`.
-	ValueFormat   string `protobuf:"bytes,2,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
+	// The value of the tag, using :ref:`command operators
+	// <config_access_log_command_operators>`.
+	ValueFormat string `protobuf:"bytes,2,opt,name=value_format,json=valueFormat,proto3" json:"value_format,omitempty"`
+	// The custom rules to generate the stat tags. Currently, the only
+	// supported input is
+	// :ref:`Stat tag value input <envoy_v3_api_msg_extensions.matching.common_inputs.stats.v3.StatTagValueInput>`.
+	// The supported actions are
+	// - :ref:`Transform stat action <envoy_v3_api_msg_extensions.matching.actions.transform_stat.v3.TransformStat>`.
+	Rules         *v3.Matcher `protobuf:"bytes,3,opt,name=rules,proto3" json:"rules,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -210,6 +218,13 @@ func (x *Config_Tag) GetValueFormat() string {
 		return x.ValueFormat
 	}
 	return ""
+}
+
+func (x *Config_Tag) GetRules() *v3.Matcher {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
 }
 
 // Defines the name and tags of a stat.
@@ -492,7 +507,7 @@ func (x *Config_Gauge) GetSet() *Config_Gauge_Set {
 type Config_Gauge_Set struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The access log type to trigger the operation.
-	LogType       v3.AccessLogType `protobuf:"varint,1,opt,name=log_type,json=logType,proto3,enum=envoy.data.accesslog.v3.AccessLogType" json:"log_type,omitempty"`
+	LogType       v31.AccessLogType `protobuf:"varint,1,opt,name=log_type,json=logType,proto3,enum=envoy.data.accesslog.v3.AccessLogType" json:"log_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -527,11 +542,11 @@ func (*Config_Gauge_Set) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_access_loggers_stats_v3_stats_proto_rawDescGZIP(), []int{0, 4, 0}
 }
 
-func (x *Config_Gauge_Set) GetLogType() v3.AccessLogType {
+func (x *Config_Gauge_Set) GetLogType() v31.AccessLogType {
 	if x != nil {
 		return x.LogType
 	}
-	return v3.AccessLogType(0)
+	return v31.AccessLogType(0)
 }
 
 // The PairedAddSubtract operation config.
@@ -546,9 +561,9 @@ func (x *Config_Gauge_Set) GetLogType() v3.AccessLogType {
 type Config_Gauge_PairedAddSubtract struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The access log type to trigger the add operation.
-	AddLogType v3.AccessLogType `protobuf:"varint,1,opt,name=add_log_type,json=addLogType,proto3,enum=envoy.data.accesslog.v3.AccessLogType" json:"add_log_type,omitempty"`
+	AddLogType v31.AccessLogType `protobuf:"varint,1,opt,name=add_log_type,json=addLogType,proto3,enum=envoy.data.accesslog.v3.AccessLogType" json:"add_log_type,omitempty"`
 	// The access log type to trigger the subtract operation.
-	SubLogType    v3.AccessLogType `protobuf:"varint,2,opt,name=sub_log_type,json=subLogType,proto3,enum=envoy.data.accesslog.v3.AccessLogType" json:"sub_log_type,omitempty"`
+	SubLogType    v31.AccessLogType `protobuf:"varint,2,opt,name=sub_log_type,json=subLogType,proto3,enum=envoy.data.accesslog.v3.AccessLogType" json:"sub_log_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -583,25 +598,25 @@ func (*Config_Gauge_PairedAddSubtract) Descriptor() ([]byte, []int) {
 	return file_envoy_extensions_access_loggers_stats_v3_stats_proto_rawDescGZIP(), []int{0, 4, 1}
 }
 
-func (x *Config_Gauge_PairedAddSubtract) GetAddLogType() v3.AccessLogType {
+func (x *Config_Gauge_PairedAddSubtract) GetAddLogType() v31.AccessLogType {
 	if x != nil {
 		return x.AddLogType
 	}
-	return v3.AccessLogType(0)
+	return v31.AccessLogType(0)
 }
 
-func (x *Config_Gauge_PairedAddSubtract) GetSubLogType() v3.AccessLogType {
+func (x *Config_Gauge_PairedAddSubtract) GetSubLogType() v31.AccessLogType {
 	if x != nil {
 		return x.SubLogType
 	}
-	return v3.AccessLogType(0)
+	return v31.AccessLogType(0)
 }
 
 var File_envoy_extensions_access_loggers_stats_v3_stats_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_access_loggers_stats_v3_stats_proto_rawDesc = "" +
 	"\n" +
-	"4envoy/extensions/access_loggers/stats/v3/stats.proto\x12(envoy.extensions.access_loggers.stats.v3\x1a'envoy/data/accesslog/v3/accesslog.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xc9\r\n" +
+	"4envoy/extensions/access_loggers/stats/v3/stats.proto\x12(envoy.extensions.access_loggers.stats.v3\x1a'envoy/data/accesslog/v3/accesslog.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xfe\r\n" +
 	"\x06Config\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12Z\n" +
@@ -609,10 +624,11 @@ const file_envoy_extensions_access_loggers_stats_v3_stats_proto_rawDesc = "" +
 	"histograms\x18\x03 \x03(\v2:.envoy.extensions.access_loggers.stats.v3.Config.HistogramR\n" +
 	"histograms\x12T\n" +
 	"\bcounters\x18\x04 \x03(\v28.envoy.extensions.access_loggers.stats.v3.Config.CounterR\bcounters\x12N\n" +
-	"\x06gauges\x18\x05 \x03(\v26.envoy.extensions.access_loggers.stats.v3.Config.GaugeR\x06gauges\x1aN\n" +
+	"\x06gauges\x18\x05 \x03(\v26.envoy.extensions.access_loggers.stats.v3.Config.GaugeR\x06gauges\x1a\x82\x01\n" +
 	"\x03Tag\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12*\n" +
-	"\fvalue_format\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vvalueFormat\x1am\n" +
+	"\fvalue_format\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\vvalueFormat\x122\n" +
+	"\x05rules\x18\x03 \x01(\v2\x1c.xds.type.matcher.v3.MatcherR\x05rules\x1am\n" +
 	"\x04Stat\x12\x1b\n" +
 	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12H\n" +
 	"\x04tags\x18\x02 \x03(\v24.envoy.extensions.access_loggers.stats.v3.Config.TagR\x04tags\x1a\xc6\x02\n" +
@@ -673,30 +689,32 @@ var file_envoy_extensions_access_loggers_stats_v3_stats_proto_goTypes = []any{
 	(*Config_Gauge)(nil),                   // 6: envoy.extensions.access_loggers.stats.v3.Config.Gauge
 	(*Config_Gauge_Set)(nil),               // 7: envoy.extensions.access_loggers.stats.v3.Config.Gauge.Set
 	(*Config_Gauge_PairedAddSubtract)(nil), // 8: envoy.extensions.access_loggers.stats.v3.Config.Gauge.PairedAddSubtract
-	(*wrapperspb.UInt64Value)(nil),         // 9: google.protobuf.UInt64Value
-	(v3.AccessLogType)(0),                  // 10: envoy.data.accesslog.v3.AccessLogType
+	(*v3.Matcher)(nil),                     // 9: xds.type.matcher.v3.Matcher
+	(*wrapperspb.UInt64Value)(nil),         // 10: google.protobuf.UInt64Value
+	(v31.AccessLogType)(0),                 // 11: envoy.data.accesslog.v3.AccessLogType
 }
 var file_envoy_extensions_access_loggers_stats_v3_stats_proto_depIdxs = []int32{
 	4,  // 0: envoy.extensions.access_loggers.stats.v3.Config.histograms:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Histogram
 	5,  // 1: envoy.extensions.access_loggers.stats.v3.Config.counters:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Counter
 	6,  // 2: envoy.extensions.access_loggers.stats.v3.Config.gauges:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Gauge
-	2,  // 3: envoy.extensions.access_loggers.stats.v3.Config.Stat.tags:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Tag
-	3,  // 4: envoy.extensions.access_loggers.stats.v3.Config.Histogram.stat:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Stat
-	0,  // 5: envoy.extensions.access_loggers.stats.v3.Config.Histogram.unit:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Histogram.Unit
-	3,  // 6: envoy.extensions.access_loggers.stats.v3.Config.Counter.stat:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Stat
-	9,  // 7: envoy.extensions.access_loggers.stats.v3.Config.Counter.value_fixed:type_name -> google.protobuf.UInt64Value
-	3,  // 8: envoy.extensions.access_loggers.stats.v3.Config.Gauge.stat:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Stat
-	9,  // 9: envoy.extensions.access_loggers.stats.v3.Config.Gauge.value_fixed:type_name -> google.protobuf.UInt64Value
-	8,  // 10: envoy.extensions.access_loggers.stats.v3.Config.Gauge.add_subtract:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Gauge.PairedAddSubtract
-	7,  // 11: envoy.extensions.access_loggers.stats.v3.Config.Gauge.set:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Gauge.Set
-	10, // 12: envoy.extensions.access_loggers.stats.v3.Config.Gauge.Set.log_type:type_name -> envoy.data.accesslog.v3.AccessLogType
-	10, // 13: envoy.extensions.access_loggers.stats.v3.Config.Gauge.PairedAddSubtract.add_log_type:type_name -> envoy.data.accesslog.v3.AccessLogType
-	10, // 14: envoy.extensions.access_loggers.stats.v3.Config.Gauge.PairedAddSubtract.sub_log_type:type_name -> envoy.data.accesslog.v3.AccessLogType
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	9,  // 3: envoy.extensions.access_loggers.stats.v3.Config.Tag.rules:type_name -> xds.type.matcher.v3.Matcher
+	2,  // 4: envoy.extensions.access_loggers.stats.v3.Config.Stat.tags:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Tag
+	3,  // 5: envoy.extensions.access_loggers.stats.v3.Config.Histogram.stat:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Stat
+	0,  // 6: envoy.extensions.access_loggers.stats.v3.Config.Histogram.unit:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Histogram.Unit
+	3,  // 7: envoy.extensions.access_loggers.stats.v3.Config.Counter.stat:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Stat
+	10, // 8: envoy.extensions.access_loggers.stats.v3.Config.Counter.value_fixed:type_name -> google.protobuf.UInt64Value
+	3,  // 9: envoy.extensions.access_loggers.stats.v3.Config.Gauge.stat:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Stat
+	10, // 10: envoy.extensions.access_loggers.stats.v3.Config.Gauge.value_fixed:type_name -> google.protobuf.UInt64Value
+	8,  // 11: envoy.extensions.access_loggers.stats.v3.Config.Gauge.add_subtract:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Gauge.PairedAddSubtract
+	7,  // 12: envoy.extensions.access_loggers.stats.v3.Config.Gauge.set:type_name -> envoy.extensions.access_loggers.stats.v3.Config.Gauge.Set
+	11, // 13: envoy.extensions.access_loggers.stats.v3.Config.Gauge.Set.log_type:type_name -> envoy.data.accesslog.v3.AccessLogType
+	11, // 14: envoy.extensions.access_loggers.stats.v3.Config.Gauge.PairedAddSubtract.add_log_type:type_name -> envoy.data.accesslog.v3.AccessLogType
+	11, // 15: envoy.extensions.access_loggers.stats.v3.Config.Gauge.PairedAddSubtract.sub_log_type:type_name -> envoy.data.accesslog.v3.AccessLogType
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_access_loggers_stats_v3_stats_proto_init() }
