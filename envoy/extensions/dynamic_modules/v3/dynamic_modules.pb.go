@@ -8,7 +8,7 @@ package dynamic_modulesv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/envoyproxy/protoc-gen-validate/validate"
+	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -40,7 +40,7 @@ const (
 // the ABI is stabilized, this restriction will be revisited. Until then, Envoy checks the hash of
 // the ABI header files to ensure that the dynamic modules are built against the same version of the
 // ABI.
-// [#next-free-field: 6]
+// [#next-free-field: 7]
 type DynamicModuleConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the dynamic module.
@@ -52,6 +52,9 @@ type DynamicModuleConfig struct {
 	// used as the search path. After Envoy fails to find the module in the search path, it will also
 	// try to find the module from a standard system library path (e.g., “/usr/lib“) following the
 	// platform's default behavior for “dlopen“.
+	//
+	// This field is optional if the “module“ field is set. When both “name“ and “module“ are
+	// specified, the “module“ field takes precedence.
 	//
 	// .. note::
 	//
@@ -90,8 +93,13 @@ type DynamicModuleConfig struct {
 	//
 	// Defaults to “dynamicmodulescustom“.
 	MetricsNamespace string `protobuf:"bytes,5,opt,name=metrics_namespace,json=metricsNamespace,proto3" json:"metrics_namespace,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// The dynamic module binary to load. Currently only supports local file paths
+	// via “local.filename“.
+	//
+	// When both “name“ and “module“ are set, “module“ takes precedence.
+	Module        *v3.AsyncDataSource `protobuf:"bytes,6,opt,name=module,proto3" json:"module,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DynamicModuleConfig) Reset() {
@@ -152,17 +160,25 @@ func (x *DynamicModuleConfig) GetMetricsNamespace() string {
 	return ""
 }
 
+func (x *DynamicModuleConfig) GetModule() *v3.AsyncDataSource {
+	if x != nil {
+		return x.Module
+	}
+	return nil
+}
+
 var File_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xa6\x01\n" +
-	"\x13DynamicModuleConfig\x12\x1b\n" +
-	"\x04name\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name\x12 \n" +
+	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1dudpa/annotations/status.proto\"\xdc\x01\n" +
+	"\x13DynamicModuleConfig\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\fdo_not_close\x18\x03 \x01(\bR\n" +
 	"doNotClose\x12#\n" +
 	"\rload_globally\x18\x04 \x01(\bR\floadGlobally\x12+\n" +
-	"\x11metrics_namespace\x18\x05 \x01(\tR\x10metricsNamespaceB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x11metrics_namespace\x18\x05 \x01(\tR\x10metricsNamespace\x12=\n" +
+	"\x06module\x18\x06 \x01(\v2%.envoy.config.core.v3.AsyncDataSourceR\x06moduleB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"1io.envoyproxy.envoy.extensions.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Z\\github.com/envoyproxy/go-control-plane/envoy/extensions/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (
@@ -180,13 +196,15 @@ func file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_rawDescGZIP(
 var file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_goTypes = []any{
 	(*DynamicModuleConfig)(nil), // 0: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig
+	(*v3.AsyncDataSource)(nil),  // 1: envoy.config.core.v3.AsyncDataSource
 }
 var file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: envoy.extensions.dynamic_modules.v3.DynamicModuleConfig.module:type_name -> envoy.config.core.v3.AsyncDataSource
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_init() }
