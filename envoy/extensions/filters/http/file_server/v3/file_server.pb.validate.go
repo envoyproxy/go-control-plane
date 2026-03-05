@@ -132,7 +132,32 @@ func (m *FileServerConfig) validate(all bool) error {
 
 	}
 
-	// no validation rules for ContentTypes
+	{
+		sorted_keys := make([]string, len(m.GetContentTypes()))
+		i := 0
+		for key := range m.GetContentTypes() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetContentTypes()[key]
+			_ = val
+
+			if !_FileServerConfig_ContentTypes_Pattern.MatchString(key) {
+				err := FileServerConfigValidationError{
+					field:  fmt.Sprintf("ContentTypes[%v]", key),
+					reason: "value does not match regex pattern \"^[a-z0-9_\\\\-]*$\"",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+			// no validation rules for ContentTypes[key]
+		}
+	}
 
 	// no validation rules for DefaultContentType
 
@@ -247,6 +272,8 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = FileServerConfigValidationError{}
+
+var _FileServerConfig_ContentTypes_Pattern = regexp.MustCompile("^[a-z0-9_\\-]*$")
 
 // Validate checks the field values on FileServerConfig_PathMapping with the
 // rules defined in the proto definition for this message. If any rules are

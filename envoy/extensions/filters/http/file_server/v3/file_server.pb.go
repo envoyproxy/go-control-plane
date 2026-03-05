@@ -33,15 +33,16 @@ type FileServerConfig struct {
 	ManagerConfig *v3.AsyncFileManagerConfig `protobuf:"bytes,1,opt,name=manager_config,json=managerConfig,proto3" json:"manager_config,omitempty"`
 	// The longest matching path_mapping takes precedence.
 	PathMappings []*FileServerConfig_PathMapping `protobuf:"bytes,2,rep,name=path_mappings,json=pathMappings,proto3" json:"path_mappings,omitempty"`
-	// A map from filename suffix to content type header.
-	// e.g. {"txt": "text/plain"}
+	// A map from filename suffix (in lowercase) to content type header.
+	// e.g. “{"txt": "text/plain"}“
 	//
 	// File suffixes may not contain “.“ as the filename suffix after
 	// the last “.“ is used to perform an O(1) lookup against the keys.
 	//
 	// An empty string suffix will only match files ending with a “.“.
 	//
-	// Files with no suffix (e.g. “README“) can be matched as the full string.
+	// Files with no suffix (e.g. “README“) can be matched as the full string
+	// in lowercase. e.g. “{"readme": "text/plain"}“
 	ContentTypes map[string]string `protobuf:"bytes,3,rep,name=content_types,json=contentTypes,proto3" json:"content_types,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// If “content_types“ does not contain a match for a file suffix,
 	// “default_content_type“ is used.
@@ -282,11 +283,11 @@ var File_envoy_extensions_filters_http_file_server_v3_file_server_proto protoref
 
 const file_envoy_extensions_filters_http_file_server_v3_file_server_proto_rawDesc = "" +
 	"\n" +
-	">envoy/extensions/filters/http/file_server/v3/file_server.proto\x12,envoy.extensions.filters.http.file_server.v3\x1a?envoy/extensions/common/async_files/v3/async_file_manager.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x99\a\n" +
+	">envoy/extensions/filters/http/file_server/v3/file_server.proto\x12,envoy.extensions.filters.http.file_server.v3\x1a?envoy/extensions/common/async_files/v3/async_file_manager.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb6\a\n" +
 	"\x10FileServerConfig\x12o\n" +
 	"\x0emanager_config\x18\x01 \x01(\v2>.envoy.extensions.common.async_files.v3.AsyncFileManagerConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\rmanagerConfig\x12o\n" +
-	"\rpath_mappings\x18\x02 \x03(\v2J.envoy.extensions.filters.http.file_server.v3.FileServerConfig.PathMappingR\fpathMappings\x12u\n" +
-	"\rcontent_types\x18\x03 \x03(\v2P.envoy.extensions.filters.http.file_server.v3.FileServerConfig.ContentTypesEntryR\fcontentTypes\x120\n" +
+	"\rpath_mappings\x18\x02 \x03(\v2J.envoy.extensions.filters.http.file_server.v3.FileServerConfig.PathMappingR\fpathMappings\x12\x91\x01\n" +
+	"\rcontent_types\x18\x03 \x03(\v2P.envoy.extensions.filters.http.file_server.v3.FileServerConfig.ContentTypesEntryB\x1a\xfaB\x17\x9a\x01\x14\"\x12r\x102\x0e^[a-z0-9_\\-]*$R\fcontentTypes\x120\n" +
 	"\x14default_content_type\x18\x04 \x01(\tR\x12defaultContentType\x12\x81\x01\n" +
 	"\x13directory_behaviors\x18\x05 \x03(\v2P.envoy.extensions.filters.http.file_server.v3.FileServerConfig.DirectoryBehaviorR\x12directoryBehaviors\x1ay\n" +
 	"\vPathMapping\x127\n" +
