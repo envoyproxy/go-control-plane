@@ -339,7 +339,7 @@ func callEcho() (int, int) {
 		if err != nil {
 			return nil, err
 		}
-		return client.Do(req) //nolint:gosec
+		return client.Do(req)
 	}
 
 	// spawn requests
