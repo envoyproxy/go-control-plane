@@ -1,4 +1,4 @@
-package internal
+package resources
 
 import (
 	"crypto/sha256"
@@ -35,7 +35,7 @@ func TestGetSotwResource_NoTTL(t *testing.T) {
 	res := wrapperspb.String("hello")
 	cached := NewCachedResource("my-resource", testTypeURL, res)
 
-	got, err := cached.GetSotwResource(false)
+	got, err := cached.GetAnyResource(false)
 	require.NoError(t, err)
 
 	assert.Equal(t, testTypeURL, got.TypeUrl)
@@ -47,7 +47,7 @@ func TestGetSotwResource_NoTTL_HeartbeatIgnored(t *testing.T) {
 	cached := NewCachedResource("my-resource", testTypeURL, res)
 
 	// Without TTL, heartbeat flag has no effect — resource is always included.
-	got, err := cached.GetSotwResource(true)
+	got, err := cached.GetAnyResource(true)
 	require.NoError(t, err)
 
 	assert.Equal(t, testTypeURL, got.TypeUrl)
@@ -57,13 +57,13 @@ func TestGetSotwResource_NoTTL_HeartbeatIgnored(t *testing.T) {
 func TestGetSotwResource_WithTTL(t *testing.T) {
 	res := wrapperspb.String("world")
 	ttl := 5 * time.Second
-	cached := NewCachedResource("ttl-resource", testTypeURL, res, WithResourceTTL(&ttl))
+	cached := NewCachedResource("ttl-resource", testTypeURL, res, WithTTL(&ttl))
 
-	got, err := cached.GetSotwResource(false)
+	got, err := cached.GetAnyResource(false)
 	require.NoError(t, err)
 
 	// When TTL is set, the result is wrapped in a discovery.Resource envelope.
-	assert.Equal(t, deltaResourceTypeURL, got.TypeUrl)
+	assert.Equal(t, discoveryResourceTypeURL, got.TypeUrl)
 
 	// Unwrap and verify the discovery.Resource.
 	var wrapper discovery.Resource
@@ -79,12 +79,12 @@ func TestGetSotwResource_WithTTL(t *testing.T) {
 func TestGetSotwResource_WithTTL_Heartbeat(t *testing.T) {
 	res := wrapperspb.String("heartbeat")
 	ttl := 3 * time.Second
-	cached := NewCachedResource("hb-resource", testTypeURL, res, WithResourceTTL(&ttl))
+	cached := NewCachedResource("hb-resource", testTypeURL, res, WithTTL(&ttl))
 
-	got, err := cached.GetSotwResource(true)
+	got, err := cached.GetAnyResource(true)
 	require.NoError(t, err)
 
-	assert.Equal(t, deltaResourceTypeURL, got.TypeUrl)
+	assert.Equal(t, discoveryResourceTypeURL, got.TypeUrl)
 
 	var wrapper discovery.Resource
 	require.NoError(t, proto.Unmarshal(got.Value, &wrapper))
@@ -99,7 +99,7 @@ func TestGetDeltaResource(t *testing.T) {
 	res := wrapperspb.String("delta-value")
 	cached := NewCachedResource("delta-resource", testTypeURL, res)
 
-	got, err := cached.GetDeltaResource()
+	got, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	assert.Equal(t, "delta-resource", got.Name)
@@ -116,9 +116,9 @@ func TestGetDeltaResource(t *testing.T) {
 
 func TestGetDeltaResource_WithCustomVersion(t *testing.T) {
 	res := wrapperspb.String("custom-version")
-	cached := NewCachedResource("cv-resource", testTypeURL, res, WithResourceVersion("v42"))
+	cached := NewCachedResource("cv-resource", testTypeURL, res, WithVersion("v42"))
 
-	got, err := cached.GetDeltaResource()
+	got, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	assert.Equal(t, "v42", got.Version)
@@ -128,9 +128,9 @@ func TestGetDeltaResource_WithCustomVersion(t *testing.T) {
 func TestGetDeltaResource_WithMarshaledResource(t *testing.T) {
 	res := wrapperspb.String("pre-marshaled")
 	preMarshaled := deterministicMarshal(t, res)
-	cached := NewCachedResource("pm-resource", testTypeURL, res, WithMarshaledResource(preMarshaled))
+	cached := NewCachedResource("pm-resource", testTypeURL, res, WithMarshaled(preMarshaled))
 
-	got, err := cached.GetDeltaResource()
+	got, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	assert.Equal(t, preMarshaled, got.Resource.Value)
@@ -143,10 +143,10 @@ func TestGetSotwAndDeltaConsistency(t *testing.T) {
 	res := wrapperspb.String("consistent")
 	cached := NewCachedResource("cons-resource", testTypeURL, res)
 
-	sotw, err := cached.GetSotwResource(false)
+	sotw, err := cached.GetAnyResource(false)
 	require.NoError(t, err)
 
-	delta, err := cached.GetDeltaResource()
+	delta, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	// The raw bytes in the Any should match the delta resource's Any.
@@ -159,10 +159,10 @@ func TestGetDeltaResource_StableVersion(t *testing.T) {
 	res := wrapperspb.String("stable")
 	cached := NewCachedResource("stable-resource", testTypeURL, res)
 
-	r1, err := cached.GetDeltaResource()
+	r1, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
-	r2, err := cached.GetDeltaResource()
+	r2, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	assert.Equal(t, r1.Version, r2.Version)
@@ -174,7 +174,7 @@ func TestGetSotwResource_UsesTypeURL(t *testing.T) {
 	res := wrapperspb.String("typed")
 	cached := NewCachedResource("typed-resource", customTypeURL, res)
 
-	got, err := cached.GetSotwResource(false)
+	got, err := cached.GetAnyResource(false)
 	require.NoError(t, err)
 
 	assert.Equal(t, customTypeURL, got.TypeUrl)
@@ -185,7 +185,7 @@ func TestGetDeltaResource_UsesTypeURL(t *testing.T) {
 	res := wrapperspb.String("typed")
 	cached := NewCachedResource("typed-resource", customTypeURL, res)
 
-	got, err := cached.GetDeltaResource()
+	got, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	assert.Equal(t, customTypeURL, got.Resource.TypeUrl)
@@ -194,9 +194,9 @@ func TestGetDeltaResource_UsesTypeURL(t *testing.T) {
 func TestGetDeltaResource_WithMarshaledResource_Empty(t *testing.T) {
 	// Passing empty bytes to WithMarshaledResource should be a no-op (fall back to default marshaling).
 	res := wrapperspb.String("fallback")
-	cached := NewCachedResource("fb-resource", testTypeURL, res, WithMarshaledResource(nil))
+	cached := NewCachedResource("fb-resource", testTypeURL, res, WithMarshaled(nil))
 
-	got, err := cached.GetDeltaResource()
+	got, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	assert.Equal(t, deterministicMarshal(t, res), got.Resource.Value)
@@ -205,9 +205,9 @@ func TestGetDeltaResource_WithMarshaledResource_Empty(t *testing.T) {
 func TestGetDeltaResource_WithResourceVersion_Empty(t *testing.T) {
 	// Passing empty string to WithResourceVersion should be a no-op (fall back to hash-based version).
 	res := wrapperspb.String("version-fallback")
-	cached := NewCachedResource("vfb-resource", testTypeURL, res, WithResourceVersion(""))
+	cached := NewCachedResource("vfb-resource", testTypeURL, res, WithVersion(""))
 
-	got, err := cached.GetDeltaResource()
+	got, err := cached.GetDiscoveryResource()
 	require.NoError(t, err)
 
 	marshaled := deterministicMarshal(t, res)
@@ -218,7 +218,7 @@ func TestGetSotwResource_NoTTL_CanBeUnmarshaledBack(t *testing.T) {
 	original := wrapperspb.String("roundtrip")
 	cached := NewCachedResource("rt-resource", testTypeURL, original)
 
-	got, err := cached.GetSotwResource(false)
+	got, err := cached.GetAnyResource(false)
 	require.NoError(t, err)
 
 	// Unmarshal back from the Any and verify equality.

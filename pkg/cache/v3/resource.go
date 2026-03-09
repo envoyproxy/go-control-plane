@@ -23,7 +23,7 @@ import (
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	runtime "github.com/envoyproxy/go-control-plane/envoy/service/runtime/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
@@ -127,9 +127,9 @@ func GetResourceNames(resources []types.ResourceWithTTL) []string {
 }
 
 // getCachedResourceNames returns the resource names for a list of valid xDS response types.
-func getCachedResourceNames(resources []*internal.CachedResource) []string {
-	out := make([]string, len(resources))
-	for i, r := range resources {
+func getCachedResourceNames(res []*resources.CachedResource) []string {
+	out := make([]string, len(res))
+	for i, r := range res {
 		out[i] = r.Name
 	}
 	return out

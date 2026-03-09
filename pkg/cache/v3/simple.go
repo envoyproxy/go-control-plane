@@ -25,7 +25,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
@@ -194,14 +194,14 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 		info.mu.Lock()
 		for id, watch := range info.watches {
 			typeSnapshot := snapshot.GetTypeSnapshot(watch.Request.GetTypeUrl())
-			resources := typeSnapshot.GetResources()
-			if len(resources) == 0 {
+			res := typeSnapshot.GetResources()
+			if len(res) == 0 {
 				// No resources for this type.
 				continue
 			}
 
-			resourcesToReturn := map[string]*internal.CachedResource{}
-			addResource := func(res *internal.CachedResource) {
+			resourcesToReturn := map[string]*resources.CachedResource{}
+			addResource := func(res *resources.CachedResource) {
 				if !res.HasTTL() {
 					return
 				}
@@ -209,13 +209,13 @@ func (cache *snapshotCache) sendHeartbeats(ctx context.Context, node string) {
 			}
 
 			if watch.subscription.IsWildcard() {
-				resourcesToReturn = make(map[string]*internal.CachedResource, len(resources))
-				for _, res := range resources {
+				resourcesToReturn = make(map[string]*resources.CachedResource, len(res))
+				for _, res := range res {
 					addResource(res)
 				}
 			}
 			for name := range watch.subscription.SubscribedResources() {
-				if res, ok := resources[name]; ok {
+				if res, ok := res[name]; ok {
 					addResource(res)
 				}
 			}
@@ -490,12 +490,12 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 	typeURL := watch.Request.TypeUrl
 	// Use version from snapshot and not typeSnapshot to support negative case (i.e. no resources are set).
 	version := snapshot.GetVersion(typeURL)
-	resources := snapshot.GetTypeSnapshot(typeURL).GetResources()
+	res := snapshot.GetTypeSnapshot(typeURL).GetResources()
 
 	// for ADS, the request names must match the snapshot names
 	// if they do not, then the watch is never responded, and it is expected that envoy makes another request
 	if !watch.subscription.IsWildcard() && ads {
-		if missing := difference(maps.Keys(resources), watch.subscription.SubscribedResources()); len(missing) > 0 {
+		if missing := difference(maps.Keys(res), watch.subscription.SubscribedResources()); len(missing) > 0 {
 			return nil, missingRequestResource{missing}
 		}
 	}
@@ -515,8 +515,8 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 	if version == reqVersion {
 		// Check if a resource was not previously returned (e.g. if the watch is newly wildcard).
 		if watch.subscription.IsWildcard() {
-			changedResources = make(map[string]struct{}, len(resources))
-			for name := range resources {
+			changedResources = make(map[string]struct{}, len(res))
+			for name := range res {
 				_, known := knownResources[name]
 				if known {
 					continue
@@ -528,7 +528,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 		}
 
 		for name := range subscribedResources {
-			_, exist := resources[name]
+			_, exist := res[name]
 			if !exist {
 				continue
 			}
@@ -546,7 +546,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 		}
 
 		for name := range knownResources {
-			_, exist := resources[name]
+			_, exist := res[name]
 			if !exist {
 				deletedResources = append(deletedResources, name)
 				continue
@@ -570,23 +570,23 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 	}
 
 	// Now compute the response.
-	var resourcesToReturn []*internal.CachedResource
+	var resourcesToReturn []*resources.CachedResource
 	var returnedResources map[string]string
 	if version != reqVersion || watch.sendFullStateResponses() {
 		// Return all resources, with no regard to known version.
 		if watch.subscription.IsWildcard() {
-			resourcesToReturn = make([]*internal.CachedResource, 0, len(resources))
-			returnedResources = make(map[string]string, len(resources))
-			for name, resource := range resources {
+			resourcesToReturn = make([]*resources.CachedResource, 0, len(res))
+			returnedResources = make(map[string]string, len(res))
+			for name, resource := range res {
 				resourcesToReturn = append(resourcesToReturn, resource)
 				returnedResources[name] = version
 			}
 		} else {
-			resourcesToReturn = make([]*internal.CachedResource, 0, len(subscribedResources))
+			resourcesToReturn = make([]*resources.CachedResource, 0, len(subscribedResources))
 			returnedResources = make(map[string]string, len(subscribedResources))
 		}
 		for name := range subscribedResources {
-			resource, ok := resources[name]
+			resource, ok := res[name]
 			if !ok {
 				continue
 			}
@@ -597,7 +597,7 @@ func createResponse(snapshot ResourceSnapshot, watch ResponseWatch, ads bool) (*
 		// Same version and not full state, only return newly subscribed resources.
 		returnedResources = maps.Clone(knownResources)
 		for name := range changedResources {
-			resource, ok := resources[name]
+			resource, ok := res[name]
 			if !ok {
 				// Should never occur.
 				continue
@@ -688,21 +688,21 @@ func (cache *snapshotCache) CreateDeltaWatch(request *DeltaRequest, sub Subscrip
 func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, replyIfEmpty bool) (*RawDeltaResponse, error) {
 	typeURL := watch.Request.TypeUrl
 
-	resources := snapshot.GetTypeSnapshot(typeURL).GetResources()
+	res := snapshot.GetTypeSnapshot(typeURL).GetResources()
 	subscribed := watch.subscription.SubscribedResources()
 
-	var resourcesToReturn []*internal.CachedResource
+	var resourcesToReturn []*resources.CachedResource
 	var deletedResources []string
 	returnedResources := maps.Clone(watch.subscription.ReturnedResources())
 
 	if watch.subscription.IsWildcard() {
-		resourcesToReturn = make([]*internal.CachedResource, 0, len(resources)+len(subscribed))
+		resourcesToReturn = make([]*resources.CachedResource, 0, len(res)+len(subscribed))
 	} else {
-		resourcesToReturn = make([]*internal.CachedResource, 0, len(subscribed))
+		resourcesToReturn = make([]*resources.CachedResource, 0, len(subscribed))
 	}
 
 	// Check if a resource was not previously returned or has changed version.
-	addIfChanged := func(res *internal.CachedResource) error {
+	addIfChanged := func(res *resources.CachedResource) error {
 		name := res.Name
 		resVersion, err := res.GetResourceVersion()
 		if err != nil {
@@ -718,7 +718,7 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 	}
 
 	if watch.subscription.IsWildcard() {
-		for _, res := range resources {
+		for _, res := range res {
 			if err := addIfChanged(res); err != nil {
 				return nil, fmt.Errorf("failed to compute resource version for %s: %w", res.Name, err)
 			}
@@ -726,7 +726,7 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 	}
 
 	for name := range subscribed {
-		res, exist := resources[name]
+		res, exist := res[name]
 		if !exist {
 			continue
 		}
@@ -736,7 +736,7 @@ func createDeltaResponse(snapshot ResourceSnapshot, watch DeltaResponseWatch, re
 	}
 
 	for name := range returnedResources {
-		_, exist := resources[name]
+		_, exist := res[name]
 		if !exist {
 			deletedResources = append(deletedResources, name)
 			delete(returnedResources, name)
@@ -818,13 +818,13 @@ func (cache *snapshotCache) Fetch(ctx context.Context, request *Request) (Respon
 		return nil, &types.SkipFetchError{}
 	}
 
-	resources := snapshot.GetTypeSnapshot(request.GetTypeUrl()).GetResources()
-	var resourcesToReturn []*internal.CachedResource
+	res := snapshot.GetTypeSnapshot(request.GetTypeUrl()).GetResources()
+	var resourcesToReturn []*resources.CachedResource
 	if len(request.ResourceNames) == 0 {
-		resourcesToReturn = slices.Collect(maps.Values(resources))
+		resourcesToReturn = slices.Collect(maps.Values(res))
 	} else {
 		for _, name := range request.ResourceNames {
-			res, ok := resources[name]
+			res, ok := res[name]
 			if !ok {
 				continue
 			}

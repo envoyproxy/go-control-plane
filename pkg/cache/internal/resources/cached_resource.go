@@ -1,4 +1,4 @@
-package internal
+package resources
 
 import (
 	"crypto/sha256"
@@ -49,29 +49,29 @@ func WithCacheVersion(version string) CachedResourceOption {
 	return func(r *CachedResource) { r.cacheVersion = version }
 }
 
-// WithMarshaledResource enables the user to provide the already marshaled bytes if they have them.
-// Those bytes should strive at being consistent if the object has not changed (beware protobuf non-deterministic marshaling)
+// WithMarshaled enables the user to provide the already marshaled bytes if they have them.
+// Those bytes should strive for consistency if the object has not changed (beware of protobuf non-deterministic marshaling)
 // or alternatively the resource version should also then be set.
 // By default it is computed by performing a deterministic protobuf marshaling.
-func WithMarshaledResource(bytes []byte) CachedResourceOption {
+func WithMarshaled(bytes []byte) CachedResourceOption {
 	if len(bytes) == 0 {
 		return func(*CachedResource) {}
 	}
 	return func(r *CachedResource) { r.marshalFunc = func() ([]byte, error) { return bytes, nil } }
 }
 
-// WithResourceVersion enables the user to provide the resource version to be used.
+// WithVersion enables the user to provide the resource version to be used.
 // This version should be constant if the object has not changed to avoid needlessly sending resources to clients.
 // By default it is computed by hashing the serialized version of the resource.
-func WithResourceVersion(version string) CachedResourceOption {
+func WithVersion(version string) CachedResourceOption {
 	if version == "" {
 		return func(*CachedResource) {}
 	}
 	return func(r *CachedResource) { r.computeResourceVersionFunc = func() (string, error) { return version, nil } }
 }
 
-// WithResourceTTL sets a TTL on the resource, that will be sent to the client with the payload.
-func WithResourceTTL(ttl *time.Duration) CachedResourceOption {
+// WithTTL sets a TTL on the resource, that will be sent to the client with the payload.
+func WithTTL(ttl *time.Duration) CachedResourceOption {
 	return func(r *CachedResource) { r.ttl = ttl }
 }
 
@@ -113,11 +113,6 @@ func (c *CachedResource) HasTTL() bool {
 	return c.ttl != nil
 }
 
-// getMarshaledResource lazily marshals the resource and returns the bytes.
-func (c *CachedResource) getMarshaledResource() ([]byte, error) {
-	return c.marshalFunc()
-}
-
 // GetResourceVersion returns a stable version reflecting the resource content.
 // By default it is built by hashing the serialized version of the object, using deterministic serializing.
 func (c *CachedResource) GetResourceVersion() (string, error) {
@@ -143,13 +138,13 @@ func (c *CachedResource) GetRawResource() ResourceWithTTL {
 	}
 }
 
-var deltaResourceTypeURL = "type.googleapis.com/" + string(proto.MessageName(&discovery.Resource{}))
+var discoveryResourceTypeURL = "type.googleapis.com/" + string(proto.MessageName(&discovery.Resource{}))
 
-// GetSotwResource returns the serialized resource to return within a sotw response, including TTL handling if applicable.
+// GetAnyResource returns the serialized resource to return for instance within a sotw response, including TTL handling if applicable.
 // It uses lazily computed and cached fields to ensure a resource is serialized at most once per update.
-func (c *CachedResource) GetSotwResource(isHeartbeat bool) (*anypb.Any, error) {
+func (c *CachedResource) GetAnyResource(isHeartbeat bool) (*anypb.Any, error) {
 	buildResource := func() (*anypb.Any, error) {
-		marshaled, err := c.getMarshaledResource()
+		marshaled, err := c.marshalFunc()
 		if err != nil {
 			return nil, fmt.Errorf("marshaling: %w", err)
 		}
@@ -182,15 +177,15 @@ func (c *CachedResource) GetSotwResource(isHeartbeat bool) (*anypb.Any, error) {
 	}
 
 	return &anypb.Any{
-		TypeUrl: deltaResourceTypeURL,
+		TypeUrl: discoveryResourceTypeURL,
 		Value:   marshaled,
 	}, nil
 }
 
-// GetDeltaResource returns the serialized resource to return within a delta response.
+// GetDiscoveryResource returns the serialized resource to return for instance within a delta response.
 // It uses lazily computed and cached fields to ensure a resource is serialized at most once per update.
-func (c *CachedResource) GetDeltaResource() (*discovery.Resource, error) {
-	marshaled, err := c.getMarshaledResource()
+func (c *CachedResource) GetDiscoveryResource() (*discovery.Resource, error) {
+	marshaled, err := c.marshalFunc()
 	if err != nil {
 		return nil, fmt.Errorf("marshaling: %w", err)
 	}

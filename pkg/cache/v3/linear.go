@@ -23,7 +23,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 )
@@ -41,7 +41,7 @@ type watch interface {
 
 	getSubscription() Subscription
 	// buildResponse computes the actual WatchResponse object to be sent on the watch.
-	buildResponse(updatedResources []*internal.CachedResource, removedResources []string, returnedVersions map[string]string, version string) WatchResponse
+	buildResponse(updatedResources []*resources.CachedResource, removedResources []string, returnedVersions map[string]string, version string) WatchResponse
 	// sendResponse sends the response for the watch.
 	// It must be called at most once.
 	sendResponse(resp WatchResponse)
@@ -65,7 +65,7 @@ type LinearCache struct {
 	typeURL string
 
 	// resources contains all resources currently set in the cache and associated versions.
-	resources map[string]*internal.CachedResource
+	resources map[string]*resources.CachedResource
 
 	// resourceWatches keeps track of watches currently opened specifically tracking a resource.
 	// It does not contain wildcard watches.
@@ -104,10 +104,10 @@ func WithVersionPrefix(prefix string) LinearCacheOption {
 }
 
 // WithInitialResources initializes the initial set of resources.
-func WithInitialResources(resources map[string]types.Resource) LinearCacheOption {
+func WithInitialResources(res map[string]types.Resource) LinearCacheOption {
 	return func(cache *LinearCache) {
-		for name, resource := range resources {
-			cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, resource)
+		for name, r := range res {
+			cache.resources[name] = resources.NewCachedResource(name, cache.typeURL, r)
 		}
 	}
 }
@@ -122,7 +122,7 @@ func WithLogger(log log.Logger) LinearCacheOption {
 func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	out := &LinearCache{
 		typeURL:         typeURL,
-		resources:       make(map[string]*internal.CachedResource),
+		resources:       make(map[string]*resources.CachedResource),
 		resourceWatches: make(map[string]watches),
 		wildcardWatches: newWatches(),
 		version:         0,
@@ -272,7 +272,7 @@ func (cache *LinearCache) computeResponse(watch watch, replyEvenIfEmpty bool) (W
 	// Clone the current returned versions. The cache should not alter the subscription
 	returnedVersions := maps.Clone(sub.ReturnedResources())
 
-	resources := make([]*internal.CachedResource, 0, len(resourcesToReturn))
+	resources := make([]*resources.CachedResource, 0, len(resourcesToReturn))
 	for _, resourceName := range resourcesToReturn {
 		cachedResource := cache.resources[resourceName]
 		resources = append(resources, cachedResource)
@@ -341,7 +341,7 @@ func (cache *LinearCache) UpdateResource(name string, res types.Resource) error 
 	defer cache.mu.Unlock()
 
 	cache.version++
-	cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, res, internal.WithCacheVersion(cache.getVersion()))
+	cache.resources[name] = resources.NewCachedResource(name, cache.typeURL, res, resources.WithCacheVersion(cache.getVersion()))
 
 	return cache.notifyAll([]string{name})
 }
@@ -368,7 +368,7 @@ func (cache *LinearCache) UpdateResources(toUpdate map[string]types.Resource, to
 	version := cache.getVersion()
 	modified := make([]string, 0, len(toUpdate)+len(toDelete))
 	for name, resource := range toUpdate {
-		cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, resource, internal.WithCacheVersion(version))
+		cache.resources[name] = resources.NewCachedResource(name, cache.typeURL, resource, resources.WithCacheVersion(version))
 		modified = append(modified, name)
 	}
 	for _, name := range toDelete {
@@ -382,17 +382,17 @@ func (cache *LinearCache) UpdateResources(toUpdate map[string]types.Resource, to
 // SetResources replaces current resources with a new set of resources.
 // Given the use of lazy serialization, if most resources are actually the same
 // using UpdateResources instead will be much more efficient.
-func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
+func (cache *LinearCache) SetResources(res map[string]types.Resource) {
 	cache.mu.Lock()
 	defer cache.mu.Unlock()
 
 	cache.version++
 	version := cache.getVersion()
 
-	modified := make([]string, 0, len(resources))
+	modified := make([]string, 0, len(res))
 	// Collect deleted resource names.
 	for name := range cache.resources {
-		if _, found := resources[name]; !found {
+		if _, found := res[name]; !found {
 			delete(cache.resources, name)
 			modified = append(modified, name)
 		}
@@ -400,8 +400,8 @@ func (cache *LinearCache) SetResources(resources map[string]types.Resource) {
 
 	// We assume all resources passed to SetResources are changed.
 	// Otherwise we would have to do proto.Equal on resources which is pretty expensive operation
-	for name, resource := range resources {
-		cache.resources[name] = internal.NewCachedResource(name, cache.typeURL, resource, internal.WithCacheVersion(version))
+	for name, r := range res {
+		cache.resources[name] = resources.NewCachedResource(name, cache.typeURL, r, resources.WithCacheVersion(version))
 		modified = append(modified, name)
 	}
 

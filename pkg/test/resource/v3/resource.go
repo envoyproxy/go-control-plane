@@ -762,7 +762,7 @@ func (ts *TestSnapshot) getPath() string {
 }
 
 // Generate produces a snapshot from the parameters.
-func (ts *TestSnapshot) Generate() *types.Snapshot {
+func (ts *TestSnapshot) Generate() *types.NodeSnapshot {
 	ts.currentPort = ts.BasePort
 
 	clusters := make([]types.SnapshotResource, ts.NumClusters)
@@ -821,7 +821,7 @@ func (ts *TestSnapshot) Generate() *types.Snapshot {
 		}
 	}
 
-	out, _ := types.NewSnapshot(ts.Version, map[string][]types.SnapshotResource{
+	out, _ := types.NewNodeSnapshot(ts.Version, map[string][]types.SnapshotResource{
 		resource.EndpointType:        endpoints,
 		resource.ClusterType:         clusters,
 		resource.RouteType:           routes,

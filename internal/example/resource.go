@@ -167,8 +167,8 @@ func makeConfigSource() *core.ConfigSource {
 	return source
 }
 
-func GenerateSnapshot() *types.Snapshot {
-	snap, _ := types.NewSnapshot("1",
+func GenerateSnapshot() *types.NodeSnapshot {
+	snap, _ := types.NewNodeSnapshot("1",
 		map[string][]types.SnapshotResource{
 			resource.ClusterType:  {{Name: ClusterName, Resource: makeCluster(ClusterName)}},
 			resource.RouteType:    {{Name: RouteName, Resource: makeRoute(RouteName, ClusterName)}},

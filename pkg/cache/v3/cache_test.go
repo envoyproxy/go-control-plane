@@ -11,7 +11,7 @@ import (
 
 	route "github.com/envoyproxy/go-control-plane/envoy/config/route/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
 )
@@ -21,7 +21,7 @@ const (
 )
 
 func TestResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []*internal.CachedResource{internal.NewCachedResource(resourceName, resource.RouteType, &route.RouteConfiguration{Name: resourceName}, internal.WithCacheVersion("v"))}
+	routes := []*resources.CachedResource{resources.NewCachedResource(resourceName, resource.RouteType, &route.RouteConfiguration{Name: resourceName}, resources.WithCacheVersion("v"))}
 	resp := RawResponse{
 		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",
@@ -70,7 +70,7 @@ func TestPassthroughResponseGetDiscoveryResponse(t *testing.T) {
 }
 
 func TestHeartbeatResponseGetDiscoveryResponse(t *testing.T) {
-	routes := []*internal.CachedResource{internal.NewCachedResource(resourceName, resource.RouteType, &route.RouteConfiguration{Name: resourceName}, internal.WithCacheVersion("v"))}
+	routes := []*resources.CachedResource{resources.NewCachedResource(resourceName, resource.RouteType, &route.RouteConfiguration{Name: resourceName}, resources.WithCacheVersion("v"))}
 	resp := RawResponse{
 		Request:   &discovery.DiscoveryRequest{TypeUrl: resource.RouteType},
 		Version:   "v",

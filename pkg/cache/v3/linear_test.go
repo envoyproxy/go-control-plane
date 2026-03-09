@@ -29,7 +29,7 @@ import (
 	cluster "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
 	endpoint "github.com/envoyproxy/go-control-plane/envoy/config/endpoint/v3"
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
-	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 	"github.com/envoyproxy/go-control-plane/pkg/log"
 	"github.com/envoyproxy/go-control-plane/pkg/resource/v3"
@@ -196,8 +196,8 @@ func mustBlockDelta(t *testing.T, w <-chan DeltaResponse) {
 
 func hashResource(t *testing.T, resource types.Resource) string {
 	t.Helper()
-	cachedResource := internal.NewCachedResource("", "", resource)
-	marshaledResource, err := cachedResource.GetDeltaResource()
+	cachedResource := resources.NewCachedResource("", "", resource)
+	marshaledResource, err := cachedResource.GetDiscoveryResource()
 	require.NoError(t, err)
 	return marshaledResource.Version
 }

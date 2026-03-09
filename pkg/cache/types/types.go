@@ -1,16 +1,16 @@
 package types
 
 import (
-	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 
 	"google.golang.org/protobuf/proto"
 )
 
 // Resource is the base interface for the xDS payload.
-type Resource = internal.Resource
+type Resource = resources.Resource
 
 // ResourceWithTTL is a Resource with an optional TTL.
-type ResourceWithTTL = internal.ResourceWithTTL
+type ResourceWithTTL = resources.ResourceWithTTL
 
 // ResourceWithName provides a name for out-of-tree resources.
 type ResourceWithName interface {

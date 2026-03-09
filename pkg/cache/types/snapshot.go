@@ -3,7 +3,7 @@ package types
 import (
 	"time"
 
-	"github.com/envoyproxy/go-control-plane/pkg/cache/internal"
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 
 	"google.golang.org/protobuf/types/known/anypb"
 )
@@ -23,16 +23,16 @@ type SnapshotResource struct {
 	Version string
 }
 
-func (r *SnapshotResource) asCachedResource(typeURL, cacheVersion string) *internal.CachedResource {
+func (r *SnapshotResource) asCachedResource(typeURL, cacheVersion string) *resources.CachedResource {
 	var serialized []byte
 	if r.Serialized != nil {
 		serialized = r.Serialized.Value
 	}
-	return internal.NewCachedResource(r.Name, typeURL, r.Resource,
-		internal.WithCacheVersion(cacheVersion),
-		internal.WithResourceTTL(r.TTL),
-		internal.WithResourceVersion(r.Version),
-		internal.WithMarshaledResource(serialized))
+	return resources.NewCachedResource(r.Name, typeURL, r.Resource,
+		resources.WithCacheVersion(cacheVersion),
+		resources.WithTTL(r.TTL),
+		resources.WithVersion(r.Version),
+		resources.WithMarshaled(serialized))
 }
 
 // TypeSnapshot represents the resources for a given type, associated with an opaque version.
@@ -41,17 +41,17 @@ func (r *SnapshotResource) asCachedResource(typeURL, cacheVersion string) *inter
 type TypeSnapshot struct {
 	typeURL   string
 	version   string
-	resources map[string]*internal.CachedResource
+	resources map[string]*resources.CachedResource
 }
 
-func NewTypeSnapshot(typeURL, version string, resources []SnapshotResource) TypeSnapshot {
+func NewTypeSnapshot(typeURL, version string, res []SnapshotResource) TypeSnapshot {
 	s := TypeSnapshot{
 		typeURL:   typeURL,
 		version:   version,
-		resources: make(map[string]*internal.CachedResource, len(resources)),
+		resources: make(map[string]*resources.CachedResource, len(res)),
 	}
-	for _, res := range resources {
-		s.resources[res.Name] = res.asCachedResource(typeURL, version)
+	for _, r := range res {
+		s.resources[r.Name] = r.asCachedResource(typeURL, version)
 	}
 	return s
 }
@@ -64,21 +64,21 @@ func (s TypeSnapshot) GetVersion() string {
 
 // GetResources returns the resources in the snapshot.
 // The map must not be modified by the caller.
-func (s TypeSnapshot) GetResources() map[string]*internal.CachedResource {
+func (s TypeSnapshot) GetResources() map[string]*resources.CachedResource {
 	return s.resources
 }
 
-// Snapshot represents a consistent set of resources for multiple types.
+// NodeSnapshot represents a consistent set of resources for multiple types.
 // Once provided to a cache it should not be altered in any way.
-type Snapshot struct {
+type NodeSnapshot struct {
 	// defaultVersion is the negative version returned if there is no snapshot set for the provided type.
 	defaultVersion string
 	resources      map[string]TypeSnapshot
 }
 
-// NewSnapshot creates a snapshot with a single version for all resource types.
-func NewSnapshot(version string, resources map[string][]SnapshotResource) (*Snapshot, error) {
-	s := &Snapshot{
+// NewNodeSnapshot creates a snapshot with a single version for all resource types.
+func NewNodeSnapshot(version string, resources map[string][]SnapshotResource) (*NodeSnapshot, error) {
+	s := &NodeSnapshot{
 		defaultVersion: version,
 		resources:      make(map[string]TypeSnapshot, len(resources)),
 	}
@@ -88,10 +88,10 @@ func NewSnapshot(version string, resources map[string][]SnapshotResource) (*Snap
 	return s, nil
 }
 
-// NewSnapshotFromTypeSnapshots creates a snapshot from per-type snapshots.
+// NewNodeSnapshotFromTypeSnapshots creates a snapshot from per-type snapshots.
 // TypeSnapshot instances can be shared across snapshots, but must not be altered in any way once provided to at least one snapshot.
-func NewSnapshotFromTypeSnapshots(version string, snapshots []TypeSnapshot) (*Snapshot, error) {
-	s := &Snapshot{
+func NewNodeSnapshotFromTypeSnapshots(version string, snapshots []TypeSnapshot) (*NodeSnapshot, error) {
+	s := &NodeSnapshot{
 		defaultVersion: version,
 		resources:      make(map[string]TypeSnapshot, len(snapshots)),
 	}
@@ -103,7 +103,7 @@ func NewSnapshotFromTypeSnapshots(version string, snapshots []TypeSnapshot) (*Sn
 
 // GetVersion returns the current version of the resource indicated by typeURL.
 // The version string that is returned is opaque and should only be compared for equality.
-func (s *Snapshot) GetVersion(typeURL string) string {
+func (s *NodeSnapshot) GetVersion(typeURL string) string {
 	typeSnapshot, ok := s.resources[typeURL]
 	if !ok {
 		return s.defaultVersion
@@ -111,6 +111,6 @@ func (s *Snapshot) GetVersion(typeURL string) string {
 	return typeSnapshot.version
 }
 
-func (s *Snapshot) GetTypeSnapshot(typeURL string) TypeSnapshot {
+func (s *NodeSnapshot) GetTypeSnapshot(typeURL string) TypeSnapshot {
 	return s.resources[typeURL]
 }

@@ -124,7 +124,7 @@ func TestSnapshotCacheWithTTL(t *testing.T) {
 		}
 		snapshots = append(snapshots, types.NewTypeSnapshot(typeURL, fixture.version, snapRes))
 	}
-	snapshotWithTTL, err := types.NewSnapshotFromTypeSnapshots(fixture.version, snapshots)
+	snapshotWithTTL, err := types.NewNodeSnapshotFromTypeSnapshots(fixture.version, snapshots)
 	require.NoError(t, err)
 	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshotWithTTL))
 
@@ -462,7 +462,7 @@ func TestSnapshotCreateWatchWithResourcePreviouslyNotRequested(t *testing.T) {
 		}
 		snapshots = append(snapshots, types.NewTypeSnapshot(typeURL, fixture.version, snapRes))
 	}
-	snapshot2, err := types.NewSnapshotFromTypeSnapshots(fixture.version, snapshots)
+	snapshot2, err := types.NewNodeSnapshotFromTypeSnapshots(fixture.version, snapshots)
 	require.NoError(t, err)
 	require.NoError(t, c.SetSnapshot(context.Background(), key, snapshot2))
 	watch := make(chan cache.Response)

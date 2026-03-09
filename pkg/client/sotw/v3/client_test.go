@@ -72,7 +72,7 @@ func testInitialFetch(ctx context.Context, snapCache cache.SnapshotCache, c clie
 			require.NoError(t, err)
 		})
 
-		snapshot, err := types.NewSnapshot("1", map[string][]types.SnapshotResource{
+		snapshot, err := types.NewNodeSnapshot("1", map[string][]types.SnapshotResource{
 			resource.ClusterType: {
 				{Name: "cluster_1", Resource: &clusterv3.Cluster{Name: "cluster_1"}},
 				{Name: "cluster_2", Resource: &clusterv3.Cluster{Name: "cluster_2"}},
@@ -107,7 +107,7 @@ func testNextFetch(ctx context.Context, snapCache cache.SnapshotCache, c client.
 			require.NoError(t, err)
 		})
 
-		snapshot, err := types.NewSnapshot("2", map[string][]types.SnapshotResource{
+		snapshot, err := types.NewNodeSnapshot("2", map[string][]types.SnapshotResource{
 			resource.ClusterType: {
 				{Name: "cluster_2", Resource: &clusterv3.Cluster{Name: "cluster_2"}},
 				{Name: "cluster_4", Resource: &clusterv3.Cluster{Name: "cluster_4"}},
