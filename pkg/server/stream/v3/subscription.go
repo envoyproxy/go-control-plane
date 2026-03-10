@@ -84,11 +84,12 @@ func (s *Subscription) SetResourceSubscription(subscribed []string) {
 	subscribedPrefixes := make(map[string]struct{})
 	explicitWildcardSet := false
 	for _, resource := range subscribed {
-		if resource == explicitWildcard {
+		switch {
+		case resource == explicitWildcard:
 			explicitWildcardSet = true
-		} else if strings.HasSuffix(resource, globSuffix) {
+		case strings.HasSuffix(resource, globSuffix):
 			subscribedPrefixes[strings.TrimSuffix(resource, "*")] = struct{}{}
-		} else {
+		default:
 			subscribedResources[resource] = struct{}{}
 		}
 	}
