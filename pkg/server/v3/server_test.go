@@ -255,7 +255,7 @@ func TestServerShutdown(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
 			shutdown := make(chan bool)
-			ctx, cancel := context.WithCancel(t.Context()) //nolint:gosec // G118
+			ctx, cancel := context.WithCancel(t.Context())
 			s := server.NewServer(ctx, config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			// make a request
