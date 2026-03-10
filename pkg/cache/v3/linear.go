@@ -141,28 +141,16 @@ func NewLinearCache(typeURL string, opts ...LinearCacheOption) *LinearCache {
 	return out
 }
 
-const globSuffix = "/*"
-
-// isPrefixGlob returns the prefix (including the trailing separator) if name
-// is a glob collection subscription (e.g. "collection/*" → "collection/").
-func isPrefixGlob(name string) (string, bool) {
-	if strings.HasSuffix(name, globSuffix) {
-		return strings.TrimSuffix(name, "*"), true
-	}
-	return "", false
-}
-
-// isResourceMatchingSubscription checks whether resourceName is covered by any
-// entry in subscribedResources, either as an exact match or via a prefix glob.
-func isResourceMatchingSubscription(subscribedResources map[string]struct{}, resourceName string) bool {
-	if _, ok := subscribedResources[resourceName]; ok {
+// isSubscribedTo checks whether resourceName is covered by the subscription,
+// either as an exact match in SubscribedResources or via a SubscribedPrefixes entry.
+// When there are no prefix subscriptions this is a single O(1) map lookup.
+func isSubscribedTo(sub Subscription, resourceName string) bool {
+	if _, ok := sub.SubscribedResources()[resourceName]; ok {
 		return true
 	}
-	for sub := range subscribedResources {
-		if prefix, ok := isPrefixGlob(sub); ok {
-			if strings.HasPrefix(resourceName, prefix) {
-				return true
-			}
+	for prefix := range sub.SubscribedPrefixes() {
+		if strings.HasPrefix(resourceName, prefix) {
+			return true
 		}
 	}
 	return false
@@ -207,10 +195,35 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useResourceVer
 			}
 		}
 	} else {
+		// Exact subscriptions.
 		for resourceName := range sub.SubscribedResources() {
-			if prefix, ok := isPrefixGlob(resourceName); ok {
-				// Expand the prefix glob to all matching resources in the cache.
-				for cachedName, res := range cache.resources {
+			res, exists := cache.resources[resourceName]
+			if !exists {
+				continue
+			}
+			knownVersion, known := knownVersions[resourceName]
+			if !known {
+				changedResources = append(changedResources, resourceName)
+			} else {
+				resourceVersion, err := res.getVersion(useResourceVersion)
+				if err != nil {
+					return nil, nil, fmt.Errorf("failed to compute version of %s: %w", resourceName, err)
+				}
+				if knownVersion != resourceVersion {
+					changedResources = append(changedResources, resourceName)
+				}
+			}
+		}
+
+		// Prefix subscriptions: single pass over the cache, checking all prefixes per resource.
+		subscribedPrefixes := sub.SubscribedPrefixes()
+		if len(subscribedPrefixes) > 0 {
+			exactSubs := sub.SubscribedResources()
+			for cachedName, res := range cache.resources {
+				if _, exactSub := exactSubs[cachedName]; exactSub {
+					continue
+				}
+				for prefix := range subscribedPrefixes {
 					if !strings.HasPrefix(cachedName, prefix) {
 						continue
 					}
@@ -226,48 +239,16 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useResourceVer
 							changedResources = append(changedResources, cachedName)
 						}
 					}
-				}
-				// Detect resources previously returned under this prefix that were deleted.
-				for knownName := range knownVersions {
-					if strings.HasPrefix(knownName, prefix) {
-						if _, ok := cache.resources[knownName]; !ok {
-							removedResources = append(removedResources, knownName)
-						}
-					}
-				}
-				continue
-			}
-
-			res, exists := cache.resources[resourceName]
-			knownVersion, known := knownVersions[resourceName]
-			if !exists {
-				if known {
-					// This resource was removed from the cache. If the type requires full state
-					// we need to return a response.
-					removedResources = append(removedResources, resourceName)
-				}
-				continue
-			}
-
-			if !known {
-				// This resource is not yet known by the client (new resource added in the cache or newly subscribed).
-				changedResources = append(changedResources, resourceName)
-			} else {
-				resourceVersion, err := res.getVersion(useResourceVersion)
-				if err != nil {
-					return nil, nil, fmt.Errorf("failed to compute version of %s: %w", resourceName, err)
-				}
-				if knownVersion != resourceVersion {
-					// The client knows an outdated version.
-					changedResources = append(changedResources, resourceName)
+					break
 				}
 			}
 		}
 
+		// Consolidated removal: detect both unsubscription and cache deletion.
 		for resourceName := range knownVersions {
-			// If the subscription no longer watches a resource,
-			// we mark it as unknown on the client side to ensure it will be resent to the client if subscribing again later on.
-			if !isResourceMatchingSubscription(sub.SubscribedResources(), resourceName) {
+			if !isSubscribedTo(sub, resourceName) {
+				removedResources = append(removedResources, resourceName)
+			} else if _, inCache := cache.resources[resourceName]; !inCache {
 				removedResources = append(removedResources, resourceName)
 			}
 		}
@@ -321,16 +302,22 @@ func (cache *LinearCache) computeResponse(watch watch, replyEvenIfEmpty bool) (W
 		// Therefore drives on the subscription requested resources.
 		resourcesToReturn = make([]string, 0, len(requestedResources))
 		for resourceName := range requestedResources {
-			if prefix, ok := isPrefixGlob(resourceName); ok {
-				for cachedName := range cache.resources {
-					if strings.HasPrefix(cachedName, prefix) {
-						resourcesToReturn = append(resourcesToReturn, cachedName)
-					}
-				}
-				continue
-			}
 			if _, ok := cache.resources[resourceName]; ok {
 				resourcesToReturn = append(resourcesToReturn, resourceName)
+			}
+		}
+		subscribedPrefixes := sub.SubscribedPrefixes()
+		if len(subscribedPrefixes) > 0 {
+			for cachedName := range cache.resources {
+				if _, exactSub := requestedResources[cachedName]; exactSub {
+					continue
+				}
+				for prefix := range subscribedPrefixes {
+					if strings.HasPrefix(cachedName, prefix) {
+						resourcesToReturn = append(resourcesToReturn, cachedName)
+						break
+					}
+				}
 			}
 		}
 	}
@@ -602,24 +589,23 @@ func (cache *LinearCache) trackWatch(watch watch) func() {
 		}
 	}
 
-	cache.log.Infof("[linear cache] open watch %d (delta: %t) for %s resources %v", watchID, watch.isDelta(), cache.typeURL, sub.SubscribedResources())
+	cache.log.Infof("[linear cache] open watch %d (delta: %t) for %s resources %v prefixes %v", watchID, watch.isDelta(), cache.typeURL, sub.SubscribedResources(), sub.SubscribedPrefixes())
 	cache.log.Debugf("[linear cache] subscription details for watch %d: known versions %v, system version %q", watchID, sub.ReturnedResources(), cache.getVersion())
 	for name := range sub.SubscribedResources() {
-		if prefix, ok := isPrefixGlob(name); ok {
-			pw, exists := cache.prefixWatches[prefix]
-			if !exists {
-				pw = newWatches()
-				cache.prefixWatches[prefix] = pw
-			}
-			pw[watchID] = watch
-			continue
-		}
 		watches, exists := cache.resourceWatches[name]
 		if !exists {
 			watches = newWatches()
 			cache.resourceWatches[name] = watches
 		}
 		watches[watchID] = watch
+	}
+	for prefix := range sub.SubscribedPrefixes() {
+		pw, exists := cache.prefixWatches[prefix]
+		if !exists {
+			pw = newWatches()
+			cache.prefixWatches[prefix] = pw
+		}
+		pw[watchID] = watch
 	}
 	return func() {
 		cache.mu.Lock()
@@ -639,18 +625,17 @@ func (cache *LinearCache) removeWatch(watchID uint64, sub Subscription) {
 	// Make sure we clean the watch for ALL resources it might be associated with,
 	// as the channel will no longer be listened to
 	for resource := range sub.SubscribedResources() {
-		if prefix, ok := isPrefixGlob(resource); ok {
-			pw := cache.prefixWatches[prefix]
-			delete(pw, watchID)
-			if len(pw) == 0 {
-				delete(cache.prefixWatches, prefix)
-			}
-			continue
-		}
 		resourceWatches := cache.resourceWatches[resource]
 		delete(resourceWatches, watchID)
 		if len(resourceWatches) == 0 {
 			delete(cache.resourceWatches, resource)
+		}
+	}
+	for prefix := range sub.SubscribedPrefixes() {
+		pw := cache.prefixWatches[prefix]
+		delete(pw, watchID)
+		if len(pw) == 0 {
+			delete(cache.prefixWatches, prefix)
 		}
 	}
 	cache.watchCount--

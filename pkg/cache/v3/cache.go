@@ -51,8 +51,15 @@ type Subscription interface {
 	// SubscribedResources returns the list of resources currently subscribed to by the client for the type.
 	// For delta it keeps track of subscription updates across requests
 	// For sotw it is a normalized view of the last request resources
+	// Prefix glob subscriptions (e.g. "collection/*") are NOT included here; see SubscribedPrefixes.
 	// The returned map must not be altered by the Cache.
 	SubscribedResources() map[string]struct{}
+
+	// SubscribedPrefixes returns the set of prefix glob subscriptions, keyed by the
+	// prefix with the trailing glob removed but the separator kept (e.g. "collection/").
+	// Exact-name subscriptions are NOT included here; see SubscribedResources.
+	// The returned map must not be altered by the Cache.
+	SubscribedPrefixes() map[string]struct{}
 
 	// IsWildcard returns whether the client has a wildcard watch.
 	// This considers subtleties related to the current migration of wildcard definitions within the protocol.

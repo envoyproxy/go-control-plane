@@ -1627,42 +1627,19 @@ func TestLinearDeltaPrefixSubscription(t *testing.T) {
 	})
 }
 
-func TestIsPrefixGlob(t *testing.T) {
-	tests := []struct {
-		name       string
-		input      string
-		wantPrefix string
-		wantOk     bool
-	}{
-		{"glob suffix", "col/zone1/*", "col/zone1/", true},
-		{"nested glob", "a/b/c/*", "a/b/c/", true},
-		{"just glob", "/*", "/", true},
-		{"no glob", "col/zone1/host", "", false},
-		{"star without slash", "col*", "", false},
-		{"empty", "", "", false},
-		{"star only", "*", "", false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			prefix, ok := isPrefixGlob(tt.input)
-			assert.Equal(t, tt.wantOk, ok)
-			if ok {
-				assert.Equal(t, tt.wantPrefix, prefix)
-			}
-		})
-	}
-}
+func TestIsSubscribedTo(t *testing.T) {
+	sub := stream.NewDeltaSubscription([]string{"col/zone1/*", "exact-resource"}, nil, nil, false)
 
-func TestIsResourceMatchingSubscription(t *testing.T) {
-	subs := map[string]struct{}{
-		"col/zone1/*":    {},
-		"exact-resource": {},
-	}
+	assert.True(t, isSubscribedTo(sub, "col/zone1/10.0.0.1"))
+	assert.True(t, isSubscribedTo(sub, "col/zone1/10.0.0.2"))
+	assert.True(t, isSubscribedTo(sub, "exact-resource"))
+	assert.False(t, isSubscribedTo(sub, "other/zone2/10.0.0.1"))
+	assert.False(t, isSubscribedTo(sub, "col/zone2/10.0.0.1"))
+	assert.False(t, isSubscribedTo(sub, "unknown"))
 
-	assert.True(t, isResourceMatchingSubscription(subs, "col/zone1/10.0.0.1"))
-	assert.True(t, isResourceMatchingSubscription(subs, "col/zone1/10.0.0.2"))
-	assert.True(t, isResourceMatchingSubscription(subs, "exact-resource"))
-	assert.False(t, isResourceMatchingSubscription(subs, "other/zone2/10.0.0.1"))
-	assert.False(t, isResourceMatchingSubscription(subs, "col/zone2/10.0.0.1"))
-	assert.False(t, isResourceMatchingSubscription(subs, "unknown"))
+	// No prefix subscriptions → pure O(1) map lookup path
+	subExact := stream.NewDeltaSubscription([]string{"a", "b"}, nil, nil, false)
+	assert.True(t, isSubscribedTo(subExact, "a"))
+	assert.False(t, isSubscribedTo(subExact, "c"))
+	assert.Empty(t, subExact.SubscribedPrefixes())
 }
