@@ -8,7 +8,6 @@ package statsv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	_ "github.com/cncf/xds/go/xds/annotations/v3"
 	v3 "github.com/cncf/xds/go/xds/type/matcher/v3"
 	v31 "github.com/envoyproxy/go-control-plane/envoy/data/accesslog/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
@@ -616,7 +615,7 @@ var File_envoy_extensions_access_loggers_stats_v3_stats_proto protoreflect.FileD
 
 const file_envoy_extensions_access_loggers_stats_v3_stats_proto_rawDesc = "" +
 	"\n" +
-	"4envoy/extensions/access_loggers/stats/v3/stats.proto\x12(envoy.extensions.access_loggers.stats.v3\x1a'envoy/data/accesslog/v3/accesslog.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xfe\r\n" +
+	"4envoy/extensions/access_loggers/stats/v3/stats.proto\x12(envoy.extensions.access_loggers.stats.v3\x1a'envoy/data/accesslog/v3/accesslog.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf4\r\n" +
 	"\x06Config\x12(\n" +
 	"\vstat_prefix\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\n" +
 	"statPrefix\x12Z\n" +
@@ -661,7 +660,7 @@ const file_envoy_extensions_access_loggers_stats_v3_stats_proto_rawDesc = "" +
 	"\fadd_log_type\x18\x01 \x01(\x0e2&.envoy.data.accesslog.v3.AccessLogTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\n" +
 	"addLogType\x12R\n" +
 	"\fsub_log_type\x18\x02 \x01(\x0e2&.envoy.data.accesslog.v3.AccessLogTypeB\b\xfaB\x05\x82\x01\x02\x10\x01R\n" +
-	"subLogType:\b\xd2Ƥ\xe1\x06\x02\b\x01B\xa7\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"subLogTypeB\xa7\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"6io.envoyproxy.envoy.extensions.access_loggers.stats.v3B\n" +
 	"StatsProtoP\x01ZWgithub.com/envoyproxy/go-control-plane/envoy/extensions/access_loggers/stats/v3;statsv3b\x06proto3"
 
