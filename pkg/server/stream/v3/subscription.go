@@ -187,7 +187,6 @@ func (s *Subscription) UpdateResourceSubscriptions(subscribed, unsubscribed []st
 }
 
 // SubscribedResources returns the list of resources currently explicitly subscribed to.
-// Prefix glob subscriptions are not included; see SubscribedPrefixes.
 // If the request is set to wildcard it may be empty.
 func (s Subscription) SubscribedResources() map[string]struct{} {
 	return s.subscribedResourceNames

@@ -51,7 +51,6 @@ type Subscription interface {
 	// SubscribedResources returns the list of resources currently subscribed to by the client for the type.
 	// For delta it keeps track of subscription updates across requests
 	// For sotw it is a normalized view of the last request resources
-	// Prefix glob subscriptions (e.g. "collection/*") are NOT included here; see SubscribedPrefixes.
 	// The returned map must not be altered by the Cache.
 	SubscribedResources() map[string]struct{}
 
