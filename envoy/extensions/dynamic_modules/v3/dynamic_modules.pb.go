@@ -93,8 +93,12 @@ type DynamicModuleConfig struct {
 	//
 	// Defaults to “dynamicmodulescustom“.
 	MetricsNamespace string `protobuf:"bytes,5,opt,name=metrics_namespace,json=metricsNamespace,proto3" json:"metrics_namespace,omitempty"`
-	// The dynamic module binary to load. Currently only supports local file paths
-	// via “local.filename“.
+	// The dynamic module binary to load. Supports local file paths via “local.filename“
+	// and remote HTTP sources via “remote“.
+	//
+	// When using “remote“, the module is fetched asynchronously during listener initialization.
+	// If the fetch fails (network error, SHA256 mismatch, invalid binary, etc.), the filter
+	// is **not installed** and requests pass through unfiltered (fail-open).
 	//
 	// When both “name“ and “module“ are set, “module“ takes precedence.
 	Module        *v3.AsyncDataSource `protobuf:"bytes,6,opt,name=module,proto3" json:"module,omitempty"`
