@@ -782,6 +782,8 @@ type Admin struct {
 	// should apply to the admin interface or not.
 	IgnoreGlobalConnLimit bool `protobuf:"varint,6,opt,name=ignore_global_conn_limit,json=ignoreGlobalConnLimit,proto3" json:"ignore_global_conn_limit,omitempty"`
 	// List of admin paths that are accessible. If not specified, all admin endpoints are accessible.
+	// Matchers are evaluated against the request path. For endpoints commonly queried with
+	// parameters (for example “/stats?format=...“), prefer “prefix“ matchers.
 	//
 	// When specified, only paths in this list will be accessible, all others will return “HTTP 403 Forbidden“.
 	//
@@ -790,7 +792,8 @@ type Admin struct {
 	// .. code-block:: yaml
 	//
 	//	allow_paths:
-	//	- exact: /stats
+	//	- prefix: /stats
+	//	- prefix: /config_dump
 	//	- exact: /ready
 	//	- prefix: /healthcheck
 	AllowPaths    []*v35.StringMatcher `protobuf:"bytes,7,rep,name=allow_paths,json=allowPaths,proto3" json:"allow_paths,omitempty"`
