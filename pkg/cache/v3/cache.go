@@ -21,10 +21,9 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
-	"google.golang.org/protobuf/types/known/durationpb"
 
+	"github.com/envoyproxy/go-control-plane/pkg/cache/internal/resources"
 	"github.com/envoyproxy/go-control-plane/pkg/cache/types"
 
 	discovery "github.com/envoyproxy/go-control-plane/envoy/service/discovery/v3"
@@ -184,7 +183,7 @@ type RawResponse struct {
 	Version string
 
 	// resources to be included in the response.
-	resources []*cachedResource
+	resources []*resources.CachedResource
 
 	// returnedResources tracks the resources returned for the subscription and the version when it was last returned,
 	// including previously returned ones when using non-full state resources.
@@ -214,7 +213,7 @@ type RawDeltaResponse struct {
 	SystemVersionInfo string
 
 	// resources to be included in the response.
-	resources []*cachedResource
+	resources []*resources.CachedResource
 
 	// removedResources is a list of resource aliases which should be dropped by the consuming client.
 	removedResources []string
@@ -274,11 +273,10 @@ var (
 	_ DeltaResponse = &DeltaPassthroughResponse{}
 )
 
-func NewTestRawResponse(req *discovery.DiscoveryRequest, version string, resources []types.ResourceWithTTL) *RawResponse {
-	cachedRes := []*cachedResource{}
-	for _, res := range resources {
-		newRes := newCachedResource(GetResourceName(res.Resource), res.Resource, version)
-		newRes.ttl = res.TTL
+func NewTestRawResponse(req *discovery.DiscoveryRequest, version string, res []types.ResourceWithTTL) *RawResponse {
+	cachedRes := []*resources.CachedResource{}
+	for _, r := range res {
+		newRes := resources.NewCachedResource(GetResourceName(r.Resource), req.GetTypeUrl(), r.Resource, resources.WithCacheVersion(version), resources.WithTTL(r.TTL))
 		cachedRes = append(cachedRes, newRes)
 	}
 	return &RawResponse{
@@ -288,12 +286,11 @@ func NewTestRawResponse(req *discovery.DiscoveryRequest, version string, resourc
 	}
 }
 
-func NewTestRawDeltaResponse(req *discovery.DeltaDiscoveryRequest, version string, resources []types.ResourceWithTTL, removedResources []string, nextVersionMap map[string]string) *RawDeltaResponse {
-	cachedRes := []*cachedResource{}
-	for _, res := range resources {
-		name := GetResourceName(res.Resource)
-		newRes := newCachedResource(name, res.Resource, nextVersionMap[name])
-		newRes.ttl = res.TTL
+func NewTestRawDeltaResponse(req *discovery.DeltaDiscoveryRequest, version string, res []types.ResourceWithTTL, removedResources []string, nextVersionMap map[string]string) *RawDeltaResponse {
+	cachedRes := []*resources.CachedResource{}
+	for _, r := range res {
+		name := GetResourceName(r.Resource)
+		newRes := resources.NewCachedResource(name, req.GetTypeUrl(), r.Resource, resources.WithCacheVersion(version), resources.WithTTL(r.TTL))
 		cachedRes = append(cachedRes, newRes)
 	}
 	return &RawDeltaResponse{
@@ -316,9 +313,9 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 
 	marshaledResources := make([]*anypb.Any, 0, len(r.resources))
 	for _, resource := range r.resources {
-		marshaledResource, err := r.marshalTTLResource(resource)
+		marshaledResource, err := resource.GetAnyResource(r.Heartbeat)
 		if err != nil {
-			return nil, fmt.Errorf("processing %s: %w", GetResourceName(resource.resource), err)
+			return nil, fmt.Errorf("processing %s: %w", resource.Name, err)
 		}
 		marshaledResources = append(marshaledResources, marshaledResource)
 	}
@@ -337,7 +334,7 @@ func (r *RawResponse) GetDiscoveryResponse() (*discovery.DiscoveryResponse, erro
 func (r *RawResponse) GetRawResources() []types.ResourceWithTTL {
 	resources := make([]types.ResourceWithTTL, 0, len(r.resources))
 	for _, res := range r.resources {
-		resources = append(resources, types.ResourceWithTTL{Resource: res.resource, TTL: res.ttl})
+		resources = append(resources, res.GetRawResource())
 	}
 	return resources
 }
@@ -357,22 +354,11 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 
 	marshaledResources := make([]*discovery.Resource, 0, len(r.resources))
 	for _, resource := range r.resources {
-		marshaledResource, err := resource.getMarshaledResource()
+		rsrc, err := resource.GetDiscoveryResource()
 		if err != nil {
-			return nil, fmt.Errorf("processing %s: %w", resource.name, err)
+			return nil, fmt.Errorf("processing %s: %w", resource.Name, err)
 		}
-		version, err := resource.getResourceVersion()
-		if err != nil {
-			return nil, fmt.Errorf("processing version of %s: %w", resource.name, err)
-		}
-		marshaledResources = append(marshaledResources, &discovery.Resource{
-			Name: resource.name,
-			Resource: &anypb.Any{
-				TypeUrl: r.GetDeltaRequest().GetTypeUrl(),
-				Value:   marshaledResource,
-			},
-			Version: version,
-		})
+		marshaledResources = append(marshaledResources, rsrc)
 	}
 
 	marshaledResponse = &discovery.DeltaDiscoveryResponse{
@@ -390,7 +376,7 @@ func (r *RawDeltaResponse) GetDeltaDiscoveryResponse() (*discovery.DeltaDiscover
 func (r *RawDeltaResponse) GetRawResources() []types.ResourceWithTTL {
 	resources := make([]types.ResourceWithTTL, 0, len(r.resources))
 	for _, res := range r.resources {
-		resources = append(resources, types.ResourceWithTTL{Resource: res.resource, TTL: res.ttl})
+		resources = append(resources, res.GetRawResource())
 	}
 	return resources
 }
@@ -447,48 +433,6 @@ func (r *RawDeltaResponse) GetReturnedResources() map[string]string {
 
 func (r *RawDeltaResponse) GetContext() context.Context {
 	return r.Ctx
-}
-
-var deltaResourceTypeURL = "type.googleapis.com/" + string(proto.MessageName(&discovery.Resource{}))
-
-func (r *RawResponse) marshalTTLResource(resource *cachedResource) (*anypb.Any, error) {
-	buildResource := func() (*anypb.Any, error) {
-		marshaled, err := resource.getMarshaledResource()
-		if err != nil {
-			return nil, fmt.Errorf("marshaling: %w", err)
-		}
-		return &anypb.Any{
-			TypeUrl: r.GetRequest().GetTypeUrl(),
-			Value:   marshaled,
-		}, nil
-	}
-
-	if resource.ttl == nil {
-		return buildResource()
-	}
-
-	wrappedResource := &discovery.Resource{
-		Name: GetResourceName(resource.resource),
-		Ttl:  durationpb.New(*resource.ttl),
-	}
-
-	if !r.Heartbeat {
-		rsrc, err := buildResource()
-		if err != nil {
-			return nil, err
-		}
-		wrappedResource.Resource = rsrc
-	}
-
-	marshaled, err := MarshalResource(wrappedResource)
-	if err != nil {
-		return nil, fmt.Errorf("marshaling discovery resource: %w", err)
-	}
-
-	return &anypb.Any{
-		TypeUrl: deltaResourceTypeURL,
-		Value:   marshaled,
-	}, nil
 }
 
 // GetDiscoveryResponse returns the final passthrough Discovery Response.

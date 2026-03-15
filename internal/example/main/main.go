@@ -51,10 +51,6 @@ func main() {
 
 	// Create the snapshot that we'll serve to Envoy
 	snapshot := example.GenerateSnapshot()
-	if err := snapshot.Consistent(); err != nil {
-		l.Errorf("snapshot inconsistency: %+v\n%+v", snapshot, err)
-		os.Exit(1)
-	}
 	l.Debugf("will serve snapshot %+v", snapshot)
 
 	// Add the snapshot to the cache
