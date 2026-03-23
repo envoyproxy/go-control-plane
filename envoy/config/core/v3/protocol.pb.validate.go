@@ -2058,6 +2058,21 @@ func (m *Http2ProtocolOptions) validate(all bool) error {
 		}
 	}
 
+	if wrapper := m.GetMaxHeaderFieldSizeKb(); wrapper != nil {
+
+		if val := wrapper.GetValue(); val < 64 || val > 256 {
+			err := Http2ProtocolOptionsValidationError{
+				field:  "MaxHeaderFieldSizeKb",
+				reason: "value must be inside range [64, 256]",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+	}
+
 	if len(errors) > 0 {
 		return Http2ProtocolOptionsMultiError(errors)
 	}

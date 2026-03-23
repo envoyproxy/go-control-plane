@@ -53,9 +53,33 @@ type ReverseConnectionClusterConfig struct {
 	// * “node-%REQ(x-tenant-id)%-%REQ(x-region)%“: Combine multiple values.
 	//
 	// If the format string evaluates to an empty value, the request will not be routed.
-	HostIdFormat  string `protobuf:"bytes,2,opt,name=host_id_format,json=hostIdFormat,proto3" json:"host_id_format,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	HostIdFormat string `protobuf:"bytes,2,opt,name=host_id_format,json=hostIdFormat,proto3" json:"host_id_format,omitempty"`
+	// Tenant identifier format string for tenant-aware isolation.
+	//
+	// This format string is evaluated against the downstream request context to compute
+	// the tenant identifier when tenant isolation is enabled. The format string supports
+	// the same Envoy formatter syntax as “host_id_format“.
+	//
+	// **REQUIRED** when tenant isolation is enabled (via “enable_tenant_isolation“ in the
+	// reverse tunnel filter configuration).
+	//
+	// When tenant isolation is enabled and this field is set, the tenant identifier must be
+	// derivable from the request context (i.e., the formatter must evaluate to a non-empty
+	// value). If the tenant identifier cannot be inferred, host selection will fail and the
+	// request will not be routed.
+	//
+	// Examples:
+	//
+	// * “%REQ(x-tenant-id)%“: Extract tenant ID from request header.
+	// * “%DYNAMIC_METADATA(envoy.filters.network.reverse_tunnel:tenant_id)%“: Use metadata from reverse tunnel filter.
+	// * “%CEL(request.headers['x-tenant-id'] | orValue('default'))%“: Use CEL with fallback.
+	//
+	// The delimiter used for concatenation is internal and not configurable. Users should
+	// ensure that tenant identifiers and host identifiers do not contain the delimiter character
+	// (“:“) to avoid ambiguity.
+	TenantIdFormat string `protobuf:"bytes,3,opt,name=tenant_id_format,json=tenantIdFormat,proto3" json:"tenant_id_format,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ReverseConnectionClusterConfig) Reset() {
@@ -102,14 +126,22 @@ func (x *ReverseConnectionClusterConfig) GetHostIdFormat() string {
 	return ""
 }
 
+func (x *ReverseConnectionClusterConfig) GetTenantIdFormat() string {
+	if x != nil {
+		return x.TenantIdFormat
+	}
+	return ""
+}
+
 var File_envoy_extensions_clusters_reverse_connection_v3_reverse_connection_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_clusters_reverse_connection_v3_reverse_connection_proto_rawDesc = "" +
 	"\n" +
-	"Henvoy/extensions/clusters/reverse_connection/v3/reverse_connection.proto\x12/envoy.extensions.clusters.reverse_connection.v3\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x9f\x01\n" +
+	"Henvoy/extensions/clusters/reverse_connection/v3/reverse_connection.proto\x12/envoy.extensions.clusters.reverse_connection.v3\x1a\x1egoogle/protobuf/duration.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xd6\x01\n" +
 	"\x1eReverseConnectionClusterConfig\x12N\n" +
 	"\x10cleanup_interval\x18\x01 \x01(\v2\x19.google.protobuf.DurationB\b\xfaB\x05\xaa\x01\x02*\x00R\x0fcleanupInterval\x12-\n" +
-	"\x0ehost_id_format\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\fhostIdFormatB\xce\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x0ehost_id_format\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\fhostIdFormat\x125\n" +
+	"\x10tenant_id_format\x18\x03 \x01(\tB\v\xfaB\br\x06\x18\x80\b\xd0\x01\x01R\x0etenantIdFormatB\xce\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"=io.envoyproxy.envoy.extensions.clusters.reverse_connection.v3B\x16ReverseConnectionProtoP\x01Zkgithub.com/envoyproxy/go-control-plane/envoy/extensions/clusters/reverse_connection/v3;reverse_connectionv3b\x06proto3"
 
 var (

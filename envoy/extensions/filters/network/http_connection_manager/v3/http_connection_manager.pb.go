@@ -423,11 +423,13 @@ type HttpConnectionManager struct {
 	//
 	//	Currently some protocol codecs impose limits on the maximum size of a single header.
 	//
-	//	* HTTP/2 (when using nghttp2) limits a single header to around 100kb.
-	//	* HTTP/3 limits a single header to around 1024kb.
+	//	* HTTP/2 (when using nghttp2) limits a single header to around 100 KB by default. This can be
+	//	  adjusted via :ref:`max_header_field_size_kb
+	//	  <envoy_v3_api_field_config.core.v3.Http2ProtocolOptions.max_header_field_size_kb>`.
+	//	* HTTP/3 limits a single header to around 1024 KB.
 	MaxRequestHeadersKb *wrapperspb.UInt32Value `protobuf:"bytes,29,opt,name=max_request_headers_kb,json=maxRequestHeadersKb,proto3" json:"max_request_headers_kb,omitempty"`
 	// The stream idle timeout for connections managed by the connection manager.
-	// If not specified, this defaults to 5 minutes. The default value was selected
+	// If not specified, this defaults to “5 minutes“. The default value was selected
 	// so as not to interfere with any smaller configured timeouts that may have
 	// existed in configurations prior to the introduction of this feature, while
 	// introducing robustness to TCP connections that terminate without a FIN.
@@ -436,28 +438,29 @@ type HttpConnectionManager struct {
 	// :ref:`route-level idle_timeout
 	// <envoy_v3_api_field_config.route.v3.RouteAction.idle_timeout>`. Even on a stream in
 	// which the override applies, prior to receipt of the initial request
-	// headers, the :ref:`stream_idle_timeout
-	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.stream_idle_timeout>`
-	// applies. Each time an encode/decode event for headers or data is processed
-	// for the stream, the timer will be reset. If the timeout fires, the stream
-	// is terminated with a 408 Request Timeout error code if no upstream response
-	// header has been received, otherwise a stream reset occurs.
+	// headers, the “stream_idle_timeout“ applies. Each time an encode/decode event
+	// for headers or data is processed for the stream, the timer will be reset. If the
+	// timeout fires, the stream is terminated with a “408 Request Timeout“ error code
+	// if no upstream response header has been received, otherwise a stream reset occurs.
 	//
-	// If the :ref:`overload action <config_overload_manager_overload_actions>` "envoy.overload_actions.reduce_timeouts"
-	// is configured, this timeout is scaled according to the value for
+	// If the :ref:`overload action <config_overload_manager_overload_actions>`
+	// “envoy.overload_actions.reduce_timeouts“ is configured, this timeout is scaled
+	// according to the value for
 	// :ref:`HTTP_DOWNSTREAM_STREAM_IDLE <envoy_v3_api_enum_value_config.overload.v3.ScaleTimersOverloadActionConfig.TimerType.HTTP_DOWNSTREAM_STREAM_IDLE>`.
 	//
-	// Note that it is possible to idle timeout even if the wire traffic for a stream is non-idle, due
-	// to the granularity of events presented to the connection manager. For example, while receiving
-	// very large request headers, it may be the case that there is traffic regularly arriving on the
-	// wire while the connection manage is only able to observe the end-of-headers event, hence the
-	// stream may still idle timeout.
+	// .. note::
 	//
-	// A value of 0 will completely disable the connection manager stream idle
+	//	It is possible to idle timeout even if the wire traffic for a stream is non-idle, due
+	//	to the granularity of events presented to the connection manager. For example, while receiving
+	//	very large request headers, it may be the case that there is traffic regularly arriving on the
+	//	wire while the connection manager is only able to observe the end-of-headers event, hence the
+	//	stream may still idle timeout.
+	//
+	// A value of “0“ will completely disable the connection manager stream idle
 	// timeout, although per-route idle timeout overrides will continue to apply.
 	//
-	// This timeout is also used as the default value for :ref:`stream_flush_timeout
-	// <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.stream_flush_timeout>`.
+	// This timeout is also used as the default value for
+	// :ref:`stream_flush_timeout <envoy_v3_api_field_extensions.filters.network.http_connection_manager.v3.HttpConnectionManager.stream_flush_timeout>`.
 	StreamIdleTimeout *durationpb.Duration `protobuf:"bytes,24,opt,name=stream_idle_timeout,json=streamIdleTimeout,proto3" json:"stream_idle_timeout,omitempty"`
 	// The stream flush timeout for connections managed by the connection manager.
 	//

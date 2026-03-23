@@ -26,6 +26,7 @@ const (
 )
 
 // Configuration for the upstream reverse connection socket interface.
+// [#next-free-field: 6]
 type UpstreamReverseConnectionSocketInterface struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Stat prefix for upstream reverse connection socket interface stats.
@@ -41,8 +42,14 @@ type UpstreamReverseConnectionSocketInterface struct {
 	// the socket interface instantiates a reporter via the configured factory.
 	// If unset, no reporting is done.
 	ReporterConfig *v3.TypedExtensionConfig `protobuf:"bytes,4,opt,name=reporter_config,json=reporterConfig,proto3" json:"reporter_config,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Enables tenant-aware isolation for reverse connections. When set to “true“, the socket
+	// interface requires tenant identifiers in addition to node and cluster identifiers and derives
+	// composite “tenant:node“ and “tenant:cluster“ keys for socket tracking. Identifiers
+	// containing the “:“ delimiter are rejected to avoid ambiguity.
+	// Defaults to “false“ for backwards compatibility.
+	EnableTenantIsolation *wrapperspb.BoolValue `protobuf:"bytes,5,opt,name=enable_tenant_isolation,json=enableTenantIsolation,proto3" json:"enable_tenant_isolation,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *UpstreamReverseConnectionSocketInterface) Reset() {
@@ -103,17 +110,25 @@ func (x *UpstreamReverseConnectionSocketInterface) GetReporterConfig() *v3.Typed
 	return nil
 }
 
+func (x *UpstreamReverseConnectionSocketInterface) GetEnableTenantIsolation() *wrapperspb.BoolValue {
+	if x != nil {
+		return x.EnableTenantIsolation
+	}
+	return nil
+}
+
 var File_envoy_extensions_bootstrap_reverse_tunnel_upstream_socket_interface_v3_upstream_reverse_connection_socket_interface_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_upstream_socket_interface_v3_upstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"yenvoy/extensions/bootstrap/reverse_tunnel/upstream_socket_interface/v3/upstream_reverse_connection_socket_interface.proto\x12Fenvoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xb1\x02\n" +
+	"yenvoy/extensions/bootstrap/reverse_tunnel/upstream_socket_interface/v3/upstream_reverse_connection_socket_interface.proto\x12Fenvoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3\x1a$envoy/config/core/v3/extension.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x85\x03\n" +
 	"(UpstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x12[\n" +
 	"\x16ping_failure_threshold\x18\x02 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02(\x01R\x14pingFailureThreshold\x122\n" +
 	"\x15enable_detailed_stats\x18\x03 \x01(\bR\x13enableDetailedStats\x12S\n" +
-	"\x0freporter_config\x18\x04 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x0ereporterConfigB\x9b\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x0freporter_config\x18\x04 \x01(\v2*.envoy.config.core.v3.TypedExtensionConfigR\x0ereporterConfig\x12R\n" +
+	"\x17enable_tenant_isolation\x18\x05 \x01(\v2\x1a.google.protobuf.BoolValueR\x15enableTenantIsolationB\x9b\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Tio.envoyproxy.envoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3B-UpstreamReverseConnectionSocketInterfaceProtoP\x01Z\x89\x01github.com/envoyproxy/go-control-plane/envoy/extensions/bootstrap/reverse_tunnel/upstream_socket_interface/v3;upstream_socket_interfacev3b\x06proto3"
 
 var (
@@ -133,15 +148,17 @@ var file_envoy_extensions_bootstrap_reverse_tunnel_upstream_socket_interface_v3_
 	(*UpstreamReverseConnectionSocketInterface)(nil), // 0: envoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3.UpstreamReverseConnectionSocketInterface
 	(*wrapperspb.UInt32Value)(nil),                   // 1: google.protobuf.UInt32Value
 	(*v3.TypedExtensionConfig)(nil),                  // 2: envoy.config.core.v3.TypedExtensionConfig
+	(*wrapperspb.BoolValue)(nil),                     // 3: google.protobuf.BoolValue
 }
 var file_envoy_extensions_bootstrap_reverse_tunnel_upstream_socket_interface_v3_upstream_reverse_connection_socket_interface_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3.UpstreamReverseConnectionSocketInterface.ping_failure_threshold:type_name -> google.protobuf.UInt32Value
 	2, // 1: envoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3.UpstreamReverseConnectionSocketInterface.reporter_config:type_name -> envoy.config.core.v3.TypedExtensionConfig
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 2: envoy.extensions.bootstrap.reverse_tunnel.upstream_socket_interface.v3.UpstreamReverseConnectionSocketInterface.enable_tenant_isolation:type_name -> google.protobuf.BoolValue
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() {

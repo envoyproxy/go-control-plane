@@ -8,8 +8,8 @@ package override_hostv3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
-	v3 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
-	v31 "github.com/envoyproxy/go-control-plane/envoy/type/metadata/v3"
+	v31 "github.com/envoyproxy/go-control-plane/envoy/config/cluster/v3"
+	v3 "github.com/envoyproxy/go-control-plane/envoy/type/metadata/v3"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -44,14 +44,29 @@ const (
 // .. code-block:: yaml
 //
 //	override_host_sources:
-//	  - header: "x-gateway-destination-endpoint"
-//	  - metadata:
-//	      key: "envoy.lb"
-//	      path:
-//	      - key: "x-gateway-destination-endpoint"
+//	- header: "x-gateway-destination-endpoint"
+//	- metadata:
+//	    key: "envoy.lb"
+//	    path:
+//	    - key: "x-gateway-destination-endpoint"
 //
 // If no valid host in the override host list, then the specified fallback load balancing policy is used. This allows load
 // balancing to degrade to a a built in policy (i.e. Round Robin) in case external endpoint picker fails.
+//
+// In addition to specifying “override_host_sources“, the policy can be configured to inform downstream filters
+// of the selected endpoint through dynamic metadata or response headers through “selected_endpoint_key“:
+//
+// .. code-block:: yaml
+//
+//	override_host_sources:
+//	- metadata:
+//	    key: "envoy.lb"
+//	    path:
+//	    - key: "x-gateway-destination-endpoint"
+//	selected_host_key:
+//	  key: "envoy.lb"
+//	  path:
+//	  - key: "x-gateway-destination-endpoint-served"
 //
 // See the :ref:`load balancing architecture
 // overview<arch_overview_load_balancing_types>` for more information.
@@ -64,9 +79,12 @@ type OverrideHost struct {
 	// skipped and the next found address is used. If there are not enough overridden addresses to
 	// satisfy all retry attempts the fallback load balancing policy is used to pick a host.
 	OverrideHostSources []*OverrideHost_OverrideHostSource `protobuf:"bytes,1,rep,name=override_host_sources,json=overrideHostSources,proto3" json:"override_host_sources,omitempty"`
+	// The metadata key to populate with the selected host address. This is optional and
+	// may be used to inform downstream filters of the host address selected by load balancing policy.
+	SelectedHostKey *v3.MetadataKey `protobuf:"bytes,2,opt,name=selected_host_key,json=selectedHostKey,proto3" json:"selected_host_key,omitempty"`
 	// The child LB policy to use in case neither header nor metadata with selected
 	// hosts is present.
-	FallbackPolicy *v3.LoadBalancingPolicy `protobuf:"bytes,3,opt,name=fallback_policy,json=fallbackPolicy,proto3" json:"fallback_policy,omitempty"`
+	FallbackPolicy *v31.LoadBalancingPolicy `protobuf:"bytes,3,opt,name=fallback_policy,json=fallbackPolicy,proto3" json:"fallback_policy,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -108,7 +126,14 @@ func (x *OverrideHost) GetOverrideHostSources() []*OverrideHost_OverrideHostSour
 	return nil
 }
 
-func (x *OverrideHost) GetFallbackPolicy() *v3.LoadBalancingPolicy {
+func (x *OverrideHost) GetSelectedHostKey() *v3.MetadataKey {
+	if x != nil {
+		return x.SelectedHostKey
+	}
+	return nil
+}
+
+func (x *OverrideHost) GetFallbackPolicy() *v31.LoadBalancingPolicy {
 	if x != nil {
 		return x.FallbackPolicy
 	}
@@ -125,7 +150,7 @@ type OverrideHost_OverrideHostSource struct {
 	// set this field then it will take precedence over the header field.
 	//
 	// Only one of the header or metadata field could be set.
-	Metadata      *v31.MetadataKey `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata      *v3.MetadataKey `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -167,7 +192,7 @@ func (x *OverrideHost_OverrideHostSource) GetHeader() string {
 	return ""
 }
 
-func (x *OverrideHost_OverrideHostSource) GetMetadata() *v31.MetadataKey {
+func (x *OverrideHost_OverrideHostSource) GetMetadata() *v3.MetadataKey {
 	if x != nil {
 		return x.Metadata
 	}
@@ -178,9 +203,10 @@ var File_envoy_extensions_load_balancing_policies_override_host_v3_override_host
 
 const file_envoy_extensions_load_balancing_policies_override_host_v3_override_host_proto_rawDesc = "" +
 	"\n" +
-	"Menvoy/extensions/load_balancing_policies/override_host/v3/override_host.proto\x129envoy.extensions.load_balancing_policies.override_host.v3\x1a%envoy/config/cluster/v3/cluster.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x86\x03\n" +
+	"Menvoy/extensions/load_balancing_policies/override_host/v3/override_host.proto\x129envoy.extensions.load_balancing_policies.override_host.v3\x1a%envoy/config/cluster/v3/cluster.proto\x1a%envoy/type/metadata/v3/metadata.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xd7\x03\n" +
 	"\fOverrideHost\x12\x98\x01\n" +
-	"\x15override_host_sources\x18\x01 \x03(\v2Z.envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.OverrideHostSourceB\b\xfaB\x05\x92\x01\x02\b\x01R\x13overrideHostSources\x12_\n" +
+	"\x15override_host_sources\x18\x01 \x03(\v2Z.envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.OverrideHostSourceB\b\xfaB\x05\x92\x01\x02\b\x01R\x13overrideHostSources\x12O\n" +
+	"\x11selected_host_key\x18\x02 \x01(\v2#.envoy.type.metadata.v3.MetadataKeyR\x0fselectedHostKey\x12_\n" +
 	"\x0ffallback_policy\x18\x03 \x01(\v2,.envoy.config.cluster.v3.LoadBalancingPolicyB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x0efallbackPolicy\x1az\n" +
 	"\x12OverrideHostSource\x12#\n" +
 	"\x06header\x18\x01 \x01(\tB\v\xfaB\br\x06\xc8\x01\x00\xc0\x01\x02R\x06header\x12?\n" +
@@ -203,18 +229,19 @@ var file_envoy_extensions_load_balancing_policies_override_host_v3_override_host
 var file_envoy_extensions_load_balancing_policies_override_host_v3_override_host_proto_goTypes = []any{
 	(*OverrideHost)(nil),                    // 0: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost
 	(*OverrideHost_OverrideHostSource)(nil), // 1: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.OverrideHostSource
-	(*v3.LoadBalancingPolicy)(nil),          // 2: envoy.config.cluster.v3.LoadBalancingPolicy
-	(*v31.MetadataKey)(nil),                 // 3: envoy.type.metadata.v3.MetadataKey
+	(*v3.MetadataKey)(nil),                  // 2: envoy.type.metadata.v3.MetadataKey
+	(*v31.LoadBalancingPolicy)(nil),         // 3: envoy.config.cluster.v3.LoadBalancingPolicy
 }
 var file_envoy_extensions_load_balancing_policies_override_host_v3_override_host_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.override_host_sources:type_name -> envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.OverrideHostSource
-	2, // 1: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.fallback_policy:type_name -> envoy.config.cluster.v3.LoadBalancingPolicy
-	3, // 2: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.OverrideHostSource.metadata:type_name -> envoy.type.metadata.v3.MetadataKey
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 1: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.selected_host_key:type_name -> envoy.type.metadata.v3.MetadataKey
+	3, // 2: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.fallback_policy:type_name -> envoy.config.cluster.v3.LoadBalancingPolicy
+	2, // 3: envoy.extensions.load_balancing_policies.override_host.v3.OverrideHost.OverrideHostSource.metadata:type_name -> envoy.type.metadata.v3.MetadataKey
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() {

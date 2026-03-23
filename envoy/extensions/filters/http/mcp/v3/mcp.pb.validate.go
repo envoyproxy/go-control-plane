@@ -125,6 +125,64 @@ func (m *Mcp) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	if all {
+		switch v := interface{}(m.GetPropagateTraceContext()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "PropagateTraceContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "PropagateTraceContext",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPropagateTraceContext()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpValidationError{
+				field:  "PropagateTraceContext",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPropagateBaggage()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "PropagateBaggage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, McpValidationError{
+					field:  "PropagateBaggage",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPropagateBaggage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return McpValidationError{
+				field:  "PropagateBaggage",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return McpMultiError(errors)
 	}
@@ -461,6 +519,214 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = McpOverrideValidationError{}
+
+// Validate checks the field values on Mcp_TraceContextPropagationConfig with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the first error encountered is returned, or nil if there are
+// no violations.
+func (m *Mcp_TraceContextPropagationConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Mcp_TraceContextPropagationConfig
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, the result is a list of violation errors wrapped in
+// Mcp_TraceContextPropagationConfigMultiError, or nil if none found.
+func (m *Mcp_TraceContextPropagationConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Mcp_TraceContextPropagationConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return Mcp_TraceContextPropagationConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// Mcp_TraceContextPropagationConfigMultiError is an error wrapping multiple
+// validation errors returned by
+// Mcp_TraceContextPropagationConfig.ValidateAll() if the designated
+// constraints aren't met.
+type Mcp_TraceContextPropagationConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Mcp_TraceContextPropagationConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Mcp_TraceContextPropagationConfigMultiError) AllErrors() []error { return m }
+
+// Mcp_TraceContextPropagationConfigValidationError is the validation error
+// returned by Mcp_TraceContextPropagationConfig.Validate if the designated
+// constraints aren't met.
+type Mcp_TraceContextPropagationConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Mcp_TraceContextPropagationConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Mcp_TraceContextPropagationConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Mcp_TraceContextPropagationConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Mcp_TraceContextPropagationConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Mcp_TraceContextPropagationConfigValidationError) ErrorName() string {
+	return "Mcp_TraceContextPropagationConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Mcp_TraceContextPropagationConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMcp_TraceContextPropagationConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Mcp_TraceContextPropagationConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Mcp_TraceContextPropagationConfigValidationError{}
+
+// Validate checks the field values on Mcp_BaggagePropagationConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *Mcp_BaggagePropagationConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Mcp_BaggagePropagationConfig with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// Mcp_BaggagePropagationConfigMultiError, or nil if none found.
+func (m *Mcp_BaggagePropagationConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Mcp_BaggagePropagationConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return Mcp_BaggagePropagationConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// Mcp_BaggagePropagationConfigMultiError is an error wrapping multiple
+// validation errors returned by Mcp_BaggagePropagationConfig.ValidateAll() if
+// the designated constraints aren't met.
+type Mcp_BaggagePropagationConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m Mcp_BaggagePropagationConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m Mcp_BaggagePropagationConfigMultiError) AllErrors() []error { return m }
+
+// Mcp_BaggagePropagationConfigValidationError is the validation error returned
+// by Mcp_BaggagePropagationConfig.Validate if the designated constraints
+// aren't met.
+type Mcp_BaggagePropagationConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e Mcp_BaggagePropagationConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e Mcp_BaggagePropagationConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e Mcp_BaggagePropagationConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e Mcp_BaggagePropagationConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e Mcp_BaggagePropagationConfigValidationError) ErrorName() string {
+	return "Mcp_BaggagePropagationConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e Mcp_BaggagePropagationConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMcp_BaggagePropagationConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = Mcp_BaggagePropagationConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = Mcp_BaggagePropagationConfigValidationError{}
 
 // Validate checks the field values on ParserConfig_AttributeExtractionRule
 // with the rules defined in the proto definition for this message. If any

@@ -84,6 +84,17 @@ func (m *Validation) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	if utf8.RuneCountInString(m.GetTenantIdFormat()) > 1024 {
+		err := ValidationValidationError{
+			field:  "TenantIdFormat",
+			reason: "value length must be at most 1024 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	// no validation rules for EmitDynamicMetadata
 
 	if utf8.RuneCountInString(m.GetDynamicMetadataNamespace()) > 255 {

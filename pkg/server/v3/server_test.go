@@ -138,7 +138,7 @@ func makeMockStream(t *testing.T) *mockStream {
 	t.Helper()
 	return &mockStream{
 		t:    t,
-		ctx:  context.Background(),
+		ctx:  t.Context(),
 		sent: make(chan *discovery.DiscoveryResponse, 10),
 		recv: make(chan *discovery.DiscoveryRequest, 10),
 	}
@@ -255,7 +255,7 @@ func TestServerShutdown(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
 			shutdown := make(chan bool)
-			ctx, cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithCancel(t.Context())
 			s := server.NewServer(ctx, config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			// make a request
@@ -304,7 +304,7 @@ func TestResponseHandlers(t *testing.T) {
 	for _, typ := range testTypes {
 		t.Run(typ, func(t *testing.T) {
 			done := make(chan struct{})
-			ctx, cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithCancel(t.Context())
 
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
@@ -383,88 +383,88 @@ func TestFetch(t *testing.T) {
 		},
 	}
 
-	s := server.NewServer(context.Background(), config, cb, sotw.WithLogger(log.NewTestLogger(t)))
-	out, err := s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	s := server.NewServer(t.Context(), config, cb, sotw.WithLogger(log.NewTestLogger(t)))
+	out, err := s.FetchEndpoints(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.NotNil(t, out)
 	require.NoError(t, err)
 
-	out, err = s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchClusters(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.NotNil(t, out)
 	require.NoError(t, err)
 
-	out, err = s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchRoutes(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.NotNil(t, out)
 	require.NoError(t, err)
 
-	out, err = s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchListeners(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.NotNil(t, out)
 	require.NoError(t, err)
 
-	out, err = s.FetchSecrets(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchSecrets(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.NotNil(t, out)
 	require.NoError(t, err)
 
-	out, err = s.FetchRuntime(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchRuntime(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.NotNil(t, out)
 	require.NoError(t, err)
 
 	// try again and expect empty results
-	out, err = s.FetchEndpoints(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchEndpoints(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchClusters(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchClusters(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchRoutes(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchRoutes(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchListeners(context.Background(), &discovery.DiscoveryRequest{Node: node})
+	out, err = s.FetchListeners(t.Context(), &discovery.DiscoveryRequest{Node: node})
 	assert.Nil(t, out)
 	require.Error(t, err)
 
 	// try empty requests: not valid in a real gRPC server
-	out, err = s.FetchEndpoints(context.Background(), nil)
+	out, err = s.FetchEndpoints(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchClusters(context.Background(), nil)
+	out, err = s.FetchClusters(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchRoutes(context.Background(), nil)
+	out, err = s.FetchRoutes(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchListeners(context.Background(), nil)
+	out, err = s.FetchListeners(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchSecrets(context.Background(), nil)
+	out, err = s.FetchSecrets(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchRuntime(context.Background(), nil)
+	out, err = s.FetchRuntime(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
 	// send error from callback
 	callbackError = true
-	out, err = s.FetchEndpoints(context.Background(), nil)
+	out, err = s.FetchEndpoints(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchClusters(context.Background(), nil)
+	out, err = s.FetchClusters(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchRoutes(context.Background(), nil)
+	out, err = s.FetchRoutes(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
-	out, err = s.FetchListeners(context.Background(), nil)
+	out, err = s.FetchListeners(t.Context(), nil)
 	assert.Nil(t, out)
 	require.Error(t, err)
 
@@ -478,7 +478,7 @@ func TestSendError(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
+			s := server.NewServer(t.Context(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			// make a request
 			resp := makeMockStream(t)
@@ -502,7 +502,7 @@ func TestStaleNonce(t *testing.T) {
 		t.Run(typ, func(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
+			s := server.NewServer(t.Context(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 
 			resp := makeMockStream(t)
 			resp.recv <- &discovery.DiscoveryRequest{
@@ -577,7 +577,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 	// We create the server with the optional ordered ADS flag so we guarantee resource
 	// ordering over the stream.
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithOrderedADS(), sotw.WithLogger(log.NewTestLogger(t)))
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{}, sotw.WithOrderedADS(), sotw.WithLogger(log.NewTestLogger(t)))
 	go func() {
 		err := s.StreamAggregatedResources(resp)
 		require.NoError(t, err)
@@ -612,7 +612,7 @@ func TestAggregatedHandlers(t *testing.T) {
 
 func TestAggregateRequestType(t *testing.T) {
 	config := makeMockConfigWatcher()
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 	resp := makeMockStream(t)
 	resp.recv <- &discovery.DiscoveryRequest{Node: node}
 	err := s.StreamAggregatedResources(resp)
@@ -629,7 +629,7 @@ func TestCancellations(t *testing.T) {
 		}
 	}
 	close(resp.recv)
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 	err := s.StreamAggregatedResources(resp)
 	require.NoError(t, err)
 	assert.Equal(t, 0, config.watches)
@@ -647,7 +647,7 @@ func TestOpaqueRequestsChannelMuxing(t *testing.T) {
 		}
 	}
 	close(resp.recv)
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{}, sotw.WithLogger(log.NewTestLogger(t)))
 	err := s.StreamAggregatedResources(resp)
 	require.NoError(t, err)
 	assert.Equal(t, 0, config.watches)
@@ -665,7 +665,7 @@ func TestNilPropagationOverResponseChannelShouldCloseTheStream(t *testing.T) {
 		}
 	}
 	close(resp.recv)
-	s := server.NewServer(context.Background(), config, server.CallbackFuncs{})
+	s := server.NewServer(t.Context(), config, server.CallbackFuncs{})
 	err := s.StreamAggregatedResources(resp)
 	require.Error(t, err)
 	assert.Equal(t, 0, config.watches)
@@ -677,7 +677,7 @@ func TestCallbackError(t *testing.T) {
 			config := makeMockConfigWatcher()
 			config.responses = makeResponses()
 
-			s := server.NewServer(context.Background(), config, server.CallbackFuncs{
+			s := server.NewServer(t.Context(), config, server.CallbackFuncs{
 				StreamOpenFunc: func(context.Context, int64, string) error {
 					return errors.New("stream open error")
 				},

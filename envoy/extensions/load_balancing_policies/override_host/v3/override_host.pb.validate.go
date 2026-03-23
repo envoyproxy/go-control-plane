@@ -103,6 +103,35 @@ func (m *OverrideHost) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetSelectedHostKey()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, OverrideHostValidationError{
+					field:  "SelectedHostKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, OverrideHostValidationError{
+					field:  "SelectedHostKey",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSelectedHostKey()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OverrideHostValidationError{
+				field:  "SelectedHostKey",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if m.GetFallbackPolicy() == nil {
 		err := OverrideHostValidationError{
 			field:  "FallbackPolicy",
