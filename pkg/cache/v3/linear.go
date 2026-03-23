@@ -244,11 +244,13 @@ func (cache *LinearCache) computeResourceChange(sub Subscription, useResourceVer
 			}
 		}
 
-		// Consolidated removal: detect both unsubscription and cache deletion.
+		// Consolidated removal: detect both cache deletion and unsubscription.
+		// Cache deletion is checked first as it is O(1) and more common than
+		// subscription changes; isSubscribedTo may iterate prefixes.
 		for resourceName := range knownVersions {
-			if !isSubscribedTo(sub, resourceName) {
+			if _, inCache := cache.resources[resourceName]; !inCache {
 				removedResources = append(removedResources, resourceName)
-			} else if _, inCache := cache.resources[resourceName]; !inCache {
+			} else if !isSubscribedTo(sub, resourceName) {
 				removedResources = append(removedResources, resourceName)
 			}
 		}
