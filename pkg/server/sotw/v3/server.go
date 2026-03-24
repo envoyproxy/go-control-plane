@@ -98,7 +98,7 @@ type server struct {
 	ctx       context.Context
 
 	// streamCount for counting bi-di streams
-	streamCount int64
+	streamCount atomic.Int64
 
 	// Local configuration flags for individual xDS implementations.
 	opts config.Opts
@@ -110,7 +110,7 @@ type server struct {
 type streamWrapper struct {
 	stream    stream.Stream // parent stream object
 	ID        int64         // stream ID in relation to total stream count
-	nonce     int64         // nonce per stream
+	nonce     atomic.Int64  // nonce per stream
 	watches   watches       // collection of stack allocated watchers per request type
 	callbacks Callbacks     // callbacks for performing actions through stream lifecycle
 
@@ -130,7 +130,7 @@ func (s *streamWrapper) send(resp cache.Response) error {
 	}
 
 	// increment nonce and convert it to base10
-	out.Nonce = strconv.FormatInt(atomic.AddInt64(&s.nonce, 1), 10)
+	out.Nonce = strconv.FormatInt(s.nonce.Add(1), 10)
 
 	typeURL := resp.GetRequest().GetTypeUrl()
 	w, ok := s.watches.responders[typeURL]
