@@ -35,8 +35,7 @@ type HttpService struct {
 	//	  cluster: www.myserviceapi.com|443
 	HttpUri *HttpUri `protobuf:"bytes,1,opt,name=http_uri,json=httpUri,proto3" json:"http_uri,omitempty"`
 	// Specifies a list of HTTP headers that should be added to each request
-	// handled by this virtual host.
-	// Substitution formatters are supported for some uses of this field.
+	// handled by this virtual host. Substitution formatters are supported.
 	RequestHeadersToAdd []*HeaderValueOption `protobuf:"bytes,2,rep,name=request_headers_to_add,json=requestHeadersToAdd,proto3" json:"request_headers_to_add,omitempty"`
 	// Specifies a collection of Formatter plugins that can be used in substitution formatters
 	// in “request_headers_to_add“.
