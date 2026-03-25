@@ -74,7 +74,65 @@ func (A2A_TrafficMode) EnumDescriptor() ([]byte, []int) {
 	return file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDescGZIP(), []int{0, 0}
 }
 
+// Where to store parsed A2A message attributes.
+type A2A_StorageMode int32
+
+const (
+	// Default behavior: no storage.
+	A2A_NONE A2A_StorageMode = 0
+	// Store message attributes in dynamic metadata only.
+	A2A_DYNAMIC_METADATA A2A_StorageMode = 1
+	// Store message attributes in filter state only.
+	A2A_FILTER_STATE A2A_StorageMode = 2
+	// Store message attributes in both dynamic metadata and filter state.
+	A2A_DYNAMIC_METADATA_AND_FILTER_STATE A2A_StorageMode = 3
+)
+
+// Enum value maps for A2A_StorageMode.
+var (
+	A2A_StorageMode_name = map[int32]string{
+		0: "NONE",
+		1: "DYNAMIC_METADATA",
+		2: "FILTER_STATE",
+		3: "DYNAMIC_METADATA_AND_FILTER_STATE",
+	}
+	A2A_StorageMode_value = map[string]int32{
+		"NONE":                              0,
+		"DYNAMIC_METADATA":                  1,
+		"FILTER_STATE":                      2,
+		"DYNAMIC_METADATA_AND_FILTER_STATE": 3,
+	}
+)
+
+func (x A2A_StorageMode) Enum() *A2A_StorageMode {
+	p := new(A2A_StorageMode)
+	*p = x
+	return p
+}
+
+func (x A2A_StorageMode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (A2A_StorageMode) Descriptor() protoreflect.EnumDescriptor {
+	return file_envoy_extensions_filters_http_a2a_v3_a2a_proto_enumTypes[1].Descriptor()
+}
+
+func (A2A_StorageMode) Type() protoreflect.EnumType {
+	return &file_envoy_extensions_filters_http_a2a_v3_a2a_proto_enumTypes[1]
+}
+
+func (x A2A_StorageMode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use A2A_StorageMode.Descriptor instead.
+func (A2A_StorageMode) EnumDescriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDescGZIP(), []int{0, 1}
+}
+
 // This filter will inspect and get attributes from A2A traffic.
+// [#next-free-field: 6]
 type A2A struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Configures how the filter handles non-A2A traffic.
@@ -90,8 +148,14 @@ type A2A struct {
 	// Setting it to 0 would disable the limit. It is not recommended to do so in
 	// production.
 	MaxRequestBodySize *wrapperspb.UInt32Value `protobuf:"bytes,3,opt,name=max_request_body_size,json=maxRequestBodySize,proto3" json:"max_request_body_size,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Customized configuration for A2A parser.
+	ParserConfig *ParserConfig `protobuf:"bytes,4,opt,name=parser_config,json=parserConfig,proto3" json:"parser_config,omitempty"`
+	// Where to store parsed A2A message attributes.
+	// Controls whether attributes are written to dynamic metadata, filter state, or both.
+	// Default is no storage.
+	StorageMode   A2A_StorageMode `protobuf:"varint,5,opt,name=storage_mode,json=storageMode,proto3,enum=envoy.extensions.filters.http.a2a.v3.A2A_StorageMode" json:"storage_mode,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *A2A) Reset() {
@@ -138,19 +202,175 @@ func (x *A2A) GetMaxRequestBodySize() *wrapperspb.UInt32Value {
 	return nil
 }
 
+func (x *A2A) GetParserConfig() *ParserConfig {
+	if x != nil {
+		return x.ParserConfig
+	}
+	return nil
+}
+
+func (x *A2A) GetStorageMode() A2A_StorageMode {
+	if x != nil {
+		return x.StorageMode
+	}
+	return A2A_NONE
+}
+
+type MethodParsingConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The group/category name to assign to this method (e.g., "tasks", "message").
+	// If provided, this overrides any built-in classification for the method.
+	// This will be emitted to dynamic metadata under the key specified by “group_metadata_key“.
+	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
+	// List of attributes to extract for this method, specified by their JSON paths (e.g., "params.name").
+	Paths         []string `protobuf:"bytes,2,rep,name=paths,proto3" json:"paths,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MethodParsingConfig) Reset() {
+	*x = MethodParsingConfig{}
+	mi := &file_envoy_extensions_filters_http_a2a_v3_a2a_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MethodParsingConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MethodParsingConfig) ProtoMessage() {}
+
+func (x *MethodParsingConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_a2a_v3_a2a_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MethodParsingConfig.ProtoReflect.Descriptor instead.
+func (*MethodParsingConfig) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *MethodParsingConfig) GetGroup() string {
+	if x != nil {
+		return x.Group
+	}
+	return ""
+}
+
+func (x *MethodParsingConfig) GetPaths() []string {
+	if x != nil {
+		return x.Paths
+	}
+	return nil
+}
+
+type ParserConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Method-specific overrides for grouping and attribute extraction.
+	// If a method is not specified in method_configs, or if 'group' is empty in its config,
+	// its group will be determined by built-in classification based on method prefix
+	// (e.g., "message" for "message/send") and default extraction rules will be applied for that method.
+	MethodConfigs map[string]*MethodParsingConfig `protobuf:"bytes,1,rep,name=method_configs,json=methodConfigs,proto3" json:"method_configs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Attributes that should always be extracted regardless of the method.
+	// Specified by their JSON paths (e.g., "params.id").
+	AlwaysExtractAttributes []string `protobuf:"bytes,2,rep,name=always_extract_attributes,json=alwaysExtractAttributes,proto3" json:"always_extract_attributes,omitempty"`
+	// The dynamic metadata key under which the method's group name will be stored
+	// (e.g., "a2a_group"). If this key is empty, group information will not be
+	// added to dynamic metadata.
+	GroupMetadataKey string `protobuf:"bytes,3,opt,name=group_metadata_key,json=groupMetadataKey,proto3" json:"group_metadata_key,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ParserConfig) Reset() {
+	*x = ParserConfig{}
+	mi := &file_envoy_extensions_filters_http_a2a_v3_a2a_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ParserConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ParserConfig) ProtoMessage() {}
+
+func (x *ParserConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_a2a_v3_a2a_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ParserConfig.ProtoReflect.Descriptor instead.
+func (*ParserConfig) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ParserConfig) GetMethodConfigs() map[string]*MethodParsingConfig {
+	if x != nil {
+		return x.MethodConfigs
+	}
+	return nil
+}
+
+func (x *ParserConfig) GetAlwaysExtractAttributes() []string {
+	if x != nil {
+		return x.AlwaysExtractAttributes
+	}
+	return nil
+}
+
+func (x *ParserConfig) GetGroupMetadataKey() string {
+	if x != nil {
+		return x.GroupMetadataKey
+	}
+	return ""
+}
+
 var File_envoy_extensions_filters_http_a2a_v3_a2a_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDesc = "" +
 	"\n" +
-	".envoy/extensions/filters/http/a2a/v3/a2a.proto\x12$envoy.extensions.filters.http.a2a.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xf3\x01\n" +
+	".envoy/extensions/filters/http/a2a/v3/a2a.proto\x12$envoy.extensions.filters.http.a2a.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\x98\x04\n" +
 	"\x03A2a\x12b\n" +
 	"\ftraffic_mode\x18\x01 \x01(\x0e25.envoy.extensions.filters.http.a2a.v3.A2a.TrafficModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vtrafficMode\x12[\n" +
 	"\x15max_request_body_size\x18\x03 \x01(\v2\x1c.google.protobuf.UInt32ValueB\n" +
-	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\"+\n" +
+	"\xfaB\a*\x05\x18\x80\x80\x80\x05R\x12maxRequestBodySize\x12W\n" +
+	"\rparser_config\x18\x04 \x01(\v22.envoy.extensions.filters.http.a2a.v3.ParserConfigR\fparserConfig\x12b\n" +
+	"\fstorage_mode\x18\x05 \x01(\x0e25.envoy.extensions.filters.http.a2a.v3.A2a.StorageModeB\b\xfaB\x05\x82\x01\x02\x10\x01R\vstorageMode\"+\n" +
 	"\vTrafficMode\x12\x10\n" +
 	"\fPASS_THROUGH\x10\x00\x12\n" +
 	"\n" +
-	"\x06REJECT\x10\x01B\xa3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
+	"\x06REJECT\x10\x01\"f\n" +
+	"\vStorageMode\x12\b\n" +
+	"\x04NONE\x10\x00\x12\x14\n" +
+	"\x10DYNAMIC_METADATA\x10\x01\x12\x10\n" +
+	"\fFILTER_STATE\x10\x02\x12%\n" +
+	"!DYNAMIC_METADATA_AND_FILTER_STATE\x10\x03\"A\n" +
+	"\x13MethodParsingConfig\x12\x14\n" +
+	"\x05group\x18\x01 \x01(\tR\x05group\x12\x14\n" +
+	"\x05paths\x18\x02 \x03(\tR\x05paths\"\xe3\x02\n" +
+	"\fParserConfig\x12l\n" +
+	"\x0emethod_configs\x18\x01 \x03(\v2E.envoy.extensions.filters.http.a2a.v3.ParserConfig.MethodConfigsEntryR\rmethodConfigs\x12:\n" +
+	"\x19always_extract_attributes\x18\x02 \x03(\tR\x17alwaysExtractAttributes\x12,\n" +
+	"\x12group_metadata_key\x18\x03 \x01(\tR\x10groupMetadataKey\x1a{\n" +
+	"\x12MethodConfigsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12O\n" +
+	"\x05value\x18\x02 \x01(\v29.envoy.extensions.filters.http.a2a.v3.MethodParsingConfigR\x05value:\x028\x01B\xa3\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\xd2Ƥ\xe1\x06\x02\b\x01\n" +
 	"2io.envoyproxy.envoy.extensions.filters.http.a2a.v3B\bA2aProtoP\x01ZQgithub.com/envoyproxy/go-control-plane/envoy/extensions/filters/http/a2a/v3;a2av3b\x06proto3"
 
 var (
@@ -165,21 +385,29 @@ func file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDescGZIP() []byte {
 	return file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDescData
 }
 
-var file_envoy_extensions_filters_http_a2a_v3_a2a_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_envoy_extensions_filters_http_a2a_v3_a2a_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_envoy_extensions_filters_http_a2a_v3_a2a_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_envoy_extensions_filters_http_a2a_v3_a2a_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_envoy_extensions_filters_http_a2a_v3_a2a_proto_goTypes = []any{
 	(A2A_TrafficMode)(0),           // 0: envoy.extensions.filters.http.a2a.v3.A2a.TrafficMode
-	(*A2A)(nil),                    // 1: envoy.extensions.filters.http.a2a.v3.A2a
-	(*wrapperspb.UInt32Value)(nil), // 2: google.protobuf.UInt32Value
+	(A2A_StorageMode)(0),           // 1: envoy.extensions.filters.http.a2a.v3.A2a.StorageMode
+	(*A2A)(nil),                    // 2: envoy.extensions.filters.http.a2a.v3.A2a
+	(*MethodParsingConfig)(nil),    // 3: envoy.extensions.filters.http.a2a.v3.MethodParsingConfig
+	(*ParserConfig)(nil),           // 4: envoy.extensions.filters.http.a2a.v3.ParserConfig
+	nil,                            // 5: envoy.extensions.filters.http.a2a.v3.ParserConfig.MethodConfigsEntry
+	(*wrapperspb.UInt32Value)(nil), // 6: google.protobuf.UInt32Value
 }
 var file_envoy_extensions_filters_http_a2a_v3_a2a_proto_depIdxs = []int32{
 	0, // 0: envoy.extensions.filters.http.a2a.v3.A2a.traffic_mode:type_name -> envoy.extensions.filters.http.a2a.v3.A2a.TrafficMode
-	2, // 1: envoy.extensions.filters.http.a2a.v3.A2a.max_request_body_size:type_name -> google.protobuf.UInt32Value
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	6, // 1: envoy.extensions.filters.http.a2a.v3.A2a.max_request_body_size:type_name -> google.protobuf.UInt32Value
+	4, // 2: envoy.extensions.filters.http.a2a.v3.A2a.parser_config:type_name -> envoy.extensions.filters.http.a2a.v3.ParserConfig
+	1, // 3: envoy.extensions.filters.http.a2a.v3.A2a.storage_mode:type_name -> envoy.extensions.filters.http.a2a.v3.A2a.StorageMode
+	5, // 4: envoy.extensions.filters.http.a2a.v3.ParserConfig.method_configs:type_name -> envoy.extensions.filters.http.a2a.v3.ParserConfig.MethodConfigsEntry
+	3, // 5: envoy.extensions.filters.http.a2a.v3.ParserConfig.MethodConfigsEntry.value:type_name -> envoy.extensions.filters.http.a2a.v3.MethodParsingConfig
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_a2a_v3_a2a_proto_init() }
@@ -192,8 +420,8 @@ func file_envoy_extensions_filters_http_a2a_v3_a2a_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDesc), len(file_envoy_extensions_filters_http_a2a_v3_a2a_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   1,
+			NumEnums:      2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
