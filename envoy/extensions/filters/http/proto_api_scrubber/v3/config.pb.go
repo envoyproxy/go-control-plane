@@ -78,8 +78,10 @@ type ProtoApiScrubberConfig struct {
 	Restrictions *Restrictions `protobuf:"bytes,2,opt,name=restrictions,proto3" json:"restrictions,omitempty"`
 	// Specifies the filtering mode of this filter.
 	FilteringMode ProtoApiScrubberConfig_FilteringMode `protobuf:"varint,3,opt,name=filtering_mode,json=filteringMode,proto3,enum=envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig_FilteringMode" json:"filtering_mode,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// If true, the filter will scrub unknown fields from the protobuf messages.
+	ScrubUnknownFields bool `protobuf:"varint,4,opt,name=scrub_unknown_fields,json=scrubUnknownFields,proto3" json:"scrub_unknown_fields,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ProtoApiScrubberConfig) Reset() {
@@ -131,6 +133,13 @@ func (x *ProtoApiScrubberConfig) GetFilteringMode() ProtoApiScrubberConfig_Filte
 		return x.FilteringMode
 	}
 	return ProtoApiScrubberConfig_OVERRIDE
+}
+
+func (x *ProtoApiScrubberConfig) GetScrubUnknownFields() bool {
+	if x != nil {
+		return x.ScrubUnknownFields
+	}
+	return false
 }
 
 // Specifies the descriptor set for proto services.
@@ -426,11 +435,12 @@ var File_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto protor
 
 const file_envoy_extensions_filters_http_proto_api_scrubber_v3_config_proto_rawDesc = "" +
 	"\n" +
-	"@envoy/extensions/filters/http/proto_api_scrubber/v3/config.proto\x123envoy.extensions.filters.http.proto_api_scrubber.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\"\x8c\x03\n" +
+	"@envoy/extensions/filters/http/proto_api_scrubber/v3/config.proto\x123envoy.extensions.filters.http.proto_api_scrubber.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a!xds/type/matcher/v3/matcher.proto\x1a\x1dudpa/annotations/status.proto\"\xbe\x03\n" +
 	"\x16ProtoApiScrubberConfig\x12i\n" +
 	"\x0edescriptor_set\x18\x01 \x01(\v2B.envoy.extensions.filters.http.proto_api_scrubber.v3.DescriptorSetR\rdescriptorSet\x12e\n" +
 	"\frestrictions\x18\x02 \x01(\v2A.envoy.extensions.filters.http.proto_api_scrubber.v3.RestrictionsR\frestrictions\x12\x80\x01\n" +
-	"\x0efiltering_mode\x18\x03 \x01(\x0e2Y.envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig.FilteringModeR\rfilteringMode\"\x1d\n" +
+	"\x0efiltering_mode\x18\x03 \x01(\x0e2Y.envoy.extensions.filters.http.proto_api_scrubber.v3.ProtoApiScrubberConfig.FilteringModeR\rfilteringMode\x120\n" +
+	"\x14scrub_unknown_fields\x18\x04 \x01(\bR\x12scrubUnknownFields\"\x1d\n" +
 	"\rFilteringMode\x12\f\n" +
 	"\bOVERRIDE\x10\x00\"R\n" +
 	"\rDescriptorSet\x12A\n" +
