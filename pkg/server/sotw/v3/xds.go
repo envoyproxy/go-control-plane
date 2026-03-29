@@ -2,7 +2,6 @@ package sotw
 
 import (
 	"reflect"
-	"sync/atomic"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,7 +20,7 @@ func (s *server) process(str stream.Stream, reqCh chan *discovery.DiscoveryReque
 	// xDS resource processing.
 	sw := streamWrapper{
 		stream:    str,
-		ID:        atomic.AddInt64(&s.streamCount, 1), // increment stream count
+		ID:        s.streamCount.Add(1), // increment stream count
 		callbacks: s.callbacks,
 		node:      &core.Node{}, // node may only be set on the first discovery request
 

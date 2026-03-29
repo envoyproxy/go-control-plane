@@ -83,6 +83,46 @@ func (m *A2A) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetParserConfig()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, A2AValidationError{
+					field:  "ParserConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, A2AValidationError{
+					field:  "ParserConfig",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetParserConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return A2AValidationError{
+				field:  "ParserConfig",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if _, ok := A2A_StorageMode_name[int32(m.GetStorageMode())]; !ok {
+		err := A2AValidationError{
+			field:  "StorageMode",
+			reason: "value must be one of the defined enum values",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
 		return A2AMultiError(errors)
 	}
@@ -159,3 +199,254 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = A2AValidationError{}
+
+// Validate checks the field values on MethodParsingConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *MethodParsingConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MethodParsingConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// MethodParsingConfigMultiError, or nil if none found.
+func (m *MethodParsingConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MethodParsingConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Group
+
+	if len(errors) > 0 {
+		return MethodParsingConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// MethodParsingConfigMultiError is an error wrapping multiple validation
+// errors returned by MethodParsingConfig.ValidateAll() if the designated
+// constraints aren't met.
+type MethodParsingConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MethodParsingConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MethodParsingConfigMultiError) AllErrors() []error { return m }
+
+// MethodParsingConfigValidationError is the validation error returned by
+// MethodParsingConfig.Validate if the designated constraints aren't met.
+type MethodParsingConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MethodParsingConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MethodParsingConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MethodParsingConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MethodParsingConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MethodParsingConfigValidationError) ErrorName() string {
+	return "MethodParsingConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MethodParsingConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMethodParsingConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MethodParsingConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MethodParsingConfigValidationError{}
+
+// Validate checks the field values on ParserConfig with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ParserConfig) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ParserConfig with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ParserConfigMultiError, or
+// nil if none found.
+func (m *ParserConfig) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ParserConfig) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	{
+		sorted_keys := make([]string, len(m.GetMethodConfigs()))
+		i := 0
+		for key := range m.GetMethodConfigs() {
+			sorted_keys[i] = key
+			i++
+		}
+		sort.Slice(sorted_keys, func(i, j int) bool { return sorted_keys[i] < sorted_keys[j] })
+		for _, key := range sorted_keys {
+			val := m.GetMethodConfigs()[key]
+			_ = val
+
+			// no validation rules for MethodConfigs[key]
+
+			if all {
+				switch v := interface{}(val).(type) {
+				case interface{ ValidateAll() error }:
+					if err := v.ValidateAll(); err != nil {
+						errors = append(errors, ParserConfigValidationError{
+							field:  fmt.Sprintf("MethodConfigs[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				case interface{ Validate() error }:
+					if err := v.Validate(); err != nil {
+						errors = append(errors, ParserConfigValidationError{
+							field:  fmt.Sprintf("MethodConfigs[%v]", key),
+							reason: "embedded message failed validation",
+							cause:  err,
+						})
+					}
+				}
+			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+				if err := v.Validate(); err != nil {
+					return ParserConfigValidationError{
+						field:  fmt.Sprintf("MethodConfigs[%v]", key),
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		}
+	}
+
+	// no validation rules for GroupMetadataKey
+
+	if len(errors) > 0 {
+		return ParserConfigMultiError(errors)
+	}
+
+	return nil
+}
+
+// ParserConfigMultiError is an error wrapping multiple validation errors
+// returned by ParserConfig.ValidateAll() if the designated constraints aren't met.
+type ParserConfigMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ParserConfigMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ParserConfigMultiError) AllErrors() []error { return m }
+
+// ParserConfigValidationError is the validation error returned by
+// ParserConfig.Validate if the designated constraints aren't met.
+type ParserConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ParserConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ParserConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ParserConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ParserConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ParserConfigValidationError) ErrorName() string { return "ParserConfigValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ParserConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sParserConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ParserConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ParserConfigValidationError{}

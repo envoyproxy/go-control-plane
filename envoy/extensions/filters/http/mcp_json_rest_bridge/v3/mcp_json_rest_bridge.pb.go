@@ -220,6 +220,8 @@ type ServerToolConfig struct {
 	ListChanged bool `protobuf:"varint,2,opt,name=list_changed,json=listChanged,proto3" json:"list_changed,omitempty"`
 	// Optional configuration to transcode the tools/list requests to a standard HTTP request.
 	//
+	// Note: tools/list should be mapped to a GET request with an empty body.
+	//
 	//   - If provided: The extension transcodes the request and forwards it down the filter chain.
 	//     The response (whether from an upstream backend, a configured “direct_response“, or another
 	//     extension) MUST be a JSON body strictly matching the MCP “ListToolsResult“ schema.

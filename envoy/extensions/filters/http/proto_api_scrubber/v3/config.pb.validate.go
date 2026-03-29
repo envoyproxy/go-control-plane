@@ -118,6 +118,8 @@ func (m *ProtoApiScrubberConfig) validate(all bool) error {
 
 	// no validation rules for FilteringMode
 
+	// no validation rules for ScrubUnknownFields
+
 	if len(errors) > 0 {
 		return ProtoApiScrubberConfigMultiError(errors)
 	}
