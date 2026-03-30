@@ -54,6 +54,12 @@ type Subscription interface {
 	// The returned map must not be altered by the Cache.
 	SubscribedResources() map[string]struct{}
 
+	// SubscribedPrefixes returns the set of prefix glob subscriptions, keyed by the
+	// prefix with the trailing glob removed but the separator kept (e.g. "collection/").
+	// Exact-name subscriptions are NOT included here; see SubscribedResources.
+	// The returned map must not be altered by the Cache.
+	SubscribedPrefixes() map[string]struct{}
+
 	// IsWildcard returns whether the client has a wildcard watch.
 	// This considers subtleties related to the current migration of wildcard definitions within the protocol.
 	// More details on the behavior of wildcard are present at https://www.envoyproxy.io/docs/envoy/latest/api-docs/xds_protocol#how-the-client-specifies-what-resources-to-return
