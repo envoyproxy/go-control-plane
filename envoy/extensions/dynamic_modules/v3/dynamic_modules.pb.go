@@ -40,7 +40,7 @@ const (
 // the ABI is stabilized, this restriction will be revisited. Until then, Envoy checks the hash of
 // the ABI header files to ensure that the dynamic modules are built against the same version of the
 // ABI.
-// [#next-free-field: 7]
+// [#next-free-field: 8]
 type DynamicModuleConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the dynamic module.
@@ -101,9 +101,26 @@ type DynamicModuleConfig struct {
 	// is **not installed** and requests pass through unfiltered (fail-open).
 	//
 	// When both “name“ and “module“ are set, “module“ takes precedence.
-	Module        *v3.AsyncDataSource `protobuf:"bytes,6,opt,name=module,proto3" json:"module,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Module *v3.AsyncDataSource `protobuf:"bytes,6,opt,name=module,proto3" json:"module,omitempty"`
+	// Controls how a cache miss for a remote module is handled.
+	//
+	// When true (NACK mode), a cache miss causes an immediate NACK of the xDS config update.
+	// A background fetch is started and the module will be available on the next config push if
+	// the fetch succeeds.
+	//
+	// When false (default, warming mode), the server blocks during initialization until the fetch
+	// completes or exhausts retries. This mode requires an init manager and is not available in
+	// ECDS or per-route configurations.
+	//
+	// When using “module.remote“ with ECDS or per-route configurations, this must be set to
+	// “true“.
+	//
+	// Only applies when “module.remote“ is set.
+	//
+	// Defaults to “false“.
+	NackOnCacheMiss bool `protobuf:"varint,7,opt,name=nack_on_cache_miss,json=nackOnCacheMiss,proto3" json:"nack_on_cache_miss,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *DynamicModuleConfig) Reset() {
@@ -171,18 +188,26 @@ func (x *DynamicModuleConfig) GetModule() *v3.AsyncDataSource {
 	return nil
 }
 
+func (x *DynamicModuleConfig) GetNackOnCacheMiss() bool {
+	if x != nil {
+		return x.NackOnCacheMiss
+	}
+	return false
+}
+
 var File_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_dynamic_modules_v3_dynamic_modules_proto_rawDesc = "" +
 	"\n" +
-	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1dudpa/annotations/status.proto\"\xdc\x01\n" +
+	"9envoy/extensions/dynamic_modules/v3/dynamic_modules.proto\x12#envoy.extensions.dynamic_modules.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1dudpa/annotations/status.proto\"\x89\x02\n" +
 	"\x13DynamicModuleConfig\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\fdo_not_close\x18\x03 \x01(\bR\n" +
 	"doNotClose\x12#\n" +
 	"\rload_globally\x18\x04 \x01(\bR\floadGlobally\x12+\n" +
 	"\x11metrics_namespace\x18\x05 \x01(\tR\x10metricsNamespace\x12=\n" +
-	"\x06module\x18\x06 \x01(\v2%.envoy.config.core.v3.AsyncDataSourceR\x06moduleB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\x06module\x18\x06 \x01(\v2%.envoy.config.core.v3.AsyncDataSourceR\x06module\x12+\n" +
+	"\x12nack_on_cache_miss\x18\a \x01(\bR\x0fnackOnCacheMissB\xb0\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"1io.envoyproxy.envoy.extensions.dynamic_modules.v3B\x13DynamicModulesProtoP\x01Z\\github.com/envoyproxy/go-control-plane/envoy/extensions/dynamic_modules/v3;dynamic_modulesv3b\x06proto3"
 
 var (

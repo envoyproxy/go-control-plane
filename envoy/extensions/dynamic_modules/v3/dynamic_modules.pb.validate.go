@@ -95,6 +95,8 @@ func (m *DynamicModuleConfig) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for NackOnCacheMiss
+
 	if len(errors) > 0 {
 		return DynamicModuleConfigMultiError(errors)
 	}

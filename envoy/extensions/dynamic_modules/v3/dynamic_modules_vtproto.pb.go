@@ -49,6 +49,16 @@ func (m *DynamicModuleConfig) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.NackOnCacheMiss {
+		i--
+		if m.NackOnCacheMiss {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x38
+	}
 	if m.Module != nil {
 		if vtmsg, ok := interface{}(m.Module).(interface {
 			MarshalToSizedBufferVTStrict([]byte) (int, error)
@@ -137,6 +147,9 @@ func (m *DynamicModuleConfig) SizeVT() (n int) {
 			l = proto.Size(m.Module)
 		}
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.NackOnCacheMiss {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n
