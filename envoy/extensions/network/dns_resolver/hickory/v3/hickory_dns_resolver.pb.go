@@ -29,9 +29,9 @@ const (
 // Configuration for DNS-over-TLS (DoT) servers.
 type DnsOverTlsConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// DNS-over-TLS server addresses. The port should typically be 853.
+	// The list of DNS-over-TLS server addresses. The port should typically be 853.
 	Servers []*v3.Address `protobuf:"bytes,1,rep,name=servers,proto3" json:"servers,omitempty"`
-	// The SNI hostname to use for TLS verification. Required when servers are specified.
+	// The SNI hostname to use for TLS verification. Required when “servers“ are specified.
 	TlsServerName string `protobuf:"bytes,2,opt,name=tls_server_name,json=tlsServerName,proto3" json:"tls_server_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -84,7 +84,7 @@ func (x *DnsOverTlsConfig) GetTlsServerName() string {
 // Configuration for DNS-over-HTTPS (DoH) servers.
 type DnsOverHttpsConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// DNS-over-HTTPS endpoint URLs (e.g., “https://dns.google/dns-query“).
+	// The list of DNS-over-HTTPS endpoint URLs (e.g., “https://dns.google/dns-query“).
 	ServerUrls    []string `protobuf:"bytes,1,rep,name=server_urls,json=serverUrls,proto3" json:"server_urls,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -137,7 +137,7 @@ func (x *DnsOverHttpsConfig) GetServerUrls() []string {
 type HickoryDnsResolverConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A list of DNS resolver addresses for standard UDP/TCP resolution.
-	// If not specified and “use_system_config“ is not explicitly set to false, the system
+	// If not specified and “use_system_config“ is not explicitly set to “false“, the system
 	// configuration (“/etc/resolv.conf“ on Unix) will be used.
 	Resolvers []*v3.Address `protobuf:"bytes,1,rep,name=resolvers,proto3" json:"resolvers,omitempty"`
 	// Configuration for DNS-over-TLS (DoT). When specified, queries will be sent over TLS
@@ -146,36 +146,36 @@ type HickoryDnsResolverConfig struct {
 	// Configuration for DNS-over-HTTPS (DoH). When specified, queries will be sent over
 	// HTTPS to the configured endpoints.
 	DnsOverHttps *DnsOverHttpsConfig `protobuf:"bytes,3,opt,name=dns_over_https,json=dnsOverHttps,proto3" json:"dns_over_https,omitempty"`
-	// Enable “DNSSEC“ validation for DNS responses. When enabled, the resolver will validate
+	// Enables “DNSSEC“ validation for DNS responses. When enabled, the resolver will validate
 	// “DNSSEC“ signatures and reject responses that fail validation.
 	//
-	// Defaults to false.
+	// Defaults to “false“.
 	EnableDnssec bool `protobuf:"varint,4,opt,name=enable_dnssec,json=enableDnssec,proto3" json:"enable_dnssec,omitempty"`
 	// Maximum number of entries in the DNS response cache. The cache uses an LRU eviction
-	// policy and supports negative caching (caching of NXDOMAIN/NODATA responses).
+	// policy and supports negative caching (caching of “NXDOMAIN“/“NODATA“ responses).
 	//
-	// Defaults to 1024.
+	// Defaults to “1024“.
 	CacheSize *wrapperspb.UInt32Value `protobuf:"bytes,5,opt,name=cache_size,json=cacheSize,proto3" json:"cache_size,omitempty"`
 	// Number of threads in the “Tokio“ runtime used for asynchronous DNS resolution.
 	// Each resolver instance runs its own “Tokio“ runtime.
 	//
-	// Defaults to 2. Maximum is 16.
+	// Defaults to “2“. Maximum is “16“.
 	NumResolverThreads *wrapperspb.UInt32Value `protobuf:"bytes,6,opt,name=num_resolver_threads,json=numResolverThreads,proto3" json:"num_resolver_threads,omitempty"`
-	// If true, read the system DNS configuration (“/etc/resolv.conf“ on Unix) for name server
+	// If “true“, read the system DNS configuration (“/etc/resolv.conf“ on Unix) for name server
 	// addresses and search domains. When “resolvers“ are also specified, they take precedence
 	// over the system configuration.
 	//
-	// If not specified, defaults to true when no “resolvers“, “dns_over_tls“, or
+	// If not specified, defaults to “true“ when no “resolvers“, “dns_over_tls“, or
 	// “dns_over_https“ are configured.
 	UseSystemConfig *wrapperspb.BoolValue `protobuf:"bytes,7,opt,name=use_system_config,json=useSystemConfig,proto3" json:"use_system_config,omitempty"`
 	// Timeout for each individual DNS query attempt.
 	//
-	// Defaults to 5 seconds.
+	// Defaults to “5“ seconds.
 	QueryTimeout *durationpb.Duration `protobuf:"bytes,8,opt,name=query_timeout,json=queryTimeout,proto3" json:"query_timeout,omitempty"`
 	// Maximum number of query attempts before the resolver gives up. Each attempt may use
 	// a different name server.
 	//
-	// Defaults to 3.
+	// Defaults to “3“.
 	QueryTries    *wrapperspb.UInt32Value `protobuf:"bytes,9,opt,name=query_tries,json=queryTries,proto3" json:"query_tries,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
