@@ -34,6 +34,8 @@ type OutlierDetection struct {
 	// The number of consecutive server-side error responses (for HTTP traffic,
 	// 5xx responses; for TCP traffic, connection failures; for Redis, failure to
 	// respond PONG; etc.) before a consecutive 5xx ejection occurs. Defaults to 5.
+	//
+	// If set to 0 explicitly, consecutive 5xx ejection will be disabled.
 	Consecutive_5Xx *wrapperspb.UInt32Value `protobuf:"bytes,1,opt,name=consecutive_5xx,json=consecutive5xx,proto3" json:"consecutive_5xx,omitempty"`
 	// The time interval between ejection analysis sweeps. This can result in
 	// both new ejections as well as hosts being returned to service. Defaults
@@ -76,6 +78,8 @@ type OutlierDetection struct {
 	SuccessRateStdevFactor *wrapperspb.UInt32Value `protobuf:"bytes,9,opt,name=success_rate_stdev_factor,json=successRateStdevFactor,proto3" json:"success_rate_stdev_factor,omitempty"`
 	// The number of consecutive gateway failures (502, 503, 504 status codes)
 	// before a consecutive gateway failure ejection occurs. Defaults to 5.
+	//
+	// If set to 0 explicitly, consecutive gateway failure ejection will be disabled.
 	ConsecutiveGatewayFailure *wrapperspb.UInt32Value `protobuf:"bytes,10,opt,name=consecutive_gateway_failure,json=consecutiveGatewayFailure,proto3" json:"consecutive_gateway_failure,omitempty"`
 	// The % chance that a host will be actually ejected when an outlier status
 	// is detected through consecutive gateway failures. This setting can be
@@ -93,6 +97,8 @@ type OutlierDetection struct {
 	// occurs. Defaults to 5. Parameter takes effect only when
 	// :ref:`split_external_local_origin_errors<envoy_v3_api_field_config.cluster.v3.OutlierDetection.split_external_local_origin_errors>`
 	// is set to true.
+	//
+	// If set to 0 explicitly, consecutive locally originated failure ejection will be disabled.
 	ConsecutiveLocalOriginFailure *wrapperspb.UInt32Value `protobuf:"bytes,13,opt,name=consecutive_local_origin_failure,json=consecutiveLocalOriginFailure,proto3" json:"consecutive_local_origin_failure,omitempty"`
 	// The % chance that a host will be actually ejected when an outlier status
 	// is detected through consecutive locally originated failures. This setting can be
