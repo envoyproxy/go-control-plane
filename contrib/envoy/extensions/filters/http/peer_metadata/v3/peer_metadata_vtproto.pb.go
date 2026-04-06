@@ -127,6 +127,46 @@ func (m *Config_IstioHeaders) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
+func (m *Config_UpstreamFilterState) MarshalVTStrict() (dAtA []byte, err error) {
+	if m == nil {
+		return nil, nil
+	}
+	size := m.SizeVT()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBufferVTStrict(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Config_UpstreamFilterState) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Config_UpstreamFilterState) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	if m == nil {
+		return 0, nil
+	}
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.unknownFields != nil {
+		i -= len(m.unknownFields)
+		copy(dAtA[i:], m.unknownFields)
+	}
+	if len(m.PeerMetadataKey) > 0 {
+		i -= len(m.PeerMetadataKey)
+		copy(dAtA[i:], m.PeerMetadataKey)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.PeerMetadataKey)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *Config_DiscoveryMethod) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -156,6 +196,13 @@ func (m *Config_DiscoveryMethod) MarshalToSizedBufferVTStrict(dAtA []byte) (int,
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if msg, ok := m.MethodSpecifier.(*Config_DiscoveryMethod_UpstreamFilterState); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
 	}
 	if msg, ok := m.MethodSpecifier.(*Config_DiscoveryMethod_IstioHeaders); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -250,6 +297,29 @@ func (m *Config_DiscoveryMethod_IstioHeaders) MarshalToSizedBufferVTStrict(dAtA 
 	}
 	return len(dAtA) - i, nil
 }
+func (m *Config_DiscoveryMethod_UpstreamFilterState) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Config_DiscoveryMethod_UpstreamFilterState) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.UpstreamFilterState != nil {
+		size, err := m.UpstreamFilterState.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x22
+	} else {
+		i = protohelpers.EncodeVarint(dAtA, i, 0)
+		i--
+		dAtA[i] = 0x22
+	}
+	return len(dAtA) - i, nil
+}
 func (m *Config_PropagationMethod) MarshalVTStrict() (dAtA []byte, err error) {
 	if m == nil {
 		return nil, nil
@@ -279,6 +349,13 @@ func (m *Config_PropagationMethod) MarshalToSizedBufferVTStrict(dAtA []byte) (in
 	if m.unknownFields != nil {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
+	}
+	if msg, ok := m.MethodSpecifier.(*Config_PropagationMethod_Baggage); ok {
+		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
 	}
 	if msg, ok := m.MethodSpecifier.(*Config_PropagationMethod_IstioHeaders); ok {
 		size, err := msg.MarshalToSizedBufferVTStrict(dAtA[:i])
@@ -310,6 +387,29 @@ func (m *Config_PropagationMethod_IstioHeaders) MarshalToSizedBufferVTStrict(dAt
 		i = protohelpers.EncodeVarint(dAtA, i, 0)
 		i--
 		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Config_PropagationMethod_Baggage) MarshalToVTStrict(dAtA []byte) (int, error) {
+	size := m.SizeVT()
+	return m.MarshalToSizedBufferVTStrict(dAtA[:size])
+}
+
+func (m *Config_PropagationMethod_Baggage) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Baggage != nil {
+		size, err := m.Baggage.MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x12
+	} else {
+		i = protohelpers.EncodeVarint(dAtA, i, 0)
+		i--
+		dAtA[i] = 0x12
 	}
 	return len(dAtA) - i, nil
 }
@@ -446,6 +546,20 @@ func (m *Config_IstioHeaders) SizeVT() (n int) {
 	return n
 }
 
+func (m *Config_UpstreamFilterState) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PeerMetadataKey)
+	if l > 0 {
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	n += len(m.unknownFields)
+	return n
+}
+
 func (m *Config_DiscoveryMethod) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -501,6 +615,20 @@ func (m *Config_DiscoveryMethod_IstioHeaders) SizeVT() (n int) {
 	}
 	return n
 }
+func (m *Config_DiscoveryMethod_UpstreamFilterState) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.UpstreamFilterState != nil {
+		l = m.UpstreamFilterState.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	} else {
+		n += 2
+	}
+	return n
+}
 func (m *Config_PropagationMethod) SizeVT() (n int) {
 	if m == nil {
 		return 0
@@ -522,6 +650,20 @@ func (m *Config_PropagationMethod_IstioHeaders) SizeVT() (n int) {
 	_ = l
 	if m.IstioHeaders != nil {
 		l = m.IstioHeaders.SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	} else {
+		n += 2
+	}
+	return n
+}
+func (m *Config_PropagationMethod_Baggage) SizeVT() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Baggage != nil {
+		l = m.Baggage.SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	} else {
 		n += 2

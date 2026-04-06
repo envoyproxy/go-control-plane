@@ -118,8 +118,7 @@ func (x *Config) GetAdditionalLabels() []string {
 	return nil
 }
 
-// DEPRECATED.
-// This method uses “baggage“ header encoding.
+// This method uses “baggage“ header encoding. Only used for HTTP CONNECT tunnels.
 type Config_Baggage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -246,6 +245,58 @@ func (x *Config_IstioHeaders) GetSkipExternalClusters() bool {
 	return false
 }
 
+// This method extracts peer metadata from the upstream filter state if it's available.
+//
+// Upstream filter state could be populated by multiple means in general, but in practice the
+// intention here is that upstream PeerMetadata filter will populate the filter state with peer
+// details extracted from the baggage header sent in response.
+//
+// Naturally this metadata discovery method only makes sense for upstream peer metadata discovery.
+type Config_UpstreamFilterState struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Upstream filter state key that will be used to store peer metadata.
+	PeerMetadataKey string `protobuf:"bytes,1,opt,name=peer_metadata_key,json=peerMetadataKey,proto3" json:"peer_metadata_key,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *Config_UpstreamFilterState) Reset() {
+	*x = Config_UpstreamFilterState{}
+	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Config_UpstreamFilterState) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Config_UpstreamFilterState) ProtoMessage() {}
+
+func (x *Config_UpstreamFilterState) ProtoReflect() protoreflect.Message {
+	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Config_UpstreamFilterState.ProtoReflect.Descriptor instead.
+func (*Config_UpstreamFilterState) Descriptor() ([]byte, []int) {
+	return file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDescGZIP(), []int{0, 3}
+}
+
+func (x *Config_UpstreamFilterState) GetPeerMetadataKey() string {
+	if x != nil {
+		return x.PeerMetadataKey
+	}
+	return ""
+}
+
 // An exhaustive list of the derivation methods.
 type Config_DiscoveryMethod struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -254,6 +305,7 @@ type Config_DiscoveryMethod struct {
 	//	*Config_DiscoveryMethod_Baggage
 	//	*Config_DiscoveryMethod_WorkloadDiscovery
 	//	*Config_DiscoveryMethod_IstioHeaders
+	//	*Config_DiscoveryMethod_UpstreamFilterState
 	MethodSpecifier isConfig_DiscoveryMethod_MethodSpecifier `protobuf_oneof:"method_specifier"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -261,7 +313,7 @@ type Config_DiscoveryMethod struct {
 
 func (x *Config_DiscoveryMethod) Reset() {
 	*x = Config_DiscoveryMethod{}
-	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[4]
+	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -273,7 +325,7 @@ func (x *Config_DiscoveryMethod) String() string {
 func (*Config_DiscoveryMethod) ProtoMessage() {}
 
 func (x *Config_DiscoveryMethod) ProtoReflect() protoreflect.Message {
-	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[4]
+	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -286,7 +338,7 @@ func (x *Config_DiscoveryMethod) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Config_DiscoveryMethod.ProtoReflect.Descriptor instead.
 func (*Config_DiscoveryMethod) Descriptor() ([]byte, []int) {
-	return file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDescGZIP(), []int{0, 3}
+	return file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDescGZIP(), []int{0, 4}
 }
 
 func (x *Config_DiscoveryMethod) GetMethodSpecifier() isConfig_DiscoveryMethod_MethodSpecifier {
@@ -323,6 +375,15 @@ func (x *Config_DiscoveryMethod) GetIstioHeaders() *Config_IstioHeaders {
 	return nil
 }
 
+func (x *Config_DiscoveryMethod) GetUpstreamFilterState() *Config_UpstreamFilterState {
+	if x != nil {
+		if x, ok := x.MethodSpecifier.(*Config_DiscoveryMethod_UpstreamFilterState); ok {
+			return x.UpstreamFilterState
+		}
+	}
+	return nil
+}
+
 type isConfig_DiscoveryMethod_MethodSpecifier interface {
 	isConfig_DiscoveryMethod_MethodSpecifier()
 }
@@ -339,11 +400,17 @@ type Config_DiscoveryMethod_IstioHeaders struct {
 	IstioHeaders *Config_IstioHeaders `protobuf:"bytes,3,opt,name=istio_headers,json=istioHeaders,proto3,oneof"`
 }
 
+type Config_DiscoveryMethod_UpstreamFilterState struct {
+	UpstreamFilterState *Config_UpstreamFilterState `protobuf:"bytes,4,opt,name=upstream_filter_state,json=upstreamFilterState,proto3,oneof"`
+}
+
 func (*Config_DiscoveryMethod_Baggage) isConfig_DiscoveryMethod_MethodSpecifier() {}
 
 func (*Config_DiscoveryMethod_WorkloadDiscovery) isConfig_DiscoveryMethod_MethodSpecifier() {}
 
 func (*Config_DiscoveryMethod_IstioHeaders) isConfig_DiscoveryMethod_MethodSpecifier() {}
+
+func (*Config_DiscoveryMethod_UpstreamFilterState) isConfig_DiscoveryMethod_MethodSpecifier() {}
 
 // An exhaustive list of the metadata propagation methods.
 type Config_PropagationMethod struct {
@@ -351,6 +418,7 @@ type Config_PropagationMethod struct {
 	// Types that are valid to be assigned to MethodSpecifier:
 	//
 	//	*Config_PropagationMethod_IstioHeaders
+	//	*Config_PropagationMethod_Baggage
 	MethodSpecifier isConfig_PropagationMethod_MethodSpecifier `protobuf_oneof:"method_specifier"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -358,7 +426,7 @@ type Config_PropagationMethod struct {
 
 func (x *Config_PropagationMethod) Reset() {
 	*x = Config_PropagationMethod{}
-	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[5]
+	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -370,7 +438,7 @@ func (x *Config_PropagationMethod) String() string {
 func (*Config_PropagationMethod) ProtoMessage() {}
 
 func (x *Config_PropagationMethod) ProtoReflect() protoreflect.Message {
-	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[5]
+	mi := &file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -383,7 +451,7 @@ func (x *Config_PropagationMethod) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Config_PropagationMethod.ProtoReflect.Descriptor instead.
 func (*Config_PropagationMethod) Descriptor() ([]byte, []int) {
-	return file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDescGZIP(), []int{0, 4}
+	return file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDescGZIP(), []int{0, 5}
 }
 
 func (x *Config_PropagationMethod) GetMethodSpecifier() isConfig_PropagationMethod_MethodSpecifier {
@@ -402,6 +470,15 @@ func (x *Config_PropagationMethod) GetIstioHeaders() *Config_IstioHeaders {
 	return nil
 }
 
+func (x *Config_PropagationMethod) GetBaggage() *Config_Baggage {
+	if x != nil {
+		if x, ok := x.MethodSpecifier.(*Config_PropagationMethod_Baggage); ok {
+			return x.Baggage
+		}
+	}
+	return nil
+}
+
 type isConfig_PropagationMethod_MethodSpecifier interface {
 	isConfig_PropagationMethod_MethodSpecifier()
 }
@@ -410,13 +487,20 @@ type Config_PropagationMethod_IstioHeaders struct {
 	IstioHeaders *Config_IstioHeaders `protobuf:"bytes,1,opt,name=istio_headers,json=istioHeaders,proto3,oneof"`
 }
 
+type Config_PropagationMethod_Baggage struct {
+	Baggage *Config_Baggage `protobuf:"bytes,2,opt,name=baggage,proto3,oneof"`
+}
+
 func (*Config_PropagationMethod_IstioHeaders) isConfig_PropagationMethod_MethodSpecifier() {}
+
+func (*Config_PropagationMethod_Baggage) isConfig_PropagationMethod_MethodSpecifier() {}
 
 var File_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto protoreflect.FileDescriptor
 
 const file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDesc = "" +
 	"\n" +
-	"Jcontrib/envoy/extensions/filters/http/peer_metadata/v3/peer_metadata.proto\x12\x1bio.istio.http.peer_metadata\x1a\x1dudpa/annotations/status.proto\"\xa6\b\n" +
+	"Jcontrib/envoy/extensions/filters/http/peer_metadata/v3/peer_metadata.proto\x12\x1bio.istio.http.peer_metadata\x1a\x1dudpa/annotations/status.proto\"\xa1\n" +
+	"\n" +
 	"\x06Config\x12f\n" +
 	"\x14downstream_discovery\x18\x01 \x03(\v23.io.istio.http.peer_metadata.Config.DiscoveryMethodR\x13downstreamDiscovery\x12b\n" +
 	"\x12upstream_discovery\x18\x02 \x03(\v23.io.istio.http.peer_metadata.Config.DiscoveryMethodR\x11upstreamDiscovery\x12l\n" +
@@ -427,14 +511,18 @@ const file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_
 	"\aBaggage\x1a\x13\n" +
 	"\x11WorkloadDiscovery\x1aD\n" +
 	"\fIstioHeaders\x124\n" +
-	"\x16skip_external_clusters\x18\x01 \x01(\bR\x14skipExternalClusters\x1a\xaf\x02\n" +
+	"\x16skip_external_clusters\x18\x01 \x01(\bR\x14skipExternalClusters\x1aA\n" +
+	"\x13UpstreamFilterState\x12*\n" +
+	"\x11peer_metadata_key\x18\x01 \x01(\tR\x0fpeerMetadataKey\x1a\x9e\x03\n" +
 	"\x0fDiscoveryMethod\x12G\n" +
 	"\abaggage\x18\x01 \x01(\v2+.io.istio.http.peer_metadata.Config.BaggageH\x00R\abaggage\x12f\n" +
 	"\x12workload_discovery\x18\x02 \x01(\v25.io.istio.http.peer_metadata.Config.WorkloadDiscoveryH\x00R\x11workloadDiscovery\x12W\n" +
-	"\ristio_headers\x18\x03 \x01(\v20.io.istio.http.peer_metadata.Config.IstioHeadersH\x00R\fistioHeadersB\x12\n" +
-	"\x10method_specifier\x1a\x80\x01\n" +
+	"\ristio_headers\x18\x03 \x01(\v20.io.istio.http.peer_metadata.Config.IstioHeadersH\x00R\fistioHeaders\x12m\n" +
+	"\x15upstream_filter_state\x18\x04 \x01(\v27.io.istio.http.peer_metadata.Config.UpstreamFilterStateH\x00R\x13upstreamFilterStateB\x12\n" +
+	"\x10method_specifier\x1a\xc9\x01\n" +
 	"\x11PropagationMethod\x12W\n" +
-	"\ristio_headers\x18\x01 \x01(\v20.io.istio.http.peer_metadata.Config.IstioHeadersH\x00R\fistioHeadersB\x12\n" +
+	"\ristio_headers\x18\x01 \x01(\v20.io.istio.http.peer_metadata.Config.IstioHeadersH\x00R\fistioHeaders\x12G\n" +
+	"\abaggage\x18\x02 \x01(\v2+.io.istio.http.peer_metadata.Config.BaggageH\x00R\abaggageB\x12\n" +
 	"\x10method_specifierB\x94\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	")io.envoyproxy.io.istio.http.peer_metadataB\x11PeerMetadataProtoP\x01ZJgithub.com/envoyproxy/go-control-plane/contrib/io/istio/http/peer_metadatab\x06proto3"
 
@@ -450,29 +538,32 @@ func file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_p
 	return file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDescData
 }
 
-var file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_goTypes = []any{
-	(*Config)(nil),                   // 0: io.istio.http.peer_metadata.Config
-	(*Config_Baggage)(nil),           // 1: io.istio.http.peer_metadata.Config.Baggage
-	(*Config_WorkloadDiscovery)(nil), // 2: io.istio.http.peer_metadata.Config.WorkloadDiscovery
-	(*Config_IstioHeaders)(nil),      // 3: io.istio.http.peer_metadata.Config.IstioHeaders
-	(*Config_DiscoveryMethod)(nil),   // 4: io.istio.http.peer_metadata.Config.DiscoveryMethod
-	(*Config_PropagationMethod)(nil), // 5: io.istio.http.peer_metadata.Config.PropagationMethod
+	(*Config)(nil),                     // 0: io.istio.http.peer_metadata.Config
+	(*Config_Baggage)(nil),             // 1: io.istio.http.peer_metadata.Config.Baggage
+	(*Config_WorkloadDiscovery)(nil),   // 2: io.istio.http.peer_metadata.Config.WorkloadDiscovery
+	(*Config_IstioHeaders)(nil),        // 3: io.istio.http.peer_metadata.Config.IstioHeaders
+	(*Config_UpstreamFilterState)(nil), // 4: io.istio.http.peer_metadata.Config.UpstreamFilterState
+	(*Config_DiscoveryMethod)(nil),     // 5: io.istio.http.peer_metadata.Config.DiscoveryMethod
+	(*Config_PropagationMethod)(nil),   // 6: io.istio.http.peer_metadata.Config.PropagationMethod
 }
 var file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_depIdxs = []int32{
-	4, // 0: io.istio.http.peer_metadata.Config.downstream_discovery:type_name -> io.istio.http.peer_metadata.Config.DiscoveryMethod
-	4, // 1: io.istio.http.peer_metadata.Config.upstream_discovery:type_name -> io.istio.http.peer_metadata.Config.DiscoveryMethod
-	5, // 2: io.istio.http.peer_metadata.Config.downstream_propagation:type_name -> io.istio.http.peer_metadata.Config.PropagationMethod
-	5, // 3: io.istio.http.peer_metadata.Config.upstream_propagation:type_name -> io.istio.http.peer_metadata.Config.PropagationMethod
-	1, // 4: io.istio.http.peer_metadata.Config.DiscoveryMethod.baggage:type_name -> io.istio.http.peer_metadata.Config.Baggage
-	2, // 5: io.istio.http.peer_metadata.Config.DiscoveryMethod.workload_discovery:type_name -> io.istio.http.peer_metadata.Config.WorkloadDiscovery
-	3, // 6: io.istio.http.peer_metadata.Config.DiscoveryMethod.istio_headers:type_name -> io.istio.http.peer_metadata.Config.IstioHeaders
-	3, // 7: io.istio.http.peer_metadata.Config.PropagationMethod.istio_headers:type_name -> io.istio.http.peer_metadata.Config.IstioHeaders
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	5,  // 0: io.istio.http.peer_metadata.Config.downstream_discovery:type_name -> io.istio.http.peer_metadata.Config.DiscoveryMethod
+	5,  // 1: io.istio.http.peer_metadata.Config.upstream_discovery:type_name -> io.istio.http.peer_metadata.Config.DiscoveryMethod
+	6,  // 2: io.istio.http.peer_metadata.Config.downstream_propagation:type_name -> io.istio.http.peer_metadata.Config.PropagationMethod
+	6,  // 3: io.istio.http.peer_metadata.Config.upstream_propagation:type_name -> io.istio.http.peer_metadata.Config.PropagationMethod
+	1,  // 4: io.istio.http.peer_metadata.Config.DiscoveryMethod.baggage:type_name -> io.istio.http.peer_metadata.Config.Baggage
+	2,  // 5: io.istio.http.peer_metadata.Config.DiscoveryMethod.workload_discovery:type_name -> io.istio.http.peer_metadata.Config.WorkloadDiscovery
+	3,  // 6: io.istio.http.peer_metadata.Config.DiscoveryMethod.istio_headers:type_name -> io.istio.http.peer_metadata.Config.IstioHeaders
+	4,  // 7: io.istio.http.peer_metadata.Config.DiscoveryMethod.upstream_filter_state:type_name -> io.istio.http.peer_metadata.Config.UpstreamFilterState
+	3,  // 8: io.istio.http.peer_metadata.Config.PropagationMethod.istio_headers:type_name -> io.istio.http.peer_metadata.Config.IstioHeaders
+	1,  // 9: io.istio.http.peer_metadata.Config.PropagationMethod.baggage:type_name -> io.istio.http.peer_metadata.Config.Baggage
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_init() }
@@ -480,13 +571,15 @@ func file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_p
 	if File_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto != nil {
 		return
 	}
-	file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[4].OneofWrappers = []any{
+	file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[5].OneofWrappers = []any{
 		(*Config_DiscoveryMethod_Baggage)(nil),
 		(*Config_DiscoveryMethod_WorkloadDiscovery)(nil),
 		(*Config_DiscoveryMethod_IstioHeaders)(nil),
+		(*Config_DiscoveryMethod_UpstreamFilterState)(nil),
 	}
-	file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[5].OneofWrappers = []any{
+	file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_msgTypes[6].OneofWrappers = []any{
 		(*Config_PropagationMethod_IstioHeaders)(nil),
+		(*Config_PropagationMethod_Baggage)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -494,7 +587,7 @@ func file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_p
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDesc), len(file_contrib_envoy_extensions_filters_http_peer_metadata_v3_peer_metadata_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
