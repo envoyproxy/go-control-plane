@@ -412,6 +412,32 @@ func (m *OAuth2Config) MarshalToSizedBufferVTStrict(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.AllowFailedMatcher) > 0 {
+		for iNdEx := len(m.AllowFailedMatcher) - 1; iNdEx >= 0; iNdEx-- {
+			if vtmsg, ok := interface{}(m.AllowFailedMatcher[iNdEx]).(interface {
+				MarshalToSizedBufferVTStrict([]byte) (int, error)
+			}); ok {
+				size, err := vtmsg.MarshalToSizedBufferVTStrict(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+			} else {
+				encoded, err := proto.Marshal(m.AllowFailedMatcher[iNdEx])
+				if err != nil {
+					return 0, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = protohelpers.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			}
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0xda
+		}
+	}
 	if m.DisableTokenEncryption {
 		i--
 		if m.DisableTokenEncryption {
@@ -1094,6 +1120,18 @@ func (m *OAuth2Config) SizeVT() (n int) {
 	}
 	if m.DisableTokenEncryption {
 		n += 3
+	}
+	if len(m.AllowFailedMatcher) > 0 {
+		for _, e := range m.AllowFailedMatcher {
+			if size, ok := interface{}(e).(interface {
+				SizeVT() int
+			}); ok {
+				l = size.SizeVT()
+			} else {
+				l = proto.Size(e)
+			}
+			n += 2 + l + protohelpers.SizeOfVarint(uint64(l))
+		}
 	}
 	n += len(m.unknownFields)
 	return n

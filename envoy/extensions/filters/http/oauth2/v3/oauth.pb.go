@@ -431,7 +431,7 @@ func (*OAuth2Credentials_HmacSecret) isOAuth2Credentials_TokenFormation() {}
 
 // OAuth config
 //
-// [#next-free-field: 27]
+// [#next-free-field: 28]
 type OAuth2Config struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Endpoint on the authorization server to retrieve the access token from.
@@ -530,8 +530,19 @@ type OAuth2Config struct {
 	// This option should only be used in secure environments where token encryption is not required.
 	// Default is false (tokens are encrypted).
 	DisableTokenEncryption bool `protobuf:"varint,26,opt,name=disable_token_encryption,json=disableTokenEncryption,proto3" json:"disable_token_encryption,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// Any request that matches any of the provided matchers will be allowed to continue to upstream
+	// even if OAuth validation fails (missing, invalid, or expired credentials).
+	// This is useful for services that can handle both authenticated and unauthenticated requests,
+	// enabling graceful degradation patterns.
+	//
+	// When triggered, all OAuth cookies are stripped from the request and the request proceeds as unauthenticated.
+	// Context headers “x-envoy-oauth-status: failed“ and “x-envoy-oauth-failure-reason“ are added to inform upstream.
+	//
+	// Note: If a request matches pass_through_matcher, it bypasses OAuth validation and this matcher won't be evaluated.
+	// This matcher takes precedence over deny_redirect_matcher.
+	AllowFailedMatcher []*v33.HeaderMatcher `protobuf:"bytes,27,rep,name=allow_failed_matcher,json=allowFailedMatcher,proto3" json:"allow_failed_matcher,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *OAuth2Config) Reset() {
@@ -746,6 +757,13 @@ func (x *OAuth2Config) GetDisableTokenEncryption() bool {
 	return false
 }
 
+func (x *OAuth2Config) GetAllowFailedMatcher() []*v33.HeaderMatcher {
+	if x != nil {
+		return x.AllowFailedMatcher
+	}
+	return nil
+}
+
 // Filter config.
 type OAuth2 struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -936,7 +954,7 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\voauth_nonce\x18\x06 \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\n" +
 	"oauthNonce\x120\n" +
 	"\rcode_verifier\x18\a \x01(\tB\v\xfaB\br\x06\xd0\x01\x01\xc0\x01\x01R\fcodeVerifierB\x16\n" +
-	"\x0ftoken_formation\x12\x03\xf8B\x01\"\x8f\x0f\n" +
+	"\x0ftoken_formation\x12\x03\xf8B\x01\"\xe7\x0f\n" +
 	"\fOAuth2Config\x12D\n" +
 	"\x0etoken_endpoint\x18\x01 \x01(\v2\x1d.envoy.config.core.v3.HttpUriR\rtokenEndpoint\x12D\n" +
 	"\fretry_policy\x18\x12 \x01(\v2!.envoy.config.core.v3.RetryPolicyR\vretryPolicy\x12>\n" +
@@ -966,7 +984,8 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"statPrefix\x12L\n" +
 	"\x15csrf_token_expires_in\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x12csrfTokenExpiresIn\x12]\n" +
 	"\x1ecode_verifier_token_expires_in\x18\x19 \x01(\v2\x19.google.protobuf.DurationR\x1acodeVerifierTokenExpiresIn\x128\n" +
-	"\x18disable_token_encryption\x18\x1a \x01(\bR\x16disableTokenEncryption\"E\n" +
+	"\x18disable_token_encryption\x18\x1a \x01(\bR\x16disableTokenEncryption\x12V\n" +
+	"\x14allow_failed_matcher\x18\x1b \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\x12allowFailedMatcher\"E\n" +
 	"\bAuthType\x12\x14\n" +
 	"\x10URL_ENCODED_BODY\x10\x00\x12\x0e\n" +
 	"\n" +
@@ -1034,12 +1053,13 @@ var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_depIdxs = []int32{
 	3,  // 22: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.cookie_configs:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfigs
 	14, // 23: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.csrf_token_expires_in:type_name -> google.protobuf.Duration
 	14, // 24: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.code_verifier_token_expires_in:type_name -> google.protobuf.Duration
-	5,  // 25: envoy.extensions.filters.http.oauth2.v3.OAuth2.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
-	26, // [26:26] is the sub-list for method output_type
-	26, // [26:26] is the sub-list for method input_type
-	26, // [26:26] is the sub-list for extension type_name
-	26, // [26:26] is the sub-list for extension extendee
-	0,  // [0:26] is the sub-list for field type_name
+	12, // 25: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.allow_failed_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
+	5,  // 26: envoy.extensions.filters.http.oauth2.v3.OAuth2.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
+	27, // [27:27] is the sub-list for method output_type
+	27, // [27:27] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_init() }
