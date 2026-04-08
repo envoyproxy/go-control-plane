@@ -12,6 +12,7 @@ import (
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -152,6 +153,8 @@ func (x *McpJsonRestBridge) GetToolConfig() *ServerToolConfig {
 // Configuration for the server metadata.
 type ServerInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// [#not-implemented-hide:]
+	// [#comment:TODO(guoyilin42): Implement supported_protocol_versions]
 	// Lists the MCP protocol versions supported by this MCP endpoint.
 	//
 	//   - If provided: The extension enforces version negotiation according to the MCP specification:
@@ -161,10 +164,20 @@ type ServerInfo struct {
 	//
 	// Example values: ["2025-11-25", "2025-06-18"]
 	SupportedProtocolVersions []string `protobuf:"bytes,1,rep,name=supported_protocol_versions,json=supportedProtocolVersions,proto3" json:"supported_protocol_versions,omitempty"`
+	// [#not-implemented-hide:]
+	// [#comment:TODO(guoyilin42): Implement description]
 	// Optional description of the server.
-	Description   string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	// The fallback protocol version to use if the client does not provide the “mcp-protocol-version“ header.
+	//
+	//   - If provided: The extension uses this version as the fallback protocol version.
+	//   - If not provided: The extension uses the fallback protocol version defined in the latest MCP
+	//     specification. For example, the current latest 2025-11-25 specification designates "2025-03-26"
+	//     as the fallback protocol version.
+	//     See https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#protocol-version-header
+	FallbackProtocolVersion *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=fallback_protocol_version,json=fallbackProtocolVersion,proto3" json:"fallback_protocol_version,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *ServerInfo) Reset() {
@@ -211,11 +224,20 @@ func (x *ServerInfo) GetDescription() string {
 	return ""
 }
 
+func (x *ServerInfo) GetFallbackProtocolVersion() *wrapperspb.StringValue {
+	if x != nil {
+		return x.FallbackProtocolVersion
+	}
+	return nil
+}
+
 // Configuration for the MCP tool capability of the server.
 type ServerToolConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// List of MCP tools configurations.
 	Tools []*ToolConfig `protobuf:"bytes,1,rep,name=tools,proto3" json:"tools,omitempty"`
+	// [#not-implemented-hide:]
+	// [#comment:TODO(guoyilin42): Implement list_changed]
 	// Whether this server supports notifications for changes to the tool list.
 	ListChanged bool `protobuf:"varint,2,opt,name=list_changed,json=listChanged,proto3" json:"list_changed,omitempty"`
 	// Optional configuration to transcode the tools/list requests to a standard HTTP request.
@@ -463,16 +485,17 @@ var File_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bri
 
 const file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_rawDesc = "" +
 	"\n" +
-	"Penvoy/extensions/filters/http/mcp_json_rest_bridge/v3/mcp_json_rest_bridge.proto\x125envoy.extensions.filters.http.mcp_json_rest_bridge.v3\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xe1\x01\n" +
+	"Penvoy/extensions/filters/http/mcp_json_rest_bridge/v3/mcp_json_rest_bridge.proto\x125envoy.extensions.filters.http.mcp_json_rest_bridge.v3\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1fxds/annotations/v3/status.proto\x1a\x1dudpa/annotations/status.proto\x1a\x17validate/validate.proto\"\xe1\x01\n" +
 	"\x11McpJsonRestBridge\x12b\n" +
 	"\vserver_info\x18\x01 \x01(\v2A.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfoR\n" +
 	"serverInfo\x12h\n" +
 	"\vtool_config\x18\x02 \x01(\v2G.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfigR\n" +
-	"toolConfig\"n\n" +
+	"toolConfig\"\xc8\x01\n" +
 	"\n" +
 	"ServerInfo\x12>\n" +
 	"\x1bsupported_protocol_versions\x18\x01 \x03(\tR\x19supportedProtocolVersions\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\"\xfe\x01\n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12X\n" +
+	"\x19fallback_protocol_version\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x17fallbackProtocolVersion\"\xfe\x01\n" +
 	"\x10ServerToolConfig\x12W\n" +
 	"\x05tools\x18\x01 \x03(\v2A.envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfigR\x05tools\x12!\n" +
 	"\flist_changed\x18\x02 \x01(\bR\vlistChanged\x12n\n" +
@@ -504,23 +527,25 @@ func file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_br
 
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_goTypes = []any{
-	(*McpJsonRestBridge)(nil), // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge
-	(*ServerInfo)(nil),        // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
-	(*ServerToolConfig)(nil),  // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	(*ToolConfig)(nil),        // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	(*HttpRule)(nil),          // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	(*McpJsonRestBridge)(nil),      // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge
+	(*ServerInfo)(nil),             // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
+	(*ServerToolConfig)(nil),       // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
+	(*ToolConfig)(nil),             // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	(*HttpRule)(nil),               // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	(*wrapperspb.StringValue)(nil), // 5: google.protobuf.StringValue
 }
 var file_envoy_extensions_filters_http_mcp_json_rest_bridge_v3_mcp_json_rest_bridge_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.server_info:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo
 	2, // 1: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.McpJsonRestBridge.tool_config:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig
-	3, // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
-	4, // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	4, // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	5, // 2: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerInfo.fallback_protocol_version:type_name -> google.protobuf.StringValue
+	3, // 3: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tools:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig
+	4, // 4: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ServerToolConfig.tool_list_http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	4, // 5: envoy.extensions.filters.http.mcp_json_rest_bridge.v3.ToolConfig.http_rule:type_name -> envoy.extensions.filters.http.mcp_json_rest_bridge.v3.HttpRule
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() {
