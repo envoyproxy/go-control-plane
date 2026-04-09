@@ -764,10 +764,60 @@ func (x *OAuth2Config) GetAllowFailedMatcher() []*v33.HeaderMatcher {
 	return nil
 }
 
+// Per-route OAuth2 config.
+//
+// This message supplies an OAuth2Config for the matched route.
+// It overrides the filter-level config for requests matching the route.
+// If neither the global config nor a per-route config is specified, OAuth2 is disabled for the route.
+type OAuth2PerRoute struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Full OAuth2 config for this route.
+	Config        *OAuth2Config `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2PerRoute) Reset() {
+	*x = OAuth2PerRoute{}
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2PerRoute) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2PerRoute) ProtoMessage() {}
+
+func (x *OAuth2PerRoute) ProtoReflect() protoreflect.Message {
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2PerRoute.ProtoReflect.Descriptor instead.
+func (*OAuth2PerRoute) Descriptor() ([]byte, []int) {
+	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *OAuth2PerRoute) GetConfig() *OAuth2Config {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
 // Filter config.
 type OAuth2 struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Leave this empty to disable OAuth2 for a specific route, using per filter config.
+	// The OAuth2 filter config.
 	Config        *OAuth2Config `protobuf:"bytes,1,opt,name=config,proto3" json:"config,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -775,7 +825,7 @@ type OAuth2 struct {
 
 func (x *OAuth2) Reset() {
 	*x = OAuth2{}
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -787,7 +837,7 @@ func (x *OAuth2) String() string {
 func (*OAuth2) ProtoMessage() {}
 
 func (x *OAuth2) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[4]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -800,7 +850,7 @@ func (x *OAuth2) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OAuth2.ProtoReflect.Descriptor instead.
 func (*OAuth2) Descriptor() ([]byte, []int) {
-	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{4}
+	return file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *OAuth2) GetConfig() *OAuth2Config {
@@ -837,7 +887,7 @@ type OAuth2Credentials_CookieNames struct {
 
 func (x *OAuth2Credentials_CookieNames) Reset() {
 	*x = OAuth2Credentials_CookieNames{}
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -849,7 +899,7 @@ func (x *OAuth2Credentials_CookieNames) String() string {
 func (*OAuth2Credentials_CookieNames) ProtoMessage() {}
 
 func (x *OAuth2Credentials_CookieNames) ProtoReflect() protoreflect.Message {
-	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[5]
+	mi := &file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -990,7 +1040,9 @@ const file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc = "" +
 	"\x10URL_ENCODED_BODY\x10\x00\x12\x0e\n" +
 	"\n" +
 	"BASIC_AUTH\x10\x01\x12\x13\n" +
-	"\x0fTLS_CLIENT_AUTH\x10\x02\"W\n" +
+	"\x0fTLS_CLIENT_AUTH\x10\x02\"i\n" +
+	"\x0eOAuth2PerRoute\x12W\n" +
+	"\x06config\x18\x01 \x01(\v25.envoy.extensions.filters.http.oauth2.v3.OAuth2ConfigB\b\xfaB\x05\x8a\x01\x02\x10\x01R\x06config\"W\n" +
 	"\x06OAuth2\x12M\n" +
 	"\x06config\x18\x01 \x01(\v25.envoy.extensions.filters.http.oauth2.v3.OAuth2ConfigR\x06configB\xa6\x01\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"5io.envoyproxy.envoy.extensions.filters.http.oauth2.v3B\n" +
@@ -1009,7 +1061,7 @@ func file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDescGZIP() []by
 }
 
 var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_goTypes = []any{
 	(CookieConfig_SameSite)(0),            // 0: envoy.extensions.filters.http.oauth2.v3.CookieConfig.SameSite
 	(OAuth2Config_AuthType)(0),            // 1: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.AuthType
@@ -1017,15 +1069,16 @@ var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_goTypes = []any{
 	(*CookieConfigs)(nil),                 // 3: envoy.extensions.filters.http.oauth2.v3.CookieConfigs
 	(*OAuth2Credentials)(nil),             // 4: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials
 	(*OAuth2Config)(nil),                  // 5: envoy.extensions.filters.http.oauth2.v3.OAuth2Config
-	(*OAuth2)(nil),                        // 6: envoy.extensions.filters.http.oauth2.v3.OAuth2
-	(*OAuth2Credentials_CookieNames)(nil), // 7: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
-	(*v3.SdsSecretConfig)(nil),            // 8: envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	(*v31.HttpUri)(nil),                   // 9: envoy.config.core.v3.HttpUri
-	(*v31.RetryPolicy)(nil),               // 10: envoy.config.core.v3.RetryPolicy
-	(*v32.PathMatcher)(nil),               // 11: envoy.type.matcher.v3.PathMatcher
-	(*v33.HeaderMatcher)(nil),             // 12: envoy.config.route.v3.HeaderMatcher
-	(*wrapperspb.BoolValue)(nil),          // 13: google.protobuf.BoolValue
-	(*durationpb.Duration)(nil),           // 14: google.protobuf.Duration
+	(*OAuth2PerRoute)(nil),                // 6: envoy.extensions.filters.http.oauth2.v3.OAuth2PerRoute
+	(*OAuth2)(nil),                        // 7: envoy.extensions.filters.http.oauth2.v3.OAuth2
+	(*OAuth2Credentials_CookieNames)(nil), // 8: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
+	(*v3.SdsSecretConfig)(nil),            // 9: envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	(*v31.HttpUri)(nil),                   // 10: envoy.config.core.v3.HttpUri
+	(*v31.RetryPolicy)(nil),               // 11: envoy.config.core.v3.RetryPolicy
+	(*v32.PathMatcher)(nil),               // 12: envoy.type.matcher.v3.PathMatcher
+	(*v33.HeaderMatcher)(nil),             // 13: envoy.config.route.v3.HeaderMatcher
+	(*wrapperspb.BoolValue)(nil),          // 14: google.protobuf.BoolValue
+	(*durationpb.Duration)(nil),           // 15: google.protobuf.Duration
 }
 var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_depIdxs = []int32{
 	0,  // 0: envoy.extensions.filters.http.oauth2.v3.CookieConfig.same_site:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig.SameSite
@@ -1036,30 +1089,31 @@ var file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_depIdxs = []int32{
 	2,  // 5: envoy.extensions.filters.http.oauth2.v3.CookieConfigs.refresh_token_cookie_config:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig
 	2,  // 6: envoy.extensions.filters.http.oauth2.v3.CookieConfigs.oauth_nonce_cookie_config:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig
 	2,  // 7: envoy.extensions.filters.http.oauth2.v3.CookieConfigs.code_verifier_cookie_config:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfig
-	8,  // 8: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.token_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	8,  // 9: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.hmac_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
-	7,  // 10: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.cookie_names:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
-	9,  // 11: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.token_endpoint:type_name -> envoy.config.core.v3.HttpUri
-	10, // 12: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
+	9,  // 8: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.token_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	9,  // 9: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.hmac_secret:type_name -> envoy.extensions.transport_sockets.tls.v3.SdsSecretConfig
+	8,  // 10: envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.cookie_names:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials.CookieNames
+	10, // 11: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.token_endpoint:type_name -> envoy.config.core.v3.HttpUri
+	11, // 12: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.retry_policy:type_name -> envoy.config.core.v3.RetryPolicy
 	4,  // 13: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.credentials:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Credentials
-	11, // 14: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.redirect_path_matcher:type_name -> envoy.type.matcher.v3.PathMatcher
-	11, // 15: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.signout_path:type_name -> envoy.type.matcher.v3.PathMatcher
-	12, // 16: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.pass_through_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
+	12, // 14: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.redirect_path_matcher:type_name -> envoy.type.matcher.v3.PathMatcher
+	12, // 15: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.signout_path:type_name -> envoy.type.matcher.v3.PathMatcher
+	13, // 16: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.pass_through_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
 	1,  // 17: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.auth_type:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config.AuthType
-	13, // 18: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.use_refresh_token:type_name -> google.protobuf.BoolValue
-	14, // 19: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_expires_in:type_name -> google.protobuf.Duration
-	12, // 20: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.deny_redirect_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
-	14, // 21: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_refresh_token_expires_in:type_name -> google.protobuf.Duration
+	14, // 18: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.use_refresh_token:type_name -> google.protobuf.BoolValue
+	15, // 19: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_expires_in:type_name -> google.protobuf.Duration
+	13, // 20: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.deny_redirect_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
+	15, // 21: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.default_refresh_token_expires_in:type_name -> google.protobuf.Duration
 	3,  // 22: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.cookie_configs:type_name -> envoy.extensions.filters.http.oauth2.v3.CookieConfigs
-	14, // 23: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.csrf_token_expires_in:type_name -> google.protobuf.Duration
-	14, // 24: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.code_verifier_token_expires_in:type_name -> google.protobuf.Duration
-	12, // 25: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.allow_failed_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
-	5,  // 26: envoy.extensions.filters.http.oauth2.v3.OAuth2.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
-	27, // [27:27] is the sub-list for method output_type
-	27, // [27:27] is the sub-list for method input_type
-	27, // [27:27] is the sub-list for extension type_name
-	27, // [27:27] is the sub-list for extension extendee
-	0,  // [0:27] is the sub-list for field type_name
+	15, // 23: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.csrf_token_expires_in:type_name -> google.protobuf.Duration
+	15, // 24: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.code_verifier_token_expires_in:type_name -> google.protobuf.Duration
+	13, // 25: envoy.extensions.filters.http.oauth2.v3.OAuth2Config.allow_failed_matcher:type_name -> envoy.config.route.v3.HeaderMatcher
+	5,  // 26: envoy.extensions.filters.http.oauth2.v3.OAuth2PerRoute.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
+	5,  // 27: envoy.extensions.filters.http.oauth2.v3.OAuth2.config:type_name -> envoy.extensions.filters.http.oauth2.v3.OAuth2Config
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_init() }
@@ -1076,7 +1130,7 @@ func file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc), len(file_envoy_extensions_filters_http_oauth2_v3_oauth_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
