@@ -5669,6 +5669,16 @@ func (m *RateLimit_HitsAddend) MarshalToSizedBufferVTStrict(dAtA []byte) (int, e
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.IsNegativeHits {
+		i--
+		if m.IsNegativeHits {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x18
+	}
 	if len(m.Format) > 0 {
 		i -= len(m.Format)
 		copy(dAtA[i:], m.Format)
@@ -8797,6 +8807,9 @@ func (m *RateLimit_HitsAddend) SizeVT() (n int) {
 	l = len(m.Format)
 	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.IsNegativeHits {
+		n += 2
 	}
 	n += len(m.unknownFields)
 	return n

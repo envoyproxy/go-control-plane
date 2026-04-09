@@ -132,6 +132,13 @@ func (m *DynamicModuleFilterPerRoute) MarshalToSizedBufferVTStrict(dAtA []byte) 
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if len(m.FilterName) > 0 {
+		i -= len(m.FilterName)
+		copy(dAtA[i:], m.FilterName)
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(len(m.FilterName)))
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.FilterConfig != nil {
 		size, err := (*anypb.Any)(m.FilterConfig).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -227,6 +234,10 @@ func (m *DynamicModuleFilterPerRoute) SizeVT() (n int) {
 	}
 	if m.FilterConfig != nil {
 		l = (*anypb.Any)(m.FilterConfig).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	l = len(m.FilterName)
+	if l > 0 {
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)

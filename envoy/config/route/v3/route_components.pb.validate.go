@@ -11322,6 +11322,8 @@ func (m *RateLimit_HitsAddend) validate(all bool) error {
 
 	}
 
+	// no validation rules for IsNegativeHits
+
 	if len(errors) > 0 {
 		return RateLimit_HitsAddendMultiError(errors)
 	}

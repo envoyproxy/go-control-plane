@@ -6397,9 +6397,13 @@ type RateLimit_HitsAddend struct {
 	// received in the request.
 	//
 	// One of the “number“ or “format“ fields should be set but not both.
-	Format        string `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Format string `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
+	// If true, the hits addend value will be treated as negative, effectively adding to
+	// the rate limit budget instead of consuming from it. This can be used to refill previously consumed
+	// rate limit tokens.
+	IsNegativeHits bool `protobuf:"varint,3,opt,name=is_negative_hits,json=isNegativeHits,proto3" json:"is_negative_hits,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RateLimit_HitsAddend) Reset() {
@@ -6444,6 +6448,13 @@ func (x *RateLimit_HitsAddend) GetFormat() string {
 		return x.Format
 	}
 	return ""
+}
+
+func (x *RateLimit_HitsAddend) GetIsNegativeHits() bool {
+	if x != nil {
+		return x.IsNegativeHits
+	}
+	return false
 }
 
 // The following descriptor entry is appended to the descriptor:
@@ -7847,7 +7858,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x0eVirtualCluster\x12>\n" +
 	"\aheaders\x18\x04 \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\aheaders\x12\x1b\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name:(\x9aň\x1e#\n" +
-	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\xd4%\n" +
+	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\xff%\n" +
 	"\tRateLimit\x12;\n" +
 	"\x05stage\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02\x18\n" +
 	"R\x05stage\x12\x1f\n" +
@@ -7939,11 +7950,12 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x10dynamic_metadata\x18\x01 \x01(\v29.envoy.config.route.v3.RateLimit.Override.DynamicMetadataH\x00R\x0fdynamicMetadata\x1ac\n" +
 	"\x0fDynamicMetadata\x12P\n" +
 	"\fmetadata_key\x18\x01 \x01(\v2#.envoy.type.metadata.v3.MetadataKeyB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vmetadataKeyB\x19\n" +
-	"\x12override_specifier\x12\x03\xf8B\x01\x1aw\n" +
+	"\x12override_specifier\x12\x03\xf8B\x01\x1a\xa1\x01\n" +
 	"\n" +
 	"HitsAddend\x12A\n" +
 	"\x06number\x18\x01 \x01(\v2\x1c.google.protobuf.UInt64ValueB\v\xfaB\b2\x06\x18\x80\x94\xeb\xdc\x03R\x06number\x12&\n" +
-	"\x06format\x18\x02 \x01(\tB\x0e\xfaB\vr\t:\x01%B\x01%\xd0\x01\x01R\x06format\"B\n" +
+	"\x06format\x18\x02 \x01(\tB\x0e\xfaB\vr\t:\x01%B\x01%\xd0\x01\x01R\x06format\x12(\n" +
+	"\x10is_negative_hits\x18\x03 \x01(\bR\x0eisNegativeHits\"B\n" +
 	"\x10XRateLimitOption\x12\x0f\n" +
 	"\vUNSPECIFIED\x10\x00\x12\a\n" +
 	"\x03OFF\x10\x01\x12\x14\n" +

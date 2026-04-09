@@ -187,9 +187,13 @@ type RateLimitDescriptor struct {
 	Limit *RateLimitDescriptor_RateLimitOverride `protobuf:"bytes,2,opt,name=limit,proto3" json:"limit,omitempty"`
 	// Optional hits_addend for the rate limit descriptor. If set the value will override the
 	// request level hits_addend.
-	HitsAddend    *wrapperspb.UInt64Value `protobuf:"bytes,3,opt,name=hits_addend,json=hitsAddend,proto3" json:"hits_addend,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	HitsAddend *wrapperspb.UInt64Value `protobuf:"bytes,3,opt,name=hits_addend,json=hitsAddend,proto3" json:"hits_addend,omitempty"`
+	// If true, the hits_addend value will be treated as negative, effectively adding to
+	// the rate limit budget instead of consuming from it. This can be used to refill previously consumed
+	// rate limit tokens.
+	IsNegativeHits bool `protobuf:"varint,4,opt,name=is_negative_hits,json=isNegativeHits,proto3" json:"is_negative_hits,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RateLimitDescriptor) Reset() {
@@ -241,6 +245,13 @@ func (x *RateLimitDescriptor) GetHitsAddend() *wrapperspb.UInt64Value {
 		return x.HitsAddend
 	}
 	return nil
+}
+
+func (x *RateLimitDescriptor) GetIsNegativeHits() bool {
+	if x != nil {
+		return x.IsNegativeHits
+	}
+	return false
 }
 
 // Configuration used to enable local rate limiting.
@@ -475,12 +486,13 @@ var File_envoy_extensions_common_ratelimit_v3_ratelimit_proto protoreflect.FileD
 
 const file_envoy_extensions_common_ratelimit_v3_ratelimit_proto_rawDesc = "" +
 	"\n" +
-	"4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x12$envoy.extensions.common.ratelimit.v3\x1a\"envoy/type/v3/ratelimit_unit.proto\x1a envoy/type/v3/token_bucket.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xc8\x04\n" +
+	"4envoy/extensions/common/ratelimit/v3/ratelimit.proto\x12$envoy.extensions.common.ratelimit.v3\x1a\"envoy/type/v3/ratelimit_unit.proto\x1a envoy/type/v3/token_bucket.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1dudpa/annotations/status.proto\x1a!udpa/annotations/versioning.proto\x1a\x17validate/validate.proto\"\xf2\x04\n" +
 	"\x13RateLimitDescriptor\x12c\n" +
 	"\aentries\x18\x01 \x03(\v2?.envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.EntryB\b\xfaB\x05\x92\x01\x02\b\x01R\aentries\x12a\n" +
 	"\x05limit\x18\x02 \x01(\v2K.envoy.extensions.common.ratelimit.v3.RateLimitDescriptor.RateLimitOverrideR\x05limit\x12=\n" +
 	"\vhits_addend\x18\x03 \x01(\v2\x1c.google.protobuf.UInt64ValueR\n" +
-	"hitsAddend\x1az\n" +
+	"hitsAddend\x12(\n" +
+	"\x10is_negative_hits\x18\x04 \x01(\bR\x0eisNegativeHits\x1az\n" +
 	"\x05Entry\x12\x19\n" +
 	"\x03key\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x03key\x12\x1d\n" +
 	"\x05value\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x00R\x05value:7\x9aň\x1e2\n" +
