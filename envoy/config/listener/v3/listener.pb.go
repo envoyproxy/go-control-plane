@@ -274,6 +274,12 @@ type Listener struct {
 	// to 0, connections will not be closed due to buffer high watermark usage.
 	PerConnectionBufferHighWatermarkTimeout *durationpb.Duration `protobuf:"bytes,38,opt,name=per_connection_buffer_high_watermark_timeout,json=perConnectionBufferHighWatermarkTimeout,proto3" json:"per_connection_buffer_high_watermark_timeout,omitempty"`
 	// Listener metadata.
+	//
+	// The following pre-defined metadata could be used by Envoy to manipulate the listener behavior:
+	//
+	//   - “envoy.stats_matcher“: this metadata could be used to customize the stats emitted by the
+	//     listener. See :ref:`well-known metadata <well_known_metadata_envoy_stats_matcher>` for more
+	//     details.
 	Metadata *v3.Metadata `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// [#not-implemented-hide:]
 	//
