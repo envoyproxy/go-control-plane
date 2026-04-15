@@ -367,6 +367,12 @@ const (
 	RateLimit_Action_MetaData_ROUTE_ENTRY RateLimit_Action_MetaData_Source = 1
 	// Query :ref:`cluster metadata <envoy_v3_api_field_config.cluster.v3.Cluster.metadata>`
 	RateLimit_Action_MetaData_CLUSTER_ENTRY RateLimit_Action_MetaData_Source = 2
+	// Query :ref:`cluster locality metadata <envoy_v3_api_field_config.endpoint.v3.LbEndpoint.metadata>`
+	// Cluster locality metadata is available after upstream host selection only. To populate descriptors
+	// with cluster locality metadata it needs to be have the
+	// :ref:`apply_on_stream_done field <envoy_v3_api_field_config.route.v3.RateLimit.apply_on_stream_done>`
+	// set to “true“ or host selection completed before the rate limit filter is executed.
+	RateLimit_Action_MetaData_CLUSTER_LOCALITY_ENTRY RateLimit_Action_MetaData_Source = 3
 )
 
 // Enum value maps for RateLimit_Action_MetaData_Source.
@@ -375,11 +381,13 @@ var (
 		0: "DYNAMIC",
 		1: "ROUTE_ENTRY",
 		2: "CLUSTER_ENTRY",
+		3: "CLUSTER_LOCALITY_ENTRY",
 	}
 	RateLimit_Action_MetaData_Source_value = map[string]int32{
-		"DYNAMIC":       0,
-		"ROUTE_ENTRY":   1,
-		"CLUSTER_ENTRY": 2,
+		"DYNAMIC":                0,
+		"ROUTE_ENTRY":            1,
+		"CLUSTER_ENTRY":          2,
+		"CLUSTER_LOCALITY_ENTRY": 3,
 	}
 )
 
@@ -7858,7 +7866,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x0eVirtualCluster\x12>\n" +
 	"\aheaders\x18\x04 \x03(\v2$.envoy.config.route.v3.HeaderMatcherR\aheaders\x12\x1b\n" +
 	"\x04name\x18\x02 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x04name:(\x9aň\x1e#\n" +
-	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\xff%\n" +
+	"!envoy.api.v2.route.VirtualClusterJ\x04\b\x01\x10\x02J\x04\b\x03\x10\x04R\apatternR\x06method\"\x9b&\n" +
 	"\tRateLimit\x12;\n" +
 	"\x05stage\x18\x01 \x01(\v2\x1c.google.protobuf.UInt32ValueB\a\xfaB\x04*\x02\x18\n" +
 	"R\x05stage\x12\x1f\n" +
@@ -7869,7 +7877,7 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\vhits_addend\x18\x05 \x01(\v2+.envoy.config.route.v3.RateLimit.HitsAddendR\n" +
 	"hitsAddend\x12/\n" +
 	"\x14apply_on_stream_done\x18\x06 \x01(\bR\x11applyOnStreamDone\x12_\n" +
-	"\x12x_ratelimit_option\x18\a \x01(\x0e21.envoy.config.route.v3.RateLimit.XRateLimitOptionR\x10xRatelimitOption\x1a\xa3\x1e\n" +
+	"\x12x_ratelimit_option\x18\a \x01(\x0e21.envoy.config.route.v3.RateLimit.XRateLimitOptionR\x10xRatelimitOption\x1a\xbf\x1e\n" +
 	"\x06Action\x12^\n" +
 	"\x0esource_cluster\x18\x01 \x01(\v25.envoy.config.route.v3.RateLimit.Action.SourceClusterH\x00R\rsourceCluster\x12m\n" +
 	"\x13destination_cluster\x18\x02 \x01(\v2:.envoy.config.route.v3.RateLimit.Action.DestinationClusterH\x00R\x12destinationCluster\x12a\n" +
@@ -7922,17 +7930,18 @@ const file_envoy_config_route_v3_route_components_proto_rawDesc = "" +
 	"\x0fDynamicMetaData\x12.\n" +
 	"\x0edescriptor_key\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\rdescriptorKey\x12P\n" +
 	"\fmetadata_key\x18\x02 \x01(\v2#.envoy.type.metadata.v3.MetadataKeyB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vmetadataKey\x12#\n" +
-	"\rdefault_value\x18\x03 \x01(\tR\fdefaultValue\x1a\xed\x02\n" +
+	"\rdefault_value\x18\x03 \x01(\tR\fdefaultValue\x1a\x89\x03\n" +
 	"\bMetaData\x12.\n" +
 	"\x0edescriptor_key\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\rdescriptorKey\x12P\n" +
 	"\fmetadata_key\x18\x02 \x01(\v2#.envoy.type.metadata.v3.MetadataKeyB\b\xfaB\x05\x8a\x01\x02\x10\x01R\vmetadataKey\x12#\n" +
 	"\rdefault_value\x18\x03 \x01(\tR\fdefaultValue\x12Y\n" +
 	"\x06source\x18\x04 \x01(\x0e27.envoy.config.route.v3.RateLimit.Action.MetaData.SourceB\b\xfaB\x05\x82\x01\x02\x10\x01R\x06source\x12$\n" +
-	"\x0eskip_if_absent\x18\x05 \x01(\bR\fskipIfAbsent\"9\n" +
+	"\x0eskip_if_absent\x18\x05 \x01(\bR\fskipIfAbsent\"U\n" +
 	"\x06Source\x12\v\n" +
 	"\aDYNAMIC\x10\x00\x12\x0f\n" +
 	"\vROUTE_ENTRY\x10\x01\x12\x11\n" +
-	"\rCLUSTER_ENTRY\x10\x02\x1a\xbc\x02\n" +
+	"\rCLUSTER_ENTRY\x10\x02\x12\x1a\n" +
+	"\x16CLUSTER_LOCALITY_ENTRY\x10\x03\x1a\xbc\x02\n" +
 	"\x18QueryParameterValueMatch\x122\n" +
 	"\x10descriptor_value\x18\x01 \x01(\tB\a\xfaB\x04r\x02\x10\x01R\x0fdescriptorValue\x12#\n" +
 	"\rdefault_value\x18\x05 \x01(\tR\fdefaultValue\x12%\n" +
