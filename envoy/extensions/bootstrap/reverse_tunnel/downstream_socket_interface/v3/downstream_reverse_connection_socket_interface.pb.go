@@ -8,6 +8,7 @@ package downstream_socket_interfacev3
 
 import (
 	_ "github.com/cncf/xds/go/udpa/annotations"
+	v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -96,9 +97,11 @@ type DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Request path used when issuing the HTTP reverse-connection handshake. Defaults to
 	// "/reverse_connections/request".
-	RequestPath   string `protobuf:"bytes,1,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	RequestPath string `protobuf:"bytes,1,opt,name=request_path,json=requestPath,proto3" json:"request_path,omitempty"`
+	// Additional headers to include in the HTTP handshake request.
+	AdditionalHeaders []*v3.HeaderValueOption `protobuf:"bytes,2,rep,name=additional_headers,json=additionalHeaders,proto3" json:"additional_headers,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) Reset() {
@@ -138,18 +141,26 @@ func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetRequ
 	return ""
 }
 
+func (x *DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig) GetAdditionalHeaders() []*v3.HeaderValueOption {
+	if x != nil {
+		return x.AdditionalHeaders
+	}
+	return nil
+}
+
 var File_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto protoreflect.FileDescriptor
 
 const file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_rawDesc = "" +
 	"\n" +
-	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a\x1dudpa/annotations/status.proto\"\xee\x02\n" +
+	"}envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3/downstream_reverse_connection_socket_interface.proto\x12Henvoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3\x1a\x1fenvoy/config/core/v3/base.proto\x1a\x1dudpa/annotations/status.proto\"\xc7\x03\n" +
 	"*DownstreamReverseConnectionSocketInterface\x12\x1f\n" +
 	"\vstat_prefix\x18\x01 \x01(\tR\n" +
 	"statPrefix\x122\n" +
 	"\x15enable_detailed_stats\x18\x02 \x01(\bR\x13enableDetailedStats\x12\xb0\x01\n" +
-	"\x0ehttp_handshake\x18\x03 \x01(\v2\x88\x01.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfigR\rhttpHandshake\x1a8\n" +
+	"\x0ehttp_handshake\x18\x03 \x01(\v2\x88\x01.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfigR\rhttpHandshake\x1a\x90\x01\n" +
 	"\x13HttpHandshakeConfig\x12!\n" +
-	"\frequest_path\x18\x01 \x01(\tR\vrequestPathB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
+	"\frequest_path\x18\x01 \x01(\tR\vrequestPath\x12V\n" +
+	"\x12additional_headers\x18\x02 \x03(\v2'.envoy.config.core.v3.HeaderValueOptionR\x11additionalHeadersB\xa3\x02\xba\x80\xc8\xd1\x06\x02\x10\x02\n" +
 	"Vio.envoyproxy.envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3B/DownstreamReverseConnectionSocketInterfaceProtoP\x01Z\x8d\x01github.com/envoyproxy/go-control-plane/envoy/extensions/bootstrap/reverse_tunnel/downstream_socket_interface/v3;downstream_socket_interfacev3b\x06proto3"
 
 var (
@@ -168,14 +179,16 @@ var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v
 var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_goTypes = []any{
 	(*DownstreamReverseConnectionSocketInterface)(nil),                     // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface
 	(*DownstreamReverseConnectionSocketInterface_HttpHandshakeConfig)(nil), // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
+	(*v3.HeaderValueOption)(nil),                                           // 2: envoy.config.core.v3.HeaderValueOption
 }
 var file_envoy_extensions_bootstrap_reverse_tunnel_downstream_socket_interface_v3_downstream_reverse_connection_socket_interface_proto_depIdxs = []int32{
 	1, // 0: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.http_handshake:type_name -> envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 1: envoy.extensions.bootstrap.reverse_tunnel.downstream_socket_interface.v3.DownstreamReverseConnectionSocketInterface.HttpHandshakeConfig.additional_headers:type_name -> envoy.config.core.v3.HeaderValueOption
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() {
