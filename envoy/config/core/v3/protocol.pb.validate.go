@@ -532,6 +532,36 @@ func (m *QuicProtocolOptions) validate(all bool) error {
 		}
 	}
 
+	if d := m.GetMemoryReductionTimeout(); d != nil {
+		dur, err := d.AsDuration(), d.CheckValid()
+		if err != nil {
+			err = QuicProtocolOptionsValidationError{
+				field:  "MemoryReductionTimeout",
+				reason: "value is not a valid duration",
+				cause:  err,
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		} else {
+
+			gte := time.Duration(1*time.Second + 0*time.Nanosecond)
+
+			if dur < gte {
+				err := QuicProtocolOptionsValidationError{
+					field:  "MemoryReductionTimeout",
+					reason: "value must be greater than or equal to 1s",
+				}
+				if !all {
+					return err
+				}
+				errors = append(errors, err)
+			}
+
+		}
+	}
+
 	if len(errors) > 0 {
 		return QuicProtocolOptionsMultiError(errors)
 	}
@@ -2073,6 +2103,35 @@ func (m *Http2ProtocolOptions) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetDisallowObsText()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Http2ProtocolOptionsValidationError{
+					field:  "DisallowObsText",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Http2ProtocolOptionsValidationError{
+					field:  "DisallowObsText",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDisallowObsText()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Http2ProtocolOptionsValidationError{
+				field:  "DisallowObsText",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return Http2ProtocolOptionsMultiError(errors)
 	}
@@ -2371,6 +2430,35 @@ func (m *Http3ProtocolOptions) validate(all bool) error {
 	// no validation rules for DisableQpack
 
 	// no validation rules for DisableConnectionFlowControlForStreams
+
+	if all {
+		switch v := interface{}(m.GetDisallowObsText()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, Http3ProtocolOptionsValidationError{
+					field:  "DisallowObsText",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, Http3ProtocolOptionsValidationError{
+					field:  "DisallowObsText",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetDisallowObsText()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return Http3ProtocolOptionsValidationError{
+				field:  "DisallowObsText",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return Http3ProtocolOptionsMultiError(errors)
