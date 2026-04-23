@@ -233,6 +233,16 @@ func (m *QuicProtocolOptions) MarshalToSizedBufferVTStrict(dAtA []byte) (int, er
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
+	if m.EnableScone != nil {
+		size, err := (*wrapperspb.BoolValue)(m.EnableScone).MarshalToSizedBufferVTStrict(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = protohelpers.EncodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0x6a
+	}
 	if m.MemoryReductionTimeout != nil {
 		size, err := (*durationpb.Duration)(m.MemoryReductionTimeout).MarshalToSizedBufferVTStrict(dAtA[:i])
 		if err != nil {
@@ -1619,6 +1629,10 @@ func (m *QuicProtocolOptions) SizeVT() (n int) {
 	}
 	if m.MemoryReductionTimeout != nil {
 		l = (*durationpb.Duration)(m.MemoryReductionTimeout).SizeVT()
+		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
+	}
+	if m.EnableScone != nil {
+		l = (*wrapperspb.BoolValue)(m.EnableScone).SizeVT()
 		n += 1 + l + protohelpers.SizeOfVarint(uint64(l))
 	}
 	n += len(m.unknownFields)
